@@ -67,10 +67,10 @@ constexpr size_t kMaxTCPConnectAttempts = 3;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
 
 chip::Transport::AppTCPConnectionCallbackCtxt gAppTCPConnCbCtxt;
-chip::Transport::ActiveTCPConnectionState * gActiveTCPConnState = nullptr;
+chip::Transport::ActiveTCPConnectionHandle gActiveTCPConnState;
 
-static void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
-static void HandleConnectionClosed(chip::Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+static void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr);
+static void HandleConnectionClosed(chip::Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr);
 
 // True, if client is still connecting to the server, false otherwise.
 static bool gClientConInProgress = false;
@@ -123,12 +123,12 @@ void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState)
         if (err != CHIP_NO_ERROR)
         {
             printf("Send request failed: %s\n", chip::ErrorStr(err));
-            chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
         }
     }
     else
     {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     }
 }
 
@@ -202,7 +202,7 @@ CHIP_ERROR EstablishSecureSession()
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         if (gUseTCP)
         {
-            printf("Associating secure session with connection %p\n", gActiveTCPConnState);
+            printf("Associating secure session with connection %p\n", static_cast<const void *>(gActiveTCPConnState));
             gSession.Get().Value()->AsSecureSession()->SetTCPConnection(gActiveTCPConnState);
         }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -219,7 +219,7 @@ void CloseConnection()
     char peerAddrBuf[chip::Transport::PeerAddress::kMaxToStringSize];
     chip::Transport::PeerAddress peerAddr = chip::Transport::PeerAddress::TCP(gDestAddr, CHIP_PORT);
 
-    gSessionManager.TCPDisconnect(peerAddr);
+    gActiveTCPConnState.Release();
 
     peerAddr.ToString(peerAddrBuf);
     printf("Connection closed to peer at %s\n", peerAddrBuf);
@@ -228,9 +228,9 @@ void CloseConnection()
     gClientConInProgress  = false;
 }
 
-void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionState * conn, CHIP_ERROR err)
+void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR err)
 {
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 
     if (err != CHIP_NO_ERROR || conn != gActiveTCPConnState)
     {
@@ -256,7 +256,7 @@ void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionState *
     gClientConInProgress  = false;
 }
 
-void HandleConnectionClosed(chip::Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+void HandleConnectionClosed(chip::Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr)
 {
     CloseConnection();
 }
@@ -275,7 +275,7 @@ void EstablishTCPConnection()
     chip::Transport::PeerAddress peerAddr = chip::Transport::PeerAddress::TCP(gDestAddr, CHIP_PORT);
 
     // Connect to the peer
-    err = gSessionManager.TCPConnect(peerAddr, &gAppTCPConnCbCtxt, &gActiveTCPConnState);
+    err = gSessionManager.TCPConnect(peerAddr, &gAppTCPConnCbCtxt, gActiveTCPConnState);
     if (err != CHIP_NO_ERROR)
     {
         printf("Connection FAILED with err: %s\n", chip::ErrorStr(err));
@@ -417,10 +417,7 @@ int main(int argc, char * argv[])
     gUDPManager.Close();
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    if (gUseTCP)
-    {
-        gTCPManager.TCPDisconnect(chip::Transport::PeerAddress::TCP(gDestAddr));
-    }
+    gActiveTCPConnState.Release();
     gTCPManager.Close();
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 

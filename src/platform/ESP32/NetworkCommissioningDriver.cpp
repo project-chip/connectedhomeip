@@ -117,7 +117,7 @@ CHIP_ERROR ESPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     // If the network configuration backup exists, it means that the device has been rebooted with
     // the fail-safe armed. Since ESP-WiFi persists all wifi credentials changes, the backup must
     // be restored on the boot. If there's no backup, the below function is a no-op.
-    RevertConfiguration();
+    TEMPORARY_RETURN_IGNORED RevertConfiguration();
 
     return CHIP_NO_ERROR;
 }
@@ -129,8 +129,8 @@ void ESPWiFiDriver::Shutdown()
 
 CHIP_ERROR ESPWiFiDriver::CommitConfiguration()
 {
-    PersistedStorage::KeyValueStoreMgr().Delete(kWiFiSSIDKeyName);
-    PersistedStorage::KeyValueStoreMgr().Delete(kWiFiCredentialsKeyName);
+    TEMPORARY_RETURN_IGNORED PersistedStorage::KeyValueStoreMgr().Delete(kWiFiSSIDKeyName);
+    TEMPORARY_RETURN_IGNORED PersistedStorage::KeyValueStoreMgr().Delete(kWiFiCredentialsKeyName);
 
     return CHIP_NO_ERROR;
 }
@@ -170,8 +170,8 @@ CHIP_ERROR ESPWiFiDriver::RevertConfiguration()
 exit:
 
     // Remove the backup.
-    PersistedStorage::KeyValueStoreMgr().Delete(kWiFiSSIDKeyName);
-    PersistedStorage::KeyValueStoreMgr().Delete(kWiFiCredentialsKeyName);
+    TEMPORARY_RETURN_IGNORED PersistedStorage::KeyValueStoreMgr().Delete(kWiFiSSIDKeyName);
+    TEMPORARY_RETURN_IGNORED PersistedStorage::KeyValueStoreMgr().Delete(kWiFiCredentialsKeyName);
 
     return error;
 }
@@ -224,22 +224,14 @@ Status ESPWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableC
 
 CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
-    // If device is already connected to WiFi, then disconnect the WiFi,
-    // clear the WiFi configurations and add the newly provided WiFi configurations.
+    // Clear the WiFi configurations and add the newly provided WiFi configurations.
     if (chip::DeviceLayer::Internal::ESP32Utils::IsStationProvisioned())
     {
-        ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
-        esp_err_t err = esp_wifi_disconnect();
-        if (err != ESP_OK)
-        {
-            ChipLogError(DeviceLayer, "esp_wifi_disconnect() failed: %s", esp_err_to_name(err));
-            return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
-        }
         CHIP_ERROR error = chip::DeviceLayer::Internal::ESP32Utils::ClearWiFiStationProvision();
         if (error != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %" CHIP_ERROR_FORMAT, error.Format());
-            return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
+            return error;
         }
     }
 
@@ -260,7 +252,6 @@ CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
         return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
     }
 
-    ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
     return ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
 }
 
@@ -290,7 +281,23 @@ void ESPWiFiDriver::OnConnectWiFiNetworkFailed()
 {
     if (mpConnectCallback)
     {
-        mpConnectCallback->OnResult(Status::kNetworkNotFound, CharSpan(), 0);
+        Status status = Status::kOtherConnectionFailure;
+        switch (mLastDisconnectedReason)
+        {
+        case WIFI_REASON_AUTH_FAIL:
+        case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT:
+        case WIFI_REASON_HANDSHAKE_TIMEOUT:
+        case WIFI_REASON_MIC_FAILURE:
+        case WIFI_REASON_CONNECTION_FAIL:
+            status = Status::kAuthFailure;
+            break;
+        case WIFI_REASON_NO_AP_FOUND:
+            status = Status::kNetworkNotFound;
+            break;
+        default:
+            break;
+        }
+        mpConnectCallback->OnResult(status, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
 }
@@ -360,7 +367,7 @@ CHIP_ERROR ESPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     }
     else
     {
-        err = esp_wifi_scan_start(NULL, false);
+        err = esp_wifi_scan_start(nullptr, false);
     }
     if (err != ESP_OK)
     {

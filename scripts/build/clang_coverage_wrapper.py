@@ -26,7 +26,7 @@ import jinja2
 __LOG_LEVELS__ = {
     "debug": logging.DEBUG,
     "info": logging.INFO,
-    "warn": logging.WARN,
+    "warn": logging.WARNING,
     "fatal": logging.FATAL,
 }
 
@@ -59,7 +59,7 @@ struct StaticInitLLVMProfile {
 @click.option(
     "--log-level",
     default="INFO",
-    type=click.Choice([k for k in __LOG_LEVELS__.keys()], case_sensitive=False),
+    type=click.Choice([k for k in __LOG_LEVELS__], case_sensitive=False),
     help="Determines the verbosity of script output.",
 )
 @click.option(
@@ -84,7 +84,7 @@ def main(log_level, no_log_timestamps, output, raw_profile_filename):
 
     expected_output = jinja2.Template(_CPP_TEMPLATE).render(raw_profile_filename=raw_profile_filename)
     if os.path.exists(output):
-        with open(output, 'rt') as f:
+        with open(output) as f:
             if f.read() == expected_output:
                 logging.info("File %s is already as expected. Will not re-write", output)
                 sys.exit(0)

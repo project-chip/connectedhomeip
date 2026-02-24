@@ -24,6 +24,7 @@ import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.GroupSettingFragmentBinding
 import com.google.chip.chiptool.util.DeviceIdUtil
 import java.lang.Exception
+import java.util.Optional
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -259,7 +260,8 @@ class GroupSettingFragment : Fragment() {
             hexStringToByteArray(epochKey1Ed.text.toString()),
             epochStartTime1Ed.text.toString().toULong().toLong(),
             hexStringToByteArray(epochKey2Ed.text.toString()),
-            epochStartTime2Ed.text.toString().toULong().toLong()
+            epochStartTime2Ed.text.toString().toULong().toLong(),
+            0
           )
         sendKeySetWrite(keySetWritestruct)
         requireActivity().runOnUiThread { dialog.dismiss() }
@@ -481,8 +483,9 @@ class GroupSettingFragment : Fragment() {
       AccessControlClusterAccessControlEntryStruct(
         privilege.toInt(),
         AccessControlEntry.Operate.id.toInt() /* Group */,
-        arrayListOf(groupId.toULong().toLong()),
-        null,
+        arrayListOf(groupId.toULong().toLong()), /* GroupID as subject */
+        null, /* null (empty) targets: wildcard access to everything */
+        Optional.empty(), /* no auxiliaryType (does not apply to writes) */
         deviceController.fabricIndex.toUInt().toInt()
       )
     sendEntry.add(newEntry)

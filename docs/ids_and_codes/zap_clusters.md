@@ -71,8 +71,10 @@ Generally regenerate using one of:
 |         96 |       0x60 | OperationalState                                        |
 |         97 |       0x61 | RvcOperationalState                                     |
 |         98 |       0x62 | ScenesManagement                                        |
+|        101 |       0x65 | Groupcast                                               |
 |        113 |       0x71 | HepaFilterMonitoring                                    |
 |        114 |       0x72 | ActivatedCarbonFilterMonitoring                         |
+|        121 |       0x79 | WaterTankLevelMonitoring                                |
 |        128 |       0x80 | BooleanStateConfiguration                               |
 |        129 |       0x81 | ValveConfigurationAndControl                            |
 |        144 |       0x90 | ElectricalPowerMeasurement                              |
@@ -116,6 +118,7 @@ Generally regenerate using one of:
 |       1070 |      0x42E | TotalVolatileOrganicCompoundsConcentrationMeasurement   |
 |       1071 |      0x42F | RadonConcentrationMeasurement                           |
 |       1072 |      0x430 | SoilMeasurement                                         |
+|       1073 |      0x431 | AmbientContextSensing                                   |
 |       1105 |      0x451 | WiFiNetworkManagement                                   |
 |       1106 |      0x452 | ThreadBorderRouterManagement                            |
 |       1107 |      0x453 | ThreadNetworkDirectory                                  |

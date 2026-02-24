@@ -17,7 +17,7 @@
 #include <app/server-cluster/testing/EmptyProvider.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 using Protocols::InteractionModel::Status;
 using namespace chip::app;
@@ -28,10 +28,6 @@ CHIP_ERROR EmptyProvider::Endpoints(ReadOnlyBufferBuilder<app::DataModel::Endpoi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EmptyProvider::SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder)
-{
-    return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
-}
 CHIP_ERROR EmptyProvider::DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<app::DataModel::DeviceTypeEntry> & builder)
 {
     return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
@@ -96,5 +92,5 @@ std::optional<ActionReturnStatus> EmptyProvider::InvokeCommand(const app::DataMo
     return Status::UnsupportedEndpoint;
 }
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

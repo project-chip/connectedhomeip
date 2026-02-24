@@ -66,7 +66,7 @@
     }
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 constexpr EndpointId kTestEndpointId            = 1;
 constexpr EndpointId kTestDeniedEndpointId      = 66;
@@ -83,7 +83,7 @@ constexpr chip::DataVersion kRejectedDataVersion = 1;
 extern uint8_t attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
 extern size_t attributeDataTLVLen;
 
-} // namespace Test
+} // namespace Testing
 namespace app {
 
 bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);

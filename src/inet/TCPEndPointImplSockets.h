@@ -66,7 +66,7 @@ private:
     CHIP_ERROR GetSocket(IPAddressType addrType);
     void HandlePendingIO(System::SocketEvents events);
     void ReceiveData();
-    void HandleIncomingConnection();
+    CHIP_ERROR HandleIncomingConnection();
     CHIP_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId);
     static void HandlePendingIO(System::SocketEvents events, intptr_t data);
 

@@ -6,10 +6,10 @@ from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArg
 
 # Only ChipFaults (defined in src/lib/support/CHIPFaultInjection.h) are supported in this module, Implement others as needed
 class FaultType(IntEnum):
-    Unspecified = 0,
-    SystemFault = 1,
-    InetFault = 2,
-    ChipFault = 3,
+    Unspecified = 0
+    SystemFault = 1
+    InetFault = 2
+    ChipFault = 3
 
 
 # IMPORTANT: CHIPFaultId enum must be kept in sync with the 'Id' enum in src/lib/support/CHIPFaultInjection.h
@@ -49,7 +49,12 @@ class CHIPFaultId(IntEnum):
     CASECorruptSigma2NOC = 29
     CASECorruptSigma2ICAC = 30
     CASECorruptSigma2Signature = 31
-
+    ModifyWebRTCICECandidatesSessionId = 32
+    EmptyWebRTCICECandidatesList = 33
+    ClearInMemoryAllocatedVideoStreams = 34
+    ClearInMemoryAllocatedAudioStreams = 35
+    ClearInMemoryAllocatedSnapshotStreams = 36
+    LoadPersistedAllocatedVideoStreams = 37
 
 # END-IF-CHANGE-ALSO-CHANGE(/src/lib/support/CHIPFaultInjection.h)
 # IMPORTANT: CHIPFaultId enum above must be kept in sync with the 'Id' enum in src/lib/support/CHIPFaultInjection.h

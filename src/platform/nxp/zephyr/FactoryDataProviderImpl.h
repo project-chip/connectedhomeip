@@ -54,7 +54,6 @@ private:
     FactoryData mFactoryData;
 
     CHIP_ERROR ReadEncryptedData(uint8_t * dest, uint8_t * source);
-    CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair);
 };
 
 FactoryDataProvider & FactoryDataPrvdImpl();

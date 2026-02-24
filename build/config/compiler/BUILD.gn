@@ -294,7 +294,7 @@ config("strict_warnings") {
   # we can.  Ideally this would be checking chip_device_platform or so
   # to be more fine-grained than current_os, but it's not clear that
   # we can access that here.
-  if (current_os != "freertos" && current_os != "mbed" &&
+  if (current_os != "freertos" &&
       # cmsis-rtos is OpenIOT
       current_os != "cmsis-rtos" &&
       # cyw30739 is one of the Infineon builds
@@ -325,15 +325,6 @@ config("strict_warnings") {
     ]
 
     configs += [ "$dir_pw_build:clang_thread_safety_warnings" ]
-
-    # TODO: can make this back fatal in once pigweed updates can be taken again.
-    #       See https://github.com/project-chip/connectedhomeip/pull/22079
-    #
-    # Currently `./scripts/build/build_examples.py --target linux-arm64-light-rpc-ipv6only-clang build`
-    # fails in third_party/pigweed/repo/pw_protobuf
-    if (current_cpu == "arm64" && current_os == "linux") {
-      cflags += [ "-Wno-error=shorten-64-to-32" ]
-    }
   }
 
   if (!is_asan && (current_os == "linux" || current_os == "android")) {

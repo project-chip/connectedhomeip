@@ -119,7 +119,7 @@ app::Clusters::NetworkCommissioning::Instance
 
 void NetWorkCommissioningInstInit()
 {
-    sWiFiNetworkCommissioningInstance.Init();
+    TEMPORARY_RETURN_IGNORED sWiFiNetworkCommissioningInstance.Init();
 }
 
 void OnIdentifyStart(Identify *)
@@ -141,17 +141,19 @@ static Identify gIdentify1 = {
 
 static void InitServer(intptr_t context)
 {
+    // Initialize device attestation config before server init so Operational
+    // Credentials sees the configured provider during cluster construction.
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
     // Init ZCL Data Model
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    chip::Server::GetInstance().Init(initParams);
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     GetAppTask().InitOTARequestor();
 #endif
@@ -183,7 +185,7 @@ CHIP_ERROR AppTask::Init()
     }
 #endif
     // Register the callback to init the MDNS server when connectivity is available
-    PlatformMgr().AddEventHandler(
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(
         [](const ChipDeviceEvent * event, intptr_t arg) {
             // Restart the server whenever an ip address is renewed
             if (event->Type == DeviceEventType::kInternetConnectivityChange)
@@ -197,7 +199,7 @@ CHIP_ERROR AppTask::Init()
         },
         0);
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     // Initialise WSTK buttons PB0 and PB1 (including debounce).
     ButtonHandler::Init();
@@ -494,7 +496,8 @@ void AppTask::ActionCompleted(LightingManager::Action_t action)
 
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState,
+                                                                               reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
 }

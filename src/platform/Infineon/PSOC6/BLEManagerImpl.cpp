@@ -142,7 +142,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::Init() complete");
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:
     return err;
@@ -162,7 +162,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (mFlags.Has(Flags::kFlag_AdvertisingEnabled) != val)
     {
         mFlags.Set(Flags::kFlag_AdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
 exit:
@@ -229,7 +229,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kP6BLEEnabledEvt:
         mFlags.Set(Flags::kFlag_StackInitialized, true);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
         break;
 
     case DeviceEventType::kCHIPoBLESubscribe:
@@ -739,7 +739,7 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattConnectEvent(wiced_bt_gatt_conn
         // Arrange to re-enable connectable advertising in case it was disabled due to the
         // maximum connection limit being reached.
         mFlags.Set(Flags::kFlag_Advertising, false);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
         ReleaseConnectionState(p_conn->ConId);
     }

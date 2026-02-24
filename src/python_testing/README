@@ -1,0 +1,4 @@
+Information about the python testing framework including how to write test and
+how to run tests locally can be found in the python testing documentation file
+in //docs/testing/python.md, which can be also viewed at
+https://project-chip.github.io/connectedhomeip-doc/testing/python.html

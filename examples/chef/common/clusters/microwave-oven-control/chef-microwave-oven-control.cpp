@@ -44,14 +44,14 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
 {
     VerifyOrDie(mOperationalStateInstancePtr != nullptr);
     VerifyOrDie(mMicrowaveOvenModeInstancePtr != nullptr);
-    mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
-    mOperationalStateInstancePtr->Init();
+    TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
+    TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->Init();
 }
 
 void ChefMicrowaveOvenDevice::MicrowaveOvenInit()
 {
-    mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
-    mMicrowaveOvenControlInstance.Init();
+    TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
+    TEMPORARY_RETURN_IGNORED mMicrowaveOvenControlInstance.Init();
 }
 
 /**

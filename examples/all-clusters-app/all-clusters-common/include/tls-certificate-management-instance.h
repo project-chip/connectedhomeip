@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
+#include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
 
 namespace chip {
 namespace app {
@@ -27,7 +27,7 @@ namespace Clusters {
 /**
  * The application delegate to define the options & implement commands.
  */
-class TlsCertificateManagementCommandDelegate : public TlsCertificateManagementDelegate
+class TlsCertificateManagementCommandDelegate : public TLSCertificateManagementDelegate
 {
     static TlsCertificateManagementCommandDelegate instance;
     Tls::CertificateTable & mCertificateTable;
@@ -36,9 +36,9 @@ public:
     TlsCertificateManagementCommandDelegate(Tls::CertificateTable & certificateTable) : mCertificateTable(certificateTable) {}
     ~TlsCertificateManagementCommandDelegate() = default;
 
-    Protocols::InteractionModel::ClusterStatusCode ProvisionRootCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                     const ProvisionRootCertificateType & provisionReq,
-                                                                     Tls::TLSCAID & outCaid) override;
+    Protocols::InteractionModel::Status ProvisionRootCert(EndpointId matterEndpoint, FabricIndex fabric,
+                                                          const ProvisionRootCertificateType & provisionReq,
+                                                          Tls::TLSCAID & outCaid) override;
 
     CHIP_ERROR LoadedRootCerts(EndpointId matterEndpoint, FabricIndex fabric,
                                LoadedRootCertificateCallback loadedCallback) const override;
@@ -56,9 +56,8 @@ public:
     Protocols::InteractionModel::Status GenerateClientCsr(EndpointId matterEndpoint, FabricIndex fabric,
                                                           const ClientCsrType & request,
                                                           GeneratedCsrCallback loadedCallback) const override;
-    Protocols::InteractionModel::ClusterStatusCode
-    ProvisionClientCert(EndpointId matterEndpoint, FabricIndex fabric,
-                        const ProvisionClientCertificateType & provisionReq) override;
+    Protocols::InteractionModel::Status ProvisionClientCert(EndpointId matterEndpoint, FabricIndex fabric,
+                                                            const ProvisionClientCertificateType & provisionReq) override;
 
     CHIP_ERROR LoadedClientCerts(EndpointId matterEndpoint, FabricIndex fabric,
                                  LoadedClientCertificateCallback loadedCallback) const override;
@@ -73,8 +72,14 @@ public:
                                 LoadedClientCertificateCallback loadedCallback) const override;
     Protocols::InteractionModel::Status RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) override;
 
-    static inline TlsCertificateManagementCommandDelegate & getInstance() { return instance; }
+    static inline TlsCertificateManagementCommandDelegate & GetInstance() { return instance; }
 };
+
+/**
+ * Initialize the TLS Certificate Management cluster with application-specific delegate and certificate table.
+ * MUST be called before server initialization (e.g. in ApplicationInit()).
+ */
+void InitializeTlsCertificateManagement();
 
 } // namespace Clusters
 } // namespace app

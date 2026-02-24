@@ -29,5 +29,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/data-model-provider:string-builder-adapters",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/data-model-providers/codedriven/endpoint",
+    "${chip_root}/zzz_generated/app-common/devices/",
   ]
 }

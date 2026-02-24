@@ -84,13 +84,6 @@ void NetWorkCommissioningInstInit()
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 }
 
-Identify gIdentify0 = {
-    chip::EndpointId{ 0 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-};
-
 Identify gIdentify1 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
@@ -107,11 +100,9 @@ static void InitServer(intptr_t context)
 
     static AmebaObserver sAmebaObserver;
     initParams.appDelegate = &sAmebaObserver;
-
-    chip::Server::GetInstance().Init(initParams);
-
-    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+    chip::Server::GetInstance().Init(initParams);
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
 
     NetWorkCommissioningInstInit();
 

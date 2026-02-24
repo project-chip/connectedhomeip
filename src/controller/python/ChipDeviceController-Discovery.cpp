@@ -114,7 +114,8 @@ void pychip_DeviceController_IterateDiscoveredCommissionableNodes(Controller::De
         Json::Value jsonVal;
 
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-        Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId, sizeof(rotatingId));
+        TEMPORARY_RETURN_IGNORED Encoding::BytesToUppercaseHexString(dnsSdInfo->rotatingId, dnsSdInfo->rotatingIdLen, rotatingId,
+                                                                     sizeof(rotatingId));
 
         ChipLogProgress(Discovery, "Commissionable Node %d", i);
         jsonVal["instanceName"]       = dnsSdInfo->instanceName;
@@ -207,7 +208,8 @@ PyChipError pychip_CreateManualCode(uint16_t longDiscriminator, uint32_t passcod
     {
         MutableCharSpan span(manualCodeBuffer, inBufSize);
         // Plus 1 so we copy the null terminator
-        CopyCharSpanToMutableCharSpan(CharSpan(setupManualCode.c_str(), setupManualCode.length() + 1), span);
+        TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(CharSpan(setupManualCode.c_str(), setupManualCode.length() + 1),
+                                                               span);
         *outBufSize = span.size();
         if (*outBufSize == 0)
         {

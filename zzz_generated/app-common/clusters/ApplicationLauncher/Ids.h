@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster ApplicationLauncher (cluster code: 1292/0x0450C)
+// Identifier constant values for cluster ApplicationLauncher (cluster code: 1292/0x050C)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

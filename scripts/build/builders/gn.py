@@ -35,14 +35,14 @@ class GnBuilder(Builder):
 
         If used, returns a list of arguments.
         """
-        return None
+        return
 
     def GnBuildEnv(self):
         """Extra environment variables needed for the GN build to run.
 
         If used, returns a dictionary of environment variables.
         """
-        return None
+        return
 
     def PreBuildCommand(self):
         """Extra steps to run before 'build'"""
@@ -52,7 +52,7 @@ class GnBuilder(Builder):
         """Extra steps to run after 'build'"""
         pass
 
-    def generate(self):
+    def generate(self, dedup=False):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
             '--add-export-compile-commands=*',
@@ -89,7 +89,7 @@ class GnBuilder(Builder):
                 )
             ]
 
-        self._Execute(cmd, title=title)
+        self._Execute(cmd, title=title, dedup=dedup)
 
     def _build(self):
         self.PreBuildCommand()

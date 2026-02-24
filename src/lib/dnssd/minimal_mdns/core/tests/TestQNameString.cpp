@@ -41,10 +41,40 @@ TEST_F(TestQNameString, Construction)
         const testing::TestQName<2> kShort({ "some", "test" });
         QNameString heapQName(kShort.Serialized());
         EXPECT_STREQ(heapQName.c_str(), "some.test");
+        EXPECT_TRUE(heapQName.EndsWith("test"));
+        EXPECT_TRUE(heapQName.EndsWith(".test"));
+        EXPECT_FALSE(heapQName.EndsWith("some"));
 
         mdns::Minimal::SerializedQNameIterator SInvalid;
         QNameString heapQNameI(SInvalid);
         EXPECT_STREQ(heapQNameI.c_str(), "(!INVALID!)");
     }
+}
+
+TEST_F(TestQNameString, EndsWith)
+{
+    const testing::TestQName<3> kLong({ "abc", "test", "abc" });
+    QNameString qName(kLong.Serialized());
+    EXPECT_STREQ(qName.c_str(), "abc.test.abc");
+
+    // Verify that EndsWith matches only the suffix, not the first occurrence of "abc"
+    EXPECT_TRUE(qName.EndsWith("abc"));
+    EXPECT_TRUE(qName.EndsWith(".abc"));
+    EXPECT_TRUE(qName.EndsWith("test.abc"));
+    EXPECT_FALSE(qName.EndsWith("test"));
+    EXPECT_FALSE(qName.EndsWith("abc.test"));
+}
+
+TEST_F(TestQNameString, LongQName)
+{
+    const testing::TestQName<10> kLong({ "label1234567890", "label1234567890", "label1234567890", "label1234567890",
+                                         "label1234567890", "label1234567890", "label1234567890", "label1234567890",
+                                         "label1234567890", "label1234567890" });
+    QNameString qName(kLong.Serialized());
+
+    // QNameString buffer is 128 bytes. 10 * 15 + 9 = 159 bytes.
+    EXPECT_FALSE(qName.Fit());
+    // EndsWith should return false if Fit() is false, even if the suffix matches what's in the buffer
+    EXPECT_FALSE(qName.EndsWith("label1234567890"));
 }
 } // namespace

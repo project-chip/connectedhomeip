@@ -175,6 +175,9 @@ void LogBufferAsHex(const char * label, const ByteSpan & span);
  * @param dest_bytes the buffer to fill with the decoded bytes.
  * @param dest_size_max the total size of the buffer to be filled.
  *
+ * Note: src_hex and dest_bytes must not overlap, except for the special
+ * case of in-place decoding (dest_bytes == src_hex), which is supported.
+ *
  * @return 0 on errors:
  *           - dest_size_max not big enough.
  *           - src_size not even.

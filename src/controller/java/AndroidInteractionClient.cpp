@@ -663,7 +663,7 @@ CHIP_ERROR shutdownSubscriptions(JNIEnv * env, jlong handle, jobject fabricIndex
         jint jFabricIndex     = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
         jlong jPeerNodeId     = chip::JniReferences::GetInstance().LongToPrimitive(peerNodeId);
         jlong jSubscriptionId = chip::JniReferences::GetInstance().LongToPrimitive(subscriptionId);
-        app::InteractionModelEngine::GetInstance()->ShutdownSubscription(
+        TEMPORARY_RETURN_IGNORED app::InteractionModelEngine::GetInstance()->ShutdownSubscription(
             chip::ScopedNodeId(static_cast<chip::NodeId>(jPeerNodeId), static_cast<chip::FabricIndex>(jFabricIndex)),
             static_cast<chip::SubscriptionId>(jSubscriptionId));
         return CHIP_NO_ERROR;

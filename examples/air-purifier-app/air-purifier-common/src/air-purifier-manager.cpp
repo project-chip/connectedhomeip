@@ -27,8 +27,8 @@ void AirPurifierManager::Init()
 {
     FanControl::SetDefaultDelegate(mEndpointId, this);
 
-    activatedCarbonFilterInstance.Init();
-    hepaFilterInstance.Init();
+    TEMPORARY_RETURN_IGNORED activatedCarbonFilterInstance.Init();
+    TEMPORARY_RETURN_IGNORED hepaFilterInstance.Init();
     mAirQualitySensorManager.Init();
     mTemperatureSensorManager.Init();
     mHumiditySensorManager.Init();

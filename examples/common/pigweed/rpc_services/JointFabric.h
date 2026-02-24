@@ -5,13 +5,11 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
 
-using namespace chip;
-using namespace chip::Crypto;
-
 namespace joint_fabric_service {
 
-class JointFabric : public pw_rpc::nanopb::JointFabric::Service<JointFabric>, public JFARpc
+class JointFabric : public pw_rpc::nanopb::JointFabric::Service<JointFabric>, public chip::JFARpc
 {
+
 public:
     /*RPC from jfc-client to jfa-server */
     ::pw::Status TransferOwnership(const ::OwnershipContext & request, ::pw_protobuf_Empty & response);
@@ -19,25 +17,25 @@ public:
     ::pw::Status ResponseStream(const ::Response & ResponseBytes, ::pw_protobuf_Empty & response);
 
     /* JFARpc overrides */
-    CHIP_ERROR GetICACCSRForJF(MutableByteSpan & icacCSR);
+    CHIP_ERROR GetICACCSRForJF(chip::MutableByteSpan & icacCSR);
     void CloseStreams();
 
 private:
     struct OwnershipTransferContext
     {
-        OwnershipTransferContext(uint64_t nodeId, bool jcm, ByteSpan trustedIcacPublicKeyB,
+        OwnershipTransferContext(uint64_t nodeId, bool jcm, chip::ByteSpan trustedIcacPublicKeyB,
                                  uint16_t peerAdminJFAdminClusterEndpointId) :
             mNodeId(nodeId),
             mJCM(jcm), mPeerAdminJFAdminClusterEndpointId(peerAdminJFAdminClusterEndpointId)
         {
-            memcpy(keyRawBytes, trustedIcacPublicKeyB.data(), kP256_PublicKey_Length);
+            memcpy(keyRawBytes, trustedIcacPublicKeyB.data(), chip::Crypto::kP256_PublicKey_Length);
             mTrustedIcacPublicKeyBSerialized = keyRawBytes;
         }
 
         uint64_t mNodeId;
         bool mJCM;
-        uint8_t keyRawBytes[kP256_PublicKey_Length] = { 0 };
-        P256PublicKey mTrustedIcacPublicKeyBSerialized;
+        uint8_t keyRawBytes[chip::Crypto::kP256_PublicKey_Length] = { 0 };
+        chip::Crypto::P256PublicKey mTrustedIcacPublicKeyBSerialized;
 
         uint16_t mPeerAdminJFAdminClusterEndpointId;
     };
@@ -45,9 +43,9 @@ private:
     static void FinalizeCommissioningWork(intptr_t arg)
     {
         OwnershipTransferContext * data = reinterpret_cast<OwnershipTransferContext *>(arg);
-        JFAMgr().FinalizeCommissioning(data->mNodeId, data->mJCM, data->mTrustedIcacPublicKeyBSerialized,
-                                       data->mPeerAdminJFAdminClusterEndpointId);
-        Platform::Delete(data);
+        TEMPORARY_RETURN_IGNORED chip::JFAMgr().FinalizeCommissioning(
+            data->mNodeId, data->mJCM, data->mTrustedIcacPublicKeyBSerialized, data->mPeerAdminJFAdminClusterEndpointId);
+        chip::Platform::Delete(data);
     }
 
     ServerWriter<::RequestOptions> rpcGetStream;

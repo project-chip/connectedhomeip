@@ -32,8 +32,8 @@
 #include <crypto/CryptoBuildConfig.h>
 #endif // CHIP_HAVE_CONFIG_H
 
-// DIC Specific Configurations
-#ifdef DIC_ENABLE
+// MATTER AWS Specific Configurations
+#ifdef SL_MATTER_ENABLE_AWS
 #define MBEDTLS_PKCS1_V15
 #define MBEDTLS_RSA_NO_CRT
 #define MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
@@ -65,7 +65,7 @@
 #define MBEDTLS_ECDH_C
 #define MBEDTLS_ENTROPY_C
 
-#endif // DIC_ENABLE
+#endif // SL_MATTER_ENABLE_AWS
 
 // Configurations necessary for ot coap cert libs
 #if SL_USE_COAP_CONFIG

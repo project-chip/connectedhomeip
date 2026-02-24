@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2021-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,5 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("time-format-localization-server") {
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("time-format-localization-server") {
+  sources = [
+    "TimeFormatLocalizationCluster.cpp",
+    "TimeFormatLocalizationCluster.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/TimeFormatLocalization",
+  ]
 }

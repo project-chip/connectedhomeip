@@ -28,17 +28,14 @@ from ..FabricAdmin import FabricAdmin as FabricAdmin
 
 _UINT16_MAX = 65535
 
-logger = logging.getLogger('CommissioningBuildingBlocks')
+LOGGER = logging.getLogger(__name__)
 
 
 async def _IsNodeInFabricList(devCtrl, nodeId):
     resp = await devCtrl.ReadAttribute(nodeId, [(opCreds.Attributes.Fabrics)])
     listOfFabricsDescriptor = resp[0][opCreds][Clusters.OperationalCredentials.Attributes.Fabrics]
-    for fabricDescriptor in listOfFabricsDescriptor:
-        if fabricDescriptor.nodeID == nodeId:
-            return True
-
-    return False
+    return any(fabricDescriptor.nodeID == nodeId
+               for fabricDescriptor in listOfFabricsDescriptor)
 
 
 async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDeviceController,
@@ -58,7 +55,7 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
             privilege:      Privilege to grant to the granted controller. If None, no privilege is granted.
             targetNodeId:   Target node to which the controller is granted privilege.
             targetCatTag:   Target 32-bit CAT tag that is granted privilege.
-                            If provided, this will be used in the subject list instead of the nodeid of that of grantedCtrl.
+                            If provided, this will be used in the subject list instead of the nodeId of that of grantedCtrl.
     '''
     data = await adminCtrl.ReadAttribute(targetNodeId, [(Clusters.AccessControl.Attributes.Acl)])
     if 0 not in data:
@@ -109,7 +106,7 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
     # Step 4: Prune ACLs which have empty subjects.
     currentAcls = [acl for acl in currentAcls if acl.subjects != NullValue and len(acl.subjects) != 0]
 
-    logger.info(f'GrantPrivilege: Writing acls: {currentAcls}')
+    LOGGER.info(f'GrantPrivilege: Writing acls: {currentAcls}')
     await adminCtrl.WriteAttribute(targetNodeId, [(0, Clusters.AccessControl.Attributes.Acl(currentAcls))])
 
 
@@ -173,7 +170,7 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
     if (chainForAddNOC.rcacBytes is None or
             chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None):
         # Expiring the failsafe timer in an attempt to clean up.
-        logging.error(f"INTERNAL ERROR: Got invalid cert chain from issuer! Chain: {chainForAddNOC}. Disarming fail-safe!")
+        LOGGER.error(f"INTERNAL ERROR: Got invalid cert chain from issuer! Chain: {chainForAddNOC}. Disarming fail-safe!")
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False, nocResp, None
 
@@ -188,13 +185,13 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
 
     if nocResp.statusCode is not opCreds.Enums.NodeOperationalCertStatusEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
-        logging.error(f"AddNOC failed on DUT. Status code was: {resp.statusCode}. Disarming fail-safe!")
+        LOGGER.error(f"AddNOC failed on DUT. Status code was: {resp.statusCode}. Disarming fail-safe!")
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False, nocResp
 
     # Immediately return if skipping CommissioningComplete is requested.
     if omitCommissioningComplete:
-        logging.info("Not sending CommissioningComplete to allow further testing in commissioning session.")
+        LOGGER.info("Not sending CommissioningComplete to allow further testing in commissioning session.")
         return True, nocResp, chainForAddNOC
 
     # Send CommissioningComplete to finalize commissioning.
@@ -202,12 +199,12 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
 
     if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
-        logging.error(f"CommissioningComplete failed on DUT. Status code was: {resp.errorCode}. Disarming fail-safe!")
+        LOGGER.error(f"CommissioningComplete failed on DUT. Status code was: {resp.errorCode}. Disarming fail-safe!")
         await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False, nocResp, chainForAddNOC
 
     if not await _IsNodeInFabricList(newFabricDevCtrl, newNodeId):
-        logging.error(f"Failed to find new NodeID 0x{newNodeId:016X} in Fabrics list after CommissioningComplete!")
+        LOGGER.error(f"Failed to find new NodeID 0x{newNodeId:016X} in Fabrics list after CommissioningComplete!")
         return False, nocResp, chainForAddNOC
 
     return True, nocResp, chainForAddNOC
@@ -238,7 +235,7 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId, omitCommissioningComplet
     chainForUpdateNOC = await devCtrl.IssueNOCChain(csrForUpdateNOC, newNodeId)
     if (chainForUpdateNOC.rcacBytes is None or
             chainForUpdateNOC.nocBytes is None or chainForUpdateNOC.ipkBytes is None):
-        logging.error(f"INTERNAL ERROR: Got invalid cert chain from issuer! Chain: {chainForUpdateNOC}. Disarming fail-safe!")
+        LOGGER.error(f"INTERNAL ERROR: Got invalid cert chain from issuer! Chain: {chainForUpdateNOC}. Disarming fail-safe!")
         await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 
@@ -246,7 +243,7 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId, omitCommissioningComplet
                                                                                    chainForUpdateNOC.icacBytes))
     if resp.statusCode is not opCreds.Enums.NodeOperationalCertStatusEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
-        logging.error(f"UpdateNOC failed on DUT. Status code was: {resp.statusCode}. Disarming fail-safe!")
+        LOGGER.error(f"UpdateNOC failed on DUT. Status code was: {resp.statusCode}. Disarming fail-safe!")
         await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 
@@ -255,19 +252,19 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId, omitCommissioningComplet
 
     # Immediately return if skipping CommissioningComplete is requested.
     if omitCommissioningComplete:
-        logging.info("Not sending CommissioningComplete to allow further testing in commissioning session.")
+        LOGGER.info("Not sending CommissioningComplete to allow further testing in commissioning session.")
         return True
 
     # Send CommissioningComplete to finalize commissioning.
     resp = await devCtrl.SendCommand(newNodeId, 0, generalCommissioning.Commands.CommissioningComplete())
     if resp.errorCode is not generalCommissioning.Enums.CommissioningErrorEnum.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
-        logging.error(f"CommissioningComplete failed on DUT. Status code was: {resp.errorCode}. Disarming fail-safe!")
+        LOGGER.error(f"CommissioningComplete failed on DUT. Status code was: {resp.errorCode}. Disarming fail-safe!")
         await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0))
         return False
 
     if not await _IsNodeInFabricList(devCtrl, newNodeId):
-        logging.error(f"Failed to find new NodeID 0x{newNodeId:016X} in Fabrics list after CommissioningComplete!")
+        LOGGER.error(f"Failed to find new NodeID 0x{newNodeId:016X} in Fabrics list after CommissioningComplete!")
         return False
 
     return True

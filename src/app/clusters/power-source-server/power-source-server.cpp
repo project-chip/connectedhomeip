@@ -26,6 +26,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <clusters/PowerSource/Metadata.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -127,6 +128,10 @@ CHIP_ERROR PowerSourceAttrAccess::Read(const ConcreteReadAttributePath & aPath, 
         }
         break;
     }
+    case ClusterRevision::Id: {
+        err = aEncoder.Encode(PowerSource::kRevision);
+        break;
+    }
     default:
         break;
     }
@@ -159,13 +164,11 @@ CHIP_ERROR PowerSourceServer::SetEndpointList(EndpointId powerSourceClusterEndpo
     if (endpointList.size() == 0)
     {
         sPowerSourceClusterInfo[idx] = PowerSourceClusterInfo();
+        return CHIP_NO_ERROR;
     }
-    else
-    {
-        sPowerSourceClusterInfo[idx] = PowerSourceClusterInfo(powerSourceClusterEndpoint);
-        sPowerSourceClusterInfo[idx].SetEndpointList(endpointList);
-    }
-    return CHIP_NO_ERROR;
+
+    sPowerSourceClusterInfo[idx] = PowerSourceClusterInfo(powerSourceClusterEndpoint);
+    return sPowerSourceClusterInfo[idx].SetEndpointList(endpointList);
 }
 const Span<EndpointId> * PowerSourceServer::GetEndpointList(EndpointId powerSourceClusterEndpoint) const
 {

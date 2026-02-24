@@ -264,7 +264,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     // Store it
     if (retval == CHIP_NO_ERROR)
     {
-        WriteValueStr(key, encodedData.Get());
+        return WriteValueStr(key, encodedData.Get());
     }
 
     return retval;

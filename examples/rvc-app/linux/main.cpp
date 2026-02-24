@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "Identify.h"
 #include "RvcAppCommandDelegate.h"
 #include "rvc-device.h"
 #include <AppMain.h>
@@ -41,13 +42,14 @@ void ApplicationInit()
     if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sRvcAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
-        sChipNamedPipeCommands.Stop();
+        TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 
     gRvcDevice = new RvcDevice(RVC_ENDPOINT);
     gRvcDevice->Init();
 
     sRvcAppCommandDelegate.SetRvcDevice(gRvcDevice);
+    TEMPORARY_RETURN_IGNORED IdentifyInit();
 }
 
 void ApplicationShutdown()
@@ -55,7 +57,7 @@ void ApplicationShutdown()
     delete gRvcDevice;
     gRvcDevice = nullptr;
 
-    sChipNamedPipeCommands.Stop();
+    TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
 }
 
 int main(int argc, char * argv[])

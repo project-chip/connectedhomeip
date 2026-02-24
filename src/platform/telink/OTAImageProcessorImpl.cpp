@@ -24,6 +24,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
+#include <system/SystemError.h>
 
 #include <zephyr/dfu/mcuboot.h>
 #include <zephyr/storage/flash_map.h>
@@ -57,7 +58,8 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    return DeviceLayer::SystemLayer().ScheduleLambda([this] { mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
+    return DeviceLayer::SystemLayer().ScheduleLambda(
+        [this] { TEMPORARY_RETURN_IGNORED mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
 }
 const struct device * flash_dev;
 
@@ -168,12 +170,12 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
                           static_cast<unsigned>(mParams.totalFileBytes));
             if (downloadedBytesRestored)
             {
-                mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
+                TEMPORARY_RETURN_IGNORED mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
                 downloadedBytesRestored = 0;
             }
             else
             {
-                mDownloader->FetchNextData();
+                TEMPORARY_RETURN_IGNORED mDownloader->FetchNextData();
             }
         }
         else
@@ -214,10 +216,10 @@ CHIP_ERROR OTAImageProcessorImpl::RestoreBytes(ByteSpan & aBlock)
         // Align to the nearest lower multiple of sector size (4 KB) for Flash erase/write
         downloadedBytesRestored = ROUND_DOWN(downloadedBytesRestored, 0x1000);
         ChipLogDetail(SoftwareUpdate, "Restored %u/%u bytes", static_cast<unsigned>(downloadedBytesRestored),
-                      static_cast<unsigned>(mParams.totalFileBytes))
+                      static_cast<unsigned>(mParams.totalFileBytes));
 
-            // Reinit Flash Stream with offset
-            ReturnErrorOnFailure(System::MapErrorZephyr(stream_flash_buffered_write(&stream, NULL, 0, true)));
+        // Reinit Flash Stream with offset
+        ReturnErrorOnFailure(System::MapErrorZephyr(stream_flash_buffered_write(&stream, NULL, 0, true)));
         ReturnErrorOnFailure(InitFlashStream(downloadedBytesRestored));
     }
     else
@@ -265,7 +267,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)
         mParams.totalFileBytes = header.mPayloadSize;
 
         // Restore interrupted OTA process
-        RestoreBytes(header.mImageDigest);
+        TEMPORARY_RETURN_IGNORED RestoreBytes(header.mImageDigest);
 
         mHeaderParser.Clear();
     }

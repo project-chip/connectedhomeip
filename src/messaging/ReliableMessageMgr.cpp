@@ -157,7 +157,7 @@ void ReliableMessageMgr::ExecuteActions()
 #if defined(RMP_TICKLESS_DEBUG)
                 ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExecuteActions sending ACK %p", rc);
 #endif
-                rc->SendStandaloneAckMessage();
+                TEMPORARY_RETURN_IGNORED rc->SendStandaloneAckMessage();
             }
         }
     });
@@ -226,7 +226,7 @@ void ReliableMessageMgr::ExecuteActions()
                         Transport::GetSessionTypeString(session), fabricIndex, ChipLogValueX64(destination));
         MATTER_LOG_METRIC(Tracing::kMetricDeviceRMPRetryCount, entry->sendCount);
 
-        SendFromRetransTable(entry);
+        TEMPORARY_RETURN_IGNORED SendFromRetransTable(entry);
 
         return Loop::Continue;
     });
@@ -476,7 +476,7 @@ void ReliableMessageMgr::StartTimer()
                       "ms (in 0x" ChipLogFormatX64 "ms)",
                       ChipLogValueX64(now.count()), ChipLogValueX64(nextWakeTime.count()), ChipLogValueX64(nextWakeDelay.count()));
 #endif
-        VerifyOrDie(mSystemLayer->StartTimer(nextWakeDelay, Timeout, this) == CHIP_NO_ERROR);
+        SuccessOrDie(mSystemLayer->StartTimer(nextWakeDelay, Timeout, this));
     }
     else
     {

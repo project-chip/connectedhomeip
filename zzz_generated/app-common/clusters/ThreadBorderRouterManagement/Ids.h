@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster ThreadBorderRouterManagement (cluster code: 1106/0x04452)
+// Identifier constant values for cluster ThreadBorderRouterManagement (cluster code: 1106/0x0452)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

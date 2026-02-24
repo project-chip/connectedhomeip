@@ -45,10 +45,10 @@ std::set<CHIPCommand *> CHIPCommand::sDeferredCleanups;
 using DeviceControllerFactory      = chip::Controller::DeviceControllerFactory;
 using JCMAutoCommissioner          = chip::Controller::JCM::AutoCommissioner;
 using JCMDeviceCommissioner        = chip::Controller::JCM::DeviceCommissioner;
-using JCMTrustVerificationDelegate = chip::Controller::JCM::TrustVerificationDelegate;
-using JCMTrustVerificationStage    = chip::Controller::JCM::TrustVerificationStage;
-using JCMTrustVerificationError    = chip::Controller::JCM::TrustVerificationError;
-using JCMTrustVerificationInfo     = chip::Controller::JCM::TrustVerificationInfo;
+using JCMTrustVerificationDelegate = chip::Credentials::JCM::TrustVerificationDelegate;
+using JCMTrustVerificationStage    = chip::Credentials::JCM::TrustVerificationStage;
+using JCMTrustVerificationError    = chip::Credentials::JCM::TrustVerificationError;
+using JCMTrustVerificationInfo     = chip::Credentials::JCM::TrustVerificationInfo;
 
 constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
 constexpr chip::FabricId kIdentityAlphaFabricId = 1;
@@ -482,7 +482,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     VerifyOrReturnError(chip::CanCastTo<uint16_t>(CHIP_UDC_PORT + fabricId), CHIP_ERROR_INVALID_ARGUMENT);
     uint16_t udcListenPort = static_cast<uint16_t>(CHIP_UDC_PORT + fabricId);
-    deviceCommissioner->SetUdcListenPort(udcListenPort);
+    ReturnLogErrorOnFailure(deviceCommissioner->SetUdcListenPort(udcListenPort));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     chip::Controller::SetupParams commissionerParams;
     chip::CASEAuthTag administratorCAT         = chip::GetAdminCATWithVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
@@ -508,7 +508,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         ReturnLogErrorOnFailure(mCredIssuerCmds->InitializeCredentialsIssuer(mCommissionerStorage));
 
         /* a NOC with Administrator CAT will be issued to JFC */
-        mCommissionerStorage.SetCommissionerCATs({ { administratorCAT } });
+        ReturnLogErrorOnFailure(mCommissionerStorage.SetCommissionerCATs({ { administratorCAT } }));
 
         chip::MutableByteSpan nocSpan(identity.mNOC);
         chip::MutableByteSpan icacSpan(identity.mICAC);
@@ -557,7 +557,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
             chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
     }
 
-    CHIPCommand::sICDClientStorage.UpdateFabricList(deviceCommissioner->GetFabricIndex());
+    ReturnLogErrorOnFailure(CHIPCommand::sICDClientStorage.UpdateFabricList(deviceCommissioner->GetFabricIndex()));
 
     mCommissioners[identity] = std::move(deviceCommissioner);
 

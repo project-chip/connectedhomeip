@@ -31,6 +31,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.AttestationInfo
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.CommissionParameters
 import chip.devicecontroller.DeviceAttestationDelegate
 import chip.devicecontroller.ICDDeviceInfo
 import chip.devicecontroller.ICDRegistrationInfo
@@ -226,7 +227,14 @@ class DeviceProvisioningFragment : Fragment() {
 
       setAttestationDelegate()
 
-      deviceController.pairDevice(gatt, connId, deviceId, deviceInfo.setupPinCode, network)
+      val params =
+        CommissionParameters.Builder()
+          .setCsrNonce(null)
+          .setNetworkCredentials(network)
+          .setICDRegistrationInfo(null)
+          .build()
+
+      deviceController.pairDeviceThroughBLE(gatt, connId, deviceId, deviceInfo.setupPinCode, params)
       DeviceIdUtil.setNextAvailableId(requireContext(), deviceId + 1)
     }
   }

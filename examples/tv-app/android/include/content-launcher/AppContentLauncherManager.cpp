@@ -68,7 +68,7 @@ void AppContentLauncherManager::HandleLaunchContent(CommandResponseHelper<Launch
     // TODO: Insert code here
     response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
     response.status = ContentLauncher::StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void AppContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
@@ -83,7 +83,7 @@ void AppContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResp
     LaunchResponseType response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("Success"));
     response.status = ContentLauncher::StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 CHIP_ERROR AppContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)

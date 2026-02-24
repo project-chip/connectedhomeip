@@ -1177,7 +1177,7 @@ CHIP_ERROR GenerateCertificateSigningRequest(const P256Keypair * keypair, Mutabl
          *        attributes    [0] Attributes{{ CRIAttributes }}
          *     }
          */
-        GenerateCertificationRequestInformation(writer, keypair->Pubkey());
+        ReturnErrorOnFailure(GenerateCertificationRequestInformation(writer, keypair->Pubkey()));
 
         // algorithm  AlgorithmIdentifier
         ASN1_START_SEQUENCE
@@ -1309,6 +1309,15 @@ const char * PemEncoder::NextLine()
     VerifyOrDie(mStringBuilder.Fit());
 
     return hasLine ? mStringBuilder.c_str() : nullptr;
+}
+
+CHIP_ERROR P256Keypair::HazardousOperationLoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key)
+{
+    Crypto::P256SerializedKeypair serialized_keypair;
+    ReturnErrorOnFailure(serialized_keypair.SetLength(private_key.size() + public_key.size()));
+    memcpy(serialized_keypair.Bytes(), public_key.data(), public_key.size());
+    memcpy(serialized_keypair.Bytes() + public_key.size(), private_key.data(), private_key.size());
+    return this->Deserialize(serialized_keypair);
 }
 
 } // namespace Crypto

@@ -24,7 +24,6 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ZclString.h>
@@ -99,8 +98,8 @@ void ContentApp::SendAppObserverCommand(chip::Controller::DeviceCommissioner * c
         return;
     }
 
-    mContentAppClientCommandSender.SendContentAppMessage(commissioner, clientNodeId, kCastingVideoPlayerEndpointId, data,
-                                                         encodingHint);
+    TEMPORARY_RETURN_IGNORED mContentAppClientCommandSender.SendContentAppMessage(
+        commissioner, clientNodeId, kCastingVideoPlayerEndpointId, data, encodingHint);
 
     ChipLogProgress(Controller, "Completed send of AppObserver command");
 }
@@ -143,7 +142,7 @@ void ContentAppClientCommandSender::OnDeviceConnectedFn(void * context, chip::Me
     ContentAppClientCommandSender * sender = reinterpret_cast<ContentAppClientCommandSender *>(context);
     VerifyOrReturn(sender != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
 
-    sender->SendMessage(exchangeMgr, sessionHandle);
+    TEMPORARY_RETURN_IGNORED sender->SendMessage(exchangeMgr, sessionHandle);
 }
 
 CHIP_ERROR ContentAppClientCommandSender::SendMessage(chip::Messaging::ExchangeManager & exchangeMgr,

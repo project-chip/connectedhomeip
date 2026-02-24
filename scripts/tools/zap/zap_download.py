@@ -36,14 +36,11 @@ try:
 except ImportError:
     _has_coloredlogs = False
 
+log = logging.getLogger(__name__)
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARN,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 class DownloadType(enum.Enum):
@@ -54,19 +51,18 @@ class DownloadType(enum.Enum):
 def _GetDefaultExtractRoot():
     if 'PW_ENVIRONMENT_ROOT' in os.environ:
         return os.environ['PW_ENVIRONMENT_ROOT']
-    else:
-        return ".zap"
+    return ".zap"
 
 
 def _LogPipeLines(pipe, prefix):
-    log = logging.getLogger().getChild(prefix)
+    _log = log.getChild(prefix)
     for line in iter(pipe.readline, b''):
         line = line.strip().decode('utf-8', errors="ignore")
-        log.info('%s' % line)
+        _log.info(line)
 
 
 def _ExecuteProcess(cmd, cwd):
-    logging.info('Executing %r in %s' % (cmd, cwd))
+    log.info("Executing in '%s': %s", cwd, shlex.join(cmd))
 
     process = subprocess.Popen(
         cmd,
@@ -84,7 +80,7 @@ def _ExecuteProcess(cmd, cwd):
 
 def _SetupSourceZap(install_directory: str, zap_version: str):
     if os.path.exists(install_directory):
-        logging.warning("Completely re-creating %s", install_directory)
+        log.warning("Completely re-creating '%s'", install_directory)
         shutil.rmtree(install_directory)
 
     os.makedirs(install_directory, exist_ok=True)
@@ -97,37 +93,46 @@ def _SetupSourceZap(install_directory: str, zap_version: str):
     _ExecuteProcess("npm ci".split(), install_directory)
 
 
-def _SetupReleaseZap(install_directory: str, zap_version: str):
+def _GetDefaultPlatform():
+    match sys.platform:
+        case 'linux':
+            return 'linux'
+        case 'darwin':
+            return 'mac'
+        case 'win32':
+            return 'win'
+        case _:
+            raise Exception('Unknown platform - do not know what zip file to download.')
+
+
+def _GetDefaultArch():
+    arch = None
+
+    match sys.platform:
+        case 'win32':
+            # os.uname is not implemented on Windows, so use an alternative instead.
+            import platform
+            arch = platform.uname().machine
+        case _:
+            arch = os.uname().machine
+
+    if arch == 'x86_64' or arch == 'AMD64':
+        return 'x64'
+
+    # this should be `arm64` ...
+    return arch
+
+
+def DownloadReleasedZap(install_directory: str, zap_version: str, zap_platform: str, zap_arch: str):
     """
     Downloads the given [zap_version] into "[install_directory]/zap-[zap_version]/".
 
     Will download the given release from github releases.
     """
 
-    if sys.platform == 'linux':
-        zap_platform = 'linux'
-        arch = os.uname().machine
-    elif sys.platform == 'darwin':
-        zap_platform = 'mac'
-        arch = os.uname().machine
-    elif sys.platform == 'win32':
-        zap_platform = 'win'
-        # os.uname is not implemented on Windows, so use an alternative instead.
-        import platform
-        arch = platform.uname().machine
-    else:
-        raise Exception('Unknown platform - do not know what zip file to download.')
-
-    if arch == 'arm64':
-        zap_arch = 'arm64'
-    elif arch == 'x86_64' or arch == 'AMD64':
-        zap_arch = 'x64'
-    else:
-        raise Exception(f'Unknown architecture "${arch}" - do not know what zip file to download.')
-
     url = f"https://github.com/project-chip/zap/releases/download/{zap_version}/zap-{zap_platform}-{zap_arch}.zip"
 
-    logging.info("Fetching: %s", url)
+    log.info("Fetching: '%s'", url)
 
     r = requests.get(url, stream=True)
     if zap_platform == 'mac':
@@ -141,15 +146,15 @@ def _SetupReleaseZap(install_directory: str, zap_version: str):
             _ExecuteProcess(['/usr/bin/unzip', '-oq', tf.name], install_directory)
     else:
         z = zipfile.ZipFile(io.BytesIO(r.content))
-        logging.info("Data downloaded, extracting ...")
+        log.info("Data downloaded, extracting ...")
         # extractall() does not preserve permissions (https://github.com/python/cpython/issues/59999)
         for entry in z.filelist:
             path = z.extract(entry, install_directory)
             os.chmod(path, (entry.external_attr >> 16) & 0o777)
-    logging.info("Done extracting.")
+    log.info("Done extracting.")
 
 
-def _GetZapVersionToUse(project_root):
+def _GetZapVersionToUse(project_root) -> str:
     """
     Heuristic to figure out what zap version should be used.
 
@@ -170,11 +175,13 @@ def _GetZapVersionToUse(project_root):
 
     zap_version = ""
     zap_path = os.path.join(project_root, "scripts/setup/zap.json")
-    zap_json = json.load(open(zap_path))
+    with open(zap_path) as f:
+        zap_json = json.load(f)
     for package in zap_json.get("packages", []):
         for tag in package.get("tags", []):
-            if tag.startswith("version:2@"):
-                zap_version = tag.removeprefix("version:2@")
+            if tag.startswith("version:"):
+                zap_version = tag.removeprefix("version:")
+
                 suffix_index = zap_version.rfind(".")
                 if suffix_index != -1:
                     zap_version = zap_version[:suffix_index]
@@ -212,7 +219,9 @@ def _GetZapVersionToUse(project_root):
     type=click.Choice(DownloadType.__members__, case_sensitive=False),
     callback=lambda c, p, v: getattr(DownloadType, v),
     help='What type of zap download to perform')
-def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional[str], zap: DownloadType):
+@click.option('--platform', default=_GetDefaultPlatform(), show_default=True, help='ZAP Platform to download')
+@click.option('--arch', default=_GetDefaultArch(), show_default=True, help='ZAP Architecture to download')
+def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional[str], zap: DownloadType, platform: str, arch: str):
     if _has_coloredlogs:
         coloredlogs.install(level=log_level, fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
     else:
@@ -228,9 +237,9 @@ def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional
 
     if not zap_version:
         zap_version = _GetZapVersionToUse(sdk_root)
-        logging.info('Found required zap version to be: %s' % zap_version)
+        log.info("Found required zap version to be: '%s'", zap_version)
 
-    logging.debug('User requested to download a %s zap version %s into %s', zap, zap_version, extract_root)
+    log.debug("User requested to download a '%s' zap version '%s' into '%s'", zap, zap_version, extract_root)
 
     install_directory = os.path.join(extract_root, f"zap-{zap_version}")
 
@@ -245,7 +254,7 @@ def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional
         # Make sure the results can be used in scripts
         print(f"{export_cmd} ZAP_DEVELOPMENT_PATH={shlex.quote(install_directory)}")
     else:
-        _SetupReleaseZap(install_directory, zap_version)
+        DownloadReleasedZap(install_directory, zap_version, platform, arch)
 
         # Make sure the results can be used in scripts
         print(f"{export_cmd} ZAP_INSTALL_PATH={shlex.quote(install_directory)}")

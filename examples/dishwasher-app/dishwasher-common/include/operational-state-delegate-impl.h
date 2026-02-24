@@ -87,14 +87,15 @@ public:
     void HandleStopStateCallback(GenericOperationalError & err) override;
 
 private:
-    const GenericOperationalState rvcOpStateList[4] = {
+    const GenericOperationalState dishwasherOpStateList[4] = {
         GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
     };
 
-    app::DataModel::List<const GenericOperationalState> mOperationalStateList = Span<const GenericOperationalState>(rvcOpStateList);
+    app::DataModel::List<const GenericOperationalState> mOperationalStateList =
+        Span<const GenericOperationalState>(dishwasherOpStateList);
     const Span<const CharSpan> mOperationalPhaseList;
 };
 

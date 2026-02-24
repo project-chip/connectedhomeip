@@ -191,10 +191,10 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
         {
             CHIP_ERROR statusError = CHIP_NO_ERROR;
             // Parse the status response so we can log it properly.
-            StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
+            TEMPORARY_RETURN_IGNORED StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
         }
         ChipLogDetail(DataManagement, "Unexpected message type %d", aPayloadHeader.GetMessageType());
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
         Close();
         return CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
@@ -214,7 +214,7 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
         err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
         Close();
     }
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 void WriteHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
@@ -260,7 +260,8 @@ void WriteHandler::DeliverListWriteBegin(const ConcreteAttributePath & aPath)
 {
     if (mDataModelProvider != nullptr)
     {
-        mDataModelProvider->ListAttributeWriteNotification(aPath, DataModel::ListWriteOperation::kListWriteBegin);
+        mDataModelProvider->ListAttributeWriteNotification(aPath, DataModel::ListWriteOperation::kListWriteBegin,
+                                                           GetAccessingFabricIndex());
     }
 }
 
@@ -270,7 +271,8 @@ void WriteHandler::DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool
     {
         mDataModelProvider->ListAttributeWriteNotification(aPath,
                                                            writeWasSuccessful ? DataModel::ListWriteOperation::kListWriteSuccess
-                                                                              : DataModel::ListWriteOperation::kListWriteFailure);
+                                                                              : DataModel::ListWriteOperation::kListWriteFailure,
+                                                           GetAccessingFabricIndex());
     }
 }
 
@@ -588,7 +590,7 @@ exit:
     // The DeliverFinalListWriteEndForGroupWrite above will deliver the successful state of the list write and clear the
     // mProcessingAttributePath making the following call no-op. So we call it again after the exit label to deliver a failure state
     // to the clusters. Ignore the error code since we need to deliver other more important failures.
-    DeliverFinalListWriteEndForGroupWrite(false);
+    TEMPORARY_RETURN_IGNORED DeliverFinalListWriteEndForGroupWrite(false);
     return err;
 }
 
@@ -617,7 +619,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     SuccessOrExit(err);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    writeRequestParser.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED writeRequestParser.PrettyPrint();
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
     bool boolValue;
 

@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster OperationalState (cluster code: 96/0x0460)
+// Identifier constant values for cluster OperationalState (cluster code: 96/0x0060)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

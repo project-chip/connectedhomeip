@@ -22,13 +22,18 @@
 #include <app/InteractionModelEngine.h>
 #include <controller/CommissioningDelegate.h>
 #include <credentials/CHIPCert.h>
+#include <credentials/FabricTable.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Advertiser.h>
 
 using namespace ::chip;
 using namespace ::chip::app;
+using namespace ::chip::Credentials;
+using namespace ::chip::Crypto;
 using namespace chip::app::Clusters;
+using namespace ::chip::Credentials::JCM;
 
 namespace chip {
 namespace Controller {
@@ -37,9 +42,11 @@ namespace JCM {
 /*
  * DeviceCommissioner public interface and override implementation
  */
-CHIP_ERROR DeviceCommissioner::StartJCMTrustVerification()
+CHIP_ERROR DeviceCommissioner::StartJCMTrustVerification(DeviceProxy * proxy)
 {
     TrustVerificationError error = TrustVerificationError::kSuccess;
+
+    mDeviceProxy = proxy;
 
     ChipLogProgress(Controller, "JCM: Starting Trust Verification");
 
@@ -53,7 +60,7 @@ CHIP_ERROR DeviceCommissioner::StartJCMTrustVerification()
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::ContinueAfterUserConsent(bool consent)
+void DeviceCommissioner::ContinueAfterUserConsent(const bool & consent)
 {
     TrustVerificationError error = TrustVerificationError::kSuccess;
 
@@ -65,11 +72,11 @@ void DeviceCommissioner::ContinueAfterUserConsent(bool consent)
     TrustVerificationStageFinished(TrustVerificationStage::kAskingUserForConsent, error);
 }
 
-void DeviceCommissioner::ContinueAfterVendorIDVerification(bool verified)
+void DeviceCommissioner::ContinueAfterVendorIDVerification(const CHIP_ERROR & err)
 {
     TrustVerificationError error = TrustVerificationError::kSuccess;
 
-    if (!verified)
+    if (err != CHIP_NO_ERROR)
     {
         error = TrustVerificationError::kVendorIdVerificationFailed;
     }
@@ -77,7 +84,7 @@ void DeviceCommissioner::ContinueAfterVendorIDVerification(bool verified)
     TrustVerificationStageFinished(TrustVerificationStage::kPerformingVendorIDVerification, error);
 }
 
-CHIP_ERROR DeviceCommissioner::ParseAdminFabricIndexAndEndpointId(ReadCommissioningInfo & info)
+CHIP_ERROR DeviceCommissioner::ParseAdminFabricIndexAndEndpointId(const ReadCommissioningInfo & info)
 {
     auto attributeCache = info.attributes;
 
@@ -128,7 +135,7 @@ CHIP_ERROR DeviceCommissioner::ParseAdminFabricIndexAndEndpointId(ReadCommission
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::ParseOperationalCredentials(ReadCommissioningInfo & info)
+CHIP_ERROR DeviceCommissioner::ParseOperationalCredentials(const ReadCommissioningInfo & info)
 {
     auto attributeCache = info.attributes;
 
@@ -158,7 +165,7 @@ CHIP_ERROR DeviceCommissioner::ParseOperationalCredentials(ReadCommissioningInfo
 
                     if (fabricDescriptor.fabricIndex == mInfo.adminFabricIndex)
                     {
-                        if (fabricDescriptor.rootPublicKey.size() != Crypto::kP256_PublicKey_Length)
+                        if (fabricDescriptor.rootPublicKey.size() != kP256_PublicKey_Length)
                         {
                             ChipLogError(Controller, "JCM: Fabric root key size mismatch");
                             return CHIP_ERROR_KEY_NOT_FOUND;
@@ -248,7 +255,7 @@ CHIP_ERROR DeviceCommissioner::ParseOperationalCredentials(ReadCommissioningInfo
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
+CHIP_ERROR DeviceCommissioner::ParseTrustedRoot(const ReadCommissioningInfo & info)
 {
     auto attributeCache = info.attributes;
 
@@ -267,19 +274,19 @@ CHIP_ERROR DeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
                 while (iter.Next())
                 {
                     auto & trustedCA = iter.GetValue();
-                    Credentials::P256PublicKeySpan trustedCAPublicKeySpan;
+                    P256PublicKeySpan trustedCAPublicKeySpan;
 
-                    ReturnErrorOnFailure(Credentials::ExtractPublicKeyFromChipCert(trustedCA, trustedCAPublicKeySpan));
-                    Crypto::P256PublicKey trustedCAPublicKey{ trustedCAPublicKeySpan };
+                    ReturnErrorOnFailure(ExtractPublicKeyFromChipCert(trustedCA, trustedCAPublicKeySpan));
+                    P256PublicKey trustedCAPublicKey{ trustedCAPublicKeySpan };
 
-                    if (mInfo.rootPublicKey.AllocatedSize() != Crypto::kP256_PublicKey_Length)
+                    if (mInfo.rootPublicKey.AllocatedSize() != kP256_PublicKey_Length)
                     {
                         ChipLogError(Controller, "JCM: Fabric root key size mismatch");
                         return CHIP_ERROR_KEY_NOT_FOUND;
                     }
 
-                    Credentials::P256PublicKeySpan rootPubKeySpan(mInfo.rootPublicKey.Get());
-                    Crypto::P256PublicKey fabricTableRootPublicKey{ rootPubKeySpan };
+                    P256PublicKeySpan rootPubKeySpan(mInfo.rootPublicKey.Get());
+                    P256PublicKey fabricTableRootPublicKey{ rootPubKeySpan };
 
                     if (trustedCAPublicKey.Matches(fabricTableRootPublicKey) && trustedCA.size())
                     {
@@ -374,10 +381,10 @@ TrustVerificationError DeviceCommissioner::VerifyAdministratorInformation()
     }
 
     CATValues cats;
-    auto nocSpan = mInfo.adminNOC.Span();
-    Credentials::ExtractCATsFromOpCert(nocSpan, cats);
+    auto nocSpan   = mInfo.adminNOC.Span();
+    CHIP_ERROR err = ExtractCATsFromOpCert(nocSpan, cats);
 
-    if (!cats.ContainsIdentifier(kAdminCATIdentifier))
+    if ((err != CHIP_NO_ERROR) || !cats.ContainsIdentifier(kAdminCATIdentifier))
     {
         return TrustVerificationError::kInvalidAdministratorCAT;
     }
@@ -390,17 +397,34 @@ TrustVerificationError DeviceCommissioner::VerifyAdministratorInformation()
     return TrustVerificationError::kSuccess;
 }
 
-TrustVerificationError DeviceCommissioner::PerformVendorIDVerificationProcedure()
+void DeviceCommissioner::OnVendorIdVerificationComplete(const CHIP_ERROR & err)
 {
-    ChipLogProgress(Controller, "Performing Vendor ID Verification Procedure");
+    ContinueAfterVendorIDVerification(err);
+}
 
-    if (mTrustVerificationDelegate == nullptr)
+CHIP_ERROR DeviceCommissioner::OnLookupOperationalTrustAnchor(VendorId vendorID, CertificateKeyId & subjectKeyId,
+                                                              ByteSpan & globallyTrustedRootSpan)
+{
+    if (mTrustVerificationDelegate != nullptr)
     {
-        ChipLogError(Controller, "JCM: TrustVerificationDelegate is not set");
-        return TrustVerificationError::kTrustVerificationDelegateNotSet; // Indicate that the delegate is not set
+        return mTrustVerificationDelegate->OnLookupOperationalTrustAnchor(vendorID, subjectKeyId, globallyTrustedRootSpan);
     }
 
-    mTrustVerificationDelegate->OnVerifyVendorId(*this, mInfo);
+    return CHIP_ERROR_INTERNAL;
+}
+
+TrustVerificationError DeviceCommissioner::PerformVendorIDVerificationProcedure()
+{
+    auto getSession = [this]() { return this->mDeviceProxy->GetSecureSession(); };
+
+    CHIP_ERROR err = VerifyVendorId(mDeviceProxy->GetExchangeManager(), getSession, &mInfo);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to send Verify VendorId: %s", ErrorStr(err));
+        ContinueAfterVendorIDVerification(err);
+        return TrustVerificationError::kVendorIdVerificationFailed;
+    }
+
     return TrustVerificationError::kAsync; // Indicate that this is an async operation
 }
 
@@ -417,7 +441,7 @@ TrustVerificationError DeviceCommissioner::AskUserForConsent()
     return TrustVerificationError::kAsync; // Indicate that this is an async operation
 }
 
-void DeviceCommissioner::PerformTrustVerificationStage(TrustVerificationStage nextStage)
+void DeviceCommissioner::PerformTrustVerificationStage(const TrustVerificationStage & nextStage)
 {
     TrustVerificationError error = TrustVerificationError::kSuccess;
 
@@ -450,39 +474,7 @@ void DeviceCommissioner::PerformTrustVerificationStage(TrustVerificationStage ne
     }
 }
 
-void DeviceCommissioner::TrustVerificationStageFinished(TrustVerificationStage completedStage, TrustVerificationError error)
-{
-    ChipLogProgress(Controller, "JCM: Trust Verification Stage Finished: %s", EnumToString(completedStage).c_str());
-
-    if (mTrustVerificationDelegate != nullptr)
-    {
-        mTrustVerificationDelegate->OnProgressUpdate(*this, completedStage, mInfo, error);
-    }
-
-    if (error != TrustVerificationError::kSuccess)
-    {
-        OnTrustVerificationComplete(error);
-        return;
-    }
-
-    if (completedStage == TrustVerificationStage::kComplete || completedStage == TrustVerificationStage::kError)
-    {
-        ChipLogProgress(Controller, "JCM: Trust Verification already complete or error");
-        OnTrustVerificationComplete(error);
-        return;
-    }
-
-    auto nextStage = GetNextTrustVerificationStage(completedStage);
-    if (nextStage == TrustVerificationStage::kError)
-    {
-        OnTrustVerificationComplete(TrustVerificationError::kInternalError);
-        return;
-    }
-
-    PerformTrustVerificationStage(nextStage);
-}
-
-TrustVerificationStage DeviceCommissioner::GetNextTrustVerificationStage(TrustVerificationStage currentStage)
+TrustVerificationStage DeviceCommissioner::GetNextTrustVerificationStage(const TrustVerificationStage & currentStage)
 {
     TrustVerificationStage nextStage = TrustVerificationStage::kIdle;
 
@@ -537,7 +529,9 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
 
 bool DeviceCommissioner::HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData)
 {
-    if (GetCommissioningParameters().HasValue() && GetCommissioningParameters().Value().GetUseJCM().ValueOr(false))
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    if (GetCommissioningParameters().GetUseJCM().ValueOr(false))
     {
         if (nodeData.commissioningMode != to_underlying(Dnssd::CommissioningMode::kEnabledJointFabric))
         {
@@ -552,6 +546,9 @@ bool DeviceCommissioner::HasValidCommissioningMode(const Dnssd::CommissionNodeDa
     }
 
     return true;
+#else
+    return false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 }
 
 } // namespace JCM

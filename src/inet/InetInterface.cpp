@@ -95,7 +95,7 @@ CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & i
         return INET_ERROR_UNKNOWN_INTERFACE;
     }
 
-    interface = InterfaceId(intfNum);
+    interface = InterfaceId(static_cast<PlatformType>(intfNum));
     if (intfNum == 0)
     {
         return INET_ERROR_UNKNOWN_INTERFACE;

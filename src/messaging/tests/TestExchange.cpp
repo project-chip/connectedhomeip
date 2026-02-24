@@ -45,14 +45,14 @@ using namespace chip::Messaging;
 
 class MockExchangeDelegate;
 
-struct TestExchange : public Test::LoopbackMessagingContext
+struct TestExchange : public Testing::LoopbackMessagingContext
 {
     void SetUp() override
     {
 #if CHIP_CRYPTO_PSA
         ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
 #endif
-        chip::Test::LoopbackMessagingContext::SetUp();
+        Testing::LoopbackMessagingContext::SetUp();
     }
 
     template <typename AfterRequestChecker, typename AfterResponseChecker>
@@ -151,8 +151,11 @@ void TestExchange::DoRoundTripTest(MockExchangeDelegate & delegate1, MockExchang
     ec1->Close();
     ec2->Close();
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::Id, kMsgType_TEST1);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::Id, kMsgType_TEST1,
+                                                                          &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &delegate2);
 }
 
 TEST_F(TestExchange, CheckBasicMessageRoundTrip)

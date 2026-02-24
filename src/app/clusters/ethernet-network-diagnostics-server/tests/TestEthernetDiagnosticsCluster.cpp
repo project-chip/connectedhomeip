@@ -15,10 +15,11 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/ethernet-network-diagnostics-server/ethernet-diagnostics-cluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/ethernet-network-diagnostics-server/EthernetDiagnosticsCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/EthernetNetworkDiagnostics/Enums.h>
 #include <clusters/EthernetNetworkDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -34,6 +35,8 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
+using chip::Testing::IsAcceptedCommandsListEqualTo;
+using chip::Testing::IsAttributesListEqualTo;
 
 struct TestEthernetDiagnosticsCluster : public ::testing::Test
 {
@@ -70,18 +73,11 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
         EthernetDiagnosticsServerCluster cluster(nullProvider, {}, optionalAttributeSet);
 
         // without any enabled attributes, no commands are accepted
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
 
         // Everything is unimplemented, so attributes are just the global ones.
         // This is really not a useful cluster, but possible...
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), attributesBuilder),
-                  CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), DefaultServerCluster::GlobalAttributes()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster, {}));
     }
 
     {
@@ -110,28 +106,17 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
             BitFlags<EthernetNetworkDiagnostics::Feature>{ EthernetNetworkDiagnostics::Feature::kPacketCounts },
             optionalAttributeSet);
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
-
-        ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
-        ASSERT_EQ(commands.size(), 1u);
-        ASSERT_EQ(commands[0].commandId, EthernetNetworkDiagnostics::Commands::ResetCounts::Id);
-        ASSERT_EQ(commands[0].GetInvokePrivilege(),
-                  EthernetNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry.GetInvokePrivilege());
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      EthernetNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry,
+                                                  }));
 
         // Test with PacketCount enabled
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), attributesBuilder),
-                  CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({ EthernetNetworkDiagnostics::Attributes::PacketRxCount::kMetadataEntry,
-                                                   EthernetNetworkDiagnostics::Attributes::PacketTxCount::kMetadataEntry }),
-                  CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                EthernetNetworkDiagnostics::Attributes::PacketRxCount::kMetadataEntry,
+                                                EthernetNetworkDiagnostics::Attributes::PacketTxCount::kMetadataEntry,
+                                            }));
     }
 
     {
@@ -197,37 +182,24 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
             allProvider, { EthernetNetworkDiagnostics::Feature::kPacketCounts, EthernetNetworkDiagnostics::Feature::kErrorCounts },
             optionalAttributeSet);
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), commandsBuilder),
-                  CHIP_NO_ERROR);
-
-        ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
-        ASSERT_EQ(commands.size(), 1u);
-        ASSERT_EQ(commands[0].commandId, EthernetNetworkDiagnostics::Commands::ResetCounts::Id);
-        ASSERT_EQ(commands[0].GetInvokePrivilege(),
-                  EthernetNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry.GetInvokePrivilege());
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      EthernetNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry,
+                                                  }));
 
         // Test all ethernet-specific attributes
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), attributesBuilder),
-                  CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      EthernetNetworkDiagnostics::Attributes::CarrierDetect::kMetadataEntry,
-                      EthernetNetworkDiagnostics::Attributes::CollisionCount::kMetadataEntry,
-                      EthernetNetworkDiagnostics::Attributes::FullDuplex::kMetadataEntry,
-                      EthernetNetworkDiagnostics::Attributes::OverrunCount::kMetadataEntry,
-                      EthernetNetworkDiagnostics::Attributes::PacketRxCount::kMetadataEntry,
-                      EthernetNetworkDiagnostics::Attributes::PacketTxCount::kMetadataEntry,
-                      EthernetNetworkDiagnostics::Attributes::PHYRate::kMetadataEntry,
-                      EthernetNetworkDiagnostics::Attributes::TimeSinceReset::kMetadataEntry,
-                      EthernetNetworkDiagnostics::Attributes::TxErrCount::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                EthernetNetworkDiagnostics::Attributes::CarrierDetect::kMetadataEntry,
+                                                EthernetNetworkDiagnostics::Attributes::CollisionCount::kMetadataEntry,
+                                                EthernetNetworkDiagnostics::Attributes::FullDuplex::kMetadataEntry,
+                                                EthernetNetworkDiagnostics::Attributes::OverrunCount::kMetadataEntry,
+                                                EthernetNetworkDiagnostics::Attributes::PacketRxCount::kMetadataEntry,
+                                                EthernetNetworkDiagnostics::Attributes::PacketTxCount::kMetadataEntry,
+                                                EthernetNetworkDiagnostics::Attributes::PHYRate::kMetadataEntry,
+                                                EthernetNetworkDiagnostics::Attributes::TimeSinceReset::kMetadataEntry,
+                                                EthernetNetworkDiagnostics::Attributes::TxErrCount::kMetadataEntry,
+                                            }));
 
         // Test that the provider methods are working correctly by directly accessing the provider
         uint64_t value;

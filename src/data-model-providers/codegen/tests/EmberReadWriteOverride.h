@@ -22,7 +22,7 @@
 #include <variant>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 /// specify what the next `emAfReadOrWriteAttribute` will contain
 ///
@@ -32,5 +32,5 @@ void SetEmberReadOutput(std::variant<chip::ByteSpan, chip::Protocols::Interactio
 /// Grab the data currently in the buffer
 chip::ByteSpan GetEmberBuffer();
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

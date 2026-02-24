@@ -121,10 +121,8 @@ public:
      *
      * @param[in] addr   Address of the device to be set.
      * @param[in] config MRP parameters
-     *
-     * @return CHIP_NO_ERROR if the data has been updated, an error code otherwise.
      */
-    CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
+    void UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
 
     /**
      * @brief

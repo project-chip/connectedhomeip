@@ -35,11 +35,16 @@ namespace chip {
 namespace Dnssd {
 struct TextEntry;
 struct DnssdService;
+class CommissionAdvertisingParameters;
 } // namespace Dnssd
 
 namespace Thread {
 class OperationalDataset;
 } // namespace Thread
+
+namespace Transport {
+class PeerAddress;
+} // namespace Transport
 
 namespace DeviceLayer {
 
@@ -47,6 +52,14 @@ class PlatformManagerImpl;
 class ThreadStackManagerImpl;
 class ConfigurationManagerImpl;
 class DeviceControlServer;
+
+/**
+ * Provides a callback to send a Rendezvous announcement to a peer.
+ *
+ * @param[in] context A pointer to a context provided by the caller.
+ * @param[in] peerAddr The address of the peer to send the announcement to.
+ */
+typedef CHIP_ERROR (*RendezvousAnnouncementRequestCallback)(void * context, const Transport::PeerAddress & peerAddr);
 
 namespace Internal {
 class NFCCommissioningManagerImpl;
@@ -103,13 +116,14 @@ public:
     bool IsThreadProvisioned();
     bool IsThreadAttached();
     CHIP_ERROR GetThreadProvision(Thread::OperationalDataset & dataset);
-    CHIP_ERROR GetAndLogThreadStatsCounters();
-    CHIP_ERROR GetAndLogThreadTopologyMinimal();
-    CHIP_ERROR GetAndLogThreadTopologyFull();
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
-    CHIP_ERROR GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     CHIP_ERROR GetThreadVersion(uint16_t & version);
-    CHIP_ERROR GetPollPeriod(uint32_t & buf);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    CHIP_ERROR RendezvousStart(RendezvousAnnouncementRequestCallback announcementRequest, void * context);
+    void RendezvousStop();
+    void CancelRendezvousAnnouncement();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
 
     CHIP_ERROR SetThreadProvision(ByteSpan aDataset);
     CHIP_ERROR SetThreadEnabled(bool val);
@@ -194,8 +208,6 @@ private:
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 #endif
-
-    bool HaveMeshConnectivity();
 
 protected:
     // Construction/destruction limited to subclasses.
@@ -423,34 +435,9 @@ inline CHIP_ERROR ThreadStackManager::SetPollingInterval(System::Clock::Millisec
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-inline bool ThreadStackManager::HaveMeshConnectivity()
-{
-    return static_cast<ImplClass *>(this)->_HaveMeshConnectivity();
-}
-
-inline CHIP_ERROR ThreadStackManager::GetAndLogThreadStatsCounters()
-{
-    return static_cast<ImplClass *>(this)->_GetAndLogThreadStatsCounters();
-}
-
-inline CHIP_ERROR ThreadStackManager::GetAndLogThreadTopologyMinimal()
-{
-    return static_cast<ImplClass *>(this)->_GetAndLogThreadTopologyMinimal();
-}
-
-inline CHIP_ERROR ThreadStackManager::GetAndLogThreadTopologyFull()
-{
-    return static_cast<ImplClass *>(this)->_GetAndLogThreadTopologyFull();
-}
-
 inline CHIP_ERROR ThreadStackManager::GetPrimary802154MACAddress(uint8_t * buf)
 {
     return static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(buf);
-}
-
-inline CHIP_ERROR ThreadStackManager::GetExternalIPv6Address(chip::Inet::IPAddress & addr)
-{
-    return static_cast<ImplClass *>(this)->_GetExternalIPv6Address(addr);
 }
 
 inline CHIP_ERROR ThreadStackManager::GetThreadVersion(uint16_t & version)
@@ -458,10 +445,22 @@ inline CHIP_ERROR ThreadStackManager::GetThreadVersion(uint16_t & version)
     return static_cast<ImplClass *>(this)->_GetThreadVersion(version);
 }
 
-inline CHIP_ERROR ThreadStackManager::GetPollPeriod(uint32_t & buf)
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+inline CHIP_ERROR ThreadStackManager::RendezvousStart(RendezvousAnnouncementRequestCallback announcementRequest, void * context)
 {
-    return static_cast<ImplClass *>(this)->_GetPollPeriod(buf);
+    return static_cast<ImplClass *>(this)->_RendezvousStart(announcementRequest, context);
 }
+
+inline void ThreadStackManager::RendezvousStop()
+{
+    static_cast<ImplClass *>(this)->_RendezvousStop();
+}
+
+inline void ThreadStackManager::CancelRendezvousAnnouncement()
+{
+    static_cast<ImplClass *>(this)->_CancelRendezvousAnnouncement();
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
 
 inline void ThreadStackManager::ResetThreadNetworkDiagnosticsCounts()
 {

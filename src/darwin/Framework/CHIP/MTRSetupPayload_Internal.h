@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 MTR_DIRECT_MEMBERS
 @interface MTRSetupPayload ()
 
-- (instancetype)initWithSetupPayload:(chip::SetupPayload)setupPayload;
+- (instancetype)initWithSetupPayload:(const chip::SetupPayload &)setupPayload;
 - (nullable instancetype)initWithQRCode:(NSString *)qrCodePayload;
 - (nullable instancetype)initWithManualPairingCode:(NSString *)manualCode;
 

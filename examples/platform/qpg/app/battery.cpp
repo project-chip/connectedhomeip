@@ -85,7 +85,7 @@ using namespace chip::app::Clusters;
 
 void SetBatteryVoltage(uint32_t voltage)
 {
-    SystemLayer().ScheduleLambda([voltage] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([voltage] {
         Protocols::InteractionModel::Status status =
             PowerSource::Attributes::BatVoltage::Set(QPG_BATTERY_ENDPOINT_ID, (uint32_t) voltage);
         if (status != Protocols::InteractionModel::Status::Success)
@@ -97,7 +97,7 @@ void SetBatteryVoltage(uint32_t voltage)
 
 void SetBatteryPercentageRemaining(DoubledPercentage value)
 {
-    SystemLayer().ScheduleLambda([value] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([value] {
         Protocols::InteractionModel::Status status =
             PowerSource::Attributes::BatPercentRemaining::Set(QPG_BATTERY_ENDPOINT_ID, value);
         if (status != Protocols::InteractionModel::Status::Success)
@@ -109,7 +109,7 @@ void SetBatteryPercentageRemaining(DoubledPercentage value)
 
 void SetBatChargeLevel(BatChargeLevelEnum level)
 {
-    SystemLayer().ScheduleLambda([level] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([level] {
         Protocols::InteractionModel::Status status = PowerSource::Attributes::BatChargeLevel::Set(QPG_BATTERY_ENDPOINT_ID, level);
         if (status != Protocols::InteractionModel::Status::Success)
         {

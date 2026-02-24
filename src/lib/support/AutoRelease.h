@@ -30,36 +30,60 @@ namespace chip {
 /// RAII class for iterators that guarantees that Release() will be called
 /// on the underlying type.  This is effectively a simple unique_ptr, except
 /// calling Release instead of delete
+/// See also ReferenceCountedPtr<T>, which automatically retains a ReferenceCounted
 template <typename Releasable>
 class AutoRelease
 {
 public:
     AutoRelease(Releasable * releasable) : mReleasable(releasable) {}
-    ~AutoRelease() { Release(); }
+    __attribute__((always_inline)) inline ~AutoRelease() { Release(); }
 
-    // Not copyable or movable
+    // Not copyable
     AutoRelease(const AutoRelease &)             = delete;
-    AutoRelease(const AutoRelease &&)            = delete;
     AutoRelease & operator=(const AutoRelease &) = delete;
+
+    AutoRelease(AutoRelease && other) : mReleasable(other.mReleasable) { other.mReleasable = nullptr; }
+    AutoRelease & operator=(AutoRelease && other)
+    {
+        if (this != &other)
+        {
+            Release();
+            mReleasable       = other.mReleasable;
+            other.mReleasable = nullptr;
+        }
+        return *this;
+    }
 
     inline Releasable * operator->() { return mReleasable; }
     inline const Releasable * operator->() const { return mReleasable; }
     inline const Releasable & operator*() const { return *mReleasable; }
     inline Releasable & operator*() { return *mReleasable; }
-    inline operator const Releasable *() const { return mReleasable; }
-    inline operator Releasable *() { return mReleasable; }
 
+    inline operator bool() { return mReleasable != nullptr; }
     inline bool IsNull() const { return mReleasable == nullptr; }
 
-    void Release()
+    __attribute__((always_inline)) inline void Release()
     {
         VerifyOrReturn(mReleasable != nullptr);
         mReleasable->Release();
         mReleasable = nullptr;
     }
 
-private:
+    void Set(Releasable * releasable)
+    {
+        if (mReleasable != releasable)
+        {
+            Release();
+            mReleasable = releasable;
+        }
+    }
+
+protected:
     Releasable * mReleasable = nullptr;
 };
+
+// Template deduction guides to allow auto-release creation from pointers
+template <class T>
+AutoRelease(T * releasable) -> AutoRelease<T>;
 
 } // namespace chip

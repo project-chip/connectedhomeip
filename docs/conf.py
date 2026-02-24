@@ -21,6 +21,7 @@ version = "1.0.0"
 extensions = [
     "myst_parser",
     "external_content",
+    "sphinxcontrib.mermaid",
 ]
 exclude_patterns = [
     "_build",
@@ -34,6 +35,7 @@ exclude_patterns = [
     "examples/thermostat/nxp/linux-se05x/README.md",
     "examples/common/m5stack-tft/repo",
     "docs/guides/README.md",
+    "**/tests/*.md",
 ]
 
 
@@ -61,7 +63,7 @@ suppress_warnings = [
     "myst.xref_missing",
 ]
 myst_enable_extensions = ["html_image"]
-
+myst_fence_as_directive = ["mermaid"]
 
 # -- Options for external_content --------------------------------------------
 

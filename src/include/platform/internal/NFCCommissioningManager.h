@@ -24,6 +24,7 @@
 #pragma once
 
 #include <lib/support/CodeUtils.h>
+#include <nfc/NFCReaderTransport.h>
 #include <platform/ConnectivityManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
@@ -53,6 +54,8 @@ public:
 
     CHIP_ERROR Init();
     void Shutdown();
+    Nfc::NFCReaderTransport * GetNFCReaderTransport() const;
+    void SetNFCReaderTransport(Nfc::NFCReaderTransport * readerTransport);
 
 protected:
     // Construction/destruction limited to subclasses.
@@ -107,6 +110,16 @@ inline CHIP_ERROR NFCCommissioningManager::Init()
 inline void NFCCommissioningManager::Shutdown()
 {
     static_cast<ImplClass *>(this)->_Shutdown();
+}
+
+inline Nfc::NFCReaderTransport * NFCCommissioningManager::GetNFCReaderTransport() const
+{
+    return static_cast<const ImplClass *>(this)->_GetNFCReaderTransport();
+}
+
+inline void NFCCommissioningManager::SetNFCReaderTransport(Nfc::NFCReaderTransport * readerTransport)
+{
+    return static_cast<ImplClass *>(this)->_SetNFCReaderTransport(readerTransport);
 }
 
 } // namespace Internal

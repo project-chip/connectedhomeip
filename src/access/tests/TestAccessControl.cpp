@@ -23,6 +23,7 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 namespace chip {
 namespace Access {
@@ -1086,7 +1087,7 @@ public: // protected
     {
         AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate();
         SetAccessControl(accessControl);
-        VerifyOrDie(GetAccessControl().Init(delegate, testDeviceTypeResolver) == CHIP_NO_ERROR);
+        SuccessOrDie(GetAccessControl().Init(delegate, testDeviceTypeResolver));
     }
     static void TearDownTestSuite()
     {
@@ -1126,12 +1127,12 @@ TEST_F(TestAccessControl, TestAclValidateAuthModeSubject)
         EXPECT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_SUCCESS(accessControl.DeleteEntry(1));
 
         EXPECT_EQ(entry.SetAuthMode(AuthMode::kGroup), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_SUCCESS(accessControl.DeleteEntry(1));
 
         EXPECT_EQ(entry.AddSubject(nullptr, kOperationalNodeId0), CHIP_NO_ERROR);
     }
@@ -1142,7 +1143,7 @@ TEST_F(TestAccessControl, TestAclValidateAuthModeSubject)
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_SUCCESS(accessControl.DeleteEntry(1));
     }
 
     EXPECT_EQ(entry.SetAuthMode(AuthMode::kGroup), CHIP_NO_ERROR);
@@ -1151,7 +1152,7 @@ TEST_F(TestAccessControl, TestAclValidateAuthModeSubject)
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_SUCCESS(accessControl.DeleteEntry(1));
     }
 
     // Use test entry for invalid cases (to ensure it can hold invalid data)
@@ -1164,7 +1165,7 @@ TEST_F(TestAccessControl, TestAclValidateAuthModeSubject)
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
 
     EXPECT_EQ(entry.SetAuthMode(AuthMode::kCase), CHIP_NO_ERROR);
@@ -1173,21 +1174,21 @@ TEST_F(TestAccessControl, TestAclValidateAuthModeSubject)
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
     for (auto subject : validPaseSubjects)
     {
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
     for (auto subject : invalidSubjects)
     {
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
 
     EXPECT_EQ(entry.SetAuthMode(AuthMode::kGroup), CHIP_NO_ERROR);
@@ -1196,21 +1197,21 @@ TEST_F(TestAccessControl, TestAclValidateAuthModeSubject)
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
     for (auto subject : validPaseSubjects)
     {
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
     for (auto subject : invalidSubjects)
     {
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
 
     EXPECT_EQ(entry.SetAuthMode(AuthMode::kPase), CHIP_NO_ERROR);
@@ -1219,21 +1220,21 @@ TEST_F(TestAccessControl, TestAclValidateAuthModeSubject)
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
     for (auto subject : validGroupSubjects)
     {
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
     for (auto subject : invalidSubjects)
     {
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
 
     EXPECT_EQ(entry.SetAuthMode(AuthMode::kNone), CHIP_NO_ERROR);
@@ -1242,28 +1243,28 @@ TEST_F(TestAccessControl, TestAclValidateAuthModeSubject)
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
     for (auto subject : validGroupSubjects)
     {
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
     for (auto subject : validPaseSubjects)
     {
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
     for (auto subject : invalidSubjects)
     {
         EXPECT_EQ(entry.SetSubject(0, subject), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
 
     // Next cases have no subject
@@ -1274,7 +1275,7 @@ TEST_F(TestAccessControl, TestAclValidateAuthModeSubject)
         EXPECT_EQ(entry.SetAuthMode(AuthMode::kPase), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
 
     // None is not a real auth mode but also shouldn't work with no subject
@@ -1282,7 +1283,7 @@ TEST_F(TestAccessControl, TestAclValidateAuthModeSubject)
         EXPECT_EQ(entry.SetAuthMode(AuthMode::kNone), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
 }
 
@@ -1307,7 +1308,7 @@ TEST_F(TestAccessControl, TestAclValidateFabricIndex)
         EXPECT_EQ(entry.SetFabricIndex(fabricIndex), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_SUCCESS(accessControl.DeleteEntry(1));
     }
 
     // Use test entry for invalid cases (to ensure it can hold invalid data)
@@ -1318,7 +1319,7 @@ TEST_F(TestAccessControl, TestAclValidateFabricIndex)
         EXPECT_EQ(entry.SetFabricIndex(fabricIndex), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
 }
 
@@ -1343,7 +1344,7 @@ TEST_F(TestAccessControl, TestAclValidatePrivilege)
         EXPECT_EQ(entry.SetPrivilege(privilege), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_SUCCESS(accessControl.DeleteEntry(1));
     }
 
     // Use test entry for invalid cases (to ensure it can hold invalid data)
@@ -1356,7 +1357,7 @@ TEST_F(TestAccessControl, TestAclValidatePrivilege)
         EXPECT_EQ(entry.SetSubject(0, kGroup4), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
 }
 
@@ -1381,7 +1382,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
         EXPECT_EQ(entry.SetTarget(0, { .flags = Target::kCluster, .cluster = cluster }), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_SUCCESS(accessControl.DeleteEntry(1));
     }
 
     for (auto endpoint : validEndpoints)
@@ -1389,7 +1390,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
         EXPECT_EQ(entry.SetTarget(0, { .flags = Target::kEndpoint, .endpoint = endpoint }), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_SUCCESS(accessControl.DeleteEntry(1));
     }
 
     for (auto deviceType : validDeviceTypes)
@@ -1397,7 +1398,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
         EXPECT_EQ(entry.SetTarget(0, { .flags = Target::kDeviceType, .deviceType = deviceType }), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_SUCCESS(accessControl.DeleteEntry(1));
     }
 
     for (auto cluster : validClusters)
@@ -1409,7 +1410,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                 CHIP_NO_ERROR);
             EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
             EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-            accessControl.DeleteEntry(1);
+            EXPECT_SUCCESS(accessControl.DeleteEntry(1));
         }
     }
 
@@ -1422,7 +1423,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                       CHIP_NO_ERROR);
             EXPECT_EQ(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
             EXPECT_EQ(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-            accessControl.DeleteEntry(1);
+            EXPECT_SUCCESS(accessControl.DeleteEntry(1));
         }
     }
 
@@ -1439,7 +1440,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                       CHIP_NO_ERROR);
             EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
             EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-            accessControl.DeleteEntry(1);
+            EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
         }
     }
 
@@ -1458,7 +1459,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                           CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-                accessControl.DeleteEntry(1);
+                EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
             }
         }
     }
@@ -1468,7 +1469,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
         EXPECT_EQ(entry.SetTarget(0, { .flags = 0 }), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
 
     for (auto cluster : invalidClusters)
@@ -1476,7 +1477,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
         EXPECT_EQ(entry.SetTarget(0, { .flags = Target::kCluster, .cluster = cluster }), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
 
     for (auto endpoint : invalidEndpoints)
@@ -1484,7 +1485,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
         EXPECT_EQ(entry.SetTarget(0, { .flags = Target::kEndpoint, .endpoint = endpoint }), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
 
     for (auto deviceType : invalidDeviceTypes)
@@ -1492,7 +1493,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
         EXPECT_EQ(entry.SetTarget(0, { .flags = Target::kDeviceType, .deviceType = deviceType }), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
         EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        accessControl.DeleteEntry(1);
+        EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
     }
 
     for (auto cluster : invalidClusters)
@@ -1504,7 +1505,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                 CHIP_NO_ERROR);
             EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
             EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-            accessControl.DeleteEntry(1);
+            EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
         }
     }
 
@@ -1517,7 +1518,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                 CHIP_NO_ERROR);
             EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
             EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-            accessControl.DeleteEntry(1);
+            EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
         }
     }
 
@@ -1530,7 +1531,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                 CHIP_NO_ERROR);
             EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
             EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-            accessControl.DeleteEntry(1);
+            EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
         }
     }
 
@@ -1543,7 +1544,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                       CHIP_NO_ERROR);
             EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
             EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-            accessControl.DeleteEntry(1);
+            EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
         }
     }
 
@@ -1556,7 +1557,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                       CHIP_NO_ERROR);
             EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
             EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-            accessControl.DeleteEntry(1);
+            EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
         }
     }
 
@@ -1569,7 +1570,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                       CHIP_NO_ERROR);
             EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
             EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-            accessControl.DeleteEntry(1);
+            EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
         }
     }
 
@@ -1582,7 +1583,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                       CHIP_NO_ERROR);
             EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
             EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-            accessControl.DeleteEntry(1);
+            EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
         }
     }
 
@@ -1595,7 +1596,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                       CHIP_NO_ERROR);
             EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
             EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-            accessControl.DeleteEntry(1);
+            EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
         }
     }
 
@@ -1608,7 +1609,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                       CHIP_NO_ERROR);
             EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
             EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-            accessControl.DeleteEntry(1);
+            EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
         }
     }
 
@@ -1626,7 +1627,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                           CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-                accessControl.DeleteEntry(1);
+                EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
             }
         }
     }
@@ -1645,7 +1646,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                           CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-                accessControl.DeleteEntry(1);
+                EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
             }
         }
     }
@@ -1664,7 +1665,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                           CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-                accessControl.DeleteEntry(1);
+                EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
             }
         }
     }
@@ -1683,7 +1684,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                           CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-                accessControl.DeleteEntry(1);
+                EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
             }
         }
     }
@@ -1702,7 +1703,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                           CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-                accessControl.DeleteEntry(1);
+                EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
             }
         }
     }
@@ -1721,7 +1722,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                           CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-                accessControl.DeleteEntry(1);
+                EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
             }
         }
     }
@@ -1740,7 +1741,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
                           CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.UpdateEntry(0, entry), CHIP_NO_ERROR);
                 EXPECT_NE(accessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-                accessControl.DeleteEntry(1);
+                EXPECT_NE(accessControl.DeleteEntry(1), CHIP_NO_ERROR);
             }
         }
     }
@@ -1748,7 +1749,7 @@ TEST_F(TestAccessControl, TestAclValidateTarget)
 
 TEST_F(TestAccessControl, TestCheck)
 {
-    LoadAccessControl(accessControl, entryData1, entryData1Count);
+    EXPECT_SUCCESS(LoadAccessControl(accessControl, entryData1, entryData1Count));
     for (const auto & checkData : checkData1)
     {
         CHIP_ERROR expectedResult = checkData.allow ? CHIP_NO_ERROR : CHIP_ERROR_ACCESS_DENIED;
@@ -1880,7 +1881,7 @@ TEST_F(TestAccessControl, TestFabricFilteredReadEntry)
 
 TEST_F(TestAccessControl, TestIterator)
 {
-    LoadAccessControl(accessControl, entryData1, entryData1Count);
+    EXPECT_SUCCESS(LoadAccessControl(accessControl, entryData1, entryData1Count));
 
     FabricIndex fabricIndex;
     EntryIterator iterator;

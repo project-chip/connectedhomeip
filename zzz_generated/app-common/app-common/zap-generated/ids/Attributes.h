@@ -26,6 +26,7 @@
 #include <clusters/ActivatedCarbonFilterMonitoring/AttributeIds.h>
 #include <clusters/AdministratorCommissioning/AttributeIds.h>
 #include <clusters/AirQuality/AttributeIds.h>
+#include <clusters/AmbientContextSensing/AttributeIds.h>
 #include <clusters/ApplicationBasic/AttributeIds.h>
 #include <clusters/ApplicationLauncher/AttributeIds.h>
 #include <clusters/AudioOutput/AttributeIds.h>
@@ -74,6 +75,7 @@
 #include <clusters/GeneralCommissioning/AttributeIds.h>
 #include <clusters/GeneralDiagnostics/AttributeIds.h>
 #include <clusters/GroupKeyManagement/AttributeIds.h>
+#include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groups/AttributeIds.h>
 #include <clusters/HepaFilterMonitoring/AttributeIds.h>
 #include <clusters/IcdManagement/AttributeIds.h>
@@ -154,6 +156,7 @@
 #include <clusters/WakeOnLan/AttributeIds.h>
 #include <clusters/WaterHeaterManagement/AttributeIds.h>
 #include <clusters/WaterHeaterMode/AttributeIds.h>
+#include <clusters/WaterTankLevelMonitoring/AttributeIds.h>
 #include <clusters/WebRTCTransportProvider/AttributeIds.h>
 #include <clusters/WebRTCTransportRequestor/AttributeIds.h>
 #include <clusters/WiFiNetworkDiagnostics/AttributeIds.h>

@@ -16,7 +16,7 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/ota-provider/ota-provider-cluster.h>
+#include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ScopedBuffer.h>

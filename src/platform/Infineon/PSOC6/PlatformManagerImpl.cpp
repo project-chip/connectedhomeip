@@ -33,34 +33,15 @@
 namespace chip {
 namespace DeviceLayer {
 
-namespace Internal {
-extern CHIP_ERROR InitLwIPCoreLock(void);
-}
-
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    CHIP_ERROR err;
-
-    // Make sure the LwIP core lock has been initialized
-    err = Internal::InitLwIPCoreLock();
-    SuccessOrExit(err);
-
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
-    err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
-
-CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)
-{
-    return Internal::InitLwIPCoreLock();
+    return Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
 }
 
 void PlatformManagerImpl::_Shutdown()
@@ -73,7 +54,8 @@ void PlatformManagerImpl::_Shutdown()
 
         if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                                                   static_cast<uint32_t>(upTime / 3600));
         }
         else
         {

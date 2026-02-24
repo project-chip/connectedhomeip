@@ -1489,7 +1489,7 @@ void InitNetworkIdentitySubject(ChipDN & name)
 {
     name.Clear();
     CHIP_ERROR err = name.AddAttribute_CommonName(kNetworkIdentityCN, /* not printable */ false);
-    VerifyOrDie(err == CHIP_NO_ERROR); // AddAttribute can't fail in this case
+    SuccessOrDie(err); // AddAttribute can't fail in this case
 }
 
 static CHIP_ERROR CalculateKeyIdentifierSha256(const P256PublicKeySpan & publicKey, MutableCertificateKeyId outKeyId)

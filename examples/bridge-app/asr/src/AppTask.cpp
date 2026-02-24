@@ -60,7 +60,7 @@ std::unique_ptr<app::Clusters::Actions::ActionsServer> sActionsServer;
 
 void NetWorkCommissioningInstInit()
 {
-    sWiFiNetworkCommissioningInstance.Init();
+    TEMPORARY_RETURN_IGNORED sWiFiNetworkCommissioningInstance.Init();
 
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
@@ -77,7 +77,7 @@ void emberAfActionsClusterInitCallback(EndpointId endpoint)
     sActionsDelegateImpl = std::make_unique<app::Clusters::Actions::ActionsDelegateImpl>();
     sActionsServer       = std::make_unique<app::Clusters::Actions::ActionsServer>(endpoint, *sActionsDelegateImpl.get());
 
-    sActionsServer->Init();
+    TEMPORARY_RETURN_IGNORED sActionsServer->Init();
 }
 
 static DeviceCallbacks EchoCallbacks;

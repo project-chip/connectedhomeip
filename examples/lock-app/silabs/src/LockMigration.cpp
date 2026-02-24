@@ -1,6 +1,25 @@
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #include <LockManager.h>
 #include <app/server/Server.h>
 #include <lib/support/CodeUtils.h>
+#include <nvm3_default.h>
 #include <platform/silabs/SilabsConfig.h>
 
 using namespace chip::app::Clusters;
@@ -178,8 +197,8 @@ bool MigrateCredentials(chip::EndpointId endpoint_id, const SilabsDoorLock::Lock
         }
     }
 
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_CredentialData);
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_Credential);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_CredentialData);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_Credential);
 exit:
     Platform::MemoryFree(creds_data_buffer);
     Platform::MemoryFree(creds_info_buffer);
@@ -266,9 +285,9 @@ bool MigrateUsers(chip::EndpointId endpoint_id, const SilabsDoorLock::LockInitPa
                                     info.credentialRule, new_creds, info.credentials.size());
     }
 
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_UserCredentials);
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_LockUserName);
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_LockUser);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_UserCredentials);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_LockUserName);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_LockUser);
 exit:
     Platform::MemoryFree(user_creds_buffer);
     Platform::MemoryFree(names_buffer);
@@ -384,9 +403,9 @@ bool MigrateSchedules(chip::EndpointId endpoint_id, const SilabsDoorLock::LockIn
         }
     }
 
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_WeekDaySchedules);
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_YearDaySchedules);
-    SilabsConfig::ClearConfigValue(Legacy::kConfigKey_HolidaySchedules);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_WeekDaySchedules);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_YearDaySchedules);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::ClearConfigValue(Legacy::kConfigKey_HolidaySchedules);
 exit:
     Platform::MemoryFree(week_schedules_buffer);
     Platform::MemoryFree(year_schedules_buffer);

@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster GeneralCommissioning (cluster code: 48/0x0430)
+// Identifier constant values for cluster GeneralCommissioning (cluster code: 48/0x0030)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

@@ -23,6 +23,7 @@
 #include <data-model-providers/codegen/tests/EmberInvokeOverride.h>
 #include <data-model-providers/codegen/tests/EmberReadWriteOverride.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 #include <server-cluster-shim/ServerClusterShim.h>
 
@@ -31,11 +32,11 @@
 // and also validates the ServerClusterShim.
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
-using namespace chip::app::Testing;
+using namespace chip::Testing;
 using namespace chip::Protocols::InteractionModel;
 using namespace chip::app::Clusters::Globals::Attributes;
 
@@ -323,26 +324,26 @@ struct TestServerClusterShim : public ::testing::Test
 TEST_F(TestServerClusterShim, TestWriteAttributeOnlyProvidedPathsAreValid)
 {
     TestServerClusterContext testContext;
-    chip::Test::SetMockNodeConfig(gTestNodeConfig);
+    SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim invalid_cluster(
         { { kMockEndpoint1,
             MockClusterId(1) } }); // Only adds path endpoint 1, cluster 1, even though behind the scenes ember knows more stuff.
-    invalid_cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(invalid_cluster.Startup(testContext.Get()));
 
     WriteOperation test(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_CHAR_STRING_ATTRIBUTE_TYPE));
     test.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
     AttributeValueDecoder decoder = test.DecoderFor<CharSpan>("hello world"_span);
 
-    chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Success);
+    SetEmberReadOutput(Protocols::InteractionModel::Status::Success);
     // Expect unsupported cluster because the ServerClusterShim instance was initialized with path 1,1 only
     ASSERT_EQ(invalid_cluster.WriteAttribute(test.GetRequest(), decoder), Status::Failure);
 
     // Create another cluster with the valid paths for the write command
     ServerClusterShim valid_cluster({ { kMockEndpoint1, MockClusterId(1) }, { kMockEndpoint3, MockClusterId(4) } });
-    valid_cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(valid_cluster.Startup(testContext.Get()));
 
-    chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Success);
+    SetEmberReadOutput(Protocols::InteractionModel::Status::Success);
     // Expect success now
     ASSERT_EQ(valid_cluster.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
 
@@ -356,10 +357,10 @@ TEST_F(TestServerClusterShim, TestWriteAttributeOnlyProvidedPathsAreValid)
 TEST_F(TestServerClusterShim, TestDataVersion)
 {
     TestServerClusterContext testContext;
-    chip::Test::SetMockNodeConfig(gTestNodeConfig);
+    SetMockNodeConfig(gTestNodeConfig);
 
     ServerClusterShim cluster({ { kMockEndpoint3, MockClusterId(4) } });
-    cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(cluster.Startup(testContext.Get()));
 
     DataVersion v1 = cluster.GetDataVersion({ kMockEndpoint3, MockClusterId(4) });
 
@@ -368,7 +369,7 @@ TEST_F(TestServerClusterShim, TestDataVersion)
 
     AttributeValueDecoder decoder = test.DecoderFor<CharSpan>("hello world"_span);
 
-    chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Success);
+    SetEmberReadOutput(Protocols::InteractionModel::Status::Success);
     ASSERT_EQ(cluster.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
 
     ASSERT_EQ(cluster.GetDataVersion({ kMockEndpoint3, MockClusterId(4) }), v1 + 1);
@@ -377,16 +378,16 @@ TEST_F(TestServerClusterShim, TestDataVersion)
 TEST_F(TestServerClusterShim, AttributeWriteShortString)
 {
     TestServerClusterContext testContext;
-    chip::Test::SetMockNodeConfig(gTestNodeConfig);
+    SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim cluster({ { kMockEndpoint3, MockClusterId(4) } });
-    cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(cluster.Startup(testContext.Get()));
 
     WriteOperation test(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_CHAR_STRING_ATTRIBUTE_TYPE));
     test.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
     AttributeValueDecoder decoder = test.DecoderFor<CharSpan>("hello world"_span);
 
-    chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Success);
+    SetEmberReadOutput(Protocols::InteractionModel::Status::Success);
     ASSERT_EQ(cluster.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
     chip::ByteSpan writtenData = GetEmberBuffer();
     ASSERT_GT(writtenData.size(), 0U);
@@ -398,11 +399,11 @@ TEST_F(TestServerClusterShim, AttributeWriteShortString)
 TEST_F(TestServerClusterShim, EmberAttributeReadOctetString)
 {
     TestServerClusterContext testContext;
-    chip::Test::SetMockNodeConfig(gTestNodeConfig);
+    SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim invalid_cluster({ { 1, 1 } });
     ServerClusterShim valid_cluster({ { kMockEndpoint3, MockClusterId(4) } });
-    invalid_cluster.Startup(testContext.Get());
-    valid_cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(invalid_cluster.Startup(testContext.Get()));
+    EXPECT_SUCCESS(valid_cluster.Startup(testContext.Get()));
 
     ReadOperation testRequest(kMockEndpoint3, MockClusterId(4),
                               MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE));
@@ -413,7 +414,7 @@ TEST_F(TestServerClusterShim, EmberAttributeReadOctetString)
     char data[] = "\0\0testing here with overflow";
     uint8_t * p = reinterpret_cast<uint8_t *>(data);
     chip::Encoding::LittleEndian::Write16(p, 4);
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+    SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Read on invalid cluster, expect Status::Failure
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -443,9 +444,9 @@ TEST_F(TestServerClusterShim, EmberAttributeReadOctetString)
 TEST_F(TestServerClusterShim, IterateOverAttributes)
 {
     TestServerClusterContext testContext;
-    chip::Test::SetMockNodeConfig(gTestNodeConfig);
+    SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim cluster({ { kMockEndpoint3, MockClusterId(4) } });
-    cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(cluster.Startup(testContext.Get()));
 
     // should be able to iterate over valid paths
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
@@ -493,27 +494,27 @@ TEST_F(TestServerClusterShim, EmberInvokeTest)
     // is actually invoked.
 
     TestServerClusterContext testContext;
-    chip::Test::SetMockNodeConfig(gTestNodeConfig);
+    SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim cluster_with_invalid_path({ { kMockEndpoint3, MockClusterId(4) } });
     ServerClusterShim cluster_with_valid_path({ { kMockEndpoint1, MockClusterId(1) } });
 
-    cluster_with_invalid_path.Startup(testContext.Get());
-    cluster_with_valid_path.Startup(testContext.Get());
+    EXPECT_SUCCESS(cluster_with_invalid_path.Startup(testContext.Get()));
+    EXPECT_SUCCESS(cluster_with_valid_path.Startup(testContext.Get()));
 
     {
         const ConcreteCommandPath kCommandPath(kMockEndpoint1, MockClusterId(1), kMockCommandId1);
         const InvokeRequest kInvokeRequest{ .path = kCommandPath };
         chip::TLV::TLVReader tlvReader;
 
-        const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
+        const uint32_t kDispatchCountPre = DispatchCount();
 
         // Using a handler set to nullptr as it is not used by the impl
         ASSERT_EQ(cluster_with_invalid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), Status::Failure);
-        EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre); // no dispatch expected
+        EXPECT_EQ(DispatchCount(), kDispatchCountPre); // no dispatch expected
 
         ASSERT_EQ(cluster_with_valid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
-        EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // one dispatch expected
-        EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
+        EXPECT_EQ(DispatchCount(), kDispatchCountPre + 1); // one dispatch expected
+        EXPECT_EQ(GetLastDispatchPath(), kCommandPath);    // for the right path
     }
 
     {
@@ -521,25 +522,25 @@ TEST_F(TestServerClusterShim, EmberInvokeTest)
         const InvokeRequest kInvokeRequest{ .path = kCommandPath };
         chip::TLV::TLVReader tlvReader;
 
-        const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
+        const uint32_t kDispatchCountPre = DispatchCount();
 
         // Using a handler set to nullptr as it is not used by the impl
         ASSERT_EQ(cluster_with_invalid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), Status::Failure);
 
-        EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre); // no dispatch expected
+        EXPECT_EQ(DispatchCount(), kDispatchCountPre); // no dispatch expected
 
         ASSERT_EQ(cluster_with_valid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
-        EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // one dispatch expected
-        EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
+        EXPECT_EQ(DispatchCount(), kDispatchCountPre + 1); // one dispatch expected
+        EXPECT_EQ(GetLastDispatchPath(), kCommandPath);    // for the right path
     }
 }
 
 TEST_F(TestServerClusterShim, IterateOverAcceptedCommands)
 {
     TestServerClusterContext testContext;
-    chip::Test::SetMockNodeConfig(gTestNodeConfig);
+    SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim cluster({ { kMockEndpoint3, MockClusterId(4) }, { kMockEndpoint2, MockClusterId(2) } });
-    cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(cluster.Startup(testContext.Get()));
 
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
 
@@ -576,12 +577,12 @@ TEST_F(TestServerClusterShim, IterateOverAcceptedCommands)
 TEST_F(TestServerClusterShim, IterateOverGeneratedCommands)
 {
     TestServerClusterContext testContext;
-    chip::Test::SetMockNodeConfig(gTestNodeConfig);
+    SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim cluster({ { kMockEndpoint2, MockClusterId(2) }, { kMockEndpoint2, MockClusterId(3) } });
-    cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(cluster.Startup(testContext.Get()));
 
     ServerClusterShim cluster_without_id3({ { kMockEndpoint2, MockClusterId(2) } });
-    cluster_without_id3.Startup(testContext.Get());
+    EXPECT_SUCCESS(cluster_without_id3.Startup(testContext.Get()));
 
     ReadOnlyBufferBuilder<CommandId> builder;
 

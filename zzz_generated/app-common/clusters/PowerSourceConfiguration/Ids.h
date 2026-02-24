@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster PowerSourceConfiguration (cluster code: 46/0x042E)
+// Identifier constant values for cluster PowerSourceConfiguration (cluster code: 46/0x002E)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

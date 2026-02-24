@@ -61,7 +61,7 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Init ZCL Data Model and start server
-    PlatformMgr().ScheduleWork(AppTask::InitServerWrapper, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(AppTask::InitServerWrapper, 0);
 
     // Setup powercycle reset expired handler
     gpAppFramework_SetResetExpiredHandler(AppTask::PowerCycleExpiredHandlerWrapper);

@@ -59,14 +59,20 @@ async def main():
         metavar="<timeout-second>",
     )
     optParser.add_option(
-        "-a",
-        "--address",
+        "-d",
+        "--discriminator",
         action="store",
-        dest="deviceAddress",
-        default='',
-        type='str',
-        help="Address of the device",
-        metavar="<device-addr>",
+        dest="discriminator",
+        type='int',
+        help="Discriminator of the device",
+    )
+    optParser.add_option(
+        "-c",
+        "--passcode",
+        action="store",
+        dest="passcode",
+        type='int',
+        help="Passcode of the device",
     )
     optParser.add_option(
         "-p",
@@ -85,7 +91,7 @@ async def main():
     timeoutTicker.start()
 
     test = BaseTestHelper(
-        nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=False)
+        nodeId=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=False)
 
     logger.info("Testing discovery")
     FailIfNot(await test.TestDiscovery(discriminator=TEST_DISCRIMINATOR),
@@ -95,12 +101,12 @@ async def main():
               "Failed to finish network commissioning")
 
     logger.info("Testing commissioning")
-    FailIfNot(await test.TestCommissioning(ip=options.deviceAddress,
-                                           setuppin=20202021,
-                                           nodeid=1),
+    FailIfNot(await test.TestOnNetworkCommissioning(discriminator=options.discriminator,
+                                                    setuppin=options.passcode,
+                                                    nodeId=1),
               "Failed to finish key exchange")
 
-    FailIfNot(await test.TestFailsafe(nodeid=1), "Failed failsafe test")
+    FailIfNot(await test.TestFailsafe(nodeId=1), "Failed failsafe test")
 
     timeoutTicker.stop()
 

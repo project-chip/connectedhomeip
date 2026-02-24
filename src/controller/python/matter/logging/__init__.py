@@ -44,7 +44,7 @@ def _RedirectToPythonLogging(category, module, message):
     else:
         # All logs are expected to have some reasonable category. This treats
         # unknown/None as critical.
-        logging.critical("%s", message)
+        logger.critical("%s", message)
 
 
 def RedirectToPythonLogging():

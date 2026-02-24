@@ -34,23 +34,18 @@ declare_args() {
   ota_periodic_query_timeout_sec = 86400
 }
 
+chip_detail_logging = sl_verbose_mode
+
 # Sanity check
 assert(chip_enable_wifi)
 silabs_plat_dir = "${chip_root}/src/platform/silabs"
-silabs_plat_si91x_wifi_dir = "${chip_root}/src/platform/silabs/SiWx917/wifi"
+silabs_plat_si91x_wifi_dir = "${chip_root}/src/platform/silabs/wifi"
 
 config("chip_examples_project_config") {
   # Link options that provide a replacement for dynamic memory operations in standard
   # library with the sl_memory_manager in platform code.
   ldflags = [
     "-Wl,--wrap=MemoryAlloc",
-
-    # Wrap these in case internal newlib call them (e.g. strdup will)
-    # directly call _malloc_r)
-    "-Wl,--wrap=_malloc_r",
-    "-Wl,--wrap=_realloc_r",
-    "-Wl,--wrap=_free_r",
-    "-Wl,--wrap=_calloc_r",
     "-Wl,--wrap=main",
   ]
 }
@@ -162,17 +157,14 @@ source_set("siwx917-common") {
     }
   }
 
-  # DIC
-  if (enable_dic) {
-    public_deps +=
-        [ "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-dic" ]
+  # MATTER_AWS
+  if (enable_matter_aws) {
+    public_deps += [ "${silabs_common_plat_dir}/matter_aws/matter_aws_interface:silabs-matter-aws" ]
   }
 
   # AWS SDK OTA
   if (aws_sdk_ota) {
-    public_deps += [
-      "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-aws-sdk-ota",
-    ]
+    public_deps += [ "${silabs_common_plat_dir}/matter_aws/matter_aws_interface:silabs-matter-aws-sdk-ota" ]
   }
 
   public_deps += [

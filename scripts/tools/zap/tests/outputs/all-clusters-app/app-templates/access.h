@@ -29,19 +29,16 @@
 
 // Parallel array data (*cluster*, attribute, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
-    /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
-    /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0x0000003E, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
+    0x0000003F, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
@@ -61,19 +58,16 @@
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
-    /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     0x00000000, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     0x00000001, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
-    /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
     0x00000005, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     0x00000006, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     0x00000007, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0x00000000, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
+    0x00000004, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
@@ -93,19 +87,16 @@
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
-    /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
     /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
-    /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: view */ \
-    /* Cluster: User Label, Attribute: LabelList, Privilege: view */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
@@ -143,6 +134,7 @@
     0x00000030, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x0000003F, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
+    0x0000003F, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     0x00000041, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     0x0000005C, /* Cluster: Smoke CO Alarm, Attribute: SmokeSensitivityLevel, Privilege: manage */ \
     0x00000099, /* Cluster: Energy EVSE, Attribute: UserMaximumChargeCurrent, Privilege: manage */ \
@@ -197,6 +189,7 @@
     0x00000000, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000004, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x00000000, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
+    0x00000004, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     0x00000000, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     0x0000000B, /* Cluster: Smoke CO Alarm, Attribute: SmokeSensitivityLevel, Privilege: manage */ \
     0x00000009, /* Cluster: Energy EVSE, Attribute: UserMaximumChargeCurrent, Privilege: manage */ \
@@ -251,6 +244,7 @@
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Smoke CO Alarm, Attribute: SmokeSensitivityLevel, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Energy EVSE, Attribute: UserMaximumChargeCurrent, Privilege: manage */ \
@@ -340,7 +334,7 @@
     0x00000201, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     0x00000801, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
     0x00000801, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
-    0x00000801, /* Cluster: TLS Certificate Management, Command: TLSClientCSR, Privilege: administer */ \
+    0x00000801, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \
     0x00000801, /* Cluster: TLS Certificate Management, Command: ProvisionClientCertificate, Privilege: administer */ \
     0x00000801, /* Cluster: TLS Certificate Management, Command: RemoveClientCertificate, Privilege: administer */ \
     0x00000802, /* Cluster: TLS Client Management, Command: ProvisionEndpoint, Privilege: administer */ \
@@ -400,7 +394,7 @@
     0x000000FE, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     0x00000000, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
     0x00000006, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
-    0x00000007, /* Cluster: TLS Certificate Management, Command: TLSClientCSR, Privilege: administer */ \
+    0x00000007, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \
     0x00000009, /* Cluster: TLS Certificate Management, Command: ProvisionClientCertificate, Privilege: administer */ \
     0x0000000E, /* Cluster: TLS Certificate Management, Command: RemoveClientCertificate, Privilege: administer */ \
     0x00000000, /* Cluster: TLS Client Management, Command: ProvisionEndpoint, Privilege: administer */ \
@@ -460,7 +454,7 @@
     chip::Access::Privilege::kManage, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: TLSClientCSR, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: ProvisionClientCertificate, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: RemoveClientCertificate, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Client Management, Command: ProvisionEndpoint, Privilege: administer */ \
@@ -476,6 +470,7 @@
     0x0000001F, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
+    0x0000001F, /* Cluster: Access Control, Event: AuxiliaryAccessUpdated, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *event*, privilege) for read event
@@ -483,6 +478,7 @@
     0x00000000, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
     0x00000002, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
+    0x00000003, /* Cluster: Access Control, Event: AuxiliaryAccessUpdated, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, event, *privilege*) for read event
@@ -490,6 +486,7 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlEntryChanged, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AccessControlExtensionChanged, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: FabricRestrictionReviewUpdate, Privilege: administer */ \
+    chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Event: AuxiliaryAccessUpdated, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

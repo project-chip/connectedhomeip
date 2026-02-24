@@ -159,3 +159,4 @@ class StatefulShell:
                     )
 
                 return output
+        return None

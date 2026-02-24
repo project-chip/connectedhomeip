@@ -33,31 +33,29 @@ class AmebaApp(Enum):
     def ExampleName(self):
         if self == AmebaApp.ALL_CLUSTERS:
             return 'all-clusters-app'
-        elif self == AmebaApp.ALL_CLUSTERS_MINIMAL:
+        if self == AmebaApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
-        elif self == AmebaApp.LIGHT:
+        if self == AmebaApp.LIGHT:
             return 'lighting-app'
-        elif self == AmebaApp.LIGHT_SWITCH:
+        if self == AmebaApp.LIGHT_SWITCH:
             return 'light-switch-app'
-        elif self == AmebaApp.PIGWEED:
+        if self == AmebaApp.PIGWEED:
             return 'pigweed-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     @property
     def AppNamePrefix(self):
         if self == AmebaApp.ALL_CLUSTERS:
             return 'chip-ameba-all-clusters-app'
-        elif self == AmebaApp.ALL_CLUSTERS_MINIMAL:
+        if self == AmebaApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-ameba-all-clusters-minimal-app'
-        elif self == AmebaApp.LIGHT:
+        if self == AmebaApp.LIGHT:
             return 'chip-ameba-lighting-app'
-        elif self == AmebaApp.LIGHT_SWITCH:
+        if self == AmebaApp.LIGHT_SWITCH:
             return 'chip-ameba-light-switch-app'
-        elif self == AmebaApp.PIGWEED:
+        if self == AmebaApp.PIGWEED:
             return 'chip-ameba-pigweed-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
 
 class AmebaBuilder(Builder):

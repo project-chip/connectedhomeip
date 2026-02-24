@@ -70,7 +70,7 @@ def main(argv):
         elf = {}
         for filename in config['args.inputs']:
             elf[filename] = {
-                'elffile': ELFFile(open(filename, 'rb')),
+                'elffile': ELFFile(open(filename, 'rb')),  # noqa: SIM115
                 'section': {},
                 'data': {},
                 'limit': {},

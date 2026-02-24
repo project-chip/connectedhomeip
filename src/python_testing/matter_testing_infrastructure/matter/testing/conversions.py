@@ -107,7 +107,7 @@ def cluster_id_with_name(id):
         >>> cluster_id_with_name("invalid")  # Invalid input
         'HERE IS THE PROBLEM'
     """
-    if id in Clusters.ClusterObjects.ALL_CLUSTERS.keys():
+    if id in Clusters.ClusterObjects.ALL_CLUSTERS:
         s = Clusters.ClusterObjects.ALL_CLUSTERS[id].__name__
     else:
         s = "Unknown cluster"

@@ -245,7 +245,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
+    err = mLifetimePersistedCounter.Init(CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY);
 #endif
 
 #if CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER
@@ -443,7 +443,7 @@ void GenericConfigurationManagerImpl<ImplClass>::NotifyOfAdvertisementStart()
 {
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     // Increment life time counter to protect against long-term tracking of rotating device ID.
-    IncrementLifetimeCounter();
+    TEMPORARY_RETURN_IGNORED IncrementLifetimeCounter();
     // Inheriting classes should call this method so the lifetime counter is updated if necessary.
 #endif
 }
@@ -673,7 +673,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetCommissionableDevice
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetInitialPairingInstruction(char * buf, size_t bufSize)
 {
-    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION), CHIP_ERROR_BUFFER_TOO_SMALL);
+    constexpr size_t kLiteralSize  = sizeof(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION);
+    constexpr bool kIsLiteralEmpty = (kLiteralSize == 1); // Only the null terminator is present, the literal is "" (empty-string)
+
+    if (kIsLiteralEmpty)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    VerifyOrReturnError((bufSize >= kLiteralSize), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION);
     return CHIP_NO_ERROR;
 }
@@ -681,7 +689,15 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetInitialPairingInstru
 template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSecondaryPairingInstruction(char * buf, size_t bufSize)
 {
-    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION), CHIP_ERROR_BUFFER_TOO_SMALL);
+    constexpr size_t kLiteralSize  = sizeof(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION);
+    constexpr bool kIsLiteralEmpty = (kLiteralSize == 1); // Only the null terminator is present, the literal is "" (empty-string)
+
+    if (kIsLiteralEmpty)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    VerifyOrReturnError((bufSize >= kLiteralSize), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION);
     return CHIP_NO_ERROR;
 }

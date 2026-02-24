@@ -30,6 +30,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/PlatformError.h>
 #include <platform/silabs/wifi/lwip-support/dhcp_client.h>
 #include <platform/silabs/wifi/lwip-support/ethernetif.h>
 #include <platform/silabs/wifi/lwip-support/lwip_netif.h>
@@ -393,9 +394,7 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
         sl_wfx_exception_ind_t * firmware_exception = (sl_wfx_exception_ind_t *) event_payload;
         ChipLogError(DeviceLayer, "event: SL_WFX_EXCEPTION_IND_ID");
         ChipLogError(DeviceLayer, "firmware_exception->header.length: %d", firmware_exception->header.length);
-        // create a bytespan header.length with exception payload
-        ByteSpan exception_byte_span = ByteSpan((uint8_t *) firmware_exception, firmware_exception->header.length);
-        ChipLogByteSpan(DeviceLayer, exception_byte_span);
+        ChipLogByteSpan(DeviceLayer, ByteSpan((uint8_t *) firmware_exception, firmware_exception->header.length));
         break;
     }
     case SL_WFX_ERROR_IND_ID: {
@@ -403,9 +402,7 @@ extern "C" sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * even
         ChipLogError(DeviceLayer, "event: SL_WFX_ERROR_IND_ID");
         ChipLogError(DeviceLayer, "firmware_error->type: %lu", firmware_error->body.type);
         ChipLogError(DeviceLayer, "firmware_error->header.length: %d", firmware_error->header.length);
-        // create a bytespan header.length with error payload
-        ByteSpan error_byte_span = ByteSpan((uint8_t *) firmware_error, firmware_error->header.length);
-        ChipLogByteSpan(DeviceLayer, error_byte_span);
+        ChipLogByteSpan(DeviceLayer, ByteSpan((uint8_t *) firmware_error, firmware_error->header.length));
         break;
     }
     }
@@ -440,7 +437,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
 
     // Copy scanned SSID to the output buffer
     chip::MutableByteSpan outputSsid(ap->scan.ssid, WFX_MAX_SSID_LENGTH);
-    chip::CopySpanToMutableSpan(scannedSsid, outputSsid);
+    TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(scannedSsid, outputSsid);
     ap->scan.ssid_length = outputSsid.size();
 
     // Set Network Security - We start by WPA3 to set the most secure type
@@ -473,7 +470,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
 
     chip::ByteSpan scannedBssid(scan_result->mac, kWifiMacAddressLength);
     chip::MutableByteSpan outputBssid(ap->scan.bssid, kWifiMacAddressLength);
-    chip::CopySpanToMutableSpan(scannedBssid, outputBssid);
+    TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(scannedBssid, outputBssid);
 
     scan_count++;
 }
@@ -499,7 +496,8 @@ static void sl_wfx_scan_complete_callback(uint32_t status)
  *****************************************************************************/
 static void sl_wfx_start_ap_callback(uint32_t status)
 {
-    VerifyOrReturnLogError(status == AP_START_SUCCESS, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnLogError(status == AP_START_SUCCESS, MATTER_PLATFORM_ERROR(status),
+                           ChipLogError(DeviceLayer, "Failed to start AP: %lx", status));
     wifi_extra.Set(WifiInterface::WifiState::kAPReady);
 
     xEventGroupSetBits(sl_wfx_event_group, SL_WFX_START_AP);
@@ -636,7 +634,7 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ScanCallback
         VerifyOrReturnError(scan_ssid != nullptr, CHIP_ERROR_NO_MEMORY);
 
         chip::MutableByteSpan scannedSsidSpan(scan_ssid, WFX_MAX_SSID_LENGTH);
-        chip::CopySpanToMutableSpan(ssid, scannedSsidSpan);
+        TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(ssid, scannedSsidSpan);
     }
     scan_cb = callback;
 
@@ -653,10 +651,12 @@ CHIP_ERROR WifiInterfaceImpl::StartWifiTask()
     }
     wifi_extra.Set(WifiInterface::WifiState::kStationInit);
 
-    VerifyOrReturnError(wfx_soft_init() == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "Failed to execute the WFX software init."));
-    VerifyOrReturnError(InitWf200Platform() == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "Failed to execute the WFX HW start."));
+    sl_status_t status = wfx_soft_init();
+    VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status),
+                        ChipLogError(DeviceLayer, "Failed to execute the WFX software init : %ld", status));
+    status = InitWf200Platform();
+    VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status),
+                        ChipLogError(DeviceLayer, "Failed to execute the WFX HW start : %ld", status));
 
     return CHIP_NO_ERROR;
 }
@@ -686,7 +686,7 @@ CHIP_ERROR WifiInterfaceImpl::TriggerDisconnection(void)
     ChipLogProgress(DeviceLayer, "STA-Disconnecting");
 
     sl_status_t status = sl_wfx_send_disconnect_command();
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status));
 
     wifi_extra.Clear(WifiInterface::WifiState::kStationConnected);
 
@@ -698,22 +698,20 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
 {
     uint32_t signal_strength = 0;
 
-    // TODO: The ap_info.ssid isn't populated anywhere. The returned value is always 0.
     chip::ByteSpan apSsidSpan(ap_info.ssid, ap_info.ssid_length);
     chip::MutableByteSpan apSsidMutableSpan(info.ssid, WFX_MAX_SSID_LENGTH);
-    chip::CopySpanToMutableSpan(apSsidSpan, apSsidMutableSpan);
+    TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(apSsidSpan, apSsidMutableSpan);
     info.ssid_length = apSsidMutableSpan.size();
 
-    // TODO: The ap_info.bssid isn't populated anywhere. The returned value is always 0.
     chip::ByteSpan apBssidSpan(ap_info.bssid, kWifiMacAddressLength);
     chip::MutableByteSpan apBssidMutableSpan(info.bssid, kWifiMacAddressLength);
-    chip::CopySpanToMutableSpan(apBssidSpan, apBssidMutableSpan);
+    TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(apBssidSpan, apBssidMutableSpan);
 
     info.security = ap_info.security;
     info.chan     = ap_info.chan;
 
     sl_status_t status = sl_wfx_get_signal_strength(&signal_strength);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status));
 
     info.rssi = ConvertRcpiToRssi(signal_strength);
 
@@ -730,7 +728,8 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
 CHIP_ERROR WifiInterfaceImpl::GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info)
 {
     sl_status_t status = get_all_counters();
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "Failed to get the couters"));
+    VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status),
+                        ChipLogError(DeviceLayer, "Failed to get the counters : %ld", status));
 
     info.beacon_lost_count = counters->body.count_miss_beacon;
     info.beacon_rx_count   = counters->body.count_rx_beacon;
@@ -819,10 +818,10 @@ CHIP_ERROR WifiInterfaceImpl::ConnectToAccessPoint(void)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    VerifyOrReturnError(sl_wfx_send_join_command(wifi_provision.ssid, wifi_provision.ssidLength, NULL, CHANNEL_0,
-                                                 connect_security_mode, PREVENT_ROAMING, DISABLE_PMF_MODE, wifi_provision.passkey,
-                                                 wifi_provision.passkeyLength, NULL, IE_DATA_LENGTH) == SL_STATUS_OK,
-                        CHIP_ERROR_INTERNAL);
+    sl_status_t status = sl_wfx_send_join_command(wifi_provision.ssid, wifi_provision.ssidLength, NULL, CHANNEL_0,
+                                                  connect_security_mode, PREVENT_ROAMING, DISABLE_PMF_MODE, wifi_provision.passkey,
+                                                  wifi_provision.passkeyLength, NULL, IE_DATA_LENGTH);
+    VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status));
 
     return CHIP_NO_ERROR;
 }
@@ -869,15 +868,31 @@ void WifiInterfaceImpl::CancelScanNetworks()
 
 void WifiInterfaceImpl::ConnectionEventCallback(sl_wfx_connect_ind_body_t connect_indication_body)
 {
-    uint8_t * mac   = connect_indication_body.mac;
     uint32_t status = connect_indication_body.status;
-    ap_info.chan    = connect_indication_body.channel;
-    memcpy(&ap_info.security, &wifi_provision.security, sizeof(wifi_provision.security));
     switch (status)
     {
     case WFM_STATUS_SUCCESS: {
         ChipLogProgress(DeviceLayer, "STA-Connected");
-        memcpy(ap_mac.data(), mac, kWifiMacAddressLength);
+
+        ap_info.chan = connect_indication_body.channel;
+        chip::ByteSpan securitySpan(reinterpret_cast<const uint8_t *>(&wifi_provision.security), sizeof(wifi_provision.security));
+        chip::MutableByteSpan apSecurityMutableSpan(reinterpret_cast<uint8_t *>(&ap_info.security), sizeof(ap_info.security));
+        TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(securitySpan, apSecurityMutableSpan);
+
+        // Store SSID
+        chip::ByteSpan apSsidSpan(wifi_provision.ssid, wifi_provision.ssidLength);
+        chip::MutableByteSpan apSsidMutableSpan(ap_info.ssid, WFX_MAX_SSID_LENGTH);
+        TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(apSsidSpan, apSsidMutableSpan);
+        ap_info.ssid_length = wifi_provision.ssidLength;
+
+        // Store BSSID
+        chip::ByteSpan macSpan(connect_indication_body.mac, kWifiMacAddressLength);
+        chip::MutableByteSpan apBssidMutableSpan(ap_info.bssid, kWifiMacAddressLength);
+        TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(macSpan, apBssidMutableSpan);
+
+        // TODO: Refactor WifiInterface to use single representation of MAC address
+        chip::MutableByteSpan apMacMutableSpan(ap_mac.data(), kWifiMacAddressLength);
+        TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(macSpan, apMacMutableSpan);
 
         wifi_extra.Set(WifiInterface::WifiState::kStationConnected);
         xEventGroupSetBits(sl_wfx_event_group, SL_WFX_CONNECT);
@@ -943,7 +958,7 @@ void WifiInterfaceImpl::ProcessEvents(void * arg)
         if (flags & SL_WFX_RETRY_CONNECT)
         {
             ChipLogProgress(DeviceLayer, "sending the connect command");
-            WifiInterface::GetInstance().ConnectToAccessPoint();
+            TEMPORARY_RETURN_IGNORED WifiInterface::GetInstance().ConnectToAccessPoint();
         }
 
         if (wifi_extra.Has(WifiInterface::WifiState::kStationConnected))
@@ -1029,7 +1044,7 @@ void WifiInterfaceImpl::ProcessEvents(void * arg)
                 chip::ByteSpan requestedSsid(scan_ssid, scan_ssid_length);
                 chip::MutableByteSpan outputSsid(ssid.ssid, WFX_MAX_SSID_LENGTH);
 
-                chip::CopySpanToMutableSpan(requestedSsid, outputSsid);
+                TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(requestedSsid, outputSsid);
                 ssid.ssid_length = outputSsid.size();
 
                 nbreScannedNetworks = 1;

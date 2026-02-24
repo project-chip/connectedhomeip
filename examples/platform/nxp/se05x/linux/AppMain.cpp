@@ -400,7 +400,7 @@ public:
     }
 };
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 /*
     Get the freq_list from args.
     Format:
@@ -586,7 +586,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (LinuxDeviceOptions::GetInstance().mWiFi && LinuxDeviceOptions::GetInstance().mWiFiPAF)
     {
         ChipLogProgress(WiFiPAF, "WiFi-PAF: initialzing");
@@ -653,7 +653,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
         uint16_t version  = LinuxDeviceOptions::GetInstance().tcVersion.Value();
         uint16_t required = LinuxDeviceOptions::GetInstance().tcRequired.Value();
         Optional<app::TermsAndConditions> requiredAcknowledgements(app::TermsAndConditions(required, version));
-        app::TermsAndConditionsManager::GetInstance()->Init(initParams.persistentStorageDelegate, requiredAcknowledgements);
+        app::TermsAndConditionsManager::GetInstance().Init(initParams.persistentStorageDelegate, requiredAcknowledgements);
     }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
@@ -768,6 +768,14 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     initParams.accessRestrictionProvider = exampleAccessRestrictionProvider.get();
 #endif
 
+    // Initialize device attestation config before server init so Operational
+    // Credentials sees the configured provider during cluster construction.
+#if ENABLE_SE05X_DEVICE_ATTESTATION
+    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleSe05xDACProvider());
+#else
+    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
+#endif
+
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
     se05xInstance.Init(initParams.persistentStorageDelegate);
@@ -812,13 +820,6 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     ConfigurationMgr().LogDeviceConfig();
 
     PrintOnboardingCodes(LinuxDeviceOptions::GetInstance().payload);
-
-    // Initialize device attestation config
-#if ENABLE_SE05X_DEVICE_ATTESTATION
-    SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleSe05xDACProvider());
-#else
-    SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
-#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ChipLogProgress(AppServer, "Starting commissioner");

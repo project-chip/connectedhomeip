@@ -22,6 +22,7 @@ chip_test_suite("tests") {
     "TestAttributeListBuilder.cpp",
     "TestDefaultServerCluster.cpp",
     "TestOptionalAttributeSet.cpp",
+    "TestServerClusterExtension.cpp",
     "TestServerClusterInterfaceRegistry.cpp",
     "TestSingleEndpointServerClusterRegistry.cpp",
   ]

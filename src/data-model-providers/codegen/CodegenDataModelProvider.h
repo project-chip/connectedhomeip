@@ -31,7 +31,7 @@
 namespace chip {
 namespace app {
 
-/// An implementation of `InteractionModel::Model` that relies on code-generation
+/// An implementation of `DataModel::Provider` that relies on code-generation
 /// via zap/ember.
 ///
 /// The Ember framework uses generated files (like endpoint-config.h and various
@@ -41,8 +41,8 @@ namespace app {
 /// as well as application-specific overrides to provide data model functionality.
 ///
 /// Given that this relies on global data at link time, there generally can be
-/// only one CodegenDataModelProvider per application (you can create more instances,
-/// however they would share the exact same underlying data and storage).
+/// only one CodegenDataModelProvider per application. Per-cluster CodegenIntegration
+/// functions access the global singleton instance via `CodegenDataModelProvider::Instance()`.
 class CodegenDataModelProvider : public DataModel::Provider
 {
 public:
@@ -53,7 +53,11 @@ public:
     /// where path caching does not really apply (the same path may result in different outcomes)
     void Reset() { mPreviouslyFoundCluster = std::nullopt; }
 
-    void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
+    void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate)
+    {
+        VerifyOrDie(!mContext.has_value()); // can't change once started
+        mPersistentStorageDelegate = delegate;
+    }
     PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
 
     SingleEndpointServerClusterRegistry & Registry() { return mRegistry; }
@@ -67,13 +71,13 @@ public:
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
 
-    void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType) override;
+    void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType,
+                                        FabricIndex accessingFabric) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     /// attribute tree iteration
     CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & out) override;
-    CHIP_ERROR SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder) override;
     CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & builder) override;
     CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder) override;
     CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> & builder) override;

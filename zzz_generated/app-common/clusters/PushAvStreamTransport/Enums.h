@@ -75,6 +75,9 @@ enum class StatusCodeEnum : uint8_t
     kInvalidTransportStatus = 0x08,
     kInvalidOptions         = 0x09,
     kInvalidStreamUsage     = 0x0A,
+    kInvalidTime            = 0x0B,
+    kInvalidPreRollLength   = 0x0C,
+    kDuplicateStreamValues  = 0x0D,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -110,14 +113,15 @@ enum class TransportTriggerTypeEnum : uint8_t
 // Enum for TriggerActivationReasonEnum
 enum class TriggerActivationReasonEnum : uint8_t
 {
-    kUserInitiated = 0x00,
-    kAutomation    = 0x01,
-    kEmergency     = 0x02,
+    kUserInitiated   = 0x00,
+    kAutomation      = 0x01,
+    kEmergency       = 0x02,
+    kDoorbellPressed = 0x03,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
+    kUnknownEnumValue = 4,
 };
 
 // Bitmap for Feature

@@ -62,14 +62,6 @@ config("nxp_platform_config") {
     "../common/ota",
   ]
 
-  # Needed for sources that use mbedtls
-  if (nxp_external_sdk) {
-    include_dirs += [
-      "${nxp_sdk_root}/middleware/mbedtls/include",
-      "${nxp_sdk_root}/middleware/mbedtls/port/sssapi",
-    ]
-  }
-
   defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/${nxp_platform}/BLEManagerImpl.h\"" ]
 }
 
@@ -89,7 +81,6 @@ static_library("nxp_platform") {
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "../common/CHIPDevicePlatformEvent.h",
-    "../common/ConfigurationManagerImpl.cpp",
     "../common/ConfigurationManagerImpl.h",
     "../common/ConnectivityManagerImpl.cpp",
     "../common/ConnectivityManagerImpl.h",
@@ -102,6 +93,7 @@ static_library("nxp_platform") {
     "../common/NetworkProvisioningServerImpl.h",
     "../common/PlatformManagerImpl.h",
     "../common/SoftwareUpdateManagerImpl.h",
+    "../mcxw71/ConfigurationManagerImpl.cpp",
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
@@ -116,14 +108,11 @@ static_library("nxp_platform") {
       "../common/crypto/S200/PersistentStorageOpKeystoreS200.h",
     ]
 
-    # TODO: Why are these definitions and include dirs required here and not
-    # inherited from the dependencies?
-    defines += [
-      "MBEDTLS_CONFIG_FILE=<sssapi_mbedtls_config.h>",
-      "MBEDTLS_USER_CONFIG_FILE=<nxp_matter_mbedtls_config.h>",
-    ]
-
     include_dirs = [ "${nxp_sdk_build_root}/mbedtls/config" ]
+  } else if (chip_crypto == "psa") {
+    if (chip_crypto_spake2p == "custom") {
+      sources += [ "../common/crypto/SecLibSpake2p.cpp" ]
+    }
   }
 
   if (chip_enable_ble) {
@@ -151,7 +140,7 @@ static_library("nxp_platform") {
     "${chip_root}/src/platform/logging:headers",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
       "../common/ThreadStackManagerImpl.cpp",

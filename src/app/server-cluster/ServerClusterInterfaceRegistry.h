@@ -20,6 +20,7 @@
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <cstdint>
 #include <new>
@@ -58,7 +59,10 @@ struct RegisteredServerCluster
     {}
 
     [[nodiscard]] constexpr ServerClusterRegistration & Registration() { return registration; }
+    [[nodiscard]] constexpr const ServerClusterRegistration & Registration() const { return registration; }
+
     [[nodiscard]] constexpr SERVER_CLUSTER & Cluster() { return cluster; }
+    [[nodiscard]] constexpr const SERVER_CLUSTER & Cluster() const { return cluster; }
 
 private:
     SERVER_CLUSTER cluster;
@@ -94,7 +98,14 @@ public:
     template <typename... Args>
     void Create(Args &&... args)
     {
-        VerifyOrDie(!IsConstructed());
+        // Handle idempotent Create() - if already constructed, this is a no-op.
+        // The cluster remains registered and functional. This supports the Stop() → Start() lifecycle
+        // where clusters are shutdown but remain constructed.
+        if (IsConstructed())
+        {
+            ChipLogDetail(DataManagement, "LazyRegisteredServerCluster::Create: Cluster already constructed, skipping re-creation");
+            return;
+        }
 
         new (mCluster) SERVER_CLUSTER(std::forward<Args>(args)...);
         new (mRegistration) ServerClusterRegistration(Cluster());
@@ -147,7 +158,8 @@ public:
     /// Remove an existing registration
     ///
     /// Will return CHIP_ERROR_NOT_FOUND if the given registration is not found.
-    CHIP_ERROR Unregister(ServerClusterInterface *);
+    CHIP_ERROR Unregister(ServerClusterInterface *,
+                          ClusterShutdownType clusterShutdownType = ClusterShutdownType::kClusterShutdown);
 
     /// Return the interface registered for the given cluster path or nullptr if one does not exist
     ServerClusterInterface * Get(const ConcreteClusterPath & path);
@@ -155,6 +167,11 @@ public:
     // Set up the underlying context for all clusters that are managed by this registry.
     //
     // The values within context will be moved and used as-is.
+    //
+    // Returns:
+    //   - CHIP_NO_ERROR on success
+    //   - CHIP_ERROR_HAD_FAILURES if some cluster `Startup` calls had errors (Startup
+    //     will be called for all clusters).
     CHIP_ERROR SetContext(ServerClusterContext && context);
 
     // Invalidates current context.

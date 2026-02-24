@@ -17,13 +17,22 @@
 import json
 import logging
 import os
-import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, Set
 
-from . import linux, runner
-from .test_definition import ApplicationPaths, TestDefinition, TestTag, TestTarget
+import yaml
+
+from . import runner
+from .test_definition import TestDefinition, TestTag, TestTarget
+
+log = logging.getLogger(__name__)
+
+__all__ = [
+    "TestTarget",
+    "TestDefinition",
+    "runner",
+]
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
@@ -69,7 +78,7 @@ def _IsValidYamlTest(name: str) -> bool:
 
 
 def _LoadManualTestsJson(json_file_path: str) -> Iterator[str]:
-    with open(json_file_path, 'rt') as f:
+    with open(json_file_path) as f:
         data = json.load(f)
         for c in data["collection"]:
             for name in data[c]:
@@ -77,7 +86,7 @@ def _LoadManualTestsJson(json_file_path: str) -> Iterator[str]:
 
 
 def _GetManualTests() -> Set[str]:
-    manualtests = set()
+    manualtests: set[str] = set()
 
     # Flagged as manual from: src/app/tests/suites/manualTests.json
     for item in _LoadManualTestsJson(os.path.join(_YAML_TEST_SUITE_PATH, "manualTests.json")):
@@ -195,6 +204,7 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_ACL_2_6",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_ACL_2_7",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_ACL_2_8",  # darwin-framework-tool does not currently support reading or subscribing to Events
+        "Test_TC_ACL_2_9",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_ACL_2_10",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_TC_BINFO_2_1",  # darwin-framework-tool does not support writing readonly attributes by name
         "Test_TC_BINFO_2_2",  # darwin-framework-tool does not currently support reading or subscribing to Events
@@ -268,75 +278,24 @@ def _AllYamlTests():
         yield path
 
 
-def target_for_name(name: str):
-    if (name.startswith("TV_") or name.startswith("Test_TC_MC_") or
-            name.startswith("Test_TC_LOWPOWER_") or name.startswith("Test_TC_KEYPADINPUT_") or
-            name.startswith("Test_TC_APPLAUNCHER_") or name.startswith("Test_TC_MEDIAINPUT_") or
-            name.startswith("Test_TC_WAKEONLAN_") or name.startswith("Test_TC_CHANNEL_") or
-            name.startswith("Test_TC_MEDIAPLAYBACK_") or name.startswith("Test_TC_AUDIOOUTPUT_") or
-            name.startswith("Test_TC_TGTNAV_") or name.startswith("Test_TC_APBSC_") or
-            name.startswith("Test_TC_CONTENTLAUNCHER_") or name.startswith("Test_TC_ALOGIN_")):
-        return TestTarget.TV
-    if name.startswith("DL_") or name.startswith("Test_TC_DRLK_"):
-        return TestTarget.LOCK
-    if name.startswith("TestFabricSync"):
-        return TestTarget.FABRIC_SYNC
-    if name.startswith("OTA_"):
-        return TestTarget.OTA
-    if name.startswith("Test_TC_BRBINFO_") or name.startswith("Test_TC_ACT_"):
-        return TestTarget.BRIDGE
-    if name.startswith("TestIcd") or name.startswith("Test_TC_ICDM_"):
-        return TestTarget.LIT_ICD
-    if name.startswith("Test_TC_MWOCTRL_") or name.startswith("Test_TC_MWOM_"):
-        return TestTarget.MWO
-    if name.startswith("Test_TC_RVCRUNM_") or name.startswith("Test_TC_RVCCLEANM_") or name.startswith("Test_TC_RVCOPSTATE_"):
-        return TestTarget.RVC
-    if name.startswith("Test_TC_TBRM_") or name.startswith("Test_TC_THNETDIR_") or name.startswith("Test_TC_WIFINM_"):
-        return TestTarget.NETWORK_MANAGER
-    if name.startswith("Test_TC_MTRID_"):
-        return TestTarget.ENERGY_GATEWAY
-    if (name.startswith("Test_TC_DEM_") or name.startswith("Test_TC_DEMM_") or
-            name.startswith("Test_TC_EEVSE_") or name.startswith("Test_TC_EEVSEM_")):
-        return TestTarget.ENERGY_MANAGEMENT
-    if name.startswith("Test_TC_CLCTRL_") or name.startswith("Test_TC_CLDIM_"):
-        return TestTarget.CLOSURE
-    return TestTarget.ALL_CLUSTERS
+def _TargetsForYaml(yaml_path: Path) -> list[TestTarget]:
+    targets = []
 
+    with open(yaml_path, 'rt') as f:
+        data = yaml.safe_load(f)
+        if 'CI' in data:
+            for item in data['CI']:
+                targets.append(TestTarget(
+                    name=item['name'],
+                    command=item['app'],
+                    arguments=item.get('args', [])
+                ))
 
-def tests_with_command(chip_tool: str, is_manual: bool):
-    """Executes `chip_tool` binary to see what tests are available, using cmd
-    to get the list.
-    """
-    cmd = "list"
-    if is_manual:
-        cmd += "-manual"
+    # default to a 'standard app name' if nothing set in the yaml file
+    if not targets:
+        targets.append(TestTarget(name='all-clusters', command='all-clusters'))
 
-    cmd = [chip_tool, "tests", cmd]
-    result = subprocess.run(cmd, capture_output=True, encoding="utf-8")
-    if result.returncode != 0:
-        logging.error(f'Failed to run {cmd}:')
-        logging.error('STDOUT: ' + result.stdout)
-        logging.error('STDERR: ' + result.stderr)
-        result.check_returncode()
-
-    test_tags = set()
-    if is_manual:
-        test_tags.add(TestTag.MANUAL)
-
-    in_development_tests = [s.replace(".yaml", "") for s in _GetInDevelopmentTests()]
-
-    for name in result.stdout.split("\n"):
-        if not name:
-            continue
-
-        target = target_for_name(name)
-        tags = test_tags.copy()
-        if name in in_development_tests:
-            tags.add(TestTag.IN_DEVELOPMENT)
-
-        yield TestDefinition(
-            run_name=name, name=name, target=target, tags=tags
-        )
+    return targets
 
 
 def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft_unsupported_as_in_development: bool, treat_chip_tool_unsupported_as_in_development: bool, use_short_run_name: bool):
@@ -357,7 +316,7 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
         if not _IsValidYamlTest(path.name):
             continue
 
-        tags = set()
+        tags: set[TestTag] = set()
         if path.name in manual_tests:
             tags.add(TestTag.MANUAL)
 
@@ -393,7 +352,7 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
         yield TestDefinition(
             run_name=run_name,
             name=path.stem,  # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
-            target=target_for_name(path.name),
+            targets=_TargetsForYaml(path),
             tags=tags,
         )
 
@@ -411,21 +370,3 @@ def AllChipToolYamlTests(use_short_run_name: bool = True):
 def AllDarwinFrameworkToolYamlTests():
     for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, treat_dft_unsupported_as_in_development=True, treat_chip_tool_unsupported_as_in_development=False, use_short_run_name=True):
         yield test
-
-
-def AllChipToolTests(chip_tool: str):
-    for test in tests_with_command(chip_tool, is_manual=False):
-        yield test
-
-    for test in tests_with_command(chip_tool, is_manual=True):
-        yield test
-
-
-__all__ = [
-    "TestTarget",
-    "TestDefinition",
-    "AllTests",
-    "ApplicationPaths",
-    "linux",
-    "runner",
-]

@@ -58,7 +58,8 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 {
     mCB = cb;
 
-    PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler,
+                                                           reinterpret_cast<intptr_t>(cb));
 
     return CHIP_NO_ERROR;
 }

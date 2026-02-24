@@ -113,7 +113,7 @@ public:
         VerifyOrReturn(mExchangeCtx);
         auto * msgContext = mExchangeCtx->GetReliableMessageContext();
         VerifyOrReturn(msgContext != nullptr);
-        msgContext->FlushAcks();
+        TEMPORARY_RETURN_IGNORED msgContext->FlushAcks();
     }
 
     void AddInvokeResponseToSend(System::PacketBufferHandle && aPacket) override
@@ -173,7 +173,7 @@ private:
 
     void SendStatusResponse(Protocols::InteractionModel::Status aStatus)
     {
-        StatusResponse::Send(aStatus, mExchangeCtx.Get(), /*aExpectResponse = */ false);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(aStatus, mExchangeCtx.Get(), /*aExpectResponse = */ false);
     }
 
     CHIP_ERROR SendCommandResponse();

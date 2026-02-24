@@ -15,12 +15,15 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
+#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
+#include <app/server/Server.h>
 #include <app/static-cluster-config/GeneralDiagnostics.h>
 #include <app/util/config.h>
 #include <app/util/util.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -36,20 +39,22 @@ static_assert((GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.
 
 namespace {
 
-// Determine if the configurable version of the general diagnostics cluster with additonal command options is needed
+// Determine if the configurable version of the general diagnostics cluster with additional command options is needed
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-LazyRegisteredServerCluster<GeneralDiagnosticsClusterFullConfigurable> gServer;
+LazyRegisteredServerCluster<GeneralDiagnosticsClusterFullConfigurable> gDiagnosticsServer;
 #else
-LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
+LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gDiagnosticsServer;
 #endif
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned emberEndpointIndex,
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
+        InteractionModelEngine * interactionModel = InteractionModelEngine::GetInstance();
+        VerifyOrDie(interactionModel != nullptr);
 
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
         const GeneralDiagnosticsFunctionsConfig functionsConfig
@@ -61,57 +66,72 @@ public:
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
             .enablePosixTime = true,
 #else
-            .enablePosixTime      = false,
+            .enablePosixTime       = false,
 #endif
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-            .enablePayloadSnaphot = true,
+            .enablePayloadSnapshot = true,
 #else
-            .enablePayloadSnaphot = false,
+            .enablePayloadSnapshot = false,
 #endif
         };
-        gServer.Create(optionalAttributeSet, functionsConfig);
+        gDiagnosticsServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap),
+                                  GeneralDiagnosticsCluster::Context{
+                                      .deviceLoadStatusProvider = *interactionModel,
+                                      .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+                                      .testEventTriggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate(),
+                                  },
+                                  functionsConfig);
 #else
-        gServer.Create(optionalAttributeSet);
+        gDiagnosticsServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap),
+                                  GeneralDiagnosticsCluster::Context{
+                                      .deviceLoadStatusProvider = *interactionModel,
+                                      .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+                                      .testEventTriggerDelegate = Server::GetInstance().GetTestEventTriggerDelegate(),
+                                  });
 #endif
-        return gServer.Registration();
+        return gDiagnosticsServer.Registration();
     }
 
-    ServerClusterInterface & FindRegistration(unsigned emberEndpointIndex) override { return gServer.Cluster(); }
-    void ReleaseRegistration(unsigned emberEndpointIndex) override { gServer.Destroy(); }
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gDiagnosticsServer.IsConstructed(), nullptr);
+        return &gDiagnosticsServer.Cluster();
+    }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gDiagnosticsServer.Destroy(); }
 };
 
 } // namespace
 
-void emberAfGeneralDiagnosticsClusterServerInitCallback(EndpointId endpointId)
+void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = GeneralDiagnostics::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
-            .fetchFeatureMap                 = false,
-            .fetchOptionalAttributes         = true,
+            .endpointId                = endpointId,
+            .clusterId                 = GeneralDiagnostics::Id,
+            .fixedClusterInstanceCount = GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
 }
 
-void MatterGeneralDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
+void MatterGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
         {
-            .endpointId                      = endpointId,
-            .clusterId                       = GeneralDiagnostics::Id,
-            .fixedClusterServerEndpointCount = 1,
-            .maxEndpointCount                = 1,
+            .endpointId                = endpointId,
+            .clusterId                 = GeneralDiagnostics::Id,
+            .fixedClusterInstanceCount = GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterGeneralDiagnosticsPluginServerInitCallback() {}
@@ -121,36 +141,36 @@ void MatterGeneralDiagnosticsPluginServerShutdownCallback() {}
 namespace chip::app::Clusters::GeneralDiagnostics {
 void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason)
 {
-    if (gServer.IsConstructed())
+    if (gDiagnosticsServer.IsConstructed())
     {
-        gServer.Cluster().OnDeviceReboot(bootReason);
+        gDiagnosticsServer.Cluster().OnDeviceReboot(bootReason);
     }
 }
 
 void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
                                       const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current)
 {
-    if (gServer.IsConstructed())
+    if (gDiagnosticsServer.IsConstructed())
     {
-        gServer.Cluster().OnHardwareFaultsDetect(previous, current);
+        gDiagnosticsServer.Cluster().OnHardwareFaultsDetect(previous, current);
     }
 }
 
 void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
                                    const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current)
 {
-    if (gServer.IsConstructed())
+    if (gDiagnosticsServer.IsConstructed())
     {
-        gServer.Cluster().OnRadioFaultsDetect(previous, current);
+        gDiagnosticsServer.Cluster().OnRadioFaultsDetect(previous, current);
     }
 }
 
 void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
                                      const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current)
 {
-    if (gServer.IsConstructed())
+    if (gDiagnosticsServer.IsConstructed())
     {
-        gServer.Cluster().OnNetworkFaultsDetect(previous, current);
+        gDiagnosticsServer.Cluster().OnNetworkFaultsDetect(previous, current);
     }
 }
 } // namespace chip::app::Clusters::GeneralDiagnostics

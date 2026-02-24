@@ -49,7 +49,7 @@ void ApplicationInit()
     // Enable secondary endpoint only when we need it.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
-    sEthernetNetworkCommissioningInstance.Init();
+    SuccessOrDie(sEthernetNetworkCommissioningInstance.Init());
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 }
@@ -61,7 +61,7 @@ int main(int argc, char * argv[])
     TizenServiceAppMain app;
     VerifyOrDie(app.Init(argc, argv) == 0);
 
-    VerifyOrDie(InitBindingHandlers() == CHIP_NO_ERROR);
+    SuccessOrDie(InitBindingHandlers());
 
     return app.RunMainLoop();
 }

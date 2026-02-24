@@ -31,8 +31,8 @@ from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.setup_payload import SetupPayload
 
-logger = logging.getLogger("matter.python_testing")
-logger.setLevel(logging.INFO)
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.INFO)
 
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
 
@@ -87,6 +87,8 @@ class CommissioningInfo:
     wifi_ssid: Optional[str] = None
     tc_version_to_simulate: Optional[int] = None
     tc_user_response_to_simulate: Optional[int] = None
+    thread_ba_host: Optional[str] = None
+    thread_ba_port: Optional[int] = None
 
 
 @dataclass
@@ -143,8 +145,9 @@ async def commission_device(
     """
 
     if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
-        logging.debug(
-            f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response {commissioning_info.tc_user_response_to_simulate}."
+        LOGGER.debug(
+            f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response "
+            f"{commissioning_info.tc_user_response_to_simulate}."
         )
         dev_ctrl.SetTCAcknowledgements(commissioning_info.tc_version_to_simulate, commissioning_info.tc_user_response_to_simulate)
 
@@ -155,7 +158,7 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            logging.error("Commissioning failed: %s" % e)
+            LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-wifi":
         try:
@@ -165,7 +168,7 @@ async def commission_device(
             # Type assertions to help mypy understand these are not None after the asserts
             assert commissioning_info.wifi_ssid is not None
             assert commissioning_info.wifi_passphrase is not None
-            await dev_ctrl.CommissionWiFi(
+            await dev_ctrl.CommissionBleWiFi(
                 info.filter_value,
                 info.passcode,
                 node_id,
@@ -175,7 +178,7 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            logging.error("Commissioning failed: %s" % e)
+            LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-thread":
         try:
@@ -183,7 +186,7 @@ async def commission_device(
                                        "Thread dataset must be provided for ble-thread commissioning")
             # Type assertion to help mypy understand this is not None after the assert
             assert commissioning_info.thread_operational_dataset is not None
-            await dev_ctrl.CommissionThread(
+            await dev_ctrl.CommissionBleThread(
                 info.filter_value,
                 info.passcode,
                 node_id,
@@ -192,7 +195,69 @@ async def commission_device(
             )
             return PairingStatus()
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            logging.error("Commissioning failed: %s" % e)
+            LOGGER.exception("Commissioning failed")
+            return PairingStatus(exception=e)
+    elif commissioning_info.commissioning_method == "nfc-thread":
+        try:
+            asserts.assert_is_not_none(commissioning_info.thread_operational_dataset,
+                                       "Thread dataset must be provided for nfc-thread commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.thread_operational_dataset is not None
+            await dev_ctrl.CommissionNfcThread(
+                info.filter_value,
+                info.passcode,
+                node_id,
+                commissioning_info.thread_operational_dataset,
+            )
+            return PairingStatus()
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
+            LOGGER.exception("Commissioning failed")
+            return PairingStatus(exception=e)
+    elif commissioning_info.commissioning_method == "nfc-wifi":
+        try:
+            asserts.assert_is_not_none(commissioning_info.wifi_ssid, "WiFi SSID must be provided for nfc-wifi commissioning")
+            asserts.assert_is_not_none(commissioning_info.wifi_passphrase,
+                                       "WiFi Passphrase must be provided for nfc-wifi commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.wifi_ssid is not None
+            assert commissioning_info.wifi_passphrase is not None
+            await dev_ctrl.CommissionNfcWiFi(
+                info.filter_value,
+                info.passcode,
+                node_id,
+                commissioning_info.wifi_ssid,
+                commissioning_info.wifi_passphrase,
+            )
+            return PairingStatus()
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
+            LOGGER.exception("Commissioning failed")
+            return PairingStatus(exception=e)
+    elif commissioning_info.commissioning_method == "thread-meshcop":
+        try:
+            asserts.assert_is_not_none(commissioning_info.thread_operational_dataset,
+                                       "Thread dataset must be provided for thread-meshcop commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.thread_operational_dataset is not None
+            asserts.assert_is_not_none(commissioning_info.thread_ba_host,
+                                       "thread_ba_host must be provided for thread-meshcop commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.thread_ba_host is not None
+            asserts.assert_is_not_none(commissioning_info.thread_ba_port,
+                                       "thread_ba_port must be provided for thread-meshcop commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.thread_ba_port is not None
+
+            await dev_ctrl.CommissionThreadMeshcop(
+                node_id,
+                info.passcode,
+                info.filter_value,
+                commissioning_info.thread_ba_host,
+                commissioning_info.thread_ba_port,
+                commissioning_info.thread_operational_dataset,
+            )
+            return PairingStatus()
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
+            LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
     else:
         raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
@@ -220,7 +285,7 @@ async def commission_devices(
     """
     commissioned = []
     for node_id, setup_payload in zip(dut_node_ids, setup_payloads):
-        logging.info(f"Commissioning method: {commissioning_info.commissioning_method}")
+        LOGGER.info(f"Commissioning method: {commissioning_info.commissioning_method}")
         commissioned.append(await commission_device(dev_ctrl, node_id, setup_payload, commissioning_info))
 
     return all(commissioned)
@@ -243,9 +308,16 @@ def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadI
         except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
             asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
 
+    manual_code_equivalents = [(s.long_discriminator >> 8, s.setup_passcode) for s in setup_payloads]
     for manual_code in matter_test_config.manual_code:
         try:
-            setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
+            # Remove any duplicate codes - where the discriminator and passcode match a previously added QR code.
+            # This lets testers pass in the QR and equivalent manual code in order to run
+            # the DD tests with a single set of parameters
+            temp_payload = SetupPayload().ParseManualPairingCode(manual_code)
+            if (temp_payload.short_discriminator, temp_payload.setup_passcode) in manual_code_equivalents:
+                continue
+            setup_payloads.append(temp_payload)
         except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
             asserts.fail(
                 f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
@@ -296,6 +368,8 @@ class CommissionDeviceTest(base_test.BaseTestClass):
             wifi_ssid=meta_config['wifi_ssid'],
             tc_version_to_simulate=meta_config['tc_version_to_simulate'],
             tc_user_response_to_simulate=meta_config['tc_user_response_to_simulate'],
+            thread_ba_host=meta_config['thread_ba_host'],
+            thread_ba_port=meta_config['thread_ba_port'],
         )
         self.setup_payloads: List[SetupPayloadInfo] = get_setup_payload_info_config(
             global_stash.unstash_globally(test_config.user_params['matter_test_config']))

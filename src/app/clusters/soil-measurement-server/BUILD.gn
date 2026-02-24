@@ -16,8 +16,8 @@ import("//build_overrides/chip.gni")
 
 source_set("soil-measurement-server") {
   sources = [
-    "soil-measurement-cluster.cpp",
-    "soil-measurement-cluster.h",
+    "SoilMeasurementCluster.cpp",
+    "SoilMeasurementCluster.h",
   ]
 
   public_deps = [

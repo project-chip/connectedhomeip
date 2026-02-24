@@ -383,7 +383,7 @@ public:
     void ProcessError(const char * msg)
     {
         ChipLogError(DeviceLayer, "%s", msg);
-        SendOnNfcTagError();
+        TEMPORARY_RETURN_IGNORED SendOnNfcTagError();
     }
 
     void NotifyResponse(uint8_t * response, uint32_t responseLen)
@@ -391,7 +391,7 @@ public:
 
         System::PacketBufferHandle buffer =
             System::PacketBufferHandle::NewWithData(reinterpret_cast<const uint8_t *>(response), static_cast<size_t>(responseLen));
-        SendOnNfcTagResponse(std::move(buffer));
+        TEMPORARY_RETURN_IGNORED SendOnNfcTagResponse(std::move(buffer));
     }
 
     void ResetChainedResponseBuffer(void) { mChainedResponseLength = 0; }
@@ -584,7 +584,7 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
         // We don't have yet a cardHandle for this nfcShortId
 
         // Scan all the readers and tags
-        ScanAllReaders(nfcShortId);
+        TEMPORARY_RETURN_IGNORED ScanAllReaders(nfcShortId);
 
         // and check if we now have a TagInstance corresponding to this nfcShortId
         tagInstance = SearchTagInstanceFromDiscriminator(nfcShortId);
@@ -721,7 +721,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanAllReaders(uint16_t nfcShortId)
     {
         if (*reader != '\0')
         {
-            ScanReader(nfcShortId, reader);
+            TEMPORARY_RETURN_IGNORED ScanReader(nfcShortId, reader);
 
             // Move the pointer to the next substring
             reader += strlen(reader) + 1;

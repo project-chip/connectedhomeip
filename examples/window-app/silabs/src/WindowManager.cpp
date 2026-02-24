@@ -20,6 +20,7 @@
 #include <AppConfig.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -54,15 +55,32 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 #define APP_ACTION_LED 1
 
-#ifdef DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
 #define DECIMAL 10
 #define MSG_SIZE 6
-#include "dic.h"
-#endif // DIC_ENABLE
+#include "MatterAws.h"
+#endif // SL_MATTER_ENABLE_AWS
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WindowCovering;
+
+namespace {
+// Position Namespace for semantic tags (from Common Namespace spec)
+// See: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Position.adoc
+constexpr uint8_t kNamespacePosition = 8;
+constexpr uint8_t kTagPositionLeft   = 0;
+constexpr uint8_t kTagPositionRight  = 1;
+
+// Set unique TagList for endpoints 1 and 2 (both have Window Covering device type)
+const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type kEndpoint1TagList[] = {
+    { .namespaceID = kNamespacePosition, .tag = kTagPositionLeft },
+};
+
+const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type kEndpoint2TagList[] = {
+    { .namespaceID = kNamespacePosition, .tag = kTagPositionRight },
+};
+} // namespace
 
 WindowManager WindowManager::sWindow;
 
@@ -79,10 +97,11 @@ AppEvent CreateNewEvent(AppEvent::AppEventTypes type)
 void WindowManager::Timer::Start()
 {
     // Starts or restarts the function timer
-    if (osTimerStart(mHandler, pdMS_TO_TICKS(100)) != osOK)
+    osStatus_t status = osTimerStart(mHandler, pdMS_TO_TICKS(100));
+    if (status != osOK)
     {
-        SILABS_LOG("Timer start() failed");
-        appError(CHIP_ERROR_INTERNAL);
+        SILABS_LOG("Timer start() failed with error %ld", status);
+        appError(APP_ERROR_START_TIMER_FAILED);
     }
 
     mIsActive = true;
@@ -478,22 +497,22 @@ void WindowManager::Cover::PositionSet(chip::EndpointId endpointId, chip::Percen
     if (action == ControlAction::Tilt)
     {
         TiltPositionSet(endpointId, nullablePosition);
-#ifdef DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
         uint16_t value = position;
         char buffer[MSG_SIZE];
         itoa(value, buffer, DECIMAL);
-        dic_sendmsg("tilt/position set", (const char *) (buffer));
-#endif // DIC_ENABLE
+        MatterAwsSendMsg("tilt/position set", (const char *) (buffer));
+#endif // SL_MATTER_ENABLE_AWS
     }
     else
     {
         LiftPositionSet(endpointId, nullablePosition);
-#ifdef DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
         uint16_t value = position;
         char buffer[MSG_SIZE];
         itoa(value, buffer, DECIMAL);
-        dic_sendmsg("lift/position set", (const char *) (buffer));
-#endif // DIC_ENABLE
+        MatterAwsSendMsg("lift/position set", (const char *) (buffer));
+#endif // SL_MATTER_ENABLE_AWS
     }
 }
 
@@ -512,7 +531,7 @@ WindowManager::Timer::Timer(uint32_t timeoutInMs, Callback callback, void * cont
     if (mHandler == NULL)
     {
         SILABS_LOG("Timer create failed");
-        appError(CHIP_ERROR_INTERNAL);
+        appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 }
 
@@ -527,12 +546,13 @@ WindowManager::Timer::~Timer()
 
 void WindowManager::Timer::Stop()
 {
-    mIsActive = false;
+    // Abort on osError (-1) as it indicates an unspecified failure with no clear recovery path.
     if (osTimerStop(mHandler) == osError)
     {
         SILABS_LOG("Timer stop() failed");
-        appError(CHIP_ERROR_INTERNAL);
+        appError(APP_ERROR_STOP_TIMER_FAILED);
     }
+    mIsActive = false;
 }
 
 void WindowManager::Timer::TimerCallback(void * timerCbArg)
@@ -572,6 +592,14 @@ CHIP_ERROR WindowManager::Init()
     // Coverings
     mCoverList[0].Init(WINDOW_COVER_ENDPOINT1);
     mCoverList[1].Init(WINDOW_COVER_ENDPOINT2);
+
+    // Set unique TagList for endpoints 1 and 2 (both have Window Covering device type)
+    SuccessOrDie(
+        SetTagList(WINDOW_COVER_ENDPOINT1,
+                   chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint1TagList)));
+    SuccessOrDie(
+        SetTagList(WINDOW_COVER_ENDPOINT2,
+                   chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint2TagList)));
 
     // Initialize LEDs
     LEDWidget::InitGpio();

@@ -40,6 +40,7 @@ buildconfig_header("chip_buildconfig") {
   # TODO - Move CHIP_PROJECT_CONFIG_INCLUDE, CHIP_PLATFORM_CONFIG_INCLUDE here.
   # Currently those are also used from src/system.
   defines = [
+    "CALLER_HANDLES_CRITICAL_FAILURE=${chip_build_tests}",
     "CHIP_FUZZING_ENABLED=false",
     "CHIP_CONFIG_TEST=${chip_build_tests}",
     "CHIP_ERROR_LOGGING=${chip_error_logging}",
@@ -50,7 +51,6 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_PW_TOKENIZER_LOGGING=${chip_pw_tokenizer_logging}",
     "CHIP_EXCHANGE_NODE_ID_LOGGING=${chip_exchange_node_id_logging}",
     "CHIP_CONFIG_SHORT_ERROR_STR=${chip_config_short_error_str}",
-    "CHIP_CONFIG_ENABLE_ARG_PARSER=${chip_config_enable_arg_parser}",
     "CHIP_TARGET_STYLE_UNIX=${chip_target_style_unix}",
     "CHIP_TARGET_STYLE_EMBEDDED=${chip_target_style_embedded}",
     "CHIP_CONFIG_MEMORY_MGMT_MALLOC=${chip_config_memory_management_malloc}",
@@ -88,9 +88,17 @@ source_set("chip_config_header") {
     "${chip_root}/src/system:system_config_header",
   ]
 
+  if (chip_enable_nfc_based_commissioning) {
+    public_deps += [ "${chip_root}/src/nfc:nfc_config_header" ]
+  }
+
   deps = [ ":chip_buildconfig" ]
 
   allow_circular_includes_from = [ "${chip_root}/src/ble:ble_config_header" ]
+
+  if (chip_enable_nfc_based_commissioning) {
+    allow_circular_includes_from += [ "${chip_root}/src/nfc:nfc_config_header" ]
+  }
 }
 
 source_set("error") {
@@ -118,6 +126,7 @@ source_set("string-builder-adapters") {
     ":error",
     "$dir_pw_string",
     "$dir_pw_unit_test",
+    "${chip_root}/src/lib/support",
   ]
 }
 
@@ -203,6 +212,11 @@ static_library("core") {
     "${chip_root}/src/inet",
     "${chip_root}/src/system",
   ]
+
+  if (chip_enable_nfc_based_commissioning) {
+    public_deps += [ "${chip_root}/src/nfc" ]
+    allow_circular_includes_from += [ "${chip_root}/src/nfc" ]
+  }
 }
 
 source_set("vectortlv") {

@@ -29,15 +29,6 @@
 namespace chip {
 namespace {
 
-CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serializedKeypair;
-    ReturnErrorOnFailure(serializedKeypair.SetLength(privateKey.size() + publicKey.size()));
-    memcpy(serializedKeypair.Bytes(), publicKey.data(), publicKey.size());
-    memcpy(serializedKeypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
-    return keypair.Deserialize(serializedKeypair);
-}
-
 CHIP_ERROR GetFactoryDataString(const FactoryDataString & str, char * buf, size_t bufSize)
 {
     VerifyOrReturnError(bufSize >= str.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -194,9 +185,9 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SignWithDeviceAttestationKey(c
 
         err = chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey);
         VerifyOrExit(err == CHIP_NO_ERROR, );
-        err =
-            LoadKeypairFromRaw(ByteSpan(reinterpret_cast<uint8_t *>(mFactoryData.dac_priv_key.data), mFactoryData.dac_priv_key.len),
-                               ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair);
+        err = keypair.HazardousOperationLoadKeypairFromRaw(
+            ByteSpan(reinterpret_cast<uint8_t *>(mFactoryData.dac_priv_key.data), mFactoryData.dac_priv_key.len),
+            ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()));
         VerifyOrExit(err == CHIP_NO_ERROR, );
         err = keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature);
         VerifyOrExit(err == CHIP_NO_ERROR, );

@@ -112,7 +112,7 @@ CHIP_ERROR AndroidLogDownloadFromNode::SendRetrieveLogsRequest(Messaging::Exchan
 
     if (mTimeout > 0)
     {
-        mBdxReceiver->StartBDXTransferTimeout(mTimeout);
+        TEMPORARY_RETURN_IGNORED mBdxReceiver->StartBDXTransferTimeout(mTimeout);
     }
 
     request.transferFileDesignator = MakeOptional(mFileDesignator);

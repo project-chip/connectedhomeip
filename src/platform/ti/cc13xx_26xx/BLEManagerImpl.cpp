@@ -916,7 +916,7 @@ CHIP_ERROR BLEManagerImpl::AddUpdateMatteroBLEAdv(void)
                                         .secPhy       = GAP_ADV_SEC_PHY_1_MBPS,
                                         .sid          = 0 };
 
-    ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
+    TEMPORARY_RETURN_IGNORED ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
     BLEMGR_LOG("BLEMGR: AddUpdateMatteroBLEAdv");
 
     memset(sInstance.mScanResDatachipOBle, 0, CHIPOBLE_ADV_DATA_MAX_SIZE);
@@ -1365,7 +1365,7 @@ void BLEManagerImpl::ProcessBleMgrEvt(GenericQueuedEvt_t * pMsg)
                     /* Update Advertising payload for Matter if required */
                     if (currAdvIndex == matterAdvIndex)
                     {
-                        AddUpdateMatteroBLEAdv();
+                        TEMPORARY_RETURN_IGNORED AddUpdateMatteroBLEAdv();
                     }
                     mAdvSetArray[currAdvIndex].advState.Clear(AdvFlags::kAdvertisingRefreshNeeded);
                     UpdateAdvInterval(currAdvIndex);
@@ -1652,13 +1652,13 @@ void BLEManagerImpl::ProcessGapMessage(gapEventHdr_t * pMsg)
             DevInfo_SetParameter(DEVINFO_SYSTEM_ID, DEVINFO_SYSTEM_ID_LEN, systemId);
 
             // Create Matter advertisement set
-            AddUpdateMatteroBLEAdv();
+            TEMPORARY_RETURN_IGNORED AddUpdateMatteroBLEAdv();
             sInstance.mAdvSetArray[sInstance.matterAdvIndex].advState.Set(AdvFlags::kAdvertisingRefreshNeeded);
 
             sInstance.mFlags.Set(Flags::kBLEStackInitialized);
 
             /* Trigger post-initialization state update */
-            DriveBLEState();
+            TEMPORARY_RETURN_IGNORED DriveBLEState();
 
             if (sInstance.addrMode > ADDRMODE_RANDOM)
             {
@@ -1718,7 +1718,7 @@ void BLEManagerImpl::ProcessGapMessage(gapEventHdr_t * pMsg)
             Util_stopClock(&sInstance.clkAdvTimeout);
         }
 
-        DriveBLEState();
+        TEMPORARY_RETURN_IGNORED DriveBLEState();
 
         break;
     }
@@ -1747,7 +1747,7 @@ void BLEManagerImpl::ProcessGapMessage(gapEventHdr_t * pMsg)
         event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
         PlatformMgr().PostEventOrDie(&event);
 
-        DriveBLEState();
+        TEMPORARY_RETURN_IGNORED DriveBLEState();
 
         break;
     }
@@ -1799,7 +1799,7 @@ void BLEManagerImpl::ProcessGapMessage(gapEventHdr_t * pMsg)
         if (connHandleEntry != NULL)
         {
             // Attempt to send queued update now
-            ProcessParamUpdate(connHandleEntry->connHandle);
+            TEMPORARY_RETURN_IGNORED ProcessParamUpdate(connHandleEntry->connHandle);
 
             // Free list element
             ICall_free(connHandleEntry);
@@ -2416,7 +2416,7 @@ void BLEManagerImpl::AdvTimeoutHandler(uintptr_t arg)
             sInstance.mAdvSetArray[sInstance.matterAdvIndex].advState.Clear(AdvFlags::kAdvertisingEnabled);
         }
         /* Send event to process state change request */
-        DriveBLEState();
+        TEMPORARY_RETURN_IGNORED DriveBLEState();
     }
 }
 

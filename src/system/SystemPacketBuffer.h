@@ -178,6 +178,8 @@ public:
             return LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - kStructureSize;
         else
             return LWIP_MEM_ALIGN_SIZE(memp_sizes[this->pool]) - kStructureSize;
+#elif CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
+        return PacketBuffer::kMaxAllocSize;
 #else
 #error "Unimplemented PacketBuffer storage case"
 #endif

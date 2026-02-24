@@ -344,13 +344,13 @@ TEST_F(TestChipCert, TestChipCert_ChipDN)
 
     CATValues noc_cats2;
     chip::CATValues::Serialized serializedCATs;
-    EXPECT_EQ(noc_cats.Serialize(serializedCATs), CHIP_NO_ERROR);
-    EXPECT_EQ(noc_cats2.Deserialize(serializedCATs), CHIP_NO_ERROR);
+    noc_cats.Serialize(serializedCATs);
+    noc_cats2.Deserialize(serializedCATs);
     EXPECT_EQ(memcmp(&noc_cats, &noc_cats2, chip::CATValues::kSerializedLength), 0);
 
     CATValues noc_cats3 = { { 0xABCD0001, 0xFFEEAA00, 0x0001F012 } };
-    EXPECT_EQ(noc_cats3.Serialize(serializedCATs), CHIP_NO_ERROR);
-    EXPECT_EQ(noc_cats2.Deserialize(serializedCATs), CHIP_NO_ERROR);
+    noc_cats3.Serialize(serializedCATs);
+    noc_cats2.Deserialize(serializedCATs);
     EXPECT_EQ(memcmp(&noc_cats3, &noc_cats2, chip::CATValues::kSerializedLength), 0);
 }
 

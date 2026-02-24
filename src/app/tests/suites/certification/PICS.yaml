@@ -310,6 +310,9 @@ PICS:
     - label: "Does Device support LwIP stack?"
       id: MCORE.SC.LWIP
 
+    - label: "Does Device support TCP transport?"
+      id: MCORE.SC.TCP
+
     - label:
           "Does Commissioner notify user that Commissionee is not a fully
           trusted device on device attestation failure?"
@@ -340,6 +343,23 @@ PICS:
     #
     - label: "Does the device implement Fabric Synchronization capabilities?"
       id: MCORE.FS
+
+    #
+    # Joint Fabric Administrator
+    #
+
+    - label:
+          "Does the device implement Joint Fabric Administrator cluster as
+          server?"
+      id: JFPKI.S
+
+    - label:
+          "Does the device implement Joint Fabric Administrator cluster as
+          client?"
+      id: JFPKI.C
+
+    - label: "Does the device implement AdministratorFabricIndex attribute?"
+      id: JFPKI.S.A0000
 
     #
     #IDM
@@ -2175,6 +2195,11 @@ PICS:
       id: OPCREDS.S.C0b.Rsp
 
     - label:
+          "Does the Device(Server) implement receiving the
+          SignVIDVerificationResponse command?"
+      id: OPCREDS.S.C0e.Rsp
+
+    - label:
           "Does the Device(Server) implement receiving the ScanNetworks command?"
       id: CNET.S.C00.Rsp
 
@@ -2223,6 +2248,16 @@ PICS:
     - label:
           "Does the Device(Server) invoking/generating the NOCResponse command?"
       id: OPCREDS.S.C08.Tx
+
+    - label:
+          "Does the Device(Server) invoking/generating the
+          SetVIDVerificationStatement command?"
+      id: OPCREDS.S.C0c.Tx
+
+    - label:
+          "Does the Device(Server) invoking/generating the
+          SignVIDVerificationRequest command?"
+      id: OPCREDS.S.C0d.Tx
 
     - label:
           "Does the Device(Server) invoking/generating the ScanNetworksResponse
@@ -5243,6 +5278,12 @@ PICS:
       id: OCC.S.A0032
 
     #
+    # server / Events
+    #
+    - label: "Does the device implement the OccupancyChanged event?"
+      id: OCC.S.E00
+
+    #
     # server / manually
     #
     - label:
@@ -6062,6 +6103,9 @@ PICS:
     - label: "Does the device implement the ExpiryDate attribute?"
       id: SMOKECO.S.A000c
 
+    - label: "Does the device implement the Unmounted attribute?"
+      id: SMOKECO.S.A000d
+
     #
     # server / Events
     #
@@ -6110,6 +6154,9 @@ PICS:
           "Can the DeviceMuted attribute be changed by physical control at the
           device?"
       id: SMOKECO.M.ManuallyControlledMute
+
+    - label: "Is the device inoperative when it is unmounted?"
+      id: SMOKECO.M.InoperativeWhenUnmounted
 
     #
     # server / commandsReceived
@@ -6525,6 +6572,21 @@ PICS:
     - label:
           "Does the device implement the SetpointHoldExpiryTimestamp attribute?"
       id: TSTAT.S.A0052
+
+    - label: "Does the device implement the MaxThermostatSuggestions attribute?"
+      id: TSTAT.S.A0053
+
+    - label: "Does the device implement the ThermostatSuggestions attribute?"
+      id: TSTAT.S.A0054
+
+    - label:
+          "Does the device implement the CurrentThermostatSuggestion attribute?"
+      id: TSTAT.S.A0055
+
+    - label:
+          "Does the device implement the ThermostatSuggestionNotFollowingReason
+          attribute?"
+      id: TSTAT.S.A0056
 
     #
     # server / commandsReceived
@@ -10323,6 +10385,28 @@ PICS:
     #
     # Camera AV Stream Management Cluster
     #
+    - label:
+          "Does the device implement the Camera AV Stream Management Cluster as
+          a server?"
+      id: AVSM.S
+
+    # Features
+    - label: "Does the device support Audio Data Output feature?"
+      id: AVSM.S.F00
+
+    - label: "Does the device support Video Data Output feature?"
+      id: AVSM.S.F01
+
+    - label: "Does the device support Audio Data Input feature?"
+      id: AVSM.S.F02
+
+    - label: "Does the device support Video Data Input feature?"
+      id: AVSM.S.F03
+
+    - label: "Does the device support Speaker feature?"
+      id: AVSM.S.F04
+
+    # Server attributes
     - label: " Does the device implement the MaxConcurrentEncoders attribute?"
       id: AVSM.S.A0000
     - label: " Does the device implement the MaxEncodedPixelRate attribute?"
@@ -10417,6 +10501,118 @@ PICS:
       id: AVSM.S.A0028
 
     #
+    # Commodity Tariff Cluster
+    #
+    - label:
+          "Does the device implement the Commodity Tariff Cluster as a server?"
+      id: SETRF.S
+
+    #  Features
+
+    - label: "Does the device supports information about commodity pricing?"
+      id: SETRF.S.F00
+
+    - label:
+          "Does the device supports information about when friendly credit
+          periods begin and end?"
+      id: SETRF.S.F01
+
+    - label:
+          "Does the device supports information about when auxiliary loads
+          should be enabled or disabled?"
+      id: SETRF.S.F02
+
+    - label:
+          "Does the device supports information about information about peak
+          periods?"
+      id: SETRF.S.F03
+
+    - label: "Does the device supports information about power threshold?"
+      id: SETRF.S.F04
+
+    - label:
+          "Does the device supports information about randomization of calendar
+          transitions?"
+      id: SETRF.S.F05
+
+    #Server attributes
+
+    - label: "Does the device implement the TariffInfo attribute?"
+      id: SETRF.S.A0000
+
+    - label: "Does the device implement the TariffUnit attribute?"
+      id: SETRF.S.A0001
+
+    - label: "Does the device implement the StartDate attribute?"
+      id: SETRF.S.A0002
+
+    - label: "Does the device implement the DayEntries attribute?"
+      id: SETRF.S.A0003
+
+    - label: "Does the device implement the DayPatterns attribute?"
+      id: SETRF.S.A0004
+
+    - label: "Does the device implement the CalendarPeriods attribute?"
+      id: SETRF.S.A0005
+
+    - label: "Does the device implement the IndividualDays attribute?"
+      id: SETRF.S.A0006
+
+    - label: "Does the device implement the CurrentDay attribute?"
+      id: SETRF.S.A0007
+
+    - label: "Does the device implement the NextDay attribute?"
+      id: SETRF.S.A0008
+
+    - label: "Does the device implement the CurrentDayEntry attribute?"
+      id: SETRF.S.A0009
+
+    - label: "Does the device implement the CurrentDayEntryDate attribute?"
+      id: SETRF.S.A000A
+
+    - label: "Does the device implement the NextDayEntry attribute?"
+      id: SETRF.S.A000B
+
+    - label: "Does the device implement the NextDayEntryDate attribute?"
+      id: SETRF.S.A000C
+
+    - label: "Does the device implement the TariffComponents attribute?"
+      id: SETRF.S.A000D
+
+    - label: "Does the device implement the TariffPeriods attribute?"
+      id: SETRF.S.A000E
+
+    - label: "Does the device implement the CurrentTariffComponents attribute?"
+      id: SETRF.S.A000F
+
+    - label: "Does the device implement the NextTariffComponents attribute?"
+      id: SETRF.S.A0010
+
+    - label:
+          "Does the device implement the DefaultRandomizationOffset attribute?"
+      id: SETRF.S.A0011
+
+    - label: "Does the device implement the DefaultRandomizationType attribute?"
+      id: SETRF.S.A0012
+
+    #  Server commands received
+
+    - label: "Does the DUT supports receiving the GetTariffComponent command?"
+      id: SETRF.S.C00.Rsp
+
+    - label: "Does the DUT supports receiving the GetDayEntry command?"
+      id: SETRF.S.C01.Rsp
+
+    #  Server commands generated
+
+    - label:
+          "Does the DUT supports sending the GetTariffComponentResponse command?"
+      id: SETRF.S.C00.Tx
+
+    - label: "Does the DUT supports sending the GetDayEntryResponse command?"
+      id: SETRF.S.C01.Tx
+
+    #
     # Commodity Metering Cluster
     #
     - label:
@@ -10461,3 +10657,69 @@ PICS:
 
     - label: "Does the device implement the PowerThreshold attribute?"
       id: MTRID.S.A0004
+
+    #
+    # WebRTC Transport Provider Cluster
+    #
+    - label:
+          "Does the device implement the WebRTC Transport Provider Cluster as a
+          server?"
+      id: WEBRTCP.S
+
+    # Features
+    - label: "Does the device support Metadata transmission feature?"
+      id: WEBRTCP.S.F00
+
+    - label: "Does the device support SFrame End-to-End Encryption feature?"
+      id: WEBRTCP.S.F01
+
+    # Server attributes
+    - label: "Does the device implement the CurrentSessions attribute?"
+      id: WEBRTCP.S.A0000
+
+    # Commands received
+    - label: "Does the device implement the SolicitOffer command?"
+      id: WEBRTCP.S.C00.Rsp
+
+    - label: "Does the device implement the ProvideOffer command?"
+      id: WEBRTCP.S.C02.Rsp
+
+    - label: "Does the device implement the ProvideAnswer command?"
+      id: WEBRTCP.S.C04.Rsp
+
+    - label: "Does the device implement the ProvideICECandidates command?"
+      id: WEBRTCP.S.C05.Rsp
+
+    - label: "Does the device implement the EndSession command?"
+      id: WEBRTCP.S.C06.Rsp
+
+    # Commands generated
+    - label: "Does the device implement the SolicitOfferResponse command?"
+      id: WEBRTCP.S.C01.Tx
+
+    - label: "Does the device implement the ProvideOfferResponse command?"
+      id: WEBRTCP.S.C03.Tx
+
+    #
+    # WebRTC Requestor Cluster
+    #
+    - label:
+          "Does the device implement the WebRTC Requestor Cluster as a server?"
+      id: WEBRTCR.S
+
+    # Server attributes
+    - label: "Does the device implement the CurrentSessions attribute?"
+      id: WEBRTCR.S.A0000
+
+    # Commands received
+    - label: "Does the device implement the Offer command?"
+      id: WEBRTCR.S.C00.Rsp
+
+    - label: "Does the device implement the Answer command?"
+      id: WEBRTCR.S.C01.Rsp
+
+    - label: "Does the device implement the ICECandidates command?"
+      id: WEBRTCR.S.C02.Rsp
+
+    - label: "Does the device implement the End command?"
+      id: WEBRTCR.S.C03.Rsp

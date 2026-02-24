@@ -127,7 +127,8 @@ void IdentifyTimerHandler(Layer * systemLayer, void * appState)
 
     if (identifyTimerCount)
     {
-        systemLayer->StartTimer(Clock::Milliseconds32(kIdentifyTimerDelayMS), IdentifyTimerHandler, appState);
+        TEMPORARY_RETURN_IGNORED systemLayer->StartTimer(Clock::Milliseconds32(kIdentifyTimerDelayMS), IdentifyTimerHandler,
+                                                         appState);
         // Decrement the timer count.
         identifyTimerCount--;
     }
@@ -148,7 +149,8 @@ void ClusterManager::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId
     identifyTimerCount = (*value) * 4;
 
     DeviceLayer::SystemLayer().CancelTimer(IdentifyTimerHandler, this);
-    DeviceLayer::SystemLayer().StartTimer(Clock::Milliseconds32(kIdentifyTimerDelayMS), IdentifyTimerHandler, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(Clock::Milliseconds32(kIdentifyTimerDelayMS),
+                                                                   IdentifyTimerHandler, this);
 
 exit:
     return;

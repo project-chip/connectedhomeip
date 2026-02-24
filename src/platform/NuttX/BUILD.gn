@@ -22,9 +22,8 @@ import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "linux" || chip_device_platform == "nuttx")
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
-  import("//build_overrides/ot_br_posix.gni")
 }
 
 if (chip_mdns == "platform") {
@@ -77,7 +76,7 @@ static_library("NuttX") {
     "${chip_root}/src/setup_payload",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]
   }
 
@@ -128,7 +127,7 @@ static_library("NuttX") {
     ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",

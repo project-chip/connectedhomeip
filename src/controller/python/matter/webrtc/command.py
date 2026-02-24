@@ -22,7 +22,7 @@ from ..clusters.ClusterObjects import ClusterCommand
 from ..clusters.Command import (AsyncCommandTransaction, CommandPath, _OnCommandSenderDoneCallback, _OnCommandSenderErrorCallback,
                                 _OnCommandSenderResponseCallback)
 from ..native import PyChipError
-from .library_handle import _GetWebRTCLibraryHandle
+from .library_handle import get_webrtc_provider_handle
 
 
 class WebRTCProviderCommand:
@@ -35,27 +35,35 @@ class WebRTCProviderCommand:
     handling. This class handles that.
     """
 
-    async def send_webrtc_provider_command(self, webrtc_handle, endpoint: int, cmd: ClusterCommand, *args, **kwargs):
-        return await self._SendCommand(
-            webrtc_handle, CommandPath(EndpointId=endpoint, ClusterId=cmd.cluster_id, CommandId=cmd.command_id), payload=cmd
+    def __init__(self):
+        lib = get_webrtc_provider_handle()
+        self._handle = lib.pychip_webrtc_provider_client_create()
+        lib.pychip_webrtc_provider_client_init_commandsender_callbacks(
+            self._handle, _OnCommandSenderResponseCallback, _OnCommandSenderErrorCallback, _OnCommandSenderDoneCallback
         )
 
-    async def _SendCommand(
-        self, webrtc_handle, commandPath: CommandPath, payload: ClusterCommand, responseType=None
-    ) -> PyChipError:
+    def __del__(self):
+        get_webrtc_provider_handle().pychip_webrtc_provider_client_destroy(self._handle)
+
+    async def send_webrtc_provider_command(self, endpoint: int, cmd: ClusterCommand, *args, **kwargs):
+        return await self._SendCommand(
+            commandPath=CommandPath(EndpointId=endpoint, ClusterId=cmd.cluster_id, CommandId=cmd.command_id), payload=cmd
+        )
+
+    async def _SendCommand(self, commandPath: CommandPath, payload: ClusterCommand, responseType=None) -> PyChipError:
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
         if (responseType is not None) and (not issubclass(responseType, ClusterCommand)):
             raise ValueError("responseType must be a ClusterCommand or None")
 
-        handle = _GetWebRTCLibraryHandle()
+        handle = get_webrtc_provider_handle()
         transaction = AsyncCommandTransaction(future, eventLoop, responseType)
 
         payloadTLV = payload.ToTLV()
         ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
         res = await builtins.chipStack.CallAsyncWithResult(
             lambda: handle.pychip_webrtc_provider_client_send_command(
-                webrtc_handle,
+                self._handle,
                 ctypes.py_object(transaction),
                 commandPath.EndpointId,
                 commandPath.ClusterId,
@@ -64,15 +72,11 @@ class WebRTCProviderCommand:
                 len(payloadTLV),
             )
         )
-        res.raise_on_error()
+        if not res.is_success:
+            ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
+            res.raise_on_error()
         return await future
 
-    def init_callback(self, webrtc_handle):
-        handle = _GetWebRTCLibraryHandle()
-        handle.pychip_webrtc_provider_client_init_commandsender_callbacks(
-            webrtc_handle, _OnCommandSenderResponseCallback, _OnCommandSenderErrorCallback, _OnCommandSenderDoneCallback
-        )
-
-    def init(self, webrtc_handle, node_id: int, fabric_index: int, endpoint: int):
-        handle = _GetWebRTCLibraryHandle()
-        handle.pychip_webrtc_provider_client_init(webrtc_handle, node_id, fabric_index, endpoint)
+    def init(self, node_id: int, fabric_index: int, endpoint: int):
+        lib = get_webrtc_provider_handle()
+        lib.pychip_webrtc_provider_client_init(self._handle, node_id, fabric_index, endpoint)

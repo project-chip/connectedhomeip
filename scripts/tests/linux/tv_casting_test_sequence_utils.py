@@ -18,9 +18,9 @@ from enum import Enum
 from typing import List, Optional
 
 """
-This file defines the utility classes for creating and managing test sequences to validate the casting experience between 
-the Linux tv-casting-app and the Linux tv-app. It includes an enumeration for the supported applications (App), a class to 
-represent individual steps in a test sequence (Step), and a class to represent a complete test sequence (Sequence). 
+This file defines the utility classes for creating and managing test sequences to validate the casting experience between
+the Linux tv-casting-app and the Linux tv-app. It includes an enumeration for the supported applications (App), a class to
+represent individual steps in a test sequence (Step), and a class to represent a complete test sequence (Sequence).
 Additionally, it provides helper functions to retrieve specific test sequences or all defined test sequences.
 """
 
@@ -40,7 +40,7 @@ class Step:
     - `timeout_sec` specified the timeout duration for parsing the `output_msg` (optional, defaults to DEFAULT_TIMEOUT_SEC)
     - `output_msg` or `input_cmd` (mutually exclusive)
 
-    For output message blocks, define the start line, relevant lines, and the last line. If the last line contains trivial closing 
+    For output message blocks, define the start line, relevant lines, and the last line. If the last line contains trivial closing
     characters (e.g., closing brackets, braces, or commas), include the line before it with actual content. For example:
         `Step(subprocess_='tv-casting-app', output_msg=['InvokeResponseMessage =', 'exampleData', 'InteractionModelRevision =', '},'])`
 
@@ -62,7 +62,7 @@ class Step:
         if output_msg is not None and input_cmd is not None:
             raise ValueError(
                 'Step cannot contain both `output_msg` and `input_cmd`. Either `output_msg` or `input_cmd` should be provided.')
-        elif output_msg is None and input_cmd is None:
+        if output_msg is None and input_cmd is None:
             raise ValueError('Step must contain either `output_msg` or `input_cmd`. Both are `None`.')
 
         # Define either `App.TV_APP` or `App.TV_CASTING_APP` on which we need to parse for `output_msg` or send `input_cmd`.

@@ -20,6 +20,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/persistence/PascalString.h>
@@ -194,12 +195,12 @@ void emberAfEndpointConfigure()
 {
     uint16_t ep;
 
-    static_assert(FIXED_ENDPOINT_COUNT <= std::numeric_limits<decltype(ep)>::max(),
-                  "FIXED_ENDPOINT_COUNT must not exceed the size of the endpoint data type");
-
     emberEndpointCount = FIXED_ENDPOINT_COUNT;
 
 #if FIXED_ENDPOINT_COUNT > 0
+
+    static_assert(FIXED_ENDPOINT_COUNT <= std::numeric_limits<decltype(ep)>::max(),
+                  "FIXED_ENDPOINT_COUNT must not exceed the size of the endpoint data type");
 
     constexpr uint16_t fixedEndpoints[]             = FIXED_ENDPOINT_ARRAY;
     constexpr uint16_t fixedDeviceTypeListLengths[] = FIXED_DEVICE_TYPE_LENGTHS;
@@ -395,7 +396,7 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id
     return CHIP_NO_ERROR;
 }
 
-EndpointId emberAfClearDynamicEndpoint(uint16_t index)
+EndpointId emberAfClearDynamicEndpoint(uint16_t index, MatterClusterShutdownType shutdownType)
 {
     EndpointId ep = 0;
 
@@ -405,7 +406,7 @@ EndpointId emberAfClearDynamicEndpoint(uint16_t index)
         (emberAfEndpointIndexIsEnabled(index)))
     {
         ep = emAfEndpoints[index].endpoint;
-        emberAfEndpointEnableDisable(ep, false);
+        emberAfEndpointEnableDisable(ep, false, shutdownType);
         emAfEndpoints[index].endpoint = kInvalidEndpointId;
     }
 
@@ -476,6 +477,12 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
     {
         const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
         EmberAfGenericClusterFunction f;
+        if (cluster->IsServer())
+        {
+            // Call the code-driven init callback before the emberAf... one,
+            // so the latter can be used to configure code-driven clusters
+            MatterClusterServerInitCallback(definedEndpoint->endpoint, cluster->clusterId);
+        }
         emberAfClusterInitCallback(definedEndpoint->endpoint, cluster->clusterId);
         f = emberAfFindClusterFunction(cluster, MATTER_CLUSTER_FLAG_INIT_FUNCTION);
         if (f != nullptr)
@@ -485,14 +492,18 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
     }
 }
 
-static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
+static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint, MatterClusterShutdownType shutdownType)
 {
     // Call shutdown callbacks from clusters, mainly for canceling pending timers
     uint8_t clusterIndex;
     const EmberAfEndpointType * epType = definedEndpoint->endpointType;
     for (clusterIndex = 0; clusterIndex < epType->clusterCount; clusterIndex++)
     {
-        const EmberAfCluster * cluster  = &(epType->cluster[clusterIndex]);
+        const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
+        if (cluster->IsServer())
+        {
+            MatterClusterServerShutdownCallback(definedEndpoint->endpoint, cluster->clusterId, shutdownType);
+        }
         EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, MATTER_CLUSTER_FLAG_SHUTDOWN_FUNCTION);
         if (f != nullptr)
         {
@@ -925,6 +936,7 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
         return kEmberInvalidEndpointIndex;
     }
 
+#if FIXED_ENDPOINT_COUNT > 0
     if (epIndex < FIXED_ENDPOINT_COUNT)
     {
         // This endpoint is a fixed one.
@@ -946,6 +958,7 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
         epIndex = adjustedEndpointIndex;
     }
     else
+#endif // FIXED_ENDPOINT_COUNT > 0
     {
         // This is a dynamic endpoint.
         // Its index is just its index in the dynamic endpoint list, offset by fixedClusterServerEndpointCount.
@@ -967,7 +980,7 @@ bool emberAfEndpointIsEnabled(EndpointId endpoint)
     return emberAfEndpointIndexIsEnabled(index);
 }
 
-bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
+bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable, MatterClusterShutdownType shutdownType)
 {
     uint16_t index = findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
     bool currentlyEnabled;
@@ -993,7 +1006,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         }
         else
         {
-            shutdownEndpoint(&(emAfEndpoints[index]));
+            shutdownEndpoint(&(emAfEndpoints[index]), shutdownType);
             emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
         }
 
@@ -1097,6 +1110,19 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsig
 
     err = CHIP_NO_ERROR;
     return emAfEndpoints[endpointIndex].deviceTypeList;
+}
+
+void GetSemanticTagsForEndpoint(EndpointId endpoint,
+                                Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type> & semanticTags)
+{
+    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
+
+    if (endpointIndex == 0xFFFF)
+    {
+        semanticTags = Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>();
+        return;
+    }
+    semanticTags = emAfEndpoints[endpointIndex].tagList;
 }
 
 CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
@@ -1406,7 +1432,8 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, EndpointId endpoint, Clu
     auto * attrStorage = GetAttributePersistenceProvider();
     if (attrStorage)
     {
-        attrStorage->WriteValue(ConcreteAttributePath(endpoint, clusterId, metadata->attributeId), ByteSpan(data, dataSize));
+        TEMPORARY_RETURN_IGNORED attrStorage->WriteValue(ConcreteAttributePath(endpoint, clusterId, metadata->attributeId),
+                                                         ByteSpan(data, dataSize));
     }
     else
     {
@@ -1568,28 +1595,13 @@ DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClu
     return ep.dataVersions + clusterIndex;
 }
 
-namespace {
-class GlobalInteractionModelEngineChangedpathListener : public AttributesChangedListener
+DataModel::ProviderChangeListener * emberAfGlobalInteractionModelAttributesChangedListener()
 {
-public:
-    ~GlobalInteractionModelEngineChangedpathListener() = default;
-
-    void MarkDirty(const AttributePathParams & path) override
-    {
-        InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
-    }
-};
-
-} // namespace
-
-AttributesChangedListener * emberAfGlobalInteractionModelAttributesChangedListener()
-{
-    static GlobalInteractionModelEngineChangedpathListener listener;
-    return &listener;
+    return &InteractionModelEngine::GetInstance()->GetReportingEngine();
 }
 
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             AttributesChangedListener * listener)
+                             DataModel::ProviderChangeListener * listener)
 {
     // Increase cluster data path
     DataVersion * version = emberAfDataVersionStorage(ConcreteClusterPath(endpoint, clusterId));
@@ -1608,7 +1620,7 @@ void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, Attribute
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
-void emberAfEndpointChanged(EndpointId endpoint, AttributesChangedListener * listener)
+void emberAfEndpointChanged(EndpointId endpoint, DataModel::ProviderChangeListener * listener)
 {
     listener->MarkDirty(AttributePathParams(endpoint));
 }

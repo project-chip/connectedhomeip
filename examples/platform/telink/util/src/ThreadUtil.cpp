@@ -40,16 +40,16 @@ void StartDefaultThreadNetwork(void)
 
     net_bytes_from_str(xpanid, sizeof(xpanid), CONFIG_OPENTHREAD_XPANID);
 
-    dataset.SetChannel(CONFIG_OPENTHREAD_CHANNEL);
-    dataset.SetExtendedPanId(xpanid);
-    dataset.SetMasterKey(masterkey);
-    dataset.SetMeshLocalPrefix(meshLocalPrefix);
-    dataset.SetNetworkName(CONFIG_OPENTHREAD_NETWORK_NAME);
-    dataset.SetPanId(CONFIG_OPENTHREAD_PANID);
+    TEMPORARY_RETURN_IGNORED dataset.SetChannel(CONFIG_OPENTHREAD_CHANNEL);
+    TEMPORARY_RETURN_IGNORED dataset.SetExtendedPanId(xpanid);
+    TEMPORARY_RETURN_IGNORED dataset.SetMasterKey(masterkey);
+    TEMPORARY_RETURN_IGNORED dataset.SetMeshLocalPrefix(meshLocalPrefix);
+    TEMPORARY_RETURN_IGNORED dataset.SetNetworkName(CONFIG_OPENTHREAD_NETWORK_NAME);
+    TEMPORARY_RETURN_IGNORED dataset.SetPanId(CONFIG_OPENTHREAD_PANID);
 
-    chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(false);
-    chip::DeviceLayer::ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan());
-    chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(true);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(false);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan());
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(true);
 
     chip::app::DnssdServer::Instance().StartServer();
 }

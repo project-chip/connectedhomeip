@@ -37,14 +37,11 @@ try:
 except ImportError:
     _has_coloredlogs = False
 
+log = logging.getLogger(__name__)
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARN,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 def _ParallelGenerateOne(arg):
@@ -111,7 +108,7 @@ def main(log_level, parallel, dry_run, generator, input_glob, sdk_root, external
 
     output_dir = os.path.abspath(output_dir)
 
-    logging.info(f"Pre-generating {sdk_root} data into {output_dir}")
+    log.info("Pre-generating '%s' data into '%s'", sdk_root, output_dir)
 
     if not dry_run:
         runner = ShellRunner()
@@ -137,7 +134,7 @@ def main(log_level, parallel, dry_run, generator, input_glob, sdk_root, external
         for target in targets:
             target.Generate(output_dir)
 
-    logging.info("Done")
+    log.info("Done")
 
 
 if __name__ == '__main__':

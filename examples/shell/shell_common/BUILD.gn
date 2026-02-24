@@ -49,7 +49,7 @@ static_library("shell_common") {
     "${chip_root}/src/protocols",
   ]
 
-  if (chip_enable_openthread &&
+  if (chip_enable_thread &&
       (current_os == "freertos" || current_os == "zephyr")) {
     public_deps += [
       "${chip_root}/third_party/openthread:openthread",
@@ -72,10 +72,15 @@ static_library("shell_common") {
     include_dirs =
         [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
 
-    public_deps +=
-        [ "${chip_root}/examples/all-clusters-app/all-clusters-common" ]
+    public_deps += [
+      "${chip_root}/examples/all-clusters-app/all-clusters-common",
+      "${chip_root}/src/app/clusters/boolean-state-server",
+    ]
 
-    deps = [ "${chip_root}/src/app:attribute-persistence" ]
+    deps = [
+      "${chip_root}/src/app:attribute-persistence",
+      "${chip_root}/src/lib/support:arg_parser",
+    ]
   }
 
   public_configs = [ ":shell_common_config" ]

@@ -187,10 +187,10 @@ def convert_to_data_model_type(field_value, field_type):
             return_field_value[field_descriptor.Label] = convert_to_data_model_type(
                 field_value[item], field_descriptor.Type)
         return return_field_value
-    elif (type(field_value) is float):
+    if (type(field_value) is float):
         return float32(field_value)
     # list represents a data model list
-    elif (type(field_value) is list):
+    if (type(field_value) is list):
         list_element_type = typing.get_args(field_type)[0]
 
         # The field type passed in is the type of the list element and not list[T].
@@ -199,14 +199,13 @@ def convert_to_data_model_type(field_value, field_type):
         return field_value
     # YAML conversion treats all numbers as ints. Convert to a uint type if the schema
     # type indicates so.
-    elif (type(field_value) is str and field_type == uint):
+    if (type(field_value) is str and field_type == uint):
         # Longer number are stored as strings. Need to make this conversion first.
         # The value can be represented in binary, octal, decimal or hexadecimal
         # format.
         return field_type(int(field_value, 0))
     # YAML treats enums as ints. Convert to the typed enum class.
-    elif (issubclass(field_type, MatterIntEnum)):
+    if (issubclass(field_type, MatterIntEnum)):
         return field_type.extend_enum_if_value_doesnt_exist(field_value)
     # By default, just return the field_value casted to field_type.
-    else:
-        return field_type(field_value)
+    return field_type(field_value)

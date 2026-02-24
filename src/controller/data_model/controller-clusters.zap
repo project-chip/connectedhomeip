@@ -54,7 +54,7 @@
         }
       ],
       "deviceVersions": [
-        1
+        5
       ],
       "deviceIdentifiers": [
         22
@@ -3008,6 +3008,7 @@
           "define": "COMMODITY_TARIFF_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "GetTariffComponentResponse",

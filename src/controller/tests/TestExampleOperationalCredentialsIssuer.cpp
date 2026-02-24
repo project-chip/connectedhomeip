@@ -24,6 +24,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <cstring>
 #include <iostream>
@@ -62,8 +63,8 @@ TEST_F(ExampleOperationalCredentialsIssuerTest, SuccessfulyGeneratesDistinctRand
 
     ASSERT_EQ(node_id_1, node_id_2); // should be both 0 since type of NodeId is uint64_t
 
-    ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(&node_id_1);
-    ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(&node_id_2);
+    EXPECT_SUCCESS(ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(&node_id_1));
+    EXPECT_SUCCESS(ExampleOperationalCredentialsIssuer::GetRandomOperationalNodeId(&node_id_2));
 
     ASSERT_NE(node_id_1, node_id_2);
 }
@@ -101,7 +102,7 @@ TEST_F(ExampleOperationalCredentialsIssuerTest, SuccessfulyGeneratesNOCChainAfte
     MutableByteSpan icacSpan(icac.Get(), Controller::kMaxCHIPDERCertLength);
     MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
 
-    mCredsIssuer.Initialize(mPersistentStorageDelegate);
+    EXPECT_SUCCESS(mCredsIssuer.Initialize(mPersistentStorageDelegate));
 
     auto r = mCredsIssuer.GenerateNOCChainAfterValidation(mNodeId, ::kFabricId, chip::kUndefinedCATs, ephemeralKey.Pubkey(),
                                                           rcacSpan, icacSpan, nocSpan);
@@ -141,7 +142,7 @@ TEST_F(ExampleOperationalCredentialsIssuerTest, SuccessfulyGeneratesNOCChainAfte
 
     ASSERT_EQ(CHIP_NO_ERROR, err);
 
-    mCredsIssuer.Initialize(mPersistentStorageDelegate);
+    EXPECT_SUCCESS(mCredsIssuer.Initialize(mPersistentStorageDelegate));
 
     mCredsIssuer.SetMaximallyLargeCertsUsed(true);
 

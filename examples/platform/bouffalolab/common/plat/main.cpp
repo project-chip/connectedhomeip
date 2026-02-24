@@ -54,7 +54,7 @@ extern "C" int START_ENTRY(void)
     ChipLogProgress(NotSpecified, "==================================================");
 
     ChipLogProgress(NotSpecified, "Init CHIP Memory");
-    chip::Platform::MemoryInit(NULL, 0);
+    TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit(NULL, 0);
 
     ChipLogProgress(NotSpecified, "Starting App Task");
     StartAppTask();
