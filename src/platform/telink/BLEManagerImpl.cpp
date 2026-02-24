@@ -945,7 +945,7 @@ CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * eve
     }
     else // Unexpected BLE disconnect during commissioning
     {
-        LOG_INF("BLE disconnected during commissioning");
+        ChipLogDetail(DeviceLayer, "BLE disconnected during commissioning");
         chip::Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
     }
     return CHIP_NO_ERROR;
