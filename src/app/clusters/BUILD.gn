@@ -38,6 +38,7 @@ source_set("clusters") {
     "operational-credentials-server",
     "scenes-server",
     "software-diagnostics-server",
+    "temperature-measurement-server",
     "tls-certificate-management-server",
     "tls-client-management-server",
     "webrtc-transport-provider-server",
