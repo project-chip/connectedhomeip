@@ -96,11 +96,6 @@ static_library("nxp_crypto_lib") {
     public_deps += [ "${mbedtls_root}:mbedtls" ]
   }
 
-  public_deps += [
-    "${chip_root}/src/credentials:credentials_header",
-    "${chip_root}/third_party/inipp",
-  ]
-
   include_dirs = [
     ".",
     "${chip_root}/src/crypto",
