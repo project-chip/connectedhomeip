@@ -498,6 +498,7 @@ class AttributeSubscriptionHandler:
         _ = self.get_last_report()
         return
 
+
 class WildcardAttributeSubscriptionHandler:
     """
     Callback class to handle wildcard attribute subscription reports.
