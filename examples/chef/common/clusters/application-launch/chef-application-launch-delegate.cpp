@@ -73,7 +73,7 @@ void PlatformDelegate::HandleLaunchApp(CommandResponseHelper<LauncherResponseTyp
     }
 
     response.data = chip::MakeOptional(data);
-    TEMPORARY_RETURN_IGNORED helper.Success(response);
+    LogErrorOnFailure(helper.Success(response));
 }
 
 void PlatformDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application)
@@ -108,7 +108,7 @@ void PlatformDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType>
         }
         response.status = StatusEnum::kSuccess;
     }
-    TEMPORARY_RETURN_IGNORED helper.Success(response);
+    LogErrorOnFailure(helper.Success(response));
 }
 
 void PlatformDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application)
@@ -141,7 +141,7 @@ void PlatformDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType>
         }
         response.status = StatusEnum::kSuccess;
     }
-    TEMPORARY_RETURN_IGNORED helper.Success(response);
+    LogErrorOnFailure(helper.Success(response));
 }
 
 CHIP_ERROR PlatformDelegate::HandleGetCatalogList(app::AttributeValueEncoder & aEncoder)
@@ -231,7 +231,7 @@ void AppDelegate::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & 
     if (!mPlatformDelegate)
     {
         ChipLogError(Zcl, "ApplicationLauncher::Chef::AppDelegate::HandleLaunchApp : Platform delegate not initialised.");
-        TEMPORARY_RETURN_IGNORED helper.Failure(Protocols::InteractionModel::Status::InvalidInState);
+        LogErrorOnFailure(helper.Failure(Protocols::InteractionModel::Status::InvalidInState));
         return;
     }
     Application targetApp;
@@ -247,7 +247,7 @@ void AppDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType> & he
     if (!mPlatformDelegate)
     {
         ChipLogError(Zcl, "ApplicationLauncher::Chef::AppDelegate::HandleStopApp : Platform delegate not initialised.");
-        TEMPORARY_RETURN_IGNORED helper.Failure(Protocols::InteractionModel::Status::InvalidInState);
+        LogErrorOnFailure(helper.Failure(Protocols::InteractionModel::Status::InvalidInState));
         return;
     }
     Application targetApp;
@@ -263,7 +263,7 @@ void AppDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType> & he
     if (!mPlatformDelegate)
     {
         ChipLogError(Zcl, "ApplicationLauncher::Chef::AppDelegate::HandleHideApp : Platform delegate not initialised.");
-        TEMPORARY_RETURN_IGNORED helper.Failure(Protocols::InteractionModel::Status::InvalidInState);
+        LogErrorOnFailure(helper.Failure(Protocols::InteractionModel::Status::InvalidInState));
         return;
     }
     Application targetApp;

@@ -102,7 +102,7 @@ void ChefDelegate::HandleLaunchContent(CommandResponseHelper<LaunchResponseType>
     }
 
     response.data = chip::MakeOptional(data);
-    TEMPORARY_RETURN_IGNORED helper.Success(response);
+    LogErrorOnFailure(helper.Success(response));
 }
 
 void ChefDelegate::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
@@ -112,7 +112,7 @@ void ChefDelegate::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & h
     LaunchResponseType response;
     response.status = ContentLauncher::StatusEnum::kSuccess;
     response.data   = chip::MakeOptional(contentUrl);
-    TEMPORARY_RETURN_IGNORED helper.Success(response);
+    LogErrorOnFailure(helper.Success(response));
 }
 
 CHIP_ERROR ChefDelegate::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
