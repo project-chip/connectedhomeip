@@ -30,7 +30,6 @@ public:
     UnitLocalizationServer(EndpointId endpointId, const BitFlags<UnitLocalization::Feature> features) :
         UnitLocalizationCluster(endpointId, features)
     {}
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
     static UnitLocalizationServer & Instance();
 };
 

@@ -33,12 +33,11 @@ CHIP_ERROR UnitLocalizationCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    CHIP_ERROR err         = CHIP_NO_ERROR;
     uint8_t storedTempUnit = 0;
-
     MutableByteSpan span(&storedTempUnit, sizeof(storedTempUnit));
-    err =
+    CHIP_ERROR err =
         context.attributeStorage.ReadValue(ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), span);
+
     if (err == CHIP_NO_ERROR)
     {
         mTemperatureUnit = static_cast<TempUnitEnum>(storedTempUnit);

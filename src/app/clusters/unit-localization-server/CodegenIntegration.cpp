@@ -20,6 +20,7 @@
 #include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
 #include <app/persistence/AttributePersistenceMigration.h>
 #include <app/static-cluster-config/UnitLocalization.h>
+#include <app/server/Server.h>
 #include <clusters/UnitLocalization/Ids.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
@@ -67,15 +68,6 @@ UnitLocalizationServer & UnitLocalizationServer::Instance()
     return gServer.Cluster();
 }
 
-CHIP_ERROR UnitLocalizationServer::Startup(ServerClusterContext & context)
-{
-    static constexpr AttrMigrationData attributesToUpdate[] = { { UnitLocalization::Attributes::TemperatureUnit::Id,
-                                                                  &DefaultMigrators::ScalarValue<uint8_t> } };
-    SuccessOrLog(MigrateFromSafeToAttributePersistenceProvider<sizeof(uint8_t)>(mPath, Span(attributesToUpdate), context.storage),
-                 Zcl, "Error migrating UnitLocalization");
-    return UnitLocalizationCluster::Startup(context);
-}
-
 void MatterUnitLocalizationClusterInitCallback(chip::EndpointId endpointId)
 {
     // This cluster should only exist in Root endpoint.
@@ -92,6 +84,11 @@ void MatterUnitLocalizationClusterInitCallback(chip::EndpointId endpointId)
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
+    
+    static constexpr AttrMigrationData attributesToUpdate[] = { { UnitLocalization::Attributes::TemperatureUnit::Id,
+                                                                  &DefaultMigrators::ScalarValue<uint8_t> } };
+    SuccessOrLog(MigrateFromSafeToAttributePersistenceProvider<sizeof(uint8_t)>({endpointId, UnitLocalization::Id}, Span(attributesToUpdate), 
+    chip::Server::GetInstance().GetPersistentStorage()), Zcl, "Error migrating UnitLocalization");
 }
 
 void MatterUnitLocalizationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)

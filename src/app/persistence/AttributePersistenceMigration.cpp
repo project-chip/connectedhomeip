@@ -29,7 +29,6 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
 
     for (const auto & entry : attributes)
     {
-        ChipError attributeMigrationError = CHIP_NO_ERROR;
         attrPath                          = ConcreteAttributePath(cluster.mEndpointId, cluster.mClusterId, entry.attributeId);
 
         // Create a copy of the buffer to check if the value is already in the AttributePersistence
@@ -46,7 +45,7 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
         MutableByteSpan copyOfBuffer = buffer;
         // If there was an error reading from SafeAttribute, then we shouldn't try to write that value
         // to AttributePersistence
-        attributeMigrationError = entry.migrator(attrPath, safeProvider, copyOfBuffer);
+        ChipError attributeMigrationError = entry.migrator(attrPath, safeProvider, copyOfBuffer);
         if (attributeMigrationError != CHIP_NO_ERROR)
         {
             migrationError = CHIP_ERROR_HAD_FAILURES;
