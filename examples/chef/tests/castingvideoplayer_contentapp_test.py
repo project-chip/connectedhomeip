@@ -52,7 +52,8 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                     9, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using platform endpoint."),
                 TestStep(
                     10, "[APP_LAUNCH_CUJ] Launch and stop app A using app endpoint."),
-                TestStep(11, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint."),
+                TestStep(
+                    11, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint."),
                 TestStep(12, "[TC_TARGET_NAVIGATOR] Test target navigator.")]
 
     async def _read_application_launcher_current_app(self, endpoint):
@@ -537,7 +538,8 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
     async def target_navigator_test(self, endpoint):
         target_list = await self._read_target_navigator_target_list(endpoint)
-        asserts.assert_true(len(target_list) > 0, "Target list should not be empty.")
+        asserts.assert_true(len(target_list) > 0,
+                            "Target list should not be empty.")
 
         current_target = await self._read_target_navigator_current_target(endpoint)
 
