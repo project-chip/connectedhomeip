@@ -156,19 +156,12 @@
 #endif
 
 #include <platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config.h>
+#include <platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_utils.h>
 #include <platform/nxp/crypto/se05x/PersistentStorageOperationalKeystore_se05x.h>
 #if ENABLE_SE05X_DEVICE_ATTESTATION
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
 #include <third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-extern CHIP_ERROR se05x_close_session(void);
-#ifdef __cplusplus
-}
-#endif
 
 using namespace chip;
 using namespace chip::ArgParser;

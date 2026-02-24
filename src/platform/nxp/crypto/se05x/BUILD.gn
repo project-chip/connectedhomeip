@@ -101,12 +101,6 @@ static_library("nxp_crypto_lib") {
     "${chip_root}/third_party/inipp",
   ]
 
-  if (nxp_platform != "rt/rw61x" && nxp_platform != "rt/rt1060" &&
-      nxp_platform != "mcxw72") {
-    public_deps += [ "${chip_root}/src/platform" ]
-    public_deps += [ "${chip_root}/src/app/server" ]
-  }
-
   include_dirs = [
     ".",
     "${chip_root}/src/crypto",
