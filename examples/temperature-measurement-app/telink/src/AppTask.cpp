@@ -48,13 +48,8 @@ CHIP_ERROR AppTask::Init(void)
     k_timer_start(&sTemperatureMeasurementUpdateTimer, K_MSEC(kTemperatureMeasurementUpdateTimerPeriodMs), K_NO_WAIT);
 
     PlatformMgr().LockChipStack();
-
-    CHIP_ERROR err = TemperatureMeasurement::SetMeasuredValueRange(kExampleEndpointId, SensorMgr().GetMinMeasuredTempValue(),
-                                                                   SensorMgr().GetMaxMeasuredTempValue());
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(NotSpecified, "Failed to set TemperatureMeasurement MeasuredValueRange for Endpoint: %d"),
-                   kExampleEndpointId);
-
+    LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValueRange(kExampleEndpointId, SensorMgr().GetMinMeasuredTempValue(),
+                                                                    SensorMgr().GetMaxMeasuredTempValue()));
     PlatformMgr().UnlockChipStack();
 
     return CHIP_NO_ERROR;

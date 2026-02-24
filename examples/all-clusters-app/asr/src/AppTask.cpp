@@ -182,7 +182,8 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
     switch (aEvent->Type)
     {
     case AppEvent::kEventType_Timer: {
-        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(/* endpoint ID */ 1, /* temperature in 0.01*C */ temperature));
+        LogErrorOnFailure(chip::app::Clusters::TemperatureMeasurement::SetMeasuredValue(/* endpoint ID */ 1,
+                                                                                        /* temperature in 0.01*C */ temperature));
 
         chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(
             /* endpoint ID */ 1, /* humidity in 0.01% */ humidity);
