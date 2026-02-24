@@ -354,10 +354,12 @@ void FactoryDataProviderImpl::SSS_RunApiTest()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SSS_API_TEST
 #endif // CHIP_USE_PLAIN_DAC_KEY
 
+#ifndef CONFIG_CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 FactoryDataProvider & FactoryDataPrvdImpl()
 {
     return FactoryDataProviderImpl::sInstance;
 }
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

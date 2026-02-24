@@ -112,10 +112,12 @@ CHIP_ERROR FactoryDataProviderImpl::SetEncryptionMode(EncryptionMode mode)
     return error;
 }
 
+#ifndef CONFIG_CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 FactoryDataProvider & FactoryDataPrvdImpl()
 {
     return FactoryDataProviderImpl::sInstance;
 }
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip
