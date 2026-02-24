@@ -129,8 +129,9 @@ bouffalolab-{bl602-night-light,bl602dk,bl616dk,bl704ldk,bl706-night-light,bl706d
 
     -   `-easyflash`, specifies to use `easyflash` for flash access.
 
-        > `littlefs` uses a different format than `easyflash` and they are not compatible.
-        > Please use the `-easyflash` flag if existing in-field devices were already deployed with `easyflash`.
+        > `littlefs` uses a different format than `easyflash` and they are not
+        > compatible. Please use the `-easyflash` flag if existing in-field
+        > devices were already deployed with `easyflash`.
 
 -   `-rotating_device_id`, enable rotating device id
 
@@ -173,6 +174,7 @@ Taking lighting app with `littlefs` supported as example :
     ```
     ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-ethernet-littlefs build
     ```
+
     > This BL706 + BL602 Wi-Fi solution: BL602 runs WLAN part and BL706 runs
     > TCP/IP stack which uses SPI for communication between these two parts.
 
