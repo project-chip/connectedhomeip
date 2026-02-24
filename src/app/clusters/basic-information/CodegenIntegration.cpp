@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "ConfigurationVersionDelegate.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
@@ -92,7 +93,33 @@ public:
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 };
 
+class BasicInformationClusterVersionDelegate : public ConfigurationVersionDelegate
+{
+public:
+    CHIP_ERROR IncreaseConfigurationVersion() override
+    {
+        VerifyOrReturnError(gServer.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+        return gServer.Cluster().IncreaseConfigurationVersion();
+    }
+};
+
 } // namespace
+  //
+namespace chip::app::Clusters::BasicInformation {
+
+BasicInformationCluster * GetClusterInstance()
+{
+    VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+    return &gServer.Cluster();
+}
+
+ConfigurationVersionDelegate * GetBasicInformationClusterConfigurationVersionDelegate()
+{
+    static BasicInformationClusterVersionDelegate gDelegate;
+    return &gDelegate;
+}
+
+} // namespace chip::app::Clusters::BasicInformation
 
 void MatterBasicInformationClusterInitCallback(EndpointId endpointId)
 {
