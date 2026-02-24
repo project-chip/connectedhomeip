@@ -464,22 +464,9 @@ class WpaSupplicantMock(threading.Thread):
             """
             raise NotImplementedError
 
-        @sdbus.dbus_signal_async("us")
-        def NANPublishTerminated(self) -> tuple:
-            """Signal: (publish_id, reason)"""
-            raise NotImplementedError
-
-        @sdbus.dbus_signal_async("us")
-        def NANSubscribeTerminated(self) -> tuple:
-            """Signal: (subscribe_id, reason)"""
-            raise NotImplementedError
-
-        @sdbus.dbus_signal_async("a{sv}")
-        def PropertiesChanged(self) -> dict:
-            raise NotImplementedError
-
         @sdbus.dbus_signal_async("b")
         def ScanDone(self) -> bool:
+            """Signal emitted when scaning is done"""
             raise NotImplementedError
 
         # =====================================================================
