@@ -22,6 +22,7 @@ source_set("clusters") {
     "basic-information",
     "boolean-state-configuration-server",
     "boolean-state-server",
+    "bridged-device-basic-information-server",
     "camera-av-settings-user-level-management-server",
     "chime-server",
     "descriptor",
