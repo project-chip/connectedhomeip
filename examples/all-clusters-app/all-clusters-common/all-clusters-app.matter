@@ -8196,6 +8196,8 @@ endpoint 1 {
     ram      attribute minSetpointDeadBand default = 0x19;
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;
+    ram      attribute temperatureSetpointHold default = 0;
+    ram      attribute temperatureSetpointHoldDuration;
     callback attribute presetTypes;
     callback attribute scheduleTypes;
     ram      attribute numberOfPresets default = 0;

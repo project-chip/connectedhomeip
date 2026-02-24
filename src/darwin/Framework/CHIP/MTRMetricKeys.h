@@ -84,6 +84,10 @@ constexpr Tracing::MetricKey kMetricDeviceVendorID = "dwnfw_device_vendor_id";
 // Device Product ID
 constexpr Tracing::MetricKey kMetricDeviceProductID = "dwnfw_device_product_id";
 
+// Discovery capabilities bitmask from the setup payload (MTRDiscoveryCapabilities / RendezvousInformationFlags).
+// Bits: SoftAP=1, BLE=2, OnNetwork=4, NFC=16. Value is 0 (unknown) when not present in the payload (e.g. manual code).
+constexpr Tracing::MetricKey kMetricDeviceDiscoveryCapabilities = "dwnfw_device_discovery_capabilities";
+
 // Device Uses Thread
 constexpr Tracing::MetricKey kMetricDeviceUsesThread = "dwnfw_device_uses_thread_bool";
 
