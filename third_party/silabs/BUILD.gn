@@ -145,6 +145,7 @@ if (wifi_soc != true) {  # CCP board
         "${sl_ot_efr32_root}/misc.c",
         "${sl_ot_efr32_root}/radio_security.cpp",
         "${sl_ot_efr32_root}/radio_instance.cpp",
+        "${sl_ot_efr32_root}/radio_energy_scan.cpp",
         "${sl_ot_efr32_root}/radio_coex.c",
         "${sl_ot_efr32_root}/radio_csl.cpp",
         "${sl_ot_efr32_root}/radio_extension.c",
