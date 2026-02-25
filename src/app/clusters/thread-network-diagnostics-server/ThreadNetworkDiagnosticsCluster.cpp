@@ -191,8 +191,8 @@ void ThreadNetworkDiagnosticsCluster::OnNetworkFaultChanged(const GeneralFaults<
     if (current.size() > 0)
     {
         uint8_t latestFault = current.data()[current.size() - 1];
-        ChipLogProgress(Zcl, "ThdDiag: OnNetworkFaultChanged, %lu active fault(s). Latest: %s (%u)",
-            current.size(), GetNetworkFaultString(latestFault), latestFault);
+        ChipLogProgress(Zcl, "ThdDiag: OnNetworkFaultChanged, %lu active fault(s). Latest: %s (%u)", current.size(),
+                        GetNetworkFaultString(latestFault), latestFault);
     }
     else
     {
