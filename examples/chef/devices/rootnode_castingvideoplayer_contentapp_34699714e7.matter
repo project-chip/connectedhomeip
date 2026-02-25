@@ -2899,7 +2899,7 @@ endpoint 1 {
 
   server cluster AudioOutput {
     callback attribute outputList;
-    callback attribute currentOutput default = 0x00;
+    persist  attribute currentOutput default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
