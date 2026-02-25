@@ -798,12 +798,9 @@ jobs:
                         --target linux-x64-air-purifier-${BUILD_VARIANT}-asan-clang-test-unified \
                         --target linux-x64-bridge-${BUILD_VARIANT}-asan-clang-test-unified \
                         --target linux-x64-closure-${BUILD_VARIANT}-asan-clang-test-unified \
-                        --target linux-x64-light-${BUILD_VARIANT}-asan-clang-unified \
                         --target linux-x64-lock-${BUILD_VARIANT}-asan-clang-test-unified \
                         --target linux-x64-microwave-oven-${BUILD_VARIANT}-asan-clang-test-unified \
                         --target linux-x64-ota-provider-${BUILD_VARIANT}-asan-clang-test-unified \
-                        --target linux-x64-thermostat-${BUILD_VARIANT}-asan-clang-unified \
-                        --target linux-x64-tv-app-${BUILD_VARIANT}-asan-clang-unified \
                         --target linux-x64-rvc-${BUILD_VARIANT}-asan-clang-test-unified \
                         --target linux-x64-water-leak-detector-${BUILD_VARIANT}-asan-clang-test-unified \
                         --pw-command-launcher=ccache \
@@ -941,13 +938,6 @@ jobs:
                   --target linux-x64-ota-requestor-${BUILD_VARIANT}-asan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-ota-requestor-${BUILD_VARIANT}-asan-clang-test"
-
-            - name: Build linux-x64-provider-app
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-ota-provider-${BUILD_VARIANT}-asan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-ota-provider-${BUILD_VARIANT}-asan-clang-test"
 
             - name: Build Software Update ota images with new version.
               run: >-
