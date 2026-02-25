@@ -173,15 +173,15 @@ to SE05x:
 
 ### GN Build Options
 
-| GN Option                               | Description                             | Type    | Default |
-| --------------------------------------- | --------------------------------------- | ------- | ------- |
-| chip_se05x_spake_verifier               | SPAKE2+ verifier on SE                  | Boolean | false   |
-| chip_se05x_spake_prover                 | SPAKE2+ prover on SE                    | Boolean | false   |
-| chip_se05x_rnd_gen                      | Random number generation                | Boolean | false   |
-| chip_se05x_device_attestation           | Device attestation                      | Boolean | false   |
-| chip_se05x_spake_verifier_use_tp_values | SPAKE with trust provisioned verifiers  | Boolean | false   |
-| chip_se05x_spake_verifier_tp_set_no     | Trust provisioned passcode set number   | Integer | 1       |
-| chip_se05x_spake_verifier_tp_iter_cnt   | SPAKE iteration count                   | Integer | 1000    |
+| GN Option                                 | Description                             | Type    | Default |
+| ----------------------------------------- | --------------------------------------- | ------- | ------- |
+| `chip_se05x_spake_verifier`               | SPAKE2+ verifier on SE                  | Boolean | false   |
+| `chip_se05x_spake_prover`                 | SPAKE2+ prover on SE                    | Boolean | false   |
+| `chip_se05x_rnd_gen`                      | Random number generation                | Boolean | false   |
+| `chip_se05x_device_attestation`           | Device attestation                      | Boolean | false   |
+| `chip_se05x_spake_verifier_use_tp_values` | SPAKE with trust provisioned verifiers  | Boolean | false   |
+| `chip_se05x_spake_verifier_tp_set_no`     | Trust provisioned passcode set number   | Integer | 1       |
+| `chip_se05x_spake_verifier_tp_iter_cnt`   | SPAKE iteration count                   | Integer | 1000    |
 
 **Example:**
 
@@ -191,15 +191,15 @@ gn gen out --args="chip_se05x_device_attestation=true"
 
 ### CMake/Kconfig Options
 
-| Kconfig Option                                 | Description                             | Default |
-| ---------------------------------------------- | --------------------------------------- | ------- |
-| CONFIG_CHIP_SE05X_SPAKE_VERIFIER               | SPAKE2+ verifier on SE                  | n       |
-| CONFIG_CHIP_SE05X_SPAKE_PROVER                 | SPAKE2+ prover on SE                    | n       |
-| CONFIG_CHIP_SE05X_RND_GEN                      | Random number generation                | n       |
-| CONFIG_CHIP_SE05X_DEVICE_ATTESTATION           | Device attestation                      | n       |
-| CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES | SPAKE with trust provisioned verifiers  | n       |
-| CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO     | Trust provisioned passcode set number   | 1       |
-| CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITER_CNT   | SPAKE iteration count                   | 1000    |
+| Kconfig Option                                   | Description                             | Default |
+| ------------------------------------------------ | --------------------------------------- | ------- |
+| `CONFIG_CHIP_SE05X_SPAKE_VERIFIER`               | SPAKE2+ verifier on SE                  | n       |
+| `CONFIG_CHIP_SE05X_SPAKE_PROVER`                 | SPAKE2+ prover on SE                    | n       |
+| `CONFIG_CHIP_SE05X_RND_GEN`                      | Random number generation                | n       |
+| `CONFIG_CHIP_SE05X_DEVICE_ATTESTATION`           | Device attestation                      | n       |
+| `CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES` | SPAKE with trust provisioned verifiers  | n       |
+| `CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO`     | Trust provisioned passcode set number   | 1       |
+| `CONFIG_CHIP_SE05X_SPAKE_VERIFIER_TP_ITER_CNT`   | SPAKE iteration count                   | 1000    |
 
 **Example:**
 
