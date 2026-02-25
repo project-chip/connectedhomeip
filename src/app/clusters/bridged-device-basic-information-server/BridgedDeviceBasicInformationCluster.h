@@ -55,9 +55,9 @@ public:
         BridgedDeviceIcdDelegate * icdDelegate = nullptr; // if nullptr, ICD support feature is disabled
     };
 
-    /// Most attributes in the bridged device basic information cluster are fixed and cannot be
-
-    /// changed after construction. This class defines those attributes.
+    /// Most attributes in the bridged device basic information cluster are fixed
+    /// and cannot be changed after construction. This class defines those attributes.
+    ///
     ///
     /// Attribute will be exposed if the optional values have a value.
     struct FixedData
