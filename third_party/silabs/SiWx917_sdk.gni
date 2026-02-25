@@ -374,7 +374,7 @@ template("siwx917_sdk") {
     if (sl_si91x_crypto_flavor == "psa") {
       assert(chip_crypto_keystore == "psa",
              "chip_crypto_keystore must be set to psa")
-      _mbedtls_root = "${efr32_sdk_root}/util/third_party/mbedtls"
+      _mbedtls_root = "${efr32_sdk_root}/security_mbedtls_source"
 
       sl_si91x_psa_crypto_path =
           "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/"
@@ -544,7 +544,7 @@ template("siwx917_sdk") {
     }
 
     if (sl_si91x_crypto_flavor == "tinycrypt") {
-      _mbedtls_root = "${efr32_sdk_root}/openthread_stack/util/third_part/openthread/third_party/mbedtls/repo"
+      _mbedtls_root = "${efr32_sdk_root}/security_mbedtls_source"
 
       config("siwx917_tinycrypt_config") {
         defines = [
@@ -594,7 +594,7 @@ template("siwx917_sdk") {
           "${_mbedtls_root}/library/ecp.c",
           "${_mbedtls_root}/library/ecp_curves.c",
           "${_mbedtls_root}/library/entropy.c",
-          "${_mbedtls_root}/library/error.c",
+          "${efr32_sdk_root}/security_mbedtls/platform/security/sl_component/sl_mbedtls_support/src/error.c",
           "${_mbedtls_root}/library/hkdf.c",
           "${_mbedtls_root}/library/hmac_drbg.c",
           "${_mbedtls_root}/library/md.c",
