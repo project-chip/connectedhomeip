@@ -152,7 +152,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             # TH reads the FeatureMap attribute.
             feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.FeatureMap)
             log.info(f"FeatureMap: {feature_map}")
-    
+
             # Verify that the TSUGGEST bit is set in the FeatureMap value.
             asserts.assert_true(feature_map & cluster.Bitmaps.Feature.kThermostatSuggestions,
                                 "TSUGGEST bit is not set in the FeatureMap")
