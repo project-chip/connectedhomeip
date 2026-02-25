@@ -644,9 +644,13 @@ void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
     {
         // Only 1 request per type (kCommissioningWindowOpen)
         // delay the requirement removal for more responsiveness post commissioning.
-        DeviceLayer::SystemLayer().CancelTimer(OnCommissioningDone, this);
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(60), OnCommissioningDone, this);
-        return;
+        RETURN_SAFELY_IGNORED DeviceLayer::SystemLayer().CancelTimer(OnCommissioningDone, this);
+        if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(60), OnCommissioningDone, this))
+        {
+            // if we fail to start the timer, we will remove the requirement immediately to avoid staying in active mode
+            // indefinitely. Otherwise wait for the timer to expire.
+            return;
+        }
     }
 
     if (request.Has(KeepActiveFlag::kCommissioningWindowOpen) || request.Has(KeepActiveFlag::kFailSafeArmed))

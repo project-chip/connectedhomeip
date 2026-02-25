@@ -618,9 +618,9 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnu
 {
     CommissioningWindowStatusEnum oldClusterStatus = CommissioningWindowStatusForCluster();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    // BugFix, The commissioning window is open before the initialisation of the ICD Manager
-    // trigger a request notification everytime the status is updated to make sure the ICDManager
-    // is in sync the the commissioning window status.
+    // BugFix: The commissioning window can be open before the initialization of the ICD Manager.
+    // Trigger a request notification every time this function is called with an open status
+    // to ensure the ICDManager is in sync with the commissioning window status.
     if (aNewStatus == CommissioningWindowStatusEnum::kEnhancedWindowOpen ||
         aNewStatus == CommissioningWindowStatusEnum::kBasicWindowOpen)
     {
