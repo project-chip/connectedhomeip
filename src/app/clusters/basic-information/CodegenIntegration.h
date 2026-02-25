@@ -18,13 +18,9 @@
 #pragma once
 
 #include <app/clusters/basic-information/BasicInformationCluster.h>
-#include <app/clusters/basic-information/ConfigurationVersionDelegate.h>
 
 namespace chip::app::Clusters::BasicInformation {
 
 BasicInformationCluster * GetClusterInstance();
-
-/// Get access to a delegate that allows increasing the basic information cluster revision
-ConfigurationVersionDelegate * GetBasicInformationClusterConfigurationVersionDelegate();
 
 } // namespace chip::app::Clusters::BasicInformation

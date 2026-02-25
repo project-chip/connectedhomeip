@@ -16,9 +16,9 @@
  */
 #pragma once
 
-#include <app/clusters/basic-information/ConfigurationVersionDelegate.h>
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationDelegate.h>
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceIcdDelegate.h>
+#include <app/clusters/bridged-device-basic-information-server/ConfigurationVersionDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/BridgedDeviceBasicInformation/ClusterId.h>
 #include <clusters/BridgedDeviceBasicInformation/Structs.h>

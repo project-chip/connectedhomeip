@@ -18,7 +18,6 @@ source_set("basic-information") {
   sources = [
     "BasicInformationCluster.cpp",
     "BasicInformationCluster.h",
-    "ConfigurationVersionDelegate.h",
   ]
   public_deps = [
     "${chip_root}/src/app:constants",

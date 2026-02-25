@@ -15,8 +15,11 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app/clusters/basic-information/BasicInformationCluster.h>
+#include <app/clusters/bridged-device-basic-information-server/BasicInformationClusterProxy.h>
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationCluster.h>
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationDelegate.h>
+#include <app/clusters/bridged-device-basic-information-server/ConfigurationVersionDelegate.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/String.h>
@@ -51,6 +54,78 @@ using chip::Protocols::InteractionModel::Status;
 
 constexpr EndpointId kTestEndpointId = 1;
 
+class MockConfigurationManager : public DeviceLayer::ConfigurationManager
+{
+public:
+    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan & buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVer) override
+    {
+        configurationVer = mConfigurationVersion;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetRegulatoryLocation(uint8_t & location) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreConfigurationVersion(uint32_t configurationVer) override
+    {
+        mConfigurationVersion = configurationVer;
+        mStoreCalled++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreRegulatoryLocation(uint8_t location) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetBootReason(uint32_t & bootReason) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreBootReason(uint32_t bootReason) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetFailSafeArmed(bool & val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR SetFailSafeArmed(bool val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    bool IsFullyProvisioned() override { return true; }
+    void InitiateFactoryReset() override {}
+    void LogDeviceConfig() override {}
+    bool IsCommissionableDeviceTypeEnabled() override { return false; }
+    CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    bool IsCommissionableDeviceNameEnabled() override { return false; }
+    CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
+    bool CanFactoryReset() override { return true; }
+    CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    virtual void RunUnitTests() override {}
+
+    uint32_t mConfigurationVersion = 10;
+    uint32_t mStoreCalled          = 0;
+};
+
 class MockDelegate : public BridgedDeviceBasicInformationDelegate
 {
 public:
@@ -78,6 +153,23 @@ public:
     uint32_t mVersion = 0;
 };
 
+class MockDeviceInstanceInfoProvider : public DeviceLayer::DeviceInstanceInfoProvider
+{
+public:
+    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetVendorId(uint16_t & vendorId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductName(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductId(uint16_t & productId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+};
+
 class TestBridgedDeviceIcdDelegate : public BridgedDeviceIcdDelegate
 {
 public:
@@ -98,6 +190,16 @@ struct TestBridgedDeviceBasicInformationCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
+    MockDeviceInstanceInfoProvider mDeviceInfoProvider;
+    MockConfigurationManager mMockConfigManager;
+
+    BasicInformationCluster::Context mBasicInfoContext = {
+        .deviceInstanceInfoProvider = mDeviceInfoProvider,
+        .configurationManager       = mMockConfigManager,
+        .platformManager            = DeviceLayer::PlatformMgr(),
+        .subscriptionsPerFabric     = 1,
+    };
 
     TestServerClusterContext mContext;
     MockDelegate mDelegate;
@@ -879,6 +981,21 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestNodeLabelPersistence)
     Storage::String<32> storedLabel;
     EXPECT_TRUE(persistence.LoadString({ kTestEndpointId, Id, Attributes::NodeLabel::Id }, storedLabel));
     EXPECT_TRUE(storedLabel.Content().data_equal("PersistentLabel"_span));
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestBasicInformationClusterProxy)
+{
+    BasicInformationCluster basicInfo(BasicInformationCluster::OptionalAttributesSet(), mBasicInfoContext);
+
+    // Initial value in our mock is 10
+    EXPECT_EQ(mMockConfigManager.mConfigurationVersion, 10u);
+    EXPECT_EQ(mMockConfigManager.mStoreCalled, 0u);
+
+    BasicInformationClusterProxy proxy(basicInfo);
+    EXPECT_EQ(proxy.IncreaseConfigurationVersion(), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mMockConfigManager.mConfigurationVersion, 11u);
+    EXPECT_EQ(mMockConfigManager.mStoreCalled, 1u);
 }
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestStartupPersistence)
