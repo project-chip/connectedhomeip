@@ -57,6 +57,11 @@ CharSpan ToSpan(const std::optional<std::string> & s)
 
 DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel(CharSpan nodeLabel)
 {
+    return SetNodeLabelInternal(nodeLabel, PersistenceMode::kPersist);
+}
+
+DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabelInternal(CharSpan nodeLabel, PersistenceMode mode)
+{
     VerifyOrReturnError(nodeLabel.size() <= Attributes::NodeLabel::TypeInfo::MaxLength(), Status::ConstraintError);
 
     // std::string may not like a nullptr .data() when the charspan is empty.
@@ -73,9 +78,7 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel
         return status;
     }
 
-    mRequiredData.nodeLabel = newValue;
-
-    if (mContext != nullptr)
+    if (mode == PersistenceMode::kPersist && mContext != nullptr)
     {
         AttributePersistence persistence(mContext->attributeStorage);
         Storage::String<Attributes::NodeLabel::TypeInfo::MaxLength()> storageString;
@@ -89,7 +92,9 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel
         }
     }
 
+    mRequiredData.nodeLabel = newValue;
     NotifyAttributeChanged(Attributes::NodeLabel::Id);
+
     return Status::Success;
 }
 
@@ -102,8 +107,10 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Startup(ServerClusterContext & 
 
     if (persistence.LoadString({ mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::NodeLabel::Id }, storedLabel))
     {
-        // LoadString already handles logging in case of load errors
-        RETURN_SAFELY_IGNORED SetNodeLabel(storedLabel.Content());
+        // LoadString already handles logging in case of load errors.
+        // We do not want to re-persist what we just loaded from NVM, hence kDoNotPersist.
+        // Failure here is unlikely and most applications cannot recover from it, so we ignore the status.
+        RETURN_SAFELY_IGNORED SetNodeLabelInternal(storedLabel.Content(), PersistenceMode::kDoNotPersist);
     }
     else
     {

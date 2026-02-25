@@ -141,6 +141,22 @@ public:
                                                                CommandHandler * handler) override;
 
 private:
+    enum class PersistenceMode
+    {
+        kPersist,
+        kDoNotPersist,
+    };
+
+    /// Updates the NodeLabel attribute value with optional persistence.
+    ///
+    /// This internal helper handles the logic of updating the in-memory state, notifying
+    /// the application delegate for validation, and optionally persisting the value to NVM.
+    ///
+    /// @param nodeLabel The new node label to set.
+    /// @param mode Whether to persist the new value to NVM.
+    /// @return Status code indicating the result of the operation.
+    DataModel::ActionReturnStatus SetNodeLabelInternal(CharSpan nodeLabel, PersistenceMode mode);
+
     // TimerContext
     void TimerFired() override;
 

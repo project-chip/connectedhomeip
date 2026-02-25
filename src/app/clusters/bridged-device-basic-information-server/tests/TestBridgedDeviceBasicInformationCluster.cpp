@@ -13,8 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <pw_unit_test/framework.h>
-
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/bridged-device-basic-information-server/BasicInformationClusterProxy.h>
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationCluster.h>
@@ -306,17 +304,23 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestAllAttributes)
                                             Attributes::ProductURL::kMetadataEntry,
                                             Attributes::ProductLabel::kMetadataEntry,
                                             Attributes::SerialNumber::kMetadataEntry,
+                                            Attributes::Reachable::kMetadataEntry,
                                             Attributes::UniqueID::kMetadataEntry,
                                             Attributes::ProductAppearance::kMetadataEntry,
                                             Attributes::ConfigurationVersion::kMetadataEntry,
-                                            Attributes::Reachable::kMetadataEntry,
                                         }));
 }
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestAttributeReads)
 {
     BridgedDeviceBasicInformationCluster cluster(
-        kTestEndpointId, { .uniqueId = "test-unique-id", .reachable = true, .nodeLabel = "TestLabel", .configurationVersion = 5u },
+        kTestEndpointId,
+        {
+            .uniqueId             = "test-unique-id",
+            .reachable            = true,
+            .nodeLabel            = "TestLabel",
+            .configurationVersion = 5u,
+        },
         {
             .vendorName            = "TestVendor",
             .vendorId              = VendorId::TestVendor1,
@@ -415,7 +419,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommand)
     request.timeoutMs          = 30000;
 
     auto response = tester.Invoke<Commands::KeepActive::Type>(request);
-    EXPECT_TRUE(response.IsSuccess());
+    ASSERT_TRUE(response.IsSuccess());
     EXPECT_EQ(icdDelegate.mEnterCalled, 1u);
     EXPECT_EQ(icdDelegate.mExpiredCalled, 0u);
 
@@ -562,7 +566,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommandMultipleRe
         request.timeoutMs          = 30000;
 
         auto response = tester.Invoke<Commands::KeepActive::Type>(request);
-        EXPECT_TRUE(response.IsSuccess());
+        ASSERT_TRUE(response.IsSuccess());
         EXPECT_EQ(cluster.GetRequestedStayActiveDurationMs(), 1000u);
     }
 
@@ -573,7 +577,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommandMultipleRe
         request.timeoutMs          = 40000;
 
         auto response = tester.Invoke<Commands::KeepActive::Type>(request);
-        EXPECT_TRUE(response.IsSuccess());
+        ASSERT_TRUE(response.IsSuccess());
         // Max stay active duration should be kept
         EXPECT_EQ(cluster.GetRequestedStayActiveDurationMs(), 1000u);
     }
@@ -585,7 +589,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommandMultipleRe
         request.timeoutMs          = 35000;
 
         auto response = tester.Invoke<Commands::KeepActive::Type>(request);
-        EXPECT_TRUE(response.IsSuccess());
+        ASSERT_TRUE(response.IsSuccess());
         // New max duration
         EXPECT_EQ(cluster.GetRequestedStayActiveDurationMs(), 2000u);
     }
@@ -629,7 +633,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommandTimeoutDom
         request.timeoutMs          = timeoutMs;
 
         auto response = tester.Invoke<Commands::KeepActive::Type>(request);
-        EXPECT_FALSE(response.IsSuccess());
+        ASSERT_FALSE(response.IsSuccess());
         EXPECT_EQ(response.status, Status::ConstraintError);
         EXPECT_EQ(icdDelegate.mEnterCalled, 0u);
         EXPECT_EQ(icdDelegate.mExpiredCalled, 0u);
