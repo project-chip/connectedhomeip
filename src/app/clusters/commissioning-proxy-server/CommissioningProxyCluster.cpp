@@ -287,6 +287,7 @@ CommissioningProxyCluster::State_t CommissioningProxyCluster::GetCPState(void)
 //    return mMainCommissioningProxyState == kState_CPConnected;
 //}
 
+
 } // namespace CommissioningProxy
 } // namespace Clusters
 } // namespace app

@@ -29,6 +29,80 @@ using namespace chip;
 using namespace chip::app;
 using namespace Clusters::CommissioningProxy;
 
+namespace {
+
+using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type;
+
+// Context that keeps the IM command alive until scan completes.
+struct ProxyScanCtx
+{
+    chip::app::CommandHandler::Handle handle;
+    chip::app::ConcreteCommandPath path;
+    uint8_t scanMaxTime = 0;
+};
+
+// This is a callback that called from FinishWiFiPAFScan (in platform layer)
+// to keep the application CommandHandler seperated (in app layer) as per
+// the SDK architecture
+static void OnPafScanDone(void * context,
+                          const std::vector<chip::DeviceLayer::NanPeerInfo> & peers)
+{
+    auto * ctx = static_cast<ProxyScanCtx *>(context);
+    chip::app::CommandHandler * cmd = ctx->handle.Get();
+
+    if (cmd == nullptr)
+    {
+        delete ctx;
+        return;
+    }
+
+    chip::app::Clusters::CommissioningProxy::Commands::ProxyScanResponse::Type response;
+
+    // Build output list; must live until AddResponse returns.
+    std::vector<ScanResultT> out;
+    out.reserve(peers.size());
+
+    for (const auto & p : peers)
+    {
+        ScanResultT r{};
+
+        r.address.SetNonNull(chip::ByteSpan(p.mac, sizeof(p.mac)));
+
+        // NOTE: transport field type is BitMask<CapabilitiesBitmap> in the struct
+        r.transport = chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap>(
+            chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF);
+
+        r.discriminator = p.discriminator;
+        r.vendorId      = static_cast<chip::VendorId>(p.vid);
+        r.productId     = p.pid;
+
+        if (p.hasExtendedData && !p.storage.empty())
+        {
+            r.extendedData.SetNonNull(chip::ByteSpan(p.storage.data(), p.storage.size()));
+        }
+        else
+        {
+            r.extendedData.SetNull();
+        }
+
+        // Optional wifi band
+        r.wiFiBand.ClearValue();
+
+        out.push_back(r);
+    }
+
+    chip::app::DataModel::List<const ScanResultT> list{ chip::Span<const ScanResultT>(out.data(), out.size()) };
+    response.proxyScanResult = list;
+    response.numberOfResults = static_cast<uint8_t>(out.size());
+
+    cmd->AddResponse(ctx->path, response);
+    cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Success);
+
+    delete ctx;
+}
+
+} // namespace
+
 Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::ProxyConnectRequest(
                         DataModel::Nullable<chip::ByteSpan> address,
                         CapabilitiesBitmap transport,
@@ -58,11 +132,9 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     CapabilitiesBitmap transport, WiFiBandBitmap wiFiBands, app::CommandHandler * commandObj,
     const DataModel::InvokeRequest & request)
 {
-    ChipLogProgress(AppServer, "===SHM %s(), transport:%d wiFiBands:%d", __func__, (int)transport, (int)wiFiBands);
-    using ScanResultT = Clusters::CommissioningProxy::Structs::ScanResultStruct::DecodableType;
-    std::vector<ScanResultT> results;
+    ChipLogProgress(AppServer, "===SHM %s(), transport:%d wiFiBands:%d", __func__, (int) transport, (int) wiFiBands);
 
-    // Start PAF
+    // Start PAF (you already do this)
     CHIP_ERROR err = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Init(&DeviceLayer::SystemLayer());
     if (err != CHIP_NO_ERROR)
     {
@@ -70,57 +142,28 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
         return chip::Protocols::InteractionModel::Status::Failure;
     }
 
-    ChipLogProgress(NotSpecified, "=== %s() Transport:0x%x WiFiBands:0x%x", __func__,
-        static_cast<uint16_t>(transport), static_cast<uint16_t>(wiFiBands));
+    uint8_t scanMaxTime = GetScanMaxTime();
 
-    // Create a Handle and move it into ConnectivityManagerImpl
+    // Hold the invoke open and move it into ConnectivityManagerImpl
     // This keeps the ProxyScanRequest open, so the scan can complete before the ProxyScanResponse is sent
     // Scan results are processed in ConnectivityManagerImpl::ScanDiscoveryResult()
-    // scanMaxTime expiry handled in ConnectivityManagerImpl::FinishWiFiPAFScanAndRespond()
-    CommandHandler::Handle handle(commandObj);
-    uint8_t scanMaxTime = GetScanMaxTime();
-    err = chip::DeviceLayer::ConnectivityMgrImpl()._WiFiPAFScan( std::move(handle), request.path, scanMaxTime);
-    if (err != CHIP_NO_ERROR) {
+    // scanMaxTime expiry handled in ConnectivityManagerImpl::FinishWiFiPAFScan()
+    // Callback OnPafScanDone() sends the ProxyScanResponse to the client
+    auto * ctx = new ProxyScanCtx{ chip::app::CommandHandler::Handle(commandObj), request.path, scanMaxTime };
+
+    err = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFScan(scanMaxTime, &OnPafScanDone, ctx);
+    if (err != CHIP_NO_ERROR)
+    {
+        delete ctx;
         commandObj->AddStatus(request.path, chip::Protocols::InteractionModel::Status::Failure);
         return chip::Protocols::InteractionModel::Status::Failure;
     }
 
-    ChipLogProgress(Controller, "===SHM %s() Before", __func__);
-    // Ensure Response Timeout is greater than the ScanMaxTime
-    if (auto * responseTimeout = commandObj->GetExchangeContext())
+    // Ensure response timeout is > scan time
+    if (auto * exchange = commandObj->GetExchangeContext())
     {
-        responseTimeout->SetResponseTimeout(chip::System::Clock::Seconds16(scanMaxTime + 5));
-        ChipLogProgress(Controller, "===SHM %s() In", __func__);
+        exchange->SetResponseTimeout(chip::System::Clock::Seconds16(scanMaxTime + 5));
     }
 
     return chip::Protocols::InteractionModel::Status::Success;
 }
-
-#if 0
-bool emberAfCommissioningProxyClusterProxyBackGroundScanStartRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommissioningProxy::Commands::ProxyBackGroundScanStartRequest::DecodableType & commandData)
-{
-    ChipLogError(NotSpecified, "=== %s() Received ProxyBackGroundScanStartRequest", __func__);
-
-    // Use the NodeId and fabric Index as unique identifiers for the background scan
-    FabricIndex fabricIndex = kUndefinedFabricIndex;
-    NodeId localNodeId = kUndefinedNodeId;
-
-    fabricIndex = commandObj->GetAccessingFabricIndex();
-    if (IsValidFabricIndex(fabricIndex))
-    {
-        const auto * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-        if (fabricInfo != nullptr)
-        {
-            localNodeId = fabricInfo->GetNodeId();
-        }
-    }
-
-    ChipLogProgress(AppServer,
-                    "===SHM %s(): fabricIndex=%u localNodeId=0x" ChipLogFormatX64, __func__,
-                    static_cast<unsigned>(fabricIndex), ChipLogValueX64(localNodeId));
-
-    return true;
-}
-#endif

@@ -54,7 +54,7 @@
 #include <wifipaf/WiFiPAFLayer.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
-#include <app/CommandHandler.h>
+// #include <app/CommandHandler.h>
 #include <set>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
@@ -107,10 +107,8 @@ struct NanPeerInfo
     uint8_t  opcode = 0;
     uint16_t srvProtoType = 0;
 
-    std::vector<uint8_t> storage;   // extendedData storage
-    app::DataModel::Nullable<ByteSpan> extendedData;
-
-    std::vector<uint8_t> ssi;
+    std::vector<uint8_t> storage;   // ExtendedData storage
+    bool hasExtendedData = false;
 
     // Used in the std::set<NanPeerInfo> to determine uniqueness
     bool operator<(const NanPeerInfo & o) const
@@ -125,10 +123,8 @@ struct NanPeerInfo
 
 struct ScanTimerCtx
 {
-    chip::DeviceLayer::ConnectivityManagerImpl * self;
+    chip::DeviceLayer::ConnectivityManagerImpl * self = nullptr;
     guint subscribe_id;
-    chip::app::CommandHandler::Handle PendingProxyScanHandle;
-    chip::app::ConcreteCommandPath PendingProxyScanPath;
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
@@ -213,12 +209,14 @@ public:
     void ScanNanReceive(GVariant * obj);
     void ScanNanSubscribeTerminated(guint subscribe_id, gchar * reason);
     void ScanDiscoveryResult(GVariant * discov_info);
-    CHIP_ERROR _WiFiPAFScan(chip::app::CommandHandler::Handle handle,
-                            const chip::app::ConcreteCommandPath & path,
-                            uint8_t scan_max_time);
-private:
+    using PafScanResultsCallback = void (*)(void * context, const std::vector<NanPeerInfo> & results);
+    CHIP_ERROR WiFiPAFScan(uint8_t scanMaxTime, PafScanResultsCallback cb, void * cbContext);
+
+    private:
     std::set<NanPeerInfo> mNanScanPeers;
-    void FinishWiFiPAFScanAndRespond(ScanTimerCtx * ctx);
+    PafScanResultsCallback mScanCb = nullptr;
+    void * mScanCbContext = nullptr;
+    void FinishWiFiPAFScan(ScanTimerCtx * ctx);
 #endif
 
 private:

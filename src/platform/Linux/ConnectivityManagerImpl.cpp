@@ -2024,7 +2024,7 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
     {
         const auto * bytes = static_cast<const uint8_t *>(ssibuf);
         peer.storage.assign(bytes + PAF_MANDATORY_PUBLISH_LENGTH, bytes + bufferLen);
-        peer.extendedData = ByteSpan(peer.storage.data(), peer.storage.size());
+        peer.hasExtendedData = true;
     }
 
     // Do not log if already present
@@ -2042,9 +2042,9 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
         peer_addr[0], peer_addr[1], peer_addr[2], peer_addr[3], peer_addr[4], peer_addr[5]);
     ChipLogProgress(DeviceLayer, "\tSSI Buffer Len:%lu",bufferLen);
 
-    if (!peer.extendedData.IsNull())
+    if (peer.hasExtendedData && !peer.storage.empty())
     {
-        chip::ByteSpan s(peer.extendedData.Value().data(), peer.extendedData.Value().size());
+        chip::ByteSpan s(peer.storage.data(), peer.storage.size());
         constexpr size_t kMaxBytesToPrint = 20;
         const size_t bytesToPrint = (s.size() > kMaxBytesToPrint) ? kMaxBytesToPrint : s.size();
         // Hex output needs 2 chars per byte + null terminator
@@ -2078,21 +2078,18 @@ void ConnectivityManagerImpl::ScanNanReceive(GVariant * obj)
 void ConnectivityManagerImpl::ScanNanSubscribeTerminated(guint subscribe_id, gchar * reason)
 {
     ChipLogProgress(DeviceLayer, "Commissioning Proxy: Subscription terminated (%u, %s)", subscribe_id, reason);
-    //WiFiPAFSession sessionInfo  = { .id = subscribe_id };
-    //WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
-    //WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
-    /*
-        Indicate the connection event
-    */
-    //ChipDeviceEvent event;
-    //event.Type = DeviceEventType::kCHIPoWiFiPAFCancelConnect;
-    //PlatformMgr().PostEventOrDie(&event);
+    WiFiPAFSession sessionInfo  = { .id = subscribe_id };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFScan(chip::app::CommandHandler::Handle handle,
-                                                 const chip::app::ConcreteCommandPath & path,
-                                                 uint8_t scanMaxTime)
+CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime,
+                                               PafScanResultsCallback cb,
+                                               void * cbContext)
 {
+    mScanCb = cb;
+    mScanCbContext = cbContext;
+
     CHIP_ERROR result = StartWiFiManagementSync();
     VerifyOrReturnError(result == CHIP_NO_ERROR, result);
 
@@ -2165,81 +2162,51 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFScan(chip::app::CommandHandler::Hand
         }),
         this);
 
-    ChipLogProgress(DeviceLayer, "===SHM %s() Timeout in %d seconds",__func__, scanMaxTime);
+    ChipLogProgress(DeviceLayer, "===SHM %s() Timeout in %d seconds on subscribe_id %u",__func__, scanMaxTime, subscribe_id);
     // Allow the given scan timeout before returning results
     // Take ownership of the Handle; this defers the scan response.
-    auto * ctx = new ScanTimerCtx{ this, subscribe_id, std::move(handle), path };
-    SystemLayer().StartTimer(
-        System::Clock::Milliseconds32(scanMaxTime * 1000),
+    auto * ctx = new ScanTimerCtx{ this, subscribe_id };
+    SystemLayer().StartTimer(System::Clock::Milliseconds32(scanMaxTime * 1000),
         +[](System::Layer *, void * context) {
             auto * timerCtx = static_cast<ScanTimerCtx *>(context);
-            timerCtx->self->FinishWiFiPAFScanAndRespond(timerCtx);
-            // Releasing the Handle triggers sending the scan response.
+            timerCtx->self->FinishWiFiPAFScan(timerCtx);
             delete timerCtx;
         }, ctx);
 
     return CHIP_NO_ERROR;
 }
 
-void ConnectivityManagerImpl::FinishWiFiPAFScanAndRespond(ScanTimerCtx * ctx)
+void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
 {
-    using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::DecodableType;
-    ChipLogProgress(DeviceLayer, "===SHM %s() Timeout fired, subscribe_id:%u", __func__, ctx->subscribe_id);
-
-    chip::app::CommandHandler * cmd = ctx->PendingProxyScanHandle.Get();   // Could be null if session went away
-    if (cmd == nullptr)
-    {
-        ChipLogError(DeviceLayer, "Commissioning Proxy: Scan Command Handle not found");
-        return;
-    }
-
-    // Stop the PAF discovery
-    (void) _WiFiPAFCancelSubscribe(ctx->subscribe_id);
-    (void) _WiFiPAFCancelIncompleteSubscribe();
+    ChipLogProgress(DeviceLayer, "===SHM %s() subscribe_id %u",__func__, ctx->subscribe_id);
+    // Stop subscribe, cleanup, etc (platform stuff)...
+    TEMPORARY_RETURN_IGNORED _WiFiPAFCancelSubscribe(ctx->subscribe_id);
+    TEMPORARY_RETURN_IGNORED _WiFiPAFCancelIncompleteSubscribe();
 
     WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = ctx->subscribe_id };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
-    (void) WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
+    TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
 
-    chip::app::Clusters::CommissioningProxy::Commands::ProxyScanResponse::Type response;
-    std::vector<ScanResultT> results;
-
-    // Convert each NanPeerInfo -> ScanResultStruct::Type
-    for (const auto & p : mNanScanPeers)
+    // Copy results out of the set into a vector
+    std::vector<NanPeerInfo> results;
+    results.reserve(mNanScanPeers.size());
+    for (auto & p : mNanScanPeers)
     {
-        ScanResultT r{};
-        r.address.SetNonNull(chip::ByteSpan(p.mac, 6));  // 6-byte MAC
-        
-
-        // If you want to include SSI as extended data:
-        if (!p.ssi.empty()) {
-            r.extendedData.SetNonNull(chip::ByteSpan(p.ssi.data(), p.ssi.size()));
-        } else {
-            r.extendedData.SetNull();
-        }
-
-        // Fill anything else you can/need. Examples:
-        r.transport = chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF;
-        r.discriminator = p.discriminator;
-        r.vendorId = static_cast<chip::VendorId>(p.vid);
-        r.productId = p.pid;
-        // Add the extended data
-        r.extendedData = p.extendedData;
-
-        results.push_back(r);
+        results.push_back(p); // copies vectors too; OK for now
     }
-
-    List<const ScanResultT> list{ Span<const ScanResultT>(results.data(), results.size()) };
-    response.proxyScanResult = list;
-    response.numberOfResults = static_cast<uint8_t>(response.proxyScanResult.size());
-    cmd->AddResponse(ctx->PendingProxyScanPath, response);
-    cmd->AddStatus(ctx->PendingProxyScanPath, Protocols::InteractionModel::Status::Success);
-
-    // Clear discovered devices cache
     mNanScanPeers.clear();
 
-    ChipLogProgress(DeviceLayer, "===SHM Leaving %s()",__func__);
+    // Call up into cluster layer
+    if (mScanCb != nullptr)
+    {
+        mScanCb(mScanCbContext, results);
+    }
+
+    // Clear callback if one-shot
+    mScanCb = nullptr;
+    mScanCbContext = nullptr;
 }
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 namespace {
