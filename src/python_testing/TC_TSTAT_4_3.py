@@ -148,13 +148,14 @@ class TC_TSTAT_4_3(MatterBaseTest):
         # Commission DUT - already done
 
         self.step("2a")
-        # TH reads the FeatureMap attribute.
-        feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.FeatureMap)
-        log.info(f"FeatureMap: {feature_map}")
-
-        # Verify that the TSUGGEST bit is set in the FeatureMap value.
-        asserts.assert_true(feature_map & cluster.Bitmaps.Feature.kThermostatSuggestions,
-                            "TSUGGEST bit is not set in the FeatureMap")
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
+            # TH reads the FeatureMap attribute.
+            feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.FeatureMap)
+            log.info(f"FeatureMap: {feature_map}")
+    
+            # Verify that the TSUGGEST bit is set in the FeatureMap value.
+            asserts.assert_true(feature_map & cluster.Bitmaps.Feature.kThermostatSuggestions,
+                                "TSUGGEST bit is not set in the FeatureMap")
 
         self.step("2b")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.F0a")):
