@@ -96,7 +96,7 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
     const uint32_t kParamsChanged = (OT_CHANGED_THREAD_NETWORK_NAME | OT_CHANGED_THREAD_PANID | OT_CHANGED_THREAD_EXT_PANID |
                                      OT_CHANGED_THREAD_CHANNEL | OT_CHANGED_NETWORK_KEY | OT_CHANGED_PSKC);
     static char strBuf[64];
-    
+
     ChipLogDetail(DeviceLayer, "OpenThread State Changed (Flags: 0x%08" PRIx32 ")", flags);
     if ((flags & OT_CHANGED_THREAD_ROLE) != 0)
     {
