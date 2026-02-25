@@ -148,18 +148,55 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath
 // Notified when the Node’s connection status to a Thread network has changed.
 void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatusEnum newConnectionStatus)
 {
-    ChipLogProgress(Zcl, "ThdDiag: OnConnectionStatusChanged");
+    if (newConnectionStatus == ConnectionStatusEnum::kConnected)
+    {
+        ChipLogProgress(Zcl, "ThdDiag: OnConnectionStatusChanged: Connected (joined), PAN ID: 0x%04x", GetPanId());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "ThdDiag: OnConnectionStatusChanged: NotConnected (left)");
+    }
 
     VerifyOrReturn(mContext != nullptr);
     Events::ConnectionStatus::Type event{ newConnectionStatus };
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
+namespace {
+
+const char * GetNetworkFaultString(uint8_t fault)
+{
+    switch (static_cast<NetworkFaultEnum>(fault))
+    {
+    case NetworkFaultEnum::kUnspecified:
+        return "Unspecified";
+    case NetworkFaultEnum::kLinkDown:
+        return "LinkDown";
+    case NetworkFaultEnum::kHardwareFailure:
+        return "HardwareFailure";
+    case NetworkFaultEnum::kNetworkJammed:
+        return "NetworkJammed";
+    case NetworkFaultEnum::kUnknownEnumValue:
+        return "Unknown";
+    }
+    return "Unknown";
+}
+
+} // namespace
+
 // Notified when the Node’s faults related to a Thread network have changed.
 void ThreadNetworkDiagnosticsCluster::OnNetworkFaultChanged(const GeneralFaults<kMaxNetworkFaults> & previous,
                                                             const GeneralFaults<kMaxNetworkFaults> & current)
 {
-    ChipLogProgress(Zcl, "ThdDiag: OnNetworkFaultChanged");
+    if (current.size() > 0)
+    {
+        uint8_t latestFault = current.data()[current.size() - 1];
+        ChipLogProgress(Zcl, "ThdDiag: OnNetworkFaultChanged, latest fault: %s (%u)", GetNetworkFaultString(latestFault), latestFault);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "ThdDiag: OnNetworkFaultChanged, no active faults");
+    }
 
     /* Verify that the data size matches the expected one. */
     static_assert(sizeof(*current.data()) == sizeof(NetworkFaultEnum));

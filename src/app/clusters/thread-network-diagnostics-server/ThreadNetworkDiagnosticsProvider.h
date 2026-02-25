@@ -25,5 +25,6 @@
 namespace chip::app::Clusters::ThreadNetworkDiagnostics {
 
 CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
+uint16_t GetPanId();
 
 } // namespace chip::app::Clusters::ThreadNetworkDiagnostics

@@ -732,4 +732,20 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
     return err;
 }
 
+/*
+ * @brief Get the Thread PAN ID.
+ *        Returns 0 if the Thread instance is unavailable or Thread is not enabled.
+ */
+uint16_t GetPanId()
+{
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+    otInstance * otInst = ThreadStackMgrImpl().OTInstance();
+    if (otInst != nullptr)
+    {
+        return otLinkGetPanId(otInst);
+    }
+#endif
+    return 0;
+}
+
 } // namespace chip::app::Clusters::ThreadNetworkDiagnostics
