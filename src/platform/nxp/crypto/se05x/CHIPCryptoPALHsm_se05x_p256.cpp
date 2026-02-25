@@ -184,7 +184,10 @@ CHIP_ERROR P256KeypairSE05x::Initialize(ECPKeyTarget key_target)
 
     error = CHIP_NO_ERROR;
 exit:
-    TEMPORARY_RETURN_IGNORED se05x_close_session();
+    if (se05x_close_session() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x::Error in se05x_close_session.");
+    }
     return error;
 }
 
@@ -246,7 +249,10 @@ exit:
     {
         sss_asymmetric_context_free(&asymm_ctx);
     }
-    TEMPORARY_RETURN_IGNORED se05x_close_session();
+    if (se05x_close_session() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x::Error in se05x_close_session.");
+    }
     return error;
 }
 
@@ -349,7 +355,10 @@ CHIP_ERROR P256KeypairSE05x::ECDH_derive_secret(const P256PublicKey & remote_pub
 
     error = CHIP_NO_ERROR;
 exit:
-    TEMPORARY_RETURN_IGNORED se05x_close_session();
+    if (se05x_close_session() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x::Error in se05x_close_session.");
+    }
     return error;
 }
 
@@ -391,7 +400,10 @@ CHIP_ERROR SE05X_Set_ECDSA_Public_Key(sss_object_t * keyObject, const uint8_t * 
 
     error = CHIP_NO_ERROR;
 exit:
-    TEMPORARY_RETURN_IGNORED se05x_close_session();
+    if (se05x_close_session() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x::Error in se05x_close_session.");
+    }
     return error;
 }
 
@@ -449,7 +461,10 @@ exit:
     {
         sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
     }
-    TEMPORARY_RETURN_IGNORED se05x_close_session();
+    if (se05x_close_session() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x::Error in se05x_close_session.");
+    }
     return error;
 }
 
@@ -501,7 +516,10 @@ exit:
     {
         sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
     }
-    TEMPORARY_RETURN_IGNORED se05x_close_session();
+    if (se05x_close_session() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x::Error in se05x_close_session.");
+    }
     return error;
 }
 
@@ -736,7 +754,10 @@ exit:
     {
         sss_asymmetric_context_free(&asymm_ctx);
     }
-    TEMPORARY_RETURN_IGNORED se05x_close_session();
+    if (se05x_close_session() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x::Error in se05x_close_session.");
+    }
     return error;
 }
 

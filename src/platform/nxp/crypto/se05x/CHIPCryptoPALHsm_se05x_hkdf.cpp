@@ -83,7 +83,10 @@ exit:
     {
         sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
     }
-    TEMPORARY_RETURN_IGNORED se05x_close_session();
+    if (se05x_close_session() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x::Error in se05x_close_session.");
+    }
     return error;
 }
 
