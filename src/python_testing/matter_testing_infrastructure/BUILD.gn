@@ -67,6 +67,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/metadata.py",
     "matter/testing/nfc.py",
     "matter/testing/pics.py",
+    "matter/testing/pixit.py",
     "matter/testing/problem_notices.py",
     "matter/testing/runner.py",
     "matter/testing/spec_parsing.py",
@@ -76,6 +77,7 @@ pw_python_package("matter-testing-module") {
   ]
   tests = [
     "matter/testing/test_metadata.py",
+    "matter/testing/test_pixit.py",
     "matter/testing/test_tasks.py",
     "matter/testing/test_matter_asserts.py",
   ]
