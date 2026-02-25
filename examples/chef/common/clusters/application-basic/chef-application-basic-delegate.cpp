@@ -25,16 +25,7 @@
 
 #if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::ApplicationBasic;
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ApplicationBasic {
-namespace Chef {
+namespace chip::app::Clusters::ApplicationBasic::Chef {
 
 ChefDelegate::ChefDelegate(EndpointId endpointId, const char * vendorName, uint16_t catalogVendorId, const char * applicationId,
                            const char * applicationName, const char * applicationVersion,
@@ -98,10 +89,6 @@ void ChefDelegate::Register()
     SetDefaultDelegate(mEndpointId, this);
 }
 
-} // namespace Chef
-} // namespace ApplicationBasic
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::ApplicationBasic::Chef
 
 #endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT

@@ -23,11 +23,7 @@
 
 #if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ApplicationBasic {
-namespace Chef {
+namespace chip::app::Clusters::ApplicationBasic::Chef {
 
 class ChefDelegate : public Delegate
 {
@@ -59,10 +55,6 @@ private:
     const Span<const uint16_t> mAllowedVendorList;
 };
 
-} // namespace Chef
-} // namespace ApplicationBasic
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::ApplicationBasic::Chef
 
 #endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT
