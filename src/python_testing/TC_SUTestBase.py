@@ -388,14 +388,19 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         log.info(f"Removed all KVS files/folders with prefix: {real_kvs_path_prefix}")
 
     def get_ota_image_software_version(self, ota_image_path: str) -> int:
+        # Format values  from src/app/ota_image_tool.py
         FIXED_HEADER_FORMAT = '<IQI'
+        HEADER_MAGIC = 0x1BEEF11E
         header_tlv = None
         version = 0
         with open(ota_image_path, 'rb') as file:
             fixed_header = file.read(struct.calcsize(FIXED_HEADER_FORMAT))
             magic, total_size, header_size = struct.unpack(
                 FIXED_HEADER_FORMAT, fixed_header)
+            if magic != HEADER_MAGIC:
+                asserts.fail("Invalid Ota Image")
             header_tlv = TLVReader(file.read(header_size)).get()['Any']
+
         try:
             # Version has context tag 2
             version = header_tlv[2]
@@ -408,8 +413,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         """Verify the ota image version from the header and compare against the DUT version, confirm we can proceed with the Software Update.
         If sucessfull return the software version to update.
         """
-        if not path.exists(ota_image_path):
-            raise FileNotFoundError(f"Ota image not found {ota_image_path}")
 
         ota_version = self.get_ota_image_software_version(ota_image_path=ota_image_path)
         basicinfo_softwareversion = await self.read_single_attribute_check_success(
