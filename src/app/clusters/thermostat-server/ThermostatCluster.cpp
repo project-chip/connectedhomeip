@@ -334,3 +334,22 @@ void ThermostatCluster::OnAtomicWriteTimeout() {}
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+void __attribute__((weak)) emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
+{
+    // TODO
+    // Get from the "real thermostat"
+    // current mode
+    // current occupied heating setpoint
+    // current unoccupied heating setpoint
+    // current occupied cooling setpoint
+    // current unoccupied cooling setpoint
+    // and update the zcl cluster values
+    // This should be a callback defined function
+    // with weak binding so that real thermostat
+    // can get the values.
+    // or should this just be the responsibility of the thermostat application?
+
+    // To prevent warning
+    (void) endpoint;
+}
