@@ -1003,6 +1003,7 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/security_mbedtls_source/library/psa_crypto_driver_wrappers.h",
         "${efr32_sdk_root}/security_mbedtls_source/library/psa_crypto_pake.c",
+        "${efr32_sdk_root}/security_mbedtls_source/library/ssl_tls.c",
       ]
     }
     if (silabs_family == "efr32mg24") {
