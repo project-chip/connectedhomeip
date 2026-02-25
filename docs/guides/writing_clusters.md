@@ -97,7 +97,11 @@ burden on the application developer.
 
 -   **Handle Common Logic Internally:** Implement persistence (NVM), timers, and
     complex state machines within the cluster itself. The application should
-    only be notified of significant events or changes it needs to act upon.
+    only be notified of significant events or changes it needs to act upon. _For
+    example, a state machine managing a multi-step process like a firmware
+    update, door lock/unlock sequence with retries, or a calibration procedure
+    should typically reside within the cluster, rather than requiring the
+    application to manage the intermediate steps and timeouts._
 -   **Provide Helper Abstractions:** If a cluster requires the application to
     implement complex logic, consider providing helper classes or default
     implementations that simplify the task.
@@ -113,10 +117,11 @@ writes or commands), use a delegate (or driver) interface that acts as a
 -   **Pre-Write Validation:** For writable attributes, provide a callback that
     allows the application to accept or reject the new value _before_ it is
     applied to the cluster's internal state or persisted.
--   **Return Status Codes:** These callbacks should return a status code (e.g.,
-    `Protocols::InteractionModel::Status`). If a non-success status is returned,
-    the cluster must fail the operation and return that status to the network
-    requester.
+-   **Delegate Veto:** Callbacks must return a
+    `Protocols::InteractionModel::Status`. Returning any status other than
+    Success allows the application to reject the proposed change. The cluster
+    MUST honor this by failing the operation and propagating the delegate's
+    status code to the initiator.
 -   **Perform Cluster-Level Checks First:** The cluster remains responsible for
     all spec-defined validations (e.g., range checks, constraint validations, or
     state-based restrictions) before involving the application delegate.
