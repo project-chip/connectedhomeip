@@ -8196,6 +8196,8 @@ endpoint 1 {
     ram      attribute minSetpointDeadBand default = 0x19;
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;
+    ram      attribute temperatureSetpointHold default = 0;
+    ram      attribute temperatureSetpointHoldDuration;
     callback attribute presetTypes;
     callback attribute scheduleTypes;
     ram      attribute numberOfPresets default = 0;
@@ -8355,12 +8357,12 @@ endpoint 1 {
   }
 
   server cluster TemperatureMeasurement {
-    ram      attribute measuredValue default = 0x8000;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 0x8000;
     ram      attribute maxMeasuredValue default = 0x8000;
     ram      attribute tolerance;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster PressureMeasurement {

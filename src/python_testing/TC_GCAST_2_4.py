@@ -20,7 +20,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
+#     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -184,7 +184,7 @@ class TC_GCAST_2_4(MatterBaseTest):
 
             self.step("4f")
             if sd_enabled:
-                membership_matcher = generate_membership_entry_matcher(groupID3, endpoints=[])
+                membership_matcher = generate_membership_entry_matcher(groupID3, endpoints=None)
                 sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
             else:
                 membership_matcher = generate_membership_entry_matcher(groupID3, test_for_exists=False)
