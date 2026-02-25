@@ -29,6 +29,12 @@
 #if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 using chip::EndpointId;
+using chip::Span;
+using chip::app::AttributeValueEncoder;
+using chip::app::CommandResponseHelper;
+using Application          = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type;
+using ApplicationEPType    = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type;
+using LauncherResponseType = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type;
 
 namespace chip::app::Clusters::ApplicationLauncher::Chef {
 

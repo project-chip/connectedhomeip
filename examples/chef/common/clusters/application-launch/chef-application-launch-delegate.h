@@ -26,8 +26,6 @@
 
 #if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
-using chip::Span;
-using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
 using Application          = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type;
 using ApplicationEPType    = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type;
@@ -40,7 +38,7 @@ class AppDelegate;
 class PlatformDelegate : public Delegate // This is for the "Casting Video Player" endpoint.
 {
 public:
-    PlatformDelegate(chip::EndpointId endpointId, const Span<const uint16_t> catalogList) :
+    PlatformDelegate(chip::EndpointId endpointId, const chip::Span<const uint16_t> catalogList) :
         mEndpointId(endpointId), mCatalogList(catalogList)
     {
         mFeatureMapContentPlatform = true;
@@ -56,10 +54,10 @@ public:
     // Attributes
 
     // this attribute should only be enabled for app platform instance
-    CHIP_ERROR HandleGetCatalogList(app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetCatalogList(chip::app::AttributeValueEncoder & aEncoder) override;
 
     // this attribute should only be enabled for app platform instance
-    CHIP_ERROR HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR HandleGetCurrentApp(chip::app::AttributeValueEncoder & aEncoder);
 
     chip::EndpointId GetEndpointId() { return mEndpointId; }
 
@@ -72,7 +70,7 @@ public:
 private:
     const chip::EndpointId mEndpointId;
     AppDelegate * mCurrentApp = nullptr; // track which app is currently in focus
-    Span<const uint16_t> mCatalogList;
+    chip::Span<const uint16_t> mCatalogList;
     chip::IntrusiveList<AppDelegate> mAppDelegateList; // List of managed content apps
 };
 
@@ -91,7 +89,7 @@ public:
     void HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
 
     // Return error as this is not the platform instance
-    CHIP_ERROR HandleGetCatalogList(app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetCatalogList(chip::app::AttributeValueEncoder & aEncoder) override;
 
     chip::EndpointId GetEndpointId() { return mEndpointId; }
 
