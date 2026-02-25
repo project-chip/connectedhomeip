@@ -784,9 +784,6 @@ jobs:
                   platform: linux
                   bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
-            - name: Set ASAN symbolizer path
-              run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
-
             - name: Setup and Restore Cache
               id: ccache
               uses: ./.github/actions/setup-ccache
@@ -962,7 +959,7 @@ jobs:
               env:
                 XZ_OPT: -T 0 -1
               run: |
-                find objdir-clone -executable -type f | xargs -n 1 strip
+                find objdir-clone -executable -type f | xargs -n 1 strip --strip-unneeded
                 tar cfJ repl-build-data.tar.xz out/venv objdir-clone
 
             - name: Upload artifacts for running
