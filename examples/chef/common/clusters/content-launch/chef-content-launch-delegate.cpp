@@ -82,16 +82,9 @@ void ChefDelegate::HandleLaunchContent(CommandResponseHelper<LaunchResponseType>
 {
     ChipLogProgress(Zcl, "ContentLauncher::ChefDelegate::HandleLaunchContent");
 
-    bool foundMatch = false;
-    for (auto it = mLaunchableContent.begin(); it != mLaunchableContent.end(); ++it)
-    {
-        auto & content = *it;
-        if (checkContentMatch(content, parameterList))
-        {
-            foundMatch = true;
-            break;
-        }
-    }
+    bool foundMatch =
+        std::any_of(mLaunchableContent.begin(), mLaunchableContent.end(),
+                    [parameterList](const ContentEntry & content) { return checkContentMatch(content, parameterList); });
 
     LaunchResponseType response;
 
