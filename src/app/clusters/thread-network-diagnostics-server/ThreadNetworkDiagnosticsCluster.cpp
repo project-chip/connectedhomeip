@@ -176,10 +176,9 @@ namespace {
         return "HardwareFailure";
     case NetworkFaultEnum::kNetworkJammed:
         return "NetworkJammed";
-    case NetworkFaultEnum::kUnknownEnumValue:
+    default:
         return "Unknown";
     }
-    return "Unknown";
 }
 
 } // namespace
