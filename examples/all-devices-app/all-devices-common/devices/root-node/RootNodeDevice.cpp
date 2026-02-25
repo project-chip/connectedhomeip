@@ -135,7 +135,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
-void RootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+void RootNodeDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
 

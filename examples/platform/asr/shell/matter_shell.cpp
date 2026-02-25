@@ -37,6 +37,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include "init_OTARequestor.h"
 #endif
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -97,8 +98,7 @@ void asr_matter_sensors(bool enable, int temp, int humi, int pressure)
 #ifdef ASR_BOARD_ENABLE_SENSORS
     if (enable)
     {
-        chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(
-            /* endpoint ID */ 1, static_cast<int16_t>(temp));
+        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(/* endpoint ID */ 1, static_cast<int16_t>(temp)));
 
         chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(
             /* endpoint ID */ 1, static_cast<int16_t>(humi));

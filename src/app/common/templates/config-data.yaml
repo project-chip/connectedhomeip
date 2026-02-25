@@ -148,6 +148,7 @@ CodeDrivenClusters:
     - Switch
     - TLS Certificate Management
     - TLS Client Management
+    - Temperature Measurement
     - Thermostat
     - Thread Network Diagnostics
     - Time Format Localization
