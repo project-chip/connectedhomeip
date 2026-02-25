@@ -56,7 +56,8 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                 TestStep(12, "[TC_TARGET_NAVIGATOR] Test target navigator."),
                 TestStep(13, "[TC_AUDIO_OUTPUT] Test audio output."),
                 TestStep(14, "[TC_KEYPAD_INPUT] Test keypad input."),
-                TestStep(15, "[TC_LOW_POWER] Test low power.")]
+                TestStep(15, "[TC_LOW_POWER] Test low power."),
+                TestStep(16, "[TC_MEDIA_INPUT] Test media input.")]
 
     async def _read_application_launcher_current_app(self, endpoint):
         return await self.read_single_attribute_check_success(
@@ -645,6 +646,64 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
             endpoint=endpoint,
         )
 
+    async def _read_media_input_current_input(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.MediaInput, attribute=Clusters.Objects.MediaInput.Attributes.CurrentInput)
+
+    async def _read_media_input_input_list(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.MediaInput, attribute=Clusters.Objects.MediaInput.Attributes.InputList)
+
+    async def media_input_test(self, endpoint):
+        current_input = await self._read_media_input_current_input(endpoint)
+        input_list = await self._read_media_input_input_list(endpoint)
+        asserts.assert_true(len(input_list) > 0,
+                            "Input list should not be empty.")
+
+        # Select a different input
+        for input in input_list:
+            if current_input == input.index:
+                continue
+
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.MediaInput.Commands.SelectInput(
+                    index=input.index),
+                endpoint=endpoint,
+            )
+            current_input = await self._read_media_input_current_input(endpoint)
+            asserts.assert_equal(current_input, input.index)
+            break
+
+        # Rename an input
+        target_index = input_list[0].index
+        new_name = "Renamed Input"
+        await self.send_single_cmd(
+            cmd=Clusters.Objects.MediaInput.Commands.RenameInput(
+                index=target_index, name=new_name),
+            endpoint=endpoint,
+        )
+
+        input_list = await self._read_media_input_input_list(endpoint)
+        found = False
+        for input in input_list:
+            if input.index == target_index:
+                asserts.assert_equal(input.name, new_name)
+                found = True
+                break
+        asserts.assert_true(
+            found, f"Input with index {target_index} not found after rename.")
+
+        # Show/Hide status
+        await self.send_single_cmd(
+            cmd=Clusters.Objects.MediaInput.Commands.ShowInputStatus(),
+            endpoint=endpoint,
+        )
+
+        await self.send_single_cmd(
+            cmd=Clusters.Objects.MediaInput.Commands.HideInputStatus(),
+            endpoint=endpoint,
+        )
+
     async def application_basic_test(self, endpoint):
         # Test VendorName
         vendor_name = await self._read_application_basic_vendor_name(endpoint)
@@ -731,6 +790,9 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         self.step(15)
         await self.low_power_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
+
+        self.step(16)
+        await self.media_input_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
 
 
 if __name__ == "__main__":
