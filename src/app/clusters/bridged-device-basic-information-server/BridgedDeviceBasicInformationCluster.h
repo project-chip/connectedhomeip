@@ -47,6 +47,8 @@ class BridgedDeviceBasicInformationCluster : public DefaultServerCluster, public
 public:
     struct Context
     {
+        // NOTE: These delegate references are used throughout the cluster's lifetime.
+        // Their lifetimes MUST be greater than or equal to the lifetime of this cluster instance.
         ConfigurationVersionDelegate & parentVersionConfiguration;
         BridgedDeviceBasicInformationDelegate & delegate;
         TimerDelegate & timerDelegate;
@@ -54,6 +56,7 @@ public:
     };
 
     /// Most attributes in the bridged device basic information cluster are fixed and cannot be
+
     /// changed after construction. This class defines those attributes.
     ///
     /// Attribute will be exposed if the optional values have a value.

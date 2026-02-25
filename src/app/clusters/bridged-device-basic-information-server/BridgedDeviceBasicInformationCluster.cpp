@@ -298,7 +298,7 @@ BridgedDeviceBasicInformationCluster::InvokeCommand(const DataModel::InvokeReque
         // already in pending active state, may need to sleep longer. The logic is:
         //   - we need to keep the "max" stay active duration
         //   - we need to potentially extend our timeout
-        mStayActiveDurationMs = std::max(*mStayActiveDurationMs, commandData.stayActiveDuration);
+        mStayActiveDurationMs = std::max(mStayActiveDurationMs.value_or(0), commandData.stayActiveDuration);
         StartPendingActiveTimer(System::Clock::Milliseconds32(commandData.timeoutMs));
 
         return Status::Success;
