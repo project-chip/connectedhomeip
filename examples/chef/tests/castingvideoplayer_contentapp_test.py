@@ -55,7 +55,8 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                 TestStep(11, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint."),
                 TestStep(12, "[TC_TARGET_NAVIGATOR] Test target navigator."),
                 TestStep(13, "[TC_AUDIO_OUTPUT] Test audio output."),
-                TestStep(14, "[TC_KEYPAD_INPUT] Test keypad input.")]
+                TestStep(14, "[TC_KEYPAD_INPUT] Test keypad input."),
+                TestStep(15, "[TC_LOW_POWER] Test low power.")]
 
     async def _read_application_launcher_current_app(self, endpoint):
         return await self.read_single_attribute_check_success(
@@ -638,6 +639,12 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
             asserts.assert_equal(
                 response.status, Clusters.Objects.KeypadInput.Enums.StatusEnum.kSuccess)
 
+    async def low_power_test(self, endpoint):
+        await self.send_single_cmd(
+            cmd=Clusters.Objects.LowPower.Commands.Sleep(),
+            endpoint=endpoint,
+        )
+
     async def application_basic_test(self, endpoint):
         # Test VendorName
         vendor_name = await self._read_application_basic_vendor_name(endpoint)
@@ -721,6 +728,9 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         self.step(14)
         await self.keypad_input_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
         await self.keypad_input_test(self.APP_A_ENDPOINT)
+
+        self.step(15)
+        await self.low_power_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
 
 
 if __name__ == "__main__":
