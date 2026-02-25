@@ -19,8 +19,8 @@
 
 import unittest
 
-from matter.testing.pixit import (PixitDefinition, _type_to_arg_flag, format_pixit_error, get_pixit_definitions, requires_pixit,
-                                  validate_pixits)
+from matter.testing.pixit import (_PIXIT_NO_DEFAULT, PixitDefinition, _type_to_arg_flag, format_pixit_error, get_pixit_definitions,
+                                  requires_pixit, validate_pixits)
 
 
 class TestPixitDefinition(unittest.TestCase):
@@ -33,7 +33,7 @@ class TestPixitDefinition(unittest.TestCase):
         self.assertEqual(pixit.type, str)
         self.assertEqual(pixit.description, "A test parameter")
         self.assertTrue(pixit.required)
-        self.assertIsNone(pixit.default)
+        self.assertIs(pixit.default, _PIXIT_NO_DEFAULT)
 
     def test_creation_optional_with_default(self):
         """Test PixitDefinition for optional PIXIT with default value."""
@@ -264,7 +264,7 @@ class TestTypeToArgFlag(unittest.TestCase):
         self.assertEqual(_type_to_arg_flag(float), "float-arg")
 
     def test_unknown_type_defaults_to_string(self):
-        self.assertEqual(_type_to_arg_flag(bytes), "hex-arg")
+        self.assertEqual(_type_to_arg_flag(set), "string-arg")
 
     def test_bytes_flag(self):
         self.assertEqual(_type_to_arg_flag(bytes), "hex-arg")

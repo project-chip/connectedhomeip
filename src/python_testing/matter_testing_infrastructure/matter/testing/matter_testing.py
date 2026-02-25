@@ -59,7 +59,7 @@ from matter.testing.decorators import _has_attribute, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
-from matter.testing.pixit import format_pixit_error, get_pixit_definitions, validate_pixits
+from matter.testing.pixit import _PIXIT_NO_DEFAULT, format_pixit_error, get_pixit_definitions, validate_pixits
 from matter.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from matter.testing.runner import TestRunnerHooks, TestStep
 from matter.tlv import uint
@@ -540,7 +540,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if test_method:
             for pixit_def in get_pixit_definitions(test_method):
                 if pixit_def.name == name:
-                    if pixit_def.default is not None:
+                    if pixit_def.default is not _PIXIT_NO_DEFAULT:
                         return pixit_def.default
                     return default
         return default

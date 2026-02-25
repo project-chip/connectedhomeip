@@ -38,7 +38,7 @@ Usage example:
 """
 
 from dataclasses import dataclass
-from typing import Any, Optional, Type
+from typing import Any, Type
 
 # Sentinel object to distinguish "no default provided" from None
 _PIXIT_NO_DEFAULT = object()
@@ -56,13 +56,14 @@ class PixitDefinition:
         required: If True, the test fails early when the PIXIT is not provided.
                   If False, the PIXIT is optional and uses the default value.
         default: Default value for optional PIXITs. Ignored when required=True.
+                 Uses _PIXIT_NO_DEFAULT sentinel to distinguish "no default" from None.
     """
 
     name: str
     type: Type
     description: str
     required: bool = True
-    default: Optional[Any] = None
+    default: Any = _PIXIT_NO_DEFAULT
 
 
 def requires_pixit(name: str, type: Type, description: str, required: bool = True, default: Any = _PIXIT_NO_DEFAULT):
@@ -94,15 +95,12 @@ def requires_pixit(name: str, type: Type, description: str, required: bool = Tru
             path = self.pixit("app_path")      # guaranteed to exist
             retries = self.pixit("retry_count") # returns 3 if not provided
     """
-    # Resolve default value
-    resolved_default = None if default is _PIXIT_NO_DEFAULT else default
-
     pixit_def = PixitDefinition(
         name=name,
         type=type,
         description=description,
         required=required,
-        default=resolved_default,
+        default=default,
     )
 
     def decorator(func):
