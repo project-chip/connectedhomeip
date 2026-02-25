@@ -45,7 +45,7 @@ bool checkContentMatch(const ContentEntry & content, const SearchParameters & pa
     while (required_it.Next())
     {
         auto & requiredParam = required_it.GetValue();
-        ChipLogProgress(Zcl, "    Looking for param: type=%d value=%s", requiredParam.type,
+        ChipLogProgress(Zcl, "    Looking for param: type=%d value=%s", to_underlying(requiredParam.type),
                         NullTerminated(requiredParam.value).c_str());
         bool found = std::any_of(content.begin(), content.end(), [requiredParam](const ParameterType & availableParam) {
             return requiredParam.type == availableParam.type && requiredParam.value.data_equal(availableParam.value);
