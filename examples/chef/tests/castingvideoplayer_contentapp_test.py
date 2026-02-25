@@ -54,7 +54,8 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                     10, "[APP_LAUNCH_CUJ] Launch and stop app A using app endpoint."),
                 TestStep(11, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint."),
                 TestStep(12, "[TC_TARGET_NAVIGATOR] Test target navigator."),
-                TestStep(13, "[TC_AUDIO_OUTPUT] Test audio output.")]
+                TestStep(13, "[TC_AUDIO_OUTPUT] Test audio output."),
+                TestStep(14, "[TC_KEYPAD_INPUT] Test keypad input.")]
 
     async def _read_application_launcher_current_app(self, endpoint):
         return await self.read_single_attribute_check_success(
@@ -605,6 +606,38 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         asserts.assert_true(
             found, f"Output with index {target_index} not found after rename.")
 
+    async def keypad_input_test(self, endpoint):
+        keys = [
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kUp,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kDown,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kLeft,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kRight,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kSelect,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kBackward,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kExit,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kRootMenu,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kSetupMenu,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kEnter,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kNumber0OrNumber10,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kNumbers1,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kNumbers2,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kNumbers3,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kNumbers4,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kNumbers5,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kNumbers6,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kNumbers7,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kNumbers8,
+            Clusters.Objects.KeypadInput.Enums.CECKeyCodeEnum.kNumbers9,
+        ]
+
+        for key in keys:
+            response = await self.send_single_cmd(
+                cmd=Clusters.Objects.KeypadInput.Commands.SendKey(keyCode=key),
+                endpoint=endpoint,
+            )
+            asserts.assert_equal(
+                response.status, Clusters.Objects.KeypadInput.Enums.StatusEnum.kSuccess)
+
     async def application_basic_test(self, endpoint):
         # Test VendorName
         vendor_name = await self._read_application_basic_vendor_name(endpoint)
@@ -684,6 +717,11 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         self.step(13)
         await self.audio_output_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        await self.audio_output_test(self.APP_A_ENDPOINT)
+
+        self.step(14)
+        await self.keypad_input_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        await self.keypad_input_test(self.APP_A_ENDPOINT)
 
 
 if __name__ == "__main__":
