@@ -261,7 +261,63 @@ class TestTypeToArgFlag(unittest.TestCase):
         self.assertEqual(_type_to_arg_flag(float), "float-arg")
 
     def test_unknown_type_defaults_to_string(self):
-        self.assertEqual(_type_to_arg_flag(bytes), "string-arg")
+        self.assertEqual(_type_to_arg_flag(bytes), "hex-arg")
+
+    def test_bytes_flag(self):
+        self.assertEqual(_type_to_arg_flag(bytes), "hex-arg")
+
+    def test_list_flag(self):
+        self.assertEqual(_type_to_arg_flag(list), "json-arg")
+
+    def test_dict_flag(self):
+        self.assertEqual(_type_to_arg_flag(dict), "json-arg")
+
+    def test_truly_unknown_type_defaults_to_string(self):
+        self.assertEqual(_type_to_arg_flag(object), "string-arg")
+
+
+class TestDecoratorPrecedence(unittest.TestCase):
+    """Tests for decorator precedence after insert(0, ...) fix."""
+
+    def test_outermost_decorator_first_in_list(self):
+        """Verify outermost decorator's definition appears first in the list."""
+        @requires_pixit("outer", str, "Outer param")
+        @requires_pixit("inner", str, "Inner param")
+        def test_method(self):
+            pass
+
+        defs = test_method._pixit_definitions
+        self.assertEqual(len(defs), 2)
+        # With insert(0, ...), outermost should be first
+        self.assertEqual(defs[0].name, "outer")
+        self.assertEqual(defs[1].name, "inner")
+
+
+class TestGetPixitDefinitionsNone(unittest.TestCase):
+    """Tests for get_pixit_definitions None safety."""
+
+    def test_none_returns_empty_list(self):
+        """get_pixit_definitions(None) should return empty list, not raise."""
+        defs = get_pixit_definitions(None)
+        self.assertEqual(defs, [])
+
+
+class TestValidatePixitsDeduplication(unittest.TestCase):
+    """Tests for validate_pixits deduplication behavior."""
+
+    def test_duplicate_names_not_reported_multiple_times(self):
+        """Duplicate PIXIT names should only be validated once."""
+        pixit_defs = [
+            PixitDefinition(name="app_path", type=str, description="Path v1", required=True),
+            PixitDefinition(name="app_path", type=str, description="Path v2", required=True),
+        ]
+        user_params = {}
+        missing, optional = validate_pixits(pixit_defs, user_params)
+        # Should only report once despite duplicate definitions
+        self.assertEqual(len(missing), 1)
+        self.assertEqual(missing[0].name, "app_path")
+        # First definition (effective one) should be used
+        self.assertEqual(missing[0].description, "Path v1")
 
 
 if __name__ == '__main__':

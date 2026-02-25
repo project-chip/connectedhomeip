@@ -508,7 +508,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     # Matter Test API - Parameter Getters
     #
 
-    def get_pixit(self, name: str, default: Any = None) -> Any:
+    def pixit(self, name: str, default: Any = None) -> Any:
         """Get a declared PIXIT value by name.
 
         Retrieves the value from user_params. If not found, falls back to the

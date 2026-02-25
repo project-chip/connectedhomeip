@@ -32,8 +32,8 @@ Usage example:
         @requires_pixit("timeout_sec", int, "Timeout in seconds", required=False, default=30)
         @async_test_body
         async def test_TC_Example_1_1(self):
-            app_path = self.get_pixit("th_server_app_path")
-            timeout = self.get_pixit("timeout_sec")
+            app_path = self.pixit("th_server_app_path")
+            timeout = self.pixit("timeout_sec")
             ...
 """
 
@@ -91,8 +91,8 @@ def requires_pixit(name: str, type: Type, description: str,
         @requires_pixit("retry_count", int, "Number of retries", required=False, default=3)
         @async_test_body
         async def test_TC_Example_1_1(self):
-            path = self.get_pixit("app_path")      # guaranteed to exist
-            retries = self.get_pixit("retry_count") # returns 3 if not provided
+            path = self.pixit("app_path")      # guaranteed to exist
+            retries = self.pixit("retry_count") # returns 3 if not provided
     """
     # Resolve default value
     resolved_default = None if default is _PIXIT_NO_DEFAULT else default
@@ -109,7 +109,7 @@ def requires_pixit(name: str, type: Type, description: str,
         # Initialize the list if this is the first @requires_pixit on this function
         if not hasattr(func, '_pixit_definitions'):
             func._pixit_definitions = []
-        func._pixit_definitions.append(pixit_def)
+        func._pixit_definitions.insert(0, pixit_def)
         return func
     return decorator
 
@@ -122,8 +122,10 @@ def get_pixit_definitions(test_method) -> list[PixitDefinition]:
 
     Returns:
         List of PixitDefinition objects attached to the method, or empty list
-        if the method has no PIXIT declarations.
+        if the method has no PIXIT declarations or test_method is None.
     """
+    if test_method is None:
+        return []
     return getattr(test_method, '_pixit_definitions', [])
 
 
@@ -142,8 +144,12 @@ def validate_pixits(pixit_definitions: list[PixitDefinition],
     """
     missing_required = []
     available_optional = []
+    seen_names = set()
 
     for pixit_def in pixit_definitions:
+        if pixit_def.name in seen_names:
+            continue
+        seen_names.add(pixit_def.name)
         if pixit_def.required:
             if pixit_def.name not in user_params or user_params[pixit_def.name] is None:
                 missing_required.append(pixit_def)
@@ -203,5 +209,8 @@ def _type_to_arg_flag(pixit_type: Type) -> str:
         str: "string-arg",
         bool: "bool-arg",
         float: "float-arg",
+        bytes: "hex-arg",
+        list: "json-arg",
+        dict: "json-arg",
     }
     return type_map.get(pixit_type, "string-arg")
