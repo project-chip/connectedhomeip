@@ -530,10 +530,10 @@ class WpaSupplicantMock(threading.Thread):
         self.wpa.export_to_dbus(self.wpa.path)
 
         # Create and export multiple interfaces
-        for i in self.interfaces:
-            i.export_to_dbus(i.path)
-        for n in self.networks:
-            n.export_to_dbus(n.path)
+        for interface in self.interfaces:
+            interface.export_to_dbus(interface.path)
+        for network in self.networks:
+            network.export_to_dbus(network.path)
 
         log.info("WiFi-PAF mode enabled with NAN simulator")
 
@@ -542,13 +542,13 @@ class WpaSupplicantMock(threading.Thread):
         If no match is found, returns the index of the last available interface.
         """
         name_lower = name.lower()
-        for idx, i in enumerate(self.interfaces):
-            if i.interface_name_in_sim in name_lower:  # Case-insensitive match
+        for idx, interface in enumerate(self.interfaces):
+            if interface.interface_name_in_sim in name_lower:  # Case-insensitive match
                 return idx
 
         return -1  # Default to last interface if no app found in the interface name
 
-    def __init__(self, interfaces_info: list, ssid: str, password: str, ns: IsolatedNetworkNamespace):
+    def __init__(self, interfaces_info: list[str], ssid: str, password: str, ns: IsolatedNetworkNamespace):
         self.ssid = ssid
         self.password = password
         self.networking = ns
@@ -557,11 +557,11 @@ class WpaSupplicantMock(threading.Thread):
 
         self.nan_simulator = NANSimulator(discovery_delay=0.1)
 
-        for i, info in enumerate(interfaces_info):
-            self.interfaces.append(WpaSupplicantMock.WpaInterface(self, i))
-            self.networks.append(WpaSupplicantMock.WpaNetwork(self, i))
+        for idx, info in enumerate(interfaces_info):
+            self.interfaces.append(interface := WpaSupplicantMock.WpaInterface(self, idx))
+            self.networks.append(WpaSupplicantMock.WpaNetwork(self, idx))
             # Assign interfaces to given names
-            self.nan_simulator.register_interface(info, self.interfaces[i])
+            self.nan_simulator.register_interface(info, interface)
 
         self.loop = asyncio.new_event_loop()
         self.loop.run_until_complete(self.startup())
