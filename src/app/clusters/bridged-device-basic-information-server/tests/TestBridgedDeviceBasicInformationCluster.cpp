@@ -75,6 +75,10 @@ public:
     CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreConfigurationVersion(uint32_t configurationVer) override
     {
+        if (mReturnError != CHIP_NO_ERROR)
+        {
+            return mReturnError;
+        }
         mConfigurationVersion = configurationVer;
         mStoreCalled++;
         return CHIP_NO_ERROR;
@@ -124,6 +128,7 @@ public:
 
     uint32_t mConfigurationVersion = 10;
     uint32_t mStoreCalled          = 0;
+    CHIP_ERROR mReturnError        = CHIP_NO_ERROR;
 };
 
 class MockDelegate : public BridgedDeviceBasicInformationDelegate
@@ -994,6 +999,12 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestBasicInformationClusterProx
     BasicInformationClusterProxy proxy(basicInfo);
     EXPECT_EQ(proxy.IncreaseConfigurationVersion(), CHIP_NO_ERROR);
 
+    EXPECT_EQ(mMockConfigManager.mConfigurationVersion, 11u);
+    EXPECT_EQ(mMockConfigManager.mStoreCalled, 1u);
+
+    // Test failure
+    mMockConfigManager.mReturnError = CHIP_ERROR_INTERNAL;
+    EXPECT_EQ(proxy.IncreaseConfigurationVersion(), CHIP_ERROR_INTERNAL);
     EXPECT_EQ(mMockConfigManager.mConfigurationVersion, 11u);
     EXPECT_EQ(mMockConfigManager.mStoreCalled, 1u);
 }

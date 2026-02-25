@@ -80,8 +80,13 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel
         AttributePersistence persistence(mContext->attributeStorage);
         Storage::String<Attributes::NodeLabel::TypeInfo::MaxLength()> storageString;
         storageString.SetContent(nodeLabel);
-        LogErrorOnFailure(persistence.StoreString(
-            { mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::NodeLabel::Id }, storageString));
+        CHIP_ERROR err = persistence.StoreString(
+            { mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::NodeLabel::Id }, storageString);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to persist NodeLabel: %" CHIP_ERROR_FORMAT, err.Format());
+            return Status::Failure;
+        }
     }
 
     NotifyAttributeChanged(Attributes::NodeLabel::Id);
@@ -97,14 +102,20 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Startup(ServerClusterContext & 
 
     if (persistence.LoadString({ mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::NodeLabel::Id }, storedLabel))
     {
-        SetNodeLabel(storedLabel.Content());
+        // LoadString already handles logging in case of load errors
+        RETURN_SAFELY_IGNORED SetNodeLabel(storedLabel.Content());
     }
     else
     {
+        // missing label, we keep whatever is already in the cluster (e.g. set at startup)
         Storage::String<Attributes::NodeLabel::TypeInfo::MaxLength()> initialLabel;
         initialLabel.SetContent(ToSpan(mRequiredData.nodeLabel));
-        ReturnErrorOnFailure(persistence.StoreString(
-            { mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::NodeLabel::Id }, initialLabel));
+
+        // Ignore errors on purpose: not stored, but already an initial value from the app, so
+        // same value is likely to be provided again. Failure to store here should not cause the cluster
+        // to stop initializing.
+        RETURN_SAFELY_IGNORED persistence.StoreString(
+            { mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::NodeLabel::Id }, initialLabel);
     }
 
     return CHIP_NO_ERROR;
