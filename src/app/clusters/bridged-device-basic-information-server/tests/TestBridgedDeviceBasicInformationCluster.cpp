@@ -319,39 +319,38 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestAllAttributes)
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestAttributeReads)
 {
-    BridgedDeviceBasicInformationCluster cluster(
-        kTestEndpointId,
-        {
-            .uniqueId             = "test-unique-id",
-            .reachable            = true,
-            .nodeLabel            = "TestLabel",
-            .configurationVersion = 5u,
-        },
-        {
-            .vendorName            = "TestVendor",
-            .vendorId              = VendorId::TestVendor1,
-            .productName           = "TestProduct",
-            .productId             = 0xABCD,
-            .hardwareVersion       = 1,
-            .hardwareVersionString = "v1.0",
-            .softwareVersion       = 2,
-            .softwareVersionString = "v2.0",
-            .manufacturingDate     = "20240101",
-            .partNumber            = "PN123",
-            .productUrl            = "http://test.com",
-            .productLabel          = "Test Product Label",
-            .serialNumber          = "SN789",
-            .productAppearance =
-                Structs::ProductAppearanceStruct::Type{
-                    .finish       = ProductFinishEnum::kMatte,
-                    .primaryColor = ColorEnum::kRed,
-                },
-        },
-        {
-            .parentVersionConfiguration = mMockVersionConfiguration,
-            .delegate                   = mDelegate,
-            .timerDelegate              = mMockTimer,
-        });
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId             = "test-unique-id",
+                                                     .reachable            = true,
+                                                     .nodeLabel            = "TestLabel",
+                                                     .configurationVersion = 5u,
+                                                 },
+                                                 {
+                                                     .vendorName            = "TestVendor",
+                                                     .vendorId              = VendorId::TestVendor1,
+                                                     .productName           = "TestProduct",
+                                                     .productId             = 0xABCD,
+                                                     .hardwareVersion       = 1,
+                                                     .hardwareVersionString = "v1.0",
+                                                     .softwareVersion       = 2,
+                                                     .softwareVersionString = "v2.0",
+                                                     .manufacturingDate     = "20240101",
+                                                     .partNumber            = "PN123",
+                                                     .productUrl            = "http://test.com",
+                                                     .productLabel          = "Test Product Label",
+                                                     .serialNumber          = "SN789",
+                                                     .productAppearance =
+                                                         Structs::ProductAppearanceStruct::Type{
+                                                             .finish       = ProductFinishEnum::kMatte,
+                                                             .primaryColor = ColorEnum::kRed,
+                                                         },
+                                                 },
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                 });
     ClusterTester tester(cluster);
 
     CharSpan charSpanVal;
