@@ -17,8 +17,7 @@ name: Build example - EFR32
 on:
   push:
     branches:
-      - master
-      - "v*-branch"
+      - "*"
   pull_request:
   merge_group:
 
