@@ -128,7 +128,7 @@ class NetworkResource:
 
     def setup(self):
         """
-        Run commands to setup a resouce. If resource already exists it is a nop.
+        Run commands to setup a resource. If resource already exists it is a nop.
         """
         if not self.exists:
             for netcmd in self.setup_cmds:
@@ -138,7 +138,7 @@ class NetworkResource:
 
     def teardown(self, check: bool = True):
         """
-        Run commands to teardown a resouce. If resource does not exist it is a nop.
+        Run commands to teardown a resource. If resource does not exist it is a nop.
         """
         if self.exists:
             for netcmd in self.teardown_cmds:
