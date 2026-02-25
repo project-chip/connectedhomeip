@@ -23,7 +23,7 @@
 
 #if MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
-typedef Span<const ParameterType> ContentEntry;
+typedef chip::Span<const chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType> ContentEntry;
 
 namespace chip::app::Clusters::ContentLauncher::Chef {
 
@@ -31,7 +31,7 @@ namespace chip::app::Clusters::ContentLauncher::Chef {
 static constexpr uint32_t kEndpointFeatureMap = to_underlying(Feature::kContentSearch) | to_underlying(Feature::kURLPlayback);
 static constexpr uint16_t kClusterRevision    = 1;
 static constexpr uint32_t kSupportedStreamingProtocols = 0;
-static constexpr CharSpan kAcceptHeaderList[]          = { "application/dash+xml"_span,
+static constexpr chip::CharSpan kAcceptHeaderList[]    = { "application/dash+xml"_span,
                                                            "application/vnd.apple.mpegurl"_span,
                                                            "application/x-mpegurl"_span,
                                                            "video/mp4"_span,
@@ -40,7 +40,7 @@ static constexpr CharSpan kAcceptHeaderList[]          = { "application/dash+xml
                                                            "audio/mpeg"_span };
 
 // LaunchContent will succeed only when requested content matches with one of the below items.
-static const ParameterType kInterstellar[] = {
+static const ContentLauncher::Structs::ParameterStruct::DecodableType kInterstellar[] = {
     {
         .type  = ParameterEnum::kType,
         .value = "Movie"_span,
@@ -68,7 +68,7 @@ static const ParameterType kInterstellar[] = {
     },
 };
 
-static const ParameterType kManUnitedMatch[] = {
+static const ContentLauncher::Structs::ParameterStruct::DecodableType kManUnitedMatch[] = {
     {
         .type  = ParameterEnum::kType,
         .value = "SportsEvent"_span,
@@ -97,40 +97,43 @@ static const ContentEntry kLaunchableContent[] = {
 class ChefDelegate : public Delegate
 {
 public:
-    ChefDelegate(const EndpointId endpointId, const uint32_t featureMap, const uint16_t clusterRevision,
-                 const uint32_t supportedStreamingProtocols, const Span<const CharSpan> acceptHeaderList,
-                 const Span<const ContentEntry> launchableContent) :
-        mEndpointId(endpointId),
-        mFeaturemap(featureMap), mClusterRevision(clusterRevision), mSupportedStreamingProtocols(supportedStreamingProtocols),
-        mAcceptHeaderList(acceptHeaderList), mLaunchableContent(launchableContent){};
-    ChefDelegate(EndpointId endpointId) :
+    ChefDelegate(const chip::EndpointId endpointId, const uint32_t featureMap, const uint16_t clusterRevision,
+                 const uint32_t supportedStreamingProtocols, const chip::Span<const chip::CharSpan> acceptHeaderList,
+                 const chip::Span<const ContentEntry> launchableContent) :
+        mEndpointId(endpointId), mFeaturemap(featureMap), mClusterRevision(clusterRevision),
+        mSupportedStreamingProtocols(supportedStreamingProtocols), mAcceptHeaderList(acceptHeaderList),
+        mLaunchableContent(launchableContent) {};
+    ChefDelegate(chip::EndpointId endpointId) :
         ChefDelegate(endpointId, kEndpointFeatureMap, kClusterRevision, kSupportedStreamingProtocols,
-                     Span<const CharSpan>(kAcceptHeaderList), Span<const ContentEntry>(kLaunchableContent)){};
+                     chip::Span<const chip::CharSpan>(kAcceptHeaderList), chip::Span<const ContentEntry>(kLaunchableContent)) {};
     ~ChefDelegate() = default;
 
-    void HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
-                             const chip::app::DataModel::DecodableList<ParameterType> & parameterList, bool autoplay,
-                             const CharSpan & data, const chip::Optional<PlaybackPreferencesType> playbackPreferences,
-                             bool useCurrentContext) override;
-    void HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
-                         const CharSpan & displayString, const BrandingInformationType & brandingInformation) override;
-    CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
+    void HandleLaunchContent(
+        chip::app::CommandResponseHelper<ContentLauncher::Commands::LauncherResponse::Type> & helper,
+        const chip::app::DataModel::DecodableList<ContentLauncher::Structs::ParameterStruct::DecodableType> & parameterList,
+        bool autoplay, const chip::CharSpan & data,
+        const chip::Optional<ContentLauncher::Structs::PlaybackPreferencesStruct::DecodableType> playbackPreferences,
+        bool useCurrentContext) override;
+    void HandleLaunchUrl(chip::app::CommandResponseHelper<ContentLauncher::Commands::LauncherResponse::Type> & helper,
+                         const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                         const ContentLauncher::Structs::BrandingInformationStruct::Type & brandingInformation) override;
+    CHIP_ERROR HandleGetAcceptHeaderList(chip::app::AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
 
-    EndpointId GetEndpointId() { return mEndpointId; }
+    chip::EndpointId GetEndpointId() { return mEndpointId; }
 
     void Register();
 
 private:
-    EndpointId mEndpointId;
+    chip::EndpointId mEndpointId;
     uint32_t mFeaturemap;
     uint16_t mClusterRevision;
     uint32_t mSupportedStreamingProtocols;
-    Span<const CharSpan> mAcceptHeaderList;
-    Span<const ContentEntry> mLaunchableContent;
+    chip::Span<const chip::CharSpan> mAcceptHeaderList;
+    chip::Span<const ContentEntry> mLaunchableContent;
 };
 
 } // namespace chip::app::Clusters::ContentLauncher::Chef
