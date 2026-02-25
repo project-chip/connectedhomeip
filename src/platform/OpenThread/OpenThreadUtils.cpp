@@ -105,7 +105,7 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
     if ((flags & kParamsChanged) != 0)
     {
         otOperationalDataset aDataset;
-        otError otErr                   = otDatasetGetActive(otInst, &aDataset);
+        otError otErr = otDatasetGetActive(otInst, &aDataset);
         if (otErr == OT_ERROR_NONE)
         {
             CHIP_ERROR err = CHIP_NO_ERROR;
@@ -119,8 +119,8 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
             }
             if (aDataset.mComponents.mIsExtendedPanIdPresent)
             {
-                err = Encoding::BytesToHex(aDataset.mExtendedPanId.m8, sizeof(aDataset.mExtendedPanId.m8), strBuf,
-                                              sizeof(strBuf), Encoding::HexFlags::kNullTerminate);
+                err = Encoding::BytesToHex(aDataset.mExtendedPanId.m8, sizeof(aDataset.mExtendedPanId.m8), strBuf, sizeof(strBuf),
+                                           Encoding::HexFlags::kNullTerminate);
                 ChipLogDetail(DeviceLayer, "   Extended PANID: %s", (err == CHIP_NO_ERROR) ? strBuf : "");
             }
             if (aDataset.mComponents.mIsChannelPresent)
@@ -140,7 +140,7 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
             if (aDataset.mComponents.mIsNetworkKeyPresent)
             {
                 err = Encoding::BytesToHex(aDataset.mNetworkKey.m8, sizeof(aDataset.mNetworkKey.m8), strBuf, sizeof(strBuf),
-                                              Encoding::HexFlags::kNullTerminate);
+                                           Encoding::HexFlags::kNullTerminate);
                 ChipLogDetail(DeviceLayer, "   Network Key: %s", (err == CHIP_NO_ERROR) ? strBuf : "");
             }
 #endif // CHIP_CONFIG_SECURITY_TEST_MODE
