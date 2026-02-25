@@ -40,7 +40,11 @@ namespace {
  */
 bool checkContentMatch(const ContentEntry & content, const SearchParameters & params)
 {
-    ChipLogProgress(Zcl, "In checkContentMatch");
+    ChipLogProgress(Zcl, "In checkContentMatch. Available params: ");
+    for (auto it = content.begin(); it != content.end(); ++it)
+    {
+        ChipLogProgress(Zcl, "    type=%d value=%s", to_underlying(it->type), NullTerminated(it->value).c_str());
+    }
     auto required_it = params.begin();
     while (required_it.Next())
     {
@@ -57,6 +61,7 @@ bool checkContentMatch(const ContentEntry & content, const SearchParameters & pa
         }
         ChipLogProgress(Zcl, "    Param found");
     }
+    ChipLogProgress(Zcl, "    All params found");
     return true;
 }
 
