@@ -139,6 +139,7 @@ if (wifi_soc != true) {  # CCP board
         "${openthread_root}/examples/platforms/utils/soft_source_match_table.h",
         "${sl_ot_efr32_root}/alarm.c",
         "${sl_ot_efr32_root}/crypto.c",
+        "${sl_ot_efr32_root}/radio_interface.cpp",
         "${sl_ot_efr32_root}/entropy.c",
         "${sl_ot_efr32_root}/ieee802154-packet-utils.cpp",
         "${sl_ot_efr32_root}/misc.c",
