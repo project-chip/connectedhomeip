@@ -52,9 +52,9 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                     9, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using platform endpoint."),
                 TestStep(
                     10, "[APP_LAUNCH_CUJ] Launch and stop app A using app endpoint."),
-                TestStep(
-                    11, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint."),
-                TestStep(12, "[TC_TARGET_NAVIGATOR] Test target navigator.")]
+                TestStep(11, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint."),
+                TestStep(12, "[TC_TARGET_NAVIGATOR] Test target navigator."),
+                TestStep(13, "[TC_AUDIO_OUTPUT] Test audio output.")]
 
     async def _read_application_launcher_current_app(self, endpoint):
         return await self.read_single_attribute_check_success(
@@ -558,6 +558,53 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
             current_target = await self._read_target_navigator_current_target(endpoint)
             asserts.assert_equal(current_target, target.identifier)
 
+    async def _read_audio_output_current_output(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.AudioOutput, attribute=Clusters.Objects.AudioOutput.Attributes.CurrentOutput)
+
+    async def _read_audio_output_output_list(self, endpoint):
+        return await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=Clusters.Objects.AudioOutput, attribute=Clusters.Objects.AudioOutput.Attributes.OutputList)
+
+    async def audio_output_test(self, endpoint):
+        current_output = await self._read_audio_output_current_output(endpoint)
+        output_list = await self._read_audio_output_output_list(endpoint)
+        asserts.assert_true(len(output_list) > 0,
+                            "Output list should not be empty.")
+
+        # Select a different output
+        for output in output_list:
+            if current_output == output.index:
+                continue
+
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.AudioOutput.Commands.SelectOutput(
+                    index=output.index),
+                endpoint=endpoint,
+            )
+            current_output = await self._read_audio_output_current_output(endpoint)
+            asserts.assert_equal(current_output, output.index)
+            break
+
+        # Rename an output
+        target_index = output_list[0].index
+        new_name = "Renamed Output"
+        await self.send_single_cmd(
+            cmd=Clusters.Objects.AudioOutput.Commands.RenameOutput(
+                index=target_index, name=new_name),
+            endpoint=endpoint,
+        )
+
+        output_list = await self._read_audio_output_output_list(endpoint)
+        found = False
+        for output in output_list:
+            if output.index == target_index:
+                asserts.assert_equal(output.name, new_name)
+                found = True
+                break
+        asserts.assert_true(
+            found, f"Output with index {target_index} not found after rename.")
+
     async def application_basic_test(self, endpoint):
         # Test VendorName
         vendor_name = await self._read_application_basic_vendor_name(endpoint)
@@ -634,6 +681,10 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         self.step(12)
         await self.target_navigator_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
         await self.target_navigator_test(self.APP_A_ENDPOINT)
+
+        self.step(13)
+        await self.audio_output_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        await self.audio_output_test(self.APP_A_ENDPOINT)
 
 
 if __name__ == "__main__":
