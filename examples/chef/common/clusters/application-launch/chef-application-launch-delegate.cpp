@@ -35,8 +35,8 @@ namespace chip::app::Clusters::ApplicationLauncher::Chef {
 void PlatformDelegate::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
                                        const Application & application)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleLaunchApp (%d , %.*s)", application.catalogVendorID,
-                    static_cast<int>(application.applicationID.size()), application.applicationID.data());
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleLaunchApp (%d , %s)", application.catalogVendorID,
+                    NullTerminated(application.applicationID).c_str());
     LauncherResponseType response;
 
     AppDelegate * app = FindAppDelegate(application);
@@ -74,8 +74,8 @@ void PlatformDelegate::HandleLaunchApp(CommandResponseHelper<LauncherResponseTyp
 
 void PlatformDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleStopApp (%d , %.*s)", application.catalogVendorID,
-                    static_cast<int>(application.applicationID.size()), application.applicationID.data());
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleStopApp (%d , %s)", application.catalogVendorID,
+                    NullTerminated(application.applicationID).c_str());
     LauncherResponseType response;
 
     AppDelegate * app = FindAppDelegate(application);
@@ -109,8 +109,8 @@ void PlatformDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType>
 
 void PlatformDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleHideApp (%d , %.*s)", application.catalogVendorID,
-                    static_cast<int>(application.applicationID.size()), application.applicationID.data());
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::HandleHideApp (%d , %s)", application.catalogVendorID,
+                    NullTerminated(application.applicationID).c_str());
     LauncherResponseType response;
 
     AppDelegate * app = FindAppDelegate(application);
@@ -200,8 +200,8 @@ CHIP_ERROR PlatformDelegate::AddAppDelegate(AppDelegate * delegate)
 
 AppDelegate * PlatformDelegate::FindAppDelegate(const Application & application)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::FindAppDelegate (%d , %.*s)", application.catalogVendorID,
-                    static_cast<int>(application.applicationID.size()), application.applicationID.data());
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::PlatformDelegate::FindAppDelegate (%d , %s)", application.catalogVendorID,
+                    NullTerminated(application.applicationID).c_str());
     for (auto it = mAppDelegateList.begin(); it != mAppDelegateList.end(); ++it)
     {
         if (it->Match(application))
@@ -283,8 +283,8 @@ void AppDelegate::Register()
 
 bool AppDelegate::Match(const Application & application)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AppDelegate::Match Checking (%d , %.*s)", application.catalogVendorID,
-                    static_cast<int>(application.applicationID.size()), application.applicationID.data());
+    ChipLogProgress(Zcl, "ApplicationLauncher::Chef::AppDelegate::Match Checking (%d , %s)",
+                    NullTerminated(application.applicationID).c_str());
     ApplicationBasic::CatalogVendorApp * vendorApp = GetCatalogVendorApp();
     if (vendorApp->catalogVendorId != application.catalogVendorID)
         return false;
