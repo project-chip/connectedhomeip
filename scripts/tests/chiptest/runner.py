@@ -24,8 +24,8 @@ import subprocess
 import threading
 from contextlib import suppress
 from typing import IO, TYPE_CHECKING, Any, Protocol
-import python_path
 
+import python_path
 
 if TYPE_CHECKING:
     from .test_definition import AppsRegister, ExecutionCapture
