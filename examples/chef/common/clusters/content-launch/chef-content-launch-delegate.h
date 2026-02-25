@@ -23,17 +23,6 @@
 
 #if MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
-using chip::CharSpan;
-using chip::EndpointId;
-using chip::Span;
-using chip::app::AttributeValueEncoder;
-using chip::app::CommandResponseHelper;
-using ContentLauncherDelegate = chip::app::Clusters::ContentLauncher::Delegate;
-using LaunchResponseType      = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
-using ParameterType           = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
-using BrandingInformationType = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
-using PlaybackPreferencesType = chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::DecodableType;
-
 typedef Span<const ParameterType> ContentEntry;
 
 namespace chip::app::Clusters::ContentLauncher::Chef {
