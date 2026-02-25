@@ -33,7 +33,7 @@ class AppDelegate;
 class PlatformDelegate : public Delegate // This is for the "Casting Video Player" endpoint.
 {
 public:
-    PlatformDelegate(chip::EndpointId endpointId, const chip::Span<const uint16_t> catalogList) :
+    PlatformDelegate(EndpointId endpointId, const Span<const uint16_t> catalogList) :
         mEndpointId(endpointId), mCatalogList(catalogList)
     {
         mFeatureMapContentPlatform = true;
@@ -41,61 +41,56 @@ public:
     ~PlatformDelegate() = default;
 
     // Commands
-    void HandleLaunchApp(chip::app::CommandResponseHelper<ApplicationLauncher::Commands::LauncherResponse::Type> & helper,
-                         const ByteSpan & data, const ApplicationLauncher::Structs::ApplicationStruct::Type & application) override;
-    void HandleStopApp(chip::app::CommandResponseHelper<ApplicationLauncher::Commands::LauncherResponse::Type> & helper,
-                       const ApplicationLauncher::Structs::ApplicationStruct::Type & application) override;
-    void HandleHideApp(chip::app::CommandResponseHelper<ApplicationLauncher::Commands::LauncherResponse::Type> & helper,
-                       const ApplicationLauncher::Structs::ApplicationStruct::Type & application) override;
+    void HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
+                         const Application & application) override;
+    void HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
+    void HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
 
     // Attributes
 
     // this attribute should only be enabled for app platform instance
-    CHIP_ERROR HandleGetCatalogList(chip::app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetCatalogList(app::AttributeValueEncoder & aEncoder) override;
 
     // this attribute should only be enabled for app platform instance
-    CHIP_ERROR HandleGetCurrentApp(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder);
 
-    chip::EndpointId GetEndpointId() { return mEndpointId; }
+    EndpointId GetEndpointId() { return mEndpointId; }
 
     CHIP_ERROR AddAppDelegate(AppDelegate * delegate); // Adds a new app to the list of managed apps
 
-    AppDelegate * FindAppDelegate(const ApplicationLauncher::Structs::ApplicationStruct::Type & application);
+    AppDelegate * FindAppDelegate(const Application & application);
 
     void Register();
 
 private:
-    const chip::EndpointId mEndpointId;
+    const EndpointId mEndpointId;
     AppDelegate * mCurrentApp = nullptr; // track which app is currently in focus
-    chip::Span<const uint16_t> mCatalogList;
+    Span<const uint16_t> mCatalogList;
     chip::IntrusiveList<AppDelegate> mAppDelegateList; // List of managed content apps
 };
 
 class AppDelegate : public Delegate, public chip::IntrusiveListNodeBase<> // This is for the "Content App" endpoints.
 {
 public:
-    AppDelegate(chip::EndpointId endpointId, ApplicationBasic::Chef::ChefDelegate * appBasicDelegate) :
+    AppDelegate(EndpointId endpointId, ApplicationBasic::Chef::ChefDelegate * appBasicDelegate) :
         mEndpointId(endpointId), mAppBasicDelegate(appBasicDelegate)
     {}
     ~AppDelegate() = default;
 
     // Commands
-    void HandleLaunchApp(chip::app::CommandResponseHelper<ApplicationLauncher::Commands::LauncherResponse::Type> & helper,
-                         const ByteSpan & data, const ApplicationLauncher::Structs::ApplicationStruct::Type & application) override;
-    void HandleStopApp(chip::app::CommandResponseHelper<ApplicationLauncher::Commands::LauncherResponse::Type> & helper,
-                       const ApplicationLauncher::Structs::ApplicationStruct::Type & application) override;
-    void HandleHideApp(chip::app::CommandResponseHelper<ApplicationLauncher::Commands::LauncherResponse::Type> & helper,
-                       const ApplicationLauncher::Structs::ApplicationStruct::Type & application) override;
+    void HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
+                         const Application & application) override;
+    void HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
+    void HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
 
     // Return error as this is not the platform instance
-    CHIP_ERROR HandleGetCatalogList(chip::app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetCatalogList(app::AttributeValueEncoder & aEncoder) override;
 
-    chip::EndpointId GetEndpointId() { return mEndpointId; }
+    EndpointId GetEndpointId() { return mEndpointId; }
 
     void Register();
 
-    bool Match(const ApplicationLauncher::Structs::ApplicationStruct::Type &
-                   application); // Checks if the specified application matches with the current one
+    bool Match(const Application & application); // Checks if the specified application matches with the current one
 
     ApplicationBasic::CatalogVendorApp * GetCatalogVendorApp() { return mAppBasicDelegate->GetCatalogVendorApp(); }
 
@@ -106,7 +101,7 @@ public:
     ApplicationBasic::ApplicationStatusEnum GetApplicationStatus() const { return mAppBasicDelegate->GetApplicationStatus(); }
 
 private:
-    chip::EndpointId mEndpointId;
+    EndpointId mEndpointId;
     ApplicationBasic::Chef::ChefDelegate * mAppBasicDelegate;
     PlatformDelegate * mPlatformDelegate = nullptr;
 };
