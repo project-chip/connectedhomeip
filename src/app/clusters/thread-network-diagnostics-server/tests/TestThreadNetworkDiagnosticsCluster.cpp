@@ -380,7 +380,7 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, ReadAttributeTest)
     }
 }
 
-TEST_F(TestThreadNetworkDiagnosticsCluster, LoggingTest)
+TEST_F(TestThreadNetworkDiagnosticsCluster, FaultAndConnectionStatusChangeTest)
 {
     ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kFull);
     ASSERT_EQ(threadNetworkDiagnostics.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -402,4 +402,3 @@ TEST_F(TestThreadNetworkDiagnosticsCluster, LoggingTest)
 
     threadNetworkDiagnostics.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
-
