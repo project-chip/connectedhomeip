@@ -40,28 +40,30 @@ namespace {
  */
 bool checkContentMatch(const ContentEntry & content, const SearchParameters & params)
 {
-    ChipLogProgress(Zcl, "In checkContentMatch. Available params: ");
+    ChipLogProgress(Zcl, "In checkContentMatch");
+    ChipLogProgress(Zcl, "    Available params:");
     for (auto it = content.begin(); it != content.end(); ++it)
     {
-        ChipLogProgress(Zcl, "    type=%d value=%s", to_underlying(it->type), NullTerminated(it->value).c_str());
+        ChipLogProgress(Zcl, "        type=%d value=%s", to_underlying(it->type), NullTerminated(it->value).c_str());
     }
     auto required_it = params.begin();
+    ChipLogProgress(Zcl, "    Looking for params:");
     while (required_it.Next())
     {
         auto & requiredParam = required_it.GetValue();
-        ChipLogProgress(Zcl, "    Looking for param: type=%d value=%s", to_underlying(requiredParam.type),
+        ChipLogProgress(Zcl, "        Looking for param: type=%d value=%s", to_underlying(requiredParam.type),
                         NullTerminated(requiredParam.value).c_str());
         bool found = std::any_of(content.begin(), content.end(), [requiredParam](const ParameterType & availableParam) {
             return requiredParam.type == availableParam.type && requiredParam.value.data_equal(availableParam.value);
         });
         if (!found)
         {
-            ChipLogProgress(Zcl, "    Param not found");
+            ChipLogProgress(Zcl, "        Param not found");
             return false;
         }
-        ChipLogProgress(Zcl, "    Param found");
+        ChipLogProgress(Zcl, "        Param found");
     }
-    ChipLogProgress(Zcl, "    All params found");
+    ChipLogProgress(Zcl, "        All params found");
     return true;
 }
 
