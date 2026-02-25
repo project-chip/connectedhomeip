@@ -422,6 +422,11 @@
             "nullable_global_struct"
         ],
         "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
+        "Temperature Measurement": [
+            "ClusterRevision",
+            "FeatureMap",
+            "MeasuredValue"
+        ],
         "Thread Border Router Management": [
             "BorderRouterName",
             "BorderAgentID",

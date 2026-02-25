@@ -37,7 +37,7 @@ public:
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
-    void UnRegister(CodeDrivenDataModelProvider & provider) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     // Accessors for subclasses/implementations to interact with clusters
     Clusters::OnOffCluster & OnOffCluster();

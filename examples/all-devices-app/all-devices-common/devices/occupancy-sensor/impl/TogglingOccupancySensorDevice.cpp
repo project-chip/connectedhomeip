@@ -58,10 +58,10 @@ CHIP_ERROR TogglingOccupancySensorDevice::Register(EndpointId endpoint, CodeDriv
     return mTimerDelegate.StartTimer(this, kOccupancyStateChangeIntervalSec);
 }
 
-void TogglingOccupancySensorDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+void TogglingOccupancySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     mTimerDelegate.CancelTimer(this);
-    OccupancySensorDevice::UnRegister(provider);
+    OccupancySensorDevice::Unregister(provider);
 }
 
 void TogglingOccupancySensorDevice::OnOccupancyChanged(bool occupied)
