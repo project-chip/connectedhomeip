@@ -104,16 +104,6 @@ def download_slt_cli():
         logger.error("Failed to download/extract slt-cli: %s", e)
         sys.exit(1)
 
-
-def ensure_slt_available():
-    """Ensure SLT CLI is available, either from PATH or by downloading."""
-    slt_in_path = find_slt_in_path()
-    if slt_in_path:
-        logger.info("SLT already installed on system: %s", slt_in_path)
-        return slt_in_path
-    return download_slt_cli()
-
-
 def update_slt_cli(slt_cli_path):
     """Update SLT CLI to latest version."""
     update_cmd = [slt_cli_path, "update", "--self"]
@@ -127,27 +117,31 @@ def update_slt_cli(slt_cli_path):
         logger.warning("SLT CLI not found at %s, skipping update", slt_cli_path)
 
 
-def get_sdk_pkg_path():
-    """Return the path to sdk-pkg.slt file."""
+def get_pkg_manifest_paths():
+    """Return paths to sisdk-pkg.slt and wiseconnect-pkg.slt (lock files used automatically alongside)."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(script_dir, "sdk-pkg.slt")
+    return [
+        os.path.join(script_dir, "sisdk-pkg.lock"),
+        os.path.join(script_dir, "wiseconnect-pkg.slt"),
+    ]
 
 
 def install_sdk_packages(slt_cli_path):
-    """Install packages from sdk-pkg.slt file."""
-    sdk_pkg_path = get_sdk_pkg_path()
-    if not os.path.isfile(sdk_pkg_path):
-        logger.error("sdk-pkg.slt not found at %s", sdk_pkg_path)
-        sys.exit(1)
+    """Install packages from sisdk-pkg.slt and wiseconnect-pkg.slt."""
+    for pkg_path in get_pkg_manifest_paths():
+        if not os.path.isfile(pkg_path):
+            logger.error("Package manifest not found at %s", pkg_path)
+            sys.exit(1)
 
-    install_cmd = [slt_cli_path, "install", "-f", sdk_pkg_path]
-    try:
-        logger.info("Installing packages from sdk-pkg.slt...")
-        subprocess.run(install_cmd, check=True)
-        logger.info("Packages installed successfully")
-    except subprocess.CalledProcessError as e:
-        logger.error("Failed to install packages: %s", e)
-        sys.exit(1)
+    for pkg_path in get_pkg_manifest_paths():
+        install_cmd = [slt_cli_path, "install", "-f", pkg_path]
+        try:
+            logger.info("Installing packages from %s...", os.path.basename(pkg_path))
+            subprocess.run(install_cmd, check=True)
+            logger.info("Packages from %s installed successfully", os.path.basename(pkg_path))
+        except subprocess.CalledProcessError as e:
+            logger.error("Failed to install packages from %s: %s", pkg_path, e)
+            sys.exit(1)
 
 
 def slt_where(slt_cli_path, package):
@@ -207,7 +201,7 @@ def setup_slt_environment(verbose=False):
     """Main function to setup SLT CLI and install required packages."""
     setup_logging(verbose)
 
-    slt_cli_path = ensure_slt_available()
+    slt_cli_path = download_slt_cli()
     update_slt_cli(slt_cli_path)
     install_sdk_packages(slt_cli_path)
 
