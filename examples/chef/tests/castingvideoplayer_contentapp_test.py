@@ -52,7 +52,8 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
                     9, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using platform endpoint."),
                 TestStep(
                     10, "[APP_LAUNCH_CUJ] Launch and stop app A using app endpoint."),
-                TestStep(11, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint."),
+                TestStep(
+                    11, "[APP_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint."),
                 TestStep(12, "[TC_TARGET_NAVIGATOR] Test target navigator."),
                 TestStep(13, "[TC_AUDIO_OUTPUT] Test audio output."),
                 TestStep(14, "[TC_KEYPAD_INPUT] Test keypad input."),
