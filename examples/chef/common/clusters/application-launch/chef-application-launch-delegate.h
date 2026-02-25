@@ -26,7 +26,6 @@
 
 #if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
-using chip::app::CommandResponseHelper;
 using Application          = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type;
 using ApplicationEPType    = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type;
 using LauncherResponseType = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type;
@@ -46,10 +45,10 @@ public:
     ~PlatformDelegate() = default;
 
     // Commands
-    void HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
+    void HandleLaunchApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
                          const Application & application) override;
-    void HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
-    void HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
+    void HandleStopApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
+    void HandleHideApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
 
     // Attributes
 
@@ -83,10 +82,10 @@ public:
     ~AppDelegate() = default;
 
     // Commands
-    void HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
+    void HandleLaunchApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
                          const Application & application) override;
-    void HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
-    void HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
+    void HandleStopApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
+    void HandleHideApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
 
     // Return error as this is not the platform instance
     CHIP_ERROR HandleGetCatalogList(chip::app::AttributeValueEncoder & aEncoder) override;
