@@ -46,7 +46,7 @@ public:
 
     // Commands
     void HandleLaunchApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
-                         const Application & application) override;
+                         const ApplicationLauncher::Structs::ApplicationStruct::Type & application) override;
     void HandleStopApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
     void HandleHideApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
 
