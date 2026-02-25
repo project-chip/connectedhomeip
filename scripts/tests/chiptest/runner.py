@@ -21,10 +21,8 @@ import queue
 import re
 import shlex
 import subprocess
-import sys
 import threading
 from contextlib import suppress
-from pathlib import Path
 from typing import IO, TYPE_CHECKING, Any, Protocol
 import python_path
 

@@ -20,7 +20,6 @@ Handles linux-specific functionality for running test cases
 
 import logging
 import os
-import shlex
 from typing import IO, Any
 
 from chiptest.runner import Executor, LogPipe, SubprocessInfo
