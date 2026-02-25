@@ -125,10 +125,5 @@ CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::Thread
     return CHIP_NO_ERROR;
 }
 
-void ThreadStackManagerImpl::Finalize(void)
-{
-    otInstanceFinalize(openthread_get_default_instance());
-}
-
 } // namespace DeviceLayer
 } // namespace chip

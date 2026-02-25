@@ -186,7 +186,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
     {
         if (ThreadStackManagerImpl().IsThreadEnabled())
         {
-            ThreadStackManagerImpl().Finalize();
+            otInstanceFinalize(openthread_get_default_instance());
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
