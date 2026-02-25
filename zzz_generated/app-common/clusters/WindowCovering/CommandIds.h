@@ -13,7 +13,7 @@ namespace WindowCovering {
 namespace Commands {
 
 // Total number of client to server commands supported by the cluster
-inline constexpr uint32_t kAcceptedCommandsCount = 7;
+inline constexpr uint32_t kAcceptedCommandsCount = 5;
 
 // Total number of server to client commands supported by the cluster (response commands)
 inline constexpr uint32_t kGeneratedCommandsCount = 0;
@@ -30,17 +30,9 @@ namespace StopMotion {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace StopMotion
 
-namespace GoToLiftValue {
-inline constexpr CommandId Id = 0x00000004;
-} // namespace GoToLiftValue
-
 namespace GoToLiftPercentage {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace GoToLiftPercentage
-
-namespace GoToTiltValue {
-inline constexpr CommandId Id = 0x00000007;
-} // namespace GoToTiltValue
 
 namespace GoToTiltPercentage {
 inline constexpr CommandId Id = 0x00000008;

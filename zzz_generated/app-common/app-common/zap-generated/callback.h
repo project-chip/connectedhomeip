@@ -7305,23 +7305,11 @@ bool emberAfWindowCoveringClusterStopMotionCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WindowCovering::Commands::StopMotion::DecodableType & commandData);
 /**
- * @brief Window Covering Cluster GoToLiftValue Command callback (from client)
- */
-bool emberAfWindowCoveringClusterGoToLiftValueCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::DecodableType & commandData);
-/**
  * @brief Window Covering Cluster GoToLiftPercentage Command callback (from client)
  */
 bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::DecodableType & commandData);
-/**
- * @brief Window Covering Cluster GoToTiltValue Command callback (from client)
- */
-bool emberAfWindowCoveringClusterGoToTiltValueCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::DecodableType & commandData);
 /**
  * @brief Window Covering Cluster GoToTiltPercentage Command callback (from client)
  */

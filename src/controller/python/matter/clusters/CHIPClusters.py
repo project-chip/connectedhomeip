@@ -7809,25 +7809,11 @@ class ChipClusters:
                 "args": {
                 },
             },
-            0x00000004: {
-                "commandId": 0x00000004,
-                "commandName": "GoToLiftValue",
-                "args": {
-                    "liftValue": "int",
-                },
-            },
             0x00000005: {
                 "commandId": 0x00000005,
                 "commandName": "GoToLiftPercentage",
                 "args": {
                     "liftPercent100thsValue": "int",
-                },
-            },
-            0x00000007: {
-                "commandId": 0x00000007,
-                "commandName": "GoToTiltValue",
-                "args": {
-                    "tiltValue": "int",
                 },
             },
             0x00000008: {
@@ -7842,30 +7828,6 @@ class ChipClusters:
             0x00000000: {
                 "attributeName": "Type",
                 "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "PhysicalClosedLimitLift",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "PhysicalClosedLimitTilt",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "CurrentPositionLift",
-                "attributeId": 0x00000003,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "CurrentPositionTilt",
-                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -7932,30 +7894,6 @@ class ChipClusters:
             0x0000000F: {
                 "attributeName": "CurrentPositionTiltPercent100ths",
                 "attributeId": 0x0000000F,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000010: {
-                "attributeName": "InstalledOpenLimitLift",
-                "attributeId": 0x00000010,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000011: {
-                "attributeName": "InstalledClosedLimitLift",
-                "attributeId": 0x00000011,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000012: {
-                "attributeName": "InstalledOpenLimitTilt",
-                "attributeId": 0x00000012,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000013: {
-                "attributeName": "InstalledClosedLimitTilt",
-                "attributeId": 0x00000013,
                 "type": "int",
                 "reportable": True,
             },

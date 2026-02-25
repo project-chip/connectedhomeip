@@ -102,7 +102,6 @@ enum class Feature : uint32_t
     kLift              = 0x1,
     kTilt              = 0x2,
     kPositionAwareLift = 0x4,
-    kAbsolutePosition  = 0x8,
     kPositionAwareTilt = 0x10,
 };
 

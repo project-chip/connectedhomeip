@@ -37,7 +37,6 @@ namespace WindowCovering {
 
 typedef DataModel::Nullable<Percent> NPercent;
 typedef DataModel::Nullable<Percent100ths> NPercent100ths;
-typedef DataModel::Nullable<uint16_t> NAbsolute;
 typedef Optional<Percent> OPercent;
 typedef Optional<Percent100ths> OPercent100ths;
 
@@ -120,12 +119,7 @@ bool IsPercent100thsValid(NPercent100ths npercent100ths);
 
 uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative);
 
-uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift);
-uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths);
 void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths position);
-
-uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt);
-uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths);
 void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths position);
 
 Protocols::InteractionModel::Status GetMotionLockStatus(chip::EndpointId endpoint);

@@ -3586,18 +3586,6 @@ static BOOL AttributeIsSpecifiedInWindowCoveringCluster(AttributeId aAttributeId
     case Attributes::Type::Id: {
         return YES;
     }
-    case Attributes::PhysicalClosedLimitLift::Id: {
-        return YES;
-    }
-    case Attributes::PhysicalClosedLimitTilt::Id: {
-        return YES;
-    }
-    case Attributes::CurrentPositionLift::Id: {
-        return YES;
-    }
-    case Attributes::CurrentPositionTilt::Id: {
-        return YES;
-    }
     case Attributes::NumberOfActuationsLift::Id: {
         return YES;
     }
@@ -3629,18 +3617,6 @@ static BOOL AttributeIsSpecifiedInWindowCoveringCluster(AttributeId aAttributeId
         return YES;
     }
     case Attributes::CurrentPositionTiltPercent100ths::Id: {
-        return YES;
-    }
-    case Attributes::InstalledOpenLimitLift::Id: {
-        return YES;
-    }
-    case Attributes::InstalledClosedLimitLift::Id: {
-        return YES;
-    }
-    case Attributes::InstalledOpenLimitTilt::Id: {
-        return YES;
-    }
-    case Attributes::InstalledClosedLimitTilt::Id: {
         return YES;
     }
     case Attributes::Mode::Id: {

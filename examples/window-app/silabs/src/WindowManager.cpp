@@ -251,15 +251,8 @@ void WindowManager::Cover::Init(chip::EndpointId endpoint)
     mLiftTimer = new Timer(COVER_LIFT_TILT_TIMEOUT, OnLiftTimeout, this);
     mTiltTimer = new Timer(COVER_LIFT_TILT_TIMEOUT, OnTiltTimeout, this);
 
-    // Preset Lift attributes
-    Attributes::InstalledOpenLimitLift::Set(endpoint, LIFT_OPEN_LIMIT);
-    Attributes::InstalledClosedLimitLift::Set(endpoint, LIFT_CLOSED_LIMIT);
-
-    // Preset Tilt attributes
-    Attributes::InstalledOpenLimitTilt::Set(endpoint, TILT_OPEN_LIMIT);
-    Attributes::InstalledClosedLimitTilt::Set(endpoint, TILT_CLOSED_LIMIT);
-
-    // Note: All Current Positions are preset via Zap config and kept across reboot via NVM: no need to init them
+    // Note: Attributes CurrentPositionTilt/Lift, PhysicalClosedLimitTilt/Lift, InstalledOpenLimitTilt/Lift
+    // InstalledOpenLimitTilt/Lift were deprecated, so they are not used anymore in this example app.
 
     // Attribute: Id  0 Type
     TypeSet(endpoint, Type::kTiltBlindLiftAndTilt);
@@ -674,20 +667,13 @@ void WindowManager::UpdateLCD()
     if (BaseApplication::GetProvisionStatus())
     {
         Cover & cover = GetCover();
-        chip::app::DataModel::Nullable<uint16_t> lift;
-        chip::app::DataModel::Nullable<uint16_t> tilt;
-
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         Type type = TypeGet(cover.mEndpoint);
 
-        Attributes::CurrentPositionLift::Get(cover.mEndpoint, lift);
-        Attributes::CurrentPositionTilt::Get(cover.mEndpoint, tilt);
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-        if (!tilt.IsNull() && !lift.IsNull())
-        {
-            LcdPainter::Paint(AppTask::GetAppTask().GetLCD(), type, lift.Value(), tilt.Value(), mIcon);
-        }
+        // TODO: CurrentPositionLift and CurrentPositionTilt attributes are deprecated now, setting the value
+        // here to the default one defined in the ZAP file for this example before the removal.
+        LcdPainter::Paint(AppTask::GetAppTask().GetLCD(), type, LIFT_OPEN_DEFAULT, TILT_OPEN_DEFAULT, mIcon);
     }
 }
 #endif // DISPLAY_ENABLED

@@ -9035,17 +9035,11 @@ private:
 | * UpOrOpen                                                          |   0x00 |
 | * DownOrClose                                                       |   0x01 |
 | * StopMotion                                                        |   0x02 |
-| * GoToLiftValue                                                     |   0x04 |
 | * GoToLiftPercentage                                                |   0x05 |
-| * GoToTiltValue                                                     |   0x07 |
 | * GoToTiltPercentage                                                |   0x08 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Type                                                              | 0x0000 |
-| * PhysicalClosedLimitLift                                           | 0x0001 |
-| * PhysicalClosedLimitTilt                                           | 0x0002 |
-| * CurrentPositionLift                                               | 0x0003 |
-| * CurrentPositionTilt                                               | 0x0004 |
 | * NumberOfActuationsLift                                            | 0x0005 |
 | * NumberOfActuationsTilt                                            | 0x0006 |
 | * ConfigStatus                                                      | 0x0007 |
@@ -9057,10 +9051,6 @@ private:
 | * EndProductType                                                    | 0x000D |
 | * CurrentPositionLiftPercent100ths                                  | 0x000E |
 | * CurrentPositionTiltPercent100ths                                  | 0x000F |
-| * InstalledOpenLimitLift                                            | 0x0010 |
-| * InstalledClosedLimitLift                                          | 0x0011 |
-| * InstalledOpenLimitTilt                                            | 0x0012 |
-| * InstalledClosedLimitTilt                                          | 0x0013 |
 | * Mode                                                              | 0x0017 |
 | * SafetyStatus                                                      | 0x001A |
 | * GeneratedCommandList                                              | 0xFFF8 |
@@ -9181,44 +9171,6 @@ private:
 };
 
 /*
- * Command GoToLiftValue
- */
-class WindowCoveringGoToLiftValue : public ClusterCommand
-{
-public:
-    WindowCoveringGoToLiftValue(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("go-to-lift-value", credsIssuerConfig)
-    {
-        AddArgument("LiftValue", 0, UINT16_MAX, &mRequest.liftValue);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Type mRequest;
-};
-
-/*
  * Command GoToLiftPercentage
  */
 class WindowCoveringGoToLiftPercentage : public ClusterCommand
@@ -9254,44 +9206,6 @@ public:
 
 private:
     chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type mRequest;
-};
-
-/*
- * Command GoToTiltValue
- */
-class WindowCoveringGoToTiltValue : public ClusterCommand
-{
-public:
-    WindowCoveringGoToTiltValue(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("go-to-tilt-value", credsIssuerConfig)
-    {
-        AddArgument("TiltValue", 0, UINT16_MAX, &mRequest.tiltValue);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::WindowCovering::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Type mRequest;
 };
 
 /*
@@ -26171,22 +26085,16 @@ void registerClusterWindowCovering(Commands & commands, CredentialIssuerCommands
         make_unique<WindowCoveringUpOrOpen>(credsIssuerConfig),           //
         make_unique<WindowCoveringDownOrClose>(credsIssuerConfig),        //
         make_unique<WindowCoveringStopMotion>(credsIssuerConfig),         //
-        make_unique<WindowCoveringGoToLiftValue>(credsIssuerConfig),      //
         make_unique<WindowCoveringGoToLiftPercentage>(credsIssuerConfig), //
-        make_unique<WindowCoveringGoToTiltValue>(credsIssuerConfig),      //
         make_unique<WindowCoveringGoToTiltPercentage>(credsIssuerConfig), //
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                        //
-        make_unique<ReadAttribute>(Id, "type", Attributes::Type::Id, credsIssuerConfig),                                          //
-        make_unique<ReadAttribute>(Id, "physical-closed-limit-lift", Attributes::PhysicalClosedLimitLift::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "physical-closed-limit-tilt", Attributes::PhysicalClosedLimitTilt::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "current-position-lift", Attributes::CurrentPositionLift::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "current-position-tilt", Attributes::CurrentPositionTilt::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "number-of-actuations-lift", Attributes::NumberOfActuationsLift::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "number-of-actuations-tilt", Attributes::NumberOfActuationsTilt::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "config-status", Attributes::ConfigStatus::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
+        make_unique<ReadAttribute>(Id, "type", Attributes::Type::Id, credsIssuerConfig),                                        //
+        make_unique<ReadAttribute>(Id, "number-of-actuations-lift", Attributes::NumberOfActuationsLift::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "number-of-actuations-tilt", Attributes::NumberOfActuationsTilt::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "config-status", Attributes::ConfigStatus::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "current-position-lift-percentage", Attributes::CurrentPositionLiftPercentage::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "current-position-tilt-percentage", Attributes::CurrentPositionTiltPercentage::Id,
@@ -26200,12 +26108,6 @@ void registerClusterWindowCovering(Commands & commands, CredentialIssuerCommands
         make_unique<ReadAttribute>(Id, "current-position-lift-percent100ths", Attributes::CurrentPositionLiftPercent100ths::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "current-position-tilt-percent100ths", Attributes::CurrentPositionTiltPercent100ths::Id,
-                                   credsIssuerConfig),                                                                          //
-        make_unique<ReadAttribute>(Id, "installed-open-limit-lift", Attributes::InstalledOpenLimitLift::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "installed-closed-limit-lift", Attributes::InstalledClosedLimitLift::Id,
-                                   credsIssuerConfig),                                                                          //
-        make_unique<ReadAttribute>(Id, "installed-open-limit-tilt", Attributes::InstalledOpenLimitTilt::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "installed-closed-limit-tilt", Attributes::InstalledClosedLimitTilt::Id,
                                    credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "mode", Attributes::Mode::Id, credsIssuerConfig),                                   //
         make_unique<ReadAttribute>(Id, "safety-status", Attributes::SafetyStatus::Id, credsIssuerConfig),                  //
@@ -26217,18 +26119,6 @@ void registerClusterWindowCovering(Commands & commands, CredentialIssuerCommands
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::app::Clusters::WindowCovering::Type>>(Id, "type", 0, UINT8_MAX, Attributes::Type::Id,
                                                                                WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "physical-closed-limit-lift", 0, UINT16_MAX,
-                                              Attributes::PhysicalClosedLimitLift::Id, WriteCommandType::kForceWrite,
-                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "physical-closed-limit-tilt", 0, UINT16_MAX,
-                                              Attributes::PhysicalClosedLimitTilt::Id, WriteCommandType::kForceWrite,
-                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "current-position-lift", 0, UINT16_MAX,
-                                                                              Attributes::CurrentPositionLift::Id,
-                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "current-position-tilt", 0, UINT16_MAX,
-                                                                              Attributes::CurrentPositionTilt::Id,
-                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "number-of-actuations-lift", 0, UINT16_MAX,
                                               Attributes::NumberOfActuationsLift::Id, WriteCommandType::kForceWrite,
                                               credsIssuerConfig), //
@@ -26261,18 +26151,6 @@ void registerClusterWindowCovering(Commands & commands, CredentialIssuerCommands
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent100ths>>>(
             Id, "current-position-tilt-percent100ths", 0, UINT16_MAX, Attributes::CurrentPositionTiltPercent100ths::Id,
             WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "installed-open-limit-lift", 0, UINT16_MAX,
-                                              Attributes::InstalledOpenLimitLift::Id, WriteCommandType::kForceWrite,
-                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "installed-closed-limit-lift", 0, UINT16_MAX,
-                                              Attributes::InstalledClosedLimitLift::Id, WriteCommandType::kForceWrite,
-                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "installed-open-limit-tilt", 0, UINT16_MAX,
-                                              Attributes::InstalledOpenLimitTilt::Id, WriteCommandType::kForceWrite,
-                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "installed-closed-limit-tilt", 0, UINT16_MAX,
-                                              Attributes::InstalledClosedLimitTilt::Id, WriteCommandType::kForceWrite,
-                                              credsIssuerConfig), //
         make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>>(
             Id, "mode", 0, UINT8_MAX, Attributes::Mode::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus>>>(
@@ -26290,12 +26168,6 @@ void registerClusterWindowCovering(Commands & commands, CredentialIssuerCommands
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                  //
         make_unique<SubscribeAttribute>(Id, "type", Attributes::Type::Id, credsIssuerConfig),    //
-        make_unique<SubscribeAttribute>(Id, "physical-closed-limit-lift", Attributes::PhysicalClosedLimitLift::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "physical-closed-limit-tilt", Attributes::PhysicalClosedLimitTilt::Id,
-                                        credsIssuerConfig),                                                                   //
-        make_unique<SubscribeAttribute>(Id, "current-position-lift", Attributes::CurrentPositionLift::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "current-position-tilt", Attributes::CurrentPositionTilt::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-actuations-lift", Attributes::NumberOfActuationsLift::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "number-of-actuations-tilt", Attributes::NumberOfActuationsTilt::Id,
@@ -26314,14 +26186,6 @@ void registerClusterWindowCovering(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeAttribute>(Id, "current-position-lift-percent100ths", Attributes::CurrentPositionLiftPercent100ths::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "current-position-tilt-percent100ths", Attributes::CurrentPositionTiltPercent100ths::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "installed-open-limit-lift", Attributes::InstalledOpenLimitLift::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "installed-closed-limit-lift", Attributes::InstalledClosedLimitLift::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "installed-open-limit-tilt", Attributes::InstalledOpenLimitTilt::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "installed-closed-limit-tilt", Attributes::InstalledClosedLimitTilt::Id,
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "mode", Attributes::Mode::Id, credsIssuerConfig),                                   //
         make_unique<SubscribeAttribute>(Id, "safety-status", Attributes::SafetyStatus::Id, credsIssuerConfig),                  //

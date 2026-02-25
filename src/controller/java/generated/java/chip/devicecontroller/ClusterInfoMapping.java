@@ -11325,48 +11325,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedWindowCoveringClusterCurrentPositionLiftAttributeCallback implements ChipClusters.WindowCoveringCluster.CurrentPositionLiftAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedWindowCoveringClusterCurrentPositionTiltAttributeCallback implements ChipClusters.WindowCoveringCluster.CurrentPositionTiltAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedWindowCoveringClusterCurrentPositionLiftPercentageAttributeCallback implements ChipClusters.WindowCoveringCluster.CurrentPositionLiftPercentageAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -27948,23 +27906,6 @@ public class ClusterInfoMapping {
     );
     windowCoveringClusterInteractionInfoMap.put("stopMotion", windowCoveringstopMotionInteractionInfo);
 
-    Map<String, CommandParameterInfo> windowCoveringgoToLiftValueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo windowCoveringgoToLiftValueliftValueCommandParameterInfo = new CommandParameterInfo("liftValue", Integer.class, Integer.class);
-    windowCoveringgoToLiftValueCommandParams.put("liftValue",windowCoveringgoToLiftValueliftValueCommandParameterInfo);
-    InteractionInfo windowCoveringgoToLiftValueInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.WindowCoveringCluster) cluster)
-        .goToLiftValue((DefaultClusterCallback) callback
-        , (Integer)
-        commandArguments.get("liftValue")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        windowCoveringgoToLiftValueCommandParams
-    );
-    windowCoveringClusterInteractionInfoMap.put("goToLiftValue", windowCoveringgoToLiftValueInteractionInfo);
-
     Map<String, CommandParameterInfo> windowCoveringgoToLiftPercentageCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
     CommandParameterInfo windowCoveringgoToLiftPercentageliftPercent100thsValueCommandParameterInfo = new CommandParameterInfo("liftPercent100thsValue", Integer.class, Integer.class);
@@ -27981,23 +27922,6 @@ public class ClusterInfoMapping {
         windowCoveringgoToLiftPercentageCommandParams
     );
     windowCoveringClusterInteractionInfoMap.put("goToLiftPercentage", windowCoveringgoToLiftPercentageInteractionInfo);
-
-    Map<String, CommandParameterInfo> windowCoveringgoToTiltValueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo windowCoveringgoToTiltValuetiltValueCommandParameterInfo = new CommandParameterInfo("tiltValue", Integer.class, Integer.class);
-    windowCoveringgoToTiltValueCommandParams.put("tiltValue",windowCoveringgoToTiltValuetiltValueCommandParameterInfo);
-    InteractionInfo windowCoveringgoToTiltValueInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.WindowCoveringCluster) cluster)
-        .goToTiltValue((DefaultClusterCallback) callback
-        , (Integer)
-        commandArguments.get("tiltValue")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        windowCoveringgoToTiltValueCommandParams
-    );
-    windowCoveringClusterInteractionInfoMap.put("goToTiltValue", windowCoveringgoToTiltValueInteractionInfo);
 
     Map<String, CommandParameterInfo> windowCoveringgoToTiltPercentageCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 

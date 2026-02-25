@@ -4907,7 +4907,6 @@ cluster WindowCovering = 258 {
     kLift = 0x1;
     kTilt = 0x2;
     kPositionAwareLift = 0x4;
-    kAbsolutePosition = 0x8;
     kPositionAwareTilt = 0x10;
   }
 
@@ -4940,10 +4939,6 @@ cluster WindowCovering = 258 {
   }
 
   readonly attribute Type type = 0;
-  readonly attribute optional int16u physicalClosedLimitLift = 1;
-  readonly attribute optional int16u physicalClosedLimitTilt = 2;
-  readonly attribute optional nullable int16u currentPositionLift = 3;
-  readonly attribute optional nullable int16u currentPositionTilt = 4;
   readonly attribute optional int16u numberOfActuationsLift = 5;
   readonly attribute optional int16u numberOfActuationsTilt = 6;
   readonly attribute ConfigStatus configStatus = 7;
@@ -4955,10 +4950,6 @@ cluster WindowCovering = 258 {
   readonly attribute EndProductType endProductType = 13;
   readonly attribute optional nullable percent100ths currentPositionLiftPercent100ths = 14;
   readonly attribute optional nullable percent100ths currentPositionTiltPercent100ths = 15;
-  readonly attribute optional int16u installedOpenLimitLift = 16;
-  readonly attribute optional int16u installedClosedLimitLift = 17;
-  readonly attribute optional int16u installedOpenLimitTilt = 18;
-  readonly attribute optional int16u installedClosedLimitTilt = 19;
   attribute access(write: manage) Mode mode = 23;
   readonly attribute optional SafetyStatus safetyStatus = 26;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -4967,35 +4958,23 @@ cluster WindowCovering = 258 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct GoToLiftValueRequest {
-    int16u liftValue = 0;
-  }
-
   request struct GoToLiftPercentageRequest {
     percent100ths liftPercent100thsValue = 0;
-  }
-
-  request struct GoToTiltValueRequest {
-    int16u tiltValue = 0;
   }
 
   request struct GoToTiltPercentageRequest {
     percent100ths tiltPercent100thsValue = 0;
   }
 
-  /** Moves window covering to InstalledOpenLimitLift and InstalledOpenLimitTilt */
+  /** Upon receipt of this command, the window covering will adjust its position so the physical lift/slide and tilt is at the maximum open/up position. */
   command UpOrOpen(): DefaultSuccess = 0;
-  /** Moves window covering to InstalledClosedLimitLift and InstalledCloseLimitTilt */
+  /** Upon receipt of this command, the window covering will adjust its position so the physical lift/slide and tilt is at the maximum closed/down position. */
   command DownOrClose(): DefaultSuccess = 1;
-  /** Stop any adjusting of window covering */
+  /** Upon receipt of this command, the window covering will stop any adjusting to the physical tilt and lift/slide that is currently occurring. */
   command StopMotion(): DefaultSuccess = 2;
-  /** Go to lift value specified */
-  command GoToLiftValue(GoToLiftValueRequest): DefaultSuccess = 4;
-  /** Go to lift percentage specified */
+  /** This command is used to set the target lift position of the window covering to the percentage value specified in the command. */
   command GoToLiftPercentage(GoToLiftPercentageRequest): DefaultSuccess = 5;
-  /** Go to tilt value specified */
-  command GoToTiltValue(GoToTiltValueRequest): DefaultSuccess = 7;
-  /** Go to tilt percentage specified */
+  /** This command is used to set the target tilt position of the window covering to the percentage value specified in the command. */
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 
@@ -9171,8 +9150,6 @@ endpoint 0 {
 
   server cluster WindowCovering {
     ram      attribute type default = 0x00;
-    persist  attribute currentPositionLift default = 0x7FFF;
-    persist  attribute currentPositionTilt default = 0x7FFF;
     persist  attribute configStatus default = 0x03;
     persist  attribute currentPositionLiftPercentage default = 50;
     persist  attribute currentPositionTiltPercentage default = 50;
@@ -9182,10 +9159,6 @@ endpoint 0 {
     ram      attribute endProductType default = 0x00;
     persist  attribute currentPositionLiftPercent100ths default = 500;
     persist  attribute currentPositionTiltPercent100ths default = 500;
-    persist  attribute installedOpenLimitLift default = 0x0000;
-    persist  attribute installedClosedLimitLift default = 0xFFFF;
-    persist  attribute installedOpenLimitTilt default = 0x0000;
-    persist  attribute installedClosedLimitTilt default = 0xFFFF;
     persist  attribute mode default = 0x00;
     ram      attribute safetyStatus default = 0x00;
     ram      attribute featureMap default = 0x17;
@@ -9194,9 +9167,7 @@ endpoint 0 {
     handle command UpOrOpen;
     handle command DownOrClose;
     handle command StopMotion;
-    handle command GoToLiftValue;
     handle command GoToLiftPercentage;
-    handle command GoToTiltValue;
     handle command GoToTiltPercentage;
   }
 

@@ -10528,50 +10528,6 @@ public class ClusterReadMapping {
           readWindowCoveringTypeCommandParams
         );
         result.put("readTypeAttribute", readWindowCoveringTypeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readWindowCoveringPhysicalClosedLimitLiftCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readWindowCoveringPhysicalClosedLimitLiftAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.WindowCoveringCluster) cluster).readPhysicalClosedLimitLiftAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readWindowCoveringPhysicalClosedLimitLiftCommandParams
-        );
-        result.put("readPhysicalClosedLimitLiftAttribute", readWindowCoveringPhysicalClosedLimitLiftAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readWindowCoveringPhysicalClosedLimitTiltCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readWindowCoveringPhysicalClosedLimitTiltAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.WindowCoveringCluster) cluster).readPhysicalClosedLimitTiltAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readWindowCoveringPhysicalClosedLimitTiltCommandParams
-        );
-        result.put("readPhysicalClosedLimitTiltAttribute", readWindowCoveringPhysicalClosedLimitTiltAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readWindowCoveringCurrentPositionLiftCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readWindowCoveringCurrentPositionLiftAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.WindowCoveringCluster) cluster).readCurrentPositionLiftAttribute(
-              (ChipClusters.WindowCoveringCluster.CurrentPositionLiftAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedWindowCoveringClusterCurrentPositionLiftAttributeCallback(),
-          readWindowCoveringCurrentPositionLiftCommandParams
-        );
-        result.put("readCurrentPositionLiftAttribute", readWindowCoveringCurrentPositionLiftAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readWindowCoveringCurrentPositionTiltCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readWindowCoveringCurrentPositionTiltAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.WindowCoveringCluster) cluster).readCurrentPositionTiltAttribute(
-              (ChipClusters.WindowCoveringCluster.CurrentPositionTiltAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedWindowCoveringClusterCurrentPositionTiltAttributeCallback(),
-          readWindowCoveringCurrentPositionTiltCommandParams
-        );
-        result.put("readCurrentPositionTiltAttribute", readWindowCoveringCurrentPositionTiltAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readWindowCoveringNumberOfActuationsLiftCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWindowCoveringNumberOfActuationsLiftAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -10693,50 +10649,6 @@ public class ClusterReadMapping {
           readWindowCoveringCurrentPositionTiltPercent100thsCommandParams
         );
         result.put("readCurrentPositionTiltPercent100thsAttribute", readWindowCoveringCurrentPositionTiltPercent100thsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readWindowCoveringInstalledOpenLimitLiftCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readWindowCoveringInstalledOpenLimitLiftAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.WindowCoveringCluster) cluster).readInstalledOpenLimitLiftAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readWindowCoveringInstalledOpenLimitLiftCommandParams
-        );
-        result.put("readInstalledOpenLimitLiftAttribute", readWindowCoveringInstalledOpenLimitLiftAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readWindowCoveringInstalledClosedLimitLiftCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readWindowCoveringInstalledClosedLimitLiftAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.WindowCoveringCluster) cluster).readInstalledClosedLimitLiftAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readWindowCoveringInstalledClosedLimitLiftCommandParams
-        );
-        result.put("readInstalledClosedLimitLiftAttribute", readWindowCoveringInstalledClosedLimitLiftAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readWindowCoveringInstalledOpenLimitTiltCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readWindowCoveringInstalledOpenLimitTiltAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.WindowCoveringCluster) cluster).readInstalledOpenLimitTiltAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readWindowCoveringInstalledOpenLimitTiltCommandParams
-        );
-        result.put("readInstalledOpenLimitTiltAttribute", readWindowCoveringInstalledOpenLimitTiltAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readWindowCoveringInstalledClosedLimitTiltCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readWindowCoveringInstalledClosedLimitTiltAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.WindowCoveringCluster) cluster).readInstalledClosedLimitTiltAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readWindowCoveringInstalledClosedLimitTiltCommandParams
-        );
-        result.put("readInstalledClosedLimitTiltAttribute", readWindowCoveringInstalledClosedLimitTiltAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readWindowCoveringModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWindowCoveringModeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

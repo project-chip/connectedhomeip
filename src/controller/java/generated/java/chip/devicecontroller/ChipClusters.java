@@ -35290,10 +35290,6 @@ public class ChipClusters {
     public static final long CLUSTER_ID = 258L;
 
     private static final long TYPE_ATTRIBUTE_ID = 0L;
-    private static final long PHYSICAL_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID = 1L;
-    private static final long PHYSICAL_CLOSED_LIMIT_TILT_ATTRIBUTE_ID = 2L;
-    private static final long CURRENT_POSITION_LIFT_ATTRIBUTE_ID = 3L;
-    private static final long CURRENT_POSITION_TILT_ATTRIBUTE_ID = 4L;
     private static final long NUMBER_OF_ACTUATIONS_LIFT_ATTRIBUTE_ID = 5L;
     private static final long NUMBER_OF_ACTUATIONS_TILT_ATTRIBUTE_ID = 6L;
     private static final long CONFIG_STATUS_ATTRIBUTE_ID = 7L;
@@ -35305,10 +35301,6 @@ public class ChipClusters {
     private static final long END_PRODUCT_TYPE_ATTRIBUTE_ID = 13L;
     private static final long CURRENT_POSITION_LIFT_PERCENT100THS_ATTRIBUTE_ID = 14L;
     private static final long CURRENT_POSITION_TILT_PERCENT100THS_ATTRIBUTE_ID = 15L;
-    private static final long INSTALLED_OPEN_LIMIT_LIFT_ATTRIBUTE_ID = 16L;
-    private static final long INSTALLED_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID = 17L;
-    private static final long INSTALLED_OPEN_LIMIT_TILT_ATTRIBUTE_ID = 18L;
-    private static final long INSTALLED_CLOSED_LIMIT_TILT_ATTRIBUTE_ID = 19L;
     private static final long MODE_ATTRIBUTE_ID = 23L;
     private static final long SAFETY_STATUS_ATTRIBUTE_ID = 26L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
@@ -35375,26 +35367,6 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void goToLiftValue(DefaultClusterCallback callback, Integer liftValue) {
-      goToLiftValue(callback, liftValue, 0);
-    }
-
-    public void goToLiftValue(DefaultClusterCallback callback, Integer liftValue, int timedInvokeTimeoutMs) {
-      final long commandId = 4L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long liftValueFieldID = 0L;
-      BaseTLVType liftValuetlvValue = new UIntType(liftValue);
-      elements.add(new StructElement(liftValueFieldID, liftValuetlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
     public void goToLiftPercentage(DefaultClusterCallback callback, Integer liftPercent100thsValue) {
       goToLiftPercentage(callback, liftPercent100thsValue, 0);
     }
@@ -35406,26 +35378,6 @@ public class ChipClusters {
       final long liftPercent100thsValueFieldID = 0L;
       BaseTLVType liftPercent100thsValuetlvValue = new UIntType(liftPercent100thsValue);
       elements.add(new StructElement(liftPercent100thsValueFieldID, liftPercent100thsValuetlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void goToTiltValue(DefaultClusterCallback callback, Integer tiltValue) {
-      goToTiltValue(callback, tiltValue, 0);
-    }
-
-    public void goToTiltValue(DefaultClusterCallback callback, Integer tiltValue, int timedInvokeTimeoutMs) {
-      final long commandId = 7L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long tiltValueFieldID = 0L;
-      BaseTLVType tiltValuetlvValue = new UIntType(tiltValue);
-      elements.add(new StructElement(tiltValueFieldID, tiltValuetlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -35453,14 +35405,6 @@ public class ChipClusters {
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public interface CurrentPositionLiftAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
-    public interface CurrentPositionTiltAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
     }
 
     public interface CurrentPositionLiftPercentageAttributeCallback extends BaseAttributeCallback {
@@ -35523,110 +35467,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readPhysicalClosedLimitLiftAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PHYSICAL_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PHYSICAL_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribePhysicalClosedLimitLiftAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PHYSICAL_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PHYSICAL_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readPhysicalClosedLimitTiltAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PHYSICAL_CLOSED_LIMIT_TILT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PHYSICAL_CLOSED_LIMIT_TILT_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribePhysicalClosedLimitTiltAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PHYSICAL_CLOSED_LIMIT_TILT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PHYSICAL_CLOSED_LIMIT_TILT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readCurrentPositionLiftAttribute(
-        CurrentPositionLiftAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_POSITION_LIFT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CURRENT_POSITION_LIFT_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeCurrentPositionLiftAttribute(
-        CurrentPositionLiftAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_POSITION_LIFT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CURRENT_POSITION_LIFT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readCurrentPositionTiltAttribute(
-        CurrentPositionTiltAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_POSITION_TILT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CURRENT_POSITION_TILT_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeCurrentPositionTiltAttribute(
-        CurrentPositionTiltAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_POSITION_TILT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CURRENT_POSITION_TILT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readNumberOfActuationsLiftAttribute(
@@ -35913,110 +35753,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, CURRENT_POSITION_TILT_PERCENT100THS_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readInstalledOpenLimitLiftAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTALLED_OPEN_LIMIT_LIFT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTALLED_OPEN_LIMIT_LIFT_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeInstalledOpenLimitLiftAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTALLED_OPEN_LIMIT_LIFT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTALLED_OPEN_LIMIT_LIFT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readInstalledClosedLimitLiftAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTALLED_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTALLED_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeInstalledClosedLimitLiftAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTALLED_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTALLED_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readInstalledOpenLimitTiltAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTALLED_OPEN_LIMIT_TILT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTALLED_OPEN_LIMIT_TILT_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeInstalledOpenLimitTiltAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTALLED_OPEN_LIMIT_TILT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTALLED_OPEN_LIMIT_TILT_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readInstalledClosedLimitTiltAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTALLED_CLOSED_LIMIT_TILT_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTALLED_CLOSED_LIMIT_TILT_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeInstalledClosedLimitTiltAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, INSTALLED_CLOSED_LIMIT_TILT_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, INSTALLED_CLOSED_LIMIT_TILT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readModeAttribute(

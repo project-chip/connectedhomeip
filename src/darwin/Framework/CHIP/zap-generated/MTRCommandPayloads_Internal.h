@@ -1495,19 +1495,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRWindowCoveringClusterGoToLiftValueParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
 @interface MTRWindowCoveringClusterGoToLiftPercentageParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRWindowCoveringClusterGoToTiltValueParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

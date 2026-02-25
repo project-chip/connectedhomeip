@@ -5110,22 +5110,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"Type";
             break;
 
-        case MTRAttributeIDTypeClusterWindowCoveringAttributePhysicalClosedLimitLiftID:
-            result = @"PhysicalClosedLimitLift";
-            break;
-
-        case MTRAttributeIDTypeClusterWindowCoveringAttributePhysicalClosedLimitTiltID:
-            result = @"PhysicalClosedLimitTilt";
-            break;
-
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionLiftID:
-            result = @"CurrentPositionLift";
-            break;
-
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltID:
-            result = @"CurrentPositionTilt";
-            break;
-
         case MTRAttributeIDTypeClusterWindowCoveringAttributeNumberOfActuationsLiftID:
             result = @"NumberOfActuationsLift";
             break;
@@ -5168,22 +5152,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterWindowCoveringAttributeCurrentPositionTiltPercent100thsID:
             result = @"CurrentPositionTiltPercent100ths";
-            break;
-
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledOpenLimitLiftID:
-            result = @"InstalledOpenLimitLift";
-            break;
-
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledClosedLimitLiftID:
-            result = @"InstalledClosedLimitLift";
-            break;
-
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledOpenLimitTiltID:
-            result = @"InstalledOpenLimitTilt";
-            break;
-
-        case MTRAttributeIDTypeClusterWindowCoveringAttributeInstalledClosedLimitTiltID:
-            result = @"InstalledClosedLimitTilt";
             break;
 
         case MTRAttributeIDTypeClusterWindowCoveringAttributeModeID:
@@ -11185,16 +11153,8 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"StopMotion";
             break;
 
-        case MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftValueID:
-            result = @"GoToLiftValue";
-            break;
-
         case MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftPercentageID:
             result = @"GoToLiftPercentage";
-            break;
-
-        case MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltValueID:
-            result = @"GoToTiltValue";
             break;
 
         case MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltPercentageID:

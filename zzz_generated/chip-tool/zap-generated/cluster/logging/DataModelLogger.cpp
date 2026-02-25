@@ -18455,26 +18455,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Type", 1, value);
         }
-        case WindowCovering::Attributes::PhysicalClosedLimitLift::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PhysicalClosedLimitLift", 1, value);
-        }
-        case WindowCovering::Attributes::PhysicalClosedLimitTilt::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("PhysicalClosedLimitTilt", 1, value);
-        }
-        case WindowCovering::Attributes::CurrentPositionLift::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CurrentPositionLift", 1, value);
-        }
-        case WindowCovering::Attributes::CurrentPositionTilt::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CurrentPositionTilt", 1, value);
-        }
         case WindowCovering::Attributes::NumberOfActuationsLift::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -18529,26 +18509,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::DataModel::Nullable<chip::Percent100ths> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentPositionTiltPercent100ths", 1, value);
-        }
-        case WindowCovering::Attributes::InstalledOpenLimitLift::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InstalledOpenLimitLift", 1, value);
-        }
-        case WindowCovering::Attributes::InstalledClosedLimitLift::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InstalledClosedLimitLift", 1, value);
-        }
-        case WindowCovering::Attributes::InstalledOpenLimitTilt::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InstalledOpenLimitTilt", 1, value);
-        }
-        case WindowCovering::Attributes::InstalledClosedLimitTilt::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("InstalledClosedLimitTilt", 1, value);
         }
         case WindowCovering::Attributes::Mode::Id: {
             chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value;

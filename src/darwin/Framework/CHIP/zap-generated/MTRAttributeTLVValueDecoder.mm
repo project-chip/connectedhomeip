@@ -10991,58 +10991,6 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
-    case Attributes::PhysicalClosedLimitLift::Id: {
-        using TypeInfo = Attributes::PhysicalClosedLimitLift::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedShort:cppValue];
-        return value;
-    }
-    case Attributes::PhysicalClosedLimitTilt::Id: {
-        using TypeInfo = Attributes::PhysicalClosedLimitTilt::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedShort:cppValue];
-        return value;
-    }
-    case Attributes::CurrentPositionLift::Id: {
-        using TypeInfo = Attributes::CurrentPositionLift::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
-        }
-        return value;
-    }
-    case Attributes::CurrentPositionTilt::Id: {
-        using TypeInfo = Attributes::CurrentPositionTilt::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
-        }
-        return value;
-    }
     case Attributes::NumberOfActuationsLift::Id: {
         using TypeInfo = Attributes::NumberOfActuationsLift::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -11186,50 +11134,6 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
         } else {
             value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
         }
-        return value;
-    }
-    case Attributes::InstalledOpenLimitLift::Id: {
-        using TypeInfo = Attributes::InstalledOpenLimitLift::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedShort:cppValue];
-        return value;
-    }
-    case Attributes::InstalledClosedLimitLift::Id: {
-        using TypeInfo = Attributes::InstalledClosedLimitLift::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedShort:cppValue];
-        return value;
-    }
-    case Attributes::InstalledOpenLimitTilt::Id: {
-        using TypeInfo = Attributes::InstalledOpenLimitTilt::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedShort:cppValue];
-        return value;
-    }
-    case Attributes::InstalledClosedLimitTilt::Id: {
-        using TypeInfo = Attributes::InstalledClosedLimitTilt::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedShort:cppValue];
         return value;
     }
     case Attributes::Mode::Id: {

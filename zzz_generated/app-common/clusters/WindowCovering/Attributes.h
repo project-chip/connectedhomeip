@@ -55,54 +55,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Type
-namespace PhysicalClosedLimitLift {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalClosedLimitLift::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace PhysicalClosedLimitLift
-namespace PhysicalClosedLimitTilt {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalClosedLimitTilt::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace PhysicalClosedLimitTilt
-namespace CurrentPositionLift {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLift::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace CurrentPositionLift
-namespace CurrentPositionTilt {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTilt::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace CurrentPositionTilt
 namespace NumberOfActuationsLift {
 struct TypeInfo
 {
@@ -235,54 +187,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentPositionTiltPercent100ths
-namespace InstalledOpenLimitLift {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::InstalledOpenLimitLift::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace InstalledOpenLimitLift
-namespace InstalledClosedLimitLift {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::InstalledClosedLimitLift::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace InstalledClosedLimitLift
-namespace InstalledOpenLimitTilt {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::InstalledOpenLimitTilt::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace InstalledOpenLimitTilt
-namespace InstalledClosedLimitTilt {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::InstalledClosedLimitTilt::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace InstalledClosedLimitTilt
 namespace Mode {
 struct TypeInfo
 {
@@ -347,10 +251,6 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Type::TypeInfo::DecodableType type = static_cast<chip::app::Clusters::WindowCovering::Type>(0);
-        Attributes::PhysicalClosedLimitLift::TypeInfo::DecodableType physicalClosedLimitLift = static_cast<uint16_t>(0);
-        Attributes::PhysicalClosedLimitTilt::TypeInfo::DecodableType physicalClosedLimitTilt = static_cast<uint16_t>(0);
-        Attributes::CurrentPositionLift::TypeInfo::DecodableType currentPositionLift;
-        Attributes::CurrentPositionTilt::TypeInfo::DecodableType currentPositionTilt;
         Attributes::NumberOfActuationsLift::TypeInfo::DecodableType numberOfActuationsLift = static_cast<uint16_t>(0);
         Attributes::NumberOfActuationsTilt::TypeInfo::DecodableType numberOfActuationsTilt = static_cast<uint16_t>(0);
         Attributes::ConfigStatus::TypeInfo::DecodableType configStatus =
@@ -365,10 +265,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::WindowCovering::EndProductType>(0);
         Attributes::CurrentPositionLiftPercent100ths::TypeInfo::DecodableType currentPositionLiftPercent100ths;
         Attributes::CurrentPositionTiltPercent100ths::TypeInfo::DecodableType currentPositionTiltPercent100ths;
-        Attributes::InstalledOpenLimitLift::TypeInfo::DecodableType installedOpenLimitLift     = static_cast<uint16_t>(0);
-        Attributes::InstalledClosedLimitLift::TypeInfo::DecodableType installedClosedLimitLift = static_cast<uint16_t>(0);
-        Attributes::InstalledOpenLimitTilt::TypeInfo::DecodableType installedOpenLimitTilt     = static_cast<uint16_t>(0);
-        Attributes::InstalledClosedLimitTilt::TypeInfo::DecodableType installedClosedLimitTilt = static_cast<uint16_t>(0);
         Attributes::Mode::TypeInfo::DecodableType mode = static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::Mode>>(0);
         Attributes::SafetyStatus::TypeInfo::DecodableType safetyStatus =
             static_cast<chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus>>(0);

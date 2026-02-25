@@ -25,22 +25,6 @@ namespace Type {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Type::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Type
-namespace PhysicalClosedLimitLift {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PhysicalClosedLimitLift::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
-} // namespace PhysicalClosedLimitLift
-namespace PhysicalClosedLimitTilt {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PhysicalClosedLimitTilt::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
-} // namespace PhysicalClosedLimitTilt
-namespace CurrentPositionLift {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentPositionLift::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
-} // namespace CurrentPositionLift
-namespace CurrentPositionTilt {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentPositionTilt::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
-} // namespace CurrentPositionTilt
 namespace NumberOfActuationsLift {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfActuationsLift::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -91,24 +75,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentPositionTiltPer
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace CurrentPositionTiltPercent100ths
-namespace InstalledOpenLimitLift {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(InstalledOpenLimitLift::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
-} // namespace InstalledOpenLimitLift
-namespace InstalledClosedLimitLift {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(InstalledClosedLimitLift::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
-} // namespace InstalledClosedLimitLift
-namespace InstalledOpenLimitTilt {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(InstalledOpenLimitTilt::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
-} // namespace InstalledOpenLimitTilt
-namespace InstalledClosedLimitTilt {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(InstalledClosedLimitTilt::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
-} // namespace InstalledClosedLimitTilt
 namespace Mode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Mode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
@@ -139,18 +105,10 @@ namespace StopMotion {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(StopMotion::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace StopMotion
-namespace GoToLiftValue {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GoToLiftValue::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
-} // namespace GoToLiftValue
 namespace GoToLiftPercentage {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GoToLiftPercentage::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace GoToLiftPercentage
-namespace GoToTiltValue {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GoToTiltValue::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
-} // namespace GoToTiltValue
 namespace GoToTiltPercentage {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GoToTiltPercentage::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

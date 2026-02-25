@@ -1111,30 +1111,12 @@ Protocols::InteractionModel::Status DispatchServerCommand(CommandHandler * apCom
             }
             break;
         }
-        case Commands::GoToLiftValue::Id: {
-            Commands::GoToLiftValue::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfWindowCoveringClusterGoToLiftValueCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
         case Commands::GoToLiftPercentage::Id: {
             Commands::GoToLiftPercentage::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfWindowCoveringClusterGoToLiftPercentageCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::GoToTiltValue::Id: {
-            Commands::GoToTiltValue::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfWindowCoveringClusterGoToTiltValueCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }

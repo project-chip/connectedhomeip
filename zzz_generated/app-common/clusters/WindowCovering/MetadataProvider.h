@@ -25,14 +25,6 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WindowCoveri
         {
         case Type::Id:
             return Type::kMetadataEntry;
-        case PhysicalClosedLimitLift::Id:
-            return PhysicalClosedLimitLift::kMetadataEntry;
-        case PhysicalClosedLimitTilt::Id:
-            return PhysicalClosedLimitTilt::kMetadataEntry;
-        case CurrentPositionLift::Id:
-            return CurrentPositionLift::kMetadataEntry;
-        case CurrentPositionTilt::Id:
-            return CurrentPositionTilt::kMetadataEntry;
         case NumberOfActuationsLift::Id:
             return NumberOfActuationsLift::kMetadataEntry;
         case NumberOfActuationsTilt::Id:
@@ -55,14 +47,6 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WindowCoveri
             return CurrentPositionLiftPercent100ths::kMetadataEntry;
         case CurrentPositionTiltPercent100ths::Id:
             return CurrentPositionTiltPercent100ths::kMetadataEntry;
-        case InstalledOpenLimitLift::Id:
-            return InstalledOpenLimitLift::kMetadataEntry;
-        case InstalledClosedLimitLift::Id:
-            return InstalledClosedLimitLift::kMetadataEntry;
-        case InstalledOpenLimitTilt::Id:
-            return InstalledOpenLimitTilt::kMetadataEntry;
-        case InstalledClosedLimitTilt::Id:
-            return InstalledClosedLimitTilt::kMetadataEntry;
         case Mode::Id:
             return Mode::kMetadataEntry;
         case SafetyStatus::Id:
@@ -87,12 +71,8 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Window
             return DownOrClose::kMetadataEntry;
         case StopMotion::Id:
             return StopMotion::kMetadataEntry;
-        case GoToLiftValue::Id:
-            return GoToLiftValue::kMetadataEntry;
         case GoToLiftPercentage::Id:
             return GoToLiftPercentage::kMetadataEntry;
-        case GoToTiltValue::Id:
-            return GoToTiltValue::kMetadataEntry;
         case GoToTiltPercentage::Id:
             return GoToTiltPercentage::kMetadataEntry;
 

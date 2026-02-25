@@ -2772,14 +2772,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::WindowCovering::Attributes::Type::Id:
             return "Type";
-        case chip::app::Clusters::WindowCovering::Attributes::PhysicalClosedLimitLift::Id:
-            return "PhysicalClosedLimitLift";
-        case chip::app::Clusters::WindowCovering::Attributes::PhysicalClosedLimitTilt::Id:
-            return "PhysicalClosedLimitTilt";
-        case chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::Id:
-            return "CurrentPositionLift";
-        case chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::Id:
-            return "CurrentPositionTilt";
         case chip::app::Clusters::WindowCovering::Attributes::NumberOfActuationsLift::Id:
             return "NumberOfActuationsLift";
         case chip::app::Clusters::WindowCovering::Attributes::NumberOfActuationsTilt::Id:
@@ -2802,14 +2794,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CurrentPositionLiftPercent100ths";
         case chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id:
             return "CurrentPositionTiltPercent100ths";
-        case chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitLift::Id:
-            return "InstalledOpenLimitLift";
-        case chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitLift::Id:
-            return "InstalledClosedLimitLift";
-        case chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitTilt::Id:
-            return "InstalledOpenLimitTilt";
-        case chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitTilt::Id:
-            return "InstalledClosedLimitTilt";
         case chip::app::Clusters::WindowCovering::Attributes::Mode::Id:
             return "Mode";
         case chip::app::Clusters::WindowCovering::Attributes::SafetyStatus::Id:
@@ -5891,12 +5875,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "DownOrClose";
         case chip::app::Clusters::WindowCovering::Commands::StopMotion::Id:
             return "StopMotion";
-        case chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Id:
-            return "GoToLiftValue";
         case chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Id:
             return "GoToLiftPercentage";
-        case chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Id:
-            return "GoToTiltValue";
         case chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Id:
             return "GoToTiltPercentage";
         default:

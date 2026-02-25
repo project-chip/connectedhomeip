@@ -11472,10 +11472,6 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             Type(0L),
-            PhysicalClosedLimitLift(1L),
-            PhysicalClosedLimitTilt(2L),
-            CurrentPositionLift(3L),
-            CurrentPositionTilt(4L),
             NumberOfActuationsLift(5L),
             NumberOfActuationsTilt(6L),
             ConfigStatus(7L),
@@ -11487,10 +11483,6 @@ public class ClusterIDMapping {
             EndProductType(13L),
             CurrentPositionLiftPercent100ths(14L),
             CurrentPositionTiltPercent100ths(15L),
-            InstalledOpenLimitLift(16L),
-            InstalledClosedLimitLift(17L),
-            InstalledOpenLimitTilt(18L),
-            InstalledClosedLimitTilt(19L),
             Mode(23L),
             SafetyStatus(26L),
             GeneratedCommandList(65528L),
@@ -11541,9 +11533,7 @@ public class ClusterIDMapping {
             UpOrOpen(0L),
             DownOrClose(1L),
             StopMotion(2L),
-            GoToLiftValue(4L),
             GoToLiftPercentage(5L),
-            GoToTiltValue(7L),
             GoToTiltPercentage(8L),;
             private final long id;
             Command(long id) {
@@ -11562,24 +11552,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum GoToLiftValueCommandField {LiftValue(0),;
-                    private final int id;
-                    GoToLiftValueCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static GoToLiftValueCommandField value(int id) throws NoSuchFieldError {
-                        for (GoToLiftValueCommandField field : GoToLiftValueCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum GoToLiftPercentageCommandField {LiftPercent100thsValue(0),;
+        }public enum GoToLiftPercentageCommandField {LiftPercent100thsValue(0),;
                     private final int id;
                     GoToLiftPercentageCommandField(int id) {
                         this.id = id;
@@ -11590,23 +11563,6 @@ public class ClusterIDMapping {
                     }
                     public static GoToLiftPercentageCommandField value(int id) throws NoSuchFieldError {
                         for (GoToLiftPercentageCommandField field : GoToLiftPercentageCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum GoToTiltValueCommandField {TiltValue(0),;
-                    private final int id;
-                    GoToTiltValueCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static GoToTiltValueCommandField value(int id) throws NoSuchFieldError {
-                        for (GoToTiltValueCommandField field : GoToTiltValueCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

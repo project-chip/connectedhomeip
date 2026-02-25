@@ -34,14 +34,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::Type::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, type);
-    case Attributes::PhysicalClosedLimitLift::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, physicalClosedLimitLift);
-    case Attributes::PhysicalClosedLimitTilt::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, physicalClosedLimitTilt);
-    case Attributes::CurrentPositionLift::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentPositionLift);
-    case Attributes::CurrentPositionTilt::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentPositionTilt);
     case Attributes::NumberOfActuationsLift::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, numberOfActuationsLift);
     case Attributes::NumberOfActuationsTilt::TypeInfo::GetAttributeId():
@@ -64,14 +56,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, currentPositionLiftPercent100ths);
     case Attributes::CurrentPositionTiltPercent100ths::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, currentPositionTiltPercent100ths);
-    case Attributes::InstalledOpenLimitLift::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, installedOpenLimitLift);
-    case Attributes::InstalledClosedLimitLift::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, installedClosedLimitLift);
-    case Attributes::InstalledOpenLimitTilt::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, installedOpenLimitTilt);
-    case Attributes::InstalledClosedLimitTilt::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, installedClosedLimitTilt);
     case Attributes::Mode::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, mode);
     case Attributes::SafetyStatus::TypeInfo::GetAttributeId():

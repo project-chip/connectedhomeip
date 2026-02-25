@@ -14,27 +14,11 @@ namespace WindowCovering {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 27;
+inline constexpr uint32_t kAttributesCount = 19;
 
 namespace Type {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Type
-
-namespace PhysicalClosedLimitLift {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace PhysicalClosedLimitLift
-
-namespace PhysicalClosedLimitTilt {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace PhysicalClosedLimitTilt
-
-namespace CurrentPositionLift {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace CurrentPositionLift
-
-namespace CurrentPositionTilt {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace CurrentPositionTilt
 
 namespace NumberOfActuationsLift {
 inline constexpr AttributeId Id = 0x00000005;
@@ -79,22 +63,6 @@ inline constexpr AttributeId Id = 0x0000000E;
 namespace CurrentPositionTiltPercent100ths {
 inline constexpr AttributeId Id = 0x0000000F;
 } // namespace CurrentPositionTiltPercent100ths
-
-namespace InstalledOpenLimitLift {
-inline constexpr AttributeId Id = 0x00000010;
-} // namespace InstalledOpenLimitLift
-
-namespace InstalledClosedLimitLift {
-inline constexpr AttributeId Id = 0x00000011;
-} // namespace InstalledClosedLimitLift
-
-namespace InstalledOpenLimitTilt {
-inline constexpr AttributeId Id = 0x00000012;
-} // namespace InstalledOpenLimitTilt
-
-namespace InstalledClosedLimitTilt {
-inline constexpr AttributeId Id = 0x00000013;
-} // namespace InstalledClosedLimitTilt
 
 namespace Mode {
 inline constexpr AttributeId Id = 0x00000017;

@@ -62,20 +62,10 @@ struct Type;
 struct DecodableType;
 } // namespace StopMotion
 
-namespace GoToLiftValue {
-struct Type;
-struct DecodableType;
-} // namespace GoToLiftValue
-
 namespace GoToLiftPercentage {
 struct Type;
 struct DecodableType;
 } // namespace GoToLiftPercentage
-
-namespace GoToTiltValue {
-struct Type;
-struct DecodableType;
-} // namespace GoToTiltValue
 
 namespace GoToTiltPercentage {
 struct Type;
@@ -172,40 +162,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopMotion
-namespace GoToLiftValue {
-enum class Fields : uint8_t
-{
-    kLiftValue = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GoToLiftValue::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-
-    uint16_t liftValue = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GoToLiftValue::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    uint16_t liftValue = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GoToLiftValue
 namespace GoToLiftPercentage {
 enum class Fields : uint8_t
 {
@@ -240,40 +196,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GoToLiftPercentage
-namespace GoToTiltValue {
-enum class Fields : uint8_t
-{
-    kTiltValue = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GoToTiltValue::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-
-    uint16_t tiltValue = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GoToTiltValue::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    uint16_t tiltValue = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GoToTiltValue
 namespace GoToTiltPercentage {
 enum class Fields : uint8_t
 {

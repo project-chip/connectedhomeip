@@ -103,11 +103,6 @@ uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t 
 
     return outputMax;
 }
-
-Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
-{
-    return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute);
-}
 } // namespace
 
 namespace chip {
@@ -372,92 +367,38 @@ uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
     return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative);
 }
 
-uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift)
-{
-    uint16_t openLimit   = 0;
-    uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitLift::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitLift::Get(endpoint, &closedLimit);
-
-    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
-    return ValueToPercent100ths(limits, lift);
-}
-
-uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths)
-{
-    uint16_t openLimit   = 0;
-    uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitLift::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitLift::Get(endpoint, &closedLimit);
-
-    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
-    return Percent100thsToValue(limits, percent100ths);
-}
-
 void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
     NPercent percent;
-    NAbsolute rawpos;
 
     if (percent100ths.IsNull())
     {
         percent.SetNull();
-        rawpos.SetNull();
         ChipLogProgress(Zcl, "Lift[%u] Position Set to Null", endpoint);
     }
     else
     {
         percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
-        rawpos.SetNonNull(Percent100thsToLift(endpoint, percent100ths.Value()));
         ChipLogProgress(Zcl, "Lift[%u] Position Set: %u", endpoint, percent100ths.Value());
     }
-    Attributes::CurrentPositionLift::Set(endpoint, rawpos);
     Attributes::CurrentPositionLiftPercentage::Set(endpoint, percent);
     Attributes::CurrentPositionLiftPercent100ths::Set(endpoint, percent100ths);
-}
-
-uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt)
-{
-    uint16_t openLimit   = 0;
-    uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitTilt::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitTilt::Get(endpoint, &closedLimit);
-
-    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
-
-    return ValueToPercent100ths(limits, tilt);
-}
-
-uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths)
-{
-    uint16_t openLimit   = 0;
-    uint16_t closedLimit = 0;
-    Attributes::InstalledOpenLimitTilt::Get(endpoint, &openLimit);
-    Attributes::InstalledClosedLimitTilt::Get(endpoint, &closedLimit);
-
-    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
-
-    return Percent100thsToValue(limits, percent100ths);
 }
 
 void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
 {
     NPercent percent;
-    NAbsolute rawpos;
 
     if (percent100ths.IsNull())
     {
         percent.SetNull();
-        rawpos.SetNull();
         ChipLogProgress(Zcl, "Tilt[%u] Position Set to Null", endpoint);
     }
     else
     {
         percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
-        rawpos.SetNonNull(Percent100thsToTilt(endpoint, percent100ths.Value()));
         ChipLogProgress(Zcl, "Tilt[%u] Position Set: %u", endpoint, percent100ths.Value());
     }
-    Attributes::CurrentPositionTilt::Set(endpoint, rawpos);
     Attributes::CurrentPositionTiltPercentage::Set(endpoint, percent);
     Attributes::CurrentPositionTiltPercent100ths::Set(endpoint, percent100ths);
 }
@@ -789,49 +730,6 @@ bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * comman
 }
 
 /**
- * @brief  Cluster GoToLiftValue Command callback (from client)
- */
-bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::GoToLiftValue::DecodableType & commandData)
-{
-    auto & liftValue = commandData.liftValue;
-
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    ChipLogProgress(Zcl, "GoToLiftValue %u command received", liftValue);
-
-    Status status = GetMotionLockStatus(endpoint);
-    if (Status::Success != status)
-    {
-        ChipLogProgress(Zcl, "Err device locked");
-        commandObj->AddStatus(commandPath, status);
-        return true;
-    }
-
-    if (HasFeature(endpoint, Feature::kAbsolutePosition) && HasFeaturePaLift(endpoint))
-    {
-        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, LiftToPercent100ths(endpoint, liftValue));
-        Delegate * delegate = GetDelegate(endpoint);
-        if (delegate)
-        {
-            LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
-        }
-        else
-        {
-            ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
-        }
-        commandObj->AddStatus(commandPath, Status::Success);
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "Err Device is not PA LF");
-        commandObj->AddStatus(commandPath, Status::Failure);
-    }
-    return true;
-}
-
-/**
  * @brief  Cluster GoToLiftPercentage Command callback (from client)
  */
 bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler * commandObj,
@@ -875,49 +773,6 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
     else
     {
         ChipLogProgress(Zcl, "Err Device is not PA LF");
-        commandObj->AddStatus(commandPath, Status::Failure);
-    }
-    return true;
-}
-
-/**
- * @brief  Cluster GoToTiltValue Command callback (from client)
- */
-bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::GoToTiltValue::DecodableType & commandData)
-{
-    auto & tiltValue = commandData.tiltValue;
-
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    ChipLogProgress(Zcl, "GoToTiltValue %u command received", tiltValue);
-
-    Status status = GetMotionLockStatus(endpoint);
-    if (Status::Success != status)
-    {
-        ChipLogProgress(Zcl, "Err device locked");
-        commandObj->AddStatus(commandPath, status);
-        return true;
-    }
-
-    if (HasFeature(endpoint, Feature::kAbsolutePosition) && HasFeaturePaTilt(endpoint))
-    {
-        Attributes::TargetPositionTiltPercent100ths::Set(endpoint, TiltToPercent100ths(endpoint, tiltValue));
-        Delegate * delegate = GetDelegate(endpoint);
-        if (delegate)
-        {
-            LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
-        }
-        else
-        {
-            ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
-        }
-        commandObj->AddStatus(commandPath, Status::Success);
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "Err Device is not PA TL");
         commandObj->AddStatus(commandPath, Status::Failure);
     }
     return true;
