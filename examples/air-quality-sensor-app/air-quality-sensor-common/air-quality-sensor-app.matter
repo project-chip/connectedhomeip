@@ -2830,14 +2830,14 @@ endpoint 1 {
   }
 
   server cluster TemperatureMeasurement {
-    ram      attribute measuredValue;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster RelativeHumidityMeasurement {

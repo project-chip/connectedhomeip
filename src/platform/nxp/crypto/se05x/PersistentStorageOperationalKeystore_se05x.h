@@ -36,6 +36,8 @@ class PersistentStorageOpKeystorese05x : public chip::PersistentStorageOperation
 public:
     CHIP_ERROR NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest) override;
     CHIP_ERROR RemoveOpKeypairForFabric(FabricIndex fabricIndex) override;
+    CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
+                                 Crypto::P256ECDSASignature & outSignature) const override;
 };
 
 } // namespace chip

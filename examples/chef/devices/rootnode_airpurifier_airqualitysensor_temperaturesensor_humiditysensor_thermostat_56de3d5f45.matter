@@ -3256,15 +3256,15 @@ endpoint 3 {
   }
 
   server cluster TemperatureMeasurement {
-    persist  attribute measuredValue default = 0;
+    callback attribute measuredValue;
     persist  attribute minMeasuredValue default = -5000;
     persist  attribute maxMeasuredValue default = 7500;
     persist  attribute tolerance default = 10;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 4 {

@@ -2051,14 +2051,14 @@ endpoint 2 {
   }
 
   server cluster TemperatureMeasurement {
-    ram      attribute measuredValue default = 6555;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 3000;
     ram      attribute maxMeasuredValue default = 30000;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 3 {
@@ -2141,14 +2141,14 @@ endpoint 4 {
   }
 
   server cluster TemperatureMeasurement {
-    ram      attribute measuredValue;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 0x8000;
     ram      attribute maxMeasuredValue default = 0x8000;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 

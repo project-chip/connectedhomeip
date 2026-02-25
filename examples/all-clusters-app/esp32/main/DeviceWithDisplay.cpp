@@ -27,6 +27,7 @@
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/illuminance-measurement-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
 #include <string>
 #include <tuple>
@@ -196,7 +197,7 @@ public:
             if (name == "Temperature")
             {
                 // update the temp attribute here for hardcoded endpoint 1
-                chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
+                LogErrorOnFailure(app::Clusters::TemperatureMeasurement::SetMeasuredValue(1, static_cast<int16_t>(n * 100)));
             }
             else if (name == "Color Current Level")
             {
@@ -667,8 +668,8 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Thermometer");
     AddAttribute("Temperature", "21");
-    // write the temp attribute
-    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
+
+    LogErrorOnFailure(app::Clusters::TemperatureMeasurement::SetMeasuredValue(1, static_cast<int16_t>(21 * 100)));
 
     AddDevice("Garage 1");
     AddEndpoint("Door 1");
@@ -712,7 +713,6 @@ void SetupPretendDevices()
     AddDevice("Thermostat");
     AddEndpoint("1");
     AddCluster("Thermostat");
-    app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
     AddAttribute("SystemMode", "4");
     app::Clusters::Thermostat::Attributes::SystemMode::Set(1, chip::app::Clusters::Thermostat::SystemModeEnum::kHeat);
