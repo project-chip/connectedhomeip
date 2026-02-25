@@ -100,12 +100,12 @@ public:
     ChefDelegate(const chip::EndpointId endpointId, const uint32_t featureMap, const uint16_t clusterRevision,
                  const uint32_t supportedStreamingProtocols, const chip::Span<const chip::CharSpan> acceptHeaderList,
                  const chip::Span<const ContentEntry> launchableContent) :
-        mEndpointId(endpointId), mFeaturemap(featureMap), mClusterRevision(clusterRevision),
-        mSupportedStreamingProtocols(supportedStreamingProtocols), mAcceptHeaderList(acceptHeaderList),
-        mLaunchableContent(launchableContent) {};
+        mEndpointId(endpointId),
+        mFeaturemap(featureMap), mClusterRevision(clusterRevision), mSupportedStreamingProtocols(supportedStreamingProtocols),
+        mAcceptHeaderList(acceptHeaderList), mLaunchableContent(launchableContent){};
     ChefDelegate(chip::EndpointId endpointId) :
         ChefDelegate(endpointId, kEndpointFeatureMap, kClusterRevision, kSupportedStreamingProtocols,
-                     chip::Span<const chip::CharSpan>(kAcceptHeaderList), chip::Span<const ContentEntry>(kLaunchableContent)) {};
+                     chip::Span<const chip::CharSpan>(kAcceptHeaderList), chip::Span<const ContentEntry>(kLaunchableContent)){};
     ~ChefDelegate() = default;
 
     void HandleLaunchContent(
