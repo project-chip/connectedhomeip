@@ -116,7 +116,7 @@ sl_status_t updateDisplay(void)
     status = sl_wfx_host_pre_lcd_spi_transfer();
     if (status != SL_STATUS_OK)
         return status;
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     status = DMD_updateDisplay();
     if (status != DMD_OK)
         return SL_STATUS_FAIL;
@@ -124,7 +124,7 @@ sl_status_t updateDisplay(void)
     status = sl_wfx_host_post_lcd_spi_transfer();
     if (status != SL_STATUS_OK)
         return status;
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 
 #if defined (SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER
     // MEMLCD is not a UULP component and not available in sleep so powering down before sleep and need to be re-initialized after
