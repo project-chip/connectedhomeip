@@ -164,7 +164,7 @@ void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatus
 
 namespace {
 
-const char * GetNetworkFaultString(uint8_t fault)
+[[maybe_unused]] const char * GetNetworkFaultString(uint8_t fault)
 {
     switch (static_cast<NetworkFaultEnum>(fault))
     {
@@ -190,7 +190,7 @@ void ThreadNetworkDiagnosticsCluster::OnNetworkFaultChanged(const GeneralFaults<
 {
     if (current.size() > 0)
     {
-        uint8_t latestFault = current.data()[current.size() - 1];
+        [[maybe_unused]] uint8_t latestFault = current.data()[current.size() - 1];
         ChipLogProgress(Zcl, "ThdDiag: OnNetworkFaultChanged, %lu active fault(s). Latest: %s (%u)", current.size(),
                         GetNetworkFaultString(latestFault), latestFault);
     }
