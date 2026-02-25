@@ -56,7 +56,7 @@ template("siwx917_sdk") {
     _include_dirs = [
       "${chip_root}",
       "${efr32_sdk_root}/platform_core/platform/emdrv/nvm3/config",
-      "${efr32_sdk_root}/${chip_root}/examples/platform/silabs/",
+      "${efr32_sdk_root}/cmsis_common/platform/common/inc",
       "${efr32_sdk_root}/platform_core/platform/emdrv/nvm3/inc",
       "${efr32_sdk_root}/platform_core/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform_core/platform/service/device_init/inc",
