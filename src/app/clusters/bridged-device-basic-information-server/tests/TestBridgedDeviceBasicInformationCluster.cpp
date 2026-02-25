@@ -837,8 +837,8 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetNodeLabelDelegateError)
 {
     BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
                                                  {
-                                                     .uniqueId             = "test-label",
-                                                     .nodeLabel            = "Initial",
+                                                     .uniqueId  = "test-label",
+                                                     .nodeLabel = "Initial",
                                                  },
                                                  {},
                                                  {
@@ -860,8 +860,8 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestNodeLabelPersistence)
 {
     BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
                                                  {
-                                                     .uniqueId             = "test-persistence",
-                                                     .nodeLabel            = "Initial",
+                                                     .uniqueId  = "test-persistence",
+                                                     .nodeLabel = "Initial",
                                                  },
                                                  {},
                                                  {
@@ -893,8 +893,8 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestStartupPersistence)
 
     BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
                                                  {
-                                                     .uniqueId             = "test-startup",
-                                                     .nodeLabel            = "ConstructorLabel",
+                                                     .uniqueId  = "test-startup",
+                                                     .nodeLabel = "ConstructorLabel",
                                                  },
                                                  {},
                                                  {
