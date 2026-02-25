@@ -36,11 +36,12 @@ class CancellableQueue(ABC, Generic[QueueElementT]):
         First it performs a check without waiting. It avoids waiting for condition trigger when there are already items in the queue
         or cancellation is already observed.
         """
-        with contextlib.suppress(queue.Empty):
-            return self.get_or_cancel(timeout=0)
+        if timeout != 0:
+            with contextlib.suppress(queue.Empty):
+                return self.get_or_cancel(timeout=0)
 
         with self._cond:
-            if timeout is not None and timeout > 0 and not self._cond.wait(timeout=timeout):
+            if ((timeout is not None and timeout > 0) or timeout is None) and not self._cond.wait(timeout=timeout):
                 raise TimeoutError("Timeout when waiting for work item")
             return self._get_or_cancel_logic()
 
@@ -114,11 +115,18 @@ class WorkQueue(Generic[WorkRequestT, WorkResponseT]):
         self._rsp = ResponseQueue[WorkResponseT](mp_manager, self._cancel_event)
 
     def put_req(self, req: WorkRequestT | EndOfWork, req_queue_id: int | None = 0) -> None:
+        """Put a request to the queue.
+
+        If req_queue_id is not None, put to the corresponding request queue, otherwise put to all request queues (broadcast).
+        """
+        # Single queue (more likely).
         if req_queue_id is not None:
             if req_queue_id > len(self._req):
                 raise ValueError(f"No request queue with ID {req_queue_id}")
             self._req[req_queue_id].put(req)
+            return
 
+        # Broadcast to all request queues.
         for req_queue in self._req:
             req_queue.put(req)
 

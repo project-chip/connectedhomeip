@@ -12,7 +12,7 @@ class LogConfig:
     process_name: str | None = None
 
     @cache
-    def get_log_format(self, task: str | None = None):
+    def get_log_format(self, task: str | None = None) -> str:
         """Set the logger format for the process
 
         - add timestamp if enabled,
@@ -36,8 +36,9 @@ class LogConfig:
             return self.log_level
         return coloredlogs.find_defined_levels()[self.log_level]
 
-    def set_log_fmt(self, logger: logging.Logger | None = None, task: str | None = None):
-        coloredlogs.install(level=self.log_level_int, fmt=self.get_log_format(task), logger=logger)
+    def set_log_fmt(self, task: str | None = None, log_level: int | str | None = None):
+        coloredlogs.install(level=self.log_level_int if log_level is None else log_level,
+                            fmt=self.get_log_format(task))
 
 
 LOG_LEVELS = tuple(coloredlogs.find_defined_levels().keys())

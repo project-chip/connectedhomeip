@@ -1,85 +1,18 @@
-import dataclasses
 import functools
 import logging
-import multiprocessing
-import multiprocessing.spawn
 import os
 import signal
-import stat
-import sys
-import tempfile
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from contextlib import contextmanager
 from multiprocessing.context import SpawnContext
 from multiprocessing.managers import SyncManager
-from pathlib import Path
-from typing import ClassVar, Concatenate, Generic, Iterator, ParamSpec, Self, TypeVar
+from typing import Concatenate, Generic, ParamSpec, TypeVar
 
-from chiptest.log_utils import LogConfig
-from .queue import EndOfWork, WorkQueue, WorkQueueCancelled
-from .state import ProcessGroupState, ProcessState
+from chiptest.mp_utils.config import ProcessConfigTemplate
+from chiptest.mp_utils.queue import EndOfWork, WorkQueue, WorkQueueCancelled
+from chiptest.mp_utils.state import ProcessGroupState, ProcessState
 
 log = logging.getLogger(__name__)
-
-
-@contextmanager
-def mp_wrapped_spawn_context(wrapper_linux: str | None) -> Iterator[SpawnContext]:
-    """Create platform-specific multiprocessing context.
-
-    Linux:
-    - We need to use spawn for the pool to have separate environment variables per runner, and to be able to use a wrapper script.
-    - We need unshare wrapper script to have an option to mount per-worker /tmp (initialized per-worker).
-    """
-    source_context = multiprocessing.get_context("spawn")
-
-    if sys.platform != "linux" or wrapper_linux is None:
-        yield source_context
-        return
-
-    mp_wrapper_name: Path | None = None
-    old_executable = multiprocessing.spawn.get_executable()
-    executable = old_executable.decode('utf-8') if isinstance(old_executable, bytes) else old_executable
-    try:
-        with tempfile.NamedTemporaryFile("w", encoding="utf8", delete=False) as wrapper_file:
-            mp_wrapper_name = Path(wrapper_file.name)
-            wrapper_file.write(f'#!/bin/sh\nexec {wrapper_linux} {executable} "$@"')
-        mp_wrapper_name.chmod(mp_wrapper_name.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
-
-        source_context.set_executable(str(mp_wrapper_name))
-        yield source_context
-    finally:
-        # Restore the default executable.
-        source_context.set_executable(old_executable)
-        if mp_wrapper_name is not None:
-            mp_wrapper_name.unlink()
-
-@dataclasses.dataclass(frozen=True)
-class ProcessConfigTemplate:
-    DEFAULT_START_TIMEOUT: ClassVar[float] = 4.0
-    DEFAULT_STOP_TIMEOUT: ClassVar[float] = 4.0
-    DEFAULT_TERMINATION_TIMEOUT: ClassVar[float] = 2.0
-
-    id: int = -1
-    name_short: str = "P{id}"
-    name_long: str = "Process {id}"
-    log_config: LogConfig = dataclasses.field(default_factory=LogConfig)
-    start_timeout: float | None = DEFAULT_START_TIMEOUT
-    stop_timeout: float = DEFAULT_STOP_TIMEOUT
-    termination_timeout: float = DEFAULT_TERMINATION_TIMEOUT
-
-    def with_formatted_name(self, id: int) -> Self:
-        name_short=self.name_short.format(id=id)
-        name_long=self.name_long.format(id=id)
-
-        # If the logger config defines a name of the base process, use it as a prefix for the short name and in the log config
-        # itself, to make it more clear which process is logging.
-        if self.log_config.process_name is not None:
-            name_short = f"{self.log_config.process_name}/{name_short}"
-
-        return dataclasses.replace(self, id=id, name_short=name_short, name_long=name_long,
-                                   log_config=dataclasses.replace(self.log_config, process_name=name_short))
-
 
 S = TypeVar("S", bound="WrappedProcess")
 P = ParamSpec("P")
@@ -167,6 +100,10 @@ class WrappedProcess(ABC, Generic[ConfigT, WorkRequestT, WorkResponseT]):
                 return True
             return False
 
+        if not self._proc.is_alive():
+            log.debug("Process hasn't started yet or is already stopped")
+            return
+
         log.debug("Cancelling work in process")
         self.work_queue.cancel()
         if has_stopped(self._config.stop_timeout):
@@ -197,7 +134,7 @@ class WrappedProcess(ABC, Generic[ConfigT, WorkRequestT, WorkResponseT]):
             self.state.phase = ProcessState.Phase.UNINITIALIZED
 
             # Logger needs to be initialized per-process.
-            self._config.log_config.set_log_fmt(log)
+            self._config.log_config.set_log_fmt()
 
             # Initialize.
             log.debug("Initializing")

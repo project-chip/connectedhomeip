@@ -6,8 +6,8 @@ from collections.abc import Callable, Iterable
 from multiprocessing.managers import SyncManager, ValueProxy
 from types import TracebackType
 
-from .process import ProcessConfigTemplate
-from .queue import RequestQueue
+from chiptest.mp_utils.config import ProcessConfigTemplate
+from chiptest.mp_utils.queue import RequestQueue
 
 
 class ProcessGroupState:
@@ -53,14 +53,26 @@ class ProcessGroupState:
 
 
 class ProcessState:
-    # TODO: Document behavior of the states and transitions between them, and how to use the state as a synchronization primitive.
-
     class Phase(enum.IntEnum):
+        """Phase of the process lifecycle."""
+
         NOT_STARTED = enum.auto()
+        """The process has not started yet."""
+
         UNINITIALIZED = enum.auto()
+        """The process has started but has not finished initialization yet."""
+
         READY = enum.auto()
+        """The process has finished initialization and is ready to work.
+
+        Can cycle between READY and WORKING phases multiple times.
+        """
+
         WORKING = enum.auto()
+        """The process is working on a task. Optional and can be used to distinguish between idle and busy processes."""
+
         CLOSED = enum.auto()
+        """The process has finished all work and is closed (exited). Mind that it could have been closed due to an exception."""
 
     def __init__(self, mp_manager: SyncManager, config: ProcessConfigTemplate, group_state: ProcessGroupState | None = None,
                  initial_state: Phase = Phase.NOT_STARTED) -> None:
@@ -92,7 +104,7 @@ class ProcessState:
     def exception(self, value: BaseException | None) -> None:
         with self._state_changed:
             if value is not None:
-                value.add_note(f"Exception in process {self._config.name_long} in phase {self.phase}")
+                value.add_note(f"Exception in process {self._config.name_long} in phase {self.phase.name}")
             self._exception.set(value)
             self._state_changed.notify_all()
 

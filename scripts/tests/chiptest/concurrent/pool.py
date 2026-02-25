@@ -1,19 +1,19 @@
-from collections.abc import Callable, Iterable
 import itertools
 import logging
-from multiprocessing.context import SpawnContext
 import sys
+from collections.abc import Callable, Iterable
+from multiprocessing.context import SpawnContext
 from multiprocessing.managers import SyncManager
 
-from chiptest.mp_utils.common import StartStopContextMixin
+from chiptest.concurrent.config import TestJobConfig, TestSchedulerType, WorkerConfig
+from chiptest.concurrent.results import ResultProcessingThread
+from chiptest.concurrent.status import PeriodicStatusThread
+from chiptest.concurrent.worker import WorkerError, WorkerJob, WorkerProcessCls, WorkerResult
 from chiptest.log_utils import LogConfig
+from chiptest.mp_utils.common import StartStopContextMixin, mp_wrapped_spawn_context
 from chiptest.mp_utils.pool import WrappedProcessPool
-from chiptest.mp_utils.process import ProcessState, mp_wrapped_spawn_context
+from chiptest.mp_utils.process import ProcessState
 from chiptest.test_definition import TestDefinition
-from .worker import WorkerJob, WorkerResult, WorkerProcessCls
-from .config import TestJobConfig, TestSchedulerType, WorkerConfig
-from .results import ResultProcessingThread
-from .status import PeriodicStatusThread
 
 log = logging.getLogger(__name__)
 
@@ -27,6 +27,7 @@ else:
     SYNC_MANAGER_PATH = None
 
 SchedulerFunc = Callable[[int, Iterable[TestDefinition]], None]
+
 
 class TestPool(WrappedProcessPool[WorkerProcessCls, WorkerConfig, WorkerJob, WorkerResult], StartStopContextMixin):
     def __init__(self, process_cls: type[WorkerProcessCls], mp_context: SpawnContext, mp_manager: SyncManager,
@@ -63,13 +64,15 @@ class TestPool(WrappedProcessPool[WorkerProcessCls, WorkerConfig, WorkerJob, Wor
         super().stop()
 
         # Status thread should finish on cancel invoked by the pool stop.
-        self._status_thread.join(self.config_template.stop_timeout)
+        if self._status_thread.is_alive():
+            self._status_thread.join(self.config_template.stop_timeout)
         if self._status_thread.is_alive():
             log.error("Status thread failed to stop")
 
         # Results thread should finish on cancel invoked by the pool stop.
         log.debug("Waiting for result processing thread")
-        self._results_thread.join(self.config_template.stop_timeout)
+        if self._results_thread.is_alive():
+            self._results_thread.join(self.config_template.stop_timeout)
         if self._results_thread.is_alive():
             log.error("Results processing thread failed to stop")
 
@@ -107,5 +110,8 @@ class TestPool(WrappedProcessPool[WorkerProcessCls, WorkerConfig, WorkerJob, Wor
                     pool.work_queue.finalize_req()
 
             log.info("All jobs scheduled")
-            pool.state.wait_for(
-                lambda states: pool.collect_exceptions() and all(state.phase == ProcessState.Phase.CLOSED for state in states))
+            try:
+                pool.state.wait_for(
+                    lambda states: pool.collect_exceptions() and all(state.phase == ProcessState.Phase.CLOSED for state in states))
+            except WorkerError as e:
+                log.error("%s", e)

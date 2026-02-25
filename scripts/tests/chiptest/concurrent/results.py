@@ -1,14 +1,14 @@
 import dataclasses
 import logging
 import threading
-import operator
 
-from chiptest.mp_utils.process import  WorkQueueCancelled
-from .worker import WorkerJob, WorkerResult, WorkerError
-from .config import  WorkerConfig
+from chiptest.concurrent.config import WorkerConfig
+from chiptest.concurrent.worker import WorkerError, WorkerJob, WorkerResult
+from chiptest.mp_utils.process import WorkQueueCancelled
 from chiptest.mp_utils.queue import WorkQueue
 
 log = logging.getLogger(__name__)
+
 
 @dataclasses.dataclass
 class TestResultSummary:
@@ -106,13 +106,17 @@ class ResultProcessingThread(threading.Thread):
     @property
     def successful_failed_tests(self) -> tuple[int, int]:
         with self._lock:
-            return tuple(map(operator.add, *((result.exception is not None, result.exception is None)
-                                             for results in self._results.values()
-                                             for result in results)))
+            successful, failed = tuple(map(sum, zip(
+                (0, 0),  # Needed to avoid empty input to map when there are no results yet.
+                *((result.exception is None, result.exception is not None)
+                  for results in self._results.values()
+                  for result in results))))
+            return successful, failed
 
     def print_summary(self) -> None:
         if not self._results:
             log.info("No test results available.")
+            return
 
         with self._lock:
             table: tuple[tuple[str, ...], ...] = (("Test", "Passed", "Time", "Worker ID", "Status"),) + tuple(

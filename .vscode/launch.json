@@ -8,22 +8,46 @@
             "name": "Python Debugger: run_test_suite",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/scripts/tests/run_test_suite.py",
+            "python": "unshare",
+            "pythonArgs": ["--map-root-user", "-m", "${workspaceFolder}/.environment-vscode/pigweed-venv/bin/python"],
             "console": "integratedTerminal",
-            "args": ["--internal-inside-unshare", "--runner", "chip_tool_python", "--chip-tool", "./out/linux-x64-chip-tool-/chip-tool",
-                     "--log-level", "DEBUG", "run", "--iterations", "1", "--test-timeout-seconds", "120",
-                     "--all-clusters-app", "./out/linux-x64-all-clusters-/chip-all-clusters-app",
-                     "--lock-app", "./out/linux-x64-lock-/chip-lock-app",
-                     "--ota-provider-app", "./out/linux-x64-ota-provider-/chip-ota-provider-app",
-                     "--ota-requestor-app", "./out/linux-x64-ota-requestor-/chip-ota-requestor-app",
-                     "--tv-app", "./out/linux-x64-tv-app-/chip-tv-app",
-                     "--bridge-app", "./out/linux-x64-bridge-/chip-bridge-app",
-                     "--lit-icd-app", "./out/linux-x64-lit-icd-/lit-icd-app",
-                     "--microwave-oven-app", "./out/linux-x64-microwave-oven-/chip-microwave-oven-app",
-                     "--rvc-app", "./out/linux-x64-rvc-/chip-rvc-app",
-                     "--network-manager-app", "./out/linux-x64-network-manager-/matter-network-manager-app",
-                     "--energy-gateway-app", "./out/linux-x64-energy-gateway-/chip-energy-gateway-app",
-                     "--energy-management-app", "./out/linux-x64-energy-management-/chip-energy-management-app"]
+            "subProcess": true,
+            "justMyCode": false,
+            "program": "${workspaceFolder}/scripts/tests/run_test_suite.py",
+            "args": [
+                "--internal-inside-unshare", "--runner", "chip_tool_python", "--chip-tool", "./out/linux-x64-chip-tool-/chip-tool",
+                "--log-level", "DEBUG", "run", "--iterations", "1", "--test-timeout-seconds", "600", "--keep-going",
+                "--app-path", "all-clusters:./out/linux-x64-all-clusters-/chip-all-clusters-app",
+                "--app-path", "all-devices:./out/linux-x64-all-devices-/all-devices-app",
+                "--app-path", "air-purifier:./out/linux-x64-air-purifier-/chip-air-purifier-app",
+                "--app-path", "bridge:./out/linux-x64-bridge-/chip-bridge-app",
+                // camera
+                // camera-controller
+                "--app-path", "closure:./out/linux-x64-closure-/closure-app",
+                "--app-path", "energy-gateway:./out/linux-x64-energy-gateway-/chip-energy-gateway-app",
+                "--app-path", "evse:./out/linux-x64-evse-/chip-evse-app",
+                "--app-path", "fabric-bridge:./out/linux-x64-fabric-bridge-rpc-/fabric-bridge-app",
+                // fabric-admin
+                "--app-path", "fabric-sync:./out/linux-x64-fabric-sync-/fabric-sync",
+                // jf-control
+                // jf-admin
+                "--app-path", "light:./out/linux-x64-light-/chip-lighting-app",
+                "--app-path", "lit-icd:./out/linux-x64-lit-icd-/lit-icd-app",
+                "--app-path", "lock:./out/linux-x64-lock-/chip-lock-app",
+                "--app-path", "microwave-oven:./out/linux-x64-microwave-oven-/chip-microwave-oven-app",
+                "--app-path", "network-manager:./out/linux-x64-network-manager-/matter-network-manager-app",
+                "--app-path", "ota-provider:./out/linux-x64-ota-provider-/chip-ota-provider-app",
+                "--app-path", "ota-requestor:./out/linux-x64-ota-requestor-/chip-ota-requestor-app",
+                "--app-path", "rvc:./out/linux-x64-rvc-/chip-rvc-app",
+                "--app-path", "terms-and-conditions:./out/linux-x64-terms-and-conditions/chip-terms-and-conditions-app",
+                "--app-path", "tv:./out/linux-x64-tv-app-/chip-tv-app",
+                // water-heater
+                "--app-path", "water-leak-detector:./out/linux-x64-water-leak-detector-/water-leak-detector-app"
+            ],
+            "env": {
+                "DEBUGPY_HOST": "127.0.0.1",
+                "DEBUGPY_PORT": "5678"
+            }
         },
         {
             "name": "Python: Mock Server Tests",

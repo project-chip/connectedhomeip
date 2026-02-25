@@ -247,7 +247,7 @@ class KnownSubprocessEntry:
     target_name: str | None = None
 
 
-BUILTIN_SUBPROC_DATA = MappingProxyType({
+BUILTIN_SUBPROC_DATA = {
     # Matter applications
     'all-clusters': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='chip-all-clusters-app'),
     'all-devices': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='all-devices-app'),
@@ -283,7 +283,7 @@ BUILTIN_SUBPROC_DATA = MappingProxyType({
 
     # No target_name as this is either chiptool.py or darwinframework.py depending on the selected TestRunTime
     'chip-tool-with-python': KnownSubprocessEntry(kind=SubprocessKind.CTRL)
-})
+}
 
 
 class PathsFinderProto(typing.Protocol):
@@ -296,7 +296,7 @@ class SubprocessInfoRepo(dict):
     # don't want to create a dependency on the diskcache module which PathsFinder imports.
     # Instead we just want a dict-like object
     def __init__(self, paths: PathsFinderProto,
-                 subproc_knowhow: MappingProxyType[str, KnownSubprocessEntry] = BUILTIN_SUBPROC_DATA,
+                 subproc_knowhow: dict[str, KnownSubprocessEntry] = BUILTIN_SUBPROC_DATA,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.paths = paths

@@ -2,10 +2,10 @@ import logging
 import threading
 import time
 
-from .worker import WorkerJob, WorkerResult
-from .config import WorkerConfig
+from chiptest.concurrent.config import WorkerConfig
+from chiptest.concurrent.results import ResultProcessingThread
+from chiptest.concurrent.worker import WorkerJob, WorkerResult
 from chiptest.mp_utils.queue import WorkQueue
-from .results import ResultProcessingThread
 from chiptest.mp_utils.state import ProcessGroupState
 
 log = logging.getLogger(__name__)

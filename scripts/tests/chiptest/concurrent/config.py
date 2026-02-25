@@ -5,7 +5,6 @@ import tempfile
 from pathlib import Path
 from typing import ClassVar
 
-
 from chiptest.log_utils import LogConfig
 from chiptest.mp_utils.process import ProcessConfigTemplate
 from chiptest.test_definition import SubprocessInfoRepo, TestRunTime
@@ -46,7 +45,8 @@ class WorkerConfig(ProcessConfigTemplate, TestJobConfig):
 
     @classmethod
     def from_test_job_config(cls, log_config: LogConfig, config: TestJobConfig):
-        return cls(**dataclasses.asdict(config),
+        # Needs to be a shallow copy, so that we don't accidentally create unpicklable generators in the config.
+        return cls(**{field.name: getattr(config, field.name) for field in dataclasses.fields(config)},
                    name_short=f"W{{id:0{len(str(config.concurrency))}}}",
                    name_long="Worker {id}",
                    log_config=log_config,

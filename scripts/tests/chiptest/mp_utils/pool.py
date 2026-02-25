@@ -6,9 +6,9 @@ from multiprocessing.context import SpawnContext
 from multiprocessing.managers import SyncManager
 from typing import Generic, TypeVar
 
-from .process import ProcessConfigTemplate, ProcessState, WrappedProcess
-from .queue import WorkQueue
-from .state import ProcessGroupState
+from chiptest.mp_utils.process import ProcessConfigTemplate, ProcessState, WrappedProcess
+from chiptest.mp_utils.queue import WorkQueue
+from chiptest.mp_utils.state import ProcessGroupState
 
 log = logging.getLogger(__name__)
 
@@ -21,13 +21,17 @@ WorkResponseT = TypeVar("WorkResponseT")
 class WrappedProcessPool(ABC, Generic[WrappedProcessT, ConfigT, WorkRequestT, WorkResponseT]):
     def __init__(self, process_cls: type[WrappedProcessT], mp_context: SpawnContext, mp_manager: SyncManager, concurrency: int,
                  name: str, config_template: ConfigT) -> None:
-        self.name = name
+        self._name = name
         self.config_template = config_template
         self.state = ProcessGroupState(mp_manager, process_ready_queue=True)
-        self.work_queue = WorkQueue[WorkRequestT, WorkResponseT](mp_manager, concurrency)
+        self.work_queue: WorkQueue[WorkRequestT, WorkResponseT] = WorkQueue(mp_manager, concurrency)
         self._pool = tuple(process_cls(mp_context, mp_manager, config_template.with_formatted_name(id), self.work_queue,
                                        self.state)
                            for id in range(concurrency))
+
+    @property
+    def name(self) -> str:
+        return self._name
 
     def collect_exceptions(self) -> bool:
         return self.state.collect_exceptions()

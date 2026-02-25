@@ -28,10 +28,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Concatenate, ParamSpec, TypeAlias, TypeVar
 from xmlrpc.server import SimpleXMLRPCServer
 
-from .mp_utils.common import StartStopContextMixin
-from .log_utils import LogConfig
-from .mp_utils.process import ProcessConfigTemplate, WrappedProcess, mp_wrapped_spawn_context
-from .mp_utils.queue import WorkQueue, WorkQueueCancelled
+from chiptest.log_utils import LogConfig
+from chiptest.mp_utils.common import StartStopContextMixin, mp_wrapped_spawn_context
+from chiptest.mp_utils.process import ProcessConfigTemplate, WrappedProcess
+from chiptest.mp_utils.queue import WorkQueue, WorkQueueCancelled
 
 if TYPE_CHECKING:
     from .test_definition import App
@@ -146,21 +146,21 @@ class XmlRpcServerProcessManager(threading.Thread):
 
     def run(self) -> None:
         log.debug("Starting server process")
-        try:
-            with (mp_wrapped_spawn_context(wrapper_linux=self._apps.net_ns_wrapper) as ctx,
-                  XmlRpcServerProcess(ctx, self._mp_manager, self._work_queue, self._apps.log_config) as server):
-                log.debug("XMLRPC Server process started")
-                self._init_done.set()
+        with (mp_wrapped_spawn_context(wrapper_linux=self._apps.net_ns_wrapper) as ctx,
+                XmlRpcServerProcess(ctx, self._mp_manager, self._work_queue, self._apps.log_config) as server):
+            log.debug("XMLRPC Server process started")
+            self._init_done.set()
 
+            try:
                 while True:
                     server.work_queue.put_rsp(self._execute_func(server.work_queue.get_req_or_cancel()))
-        except WorkQueueCancelled:
-            pass
-        except Exception as e:
-            log.exception("Error in XMLRPC Manager: %r", e, exc_info=True)
-            self._exception = e
-            self._init_done.set()
-            raise
+            except WorkQueueCancelled:
+                pass
+            except Exception as e:
+                log.exception("Error in XMLRPC Manager: %r", e, exc_info=True)
+                self._exception = e
+                self._init_done.set()
+                raise
 
 
 S = TypeVar("S", bound="AppsRegister")

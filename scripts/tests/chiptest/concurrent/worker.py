@@ -17,10 +17,10 @@ elif sys.platform == "darwin":
     import chiptest.darwin as darwin
 
 from chiptest.accessories import AppsRegister
+from chiptest.concurrent.config import WorkerConfig
 from chiptest.mp_utils.process import ProcessState, WrappedProcess
 from chiptest.runner import Executor
 from chiptest.test_definition import TestDefinition
-from .config import WorkerConfig
 
 log = logging.getLogger(__name__)
 
@@ -81,7 +81,7 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, WorkerResult], ABC):
 
     def _proc_work(self) -> None:
         while True:
-            work = self.work_queue.get_req_or_cancel()
+            work = self.work_queue.get_req_or_cancel(req_queue_id=self._config.id)
             self.state.phase = ProcessState.Phase.WORKING
             self.work_queue.put_rsp(self._run_test(work))
             self.state.phase = ProcessState.Phase.READY
@@ -93,9 +93,13 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, WorkerResult], ABC):
             if self.apps_register is None:
                 raise RuntimeError("Invalid state of the worker")
 
-            self._config.log_config.set_log_fmt(log, job.test.name)
+            self._config.log_config.set_log_fmt(task=job.test.name)
 
             log.info("Would run test" if self._config.dry_run else "Starting test")
+
+            # TODO: Make it into a command line option.
+            # TODO: Create a context manager for the logger.
+            self._config.log_config.set_log_fmt(task=job.test.name, log_level=logging.INFO)
             test_start = time.monotonic()
             job.test.Run(self.runner, self.apps_register, self._config.subproc_info_repo, self._config.pics_file,
                          self._config.test_timeout_seconds, self._config.dry_run, self._config.runtime,
@@ -105,6 +109,7 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, WorkerResult], ABC):
                          thread_ba_host=self.thread_ba_host,
                          thread_ba_port=self.thread_ba_port)
             result.runtime = time.monotonic() - test_start
+            self._config.log_config.set_log_fmt(task=job.test.name)
 
             if not self._config.dry_run:
                 log.info("✅ Completed in %0.2f seconds", result.runtime)
@@ -122,7 +127,7 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, WorkerResult], ABC):
 
             log.exception("❌ Failed in %0.2f seconds", result.runtime, exc_info=True)
         finally:
-            self._config.log_config.set_log_fmt(log, None)
+            self._config.log_config.set_log_fmt(task=None)
             return result
 
     def _proc_cleanup(self):

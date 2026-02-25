@@ -32,7 +32,7 @@ from chiptest.concurrent.config import TestJobConfig, TestSchedulerType
 from chiptest.concurrent.worker import WorkerError
 from chiptest.concurrent.pool import TestPool
 from chiptest.glob_matcher import GlobMatcher
-from scripts.tests.chiptest.log_utils import LogConfig
+from chiptest.log_utils import LogConfig
 from chiptest.runner import SubprocessKind
 from chiptest.test_definition import SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
