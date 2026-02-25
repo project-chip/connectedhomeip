@@ -87,6 +87,10 @@ jobs:
               with:
                   platform: linux
                   bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+
+            - name: Set ASAN symbolizer path
+              run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
+
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -780,6 +784,9 @@ jobs:
                   platform: linux
                   bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
+            - name: Set ASAN symbolizer path
+              run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
+
             - name: Setup and Restore Cache
               id: ccache
               uses: ./.github/actions/setup-ccache
@@ -1026,7 +1033,16 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v6
-            # NOTE: no bootstrap since we only use compile outputs from previous steps (including python venv in out/venv)
+
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+
+            - name: Set ASAN symbolizer path
+              run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
+
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
 
