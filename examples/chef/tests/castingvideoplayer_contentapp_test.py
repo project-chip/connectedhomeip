@@ -741,56 +741,76 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
         self.step(1)
         # Commissioning already done.
 
+        # [TC_MEDIA_PLAYBACK] Test media playback.
         self.step(2)
         await self.media_playback_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
         await self.media_playback_test(self.APP_A_ENDPOINT)
 
+        # [TC_WAKE_ON_LAN] Test wake on lan.
         self.step(3)
         await self.wake_on_lan_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
 
+        # [TC_CHANNEL] Test channel.
         self.step(4)
         await self.channel_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
         await self.channel_test(self.APP_A_ENDPOINT)
 
+        # [TC_ON_OFF] Test on/off.
         self.step(5)
         await self.on_off_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
 
+        # [TC_CONTENT_LAUNCHER] Test content launcher.
         self.step(6)
         await self.content_launcher_interstellar_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
         await self.content_launcher_man_united_match_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
         await self.content_launcher_unavailable_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
         await self.content_launcher_launch_url_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
         await self.content_launcher_attribute_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
+        await self.content_launcher_interstellar_test(self.APP_A_ENDPOINT)
+        await self.content_launcher_man_united_match_test(self.APP_A_ENDPOINT)
+        await self.content_launcher_unavailable_test(self.APP_A_ENDPOINT)
+        await self.content_launcher_launch_url_test(self.APP_A_ENDPOINT)
+        await self.content_launcher_attribute_test(self.APP_A_ENDPOINT)
 
+        # [TC_APPLICATION_BASIC] Test application basic.
         self.step(7)
         await self.application_basic_test(2)
 
+        # [APP_LAUNCH_CUJ] Launch and stop app A using platform endpoint.
         self.step(8)
         await self.cuj_launch_and_stop_app_a(command_on_endpoint=self.CASTINGVIDEOPLAYER_ENDPOINT)
 
+        # [APP_LAUNCH_CUJ] Launch, hide and stop app A using platform endpoint.
         self.step(9)
         await self.cuj_launch_hide_and_stop_app_a(command_on_endpoint=self.CASTINGVIDEOPLAYER_ENDPOINT)
 
+        # [APP_LAUNCH_CUJ] Launch and stop app A using app endpoint.
         self.step(10)
         await self.cuj_launch_and_stop_app_a(command_on_endpoint=self.APP_A_ENDPOINT)
 
+        # [APP_LAUNCH_CUJ] Launch, hide and stop app A using app endpoint.
         self.step(11)
         await self.cuj_launch_hide_and_stop_app_a(command_on_endpoint=self.APP_A_ENDPOINT)
 
+        # [TC_TARGET_NAVIGATOR] Test target navigator.
         self.step(12)
         await self.target_navigator_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
         await self.target_navigator_test(self.APP_A_ENDPOINT)
 
+        # [TC_AUDIO_OUTPUT] Test audio output.
         self.step(13)
         await self.audio_output_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
 
+        # [TC_KEYPAD_INPUT] Test keypad input.
         self.step(14)
         await self.keypad_input_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
         await self.keypad_input_test(self.APP_A_ENDPOINT)
 
+        # [TC_LOW_POWER] Test low power.
         self.step(15)
         await self.low_power_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
 
+        # [TC_MEDIA_INPUT] Test media input.
         self.step(16)
         await self.media_input_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
 
