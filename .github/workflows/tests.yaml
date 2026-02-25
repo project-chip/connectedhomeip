@@ -747,7 +747,7 @@ jobs:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
-            ASAN_OPTIONS: "suppressions=scripts/tests/chiptest/asan-linux-suppressions.txt"
+
         # Run on namespace.so instead of `ubuntu-latest`: since compilations are generally CPU
         # bound, we run these on larger/faster machines.
         runs-on: namespace-profile-16x32
@@ -880,6 +880,7 @@ jobs:
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-fabric-sync-${BUILD_VARIANT}-asan-clang"
 
+            # TODO: camera app needs clang support
             - name: Build linux-x64-camera
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
