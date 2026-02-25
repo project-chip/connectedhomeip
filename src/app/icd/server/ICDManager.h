@@ -264,7 +264,7 @@ public:
     void OnSubscriptionReport() override;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
-    void OnSendCheckIn(const Access::SubjectDescriptor & subject) override;
+    void OnSendCheckIn(Optional<Access::SubjectDescriptor> specificSubject) override;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
 private:
