@@ -70,7 +70,7 @@
       "deviceVersions": [
         3,
         1,
-        1
+        5
       ],
       "deviceIdentifiers": [
         18,
@@ -2052,6 +2052,22 @@
               "reportableChange": 0
             },
             {
+              "name": "DeviceLoadStatus",
+              "code": 10,
+              "mfgCode": null,
+              "side": "server",
+              "type": "DeviceLoadStruct",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -4003,6 +4019,22 @@
               "mfgCode": null,
               "side": "server",
               "type": "int16u",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "GroupcastAdoption",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,

@@ -843,6 +843,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     MATTER_LOG_METRIC(kMetricDeviceVendorID, [payload.vendorID unsignedIntValue]);
     MATTER_LOG_METRIC(kMetricDeviceProductID, [payload.productID unsignedIntValue]);
+    MATTER_LOG_METRIC(kMetricDeviceDiscoveryCapabilities, static_cast<uint32_t>(payload.discoveryCapabilities));
 }
 
 - (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload

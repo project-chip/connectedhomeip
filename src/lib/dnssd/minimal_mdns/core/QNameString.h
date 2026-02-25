@@ -45,12 +45,18 @@ public:
 private:
     bool EndsWith(const char * aSuffix, size_t aLength) const
     {
+        if (!Fit())
+        {
+            return false;
+        }
+
         const char * buffer = mBuffer.c_str();
         size_t bufferLength = strlen(buffer);
         if (bufferLength < aLength)
         {
             return false;
         }
+
         return memcmp(buffer + bufferLength - aLength, aSuffix, aLength) == 0;
     }
 

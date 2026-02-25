@@ -59,7 +59,7 @@ static_library("Zephyr") {
     "${chip_root}/src/platform/logging:headers",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
       "ThreadStackManagerImpl.cpp",

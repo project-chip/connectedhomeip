@@ -181,6 +181,7 @@ jobs:
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-zephyr-all-clusters \
                       --target nxp-rw61x-zephyr-thermostat \
+                      --target nxp-rw61x-zephyr-thermostat-thread \
                       --target nxp-rw61x-zephyr-laundry-washer-factory \
                       build \
                   "
