@@ -66,6 +66,12 @@ public:
         return CHIP_NO_ERROR;
     }
     CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR IncrementLifetimeCounter() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR SetRotatingDeviceIdUniqueId(const ByteSpan & uniqueIdSpan) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+#endif
     CHIP_ERROR GetRegulatoryLocation(uint8_t & location) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
