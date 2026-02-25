@@ -348,3 +348,7 @@
 	path = third_party/uriparser/repo
 	url = https://github.com/uriparser/uriparser.git
 	branch = uriparser-1.0.0
+[submodule "third_party/ot-ns/repo"]
+	path = third_party/ot-ns/repo
+	url = https://github.com/openthread/ot-ns.git
+	platforms = linux
