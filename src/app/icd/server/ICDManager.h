@@ -333,6 +333,7 @@ private:
      * @param appState pointer to the ICDManager
      */
     static void OnActiveModeDone(System::Layer * aLayer, void * appState);
+    static void OnCommissioningDone(System::Layer * aLayer, void * appState);
 
     /**
      * @brief Timer Callback function called shortly before the device enters idle mode to allow checks to be made.

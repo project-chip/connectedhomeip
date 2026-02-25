@@ -535,6 +535,12 @@ void ICDManager::SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state)
         UpdateOperationState(OperationalState::IdleMode);
     }
 }
+void ICDManager::OnCommissioningDone(System::Layer * aLayer, void * appState)
+{
+    ICDManager * pICDManager = reinterpret_cast<ICDManager *>(appState);
+    KeepActiveFlags request(KeepActiveFlag::kCommissioningWindowOpen);
+    pICDManager->SetKeepActiveModeRequirements(request, false);
+}
 
 void ICDManager::OnIdleModeDone(System::Layer * aLayer, void * appState)
 {
@@ -633,6 +639,15 @@ void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
         }
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+    if (request.Has(KeepActiveFlag::kCommissioningWindowOpen))
+    {
+        // Only 1 request per type (kCommissioningWindowOpen)
+        // delay the requirement removal for more responsiveness post commissioning.
+        DeviceLayer::SystemLayer().CancelTimer(OnCommissioningDone, this);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(60), OnCommissioningDone, this);
+        return;
+    }
 
     if (request.Has(KeepActiveFlag::kCommissioningWindowOpen) || request.Has(KeepActiveFlag::kFailSafeArmed))
     {

@@ -617,16 +617,24 @@ void CommissioningWindowManager::ExpireFailSafeIfHeldByOpenPASESession()
 void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnum aNewStatus)
 {
     CommissioningWindowStatusEnum oldClusterStatus = CommissioningWindowStatusForCluster();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // BugFix, The commissioning window is open before the initialisation of the ICD Manager
+    // trigger a request notification everytime the status is updated to make sure the ICDManager
+    // is in sync the the commissioning window status.
+    if (aNewStatus == CommissioningWindowStatusEnum::kEnhancedWindowOpen ||
+        aNewStatus == CommissioningWindowStatusEnum::kBasicWindowOpen)
+    {
+        app::ICDListener::KeepActiveFlags request = app::ICDListener::KeepActiveFlag::kCommissioningWindowOpen;
+        app::ICDNotifier::GetInstance().NotifyActiveRequestNotification(request);
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     if (mWindowStatus != aNewStatus)
     {
         mWindowStatus = aNewStatus;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         app::ICDListener::KeepActiveFlags request = app::ICDListener::KeepActiveFlag::kCommissioningWindowOpen;
-        if (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen)
-        {
-            app::ICDNotifier::GetInstance().NotifyActiveRequestNotification(request);
-        }
-        else
+        if (mWindowStatus == CommissioningWindowStatusEnum::kWindowNotOpen)
         {
             app::ICDNotifier::GetInstance().NotifyActiveRequestWithdrawal(request);
         }
