@@ -149,8 +149,8 @@ private:
 
     /// Updates the NodeLabel attribute value with optional persistence.
     ///
-    /// This internal helper handles the logic of updating the in-memory state, notifying
-    /// the application delegate for validation, and optionally persisting the value to NVM.
+    /// This internal helper validates the new value via the delegate, persists it to NVM if requested,
+    /// and then updates the in-memory state and notifies subscribers.
     ///
     /// @param nodeLabel The new node label to set.
     /// @param mode Whether to persist the new value to NVM.
