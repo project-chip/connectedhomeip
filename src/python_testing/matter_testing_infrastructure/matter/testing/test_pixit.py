@@ -37,10 +37,7 @@ class TestPixitDefinition(unittest.TestCase):
 
     def test_creation_optional_with_default(self):
         """Test PixitDefinition for optional PIXIT with default value."""
-        pixit = PixitDefinition(
-            name="timeout", type=int, description="Timeout in seconds",
-            required=False, default=30
-        )
+        pixit = PixitDefinition(name="timeout", type=int, description="Timeout in seconds", required=False, default=30)
         self.assertEqual(pixit.name, "timeout")
         self.assertEqual(pixit.type, int)
         self.assertFalse(pixit.required)
@@ -52,11 +49,12 @@ class TestRequiresPixitDecorator(unittest.TestCase):
 
     def test_decorator_attaches_single_pixit(self):
         """Verify decorator attaches _pixit_definitions to function."""
+
         @requires_pixit("app_path", str, "Path to application")
         def test_method(self):
             pass
 
-        self.assertTrue(hasattr(test_method, '_pixit_definitions'))
+        self.assertTrue(hasattr(test_method, "_pixit_definitions"))
         self.assertEqual(len(test_method._pixit_definitions), 1)
         self.assertEqual(test_method._pixit_definitions[0].name, "app_path")
         self.assertEqual(test_method._pixit_definitions[0].type, str)
@@ -64,6 +62,7 @@ class TestRequiresPixitDecorator(unittest.TestCase):
 
     def test_multiple_decorators_stack(self):
         """Verify stacking multiple @requires_pixit accumulates all definitions."""
+
         @requires_pixit("param_a", str, "First parameter")
         @requires_pixit("param_b", int, "Second parameter", required=False, default=42)
         @requires_pixit("param_c", bool, "Third parameter")
@@ -79,6 +78,7 @@ class TestRequiresPixitDecorator(unittest.TestCase):
 
     def test_decorator_preserves_function(self):
         """Verify the decorated function is still callable and returns correctly."""
+
         @requires_pixit("x", int, "Some param")
         def my_func():
             return 42
@@ -87,6 +87,7 @@ class TestRequiresPixitDecorator(unittest.TestCase):
 
     def test_optional_pixit_default(self):
         """Verify optional PIXIT has correct default value in definition."""
+
         @requires_pixit("timeout", int, "Timeout", required=False, default=30)
         def test_method(self):
             pass
@@ -97,6 +98,7 @@ class TestRequiresPixitDecorator(unittest.TestCase):
 
     def test_required_pixit_ignores_default(self):
         """Verify that default value is stored even for required PIXITs (for informational purposes)."""
+
         @requires_pixit("path", str, "Required path", required=True, default="/default/path")
         def test_method(self):
             pass
@@ -112,6 +114,7 @@ class TestGetPixitDefinitions(unittest.TestCase):
 
     def test_returns_definitions_for_decorated_method(self):
         """Returns definitions from decorated method."""
+
         @requires_pixit("x", int, "Test param")
         def test_method(self):
             pass
@@ -281,6 +284,7 @@ class TestDecoratorPrecedence(unittest.TestCase):
 
     def test_outermost_decorator_first_in_list(self):
         """Verify outermost decorator's definition appears first in the list."""
+
         @requires_pixit("outer", str, "Outer param")
         @requires_pixit("inner", str, "Inner param")
         def test_method(self):
@@ -320,5 +324,5 @@ class TestValidatePixitsDeduplication(unittest.TestCase):
         self.assertEqual(missing[0].description, "Path v1")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

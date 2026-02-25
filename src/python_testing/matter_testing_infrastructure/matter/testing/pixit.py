@@ -57,6 +57,7 @@ class PixitDefinition:
                   If False, the PIXIT is optional and uses the default value.
         default: Default value for optional PIXITs. Ignored when required=True.
     """
+
     name: str
     type: Type
     description: str
@@ -64,8 +65,7 @@ class PixitDefinition:
     default: Optional[Any] = None
 
 
-def requires_pixit(name: str, type: Type, description: str,
-                   required: bool = True, default: Any = _PIXIT_NO_DEFAULT):
+def requires_pixit(name: str, type: Type, description: str, required: bool = True, default: Any = _PIXIT_NO_DEFAULT):
     """Decorator that declares a PIXIT parameter requirement for a test method.
 
     This decorator attaches PIXIT metadata to the test method. When the test runs,
@@ -107,10 +107,11 @@ def requires_pixit(name: str, type: Type, description: str,
 
     def decorator(func):
         # Initialize the list if this is the first @requires_pixit on this function
-        if not hasattr(func, '_pixit_definitions'):
+        if not hasattr(func, "_pixit_definitions"):
             func._pixit_definitions = []
         func._pixit_definitions.insert(0, pixit_def)
         return func
+
     return decorator
 
 
@@ -126,11 +127,12 @@ def get_pixit_definitions(test_method) -> list[PixitDefinition]:
     """
     if test_method is None:
         return []
-    return getattr(test_method, '_pixit_definitions', [])
+    return getattr(test_method, "_pixit_definitions", [])
 
 
-def validate_pixits(pixit_definitions: list[PixitDefinition],
-                    user_params: dict) -> tuple[list[PixitDefinition], list[PixitDefinition]]:
+def validate_pixits(
+    pixit_definitions: list[PixitDefinition], user_params: dict
+) -> tuple[list[PixitDefinition], list[PixitDefinition]]:
     """Validate that all required PIXIT values are present in user_params.
 
     Args:
@@ -159,9 +161,7 @@ def validate_pixits(pixit_definitions: list[PixitDefinition],
     return missing_required, available_optional
 
 
-def format_pixit_error(test_name: str,
-                       missing_required: list[PixitDefinition],
-                       available_optional: list[PixitDefinition]) -> str:
+def format_pixit_error(test_name: str, missing_required: list[PixitDefinition], available_optional: list[PixitDefinition]) -> str:
     """Format a clear error message for missing PIXIT values.
 
     Args:
