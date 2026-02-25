@@ -113,7 +113,6 @@ public:
     CHIP_ERROR IncreaseConfigurationVersion();
 
     void GenerateLeaveEvent();
-    void GenerateActiveChangedEvent(uint32_t promisedActiveMs);
 
     // Application interface for ICD
 

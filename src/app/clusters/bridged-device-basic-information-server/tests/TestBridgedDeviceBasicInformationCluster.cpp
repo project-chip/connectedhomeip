@@ -297,8 +297,10 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommand)
     EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
     ClusterTester tester(cluster);
 
+    constexpr uint32_t kStayActiveDurationMs = 1000;
+
     Commands::KeepActive::Type request;
-    request.stayActiveDuration = 1000;
+    request.stayActiveDuration = kStayActiveDurationMs;
     request.timeoutMs          = 30000;
 
     auto response = tester.Invoke<Commands::KeepActive::Type>(request);
@@ -306,7 +308,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommand)
     EXPECT_EQ(icdDelegate.mEnterCalled, 1u);
     EXPECT_EQ(icdDelegate.mExpiredCalled, 0u);
 
-    EXPECT_EQ(cluster.GetRequestedStayActiveDurationMs(), 1000);
+    EXPECT_EQ(cluster.GetRequestedStayActiveDurationMs(), kStayActiveDurationMs);
 
     EXPECT_TRUE(mMockTimer.IsTimerActive(&cluster));
 
@@ -314,6 +316,18 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommand)
     cluster.NotifyDeviceActive();
     EXPECT_FALSE(cluster.GetRequestedStayActiveDurationMs().has_value());
     EXPECT_FALSE(mMockTimer.IsTimerActive(&cluster));
+
+    // validate that an event is generated
+    std::optional<LogOnlyEvents::EventInformation> eventInfo = mContext.EventsGenerator().GetNextEvent();
+    ASSERT_NE(eventInfo, std::nullopt);
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
+    EXPECT_EQ(eventInfo->eventOptions.mPath.mClusterId, Id);
+    EXPECT_EQ(eventInfo->eventOptions.mPath.mEventId, Events::ActiveChanged::Id);
+
+    Events::ActiveChanged::DecodableType decodedEvent;
+    ASSERT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    EXPECT_EQ(decodedEvent.promisedActiveDuration, kStayActiveDurationMs);
+    // NOLINTEND(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestNotifyDeviceActiveWithoutRequestedDuration)
@@ -563,37 +577,6 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestLeaveEvent)
     EXPECT_EQ(eventInfo->eventOptions.mPath.mEventId, Events::Leave::Id);
     // NOLINTEND(bugprone-unchecked-optional-access)
     // This event has no fields, so no data to decode.
-}
-
-TEST_F(TestBridgedDeviceBasicInformationCluster, TestActiveChangedEvent)
-{
-    TestBridgedDeviceIcdDelegate icdDelegate;
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
-                                                 {
-                                                     .uniqueId = "icd-dev",
-                                                 },
-                                                 {},
-                                                 {
-                                                     .parentVersionConfiguration = mMockVersionConfiguration,
-                                                     .delegate                   = mDelegate,
-                                                     .timerDelegate              = mMockTimer,
-                                                     .icdDelegate                = &icdDelegate,
-                                                 });
-    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
-
-    constexpr uint32_t promisedDuration = 5000;
-    cluster.GenerateActiveChangedEvent(promisedDuration);
-
-    std::optional<LogOnlyEvents::EventInformation> eventInfo = mContext.EventsGenerator().GetNextEvent();
-    ASSERT_NE(eventInfo, std::nullopt);
-    // NOLINTBEGIN(bugprone-unchecked-optional-access)
-    EXPECT_EQ(eventInfo->eventOptions.mPath.mClusterId, Id);
-    EXPECT_EQ(eventInfo->eventOptions.mPath.mEventId, Events::ActiveChanged::Id);
-
-    Events::ActiveChanged::DecodableType decodedEvent;
-    ASSERT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
-    EXPECT_EQ(decodedEvent.promisedActiveDuration, promisedDuration);
-    // NOLINTEND(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestFeatureMap)

@@ -259,15 +259,6 @@ void BridgedDeviceBasicInformationCluster::GenerateLeaveEvent()
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void BridgedDeviceBasicInformationCluster::GenerateActiveChangedEvent(uint32_t promisedActiveMs)
-{
-    VerifyOrReturn(mContext != nullptr);
-
-    BridgedDeviceBasicInformation::Events::ActiveChanged::Type event;
-    event.promisedActiveDuration = promisedActiveMs;
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-}
-
 void BridgedDeviceBasicInformationCluster::SetReachable(bool reachable)
 {
     VerifyOrReturn(mRequiredData.reachable != reachable);
@@ -316,7 +307,13 @@ void BridgedDeviceBasicInformationCluster::NotifyDeviceActive()
 {
     VerifyOrReturn(mStayActiveDurationMs.has_value());
 
-    GenerateActiveChangedEvent(*mStayActiveDurationMs);
+    if (mContext != nullptr)
+    {
+        BridgedDeviceBasicInformation::Events::ActiveChanged::Type event;
+        event.promisedActiveDuration = *mStayActiveDurationMs;
+        mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    }
+
     CancelPendingActiveTimer();
     mStayActiveDurationMs.reset();
 }
