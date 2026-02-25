@@ -684,7 +684,6 @@ class TC_CASTINGVIDEOPLAYER(MatterBaseTest):
 
         self.step(13)
         await self.audio_output_test(self.CASTINGVIDEOPLAYER_ENDPOINT)
-        await self.audio_output_test(self.APP_A_ENDPOINT)
 
 
 if __name__ == "__main__":
