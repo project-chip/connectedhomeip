@@ -47,7 +47,7 @@ class WrappedProcess(ABC, Generic[ConfigT, WorkRequestT, WorkResponseT]):
 
         # Create state and work queue.
         self._config = config
-        self.work_queue = work_queue if work_queue is not None else WorkQueue[WorkRequestT, WorkResponseT](mp_manager)
+        self.work_queue: WorkQueue[WorkRequestT, WorkResponseT] = work_queue if work_queue is not None else WorkQueue(mp_manager)
         self.state = ProcessState(mp_manager, config, group_state)
 
         # Create multiprocessing.Process in the given context.

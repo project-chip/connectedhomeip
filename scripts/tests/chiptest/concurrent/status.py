@@ -25,6 +25,7 @@ class PeriodicStatusThread(threading.Thread):
         match config.concurrency_status:
             case num if num < 0:
                 # "Automatic" periodicity. Could be improved with checking activity of logger.
+                # TODO: Make it responsive to logger activity (every x lines + interval).
                 self.periodicity = (0.5 if config.log_config.log_level_int <= logging.DEBUG else
                                     2 if config.concurrency > 4 else
                                     5 if config.concurrency > 1 else
@@ -42,6 +43,7 @@ class PeriodicStatusThread(threading.Thread):
         log.debug("Launching periodic status overview thread with periodicity of %0.2f seconds", self.periodicity)
         while not self.work_queue.cancelled:
             start = time.monotonic()
+            # TODO: Make the timer more precise by increasing the target time.
             try:
                 # Skip status overview if there is no activity, to avoid unnecessary logging, e.g., during initialization.
                 if (utilization := self.pool_state.working_count) == 0:

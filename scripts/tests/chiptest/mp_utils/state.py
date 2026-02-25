@@ -103,7 +103,7 @@ class ProcessState:
     @exception.setter
     def exception(self, value: BaseException | None) -> None:
         with self._state_changed:
-            if value is not None:
+            if value is not None and isinstance(value, BaseException):
                 value.add_note(f"Exception in process {self._config.name_long} in phase {self.phase.name}")
             self._exception.set(value)
             self._state_changed.notify_all()

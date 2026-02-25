@@ -131,8 +131,6 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, WorkerResult], ABC):
             return result
 
     def _proc_cleanup(self):
-        log.debug("Cleaning up state of the worker")
-
         while not self._to_clean.empty():
             # During termination treat exceptions as warnings to ensure that all items get a chance to terminate.
             try:
@@ -144,6 +142,8 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, WorkerResult], ABC):
                     setattr(self, name, None)
                 else:
                     log.debug("Cleaning up %s", item.__class__.__name__)
+
+                # Terminate the item.
                 item.terminate()
             except BaseException as e:
                 log.warning("Exception during cleanup: %s", e)

@@ -210,6 +210,7 @@ class AppsRegister:
         log.debug("Stopping XMLRPC Manager")
         self._server.cancel()
         log.debug("XMLRPC Manager stopped")
+        # TODO: Check XMLRPC logs (don't seem to be visible with the process name in the logs).
 
     def terminate(self):
         self.uninit()

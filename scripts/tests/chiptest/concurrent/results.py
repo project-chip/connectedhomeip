@@ -137,8 +137,11 @@ class ResultProcessingThread(threading.Thread):
             log.info(fmt.format(*row))
 
         # Print a note where to find /tmp for concurrent tests.
+        # TODO: It's relevant only for Linux!
         if self.config.concurrency > 1:
             log.info("Note: You can find %s of each runner in %s/{Worker ID}", self.config.tmp_dir_default,
                      self.config.tmp_dir_worker_base)
         else:
             log.info("Note: You can find %s in %s/0", self.config.tmp_dir_default, self.config.tmp_dir_worker_base)
+
+        # TODO: Check why the last test doesn't show up in the summary.
