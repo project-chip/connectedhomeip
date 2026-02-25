@@ -169,10 +169,10 @@ class NetworkResource:
 
 
 class NetworkLink(NetworkResource):
-    def __init__(self, link_name: str, ipv4_addrs: list[str], ipv6_addrs: list[str], ns: NetworkNamespace | None = None) -> None:
+    def __init__(self, name: str, ipv4_addrs: list[str], ipv6_addrs: list[str], ns: NetworkNamespace | None = None) -> None:
 
-        self.link_name = link_name
-        self.switch_name = f"{link_name}-sw"
+        self.name = name
+        self.switch_name = f"{name}-sw"
         self.ipv4_addrs = ipv4_addrs
         self.ipv6_addrs = ipv6_addrs
 
@@ -182,28 +182,28 @@ class NetworkLink(NetworkResource):
 
         up_cmds = [
             NetworkCmd(f"ip link set dev {self.switch_name} up"),
-            NetworkCmd(f"ip link set dev {self.link_name} up", ns_wrapper=True),
+            NetworkCmd(f"ip link set dev {self.name} up", ns_wrapper=True),
             NetworkCmd("ip link set dev lo up", ns_wrapper=True),
         ]
 
-        up_cmds.extend(NetworkCmd(f"ip addr add {addr} dev {self.link_name}", ns_wrapper=True) for addr in self.ipv4_addrs)
+        up_cmds.extend(NetworkCmd(f"ip addr add {addr} dev {self.name}", ns_wrapper=True) for addr in self.ipv4_addrs)
 
         if self.ipv6_addrs:
-            up_cmds.append(NetworkCmd(f"ip -6 addr flush {self.link_name}", ns_wrapper=True))
-            up_cmds.extend(NetworkCmd(f"ip -6 a add {addr} dev {self.link_name}", ns_wrapper=True) for addr in self.ipv6_addrs)
+            up_cmds.append(NetworkCmd(f"ip -6 addr flush {self.name}", ns_wrapper=True))
+            up_cmds.extend(NetworkCmd(f"ip -6 a add {addr} dev {self.name}", ns_wrapper=True) for addr in self.ipv6_addrs)
             up_cmds.extend(NetworkCmd(cmd, ns_wrapper=True) for cmd in [
                 "sysctl -w net.ipv6.conf.all.forwarding=1",
                 "sysctl -w net.ipv6.conf.default.forwarding=1",
-                f"sysctl -w net.ipv6.conf.{self.link_name}.accept_ra=2",
-                f"sysctl -w net.ipv6.conf.{self.link_name}.accept_ra_rt_info_max_plen=64"
+                f"sysctl -w net.ipv6.conf.{self.name}.accept_ra=2",
+                f"sysctl -w net.ipv6.conf.{self.name}.accept_ra_rt_info_max_plen=64"
             ])
 
         super().__init__(
-            setup_cmds=[NetworkCmd(f"ip link add {self.link_name} {netns_opt} type veth peer name {self.switch_name}")],
+            setup_cmds=[NetworkCmd(f"ip link add {self.name} {netns_opt} type veth peer name {self.switch_name}")],
             teardown_cmds=[NetworkCmd(f"ip link delete {self.switch_name}")],
             up_cmds=up_cmds,
             down_cmds=[
-                NetworkCmd(f"ip link set dev {self.link_name} down", ns_wrapper=True),
+                NetworkCmd(f"ip link set dev {self.name} down", ns_wrapper=True),
                 NetworkCmd(f"ip link set dev {self.switch_name} down")
             ],
             ns=ns)

@@ -38,7 +38,7 @@ class ThreadBorderRouter:
         self._pattern: Optional[Pattern[str]] = None
         self._event.set()
         self._netns_app = ns.netns_for_subprocess_kind(SubprocessKind.APP)
-        self._link_name_app = ns.app_link.link_name
+        self._link_name_app = ns.app_link.name
 
         radio_url = f'spinel+hdlc+forkpty:///usr/bin/env?forkpty-arg=ot-rcp&forkpty-arg={self.NODE_ID}'
         cmd = self._netns_app.wrap_cmd(['otbr-agent', '-d7', '-v', f'-B{self._link_name_app}', radio_url])
