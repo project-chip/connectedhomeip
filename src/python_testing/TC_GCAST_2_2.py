@@ -153,10 +153,10 @@ class TC_GCAST_2_2(MatterBaseTest):
                 group_id=groupID1, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=False)
             membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
-            # If DUT only support one non-root and non-aggregator endpoint, skip to step 5a
+            # If DUT only support one non-root and non-aggregator endpoint, skip to step 6a
             self.step("4a")
             if len(endpoints_list) < 2:
-                self.mark_step_range_skipped("4b", "4c")
+                self.mark_step_range_skipped("4b", "5b")
             else:
                 # Attempt to add EP2 to Group G1
                 self.step("4b")
@@ -170,23 +170,23 @@ class TC_GCAST_2_2(MatterBaseTest):
                 # TH awaits subscription report of new membership within max interval
                 self.step("4c")
                 membership_matcher = generate_membership_entry_matcher(
-                    group_id=groupID1, endpoints=endpoints_list[0:1], key_set_id=keySetID1, has_auxiliary_acl=False)
+                    group_id=groupID1, endpoints=endpoints_list[0:2], key_set_id=keySetID1, has_auxiliary_acl=False)
                 membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
-            # Attempt to replace endpoints for Group G1 using ReplaceEndpoints:
-            self.step("5a")
-            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-                groupID=groupID1,
-                endpoints=[endpoint1],
-                keySetID=keySetID1,
-                replaceEndpoints=True)
-            )
+                # Attempt to replace endpoints for Group G1 using ReplaceEndpoints:
+                self.step("5a")
+                await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                    groupID=groupID1,
+                    endpoints=[endpoint1],
+                    keySetID=keySetID1,
+                    replaceEndpoints=True)
+                )
 
-            # TH awaits subscription report of new membership within max interval
-            self.step("5b")
-            membership_matcher = generate_membership_entry_matcher(
-                group_id=groupID1, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=False)
-            membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+                # TH awaits subscription report of new membership within max interval
+                self.step("5b")
+                membership_matcher = generate_membership_entry_matcher(
+                    group_id=groupID1, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=False)
+                membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
             # Attempt to join Group G2 with existing Key1 and using Auxiliary ACL
             self.step("6a")

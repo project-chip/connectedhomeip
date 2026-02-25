@@ -998,8 +998,9 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
                 .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             },
             {
-                .groupID         = 3,
-                .endpoints       = chip::NullOptional,
+                .groupID   = 3,
+                .endpoints = MakeOptional(
+                    DataModel::List<const chip::EndpointId>()), // Listener is supported, so an empty endpoints list is expected.
                 .keySetID        = 0xabcd,
                 .hasAuxiliaryACL = MakeOptional(true),
                 .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
