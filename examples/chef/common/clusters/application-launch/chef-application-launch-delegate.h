@@ -26,7 +26,6 @@
 
 #if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
-using chip::EndpointId;
 using chip::Span;
 using chip::app::AttributeValueEncoder;
 using chip::app::CommandResponseHelper;
@@ -41,7 +40,7 @@ class AppDelegate;
 class PlatformDelegate : public Delegate // This is for the "Casting Video Player" endpoint.
 {
 public:
-    PlatformDelegate(EndpointId endpointId, const Span<const uint16_t> catalogList) :
+    PlatformDelegate(chip::EndpointId endpointId, const Span<const uint16_t> catalogList) :
         mEndpointId(endpointId), mCatalogList(catalogList)
     {
         mFeatureMapContentPlatform = true;
@@ -62,7 +61,7 @@ public:
     // this attribute should only be enabled for app platform instance
     CHIP_ERROR HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder);
 
-    EndpointId GetEndpointId() { return mEndpointId; }
+    chip::EndpointId GetEndpointId() { return mEndpointId; }
 
     CHIP_ERROR AddAppDelegate(AppDelegate * delegate); // Adds a new app to the list of managed apps
 
@@ -71,7 +70,7 @@ public:
     void Register();
 
 private:
-    const EndpointId mEndpointId;
+    const chip::EndpointId mEndpointId;
     AppDelegate * mCurrentApp = nullptr; // track which app is currently in focus
     Span<const uint16_t> mCatalogList;
     chip::IntrusiveList<AppDelegate> mAppDelegateList; // List of managed content apps
@@ -80,7 +79,7 @@ private:
 class AppDelegate : public Delegate, public chip::IntrusiveListNodeBase<> // This is for the "Content App" endpoints.
 {
 public:
-    AppDelegate(EndpointId endpointId, ApplicationBasic::Chef::ChefDelegate * appBasicDelegate) :
+    AppDelegate(chip::EndpointId endpointId, ApplicationBasic::Chef::ChefDelegate * appBasicDelegate) :
         mEndpointId(endpointId), mAppBasicDelegate(appBasicDelegate)
     {}
     ~AppDelegate() = default;
@@ -94,7 +93,7 @@ public:
     // Return error as this is not the platform instance
     CHIP_ERROR HandleGetCatalogList(app::AttributeValueEncoder & aEncoder) override;
 
-    EndpointId GetEndpointId() { return mEndpointId; }
+    chip::EndpointId GetEndpointId() { return mEndpointId; }
 
     void Register();
 
@@ -109,7 +108,7 @@ public:
     ApplicationBasic::ApplicationStatusEnum GetApplicationStatus() const { return mAppBasicDelegate->GetApplicationStatus(); }
 
 private:
-    EndpointId mEndpointId;
+    chip::EndpointId mEndpointId;
     ApplicationBasic::Chef::ChefDelegate * mAppBasicDelegate;
     PlatformDelegate * mPlatformDelegate = nullptr;
 };

@@ -28,6 +28,8 @@
 
 #if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
+using chip::EndpointId;
+
 namespace chip::app::Clusters::ApplicationLauncher::Chef {
 
 // PlatformDelegate Implementation
