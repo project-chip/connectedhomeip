@@ -26,8 +26,6 @@
 
 #if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
-using Application          = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type;
-using ApplicationEPType    = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type;
 using LauncherResponseType = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type;
 
 namespace chip::app::Clusters::ApplicationLauncher::Chef {
@@ -47,8 +45,10 @@ public:
     // Commands
     void HandleLaunchApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
                          const ApplicationLauncher::Structs::ApplicationStruct::Type & application) override;
-    void HandleStopApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
-    void HandleHideApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
+    void HandleStopApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper,
+                       const ApplicationLauncher::Structs::ApplicationStruct::Type & application) override;
+    void HandleHideApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper,
+                       const ApplicationLauncher::Structs::ApplicationStruct::Type & application) override;
 
     // Attributes
 
@@ -62,7 +62,7 @@ public:
 
     CHIP_ERROR AddAppDelegate(AppDelegate * delegate); // Adds a new app to the list of managed apps
 
-    AppDelegate * FindAppDelegate(const Application & application);
+    AppDelegate * FindAppDelegate(const ApplicationLauncher::Structs::ApplicationStruct::Type & application);
 
     void Register();
 
@@ -83,9 +83,11 @@ public:
 
     // Commands
     void HandleLaunchApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
-                         const Application & application) override;
-    void HandleStopApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
-    void HandleHideApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper, const Application & application) override;
+                         const ApplicationLauncher::Structs::ApplicationStruct::Type & application) override;
+    void HandleStopApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper,
+                       const ApplicationLauncher::Structs::ApplicationStruct::Type & application) override;
+    void HandleHideApp(chip::app::CommandResponseHelper<LauncherResponseType> & helper,
+                       const ApplicationLauncher::Structs::ApplicationStruct::Type & application) override;
 
     // Return error as this is not the platform instance
     CHIP_ERROR HandleGetCatalogList(chip::app::AttributeValueEncoder & aEncoder) override;
@@ -94,7 +96,8 @@ public:
 
     void Register();
 
-    bool Match(const Application & application); // Checks if the specified application matches with the current one
+    bool Match(const ApplicationLauncher::Structs::ApplicationStruct::Type &
+                   application); // Checks if the specified application matches with the current one
 
     ApplicationBasic::CatalogVendorApp * GetCatalogVendorApp() { return mAppBasicDelegate->GetCatalogVendorApp(); }
 
