@@ -23,9 +23,9 @@
 
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <DeviceEnergyManagementManager.h>
-#include <ElectricalPowerMeasurementDelegate.h>
+#include <ElectricalPowerMeasurementDelegateImpl.h>
 #include <EnergyManagementAppCmdLineOptions.h>
-#include <PowerTopologyDelegate.h>
+#include <PowerTopologyDelegateImpl.h>
 #include <WaterHeaterInstance.h>
 #include <WaterHeaterMain.h>
 #include <WaterHeaterManufacturer.h>

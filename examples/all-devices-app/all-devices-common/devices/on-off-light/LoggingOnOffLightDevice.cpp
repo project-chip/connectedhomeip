@@ -170,7 +170,7 @@ CHIP_ERROR LoggingOnOffLightDevice::Register(chip::EndpointId endpoint, CodeDriv
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
-void LoggingOnOffLightDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+void LoggingOnOffLightDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
 
