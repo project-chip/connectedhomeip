@@ -1044,8 +1044,8 @@ jobs:
                   echo -n "" >/tmp/test_env.yaml
                   # keep-sorted: start
                   echo "AIR_PURIFIER_APP: objdir-clone/linux-x64-air-purifier-${BUILD_VARIANT}-asan-clang-test-unified/chip-air-purifier-app" >> /tmp/test_env.yaml
-                  echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-asan-clang/chip-all-clusters-app" >> /tmp/test_env.yaml
-                  echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-asan-clang/all-devices-app" >> /tmp/test_env.yaml
+                  echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-asan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
+                  echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-asan-clang-test/all-devices-app" >> /tmp/test_env.yaml
                   echo "BRIDGE_APP: objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-asan-clang-test-unified/chip-bridge-app" >> /tmp/test_env.yaml
                   echo "CAMERA_APP: objdir-clone/linux-x64-camera-asan-clang/chip-camera-app" >> /tmp/test_env.yaml
                   echo "CAMERA_CONTROLLER_APP: objdir-clone/linux-x64-camera-controller-asan-clang/chip-camera-controller" >> /tmp/test_env.yaml
@@ -1105,7 +1105,7 @@ jobs:
               run: |
                   mkdir -p out/trace_data
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/tests/scripts/mobile-device-test.py'
-                  scripts/run_in_python_env.sh out/venv "scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-asan-clang/chip-all-clusters-app"
+                  scripts/run_in_python_env.sh out/venv "scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-asan-clang-test/chip-all-clusters-app"
 
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
@@ -1117,7 +1117,7 @@ jobs:
               if: ${{matrix.filter == ''}}
               run: |
                   # TODO: ipynb HARD CODES paths to all-clusters app. create a symlink to them
-                  ln -s ../objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-asan-clang out/linux-x64-all-clusters
+                  ln -s ../objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-asan-clang-test out/linux-x64-all-clusters
 
                   scripts/run_in_python_env.sh out/venv \
                   "jupyter execute docs/development_controllers/matter-repl/Matter_REPL_Intro.ipynb \
