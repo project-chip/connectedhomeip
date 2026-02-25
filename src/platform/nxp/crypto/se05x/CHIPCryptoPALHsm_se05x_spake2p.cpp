@@ -571,7 +571,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
     }
 
     Spake2p_Finish_HSM(&hsm_pake_context);
-
+    TEMPORARY_RETURN_IGNORED se05x_close_session();
     return error;
 }
 
