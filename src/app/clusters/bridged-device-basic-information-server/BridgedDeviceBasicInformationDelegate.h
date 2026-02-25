@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <protocols/interaction_model/Constants.h>
 #include <string>
 
 namespace chip::app::Clusters {
@@ -25,8 +26,14 @@ class BridgedDeviceBasicInformationDelegate
 public:
     virtual ~BridgedDeviceBasicInformationDelegate() = default;
 
-    // Called when the NodeLabel attribute is changed.
-    virtual void OnNodeLabelChanged(const std::string & newNodeLabel) {}
+    /// Called when the NodeLabel attribute is about to be changed.
+    ///
+    /// If a non-success status is returned, the attribute write will fail.
+    /// Note: This is NOT called for no-op writes where the value has not changed.
+    virtual Protocols::InteractionModel::Status OnNodeLabelChanged(const std::string & newNodeLabel)
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
 };
 
 } // namespace chip::app::Clusters

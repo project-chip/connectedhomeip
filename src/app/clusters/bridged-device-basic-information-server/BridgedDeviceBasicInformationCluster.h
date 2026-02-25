@@ -125,6 +125,7 @@ public:
 
     /// ServerClusterInterface (DefaultServerCluster overrides)
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;

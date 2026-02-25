@@ -16,6 +16,8 @@
  */
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationCluster.h>
 
+#include <app/persistence/AttributePersistence.h>
+#include <app/persistence/String.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/BridgedDeviceBasicInformation/Attributes.h>
 #include <clusters/BridgedDeviceBasicInformation/Commands.h>
@@ -65,10 +67,47 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel
         return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
     }
 
+    auto status = mClusterContext.delegate.OnNodeLabelChanged(newValue);
+    if (status != Status::Success)
+    {
+        return status;
+    }
+
     mRequiredData.nodeLabel = newValue;
+
+    if (mContext != nullptr)
+    {
+        AttributePersistence persistence(mContext->attributeStorage);
+        Storage::String<Attributes::NodeLabel::TypeInfo::MaxLength()> storageString;
+        storageString.SetContent(nodeLabel);
+        LogErrorOnFailure(persistence.StoreString(
+            { mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::NodeLabel::Id }, storageString));
+    }
+
     NotifyAttributeChanged(Attributes::NodeLabel::Id);
-    mClusterContext.delegate.OnNodeLabelChanged(mRequiredData.nodeLabel);
     return Status::Success;
+}
+
+CHIP_ERROR BridgedDeviceBasicInformationCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    AttributePersistence persistence(context.attributeStorage);
+    Storage::String<Attributes::NodeLabel::TypeInfo::MaxLength()> storedLabel;
+
+    if (persistence.LoadString({ mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::NodeLabel::Id }, storedLabel))
+    {
+        SetNodeLabel(storedLabel.Content());
+    }
+    else
+    {
+        Storage::String<Attributes::NodeLabel::TypeInfo::MaxLength()> initialLabel;
+        initialLabel.SetContent(ToSpan(mRequiredData.nodeLabel));
+        ReturnErrorOnFailure(persistence.StoreString(
+            { mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::NodeLabel::Id }, initialLabel));
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BridgedDeviceBasicInformationCluster::IncreaseConfigurationVersion()

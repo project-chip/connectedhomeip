@@ -18,6 +18,8 @@
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationCluster.h>
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationDelegate.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/persistence/AttributePersistence.h>
+#include <app/persistence/String.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -52,14 +54,16 @@ constexpr EndpointId kTestEndpointId = 1;
 class MockDelegate : public BridgedDeviceBasicInformationDelegate
 {
 public:
-    void OnNodeLabelChanged(const std::string & newNodeLabel) override
+    Status OnNodeLabelChanged(const std::string & newNodeLabel) override
     {
         mNodeLabelChangedCalled = true;
         mLastNodeLabel          = newNodeLabel;
+        return mReturnStatus;
     }
 
     bool mNodeLabelChangedCalled = false;
     std::string mLastNodeLabel;
+    Status mReturnStatus = Status::Success;
 };
 
 class MockVersionConfigurationDelegate : public ConfigurationVersionDelegate
@@ -649,8 +653,10 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetNodeLabel)
 
     // Test no change
     mDelegate.mNodeLabelChangedCalled = false;
+    mContext.ChangeListener().DirtyList().clear();
     EXPECT_EQ(cluster.SetNodeLabel("NewLabel"_span), DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
     EXPECT_FALSE(mDelegate.mNodeLabelChangedCalled);
+    EXPECT_FALSE(mContext.ChangeListener().IsDirty({ kTestEndpointId, Id, Attributes::NodeLabel::Id }));
 
     // Test set to empty/clear
     EXPECT_EQ(cluster.SetNodeLabel({}), Status::Success);
@@ -825,6 +831,87 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestWriteConfigurationVersion)
 
     EXPECT_EQ(tester.WriteAttribute<uint32_t>(Attributes::ConfigurationVersion::Id, 2u), Status::UnsupportedWrite);
     EXPECT_EQ(cluster.GetConfigurationVersion(), 1u);
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetNodeLabelDelegateError)
+{
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId             = "test-label",
+                                                     .nodeLabel            = "Initial",
+                                                 },
+                                                 {},
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                 });
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+
+    // Set delegate to return error
+    mDelegate.mReturnStatus = Status::ConstraintError;
+
+    EXPECT_EQ(cluster.SetNodeLabel("NewLabel"_span), Status::ConstraintError);
+    EXPECT_TRUE(mDelegate.mNodeLabelChangedCalled);
+    EXPECT_EQ(cluster.GetNodeLabel(), "Initial"); // Should NOT have changed
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestNodeLabelPersistence)
+{
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId             = "test-persistence",
+                                                     .nodeLabel            = "Initial",
+                                                 },
+                                                 {},
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                 });
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+
+    // Set new label
+    EXPECT_EQ(cluster.SetNodeLabel("PersistentLabel"_span), Status::Success);
+
+    // Verify it is in persistence
+    AttributePersistence persistence(mContext.Get().attributeStorage);
+    Storage::String<32> storedLabel;
+    EXPECT_TRUE(persistence.LoadString({ kTestEndpointId, Id, Attributes::NodeLabel::Id }, storedLabel));
+    EXPECT_TRUE(storedLabel.Content().data_equal("PersistentLabel"_span));
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestStartupPersistence)
+{
+    // Prime persistence with a value
+    {
+        AttributePersistence persistence(mContext.AttributePersistenceProvider());
+        Storage::String<32> storedLabel;
+        storedLabel.SetContent("StoredLabel"_span);
+        EXPECT_EQ(persistence.StoreString({ kTestEndpointId, Id, Attributes::NodeLabel::Id }, storedLabel), CHIP_NO_ERROR);
+    }
+
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId             = "test-startup",
+                                                     .nodeLabel            = "ConstructorLabel",
+                                                 },
+                                                 {},
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                 });
+
+    // Startup should load from persistence
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+
+    // Verify it was loaded
+    EXPECT_EQ(cluster.GetNodeLabel(), "StoredLabel");
+
+    // Delegate should have been called because stored value != constructor value
+    EXPECT_TRUE(mDelegate.mNodeLabelChangedCalled);
+    EXPECT_EQ(mDelegate.mLastNodeLabel, "StoredLabel");
 }
 
 } // namespace
