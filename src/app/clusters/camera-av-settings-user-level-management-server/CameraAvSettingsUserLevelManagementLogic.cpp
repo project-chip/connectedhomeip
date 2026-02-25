@@ -41,17 +41,18 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-CameraAvSettingsUserLevelMgmtServerLogic::CameraAvSettingsUserLevelMgmtServerLogic(
-    AttributePersistenceProvider & aAttributePersistenceProvider, EndpointId aEndpointId, BitFlags<Feature> aFeatures,
-    uint8_t aMaxPresets) :
+CameraAvSettingsUserLevelMgmtServerLogic::CameraAvSettingsUserLevelMgmtServerLogic(EndpointId aEndpointId,
+                                                                                   BitFlags<Feature> aFeatures,
+                                                                                   uint8_t aMaxPresets) :
     mEndpointId(aEndpointId),
-    mFeatures(aFeatures), mMaxPresets(aMaxPresets), mAttributePersistenceProvider(aAttributePersistenceProvider)
+    mFeatures(aFeatures), mMaxPresets(aMaxPresets)
 {}
 
 CameraAvSettingsUserLevelMgmtServerLogic::~CameraAvSettingsUserLevelMgmtServerLogic() {}
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::Startup()
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::Startup(AttributePersistenceProvider & aAttributePersistenceProvider)
 {
+    mAttributePersistenceProvider = &aAttributePersistenceProvider;
     ChipLogProgress(Zcl, "CameraAvSettingsUserLevelManagement: Startup");
     // Make sure mandated Features are set
     //
@@ -138,6 +139,7 @@ void CameraAvSettingsUserLevelMgmtServerLogic::MarkDirty(AttributeId aAttributeI
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPosition(
     const CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & mptzPosition)
 {
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
     uint8_t buffer[kMptzPositionStructMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
     TLV::TLVWriter writer;
@@ -147,17 +149,18 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPosition(
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id);
     bufferSpan.reduce_size(writer.GetLengthWritten());
-    return mAttributePersistenceProvider.WriteValue(path, bufferSpan);
+    return mAttributePersistenceProvider->WriteValue(path, bufferSpan);
 }
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(
     CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & mptzPosition)
 {
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
     uint8_t buffer[kMptzPositionStructMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPosition::Id);
-    ReturnErrorOnFailure(mAttributePersistenceProvider.ReadValue(path, bufferSpan));
+    ReturnErrorOnFailure(mAttributePersistenceProvider->ReadValue(path, bufferSpan));
 
     TLV::TLVReader reader;
 
@@ -170,6 +173,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets()
 {
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
     Platform::ScopedMemoryBuffer<uint8_t> presets;
     MutableByteSpan bufferSpan;
     size_t maxBufferSize = static_cast<size_t>(kMaxMPTZPresetStructSerializedSize * mMaxPresets);
@@ -204,13 +208,14 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets()
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
     bufferSpan.reduce_size(writer.GetLengthWritten());
-    ReturnErrorOnFailure(mAttributePersistenceProvider.WriteValue(path, bufferSpan));
+    ReturnErrorOnFailure(mAttributePersistenceProvider->WriteValue(path, bufferSpan));
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPresets()
 {
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
     Platform::ScopedMemoryBuffer<uint8_t> presets;
     MutableByteSpan bufferSpan;
     size_t maxBufferSize = static_cast<size_t>(kMaxMPTZPresetStructSerializedSize * mMaxPresets);
@@ -222,7 +227,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPresets()
     bufferSpan = MutableByteSpan{ presets.Get(), maxBufferSize };
 
     auto path      = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
-    CHIP_ERROR err = mAttributePersistenceProvider.ReadValue(path, bufferSpan);
+    CHIP_ERROR err = mAttributePersistenceProvider->ReadValue(path, bufferSpan);
 
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
@@ -262,6 +267,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPresets()
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreDPTZStreams()
 {
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
     uint8_t buffer[kMaxDPTZStreamsSerializedSize];
     MutableByteSpan bufferSpan(buffer);
     TLV::TLVWriter writer;
@@ -278,19 +284,20 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreDPTZStreams()
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::DPTZStreams::Id);
     bufferSpan.reduce_size(writer.GetLengthWritten());
-    ReturnErrorOnFailure(mAttributePersistenceProvider.WriteValue(path, bufferSpan));
+    ReturnErrorOnFailure(mAttributePersistenceProvider->WriteValue(path, bufferSpan));
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadDPTZStreams()
 {
+    VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
     uint8_t buffer[kMaxDPTZStreamsSerializedSize];
     MutableByteSpan bufferSpan(buffer);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::DPTZStreams::Id);
 
-    CHIP_ERROR err = mAttributePersistenceProvider.ReadValue(path, bufferSpan);
+    CHIP_ERROR err = mAttributePersistenceProvider->ReadValue(path, bufferSpan);
 
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {

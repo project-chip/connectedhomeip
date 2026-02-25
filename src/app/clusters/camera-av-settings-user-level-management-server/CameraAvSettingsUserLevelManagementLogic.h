@@ -48,15 +48,12 @@ public:
     /**
      * Creates a server instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
-     * @param aAttributePersistenceProvider The persistence provider used for storing and loading attributes.
-     *                                     Note: the caller must ensure that the provided AttributePersistenceProvider
-     *                                     outlives this instance.
      * @param aEndpointId       The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFeatures         The bitflags value that identifies which features are supported by this instance.
 
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CameraAvSettingsUserLevelMgmtServerLogic(AttributePersistenceProvider & aAttributePersistenceProvider, EndpointId aEndpointId,
+    CameraAvSettingsUserLevelMgmtServerLogic(EndpointId aEndpointId,
                                              BitFlags<CameraAvSettingsUserLevelManagement::Feature> aFeatures, uint8_t aMaxPresets);
     ~CameraAvSettingsUserLevelMgmtServerLogic();
 
@@ -97,7 +94,7 @@ public:
 
     CHIP_ERROR Init() { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR Startup();
+    CHIP_ERROR Startup(AttributePersistenceProvider & aAttributePersistenceProvider);
 
     // Handle any dynamic cleanup required prior to the destructor being called on an app shutdown.  To be invoked by
     // an app as part of its own shutdown sequence and prior to the destruction of the app/delegate.
@@ -219,8 +216,8 @@ public:
     bool IsMoving() const { return mMovementState == CameraAvSettingsUserLevelManagement::PhysicalMovementEnum::kMoving; }
 
 private:
-    CameraAvSettingsUserLevelManagementDelegate * mDelegate = nullptr;
-    AttributePersistenceProvider & mAttributePersistenceProvider;
+    CameraAvSettingsUserLevelManagementDelegate * mDelegate      = nullptr;
+    AttributePersistenceProvider * mAttributePersistenceProvider = nullptr;
     MarkDirtyCallback mMarkDirtyCallback;
 
     // Holding variables for values subject to successful physical movement

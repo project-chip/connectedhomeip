@@ -185,27 +185,19 @@ protected:
 class CameraAvSettingsUserLevelManagementCluster : public DefaultServerCluster
 {
 public:
-    struct Context
-    {
-        AttributePersistenceProvider & attributePersistenceProvider;
-    };
-
     /**
      * Creates a server instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
-     * @param aContext           Context providing injected dependencies (e.g., AttributePersistenceProvider).
-     *                           Note: the caller must ensure that the provided AttributePersistenceProvider
-     *                           outlives this instance.
      * @param aEndpointId       The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFeatures         The bitflags value that identifies which features are supported by this instance.
 
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CameraAvSettingsUserLevelManagementCluster(const Context & aContext, EndpointId aEndpointId,
+    CameraAvSettingsUserLevelManagementCluster(EndpointId aEndpointId,
                                                BitFlags<CameraAvSettingsUserLevelManagement::Feature> aFeatures,
                                                uint8_t aMaxPresets) :
         DefaultServerCluster({ aEndpointId, CameraAvSettingsUserLevelManagement::Id }),
-        mLogic(aContext.attributePersistenceProvider, aEndpointId, aFeatures, aMaxPresets)
+        mLogic(aEndpointId, aFeatures, aMaxPresets)
     {}
 
     CameraAvSettingsUserLevelMgmtServerLogic & GetLogic() { return mLogic; }
