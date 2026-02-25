@@ -855,7 +855,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/security_mbedtls_source/library/x509write_csr.c",
       "${efr32_sdk_root}/security_mbedtls_source/library/psa_crypto_ecp.c",
       "${efr32_sdk_root}/security_mbedtls_source/library/hmac_drbg.c",
-      "${efr32_sdk_root}/security_mbedtls_source/library/ssl_tls.c",
       "${efr32_sdk_root}/security_se_manager/platform/security/sl_component/sli_psec_osal/src/sli_psec_osal_cmsis_rtos2.c",
       "${silabs_gen_folder}/autogen/gatt_db.c",
       "${silabs_gen_folder}/autogen/sl_bluetooth.c",
