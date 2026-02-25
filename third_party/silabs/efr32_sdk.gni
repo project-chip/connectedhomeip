@@ -1004,8 +1004,13 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/security_mbedtls_source/library/psa_crypto_driver_wrappers.h",
         "${efr32_sdk_root}/security_mbedtls_source/library/psa_crypto_pake.c",
         "${efr32_sdk_root}/security_mbedtls_source/library/ssl_tls.c",
+        "${efr32_sdk_root}/security_mbedtls_source/library/ssl_cookie.c",
         "${efr32_sdk_root}/security_mbedtls_source/library/ssl_msg.c",
         "${efr32_sdk_root}/security_mbedtls_source/library/ssl_tls12_client.c",
+        "${efr32_sdk_root}/security_mbedtls_source/library/ssl_tls12_server.c",
+        "${efr32_sdk_root}/security_mbedtls_source/library/ssl_client.c",
+        "${efr32_sdk_root}/security_mbedtls_source/library/ssl_srv.c",
+        "${efr32_sdk_root}/security_mbedtls_source/library/ssl_ciphersuites.c",
       ]
     }
     if (silabs_family == "efr32mg24") {
