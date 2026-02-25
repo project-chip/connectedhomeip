@@ -270,8 +270,6 @@ CMS
 CMSIS
 CMVH
 cn
-CNT
-cnt
 COAP
 codeaurora
 codebase
@@ -778,8 +776,6 @@ isHexString
 isLowerCase
 isort
 isUpperCase
-ITER
-iter
 itemName
 iterable
 itsfoss
@@ -1533,8 +1529,6 @@ tos
 TotalColiformBacteriaConcentrationMeasurement
 totalTests
 TotalTrihalomethanesConcentrationMeasurement
-TP
-tp
 TPK
 trackAlloc
 trackFree
