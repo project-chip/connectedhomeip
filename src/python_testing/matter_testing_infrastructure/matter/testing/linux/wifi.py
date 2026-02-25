@@ -81,7 +81,6 @@ class NANSimulator:
                       iface_name, subscribe_id)
 
         # Process discoveries after a delay
-        await asyncio.sleep(self.discovery_delay)
         await self._process_discoveries(iface_name, subscribe_id, args)
 
     def on_subscribe_cancelled(self, subscribe_id: int):
@@ -227,11 +226,12 @@ class WpaSupplicantMock(threading.Thread):
         # Instance-level mapping of session id -> session info
         _nan_sessions: Dict[int, dict]
 
-        def __init__(self, mock: 'WpaSupplicantMock', index: int):
+        def __init__(self, mock: 'WpaSupplicantMock', index: int, network_ids: list[str]):
             super().__init__()
             self.mock = mock
             self.index = index
             self.path = f"/fi/w1/wpa_supplicant1/Interfaces/{index}"
+            self.networks = [WpaSupplicantMock.WpaNetwork(mock.ssid, index, id) for id in network_ids]
             self.mock_mac = f"00:11:22:33:44:{index:02x}"  # Unique MAC per interface
             self.state = "disconnected"
             self.current_network = "/"
@@ -249,7 +249,7 @@ class WpaSupplicantMock(threading.Thread):
 
         @sdbus.dbus_method_async("a{sv}", "o")
         async def AddNetwork(self, args: DictVariantT) -> str:
-            return self.path + "/Networks/1"
+            return self.networks[0].path
 
         @sdbus.dbus_method_async("o")
         async def SelectNetwork(self, path: str) -> None:
@@ -499,16 +499,16 @@ class WpaSupplicantMock(threading.Thread):
 
     class WpaNetwork(sdbus.DbusInterfaceCommonAsync,
                      interface_name="fi.w1.wpa_supplicant1.Network"):
-        def __init__(self, mock: 'WpaSupplicantMock', interface_index: int):
+        def __init__(self, ssid: str, interface_index: int, network_id: str):
             super().__init__()
-            self.mock = mock
+            self.ssid = ssid
             self.interface_index = interface_index
-            self.path = f"/fi/w1/wpa_supplicant1/Interfaces/{interface_index}/Networks/1"
+            self.path = f"/fi/w1/wpa_supplicant1/Interfaces/{interface_index}/Networks/" + network_id
             self.enabled = False
 
         @sdbus.dbus_property_async("a{sv}")
         def Properties(self) -> DictVariantT:
-            return {"ssid": ("s", self.mock.ssid)}
+            return {"ssid": ("s", self.ssid)}
 
         @sdbus.dbus_property_async("b")
         def Enabled(self) -> bool:
@@ -532,8 +532,8 @@ class WpaSupplicantMock(threading.Thread):
         # Create and export multiple interfaces
         for interface in self.interfaces:
             interface.export_to_dbus(interface.path)
-        for network in self.networks:
-            network.export_to_dbus(network.path)
+            for network in interface.networks:
+                network.export_to_dbus(network.path)
 
         log.info("WiFi-PAF mode enabled with NAN simulator")
 
@@ -548,18 +548,17 @@ class WpaSupplicantMock(threading.Thread):
 
         return -1  # Default to last interface if no app found in the interface name
 
-    def __init__(self, interfaces_info: list[str], ssid: str, password: str, ns: IsolatedNetworkNamespace):
+    def __init__(self, interfaces_info: list[str], ssid: str, password: str, network_ids: list[str], ns: IsolatedNetworkNamespace):
         self.ssid = ssid
         self.password = password
         self.networking = ns
         self.interfaces: list[WpaSupplicantMock.WpaInterface] = []
-        self.networks: list[WpaSupplicantMock.WpaNetwork] = []
 
         self.nan_simulator = NANSimulator(discovery_delay=0.1)
 
-        for idx, info in enumerate(interfaces_info):
-            self.interfaces.append(interface := WpaSupplicantMock.WpaInterface(self, idx))
-            self.networks.append(WpaSupplicantMock.WpaNetwork(self, idx))
+        for interface_idx, info in enumerate(interfaces_info):
+            self.interfaces.append(
+                interface := WpaSupplicantMock.WpaInterface(self, interface_idx, network_ids))
             # Assign interfaces to given names
             self.nan_simulator.register_interface(info, interface)
 
