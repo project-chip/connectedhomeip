@@ -93,7 +93,7 @@ public:
 };
 
 } // namespace
-  //
+
 namespace chip::app::Clusters::BasicInformation {
 
 BasicInformationCluster * GetClusterInstance()
