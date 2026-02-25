@@ -57,7 +57,7 @@ class LinuxNamespacedExecutor(Executor):
             stderr: IO[Any] | LogPipe | None = None):
         try:
             subprocess_ns = self.ns.netns_for_subprocess_kind(subproc.kind)
-            wrapped = subproc.wrap_with(*shlex.split(subprocess_ns.netns_cmd_wrapper))
+            wrapped = subproc.wrap_with(*subprocess_ns.netns_cmd_wrapper)
         except ValueError as e:
             log.warning("%s", e)
             wrapped = subproc

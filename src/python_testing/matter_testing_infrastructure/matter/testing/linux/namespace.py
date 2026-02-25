@@ -70,14 +70,46 @@ class NetworkCmd:
 
 @dataclasses.dataclass
 class NetworkResource:
+    """
+    Represent and track state of an iproute2 object (specifically a link, netns or bridge).
 
+    Allows a customizable list of commands to be run on resource setup/teardown as well as up/down operations.
+
+    A particular command (`NetworkCmd`) can be run either "bare" or inside a specified
+    `NetworkNamespace` based on their `ns_wrapper` flag.
+    """
+
+    """
+    Commands executed when resource setup (creation) is requested.
+
+    For example for a netns it represents an operation like `ip netns add {namespace}`
+    """
     setup_cmds: list[NetworkCmd] = dataclasses.field(default_factory=list)
-    teardown_cmds: list[NetworkCmd] = dataclasses.field(default_factory=list)
-    exists: bool = False
 
+    """
+    Commands executed when resource teardown is requested.
+
+    For example for a link it represents an operation like `ip link delete {device}`
+    """
+    teardown_cmds: list[NetworkCmd] = dataclasses.field(default_factory=list)
+
+    exists: bool = False  # Track existence state
+
+    """
+    Commands executed when resource state is to be up.
+
+    For example for a link it is equivalent to `ip link set up dev {device}`
+    """
     up_cmds: list[NetworkCmd] = dataclasses.field(default_factory=list)
+
+    """
+    Commands executed when resource state is to be down.
+
+    For example for a link it is equivalent to `ip link set down dev {device}`
+    """
     down_cmds: list[NetworkCmd] = dataclasses.field(default_factory=list)
-    up_flag: bool = False
+
+    up_flag: bool = False  # Track up/down state
 
     # Linux netns to which this resource is attached
     ns: NetworkNamespace | None = None
@@ -86,15 +118,18 @@ class NetworkResource:
         if netcmd.ns_wrapper and self.ns:
             cmd = self.ns.wrap_cmd(netcmd.cmd)
         else:
-            cmd = netcmd.cmd
+            cmd = shlex.split(netcmd.cmd)
 
         log.debug("Executing: '%s' check=%s", cmd, check)
         try:
-            subprocess.run(shlex.split(cmd), check=check)
+            subprocess.run(cmd, check=check)
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Failed to execute '{cmd}'. Are you using --privileged if running in docker?") from e
 
     def setup(self):
+        """
+        Run commands to setup a resouce. If resource already exists it is a nop.
+        """
         if not self.exists:
             for netcmd in self.setup_cmds:
                 self._run_netcmd(netcmd)
@@ -102,13 +137,20 @@ class NetworkResource:
             self.exists = True
 
     def teardown(self, check: bool = True):
+        """
+        Run commands to teardown a resouce. If resource does not exist it is a nop.
+        """
         if self.exists:
             for netcmd in self.teardown_cmds:
                 self._run_netcmd(netcmd, check=check)
 
             self.exists = False
+            self.up_flag = False
 
     def up(self):
+        """
+        Run commands to bring up the resource. If resource is already up it is a nop.
+        """
         if not self.up_flag:
             for netcmd in self.up_cmds:
                 self._run_netcmd(netcmd)
@@ -116,6 +158,9 @@ class NetworkResource:
             self.up_flag = True
 
     def down(self):
+        """
+        Run commands to bring down the resource. If resource is already down it is a nop.
+        """
         if self.up_flag:
             for netcmd in self.down_cmds:
                 self._run_netcmd(netcmd)
@@ -141,19 +186,17 @@ class NetworkLink(NetworkResource):
             NetworkCmd("ip link set dev lo up", ns_wrapper=True),
         ]
 
-        if len(self.ipv6_addrs) > 0:
+        up_cmds.extend(NetworkCmd(f"ip addr add {addr} dev {self.link_name}", ns_wrapper=True) for addr in self.ipv4_addrs)
+
+        if self.ipv6_addrs:
             up_cmds.append(NetworkCmd(f"ip -6 addr flush {self.link_name}", ns_wrapper=True))
-
-        up_cmds.extend([NetworkCmd(f"ip addr add {addr} dev {self.link_name}", ns_wrapper=True) for addr in self.ipv4_addrs])
-        up_cmds.extend([NetworkCmd(f"ip -6 a add {addr} dev {self.link_name}", ns_wrapper=True) for addr in self.ipv6_addrs])
-
-        if len(self.ipv6_addrs) > 0:
-            up_cmds.extend([NetworkCmd(cmd, ns_wrapper=True) for cmd in [
+            up_cmds.extend(NetworkCmd(f"ip -6 a add {addr} dev {self.link_name}", ns_wrapper=True) for addr in self.ipv6_addrs)
+            up_cmds.extend(NetworkCmd(cmd, ns_wrapper=True) for cmd in [
                 "sysctl -w net.ipv6.conf.all.forwarding=1",
                 "sysctl -w net.ipv6.conf.default.forwarding=1",
                 f"sysctl -w net.ipv6.conf.{self.link_name}.accept_ra=2",
                 f"sysctl -w net.ipv6.conf.{self.link_name}.accept_ra_rt_info_max_plen=64"
-            ]])
+            ])
 
         super().__init__(
             setup_cmds=[NetworkCmd(f"ip link add {self.link_name} {netns_opt} type veth peer name {self.switch_name}")],
@@ -170,15 +213,14 @@ class NetworkLink(NetworkResource):
         # Wait for 'tentative' address to be gone.
         log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
 
-        cmd = "ip addr"
+        cmd = ['ip', 'addr']
         if self.ns:
             cmd = self.ns.wrap_cmd(cmd)
-        cmd_list = shlex.split(cmd)
 
         # Wait at most 10 seconds.
         start_time = time.time()
         while time.time() - start_time < 10:
-            if 'tentative' not in subprocess.check_output(cmd_list, text=True):
+            if 'tentative' not in subprocess.check_output(cmd, text=True):
                 log.info("No more tentative addresses")
                 return True
             time.sleep(0.1)
@@ -208,19 +250,18 @@ class NetworkBridge(NetworkResource):
 class NetworkNamespace(NetworkResource):
     def __init__(self, name: str) -> None:
         self.name = name
-        super().__init__(setup_cmds=[
-            NetworkCmd(f"ip netns add {name}")
-        ],
-            teardown_cmds=[
-            NetworkCmd(f"ip netns del {name}")
-        ])
+        super().__init__(setup_cmds=[NetworkCmd(f"ip netns add {name}")],
+                         teardown_cmds=[NetworkCmd(f"ip netns del {name}")])
 
     @property
-    def netns_cmd_wrapper(self) -> str:
-        return f"ip netns exec {self.name}"
+    def netns_cmd_wrapper(self) -> list[str]:
+        return ['ip', 'netns', 'exec', f'{self.name}']
 
-    def wrap_cmd(self, cmd: str) -> str:
-        return f"{self.netns_cmd_wrapper} {cmd}"
+    def wrap_cmd(self, cmd: str | list[str]) -> list[str]:
+        if isinstance(cmd, str):
+            cmd = shlex.split(cmd)
+
+        return self.netns_cmd_wrapper + cmd
 
 
 class IsolatedNetworkNamespace:
@@ -292,8 +333,6 @@ class IsolatedNetworkNamespace:
                 return self.app_ns
             case SubprocessKind.TOOL:
                 return self.tool_ns
-            case SubprocessKind.MGMT:
-                return self.tool_ns
             case _:
                 raise ValueError(f"Subprocess kind {kind} doesn't map to a network namespace.")
 
@@ -306,5 +345,5 @@ class IsolatedNetworkNamespace:
         ):
             try:
                 obj.teardown(check=False)
-            except Exception as e:
-                log.warning("Encountered an error during teardown of network resource: %r", e)
+            except Exception:
+                log.exception("Encountered an error during teardown of network resource '{obj}'")

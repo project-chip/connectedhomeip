@@ -47,10 +47,7 @@ try:
 except ImportError:
     # Fallback to manual import from source tree
     with python_path.PythonPath(fallback_import_path, relative_to=__file__):
-        try:
-            from matter.testing.metadata import extract_runs_args
-        except ImportError:
-            extract_runs_args = None  # filtering by app (--app-filter) will not work.
+        from matter.testing.metadata import extract_runs_args
 
 try:
     from matter.testing.tasks import SubprocessKind

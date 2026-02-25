@@ -17,7 +17,6 @@
 import logging
 import os
 import re
-import shlex
 import subprocess
 import threading
 from typing import Optional, Pattern
@@ -42,9 +41,9 @@ class ThreadBorderRouter:
         self._link_name_app = ns.app_link.link_name
 
         radio_url = f'spinel+hdlc+forkpty:///usr/bin/env?forkpty-arg=ot-rcp&forkpty-arg={self.NODE_ID}'
-        cmd = self._netns_app.wrap_cmd(f"otbr-agent -d7 -v '-B{self._link_name_app}' '{radio_url}'")
+        cmd = self._netns_app.wrap_cmd(['otbr-agent', '-d7', '-v', f'-B{self._link_name_app}', radio_url])
 
-        self._otbr = subprocess.Popen(shlex.split(cmd),
+        self._otbr = subprocess.Popen(cmd,
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.STDOUT,
                                       text=True,
@@ -93,7 +92,7 @@ class ThreadBorderRouter:
 
     def get_border_agent_port(self) -> int:
         cmd = self._netns_app.wrap_cmd('ot-ctl ba port')
-        output = subprocess.check_output(shlex.split(cmd), text=True)
+        output = subprocess.check_output(cmd, text=True)
         # ot-ctl output includes the port number followed by "Done"
         # Using regex to find the first number in the output
         match = re.search(r'(\d+)', output)
