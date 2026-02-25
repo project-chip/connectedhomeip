@@ -28,11 +28,7 @@
 
 #if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ApplicationLauncher {
-namespace Chef {
+namespace chip::app::Clusters::ApplicationLauncher::Chef {
 
 // PlatformDelegate Implementation
 
@@ -301,10 +297,6 @@ bool AppDelegate::Match(const Application & application)
     return true;
 }
 
-} // namespace Chef
-} // namespace ApplicationLauncher
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::ApplicationLauncher::Chef
 
 #endif // MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT

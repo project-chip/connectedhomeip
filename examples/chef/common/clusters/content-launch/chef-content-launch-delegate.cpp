@@ -26,12 +26,7 @@
 
 #if MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::ContentLauncher;
-
-typedef DataModel::DecodableList<ParameterType> SearchParameters;
+typedef chip::app::DataModel::DecodableList<ParameterType> SearchParameters;
 
 namespace {
 
@@ -44,15 +39,15 @@ bool checkContentMatch(const ContentEntry & content, const SearchParameters & pa
     ChipLogProgress(Zcl, "    Available params:");
     for (auto it = content.begin(); it != content.end(); ++it)
     {
-        ChipLogProgress(Zcl, "        type=%d value=%s", to_underlying(it->type), NullTerminated(it->value).c_str());
+        ChipLogProgress(Zcl, "        type=%d value=%s", chip::to_underlying(it->type), chip::NullTerminated(it->value).c_str());
     }
     auto required_it = params.begin();
     ChipLogProgress(Zcl, "    Looking for params:");
     while (required_it.Next())
     {
         auto & requiredParam = required_it.GetValue();
-        ChipLogProgress(Zcl, "        Looking for param: type=%d value=%s", to_underlying(requiredParam.type),
-                        NullTerminated(requiredParam.value).c_str());
+        ChipLogProgress(Zcl, "        Looking for param: type=%d value=%s", chip::to_underlying(requiredParam.type),
+                        chip::NullTerminated(requiredParam.value).c_str());
         bool found = std::any_of(content.begin(), content.end(), [requiredParam](const ParameterType & availableParam) {
             return requiredParam.type == availableParam.type && requiredParam.value.data_equal(availableParam.value);
         });
@@ -69,11 +64,7 @@ bool checkContentMatch(const ContentEntry & content, const SearchParameters & pa
 
 } // namespace
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ContentLauncher {
-namespace Chef {
+namespace chip::app::Clusters::ContentLauncher::Chef {
 
 void ChefDelegate::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
                                        const chip::app::DataModel::DecodableList<ParameterType> & parameterList, bool autoplay,
@@ -162,10 +153,6 @@ void ChefDelegate::Register()
     SetDefaultDelegate(mEndpointId, this);
 }
 
-} // namespace Chef
-} // namespace ContentLauncher
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::ContentLauncher::Chef
 
 #endif // MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT

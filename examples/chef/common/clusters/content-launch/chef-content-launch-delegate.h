@@ -36,12 +36,7 @@ using PlaybackPreferencesType = chip::app::Clusters::ContentLauncher::Structs::P
 
 typedef Span<const ParameterType> ContentEntry;
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ContentLauncher {
-
-namespace Chef {
+namespace chip::app::Clusters::ContentLauncher::Chef {
 
 // Default application constants.
 static constexpr uint32_t kEndpointFeatureMap = to_underlying(Feature::kContentSearch) | to_underlying(Feature::kURLPlayback);
@@ -149,10 +144,6 @@ private:
     Span<const ContentEntry> mLaunchableContent;
 };
 
-} // namespace Chef
-} // namespace ContentLauncher
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::ContentLauncher::Chef
 
 #endif // MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
