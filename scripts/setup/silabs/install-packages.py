@@ -104,6 +104,7 @@ def download_slt_cli():
         logger.error("Failed to download/extract slt-cli: %s", e)
         sys.exit(1)
 
+
 def update_slt_cli(slt_cli_path):
     """Update SLT CLI to latest version."""
     update_cmd = [slt_cli_path, "update", "--self"]
@@ -118,16 +119,16 @@ def update_slt_cli(slt_cli_path):
 
 
 def get_pkg_manifest_paths():
-    """Return paths to sisdk-pkg.slt and wiseconnect-pkg.slt (lock files used automatically alongside)."""
+    """Return paths to sisdk-pkg.lock and wiseconnect-pkg.slt (lock files used automatically alongside)."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     return [
-        os.path.join(script_dir, "sisdk-pkg.lock"),
         os.path.join(script_dir, "wiseconnect-pkg.slt"),
+        os.path.join(script_dir, "sisdk-pkg.lock"),
     ]
 
 
 def install_sdk_packages(slt_cli_path):
-    """Install packages from sisdk-pkg.slt and wiseconnect-pkg.slt."""
+    """Install packages from sisdk-pkg.lock and wiseconnect-pkg.slt."""
     for pkg_path in get_pkg_manifest_paths():
         if not os.path.isfile(pkg_path):
             logger.error("Package manifest not found at %s", pkg_path)
@@ -205,7 +206,7 @@ def setup_slt_environment(verbose=False):
     update_slt_cli(slt_cli_path)
     install_sdk_packages(slt_cli_path)
 
-    simplicity_sdk_path = slt_where(slt_cli_path, "simplicity-sdk")
+    simplicity_sdk_path = slt_where(slt_cli_path, "simplicity-sdk/2025.12.1-alpha")
     wiseconnect_path = slt_where(slt_cli_path, "wiseconnect")
     create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path)
 
