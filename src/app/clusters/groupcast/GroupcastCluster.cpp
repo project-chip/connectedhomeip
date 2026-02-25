@@ -59,6 +59,13 @@ DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::R
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
+CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    mLogic.SetServerContext(mContext);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR GroupcastCluster::Attributes(const ConcreteClusterPath & path,
                                         ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
@@ -75,12 +82,13 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
 
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::UnsupportedCommand;
 
+    const chip::Access::SubjectDescriptor subjectDescriptor = handler->GetSubjectDescriptor();
     switch (request.path.mCommandId)
     {
     case Groupcast::Commands::JoinGroup::Id: {
         Groupcast::Commands::JoinGroup::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        status = mLogic.JoinGroup(fabric_index, data);
+        status = mLogic.JoinGroup(fabric_index, data, subjectDescriptor);
     }
     break;
     case Groupcast::Commands::LeaveGroup::Id: {
@@ -88,7 +96,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         Groupcast::Commands::LeaveGroupResponse::Type response;
         GroupcastLogic::EndpointList endpoints;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        status = mLogic.LeaveGroup(fabric_index, data, endpoints);
+        status = mLogic.LeaveGroup(fabric_index, data, endpoints, subjectDescriptor);
         if (Protocols::InteractionModel::Status::Success == status)
         {
             NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
@@ -108,7 +116,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     case Groupcast::Commands::ConfigureAuxiliaryACL::Id: {
         Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        status = mLogic.ConfigureAuxiliaryACL(fabric_index, data);
+        status = mLogic.ConfigureAuxiliaryACL(fabric_index, data, subjectDescriptor);
     }
     break;
     case Groupcast::Commands::GroupcastTesting::Id: {

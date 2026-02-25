@@ -1388,4 +1388,107 @@ TEST_F(TestGroupcastCluster, TestGroupcastTestingCommand)
     // Enable Sender Testing with duration
 }
 
+TEST_F(TestGroupcastCluster, TestAuxiliaryAccessUpdatedEvent)
+{
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints[] = { 1 };
+    const GroupId kGroupId        = 0x1234;
+    const KeysetId kKeyset        = 0xabcd;
+
+    ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    auto & logOnlyEvents = mTestContext.EventsGenerator();
+
+    // 1. Test JoinGroup with useAuxiliaryACL = true -> Should generate event
+    {
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupId;
+        data.keySetID        = kKeyset;
+        data.key             = MakeOptional(ByteSpan(key));
+        data.useAuxiliaryACL = MakeOptional(true);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(event.value().eventOptions.mPath.mClusterId, Clusters::AccessControl::Id);
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Clusters::AccessControl::Events::AuxiliaryAccessUpdated::Id);
+
+        Clusters::AccessControl::Events::AuxiliaryAccessUpdated::DecodableType decodedEvent;
+        ASSERT_EQ(event.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
+        EXPECT_EQ(decodedEvent.fabricIndex, kTestFabricIndex);
+    }
+
+    // 2. Test ConfigureAuxiliaryACL with no change -> Should NOT generate event
+    {
+        Commands::ConfigureAuxiliaryACL::Type data;
+        data.groupID         = kGroupId;
+        data.useAuxiliaryACL = true;
+
+        auto result = tester.Invoke(Commands::ConfigureAuxiliaryACL::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // 3. Test ConfigureAuxiliaryACL with change (true to false) -> Should generate event
+    {
+        Commands::ConfigureAuxiliaryACL::Type data;
+        data.groupID         = kGroupId;
+        data.useAuxiliaryACL = false;
+
+        auto result = tester.Invoke(Commands::ConfigureAuxiliaryACL::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Clusters::AccessControl::Events::AuxiliaryAccessUpdated::Id);
+    }
+
+    // 4. Test LeaveGroup with endpoints (partial remove) -> Should NOT generate event
+    {
+        Commands::LeaveGroup::Type data;
+        data.groupID   = kGroupId;
+        data.endpoints = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints)));
+
+        auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // Re-join with auxiliary ACL for LeaveGroup test
+    {
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupId;
+        data.keySetID        = kKeyset;
+        data.useAuxiliaryACL = MakeOptional(true);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent(); // Clear the event from JoinGroup
+        ASSERT_TRUE(event.has_value());
+    }
+
+    // 5. Test LeaveGroup (whole group) -> Should generate event
+    {
+        Commands::LeaveGroup::Type data;
+        data.groupID = kGroupId;
+
+        auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Clusters::AccessControl::Events::AuxiliaryAccessUpdated::Id);
+    }
+}
+
 } // namespace

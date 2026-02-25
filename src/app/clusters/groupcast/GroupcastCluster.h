@@ -34,11 +34,11 @@ class GroupcastCluster : public DefaultServerCluster, public GroupcastLogic::Lis
 {
 public:
     GroupcastCluster(GroupcastContext && context) :
-        DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mContext(std::move(context)), mLogic(mContext),
+        DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mGroupcastContext(std::move(context)), mLogic(mGroupcastContext),
         mMembershipChangedTimer(*this), mGroupcastTestingTimer(*this)
     {}
     GroupcastCluster(GroupcastContext && context, BitFlags<Groupcast::Feature> features) :
-        DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mContext(std::move(context)), mLogic(mContext, features),
+        DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mGroupcastContext(std::move(context)), mLogic(mGroupcastContext, features),
         mMembershipChangedTimer(*this), mGroupcastTestingTimer(*this)
     {}
     virtual ~GroupcastCluster() {}
@@ -66,7 +66,7 @@ private:
     void OnUsedMcastAddrCountChange() override;
     TimerDelegate & GetTimerDelegate() const { return mContext.timerDelegate; }
 
-    GroupcastContext mContext;
+    GroupcastContext mGroupcastContext;
     GroupcastLogic mLogic;
 
     Groupcast::GroupcastTestingEnum mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;

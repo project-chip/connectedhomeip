@@ -2,6 +2,12 @@
 #include <access/AccessControl.h>
 #include <app/util/endpoint-config-api.h>
 #include <credentials/GroupDataProvider.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <clusters/AccessControl/Events.h>
+
+using chip::Protocols::InteractionModel::Status;
+using namespace chip::Credentials;
 
 namespace chip {
 namespace app {
@@ -119,6 +125,7 @@ CHIP_ERROR GroupcastLogic::ReadMaxMembershipCount(EndpointId endpoint, Attribute
     return aEncoder.Encode(groups.getMaxMembershipCount());
 }
 
+<<<<<<< HEAD
 CHIP_ERROR GroupcastLogic::ReadMaxMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     GroupDataProvider & groups = Provider();
@@ -131,6 +138,10 @@ CHIP_ERROR GroupcastLogic::ReadUsedMcastAddrCount(EndpointId endpoint, Attribute
 }
 
 Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data)
+=======
+Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data,
+                                 const chip::Access::SubjectDescriptor & subjectDescriptor)
+>>>>>>> b7926c91a7 (Create event, but failing tests)
 {
     GroupDataProvider & groups = Provider();
     CHIP_ERROR err             = CHIP_NO_ERROR;
@@ -232,11 +243,16 @@ Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Comm
         }
     }
 
+    if (data.useAuxiliaryACL.HasValue() && data.useAuxiliaryACL.Value())
+    {
+        EmitAuxiliaryAccessUpdated(subjectDescriptor);
+    }
+
     return Status::Success;
 }
 
 Status GroupcastLogic::LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                                  EndpointList & endpoints)
+                                  EndpointList & endpoints, const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     GroupDataProvider & groups = Provider();
     Status err                 = Status::Success;
@@ -253,14 +269,14 @@ Status GroupcastLogic::LeaveGroup(FabricIndex fabric_index, const Groupcast::Com
         while (iter->Next(info) && (Status::Success == err))
         {
             // For leave group, the leaveGroupResponse SHALL NOT contain the endpoints that were removed.
-            err = RemoveGroup(fabric_index, info.group_id, data, nullptr /* endpoints */);
+            err = RemoveGroup(fabric_index, info.group_id, data, nullptr /* endpoints */, subjectDescriptor);
         }
         iter->Release();
     }
     else
     {
         // Modify specific group
-        err = RemoveGroup(fabric_index, data.groupID, data, &endpoints);
+        err = RemoveGroup(fabric_index, data.groupID, data, &endpoints, subjectDescriptor);
     }
 
     return err;
@@ -278,7 +294,8 @@ Status GroupcastLogic::UpdateGroupKey(FabricIndex fabric_index, const Groupcast:
 }
 
 Status GroupcastLogic::ConfigureAuxiliaryACL(FabricIndex fabric_index,
-                                             const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data)
+                                             const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data,
+                                             const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     GroupDataProvider & groups = Provider();
     CHIP_ERROR err             = CHIP_NO_ERROR;
@@ -291,8 +308,11 @@ Status GroupcastLogic::ConfigureAuxiliaryACL(FabricIndex fabric_index,
     err = groups.GetGroupInfo(fabric_index, data.groupID, info);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::NotFound);
 
+    bool hadAuxiliaryACL = (info.flags & chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL)) != 0;
+    bool hasAuxiliaryACL = data.useAuxiliaryACL;
+
     // Update group info
-    if (data.useAuxiliaryACL)
+    if (hasAuxiliaryACL)
     {
         info.flags |= chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL);
     }
@@ -302,6 +322,11 @@ Status GroupcastLogic::ConfigureAuxiliaryACL(FabricIndex fabric_index,
     }
     err = groups.SetGroupInfo(fabric_index, info);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+
+    if (hadAuxiliaryACL != hasAuxiliaryACL)
+    {
+        EmitAuxiliaryAccessUpdated(subjectDescriptor);
+    }
 
     return Status::Success;
 }
@@ -357,10 +382,17 @@ Status GroupcastLogic::SetKeySet(FabricIndex fabric_index, GroupId group_id, Key
 }
 
 Status GroupcastLogic::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
-                                   const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList * endpoints)
+                                   const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList * endpoints,
+                                   const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     GroupDataProvider & groups = Provider();
     Status stat                = Status::Success;
+
+    GroupInfo info;
+    CHIP_ERROR err = groups.GetGroupInfo(fabric_index, group_id, info);
+    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::NotFound);
+
+    bool hadAuxiliaryACL = (info.flags & chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL)) != 0;
 
     if (data.endpoints.HasValue())
     {
@@ -398,6 +430,11 @@ Status GroupcastLogic::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
         CHIP_ERROR err = groups.RemoveGroupInfo(fabric_index, group_id);
         VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
         VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+    }
+
+    if (hadAuxiliaryACL)
+    {
+        EmitAuxiliaryAccessUpdated(subjectDescriptor);
     }
 
     return Status::Success;
@@ -498,6 +535,24 @@ void GroupcastLogic::NotifyUsedMcastAddrCountOnChange()
             mListener->OnUsedMcastAddrCountChange();
         }
     }
+}
+
+void GroupcastLogic::EmitAuxiliaryAccessUpdated(const chip::Access::SubjectDescriptor & subjectDescriptor)
+{
+    VerifyOrReturn(mServerContext != nullptr);
+
+    AccessControl::Events::AuxiliaryAccessUpdated::Type event;
+    event.fabricIndex = subjectDescriptor.fabricIndex;
+    if (subjectDescriptor.subject != kUndefinedNodeId)
+    {
+        event.adminNodeID.SetNonNull(subjectDescriptor.subject);
+    }
+    else
+    {
+        event.adminNodeID.SetNull();
+    }
+
+    (void) mServerContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 } // namespace Clusters

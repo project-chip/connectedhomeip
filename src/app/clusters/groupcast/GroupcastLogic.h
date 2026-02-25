@@ -17,8 +17,10 @@
 #pragma once
 
 #include "GroupcastContext.h"
+#include <access/SubjectDescriptor.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/server-cluster/ServerClusterInterface.h>
 #include <app/server/Server.h>
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groupcast/ClusterId.h>
@@ -75,17 +77,21 @@ public:
     ~GroupcastLogic() override;
     const BitFlags<Groupcast::Feature> & Features() const { return mFeatures; }
 
+    void SetServerContext(ServerClusterContext * context) { mServerContext = context; }
+
     CHIP_ERROR ReadMembership(const chip::Access::SubjectDescriptor * subject, EndpointId endpoint,
                               AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadMaxMembershipCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadMaxMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadUsedMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 
-    Status JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data);
+    Status JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data,
+                     const chip::Access::SubjectDescriptor & subjectDescriptor);
     Status LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                      EndpointList & endpoints);
+                      EndpointList & endpoints, const chip::Access::SubjectDescriptor & subjectDescriptor);
     Status UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
-    Status ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
+    Status ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data,
+                                 const chip::Access::SubjectDescriptor & subjectDescriptor);
 
     void SetDataModelProvider(DataModel::Provider & provider) { mDataModelProvider = &provider; }
     void ResetDataModelProvider() { mDataModelProvider = nullptr; }
@@ -100,7 +106,7 @@ private:
 
     Status SetKeySet(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id, const chip::Optional<chip::ByteSpan> & key);
     Status RemoveGroup(FabricIndex fabric_index, GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                       EndpointList * endpoints);
+                       EndpointList * endpoints, const chip::Access::SubjectDescriptor & subjectDescriptor);
     Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id, EndpointList * endpoints);
     uint16_t GetUsedMcastAddrCount();
     // GroupListener implementation
@@ -110,11 +116,14 @@ private:
     void NotifyUsedMcastAddrCountOnChange();
     void NotifyMembershipChanged();
 
+    void EmitAuxiliaryAccessUpdated(const chip::Access::SubjectDescriptor & subjectDescriptor);
+
     GroupcastContext & mContext;
     const BitFlags<Groupcast::Feature> mFeatures;
     DataModel::Provider * mDataModelProvider = nullptr;
     uint16_t mUsedMcastAddrCount             = 0;
     Listener * mListener                     = nullptr;
+    ServerClusterContext * mServerContext = nullptr;
 };
 
 } // namespace Clusters
