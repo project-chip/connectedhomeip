@@ -544,7 +544,7 @@ template("siwx917_sdk") {
     }
 
     if (sl_si91x_crypto_flavor == "tinycrypt") {
-      _mbedtls_root = "${efr32_sdk_root}/openthread_stack/util/third_party/ot-br-posix/third_party/openthread/repo/third_party/mbedtls/repo"
+      _mbedtls_root = "${efr32_sdk_root}/openthread_stack/util/third_part/openthread/third_party/mbedtls/repo"
 
       config("siwx917_tinycrypt_config") {
         defines = [

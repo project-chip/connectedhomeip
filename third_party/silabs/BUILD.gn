@@ -137,6 +137,7 @@ if (wifi_soc != true) {  # CCP board
         "${openthread_root}/examples/platforms/utils/settings.h",
         "${openthread_root}/examples/platforms/utils/settings_ram.c",
         "${openthread_root}/examples/platforms/utils/soft_source_match_table.h",
+        "${openthread_root}/src/core/meshcop/secure_transport.cpp",
         "${sl_ot_efr32_root}/alarm.c",
         "${sl_ot_efr32_root}/crypto.c",
         "${sl_ot_efr32_root}/radio_interface.cpp",
