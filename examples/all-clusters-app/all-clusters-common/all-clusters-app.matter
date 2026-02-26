@@ -6313,6 +6313,71 @@ provisional cluster SoilMeasurement = 1072 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This server cluster provides an interface to ambient context sensing functionality. */
+provisional cluster AmbientContextSensing = 1073 {
+  revision 1;
+
+  bitmap Feature : bitmap32 {
+    kHumanActivity = 0x1;
+    kObjectCounting = 0x2;
+    kObjectIdentification = 0x4;
+    kSoundIdentification = 0x8;
+    kPredictedActivity = 0x10;
+  }
+
+  struct AmbientContextTypeStruct {
+    SemanticTagStruct ambientContextSensed[] = 0;
+    optional epoch_s detectionStartTime = 1;
+  }
+
+  struct HoldTimeLimitsStruct {
+    int16u holdTimeMin = 0;
+    int16u holdTimeMax = 1;
+    int16u holdTimeDefault = 2;
+  }
+
+  struct ObjectCountConfigStruct {
+    SemanticTagStruct countingObject = 0;
+    int16u objectCountThreshold = 1;
+  }
+
+  struct PredictedActivityStruct {
+    epoch_s startTimestamp = 0;
+    epoch_s endTimestamp = 1;
+    optional SemanticTagStruct ambientContextType[] = 2;
+    optional boolean crowdDetected = 3;
+    optional int8u crowdCount = 4;
+    percent confidence = 5;
+  }
+
+  info event AmbientContextDetectStarted = 0 {
+    optional AmbientContextTypeStruct ambientContextType[] = 0;
+    optional int16u objectCount = 1;
+  }
+
+  info event AmbientContextDetectEnded = 1 {
+    event_no startEventNumber = 0;
+  }
+
+  readonly attribute optional boolean humanActivityDetected = 0;
+  readonly attribute optional boolean objectIdentified = 1;
+  readonly attribute optional boolean audioContextDetected = 2;
+  readonly attribute optional AmbientContextTypeStruct ambientContextType[] = 3;
+  readonly attribute optional SemanticTagStruct ambientContextTypeSupported[] = 4;
+  readonly attribute optional boolean objectCountReached = 5;
+  attribute access(write: manage) optional ObjectCountConfigStruct objectCountConfig = 6;
+  readonly attribute optional int16u objectCount = 7;
+  attribute int8u simultaneousDetectionLimit = 8;
+  attribute access(write: manage) int16u holdTime = 9;
+  readonly attribute HoldTimeLimitsStruct holdTimeLimits = 10;
+  readonly attribute optional PredictedActivityStruct predictedActivity[] = 11;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 cluster WakeOnLan = 1283 {
   revision 1;
@@ -8600,6 +8665,28 @@ endpoint 1 {
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
+  }
+
+  server cluster AmbientContextSensing {
+    emits event AmbientContextDetectStarted;
+    emits event AmbientContextDetectEnded;
+    ram      attribute humanActivityDetected;
+    ram      attribute objectIdentified;
+    ram      attribute audioContextDetected;
+    callback attribute ambientContextType;
+    callback attribute ambientContextTypeSupported;
+    ram      attribute objectCountReached;
+    callback attribute objectCountConfig;
+    ram      attribute objectCount;
+    ram      attribute simultaneousDetectionLimit;
+    ram      attribute holdTime;
+    callback attribute holdTimeLimits;
+    callback attribute predictedActivity;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 31;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster WakeOnLan {

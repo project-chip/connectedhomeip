@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
+#include <app/clusters/ambient-context-sensing-server/CodegenIntegration.h>
 #include <app/clusters/boolean-state-configuration-server/CodegenIntegration.h>
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
@@ -290,6 +291,335 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
 }
 
 /**
+ * Named pipe handler for setting supported ambient context type
+ *
+ * Usage example:
+ *   echo '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":2},{"TypeId":74,
+ * "TagId":2},{"TypeId":75, "TagId":2}]}'> /tmp/acs_fifo
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SetAmbientContextSupport"
+ *   - "EndpointId": ID of endpoint
+ *   - "AmbientContextType": array of the supported ambient context sensing type
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+void SetAmbientContextSupportType(Json::Value & jsonValue)
+{
+    if (!HasNumericField(jsonValue, "EndpointId"))
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing or invalid value for EndpointId: %s", inputJson.c_str());
+        return;
+    }
+
+    // values to the supported status
+    EndpointId endpointId                  = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    AmbientContextSensingCluster * cluster = AmbientContextSensing::FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        ChipLogError(NotSpecified, "Failed to find AmbientContextSensingCluster");
+        return;
+    }
+
+    // Validate AmbientContextType exists and is an array
+    if (!jsonValue.isMember("AmbientContextType") || !jsonValue["AmbientContextType"].isArray())
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing or invalid AmbientContextType array: %s", inputJson.c_str());
+        return;
+    }
+
+    const Json::Value & actArray = jsonValue["AmbientContextType"];
+    if (actArray.empty())
+    {
+        ChipLogError(NotSpecified, "AmbientContextType array is empty");
+        return;
+    }
+
+    std::vector<Globals::Structs::SemanticTagStruct::Type> semanticTags;
+    semanticTags.reserve(actArray.size());
+    for (Json::ArrayIndex i = 0; i < actArray.size(); i++)
+    {
+        Json::Value item = actArray[i];
+        if (!item.isObject() || !HasNumericField(item, "TypeId") || !HasNumericField(item, "TagId"))
+        {
+            std::string inputJson = jsonValue.toStyledString();
+            ChipLogError(NotSpecified, "AmbientContextType[%u], missing/invalid TypeId/TagId in %s", static_cast<uint16_t>(i),
+                         inputJson.c_str());
+            return;
+        }
+        uint8_t typeId = static_cast<uint8_t>(item["TypeId"].asUInt());
+        uint8_t tagId  = static_cast<uint8_t>(item["TagId"].asUInt());
+
+        ChipLogDetail(NotSpecified, "AmbientContextType[%u] -> (TypeId, TagId) = (%u, %u)", static_cast<unsigned>(i), typeId,
+                      tagId);
+        Globals::Structs::SemanticTagStruct::Type tag = {
+            .namespaceID = typeId,
+            .tag         = tagId,
+        };
+        semanticTags.push_back(tag);
+    }
+    TEMPORARY_RETURN_IGNORED cluster->SetAmbientContextTypeSupported(semanticTags);
+}
+
+static bool GetAmbientContextType(const Json::Value & actArray,
+                                  std::vector<Globals::Structs::SemanticTagStruct::Type> & semanticTags)
+{
+    // Validate AmbientContextType exists and is an array
+    if (actArray.empty())
+    {
+        ChipLogError(NotSpecified, "AmbientContextType array is empty");
+        return false;
+    }
+
+    for (Json::ArrayIndex i = 0; i < actArray.size(); i++)
+    {
+        Json::Value item = actArray[i];
+        if (!item.isObject() || !HasNumericField(item, "TypeId") || !HasNumericField(item, "TagId"))
+        {
+            ChipLogError(NotSpecified, "AmbientContextType[%u], missing/invalid TypeId/TagId", static_cast<uint16_t>(i));
+            return false;
+        }
+        uint8_t typeId = static_cast<uint8_t>(item["TypeId"].asUInt());
+        uint8_t tagId  = static_cast<uint8_t>(item["TagId"].asUInt());
+
+        Globals::Structs::SemanticTagStruct::Type tag = {
+            .namespaceID = typeId,
+            .tag         = tagId,
+        };
+        semanticTags.push_back(tag);
+    }
+    return true;
+}
+
+/**
+ * Named pipe handler for ambient context detection
+ *
+ * Usage example:
+ *   echo '{"Name":"AddAmbientContextDetect","EndpointId":1,"AmbientContextType":[{"TypeId":75, "TagId":2},{"TypeId":73,
+ * "TagId":2}],"DetectionStartTime":1769138873}'> /tmp/acs_fifo
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "AddAmbientContextDetect"
+ *   - "EndpointId": ID of endpoint
+ *   - "AmbientContextType": Type of the detection
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+void SetAmbientContextDetect(Json::Value & jsonValue)
+{
+    if (!HasNumericField(jsonValue, "EndpointId"))
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing or invalid value for EndpointId: %s", inputJson.c_str());
+        return;
+    }
+
+    // values to update the detection status
+    EndpointId endpointId                  = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    AmbientContextSensingCluster * cluster = AmbientContextSensing::FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        ChipLogError(NotSpecified, "Failed to find AmbientContextSensingCluster");
+        return;
+    }
+
+    // Validate AmbientContextType exists and is an array
+    if (!jsonValue.isMember("AmbientContextType") || !jsonValue["AmbientContextType"].isArray())
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing or invalid AmbientContextType array: %s", inputJson.c_str());
+        return;
+    }
+
+    Json::Value & actArray = jsonValue["AmbientContextType"];
+    if (actArray.empty())
+    {
+        ChipLogError(NotSpecified, "AmbientContextType array is empty");
+        return;
+    }
+
+    std::vector<Globals::Structs::SemanticTagStruct::Type> semanticTags;
+    semanticTags.reserve(actArray.size());
+    if (!GetAmbientContextType(actArray, semanticTags))
+    {
+        ChipLogError(NotSpecified, "Incorrect or unsupported detection");
+        return;
+    }
+
+    auto tagList =
+        chip::app::DataModel::List<const Globals::Structs::SemanticTagStruct::Type>(semanticTags.data(), semanticTags.size());
+    AmbientContextSensing::Structs::AmbientContextTypeStruct::Type ACSType = { .ambientContextSensed = tagList };
+    // Add DetectionStartTime
+    if (HasNumericField(jsonValue, "DetectionStartTime"))
+    {
+        ACSType.detectionStartTime.SetValue(jsonValue["DetectionStartTime"].asUInt());
+    }
+
+    TEMPORARY_RETURN_IGNORED cluster->AddDetection(ACSType);
+}
+
+/**
+ * Named pipe handler for predicted activity
+ *
+ * Usage example:
+ *   echo '{"Name":"SetPredictedActivity","EndpointId":1,"PredAct":[
+ {"StartTStamp":1769138873, "EndTStamp":1769138883,"AmbientContextType":[{"TypeId":75, "TagId":2},{"TypeId":73,
+ "TagId":2}],"CrowdDetect":true,"CrowdCnt":10,"Conf":89},
+ {"StartTStamp":1769138893, "EndTStamp":1769138903,"AmbientContextType":[{"TypeId":75, "TagId":3},{"TypeId":73,
+ "TagId":4}],"CrowdDetect":true,"CrowdCnt":11,"Conf":90}
+ ]}'> /tmp/acs_fifo
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SetPredictedActivity"
+ *   - "EndpointId": ID of endpoint
+ *   - "PredAct": The server's prediction of upcoming changes
+ *   - "StartTStamp": Start Timestamp
+ *   - "EndTStamp": End Timestamp
+ *   - "AmbientContextType": Type of the detection
+ *   - "CrowdDetect": The predicted state of the CrowdDetected attribute
+ *   - "CrowdCnt": The predicted value of the CrowdCount attribute
+ *   - "Conf": Confidence level for the predicted activity state
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+void SetPredictedActivity(Json::Value & jsonValue)
+{
+    if (!HasNumericField(jsonValue, "EndpointId"))
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing or invalid value for EndpointId: %s", inputJson.c_str());
+        return;
+    }
+    // values to update the predicted status
+    EndpointId endpointId                  = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    AmbientContextSensingCluster * cluster = AmbientContextSensing::FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        ChipLogError(NotSpecified, "Failed to find AmbientContextSensingCluster");
+        return;
+    }
+    // Validate PredictedActivity exists and is an array
+    if (!jsonValue.isMember("PredAct") || !jsonValue["PredAct"].isArray())
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing or invalid PredictedActivity array: %s", inputJson.c_str());
+        return;
+    }
+
+    const Json::Value & predictArray = jsonValue["PredAct"];
+    if (predictArray.empty())
+    {
+        ChipLogError(NotSpecified, "PredictedActivity array is empty");
+        return;
+    }
+
+    std::vector<AmbientContextSensing::Structs::PredictedActivityStruct::Type> predictedActivityArray;
+    predictedActivityArray.reserve(predictArray.size());
+    std::vector<std::vector<Globals::Structs::SemanticTagStruct::Type>> allSemanticTags;
+    allSemanticTags.resize(predictArray.size());
+
+    for (Json::ArrayIndex i = 0; i < predictArray.size(); i++)
+    {
+        Json::Value item = predictArray[i];
+        if (!item.isObject() || !HasNumericField(item, "StartTStamp") || !HasNumericField(item, "EndTStamp") ||
+            !HasNumericField(item, "Conf"))
+        {
+            std::string inputJson = jsonValue.toStyledString();
+            ChipLogError(NotSpecified, "PredictedActivity[%u], missing/invalid fields in %s", static_cast<uint16_t>(i),
+                         inputJson.c_str());
+            return;
+        }
+        AmbientContextSensing::Structs::PredictedActivityStruct::Type predictAct;
+        predictAct.startTimestamp = item["StartTStamp"].asUInt();
+        predictAct.endTimestamp   = item["EndTStamp"].asUInt();
+        VerifyOrReturn(predictAct.startTimestamp < predictAct.endTimestamp,
+                       ChipLogError(DeviceLayer, "PredictedActivity, incorrect startTime/endTime"));
+        predictAct.confidence = static_cast<chip::Percent>(item["Conf"].asUInt());
+
+        if (item.isMember("CrowdDetect"))
+        {
+            predictAct.crowdDetected.SetValue(static_cast<bool>(item["CrowdDetect"].asBool()));
+        }
+        if (HasNumericField(item, "CrowdCnt"))
+        {
+            predictAct.crowdCount.SetValue(static_cast<uint8_t>(item["CrowdCnt"].asUInt()));
+        }
+        // Validate AmbientContextType exists and is an array
+        if (!item.isMember("AmbientContextType") || !item["AmbientContextType"].isArray())
+        {
+            std::string inputJson = item.toStyledString();
+            ChipLogError(NotSpecified, "Missing or invalid AmbientContextType array: %s", inputJson.c_str());
+            return;
+        }
+        const Json::Value & actArray = item["AmbientContextType"];
+        if (actArray.empty())
+        {
+            ChipLogError(NotSpecified, "AmbientContextType array is empty");
+            return;
+        }
+        auto & semanticTags = allSemanticTags[i];
+        semanticTags.clear();
+        semanticTags.reserve(actArray.size());
+        if (!GetAmbientContextType(actArray, semanticTags))
+        {
+            ChipLogError(NotSpecified, "Incorrect or unsupported detection");
+            return;
+        }
+
+        auto tagList =
+            chip::app::DataModel::List<const Globals::Structs::SemanticTagStruct::Type>(semanticTags.data(), semanticTags.size());
+        predictAct.ambientContextType.SetValue(tagList);
+        predictedActivityArray.push_back(predictAct);
+    }
+    TEMPORARY_RETURN_IGNORED cluster->SetPredictedActivity(predictedActivityArray);
+}
+
+/**
+ * Named pipe handler for setting object count
+ *
+ * Usage example:
+ *   echo '{"Name":"SetObjCount","EndpointId":1,"ObjectCount":11}'> /tmp/acs_fifo
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SetObjCount"
+ *   - "EndpointId": ID of endpoint
+ *   - "ObjectCount": value of ObjectCount
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+void SetObjectCount(Json::Value & jsonValue)
+{
+    if (!HasNumericField(jsonValue, "EndpointId"))
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing or invalid value for EndpointId: %s", inputJson.c_str());
+        return;
+    }
+
+    // Set the values of ObjectCount
+    EndpointId endpointId                  = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    AmbientContextSensingCluster * cluster = AmbientContextSensing::FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        ChipLogError(NotSpecified, "Failed to find AmbientContextSensingCluster");
+        return;
+    }
+
+    uint16_t objCount;
+    // Add ObjectCount
+    if (!HasNumericField(jsonValue, "ObjectCount"))
+    {
+        ChipLogError(NotSpecified, "Missing or invalid value for ObjectCount");
+        return;
+    }
+    objCount = static_cast<uint16_t>(jsonValue["ObjectCount"].asUInt());
+
+    TEMPORARY_RETURN_IGNORED cluster->SetObjectCount(objCount);
+}
+
+/**
  * Named pipe handler for simulating a Door Opening.
  *
  * Usage example:
@@ -540,6 +870,22 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
         {
             ChipLogError(NotSpecified, "Invalid Occupancy state to set.");
         }
+    }
+    else if (name == "SetAmbientContextSupport")
+    {
+        SetAmbientContextSupportType(self->mJsonValue);
+    }
+    else if (name == "AddAmbientContextDetect")
+    {
+        SetAmbientContextDetect(self->mJsonValue);
+    }
+    else if (name == "SetPredictedActivity")
+    {
+        SetPredictedActivity(self->mJsonValue);
+    }
+    else if (name == "SetObjCount")
+    {
+        SetObjectCount(self->mJsonValue);
     }
     else if (name == "SetRefrigeratorDoorStatus")
     {
