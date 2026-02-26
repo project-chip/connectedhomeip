@@ -722,7 +722,7 @@ TEST_F(TestAmbientContextSensingCluster, TestPredictActivity)
             .endTimestamp       = now + 20,
             .ambientContextType = MakeOptional(kACTList),
             .crowdDetected      = MakeOptional(false),
-            .crowdCount         = MakeOptional(1u),
+            .crowdCount         = MakeOptional<uint8_t>(1),
             .confidence         = 100,
         },
     };
