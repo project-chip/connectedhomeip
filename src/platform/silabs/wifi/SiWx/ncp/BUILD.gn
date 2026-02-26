@@ -38,6 +38,7 @@ config("siwx-ncp-config") {
     "${wifi_sdk_root}/components/sli_wifi/inc",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
     "${wifi_sdk_root}/components/sli_buffer_manager/inc",
+    "${efr32_sdk_root}/platform_core/platform/service/mem_pool/inc/",
   ]
 }
 
