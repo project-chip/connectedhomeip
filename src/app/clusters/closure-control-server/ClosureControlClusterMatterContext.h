@@ -40,14 +40,6 @@ public:
     ClosureControlClusterMatterContext(EndpointId endpointId) : mEndpointId(endpointId) {}
     virtual ~ClosureControlClusterMatterContext() = default;
 
-    virtual void MarkDirty(AttributeId attributeId)
-    {
-        MatterReportingAttributeChangeCallback(mEndpointId, Id, attributeId);
-
-        ConcreteAttributePath attributePath(mEndpointId, Id, attributeId);
-        MatterClosureControlClusterServerAttributeChangedCallback(attributePath);
-    }
-
     template <typename EventType>
     CHIP_ERROR GenerateEvent(EventType event)
     {

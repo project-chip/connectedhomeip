@@ -306,7 +306,7 @@ CHIP_ERROR ClosureControlCluster::SetCountdownTime(const DataModel::Nullable<Ela
 
     if (markDirty)
     {
-        mMatterContext.MarkDirty(Attributes::CountdownTime::Id);
+        NotifyAttributeChanged(Attributes::CountdownTime::Id);
     }
 
     return CHIP_NO_ERROR;
@@ -331,7 +331,7 @@ CHIP_ERROR ClosureControlCluster::SetMainState(MainStateEnum mainState)
     }
 
     mState.mMainState = mainState;
-    mMatterContext.MarkDirty(Attributes::MainState::Id);
+    NotifyAttributeChanged(Attributes::MainState::Id);
 
     if (!mConformance.HasFeature(Feature::kInstantaneous))
     {
@@ -453,7 +453,7 @@ ClosureControlCluster::SetOverallCurrentState(const DataModel::Nullable<GenericO
     }
 
     mState.mOverallCurrentState = overallCurrentState;
-    mMatterContext.MarkDirty(Attributes::OverallCurrentState::Id);
+    NotifyAttributeChanged(Attributes::OverallCurrentState::Id);
 
     return CHIP_NO_ERROR;
 }
@@ -507,7 +507,7 @@ CHIP_ERROR ClosureControlCluster::SetOverallTargetState(const DataModel::Nullabl
     }
 
     mState.mOverallTargetState = overallTarget;
-    mMatterContext.MarkDirty(Attributes::OverallTargetState::Id);
+    NotifyAttributeChanged(Attributes::OverallTargetState::Id);
 
     return CHIP_NO_ERROR;
 }
@@ -519,7 +519,7 @@ CHIP_ERROR ClosureControlCluster::SetLatchControlModes(const BitFlags<LatchContr
     VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     mState.mLatchControlModes = latchControlModes;
-    mMatterContext.MarkDirty(Attributes::LatchControlModes::Id);
+    NotifyAttributeChanged(Attributes::LatchControlModes::Id);
 
     return CHIP_NO_ERROR;
 }
@@ -539,7 +539,7 @@ CHIP_ERROR ClosureControlCluster::AddErrorToCurrentErrorList(ClosureErrorEnum er
     }
     mState.mCurrentErrorList[mState.mCurrentErrorCount++] = error;
     DataModel::List<const ClosureErrorEnum> currentErrorList(mState.mCurrentErrorList, mState.mCurrentErrorCount);
-    mMatterContext.MarkDirty(Attributes::CurrentErrorList::Id);
+    NotifyAttributeChanged(Attributes::CurrentErrorList::Id);
     ReturnLogErrorOnFailure(GenerateOperationalErrorEvent(currentErrorList));
     return CHIP_NO_ERROR;
 }
@@ -554,7 +554,7 @@ void ClosureControlCluster::ClearCurrentErrorList()
     }
     // Reset the current error count to 0
     mState.mCurrentErrorCount = 0;
-    mMatterContext.MarkDirty(Attributes::CurrentErrorList::Id);
+    NotifyAttributeChanged(Attributes::CurrentErrorList::Id);
 }
 
 // TODO: Move the CountdownTime handling to Delegate
