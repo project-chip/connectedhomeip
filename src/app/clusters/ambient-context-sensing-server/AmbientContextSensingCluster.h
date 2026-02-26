@@ -122,7 +122,7 @@ public:
     CHIP_ERROR AddDetection(const AmbientContextSensingType & sensedEvent);
     DataModel::ActionReturnStatus SetObjectCountConfig(const ObjectCountConfigType & objectCountConfig);
     CHIP_ERROR SetObjectCount(uint16_t objectCount);
-    DataModel::ActionReturnStatus SetSimultaneousDetectionLimit(const uint16_t simultaneousDetectionLimit);
+    DataModel::ActionReturnStatus SetSimultaneousDetectionLimit(const uint8_t simultaneousDetectionLimit);
     DataModel::ActionReturnStatus SetHoldTime(uint16_t holdTime);
     uint16_t GetHoldTime() const { return mHoldTime; }
     void SetHoldTimeLimits(const AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);

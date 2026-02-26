@@ -120,7 +120,7 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::WriteAttribute(const
         return SetObjectCountConfig(newObjCountConfig);
     }
     case SimultaneousDetectionLimit::Id: {
-        uint16_t newSimultaneousDetectionLimit;
+        uint8_t newSimultaneousDetectionLimit;
         ReturnErrorOnFailure(decoder.Decode(newSimultaneousDetectionLimit));
         return SetSimultaneousDetectionLimit(newSimultaneousDetectionLimit);
     }
@@ -181,7 +181,7 @@ CHIP_ERROR AmbientContextSensingCluster::AddDetection(const AmbientContextSensin
     if (mAmbientContextTypeList.size() >= mSimultaneousDetectionLimit)
     {
         // One more space is required
-        uint8_t itemsToRemove = mAmbientContextTypeList.size() - mSimultaneousDetectionLimit + 1;
+        uint8_t itemsToRemove = static_cast<uint8_t>(mAmbientContextTypeList.size() - mSimultaneousDetectionLimit + 1);
         for (auto i = 0; i < itemsToRemove; i++)
         {
             mAmbientContextTypeList.pop_back();
@@ -313,7 +313,7 @@ CHIP_ERROR AmbientContextSensingCluster::SetObjectCount(uint16_t objectCount)
     return CHIP_NO_ERROR;
 }
 
-DataModel::ActionReturnStatus AmbientContextSensingCluster::SetSimultaneousDetectionLimit(const uint16_t simultaneousDetectionLimit)
+DataModel::ActionReturnStatus AmbientContextSensingCluster::SetSimultaneousDetectionLimit(const uint8_t simultaneousDetectionLimit)
 {
     VerifyOrReturnError((simultaneousDetectionLimit <= kMaxSimultaneousDetectionLimit),
                         Protocols::InteractionModel::Status::ConstraintError);
@@ -328,7 +328,7 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetSimultaneousDetec
         return Protocols::InteractionModel::Status::Success;
     }
     // Resize the list of AmbientContextType list if the updated limitation becomes smaller than it's current length
-    uint8_t itemsToRemove = mAmbientContextTypeList.size() - mSimultaneousDetectionLimit;
+    uint8_t itemsToRemove = static_cast<uint8_t>(mAmbientContextTypeList.size() - mSimultaneousDetectionLimit);
     for (auto i = 0; i < itemsToRemove; i++)
     {
         mAmbientContextTypeList.pop_back();
