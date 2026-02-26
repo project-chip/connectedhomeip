@@ -817,8 +817,7 @@ void * bridge_polling_thread(void * context)
             if (ch == 'w')
             {
                 // TC-BRBINFO-3.2 step 3
-                uint32_t configVersion = Light1.GetConfigurationVersion() + 1;
-                Light1.SetConfigurationVersion(configVersion);
+                Light1.IncreaseConfigurationVersion();
             }
             continue;
         }
@@ -1029,8 +1028,7 @@ void BridgeAppCommandHandler::HandleCommand(intptr_t context)
 
     if (name == "SimulateConfigurationVersionChange")
     {
-        uint32_t configVersion = Light1.GetConfigurationVersion() + 1;
-        Light1.SetConfigurationVersion(configVersion);
+        Light1.IncreaseConfigurationVersion();
     }
     else
     {

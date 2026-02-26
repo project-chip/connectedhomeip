@@ -94,7 +94,6 @@ void Device::SetReachable(bool aReachable)
 
     mBridgedDevice.Cluster().SetReachable(aReachable);
     ChipLogProgress(DeviceLayer, "Device[%s]: %s", mName, aReachable ? "ONLINE" : "OFFLINE");
-    HandleDeviceChange(this, kChanged_Reachable);
 }
 
 void Device::SetName(const char * szName)
@@ -113,22 +112,26 @@ void Device::SetName(const char * szName)
 
 void Device::SetUniqueId(const char * szDeviceUniqueId)
 {
+    if (mBridgedDevice.IsConstructed())
+    {
+        ChipLogError(DeviceLayer, "Unique id is FIXED and cannot be changed after bridged device startup.") return;
+    }
     chip::Platform::CopyString(mUniqueId, szDeviceUniqueId);
     ChipLogProgress(DeviceLayer, "Device[%s]: New UniqueId=\"%s\"", mName, mUniqueId);
 }
 
 void Device::SetLocation(std::string szLocation)
 {
-    bool changed = (mLocation.compare(szLocation) != 0);
-
-    mLocation = szLocation;
-
-    ChipLogProgress(DeviceLayer, "Device[%s]: Location=\"%s\"", mName, mLocation.c_str());
-
-    if (changed)
+    if (mBridgedDevice.IsConstructed())
     {
-        HandleDeviceChange(this, kChanged_Location);
+        // TODO: set location in bridge device
     }
+    else
+    {
+        // retain for when the cluster is constructed
+        mLocation = szLocation;
+    }
+    ChipLogProgress(DeviceLayer, "Device[%s]: Location=\"%s\"", mName, mLocation.c_str());
 }
 
 void Device::GenerateUniqueId()
@@ -150,21 +153,16 @@ void Device::GenerateUniqueId()
 
 uint32_t Device::GetConfigurationVersion()
 {
-    return mConfigurationVersion;
+    VerifyOrReturnValue(mBridgedDevice.IsConstructed(), 0);
+    return mBridgedDevice.Cluster().GetConfigurationVersion();
 }
 
-void Device::SetConfigurationVersion(uint32_t configurationVersion)
+void Device::IncreaseConfigurationVersion()
 {
-    bool changed = (mConfigurationVersion != configurationVersion);
-
-    mConfigurationVersion = configurationVersion;
-
-    ChipLogProgress(DeviceLayer, "Device[%s]: New Configuration Version=\"%d\"", mName, mConfigurationVersion);
-
-    if (changed)
-    {
-        HandleDeviceChange(this, kChanged_ConfigurationVersion);
-    }
+    VerifyOrReturn(mBridgedDevice.IsConstructed());
+    LogErrorOnFailure(mBridgedDevice.Cluster().IncreaseConfigurationVersion());
+    ChipLogProgress(DeviceLayer, "Device[%s]: New Configuration Version=\"%d\"", mName,
+                    mBridgedDevice.Cluster().GetConfigurationVersion());
 }
 
 DeviceOnOff::DeviceOnOff(const char * szDeviceName, std::string szLocation) : Device(szDeviceName, szLocation)

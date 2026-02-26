@@ -37,11 +37,9 @@ public:
 
     enum Changed_t
     {
-        kChanged_Reachable            = 1u << 0,
-        kChanged_Location             = 1u << 1,
-        kChanged_Name                 = 1u << 2,
-        kChanged_ConfigurationVersion = 1u << 3,
-        kChanged_Last                 = kChanged_ConfigurationVersion,
+        // NOTE: device changes are handled automatically by the cluster, there
+        //       is no separate notification needed
+        kChanged_Last = 0,
     } Changed;
 
     Device(const char * szDeviceName, std::string szLocation);
@@ -54,7 +52,7 @@ public:
     void SetLocation(std::string szLocation);
     void GenerateUniqueId();
     uint32_t GetConfigurationVersion();
-    void SetConfigurationVersion(uint32_t configurationVersion);
+    void IncreaseConfigurationVersion();
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
     inline void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; };
@@ -81,7 +79,6 @@ private:
 protected:
     char mName[kDeviceNameSize + 1]         = { 0 };
     char mUniqueId[kDeviceUniqueIdSize + 1] = { 0 };
-    uint32_t mConfigurationVersion          = 1;
     std::string mLocation;
     chip::EndpointId mEndpointId = 0;
     chip::EndpointId mParentEndpointId;
