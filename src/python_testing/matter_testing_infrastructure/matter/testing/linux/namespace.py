@@ -346,4 +346,4 @@ class IsolatedNetworkNamespace:
             try:
                 obj.teardown(check=False)
             except Exception:
-                log.exception("Encountered an error during teardown of network resource '{obj}'")
+                log.exception("Encountered an error during teardown of network resource '%s'", obj)
