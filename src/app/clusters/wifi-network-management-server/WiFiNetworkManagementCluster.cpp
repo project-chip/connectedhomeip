@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,11 +17,15 @@
 
 #include "WiFiNetworkManagementCluster.h"
 
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandlerInterfaceRegistry.h>
-#include <app/InteractionModelEngine.h>
-#include <app/reporting/reporting.h>
+#include <access/SubjectDescriptor.h>
+#include <app/CommandHandler.h>
+#include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/WiFiNetworkManagement/Attributes.h>
+#include <clusters/WiFiNetworkManagement/CommandIds.h>
+#include <clusters/WiFiNetworkManagement/Commands.h>
+#include <clusters/WiFiNetworkManagement/Metadata.h>
 #include <lib/support/CodeUtils.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemClock.h>
 
 #include <algorithm>
@@ -30,13 +34,9 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::WiFiNetworkManagement;
 using namespace chip::app::Clusters::WiFiNetworkManagement::Attributes;
 using namespace chip::app::Clusters::WiFiNetworkManagement::Commands;
-using IMStatus = chip::Protocols::InteractionModel::Status;
-
-namespace chip {
-namespace app {
-namespace Clusters {
 
 namespace {
 
@@ -57,52 +57,37 @@ bool IsValidWpaPersonalCredential(ByteSpan credential)
 
 } // namespace
 
-WiFiNetworkManagementServer::WiFiNetworkManagementServer(EndpointId endpoint) :
-    AttributeAccessInterface(MakeOptional(endpoint), WiFiNetworkManagement::Id),
-    CommandHandlerInterface(MakeOptional(endpoint), WiFiNetworkManagement::Id)
-{}
+namespace chip::app::Clusters {
 
-WiFiNetworkManagementServer::~WiFiNetworkManagementServer()
+CHIP_ERROR WiFiNetworkManagementCluster::ClearNetworkCredentials()
 {
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
-    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-}
+    VerifyOrReturnError(HasNetworkCredentials(), CHIP_NO_ERROR);
 
-CHIP_ERROR WiFiNetworkManagementServer::Init()
-{
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    mSsid.clear();
+    RETURN_SAFELY_IGNORED mPassphrase.SetLength(0);
+
+    NotifyAttributeChanged(Ssid::Id);
+    NotifyAttributeChanged(PassphraseSurrogate::Id);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiNetworkManagementServer::ClearNetworkCredentials()
+CHIP_ERROR WiFiNetworkManagementCluster::SetNetworkCredentials(ByteSpan ssid, ByteSpan passphrase)
 {
-    VerifyOrReturnError(HaveNetworkCredentials(), CHIP_NO_ERROR);
-
-    mSsidLen = 0;
-    TEMPORARY_RETURN_IGNORED mPassphrase.SetLength(0);
-    MatterReportingAttributeChangeCallback(GetEndpointId(), WiFiNetworkManagement::Id, Ssid::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR WiFiNetworkManagementServer::SetNetworkCredentials(ByteSpan ssid, ByteSpan passphrase)
-{
-    VerifyOrReturnError(1 <= ssid.size() && ssid.size() <= sizeof(mSsid), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(1 <= ssid.size() && ssid.size() <= mSsid.capacity(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsValidWpaPersonalCredential(passphrase), CHIP_ERROR_INVALID_ARGUMENT);
 
-    bool ssidChanged       = !SsidSpan().data_equal(ssid);
-    bool passphraseChanged = !PassphraseSpan().data_equal(passphrase);
+    bool ssidChanged       = !Ssid().data_equal(ssid);
+    bool passphraseChanged = !Passphrase().data_equal(passphrase);
     VerifyOrReturnError(ssidChanged || passphraseChanged, CHIP_NO_ERROR);
 
-    memcpy(mSsid, ssid.data(), ssid.size());
-    mSsidLen = static_cast<decltype(mSsidLen)>(ssid.size());
+    mSsid.assign(ssid);
 
-    TEMPORARY_RETURN_IGNORED mPassphrase.SetLength(passphrase.size());
+    RETURN_SAFELY_IGNORED mPassphrase.SetLength(passphrase.size());
     memcpy(mPassphrase.Bytes(), passphrase.data(), passphrase.size());
 
     if (ssidChanged)
     {
-        MatterReportingAttributeChangeCallback(GetEndpointId(), WiFiNetworkManagement::Id, Ssid::Id);
+        NotifyAttributeChanged(Ssid::Id);
     }
     if (passphraseChanged)
     {
@@ -112,58 +97,74 @@ CHIP_ERROR WiFiNetworkManagementServer::SetNetworkCredentials(ByteSpan ssid, Byt
         {
             mPassphraseSurrogate = std::max(mPassphraseSurrogate, realtime.count());
         }
-        MatterReportingAttributeChangeCallback(GetEndpointId(), WiFiNetworkManagement::Id, PassphraseSurrogate::Id);
+        NotifyAttributeChanged(PassphraseSurrogate::Id);
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiNetworkManagementServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+DataModel::ActionReturnStatus WiFiNetworkManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                          AttributeValueEncoder & encoder)
 {
-    switch (aPath.mAttributeId)
+    switch (request.path.mAttributeId)
     {
+    case FeatureMap::Id:
+        return encoder.Encode<uint32_t>(0);
+    case ClusterRevision::Id:
+        return encoder.Encode(WiFiNetworkManagement::kRevision);
     case Ssid::Id:
-        return HaveNetworkCredentials() ? aEncoder.Encode(SsidSpan()) : aEncoder.EncodeNull();
+        return HasNetworkCredentials() ? encoder.Encode(Ssid()) : encoder.EncodeNull();
     case PassphraseSurrogate::Id:
-        return HaveNetworkCredentials() ? aEncoder.Encode(mPassphraseSurrogate) : aEncoder.EncodeNull();
-    }
-    return CHIP_NO_ERROR;
-}
-
-void WiFiNetworkManagementServer::InvokeCommand(HandlerContext & ctx)
-{
-    switch (ctx.mRequestPath.mCommandId)
-    {
-    case NetworkPassphraseRequest::Id:
-        HandleCommand<NetworkPassphraseRequest::DecodableType>(
-            ctx, [this](HandlerContext & aCtx, const auto & req) { HandleNetworkPassphraseRequest(aCtx, req); });
-        return;
+        return HasNetworkCredentials() ? encoder.Encode(mPassphraseSurrogate) : encoder.EncodeNull();
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
 }
 
-void WiFiNetworkManagementServer::HandleNetworkPassphraseRequest(HandlerContext & ctx,
-                                                                 const NetworkPassphraseRequest::DecodableType & req)
+std::optional<DataModel::ActionReturnStatus> WiFiNetworkManagementCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                         TLV::TLVReader & input_arguments,
+                                                                                         CommandHandler * handler)
 {
-    if (ctx.mCommandHandler.GetSubjectDescriptor().authMode != Access::AuthMode::kCase)
+    switch (request.path.mCommandId)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMStatus::UnsupportedAccess);
-        return;
-    }
+    case NetworkPassphraseRequest::Id: {
+        VerifyOrReturnValue(request.subjectDescriptor->authMode == Access::AuthMode::kCase,
+                            Protocols::InteractionModel::Status::UnsupportedAccess);
+        VerifyOrReturnValue(HasNetworkCredentials(), Protocols::InteractionModel::Status::InvalidInState);
 
-    if (HaveNetworkCredentials())
-    {
         NetworkPassphraseResponse::Type response;
         response.passphrase = mPassphrase.Span();
-        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        handler->AddResponse(request.path, response);
+        return std::nullopt;
     }
-    else
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMStatus::InvalidInState);
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
 }
 
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+CHIP_ERROR WiFiNetworkManagementCluster::Attributes(const ConcreteClusterPath & path,
+                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span<const DataModel::AttributeEntry>(WiFiNetworkManagement::Attributes::kMandatoryMetadata),
+                              Span<const AttributeListBuilder::OptionalAttributeEntry>());
+}
 
-void MatterWiFiNetworkManagementPluginServerInitCallback() {}
-void MatterWiFiNetworkManagementPluginServerShutdownCallback() {}
+CHIP_ERROR WiFiNetworkManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                          ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+        WiFiNetworkManagement::Commands::NetworkPassphraseRequest::kMetadataEntry,
+    };
+    return builder.AppendElements(kAcceptedCommands);
+}
+
+CHIP_ERROR WiFiNetworkManagementCluster::GeneratedCommands(const ConcreteClusterPath & path,
+                                                           ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    static constexpr CommandId kGeneratedCommands[] = {
+        WiFiNetworkManagement::Commands::NetworkPassphraseResponse::Id,
+    };
+    return builder.AppendElements(kGeneratedCommands);
+}
+
+} // namespace chip::app::Clusters

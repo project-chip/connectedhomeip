@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/controller/flags.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/system/system.gni")
@@ -152,9 +153,16 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER=${chip_use_transitional_device_instance_info_provider}",
       "CHIP_DEVICE_CONFIG_ENABLE_DYNAMIC_MRP_CONFIG=${chip_device_config_enable_dynamic_mrp_config}",
       "CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF=${chip_device_config_enable_wifipaf}",
-      "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=${chip_device_config_enable_joint_fabric}",
       "CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP=${chip_device_config_enable_thread_meshcop}",
     ]
+
+    _enable_joint_fabric = chip_device_config_enable_joint_fabric
+    if (chip_build_tests &&
+        (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
+      _enable_joint_fabric = true
+    }
+    defines +=
+        [ "CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC=${_enable_joint_fabric}" ]
 
     public_deps = [ "${chip_root}/src/app/icd/server:icd-server-config" ]
 

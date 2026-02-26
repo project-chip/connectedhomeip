@@ -71,18 +71,14 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(val != kWiFiStationMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(val != kWiFiStationMode_NotSupported, CHIP_ERROR_INVALID_ARGUMENT);
 
     if (val != kWiFiStationMode_ApplicationControlled)
     {
         /* Remain consistent with the previous logic to enable STA mode here.
            TODO: Set STA mode according to `val`. */
-        err = Internal::ESP32Utils::EnableStationMode();
-        SuccessOrExit(err);
-
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        ReturnErrorOnFailure(Internal::ESP32Utils::EnableStationMode());
+        ReturnErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL));
     }
 
     if (mWiFiStationMode != val)
@@ -93,8 +89,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 
     mWiFiStationMode = val;
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
@@ -112,7 +107,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
             ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %" CHIP_ERROR_FORMAT, error.Format());
             return;
         }
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL));
     }
 }
 
@@ -408,7 +403,7 @@ void ConnectivityManagerImpl::OnWiFiPlatformEvent(const ChipDeviceEvent * event)
                 break;
             case WIFI_EVENT_STA_DISCONNECTED:
                 ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_DISCONNECTED");
-                TEMPORARY_RETURN_IGNORED NetworkCommissioning::ESPWiFiDriver::GetInstance().SetLastDisconnectReason(event);
+                LogErrorOnFailure(NetworkCommissioning::ESPWiFiDriver::GetInstance().SetLastDisconnectReason(event));
                 if (mWiFiStationState == kWiFiStationState_Connecting)
                 {
                     ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
@@ -455,13 +450,13 @@ void ConnectivityManagerImpl::_OnWiFiScanDone()
 {
     // Schedule a call to DriveStationState method in case a station connect attempt was
     // deferred because the scan was in progress.
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL));
 }
 
 void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 {
     // Schedule a call to the DriveStationState method to adjust the station state as needed.
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL));
 }
 
 void ConnectivityManagerImpl::DriveStationState()

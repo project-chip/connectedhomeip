@@ -92,6 +92,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/soil-measurement-server/tests",
       "${chip_root}/src/app/clusters/switch-server/tests",
+      "${chip_root}/src/app/clusters/temperature-measurement-server/tests",
       "${chip_root}/src/app/clusters/thread-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/time-format-localization-server/tests",
       "${chip_root}/src/app/clusters/time-synchronization-server/tests",
@@ -103,6 +104,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/webrtc-transport-provider-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
+      "${chip_root}/src/app/clusters/wifi-network-management-server/tests",
       "${chip_root}/src/app/clusters/zone-management-server/tests",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
@@ -233,8 +235,10 @@ if (chip_build_tests) {
     deps = []
     tests = []
 
+    # NXP: EVSE tests depend on ot-simulation; missing headers
+    # in ot-nxp OpenThread cause build failure, so we exclude them here.
     if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
-        current_os != "android") {
+        chip_device_platform != "nxp" && current_os != "android") {
       tests += [ "${chip_root}/examples/evse-app/evse-common/tests" ]
     }
   }

@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2025-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent to app_config_dependent_sources.gni
+# This block adds the codegen integration sources
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/wifi-network-management-server.h"
+)
+
+# These are the things that BUILD.gn dependencies would pull
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
