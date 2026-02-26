@@ -158,7 +158,7 @@ Alchemy: v1.6.9
         </greaterOrEqualTerm>
       </mandatoryConform>
     </attribute>
-    <attribute code="0x0017" side="server" name="DeviceLocation" define="DEVICE_LOCATION" type="LocationDescriptorStruct">
+    <attribute code="0x0017" side="server" name="DeviceLocation" define="DEVICE_LOCATION" type="LocationDescriptorStruct" optional="true">
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
