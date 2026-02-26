@@ -28,8 +28,9 @@
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/server/Server.h>
+#include <DEMConfig.h>
 #include <DEMManufacturerDelegate.h>
-#include <EnergyManagementAppCommonMain.h>
+#include <EnergyEvseMain.h>
 #include <EVSEManufacturerImpl.h>
 #include "UserInterfaceFeedback.h"
 
@@ -50,7 +51,6 @@ using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
-using namespace chip::app::Clusters::WaterHeaterManagement;
 using namespace chip::app::Clusters::EnergyEvse;
 
 constexpr chip::EndpointId kEvseEndpoint        = 1;
@@ -99,7 +99,6 @@ namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
 
-// Keep track of the parsed featureMap option
 static chip::BitMask<Feature> sFeatureMap(Feature::kPowerAdjustment, Feature::kPowerForecastReporting,
                                           Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
                                           Feature::kConstraintBasedAdjustment);
@@ -311,9 +310,11 @@ void EVSEApp::AppTask::UpdateChargingInternal(intptr_t arg)
         VerifyOrDieWithMsg(mn != nullptr, AppServer, "EVSEManufacturer is null");
         EnergyEvseDelegate * dg = mn->GetEvseDelegate();
         VerifyOrDieWithMsg(dg != nullptr, AppServer, "EVSE Delegate is null");
+        EnergyEvse::Instance * instance = dg->GetInstance();
+        VerifyOrDieWithMsg(instance != nullptr, AppServer, "EVSE Instance is null");
         gStateOfCharge = (gTotalEnergyImported * 100) / gFullChargingEnergy;
         dg->HwSetState(StateEnum::kPluggedInDemand);
-        TEMPORARY_RETURN_IGNORED dg->SetStateOfCharge(gStateOfCharge);
+        TEMPORARY_RETURN_IGNORED instance->SetStateOfCharge(gStateOfCharge);
     }
 
 	if(gTotalEnergyImported >= gFullChargingEnergy)

@@ -37,6 +37,8 @@ get_filename_component(NXP_EXAMPLE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common REALPA
 get_filename_component(NXP_EXAMPLE_ZAP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/zap REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
 get_filename_component(EXAMPLE_PLATFORM_NXP_COMMON_DIR ${CHIP_ROOT}/examples/platform/nxp/common REALPATH)
+get_filename_component(EVSE_COMMON_DIR ${CHIP_ROOT}/examples/evse-app/evse-common REALPATH)
+get_filename_component(ENERGY_MGMT_DIR ${CHIP_ROOT}/examples/energy-management REALPATH)
 get_filename_component(NXP_MATTER_SUPPORT_DIR ${CHIP_ROOT}/third_party/nxp/nxp_matter_support REALPATH)
 
 # Add the CHIP stack & NXP port libs as an external module
@@ -82,11 +84,11 @@ target_include_directories(app
     ${ALL_CLUSTERS_COMMON_DIR}/include
     ${NXP_EXAMPLE_DIR}/main/include
     ${GEN_DIR}/app-common
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/common/include
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/device-energy-management/include
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/energy-evse/include
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/energy-reporting/include
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/water-heater/include
+    ${EVSE_COMMON_DIR}/include
+    ${ENERGY_MGMT_DIR}/device-energy-management/include
+    ${ENERGY_MGMT_DIR}/electrical-sensor/include
+    ${ENERGY_MGMT_DIR}/utils/include
+    ${ENERGY_MGMT_DIR}/energy-management-triggers
 )
 
 target_sources(app
@@ -96,24 +98,23 @@ target_sources(app
     ${NXP_EXAMPLE_DIR}/main/DeviceCallbacks.cpp
     ${NXP_EXAMPLE_DIR}/main/ZclCallbacks.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/common/src/EnergyManagementAppCommonMain.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/device-energy-management/src/DEMTestEventTriggers.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/device-energy-management/src/device-energy-management-mode.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/energy-evse/src/ChargingTargetsMemMgr.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/energy-evse/src/EVSEManufacturerImpl.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseDelegateImpl.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseEventTriggers.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseMain.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseManager.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseTargetsStore.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/energy-evse/src/energy-evse-mode.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/energy-reporting/src/EnergyReportingEventTriggers.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/energy-reporting/src/FakeReadings.cpp
-    ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/energy-reporting/src/PowerTopologyDelegate.cpp
+    ${EVSE_COMMON_DIR}/src/ChargingTargetsMemMgr.cpp
+    ${EVSE_COMMON_DIR}/src/energy-evse-mode.cpp
+    ${EVSE_COMMON_DIR}/src/EnergyEvseDelegateImpl.cpp
+    ${EVSE_COMMON_DIR}/src/EnergyEvseEventTriggers.cpp
+    ${EVSE_COMMON_DIR}/src/EnergyEvseMain.cpp
+    ${EVSE_COMMON_DIR}/src/EnergyEvseManager.cpp
+    ${EVSE_COMMON_DIR}/src/EnergyEvseTargetsStore.cpp
+    ${EVSE_COMMON_DIR}/src/EVSEManufacturerImpl.cpp
+    ${ENERGY_MGMT_DIR}/device-energy-management/src/device-energy-management-mode.cpp
+    ${ENERGY_MGMT_DIR}/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp
+    ${ENERGY_MGMT_DIR}/device-energy-management/src/DeviceEnergyManagementManager.cpp
+    ${ENERGY_MGMT_DIR}/electrical-sensor/src/ElectricalPowerMeasurementDelegate.cpp
+    ${ENERGY_MGMT_DIR}/electrical-sensor/src/PowerTopologyDelegate.cpp
+    ${ENERGY_MGMT_DIR}/utils/src/EnergyTimeUtils.cpp
+    ${ENERGY_MGMT_DIR}/energy-management-triggers/DEMTestEventTriggers.cpp
+    ${ENERGY_MGMT_DIR}/energy-management-triggers/EnergyReportingEventTriggers.cpp
+    ${ENERGY_MGMT_DIR}/energy-management-triggers/FakeReadings.cpp
 )
 
 if(CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
@@ -121,7 +122,7 @@ if(CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
 elseif(CONFIG_CHIP_WIFI AND NOT CONFIG_NET_L2_OPENTHREAD)
     chip_configure_data_model(app
         INCLUDE_SERVER
-        ZAP_FILE ${CHIP_ROOT}/examples/energy-management-app/nxp/zap/energy-management-app_wifi.zap
+        ZAP_FILE ${CHIP_ROOT}/examples/evse-app/nxp/zap/evse-app_wifi.zap
     )
 elseif(CONFIG_NET_L2_OPENTHREAD AND NOT CONFIG_CHIP_WIFI)
     message(FATAL_ERROR "Thread configuration is not supported in this application.")
