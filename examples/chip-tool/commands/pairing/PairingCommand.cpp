@@ -280,6 +280,7 @@ CHIP_ERROR PairingCommand::PaseWithCode(NodeId remoteId)
 CHIP_ERROR
 PairingCommand::GetMeshcopCommissionParams(chip::Controller::SetUpCodePairer::ThreadMeshcopCommissionParameters & meshcopParams)
 {
+#if CHIP_SUPPORT_THREAD_MESHCOP
     Inet::IPAddress ipAddr;
     VerifyOrReturnError(Inet::IPAddress::FromString(mThreadBaHost.Value(), ipAddr), CHIP_ERROR_INVALID_ADDRESS);
     meshcopParams.mBorderAgentAddress = PeerAddress::ThreadMeshcop(ipAddr, mThreadBaPort.Value());
@@ -287,6 +288,9 @@ PairingCommand::GetMeshcopCommissionParams(chip::Controller::SetUpCodePairer::Th
     ReturnErrorOnFailure(dataset.Init(mOperationalDataset));
     ReturnErrorOnFailure(dataset.GetPSKc(meshcopParams.mPSKcBuffer));
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
 }
 
 CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
