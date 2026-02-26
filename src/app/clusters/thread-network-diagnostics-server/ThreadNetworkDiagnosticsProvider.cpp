@@ -745,7 +745,7 @@ uint16_t GetPanId()
             return aDataset.mPanId;
         }
     }
-#endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+#endif             // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
     return 0xffff; // 0xFFFF is an invalid PAN ID and indicates it is unconfigured/unavailable
 }
 

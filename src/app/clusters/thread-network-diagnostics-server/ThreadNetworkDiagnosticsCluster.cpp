@@ -26,7 +26,6 @@
 #include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceLayer.h>
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -184,7 +183,6 @@ void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatus
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-
 // Notified when the Node’s faults related to a Thread network have changed.
 void ThreadNetworkDiagnosticsCluster::OnNetworkFaultChanged(const GeneralFaults<kMaxNetworkFaults> & previous,
                                                             const GeneralFaults<kMaxNetworkFaults> & current)
@@ -192,8 +190,7 @@ void ThreadNetworkDiagnosticsCluster::OnNetworkFaultChanged(const GeneralFaults<
     if (current.size() > 0)
     {
         [[maybe_unused]] uint8_t latestFault = current.data()[current.size() - 1];
-        ChipLogProgress(Zcl, "ThdDiag: OnNetworkFaultChanged. Latest: %s (%u)", GetNetworkFaultString(latestFault),
-                        latestFault);
+        ChipLogProgress(Zcl, "ThdDiag: OnNetworkFaultChanged. Latest: %s (%u)", GetNetworkFaultString(latestFault), latestFault);
     }
     else
     {
