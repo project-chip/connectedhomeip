@@ -31,7 +31,7 @@ using namespace chip;
 using namespace chip::app::Clusters::Actions;
 
 // We cannot use the proxy since we need ember support.
-// As a result we update the version at runtime by fetching the basicinfo cluster
+// As a result we update the version at runtime by fetching the Basic Information cluster
 // during processing.
 class EmberBridgeVersionUpdate : public chip::app::Clusters::ConfigurationVersionDelegate
 {
