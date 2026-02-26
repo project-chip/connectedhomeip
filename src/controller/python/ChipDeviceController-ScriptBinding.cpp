@@ -519,6 +519,7 @@ struct UnpairDeviceCallback
     chip::Controller::CurrentFabricRemover * mRemover;
 };
 
+#if CHIP_SUPPORT_THREAD_MESHCOP
 CHIP_ERROR GetSetupPasscodeFromOnboardingPayload(const char * onboardingPayload, uint32_t & setupPasscode)
 {
     SetupPayload setupPayload;
@@ -535,6 +536,7 @@ CHIP_ERROR GetSetupPasscodeFromOnboardingPayload(const char * onboardingPayload,
     }
     return CHIP_NO_ERROR;
 }
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
 } // anonymous namespace
 
 PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid,
