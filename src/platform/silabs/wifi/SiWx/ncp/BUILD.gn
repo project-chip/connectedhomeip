@@ -37,6 +37,7 @@ config("siwx-ncp-config") {
     "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sl_log/inc",
     "${wifi_sdk_root}/components/sli_wifi/inc",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
+    "${wifi_sdk_root}/components/sli_buffer_manager/inc",
   ]
 }
 
