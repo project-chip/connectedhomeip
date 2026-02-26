@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <PowerTopologyDelegate.h>
+#include <PowerTopologyDelegateImpl.h>
 
 namespace chip {
 namespace app {

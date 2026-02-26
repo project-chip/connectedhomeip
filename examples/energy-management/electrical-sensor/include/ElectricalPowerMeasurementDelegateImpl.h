@@ -17,7 +17,7 @@
  */
 #pragma once
 
-#include <app/clusters/electrical-power-measurement-server/electrical-power-measurement-server.h>
+#include <app/clusters/electrical-power-measurement-server/CodegenIntegration.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
 

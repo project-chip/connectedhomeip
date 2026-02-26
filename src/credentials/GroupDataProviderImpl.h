@@ -72,6 +72,9 @@ public:
     // Endpoints
     bool HasEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) override;
     CHIP_ERROR AddEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) override;
+    CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id,
+                              GroupCleanupPolicy cleanupPolicy) override;
+    CHIP_ERROR RemoveEndpointAllGroups(FabricIndex fabric_index, EndpointId endpoint_id, GroupCleanupPolicy cleanupPolicy) override;
     CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) override;
     CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, EndpointId endpoint_id) override;
     CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id) override;

@@ -160,10 +160,10 @@ public:
     {
         for (auto & device : mConstructedDevices)
         {
-            device->UnRegister(mDataModelProvider);
+            device->Unregister(mDataModelProvider);
         }
         mConstructedDevices.clear();
-        mRootNode.RootDevice().UnRegister(mDataModelProvider);
+        mRootNode.RootDevice().Unregister(mDataModelProvider);
     }
 
     chip::app::CodeDrivenDataModelProvider & DataModelProvider() { return mDataModelProvider; }

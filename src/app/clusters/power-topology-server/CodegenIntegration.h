@@ -17,8 +17,6 @@
  */
 #pragma once
 
-#include <lib/core/Optional.h>
-
 #include <app/clusters/power-topology-server/PowerTopologyCluster.h>
 #include <app/clusters/power-topology-server/PowerTopologyDelegate.h>
 

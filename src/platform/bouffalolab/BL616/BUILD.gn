@@ -56,9 +56,9 @@ static_library("BL616") {
   }
 
   if (bouffalo_sdk_component_easyflash_enabled) {
-    sources += [ "../common/BLConfig.cpp" ]
+    sources += [ "../common/BflbConfig.cpp" ]
   } else {
-    sources += [ "../common/BLConfig_littlefs.cpp" ]
+    sources += [ "../common/BflbConfig_littlefs.cpp" ]
   }
 
   deps = [
@@ -96,7 +96,7 @@ static_library("BL616") {
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
-      "ThreadStackManagerImpl.cpp",
+      "../common/ThreadStackManagerImpl.cpp",
     ]
 
     if (chip_mdns == "platform") {
@@ -107,6 +107,15 @@ static_library("BL616") {
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
+  }
+
+  if (chip_enable_ethernet) {
+    sources += [ "NetworkCommissioningEthernetDriver.cpp" ]
+
+    deps += [
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/src/lib/dnssd:platform_header",
+    ]
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]

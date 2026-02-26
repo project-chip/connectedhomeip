@@ -23,7 +23,9 @@ namespace chip {
 
 using namespace chip::Crypto;
 
-#define CHIP_SE05x_NODE_OP_KEY_INDEX 0x7E000000
+#define CHIP_SE05x_NODE_OP_KEY_INDEX (SE051H_NODE_OP_KEY_ID - 1)
+#define NUM_NODE_OP_KEY_INDEXES (5)
+
 #define CHIP_SE05x_NODE_OP_REF_KEY_TEMPLATE                                                                                        \
     {                                                                                                                              \
         0xA5, 0xA6, 0xB5, 0xB6, 0xA5, 0xA6, 0xB5, 0xB6, 0x7E, 0x00, 0x00, 0x00                                                     \
@@ -44,6 +46,7 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex f
 
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+    VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     // If a key is pending, we cannot generate for a different fabric index until we commit or revert.
     if ((mPendingFabricIndex != kUndefinedFabricIndex) && (fabricIndex != mPendingFabricIndex))
@@ -56,7 +59,7 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex f
     // Replace previous pending key pair, if any was previously allocated
     ResetPendingKey();
 
-    mPendingKeypair = Platform::New<Crypto::P256Keypair>();
+    mPendingKeypair = Platform::New<Crypto::P256KeypairSE05x>();
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_NO_MEMORY);
 
     hsmKeyId                                        = CHIP_SE05x_NODE_OP_KEY_INDEX + fabricIndex;
@@ -94,6 +97,7 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::RemoveOpKeypairForFabric(FabricInde
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+    VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     uint32_t keyId = CHIP_SE05x_NODE_OP_KEY_INDEX + fabricIndex;
 
@@ -115,6 +119,46 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::RemoveOpKeypairForFabric(FabricInde
     }
 
     return err;
+}
+
+CHIP_ERROR PersistentStorageOpKeystorese05x::SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
+                                                               Crypto::P256ECDSASignature & outSignature) const
+{
+    VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+    VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+
+    ChipLogDetail(Crypto, "PersistentStorageOpKeystorese05x::SignWithOpKeypair :: ECDSA Sign using SE05x ");
+
+    if (mIsPendingKeypairActive && (fabricIndex == mPendingFabricIndex))
+    {
+        VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_INTERNAL);
+        // We have an override key: sign with it!
+        return mPendingKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
+    }
+
+    // Use ExportOpKeypairForFabric from base class directly
+    auto transientOperationalKeypair = Platform::MakeUnique<P256KeypairSE05x>();
+    if (!transientOperationalKeypair)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    P256SerializedKeypair serializedOpKey;
+    // Call base class method directly using 'this'
+    CHIP_ERROR err = const_cast<PersistentStorageOpKeystorese05x *>(this)->ExportOpKeypairForFabric(fabricIndex, serializedOpKey);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_ERROR_INVALID_FABRIC_INDEX;
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "Failed to export keypair for fabric %u: %" CHIP_ERROR_FORMAT, fabricIndex, err.Format());
+    }
+    ReturnErrorOnFailure(err);
+
+    ReturnErrorOnFailure(transientOperationalKeypair->Deserialize(serializedOpKey));
+    return transientOperationalKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
 }
 
 } // namespace chip
