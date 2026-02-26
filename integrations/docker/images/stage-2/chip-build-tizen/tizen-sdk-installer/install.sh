@@ -220,30 +220,25 @@ function download_tizen_sdk_common() {
 
     # Download
     url="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    download "$url" "${COMMON_TIZENSTUDIO_ZIPS[@]}" "${COMMON_TOOLCHAIN_ZIPS[@]}"
+    download "$url" "${TIZEN_STUDIO_COMMON_ZIPS[@]}"
 
     # Tizen Developer Platform Certificate
     url="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
     # Tizen site does not have this package available in version 8.0.
     # Certificates are the same for 7.0 and 8.0, though.
-    download "$url" "${IOT_ZIPS[@]}"
+    download "$url" "${TIZEN_STUDIO_IOT_ZIPS[@]}"
 }
 
 # ------------------------------------------------------------------------------
 # Function for installing common packages for Tizen SDK.
 function install_tizen_sdk_common() {
-
     info "Tizen SDK installation directory: $TIZEN_SDK_ROOT"
 
     info "Installing Tizen Studio CLI..."
-
-    unzip_globs "$TIZEN_SDK_ROOT" COMMON_TIZENSTUDIO_ZIPS
-
-    info "Installing common toolchain files ..."
-    unzip_globs "$TIZEN_SDK_ROOT" COMMON_TOOLCHAIN_ZIPS
+    unzip_globs "$TIZEN_SDK_ROOT" TIZEN_STUDIO_COMMON_ZIPS
 
     info "Installing common IoT files ..."
-    unzip_globs "$TIZEN_SDK_ROOT" IOT_ZIPS
+    unzip_globs "$TIZEN_SDK_ROOT" TIZEN_STUDIO_IOT_ZIPS
 }
 
 function download_tizen_sdk_arm() {
@@ -253,7 +248,7 @@ function download_tizen_sdk_arm() {
 
     # Download
     url="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    download "$url" "${SDK_ARM_TIZENSTUDIO_ZIPS[@]}"
+    download "$url" "${TIZEN_STUDIO_SDK_ARM_ZIPS[@]}"
 
     # Base packages
     url="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/armv7l/"
@@ -270,11 +265,9 @@ function install_tizen_sdk_arm() {
     local sysroot="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core"
 
     info "Installing Tizen ARM SDK..."
-
-    unzip_globs "$TIZEN_SDK_ROOT" SDK_ARM_TIZENSTUDIO_ZIPS
+    unzip_globs "$TIZEN_SDK_ROOT" TIZEN_STUDIO_SDK_ARM_ZIPS
 
     info "Installing Tizen ARM sysroot..."
-
     unrpm_globs "$sysroot" TIZEN_SDK_ARM_BASE_RPMS
     unrpm_globs "$sysroot" TIZEN_SDK_ARM_UNIFIED_RPMS
 
@@ -290,7 +283,7 @@ function download_tizen_sdk_arm64() {
 
     # Download
     url="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    download "$url" "${SDK_ARM64_TIZENSTUDIO_ZIPS[@]}"
+    download "$url" "${TIZEN_STUDIO_SDK_ARM64_ZIPS[@]}"
 
     # Base packages
     url="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/aarch64/"
@@ -307,11 +300,9 @@ function install_tizen_sdk_arm64() {
     local sysroot="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core"
 
     info "Installing Tizen ARM64 SDK..."
-
-    unzip_globs "$TIZEN_SDK_ROOT" SDK_ARM64_TIZENSTUDIO_ZIPS
+    unzip_globs "$TIZEN_SDK_ROOT" TIZEN_STUDIO_SDK_ARM64_ZIPS
 
     info "Installing Tizen ARM64 sysroot..."
-
     unrpm_globs "$sysroot" TIZEN_SDK_ARM64_BASE_RPMS
     unrpm_globs "$sysroot" TIZEN_SDK_ARM64_UNIFIED_RPMS
 
@@ -347,13 +338,13 @@ function install_tizen_sdk_finalize() {
     echo "export TIZEN_SDK_ROOT=\"$(realpath "$TIZEN_SDK_ROOT")\""
 
     if [ "$INSTALL_ARM" = true ]; then
-        echo "export TIZEN_SDK_TOOLCHAIN=\"\$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-14.2\""
+        echo "export TIZEN_SDK_TOOLCHAIN=\"\$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-$TIZEN_STUDIO_GCC_VERSION\""
         echo "export TIZEN_SDK_SYSROOT=\"\$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core\""
         echo "export PATH=\"\$TIZEN_SDK_TOOLCHAIN/bin:\$TIZEN_SDK_ROOT/tools/ide/bin:\$TIZEN_SDK_ROOT/tools:\$PATH\""
     fi
 
     if [ "$INSTALL_ARM64" = true ]; then
-        echo "export TIZEN_SDK_TOOLCHAIN_ARM64=\"\$TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-14.2\""
+        echo "export TIZEN_SDK_TOOLCHAIN_ARM64=\"\$TIZEN_SDK_ROOT/tools/aarch64-linux-gnu-gcc-$TIZEN_STUDIO_GCC_VERSION\""
         echo "export TIZEN_SDK_SYSROOT_ARM64=\"\$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core\""
         echo "export PATH=\"\$TIZEN_SDK_TOOLCHAIN_ARM64/bin:\$TIZEN_SDK_ROOT/tools/ide/bin:\$TIZEN_SDK_ROOT/tools:\$PATH\""
     fi
@@ -456,7 +447,7 @@ done
 # ------------------------------------------------------------------------------
 # Generate zip and RPM lists whose names are dependent upon $TIZEN_VERSION
 
-COMMON_TIZENSTUDIO_ZIPS=(
+TIZEN_STUDIO_COMMON_ZIPS=(
     'certificate-encryptor_1.0.10_ubuntu-64.zip'
     'certificate-generator_0.1.4_ubuntu-64.zip'
     'new-common-cli_2.5.93_ubuntu-64.zip'
@@ -465,25 +456,32 @@ COMMON_TIZENSTUDIO_ZIPS=(
     "tizen-$TIZEN_VERSION-core-add-ons_*_ubuntu-64.zip"
 )
 
-IOT_ZIPS=(
+TIZEN_STUDIO_IOT_ZIPS=(
     "7.0-iot-things-add-ons_*_ubuntu-64.zip"
 )
 
-COMMON_TOOLCHAIN_ZIPS=(
-    'sbi-toolchain-gcc-14.2.cpp.app_2.2.31_ubuntu-64.zip'
-)
-
-SDK_ARM_TIZENSTUDIO_ZIPS=(
-    "cross-arm-gcc-14.2_0.2.16_ubuntu-64.zip"
+TIZEN_STUDIO_SDK_ARM_ZIPS=(
     # Base sysroot
     "tizen-$TIZEN_VERSION-rs-device.core_*_ubuntu-64.zip"
 )
 
-SDK_ARM64_TIZENSTUDIO_ZIPS=(
-    "cross-aarch64-gcc-14.2_0.2.16_ubuntu-64.zip"
+TIZEN_STUDIO_SDK_ARM64_ZIPS=(
     # Base sysroot
     "tizen-$TIZEN_VERSION-rs-device64.core_*_ubuntu-64.zip"
 )
+
+# Since Tizen 10.0 Tizen SDK uses GCC 14.2.
+if awk "BEGIN {exit !($TIZEN_VERSION >= 10.0)}"; then
+    TIZEN_STUDIO_GCC_VERSION=14.2
+    TIZEN_STUDIO_COMMON_ZIPS+=("sbi-toolchain-gcc-14.2.cpp.app_2.2.31_ubuntu-64.zip")
+    TIZEN_STUDIO_SDK_ARM_ZIPS+=("cross-arm-gcc-14.2_0.2.16_ubuntu-64.zip")
+    TIZEN_STUDIO_SDK_ARM64_ZIPS+=("cross-aarch64-gcc-14.2_0.2.16_ubuntu-64.zip")
+else
+    TIZEN_STUDIO_GCC_VERSION=9.2
+    TIZEN_STUDIO_COMMON_ZIPS+=("sbi-toolchain-gcc-9.2.cpp.app_2.2.16_ubuntu-64.zip")
+    TIZEN_STUDIO_SDK_ARM_ZIPS+=("cross-arm-gcc-9.2_0.1.9_ubuntu-64.zip")
+    TIZEN_STUDIO_SDK_ARM64_ZIPS+=("cross-aarch64-gcc-9.2_0.1.9_ubuntu-64.zip")
+fi
 
 # Take care to provide separate globs for binary and devel RPMs
 # The "most-recent-file" detection logic will eat unsuspecting packages
