@@ -363,14 +363,14 @@ void SetAmbientContextSupportType(Json::Value & jsonValue)
     TEMPORARY_RETURN_IGNORED cluster->SetAmbientContextTypeSupported(semanticTags);
 }
 
-static void GetAmbientContextType(const Json::Value & actArray,
+static bool GetAmbientContextType(const Json::Value & actArray,
                                   std::vector<Globals::Structs::SemanticTagStruct::Type> & semanticTags)
 {
     // Validate AmbientContextType exists and is an array
     if (actArray.empty())
     {
         ChipLogError(NotSpecified, "AmbientContextType array is empty");
-        return;
+        return false;
     }
 
     for (Json::ArrayIndex i = 0; i < actArray.size(); i++)
@@ -379,7 +379,7 @@ static void GetAmbientContextType(const Json::Value & actArray,
         if (!item.isObject() || !HasNumericField(item, "TypeId") || !HasNumericField(item, "TagId"))
         {
             ChipLogError(NotSpecified, "AmbientContextType[%u], missing/invalid TypeId/TagId", static_cast<uint16_t>(i));
-            return;
+            return false;
         }
         uint8_t typeId = static_cast<uint8_t>(item["TypeId"].asUInt());
         uint8_t tagId  = static_cast<uint8_t>(item["TagId"].asUInt());
@@ -390,7 +390,7 @@ static void GetAmbientContextType(const Json::Value & actArray,
         };
         semanticTags.push_back(tag);
     }
-    return;
+    return true;
 }
 
 /**
@@ -442,7 +442,11 @@ void SetAmbientContextDetect(Json::Value & jsonValue)
 
     std::vector<Globals::Structs::SemanticTagStruct::Type> semanticTags;
     semanticTags.reserve(actArray.size());
-    GetAmbientContextType(actArray, semanticTags);
+    if (!GetAmbientContextType(actArray, semanticTags))
+    {
+        ChipLogError(NotSpecified, "Incorrect or unsupported detection");
+        return;
+    }
 
     auto tagList =
         chip::app::DataModel::List<const Globals::Structs::SemanticTagStruct::Type>(semanticTags.data(), semanticTags.size());
@@ -558,7 +562,11 @@ void SetPredictedActivity(Json::Value & jsonValue)
         auto & semanticTags = allSemanticTags[i];
         semanticTags.clear();
         semanticTags.reserve(actArray.size());
-        GetAmbientContextType(actArray, semanticTags);
+        if (!GetAmbientContextType(actArray, semanticTags))
+        {
+            ChipLogError(NotSpecified, "Incorrect or unsupported detection");
+            return;
+        }
 
         auto tagList =
             chip::app::DataModel::List<const Globals::Structs::SemanticTagStruct::Type>(semanticTags.data(), semanticTags.size());

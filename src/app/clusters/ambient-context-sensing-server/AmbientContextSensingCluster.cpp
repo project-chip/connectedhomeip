@@ -825,9 +825,6 @@ CHIP_ERROR AmbientContextSensingCluster::CheckPredictedActivity(const std::vecto
 
         if (mFeatureMap.Has(Feature::kObjectCounting))
         {
-            // Check CrowdDetected
-            VerifyOrReturnError(item.crowdDetected.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-
             // Check CrowdCount
             if (item.crowdCount.HasValue())
             {
