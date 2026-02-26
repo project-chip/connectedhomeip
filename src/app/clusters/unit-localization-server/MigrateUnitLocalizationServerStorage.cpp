@@ -25,10 +25,10 @@ namespace UnitLocalization {
 
 CHIP_ERROR MigrateUnitLocalizationClusterStorage(EndpointId endpointId, PersistentStorageDelegate & storageDelegate)
 {
-   static constexpr AttrMigrationData attributesToUpdate[] = { { Attributes::TemperatureUnit::Id,
+    static constexpr AttrMigrationData attributesToUpdate[] = { { Attributes::TemperatureUnit::Id,
                                                                   &DefaultMigrators::ScalarValue<uint8_t> } };
-   return MigrateFromSafeToAttributePersistenceProvider<sizeof(uint8_t)>({ endpointId, UnitLocalization::Id },
-                                                                                Span(attributesToUpdate), storageDelegate);
+    return MigrateFromSafeToAttributePersistenceProvider<sizeof(uint8_t)>({ endpointId, UnitLocalization::Id },
+                                                                          Span(attributesToUpdate), storageDelegate);
 }
 
 } // namespace UnitLocalization
