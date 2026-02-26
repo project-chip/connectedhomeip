@@ -29,7 +29,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
-#       --int-arg allow_provisional_alarms:1
+#       --int-arg allow_provisional:1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -37,23 +37,29 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import typing
 
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects
 from matter.testing import matter_asserts
+from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.conformance import is_provisional
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
 from matter.testing.runner import TestStep, default_matter_test_main
-from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters
 from matter.tlv import uint
 
 logger = logging.getLogger(__name__)
 
 
-class TC_DISHALM_2_1(MatterBaseTest):
+class TC_DISHALM_2_1(BasicCompositionTests):
+
+    @async_test_body
+    async def setup_class(self):
+        super().setup_class()
+        await self.setup_class_helper()
+        self.build_spec_xmls()
 
     def desc_TC_DISHALM_2_1(self) -> str:
         return "198.2.1. [TC-DISHALM-2.1] Attributes with DUT as Server"
@@ -89,8 +95,8 @@ class TC_DISHALM_2_1(MatterBaseTest):
         # Get cluster ID for DishwasherAlarm (0x005D)
         dishwasher_alarm_cluster_id = uint(Clusters.DishwasherAlarm.id)
 
-        # Build XML clusters from the latest data model
-        xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
+        # XMLs for the spec revision are already built in setup_class.
+        xml_clusters = self.xml_clusters
 
         # Get the DishwasherAlarm cluster from parsed XML
         asserts.assert_in(dishwasher_alarm_cluster_id, xml_clusters,
@@ -126,7 +132,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
         return mask
 
     def _validate_alarm_bitmap(self, attribute_name: str, bitmap_value: int,
-                               valid_mask: int, supported_value: int = None):
+                               valid_mask: int, supported_value: typing.Optional[int] = None):
         """
         Validate that an alarm bitmap only contains valid and supported bits.
 
@@ -174,7 +180,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
         matter_asserts.assert_valid_uint32(resp, attribute.__name__)
 
         logger.info(f"Reading attribute: {attribute}, response: {resp}")
-        return int(resp)
+        return int(resp)  # type: ignore[arg-type]
 
     @run_if_endpoint_matches(has_cluster(Clusters.DishwasherAlarm))  # type: ignore[arg-type]
     async def test_TC_DISHALM_2_1(self):
@@ -183,7 +189,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
         self.endpoint = self.get_endpoint()
 
         # Get test parameter for allowing provisional alarms (default: False for certification)
-        allow_provisional = self.user_params.get("allow_provisional_alarms", False)
+        allow_provisional = self.user_params.get("allow_provisional", False)
         logger.info(f"Test running with allow_provisional={allow_provisional}")
 
         self.step(1)
