@@ -171,11 +171,11 @@ void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatus
 {
     if (newConnectionStatus == ConnectionStatusEnum::kConnected)
     {
-        ChipLogProgress(Zcl, "ThdDiag: OnConnectionStatusChanged: Connected, PAN ID: 0x%04x", GetPanId());
+        ChipLogProgress(Zcl, "ThdDiag: Conn, PAN: 0x%04x", GetPanId());
     }
     else
     {
-        ChipLogProgress(Zcl, "ThdDiag: OnConnectionStatusChanged: NotConnected");
+        ChipLogProgress(Zcl, "ThdDiag: Disconn");
     }
 
     VerifyOrReturn(mContext != nullptr);
@@ -190,11 +190,11 @@ void ThreadNetworkDiagnosticsCluster::OnNetworkFaultChanged(const GeneralFaults<
     if (current.size() > 0)
     {
         [[maybe_unused]] uint8_t latestFault = current.data()[current.size() - 1];
-        ChipLogProgress(Zcl, "ThdDiag: OnNetworkFaultChanged. Latest: %s (%u)", GetNetworkFaultString(latestFault), latestFault);
+        ChipLogProgress(Zcl, "ThdDiag: Fault. Latest: %s (%u)", GetNetworkFaultString(latestFault), latestFault);
     }
     else
     {
-        ChipLogProgress(Zcl, "ThdDiag: OnNetworkFaultChanged, no active faults");
+        ChipLogProgress(Zcl, "ThdDiag: No faults");
     }
 
     /* Verify that the data size matches the expected one. */
