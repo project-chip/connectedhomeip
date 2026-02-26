@@ -26,6 +26,7 @@
 #include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceLayer.h>
 
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -145,23 +146,6 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath
     return builder.ReferenceExisting(DefaultServerCluster::GlobalAttributes());
 }
 
-// Notified when the Node’s connection status to a Thread network has changed.
-void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatusEnum newConnectionStatus)
-{
-    if (newConnectionStatus == ConnectionStatusEnum::kConnected)
-    {
-        ChipLogProgress(Zcl, "ThdDiag: OnConnectionStatusChanged: Connected, PAN ID: 0x%04x", GetPanId());
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "ThdDiag: OnConnectionStatusChanged: NotConnected");
-    }
-
-    VerifyOrReturn(mContext != nullptr);
-    Events::ConnectionStatus::Type event{ newConnectionStatus };
-    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-}
-
 namespace {
 
 [[maybe_unused]] const char * GetNetworkFaultString(uint8_t fault)
@@ -182,6 +166,24 @@ namespace {
 }
 
 } // namespace
+
+// Notified when the Node’s connection status to a Thread network has changed.
+void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatusEnum newConnectionStatus)
+{
+    if (newConnectionStatus == ConnectionStatusEnum::kConnected)
+    {
+        ChipLogProgress(Zcl, "ThdDiag: OnConnectionStatusChanged: Connected, PAN ID: 0x%04x", GetPanId());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "ThdDiag: OnConnectionStatusChanged: NotConnected");
+    }
+
+    VerifyOrReturn(mContext != nullptr);
+    Events::ConnectionStatus::Type event{ newConnectionStatus };
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+}
+
 
 // Notified when the Node’s faults related to a Thread network have changed.
 void ThreadNetworkDiagnosticsCluster::OnNetworkFaultChanged(const GeneralFaults<kMaxNetworkFaults> & previous,

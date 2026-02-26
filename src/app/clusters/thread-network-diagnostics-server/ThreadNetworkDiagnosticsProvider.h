@@ -25,6 +25,12 @@
 namespace chip::app::Clusters::ThreadNetworkDiagnostics {
 
 CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
+
+/*
+ * @brief Get the Thread PAN ID.
+ *        Returns 0xFFFF (invalid PAN ID) if the Thread instance is unavailable,
+ *        Thread is not enabled, or there is no active dataset with a PAN ID present.
+ */
 uint16_t GetPanId();
 
 } // namespace chip::app::Clusters::ThreadNetworkDiagnostics
