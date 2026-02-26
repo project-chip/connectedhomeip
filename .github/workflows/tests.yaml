@@ -959,6 +959,7 @@ jobs:
               env:
                 XZ_OPT: -T 0 -1
               run: |
+                find objdir-clone -executable -type f | xargs -n 1 objcopy --compress-debug-sections
                 tar cfJ repl-build-data.tar.xz out/venv objdir-clone
 
             - name: Upload artifacts for running
