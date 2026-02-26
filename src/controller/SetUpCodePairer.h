@@ -30,6 +30,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
