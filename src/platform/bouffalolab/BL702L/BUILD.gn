@@ -57,9 +57,9 @@ static_library("BL702L") {
   }
 
   if (bouffalo_sdk_component_easyflash_enabled) {
-    sources += [ "../common/BLConfig.cpp" ]
+    sources += [ "../common/BflbConfig.cpp" ]
   } else {
-    sources += [ "../common/BLConfig_littlefs.cpp" ]
+    sources += [ "../common/BflbConfig_littlefs.cpp" ]
   }
 
   deps = [
@@ -89,7 +89,7 @@ static_library("BL702L") {
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
-      "ThreadStackManagerImpl.cpp",
+      "../common/ThreadStackManagerImpl.cpp",
     ]
 
     if (chip_mdns == "platform") {

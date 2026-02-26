@@ -4,11 +4,8 @@
 #include <FreeRTOS.h>
 #include <lwip/tcpip.h>
 
-#include <bl_fw_api.h>
-#undef __INLINE
-#undef __PACKED
-#include <wifi_mgmr.h>
-
+#include <fhost_api.h>
+#include <wifi_mgmr_ext.h>
 #include <wifi_mgmr_portable.h>
 
 #define WIFI_STACK_SIZE (1536)
@@ -55,5 +52,7 @@ void wifi_start_firmware_task(void)
     netif_add_ext_callback(&netifExtCallback, network_netif_ext_callback);
     UNLOCK_TCPIP_CORE();
 
-    xTaskCreate(wifi_main, (char *) "fw", WIFI_STACK_SIZE, NULL, TASK_PRIORITY_FW, &wifi_fw_task);
+    async_register_event_filter(EV_WIFI, wifi_event_handler, NULL);
+    wifi_task_create();
+    fhost_init();
 }

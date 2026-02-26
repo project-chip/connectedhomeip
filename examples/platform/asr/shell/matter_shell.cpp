@@ -98,7 +98,8 @@ void asr_matter_sensors(bool enable, int temp, int humi, int pressure)
 #ifdef ASR_BOARD_ENABLE_SENSORS
     if (enable)
     {
-        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(/* endpoint ID */ 1, static_cast<int16_t>(temp)));
+        LogErrorOnFailure(
+            chip::app::Clusters::TemperatureMeasurement::SetMeasuredValue(/* endpoint ID */ 1, static_cast<int16_t>(temp)));
 
         chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(
             /* endpoint ID */ 1, static_cast<int16_t>(humi));

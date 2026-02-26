@@ -24,4 +24,8 @@ namespace chip::app::Clusters::IlluminanceMeasurement {
 
 IlluminanceMeasurementCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
+CHIP_ERROR SetMeasuredValue(EndpointId endpointId, DataModel::Nullable<uint16_t> measuredValue);
+CHIP_ERROR SetMeasuredValueRange(EndpointId endpointId, DataModel::Nullable<uint16_t> minMeasuredValue,
+                                 DataModel::Nullable<uint16_t> maxMeasuredValue);
+
 } // namespace chip::app::Clusters::IlluminanceMeasurement
