@@ -29,6 +29,7 @@
 
 using namespace chip;
 using namespace chip::app::Clusters::Actions;
+using chip::Protocols::InteractionModel::Status;
 
 // We cannot use the proxy since we need ember support.
 // As a result we update the version at runtime by fetching the Basic Information cluster
@@ -51,6 +52,16 @@ Device::Device(const char * szDeviceName, std::string szLocation)
     chip::Platform::CopyString(mName, szDeviceName);
     chip::Platform::CopyString(mUniqueId, "");
     mLocation = szLocation;
+}
+
+Status Device::OnNodeLabelChanged(const std::string & newNodeLabel)
+{
+    VerifyOrReturnValue(mName != newNodeLabel, Status::Success);
+    chip::Platform::CopyString(mName, newNodeLabel.c_str());
+    // NOTE: WE do NOT call device change as that handles attribute chance callbacks and those
+    //       are handled by the cluster code.
+    // HandleDeviceChange(this, kChanged_Name);
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 app::ServerClusterRegistration &
@@ -88,15 +99,15 @@ void Device::SetReachable(bool aReachable)
 
 void Device::SetName(const char * szName)
 {
-    bool changed = (strncmp(mName, szName, sizeof(mName)) != 0);
-
     ChipLogProgress(DeviceLayer, "Device[%s]: New Name=\"%s\"", mName, szName);
 
-    chip::Platform::CopyString(mName, szName);
-
-    if (changed)
+    if (mBridgedDevice.IsConstructed())
     {
-        HandleDeviceChange(this, kChanged_Name);
+        mBridgedDevice.Cluster().SetNodeLabel(CharSpan::fromCharString(szName));
+    }
+    else
+    {
+        chip::Platform::CopyString(mName, szName);
     }
 }
 

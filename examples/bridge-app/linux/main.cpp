@@ -72,7 +72,6 @@ namespace {
 NamedPipeCommands sChipNamedPipeCommands;
 BridgeCommandDelegate sBridgeCommandDelegate;
 
-const int kNodeLabelSize = 32;
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 const int kDescriptorAttributeArraySize = 254;
 
@@ -290,6 +289,8 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                     {
                         dev->GenerateUniqueId();
                     }
+                    // NOTE: log only for now: this generally has no reason for failing and if it fails,
+                    //       cluster registration fails, however the rest of the device shows up.
                     LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(
                         dev->CreateBridgedDeviceInfo(gCurrentEndpointId,
                                                      {
@@ -406,26 +407,8 @@ void ScheduleReportingCallback(Device * dev, ClusterId cluster, AttributeId attr
 }
 } // anonymous namespace
 
-void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
-{
-    if (itemChangedMask & Device::kChanged_Reachable)
-    {
-        ScheduleReportingCallback(dev, BridgedDeviceBasicInformation::Id, BridgedDeviceBasicInformation::Attributes::Reachable::Id);
-    }
-
-    if (itemChangedMask & Device::kChanged_Name)
-    {
-        ScheduleReportingCallback(dev, BridgedDeviceBasicInformation::Id, BridgedDeviceBasicInformation::Attributes::NodeLabel::Id);
-    }
-}
-
 void HandleDeviceOnOffStatusChanged(DeviceOnOff * dev, DeviceOnOff::Changed_t itemChangedMask)
 {
-    if (itemChangedMask & (DeviceOnOff::kChanged_Reachable | DeviceOnOff::kChanged_Name | DeviceOnOff::kChanged_Location))
-    {
-        HandleDeviceStatusChanged(static_cast<Device *>(dev), (Device::Changed_t) itemChangedMask);
-    }
-
     if (itemChangedMask & DeviceOnOff::kChanged_OnOff)
     {
         ScheduleReportingCallback(dev, OnOff::Id, OnOff::Attributes::OnOff::Id);
@@ -435,11 +418,6 @@ void HandleDeviceOnOffStatusChanged(DeviceOnOff * dev, DeviceOnOff::Changed_t it
 void HandleDevicePowerSourceStatusChanged(DevicePowerSource * dev, DevicePowerSource::Changed_t itemChangedMask)
 {
     using namespace app::Clusters;
-    if (itemChangedMask &
-        (DevicePowerSource::kChanged_Reachable | DevicePowerSource::kChanged_Name | DevicePowerSource::kChanged_Location))
-    {
-        HandleDeviceStatusChanged(static_cast<Device *>(dev), (Device::Changed_t) itemChangedMask);
-    }
 
     if (itemChangedMask & DevicePowerSource::kChanged_BatLevel)
     {
@@ -458,11 +436,6 @@ void HandleDevicePowerSourceStatusChanged(DevicePowerSource * dev, DevicePowerSo
 
 void HandleDeviceTempSensorStatusChanged(DeviceTempSensor * dev, DeviceTempSensor::Changed_t itemChangedMask)
 {
-    if (itemChangedMask &
-        (DeviceTempSensor::kChanged_Reachable | DeviceTempSensor::kChanged_Name | DeviceTempSensor::kChanged_Location))
-    {
-        HandleDeviceStatusChanged(static_cast<Device *>(dev), (Device::Changed_t) itemChangedMask);
-    }
     if (itemChangedMask & DeviceTempSensor::kChanged_MeasurementValue)
     {
         ScheduleReportingCallback(dev, TemperatureMeasurement::Id, TemperatureMeasurement::Attributes::MeasuredValue::Id);
@@ -510,30 +483,6 @@ Protocols::InteractionModel::Status HandleWriteOnOffAttribute(DeviceOnOff * dev,
     {
         return Protocols::InteractionModel::Status::Failure;
     }
-
-    return Protocols::InteractionModel::Status::Success;
-}
-
-Protocols::InteractionModel::Status HandleWriteBridgedDeviceBasicAttribute(Device * dev, AttributeId attributeId, uint8_t * buffer)
-{
-    ChipLogProgress(DeviceLayer, "HandleWriteBridgedDeviceBasicAttribute: attrId=" ChipLogFormatMEI, ChipLogValueMEI(attributeId));
-
-    if (attributeId != BridgedDeviceBasicInformation::Attributes::NodeLabel::Id)
-    {
-        return Protocols::InteractionModel::Status::UnsupportedWrite;
-    }
-
-    CharSpan nameSpan = CharSpan::fromZclString(buffer);
-
-    if (nameSpan.size() > kNodeLabelSize)
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-
-    std::string name(nameSpan.data(), nameSpan.size());
-    dev->SetName(name.c_str());
-
-    HandleDeviceStatusChanged(dev, Device::kChanged_Name);
 
     return Protocols::InteractionModel::Status::Success;
 }
@@ -672,7 +621,7 @@ Protocols::InteractionModel::Status emberAfExternalAttributeWriteCallback(Endpoi
 
     VerifyOrReturnValue(endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT, Protocols::InteractionModel::Status::Failure);
     Device * dev = gDevices[endpointIndex];
-    VerifyOrReturnValue(dev->IsReachable(), Protocols::InteractionModel::Status::Failure);
+    VerifyOrReturnValue(dev && dev->IsReachable(), Protocols::InteractionModel::Status::Failure);
 
     if (clusterId == OnOff::Id)
     {

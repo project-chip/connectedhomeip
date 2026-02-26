@@ -73,11 +73,7 @@ public:
     );
 
     // BridgedDeviceBasicInformationDelegate
-    chip::Protocols::InteractionModel::Status OnNodeLabelChanged(const std::string & newNodeLabel) override
-    {
-        chip::Platform::CopyString(mName, newNodeLabel.c_str());
-        return chip::Protocols::InteractionModel::Status::Success;
-    }
+    chip::Protocols::InteractionModel::Status OnNodeLabelChanged(const std::string & newNodeLabel) override;
 
 private:
     virtual void HandleDeviceChange(Device * device, Device::Changed_t changeMask) = 0;
