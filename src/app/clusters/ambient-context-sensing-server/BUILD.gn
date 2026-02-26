@@ -27,4 +27,3 @@ source_set("ambient-context-sensing-server") {
     "${chip_root}/zzz_generated/app-common/clusters/AmbientContextSensing",
   ]
 }
-
