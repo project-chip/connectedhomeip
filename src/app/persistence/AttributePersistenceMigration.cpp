@@ -82,7 +82,7 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
         }
     }
     return migrationError;
-};
+}
 
 namespace DefaultMigrators {
 CHIP_ERROR SafeValue(const ConcreteAttributePath & attrPath, SafeAttributePersistenceProvider & provider, MutableByteSpan & buffer)
