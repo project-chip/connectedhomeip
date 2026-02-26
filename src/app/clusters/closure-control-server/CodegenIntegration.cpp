@@ -34,14 +34,14 @@ using namespace chip::app::Clusters::ClosureControl::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {
-ClosureControlClusterDelegate * gDelegate = nullptr;
-ClusterConformance gConformance;
-ClusterInitParameters gInitParams;
 
 constexpr size_t kClosureControlFixedClusterCount = ClosureControl::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kClosureControlMaxClusterCount   = kClosureControlFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<ClosureControlCluster> gServer[kClosureControlMaxClusterCount];
+ClosureControlClusterDelegate * gDelegates[kClosureControlMaxClusterCount] = { nullptr };
+ClusterConformance gConformances[kClosureControlMaxClusterCount];
+ClusterInitParameters gInitParams[kClosureControlMaxClusterCount];
 } // namespace
 
 namespace chip {
@@ -54,19 +54,19 @@ ClosureControlCluster & GetInstance(EndpointId endpointId)
     return gServer[endpointId].Cluster();
 }
 
-void MatterClosureControlSetDelegate(ClosureControlClusterDelegate & delegate)
+void MatterClosureControlSetDelegate(EndpointId endpointId, ClosureControlClusterDelegate & delegate)
 {
-    gDelegate = &delegate;
+    gDelegates[endpointId] = &delegate;
 }
 
-void MatterClosureControlSetConformance(const ClusterConformance & conformance)
+void MatterClosureControlSetConformance(EndpointId endpointId, const ClusterConformance & conformance)
 {
-    gConformance = conformance;
+    gConformances[endpointId] = conformance;
 }
 
-void MatterClosureControlSetInitParams(const ClusterInitParameters & initParams)
+void MatterClosureControlSetInitParams(EndpointId endpointId, const ClusterInitParameters & initParams)
 {
-    gInitParams = initParams;
+    gInitParams[endpointId] = initParams;
 }
 
 } // namespace ClosureControl
@@ -82,7 +82,7 @@ void MatterClosureControlClusterInitCallback(EndpointId endpointId)
         return;
     }
 
-    if (gDelegate == nullptr)
+    if (gDelegates[endpointId] == nullptr)
     {
         ChipLogError(Zcl,
                      "Closure Control Cluster cannot be initialized without a delegate. Call MatterClosureControlSetDelegate() "
@@ -90,7 +90,7 @@ void MatterClosureControlClusterInitCallback(EndpointId endpointId)
         return;
     }
 
-    ClosureControlCluster::Context context{ *gDelegate, gConformance, gInitParams };
+    ClosureControlCluster::Context context{ *gDelegates[endpointId], gConformances[endpointId], gInitParams[endpointId] };
     gServer[endpointId].Create(endpointId, context);
     LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(gServer[endpointId].Registration()));
 }

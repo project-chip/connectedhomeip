@@ -31,11 +31,11 @@ namespace ClosureControl {
 
 ClosureControlCluster & GetInstance(EndpointId endpointId);
 
-void MatterClosureControlSetDelegate(ClosureControlClusterDelegate & delegate);
+void MatterClosureControlSetDelegate(EndpointId endpointId, ClosureControlClusterDelegate & delegate);
 
-void MatterClosureControlSetConformance(const ClusterConformance & conformance);
+void MatterClosureControlSetConformance(EndpointId endpointId, const ClusterConformance & conformance);
 
-void MatterClosureControlSetInitParams(const ClusterInitParameters & initParams);
+void MatterClosureControlSetInitParams(EndpointId endpointId, const ClusterInitParameters & initParams);
 
 } // namespace ClosureControl
 } // namespace Clusters

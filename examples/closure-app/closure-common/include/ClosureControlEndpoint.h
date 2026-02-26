@@ -104,9 +104,9 @@ public:
 
         ClusterInitParameters initParams;
 
-        MatterClosureControlSetConformance(conformance);
-        MatterClosureControlSetInitParams(initParams);
-        MatterClosureControlSetDelegate(mDelegate);
+        MatterClosureControlSetConformance(mEndpoint, conformance);
+        MatterClosureControlSetInitParams(mEndpoint, initParams);
+        MatterClosureControlSetDelegate(mEndpoint, mDelegate);
         mDelegate.SetClusterInstance(&mClusterInstance);
     }
 
