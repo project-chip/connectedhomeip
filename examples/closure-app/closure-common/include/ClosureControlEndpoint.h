@@ -87,8 +87,7 @@ private:
 class ClosureControlEndpoint
 {
 public:
-    ClosureControlEndpoint(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mClusterInstance(GetInstance(mEndpoint))
+    ClosureControlEndpoint(EndpointId endpoint) : mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mClusterInstance(nullptr)
     {
         ClusterConformance conformance;
         conformance.FeatureMap()
@@ -107,7 +106,6 @@ public:
         MatterClosureControlSetConformance(mEndpoint, conformance);
         MatterClosureControlSetInitParams(mEndpoint, initParams);
         MatterClosureControlSetDelegate(mEndpoint, mDelegate);
-        mDelegate.SetClusterInstance(&mClusterInstance);
     }
 
     /**
@@ -129,7 +127,7 @@ public:
      *
      * @return ClosureControlCluster& Reference to the internal ClosureControlCluster object.
      */
-    ClosureControlCluster & GetClusterInstance() { return mClusterInstance; }
+    ClosureControlCluster & GetClusterInstance() { return *mClusterInstance; }
 
     /**
      * @brief Handles the completion of a stop motion action.
@@ -189,7 +187,7 @@ private:
     EndpointId mEndpoint = kInvalidEndpointId;
     ClosureControlClusterMatterContext mContext;
     ClosureControlDelegate mDelegate;
-    ClosureControlCluster & mClusterInstance;
+    ClosureControlCluster * mClusterInstance;
 
     /**
      * @brief Updates the current state of the closure control endpoint from the target state.

@@ -49,9 +49,14 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
-ClosureControlCluster & GetInstance(EndpointId endpointId)
+ClosureControlCluster * GetInstance(EndpointId endpointId)
 {
-    return gServer[endpointId].Cluster();
+    if (gServer[endpointId].IsConstructed())
+    {
+        return &gServer[endpointId].Cluster();
+    }
+    ChipLogError(Zcl, "Closure Control Cluster not initialized.");
+    return nullptr;
 }
 
 void MatterClosureControlSetDelegate(EndpointId endpointId, ClosureControlClusterDelegate & delegate)

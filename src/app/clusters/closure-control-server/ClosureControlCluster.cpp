@@ -56,7 +56,8 @@ CHIP_ERROR ClosureControlCluster::Attributes(const ConcreteClusterPath & path,
 
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { conformance.HasFeature(Feature::kPositioning) && !conformance.HasFeature(Feature::kInstantaneous),
-          CountdownTime::kMetadataEntry }
+          CountdownTime::kMetadataEntry },
+        { conformance.HasFeature(Feature::kMotionLatching), LatchControlModes::kMetadataEntry },
     };
 
     return listBuilder.Append(Span(ClosureControl::Attributes::kMandatoryMetadata), Span(optionalAttributes));

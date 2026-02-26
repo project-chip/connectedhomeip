@@ -29,7 +29,7 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
-ClosureControlCluster & GetInstance(EndpointId endpointId);
+ClosureControlCluster * GetInstance(EndpointId endpointId);
 
 void MatterClosureControlSetDelegate(EndpointId endpointId, ClosureControlClusterDelegate & delegate);
 
