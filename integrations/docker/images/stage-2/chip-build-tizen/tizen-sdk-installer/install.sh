@@ -566,8 +566,16 @@ TIZEN_SDK_UNIFIED_RPMS=(
 # Handle differences in Tizen SDK versions. For example, since
 # Tizen 10.0 the PCRE2 library is provided by the BASE repository.
 if awk "BEGIN {exit !($TIZEN_VERSION >= 10.0)}"; then
-    TIZEN_SDK_BASE_RPMS+=('pcre2-devel-[0-9]*')
-    TIZEN_SDK_UNIFIED_RPMS+=('capi-appfw-service-application-devel-[0-9]*')
+    TIZEN_SDK_BASE_RPMS+=(
+        'pcre2-devel-[0-9]*'
+        'libunwind-[0-9]*'
+    )
+    TIZEN_SDK_UNIFIED_RPMS+=(
+        'capi-appfw-service-application-devel-[0-9]*'
+        'libcynara-creds-commons-[0-9]*'
+        'libcynara-creds-self-[0-9]*'
+        'libcynara-uid-[0-9]*'
+    )
 else
     TIZEN_SDK_UNIFIED_RPMS+=('pcre2-devel-[0-9]*')
 fi
