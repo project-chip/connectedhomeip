@@ -20,7 +20,6 @@ source_set("closure-control-server") {
     "ClosureControlCluster.cpp",
     "ClosureControlCluster.h",
     "ClosureControlClusterDelegate.h",
-    "ClosureControlClusterMatterContext.h",
     "ClosureControlClusterObjects.h",
   ]
 

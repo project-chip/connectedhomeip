@@ -20,7 +20,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/closure-control-server/ClosureControlCluster.h>
 #include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
-#include <app/clusters/closure-control-server/ClosureControlClusterMatterContext.h>
 #include <app/static-cluster-config/ClosureControl.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>

@@ -21,7 +21,6 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/clusters/closure-control-server/ClosureControlCluster.h>
 #include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
-#include <app/clusters/closure-control-server/ClosureControlClusterMatterContext.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {

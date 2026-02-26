@@ -85,7 +85,7 @@ private:
 class ClosureControlEndpoint
 {
 public:
-    ClosureControlEndpoint(EndpointId endpoint) : mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mClusterInstance(nullptr)
+    ClosureControlEndpoint(EndpointId endpoint) : mEndpoint(endpoint), mDelegate(), mClusterInstance(nullptr)
     {
         ClusterConformance conformance;
         conformance.FeatureMap()
@@ -183,7 +183,6 @@ public:
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
-    ClosureControlClusterMatterContext mContext;
     ClosureControlDelegate mDelegate;
     ClosureControlCluster * mClusterInstance;
 
