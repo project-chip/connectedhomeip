@@ -64,7 +64,7 @@ class TC_SC_TC_4_1(MatterBaseTest):
         await commissioner.EstablishPASESessionThreadMeshcop(baAddr = self.matter_test_config.thread_ba_host,
                                                        setupCode = self.matter_test_config.qr_code_content[0],
                                                        nodeId = self.matter_test_config.dut_node_ids[0],
-                                                       baPort = self.matter_test_config.thread_ba_port);
+                                                       baPort = self.matter_test_config.thread_ba_port)
 
 
 if __name__ == "__main__":
