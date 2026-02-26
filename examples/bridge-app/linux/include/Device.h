@@ -184,7 +184,7 @@ private:
 class ComposedDevice : public Device
 {
 public:
-    ComposedDevice(const char * szDeviceName, std::string szLocation) : Device(szDeviceName, szLocation) {};
+    ComposedDevice(const char * szDeviceName, std::string szLocation) : Device(szDeviceName, szLocation){};
 
     using DeviceCallback_fn = std::function<void(ComposedDevice *, ComposedDevice::Changed_t)>;
 
@@ -209,7 +209,8 @@ public:
 
     DevicePowerSource(const char * szDeviceName, std::string szLocation,
                       chip::BitFlags<chip::app::Clusters::PowerSource::Feature> aFeatureMap) :
-        Device(szDeviceName, szLocation), mFeatureMap(aFeatureMap) {};
+        Device(szDeviceName, szLocation),
+        mFeatureMap(aFeatureMap){};
 
     using DeviceCallback_fn = std::function<void(DevicePowerSource *, DevicePowerSource::Changed_t)>;
     void SetChangeCallback(DeviceCallback_fn aChanged_CB) { mChanged_CB = aChanged_CB; }
