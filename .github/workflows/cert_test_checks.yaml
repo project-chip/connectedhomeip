@@ -35,7 +35,7 @@ jobs:
           fetch-depth: 2
       - name: Install Python dependencies (just the basics)
         run: |
-          python3 -m venv venv
+          python3 -m venv --system-site-packages venv
           venv/bin/pip install -r scripts/setup/requirements.build.txt
       - name: Run checks
         run: |
