@@ -41,8 +41,8 @@ using chip::Shell::streamer_get;
 using chip::Shell::streamer_printf;
 #endif // defined(ENABLE_CHIP_SHELL)
 
-static bool sSwitchOnOffState = false;
 #if defined(ENABLE_CHIP_SHELL)
+static bool sSwitchOnOffState = false;
 static void ToggleSwitchOnOff(bool newState)
 {
     sSwitchOnOffState = newState;
@@ -72,50 +72,6 @@ static void RegisterSwitchCommands()
     return;
 }
 #endif // defined(ENABLE_CHIP_SHELL)
-
-static void BoundDeviceChangedHandler(const Binding::TableEntry & binding, chip::OperationalDeviceProxy * peer_device,
-                                      void * context)
-{
-    using namespace chip;
-    using namespace chip::app;
-
-    if (binding.type == Binding::MATTER_MULTICAST_BINDING)
-    {
-        ChipLogError(NotSpecified, "Group binding is not supported now");
-        return;
-    }
-
-    if (binding.type == Binding::MATTER_UNICAST_BINDING && binding.local == 1 &&
-        binding.clusterId.value_or(Clusters::OnOff::Id) == Clusters::OnOff::Id)
-    {
-        auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
-            ChipLogProgress(NotSpecified, "OnOff command succeeds");
-        };
-        auto onFailure = [](CHIP_ERROR error) {
-            ChipLogError(NotSpecified, "OnOff command failed: %" CHIP_ERROR_FORMAT, error.Format());
-        };
-
-        VerifyOrDie(peer_device != nullptr && peer_device->ConnectionReady());
-        if (sSwitchOnOffState)
-        {
-            Clusters::OnOff::Commands::On::Type onCommand;
-            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                             binding.remote, onCommand, onSuccess, onFailure);
-        }
-        else
-        {
-            Clusters::OnOff::Commands::Off::Type offCommand;
-            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                             binding.remote, offCommand, onSuccess, onFailure);
-        }
-    }
-}
-
-static void BoundDeviceContextReleaseHandler(void * context)
-{
-    (void) context;
-}
-
 
 static void ProcessOnOffUnicastBindingCommand(chip::CommandId commandId, const Binding::TableEntry & binding,
                                        Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle)
