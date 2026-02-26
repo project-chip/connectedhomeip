@@ -241,7 +241,7 @@ TEST_F(TestAmbientContextSensingCluster, TestAmbientContextTypeSupported)
         kACTSupported_all[1],
         kACTSupported_all[2],
         kACTSupported_all[3],
-        // the duplicate one 
+        // the duplicate one
         kACTSupported_all[3],
     };
     SemanticTagType kACTSupported_unsupport[] = {
@@ -590,7 +590,7 @@ TEST_F(TestAmbientContextSensingCluster, TestObjectCount)
     // Read ObjectCountReached attribute, exp: false
     EXPECT_EQ(tester.ReadAttribute(Attributes::ObjectCountReached::Id, objCntReached), Protocols::InteractionModel::Status::Success);
     EXPECT_FALSE(objCntReached);
-    
+
     // Read ObjectCount attribute, exp: unsupported_attribute
     EXPECT_EQ(tester.ReadAttribute(Attributes::ObjectCount::Id, objCount), Protocols::InteractionModel::Status::UnsupportedAttribute);
 
@@ -624,7 +624,7 @@ TEST_F(TestAmbientContextSensingCluster, TestObjectCount)
     EXPECT_FALSE(objCntReached);
 
 
-    // Read ObjectCount attribute, exp: unsupported_attribute 
+    // Read ObjectCount attribute, exp: unsupported_attribute
     EXPECT_EQ(tester.ReadAttribute(Attributes::ObjectCount::Id, objCount), Protocols::InteractionModel::Status::UnsupportedAttribute);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -672,7 +672,7 @@ TEST_F(TestAmbientContextSensingCluster, TestObjCntThresholdPersistence)
         // Read back the ObjectCountConfig attribute. ObjectCountConfig.objectCountThreshold should be the new value
         EXPECT_EQ(tester.ReadAttribute(Attributes::ObjectCountConfig::Id, rdObjCountCfg), Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(rdObjCountCfg.objectCountThreshold, defObjCountCfg.objectCountThreshold);
-	    
+
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
 
@@ -720,7 +720,7 @@ TEST_F(TestAmbientContextSensingCluster, TestPredictActivity)
                 .confidence = 100,
             },
         };
-    
+
     EXPECT_EQ(cluster.SetPredictedActivity(predictActivity), CHIP_NO_ERROR);
 
     // Readback PredictedActivity

@@ -705,7 +705,7 @@ CHIP_ERROR AmbientContextSensingCluster::CheckInputSupportedType(const std::vect
 
         // Return error if the feature is not enabled
         VerifyOrReturnError(isFeatureEnabled, CHIP_ERROR_INVALID_ARGUMENT);
-         
+
         // Check and remove the duplicated items.
         // If the item has been set to true => it has existed.
         bool isSet = false;
@@ -741,7 +741,7 @@ bool AmbientContextSensingCluster::IsSupportedEvent(const AmbientContextSensingT
     for (size_t i = 0 ; i < tags.size() ; i++)
     {
         bool isSupported = false;
-    
+
         for (const auto & supported : mAmbientContextTypeSupportedList)
         {
             if ((tags[i].namespaceID == supported.namespaceID) && (tags[i].tag == supported.tag))

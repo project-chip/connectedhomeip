@@ -90,7 +90,7 @@ public:
             };
         TimerDelegate * mHoldTimeDelegate = nullptr;
         std::vector<SemanticTagType> mAmbientContextTypeSupportedList;
-        
+
     };
 
     struct AmbientContextSensed

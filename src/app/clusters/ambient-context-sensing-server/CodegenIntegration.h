@@ -25,4 +25,3 @@ namespace chip::app::Clusters::AmbientContextSensing {
 AmbientContextSensingCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
 } // namespace chip::app::Clusters::AmbientContextSensing
-

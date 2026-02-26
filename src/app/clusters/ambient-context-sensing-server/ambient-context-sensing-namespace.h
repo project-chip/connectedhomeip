@@ -43,7 +43,7 @@ enum class TagIdentifiedObject : uint8_t
 };
 
 
-// Identified Sound 
+// Identified Sound
 constexpr const uint8_t kNamespaceIdentifiedSound = 0x4A;
 
 enum class TagIdentifiedSound : uint8_t
@@ -93,4 +93,3 @@ enum class TagIdentifiedHumanActivity
 };
 
 } // namespace chip::app::Clusters
-
