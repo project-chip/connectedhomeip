@@ -18,7 +18,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
+#include <app/clusters/closure-control-server/ClosureControlCluster.h>
 
 using chip::app::Clusters::ClosureControl::ClusterConformance;
 using chip::app::Clusters::ClosureControl::Feature;

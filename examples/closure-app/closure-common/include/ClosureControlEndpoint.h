@@ -19,8 +19,6 @@
 #pragma once
 
 #include <app/clusters/closure-control-server/closure-control-cluster-delegate.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
 #include <app/clusters/closure-control-server/closure-control-server.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
