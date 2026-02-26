@@ -19,6 +19,7 @@
 #include "GroupcastLogic.h"
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -33,10 +34,12 @@ class GroupcastCluster : public DefaultServerCluster, public GroupcastLogic::Lis
 {
 public:
     GroupcastCluster(GroupcastContext && context) :
-        DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mContext(std::move(context)), mLogic(mContext)
+        DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mContext(std::move(context)), mLogic(mContext),
+        mTimerDelegate(mContext.timerDelegate), mMembershipChangedTimer(*this), mGroupcastTestingTimer(*this)
     {}
     GroupcastCluster(GroupcastContext && context, BitFlags<Groupcast::Feature> features) :
-        DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mContext(std::move(context)), mLogic(mContext, features)
+        DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mContext(std::move(context)), mLogic(mContext, features),
+        mTimerDelegate(mContext.timerDelegate), mMembershipChangedTimer(*this), mGroupcastTestingTimer(*this)
     {}
     virtual ~GroupcastCluster() {}
 
@@ -65,8 +68,37 @@ private:
     GroupcastContext mContext;
     GroupcastLogic mLogic;
 
+    // Timer support
+    TimerDelegate & mTimerDelegate;
+
     Groupcast::GroupcastTestingEnum mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
     FabricIndex mFabricUnderTest                  = kUndefinedFabricIndex;
+    class MembershipChangedTimer : public TimerContext
+    {
+    public:
+        MembershipChangedTimer(GroupcastCluster & cluster) : mCluster(cluster) {}
+        void Start();
+        void Cancel();
+        void TimerFired() override;
+
+    private:
+        GroupcastCluster & mCluster;
+    };
+
+    class GroupcastTestingTimer : public TimerContext
+    {
+    public:
+        GroupcastTestingTimer(GroupcastCluster & cluster) : mCluster(cluster) {}
+        void Start(uint32_t seconds);
+        void Cancel();
+        void TimerFired() override;
+
+    private:
+        GroupcastCluster & mCluster;
+    };
+
+    MembershipChangedTimer mMembershipChangedTimer;
+    GroupcastTestingTimer mGroupcastTestingTimer;
 };
 
 } // namespace Clusters

@@ -99,7 +99,7 @@ public:
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         EventManagement & eventManagement;
         SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
-
+        TimerDelegate & timerDelegate;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -127,6 +127,7 @@ public:
                     .dacProvider                      = mContext.dacProvider,                      //
                     .eventManagement                  = mContext.eventManagement,                  //
                     .safeAttributePersistenceProvider = mContext.safeAttributePersistenceProvider, //
+                    .timerDelegate                    = mContext.timerDelegate,                    //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                     .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -182,7 +183,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 {
     gMainLoopImplementation = mainLoop;
 
-    static DefaultTimerDelegate timerDelegate;
+    static DefaultTimerDelegate gTimerDelegate;
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
@@ -232,6 +233,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(), //
             .eventManagement                  = EventManagement::GetInstance(),                          //
             .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                       //
+            .timerDelegate                    = gTimerDelegate,                                          //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
