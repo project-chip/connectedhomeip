@@ -96,6 +96,8 @@ enum class Fields : uint8_t
     kICETransportPolicy    = 5,
     kMetadataEnabled       = 6,
     kSFrameConfig          = 7,
+    kVideoStreams          = 8,
+    kAudioStreams          = 9,
 };
 
 struct Type
@@ -113,6 +115,8 @@ public:
     Optional<chip::CharSpan> ICETransportPolicy;
     Optional<bool> metadataEnabled;
     Optional<Structs::SFrameStruct::Type> SFrameConfig;
+    Optional<DataModel::List<const uint16_t>> videoStreams;
+    Optional<DataModel::List<const uint16_t>> audioStreams;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -136,6 +140,8 @@ public:
     Optional<chip::CharSpan> ICETransportPolicy;
     Optional<bool> metadataEnabled;
     Optional<Structs::SFrameStruct::DecodableType> SFrameConfig;
+    Optional<DataModel::DecodableList<uint16_t>> videoStreams;
+    Optional<DataModel::DecodableList<uint16_t>> audioStreams;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };
@@ -195,6 +201,8 @@ enum class Fields : uint8_t
     kICETransportPolicy    = 7,
     kMetadataEnabled       = 8,
     kSFrameConfig          = 9,
+    kVideoStreams          = 10,
+    kAudioStreams          = 11,
 };
 
 struct Type
@@ -214,6 +222,8 @@ public:
     Optional<chip::CharSpan> ICETransportPolicy;
     Optional<bool> metadataEnabled;
     Optional<Structs::SFrameStruct::Type> SFrameConfig;
+    Optional<DataModel::List<const uint16_t>> videoStreams;
+    Optional<DataModel::List<const uint16_t>> audioStreams;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -239,6 +249,8 @@ public:
     Optional<chip::CharSpan> ICETransportPolicy;
     Optional<bool> metadataEnabled;
     Optional<Structs::SFrameStruct::DecodableType> SFrameConfig;
+    Optional<DataModel::DecodableList<uint16_t>> videoStreams;
+    Optional<DataModel::DecodableList<uint16_t>> audioStreams;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
 };

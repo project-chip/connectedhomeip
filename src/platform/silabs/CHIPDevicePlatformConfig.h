@@ -136,11 +136,18 @@
 #endif
 
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
-#if SLI_SI91X_MCU_INTERFACE
-#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (7 * 1024)
-#else
-#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (6 * 1024)
-#endif
+/**
+ * @brief CHIP_TASK_STACK_SIZE
+ *
+ * @details The stack size for the CHIP task, this is a general stack that works with various configurations, giving the application
+ * a sufficient buffer in case they need more usage.
+ *
+ * @note It has been observed that, when using the SI91X MCU Interface, the required stack size is increased to 7184 bytes.
+ * @note For a thread lighting app, the high stack watermark during commissioning is 5232 bytes.
+ * @note For a thread lighting app compiled using LTO, the high stack watermark during commissioning is 6576 bytes. This is likely
+ * due to inlining and other optimizations.
+ */
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (8 * 1024)
 #endif // CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
 
 #ifndef CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE

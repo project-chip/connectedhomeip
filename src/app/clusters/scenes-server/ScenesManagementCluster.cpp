@@ -18,6 +18,7 @@
 
 #include "ScenesManagementCluster.h"
 
+#include <app/clusters/scenes-server/Constants.h>
 #include <app/clusters/scenes-server/SceneTable.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -40,6 +41,7 @@ using chip::Protocols::InteractionModel::Status;
 using namespace chip::app::Clusters::ScenesManagement::Attributes;
 using namespace chip::app::Clusters::ScenesManagement::Commands;
 using namespace chip::app::Clusters::ScenesManagement::Structs;
+using namespace chip::app::Clusters::ScenesManagement;
 
 namespace chip::app::Clusters {
 
@@ -99,6 +101,16 @@ private:
     } while (0)
 
 } // namespace
+
+CHIP_ERROR ScenesManagementCluster::StoreCurrentGlobalScene(FabricIndex fabricIndex)
+{
+    return StoreCurrentScene(fabricIndex, scenes::kGlobalSceneGroupId, scenes::kGlobalSceneId);
+}
+
+CHIP_ERROR ScenesManagementCluster::RecallGlobalScene(FabricIndex fabricIndex)
+{
+    return RecallScene(fabricIndex, scenes::kGlobalSceneGroupId, scenes::kGlobalSceneId);
+}
 
 CHIP_ERROR ScenesManagementCluster::UpdateFabricSceneInfo(FabricIndex fabric, Optional<GroupId> group, Optional<SceneId> scene,
                                                           Optional<bool> sceneValid)
@@ -531,6 +543,7 @@ CHIP_ERROR ScenesManagementCluster::GroupWillBeRemoved(FabricIndex aFabricIdx, G
     }
 
     VerifyOrReturnError(nullptr != mGroupProvider, CHIP_ERROR_INCORRECT_STATE);
+
     if (0 != aGroupId && !mGroupProvider->HasEndpoint(aFabricIdx, aGroupId, mPath.mEndpointId))
     {
         return CHIP_NO_ERROR;

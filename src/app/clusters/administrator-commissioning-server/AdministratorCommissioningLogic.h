@@ -16,8 +16,12 @@
  */
 #pragma once
 
+#include <app/FailSafeContext.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
-#include <app/server/Server.h>
+#include <app/server/CommissioningWindowManager.h>
+#include <clusters/AdministratorCommissioning/Commands.h>
+#include <clusters/AdministratorCommissioning/Enums.h>
+#include <credentials/FabricTable.h>
 
 namespace chip {
 namespace app {
@@ -26,19 +30,35 @@ namespace Clusters {
 class AdministratorCommissioningLogic
 {
 public:
+    struct Context
+    {
+        CommissioningWindowManager & commissioningWindowManager;
+        FabricTable & fabricTable;
+        /**
+         * The FailSafeContext used by the Administrator Commissioning Cluster.
+         * * IMPORTANT: This MUST be the same FailSafeContext instance used by the
+         * provided commissioningWindowManager. In the standard Server implementation,
+         * both the Manager and this Context should retrieve this from
+         * Server::GetInstance().GetFailSafeContext().
+         */
+        FailSafeContext & failSafeContext;
+    };
+
+    constexpr AdministratorCommissioningLogic(Context context) : mContext(context) {}
+
     AdministratorCommissioning::CommissioningWindowStatusEnum GetWindowStatus()
     {
-        return Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatusForCluster();
+        return mContext.commissioningWindowManager.CommissioningWindowStatusForCluster();
     }
 
     const app::DataModel::Nullable<FabricIndex> & GetAdminFabricIndex()
     {
-        return Server::GetInstance().GetCommissioningWindowManager().GetOpenerFabricIndex();
+        return mContext.commissioningWindowManager.GetOpenerFabricIndex();
     }
 
     const app::DataModel::Nullable<VendorId> & GetAdminVendorId()
     {
-        return Server::GetInstance().GetCommissioningWindowManager().GetOpenerVendorId();
+        return mContext.commissioningWindowManager.GetOpenerVendorId();
     }
 
     // Methods to handle the various commands this cluster may receive.
@@ -52,6 +72,9 @@ public:
 
     DataModel::ActionReturnStatus
     RevokeCommissioning(const AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType & commandData);
+
+private:
+    Context mContext;
 };
 
 } // namespace Clusters

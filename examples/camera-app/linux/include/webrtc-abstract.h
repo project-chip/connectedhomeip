@@ -49,6 +49,13 @@ struct ICECandidateInfo
     int mlineIndex;
 };
 
+struct ICEServerInfo
+{
+    std::vector<std::string> urls;
+    std::string username;
+    std::string credential;
+};
+
 using OnLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type)>;
 using OnICECandidateCallback     = std::function<void(const ICECandidateInfo & candidateInfo)>;
 using OnConnectionStateCallback  = std::function<void(bool connected)>;
@@ -83,4 +90,4 @@ public:
     virtual int GetPayloadType(const std::string & sdp, SDPType type, const std::string & codec) { return -1; };
 };
 
-std::shared_ptr<WebRTCPeerConnection> CreateWebRTCPeerConnection();
+std::shared_ptr<WebRTCPeerConnection> CreateWebRTCPeerConnection(const std::vector<ICEServerInfo> & iceServers = {});

@@ -19,7 +19,7 @@
 
 #include "QueryReplyFilter.h"
 
-#include <minmdns/MinMdnsConfig.h>
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <system/SystemClock.h>
 
 namespace mdns {

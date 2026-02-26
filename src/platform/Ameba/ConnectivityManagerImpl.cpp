@@ -630,11 +630,6 @@ void ConnectivityManagerImpl::OnStationDisconnected()
             chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected));
     }
 
-    if (reason != RTW_NO_ERROR)
-    {
-        NetworkCommissioning::AmebaWiFiDriver::GetInstance().OnConnectWiFiNetworkFailed(reason);
-    }
-
     UpdateInternetConnectivityState();
 }
 

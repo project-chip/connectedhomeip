@@ -1149,6 +1149,316 @@ func connect(selectedCastingPlayer: MCCastingPlayer?) {
 }
 ```
 
+### Persistent Storage and Cached Credentials
+
+The tv-casting-app utilizes persistent storage to remember each TV
+(CastingPlayer) it has successfully connected to. This allows for faster
+reconnections and a better user experience by avoiding repeated commissioning
+flows.
+
+#### Cached Credentials
+
+Once the phone app has successfully been commissioned by a TV, it obtains a
+cached credential (an operational cert signed by the TV). With this cached
+credential, the phone app should not need to follow the pin code flow again for
+subsequent connections to that TV.
+
+#### Key Behaviors and Caveats
+
+1. **Credential Storage Deletion**: If you delete the phone app's stored
+   configuration, the cached credential is dropped and commissioning (including
+   the pin code flow) will be required again on the next connection attempt.
+
+2. **Automatic Credential Matching**: When you call
+   `verifyOrEstablishConnection` on a CastingPlayer for which the phone app has
+   a cached credential, the app will match its cached credentials with the
+   discovered CastingPlayer based on fields in the DNS-SD information. If a
+   match is found, the pin code flow will not be triggered. Instead, the app
+   will attempt to establish a secure connection with the TV by calling
+   `FindOrEstablishSession`.
+
+3) **DNS-SD Information Changes**: If the credential matching fails for a TV
+   with a cached credential (for example, if fields in the DNS-SD information
+   change, such as the IP address or device name), the pin code flow and
+   commissioning will be triggered. During this commissioning process, the TV
+   (acting as a commissioner) will discover that it already has a fabric
+   association on the phone app (e.g., a cached credential for the fabric of
+   this TV already exists on the phone app). It will then:
+
+    - Cancel the current commissioning attempt.
+    - Remove its existing fabric association on the phone app (e.g., send a
+      command to the phone app to delete the cached credential).
+    - Immediately initiate a new commissioning process with the phone app.
+
+    In this scenario, the phone app will receive a failure callback for the
+    first attempt, but the subsequent commissioning attempt should succeed.
+
+4) **TV Factory Reset Recovery**: If the phone app believes it has a cached
+   credential for a given TV (the DNS-SD information match succeeds), but the TV
+   does not recognize the phone app (this could happen if the TV has been
+   factory reset but then setup again with the same customer account - and
+   therefore put on the same fabric), then the phone app may successfully
+   establish a CASE session (because both are on the same fabric) but then
+   receive authentication failure errors with error code `0x7e` when it attempts
+   any cluster commands (reading attributes, sending commands, etc.). When the
+   phone app receives error code `0x7e`, it should detect this condition and
+   call `removeFabric()` to recover. Then it will need to perform the pin code
+   flow for this TV again.
+
+5) **Shared Credentials Across TVs**: When there are 2 TVs that use the same
+   middleware (e.g., FireTV) and are associated with the same customer account,
+   they will often use the same cached credential (they use the same Matter
+   fabric), however, the DNS-SD information is different. The resulting behavior
+   is similar to item (3) - the pin code flow will be attempted and fail, the
+   cached credential will be deleted which allows the next attempt to succeed.
+   Some middleware providers may handle this scenario differently.
+
+### Detecting App Presence on Casting Player (Optional)
+
+Before establishing a full commissioning session, a Casting Client can use the
+UDC protocol to check if a specific app is installed on the target
+`CastingPlayer`. This is useful when the user experience requires a specific app
+to be present, or when you need to verify that the correct account is active in
+the app. This feature is described in the Matter specification section 5.3.7.4 -
+"UDC with no Passcode prompt (targeted app selection)".
+
+The app detection workflow consists of four steps:
+
+1. **Generate a unique session identifier**: Create a random `instanceName`
+   string for this UDC session.
+2. **Send initial IdentificationDeclaration**: Send an IdentificationDeclaration
+   message to the `CastingPlayer` with the `instanceName`, `NoPasscode` set to
+   `true`, and `targetAppInfo` containing the app you want to check for.
+3. **Check the CommissionerDeclaration response**: The `CastingPlayer` will
+   respond with a CommissionerDeclaration message with `NeedsPasscode` set to
+   `true` and `PasscodeDialogDisplayed` set to `false`. If the `NoAppsFound`
+   field is `true`, the target app was not found on the `CastingPlayer`.
+4. **Cancel the UDC session**: Send another IdentificationDeclaration message
+   with the same `instanceName` and `CancelPasscode` set to `true` to
+   immediately end the UDC session. This is important because the default Matter
+   SDK behavior on the TV supports one UDC session at a time, and without
+   canceling, the TV will block new UDC sessions until the current one times out
+   (which could take up to 30 seconds).
+
+On Linux, you can detect app presence as follows:
+
+```c
+// Step 1: Generate a unique instanceName for this UDC session
+std::string instanceName = GenerateRandomInstanceName(); // Implement your random string generator
+
+// Step 2: Set up IdentificationDeclarationOptions with NoPasscode and targetAppInfo
+matter::casting::core::IdentificationDeclarationOptions idOptions;
+idOptions.mNoPasscode = true;
+idOptions.mInstanceName = instanceName.c_str();
+
+chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
+targetAppInfo.vendorId = kDesiredAppVendorId;  // Your target app's vendor ID
+// Optionally set productId if you want to be more specific
+// targetAppInfo.productId = kDesiredAppProductId;
+CHIP_ERROR result = idOptions.addTargetAppInfo(targetAppInfo);
+
+// Step 3: Set up callbacks to handle the CommissionerDeclaration response
+matter::casting::core::ConnectionCallbacks connectionCallbacks;
+connectionCallbacks.mCommissionerDeclarationCallback = [&instanceName, &targetCastingPlayer](
+    const chip::Transport::PeerAddress & source,
+    chip::Protocols::UserDirectedCommissioning::CommissionerDeclaration cd) {
+
+    if (cd.GetNoAppsFound()) {
+        ChipLogProgress(AppServer, "Target app not found on CastingPlayer");
+        // Handle the case where the app is not installed
+        // You may choose not to proceed with commissioning
+    } else {
+        ChipLogProgress(AppServer, "Target app found on CastingPlayer");
+        // App is present, you can proceed with commissioning if desired
+    }
+
+    // Step 4: Cancel the UDC session by sending CancelPasscode
+    matter::casting::core::IdentificationDeclarationOptions cancelOptions;
+    cancelOptions.mCancelPasscode = true;
+    cancelOptions.mInstanceName = instanceName.c_str();
+
+    matter::casting::core::ConnectionCallbacks cancelCallbacks;
+    // Send the cancel message using SendUDC
+    targetCastingPlayer->SendUDC(cancelCallbacks, cancelOptions);
+};
+
+// Send the initial IdentificationDeclaration using SendUDC
+targetCastingPlayer->SendUDC(connectionCallbacks, idOptions);
+```
+
+On Android, you can detect app presence as follows:
+
+```java
+// Step 1: Generate a unique instanceName for this UDC session
+String instanceName = UUID.randomUUID().toString();
+
+// Step 2: Set up IdentificationDeclarationOptions with NoPasscode and targetAppInfo
+IdentificationDeclarationOptions idOptions = new IdentificationDeclarationOptions(
+    /* noPasscode= */ true,
+    /* cdUponPasscodeDialog= */ false,
+    /* commissionerPasscode= */ false,
+    /* commissionerPasscodeReady= */ false,
+    /* cancelPasscode= */ false,
+    /* passcodeLength= */ 0
+);
+idOptions.setInstanceName(instanceName);
+
+TargetAppInfo targetAppInfo = new TargetAppInfo(DESIRED_APP_VENDOR_ID);
+// Optionally set productId if you want to be more specific
+// targetAppInfo.setProductId(DESIRED_APP_PRODUCT_ID);
+idOptions.addTargetAppInfo(targetAppInfo);
+
+// Step 3: Set up callbacks to handle the CommissionerDeclaration response
+ConnectionCallbacks connectionCallbacks = new ConnectionCallbacks(
+    new MatterCallback<Void>() {
+        @Override
+        public void handle(Void v) {
+            // Connection succeeded (not expected in app detection flow)
+        }
+    },
+    new MatterCallback<MatterError>() {
+        @Override
+        public void handle(MatterError err) {
+            // Connection failed (expected in app detection flow)
+        }
+    },
+    new MatterCallback<CommissionerDeclaration>() {
+        @Override
+        public void handle(CommissionerDeclaration cd) {
+            if (cd.getNoAppsFound()) {
+                Log.i(TAG, "Target app not found on CastingPlayer");
+                // Handle the case where the app is not installed
+                // You may choose not to proceed with commissioning
+            } else {
+                Log.i(TAG, "Target app found on CastingPlayer");
+                // App is present, you can proceed with commissioning if desired
+            }
+
+            // Step 4: Cancel the UDC session
+            IdentificationDeclarationOptions cancelOptions = new IdentificationDeclarationOptions(
+                /* noPasscode= */ false,
+                /* cdUponPasscodeDialog= */ false,
+                /* commissionerPasscode= */ false,
+                /* commissionerPasscodeReady= */ false,
+                /* cancelPasscode= */ true,
+                /* passcodeLength= */ 0
+            );
+            cancelOptions.setInstanceName(instanceName);
+
+            // Send the cancel message using sendUDC
+            ConnectionCallbacks cancelCallbacks = new ConnectionCallbacks(
+                new MatterCallback<Void>() {
+                    @Override
+                    public void handle(Void v) {
+                        Log.d(TAG, "UDC session cancelled successfully");
+                    }
+                },
+                new MatterCallback<MatterError>() {
+                    @Override
+                    public void handle(MatterError err) {
+                        Log.e(TAG, "Failed to cancel UDC session: " + err);
+                    }
+                },
+                null  // No CommissionerDeclaration callback needed for cancel
+            );
+
+            MatterError err = targetCastingPlayer.sendUDC(cancelCallbacks, cancelOptions);
+            if (err.hasError()) {
+                Log.e(TAG, "Failed to send cancel UDC message: " + err);
+            }
+        }
+    }
+);
+
+// Send the initial IdentificationDeclaration using sendUDC
+MatterError err = targetCastingPlayer.sendUDC(connectionCallbacks, idOptions);
+if (err.hasError()) {
+    Log.e(TAG, "Failed to send app detection request: " + err);
+}
+```
+
+On iOS, you can detect app presence as follows:
+
+```swift
+// Step 1: Generate a unique instanceName for this UDC session
+let instanceName = UUID().uuidString
+
+// Step 2: Set up MCIdentificationDeclarationOptions with NoPasscode and targetAppInfo
+let idOptions = MCIdentificationDeclarationOptions(noPasscodeOnly: true)
+idOptions.setInstanceName(instanceName)
+
+let targetAppInfo = MCTargetAppInfo(vendorId: kDesiredAppVendorId)
+// Optionally set productId if you want to be more specific
+// targetAppInfo.productId = kDesiredAppProductId
+idOptions.addTargetAppInfo(targetAppInfo)
+
+// Step 3: Set up callbacks to handle the CommissionerDeclaration response
+let commissionerDeclarationCallback: (MCCommissionerDeclaration) -> Void = { cd in
+    if cd.noAppsFound {
+        self.Log.info("Target app not found on CastingPlayer")
+        // Handle the case where the app is not installed
+        // You may choose not to proceed with commissioning
+    } else {
+        self.Log.info("Target app found on CastingPlayer")
+        // App is present, you can proceed with commissioning if desired
+    }
+
+    // Step 4: Cancel the UDC session
+    let cancelOptions = MCIdentificationDeclarationOptions(cancelPasscodeOnly: true)
+    cancelOptions.setInstanceName(instanceName)
+
+    let cancelCallbacks = MCConnectionCallbacks(
+        callbacks: { err in
+            if err == nil {
+                self.Log.info("UDC session cancelled successfully")
+            } else {
+                self.Log.error("Failed to cancel UDC session: \(String(describing: err))")
+            }
+        },
+        commissionerDeclarationCallback: nil  // No CommissionerDeclaration callback needed for cancel
+    )
+
+    // Send the cancel message using sendUDCWithCallbacks
+    let err = selectedCastingPlayer?.sendUDCWithCallbacks(cancelCallbacks, identificationDeclarationOptions: cancelOptions)
+    if err != nil {
+        self.Log.error("Failed to send cancel UDC message: \(String(describing: err))")
+    }
+}
+
+let connectionCallbacks = MCConnectionCallbacks(
+    callbacks: { err in
+        // Connection callback (not expected to complete in app detection flow)
+    },
+    commissionerDeclarationCallback: commissionerDeclarationCallback
+)
+
+// Send the initial IdentificationDeclaration using sendUDCWithCallbacks
+let err = selectedCastingPlayer?.sendUDCWithCallbacks(connectionCallbacks, identificationDeclarationOptions: idOptions)
+if err != nil {
+    self.Log.error("Failed to send app detection request: \(String(describing: err))")
+}
+```
+
+**Important Notes:**
+
+-   The `instanceName` must be unique for each app detection session and should
+    be randomly generated.
+-   Use the `sendUDC` API (Android), `SendUDC` API (Linux), or
+    `sendUDCWithCallbacks` API (iOS) for app detection. These APIs directly send
+    UDC messages without initiating a full commissioning session.
+-   Always send the `CancelPasscode` message after receiving the
+    CommissionerDeclaration response to free up the UDC session on the
+    `CastingPlayer`. Use the same `sendUDC` / `SendUDC` / `sendUDCWithCallbacks`
+    API with `CancelPasscode` set to `true`.
+-   This is a lightweight check that doesn't establish a full commissioning
+    session. If you want to proceed with commissioning after detecting the app,
+    you'll need to call `VerifyOrEstablishConnection` (or
+    `verifyOrEstablishConnection`) separately with appropriate commissioning
+    parameters.
+-   Some apps may not support guest mode or multiple simultaneous accounts. In
+    such cases, you can use this feature to detect if the app is present with a
+    different account and prompt the user to switch accounts before proceeding.
+
 ### Select an Endpoint on the Casting Player
 
 _{Complete Endpoint selection examples: [Linux](linux/simple-app-helper.cpp) |

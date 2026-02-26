@@ -28,6 +28,10 @@
 #include <vector>
 
 namespace chip {
+
+// Forward declaration for friend class
+class JFAManager;
+
 namespace app {
 
 namespace datastore {
@@ -51,6 +55,17 @@ struct ACLEntryStruct
 };
 
 } // namespace datastore
+
+enum RefreshState
+{
+    kIdle,
+    kRefreshingEndpoints,
+    kRefreshingGroups,
+    kRefreshingBindings,
+    kFetchingGroupKeySets,
+    kRefreshingGroupKeySets,
+    kRefreshingACLs,
+};
 
 /**
  * A struct which extends the DatastoreNodeInformationEntry type with FriendlyName buffer reservation.
@@ -148,14 +163,94 @@ public:
             return CHIP_ERROR_NOT_IMPLEMENTED;
         }
 
+        virtual CHIP_ERROR
+        SyncNode(NodeId nodeId,
+                 std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> & bindingEntries,
+                 std::function<void()> onSuccess)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
         virtual CHIP_ERROR SyncNode(NodeId nodeId,
                                     const Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & aclEntry,
                                     std::function<void()> onSuccess)
         {
             return CHIP_ERROR_NOT_IMPLEMENTED;
         }
+
+        virtual CHIP_ERROR
+        SyncNode(NodeId nodeId,
+                 const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> & aclEntries,
+                 std::function<void()> onSuccess)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
+        virtual CHIP_ERROR SyncNode(NodeId nodeId,
+                                    const Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet,
+                                    std::function<void()> onSuccess)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
+        virtual CHIP_ERROR FetchEndpointList(
+            NodeId nodeId,
+            std::function<void(CHIP_ERROR,
+                               const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> &)>
+                onSuccess)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
+        virtual CHIP_ERROR FetchEndpointGroupList(
+            NodeId nodeId, EndpointId endpointId,
+            std::function<
+                void(CHIP_ERROR,
+                     const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type> &)>
+                onSuccess)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
+        virtual CHIP_ERROR FetchEndpointBindingList(
+            NodeId nodeId, EndpointId endpointId,
+            std::function<
+                void(CHIP_ERROR,
+                     const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> &)>
+                onSuccess)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
+        virtual CHIP_ERROR FetchGroupKeySetList(
+            NodeId nodeId,
+            std::function<void(CHIP_ERROR,
+                               const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type> &)>
+                onSuccess)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
+        virtual CHIP_ERROR FetchACLList(
+            NodeId nodeId,
+            std::function<void(CHIP_ERROR,
+                               const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> &)>
+                onSuccess)
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
     };
 
+    CHIP_ERROR SetAnchorRootCA(const ByteSpan & anchorRootCA)
+    {
+        if (anchorRootCA.size() >= sizeof(mAnchorRootCA))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        mAnchorRootCALength = anchorRootCA.size();
+        memcpy(mAnchorRootCA, anchorRootCA.data(), mAnchorRootCALength);
+        return CHIP_NO_ERROR;
+    }
     ByteSpan GetAnchorRootCA() const { return ByteSpan(mAnchorRootCA, mAnchorRootCALength); }
 
     CHIP_ERROR SetAnchorNodeId(NodeId anchorNodeId)
@@ -190,6 +285,12 @@ public:
         return mGroupInformationEntries;
     }
 
+    void SetStatus(Clusters::JointFabricDatastore::DatastoreStateEnum state, uint32_t updateTimestamp, uint8_t failureCode)
+    {
+        mDatastoreStatusEntry.state           = state;
+        mDatastoreStatusEntry.updateTimestamp = updateTimestamp;
+        mDatastoreStatusEntry.failureCode     = failureCode;
+    }
     Clusters::JointFabricDatastore::Structs::DatastoreStatusEntryStruct::Type & GetStatus() { return mDatastoreStatusEntry; }
 
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type> & GetEndpointGroupIDList()
@@ -217,7 +318,8 @@ public:
     CHIP_ERROR AddPendingNode(NodeId nodeId, const CharSpan & friendlyName);
     CHIP_ERROR UpdateNode(NodeId nodeId, const CharSpan & friendlyName);
     CHIP_ERROR RemoveNode(NodeId nodeId);
-    CHIP_ERROR RefreshNode(NodeId nodeId, ReadOnlyBuffer<DataModel::EndpointEntry> endpointsList);
+    CHIP_ERROR RefreshNode(NodeId nodeId);
+    CHIP_ERROR ContinueRefresh();
 
     CHIP_ERROR SetNode(NodeId nodeId, Clusters::JointFabricDatastore::DatastoreStateEnum state);
 
@@ -250,6 +352,11 @@ public:
     AddACLToNode(NodeId nodeId,
                  const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType & aclEntry);
     CHIP_ERROR RemoveACLFromNode(uint16_t listId, NodeId nodeId);
+
+    CHIP_ERROR TestAddNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId, NodeId nodeId);
+    CHIP_ERROR TestAddEndpointEntry(EndpointId endpointId, NodeId nodeId, CharSpan friendlyName);
+
+    CHIP_ERROR ForceAddNodeKeySetEntry(uint16_t groupKeySetId, NodeId nodeId);
 
     const std::vector<Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type> & GetGroupKeySetList()
     {
@@ -332,6 +439,11 @@ private:
 
     Listener * mListeners = nullptr;
 
+    friend class chip::JFAManager;
+
+    CHIP_ERROR
+    ForceAddGroup(const Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType & commandData);
+
     CHIP_ERROR IsNodeIDInDatastore(NodeId nodeId, size_t & index);
 
     CHIP_ERROR UpdateNodeKeySetList(Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet);
@@ -353,6 +465,14 @@ private:
     CHIP_ERROR RemoveNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
 
     Delegate * mDelegate = nullptr;
+
+    NodeId mRefreshingNodeId        = kUndefinedNodeId;
+    RefreshState mRefreshState      = kIdle;
+    size_t mRefreshingEndpointIndex = 0;
+
+    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> mRefreshingEndpointsList;
+    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> mRefreshingBindingEntries;
+    std::vector<Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> mRefreshingACLEntries;
 };
 
 } // namespace app

@@ -1270,8 +1270,8 @@ template("bouffalo_sdk") {
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
       public_deps += [ ":${sdk_target_name}_wifi" ]
       public_deps += [ ":${sdk_target_name}_lwip" ]
-    } else if (defined(invoker.chip_enable_openthread) &&
-               invoker.chip_enable_openthread) {
+    } else if (defined(invoker.chip_enable_thread) &&
+               invoker.chip_enable_thread) {
       public_deps += [ ":${sdk_target_name}_openthread_port" ]
     }
 

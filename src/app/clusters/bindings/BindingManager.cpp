@@ -21,33 +21,6 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
-namespace {
-
-class BindingFabricTableDelegate : public chip::FabricTable::Delegate
-{
-    void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
-    {
-        auto & bindingTable = chip::app::Clusters::Binding::Table::GetInstance();
-        auto iter           = bindingTable.begin();
-        while (iter != bindingTable.end())
-        {
-            if (iter->fabricIndex == fabricIndex)
-            {
-                TEMPORARY_RETURN_IGNORED bindingTable.RemoveAt(iter);
-            }
-            else
-            {
-                ++iter;
-            }
-        }
-        chip::app::Clusters::Binding::Manager::GetInstance().FabricRemoved(fabricIndex);
-    }
-};
-
-BindingFabricTableDelegate gFabricTableDelegate;
-
-} // namespace
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -72,9 +45,10 @@ CHIP_ERROR Manager::Init(const ManagerInitParams & params)
     VerifyOrReturnError(params.mFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mInitParams = params;
-    TEMPORARY_RETURN_IGNORED params.mFabricTable->AddFabricDelegate(&gFabricTableDelegate);
-    Table::GetInstance().SetPersistentStorage(params.mStorage);
-    CHIP_ERROR error = Table::GetInstance().LoadFromStorage();
+    mBindingTable.SetPersistentStorage(params.mStorage);
+    TEMPORARY_RETURN_IGNORED params.mFabricTable->AddFabricDelegate(this);
+
+    CHIP_ERROR error = mBindingTable.LoadFromStorage();
     if (error != CHIP_NO_ERROR)
     {
         // This can happen during first boot of the device.
@@ -87,7 +61,7 @@ CHIP_ERROR Manager::Init(const ManagerInitParams & params)
         // to false.
         if (params.mEstablishConnectionOnInit)
         {
-            for (const TableEntry & entry : Table::GetInstance())
+            for (const TableEntry & entry : mBindingTable)
             {
                 if (entry.type == MATTER_UNICAST_BINDING)
                 {
@@ -139,7 +113,7 @@ void Manager::HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, co
     // iterator returns things by value anyway.
     for (PendingNotificationEntry pendingNotification : mPendingNotificationMap)
     {
-        TableEntry entry = Table::GetInstance().GetAt(pendingNotification.mBindingEntryId);
+        TableEntry entry = mBindingTable.GetAt(pendingNotification.mBindingEntryId);
 
         if (sessionHandle->GetPeer() == ScopedNodeId(entry.nodeId, entry.fabricIndex))
         {
@@ -166,6 +140,8 @@ void Manager::HandleDeviceConnectionFailure(const ScopedNodeId & peerId, CHIP_ER
 
 void Manager::FabricRemoved(FabricIndex fabricIndex)
 {
+    VerifyOrDie(mInitParams.mCASESessionManager != nullptr);
+
     mPendingNotificationMap.RemoveAllEntriesForFabric(fabricIndex);
 
     // TODO(#18436): NOC cluster should handle fabric removal without needing binding manager
@@ -184,7 +160,7 @@ CHIP_ERROR Manager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId clu
 
     bindingContext->IncrementConsumersNumber();
 
-    for (auto iter = Table::GetInstance().begin(); iter != Table::GetInstance().end(); ++iter)
+    for (auto iter = mBindingTable.begin(); iter != mBindingTable.end(); ++iter)
     {
         if (iter->local == endpoint && (iter->clusterId.value_or(cluster) == cluster))
         {
@@ -208,11 +184,9 @@ exit:
     return error;
 }
 
-} // namespace Binding
-
-CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry)
+CHIP_ERROR Manager::AddBindingEntry(const Binding::TableEntry & entry)
 {
-    CHIP_ERROR err = Binding::Table::GetInstance().Add(entry);
+    CHIP_ERROR err = mBindingTable.Add(entry);
     if (err == CHIP_ERROR_NO_MEMORY)
     {
         return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
@@ -225,7 +199,7 @@ CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry)
 
     if (entry.type == Binding::MATTER_UNICAST_BINDING)
     {
-        err = Binding::Manager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+        err = UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
         if (err != CHIP_NO_ERROR)
         {
             // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
@@ -236,6 +210,13 @@ CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry)
     }
 
     return CHIP_NO_ERROR;
+}
+
+} // namespace Binding
+
+CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry)
+{
+    return Binding::Manager::GetInstance().AddBindingEntry(entry);
 }
 
 } // namespace Clusters

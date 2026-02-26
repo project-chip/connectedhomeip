@@ -6,8 +6,8 @@
 docs/cluster_and_device_type_dev/cluster_and_device_type_dev.md
 
 # Example applications
-examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseDelegateImpl.cpp
-examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseManager.cpp
+examples/evse-app/evse-common/src/EnergyEvseDelegateImpl.cpp
+examples/evse-app/evse-common/src/EnergyEvseManager.cpp
 
 # Build files
 src/app/BUILD.gn

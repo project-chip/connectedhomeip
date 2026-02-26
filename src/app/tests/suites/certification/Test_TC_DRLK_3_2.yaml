@@ -757,3 +757,9 @@ tests:
           [1698647393.728794][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
           [1698647393.728829][11905:11905] CHIP:DMG: },
       disabled: true
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: lock
+      app: lock

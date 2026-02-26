@@ -22,6 +22,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <lib/support/FixedBuffer.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -33,6 +35,9 @@ namespace Internal {
 inline constexpr size_t kMaxWiFiSSIDLength = 32;
 inline constexpr size_t kMaxWiFiKeyLength  = 64;
 inline constexpr size_t kWiFiBSSIDLength   = 6;
+
+using WiFiKeyFixedBuffer  = FixedByteBuffer<kMaxWiFiKeyLength, uint8_t>;
+using WiFiSSIDFixedBuffer = FixedByteBuffer<kMaxWiFiSSIDLength, uint8_t>;
 
 /**
  * Ids for well-known network provision types.

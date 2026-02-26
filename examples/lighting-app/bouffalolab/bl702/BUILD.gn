@@ -111,7 +111,7 @@ bl_iot_sdk("sdk") {
 }
 
 chip_data_model("bouffalolab-lighting") {
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     zap_file = "${example_dir}/data_model/lighting-app-thread.zap"
   } else if (chip_enable_wifi) {
     zap_file = "${example_dir}/data_model/lighting-app-wifi.zap"
@@ -199,7 +199,7 @@ bouffalolab_executable("lighting_app") {
     ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     deps += [
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
@@ -260,7 +260,7 @@ bouffalolab_executable("lighting_app") {
       "${examples_plat_dir}/common/rpc/pw_sys_io:pw_sys_io",
     ]
 
-    if (chip_enable_openthread) {
+    if (chip_enable_thread) {
       deps += [
         "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
         "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",

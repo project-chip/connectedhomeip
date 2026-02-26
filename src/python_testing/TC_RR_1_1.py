@@ -330,7 +330,7 @@ class TC_RR_1_1(MatterBaseTest):
             client = client_by_name[client_name]
 
             # Send the UpdateLabel command
-            label = ("%d" % fabric.fabricIndex) * 32
+            label = (("%d." % fabric.fabricIndex) * 16)[:32]
             log.info("Step 2a: Setting fabric label on fabric %d to '%s' using client %s" %
                      (fabric.fabricIndex, label, client_name))
             await client.SendCommand(self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel(label))

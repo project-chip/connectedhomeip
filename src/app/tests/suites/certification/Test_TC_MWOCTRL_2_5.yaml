@@ -53,3 +53,9 @@ tests:
           value: 90
           constraints:
               type: elapsed_s
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: microwave-oven
+      app: microwave-oven

@@ -17,24 +17,25 @@
 import enum
 import logging
 import os
+import random
 import sys
 import time
+import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 import chiptest
 import click
 import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.runner import Executor, SubprocessInfo, SubprocessKind
-from chiptest.test_definition import TestDefinition, TestRunTime, TestTag
+from chiptest.runner import Executor, SubprocessKind
+from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
 
-# If running on Linux platform load the Linux specific code.
 if sys.platform == "linux":
     import chiptest.linux
 
@@ -60,10 +61,41 @@ __LOG_LEVELS__ = logging.getLevelNamesMapping()
 class RunContext:
     root: str
     tests: list[chiptest.TestDefinition]
-    chip_tool: SubprocessInfo | None
-    dry_run: bool
     runtime: TestRunTime
     find_path: list[str]
+
+    # Deprecated options passed to `cmd_run`
+    deprecated_chip_tool_path: Path | None = None
+
+
+# TODO: When we update click to >= 8.2.0 we will be able to use the builtin `deprecated` argument for Option
+# and drop this implementation.
+def deprecation_warning(context, param, value):
+    if value:
+        # Hack: Try to reverse the conversion between flag and variable name which happens in click
+        warnings.warn(f"Use '{param.replacement}' instead of '--{str.replace(param.name, '_', '-')}'", category=DeprecationWarning)
+    return value
+
+
+class DeprecatedOption(click.Option):
+    def __init__(self, *args, **kwargs):
+        self.replacement = kwargs.pop('replacement')
+        kwargs['help'] += f" (DEPRECATED: Use '{self.replacement}')"
+        super().__init__(*args, **kwargs, callback=deprecation_warning)
+
+
+def validate_test_order(ctx: click.Context, param: click.Parameter, value: Any) -> str | None:
+    if not isinstance(value, str):
+        raise click.BadParameter("Test order needs to be a string.")
+    if value == "alphabetic":
+        return None
+    if (value_split := value.split(":", maxsplit=1))[0] == "random":
+        if len(value_split) == 1:
+            return str(time.time_ns())
+        if not value_split[1]:
+            raise click.BadParameter("Random seed not specified. Should be: 'random[:seed]'.")
+        return value_split[1]
+    raise click.BadParameter("Wrong format of test order. Should be: 'alphabetic' or 'random[:seed]'.")
 
 
 ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
@@ -75,11 +107,6 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     default='info',
     type=click.Choice(tuple(__LOG_LEVELS__.keys()), case_sensitive=False),
     help='Determines the verbosity of script output.')
-@click.option(
-    '--dry-run',
-    default=False,
-    is_flag=True,
-    help='Only print out shell commands that would be executed')
 @click.option(
     '--target',
     default=['all'],
@@ -126,6 +153,14 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='What test tags to exclude when running. Exclude options takes precedence over include.',
 )
 @click.option(
+    '--test-order', 'test_order_seed',
+    type=click.UNPROCESSED,
+    callback=validate_test_order,
+    default="alphabetic",
+    show_default=True,
+    help="Order in which tests should be executed. Possible values: 'alphabetic', 'random[:seed]'."
+)
+@click.option(
     '--find-path',
     default=[DEFAULT_CHIP_ROOT],
     multiple=True,
@@ -137,13 +172,15 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     default='chip_tool_python',
     help='Run YAML tests using the specified runner.')
 @click.option(
-    '--chip-tool',
-    type=ExistingFilePath,
+
+    '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
-def main(context: click.Context, dry_run: bool, log_level: str, target: str, target_glob: str, target_skip_glob: str,
+def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str,
          no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
-         exclude_tags: tuple[TestTag, ...], find_path: list[str], runner: str, chip_tool: Path | None) -> None:
+         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: str,
+         chip_tool: Path | None) -> None:
+
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -162,19 +199,6 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
         runtime = TestRunTime.MATTER_REPL_PYTHON
     elif runner == 'darwin_framework_tool_python':
         runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON
-
-    chip_tool_info: SubprocessInfo | None = None
-    if chip_tool is not None:
-        chip_tool_info = SubprocessInfo(kind=SubprocessKind.TOOL, path=chip_tool)
-    elif runtime != TestRunTime.MATTER_REPL_PYTHON:
-        paths_finder = PathsFinder(find_path)
-        if runtime == TestRunTime.CHIP_TOOL_PYTHON:
-            chip_tool_path = paths_finder.get('chip-tool')
-        else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
-            chip_tool_path = paths_finder.get('darwin-framework-tool')
-
-        if chip_tool_path is not None:
-            chip_tool_info = SubprocessInfo(kind=SubprocessKind.TOOL, path=Path(chip_tool_path))
 
     # Figures out selected test that match the given name(s)
     if runtime == TestRunTime.MATTER_REPL_PYTHON:
@@ -238,12 +262,18 @@ def main(context: click.Context, dry_run: bool, log_level: str, target: str, tar
 
         tests_filtered.append(test)
 
-    tests_filtered.sort(key=lambda x: x.name)
+    if test_order_seed is None:
+        log.info('Executing the tests in alphabetic order')
+        tests_filtered.sort(key=lambda x: x.name)
+    else:
+        log.info('Using the following seed for test order randomization: %s', test_order_seed)
+        random.seed(test_order_seed)
+        random.shuffle(tests_filtered)
 
     context.obj = RunContext(root=root, tests=tests_filtered,
-                             chip_tool=chip_tool_info, dry_run=dry_run,
-                             runtime=runtime,
-                             find_path=find_path)
+                             runtime=runtime, find_path=find_path)
+    if chip_tool:
+        context.obj.deprecated_chip_tool_path = Path(chip_tool)
 
 
 @main.command(
@@ -272,73 +302,86 @@ class Terminable(Protocol):
 @main.command(
     'run', help='Execute the tests')
 @click.option(
+    '--dry-run',
+    default=False,
+    is_flag=True,
+    help='Only print out shell commands that would be executed')
+@click.option(
     '--iterations',
     default=1,
     help='Number of iterations to run')
+# Deprecated flags:
 @click.option(
-    '--all-clusters-app',
-    type=ExistingFilePath,
+    '--all-clusters-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path all-clusters:<path>',
     help='what all clusters app to use')
 @click.option(
-    '--lock-app',
-    type=ExistingFilePath,
+    '--lock-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path lock:<path>',
     help='what lock app to use')
 @click.option(
-    '--fabric-bridge-app',
-    type=ExistingFilePath,
+    '--fabric-bridge-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path fabric-bridge:<path>',
     help='what fabric bridge app to use')
 @click.option(
-    '--ota-provider-app',
-    type=ExistingFilePath,
+    '--ota-provider-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path ota-provider:<path>',
     help='what ota provider app to use')
 @click.option(
-    '--ota-requestor-app',
-    type=ExistingFilePath,
+    '--ota-requestor-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path ota-requestor:<path>',
     help='what ota requestor app to use')
 @click.option(
-    '--tv-app',
-    type=ExistingFilePath,
+    '--tv-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path tv:<path>',
     help='what tv app to use')
 @click.option(
-    '--bridge-app',
-    type=ExistingFilePath,
+    '--bridge-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path bridge:<path>',
     help='what bridge app to use')
 @click.option(
-    '--lit-icd-app',
-    type=ExistingFilePath,
+    '--lit-icd-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path lit-icd:<path>',
     help='what lit-icd app to use')
 @click.option(
-    '--microwave-oven-app',
-    type=ExistingFilePath,
+    '--microwave-oven-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path microwave-oven:<path>',
     help='what microwave oven app to use')
 @click.option(
-    '--rvc-app',
-    type=ExistingFilePath,
+    '--rvc-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path rvc:<path>',
     help='what rvc app to use')
 @click.option(
-    '--network-manager-app',
-    type=ExistingFilePath,
+    '--network-manager-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path network-manager:<path>',
     help='what network-manager app to use')
 @click.option(
-    '--energy-gateway-app',
-    type=ExistingFilePath,
+    '--energy-gateway-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path energy-gateway:<path>',
     help='what energy-gateway app to use')
 @click.option(
-    '--energy-management-app',
-    type=ExistingFilePath,
-    help='what energy-management app to use')
+    '--water-heater-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path water-heater:<path>',
+    help='what water-heater app to use')
 @click.option(
-    '--closure-app',
-    type=ExistingFilePath,
+    '--evse-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path evse:<path>',
+    help='what evse app to use')
+@click.option(
+    '--closure-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path closure:<path>',
     help='what closure app to use')
 @click.option(
-    '--matter-repl-yaml-tester',
-    type=ExistingFilePath,
+    '--matter-repl-yaml-tester', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path matter-repl-yaml-tester:<path>',
     help='what python script to use for running yaml tests using matter-repl as controller')
 @click.option(
-    '--chip-tool-with-python',
-    type=ExistingFilePath,
+    '--chip-tool-with-python', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool-with-python:<path>',
     help='what python script to use for running yaml tests using chip-tool as controller')
+@click.option(
+    '--app-path', multiple=True, metavar="<key>:<path>",
+    help='Set path for an application (run in app network namespace), use `--help-paths` to list known keys'
+)
+@click.option(
+    '--tool-path', multiple=True, metavar="<key>:<path>",
+    help='Set path for a tool (run in tool network namespace), use `--help-paths` to list known keys'
+)
+@click.option(
+    '--discover-paths',
+    is_flag=True,
+    default=False,
+    help='Discover missing paths for application and tool binaries'
+)
+@click.option(
+    '--help-paths',
+    is_flag=True,
+    default=False,
+    help="Print keys for known application and tool paths"
+)
 @click.option(
     '--pics-file',
     type=ExistingFilePath,
@@ -363,84 +406,102 @@ class Terminable(Protocol):
     show_default=True,
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.option(
-    '--ble-wifi',
-    is_flag=True,
-    default=False,
-    show_default=True,
-    help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
+    '--commissioning-method',
+    type=click.Choice(['on-network', 'ble-wifi', 'ble-thread', 'thread-meshcop'], case_sensitive=False),
+    default='on-network',
+    help='Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth and Thread mock servers. "thread-meshcop" performs Thread commissioning using Thread mock server. This option is Linux-only.')
 @click.pass_context
-def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | None, lock_app: Path | None,
-            ota_provider_app: Path | None, ota_requestor_app: Path | None, fabric_bridge_app: Path | None, tv_app: Path | None,
-            bridge_app: Path | None, lit_icd_app: Path | None, microwave_oven_app: Path | None, rvc_app: Path | None,
-            network_manager_app: Path | None, energy_gateway_app: Path | None, energy_management_app: Path | None,
-            closure_app: Path | None, matter_repl_yaml_tester: Path | None, chip_tool_with_python: Path | None, pics_file: Path,
-            keep_going: bool, test_timeout_seconds: int | None, expected_failures: int, ble_wifi: bool) -> None:
+def cmd_run(context: click.Context, dry_run: bool, iterations: int,
+            app_path: list[str], tool_path: list[str], discover_paths: bool, help_paths: bool,
+            # Deprecated CLI flags
+            all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
+            fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
+            microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None, energy_gateway_app: Path | None,
+            water_heater_app: Path | None, evse_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
+            chip_tool_with_python: Path | None, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
+            expected_failures: int, commissioning_method: str | None) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
-        raise click.BadOptionUsage("--expected-failures", f"--expected-failures '{expected_failures}' used without '--keep-going'")
+        raise click.BadOptionUsage("--expected-failures",
+                                   f"--expected-failures '{expected_failures}' used without '--keep-going'")
 
-    paths_finder = PathsFinder(context.obj.find_path)
+    subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder(context.obj.find_path))
 
-    def build_app(arg_value: Path | None, kind: SubprocessKind, key: str) -> SubprocessInfo | None:
-        log.debug("Constructing app %s...", key)
-        app_path = arg_value if arg_value is not None else paths_finder.get(key)
-        return None if app_path is None else SubprocessInfo(kind=kind, path=Path(app_path))
+    if help_paths:
+        print("---")  # Handmade artisanal YAML
+        print("# Known application and tool path keys:")
+        for key, entry in subproc_info_repo.subproc_knowhow.items():
+            print(f"- key: {key}")
+            print(f"  kind: {entry.kind}")
+        sys.exit(0)
 
-    all_clusters_app_info = build_app(all_clusters_app, SubprocessKind.APP, 'chip-all-clusters-app')
-    lock_app_info = build_app(lock_app, SubprocessKind.APP, 'chip-lock-app')
-    fabric_bridge_app_info = build_app(fabric_bridge_app, SubprocessKind.APP, 'fabric-bridge-app')
-    ota_provider_app_info = build_app(ota_provider_app, SubprocessKind.APP, 'chip-ota-provider-app')
-    ota_requestor_app_info = build_app(ota_requestor_app, SubprocessKind.APP, 'chip-ota-requestor-app')
-    tv_app_info = build_app(tv_app, SubprocessKind.APP, 'chip-tv-app')
-    bridge_app_info = build_app(bridge_app, SubprocessKind.APP, 'chip-bridge-app')
-    lit_icd_app_info = build_app(lit_icd_app, SubprocessKind.APP, 'lit-icd-app')
-    microwave_oven_app_info = build_app(microwave_oven_app, SubprocessKind.APP, 'chip-microwave-oven-app')
-    rvc_app_info = build_app(rvc_app, SubprocessKind.APP, 'chip-rvc-app')
-    network_manager_app_info = build_app(network_manager_app, SubprocessKind.APP, 'matter-network-manager-app')
-    energy_gateway_app_info = build_app(energy_gateway_app, SubprocessKind.APP, 'chip-energy-gateway-app')
-    energy_management_app_info = build_app(energy_management_app, SubprocessKind.APP, 'chip-energy-management-app')
-    closure_app_info = build_app(closure_app, SubprocessKind.APP, 'closure-app')
+    def handle_deprecated_pathopt(key, path, kind):
+        if path is not None:
+            subproc_info_repo.addSpec(f"{key}:{path}", kind)
 
-    matter_repl_yaml_tester_info = build_app(matter_repl_yaml_tester, SubprocessKind.TOOL,
-                                             'yamltest_with_matter_repl_tester.py')
-    if matter_repl_yaml_tester_info is not None:
-        matter_repl_yaml_tester_info = matter_repl_yaml_tester_info.wrap_with('python3')
+    handle_deprecated_pathopt('all-clusters', all_clusters_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('lock', lock_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('fabric-bridge', fabric_bridge_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('ota-provider', ota_provider_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('ota-requestor', ota_requestor_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('tv', tv_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('bridge', bridge_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('lit-icd', lit_icd_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('microwave-oven', microwave_oven_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('rvc', rvc_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('network-manager', network_manager_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('energy-gateway', energy_gateway_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('water-heater', water_heater_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('evse', evse_app, SubprocessKind.APP)
+    handle_deprecated_pathopt('closure', closure_app, SubprocessKind.APP)
 
-    if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-        chip_tool_with_python_info = build_app(chip_tool_with_python, SubprocessKind.TOOL, 'darwinframeworktool.py')
-    else:
-        chip_tool_with_python_info = build_app(chip_tool_with_python, SubprocessKind.TOOL, 'chiptool.py')
+    handle_deprecated_pathopt('matter-repl-yaml-tester', matter_repl_yaml_tester, SubprocessKind.TOOL)
+    handle_deprecated_pathopt('chip-tool-with-python', chip_tool_with_python, SubprocessKind.TOOL)
+    handle_deprecated_pathopt('chip-tool', context.obj.deprecated_chip_tool_path, SubprocessKind.TOOL)
 
-    if chip_tool_with_python_info is not None:
-        chip_tool_with_python_info = chip_tool_with_python_info.wrap_with('python3')
+    # New-style options override the deprecated ones
+    for p in app_path:
+        try:
+            subproc_info_repo.addSpec(p, kind=SubprocessKind.APP)
+        except ValueError as e:
+            raise click.BadOptionUsage("app-path", f"Invalid app path specifier '{p}': {e}")
+    for p in tool_path:
+        try:
+            subproc_info_repo.addSpec(p, kind=SubprocessKind.TOOL)
+        except ValueError as e:
+            raise click.BadOptionUsage("tool-path", f"Invalid tool path specifier '{p}': {e}")
 
-    if ble_wifi and sys.platform != "linux":
-        raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
+    if discover_paths:
+        subproc_info_repo.discover()
 
-    # Command execution requires an array
-    paths = chiptest.ApplicationPaths(
-        chip_tool=context.obj.chip_tool,
-        all_clusters_app=all_clusters_app_info,
-        lock_app=lock_app_info,
-        fabric_bridge_app=fabric_bridge_app_info,
-        ota_provider_app=ota_provider_app_info,
-        ota_requestor_app=ota_requestor_app_info,
-        tv_app=tv_app_info,
-        bridge_app=bridge_app_info,
-        lit_icd_app=lit_icd_app_info,
-        microwave_oven_app=microwave_oven_app_info,
-        rvc_app=rvc_app_info,
-        network_manager_app=network_manager_app_info,
-        energy_gateway_app=energy_gateway_app_info,
-        energy_management_app=energy_management_app_info,
-        closure_app=closure_app_info,
-        matter_repl_yaml_tester_cmd=matter_repl_yaml_tester_info,
-        chip_tool_with_python_cmd=chip_tool_with_python_info,
-    )
+    # We use require here as we want to throw an error as these tools are mandatory for any test run.
+    try:
+
+        if context.obj.runtime == TestRunTime.MATTER_REPL_PYTHON:
+            subproc_info_repo.require('matter-repl-yaml-tester')
+        elif context.obj.runtime == TestRunTime.CHIP_TOOL_PYTHON:
+            subproc_info_repo.require('chip-tool')
+            subproc_info_repo.require('chip-tool-with-python', target_name='chiptool.py')
+        else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
+            # `chip-tool` on darwin is `darwin-framework-tool`
+            subproc_info_repo['chip-tool'] = subproc_info_repo.require('darwin-framework-tool')
+            subproc_info_repo.require('chip-tool-with-python', target_name='darwinframeworktool.py')
+    except (ValueError, LookupError) as e:
+        raise click.BadOptionUsage("{app,tool}-path", f"Missing required path: {e}")
+
+    # Derive boolean flags from commissioning_method parameter
+    wifi_required = commissioning_method in ['ble-wifi']
+    thread_required = commissioning_method in ['ble-thread', 'thread-meshcop']
+
+    if (wifi_required or thread_required) and sys.platform != "linux":
+        raise click.BadOptionUsage("commissioning-method",
+                                   f"Option --commissioning-method={commissioning_method} is available on Linux platform only")
 
     ble_controller_app = None
     ble_controller_tool = None
+    thread_ba_host = None
+    thread_ba_port = None
     to_terminate: list[Terminable] = []
 
     def cleanup() -> None:
@@ -457,17 +518,28 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                setup_app_link_up=not ble_wifi,
+                setup_app_link_up=not wifi_required,
+                add_ula=not thread_required,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.
-                app_link_name='wlx-app' if ble_wifi else 'eth-app'))
+                app_link_name='wlx-app' if wifi_required else 'eth-app'))
 
-            if ble_wifi:
+            if commissioning_method == 'ble-wifi':
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
                 to_terminate.append(chiptest.linux.BluetoothMock())
                 to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
+            elif commissioning_method == 'ble-thread':
+                to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                to_terminate.append(chiptest.linux.BluetoothMock())
+                to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                ble_controller_app = 0   # Bind app to the first BLE controller
+                ble_controller_tool = 1  # Bind tool to the second BLE controller
+            elif commissioning_method == 'thread-meshcop':
+                to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                thread_ba_host = tbr.get_border_agent_host()
+                thread_ba_port = tbr.get_border_agent_port()
 
             to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
@@ -489,20 +561,26 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
             for test in context.obj.tests:
                 test_start = time.monotonic()
                 try:
-                    if context.obj.dry_run:
+                    if dry_run:
                         log.info("Would run test: '%s'", test.name)
                     else:
                         log.info("%-20s - Starting test", test.name)
                     test.Run(
-                        runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
+                        runner, apps_register, subproc_info_repo, pics_file,
+                        test_timeout_seconds, dry_run,
                         test_runtime=context.obj.runtime,
                         ble_controller_app=ble_controller_app,
                         ble_controller_tool=ble_controller_tool,
+                        op_network='Thread' if thread_required else 'WiFi',
+                        thread_ba_host=thread_ba_host,
+                        thread_ba_port=thread_ba_port,
                     )
-                    if not context.obj.dry_run:
+                    if not dry_run:
                         test_end = time.monotonic()
                         log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
                 except Exception:
+                    if os.path.exists('thread.pcap'):
+                        os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
                     test_end = time.monotonic()
                     log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
                     observed_failures += 1
@@ -510,7 +588,8 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
                         sys.exit(2)
 
             if observed_failures != expected_failures:
-                log.error("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
+                log.error("Iteration %d: expected failure count %d, but got %d",
+                          i, expected_failures, observed_failures)
                 sys.exit(2)
     except KeyboardInterrupt:
         log.info("Interrupting execution on user request")

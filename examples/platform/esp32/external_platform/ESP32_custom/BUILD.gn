@@ -40,7 +40,7 @@ buildconfig_header("custom_buildconfig") {
 
   defines = [
     "CHIP_DEVICE_CONFIG_ENABLE_WPA=false",
-    "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
+    "CHIP_ENABLE_OPENTHREAD=${chip_enable_thread}",
     "CHIP_DEVICE_CONFIG_THREAD_FTD=${chip_openthread_ftd}",
     "OPENTHREAD_CONFIG_ENABLE_TOBLE=false",
     "CHIP_BYPASS_RENDEZVOUS=false",

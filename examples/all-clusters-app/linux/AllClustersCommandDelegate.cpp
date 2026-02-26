@@ -20,6 +20,8 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
+#include <app/clusters/boolean-state-configuration-server/CodegenIntegration.h>
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
@@ -64,7 +66,10 @@ uint8_t GetNumberOfSwitchPositions(EndpointId endpointId)
     uint8_t numPositions = 0;
 
     // On failure, the numPositions won't be changed, so 0 returned.
-    (void) Switch::Attributes::NumberOfPositions::Get(endpointId, &numPositions);
+    // This attribute is a configuration value for the cluster, it can not be changed once the cluster is created.
+    // This is why the cluster does not provide a getter for this attribute.
+    // We read this via ember (i.e. defaults that were set during codegen startup)
+    RETURN_SAFELY_IGNORED Switch::Attributes::NumberOfPositions::Get(endpointId, &numPositions);
 
     return numPositions;
 }
@@ -265,19 +270,17 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
         return;
     }
 
-    uint8_t previousPositionId                 = 0;
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Get(endpointId, &previousPositionId);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to get CurrentPosition attribute"));
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
 
+    uint8_t previousPositionId = switchCluster->GetCurrentPosition();
     if (positionId != previousPositionId)
     {
-        status = Switch::Attributes::CurrentPosition::Set(endpointId, positionId);
-        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                       ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+        CHIP_ERROR status = switchCluster->SetCurrentPosition(positionId);
+        VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
         ChipLogDetail(NotSpecified, "The latching switch is moved to a new position: %u", static_cast<unsigned>(positionId));
 
-        Clusters::SwitchServer::Instance().OnSwitchLatch(endpointId, positionId);
+        RETURN_SAFELY_IGNORED switchCluster->OnSwitchLatch(positionId);
     }
     else
     {
@@ -352,7 +355,11 @@ void HandleSimulateSwitchIdle(Json::Value & jsonValue)
     }
 
     EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
-    (void) Switch::Attributes::CurrentPosition::Set(endpointId, 0);
+
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    LogErrorOnFailure(switchCluster->SetCurrentPosition(0));
 }
 
 } // namespace
@@ -576,6 +583,62 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     {
         TEMPORARY_RETURN_IGNORED Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
+    else if (name == "SetBooleanState")
+    {
+        bool hasEndpointId = HasNumericField(self->mJsonValue, "EndpointId");
+        bool hasNewState   = self->mJsonValue.isMember("NewState");
+
+        if (!hasEndpointId || !hasNewState)
+        {
+            std::string inputJson = self->mJsonValue.toStyledString();
+            ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId, NewState in %s", inputJson.c_str());
+            return;
+        }
+
+        if (!self->mJsonValue["EndpointId"].isUInt() || !self->mJsonValue["NewState"].isBool())
+        {
+            std::string inputJson = self->mJsonValue.toStyledString();
+            ChipLogError(NotSpecified, "Invalid type for one of EndpointId, NewState in %s", inputJson.c_str());
+            return;
+        }
+
+        auto endpointId = static_cast<chip::EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+        auto newState   = self->mJsonValue["NewState"].asBool();
+
+        self->OnBooleanStateChangeHandler(endpointId, newState);
+    }
+    else if (name == "SetBooleanStateSensorFault")
+    {
+        bool hasEndpointId  = HasNumericField(self->mJsonValue, "EndpointId");
+        bool hasSensorFault = HasNumericField(self->mJsonValue, "SensorFault");
+
+        if (!hasEndpointId || !hasSensorFault)
+        {
+            std::string inputJson = self->mJsonValue.toStyledString();
+            ChipLogError(NotSpecified, "Missing or invalid value for EndpointId or SensorFault in %s", inputJson.c_str());
+            return;
+        }
+
+        auto endpointId  = static_cast<chip::EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+        auto sensorFault = static_cast<uint16_t>(self->mJsonValue["SensorFault"].asUInt());
+
+        self->OnBooleanStateSensorFaultHandler(endpointId, sensorFault);
+    }
+    else if (name == "SetUnmounted")
+    {
+        uint8_t unmounted   = static_cast<uint8_t>(self->mJsonValue["Unmounted"].asUInt());
+        EndpointId endpoint = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+        SmokeCoAlarmServer::Instance().SetInoperativeWhenUnmounted(true);
+        if (1 == unmounted || 0 == unmounted)
+        {
+            VerifyOrReturn(SmokeCoAlarmServer::Instance().SetUnmountedState(endpoint, static_cast<bool>(unmounted)),
+                           ChipLogError(NotSpecified, "Error setting unmounted state."));
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "Invalid Unmounted state to set.");
+        }
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
@@ -695,36 +758,42 @@ void AllClustersAppCommandHandler::OnSwitchLatchedHandler(uint8_t newPosition)
 {
     EndpointId endpoint = 1;
 
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
+    VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The latching switch is moved to a new position:%d", newPosition);
 
-    Clusters::SwitchServer::Instance().OnSwitchLatch(endpoint, newPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnSwitchLatch(newPosition);
 }
 
 void AllClustersAppCommandHandler::OnSwitchInitialPressedHandler(uint8_t newPosition)
 {
     EndpointId endpoint = 1;
 
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
+    VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The new position when the momentary switch starts to be pressed:%d", newPosition);
 
-    Clusters::SwitchServer::Instance().OnInitialPress(endpoint, newPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(newPosition);
 }
 
 void AllClustersAppCommandHandler::OnSwitchLongPressedHandler(uint8_t newPosition)
 {
     EndpointId endpoint = 1;
 
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
+    VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed for a long time:%d", newPosition);
 
-    Clusters::SwitchServer::Instance().OnLongPress(endpoint, newPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnLongPress(newPosition);
 
     // Long press to trigger smokeco self-test
     SmokeCoAlarmServer::Instance().RequestSelfTest(endpoint);
@@ -734,56 +803,64 @@ void AllClustersAppCommandHandler::OnSwitchShortReleasedHandler(uint8_t previous
 {
     EndpointId endpoint = 1;
 
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
-    ChipLogDetail(NotSpecified, "The the previous value of the CurrentPosition when the momentary switch has been released:%d",
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    CHIP_ERROR status = switchCluster->SetCurrentPosition(0);
+    VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    ChipLogDetail(NotSpecified, "The previous value of the CurrentPosition when the momentary switch has been released:%d",
                   previousPosition);
 
-    Clusters::SwitchServer::Instance().OnShortRelease(endpoint, previousPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
 }
 
 void AllClustersAppCommandHandler::OnSwitchLongReleasedHandler(uint8_t previousPosition)
 {
     EndpointId endpoint = 1;
 
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    CHIP_ERROR status = switchCluster->SetCurrentPosition(0);
+    VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
     ChipLogDetail(NotSpecified,
-                  "The the previous value of the CurrentPosition when the momentary switch has been released after having been "
+                  "The previous value of the CurrentPosition when the momentary switch has been released after having been "
                   "pressed for a long time:%d",
                   previousPosition);
 
-    Clusters::SwitchServer::Instance().OnLongRelease(endpoint, previousPosition);
+    RETURN_SAFELY_IGNORED switchCluster->OnLongRelease(previousPosition);
 }
 
 void AllClustersAppCommandHandler::OnSwitchMultiPressOngoingHandler(uint8_t newPosition, uint8_t count)
 {
     EndpointId endpoint = 1;
 
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
+    VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed in a multi-press sequence:%d",
                   newPosition);
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
 
-    Clusters::SwitchServer::Instance().OnMultiPressOngoing(endpoint, newPosition, count);
+    RETURN_SAFELY_IGNORED switchCluster->OnMultiPressOngoing(newPosition, count);
 }
 
 void AllClustersAppCommandHandler::OnSwitchMultiPressCompleteHandler(uint8_t previousPosition, uint8_t count)
 {
     EndpointId endpoint = 1;
 
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpoint);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    CHIP_ERROR status = switchCluster->SetCurrentPosition(0);
+    VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
     ChipLogDetail(NotSpecified, "The previous position when the momentary switch has been pressed in a multi-press sequence:%d",
                   previousPosition);
     ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
 
-    Clusters::SwitchServer::Instance().OnMultiPressComplete(endpoint, previousPosition, count);
+    RETURN_SAFELY_IGNORED switchCluster->OnMultiPressComplete(previousPosition, count);
 }
 
 void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::string type, DataModel::Nullable<uint8_t> mode)
@@ -827,6 +904,11 @@ void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::
     else if (type == "On")
     {
         modeInstance->UpdateOnMode(mode);
+    }
+    else if (type == "ToggleFailTransition")
+    {
+        modeInstance->ToggleFailTransition();
+        return;
     }
     else
     {
@@ -964,6 +1046,30 @@ void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointI
         return;
     }
     cluster->SetOccupancy(newOccupancyValue == 1);
+}
+
+// TODO: Do not rely on global getters. Use a direct reference to a directly registered boolean state cluster.
+// See https://github.com/project-chip/connectedhomeip/issues/43081
+void AllClustersAppCommandHandler::OnBooleanStateChangeHandler(chip::EndpointId endpointId, bool newState)
+{
+    auto booleanState = BooleanState::FindClusterOnEndpoint(endpointId);
+    if (booleanState != nullptr)
+    {
+        booleanState->SetStateValue(newState);
+        ChipLogProgress(NotSpecified, "BooleanState changed to %s on endpoint %d", newState ? "true" : "false", endpointId);
+    }
+}
+
+void AllClustersAppCommandHandler::OnBooleanStateSensorFaultHandler(chip::EndpointId endpointId, uint16_t sensorFault)
+{
+    BitMask<BooleanStateConfiguration::SensorFaultBitmap> fault(sensorFault);
+    CHIP_ERROR err = BooleanStateConfiguration::EmitSensorFault(endpointId, fault);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to emit SensorFault on endpoint %d: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
+        return;
+    }
+    ChipLogProgress(NotSpecified, "SensorFault set to 0x%04x on endpoint %d", sensorFault, endpointId);
 }
 
 void AllClustersCommandDelegate::OnEventCommandReceived(const char * json)

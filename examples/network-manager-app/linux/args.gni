@@ -25,7 +25,7 @@ chip_config_network_layer_ble = false
 
 # Wi-Fi and OpenThread support in the core are not needed for NIM
 chip_enable_wifi = false
-chip_enable_openthread = false
+chip_enable_thread = false
 
 chip_enable_access_restrictions = true
 matter_enable_tracing_support = true

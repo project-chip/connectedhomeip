@@ -40,14 +40,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:177
+            image: ghcr.io/project-chip/chip-build-nrf-platform:181
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -169,7 +169,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "source $ZEPHYR_BASE/zephyr-env.sh && pip3 install -r scripts/setup/requirements.build.txt && ./scripts/build/build_examples.py --target nrf-native-sim-tests build"
             - name: Uploading Failed Test Logs
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ failure() && !env.ACT }}
               with:
                   name: test-log

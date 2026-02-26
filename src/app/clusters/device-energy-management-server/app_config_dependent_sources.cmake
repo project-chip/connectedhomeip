@@ -18,7 +18,6 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
-    "${CLUSTER_DIR}/DeviceEnergyManagementTestEventTriggerHandler.h"
     "${CLUSTER_DIR}/device-energy-management-server.h"
 )
 
@@ -29,4 +28,5 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/DeviceEnergyManagementCluster.cpp"
     "${CLUSTER_DIR}/DeviceEnergyManagementCluster.h"
     "${CLUSTER_DIR}/DeviceEnergyManagementDelegate.h"
+    "${CLUSTER_DIR}/DeviceEnergyManagementTestEventTriggerHandler.h"
 )

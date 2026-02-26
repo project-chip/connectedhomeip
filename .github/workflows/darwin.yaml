@@ -53,7 +53,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -97,7 +97,7 @@ jobs:
                       defines: ENABLE_LEAK_DETECTION=1
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -132,7 +132,7 @@ jobs:
                   mkdir -p /tmp/darwin/framework-tests
                   find ~/Library/Developer/Xcode/DerivedData /Library/Logs/DiagnosticReports -name '*.ips' -print0 | xargs -0 -J % cp % /tmp/darwin/framework-tests
             - name: Uploading log files
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: failure() && !env.ACT
               with:
                   name: darwin-framework-test-logs-${{ matrix.options.flavor }}

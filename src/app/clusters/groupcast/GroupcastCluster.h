@@ -31,8 +31,16 @@ namespace Clusters {
 class GroupcastCluster : public DefaultServerCluster
 {
 public:
-    GroupcastCluster(BitFlags<Groupcast::Feature> features);
+    GroupcastCluster(GroupcastContext && context) :
+        DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mContext(std::move(context)), mLogic(mContext)
+    {}
+    GroupcastCluster(GroupcastContext && context, BitFlags<Groupcast::Feature> features) :
+        DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mContext(std::move(context)), mLogic(mContext, features)
+    {}
     virtual ~GroupcastCluster() {}
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType shutdownType) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -43,6 +51,7 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
 private:
+    GroupcastContext mContext;
     GroupcastLogic mLogic;
 };
 

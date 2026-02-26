@@ -21,7 +21,7 @@ import("${chip_root}/src/platform/bouffalolab/common/args.gni")
 
 assert(chip_device_platform == "bl616")
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -40,10 +40,6 @@ static_library("BL616") {
     "../common/KeyValueStoreManagerImpl.cpp",
     "../common/PlatformManagerImpl.cpp",
   ]
-
-  if (chip_enable_ota_requestor) {
-    sources += [ "../common/OTAImageProcessorImpl_bflb.cpp" ]
-  }
 
   if (chip_enable_ble) {
     sources += [
@@ -73,6 +69,10 @@ static_library("BL616") {
     "${chip_root}/src/platform/logging:headers",
   ]
 
+  if (chip_enable_ota_requestor) {
+    sources += [ "../common/OTAImageProcessorImpl_bflb.cpp" ]
+  }
+
   if (chip_enable_wifi) {
     sources += [
       "ConfigurationManagerImpl.cpp",
@@ -84,7 +84,7 @@ static_library("BL616") {
     deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     # needed for MTD/FTD
 
     import("//build_overrides/bouffalolab_iot_sdk.gni")

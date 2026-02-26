@@ -23,7 +23,7 @@ from pathlib import Path
 
 import click
 
-from matter.testing.matter_testing import MatterTestConfig
+from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.runner import generate_mobly_test_config
 
 log = logging.getLogger(__name__)

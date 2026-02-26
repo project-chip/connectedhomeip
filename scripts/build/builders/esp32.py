@@ -25,14 +25,17 @@ class Esp32Board(Enum):
     DevKitC = auto()
     M5Stack = auto()
     C3DevKit = auto()
+    P4FunctionEV = auto()
     QEMU = auto()
 
 
 class Esp32App(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
+    ALL_DEVICES = auto()
     ENERGY_GATEWAY = auto()
-    ENERGY_MANAGEMENT = auto()
+    EVSE = auto()
+    WATER_HEATER = auto()
     LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
@@ -46,12 +49,16 @@ class Esp32App(Enum):
     def ExamplePath(self):
         if self == Esp32App.ALL_CLUSTERS:
             return 'examples/all-clusters-app'
+        if self == Esp32App.ALL_DEVICES:
+            return 'examples/all-devices-app'
         if self == Esp32App.ALL_CLUSTERS_MINIMAL:
             return 'examples/all-clusters-minimal-app'
         if self == Esp32App.ENERGY_GATEWAY:
             return 'examples/energy-gateway-app'
-        if self == Esp32App.ENERGY_MANAGEMENT:
-            return 'examples/energy-management-app'
+        if self == Esp32App.EVSE:
+            return 'examples/evse-app'
+        if self == Esp32App.WATER_HEATER:
+            return 'examples/water-heater-app'
         if self == Esp32App.LIGHT:
             return 'examples/lighting-app'
         if self == Esp32App.LOCK:
@@ -76,10 +83,14 @@ class Esp32App(Enum):
             return 'chip-all-clusters-app'
         if self == Esp32App.ALL_CLUSTERS_MINIMAL:
             return 'chip-all-clusters-minimal-app'
+        if self == Esp32App.ALL_DEVICES:
+            return 'all-devices-app'
         if self == Esp32App.ENERGY_GATEWAY:
             return 'chip-energy-gateway-app'
-        if self == Esp32App.ENERGY_MANAGEMENT:
-            return 'chip-energy-management-app'
+        if self == Esp32App.EVSE:
+            return 'chip-evse-app'
+        if self == Esp32App.WATER_HEATER:
+            return 'matter-water-heater-app'
         if self == Esp32App.LIGHT:
             return 'chip-lighting-app'
         if self == Esp32App.LOCK:
@@ -110,6 +121,8 @@ class Esp32App(Enum):
             return self == Esp32App.TESTS
         if board == Esp32Board.C3DevKit:
             return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL
+        if board == Esp32Board.P4FunctionEV:
+            return self == Esp32App.ALL_CLUSTERS
         return (board in {Esp32Board.M5Stack, Esp32Board.DevKitC}) and (self != Esp32App.TESTS)
 
 
@@ -126,7 +139,7 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
         return 'sdkconfig.defaults'
 
     rpc = "_rpc" if enable_rpcs else ""
-    if board == Esp32Board.DevKitC or board == Esp32Board.C3DevKit:
+    if board == Esp32Board.DevKitC or board == Esp32Board.C3DevKit or board == Esp32Board.P4FunctionEV:
         return 'sdkconfig{}.defaults'.format(rpc)
     if board == Esp32Board.M5Stack:
         # a subset of apps have m5stack specific configurations. However others
@@ -175,12 +188,16 @@ class Esp32Builder(Builder):
     def TargetName(self):
         if self.board == Esp32Board.C3DevKit:
             return 'esp32c3'
+        if self.board == Esp32Board.P4FunctionEV:
+            return 'esp32p4'
         return 'esp32'
 
     @property
     def TargetFileName(self) -> Optional[str]:
         if self.board == Esp32Board.C3DevKit:
             return 'sdkconfig.defaults.esp32c3'
+        if self.board == Esp32Board.P4FunctionEV:
+            return 'sdkconfig.defaults.esp32p4'
         return None
 
     @property

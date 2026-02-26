@@ -1,0 +1,32 @@
+{{> base_clusters_src_header baseClusterHeader="MTRBaseClusters_Private.h"}}
+{{> placeholder_comment}}
+
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+@implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
+
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
+{{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
+{{#*inline "commandImpl"}}
+{{#if (isSupported cluster command=command)}}
+{{#*inline "paramsType"}}MTR{{cluster}}Cluster{{command}}Params{{/inline}}
+{{> base_clusters_command_impl cluster=cluster}}
+{{/if}}
+{{/inline}}
+{{> commandImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                command=(asUpperCamelCase name preserveAcronyms=true)}}
+{{/if}}
+{{/zcl_commands}}
+
+{{#zcl_attributes_server removeKeys='isOptional'}}
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
+{{> base_clusters_attribute_impl}}
+{{/if}}
+{{/zcl_attributes_server}}
+
+@end
+{{/if}}
+{{/zcl_clusters}}
+
+// NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)

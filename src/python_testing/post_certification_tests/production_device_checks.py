@@ -67,7 +67,7 @@ try:
     from matter.testing.decorators import async_test_body
     from matter.testing.matter_stack_state import MatterStackState
     from matter.testing.matter_test_config import MatterTestConfig
-    from matter.testing.matter_testing import MatterBaseTest, TestStep
+    from matter.testing.matter_testing import MatterBaseTest
     from matter.testing.runner import run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
@@ -76,8 +76,7 @@ except ImportError:
     from matter.testing.decorators import async_test_body
     from matter.testing.matter_stack_state import MatterStackState
     from matter.testing.matter_test_config import MatterTestConfig
-    from matter.testing.matter_testing import TestStep
-    from matter.testing.runner import run_tests_no_exit
+    from matter.testing.runner import TestStep, run_tests_no_exit
 
 try:
     import fetch_paa_certs_from_dcl

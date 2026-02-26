@@ -127,7 +127,11 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
       mainThreadHandler.removeCallbacksAndMessages(null);
     }
 
-    this.nsdManager.stopServiceDiscovery(discovery);
+    try {
+      this.nsdManager.stopServiceDiscovery(discovery);
+    } catch (Exception e) {
+      Log.e(TAG, "Exception in stopDiscover " + e, e);
+    }
   }
 
   public class NsdManagerDiscovery implements NsdManager.DiscoveryListener {

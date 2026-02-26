@@ -99,6 +99,8 @@ public class IdentificationDeclarationOptions {
    * TargetApp is not found in the on-device CastingStore.
    */
   private List<TargetAppInfo> targetAppInfos = new ArrayList<>();
+  /** Instance name string. */
+  private String instanceName = "";
 
   /**
    * @brief Adds a TargetAppInfo to the IdentificationDeclarationOptions.java TargetAppInfos list,
@@ -143,6 +145,14 @@ public class IdentificationDeclarationOptions {
 
   public List<TargetAppInfo> getTargetAppInfoList() {
     return targetAppInfos;
+  }
+
+  public String getInstanceName() {
+    return instanceName;
+  }
+
+  public void setInstanceName(String instanceName) {
+    this.instanceName = instanceName;
   }
 
   @Override

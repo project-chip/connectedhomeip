@@ -27,7 +27,7 @@ assert(chip_device_platform == "stm32")
 if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
 }
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -83,7 +83,7 @@ static_library("stm32") {
     "${chip_root}/src/platform:platform_base",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../OpenThread/DnssdImpl.cpp",
       "../OpenThread/OpenThreadDnssdImpl.cpp",

@@ -23,21 +23,27 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 
+#include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
+#include <optional>
+
 namespace example {
 namespace Ui {
 namespace Windows {
 
-using chip::app::Clusters::OccupancySensing::OccupancyBitmap;
+using namespace chip::app::Clusters::OccupancySensing;
+using chip::app::Clusters::OccupancySensingCluster;
 
 void OccupancySensing::UpdateState()
 {
-    if (mTargetOccupancy.HasValue())
+    OccupancySensingCluster * cluster = FindClusterOnEndpoint(mEndpointId);
+    VerifyOrReturn(cluster != nullptr);
+    if (mTargetOccupied.has_value())
     {
-        chip::app::Clusters::OccupancySensing::Attributes::Occupancy::Set(mEndpointId, mTargetOccupancy.Value());
-        mTargetOccupancy.ClearValue();
+        cluster->SetOccupancy(*mTargetOccupied);
+        mTargetOccupied.reset();
     }
 
-    chip::app::Clusters::OccupancySensing::Attributes::Occupancy::Get(mEndpointId, &mOccupancy);
+    mOccupied = cluster->IsOccupied();
 }
 
 void OccupancySensing::Render()
@@ -45,15 +51,14 @@ void OccupancySensing::Render()
     ImGui::Begin(mTitle.c_str());
     ImGui::Text("On Endpoint %d", mEndpointId);
 
-    bool occupied = mOccupancy.Has(OccupancyBitmap::kOccupied);
-    bool uiState  = occupied;
+    bool uiState = mOccupied;
     ImGui::Checkbox("Occupancy Value", &uiState);
 
-    if (uiState != occupied)
+    if (uiState != mOccupied)
     {
         // toggle value on the next 'UpdateState' call
         // Occupancy is just a single bit, update it as such
-        mTargetOccupancy.SetValue(uiState ? BitMask(OccupancyBitmap::kOccupied) : BitMask());
+        mTargetOccupied = std::make_optional(uiState);
     }
 
     ImGui::End();

@@ -95,7 +95,7 @@ void OTAConfig::Init()
     gRequestorUser.SetPeriodicQueryTimeout(OTA_PERIODIC_TIMEOUT);
 
 #if SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
-    auto & imageProcessor = chip::OTAMultiImageProcessorImpl::GetDefaultInstance();
+    auto & imageProcessor = chip::DeviceLayer::Silabs::MultiOTA::OTAMultiImageProcessorImpl::GetDefaultInstance();
 #else
     auto & imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
 #endif

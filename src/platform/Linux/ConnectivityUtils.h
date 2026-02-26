@@ -30,11 +30,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-static constexpr uint16_t kWiFi_BAND_2_4_GHZ      = 2400;
-static constexpr uint16_t kWiFi_BAND_5_0_GHZ      = 5000;
-static constexpr char kWpaSupplicantServiceName[] = "fi.w1.wpa_supplicant1";
-static constexpr char kWpaSupplicantObjectPath[]  = "/fi/w1/wpa_supplicant1";
-static constexpr char kWpaSupplicantBlobUnknown[] = "fi.w1.wpa_supplicant1.BlobUnknown";
+static constexpr uint16_t kWiFi_BAND_2_4_GHZ = 2400;
+static constexpr uint16_t kWiFi_BAND_5_0_GHZ = 5000;
 
 namespace ConnectivityUtils {
 

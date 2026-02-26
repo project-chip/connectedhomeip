@@ -42,8 +42,8 @@ import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest, TestStep
-from matter.testing.runner import default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
@@ -110,7 +110,7 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
 
         self.step(6)
         # Read DPTZStreams and verify that the stream and viewport are present
-        if not self.dptzstreamentryvalid(endpoint, videoStreamID, viewport):
+        if not await self.dptzstreamentryvalid(endpoint, videoStreamID, viewport):
             asserts.assert_fail("No matching stream id and viewport found in DPTZStreams for the allocated video stream")
 
         self.step(7)
@@ -139,7 +139,7 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
 
         self.step(12)
         # Verify the viewport has been updated in DPTZStreams
-        if not self.dptzstreamentryvalid(endpoint, videoStreamID, passingviewport):
+        if not await self.dptzstreamentryvalid(endpoint, videoStreamID, passingviewport):
             asserts.assert_fail("Viewport has not been updated in DPTZStreams")
 
         self.step(13)

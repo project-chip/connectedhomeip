@@ -11,8 +11,4 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-app_config_dependent_sources = [
-  "valve-configuration-and-control-cluster.cpp",
-  "valve-configuration-and-control-cluster.h",
-  "valve-configuration-and-control-delegate.h",
-]
+app_config_dependent_sources = [ "CodegenIntegration.cpp" ]

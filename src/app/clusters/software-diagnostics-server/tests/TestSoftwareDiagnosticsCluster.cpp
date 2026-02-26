@@ -69,7 +69,7 @@ struct TestSoftwareDiagnosticsCluster : public ::testing::Test
 TEST_F(TestSoftwareDiagnosticsCluster, CompileTest)
 {
     // The cluster should compile for any logic
-    SoftwareDiagnosticsServerCluster cluster({});
+    SoftwareDiagnosticsServerCluster cluster({}, DeviceLayer::GetDiagnosticDataProvider());
 
     // Essentially say "code executes"
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, SoftwareDiagnostics::Id }),
@@ -84,7 +84,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         {
         };
         ScopedDiagnosticsProvider<NullProvider> nullProvider;
-        SoftwareDiagnosticsServerCluster cluster({});
+        SoftwareDiagnosticsServerCluster cluster({}, DeviceLayer::GetDiagnosticDataProvider());
         chip::Testing::ClusterTester tester(cluster);
 
         // without watermarks, no commands are accepted
@@ -117,7 +117,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
 
         ScopedDiagnosticsProvider<WatermarksProvider> watermarksProvider;
         SoftwareDiagnosticsServerCluster cluster(
-            SoftwareDiagnosticsLogic::OptionalAttributeSet().Set<Attributes::CurrentHeapHighWatermark::Id>());
+            SoftwareDiagnosticsServerCluster::OptionalAttributeSet().Set<Attributes::CurrentHeapHighWatermark::Id>(),
+            DeviceLayer::GetDiagnosticDataProvider());
         chip::Testing::ClusterTester tester(cluster);
 
         ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, { Commands::ResetWatermarks::kMetadataEntry }));
@@ -174,11 +175,12 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         };
 
         ScopedDiagnosticsProvider<AllProvider> allProvider;
-        SoftwareDiagnosticsServerCluster cluster(SoftwareDiagnosticsLogic::OptionalAttributeSet()
+        SoftwareDiagnosticsServerCluster cluster(SoftwareDiagnosticsServerCluster::OptionalAttributeSet()
                                                      .Set<Attributes::ThreadMetrics::Id>()
                                                      .Set<Attributes::CurrentHeapFree::Id>()
                                                      .Set<Attributes::CurrentHeapUsed::Id>()
-                                                     .Set<Attributes::CurrentHeapHighWatermark::Id>());
+                                                     .Set<Attributes::CurrentHeapHighWatermark::Id>(),
+                                                 DeviceLayer::GetDiagnosticDataProvider());
 
         chip::Testing::ClusterTester tester(cluster);
 
@@ -254,7 +256,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
 
 TEST_F(TestSoftwareDiagnosticsCluster, TestEventGeneration)
 {
-    SoftwareDiagnosticsServerCluster cluster({});
+    SoftwareDiagnosticsServerCluster cluster({}, DeviceLayer::GetDiagnosticDataProvider());
     chip::Testing::ClusterTester tester(cluster);
 
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);

@@ -25,7 +25,6 @@ CommandHandlerInterfaceOnlyClusters:
     # keep-sorted start
     - Actions
     - Camera AV Settings User Level Management
-    - Camera AV Stream Management
     - Closure Control
     - Closure Dimension
     - Commissioner Control
@@ -34,7 +33,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Device Energy Management Mode
     - Dishwasher Mode
     - Electrical Energy Measurement
-    - Energy EVSE
     - Energy EVSE Mode
     - Joint Fabric Administrator
     - Laundry Washer Mode
@@ -68,7 +66,6 @@ CommandHandlerInterfaceOnlyClusters:
 ClustersWithInitFunctions:
     # keep-sorted start
     - Color Control
-    - Groups
     - Level Control
     - Mode Select
     - On/Off
@@ -123,20 +120,24 @@ CodeDrivenClusters:
     - Binding
     - Boolean State
     - Boolean State Configuration
+    - Camera AV Stream Management
     - Chime
     - Descriptor
     - Device Energy Management
     - Diagnostic Logs
     - Electrical Power Measurement
+    - Energy EVSE
     - Ethernet Network Diagnostics
     - Fixed Label
     - General Commissioning
     - General Diagnostics
     - Group Key Management
     - Groupcast
+    - Groups
     - HEPA Filter Monitoring
     - ICD Management
     - Identify
+    - Illuminance Measurement
     - Localization Configuration
     - OTA Software Update Provider
     - Occupancy Sensing
@@ -145,8 +146,14 @@ CodeDrivenClusters:
     - Push AV Stream Transport
     - Scenes Management
     - Software Diagnostics
+    - Switch
+    - TLS Certificate Management
+    - TLS Client Management
+    - Thread Network Diagnostics
     - Time Format Localization
     - Time Synchronization
+    - Unit Localization
     - User Label
+    - Valve Configuration and Control
     - Wi-Fi Network Diagnostics
     # keep-sorted end

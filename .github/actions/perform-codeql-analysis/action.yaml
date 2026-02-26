@@ -8,7 +8,7 @@ runs:
   using: "composite"
   steps:
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@v4
       with:
         category: "/language:${{ inputs.language }}"
         upload: False
@@ -27,7 +27,7 @@ runs:
         output: "sarif-results/${{ inputs.language }}.sarif"
 
     - name: Upload SARIF
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@v4
       with:
         sarif_file: "sarif-results/${{ inputs.language }}.sarif"
     - name: Upload loc as a Build Artifact

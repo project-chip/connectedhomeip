@@ -29,6 +29,10 @@ choice CHIP_CRYPTO
 	default CHIP_CRYPTO_MBEDTLS if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
 endchoice
 
+choice CHIP_CRYPTO_SPAKE2P
+     default CHIP_CRYPTO_SPAKE2P_CUSTOM if CHIP_NXP_PLATFORM_MCXW72 && CHIP_CRYPTO_PSA
+endchoice
+
 config CHIP_WIFI
 	default y if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
 
@@ -53,8 +57,17 @@ config CHIP_TASK_STACK_SIZE
 	default 13000 if CHIP_SE05X  # Increase is do to the additional middle-ware APDU buffers
 	default 10240
 
+ config CHIP_INET_ENABLE_TCP_ENDPOINT
+	default n
+
 config CHIP_TASK_PRIORITY
 	default 2
+
+config CHIP_USE_OT_ENDPOINT
+	default y if !CHIP_WITH_LWIP
+
+config CHIP_ENABLE_READ_CLIENT
+	default y
 
 config CHIP_DEVICE_HARDWARE_VERSION
 	default 1
@@ -138,6 +151,9 @@ endif # CHIP_FACTORY_DATA
 
 config CHIP_LOG_SIZE_OPTIMIZATION
 	default y
+
+config CHIP_OPTIMIZE_DEBUG_LEVEL
+	default "g" if CHIP_NXP_PLATFORM_MCXW71
 
 # Enable extended discovery
 config CHIP_EXTENDED_DISCOVERY

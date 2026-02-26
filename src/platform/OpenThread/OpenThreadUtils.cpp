@@ -43,7 +43,7 @@ namespace Internal {
  */
 CHIP_ERROR MapOpenThreadError(otError otErr)
 {
-    return (otErr == OT_ERROR_NONE) ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kOpenThread, static_cast<unsigned int>(otErr));
+    return (otErr == OT_ERROR_NONE) ? CHIP_NO_ERROR : CHIP_ERROR(ChipError::Range::kOpenThread, static_cast<int>(otErr));
 }
 
 /**

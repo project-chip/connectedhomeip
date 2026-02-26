@@ -19,7 +19,7 @@ import importlib.resources as pkg_resources
 import os
 import zipfile
 from enum import Enum, auto
-from importlib.abc import Traversable
+from importlib.resources.abc import Traversable
 from typing import Union
 
 

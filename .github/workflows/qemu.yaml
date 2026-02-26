@@ -48,7 +48,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -67,7 +67,7 @@ jobs:
                     --verbose                             \
                     --file-image-list ./out/esp32-qemu-tests/test_images.txt
             - name: Uploading Logs
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v6
               if: ${{ !env.ACT }}
               with:
                   name: qemu-esp32-logs
@@ -80,14 +80,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-tizen-qemu:177
+            image: ghcr.io/project-chip/chip-build-tizen-qemu:181
             options: --user root
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:

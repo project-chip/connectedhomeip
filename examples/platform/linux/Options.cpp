@@ -31,6 +31,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -73,6 +74,7 @@ enum
     kDeviceOption_BleDevice = 0x1000,
     kDeviceOption_WiFi,
     kDeviceOption_Thread,
+    kDeviceOption_ThreadNodeId,
     kDeviceOption_Version,
     kDeviceOption_VendorID,
     kDeviceOption_ProductID,
@@ -93,6 +95,7 @@ enum
     kDeviceOption_KVS,
     kDeviceOption_InterfaceId,
     kDeviceOption_AppPipe,
+    kDeviceOption_AppPipeOut,
     kDeviceOption_Spake2pVerifierBase64,
     kDeviceOption_Spake2pSaltBase64,
     kDeviceOption_Spake2pIterations,
@@ -173,7 +176,11 @@ OptionDef sDeviceOptionDefs[] = {
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    { "thread-node-id", kArgumentRequired, kDeviceOption_ThreadNodeId },
+#else
     { "thread", kNoArgument, kDeviceOption_Thread },
+#endif
 #endif // CHIP_ENABLE_OPENTHREAD
     { "version", kArgumentRequired, kDeviceOption_Version },
     { "vendor-id", kArgumentRequired, kDeviceOption_VendorID },
@@ -202,6 +209,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "KVS", kArgumentRequired, kDeviceOption_KVS },
     { "interface-id", kArgumentRequired, kDeviceOption_InterfaceId },
     { "app-pipe", kArgumentRequired, kDeviceOption_AppPipe },
+    { "app-pipe-out", kArgumentRequired, kDeviceOption_AppPipeOut },
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     { "trace_file", kArgumentRequired, kDeviceOption_TraceFile },
     { "trace_log", kArgumentRequired, kDeviceOption_TraceLog },
@@ -282,9 +290,14 @@ const char * sDeviceOptionHelp =
     "       Give an empty string if not setting freq_list: \"\"\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAFs
 #if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     "\n"
+    "  --thread-node-id <node id>\n"
+    "       Enable Thread Simulation with the specified node id.\n"
+#else
     "  --thread\n"
     "       Enable Thread management via ot-agent.\n"
+#endif
 #endif // CHIP_ENABLE_OPENTHREAD
     "\n"
     "  --version <version>\n"
@@ -365,7 +378,10 @@ const char * sDeviceOptionHelp =
     "       A interface id to advertise on.\n"
     "\n"
     "  --app-pipe <filepath>\n"
-    "       Custom path for the current application to send out of band commands.\n"
+    "       Custom path for the current application to receive out of band commands from the test.\n"
+    "\n"
+    "  --app-pipe-out <filepath>\n"
+    "       Custom path for the current application to send out of band commands to the test.\n"
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     "\n"
     "  --trace_file <file>\n"
@@ -550,9 +566,21 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().wifiSupports5g = true;
         break;
 
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    case kDeviceOption_ThreadNodeId:
+        if (!ParseInt(aValue, LinuxDeviceOptions::GetInstance().mThreadNodeId))
+        {
+            PrintArgError("%s: invalid value specified for Thread node id: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        break;
+#else
     case kDeviceOption_Thread:
         LinuxDeviceOptions::GetInstance().mThread = true;
         break;
+#endif
+#endif
 
     case kDeviceOption_Version:
         LinuxDeviceOptions::GetInstance().payload.version = static_cast<uint8_t>(strtoul(aValue, nullptr, 0));
@@ -715,6 +743,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_AppPipe:
         LinuxDeviceOptions::GetInstance().app_pipe = aValue;
+        break;
+
+    case kDeviceOption_AppPipeOut:
+        LinuxDeviceOptions::GetInstance().app_pipe_out = aValue;
         break;
 
     case kDeviceOption_InterfaceId:

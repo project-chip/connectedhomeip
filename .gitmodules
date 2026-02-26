@@ -339,3 +339,12 @@
 	url = https://github.com/awslabs/amazon-kinesis-video-streams-webrtc-sdk-c
 	platforms = esp32
 	recursive = true
+[submodule "third_party/ot-commissioner/repo"]
+	path = third_party/ot-commissioner/repo
+	url = https://github.com/openthread/ot-commissioner.git
+	platforms = linux
+	recursive = true
+[submodule "third_party/uriparser/repo"]
+	path = third_party/uriparser/repo
+	url = https://github.com/uriparser/uriparser.git
+	branch = uriparser-1.0.0

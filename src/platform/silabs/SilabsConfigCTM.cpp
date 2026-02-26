@@ -25,6 +25,7 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/PlatformError.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 #include <platform/silabs/CHIPDevicePlatformConfig.h>
 
@@ -79,7 +80,7 @@ CHIP_ERROR MapNvm3Error(sl_status_t nvm3Res)
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
         break;
     default:
-        err = CHIP_ERROR(ChipError::Range::kPlatform, (nvm3Res & 0xFF) + CHIP_DEVICE_CONFIG_SILABS_NVM3_ERROR_MIN);
+        err = MATTER_PLATFORM_ERROR((nvm3Res & 0xFF) + CHIP_DEVICE_CONFIG_SILABS_NVM3_ERROR_MIN);
         break;
     }
 

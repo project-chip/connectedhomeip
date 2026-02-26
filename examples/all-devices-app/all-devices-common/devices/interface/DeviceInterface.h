@@ -23,8 +23,6 @@
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
 
-#include <string>
-
 namespace chip::app {
 
 /// A device is an entity that maintains some cluster functionality.

@@ -52,17 +52,15 @@ CHIP_ERROR LoggingChimeDevice::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & c
     return CHIP_NO_ERROR;
 }
 
-Protocols::InteractionModel::Status LoggingChimeDevice::PlayChimeSound()
+Protocols::InteractionModel::Status LoggingChimeDevice::PlayChimeSound(uint8_t chimeID)
 {
-    // Access the cluster to get the selected chime attribute
-    // Note: ChimeDevice exposes ChimeCluster() accessor
-    uint8_t selectedChime = ChimeCluster().GetSelectedChime();
+    // The chime ID to be played is provided to the app
 
     // Find the name
     CharSpan soundName = "Unknown"_span;
     for (const auto & sound : mSounds)
     {
-        if (sound.id == selectedChime)
+        if (sound.id == chimeID)
         {
             soundName = sound.name;
             break;
