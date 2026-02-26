@@ -91,6 +91,7 @@ config("wifi-platform-config") {
     include_dirs += [
       "${chip_root}/src/platform/silabs/SiWx/ble",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+      "${wifi_sdk_root}/components/protocol/wifi/inc"
     ]
   }
 }
@@ -129,6 +130,7 @@ source_set("wifi-platform") {
     sources += [
       "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
+      "${wifi_sdk_root}/components/protocol/wifi/src/sli_wifi_callback_framework.c
       "${wifi_sdk_root}/components/service/network_manager/src/sli_net_common_utility.c",
     ]
 
