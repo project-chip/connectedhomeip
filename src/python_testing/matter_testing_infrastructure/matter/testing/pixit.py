@@ -187,7 +187,8 @@ def format_pixit_error(test_name: str, missing_required: list[PixitDefinition], 
         for pixit_def in available_optional:
             type_name = pixit_def.type.__name__
             lines.append(f"  - {pixit_def.name} ({type_name}): {pixit_def.description}")
-            lines.append(f"    Default: {pixit_def.default!r}")
+            if pixit_def.default is not _PIXIT_NO_DEFAULT:
+                lines.append(f"    Default: {pixit_def.default!r}")
             lines.append(f"    Override via: --{_type_to_arg_flag(pixit_def.type)} {pixit_def.name}:<value>")
 
     return "\n".join(lines)

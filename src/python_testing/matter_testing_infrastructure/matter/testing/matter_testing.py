@@ -294,7 +294,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_start_time = datetime.now(timezone.utc)
         self.step_skipped = False
         self.failed = False
-        self._validate_pixits()
         if self.runner_hook and not self.is_commissioning:
             test_name = self.current_test_info.name
             steps = self.get_defined_test_steps(test_name)
@@ -308,6 +307,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             # to indicates how it is proceeding
             if steps is None:
                 self.step(1)
+        self._validate_pixits()
 
     def on_fail(self, record):
         """Handle test failure callback from Mobly framework.
