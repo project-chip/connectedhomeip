@@ -93,8 +93,6 @@ class NetworkResource:
     """
     teardown_cmds: list[NetworkCmd] = dataclasses.field(default_factory=list)
 
-    exists: bool = False  # Track existence state
-
     """
     Commands executed when resource state is to be up.
 
@@ -127,43 +125,26 @@ class NetworkResource:
             raise RuntimeError(f"Failed to execute '{cmd}'. Are you using --privileged if running in docker?") from e
 
     def setup(self):
-        """
-        Run commands to setup a resource. If resource already exists it is a nop.
-        """
-        if not self.exists:
-            for netcmd in self.setup_cmds:
-                self._run_netcmd(netcmd)
+        """Run commands to setup a resource."""
+        for netcmd in self.setup_cmds:
+            self._run_netcmd(netcmd)
 
-            self.exists = True
-
-    def teardown(self, check: bool = True):
-        """
-        Run commands to teardown a resource. If resource does not exist it is a nop.
-        """
-        if self.exists:
-            for netcmd in self.teardown_cmds:
-                self._run_netcmd(netcmd, check=check)
-
-            self.exists = False
-            self.up_flag = False
+    def teardown(self):
+        """Run commands to teardown a resource."""
+        for netcmd in self.teardown_cmds:
+            self._run_netcmd(netcmd, check=False)
 
     def up(self):
-        """
-        Run commands to bring up the resource. If resource is already up it is a nop.
-        """
-        if not self.up_flag:
-            for netcmd in self.up_cmds:
-                self._run_netcmd(netcmd)
+        """Run commands to bring up the resource."""
+        for netcmd in self.up_cmds:
+            self._run_netcmd(netcmd)
 
             self.up_flag = True
 
     def down(self):
-        """
-        Run commands to bring down the resource. If resource is already down it is a nop.
-        """
-        if self.up_flag:
-            for netcmd in self.down_cmds:
-                self._run_netcmd(netcmd)
+        """Run commands to bring down the resource."""
+        for netcmd in self.down_cmds:
+            self._run_netcmd(netcmd)
 
             self.up_flag = False
 
@@ -344,6 +325,6 @@ class IsolatedNetworkNamespace:
             self.app_ns, self.tool_ns
         ):
             try:
-                obj.teardown(check=False)
+                obj.teardown()
             except Exception:
                 log.exception("Encountered an error during teardown of network resource '%s'", obj)
