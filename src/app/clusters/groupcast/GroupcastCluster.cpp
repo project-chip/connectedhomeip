@@ -179,15 +179,15 @@ void GroupcastCluster::OnUsedMcastAddrCountChange()
 // MembershipChangedTimer implementation
 void GroupcastCluster::MembershipChangedTimer::Start()
 {
-    VerifyOrReturn(!mCluster.mTimerDelegate.IsTimerActive(this));
+    VerifyOrReturn(!mCluster.GetTimerDelegate().IsTimerActive(this));
     constexpr System::Clock::Milliseconds32 kChangeTemporisation = System::Clock::Milliseconds32(250);
-    ReturnAndLogOnFailure(mCluster.mTimerDelegate.StartTimer(this, kChangeTemporisation), AppServer,
+    ReturnAndLogOnFailure(mCluster.GetTimerDelegate().StartTimer(this, kChangeTemporisation), AppServer,
                           "Failed to start MembershipChangedTimer");
 }
 
 void GroupcastCluster::MembershipChangedTimer::Cancel()
 {
-    mCluster.mTimerDelegate.CancelTimer(this);
+    mCluster.GetTimerDelegate().CancelTimer(this);
 }
 
 void GroupcastCluster::MembershipChangedTimer::TimerFired()
@@ -199,15 +199,15 @@ void GroupcastCluster::MembershipChangedTimer::TimerFired()
 void GroupcastCluster::GroupcastTestingTimer::Start(uint32_t seconds)
 {
     Cancel();
-    ReturnAndLogOnFailure(mCluster.mTimerDelegate.StartTimer(this, System::Clock::Seconds32(seconds)), AppServer,
+    ReturnAndLogOnFailure(mCluster.GetTimerDelegate().StartTimer(this, System::Clock::Seconds32(seconds)), AppServer,
                           "Failed to start GroupcastTestingTimer");
 }
 
 void GroupcastCluster::GroupcastTestingTimer::Cancel()
 {
-    if (mCluster.mTimerDelegate.IsTimerActive(this))
+    if (mCluster.GetTimerDelegate().IsTimerActive(this))
     {
-        mCluster.mTimerDelegate.CancelTimer(this);
+        mCluster.GetTimerDelegate().CancelTimer(this);
     }
 }
 

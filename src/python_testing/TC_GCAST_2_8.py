@@ -99,34 +99,34 @@ class TC_GCAST_2_8(MatterBaseTest):
         else:
             testOperation = Clusters.Groupcast.Enums.GroupcastTestingEnum.kEnableSenderTesting
 
+        sub.reset()
         await self.send_single_cmd(Clusters.Groupcast.Commands.GroupcastTesting(
             testOperation=testOperation)
         )
 
         self.step(4)
-        sub.reset()
         fabric_matcher = generate_fabric_under_test_matcher(F1)
         sub.await_all_expected_report_matches(expected_matchers=[fabric_matcher], timeout_sec=60)
 
         self.step(5)
+        sub.reset()
         await self.send_single_cmd(Clusters.Groupcast.Commands.GroupcastTesting(
             testOperation=Clusters.Groupcast.Enums.GroupcastTestingEnum.kDisableTesting)
         )
 
         self.step(6)
-        sub.reset()
         fabric_matcher = generate_fabric_under_test_matcher(0)
         sub.await_all_expected_report_matches(expected_matchers=[fabric_matcher], timeout_sec=60)
 
         self.step(7)
         durationSeconds = 10
+        sub.reset()
         await self.send_single_cmd(Clusters.Groupcast.Commands.GroupcastTesting(
             testOperation=testOperation,
             durationSeconds=durationSeconds)
         )
 
         self.step(8)
-        sub.reset()
         fabric_matcher = generate_fabric_under_test_matcher(F1)
         sub.await_all_expected_report_matches(expected_matchers=[fabric_matcher], timeout_sec=60)
 
