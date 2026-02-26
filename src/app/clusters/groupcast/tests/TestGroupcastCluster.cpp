@@ -43,6 +43,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <set>
 
 namespace {
 
@@ -58,6 +59,7 @@ using chip::Testing::IsAttributesListEqualTo;
 
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
+static constexpr size_t kMaxMembershipEndpoints = app::Clusters::GroupcastLogic::kMaxMembershipEndpoints;
 
 template <typename DecodableListType>
 CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
@@ -209,30 +211,43 @@ void ValidateMembership(const Attributes::Membership::TypeInfo::DecodableType & 
     ASSERT_EQ(CountListElements(memberships, membershipCount), CHIP_NO_ERROR);
     ASSERT_EQ(membershipCount, expectedMembershipsCount);
 
+    size_t index        = 0;
     auto iterMembership = memberships.begin();
-    size_t iteration    = 0;
-    while (iterMembership.Next())
+    while (iterMembership.Next() && (index < expectedMembershipsCount))
     {
         auto membership = iterMembership.GetValue();
-        ASSERT_EQ(membership.groupID, expectedMemberships[iteration].groupID);
-        ASSERT_EQ(membership.keySetID, expectedMemberships[iteration].keySetID);
-        ASSERT_EQ(membership.mcastAddrPolicy, expectedMemberships[iteration].mcastAddrPolicy);
-        ASSERT_EQ(membership.hasAuxiliaryACL.HasValue(), expectedMemberships[iteration].hasAuxiliaryACL.HasValue());
-        if (expectedMemberships[iteration].hasAuxiliaryACL.HasValue())
+        ASSERT_EQ(membership.groupID, expectedMemberships[index].groupID);
+        ASSERT_EQ(membership.keySetID, expectedMemberships[index].keySetID);
+        ASSERT_EQ(membership.mcastAddrPolicy, expectedMemberships[index].mcastAddrPolicy);
+        ASSERT_EQ(membership.hasAuxiliaryACL.HasValue(), expectedMemberships[index].hasAuxiliaryACL.HasValue());
+        if (expectedMemberships[index].hasAuxiliaryACL.HasValue())
         {
-            ASSERT_EQ(membership.hasAuxiliaryACL, expectedMemberships[iteration].hasAuxiliaryACL);
+            ASSERT_EQ(membership.hasAuxiliaryACL, expectedMemberships[index].hasAuxiliaryACL);
         }
 
-        ASSERT_EQ(membership.endpoints.HasValue(), expectedMemberships[iteration].endpoints.HasValue());
+        ASSERT_EQ(membership.endpoints.HasValue(), expectedMemberships[index].endpoints.HasValue());
         if (membership.endpoints.HasValue())
         {
             size_t endpoint_count = 0;
             ASSERT_EQ(membership.endpoints.Value().ComputeSize(&endpoint_count), CHIP_NO_ERROR);
-            ASSERT_EQ(endpoint_count, expectedMemberships[iteration].endpoints.Value().size());
+            ASSERT_EQ(endpoint_count, expectedMemberships[index].endpoints.Value().size());
+            // Build set from expected endpoints
+            std::set<EndpointId> expectedEndpoints;
+            for (size_t i = 0; i < expectedMemberships[index].endpoints.Value().size(); i++)
+            {
+                expectedEndpoints.insert(expectedMemberships[index].endpoints.Value()[i]);
+            }
+            // Check each actual endpoint is in the expected set
+            auto iterEndpoints = membership.endpoints.Value().begin();
+            while (iterEndpoints.Next())
+            {
+                auto endpoint = iterEndpoints.GetValue();
+                ASSERT_NE(expectedEndpoints.find(endpoint), expectedEndpoints.end());
+            }
         }
-        iteration++;
+        index++;
     }
-    ASSERT_EQ(iteration, membershipCount);
+    ASSERT_EQ(index, membershipCount);
 }
 
 TEST_F(TestGroupcastCluster, TestAcceptedCommands)
@@ -249,8 +264,9 @@ TEST_F(TestGroupcastCluster, TestAcceptedCommands)
 
 TEST_F(TestGroupcastCluster, TestReadMembership)
 {
-    static constexpr uint16_t kMaxEndpoints = app::Clusters::GroupcastLogic::kMaxCommandEndpoints;
-    static constexpr uint16_t kIntervals    = 15;
+    static constexpr uint16_t kMaxEndpoints   = app::Clusters::GroupcastLogic::kMaxCommandEndpoints;
+    static constexpr uint16_t kIntervals      = 15;
+    static constexpr uint16_t kTotalEndpoints = kMaxEndpoints * kIntervals;
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
     const EndpointId kEndpoints[kIntervals][kMaxEndpoints] = {
         { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 },
@@ -307,7 +323,7 @@ TEST_F(TestGroupcastCluster, TestReadMembership)
         data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
         for (int i = 0; i < 2; i++)
         {
-            data.endpoints = DataModel::List<const EndpointId>(kEndpoints[i + 1], kMaxEndpoints);
+            data.endpoints = DataModel::List<const EndpointId>(kEndpoints[i], kMaxEndpoints);
             result         = tester.Invoke(Commands::JoinGroup::Id, data);
             ASSERT_TRUE(result.status.has_value());
             EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
@@ -335,51 +351,67 @@ TEST_F(TestGroupcastCluster, TestReadMembership)
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
 
-        size_t memershipCount = 0;
-        ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
-        ASSERT_EQ(memershipCount, 4u); // Group1 [1..255], Group1 [256..300], Group2 [1..40], Group3 [63..80]
-
-        GroupId expected_groups[]            = { kGroup1, kGroup1, kGroup2, kGroup3 };
-        GroupId expected_keysets[]           = { kKeyset1, kKeyset1, kKeyset1, kInvalidKeysetId };
-        GroupId prev_group                   = kGroup1;
-        uint16_t expected_endpoint_counts[]  = { 255, 45, 40, 8 };
-        uint16_t expected_endpoint_offsets[] = { 0, 0, 1, 4 };
-        uint16_t i = 0, j = 0;
-        auto iter = memberships.begin();
-        while (iter.Next())
+        // Build expected endpoint arrays
+        // Group1 chunk 1: first kMaxMembershipEndpoints endpoints (intervals 0-12, plus 15 from interval 13 = 255 endpoints)
+        EndpointId group1_chunk1[kMaxMembershipEndpoints];
+        for (size_t i = 0; i < kMaxMembershipEndpoints; i++)
         {
-            auto item             = iter.GetValue();
-            size_t endpoint_count = 0;
-            // Check group
-            ASSERT_EQ(item.groupID, expected_groups[i]);
-            ASSERT_EQ(item.keySetID, expected_keysets[i]);
-            ASSERT_TRUE(item.hasAuxiliaryACL.HasValue());
-            ASSERT_EQ(item.hasAuxiliaryACL.Value(), item.groupID == kGroup1);
-            ASSERT_EQ(item.mcastAddrPolicy,
-                      item.groupID == kGroup1 ? app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr
-                                              : app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
-            // Check endpoint count
-            ASSERT_TRUE(item.endpoints.HasValue());
-            ASSERT_EQ(item.endpoints.Value().ComputeSize(&endpoint_count), CHIP_NO_ERROR);
-            ASSERT_EQ(endpoint_count, expected_endpoint_counts[i]);
-            // Check individual endpoints
-            if (item.groupID != prev_group)
-            {
-                // Reset endpoint idex for the new group
-                j = 0;
-            }
-            auto iter2 = item.endpoints.Value().begin();
-            while (iter2.Next())
-            {
-                EndpointId index       = j + static_cast<EndpointId>(expected_endpoint_offsets[i] * kMaxEndpoints);
-                EndpointId endpoint_id = iter2.GetValue();
-                EndpointId expected_id = kEndpoints[index / kMaxEndpoints][index % kMaxEndpoints];
-                ASSERT_EQ(endpoint_id, expected_id);
-                j++;
-            }
-            prev_group = item.groupID;
-            i++;
+            group1_chunk1[i] = static_cast<EndpointId>(i + 1);
         }
+
+        // Group1 chunk 2: remaining 45 endpoints (last 5 from interval 13, plus all 20 from interval 14)
+        EndpointId group1_chunk2[kTotalEndpoints - kMaxMembershipEndpoints];
+        for (size_t i = 0; i < MATTER_ARRAY_SIZE(group1_chunk2); i++)
+        {
+            group1_chunk2[i] = static_cast<EndpointId>(kMaxMembershipEndpoints + i + 1);
+        }
+
+        // Group2: 40 endpoints from intervals 1-2
+        EndpointId group2_endpoints[2 * kMaxEndpoints];
+        for (size_t i = 0; i < 2 * kMaxEndpoints; i++)
+        {
+            group2_endpoints[i] = static_cast<EndpointId>(i + 1);
+        }
+
+        // Group3: 8 endpoints from interval 4
+        EndpointId group3_endpoints[8];
+        for (size_t i = 0; i < 8; i++)
+        {
+            group3_endpoints[i] = static_cast<EndpointId>(4 * kMaxEndpoints + i + 1);
+        }
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
+            {
+                .groupID         = kGroup1,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(group1_chunk1, kMaxMembershipEndpoints)),
+                .keySetID        = kKeyset1,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID         = kGroup1,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(group1_chunk2, MATTER_ARRAY_SIZE(group1_chunk2))),
+                .keySetID        = kKeyset1,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID   = kGroup2,
+                .endpoints = MakeOptional(DataModel::List<const EndpointId>(group2_endpoints, MATTER_ARRAY_SIZE(group2_endpoints))),
+                .keySetID  = kKeyset1,
+                .hasAuxiliaryACL = MakeOptional(false),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup,
+            },
+            {
+                .groupID   = kGroup3,
+                .endpoints = MakeOptional(DataModel::List<const EndpointId>(group3_endpoints, MATTER_ARRAY_SIZE(group3_endpoints))),
+                .keySetID  = kInvalidKeysetId,
+                .hasAuxiliaryACL = MakeOptional(false),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup,
+            }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 }
 
@@ -542,10 +574,11 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 {
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
     const EndpointId kEndpoints[] = { 1 };
+    const KeysetId kKeyset        = 0xabcd;
 
     Commands::JoinGroup::Type data;
     data.groupID         = 1;
-    data.keySetID        = 0xabcd;
+    data.keySetID        = kKeyset;
     data.key             = MakeOptional(ByteSpan(key));
     data.useAuxiliaryACL = MakeOptional(true);
     data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
@@ -663,18 +696,26 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
     static const std::set<EndpointId> kRemoveSet1(std::begin(kLeaveEndpoints1), std::end(kLeaveEndpoints1));
     static const std::set<EndpointId> kRemoveSet2(std::begin(kLeaveEndpoints2), std::end(kLeaveEndpoints2));
 
-    GroupId kGroup1 = 0xab01;
-    GroupId kGroup2 = kGroup1 + 1;
+    GroupId kGroup1  = 0xab01;
+    GroupId kGroup2  = 0xcd02;
+    GroupId kGroup3  = 0xef03;
+    KeysetId kKeyset = 0xabcd;
 
     chip::Testing::ClusterTester tester(mListener);
     tester.SetFabricIndex(kTestFabricIndex);
+
+    EndpointId all_endpoints[kTotalEndpoints];
+    for (size_t i = 0; i < kTotalEndpoints; i++)
+    {
+        all_endpoints[i] = static_cast<EndpointId>(i + 1);
+    }
 
     // Join groups
     {
         // Group 1
         Commands::JoinGroup::Type data;
         data.groupID         = kGroup1;
-        data.keySetID        = 0xabcd;
+        data.keySetID        = kKeyset;
         data.key             = MakeOptional(ByteSpan(key));
         data.useAuxiliaryACL = MakeOptional(true);
         data.endpoints       = DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints);
@@ -710,35 +751,25 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
 
-        size_t memershipCount = 0;
-        ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
-        ASSERT_EQ(memershipCount, 2u); // Group1 [1..255], Group1 [256..300], Group2 [1..40]
-
-        GroupId group_id = kGroup1;
-        auto iter        = memberships.begin();
-        while (iter.Next())
-        {
-            auto item = iter.GetValue();
-            ASSERT_EQ(item.groupID, group_id);
-            // Check the endpoints are still in the group
-            size_t found          = 0;
-            size_t endpoint_count = 0;
-            // Check endpoint count
-            ASSERT_TRUE(item.endpoints.HasValue());
-            ASSERT_EQ(item.endpoints.Value().ComputeSize(&endpoint_count), CHIP_NO_ERROR);
-            ASSERT_EQ(endpoint_count, kTotalEndpoints);
-            // Check endpoints are stil in the group
-            auto iter2 = item.endpoints.Value().begin();
-            while (iter2.Next())
+        // Build expected endpoint arrays - both groups have all 100 endpoints
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
             {
-                if (kRemoveSet1.find(iter2.GetValue()) != kRemoveSet1.end())
-                {
-                    found++;
-                }
+                .groupID         = kGroup1,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(all_endpoints, kTotalEndpoints)),
+                .keySetID        = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID         = kGroup2,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(all_endpoints, kTotalEndpoints)),
+                .keySetID        = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(false),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             }
-            ASSERT_EQ(found, kRemoveSet1.size());
-            group_id++;
-        }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 
     // LeaveGroup
@@ -759,38 +790,38 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
 
-        size_t memershipCount = 0;
-        ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
-        ASSERT_EQ(memershipCount, 2u); // Group1 [1..255], Group1 [256..300], Group2 [1..40]
-
-        GroupId group_id = kGroup1;
-        auto iter        = memberships.begin();
-        while (iter.Next())
+        // Build expected endpoint arrays
+        // Group1: all endpoints except kLeaveEndpoints1 (100 - 8 = 92 endpoints)
+        EndpointId group1_endpoints[kTotalEndpoints - MATTER_ARRAY_SIZE(kLeaveEndpoints1)];
+        for (size_t i = 0, j = 0; (i < kTotalEndpoints) && (j < MATTER_ARRAY_SIZE(group1_endpoints)); i++)
         {
-            auto item = iter.GetValue();
-            ASSERT_EQ(item.groupID, group_id);
-            // Check the endpoints are still in the group
-            size_t found          = 0;
-            size_t endpoint_count = 0;
-            // Check endpoint count
-
-            size_t expected_count = (kGroup1 == group_id) ? kTotalEndpoints - kRemoveSet1.size() : kTotalEndpoints;
-            ASSERT_TRUE(item.endpoints.HasValue());
-            ASSERT_EQ(item.endpoints.Value().ComputeSize(&endpoint_count), CHIP_NO_ERROR);
-            ASSERT_EQ(endpoint_count, expected_count);
-            // Check endpoints are stil in the group
-            auto iter2 = item.endpoints.Value().begin();
-            while (iter2.Next())
+            EndpointId ep = static_cast<EndpointId>(i + 1);
+            if (kRemoveSet1.find(ep) == kRemoveSet1.end())
             {
-                if (kRemoveSet1.find(iter2.GetValue()) != kRemoveSet1.end())
-                {
-                    found++;
-                }
+                group1_endpoints[j++] = ep;
             }
-            // Endpoints removed from group 1, but not from group 2
-            ASSERT_EQ(found, kGroup1 == group_id ? 0 : kRemoveSet1.size());
-            group_id++;
         }
+
+        // Group2: all endpoints (100 endpoints)
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
+            {
+                .groupID   = kGroup1,
+                .endpoints = MakeOptional(DataModel::List<const EndpointId>(group1_endpoints, MATTER_ARRAY_SIZE(group1_endpoints))),
+                .keySetID  = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID         = kGroup2,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(all_endpoints, kTotalEndpoints)),
+                .keySetID        = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(false),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 
     // LeaveGroup a List of endpoints from all groups
@@ -810,39 +841,47 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
 
-        size_t memershipCount = 0;
-        ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
-        ASSERT_EQ(memershipCount, 2u); // Group1 [1..255], Group1 [256..300], Group2 [1..40]
-
-        GroupId group_id = kGroup1;
-        auto iter        = memberships.begin();
-        while (iter.Next())
+        // Build expected endpoint arrays
+        // Group1: all endpoints except kLeaveEndpoints1 and kLeaveEndpoints2 (100 - 8 - 8 = 84 endpoints)
+        EndpointId group1_endpoints[kTotalEndpoints - MATTER_ARRAY_SIZE(kLeaveEndpoints1) - MATTER_ARRAY_SIZE(kLeaveEndpoints2)];
+        for (size_t i = 0, j = 0; (i < kTotalEndpoints) && (j < MATTER_ARRAY_SIZE(group1_endpoints)); i++)
         {
-            auto item = iter.GetValue();
-            ASSERT_EQ(item.groupID, group_id);
-            // Check the endpoints are still in the group
-            size_t found          = 0;
-            size_t endpoint_count = 0;
-            // Check endpoint count
-            size_t expected_count = (kGroup1 == group_id) ? kTotalEndpoints - kRemoveSet1.size() - kRemoveSet2.size()
-                                                          : kTotalEndpoints - kRemoveSet2.size();
-
-            ASSERT_TRUE(item.endpoints.HasValue());
-            ASSERT_EQ(item.endpoints.Value().ComputeSize(&endpoint_count), CHIP_NO_ERROR);
-            ASSERT_EQ(endpoint_count, expected_count);
-            // Check endpoints are stil in the group
-            auto iter2 = item.endpoints.Value().begin();
-            while (iter2.Next())
+            EndpointId ep = static_cast<EndpointId>(i + 1);
+            if (kRemoveSet1.find(ep) == kRemoveSet1.end() && kRemoveSet2.find(ep) == kRemoveSet2.end())
             {
-                if (kRemoveSet2.find(iter2.GetValue()) != kRemoveSet2.end())
-                {
-                    found++;
-                }
+                group1_endpoints[j++] = ep;
             }
-            // Endpoints removed from both all groups
-            ASSERT_EQ(found, static_cast<size_t>(0));
-            group_id++;
         }
+
+        // Group2: all endpoints except kLeaveEndpoints2 (100 - 8 = 92 endpoints)
+        EndpointId group2_endpoints[kTotalEndpoints - MATTER_ARRAY_SIZE(kLeaveEndpoints2)];
+        for (size_t i = 0, j = 0; (i < kTotalEndpoints) && (j < MATTER_ARRAY_SIZE(group2_endpoints)); i++)
+        {
+            EndpointId ep = static_cast<EndpointId>(i + 1);
+            if (kRemoveSet2.find(ep) == kRemoveSet2.end())
+            {
+                group2_endpoints[j++] = ep;
+            }
+        }
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
+            {
+                .groupID   = kGroup1,
+                .endpoints = MakeOptional(DataModel::List<const EndpointId>(group1_endpoints, MATTER_ARRAY_SIZE(group1_endpoints))),
+                .keySetID  = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID   = kGroup2,
+                .endpoints = MakeOptional(DataModel::List<const EndpointId>(group2_endpoints, MATTER_ARRAY_SIZE(group2_endpoints))),
+                .keySetID  = kKeyset,
+                .hasAuxiliaryACL = MakeOptional(false),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 
     // LeaveGroup all groups completely.
@@ -860,25 +899,25 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
 
-        size_t memershipCount = 0;
-        ASSERT_EQ(CountListElements(memberships, memershipCount), CHIP_NO_ERROR);
-        ASSERT_EQ(memershipCount, 0u);
+        // After leaving all groups, membership should be empty
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[0] = {};
+        ValidateMembership(memberships, expectedMembership, 0);
     }
 
     // JoinGroup for GroupID 1 and then GroupID 2 with the same endpoint list.
     {
         // JoinGroup for GroupID 1
         Commands::JoinGroup::Type data;
-        data.groupID         = 1;
+        data.groupID         = kGroup1;
         data.endpoints       = DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints);
-        data.keySetID        = 0xabcd;
+        data.keySetID        = kKeyset;
         data.useAuxiliaryACL = MakeOptional(true);
         auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
         // JoinGroup for GroupID 2
-        data.groupID = 2;
+        data.groupID = kGroup2;
         result       = tester.Invoke(Commands::JoinGroup::Id, data);
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
@@ -890,16 +929,16 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
 
         Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
             {
-                .groupID         = 1,
+                .groupID         = kGroup1,
                 .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
-                .keySetID        = 0xabcd,
+                .keySetID        = kKeyset,
                 .hasAuxiliaryACL = MakeOptional(true),
                 .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             },
             {
-                .groupID         = 2,
+                .groupID         = kGroup2,
                 .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
-                .keySetID        = 0xabcd,
+                .keySetID        = kKeyset,
                 .hasAuxiliaryACL = MakeOptional(true),
                 .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             }
@@ -911,7 +950,7 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
     // LeaveGroup for GroupID 2 without providing any endpoints
     {
         Commands::LeaveGroup::Type data;
-        data.groupID = 2;
+        data.groupID = kGroup2;
         data.endpoints.ClearValue();
         auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
         ASSERT_TRUE(result.status.has_value());
@@ -923,9 +962,9 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
 
         Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = { {
-            .groupID         = 1,
+            .groupID         = kGroup1,
             .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
-            .keySetID        = 0xabcd,
+            .keySetID        = kKeyset,
             .hasAuxiliaryACL = MakeOptional(true),
             .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
         } };
@@ -943,9 +982,9 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
     {
         // JoinGroup for GroupID 3
         Commands::JoinGroup::Type data;
-        data.groupID         = 3;
+        data.groupID         = kGroup3;
         data.endpoints       = DataModel::List<const EndpointId>(kEndpoints[0], 1);
-        data.keySetID        = 0xabcd;
+        data.keySetID        = kKeyset;
         data.useAuxiliaryACL = MakeOptional(true);
         auto result          = listenerAndSendertester.Invoke(Commands::JoinGroup::Id, data);
         ASSERT_TRUE(result.status.has_value());
@@ -958,16 +997,16 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
 
         Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
             {
-                .groupID         = 1,
+                .groupID         = kGroup1,
                 .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
-                .keySetID        = 0xabcd,
+                .keySetID        = kKeyset,
                 .hasAuxiliaryACL = MakeOptional(true),
                 .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             },
             {
-                .groupID         = 3,
+                .groupID         = kGroup3,
                 .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], 1)),
-                .keySetID        = 0xabcd,
+                .keySetID        = kKeyset,
                 .hasAuxiliaryACL = MakeOptional(true),
                 .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             }
@@ -979,7 +1018,7 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
     {
         // LeaveGroup for GroupID 3
         Commands::LeaveGroup::Type data;
-        data.groupID   = 3;
+        data.groupID   = kGroup3;
         data.endpoints = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], 1));
         auto result    = listenerAndSendertester.Invoke(Commands::LeaveGroup::Id, data);
         ASSERT_TRUE(result.status.has_value());
@@ -991,17 +1030,17 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
 
         Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
             {
-                .groupID         = 1,
+                .groupID         = kGroup1,
                 .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints[0], kMaxEndpoints)),
-                .keySetID        = 0xabcd,
+                .keySetID        = kKeyset,
                 .hasAuxiliaryACL = MakeOptional(true),
                 .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             },
             {
-                .groupID   = 3,
+                .groupID   = kGroup3,
                 .endpoints = MakeOptional(
                     DataModel::List<const chip::EndpointId>()), // Listener is supported, so an empty endpoints list is expected.
-                .keySetID        = 0xabcd,
+                .keySetID        = kKeyset,
                 .hasAuxiliaryACL = MakeOptional(true),
                 .mcastAddrPolicy = Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
             }
@@ -1017,6 +1056,8 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
     const uint8_t key1[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
     const uint8_t key2[] = { 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf };
     const EndpointId kEndpoints[] = { 1 };
+    GroupId kGroup1               = 0xab01;
+    GroupId kGroup2               = 0xcd02;
     const KeysetId kKeyset1       = 0xabcd;
     const KeysetId kKeyset2       = 0xcafe;
     const KeysetId kKeyset3       = 0xface;
@@ -1027,7 +1068,7 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
     // Join groups
     {
         Commands::JoinGroup::Type data;
-        data.groupID         = 1;
+        data.groupID         = kGroup1;
         data.keySetID        = kKeyset1;
         data.key             = MakeOptional(ByteSpan(key1));
         data.useAuxiliaryACL = MakeOptional(true);
@@ -1038,7 +1079,7 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
 
-        data.groupID  = 2;
+        data.groupID  = kGroup2;
         data.keySetID = kKeyset2;
         data.key      = MakeOptional(ByteSpan(key2));
         result        = tester.Invoke(Commands::JoinGroup::Id, data);
@@ -1051,16 +1092,24 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
     {
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
-        GroupId group_id = 1;
-        auto iter        = memberships.begin();
-        while (iter.Next())
-        {
-            auto item            = iter.GetValue();
-            KeysetId expected_id = (1 == item.groupID) ? kKeyset1 : kKeyset2;
-            ASSERT_EQ(item.groupID, group_id);
-            ASSERT_EQ(item.keySetID, expected_id);
-            group_id++;
-        }
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
+            {
+                .groupID         = kGroup1,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints))),
+                .keySetID        = kKeyset1,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID         = kGroup2,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints))),
+                .keySetID        = kKeyset2,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 
     // Update
@@ -1068,7 +1117,7 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
         Commands::UpdateGroupKey::Type data;
 
         // Update existing key (invalid)
-        data.groupID  = 2;
+        data.groupID  = kGroup2;
         data.keySetID = kKeyset1;
         data.key      = MakeOptional(ByteSpan(key1));
         auto result   = tester.Invoke(Commands::UpdateGroupKey::Id, data);
@@ -1077,7 +1126,7 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
                   Protocols::InteractionModel::Status::AlreadyExists);
 
         // Update to non-existing keyset (invalid)
-        data.groupID  = 2;
+        data.groupID  = kGroup2;
         data.keySetID = kKeyset3;
         data.key.ClearValue();
         result = tester.Invoke(Commands::UpdateGroupKey::Id, data);
@@ -1086,7 +1135,7 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
                   Protocols::InteractionModel::Status::NotFound);
 
         // Update without key (always valid)
-        data.groupID  = 2;
+        data.groupID  = kGroup2;
         data.keySetID = kKeyset1;
         data.key.ClearValue();
         result = tester.Invoke(Commands::UpdateGroupKey::Id, data);
@@ -1112,16 +1161,25 @@ TEST_F(TestGroupcastCluster, TestUpdateGroupKey)
     {
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
-        GroupId group_id = 1;
-        auto iter        = memberships.begin();
-        while (iter.Next())
-        {
-            auto item            = iter.GetValue();
-            KeysetId expected_id = (1 == item.groupID) ? kKeyset1 : kKeyset2 + mProvider.GetMaxGroupKeysPerFabric();
-            ASSERT_EQ(item.groupID, group_id);
-            ASSERT_EQ(item.keySetID, expected_id);
-            group_id++;
-        }
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = {
+            {
+                .groupID         = kGroup1,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints))),
+                .keySetID        = kKeyset1,
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            },
+            {
+                .groupID         = kGroup2,
+                .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints))),
+                .keySetID        = static_cast<KeysetId>(kKeyset2 + mProvider.GetMaxGroupKeysPerFabric()),
+                .hasAuxiliaryACL = MakeOptional(true),
+                .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+            }
+        };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 }
 
@@ -1154,15 +1212,16 @@ TEST_F(TestGroupcastCluster, TestConfigureAuxiliaryACL)
     {
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
-        auto iter = memberships.begin();
-        while (iter.Next())
-        {
-            auto item = iter.GetValue();
-            ASSERT_EQ(item.groupID, kGroupId);
-            ASSERT_EQ(item.keySetID, kKeyset);
-            ASSERT_TRUE(item.hasAuxiliaryACL.HasValue());
-            ASSERT_FALSE(item.hasAuxiliaryACL.Value());
-        }
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = { {
+            .groupID         = kGroupId,
+            .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints))),
+            .keySetID        = kKeyset,
+            .hasAuxiliaryACL = MakeOptional(false),
+            .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+        } };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 
     // Update Sender (false to true), invalid
@@ -1196,15 +1255,16 @@ TEST_F(TestGroupcastCluster, TestConfigureAuxiliaryACL)
     {
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
-        auto iter = memberships.begin();
-        while (iter.Next())
-        {
-            auto item = iter.GetValue();
-            ASSERT_EQ(item.groupID, kGroupId);
-            ASSERT_EQ(item.keySetID, kKeyset);
-            ASSERT_TRUE(item.hasAuxiliaryACL.HasValue());
-            ASSERT_TRUE(item.hasAuxiliaryACL.Value());
-        }
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = { {
+            .groupID         = kGroupId,
+            .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints))),
+            .keySetID        = kKeyset,
+            .hasAuxiliaryACL = MakeOptional(true),
+            .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+        } };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 
     // Update (true to false)
@@ -1223,15 +1283,16 @@ TEST_F(TestGroupcastCluster, TestConfigureAuxiliaryACL)
     {
         app::Clusters::Groupcast::Attributes::Membership::TypeInfo::DecodableType memberships;
         ASSERT_EQ(tester.ReadAttribute(Attributes::Membership::Id, memberships), CHIP_NO_ERROR);
-        auto iter = memberships.begin();
-        while (iter.Next())
-        {
-            auto item = iter.GetValue();
-            ASSERT_EQ(item.groupID, kGroupId);
-            ASSERT_EQ(item.keySetID, kKeyset);
-            ASSERT_TRUE(item.hasAuxiliaryACL.HasValue());
-            ASSERT_FALSE(item.hasAuxiliaryACL.Value());
-        }
+
+        Clusters::Groupcast::Structs::MembershipStruct::Type expectedMembership[] = { {
+            .groupID         = kGroupId,
+            .endpoints       = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints))),
+            .keySetID        = kKeyset,
+            .hasAuxiliaryACL = MakeOptional(false),
+            .mcastAddrPolicy = app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr,
+        } };
+
+        ValidateMembership(memberships, expectedMembership, MATTER_ARRAY_SIZE(expectedMembership));
     }
 }
 

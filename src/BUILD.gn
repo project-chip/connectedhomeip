@@ -104,6 +104,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/webrtc-transport-provider-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
+      "${chip_root}/src/app/clusters/wifi-network-management-server/tests",
       "${chip_root}/src/app/clusters/zone-management-server/tests",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",

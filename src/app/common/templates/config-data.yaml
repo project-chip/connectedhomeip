@@ -57,7 +57,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Water Heater Mode
     - WebRTC Transport Provider
     - WebRTC Transport Requestor
-    - Wi-Fi Network Management
     - Zone Management
     # keep-sorted end
 
@@ -157,4 +156,5 @@ CodeDrivenClusters:
     - User Label
     - Valve Configuration and Control
     - Wi-Fi Network Diagnostics
+    - Wi-Fi Network Management
     # keep-sorted end

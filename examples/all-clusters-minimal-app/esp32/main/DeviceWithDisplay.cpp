@@ -185,18 +185,14 @@ public:
             else if (name == "Illuminance")
             {
                 // update the current illuminance here for hardcoded endpoint 1
-                auto illuminanceMeasurement = app::Clusters::IlluminanceMeasurement::FindClusterOnEndpoint(1);
-                if (illuminanceMeasurement != nullptr)
+                CHIP_ERROR err = app::Clusters::IlluminanceMeasurement::SetMeasuredValue(1, static_cast<uint16_t>(n));
+                if (err == CHIP_NO_ERROR)
                 {
-                    CHIP_ERROR err = illuminanceMeasurement->SetMeasuredValue(static_cast<int16_t>(n));
-                    if (err == CHIP_NO_ERROR)
-                    {
-                        ESP_LOGI(TAG, "Illuminance changed to : %d", n);
-                    }
-                    else
-                    {
-                        ESP_LOGE(TAG, "Failed to set illuminance: %" CHIP_ERROR_FORMAT, err.Format());
-                    }
+                    ESP_LOGI(TAG, "Illuminance changed to : %d", n);
+                }
+                else
+                {
+                    ESP_LOGE(TAG, "Failed to set illuminance: %" CHIP_ERROR_FORMAT, err.Format());
                 }
             }
             else if (name == "Humidity")
@@ -598,11 +594,7 @@ void SetupPretendDevices()
     AddCluster("Illuminance Measurement");
     AddAttribute("Illuminance", "1000");
 
-    auto illuminanceMeasurement = app::Clusters::IlluminanceMeasurement::FindClusterOnEndpoint(1);
-    if (illuminanceMeasurement != nullptr)
-    {
-        LogErrorOnFailure(illuminanceMeasurement->SetMeasuredValue(static_cast<int16_t>(1000)));
-    }
+    LogErrorOnFailure(app::Clusters::IlluminanceMeasurement::SetMeasuredValue(1, static_cast<uint16_t>(1000)));
 
     AddDevice("Color Light");
     AddEndpoint("1");

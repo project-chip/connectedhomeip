@@ -31,6 +31,7 @@ source_set("clusters") {
     "groupcast",
     "groups-server",
     "identify-server",
+    "illuminance-measurement-server",
     "level-control",
     "network-commissioning",
     "occupancy-sensor-server",
