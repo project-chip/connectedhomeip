@@ -117,7 +117,7 @@ CHIP_ERROR Se05xDataProviderImpl::GetSetupPasscode(uint32_t & setupPasscode)
     }
 
     /* 3 set of verifiers are provisioned in se05x. Each with 4 bytes passcode and 32 bytes salt */
-    uint8_t offset = (SE05X_SPAKE_VERIFIER_TP_SET_NO - 1) * (kSpake2p_PBKDF_Salt_Length_SE05x + kSpake2p_Passcode_Length_SE05x);
+    size_t offset = (SE05X_SPAKE_VERIFIER_TP_SET_NO - 1) * (kSpake2p_PBKDF_Salt_Length_SE05x + kSpake2p_Passcode_Length_SE05x);
 
     VerifyOrReturnError(certLen >= offset + 4, CHIP_ERROR_INTERNAL);
     setupPasscode = (BCD_TO_DEC(cert[offset + 3])) + (100 * BCD_TO_DEC(cert[offset + 2])) + (10000 * BCD_TO_DEC(cert[offset + 1])) +

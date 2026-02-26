@@ -18,9 +18,12 @@
 
 #if FRDM_RW612
 #include <platform/nxp/rt/rw61x/FactoryDataProviderImpl.h>
-#else
+#elif IMX_RT
 #include <platform/nxp/rt/rt1060/FactoryDataProviderImpl.h>
+#else
+#error "The selected platform is not supported for SE05x data provider"
 #endif
+
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
