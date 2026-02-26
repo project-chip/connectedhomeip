@@ -783,7 +783,7 @@ class TestMatterTestingSupport(MatterBaseTest):
         direct_children[14] = [15, 16]
         direct_children[17] = [18, 19]
         for i in all_endpoints:
-            if i in direct_children.keys():
+            if i in direct_children:
                 asserts.assert_equal(tree[i].children, direct_children[i], f"Incorrect children for endpoint {i}")
             else:
                 asserts.assert_equal(tree[i].children, [], f"Incorrect children for endpoint {i}")
