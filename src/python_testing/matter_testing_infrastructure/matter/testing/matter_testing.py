@@ -223,6 +223,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         # subscription-verification logic does not flag them as missing or stale.
         # The XML parsing is done once per class here (not per test) because it is expensive.
         self.wildcard_subscription_handler = None
+        self.subscription_controller = None
+        self.subscription_controller_node_id: int = self.matter_test_config.controller_node_id + 123456
         self._cq_excluded_attr_ids: frozenset[tuple[int, int]] = self._build_cq_excluded_ids()
 
     def teardown_class(self):
@@ -246,6 +248,14 @@ class MatterBaseTest(base_test.BaseTestClass):
             for problem in self.problems:
                 LOGGER.info(str(problem))
             LOGGER.info("###########################################################")
+
+        if self.subscription_controller is not None:
+            try:
+                self.subscription_controller.Shutdown()
+            except Exception as e:
+                LOGGER.warning("[MatterBaseTest] Error shutting down subscription controller: %s", e)
+            self.subscription_controller = None
+
         super().teardown_class()
 
     @staticmethod
@@ -300,9 +310,20 @@ class MatterBaseTest(base_test.BaseTestClass):
             excluded_attribute_ids=self._cq_excluded_attr_ids
         )
 
+        # Create the secondary controller once and reuse it across tests.
+        # Using a different node ID on the same fabric means the DUT treats it as
+        # a separate initiator, so keepSubscriptions=False from default_controller
+        # will not cancel this subscription.
+        if self.subscription_controller is None:
+            fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
+            self.subscription_controller = fabric_admin.NewController(
+                nodeId=self.subscription_controller_node_id,
+                paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
+            )
+
         async def _start():
             await handler.start(
-                dev_ctrl=self.default_controller,
+                dev_ctrl=self.subscription_controller,
                 node_id=self.dut_node_id,
                 # Wildcard: subscribe to every attribute on every endpoint/cluster.
                 attributes=[Attribute.AttributePath(None, None, None)],
