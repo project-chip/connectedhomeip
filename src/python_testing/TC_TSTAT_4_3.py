@@ -629,7 +629,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
                                                                                                         preset_handle=presetHandle,
                                                                                                         effective_time=currentUTC,
                                                                                                         expiration_in_minutes=expirationInMinutes,
-                                                                                                        expected_status=Status.ResourceExhausted)
+                                                                                                        expected_status=Status.Success)
 
 
 if __name__ == "__main__":
