@@ -870,7 +870,9 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, c
     {
         // Existing group_id
         group.Copy(info);
-        return group.Save(mStorage);
+        ReturnErrorOnFailure(group.Save(mStorage));
+        GroupModified(fabric_index, info.group_id);
+        return CHIP_NO_ERROR;
     }
 
     // New group_id
@@ -1388,8 +1390,11 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupKey(FabricIndex fabric_index, GroupId 
         if (map.group_id == group_id)
         {
             // Existing group, replace keyset
+
             map.keyset_id = keyset_id;
-            return map.Save(mStorage);
+            ReturnErrorOnFailure(map.Save(mStorage));
+            GroupModified(fabric_index, group_id);
+            return CHIP_NO_ERROR;
         }
         map.id = map.next;
     }

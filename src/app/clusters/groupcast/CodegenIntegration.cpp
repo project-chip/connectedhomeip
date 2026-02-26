@@ -33,7 +33,7 @@ using chip::Protocols::InteractionModel::Status;
 namespace {
 
 LazyRegisteredServerCluster<GroupcastCluster> gServer;
-DefaultTimerDelegate gTimerDelegate;
+DefaultTimerDelegate sTimerDelegate;
 
 // Groupcast implementation is specifically implemented
 // only for the root endpoint (endpoint 0)
@@ -58,7 +58,7 @@ public:
             GroupcastContext{
                 .fabricTable       = Server::GetInstance().GetFabricTable(),
                 .groupDataProvider = *groupDataProvider,
-                .timerDelegate     = gTimerDelegate,
+                .timerDelegate     = sTimerDelegate,
             },
             BitFlags<Groupcast::Feature>(featureMap));
         return gServer.Registration();

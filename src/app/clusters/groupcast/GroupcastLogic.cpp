@@ -268,6 +268,12 @@ Status GroupcastLogic::LeaveGroup(FabricIndex fabric_index, const Groupcast::Com
 
 Status GroupcastLogic::UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data)
 {
+    // Validate that the group exists early before trying to set the keyset
+    GroupDataProvider::GroupInfo info;
+    CHIP_ERROR err = Provider().GetGroupInfo(fabric_index, data.groupID, info);
+    VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
+    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+
     return SetKeySet(fabric_index, data.groupID, data.keySetID, data.key);
 }
 
