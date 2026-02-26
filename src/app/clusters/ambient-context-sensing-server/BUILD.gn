@@ -25,13 +25,14 @@ source_set("ambient-context-sensing-server") {
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/AmbientContextSensing",
-#    "${chip_root}/src/app:constants",
-#    "${chip_root}/src/app:interaction-model",
-#    "${chip_root}/src/app/persistence",
-#    "${chip_root}/src/app/server",
-#    "${chip_root}/src/app/server-cluster",
-#    "${chip_root}/src/platform",
-#    "${chip_root}/zzz_generated/app-common/clusters/AmbientContextSensing",
+
+    #    "${chip_root}/src/app:constants",
+    #    "${chip_root}/src/app:interaction-model",
+    #    "${chip_root}/src/app/persistence",
+    #    "${chip_root}/src/app/server",
+    #    "${chip_root}/src/app/server-cluster",
+    #    "${chip_root}/src/platform",
+    #    "${chip_root}/zzz_generated/app-common/clusters/AmbientContextSensing",
   ]
 }
 
