@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -23,7 +24,10 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class PowerSourceClusterBatFaultChangeType(val current: List<UByte>, val previous: List<UByte>) {
+class PowerSourceClusterBatFaultChangeType(
+  val current: List<UByte>,
+  val previous: List<UByte>
+) {
   override fun toString(): String = buildString {
     append("PowerSourceClusterBatFaultChangeType {\n")
     append("\tcurrent : $current\n")
@@ -54,23 +58,21 @@ class PowerSourceClusterBatFaultChangeType(val current: List<UByte>, val previou
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PowerSourceClusterBatFaultChangeType {
       tlvReader.enterStructure(tlvTag)
-      val current =
-        buildList<UByte> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      val previous =
-        buildList<UByte> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val current = buildList<UByte> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUByte(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      val previous = buildList<UByte> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUByte(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return PowerSourceClusterBatFaultChangeType(current, previous)

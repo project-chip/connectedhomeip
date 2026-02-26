@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +28,7 @@ class ThermostatClusterThermostatSuggestionStruct(
   val uniqueID: UByte,
   val presetHandle: ByteArray,
   val effectiveTime: UInt,
-  val expirationTime: UInt,
+  val expirationTime: UInt
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterThermostatSuggestionStruct {\n")
@@ -60,15 +62,10 @@ class ThermostatClusterThermostatSuggestionStruct(
       val presetHandle = tlvReader.getByteArray(ContextSpecificTag(TAG_PRESET_HANDLE))
       val effectiveTime = tlvReader.getUInt(ContextSpecificTag(TAG_EFFECTIVE_TIME))
       val expirationTime = tlvReader.getUInt(ContextSpecificTag(TAG_EXPIRATION_TIME))
-
+      
       tlvReader.exitContainer()
 
-      return ThermostatClusterThermostatSuggestionStruct(
-        uniqueID,
-        presetHandle,
-        effectiveTime,
-        expirationTime,
-      )
+      return ThermostatClusterThermostatSuggestionStruct(uniqueID, presetHandle, effectiveTime, expirationTime)
     }
   }
 }

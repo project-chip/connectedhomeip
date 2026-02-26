@@ -34,7 +34,7 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
   val metadataEnabled: Boolean,
   val videoStreams: Optional<List<UShort>>,
   val audioStreams: Optional<List<UShort>>,
-  val fabricIndex: UByte,
+  val fabricIndex: UByte
 ) {
   override fun toString(): String = buildString {
     append("WebRTCTransportProviderClusterWebRTCSessionStruct {\n")
@@ -72,18 +72,18 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
       if (videoStreams.isPresent) {
         val optvideoStreams = videoStreams.get()
         startArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
-        for (item in optvideoStreams.iterator()) {
-          put(AnonymousTag, item)
-        }
-        endArray()
+      for (item in optvideoStreams.iterator()) {
+        put(AnonymousTag, item)
+      }
+      endArray()
       }
       if (audioStreams.isPresent) {
         val optaudioStreams = audioStreams.get()
         startArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
-        for (item in optaudioStreams.iterator()) {
-          put(AnonymousTag, item)
-        }
-        endArray()
+      for (item in optaudioStreams.iterator()) {
+        put(AnonymousTag, item)
+      }
+      endArray()
       }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
@@ -102,74 +102,52 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
     private const val TAG_AUDIO_STREAMS = 8
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): WebRTCTransportProviderClusterWebRTCSessionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): WebRTCTransportProviderClusterWebRTCSessionStruct {
       tlvReader.enterStructure(tlvTag)
       val id = tlvReader.getUShort(ContextSpecificTag(TAG_ID))
       val peerNodeID = tlvReader.getULong(ContextSpecificTag(TAG_PEER_NODE_ID))
       val peerEndpointID = tlvReader.getUShort(ContextSpecificTag(TAG_PEER_ENDPOINT_ID))
       val streamUsage = tlvReader.getUByte(ContextSpecificTag(TAG_STREAM_USAGE))
-      val videoStreamID =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
-          null
-        }
-      val audioStreamID =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-          null
-        }
+      val videoStreamID = if (!tlvReader.isNull()) {
+      tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
+      null
+    }
+      val audioStreamID = if (!tlvReader.isNull()) {
+      tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
+      null
+    }
       val metadataEnabled = tlvReader.getBoolean(ContextSpecificTag(TAG_METADATA_ENABLED))
-      val videoStreams =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VIDEO_STREAMS))) {
-          Optional.of(
-            buildList<UShort> {
-              tlvReader.enterArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUShort(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-          )
-        } else {
-          Optional.empty()
-        }
-      val audioStreams =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_STREAMS))) {
-          Optional.of(
-            buildList<UShort> {
-              tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUShort(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-          )
-        } else {
-          Optional.empty()
-        }
+      val videoStreams = if (tlvReader.isNextTag(ContextSpecificTag(TAG_VIDEO_STREAMS))) {
+      Optional.of(buildList<UShort> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_VIDEO_STREAMS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUShort(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    })
+    } else {
+      Optional.empty()
+    }
+      val audioStreams = if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_STREAMS))) {
+      Optional.of(buildList<UShort> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_STREAMS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUShort(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    })
+    } else {
+      Optional.empty()
+    }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return WebRTCTransportProviderClusterWebRTCSessionStruct(
-        id,
-        peerNodeID,
-        peerEndpointID,
-        streamUsage,
-        videoStreamID,
-        audioStreamID,
-        metadataEnabled,
-        videoStreams,
-        audioStreams,
-        fabricIndex,
-      )
+      return WebRTCTransportProviderClusterWebRTCSessionStruct(id, peerNodeID, peerEndpointID, streamUsage, videoStreamID, audioStreamID, metadataEnabled, videoStreams, audioStreams, fabricIndex)
     }
   }
 }

@@ -17,16 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class PushAvStreamTransportClusterVideoStreamStruct(
-  val videoStreamName: String,
-  val videoStreamID: UInt,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class PushAvStreamTransportClusterVideoStreamStruct (
+    val videoStreamName: String,
+    val videoStreamID: UInt) {
+  override fun toString(): String  = buildString {
     append("PushAvStreamTransportClusterVideoStreamStruct {\n")
     append("\tvideoStreamName : $videoStreamName\n")
     append("\tvideoStreamID : $videoStreamID\n")
@@ -46,11 +49,11 @@ class PushAvStreamTransportClusterVideoStreamStruct(
     private const val TAG_VIDEO_STREAM_NAME = 0
     private const val TAG_VIDEO_STREAM_ID = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterVideoStreamStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : PushAvStreamTransportClusterVideoStreamStruct {
       tlvReader.enterStructure(tlvTag)
       val videoStreamName = tlvReader.getString(ContextSpecificTag(TAG_VIDEO_STREAM_NAME))
       val videoStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
-
+      
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterVideoStreamStruct(videoStreamName, videoStreamID)

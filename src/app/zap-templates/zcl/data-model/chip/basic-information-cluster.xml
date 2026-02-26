@@ -158,6 +158,17 @@ Alchemy: v1.6.9
         </greaterOrEqualTerm>
       </mandatoryConform>
     </attribute>
+    <attribute code="0x0017" side="server" name="DeviceLocation" define="DEVICE_LOCATION" type="LocationDescriptorStruct">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="6"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
     <attribute code="0x0018" side="server" name="ConfigurationVersion" define="CONFIGURATION_VERSION" type="int32u" min="1" default="1" optional="true">
       <otherwiseConform>
         <provisionalConform/>

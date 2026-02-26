@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +28,7 @@ class CameraAvStreamManagementClusterViewportStruct(
   val x1: UShort,
   val y1: UShort,
   val x2: UShort,
-  val y2: UShort,
+  val y2: UShort
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterViewportStruct {\n")
@@ -60,7 +62,7 @@ class CameraAvStreamManagementClusterViewportStruct(
       val y1 = tlvReader.getUShort(ContextSpecificTag(TAG_Y1))
       val x2 = tlvReader.getUShort(ContextSpecificTag(TAG_X2))
       val y2 = tlvReader.getUShort(ContextSpecificTag(TAG_Y2))
-
+      
       tlvReader.exitContainer()
 
       return CameraAvStreamManagementClusterViewportStruct(x1, y1, x2, y2)

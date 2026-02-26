@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -24,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class GroupKeyManagementClusterGroupcastAdoptionStruct(
   val groupcastAdopted: Boolean,
-  val fabricIndex: UByte,
+  val fabricIndex: UByte
 ) {
   override fun toString(): String = buildString {
     append("GroupKeyManagementClusterGroupcastAdoptionStruct {\n")
@@ -46,14 +48,11 @@ class GroupKeyManagementClusterGroupcastAdoptionStruct(
     private const val TAG_GROUPCAST_ADOPTED = 0
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): GroupKeyManagementClusterGroupcastAdoptionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GroupKeyManagementClusterGroupcastAdoptionStruct {
       tlvReader.enterStructure(tlvTag)
       val groupcastAdopted = tlvReader.getBoolean(ContextSpecificTag(TAG_GROUPCAST_ADOPTED))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
       return GroupKeyManagementClusterGroupcastAdoptionStruct(groupcastAdopted, fabricIndex)

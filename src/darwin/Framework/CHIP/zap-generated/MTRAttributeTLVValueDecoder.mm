@@ -1536,6 +1536,33 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
         value = [NSNumber numberWithUnsignedShort:cppValue];
         return value;
     }
+    case Attributes::DeviceLocation::Id: {
+        using TypeInfo = Attributes::DeviceLocation::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRDataTypeLocationDescriptorStruct * _Nonnull value;
+        value = [MTRDataTypeLocationDescriptorStruct new];
+        value.locationName = AsString(cppValue.locationName);
+        if (value.locationName == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
+        if (cppValue.floorNumber.IsNull()) {
+            value.floorNumber = nil;
+        } else {
+            value.floorNumber = [NSNumber numberWithShort:cppValue.floorNumber.Value()];
+        }
+        if (cppValue.areaType.IsNull()) {
+            value.areaType = nil;
+        } else {
+            value.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.areaType.Value())];
+        }
+        return value;
+    }
     case Attributes::ConfigurationVersion::Id: {
         using TypeInfo = Attributes::ConfigurationVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;

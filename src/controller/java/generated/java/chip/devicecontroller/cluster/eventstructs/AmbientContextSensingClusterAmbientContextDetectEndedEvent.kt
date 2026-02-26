@@ -17,13 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class AmbientContextSensingClusterAmbientContextDetectEndedEvent(val startEventNumber: ULong) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class AmbientContextSensingClusterAmbientContextDetectEndedEvent (
+    val startEventNumber: ULong) {
+  override fun toString(): String  = buildString {
     append("AmbientContextSensingClusterAmbientContextDetectEndedEvent {\n")
     append("\tstartEventNumber : $startEventNumber\n")
     append("}\n")
@@ -40,13 +45,10 @@ class AmbientContextSensingClusterAmbientContextDetectEndedEvent(val startEventN
   companion object {
     private const val TAG_START_EVENT_NUMBER = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): AmbientContextSensingClusterAmbientContextDetectEndedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AmbientContextSensingClusterAmbientContextDetectEndedEvent {
       tlvReader.enterStructure(tlvTag)
       val startEventNumber = tlvReader.getULong(ContextSpecificTag(TAG_START_EVENT_NUMBER))
-
+      
       tlvReader.exitContainer()
 
       return AmbientContextSensingClusterAmbientContextDetectEndedEvent(startEventNumber)

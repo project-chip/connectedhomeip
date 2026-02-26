@@ -17,13 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class EnergyEvseClusterEVConnectedEvent(val sessionID: ULong) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class EnergyEvseClusterEVConnectedEvent (
+    val sessionID: ULong) {
+  override fun toString(): String  = buildString {
     append("EnergyEvseClusterEVConnectedEvent {\n")
     append("\tsessionID : $sessionID\n")
     append("}\n")
@@ -40,10 +45,10 @@ class EnergyEvseClusterEVConnectedEvent(val sessionID: ULong) {
   companion object {
     private const val TAG_SESSION_ID = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterEVConnectedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : EnergyEvseClusterEVConnectedEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getULong(ContextSpecificTag(TAG_SESSION_ID))
-
+      
       tlvReader.exitContainer()
 
       return EnergyEvseClusterEVConnectedEvent(sessionID)

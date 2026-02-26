@@ -17,13 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ThreadNetworkDiagnosticsClusterSecurityPolicy(val rotationTime: UInt, val flags: UInt) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ThreadNetworkDiagnosticsClusterSecurityPolicy (
+    val rotationTime: UInt,
+    val flags: UInt) {
+  override fun toString(): String  = buildString {
     append("ThreadNetworkDiagnosticsClusterSecurityPolicy {\n")
     append("\trotationTime : $rotationTime\n")
     append("\tflags : $flags\n")
@@ -43,11 +49,11 @@ class ThreadNetworkDiagnosticsClusterSecurityPolicy(val rotationTime: UInt, val 
     private const val TAG_ROTATION_TIME = 0
     private const val TAG_FLAGS = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThreadNetworkDiagnosticsClusterSecurityPolicy {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThreadNetworkDiagnosticsClusterSecurityPolicy {
       tlvReader.enterStructure(tlvTag)
       val rotationTime = tlvReader.getUInt(ContextSpecificTag(TAG_ROTATION_TIME))
       val flags = tlvReader.getUInt(ContextSpecificTag(TAG_FLAGS))
-
+      
       tlvReader.exitContainer()
 
       return ThreadNetworkDiagnosticsClusterSecurityPolicy(rotationTime, flags)

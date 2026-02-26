@@ -331,6 +331,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxPathsPerInvoke
+namespace DeviceLocation {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type;
+    using DecodableType    = chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DeviceLocation::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DeviceLocation
 namespace ConfigurationVersion {
 struct TypeInfo
 {
@@ -405,6 +417,7 @@ struct TypeInfo
         Attributes::ProductAppearance::TypeInfo::DecodableType productAppearance;
         Attributes::SpecificationVersion::TypeInfo::DecodableType specificationVersion = static_cast<uint32_t>(0);
         Attributes::MaxPathsPerInvoke::TypeInfo::DecodableType maxPathsPerInvoke       = static_cast<uint16_t>(0);
+        Attributes::DeviceLocation::TypeInfo::DecodableType deviceLocation;
         Attributes::ConfigurationVersion::TypeInfo::DecodableType configurationVersion = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
