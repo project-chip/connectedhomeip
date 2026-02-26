@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
+#include <app/clusters/ambient-context-sensing-server/CodegenIntegration.h>
 #include <app/clusters/boolean-state-configuration-server/CodegenIntegration.h>
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
@@ -28,7 +29,6 @@
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/clusters/switch-server/switch-server.h>
-#include <app/clusters/ambient-context-sensing-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
@@ -294,7 +294,8 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
  * Named pipe handler for setting supported ambient context type
  *
  * Usage example:
- *   echo '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":2},{"TypeId":74, "TagId":2},{"TypeId":75, "TagId":2}]}'> /tmp/acs_fifo
+ *   echo '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":2},{"TypeId":74,
+ * "TagId":2},{"TypeId":75, "TagId":2}]}'> /tmp/acs_fifo
  *
  * JSON Arguments:
  *   - "Name": Must be "SetAmbientContextSupport"
@@ -313,7 +314,7 @@ void SetAmbientContextSupportType(Json::Value & jsonValue)
     }
 
     // values to the supported status
-    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    EndpointId endpointId                  = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     AmbientContextSensingCluster * cluster = AmbientContextSensing::FindClusterOnEndpoint(endpointId);
     if (cluster == nullptr)
     {
@@ -338,21 +339,21 @@ void SetAmbientContextSupportType(Json::Value & jsonValue)
 
     std::vector<Globals::Structs::SemanticTagStruct::Type> semanticTags;
     semanticTags.reserve(actArray.size());
-    for (Json::ArrayIndex i = 0 ; i< actArray.size() ; i++)
+    for (Json::ArrayIndex i = 0; i < actArray.size(); i++)
     {
         Json::Value item = actArray[i];
         if (!item.isObject() || !HasNumericField(item, "TypeId") || !HasNumericField(item, "TagId"))
         {
             std::string inputJson = jsonValue.toStyledString();
-            ChipLogError(NotSpecified, "AmbientContextType[%u], missing/invalid TypeId/TagId in %s",
-                static_cast<uint16_t>(i), inputJson.c_str());
+            ChipLogError(NotSpecified, "AmbientContextType[%u], missing/invalid TypeId/TagId in %s", static_cast<uint16_t>(i),
+                         inputJson.c_str());
             return;
         }
-        uint8_t    typeId = static_cast<uint8_t>(item["TypeId"].asUInt());
-        uint8_t    tagId  = static_cast<uint8_t>(item["TagId"].asUInt());
+        uint8_t typeId = static_cast<uint8_t>(item["TypeId"].asUInt());
+        uint8_t tagId  = static_cast<uint8_t>(item["TagId"].asUInt());
 
-        ChipLogDetail(NotSpecified, "AmbientContextType[%u] -> (TypeId, TagId) = (%u, %u)",
-                      static_cast<unsigned>(i), typeId, tagId);
+        ChipLogDetail(NotSpecified, "AmbientContextType[%u] -> (TypeId, TagId) = (%u, %u)", static_cast<unsigned>(i), typeId,
+                      tagId);
         Globals::Structs::SemanticTagStruct::Type tag = {
             .namespaceID = typeId,
             .tag         = tagId,
@@ -363,7 +364,7 @@ void SetAmbientContextSupportType(Json::Value & jsonValue)
 }
 
 static void GetAmbientContextType(const Json::Value & actArray,
-        std::vector<Globals::Structs::SemanticTagStruct::Type> & semanticTags)
+                                  std::vector<Globals::Structs::SemanticTagStruct::Type> & semanticTags)
 {
     // Validate AmbientContextType exists and is an array
     if (actArray.empty())
@@ -372,7 +373,7 @@ static void GetAmbientContextType(const Json::Value & actArray,
         return;
     }
 
-    for (Json::ArrayIndex i = 0 ; i< actArray.size() ; i++)
+    for (Json::ArrayIndex i = 0; i < actArray.size(); i++)
     {
         Json::Value item = actArray[i];
         if (!item.isObject() || !HasNumericField(item, "TypeId") || !HasNumericField(item, "TagId"))
@@ -380,8 +381,8 @@ static void GetAmbientContextType(const Json::Value & actArray,
             ChipLogError(NotSpecified, "AmbientContextType[%u], missing/invalid TypeId/TagId", static_cast<uint16_t>(i));
             return;
         }
-        uint8_t    typeId = static_cast<uint8_t>(item["TypeId"].asUInt());
-        uint8_t    tagId  = static_cast<uint8_t>(item["TagId"].asUInt());
+        uint8_t typeId = static_cast<uint8_t>(item["TypeId"].asUInt());
+        uint8_t tagId  = static_cast<uint8_t>(item["TagId"].asUInt());
 
         Globals::Structs::SemanticTagStruct::Type tag = {
             .namespaceID = typeId,
@@ -396,7 +397,8 @@ static void GetAmbientContextType(const Json::Value & actArray,
  * Named pipe handler for ambient context detection
  *
  * Usage example:
- *   echo '{"Name":"AddAmbientContextDetect","EndpointId":1,"AmbientContextType":[{"TypeId":75, "TagId":2},{"TypeId":73, "TagId":2}],"DetectionStartTime":1769138873}'> /tmp/acs_fifo
+ *   echo '{"Name":"AddAmbientContextDetect","EndpointId":1,"AmbientContextType":[{"TypeId":75, "TagId":2},{"TypeId":73,
+ * "TagId":2}],"DetectionStartTime":1769138873}'> /tmp/acs_fifo
  *
  * JSON Arguments:
  *   - "Name": Must be "AddAmbientContextDetect"
@@ -415,7 +417,7 @@ void SetAmbientContextDetect(Json::Value & jsonValue)
     }
 
     // values to update the detection status
-    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    EndpointId endpointId                  = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     AmbientContextSensingCluster * cluster = AmbientContextSensing::FindClusterOnEndpoint(endpointId);
     if (cluster == nullptr)
     {
@@ -442,12 +444,9 @@ void SetAmbientContextDetect(Json::Value & jsonValue)
     semanticTags.reserve(actArray.size());
     GetAmbientContextType(actArray, semanticTags);
 
-    auto tagList = chip::app::DataModel::List<const Globals::Structs::SemanticTagStruct::Type> (
-        semanticTags.data(), semanticTags.size()
-    );
-    AmbientContextSensing::Structs::AmbientContextTypeStruct::Type ACSType = {
-        .ambientContextSensed = tagList
-    };
+    auto tagList =
+        chip::app::DataModel::List<const Globals::Structs::SemanticTagStruct::Type>(semanticTags.data(), semanticTags.size());
+    AmbientContextSensing::Structs::AmbientContextTypeStruct::Type ACSType = { .ambientContextSensed = tagList };
     // Add DetectionStartTime
     if (HasNumericField(jsonValue, "DetectionStartTime"))
     {
@@ -462,8 +461,10 @@ void SetAmbientContextDetect(Json::Value & jsonValue)
  *
  * Usage example:
  *   echo '{"Name":"SetPredictedActivity","EndpointId":1,"PredAct":[
- {"StartTStamp":1769138873, "EndTStamp":1769138883,"AmbientContextType":[{"TypeId":75, "TagId":2},{"TypeId":73, "TagId":2}],"CrowdDetect":true,"CrowdCnt":10,"Conf":89},
- {"StartTStamp":1769138893, "EndTStamp":1769138903,"AmbientContextType":[{"TypeId":75, "TagId":3},{"TypeId":73, "TagId":4}],"CrowdDetect":true,"CrowdCnt":11,"Conf":90}
+ {"StartTStamp":1769138873, "EndTStamp":1769138883,"AmbientContextType":[{"TypeId":75, "TagId":2},{"TypeId":73,
+ "TagId":2}],"CrowdDetect":true,"CrowdCnt":10,"Conf":89},
+ {"StartTStamp":1769138893, "EndTStamp":1769138903,"AmbientContextType":[{"TypeId":75, "TagId":3},{"TypeId":73,
+ "TagId":4}],"CrowdDetect":true,"CrowdCnt":11,"Conf":90}
  ]}'> /tmp/acs_fifo
  *
  * JSON Arguments:
@@ -488,7 +489,7 @@ void SetPredictedActivity(Json::Value & jsonValue)
         return;
     }
     // values to update the predicted status
-    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    EndpointId endpointId                  = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     AmbientContextSensingCluster * cluster = AmbientContextSensing::FindClusterOnEndpoint(endpointId);
     if (cluster == nullptr)
     {
@@ -515,21 +516,22 @@ void SetPredictedActivity(Json::Value & jsonValue)
     std::vector<std::vector<Globals::Structs::SemanticTagStruct::Type>> allSemanticTags;
     allSemanticTags.resize(predictArray.size());
 
-    for (Json::ArrayIndex i = 0 ; i< predictArray.size() ; i++)
+    for (Json::ArrayIndex i = 0; i < predictArray.size(); i++)
     {
         Json::Value item = predictArray[i];
         if (!item.isObject() || !HasNumericField(item, "StartTStamp") || !HasNumericField(item, "EndTStamp") ||
             !HasNumericField(item, "Conf"))
         {
             std::string inputJson = jsonValue.toStyledString();
-            ChipLogError(NotSpecified, "PredictedActivity[%u], missing/invalid fields in %s",
-                static_cast<uint16_t>(i), inputJson.c_str());
+            ChipLogError(NotSpecified, "PredictedActivity[%u], missing/invalid fields in %s", static_cast<uint16_t>(i),
+                         inputJson.c_str());
             return;
         }
         AmbientContextSensing::Structs::PredictedActivityStruct::Type predictAct;
         predictAct.startTimestamp = item["StartTStamp"].asUInt();
         predictAct.endTimestamp   = item["EndTStamp"].asUInt();
-        VerifyOrReturn(predictAct.startTimestamp < predictAct.endTimestamp, ChipLogError(DeviceLayer, "PredictedActivity, incorrect startTime/endTime"));
+        VerifyOrReturn(predictAct.startTimestamp < predictAct.endTimestamp,
+                       ChipLogError(DeviceLayer, "PredictedActivity, incorrect startTime/endTime"));
         predictAct.confidence = static_cast<chip::Percent>(item["Conf"].asUInt());
 
         if (item.isMember("CrowdDetect"))
@@ -558,9 +560,8 @@ void SetPredictedActivity(Json::Value & jsonValue)
         semanticTags.reserve(actArray.size());
         GetAmbientContextType(actArray, semanticTags);
 
-        auto tagList = chip::app::DataModel::List<const Globals::Structs::SemanticTagStruct::Type> (
-            semanticTags.data(), semanticTags.size()
-        );
+        auto tagList =
+            chip::app::DataModel::List<const Globals::Structs::SemanticTagStruct::Type>(semanticTags.data(), semanticTags.size());
         predictAct.ambientContextType.SetValue(tagList);
         predictedActivityArray.push_back(predictAct);
     }
@@ -590,7 +591,7 @@ void SetObjectCount(Json::Value & jsonValue)
     }
 
     // Set the values of ObjectCount
-    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    EndpointId endpointId                  = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
     AmbientContextSensingCluster * cluster = AmbientContextSensing::FindClusterOnEndpoint(endpointId);
     if (cluster == nullptr)
     {
@@ -604,7 +605,6 @@ void SetObjectCount(Json::Value & jsonValue)
     {
         ChipLogError(NotSpecified, "Missing or invalid value for ObjectCount");
         return;
-
     }
     objCount = static_cast<uint16_t>(jsonValue["ObjectCount"].asUInt());
 

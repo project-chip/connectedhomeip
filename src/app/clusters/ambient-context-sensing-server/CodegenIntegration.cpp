@@ -32,8 +32,10 @@ using namespace chip::app::Clusters::AmbientContextSensing::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
-constexpr size_t kAmbientContextSensingFixedClusterCount = AmbientContextSensing::StaticApplicationConfig::kFixedClusterConfig.size();
-constexpr size_t kAmbientContextSensingMaxClusterCount   = kAmbientContextSensingFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kAmbientContextSensingFixedClusterCount =
+    AmbientContextSensing::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kAmbientContextSensingMaxClusterCount =
+    kAmbientContextSensingFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<AmbientContextSensingCluster> gServers[kAmbientContextSensingMaxClusterCount];
 DefaultTimerDelegate gDefaultTimerDelegate;
@@ -47,10 +49,8 @@ public:
         AmbientContextSensingCluster::Config config(endpointId);
         config.WithFeatures(static_cast<Feature>(featureMap));
         constexpr chip::app::Clusters::AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type kDefaultHoldTimeLimits = {
-                .holdTimeMin     = kDefaultHoldTimeMin,
-                .holdTimeMax     = kDefaultHoldTimeMax,
-                .holdTimeDefault = kDefaultHoldTimeDefault
-            };
+            .holdTimeMin = kDefaultHoldTimeMin, .holdTimeMax = kDefaultHoldTimeMax, .holdTimeDefault = kDefaultHoldTimeDefault
+        };
         config.WithHoldTime(kDefaultHoldTimeLimits.holdTimeDefault, kDefaultHoldTimeLimits, gDefaultTimerDelegate);
         gServers[clusterInstanceIndex].Create(config);
         return gServers[clusterInstanceIndex].Registration();
@@ -117,7 +117,6 @@ AmbientContextSensingCluster * FindClusterOnEndpoint(EndpointId endpointId)
 }
 
 } // namespace chip::app::Clusters::AmbientContextSensing
-
 
 void MatterAmbientContextSensingPluginServerInitCallback() {}
 void MatterAmbientContextSensingPluginServerShutdownCallback() {}

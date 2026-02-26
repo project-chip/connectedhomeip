@@ -42,7 +42,6 @@ enum class TagIdentifiedObject : uint8_t
     kMax
 };
 
-
 // Identified Sound
 constexpr const uint8_t kNamespaceIdentifiedSound = 0x4A;
 

@@ -16,14 +16,14 @@
  */
 #pragma once
 
+#include "ambient-context-sensing-namespace.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/ServerClusterContext.h>
-#include <platform/DefaultTimerDelegate.h>
 #include <lib/support/Span.h>
-#include <vector>
 #include <list>
-#include "ambient-context-sensing-namespace.h"
+#include <platform/DefaultTimerDelegate.h>
+#include <vector>
 
 namespace chip::app::Clusters {
 // Default value for implementation sake. They should be set by device vendor
@@ -40,10 +40,10 @@ constexpr uint8_t kMaxSimultaneousDetectionLimit = 10;
 constexpr uint16_t kMinObjectCount               = 1;
 constexpr uint8_t kMaxPredictedActivity          = 20;
 
-using SemanticTagType = Globals::Structs::SemanticTagStruct::Type;
+using SemanticTagType           = Globals::Structs::SemanticTagStruct::Type;
 using AmbientContextSensingType = AmbientContextSensing::Structs::AmbientContextTypeStruct::Type;
-using ObjectCountConfigType = AmbientContextSensing::Structs::ObjectCountConfigStruct::Type;
-using PredictedActivityType = AmbientContextSensing::Structs::PredictedActivityStruct::Type;
+using ObjectCountConfigType     = AmbientContextSensing::Structs::ObjectCountConfigStruct::Type;
+using PredictedActivityType     = AmbientContextSensing::Structs::PredictedActivityStruct::Type;
 
 class AmbientContextSensingCluster : public DefaultServerCluster, public TimerContext
 {
@@ -58,16 +58,17 @@ public:
             return *this;
         }
 
-        Config & WithHoldTime(uint16_t aHoldTime, const AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type & aHoldTimeLimits,
+        Config & WithHoldTime(uint16_t aHoldTime,
+                              const AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type & aHoldTimeLimits,
                               TimerDelegate & aTimerDelegate)
         {
-            mHoldTime       = aHoldTime;
-            mHoldTimeLimits = aHoldTimeLimits;
+            mHoldTime         = aHoldTime;
+            mHoldTimeLimits   = aHoldTimeLimits;
             mHoldTimeDelegate = &aTimerDelegate;
             return *this;
         }
 
-        Config & WithAmbientContextSupported(chip::Span <const SemanticTagType> acsTypes)
+        Config & WithAmbientContextSupported(chip::Span<const SemanticTagType> acsTypes)
         {
             mAmbientContextTypeSupportedList.assign(acsTypes.begin(), acsTypes.end());
             return *this;
@@ -83,14 +84,11 @@ public:
             .objectCountThreshold = kDefaultCountThreshold,
             };
         uint16_t mHoldTime                                                         = kDefaultHoldTimeDefault;
-        AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = {
-            .holdTimeMin     = kDefaultHoldTimeMin,
-            .holdTimeMax     = kDefaultHoldTimeMax,
-            .holdTimeDefault = kDefaultHoldTimeDefault
-            };
-        TimerDelegate * mHoldTimeDelegate = nullptr;
+        AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = { .holdTimeMin     = kDefaultHoldTimeMin,
+                                                                                       .holdTimeMax     = kDefaultHoldTimeMax,
+                                                                                       .holdTimeDefault = kDefaultHoldTimeDefault };
+        TimerDelegate * mHoldTimeDelegate                                          = nullptr;
         std::vector<SemanticTagType> mAmbientContextTypeSupportedList;
-
     };
 
     struct AmbientContextSensed
@@ -117,7 +115,7 @@ public:
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                AttributeValueDecoder & decoder) override;
+                                                 AttributeValueDecoder & decoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     CHIP_ERROR SetAmbientContextTypeSupported(const std::vector<SemanticTagType> & ACTypeList);
@@ -155,7 +153,7 @@ private:
     std::list<AmbientContextSensed> mAmbientContextTypeList;
 
     uint8_t mSimultaneousDetectionLimit = kDefaultSimultaneousDetectionLimit;
-    bool mObjectCountReached = false;
+    bool mObjectCountReached            = false;
     ObjectCountConfigType mObjectCountConfig = {
             .countingObject  = {
                 .namespaceID = kNamespaceIdentifiedObject,
@@ -165,12 +163,10 @@ private:
         };
     uint16_t mObjectCount = 0;
     System::Clock::Timestamp mObjectCountEndTime;
-    uint16_t mHoldTime = kDefaultHoldTimeDefault;
-    AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = {
-            .holdTimeMin     = kDefaultHoldTimeMin,
-            .holdTimeMax     = kDefaultHoldTimeMax,
-            .holdTimeDefault = kDefaultHoldTimeDefault
-        };
+    uint16_t mHoldTime                                                         = kDefaultHoldTimeDefault;
+    AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = { .holdTimeMin     = kDefaultHoldTimeMin,
+                                                                                   .holdTimeMax     = kDefaultHoldTimeMax,
+                                                                                   .holdTimeDefault = kDefaultHoldTimeDefault };
     TimerDelegate * mHoldTimeDelegate;
 
     std::vector<PredictActivity> mPredictedActivityList;

@@ -19,8 +19,8 @@
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server/Server.h>
-#include <clusters/AmbientContextSensing/Metadata.h>
 #include <chrono>
+#include <clusters/AmbientContextSensing/Metadata.h>
 
 namespace chip::app::Clusters {
 
@@ -28,8 +28,7 @@ using namespace AmbientContextSensing;
 using namespace AmbientContextSensing::Attributes;
 
 AmbientContextSensingCluster::AmbientContextSensingCluster(const Config & config) :
-    DefaultServerCluster({ config.mEndpointId, AmbientContextSensing::Id }),
-    mFeatureMap(config.mFeatureMap),
+    DefaultServerCluster({ config.mEndpointId, AmbientContextSensing::Id }), mFeatureMap(config.mFeatureMap),
     mHoldTimeDelegate(config.mHoldTimeDelegate)
 {
     TEMPORARY_RETURN_IGNORED SetAmbientContextTypeSupported(config.mAmbientContextTypeSupportedList);
@@ -45,16 +44,16 @@ CHIP_ERROR AmbientContextSensingCluster::Startup(ServerClusterContext & context)
 
     // Read the CountThreshold from the persistence storage
     uint16_t storedCountThreshold;
-    if (persistence.LoadNativeEndianValue({ mPath.mEndpointId, AmbientContextSensing::Id, Attributes::ObjectCountConfig::Id }, storedCountThreshold,
-                                              mObjectCountConfig.objectCountThreshold))
+    if (persistence.LoadNativeEndianValue({ mPath.mEndpointId, AmbientContextSensing::Id, Attributes::ObjectCountConfig::Id },
+                                          storedCountThreshold, mObjectCountConfig.objectCountThreshold))
     {
         // A value was found in persistence.
         mObjectCountConfig.objectCountThreshold = storedCountThreshold;
     }
 
     uint16_t storedHoldTime;
-    if (persistence.LoadNativeEndianValue({ mPath.mEndpointId, AmbientContextSensing::Id, Attributes::HoldTime::Id }, storedHoldTime,
-                                              mHoldTime))
+    if (persistence.LoadNativeEndianValue({ mPath.mEndpointId, AmbientContextSensing::Id, Attributes::HoldTime::Id },
+                                          storedHoldTime, mHoldTime))
     {
         // A value was found in persistence.
         RETURN_SAFELY_IGNORED SetHoldTime(storedHoldTime);
@@ -73,7 +72,7 @@ void AmbientContextSensingCluster::Shutdown(ClusterShutdownType shutdownType)
 }
 
 DataModel::ActionReturnStatus AmbientContextSensingCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                              AttributeValueEncoder & encoder)
+                                                                          AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -88,7 +87,7 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::ReadAttribute(const 
     case AmbientContextTypeSupported::Id:
         return ReadAmbientContextTypeSupported(mFeatureMap, encoder);
     case ObjectCountReached::Id:
-        return encoder.Encode (mObjectCountReached);
+        return encoder.Encode(mObjectCountReached);
     case ObjectCountConfig::Id:
         return encoder.Encode(mObjectCountConfig);
     case ObjectCount::Id:
@@ -111,7 +110,7 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::ReadAttribute(const 
 }
 
 DataModel::ActionReturnStatus AmbientContextSensingCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                               AttributeValueDecoder & decoder)
+                                                                           AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -136,23 +135,25 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::WriteAttribute(const
 }
 
 CHIP_ERROR AmbientContextSensingCluster::Attributes(const ConcreteClusterPath & path,
-                                        ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+                                                    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { mFeatureMap.Has(Feature::kHumanActivity), Attributes::HumanActivityDetected::kMetadataEntry },
         { mFeatureMap.Has(Feature::kObjectIdentification), Attributes::ObjectIdentified::kMetadataEntry },
         { mFeatureMap.Has(Feature::kSoundIdentification), Attributes::AudioContextDetected::kMetadataEntry },
-        { mFeatureMap.Has(Feature::kHumanActivity) || mFeatureMap.Has(Feature::kObjectIdentification) || mFeatureMap.Has(Feature::kSoundIdentification),
-            Attributes::AmbientContextType::kMetadataEntry },
-        { mFeatureMap.Has(Feature::kHumanActivity) || mFeatureMap.Has(Feature::kObjectIdentification) || mFeatureMap.Has(Feature::kSoundIdentification),
-            Attributes::AmbientContextTypeSupported::kMetadataEntry },
+        { mFeatureMap.Has(Feature::kHumanActivity) || mFeatureMap.Has(Feature::kObjectIdentification) ||
+              mFeatureMap.Has(Feature::kSoundIdentification),
+          Attributes::AmbientContextType::kMetadataEntry },
+        { mFeatureMap.Has(Feature::kHumanActivity) || mFeatureMap.Has(Feature::kObjectIdentification) ||
+              mFeatureMap.Has(Feature::kSoundIdentification),
+          Attributes::AmbientContextTypeSupported::kMetadataEntry },
         { mFeatureMap.Has(Feature::kObjectCounting) && mFeatureMap.Has(Feature::kObjectIdentification),
-            Attributes::ObjectCountReached::kMetadataEntry },
+          Attributes::ObjectCountReached::kMetadataEntry },
         { mFeatureMap.Has(Feature::kObjectCounting) && mFeatureMap.Has(Feature::kObjectIdentification),
-            Attributes::ObjectCountConfig::kMetadataEntry },
+          Attributes::ObjectCountConfig::kMetadataEntry },
         { mFeatureMap.Has(Feature::kObjectCounting) && mFeatureMap.Has(Feature::kObjectIdentification) && mObjectCountReached,
-            Attributes::ObjectCount::kMetadataEntry },
+          Attributes::ObjectCount::kMetadataEntry },
         { false, Attributes::SimultaneousDetectionLimit::kMetadataEntry },
         { false, Attributes::HoldTime::kMetadataEntry },
         { false, Attributes::HoldTimeLimits::kMetadataEntry },
@@ -172,8 +173,8 @@ CHIP_ERROR AmbientContextSensingCluster::SetAmbientContextTypeSupported(const st
 
 CHIP_ERROR AmbientContextSensingCluster::AddDetection(const AmbientContextSensingType & sensedEvent)
 {
-    VerifyOrReturnError(sensedEvent.ambientContextSensed.size()>0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(sensedEvent.ambientContextSensed.size()<=kMaxACSensed, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(sensedEvent.ambientContextSensed.size() > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(sensedEvent.ambientContextSensed.size() <= kMaxACSensed, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedEvent(sensedEvent), CHIP_ERROR_INCORRECT_STATE);
 
     // If there have already been mSimultaneousDetectionLimit items in mAmbientContextTypeList => remove the oldest ones
@@ -181,7 +182,7 @@ CHIP_ERROR AmbientContextSensingCluster::AddDetection(const AmbientContextSensin
     {
         // One more space is required
         uint8_t itemsToRemove = mAmbientContextTypeList.size() - mSimultaneousDetectionLimit + 1;
-        for (auto i = 0; i<itemsToRemove ; i++)
+        for (auto i = 0; i < itemsToRemove; i++)
         {
             mAmbientContextTypeList.pop_back();
         }
@@ -215,7 +216,8 @@ CHIP_ERROR AmbientContextSensingCluster::AddDetection(const AmbientContextSensin
         item.mOwnedTags.assign(tags.begin(), tags.end());
 
         item.mInfo = sensedEvent;
-        item.mInfo.ambientContextSensed = chip::app::DataModel::List<const SemanticTagType>(item.mOwnedTags.data(), item.mOwnedTags.size());
+        item.mInfo.ambientContextSensed =
+            chip::app::DataModel::List<const SemanticTagType>(item.mOwnedTags.data(), item.mOwnedTags.size());
         item.mStartTimestamp = now;
 
         newHoldTime = System::Clock::Seconds16(mHoldTime);
@@ -223,7 +225,8 @@ CHIP_ERROR AmbientContextSensingCluster::AddDetection(const AmbientContextSensin
     else
     {
         // The event which is detected and whose hold-time has not elapsed
-        const System::Clock::Seconds16 elapsedSec = std::chrono::duration_cast<System::Clock::Seconds16>(now - item.mStartTimestamp);
+        const System::Clock::Seconds16 elapsedSec =
+            std::chrono::duration_cast<System::Clock::Seconds16>(now - item.mStartTimestamp);
 
         System::Clock::Seconds16 holdTimeMaxSec = System::Clock::Seconds16(mHoldTimeLimits.holdTimeMax);
         if (elapsedSec + System::Clock::Seconds16(mHoldTime) <= holdTimeMaxSec)
@@ -250,10 +253,12 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetObjectCountConfig
 {
     auto newObjectCountConfig = objectCountConfig;
 
-    VerifyOrReturnError(newObjectCountConfig.objectCountThreshold >= kMinObjectCount, Protocols::InteractionModel::Status::ConstraintError);
+    VerifyOrReturnError(newObjectCountConfig.objectCountThreshold >= kMinObjectCount,
+                        Protocols::InteractionModel::Status::ConstraintError);
     if (newObjectCountConfig.countingObject.mfgCode.IsNull())
     {
-        VerifyOrReturnError(newObjectCountConfig.countingObject.namespaceID == kNamespaceIdentifiedObject, Protocols::InteractionModel::Status::ConstraintError);
+        VerifyOrReturnError(newObjectCountConfig.countingObject.namespaceID == kNamespaceIdentifiedObject,
+                            Protocols::InteractionModel::Status::ConstraintError);
         bool inList = false;
         for (auto item : mAmbientContextTypeSupportedList)
         {
@@ -292,7 +297,8 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetObjectCountConfig
 
 CHIP_ERROR AmbientContextSensingCluster::SetObjectCount(uint16_t objectCount)
 {
-    VerifyOrReturnError((mFeatureMap.Has(Feature::kObjectCounting) && mFeatureMap.Has(Feature::kObjectIdentification)), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError((mFeatureMap.Has(Feature::kObjectCounting) && mFeatureMap.Has(Feature::kObjectIdentification)),
+                        CHIP_ERROR_INCORRECT_STATE);
     if (objectCount == mObjectCount)
     {
         return CHIP_NO_ERROR;
@@ -309,8 +315,10 @@ CHIP_ERROR AmbientContextSensingCluster::SetObjectCount(uint16_t objectCount)
 
 DataModel::ActionReturnStatus AmbientContextSensingCluster::SetSimultaneousDetectionLimit(const uint16_t simultaneousDetectionLimit)
 {
-    VerifyOrReturnError((simultaneousDetectionLimit <= kMaxSimultaneousDetectionLimit), Protocols::InteractionModel::Status::ConstraintError);
-    VerifyOrReturnError((simultaneousDetectionLimit != mSimultaneousDetectionLimit), DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+    VerifyOrReturnError((simultaneousDetectionLimit <= kMaxSimultaneousDetectionLimit),
+                        Protocols::InteractionModel::Status::ConstraintError);
+    VerifyOrReturnError((simultaneousDetectionLimit != mSimultaneousDetectionLimit),
+                        DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
     mSimultaneousDetectionLimit = simultaneousDetectionLimit;
     NotifyAttributeChanged(Attributes::SimultaneousDetectionLimit::Id);
@@ -321,7 +329,7 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetSimultaneousDetec
     }
     // Resize the list of AmbientContextType list if the updated limitation becomes smaller than it's current length
     uint8_t itemsToRemove = mAmbientContextTypeList.size() - mSimultaneousDetectionLimit;
-    for (auto i = 0; i<itemsToRemove ; i++)
+    for (auto i = 0; i < itemsToRemove; i++)
     {
         mAmbientContextTypeList.pop_back();
     }
@@ -354,7 +362,8 @@ DataModel::ActionReturnStatus AmbientContextSensingCluster::SetHoldTime(uint16_t
     return Protocols::InteractionModel::Status::Success;
 }
 
-void AmbientContextSensingCluster::SetHoldTimeLimits(const AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits)
+void AmbientContextSensingCluster::SetHoldTimeLimits(
+    const AmbientContextSensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits)
 {
     auto newHoldTimeLimits = holdTimeLimits;
 
@@ -383,8 +392,7 @@ void AmbientContextSensingCluster::SetHoldTimeLimits(const AmbientContextSensing
 
 CHIP_ERROR AmbientContextSensingCluster::SetPredictedActivity(const std::vector<PredictedActivityType> & predictedActivityList)
 {
-    VerifyOrReturnError(predictedActivityList.size() <= kMaxPredictedActivity,
-                        CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(predictedActivityList.size() <= kMaxPredictedActivity, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(CheckPredictedActivity(predictedActivityList));
 
     // Destroy the old context
@@ -396,7 +404,7 @@ CHIP_ERROR AmbientContextSensingCluster::SetPredictedActivity(const std::vector<
     {
         const auto & src = predictedActivityList[i];
         auto & dst       = mPredictedActivityList[i];
-        dst.mInfo = src;
+        dst.mInfo        = src;
         if (!src.ambientContextType.HasValue())
         {
             dst.mOwnedTags.clear();
@@ -408,11 +416,7 @@ CHIP_ERROR AmbientContextSensingCluster::SetPredictedActivity(const std::vector<
 
         dst.mOwnedTags.assign(acTypeList.begin(), acTypeList.end());
         dst.mInfo.ambientContextType.SetValue(
-            DataModel::List<const SemanticTagType>(
-                dst.mOwnedTags.data(),
-                static_cast<uint16_t>(dst.mOwnedTags.size())
-            )
-        );
+            DataModel::List<const SemanticTagType>(dst.mOwnedTags.data(), static_cast<uint16_t>(dst.mOwnedTags.size())));
     }
     return CHIP_NO_ERROR;
 }
@@ -430,17 +434,17 @@ void AmbientContextSensingCluster::TimerFired()
     UpdateEventTimeout();
 }
 
-bool AmbientContextSensingCluster::CompareAmbientContextSensed(const AmbientContextSensingType & sensedEvent, const AmbientContextSensingType & newEvent)
+bool AmbientContextSensingCluster::CompareAmbientContextSensed(const AmbientContextSensingType & sensedEvent,
+                                                               const AmbientContextSensingType & newEvent)
 {
     const auto existEventTags = sensedEvent.ambientContextSensed;
-    const auto newEventTags = newEvent.ambientContextSensed;
+    const auto newEventTags   = newEvent.ambientContextSensed;
 
     // If the size is different, it's the different event
     VerifyOrReturnError(existEventTags.size() == newEventTags.size(), false);
-    for (size_t i = 0 ; i < existEventTags.size() ; i++)
+    for (size_t i = 0; i < existEventTags.size(); i++)
     {
-        if ((existEventTags[i].namespaceID != newEventTags[i].namespaceID) ||
-            (existEventTags[i].tag!= newEventTags[i].tag))
+        if ((existEventTags[i].namespaceID != newEventTags[i].namespaceID) || (existEventTags[i].tag != newEventTags[i].tag))
         {
             return false;
         }
@@ -448,7 +452,8 @@ bool AmbientContextSensingCluster::CompareAmbientContextSensed(const AmbientCont
     return true;
 }
 
-CHIP_ERROR AmbientContextSensingCluster::ReadAmbientContextTypeSupported(BitFlags<AmbientContextSensing::Feature> features, AttributeValueEncoder & encoder)
+CHIP_ERROR AmbientContextSensingCluster::ReadAmbientContextTypeSupported(BitFlags<AmbientContextSensing::Feature> features,
+                                                                         AttributeValueEncoder & encoder)
 {
     VerifyOrReturnValue(!mAmbientContextTypeSupportedList.empty(), encoder.EncodeEmptyList());
     return encoder.EncodeList([this](const auto & encode) -> CHIP_ERROR {
@@ -468,7 +473,6 @@ CHIP_ERROR AmbientContextSensingCluster::ReadAmbientContextType(AttributeValueEn
         for (const auto & item : mAmbientContextTypeList)
         {
             ReturnErrorOnFailure(encode.Encode(item.mInfo));
-
         }
         return CHIP_NO_ERROR;
     });
@@ -476,29 +480,29 @@ CHIP_ERROR AmbientContextSensingCluster::ReadAmbientContextType(AttributeValueEn
 
 void AmbientContextSensingCluster::UpdateDetectionAttributes()
 {
-    bool bHA             = false;
-    bool bOI             = false;
-    bool bAUD            = false;
-    bool bOC             = false;
+    bool bHA                = false;
+    bool bOI                = false;
+    bool bAUD               = false;
+    bool bOC                = false;
     bool needToSendEvent[4] = {};
 
     for (const auto & item : mAmbientContextTypeList)
     {
         const auto & tags = item.mInfo.ambientContextSensed;
-        for (size_t i = 0; i < tags.size() ; i++)
+        for (size_t i = 0; i < tags.size(); i++)
         {
             auto sense = tags[i];
             switch (sense.namespaceID)
             {
-                case kNamespaceIdentifiedHumanActivity:
-                    bHA = true;
-                    break;
-                case kNamespaceIdentifiedObject:
-                    bOI = true;
-                    break;
-                case kNamespaceIdentifiedSound:
-                    bAUD = true;
-                    break;
+            case kNamespaceIdentifiedHumanActivity:
+                bHA = true;
+                break;
+            case kNamespaceIdentifiedObject:
+                bOI = true;
+                break;
+            case kNamespaceIdentifiedSound:
+                bAUD = true;
+                break;
             }
         }
 
@@ -536,7 +540,7 @@ void AmbientContextSensingCluster::UpdateDetectionAttributes()
     {
         return;
     }
-    for (auto i=0 ; i<4 ; i++)
+    for (auto i = 0; i < 4; i++)
     {
         if (needToSendEvent[i] == false)
         {
@@ -551,7 +555,7 @@ void AmbientContextSensingCluster::UpdateDetectionAttributes()
             {
                 // Send the start-event of ObjectCount
                 event.objectCount.SetValue(mObjectCount);
-                auto opt =  mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+                auto opt     = mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
                 mEventNum[i] = opt.value_or(static_cast<chip::EventNumber>(0));
                 continue;
             }
@@ -562,9 +566,9 @@ void AmbientContextSensingCluster::UpdateDetectionAttributes()
             {
                 tmp.push_back(sensed.mInfo);
             }
-            event.ambientContextType.SetValue(DataModel::List<const AmbientContextSensingType>(tmp.data(),
-                                                 static_cast<uint16_t>(tmp.size())));
-            auto opt =  mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+            event.ambientContextType.SetValue(
+                DataModel::List<const AmbientContextSensingType>(tmp.data(), static_cast<uint16_t>(tmp.size())));
+            auto opt     = mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
             mEventNum[i] = opt.value_or(static_cast<chip::EventNumber>(0));
         }
         else
@@ -614,43 +618,20 @@ void AmbientContextSensingCluster::UpdateEventTimeout()
 }
 
 constexpr TagIdentifiedObject TagIdentifiedObjectIds[] = {
-    TagIdentifiedObject::kUnknown,
-    TagIdentifiedObject::kAdult,
-    TagIdentifiedObject::kChild,
-    TagIdentifiedObject::kPerson,
-    TagIdentifiedObject::kRVC,
-    TagIdentifiedObject::kPet,
-    TagIdentifiedObject::kDog,
-    TagIdentifiedObject::kCat,
-    TagIdentifiedObject::kAnimal,
-    TagIdentifiedObject::kCar,
-    TagIdentifiedObject::kVehicle,
-    TagIdentifiedObject::kPackage,
+    TagIdentifiedObject::kUnknown, TagIdentifiedObject::kAdult, TagIdentifiedObject::kChild,   TagIdentifiedObject::kPerson,
+    TagIdentifiedObject::kRVC,     TagIdentifiedObject::kPet,   TagIdentifiedObject::kDog,     TagIdentifiedObject::kCat,
+    TagIdentifiedObject::kAnimal,  TagIdentifiedObject::kCar,   TagIdentifiedObject::kVehicle, TagIdentifiedObject::kPackage,
     TagIdentifiedObject::kClothes,
 };
 
 constexpr TagIdentifiedSound TagIdentifiedSoundIds[] = {
-    TagIdentifiedSound::kUnknown,
-    TagIdentifiedSound::kObjectFall,
-    TagIdentifiedSound::kSnoring,
-    TagIdentifiedSound::kCoughing,
-    TagIdentifiedSound::kBarking,
-    TagIdentifiedSound::kShattering,
-    TagIdentifiedSound::kBabyCrying,
-    TagIdentifiedSound::kUtilityAlarm,
-    TagIdentifiedSound::kUrgentShouting,
-    TagIdentifiedSound::kDoorbell,
-    TagIdentifiedSound::kKnocking,
-    TagIdentifiedSound::kUrgentSiren,
-    TagIdentifiedSound::kFaucetRunning,
-    TagIdentifiedSound::kKettleBoiling,
-    TagIdentifiedSound::kFanDryer,
-    TagIdentifiedSound::kClapping,
-    TagIdentifiedSound::kFingerSnapping,
-    TagIdentifiedSound::kMeowing,
-    TagIdentifiedSound::kLaughing,
-    TagIdentifiedSound::kGlassBreaking,
-    TagIdentifiedSound::kDoorKnocking,
+    TagIdentifiedSound::kUnknown,       TagIdentifiedSound::kObjectFall,     TagIdentifiedSound::kSnoring,
+    TagIdentifiedSound::kCoughing,      TagIdentifiedSound::kBarking,        TagIdentifiedSound::kShattering,
+    TagIdentifiedSound::kBabyCrying,    TagIdentifiedSound::kUtilityAlarm,   TagIdentifiedSound::kUrgentShouting,
+    TagIdentifiedSound::kDoorbell,      TagIdentifiedSound::kKnocking,       TagIdentifiedSound::kUrgentSiren,
+    TagIdentifiedSound::kFaucetRunning, TagIdentifiedSound::kKettleBoiling,  TagIdentifiedSound::kFanDryer,
+    TagIdentifiedSound::kClapping,      TagIdentifiedSound::kFingerSnapping, TagIdentifiedSound::kMeowing,
+    TagIdentifiedSound::kLaughing,      TagIdentifiedSound::kGlassBreaking,  TagIdentifiedSound::kDoorKnocking,
     TagIdentifiedSound::kPersonTalking,
 };
 
@@ -671,8 +652,8 @@ constexpr TagIdentifiedHumanActivity TagIdentifiedHumanActivityIds[] = {
 template <typename T>
 static uint8_t TagToIndex(const chip::Span<const T> & SpanId, T tag)
 {
-    uint8_t i=0;
-    for (const auto iTag: SpanId)
+    uint8_t i = 0;
+    for (const auto iTag : SpanId)
     {
         if (iTag == tag)
         {
@@ -692,13 +673,14 @@ CHIP_ERROR AmbientContextSensingCluster::CheckInputSupportedType(const std::vect
 {
     // Remove the type if the feature is disabled or duplicated
     bool pickType_HA[std::size(TagIdentifiedHumanActivityIds)] = {};
-    bool pickType_OI[std::size(TagIdentifiedObjectIds)] = {};
-    bool pickType_AUD[std::size(TagIdentifiedSoundIds)] = {};
+    bool pickType_OI[std::size(TagIdentifiedObjectIds)]        = {};
+    bool pickType_AUD[std::size(TagIdentifiedSoundIds)]        = {};
 
     for (auto it = ACTSupportedList.begin(); it != ACTSupportedList.end(); it++)
     {
         const auto & act = *it;
-        bool isFeatureEnabled = (act.namespaceID == kNamespaceIdentifiedHumanActivity && mFeatureMap.Has(Feature::kHumanActivity)) ||
+        bool isFeatureEnabled =
+            (act.namespaceID == kNamespaceIdentifiedHumanActivity && mFeatureMap.Has(Feature::kHumanActivity)) ||
             (act.namespaceID == kNamespaceIdentifiedObject && mFeatureMap.Has(Feature::kObjectIdentification)) ||
             (act.namespaceID == kNamespaceIdentifiedSound && mFeatureMap.Has(Feature::kSoundIdentification));
         uint8_t id;
@@ -712,7 +694,8 @@ CHIP_ERROR AmbientContextSensingCluster::CheckInputSupportedType(const std::vect
         switch (act.namespaceID)
         {
         case kNamespaceIdentifiedHumanActivity:
-            id = TagToIndex<TagIdentifiedHumanActivity>(Span(TagIdentifiedHumanActivityIds), static_cast<TagIdentifiedHumanActivity>(act.tag));
+            id = TagToIndex<TagIdentifiedHumanActivity>(Span(TagIdentifiedHumanActivityIds),
+                                                        static_cast<TagIdentifiedHumanActivity>(act.tag));
             isSet |= pickType_HA[id];
             pickType_HA[id] = true;
             break;
@@ -738,7 +721,7 @@ CHIP_ERROR AmbientContextSensingCluster::CheckInputSupportedType(const std::vect
 bool AmbientContextSensingCluster::IsSupportedEvent(const AmbientContextSensingType & sensedEvent)
 {
     const auto tags = sensedEvent.ambientContextSensed;
-    for (size_t i = 0 ; i < tags.size() ; i++)
+    for (size_t i = 0; i < tags.size(); i++)
     {
         bool isSupported = false;
 
@@ -760,7 +743,8 @@ bool AmbientContextSensingCluster::IsSupportedEvent(const AmbientContextSensingT
     return true;
 }
 
-void AmbientContextSensingCluster::RemoveExpiredItems(std::list<AmbientContextSensed> & eventList, const System::Clock::Timestamp & now)
+void AmbientContextSensingCluster::RemoveExpiredItems(std::list<AmbientContextSensed> & eventList,
+                                                      const System::Clock::Timestamp & now)
 {
     // Remove the ones which expires
     for (auto it = eventList.begin(); it != eventList.end();)
@@ -768,7 +752,7 @@ void AmbientContextSensingCluster::RemoveExpiredItems(std::list<AmbientContextSe
         if (it->mEndTimestamp <= now)
         {
             auto item = *it;
-            it = eventList.erase(it);
+            it        = eventList.erase(it);
         }
         else
         {
@@ -778,7 +762,7 @@ void AmbientContextSensingCluster::RemoveExpiredItems(std::list<AmbientContextSe
     if (mObjectCountEndTime <= now)
     {
         mObjectCountEndTime = System::Clock::Timestamp(0);
-        mObjectCount = 0;
+        mObjectCount        = 0;
     }
 }
 
@@ -789,11 +773,8 @@ System::Clock::Timestamp AmbientContextSensingCluster::FindEarliestEndTimestamp(
     if (!eventList.empty())
     {
         const auto it = std::min_element(
-            eventList.begin(),
-            eventList.end(),
-            [] (const AmbientContextSensed & a, const AmbientContextSensed & b) {
-                return a.mEndTimestamp < b.mEndTimestamp;
-            });
+            eventList.begin(), eventList.end(),
+            [](const AmbientContextSensed & a, const AmbientContextSensed & b) { return a.mEndTimestamp < b.mEndTimestamp; });
         earliestTimestamp = it->mEndTimestamp;
     }
     if (mObjectCount > 0)
@@ -812,7 +793,7 @@ CHIP_ERROR AmbientContextSensingCluster::CheckPredictedActivity(const std::vecto
 
     // Sanitize the input parameters
     uint32_t lastCheckTime = 0u;
-    for (auto item: predictedActivityList)
+    for (auto item : predictedActivityList)
     {
         // Make sure the start-time > the end-time of the previous PredictedActivityStruct
         VerifyOrReturnError(item.startTimestamp < item.endTimestamp, CHIP_ERROR_INCORRECT_STATE);
@@ -827,32 +808,32 @@ CHIP_ERROR AmbientContextSensingCluster::CheckPredictedActivity(const std::vecto
             {
                 switch (acsType.namespaceID)
                 {
-                    case kNamespaceIdentifiedObject:
-                        VerifyOrReturnError(mFeatureMap.Has(Feature::kObjectIdentification), CHIP_ERROR_INCORRECT_STATE);
-                        break;
-                    case kNamespaceIdentifiedSound:
-                        VerifyOrReturnError(mFeatureMap.Has(Feature::kSoundIdentification), CHIP_ERROR_INCORRECT_STATE);
-                        break;
-                    case kNamespaceIdentifiedHumanActivity:
-                        VerifyOrReturnError(mFeatureMap.Has(Feature::kHumanActivity), CHIP_ERROR_INCORRECT_STATE);
-                        break;
-                    default:
-                        return CHIP_ERROR_INCORRECT_STATE;
+                case kNamespaceIdentifiedObject:
+                    VerifyOrReturnError(mFeatureMap.Has(Feature::kObjectIdentification), CHIP_ERROR_INCORRECT_STATE);
+                    break;
+                case kNamespaceIdentifiedSound:
+                    VerifyOrReturnError(mFeatureMap.Has(Feature::kSoundIdentification), CHIP_ERROR_INCORRECT_STATE);
+                    break;
+                case kNamespaceIdentifiedHumanActivity:
+                    VerifyOrReturnError(mFeatureMap.Has(Feature::kHumanActivity), CHIP_ERROR_INCORRECT_STATE);
+                    break;
+                default:
+                    return CHIP_ERROR_INCORRECT_STATE;
                 }
             }
         }
 
         if (mFeatureMap.Has(Feature::kObjectCounting))
         {
-             // Check CrowdDetected
-             VerifyOrReturnError(item.crowdDetected.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+            // Check CrowdDetected
+            VerifyOrReturnError(item.crowdDetected.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
-             // Check CrowdCount
-             if (item.crowdCount.HasValue())
-             {
-                 uint8_t value = item.crowdCount.Value();
-                 VerifyOrReturnError(((1 <= value) && (value <= 254)), CHIP_ERROR_INCORRECT_STATE);
-             }
+            // Check CrowdCount
+            if (item.crowdCount.HasValue())
+            {
+                uint8_t value = item.crowdCount.Value();
+                VerifyOrReturnError(((1 <= value) && (value <= 254)), CHIP_ERROR_INCORRECT_STATE);
+            }
         }
     }
 
@@ -870,7 +851,6 @@ CHIP_ERROR AmbientContextSensingCluster::ReadPredictedActivity(AttributeValueEnc
         }
         return CHIP_NO_ERROR;
     });
-
 }
 
 } // namespace chip::app::Clusters
