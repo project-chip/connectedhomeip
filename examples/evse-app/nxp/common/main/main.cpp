@@ -26,7 +26,7 @@
 #include <AppTask.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <EnergyManagementAppCommonMain.h>
+#include <EnergyEvseMain.h>
 
 extern bool CHARGING_ON;
 
