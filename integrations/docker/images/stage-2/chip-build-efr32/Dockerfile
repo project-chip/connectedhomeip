@@ -2,9 +2,8 @@ ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build:${VERSION} as build
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
-
-# Copy SLT package manifests, lock (conan-repos without conan-aus for CI reachability), and Simplicity SDK keep-list (build context must be repo root)
-COPY scripts/setup/silabs/sisdk-pkg.lock scripts/setup/silabs/wiseconnect-pkg.slt docker/requirements.txt  /tmp/
+# Copy SLT manifests (sisdk-pkg.lock, wiseconnect-pkg.slt), requirements.txt, and Simplicity SDK keep-list (build context must be repo root)
+COPY scripts/setup/silabs/sisdk-pkg.lock scripts/setup/silabs/wiseconnect-pkg.slt docker/requirements.txt /tmp/
 COPY scripts/setup/silabs/simplicity_sdk_keep_folders.txt /tmp/keep_folders.txt
 
 # GNU ARM Embedded toolchain, cross compiler for various platform builds
@@ -22,7 +21,7 @@ RUN set -x \
     && rm /tmp/requirements.txt \
     && : # last line
 
-# Setup SLT CLI (same as scripts/setup/silabs/install-packages.py) and install simplicity-sdk + wiseconnect via sdk-pkg.slt
+# Setup SLT CLI (same as scripts/setup/silabs/install-packages.py)
 RUN set -x \
     && mkdir -p /tmp/slt_install \
     && wget -q https://www.silabs.com/documents/public/software/slt-cli-1.0.1-linux-x64.zip -O /tmp/slt.zip \
@@ -31,19 +30,19 @@ RUN set -x \
     && chmod +x /tmp/slt_install/slt \
     && : # last line
 
-# Install packages via SLT (simplicity-sdk, wiseconnect, slc-cli) then add conan remote and copy to /tmp for final image
+# Install packages via SLT (simplicity-sdk, wiseconnect, slc-cli) and copy to /tmp for final image
 RUN set -x \
     && /tmp/slt_install/slt update --self \
     && /tmp/slt_install/slt install -f /tmp/wiseconnect-pkg.slt \
-    && /tmp/slt_install/slt install -f /tmp/sisdk-pkg.lock \
     && /tmp/slt_install/slt install slc-cli \
     && cp -a $(/tmp/slt_install/slt where wiseconnect) /tmp/wifi_sdk \
-    && cp -a $(/tmp/slt_install/slt where simplicity-sdk/2025.12.1-alpha) /tmp/simplicity_sdk \
     && cp -a $(/tmp/slt_install/slt where slc-cli) /tmp/slc_cli \
+    && /tmp/slt_install/slt install -f /tmp/sisdk-pkg.lock \
+    && cp -a $(/tmp/slt_install/slt where simplicity-sdk/2025.12.1-alpha) /tmp/simplicity_sdk \
     && rm -rf /tmp/slt_install /tmp/sisdk-pkg.lock /tmp/wiseconnect-pkg.slt \
     && : # last line
 
-# Trim Simplicity SDK: keep only top-level folders and .a libraries listed in simplicity_sdk_keep_folders.txt; remove all other .a
+# Trim Simplicity SDK: keep only folders and .a libs from simplicity_sdk_keep_folders.txt
 RUN grep -v '^#' /tmp/keep_folders.txt | grep -v '^$' | grep -v '\.a$' | sort -u > /tmp/keep_list.txt \
     && for d in /tmp/simplicity_sdk/*/ ; do \
     name=$(basename "$d"); \
@@ -67,7 +66,7 @@ RUN rm -rf /tmp/wifi_sdk/.git /tmp/wifi_sdk/examples /tmp/wifi_sdk/components/de
     && : # last line
 
 # Final SDK container for compiling using Silabs SDK
-FROM ghcr.io/project-chip/chip-build:latest
+FROM ghcr.io/project-chip/chip-build:${VERSION}
 
 ADD docker/requirements.txt /tmp/requirements.txt
 
