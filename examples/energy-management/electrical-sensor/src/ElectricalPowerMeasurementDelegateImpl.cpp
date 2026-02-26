@@ -16,8 +16,9 @@
  *    limitations under the License.
  */
 
-#include <ElectricalPowerMeasurementDelegate.h>
+#include <ElectricalPowerMeasurementDelegateImpl.h>
 #include <app/reporting/reporting.h>
+#include <clusters/ElectricalPowerMeasurement/Attributes.h>
 
 namespace chip {
 namespace app {

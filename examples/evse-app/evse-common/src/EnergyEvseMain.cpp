@@ -21,10 +21,10 @@
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <DeviceEnergyManagementManager.h>
 #include <EVSEManufacturerImpl.h>
-#include <ElectricalPowerMeasurementDelegate.h>
+#include <ElectricalPowerMeasurementDelegateImpl.h>
 #include <EnergyEvseManager.h>
 #include <EnergyManagementAppCmdLineOptions.h>
-#include <PowerTopologyDelegate.h>
+#include <PowerTopologyDelegateImpl.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <device-energy-management-modes.h>
 #include <energy-evse-modes.h>

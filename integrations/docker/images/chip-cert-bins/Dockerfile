@@ -333,6 +333,7 @@ RUN apt-get install -y           \
   libcairo2-dev                  \
   libcurl4                       \
   libdbus-1-dev                  \
+  libevent-dev                   \
   libgirepository1.0-dev         \
   libglib2.0-dev                 \
   libgstreamer1.0-0              \
@@ -396,6 +397,9 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/data_model python_testing
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
 RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
+
+COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.nfc.txt /tmp/requirements.nfc.txt
+RUN pip install --break-system-packages -r /tmp/requirements.nfc.txt && rm /tmp/requirements.nfc.txt
 
 # Stage 3.2: Setup the Mock Server
 COPY --from=chip-build-cert-bins /root/connectedhomeip/integrations/mock_server mock_server

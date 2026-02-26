@@ -40,7 +40,7 @@ CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor 
 
     GroupDataProvider * groups = &Provider();
 
-    CHIP_ERROR err = aEncoder.EncodeList([fabric_index, groups](const auto & encoder) -> CHIP_ERROR {
+    CHIP_ERROR err = aEncoder.EncodeList([fabric_index, groups, this](const auto & encoder) -> CHIP_ERROR {
         EndpointList endpoints;
         CHIP_ERROR status              = CHIP_NO_ERROR;
         GroupInfoIterator * group_iter = groups->IterateGroupInfo(fabric_index);
@@ -70,9 +70,13 @@ CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor 
             group.fabricIndex     = fabric_index;
             group.groupID         = info.group_id;
             group.keySetID        = keyset_id;
-            group.hasAuxiliaryACL = MakeOptional(info.HasAuxiliaryACL());
             group.mcastAddrPolicy = info.UsePerGroupAddress() ? Groupcast::MulticastAddrPolicyEnum::kPerGroup
                                                               : Groupcast::MulticastAddrPolicyEnum::kIanaAddr;
+            if (mFeatures.Has(Groupcast::Feature::kListener))
+            {
+                group.hasAuxiliaryACL = MakeOptional(info.HasAuxiliaryACL());
+            }
+
             // Return endpoints in kMaxMembershipEndpoints chunks or less
             size_t group_total = end_iter->Count();
             size_t group_count = 0;
@@ -92,6 +96,12 @@ CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor 
             end_iter->Release();
             if (group_count == 0)
             {
+                if (mFeatures.Has(Groupcast::Feature::kListener))
+                {
+                    // If listener is supported, the membership SHALL contain the endpoints list.
+                    group.endpoints = MakeOptional(DataModel::List<const chip::EndpointId>());
+                }
+
                 status = encoder.Encode(group);
             }
         }
