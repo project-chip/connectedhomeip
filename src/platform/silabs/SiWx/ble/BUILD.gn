@@ -27,7 +27,6 @@ config("siwx-ble-config") {
   include_dirs += [
     "${silabs_platform_dir}/SiWx/ble",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
-    "${wifi_sdk_root}/components/sli_wifi/inc",
   ]
 }
 
