@@ -34,7 +34,7 @@ public:
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
-    void UnRegister(CodeDrivenDataModelProvider & provider) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::OccupancySensingCluster & OccupancySensingCluster() { return mOccupancySensingCluster.Cluster(); }
 

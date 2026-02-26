@@ -55,6 +55,7 @@ config CHIP_IPV4
 
 config CHIP_TASK_STACK_SIZE
 	default 13000 if CHIP_SE05X  # Increase is do to the additional middle-ware APDU buffers
+	default 6144 if CHIP_NXP_PLATFORM_MCXW72
 	default 10240
 
  config CHIP_INET_ENABLE_TCP_ENDPOINT

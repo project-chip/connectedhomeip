@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/server/ICDServerConfig.h>
+#include <platform/NetworkCommissioning.h>
 
 #include <array>
 #include <cmsis_os2.h>
@@ -55,23 +56,11 @@ constexpr size_t kWifiMacAddressLength = 6;
 #define WFX_MAX_SSID_LENGTH (32)
 #define MAX_JOIN_RETRIES_COUNT (5)
 
-/* Note that these are same as RSI_security */
-typedef enum
-{
-    WFX_SEC_UNSPECIFIED    = 0,
-    WFX_SEC_NONE           = 1,
-    WFX_SEC_WEP            = 2,
-    WFX_SEC_WPA            = 3,
-    WFX_SEC_WPA2           = 4,
-    WFX_SEC_WPA3           = 5,
-    WFX_SEC_WPA_WPA2_MIXED = 6,
-} wfx_sec_t;
-
 typedef struct wfx_wifi_scan_result
 {
     uint8_t ssid[WFX_MAX_SSID_LENGTH]; // excludes null-character
     size_t ssid_length;
-    wfx_sec_t security;
+    chip::BitFlags<chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> security;
     uint8_t bssid[kWifiMacAddressLength];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
@@ -159,7 +148,7 @@ public:
         size_t ssidLength                       = 0;
         uint8_t passkey[WFX_MAX_PASSKEY_LENGTH] = { 0 };
         size_t passkeyLength                    = 0;
-        wfx_sec_t security                      = WFX_SEC_UNSPECIFIED;
+        chip::BitFlags<chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> security;
 
         WifiCredentials & operator=(const WifiCredentials & other)
         {
@@ -180,7 +169,7 @@ public:
             ssidLength = 0;
             memset(passkey, 0, WFX_MAX_PASSKEY_LENGTH);
             passkeyLength = 0;
-            security      = WFX_SEC_UNSPECIFIED;
+            security.ClearAll();
         }
     };
 

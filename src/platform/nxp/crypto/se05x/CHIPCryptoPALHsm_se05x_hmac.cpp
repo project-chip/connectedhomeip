@@ -30,16 +30,10 @@
 namespace chip {
 namespace Crypto {
 
-extern CHIP_ERROR HMAC_SHA256_h(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
-                                uint8_t * out_buffer, size_t out_length);
-
-CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
-                                 uint8_t * out_buffer, size_t out_length)
+CHIP_ERROR HMAC_sha_SE05x::HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
+                                       uint8_t * out_buffer, size_t out_length)
 
 {
-#if !ENABLE_SE05X_HMAC_SHA256
-    return HMAC_SHA256_h(key, key_length, message, message_length, out_buffer, out_length);
-#else
     CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
     uint32_t keyid         = kKeyId_hmac_sha256_keyid;
     sss_mac_t ctx_mac      = { 0 };
@@ -117,11 +111,10 @@ exit:
     }
 
     return error;
-#endif
 }
 
-CHIP_ERROR HMAC_sha::HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length, uint8_t * out_buffer,
-                                 size_t out_length)
+CHIP_ERROR HMAC_sha_SE05x::HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length,
+                                       uint8_t * out_buffer, size_t out_length)
 {
     return HMAC_SHA256(key.As<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray), message, message_length,
                        out_buffer, out_length);

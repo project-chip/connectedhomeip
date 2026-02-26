@@ -38,7 +38,7 @@ jobs:
     strategy:
       matrix:
         include:
-        - os: macos-26
+        - os: macos-26    # NOTE: must match `runs-on`
           arch: arm64     # observed, not configured
           dry-run: true
           build_variant: no-ble-no-shell-asan-clang
@@ -56,7 +56,11 @@ jobs:
       LSAN_OPTIONS: detect_leaks=1 malloc_context_size=40 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
     if: github.actor != 'restyled-io[bot]'
-    runs-on: ${{matrix.os}}
+    # Namespace MacOS 26 profile is configured as "26.3 with Xcode 26.2" currently
+    # This is not yet enabled since namespace still has high concurrency limit: we have
+    # 48 cores and are forced to 6 cores minimum.
+    # runs-on: namespace-profile-macos-26
+    runs-on: macos-26
 
     steps:
       - name: Checkout

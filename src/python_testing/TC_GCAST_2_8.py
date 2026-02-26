@@ -20,7 +20,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
+#     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -43,7 +43,7 @@ import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep
+from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -134,3 +134,7 @@ class TC_GCAST_2_8(MatterBaseTest):
         sub.reset()
         fabric_matcher = generate_fabric_under_test_matcher(0)
         sub.await_all_expected_report_matches(expected_matchers=[fabric_matcher], timeout_sec=60)
+
+
+if __name__ == "__main__":
+    default_matter_test_main()

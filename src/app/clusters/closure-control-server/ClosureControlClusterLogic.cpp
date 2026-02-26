@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
+#include <app/clusters/closure-control-server/ClosureControlClusterLogic.h>
 #include <clusters/ClosureControl/Metadata.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/LockTracker.h>

@@ -12,10 +12,9 @@ namespace Clusters {
 namespace {
 
 constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
-    Groupcast::Commands::JoinGroup::kMetadataEntry,
-    Groupcast::Commands::LeaveGroup::kMetadataEntry,
-    Groupcast::Commands::UpdateGroupKey::kMetadataEntry,
-    Groupcast::Commands::ConfigureAuxiliaryACL::kMetadataEntry,
+    Groupcast::Commands::JoinGroup::kMetadataEntry,        Groupcast::Commands::LeaveGroup::kMetadataEntry,
+    Groupcast::Commands::UpdateGroupKey::kMetadataEntry,   Groupcast::Commands::ConfigureAuxiliaryACL::kMetadataEntry,
+    Groupcast::Commands::GroupcastTesting::kMetadataEntry,
 };
 } // namespace
 
@@ -24,12 +23,14 @@ CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
     mLogic.SetDataModelProvider(context.provider);
+    mLogic.SetListener(this);
 
     return CHIP_NO_ERROR;
 }
 
 void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
 {
+    DeviceLayer::SystemLayer().CancelTimer(OnGroupcastTestingDone, this);
     mLogic.ResetDataModelProvider();
     DefaultServerCluster::Shutdown(shutdownType);
 }
@@ -52,7 +53,7 @@ DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::R
     case Groupcast::Attributes::UsedMcastAddrCount::Id:
         return mLogic.ReadUsedMcastAddrCount(request.path.mEndpointId, encoder);
     case Groupcast::Attributes::FabricUnderTest::Id:
-        return mLogic.ReadFabricUnderTest(request.path.mEndpointId, encoder);
+        return encoder.Encode(mFabricUnderTest);
     }
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
@@ -109,13 +110,14 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         status = mLogic.ConfigureAuxiliaryACL(fabric_index, data);
     }
     break;
+    case Groupcast::Commands::GroupcastTesting::Id: {
+        Groupcast::Commands::GroupcastTesting::DecodableType data;
+        ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
+        return GroupcastTesting(fabric_index, data);
+    }
+    break;
     default:
         break;
-    }
-
-    if (status == Protocols::InteractionModel::Status::Success)
-    {
-        NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
     }
 
     return status;
@@ -125,6 +127,60 @@ CHIP_ERROR GroupcastCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.ReferenceExisting(kAcceptedCommands);
+}
+
+Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Commands::GroupcastTesting::DecodableType data)
+{
+    VerifyOrReturnError(mFabricUnderTest == kUndefinedFabricIndex || mFabricUnderTest == fabricIndex, Status::ConstraintError);
+
+    if (data.testOperation == Groupcast::GroupcastTestingEnum::kDisableTesting)
+    {
+        // cancel any existing GroupcastTesting timer
+        DeviceLayer::SystemLayer().CancelTimer(OnGroupcastTestingDone, this);
+        mTestingState = data.testOperation;
+        SetFabricUnderTest(kUndefinedFabricIndex);
+        return Status::Success;
+    }
+
+    constexpr uint16_t kDefaultDurationSeconds = 60;
+    System::Clock::Seconds32 duration          = System::Clock::Seconds32(kDefaultDurationSeconds);
+    if (data.durationSeconds.HasValue())
+    {
+        constexpr uint16_t kMinDurationSeconds = 10, kMaxDurationSeconds = 1200;
+        VerifyOrReturnError(data.durationSeconds.Value() >= kMinDurationSeconds &&
+                                data.durationSeconds.Value() <= kMaxDurationSeconds,
+                            Status::ConstraintError);
+        duration = System::Clock::Seconds32(data.durationSeconds.Value());
+    }
+
+    VerifyOrReturnError(CHIP_NO_ERROR == DeviceLayer::SystemLayer().StartTimer(duration, OnGroupcastTestingDone, this),
+                        Status::Failure);
+
+    mTestingState = data.testOperation;
+    SetFabricUnderTest(fabricIndex);
+    return Status::Success;
+}
+
+void GroupcastCluster::SetFabricUnderTest(FabricIndex fabricUnderTest)
+{
+    SetAttributeValue(mFabricUnderTest, fabricUnderTest, Groupcast::Attributes::FabricUnderTest::Id);
+}
+
+void GroupcastCluster::OnGroupcastTestingDone(System::Layer * aLayer, void * appState)
+{
+    GroupcastCluster * cluster = reinterpret_cast<GroupcastCluster *>(appState);
+    cluster->SetFabricUnderTest(kUndefinedFabricIndex);
+    cluster->mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
+}
+
+void GroupcastCluster::OnMembershipChanged()
+{
+    NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
+}
+
+void GroupcastCluster::OnUsedMcastAddrCountChange()
+{
+    NotifyAttributeChanged(Groupcast::Attributes::UsedMcastAddrCount::Id);
 }
 
 } // namespace Clusters
