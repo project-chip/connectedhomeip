@@ -36,6 +36,7 @@ public:
     CHIP_ERROR NewConnection(Ble::BleLayer * bleLayer, void * appState, const Span<const SetupDiscriminator> & discriminators,
                              OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
                              OnConnectionErrorFunct onConnectionError) override;
+    void NewConnection(Ble::BleLayer * bleLayer, void * appState, uint64_t recoveryIdentifier) override {};
     CHIP_ERROR CancelConnection() override;
 
 private:

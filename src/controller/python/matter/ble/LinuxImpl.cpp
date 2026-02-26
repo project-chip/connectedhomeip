@@ -100,8 +100,7 @@ public:
 
     ScannerDelegateImpl(PyObject * context, DeviceScannedCallback scanCallback, ScanCompleteCallback completeCallback,
                         ScanErrorCallback errorCallback) :
-        mContext(context),
-        mScanCallback(scanCallback), mCompleteCallback(completeCallback), mErrorCallback(errorCallback)
+        mContext(context), mScanCallback(scanCallback), mCompleteCallback(completeCallback), mErrorCallback(errorCallback)
     {}
 
     CHIP_ERROR ScannerInit(BluezAdapter1 * adapter)
@@ -145,6 +144,8 @@ public:
                           info.GetVendorId());
         }
     }
+
+    void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLENetworkRecoveryInfo & info) override {}
 
     void OnScanComplete() override
     {

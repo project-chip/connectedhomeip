@@ -89,6 +89,8 @@ static_library("chip-tool-utils") {
     "commands/discover/DiscoverCommissionersCommand.cpp",
     "commands/icd/ICDCommand.cpp",
     "commands/icd/ICDCommand.h",
+    "commands/network-recovery/NetworkRecoveryCommand.cpp",
+    "commands/network-recovery/NetworkRecoveryCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",

@@ -257,6 +257,11 @@ public:
     CHIP_ERROR NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState = nullptr,
                                                BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
                                                BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError);
+    CHIP_ERROR
+    NewBleConnectionByRecoveryIdentifier(uint64_t connRecoveryIdentifier, void * appState = nullptr,
+                                         BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
+                                         BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError,
+                                         BleConnectionDelegate::OnDiscoverCompleteFunct onDiscover  = OnDiscoverComplete);
     CHIP_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj, void * appState,
                                         BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
                                         BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError);
@@ -360,6 +365,7 @@ private:
 
     static void OnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj);
     static void OnConnectionError(void * appState, CHIP_ERROR err);
+    static void OnDiscoverComplete(void * appState, uint64_t recoverIdentifier) {}
 };
 } /* namespace Ble */
 } /* namespace chip */
