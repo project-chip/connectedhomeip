@@ -519,7 +519,7 @@ struct UnpairDeviceCallback
     chip::Controller::CurrentFabricRemover * mRemover;
 };
 
-CHIP_ERROR GetSetupPasscodeFromOnboardingPayload(const char *onboardingPayload, uint32_t & setupPasscode)
+CHIP_ERROR GetSetupPasscodeFromOnboardingPayload(const char * onboardingPayload, uint32_t & setupPasscode)
 {
     SetupPayload setupPayload;
     bool isQRCode = strncmp(onboardingPayload, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
@@ -860,25 +860,26 @@ PyChipError pychip_DeviceController_EstablishPASESessionThreadMeshcop(chip::Cont
 {
 #if CHIP_SUPPORT_THREAD_MESHCOP
     const uint32_t kDefaultDiscoveryTimeoutMsec = 1000000;
-    uint32_t setupPasscode = 0;
+    uint32_t setupPasscode                      = 0;
 
     CHIP_ERROR err = GetSetupPasscodeFromOnboardingPayload(setUpCode, setupPasscode);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
     err = sPairingDeviceDiscoveryDelegate.Init(nodeId, setupPasscode, sCommissioningParameters, nullptr, devCtrl,
-                                                          kDefaultDiscoveryTimeoutMsec, true);
+                                               kDefaultDiscoveryTimeoutMsec, true);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
 
-    VerifyOrReturnError(sCommissioningParameters.GetThreadOperationalDataset().HasValue(), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(sCommissioningParameters.GetThreadOperationalDataset().HasValue(),
+                        ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
     chip::Inet::IPAddress baAddr;
     SetUpCodePairer::ThreadMeshcopCommissionParameters meshcopParams;
-    VerifyOrReturnError(chip::Inet::IPAddress::FromString(baHost, baAddr),
-                        ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(chip::Inet::IPAddress::FromString(baHost, baAddr), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
     meshcopParams.mBorderAgentAddress.SetTransportType(chip::Transport::Type::kThreadMeshcop).SetIPAddress(baAddr).SetPort(baPort);
     Thread::OperationalDatasetView dataset;
     err = dataset.Init(sCommissioningParameters.GetThreadOperationalDataset().Value());
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
     err = dataset.GetPSKc(meshcopParams.mPSKcBuffer);
-    return ToPyChipError(devCtrl->EstablishPASEConnection(nodeId, setUpCode, DiscoveryType::kAll, NullOptional, MakeOptional(meshcopParams)));
+    return ToPyChipError(
+        devCtrl->EstablishPASEConnection(nodeId, setUpCode, DiscoveryType::kAll, NullOptional, MakeOptional(meshcopParams)));
 #else
     return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
 #endif

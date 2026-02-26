@@ -280,7 +280,8 @@ private:
     CHIP_ERROR Unpair(NodeId remoteId);
     chip::Controller::CommissioningParameters GetCommissioningParameters();
     CHIP_ERROR MaybeDisplayTermsAndConditions(chip::Controller::CommissioningParameters & params);
-    CHIP_ERROR GetMeshcopCommissionParams(chip::Controller::SetUpCodePairer::ThreadMeshcopCommissionParameters & meshcopCommissionParams);
+    CHIP_ERROR
+    GetMeshcopCommissionParams(chip::Controller::SetUpCodePairer::ThreadMeshcopCommissionParameters & meshcopCommissionParams);
 
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;

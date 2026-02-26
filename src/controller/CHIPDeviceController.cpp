@@ -738,8 +738,8 @@ CHIP_ERROR DeviceCommissioner::PairThreadMeshcop(RendezvousParameters & rendezvo
 
     {
         Dnssd::DiscoveredNodeData discoveredNodeData;
-        ReturnErrorOnFailure(ThreadMeshcopCommissionProxy::GetInstance().Discover(pskc, rendezvousParams.GetPeerAddress(), code, discriminator,
-                                                                    discoveredNodeData, 30));
+        ReturnErrorOnFailure(ThreadMeshcopCommissionProxy::GetInstance().Discover(pskc, rendezvousParams.GetPeerAddress(), code,
+                                                                                  discriminator, discoveredNodeData, 30));
 
         ChipLogProgress(Controller, "Joiner discovered");
         OnNodeDiscovered(discoveredNodeData);
@@ -764,9 +764,10 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     return errorCode;
 }
 
-CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType,
-                                                       Optional<Dnssd::CommonResolutionData> resolutionData,
-                                                       Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams)
+CHIP_ERROR
+DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType,
+                                            Optional<Dnssd::CommonResolutionData> resolutionData,
+                                            Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams)
 {
     MATTER_TRACE_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly, discoveryType,
