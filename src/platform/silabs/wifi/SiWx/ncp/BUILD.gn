@@ -84,6 +84,9 @@ source_set("siwx-ncp") {
     # utility
     "${wifi_sdk_root}/components/sli_wifi/src/sli_wifi.c",
     "${wifi_sdk_root}/components/sli_wifi/src/sli_wifi_utility.c",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sli_wifi_memory_manager.c",
+    "${wifi_sdk_root}/components/protocol/wifi/si91x/sl_wifi.c",
+    "${wifi_sdk_root}/components/protocol/wifi/src/sli_wifi_callback_framework.c",
   ]
 
   public_configs = [ ":siwx-ncp-config" ]
