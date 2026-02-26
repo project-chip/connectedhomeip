@@ -27,3 +27,13 @@ jobs:
     with:
       run-codeql: true
   
+  notify-on-failure:
+    needs: [analyze]
+    if: failure()
+    runs-on: [self-hosted, Linux]
+    steps:
+      - uses: Eltako/embedded-shared-actions/.github/actions/notify-teams-on-failure@2.0.2
+        with:
+          job_status: failure
+          workflow_name: ${{ github.workflow }}
+          msteams_webhook_url: ${{ secrets.MS_TEAMS_WEBHOOK_PIPELINE_ALERTS_URI  }}
