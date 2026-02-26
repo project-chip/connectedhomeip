@@ -13,9 +13,9 @@
 # limitations under the License.
 
 app_config_dependent_sources = [
-  "MigrateUnitLocalizationServerStorage.cpp",
-  "MigrateUnitLocalizationServerStorage.h",
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
+  "MigrateUnitLocalizationServerStorage.cpp",
+  "MigrateUnitLocalizationServerStorage.h",
   "unit-localization-server.h",
 ]
