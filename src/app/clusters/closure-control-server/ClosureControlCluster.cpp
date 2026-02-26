@@ -37,8 +37,10 @@ namespace Clusters {
 namespace ClosureControl {
 
 ClosureControlCluster::ClosureControlCluster(EndpointId endpointId, const Context & context) :
-    DefaultServerCluster({ endpointId, ClosureControl::Id }), mMatterContext(endpointId), mDelegate(context.delegate), mConformance(context.conformance)
+    DefaultServerCluster({ endpointId, ClosureControl::Id }), mMatterContext(endpointId), mDelegate(context.delegate),
+    mConformance(context.conformance)
 {
+    VerifyOrDieWithMsg(context.conformance.Valid(), AppServer, "Invalid conformance");
     LogErrorOnFailure(SetMainState(context.initParams.mMainState));
     LogErrorOnFailure(SetOverallCurrentState(context.initParams.mOverallCurrentState));
 }

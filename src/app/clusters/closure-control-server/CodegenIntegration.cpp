@@ -34,15 +34,15 @@ using namespace chip::app::Clusters::ClosureControl::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {
-ClosureControlClusterDelegate * gDelegate      = nullptr;
+ClosureControlClusterDelegate * gDelegate = nullptr;
 ClusterConformance gConformance;
 ClusterInitParameters gInitParams;
 
 constexpr size_t kClosureControlFixedClusterCount = ClosureControl::StaticApplicationConfig::kFixedClusterConfig.size();
-constexpr size_t kClosureControlMaxClusterCount = kClosureControlFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kClosureControlMaxClusterCount   = kClosureControlFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<ClosureControlCluster> gServer[kClosureControlMaxClusterCount];
-}
+} // namespace
 
 namespace chip {
 namespace app {
@@ -74,15 +74,19 @@ void MatterClosureControlSetInitParams(const ClusterInitParameters & initParams)
 } // namespace app
 } // namespace chip
 
-
-void MatterClosureControlClusterInitCallback(EndpointId endpointId) {
-    if (gServer[endpointId].IsConstructed()) {
+void MatterClosureControlClusterInitCallback(EndpointId endpointId)
+{
+    if (gServer[endpointId].IsConstructed())
+    {
         ChipLogError(Zcl, "Closure Control Cluster already initialized. Ignoring duplicate initialization.");
         return;
     }
 
-    if (gDelegate == nullptr) {
-        ChipLogError(Zcl, "Closure Control Cluster cannot be initialized without a delegate. Call MatterClosureControlSetDelegate() before ServerInit().");
+    if (gDelegate == nullptr)
+    {
+        ChipLogError(Zcl,
+                     "Closure Control Cluster cannot be initialized without a delegate. Call MatterClosureControlSetDelegate() "
+                     "before ServerInit().");
         return;
     }
 
@@ -91,8 +95,10 @@ void MatterClosureControlClusterInitCallback(EndpointId endpointId) {
     LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(gServer[endpointId].Registration()));
 }
 
-void MatterClosureControlClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType) {
-    if (!gServer[endpointId].IsConstructed()) {
+void MatterClosureControlClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    if (!gServer[endpointId].IsConstructed())
+    {
         ChipLogError(Zcl, "Closure Control Cluster not initialized. Ignoring shutdown.");
         return;
     }

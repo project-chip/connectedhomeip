@@ -406,8 +406,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
 
     // Update OverallTarget of Closure based on SetTarget command.
     DataModel::Nullable<GenericOverallTargetState> overallTargetState;
-    VerifyOrReturnError(mClosureEndpoint1.GetClusterInstance().GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to get overall target for SetTarget command"));
+    VerifyOrReturnError(mClosureEndpoint1.GetClusterInstance().GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to get overall target for SetTarget command"));
 
     if (overallTargetState.IsNull())
     {
@@ -434,15 +434,16 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
         overallTargetState.Value().speed.SetValue(speed.Value());
     }
 
-    VerifyOrReturnError(mClosureEndpoint1.GetClusterInstance().SetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure,
+    VerifyOrReturnError(mClosureEndpoint1.GetClusterInstance().SetOverallTargetState(overallTargetState) == CHIP_NO_ERROR,
+                        Status::Failure,
                         ChipLogError(AppServer, "Failed to set overall target for SetTarget command for Endpoint %d", endpointId));
 
     VerifyOrReturnError(mClosureEndpoint1.GetClusterInstance().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR,
                         Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time for SetTarget command on Endpoint %d", endpointId));
 
-    VerifyOrReturnError(mClosureEndpoint1.GetClusterInstance().SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to set main state for SetTarget command on Endpoint 1"));
+    VerifyOrReturnError(mClosureEndpoint1.GetClusterInstance().SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to set main state for SetTarget command on Endpoint 1"));
 
     // Post an event to initiate the unlatch action asynchronously.
     // Closure panel first performs the unlatch action if it is currently latched,
@@ -492,8 +493,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
                         Status::InvalidInState,
                         ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(ep1MainState)));
 
-    VerifyOrReturnError(mClosureEndpoint1.GetClusterInstance().SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
+    VerifyOrReturnError(mClosureEndpoint1.GetClusterInstance().SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
 
     VerifyOrReturnError(mClosureEndpoint1.GetClusterInstance().SetCountdownTimeFromDelegate(10) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
@@ -757,7 +758,8 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
             if (!panelCurrentState.Value().latch.Value().Value() && panelTargetState.Value().latch.Value().Value())
             {
                 DataModel::Nullable<GenericOverallCurrentState> ep1OverallCurrentState = DataModel::NullNullable;
-                VerifyOrReturn(mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState(ep1OverallCurrentState) == CHIP_NO_ERROR,
+                VerifyOrReturn(mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState(ep1OverallCurrentState) ==
+                                   CHIP_NO_ERROR,
                                ChipLogError(AppServer, "Failed to get overall current state for Endpoint 1"));
                 VerifyOrReturn(!ep1OverallCurrentState.IsNull(),
                                ChipLogError(AppServer, "Overall current state is not set for Endpoint 1"));

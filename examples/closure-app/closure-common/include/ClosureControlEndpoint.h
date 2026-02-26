@@ -90,6 +90,22 @@ public:
     ClosureControlEndpoint(EndpointId endpoint) :
         mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mClusterInstance(GetInstance(mEndpoint))
     {
+        ClusterConformance conformance;
+        conformance.FeatureMap()
+            .Set(Feature::kPositioning)
+            .Set(Feature::kMotionLatching)
+            .Set(Feature::kSpeed)
+            .Set(Feature::kVentilation)
+            .Set(Feature::kPedestrian)
+            .Set(Feature::kCalibration)
+            .Set(Feature::kProtection)
+            .Set(Feature::kManuallyOperable);
+        conformance.OptionalAttributes().Set(OptionalAttributeEnum::kCountdownTime);
+
+        ClusterInitParameters initParams;
+
+        MatterClosureControlSetConformance(conformance);
+        MatterClosureControlSetInitParams(initParams);
         MatterClosureControlSetDelegate(mDelegate);
         mDelegate.SetClusterInstance(&mClusterInstance);
     }

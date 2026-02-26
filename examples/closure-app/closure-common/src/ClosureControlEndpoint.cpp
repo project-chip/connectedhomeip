@@ -102,26 +102,26 @@ CHIP_ERROR ClosureControlDelegate::HandleEventTrigger(uint64_t eventTrigger)
 {
     eventTrigger                           = clearEndpointInEventTrigger(eventTrigger);
     ClosureControlTestEventTrigger trigger = static_cast<ClosureControlTestEventTrigger>(eventTrigger);
-    ClosureControlCluster * logic         = GetClusterInstance();
+    ClosureControlCluster * cluster        = GetClusterInstance();
 
     switch (trigger)
     {
     case ClosureControlTestEventTrigger::kMainStateIsSetupRequired:
-        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kSetupRequired));
+        ReturnErrorOnFailure(cluster->SetMainState(MainStateEnum::kSetupRequired));
         break;
     case ClosureControlTestEventTrigger::kMainStateIsProtected:
-        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kProtected));
+        ReturnErrorOnFailure(cluster->SetMainState(MainStateEnum::kProtected));
         break;
     case ClosureControlTestEventTrigger::kMainStateIsError:
-        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kError));
-        ReturnErrorOnFailure(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor));
+        ReturnErrorOnFailure(cluster->SetMainState(MainStateEnum::kError));
+        ReturnErrorOnFailure(cluster->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor));
         break;
     case ClosureControlTestEventTrigger::kMainStateIsDisengaged:
-        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kDisengaged));
+        ReturnErrorOnFailure(cluster->SetMainState(MainStateEnum::kDisengaged));
         break;
     case ClosureControlTestEventTrigger::kClearEvent:
-        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kStopped));
-        logic->ClearCurrentErrorList();
+        ReturnErrorOnFailure(cluster->SetMainState(MainStateEnum::kStopped));
+        cluster->ClearCurrentErrorList();
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -131,22 +131,6 @@ CHIP_ERROR ClosureControlDelegate::HandleEventTrigger(uint64_t eventTrigger)
 
 CHIP_ERROR ClosureControlEndpoint::Init()
 {
-    ClusterConformance conformance;
-    conformance.FeatureMap()
-        .Set(Feature::kPositioning)
-        .Set(Feature::kMotionLatching)
-        .Set(Feature::kSpeed)
-        .Set(Feature::kVentilation)
-        .Set(Feature::kPedestrian)
-        .Set(Feature::kCalibration)
-        .Set(Feature::kProtection)
-        .Set(Feature::kManuallyOperable);
-    conformance.OptionalAttributes().Set(OptionalAttributeEnum::kCountdownTime);
-
-    ClusterInitParameters initParams;
-
-    MatterClosureControlSetConformance(conformance);
-    MatterClosureControlSetInitParams(initParams);
     return CHIP_NO_ERROR;
 }
 

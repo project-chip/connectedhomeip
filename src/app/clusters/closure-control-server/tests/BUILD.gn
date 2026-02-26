@@ -18,18 +18,18 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "TestClosureControlCluster"
 
-  test_sources = [ 
+  test_sources = [
     "TestClosureControlCluster.cpp",
     "TestClosureControlClusterObjects.cpp",
-    "TestClosureControlConformance.cpp"
-    ]
+    "TestClosureControlConformance.cpp",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/clusters/closure-control-server",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/app/server-cluster/testing:testing",
-    "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
   ]
 }
