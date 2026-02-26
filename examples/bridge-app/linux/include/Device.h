@@ -72,7 +72,7 @@ public:
 
     );
 
-    // BridedDeviceBasicInformationDelegate
+    // BridgedDeviceBasicInformationDelegate
     chip::Protocols::InteractionModel::Status OnNodeLabelChanged(const std::string & newNodeLabel) override
     {
         chip::Platform::CopyString(mName, newNodeLabel.c_str());
