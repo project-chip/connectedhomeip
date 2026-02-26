@@ -59,6 +59,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/bindings/tests",
       "${chip_root}/src/app/clusters/boolean-state-configuration-server/tests",
       "${chip_root}/src/app/clusters/boolean-state-server/tests",
+      "${chip_root}/src/app/clusters/bridged-device-basic-information-server/tests",
       "${chip_root}/src/app/clusters/camera-av-stream-management-server/tests",
       "${chip_root}/src/app/clusters/camera-av-settings-user-level-management-server/tests",
       "${chip_root}/src/app/clusters/chime-server/tests",

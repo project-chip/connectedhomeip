@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <pkg_protocol.h>
 #include <platform/NetworkCommissioning.h>
 
 namespace chip {
@@ -26,51 +25,63 @@ namespace NetworkCommissioning {
 
 void NetworkEventHandler(const ChipDeviceEvent * event, intptr_t arg);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 namespace {
 inline constexpr uint8_t kMaxWiFiNetworks                  = 1;
 inline constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
 inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 } // namespace
 
-class BLScanResponseIterator : public Iterator<WiFiScanResponse>
+template <typename RawType, typename Converter>
+class BflbScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
-    BLScanResponseIterator(size_t size, WiFiScanResponse * pScanResults) : mSize(size), mpScanResults(pScanResults) {}
+    BflbScanResponseIterator(size_t size, const RawType * pScanResults, Converter conv) :
+        mSize(size), mpRawResults(pScanResults), mConvert(std::move(conv))
+    {}
     size_t Count() override { return mSize; }
+    void Release() override {}
+
     bool Next(WiFiScanResponse & item) override
     {
-        if (mIternum >= mSize)
+        if (mIternum >= mSize || mpRawResults == nullptr)
         {
             return false;
         }
 
-        memcpy(&item, mpScanResults + mIternum, sizeof(WiFiScanResponse));
-
-        mIternum++;
+        item = mConvert(mpRawResults[mIternum]);
+        ++mIternum;
         return true;
     }
-    void Release() override {}
 
 private:
     const size_t mSize;
-    const WiFiScanResponse * mpScanResults;
     size_t mIternum = 0;
+
+    const RawType * mpRawResults;
+    Converter mConvert;
 };
 
-class BLWiFiDriver final : public WiFiDriver
+template <typename RawType, typename Converter>
+auto makeBflbScanIterator(size_t count, const RawType * results, Converter && conv)
+{
+    return BflbScanResponseIterator<RawType, std::decay_t<Converter>>(count, results, std::forward<Converter>(conv));
+}
+
+class BflbWiFiDriver final : public WiFiDriver
 {
 public:
     class WiFiNetworkIterator final : public NetworkIterator
     {
     public:
-        WiFiNetworkIterator(BLWiFiDriver * aDriver) : mDriver(aDriver) {}
+        WiFiNetworkIterator(BflbWiFiDriver * aDriver) : mDriver(aDriver) {}
         size_t Count() override;
         bool Next(Network & item) override;
         void Release() override { delete this; }
         ~WiFiNetworkIterator() = default;
 
     private:
-        BLWiFiDriver * mDriver;
+        BflbWiFiDriver * mDriver;
         bool mExhausted = false;
     };
 
@@ -89,6 +100,7 @@ public:
         kMaxWPAPSK = 63,
         kWPAPSKHex = 64,
     };
+
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
@@ -114,23 +126,25 @@ public:
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
     void OnConnectWiFiNetwork(bool isConnected);
     void OnScanWiFiNetworkDone(void);
-    void OnScanWiFiNetworkDone(void * opaque);
     void OnNetworkStatusChange(void);
-
     CHIP_ERROR SetLastDisconnectReason(const ChipDeviceEvent * event);
+
+    void OnScanWiFiNetworkDone(void * opaque);
     int32_t GetLastDisconnectReason();
 
-    static BLWiFiDriver & GetInstance()
+    static BflbWiFiDriver & GetInstance()
     {
-        static BLWiFiDriver instance;
+        static BflbWiFiDriver instance;
         return instance;
     }
 
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
 
+#if CHIP_DEVICE_LAYER_TARGET_BL702
     WiFiScanResponse * mScanResponse = nullptr;
     size_t mScanResponseNum          = 0;
+#endif
 
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
@@ -139,10 +153,52 @@ private:
     NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
     int32_t mLastDisconnectedReason;
 
-    /** +1 byte for string termination */
-    char mScanSSID[chip::DeviceLayer::Internal::kMaxWiFiSSIDLength + 1];
-    bool mScanSpecific = false;
+    char mScanSSID[DeviceLayer::Internal::kMaxWiFiSSIDLength];
+    int mScanSSIDlength;
 };
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+class BflbEthernetDriver final : public EthernetDriver
+{
+public:
+    struct EthernetNetworkIterator final : public NetworkIterator
+    {
+        EthernetNetworkIterator() = default;
+        size_t Count() override { return interfaceNameLen > 0 ? 1 : 0; }
+        bool Next(Network & item) override
+        {
+            if (exhausted)
+            {
+                return false;
+            }
+            exhausted = true;
+            memcpy(item.networkID, interfaceName, interfaceNameLen);
+            item.networkIDLen = interfaceNameLen;
+            item.connected    = true;
+            return true;
+        }
+        void Release() override { delete this; }
+        ~EthernetNetworkIterator() override = default;
+
+        // Public, but cannot be accessed via NetworkIterator interface.
+        uint8_t interfaceName[kMaxNetworkIDLen];
+        uint8_t interfaceNameLen = 0;
+        bool exhausted           = false;
+    };
+
+    uint8_t GetMaxNetworks() override { return 1; };
+    NetworkIterator * GetNetworks() override;
+    CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
+    void Shutdown() override;
+
+    static BflbEthernetDriver & GetInstance()
+    {
+        static BflbEthernetDriver instance;
+        return instance;
+    }
+};
+#endif
 
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
