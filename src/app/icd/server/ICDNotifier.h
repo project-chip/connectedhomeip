@@ -19,8 +19,8 @@
 #include <access/SubjectDescriptor.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/BitFlags.h>
 #include <lib/core/Optional.h>
+#include <lib/support/BitFlags.h>
 
 namespace chip {
 namespace app {
@@ -144,7 +144,7 @@ public:
     void NotifySubscriptionReport();
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
-    void NotifySendCheckIn(const chip::Access::SubjectDescriptor & subject);
+    void NotifySendCheckIn(Optional<Access::SubjectDescriptor> specificSubject);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
     inline void BroadcastActiveRequest(ICDListener::KeepActiveFlags request, bool notify)
