@@ -3387,7 +3387,7 @@ class TLVJsonConverter():
         self._dmLib = CDLL(self._ChipStack.LocateChipDLL())
 
         self._dmLib.pychip_JsonToTlv.argtypes = [c_char_p, POINTER(c_ubyte), c_size_t]
-        self._dmLib.pychip_DeviceController_DeleteDeviceController.restype = c_size_t
+        self._dmLib.pychip_JsonToTlv.restype = c_size_t
 
     # PER ATTRIBUTE
 
