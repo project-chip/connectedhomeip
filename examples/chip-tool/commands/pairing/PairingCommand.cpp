@@ -277,7 +277,8 @@ CHIP_ERROR PairingCommand::PaseWithCode(NodeId remoteId)
     return CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload, discoveryType);
 }
 
-CHIP_ERROR PairingCommand::GetMeshcopCommissionParams(chip::Controller::SetUpCodePairer::ThreadMeshcopCommissionParameters & meshcopParams)
+CHIP_ERROR
+PairingCommand::GetMeshcopCommissionParams(chip::Controller::SetUpCodePairer::ThreadMeshcopCommissionParameters & meshcopParams)
 {
     Inet::IPAddress ipAddr;
     VerifyOrReturnError(Inet::IPAddress::FromString(mThreadBaHost.Value(), ipAddr), CHIP_ERROR_INVALID_ADDRESS);
@@ -345,8 +346,8 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
             CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
             SetUpCodePairer::ThreadMeshcopCommissionParameters meshcopParams;
             ReturnErrorOnFailure(GetMeshcopCommissionParams(meshcopParams));
-            err = CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload, DiscoveryType::kAll,
-                                                                NullOptional, MakeOptional(meshcopParams));
+            err = CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload, DiscoveryType::kAll, NullOptional,
+                                                                MakeOptional(meshcopParams));
             CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
         }
         else

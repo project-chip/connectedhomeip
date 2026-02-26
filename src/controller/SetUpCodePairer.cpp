@@ -430,8 +430,8 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverThreadMeshcop()
     {
         mWaitingForDiscovery[kThreadMeshcopTransport] = true;
         Dnssd::DiscoveredNodeData discoveredNodeData;
-        ReturnErrorOnFailure(ThreadMeshcopCommissionProxy::GetInstance().Discover(pskc, mThreadMeshcopCommissionParams.mBorderAgentAddress,
-                                                                    code, connDiscriminator, discoveredNodeData, 30));
+        ReturnErrorOnFailure(ThreadMeshcopCommissionProxy::GetInstance().Discover(
+            pskc, mThreadMeshcopCommissionParams.mBorderAgentAddress, code, connDiscriminator, discoveredNodeData, 30));
 
         mWaitingForDiscovery[kThreadMeshcopTransport] = false;
         mCommissioner->OnNodeDiscovered(discoveredNodeData);

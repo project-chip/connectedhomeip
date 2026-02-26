@@ -589,10 +589,10 @@ public:
      * @param[in] discoveryType         The network discovery type, defaults to DiscoveryType::kAll.
      * @param[in] resolutionData        Optional resolution data previously discovered on the network for the target device.
      */
-    CHIP_ERROR EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode,
-                                       DiscoveryType discoveryType                          = DiscoveryType::kAll,
-                                       Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional,
-                          Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams = NullOptional);
+    CHIP_ERROR
+    EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType = DiscoveryType::kAll,
+                            Optional<Dnssd::CommonResolutionData> resolutionData                                 = NullOptional,
+                            Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams = NullOptional);
 
     /**
      * @brief
