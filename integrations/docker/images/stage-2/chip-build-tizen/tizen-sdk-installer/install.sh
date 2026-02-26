@@ -358,7 +358,7 @@ while (($#)); do
             show_help
             exit 0
             ;;
-        --verbose)
+        -v | --verbose)
             VERBOSE=true
             ;;
         --cpu)
