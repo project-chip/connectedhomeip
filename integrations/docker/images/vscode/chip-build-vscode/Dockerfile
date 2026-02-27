@@ -135,7 +135,7 @@ ENV PW_ENVIRONMENT_ROOT=/home/vscode/pigweed/env
 
 ENV TIZEN_VERSION=9.0
 ENV TIZEN_SDK_ROOT=/opt/tizen-sdk
-ENV TIZEN_SDK_TOOLCHAIN=$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-14.2
+ENV TIZEN_SDK_TOOLCHAIN=$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2
 ENV TIZEN_SDK_SYSROOT=$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core
 
 ENV FVP_CORSTONE_300_PATH=/opt/FVP_Corstone_SSE-300
