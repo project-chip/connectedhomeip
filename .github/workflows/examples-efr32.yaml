@@ -17,7 +17,8 @@ name: Build example - EFR32
 on:
   push:
     branches:
-      - "*"
+      - master
+      - "v*-branch"
   pull_request:
   merge_group:
 
@@ -40,7 +41,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/siliconlabssoftware/chip-efr32-csa:2025.12.0
+      image: ghcr.io/project-chip/chip-build-efr32:188
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
