@@ -39,7 +39,7 @@ public:
 
     CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID);
 
-    Protocols::InteractionModel::Status PlayChimeSound();
+    Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID);
 
     ChimeCommandDelegate()  = default;
     ~ChimeCommandDelegate() = default;
