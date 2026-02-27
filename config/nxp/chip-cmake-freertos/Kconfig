@@ -264,6 +264,27 @@ config NXP_USE_LOW_POWER
 	help
 	  Enables low power support
 
+if NXP_USE_LOW_POWER
+
+config NXP_USE_POWER_DOWN
+	bool "Use PowerDown to reduce power consumption"
+	help
+	  Uses PowerDown to reduce power consumption during idle times
+
+if NXP_USE_POWER_DOWN
+
+config NXP_POWER_DOWN_POLL_THRESHOLD
+	int "Data poll interval threshold, in seconds, for power down"
+	depends on NXP_USE_POWER_DOWN
+	range 1 60
+	help
+	  Minimum data poll interval, in seconds, from which the device will
+	  start using power down as a low power state, instead of deep sleep
+
+endif # NXP_USE_POWER_DOWN
+
+endif # NXP_USE_LOW_POWER
+
 config NXP_USE_PLAIN_DAC_KEY
 	bool "Store DAC private key in plaintext"
 	help
