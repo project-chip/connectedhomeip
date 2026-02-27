@@ -176,15 +176,17 @@ void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatus
 {
     if (newConnectionStatus == ConnectionStatusEnum::kConnected)
     {
-        uint16_t panId = 0xffff;
 #if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
-        panId = chip::DeviceLayer::Internal::GetOpenThreadPanId(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance());
+        chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+        ChipLogDetail(Zcl, "ThdDiag: Conn, PAN: 0x%04x", chip::DeviceLayer::Internal::GetOpenThreadPanId(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance()));
+        chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+#else
+        ChipLogDetail(Zcl, "ThdDiag: Conn");
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
-        ChipLogProgress(Zcl, "ThdDiag: Conn, PAN: 0x%04x", panId);
     }
     else
     {
-        ChipLogProgress(Zcl, "ThdDiag: Disconn");
+        ChipLogDetail(Zcl, "ThdDiag: Disconn");
     }
 
     VerifyOrReturn(mContext != nullptr);
@@ -199,11 +201,11 @@ void ThreadNetworkDiagnosticsCluster::OnNetworkFaultChanged(const GeneralFaults<
     if (current.size() > 0)
     {
         [[maybe_unused]] uint8_t latestFault = current.data()[current.size() - 1];
-        ChipLogProgress(Zcl, "ThdDiag: Fault. Latest: %s (%u)", GetNetworkFaultString(latestFault), latestFault);
+        ChipLogDetail(Zcl, "ThdDiag: Fault. Latest: %s (%u)", GetNetworkFaultString(latestFault), latestFault);
     }
     else
     {
-        ChipLogProgress(Zcl, "ThdDiag: No faults");
+        ChipLogDetail(Zcl, "ThdDiag: No faults");
     }
 
     /* Verify that the data size matches the expected one. */
