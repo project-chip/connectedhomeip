@@ -97,7 +97,7 @@ def GetPkgConfigPrefixToStrip(options, args):
     # instead of relative to /path/to/chroot/build/x86-generic (i.e prefix=/usr).
     # To support this correctly, it's necessary to extract the prefix to strip
     # from pkg-config's |prefix| variable.
-    prefix = subprocess.check_output([options.pkg_config,
+    prefix = subprocess.check_output([options.pkg_config, "--print-errors",
                                       "--variable=prefix"] + args, env=os.environ).decode('utf-8')
     if prefix[:4] == '/usr':
         return prefix[4:]

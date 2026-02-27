@@ -99,23 +99,34 @@ RUN set -x \
     $TIZEN_SDK_SYSROOT/usr/lib/libcapi-network-thread.so.* \
     $TIZEN_SDK_SYSROOT/usr/lib/libnsd-dns-sd.so.* \
     /usr/lib/ \
-    # Disable failing systemd services
+    # Disable failing (and not essential) systemd services
     && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda \
-    rm-f $SYSTEMD_SYSTEM/clone_partitions.service : \
-    rm-f $SYSTEMD_SYSTEM/deviced.service : \
-    rm-f $SYSTEMD_SYSTEM/mm-resource-managerd.service : \
-    rm-f $SYSTEMD_SYSTEM/mnt-inform.mount : \
+    glob rm-f $SYSTEMD_SYSTEM/clone_partitions.* : \
+    glob rm-f $SYSTEMD_SYSTEM/deviced.* : \
+    glob rm-f $SYSTEMD_SYSTEM/display-manager.* : \
+    glob rm-f $SYSTEMD_SYSTEM/display-manager-ready.* : \
+    glob rm-f $SYSTEMD_SYSTEM/mm-resource-managerd.* : \
+    glob rm-f $SYSTEMD_SYSTEM/mnt-inform.* : \
     glob rm-f $SYSTEMD_SYSTEM/muse-server.* : \
-    rm-f $SYSTEMD_SYSTEM/murphyd.service : \
-    rm-f $SYSTEMD_SYSTEM/pulseaudio.service \
+    glob rm-f $SYSTEMD_SYSTEM/murphyd.* : \
+    glob rm-f $SYSTEMD_SYSTEM/pulseaudio.* : \
+    glob rm-f $SYSTEMD_SYSTEM/stability-monitor.* : \
+    glob rm-f $SYSTEMD_SYSTEM/update-manager.* : \
     # Mount Tizen system partition on /opt-ro instead of /opt
     && SYSTEMD_UNIT_OPT_RO_MOUNT=$SYSTEMD_SYSTEM/opt\\x2dro.mount \
     && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda \
-    mv $SYSTEMD_SYSTEM/opt.mount $SYSTEMD_UNIT_OPT_RO_MOUNT : \
     ln-sf $SYSTEMD_UNIT_OPT_RO_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS : \
     mkdir /opt-ro \
-    && virt-edit $TIZEN_IOT_IMAGE_ROOT -e 's#/opt#/opt-ro#g' $SYSTEMD_UNIT_OPT_RO_MOUNT \
-    && virt-edit $TIZEN_IOT_IMAGE_ROOT -e 's#Options=#Options=ro,#' $SYSTEMD_UNIT_OPT_RO_MOUNT \
+    && echo -n \
+    "[Unit]\n" \
+    "Before=local-fs.target\n" \
+    "ConditionPathIsMountPoint=!/opt-ro\n" \
+    "[Mount]\n" \
+    "What=LABEL=system-data\n" \
+    "Where=/opt-ro\n" \
+    "Type=ext4\n" \
+    "Options=ro,relatime\n" \
+    | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_OPT_RO_MOUNT \
     # Create /tmp/.opt-upper and /tmp/.opt-work after /tmp is mounted
     && SYSTEMD_UNIT_OPT_PRE_MOUNT=$SYSTEMD_SYSTEM/opt.pre-mount.service \
     && echo -n \
@@ -130,7 +141,8 @@ RUN set -x \
     # Mount Tizen system partition as a tmp-based overlay
     && SYSTEMD_UNIT_OPT_MOUNT=$SYSTEMD_SYSTEM/opt.mount \
     && echo -n \
-    "[Unit]\nConditionPathIsMountPoint=!/opt\n" \
+    "[Unit]\n" \
+    "ConditionPathIsMountPoint=!/opt\n" \
     "RequiresMountsFor=/opt-ro /tmp\n" \
     "Wants=opt.pre-mount.service\n" \
     "After=opt.pre-mount.service\n" \
