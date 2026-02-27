@@ -44,6 +44,7 @@ set(SRC_DIRS_LIST
                       "${CHEF}/common/clusters/channel/"
                       "${CHEF}/common/clusters/door-lock/"
                       "${CHEF}/common/clusters/keypad-input/"
+                      "${CHEF}/common/clusters/laundry-dryer-controls/"
                       "${CHEF}/common/clusters/low-power/"
                       "${CHEF}/common/clusters/media-input/"
                       "${CHEF}/common/clusters/media-playback/"

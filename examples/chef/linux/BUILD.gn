@@ -58,6 +58,7 @@ executable("${sample_name}") {
     "${project_dir}/common/clusters/door-lock/chef-lock-endpoint.cpp",
     "${project_dir}/common/clusters/door-lock/chef-lock-manager.cpp",
     "${project_dir}/common/clusters/keypad-input/KeypadInputManager.cpp",
+    "${project_dir}/common/clusters/laundry-dryer-controls/chef-laundry-dryer-controls-delegate.cpp"
     "${project_dir}/common/clusters/low-power/LowPowerManager.cpp",
     "${project_dir}/common/clusters/media-input/MediaInputManager.cpp",
     "${project_dir}/common/clusters/media-playback/MediaPlaybackManager.cpp",
