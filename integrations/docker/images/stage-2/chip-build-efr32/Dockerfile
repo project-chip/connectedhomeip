@@ -3,23 +3,8 @@ FROM ghcr.io/project-chip/chip-build:${VERSION} as build
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
 # Copy SLT manifests (sisdk-pkg.lock, wiseconnect-pkg.slt), requirements.txt, and Simplicity SDK keep-list (build context must be repo root)
-COPY scripts/setup/silabs/sisdk-pkg.lock scripts/setup/silabs/wiseconnect-pkg.slt docker/requirements.txt /tmp/
+COPY scripts/setup/silabs/sisdk-pkg.lock scripts/setup/silabs/wiseconnect-pkg.slt /tmp/
 COPY scripts/setup/silabs/simplicity_sdk_keep_folders.txt /tmp/keep_folders.txt
-
-# GNU ARM Embedded toolchain, cross compiler for various platform builds
-RUN set -x \
-    && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    gcc-arm-none-eabi \
-    binutils-arm-none-eabi \
-    openjdk-17-jdk-headless \
-    ccache \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/ \
-    # Install Python Packages
-    && pip3 install --break-system-packages -r /tmp/requirements.txt \
-    && rm /tmp/requirements.txt \
-    && : # last line
 
 # Setup SLT CLI (same as scripts/setup/silabs/install-packages.py)
 RUN set -x \
@@ -32,7 +17,6 @@ RUN set -x \
 
 # Install packages via SLT (simplicity-sdk, wiseconnect, slc-cli) and copy to /tmp for final image
 RUN set -x \
-    && /tmp/slt_install/slt update --self \
     && /tmp/slt_install/slt install -f /tmp/wiseconnect-pkg.slt \
     && /tmp/slt_install/slt install slc-cli \
     && cp -a $(/tmp/slt_install/slt where wiseconnect) /tmp/wifi_sdk \
@@ -49,11 +33,9 @@ RUN grep -v '^#' /tmp/keep_folders.txt | grep -v '^$' | grep -v '\.a$' | sort -u
     grep -qFx "$name" /tmp/keep_list.txt || rm -rf "$d"; \
     done \
     && grep -v '^#' /tmp/keep_folders.txt | grep -v '^$' | grep '\.a$' | sort -u > /tmp/keep_libs.txt \
-    && ( cd /tmp/simplicity_sdk && find . -name "*.a" -type f | while read f; do \
-    rel="${f#./}"; \
-    grep -qFx "$rel" /tmp/keep_libs.txt || rm -f "$f"; \
-    done ) \
-    && rm /tmp/keep_folders.txt /tmp/keep_list.txt /tmp/keep_libs.txt \
+    && ( cd /tmp/simplicity_sdk && find . -name "*.a" -type f | sed 's|^\./||' > /tmp/all_libs.txt ) \
+    && grep -vFxf /tmp/keep_libs.txt /tmp/all_libs.txt | sed 's|^|/tmp/simplicity_sdk/|' | xargs -r rm -f \
+    && rm /tmp/keep_folders.txt /tmp/keep_list.txt /tmp/keep_libs.txt /tmp/all_libs.txt \
     && find /tmp/simplicity_sdk/openthread -name "*efr32mg21*" -delete \
     && find /tmp/simplicity_sdk/boards/hardware/board/config -mindepth 1 -maxdepth 1 -type d ! \( -name '*brd4186c*' -o -name '*brd4187c*' -o -name '*brd4186a*' -o -name '*brd4187a*' -o -name '*brd2601b*' -o -name '*brd2703a*' -o -name '*brd2704a*' -o -name '*component*' \
     -o -name '*brd4316a*' -o -name '*brd4317a*' -o -name '*brd4318a*' -o -name '*brd4319a*' -o -name '*brd4116a*' -o -name '*brd4117a*' -o -name '*brd4118a*' -o -name '*brd2608a*' -o -name '*brd4350a*' -o -name '*brd4351a*' -o -name '*brd2709a*' \
@@ -68,7 +50,22 @@ RUN rm -rf /tmp/wifi_sdk/.git /tmp/wifi_sdk/examples /tmp/wifi_sdk/components/de
 # Final SDK container for compiling using Silabs SDK
 FROM ghcr.io/project-chip/chip-build:${VERSION}
 
-ADD docker/requirements.txt /tmp/requirements.txt
+ADD requirements.txt /tmp/requirements.txt
+
+# GNU ARM Embedded toolchain, cross compiler for various platform builds
+RUN set -x \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
+    gcc-arm-none-eabi \
+    binutils-arm-none-eabi \
+    openjdk-17-jdk-headless \
+    ccache \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/ \
+    # Install Python Packages
+    && pip3 install --break-system-packages -r /tmp/requirements.txt \
+    && rm /tmp/requirements.txt \
+    && : # last line
 
 # Keep GSDK_ROOT name until rename transition to SISDK is completed
 ENV GSDK_ROOT=/opt/silabs/simplicity_sdk/

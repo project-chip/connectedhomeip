@@ -64,22 +64,6 @@ def make_executable(path):
         logger.warning("Path %s does not exist to make executable.", path)
 
 
-def find_slt_in_path():
-    """Return path to slt if found in PATH, else None."""
-    try:
-        result = subprocess.run(
-            ["which", "slt"],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if result.returncode == 0 and result.stdout.strip():
-            return result.stdout.strip()
-    except (subprocess.SubprocessError, FileNotFoundError):
-        pass
-    return None
-
-
 def download_slt_cli():
     """Download and extract SLT CLI tool to script directory."""
     platform_name, slt_cli_url = get_platform_vars()
@@ -95,6 +79,13 @@ def download_slt_cli():
     try:
         dload.save(slt_cli_url, slt_zip_path)
         with ZipFile(slt_zip_path, 'r') as zObject:
+            # Check for path traversal vulnerabilities before extracting
+            for member in zObject.infolist():
+                resolved_path = os.path.realpath(os.path.join(tools_folder_path, member.filename))
+                if not resolved_path.startswith(os.path.realpath(tools_folder_path)):
+                    logger.error("Zip file contains unsafe path: %s", member.filename)
+                    sys.exit(1)
+            # If all paths are safe, extract
             zObject.extractall(path=tools_folder_path)
         os.remove(slt_zip_path)
         make_executable(slt_cli_path)
