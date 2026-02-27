@@ -95,6 +95,13 @@ def download_slt_cli():
     try:
         dload.save(slt_cli_url, slt_zip_path)
         with ZipFile(slt_zip_path, 'r') as zObject:
+            # Check for path traversal vulnerabilities before extracting
+            for member in zObject.infolist():
+                resolved_path = os.path.realpath(os.path.join(tools_folder_path, member.filename))
+                if not resolved_path.startswith(os.path.realpath(tools_folder_path)):
+                    logger.error("Zip file contains unsafe path: %s", member.filename)
+                    sys.exit(1)
+            # If all paths are safe, extract
             zObject.extractall(path=tools_folder_path)
         os.remove(slt_zip_path)
         make_executable(slt_cli_path)
