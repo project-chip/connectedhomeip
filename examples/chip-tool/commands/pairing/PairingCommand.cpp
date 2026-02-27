@@ -370,7 +370,7 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
         else
         {
             auto commissioningParams = GetCommissioningParameters();
-            err = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
+            err                      = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
         }
     }
     return err;
