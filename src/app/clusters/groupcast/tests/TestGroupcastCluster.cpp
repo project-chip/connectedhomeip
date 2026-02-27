@@ -663,6 +663,25 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
 
+        // Join group: ReplaceEndpoints
+        data.replaceEndpoints = MakeOptional(true);
+        result                = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::ConstraintError);
+
+        data.replaceEndpoints = MakeOptional(false);
+        result                = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::ConstraintError);
+
+        data.replaceEndpoints.ClearValue();
+        result = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+
         // Join group: Non-empty endpoints
         data.groupID   = 3;
         data.endpoints = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
