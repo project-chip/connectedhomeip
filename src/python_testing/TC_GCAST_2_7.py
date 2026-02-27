@@ -182,9 +182,10 @@ class TC_GCAST_2_7(MatterBaseTest):
         usedMcastAddrCount_matcher = generate_usedMcastAddrCount_entry_matcher(2)
         sub2.await_all_expected_report_matches(expected_matchers=[usedMcastAddrCount_matcher], timeout_sec=60)
 
+        f2_current_group_count = 0
         self.step("6a")
         if A_max < math.floor(M_max / 2):
-            self.mark_step_range_skipped("6b", "8")
+            self.mark_step_range_skipped("6b", "7b")
         else:
             self.step("6b")
             self.th1 = self.default_controller
@@ -236,29 +237,29 @@ class TC_GCAST_2_7(MatterBaseTest):
                 )
                 f2_current_group_count += 1
 
-            self.step(8)
-            total_per_group_count = f1_current_group_count + f2_current_group_count
-            for i in range(total_per_group_count, A_max):
-                groupID = i + 1
-                await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.JoinGroup(
-                    groupID=groupID,
-                    endpoints=endpoints_list,
-                    keySetID=keySetID1,
-                    mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kPerGroup)
-                )
-                f1_current_group_count += 1
+        self.step(8)
+        total_per_group_count = f1_current_group_count + f2_current_group_count
+        for i in range(total_per_group_count, A_max):
+            groupID = i + 1
+            await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID,
+                endpoints=endpoints_list,
+                keySetID=keySetID1,
+                mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kPerGroup)
+            )
+            f1_current_group_count += 1
 
-        self.step("9")
+        self.step(9)
         usedMcastAddrCount_matcher = generate_usedMcastAddrCount_entry_matcher(A_max)
         sub2.await_all_expected_report_matches(expected_matchers=[usedMcastAddrCount_matcher], timeout_sec=60)
 
-        self.step("10")
+        self.step(10)
         groupIDExhausted = A_max + 1
         try:
-            await self.send_single_cmd(dev_ctrl=self.th2, cmd=Clusters.Groupcast.Commands.JoinGroup(
+            await self.send_single_cmd(cmd=Clusters.Groupcast.Commands.JoinGroup(
                 groupID=groupIDExhausted,
                 endpoints=endpoints_list,
-                keySetID=keySetID3,
+                keySetID=keySetID1,
                 mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kPerGroup)
             )
             asserts.fail("JoinGroup command should have failed with ResourceExhausted, but it succeeded")

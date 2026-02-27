@@ -268,6 +268,12 @@ Status GroupcastLogic::LeaveGroup(FabricIndex fabric_index, const Groupcast::Com
 
 Status GroupcastLogic::UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data)
 {
+    // Validate that the group exists early before trying to set the keyset
+    GroupDataProvider::GroupInfo info;
+    CHIP_ERROR err = Provider().GetGroupInfo(fabric_index, data.groupID, info);
+    VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
+    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+
     return SetKeySet(fabric_index, data.groupID, data.keySetID, data.key);
 }
 
@@ -427,12 +433,7 @@ void GroupcastLogic::OnGroupAdded(FabricIndex fabric_index, const GroupInfo & ne
     (void) fabric_index;
     (void) new_group;
     NotifyMembershipChanged();
-    uint16_t address_count = GetUsedMcastAddrCount();
-    if (address_count != mUsedMcastAddrCount)
-    {
-        mUsedMcastAddrCount = address_count;
-        NotifyUsedMcastAddrCountChange();
-    }
+    NotifyUsedMcastAddrCountOnChange();
 }
 
 void GroupcastLogic::OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group)
@@ -440,12 +441,15 @@ void GroupcastLogic::OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & 
     (void) fabric_index;
     (void) old_group;
     NotifyMembershipChanged();
-    uint16_t address_count = GetUsedMcastAddrCount();
-    if (address_count != mUsedMcastAddrCount)
-    {
-        mUsedMcastAddrCount = address_count;
-        NotifyUsedMcastAddrCountChange();
-    }
+    NotifyUsedMcastAddrCountOnChange();
+}
+
+void GroupcastLogic::OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id)
+{
+    (void) fabric_index;
+    (void) modified_group_id;
+    NotifyMembershipChanged();
+    NotifyUsedMcastAddrCountOnChange();
 }
 
 uint16_t GroupcastLogic::GetUsedMcastAddrCount()
@@ -483,11 +487,16 @@ void GroupcastLogic::NotifyMembershipChanged()
     }
 }
 
-void GroupcastLogic::NotifyUsedMcastAddrCountChange()
+void GroupcastLogic::NotifyUsedMcastAddrCountOnChange()
 {
-    if (mListener != nullptr)
+    uint16_t new_count = GetUsedMcastAddrCount();
+    if (new_count != mUsedMcastAddrCount)
     {
-        mListener->OnUsedMcastAddrCountChange();
+        mUsedMcastAddrCount = new_count;
+        if (mListener != nullptr)
+        {
+            mListener->OnUsedMcastAddrCountChange();
+        }
     }
 }
 

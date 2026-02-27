@@ -25,7 +25,6 @@
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
-#include <app/tests/AppTestContext.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <clusters/Groupcast/Enums.h>
@@ -36,8 +35,8 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/TimerDelegateMock.h>
 #include <platform/NetworkCommissioning.h>
-#include <system/RAIIMockClock.h>
 
 #include <array>
 #include <credentials/GroupDataProviderImpl.h>
@@ -52,7 +51,6 @@ using namespace chip::app;
 using namespace chip::Testing;
 using namespace chip::Credentials;
 using namespace chip::app::Clusters::Groupcast;
-using namespace chip::System;
 using namespace chip::System::Clock::Literals;
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
@@ -102,20 +100,11 @@ public:
 };
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
-class TestGroupcastCluster : public AppContext
+struct TestGroupcastCluster : public ::testing::Test
 {
-public:
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
-        AppContext::SetUpTestSuite();
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
 
-    static void TearDownTestSuite()
-    {
-        AppContext::TearDownTestSuite();
-        Platform::MemoryShutdown();
-    }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
     void SetUp() override
     {
@@ -139,8 +128,6 @@ public:
         CHIP_ERROR err = mFabricHelper.SetUpTestFabric(kTestFabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
         Credentials::SetGroupDataProvider(&mProvider);
-        DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
-        AppContext::SetUp();
     }
 
     void TearDown() override
@@ -152,8 +139,6 @@ public:
         CHIP_ERROR err = mFabricHelper.TearDownTestFabric(kTestFabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
         mProvider.Finish();
-        DeviceLayer::SetSystemLayerForTesting(nullptr);
-        AppContext::TearDown();
     }
 
     void AssertStatus(std::optional<app::DataModel::ActionReturnStatus> & status,
@@ -166,12 +151,14 @@ public:
 
     TestServerClusterContext mTestContext;
     Credentials::GroupDataProviderImpl mProvider;
+    TimerDelegateMock mMockTimerDelegate;
     Crypto::DefaultSessionKeystore mKeystore;
     CustomDataModel customDataModel;
     std::unique_ptr<ServerClusterContext> clusterContext;
     FabricTestFixture mFabricHelper{ &mTestContext.StorageDelegate() };
-    app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider }, BitFlags<Feature>{ Feature::kSender } };
-    app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider },
+    app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate },
+                                             BitFlags<Feature>{ Feature::kSender } };
+    app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate },
                                                BitFlags<Feature>{ Feature::kListener } };
 };
 
@@ -425,6 +412,7 @@ TEST_F(TestGroupcastCluster, TestReadUsedMcastAddrCount)
     GroupId kGroup4               = 0xff04;
     KeysetId kKeyset              = 0xabcd;
 
+    constexpr System::Clock::Milliseconds32 kChangeTemporisation = System::Clock::Milliseconds32(251);
     chip::Testing::ClusterTester tester(mListener);
     tester.SetFabricIndex(kTestFabricIndex);
 
@@ -455,6 +443,7 @@ TEST_F(TestGroupcastCluster, TestReadUsedMcastAddrCount)
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
         ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
         ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
         // Read UsedMcastAddrCount
@@ -471,6 +460,7 @@ TEST_F(TestGroupcastCluster, TestReadUsedMcastAddrCount)
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
         ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
         ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
         // Read UsedMcastAddrCount
@@ -485,6 +475,7 @@ TEST_F(TestGroupcastCluster, TestReadUsedMcastAddrCount)
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
         ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
         ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
         // Read UsedMcastAddrCount
@@ -500,6 +491,7 @@ TEST_F(TestGroupcastCluster, TestReadUsedMcastAddrCount)
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
         ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
         ASSERT_FALSE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
         // Read UsedMcastAddrCount
@@ -518,6 +510,7 @@ TEST_F(TestGroupcastCluster, TestReadUsedMcastAddrCount)
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
         ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
         ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
         // Read UsedMcastAddrCount
@@ -532,6 +525,7 @@ TEST_F(TestGroupcastCluster, TestReadUsedMcastAddrCount)
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
         ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
         ASSERT_FALSE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
         // Read UsedMcastAddrCount
@@ -546,6 +540,7 @@ TEST_F(TestGroupcastCluster, TestReadUsedMcastAddrCount)
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
         ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
         ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
         // Read UsedMcastAddrCount
@@ -560,6 +555,7 @@ TEST_F(TestGroupcastCluster, TestReadUsedMcastAddrCount)
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
+        mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(kChangeTemporisation));
         ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(membershipAttributePath));
         ASSERT_TRUE(mTestContext.ChangeListener().IsDirty(usedMcastAddrCountAttributePath));
         // Read UsedMcastAddrCount
@@ -585,7 +581,7 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 
     // Neither Listener, nor Sender
     {
-        app::Clusters::GroupcastCluster cluster({ mFabricHelper.GetFabricTable(), mProvider });
+        app::Clusters::GroupcastCluster cluster({ mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate });
         chip::Testing::ClusterTester tester(cluster);
         tester.SetFabricIndex(kTestFabricIndex);
 
@@ -974,7 +970,7 @@ TEST_F(TestGroupcastCluster, TestLeaveGroup)
 
     // Create a Listener and Sender capable group with 1 endpoint.
     // Remove the endpoint from the group. Verify that the group still exists for Sender.
-    app::Clusters::GroupcastCluster ListenerAndSender{ { mFabricHelper.GetFabricTable(), mProvider },
+    app::Clusters::GroupcastCluster ListenerAndSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate },
                                                        BitFlags<Feature>{ Feature::kListener, Feature::kSender } };
     ASSERT_EQ(ListenerAndSender.Startup(*clusterContext), CHIP_NO_ERROR);
     chip::Testing::ClusterTester listenerAndSendertester(ListenerAndSender);
@@ -1364,7 +1360,6 @@ TEST_F(TestGroupcastCluster, TestGroupcastTestingCommand)
 
     // Enable Listener Testing with duration
     {
-        chip::System::Clock::Internal::RAIIMockClock mockClock;
         const uint16_t durationSeconds = 10;
 
         Commands::GroupcastTesting::Type data;
@@ -1380,14 +1375,12 @@ TEST_F(TestGroupcastCluster, TestGroupcastTestingCommand)
         EXPECT_EQ(fabricUnderTest, kTestFabricIndex);
 
         //  Testing should still be active
-        mockClock.AdvanceMonotonic(Clock::Seconds16(durationSeconds - 1));
-        GetIOContext().DriveIO();
+        mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(durationSeconds - 1));
         ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
         EXPECT_EQ(fabricUnderTest, kTestFabricIndex);
 
         //  Testing should end after the duration
-        mockClock.AdvanceMonotonic(Clock::Seconds16(durationSeconds + 1));
-        GetIOContext().DriveIO();
+        mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(durationSeconds + 1));
         ASSERT_EQ(tester.ReadAttribute(Attributes::FabricUnderTest::Id, fabricUnderTest), CHIP_NO_ERROR);
         EXPECT_EQ(fabricUnderTest, kUndefinedFabricIndex);
     }

@@ -18,6 +18,7 @@
 
 #include <app/server/Server.h>
 #include <credentials/GroupDataProvider.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip {
 namespace app {
@@ -27,6 +28,7 @@ struct GroupcastContext
 {
     chip::FabricTable & fabricTable;
     chip::Credentials::GroupDataProvider & groupDataProvider;
+    chip::TimerDelegate & timerDelegate;
 };
 
 } // namespace Clusters
