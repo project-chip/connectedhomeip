@@ -334,7 +334,7 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${efr32_sdk_root}/sbluetooth_le_controller/build/gcc/xg24/release/liblinklayer.a ",
+        "${efr32_sdk_root}/bluetooth_le_controller/build/gcc/xg24/release/liblinklayer.a ",
         "${efr32_sdk_root}/rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
       ]
 
