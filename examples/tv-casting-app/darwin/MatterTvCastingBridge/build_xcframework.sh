@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Clean and recreate output directories for a reproducible build
+rm -rf archives xcframeworks
+mkdir -p archives xcframeworks
+
 xcodebuild archive \
     -project MatterTvCastingBridge.xcodeproj \
     -scheme MatterTvCastingBridge \
