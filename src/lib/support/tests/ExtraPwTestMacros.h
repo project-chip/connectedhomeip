@@ -94,18 +94,15 @@
 // only two possible values, we can directly evaluate the expression in the
 // if() condition, and still generate a good message.
 
-// clang-format off
 #if defined(_PW_TEST) // pw_unit_test:light
-#define _CHIP_TEST_ASSERT_FAILURE(expr, expected, actual)                     \
-    return ::pw::unit_test::internal::ReturnHelper() =                        \
-        ::pw::unit_test::internal::Framework::Get().CurrentTestExpectSimple(  \
-        #expr " is " #expected, #actual, __FILE__, __LINE__, false)
+#define _CHIP_TEST_ASSERT_FAILURE(expr, expected, actual)                                                                          \
+    return ::pw::unit_test::internal::ReturnHelper() = ::pw::unit_test::internal::Framework::Get().CurrentTestExpectSimple(        \
+               #expr " is " #expected, #actual, __FILE__, __LINE__, false)
 #else // googletest
-#define _CHIP_TEST_ASSERT_FAILURE(expr, expected, actual)                     \
-    GTEST_FAIL() <<                                                           \
-        "Value of: " #expr "\n"                                               \
-        "  Actual: " #actual "\n"                                             \
-        "Expected: " #expected
+#define _CHIP_TEST_ASSERT_FAILURE(expr, expected, actual)                                                                          \
+    GTEST_FAIL() << "Value of: " #expr "\n"                                                                                        \
+                    "  Actual: " #actual "\n"                                                                                      \
+                    "Expected: " #expected
 #endif
 
 /// @def ASSERT_TRUE
@@ -113,12 +110,19 @@
 ///
 /// @param[in] expr The expression to evaluate.
 #undef ASSERT_TRUE
-#define ASSERT_TRUE(expr) if ((expr)) ; else _CHIP_TEST_ASSERT_FAILURE(expr, true, false)
+#define ASSERT_TRUE(expr)                                                                                                          \
+    if ((expr))                                                                                                                    \
+        ;                                                                                                                          \
+    else                                                                                                                           \
+        _CHIP_TEST_ASSERT_FAILURE(expr, true, false)
 
 /// @def ASSERT_FALSE
 /// Verifies that @p expr evaluates to false, otherwise the current function will be aborted.
 ///
 /// @param[in] expr The expression to evaluate.
 #undef ASSERT_FALSE
-#define ASSERT_FALSE(expr) if (!(expr)) ; else _CHIP_TEST_ASSERT_FAILURE(expr, false, true)
-// clang-format off
+#define ASSERT_FALSE(expr)                                                                                                         \
+    if (!(expr))                                                                                                                   \
+        ;                                                                                                                          \
+    else                                                                                                                           \
+        _CHIP_TEST_ASSERT_FAILURE(expr, false, true)
