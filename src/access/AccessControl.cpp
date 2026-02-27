@@ -362,6 +362,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     VerifyOrReturnError(IsValidPrivilege(requestPrivilege), CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR result = CheckACL(subjectDescriptor, requestPath, requestPrivilege);
+    // TODO: Combine this with the exisiting condition below with group data
     if (result != CHIP_NO_ERROR && IsGroupAuxiliaryDelegateRegistered() && subjectDescriptor.authMode == AuthMode::kGroup && IsGroupId(subjectDescriptor.subject)) {
         CHIP_ERROR groupCheckErr = mGroupAuxDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
         result = groupCheckErr!=CHIP_ERROR_NOT_IMPLEMENTED ? groupCheckErr : result;

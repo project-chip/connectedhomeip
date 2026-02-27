@@ -422,7 +422,7 @@ Status GroupcastLogic::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
             epIter->Release();
         }
         // Remove whole group (with all endpoints)
-        CHIP_ERROR err = groups.RemoveGroupInfo(fabric_index, group_id);
+        err = groups.RemoveGroupInfo(fabric_index, group_id);
         VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
         VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
     }

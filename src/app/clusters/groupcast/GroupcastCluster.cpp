@@ -21,6 +21,7 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    mLogic.SetServerContext(mContext);
     mLogic.SetDataModelProvider(context.provider);
     mLogic.SetListener(this);
 
@@ -57,13 +58,6 @@ DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::R
         return encoder.Encode(mFabricUnderTest);
     }
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
-}
-
-CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
-{
-    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    mLogic.SetServerContext(mContext);
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR GroupcastCluster::Attributes(const ConcreteClusterPath & path,
