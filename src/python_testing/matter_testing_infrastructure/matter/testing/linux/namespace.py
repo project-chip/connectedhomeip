@@ -79,38 +79,46 @@ class NetworkResource:
     `NetworkNamespace` based on their `ns_wrapper` flag.
     """
 
+    name: str
+    """
+    The resource name.
+
+    Usually corresponds directly to a iproute2 object name in the Linux kernel
+    """
+
+    setup_cmds: list[NetworkCmd] = dataclasses.field(default_factory=list)
     """
     Commands executed when resource setup (creation) is requested.
 
     For example for a netns it represents an operation like `ip netns add {namespace}`
     """
-    setup_cmds: list[NetworkCmd] = dataclasses.field(default_factory=list)
 
+    teardown_cmds: list[NetworkCmd] = dataclasses.field(default_factory=list)
     """
     Commands executed when resource teardown is requested.
 
     For example for a link it represents an operation like `ip link delete {device}`
     """
-    teardown_cmds: list[NetworkCmd] = dataclasses.field(default_factory=list)
 
+    up_cmds: list[NetworkCmd] = dataclasses.field(default_factory=list)
     """
     Commands executed when resource state is to be up.
 
     For example for a link it is equivalent to `ip link set up dev {device}`
     """
-    up_cmds: list[NetworkCmd] = dataclasses.field(default_factory=list)
 
+    down_cmds: list[NetworkCmd] = dataclasses.field(default_factory=list)
     """
     Commands executed when resource state is to be down.
 
     For example for a link it is equivalent to `ip link set down dev {device}`
     """
-    down_cmds: list[NetworkCmd] = dataclasses.field(default_factory=list)
 
-    up_flag: bool = False  # Track up/down state
+    up_flag: bool = False
+    """Track up/down state."""
 
-    # Linux netns to which this resource is attached
     ns: NetworkNamespace | None = None
+    """"Linux netns to which this resource is attached."""
 
     def _run_netcmd(self, netcmd: NetworkCmd, check: bool = True) -> None:
         if netcmd.ns_wrapper and self.ns:
@@ -152,39 +160,37 @@ class NetworkResource:
 class NetworkLink(NetworkResource):
     def __init__(self, name: str, ipv4_addrs: list[str], ipv6_addrs: list[str], ns: NetworkNamespace | None = None) -> None:
 
-        self.name = name
         self.switch_name = f"{name}-sw"
         self.ipv4_addrs = ipv4_addrs
         self.ipv6_addrs = ipv6_addrs
 
-        netns_opt = ""
-        if ns:
-            netns_opt = f"netns {ns.name}"
+        netns_opt = f"netns {ns.name}" if ns else ''
 
         up_cmds = [
             NetworkCmd(f"ip link set dev {self.switch_name} up"),
-            NetworkCmd(f"ip link set dev {self.name} up", ns_wrapper=True),
+            NetworkCmd(f"ip link set dev {name} up", ns_wrapper=True),
             NetworkCmd("ip link set dev lo up", ns_wrapper=True),
         ]
 
-        up_cmds.extend(NetworkCmd(f"ip addr add {addr} dev {self.name}", ns_wrapper=True) for addr in self.ipv4_addrs)
+        up_cmds.extend(NetworkCmd(f"ip addr add {addr} dev {name}", ns_wrapper=True) for addr in self.ipv4_addrs)
 
         if self.ipv6_addrs:
-            up_cmds.append(NetworkCmd(f"ip -6 addr flush {self.name}", ns_wrapper=True))
-            up_cmds.extend(NetworkCmd(f"ip -6 a add {addr} dev {self.name}", ns_wrapper=True) for addr in self.ipv6_addrs)
+            up_cmds.append(NetworkCmd(f"ip -6 addr flush {name}", ns_wrapper=True))
+            up_cmds.extend(NetworkCmd(f"ip -6 a add {addr} dev {name}", ns_wrapper=True) for addr in self.ipv6_addrs)
             up_cmds.extend(NetworkCmd(cmd, ns_wrapper=True) for cmd in [
                 "sysctl -w net.ipv6.conf.all.forwarding=1",
                 "sysctl -w net.ipv6.conf.default.forwarding=1",
-                f"sysctl -w net.ipv6.conf.{self.name}.accept_ra=2",
-                f"sysctl -w net.ipv6.conf.{self.name}.accept_ra_rt_info_max_plen=64"
+                f"sysctl -w net.ipv6.conf.{name}.accept_ra=2",
+                f"sysctl -w net.ipv6.conf.{name}.accept_ra_rt_info_max_plen=64"
             ])
 
         super().__init__(
-            setup_cmds=[NetworkCmd(f"ip link add {self.name} {netns_opt} type veth peer name {self.switch_name}")],
+            name=name,
+            setup_cmds=[NetworkCmd(f"ip link add {name} {netns_opt} type veth peer name {self.switch_name}")],
             teardown_cmds=[NetworkCmd(f"ip link delete {self.switch_name}")],
             up_cmds=up_cmds,
             down_cmds=[
-                NetworkCmd(f"ip link set dev {self.name} down", ns_wrapper=True),
+                NetworkCmd(f"ip link set dev {name} down", ns_wrapper=True),
                 NetworkCmd(f"ip link set dev {self.switch_name} down")
             ],
             ns=ns)
@@ -217,8 +223,8 @@ class NetworkLink(NetworkResource):
 
 class NetworkBridge(NetworkResource):
     def __init__(self, name: str):
-        self.name = name
-        super().__init__(setup_cmds=[NetworkCmd(f"ip link add {name} type bridge")],
+        super().__init__(name=name,
+                         setup_cmds=[NetworkCmd(f"ip link add {name} type bridge")],
                          teardown_cmds=[NetworkCmd(f"ip link delete {name}")],
                          up_cmds=[NetworkCmd(f"ip link set {name} up")],
                          down_cmds=[NetworkCmd(f"ip link set {name} down")]
@@ -230,13 +236,13 @@ class NetworkBridge(NetworkResource):
 
 class NetworkNamespace(NetworkResource):
     def __init__(self, name: str) -> None:
-        self.name = name
-        super().__init__(setup_cmds=[NetworkCmd(f"ip netns add {name}")],
+        super().__init__(name=name,
+                         setup_cmds=[NetworkCmd(f"ip netns add {name}")],
                          teardown_cmds=[NetworkCmd(f"ip netns del {name}")])
 
     @property
     def netns_cmd_wrapper(self) -> list[str]:
-        return ['ip', 'netns', 'exec', f'{self.name}']
+        return ['ip', 'netns', 'exec', self.name]
 
     def wrap_cmd(self, cmd: str | list[str]) -> list[str]:
         if isinstance(cmd, str):
