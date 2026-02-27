@@ -152,7 +152,9 @@ if (chip_build_tests) {
     if (chip_device_platform == "darwin") {
       # Darwin does not include the uriparser submodule, which is required by
       # push-av-stream-transport-server tests.
-      tests -= [ "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests" ]
+      tests -= [
+        "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
+      ]
     }
 
     if (current_os != "zephyr") {
