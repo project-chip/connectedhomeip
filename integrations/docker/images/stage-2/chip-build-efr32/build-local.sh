@@ -26,7 +26,7 @@ else
 fi
 
 BUILD_ARGS=(
-    $PLATFORM_FLAG
+    "$PLATFORM_FLAG"
     --build-arg "TARGETPLATFORM=$TARGET_PLATFORM_TYPE"
     --build-arg "VERSION=$VERSION"
     -f "$SCRIPT_DIR/Dockerfile"

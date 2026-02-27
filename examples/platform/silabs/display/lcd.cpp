@@ -26,7 +26,7 @@
 #include "dmd.h"
 #include "glib.h"
 
-#if defined (SLI_SI91X_MCU_INTERFACE) && (SLI_SI91X_MCU_INTERFACE)
+#if defined(SLI_SI91X_MCU_INTERFACE) && (SLI_SI91X_MCU_INTERFACE)
 #include "sl_memlcd.h"
 #endif
 
@@ -67,7 +67,7 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
     }
 
     /* Enable the memory lcd */
-#if defined (SLI_SI91X_MCU_INTERFACE) && (SLI_SI91X_MCU_INTERFACE)
+#if defined(SLI_SI91X_MCU_INTERFACE) && (SLI_SI91X_MCU_INTERFACE)
     sl_memlcd_display_enable();
 #else
     status = sl_board_enable_display();
@@ -173,7 +173,7 @@ void SilabsLCD::WriteStatus()
         memcpy(str, mStatus.networkName, sizeof(str));
     }
 
-#if defined (SL_WIFI) && SL_WIFI
+#if defined(SL_WIFI) && SL_WIFI
     GLIB_drawStringOnLine(&glibContext, "SSID : ", lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
     GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
 #else

@@ -26,7 +26,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include "FreeRTOS.h"
 #include "timers.h"
-#if defined (SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
+#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
 #include "sl_si91x_ble_init.h"
 #else
 #include "gatt_db.h"
@@ -49,7 +49,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
 public:
     void HandleBootEvent(void);
 
-    #if defined (SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
+#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
     // Used for posting the event in the BLE queue
     void BlePostEvent(SilabsBleWrapper::BleEvent_t * event);
     void HandleConnectEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt);
@@ -74,7 +74,7 @@ public:
     CHIP_ERROR StopAdvertising(void);
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-#if defined (SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
+#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
     static void HandleC3ReadRequest(const SilabsBleWrapper::sl_wfx_msg_t & rsi_ble_read_req);
 #else
     static void HandleC3ReadRequest(volatile sl_bt_msg_t * evt);
@@ -86,7 +86,7 @@ private:
     // the implementation methods provided by this class.
     friend BLEManager;
 
-    #if defined (SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
+#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
     // rs91x BLE task handling
     osMessageQueueId_t sBleEventQueue = NULL;
     static void sl_ble_event_handling_task(void * args);
@@ -180,7 +180,7 @@ private:
     CHIP_ERROR EncodeAdditionalDataTlv();
 #endif
 
-#if defined (SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
+#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
     void HandleRXCharWrite(const SilabsBleWrapper::sl_wfx_msg_t & evt);
 #else
     void HandleRXCharWrite(volatile sl_bt_msg_t * evt);
@@ -194,7 +194,7 @@ private:
     static void BleAdvTimeoutHandler(void * arg);
     uint8_t GetTimerHandle(uint8_t connectionHandle, bool allocate);
 
-    #if defined (SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
+#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
 protected:
     static void OnSendIndicationTimeout(System::Layer * aLayer, void * appState);
 #endif

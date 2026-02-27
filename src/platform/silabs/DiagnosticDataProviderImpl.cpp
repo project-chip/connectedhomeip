@@ -332,7 +332,7 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
     }
 }
 
-#if defined (SL_WIFI) && SL_WIFI
+#if defined(SL_WIFI) && SL_WIFI
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
     constexpr size_t bssIdSize = 6;

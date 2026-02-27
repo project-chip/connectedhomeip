@@ -39,7 +39,7 @@
 #include "ZigbeeCallbacks.h"
 #endif // SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
 
-#if defined (SLI_SI91X_MCU_INTERFACE) && !SLI_SI91X_MCU_INTERFACE
+#if defined(SLI_SI91X_MCU_INTERFACE) && !SLI_SI91X_MCU_INTERFACE
 extern "C" {
 #include "btl_interface.h"
 #include "btl_reset_info.h"

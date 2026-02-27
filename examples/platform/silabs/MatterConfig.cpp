@@ -49,7 +49,7 @@
 #endif // (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
 #endif // SL_WIFI
 
-#if defined (PW_RPC_ENABLED) && PW_RPC_ENABLED
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
 #include "Rpc.h"
 #endif
 
@@ -232,7 +232,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     SILABS_LOG("=====%s starting=====", appName);
 
-#if defined (PW_RPC_ENABLED) && PW_RPC_ENABLED
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
     chip::rpc::Init();
 #endif
 
@@ -375,7 +375,7 @@ void OnEM4Trigger(uint32_t duration)
 
 extern "C" void vApplicationIdleHook(void)
 {
-#if ( (defined (SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE) && CHIP_CONFIG_ENABLE_ICD_SERVER)
+#if ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     SiWxPlatformInterface::sl_si91x_btn_event_handler();
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT

@@ -91,7 +91,7 @@ config("wifi-platform-config") {
     include_dirs += [
       "${chip_root}/src/platform/silabs/SiWx/ble",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
-      "${wifi_sdk_root}/components/protocol/wifi/inc"
+      "${wifi_sdk_root}/components/protocol/wifi/inc",
     ]
   }
 }
