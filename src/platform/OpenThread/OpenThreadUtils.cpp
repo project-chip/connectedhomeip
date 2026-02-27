@@ -30,6 +30,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <openthread/dataset.h>
 #include <openthread/error.h>
 
 #include <cstdio>
@@ -85,6 +86,20 @@ void RegisterOpenThreadErrorFormatter()
     static ErrorFormatter sOpenThreadErrorFormatter = { FormatOpenThreadError, NULL };
 
     RegisterErrorFormatter(&sOpenThreadErrorFormatter);
+}
+
+uint16_t GetOpenThreadPanId(otInstance * otInst)
+{
+    if (otInst != nullptr)
+    {
+        otOperationalDataset aDataset;
+        otError otErr = otDatasetGetActive(otInst, &aDataset);
+        if (otErr == OT_ERROR_NONE && aDataset.mComponents.mIsPanIdPresent)
+        {
+            return aDataset.mPanId;
+        }
+    }
+    return 0xffff; // 0xFFFF is an invalid PAN ID and indicates it is unconfigured/unavailable
 }
 
 void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)

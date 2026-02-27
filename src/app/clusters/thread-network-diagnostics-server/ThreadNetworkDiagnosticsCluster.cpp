@@ -26,6 +26,12 @@
 #include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+#include <platform/OpenThread/OpenThreadUtils.h>
+#include <platform/ThreadStackManager.h>
+#endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -171,7 +177,11 @@ void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatus
 {
     if (newConnectionStatus == ConnectionStatusEnum::kConnected)
     {
-        ChipLogProgress(Zcl, "ThdDiag: Conn, PAN: 0x%04x", GetPanId());
+        uint16_t panId = 0xffff;
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+        panId = chip::DeviceLayer::Internal::GetOpenThreadPanId(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance());
+#endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+        ChipLogProgress(Zcl, "ThdDiag: Conn, PAN: 0x%04x", panId);
     }
     else
     {
