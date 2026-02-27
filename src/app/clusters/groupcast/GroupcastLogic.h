@@ -123,7 +123,7 @@ private:
     DataModel::Provider * mDataModelProvider = nullptr;
     uint16_t mUsedMcastAddrCount             = 0;
     Listener * mListener                     = nullptr;
-    ServerClusterContext * mServerContext = nullptr;
+    ServerClusterContext * mServerContext    = nullptr;
 };
 
 } // namespace Clusters

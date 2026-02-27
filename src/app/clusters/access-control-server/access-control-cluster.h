@@ -47,7 +47,8 @@ public:
     };
 
     constexpr AccessControlCluster(BitFlags<AccessControl::Feature> featureFlags, const Context & context) :
-        DefaultServerCluster(ConcreteClusterPath::ConstExpr(kRootEndpointId, AccessControl::Id)), mFeatureFlags(featureFlags), mClusterContext(context)
+        DefaultServerCluster(ConcreteClusterPath::ConstExpr(kRootEndpointId, AccessControl::Id)), mFeatureFlags(featureFlags),
+        mClusterContext(context)
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;

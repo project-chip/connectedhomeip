@@ -29,7 +29,8 @@ namespace Examples {
 class GroupAuxiliaryAccessControlDelegate : public AccessControl::Delegate
 {
 public:
-    GroupAuxiliaryAccessControlDelegate(Credentials::GroupDataProvider * groupDataProvider) : mGroupDataProvider(groupDataProvider) {}
+    GroupAuxiliaryAccessControlDelegate(Credentials::GroupDataProvider * groupDataProvider) : mGroupDataProvider(groupDataProvider)
+    {}
     ~GroupAuxiliaryAccessControlDelegate() override = default;
 
     // Delegate implementation
@@ -37,7 +38,6 @@ public:
 
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                      Privilege requestPrivilege) override;
-
 
 private:
     Credentials::GroupDataProvider * mGroupDataProvider;

@@ -24,10 +24,10 @@
 #include "AccessRestrictionProvider.h"
 #endif
 
+#include "AuxiliaryType.h"
 #include "Privilege.h"
 #include "RequestPath.h"
 #include "SubjectDescriptor.h"
-#include "AuxiliaryType.h"
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/Global.h>

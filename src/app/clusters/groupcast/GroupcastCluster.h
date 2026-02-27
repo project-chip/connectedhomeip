@@ -38,8 +38,8 @@ public:
         mMembershipChangedTimer(*this), mGroupcastTestingTimer(*this)
     {}
     GroupcastCluster(GroupcastContext && context, BitFlags<Groupcast::Feature> features) :
-        DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mGroupcastContext(std::move(context)), mLogic(mGroupcastContext, features),
-        mMembershipChangedTimer(*this), mGroupcastTestingTimer(*this)
+        DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mGroupcastContext(std::move(context)),
+        mLogic(mGroupcastContext, features), mMembershipChangedTimer(*this), mGroupcastTestingTimer(*this)
     {}
     virtual ~GroupcastCluster() {}
 

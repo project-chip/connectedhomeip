@@ -676,9 +676,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         [&](uint16_t port) -> CHIP_ERROR {
             // Attempt to initialize UDC transport with the selected port
             return mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
-                                              .SetAddressType(Inet::IPAddressType::kIPv6)
-                                              .SetListenPort(port)
-                                              .SetNativeParams(initParams.endpointNativeParams)
+                                                           .SetAddressType(Inet::IPAddressType::kIPv6)
+                                                           .SetListenPort(port)
+                                                           .SetNativeParams(initParams.endpointNativeParams)
 #if INET_CONFIG_ENABLE_IPV4
                                               ,
                                           Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
@@ -696,12 +696,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                   .SetListenPort(mCdcListenPort)
                                                   .SetNativeParams(initParams.endpointNativeParams)
 #if INET_CONFIG_ENABLE_IPV4
-                                     ,
-                                 Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
-                                     .SetAddressType(Inet::IPAddressType::kIPv4)
-                                     .SetListenPort(mCdcListenPort)
+                                                  ,
+                                              Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                                                  .SetAddressType(Inet::IPAddressType::kIPv4)
+                                                  .SetListenPort(mCdcListenPort)
 #endif // INET_CONFIG_ENABLE_IPV4
-    );
+                 );
 #endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
     SuccessOrExit(err);
 
