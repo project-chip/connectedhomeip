@@ -19,6 +19,8 @@ out/
 /integrations/docker/images/stage-2/chip-build-efr32/files-slt/*.lock
 /integrations/docker/images/stage-2/chip-build-efr32/files-slt/user.slconf
 /scripts/setup/silabs/slt
+/third_party/silabs/simplicity_sdk
+/third_party/silabs/wifi_sdk
 
 # Pigweed Environment
 .environment*/
