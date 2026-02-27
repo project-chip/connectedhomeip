@@ -27,7 +27,7 @@ namespace Internal {
  * This class is designed to be mixed-in to concrete implementation classes as a means to
  * provide access to configuration information to generic base classes.
  */
-class BLConfig
+class BflbConfig
 {
 public:
     using Key = const char *;

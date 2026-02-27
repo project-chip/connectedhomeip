@@ -106,7 +106,8 @@ private:
     // GroupListener implementation
     void OnGroupAdded(FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group) override;
     void OnGroupRemoved(FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override;
-    void NotifyUsedMcastAddrCountChange();
+    void OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id) override;
+    void NotifyUsedMcastAddrCountOnChange();
     void NotifyMembershipChanged();
 
     GroupcastContext & mContext;
