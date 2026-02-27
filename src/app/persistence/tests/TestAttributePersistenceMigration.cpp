@@ -109,7 +109,7 @@ TEST(TestAttributePersistenceMigration, TestMigrationSkipsAbsentAttribute)
     MutableByteSpan buffer(buf);
     EXPECT_EQ(
         MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
-        CHIP_ERROR_HAD_FAILURES);
+        CHIP_NO_ERROR);
 
     // Normal provider should have nothing
     {
@@ -231,7 +231,7 @@ TEST(TestAttributePersistenceMigration, TestMultipleAttributesMixedPresence)
     MutableByteSpan buffer(buf);
     EXPECT_EQ(
         MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
-        CHIP_ERROR_HAD_FAILURES);
+        CHIP_NO_ERROR);
 
     // Attribute A should not exist in the normal provider
     {

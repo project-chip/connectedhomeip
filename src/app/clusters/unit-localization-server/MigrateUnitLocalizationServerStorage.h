@@ -25,7 +25,7 @@ namespace app {
 namespace Clusters {
 namespace UnitLocalization {
 
-CHIP_ERROR MigrateUnitLocalizationClusterStorage(EndpointId endpointId, PersistentStorageDelegate & storageDelegate);
+CHIP_ERROR MigrateUnitLocalizationServerStorage(EndpointId endpointId, PersistentStorageDelegate & storageDelegate);
 
 } // namespace UnitLocalization
 } // namespace Clusters

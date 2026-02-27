@@ -73,7 +73,8 @@ void MatterUnitLocalizationClusterInitCallback(chip::EndpointId endpointId)
     // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpointId == kRootEndpointId);
 
-    LogErrorOnFailure(MigrateUnitLocalizationClusterStorage(endpointId, chip::Server::GetInstance().GetPersistentStorage()));
+    // Migrate attributes for this cluster from SafeAttribute to AttributePersistence
+    LogErrorOnFailure(MigrateUnitLocalizationServerStorage(endpointId, chip::Server::GetInstance().GetPersistentStorage()));
 
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::RegisterServer(
