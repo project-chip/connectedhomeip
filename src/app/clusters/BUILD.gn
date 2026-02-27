@@ -38,6 +38,7 @@ source_set("clusters") {
     "occupancy-sensor-server",
     "on-off-server",
     "operational-credentials-server",
+    "push-av-stream-transport-server",
     "scenes-server",
     "software-diagnostics-server",
     "temperature-measurement-server",
@@ -66,10 +67,12 @@ source_set("clusters") {
     # INFO          |     ^~~~~~~
     # INFO    /opt/ameba/ambd_sdk_with_chip_non_NDA/component/soc/realtek/amebad/swlib/string/strproc.h:26:30: error: expected ')' before '>=' token
     # INFO       26 | #define isupper(c)      (((c)>='A')&&((c)<='Z'))
-  } else if (chip_device_platform == "darwin") {
+    public_deps -= [ "push-av-stream-transport-server" ]
+  }
+
+  if (chip_device_platform == "darwin") {
     # Darwin does not include the uriparser submodule, which is required by
     # push-av-stream-transport-server.
-  } else {
-    public_deps += [ "push-av-stream-transport-server" ]
+    public_deps -= [ "push-av-stream-transport-server" ]
   }
 }
