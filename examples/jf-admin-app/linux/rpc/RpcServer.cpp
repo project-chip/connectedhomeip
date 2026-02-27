@@ -44,12 +44,18 @@ MutableByteSpan icacCSRSpan{ icacCSRBuf };
 
 ::pw::Status JointFabric::GetCatVersions(const ::pw_protobuf_Empty & request, ::GetCatVersionsResponse & response)
 {
+    response = {};
     IgnoreUnusedVariable(request);
 
     const auto & groupEntries = Server::GetInstance().GetJointFabricDatastore().GetGroupEntries();
 
     for (const auto & entry : groupEntries)
     {
+        if (response.has_admin_cat_version && response.has_anchor_cat_version)
+        {
+            break;
+        }
+
         if (entry.groupCAT.IsNull() || entry.groupCATVersion.IsNull())
         {
             continue;
