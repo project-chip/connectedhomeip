@@ -31,8 +31,8 @@ root_dir = os.path.dirname(
     os.path.dirname(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-with PythonPath(os.path.join(root_dir, 'src/python_testing/matter_testing_infrastructure/matter'), relative_to=__file__):
-    from testing.linux import (BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, ThreadBorderRouter, WpaSupplicantMock,
+with PythonPath(os.path.join(root_dir, 'src/python_testing/matter_testing_infrastructure'), relative_to=__file__):
+    from matter.testing.linux import (BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, ThreadBorderRouter, WpaSupplicantMock,
                                ensure_network_namespace_availability, ensure_private_state)
 
 __all__ = [

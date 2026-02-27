@@ -169,8 +169,10 @@ class NetworkLink(NetworkResource):
         up_cmds = [
             NetworkCmd(f"ip link set dev {self.switch_name} up"),
             NetworkCmd(f"ip link set dev {name} up", ns_wrapper=True),
-            NetworkCmd("ip link set dev lo up", ns_wrapper=True),
         ]
+
+        if ns:  # Only needed when running in netns, otherwise can be an unintended side-effect
+            up_cmds.append(NetworkCmd("ip link set dev lo up", ns_wrapper=True))
 
         up_cmds.extend(NetworkCmd(f"ip addr add {addr} dev {name}", ns_wrapper=True) for addr in self.ipv4_addrs)
 
