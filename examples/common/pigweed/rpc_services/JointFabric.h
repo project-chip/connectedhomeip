@@ -13,7 +13,7 @@ class JointFabric : public pw_rpc::nanopb::JointFabric::Service<JointFabric>, pu
 public:
     /*RPC from jfc-client to jfa-server */
     ::pw::Status TransferOwnership(const ::OwnershipContext & request, ::pw_protobuf_Empty & response);
-    ::pw::Status GetCatVersions(const ::GetCatVersionsRequest & request, ::GetCatVersionsResponse & response);
+    ::pw::Status GetCatVersions(const ::pw_protobuf_Empty & request, ::GetCatVersionsResponse & response);
     void GetStream(const ::pw_protobuf_Empty & request, ServerWriter<::RequestOptions> & writer);
     ::pw::Status ResponseStream(const ::Response & ResponseBytes, ::pw_protobuf_Empty & response);
 

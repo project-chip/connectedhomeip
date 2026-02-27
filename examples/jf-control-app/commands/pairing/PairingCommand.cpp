@@ -721,7 +721,7 @@ bool PairingCommand::GetDatastoreCATVersions(std::optional<uint16_t> & administr
     anchorCATVersion.reset();
     catVersionsResponse = {};
 
-    GetCatVersionsRequest request = {};
+    ::pw_protobuf_Empty request = {};
     auto call                     = rpcClient.GetCatVersions(request, OnGetCATVersionsDone);
     if (!call.active())
     {

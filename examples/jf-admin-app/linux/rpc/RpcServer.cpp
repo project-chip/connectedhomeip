@@ -42,7 +42,7 @@ MutableByteSpan icacCSRSpan{ icacCSRBuf };
     return pw::OkStatus();
 }
 
-::pw::Status JointFabric::GetCatVersions(const ::GetCatVersionsRequest & request, ::GetCatVersionsResponse & response)
+::pw::Status JointFabric::GetCatVersions(const ::pw_protobuf_Empty & request, ::GetCatVersionsResponse & response)
 {
     IgnoreUnusedVariable(request);
 

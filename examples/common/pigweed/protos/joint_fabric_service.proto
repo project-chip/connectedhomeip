@@ -40,8 +40,6 @@ message Response {
   bytes response_bytes = 2;
 }
 
-message GetCatVersionsRequest {}
-
 message GetCatVersionsResponse {
   optional uint32 admin_cat_version = 1;
   optional uint32 anchor_cat_version = 2;
@@ -58,5 +56,5 @@ service JointFabric {
   rpc ResponseStream(Response) returns (pw.protobuf.Empty);
 
   // JFC requests Administrator/Anchor CAT versions from JFA JF Datastore GroupList.
-  rpc GetCatVersions(GetCatVersionsRequest) returns (GetCatVersionsResponse);
+  rpc GetCatVersions(pw.protobuf.Empty) returns (GetCatVersionsResponse);
 }
