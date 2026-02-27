@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Always run from the directory containing this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE}")" && pwd)"
+cd "$SCRIPT_DIR"
+
 # Clean and recreate output directories for a reproducible build
 rm -rf archives xcframeworks
 mkdir -p archives xcframeworks
