@@ -82,35 +82,43 @@
 #define ASSERT_SUCCESS(expr) ASSERT_EQ((expr), CHIP_NO_ERROR)
 
 // Override ASSERT_TRUE and ASSERT_FALSE from pw_unit_test in a way that
-// is friendly to static analysis tools like clang-tidy.
-//
-// The pw_unit_test implementation wraps all expression evaluation in a lambda
-// to be able to capture expression results for logging purposes, but this hides
-// the relationship between the expression being asserted and the function's
-// control flow. Since boolean expressions have only two possible values, we can
-// avoid this problem and directly evaluate the expression in the if() condition.
+// is friendly to static analysis tools like clang-tidy. The problem with
+// the default implementation (in both the light and googletest backends)
+// is that even though an ASSERT_TRUE(expr) behaves similar to
+//      if (!(expr)) return;
+// the connection between the value of the expression and the control flow
+// is obscured from static analysis tools by the testing infrastructure --
+// the actual implementations feed the expression result through a function
+// and / or hide the evaluation within a lambda to be able to generate
+// good messages in the failure case. However since boolean expressions have
+// only two possible values, we can directly evaluate the expression in the
+// if() condition, and still generate a good message.
 
 // clang-format off
-#define ADD_SIMPLE_EXPECTATION(expression, evaluated, success)               \
-    ::pw::unit_test::internal::ReturnHelper() =                              \
-        ::pw::unit_test::internal::Framework::Get().CurrentTestExpectSimple( \
-            expression, evaluated, __FILE__, __LINE__, success)
+#if defined(_PW_TEST) // pw_unit_test:light
+#define _CHIP_TEST_ASSERT_FAILURE(expr, expected, actual)                     \
+    return ::pw::unit_test::internal::ReturnHelper() =                        \
+        ::pw::unit_test::internal::Framework::Get().CurrentTestExpectSimple(  \
+        #expr " is " #expected, #actual, __FILE__, __LINE__, false)
+#else // googletest
+#define _CHIP_TEST_ASSERT_FAILURE(expr, expected, actual)                     \
+    GTEST_FAIL() <<                                                           \
+        "Value of: " #expr "\n"                                               \
+        "  Actual: " #actual "\n"                                             \
+        "Expected: " #expected
+#endif
 
 /// @def ASSERT_TRUE
 /// Verifies that @p expr evaluates to true, otherwise the current function will be aborted.
 ///
 /// @param[in] expr The expression to evaluate.
 #undef ASSERT_TRUE
-#define ASSERT_TRUE(expr)                                                          \
-    if (expr)   ADD_SIMPLE_EXPECTATION(#expr " is true", #expr " is true", true);  \
-    else return ADD_SIMPLE_EXPECTATION(#expr " is true", #expr " is false", false)
+#define ASSERT_TRUE(expr) if ((expr)) ; else _CHIP_TEST_ASSERT_FAILURE(expr, true, false)
 
 /// @def ASSERT_FALSE
 /// Verifies that @p expr evaluates to false, otherwise the current function will be aborted.
 ///
 /// @param[in] expr The expression to evaluate.
 #undef ASSERT_FALSE
-#define ASSERT_FALSE(expr)                                                           \
-    if (!(expr)) ADD_SIMPLE_EXPECTATION(#expr " is false", #expr " is false", true); \
-    else return  ADD_SIMPLE_EXPECTATION(#expr " is false", #expr " is true", false)
-// clang-format on
+#define ASSERT_FALSE(expr) if (!(expr)) ; else _CHIP_TEST_ASSERT_FAILURE(expr, false, true)
+// clang-format off
