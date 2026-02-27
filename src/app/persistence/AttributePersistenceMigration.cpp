@@ -50,14 +50,14 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
         ChipError attributeMigrationError = entry.migrator(attrPath, safeProvider, copyOfBuffer);
         if (attributeMigrationError != CHIP_NO_ERROR)
         {
-            if(attributeMigrationError != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+            if (attributeMigrationError != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
                 migrationError = CHIP_ERROR_HAD_FAILURES;
                 ChipLogError(DataManagement,
-                            "AttributeMigration: Error reading SafeAttribute '" ChipLogFormatMEI "' from cluster '" ChipLogFormatMEI
-                            "' (err=%" CHIP_ERROR_FORMAT ")",
-                            ChipLogValueMEI(entry.attributeId), ChipLogValueMEI(cluster.mClusterId), attributeMigrationError.Format());
-
+                             "AttributeMigration: Error reading SafeAttribute '" ChipLogFormatMEI
+                             "' from cluster '" ChipLogFormatMEI "' (err=%" CHIP_ERROR_FORMAT ")",
+                             ChipLogValueMEI(entry.attributeId), ChipLogValueMEI(cluster.mClusterId),
+                             attributeMigrationError.Format());
             }
             continue;
         }
