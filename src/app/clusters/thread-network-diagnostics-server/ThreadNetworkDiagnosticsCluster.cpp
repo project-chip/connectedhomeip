@@ -145,10 +145,38 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::Attributes(const ConcreteClusterPath
     return builder.ReferenceExisting(DefaultServerCluster::GlobalAttributes());
 }
 
+namespace {
+
+[[maybe_unused]] const char * GetNetworkFaultString(uint8_t fault)
+{
+    switch (static_cast<NetworkFaultEnum>(fault))
+    {
+    case NetworkFaultEnum::kUnspecified:
+        return "Unspecified";
+    case NetworkFaultEnum::kLinkDown:
+        return "LinkDown";
+    case NetworkFaultEnum::kHardwareFailure:
+        return "HardwareFailure";
+    case NetworkFaultEnum::kNetworkJammed:
+        return "NetworkJammed";
+    default:
+        return "Unknown";
+    }
+}
+
+} // namespace
+
 // Notified when the Node’s connection status to a Thread network has changed.
 void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatusEnum newConnectionStatus)
 {
-    ChipLogProgress(Zcl, "ThdDiag: OnConnectionStatusChanged");
+    if (newConnectionStatus == ConnectionStatusEnum::kConnected)
+    {
+        ChipLogProgress(Zcl, "ThdDiag: Conn, PAN: 0x%04x", GetPanId());
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "ThdDiag: Disconn");
+    }
 
     VerifyOrReturn(mContext != nullptr);
     Events::ConnectionStatus::Type event{ newConnectionStatus };
@@ -159,7 +187,15 @@ void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatus
 void ThreadNetworkDiagnosticsCluster::OnNetworkFaultChanged(const GeneralFaults<kMaxNetworkFaults> & previous,
                                                             const GeneralFaults<kMaxNetworkFaults> & current)
 {
-    ChipLogProgress(Zcl, "ThdDiag: OnNetworkFaultChanged");
+    if (current.size() > 0)
+    {
+        [[maybe_unused]] uint8_t latestFault = current.data()[current.size() - 1];
+        ChipLogProgress(Zcl, "ThdDiag: Fault. Latest: %s (%u)", GetNetworkFaultString(latestFault), latestFault);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "ThdDiag: No faults");
+    }
 
     /* Verify that the data size matches the expected one. */
     static_assert(sizeof(*current.data()) == sizeof(NetworkFaultEnum));
