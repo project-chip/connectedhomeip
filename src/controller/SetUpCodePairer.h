@@ -270,7 +270,7 @@ private:
     // mLastPASEError is the error from the last OnPairingComplete call we got.
     CHIP_ERROR mLastPASEError = CHIP_NO_ERROR;
 
-    ThreadMeshcopCommissionParameters mThreadMeshcopCommissionParams;
+    Optional<ThreadMeshcopCommissionParameters> mThreadMeshcopCommissionParams;
 };
 
 } // namespace Controller

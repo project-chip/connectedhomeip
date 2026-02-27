@@ -93,10 +93,7 @@ CHIP_ERROR SetUpCodePairer::PairDevice(NodeId remoteId, const char * setUpCode, 
         return CHIP_NO_ERROR;
     }
 
-    if (meshcopCommissioningParams.HasValue())
-    {
-        mThreadMeshcopCommissionParams = meshcopCommissioningParams.Value();
-    }
+    mThreadMeshcopCommissionParams = meshcopCommissioningParams;
 
     ReturnErrorOnFailureWithMetric(kMetricSetupCodePairerPairDevice, Connect());
     auto errorCode =
@@ -408,6 +405,13 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverThreadMeshcop()
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 
+    if (mThreadMeshcopCommissionParams.HasValue() &&
+        mThreadMeshcopCommissionParams.Value().mBorderAgentAddress.GetTransportType() != Transport::Type::kThreadMeshcop)
+    {
+        ChipLogError(Controller, "The meshcopCommissioningParams is not set");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     auto & payload = mSetupPayloads[0];
 
     ChipLogProgress(Controller, "Starting commissionable node discovery over Thread Meshcop");
@@ -426,12 +430,12 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverThreadMeshcop()
         ChipLogProgress(Controller, "Discovery code from long discriminator: 0x%" PRIx64, code.AsUInt64());
     }
 
-    ByteSpan pskc(mThreadMeshcopCommissionParams.mPSKcBuffer);
+    ByteSpan pskc(mThreadMeshcopCommissionParams.Value().mPSKcBuffer);
     {
         mWaitingForDiscovery[kThreadMeshcopTransport] = true;
         Dnssd::DiscoveredNodeData discoveredNodeData;
         ReturnErrorOnFailure(ThreadMeshcopCommissionProxy::GetInstance().Discover(
-            pskc, mThreadMeshcopCommissionParams.mBorderAgentAddress, code, connDiscriminator, discoveredNodeData, 30));
+            pskc, mThreadMeshcopCommissionParams.Value().mBorderAgentAddress, code, connDiscriminator, discoveredNodeData, 30));
 
         mWaitingForDiscovery[kThreadMeshcopTransport] = false;
         mCommissioner->OnNodeDiscovered(discoveredNodeData);

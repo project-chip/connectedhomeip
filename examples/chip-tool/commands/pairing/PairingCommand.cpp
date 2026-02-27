@@ -343,36 +343,33 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    if (mPaseOnly.ValueOr(false))
+    if (address.GetTransportType() == Transport::Type::kThreadMeshcop && mOnboardingPayload)
     {
-        if (address.GetTransportType() == Transport::Type::kThreadMeshcop && mOnboardingPayload)
+        SetUpCodePairer::ThreadMeshcopCommissionParameters meshcopParams;
+        ReturnErrorOnFailure(GetMeshcopCommissionParams(meshcopParams));
+        CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+        if (mPaseOnly.ValueOr(false))
         {
-            CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
-            SetUpCodePairer::ThreadMeshcopCommissionParameters meshcopParams;
-            ReturnErrorOnFailure(GetMeshcopCommissionParams(meshcopParams));
             err = CurrentCommissioner().EstablishPASEConnection(remoteId, mOnboardingPayload, DiscoveryType::kAll, NullOptional,
                                                                 MakeOptional(meshcopParams));
-            CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
         }
         else
         {
-            err = CurrentCommissioner().EstablishPASEConnection(remoteId, params);
+            auto commissioningParams = GetCommissioningParameters();
+            err = CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams, DiscoveryType::kAll,
+                                                   NullOptional, MakeOptional(meshcopParams));
         }
+        CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
     }
     else
     {
-        auto commissioningParams = GetCommissioningParameters();
-        if (address.GetTransportType() == Transport::Type::kThreadMeshcop && mOnboardingPayload)
+        if (mPaseOnly.ValueOr(false))
         {
-            CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
-            SetUpCodePairer::ThreadMeshcopCommissionParameters meshcopParams;
-            ReturnErrorOnFailure(GetMeshcopCommissionParams(meshcopParams));
-            err = CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams, DiscoveryType::kAll,
-                                                   NullOptional, MakeOptional(meshcopParams));
-            CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
+            err = CurrentCommissioner().EstablishPASEConnection(remoteId, params);
         }
         else
         {
+            auto commissioningParams = GetCommissioningParameters();
             err = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
         }
     }

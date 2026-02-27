@@ -880,6 +880,7 @@ PyChipError pychip_DeviceController_EstablishPASESessionThreadMeshcop(chip::Cont
     err = dataset.Init(sCommissioningParameters.GetThreadOperationalDataset().Value());
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
     err = dataset.GetPSKc(meshcopParams.mPSKcBuffer);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
     return ToPyChipError(
         devCtrl->EstablishPASEConnection(nodeId, setUpCode, DiscoveryType::kAll, NullOptional, MakeOptional(meshcopParams)));
 #else
