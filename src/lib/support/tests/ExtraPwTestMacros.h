@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <pw_unit_test/framework.h>
+
 /**
  * Run Fixture's class function as a test.
  *
@@ -78,3 +80,37 @@
  * Shorthand for ASSERT_EQ(expr, CHIP_NO_ERROR)
  */
 #define ASSERT_SUCCESS(expr) ASSERT_EQ((expr), CHIP_NO_ERROR)
+
+// Override ASSERT_TRUE and ASSERT_FALSE from pw_unit_test in a way that
+// is friendly to static analysis tools like clang-tidy.
+//
+// The pw_unit_test implementation wraps all expression evaluation in a lambda
+// to be able to capture expression results for logging purposes, but this hides
+// the relationship between the expression being asserted and the function's
+// control flow. Since boolean expressions have only two possible values, we can
+// avoid this problem and directly evaluate the expression in the if() condition.
+
+// clang-format off
+#define ADD_SIMPLE_EXPECTATION(expression, evaluated, success)               \
+    ::pw::unit_test::internal::ReturnHelper() =                              \
+        ::pw::unit_test::internal::Framework::Get().CurrentTestExpectSimple( \
+            expression, evaluated, __FILE__, __LINE__, success)
+
+/// @def ASSERT_TRUE
+/// Verifies that @p expr evaluates to true, otherwise the current function will be aborted.
+///
+/// @param[in] expr The expression to evaluate.
+#undef ASSERT_TRUE
+#define ASSERT_TRUE(expr)                                                          \
+    if (expr)   ADD_SIMPLE_EXPECTATION(#expr " is true", #expr " is true", true);  \
+    else return ADD_SIMPLE_EXPECTATION(#expr " is true", #expr " is false", false)
+
+/// @def ASSERT_FALSE
+/// Verifies that @p expr evaluates to false, otherwise the current function will be aborted.
+///
+/// @param[in] expr The expression to evaluate.
+#undef ASSERT_FALSE
+#define ASSERT_FALSE(expr)                                                           \
+    if (!(expr)) ADD_SIMPLE_EXPECTATION(#expr " is false", #expr " is false", true); \
+    else return  ADD_SIMPLE_EXPECTATION(#expr " is false", #expr " is true", false)
+// clang-format on
