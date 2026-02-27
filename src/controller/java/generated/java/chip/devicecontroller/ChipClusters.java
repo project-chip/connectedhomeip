@@ -4117,7 +4117,7 @@ public class ChipClusters {
     }
 
     public interface DeviceLocationAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(ChipStructs.BasicInformationClusterLocationDescriptorStruct value);
+      void onSuccess(@Nullable ChipStructs.BasicInformationClusterLocationDescriptorStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -4764,10 +4764,19 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            ChipStructs.BasicInformationClusterLocationDescriptorStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.BasicInformationClusterLocationDescriptorStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, DEVICE_LOCATION_ATTRIBUTE_ID, true);
+    }
+
+    public void writeDeviceLocationAttribute(DefaultClusterCallback callback, ChipStructs.BasicInformationClusterLocationDescriptorStruct value) {
+      writeDeviceLocationAttribute(callback, value, 0);
+    }
+
+    public void writeDeviceLocationAttribute(DefaultClusterCallback callback, ChipStructs.BasicInformationClusterLocationDescriptorStruct value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = value != null ? value.encodeTlv() : new NullType();
+      writeAttribute(new WriteAttributesCallbackImpl(callback), DEVICE_LOCATION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeDeviceLocationAttribute(
@@ -4777,7 +4786,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            ChipStructs.BasicInformationClusterLocationDescriptorStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.BasicInformationClusterLocationDescriptorStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, DEVICE_LOCATION_ATTRIBUTE_ID, minInterval, maxInterval);
@@ -14003,6 +14012,7 @@ public class ChipClusters {
     private static final long REACHABLE_ATTRIBUTE_ID = 17L;
     private static final long UNIQUE_ID_ATTRIBUTE_ID = 18L;
     private static final long PRODUCT_APPEARANCE_ATTRIBUTE_ID = 20L;
+    private static final long DEVICE_LOCATION_ATTRIBUTE_ID = 23L;
     private static final long CONFIGURATION_VERSION_ATTRIBUTE_ID = 24L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
@@ -14046,6 +14056,10 @@ public class ChipClusters {
 
     public interface ProductAppearanceAttributeCallback extends BaseAttributeCallback {
       void onSuccess(ChipStructs.BridgedDeviceBasicInformationClusterProductAppearanceStruct value);
+    }
+
+    public interface DeviceLocationAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable ChipStructs.BridgedDeviceBasicInformationClusterLocationDescriptorStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -14509,6 +14523,41 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, PRODUCT_APPEARANCE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readDeviceLocationAttribute(
+        DeviceLocationAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEVICE_LOCATION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable ChipStructs.BridgedDeviceBasicInformationClusterLocationDescriptorStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, DEVICE_LOCATION_ATTRIBUTE_ID, true);
+    }
+
+    public void writeDeviceLocationAttribute(DefaultClusterCallback callback, ChipStructs.BridgedDeviceBasicInformationClusterLocationDescriptorStruct value) {
+      writeDeviceLocationAttribute(callback, value, 0);
+    }
+
+    public void writeDeviceLocationAttribute(DefaultClusterCallback callback, ChipStructs.BridgedDeviceBasicInformationClusterLocationDescriptorStruct value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = value != null ? value.encodeTlv() : new NullType();
+      writeAttribute(new WriteAttributesCallbackImpl(callback), DEVICE_LOCATION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeDeviceLocationAttribute(
+        DeviceLocationAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEVICE_LOCATION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable ChipStructs.BridgedDeviceBasicInformationClusterLocationDescriptorStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, DEVICE_LOCATION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readConfigurationVersionAttribute(

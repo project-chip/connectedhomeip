@@ -3727,7 +3727,7 @@ class BasicInformation(Cluster):
                 ClusterObjectFieldDescriptor(Label="productAppearance", Tag=0x00000014, Type=typing.Optional[BasicInformation.Structs.ProductAppearanceStruct]),
                 ClusterObjectFieldDescriptor(Label="specificationVersion", Tag=0x00000015, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="maxPathsPerInvoke", Tag=0x00000016, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="deviceLocation", Tag=0x00000017, Type=typing.Optional[Globals.Structs.LocationDescriptorStruct]),
+                ClusterObjectFieldDescriptor(Label="deviceLocation", Tag=0x00000017, Type=typing.Union[None, Nullable, Globals.Structs.LocationDescriptorStruct]),
                 ClusterObjectFieldDescriptor(Label="configurationVersion", Tag=0x00000018, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -3759,7 +3759,7 @@ class BasicInformation(Cluster):
     productAppearance: typing.Optional[BasicInformation.Structs.ProductAppearanceStruct] = None
     specificationVersion: typing.Optional[uint] = None
     maxPathsPerInvoke: typing.Optional[uint] = None
-    deviceLocation: typing.Optional[Globals.Structs.LocationDescriptorStruct] = None
+    deviceLocation: typing.Union[None, Nullable, Globals.Structs.LocationDescriptorStruct] = None
     configurationVersion: typing.Optional[uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -4239,9 +4239,9 @@ class BasicInformation(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[Globals.Structs.LocationDescriptorStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, Globals.Structs.LocationDescriptorStruct])
 
-            value: typing.Optional[Globals.Structs.LocationDescriptorStruct] = None
+            value: typing.Union[None, Nullable, Globals.Structs.LocationDescriptorStruct] = None
 
         @dataclass
         class ConfigurationVersion(ClusterAttributeDescriptor):
@@ -11689,6 +11689,7 @@ class BridgedDeviceBasicInformation(Cluster):
                 ClusterObjectFieldDescriptor(Label="reachable", Tag=0x00000011, Type=bool),
                 ClusterObjectFieldDescriptor(Label="uniqueID", Tag=0x00000012, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="productAppearance", Tag=0x00000014, Type=typing.Optional[BridgedDeviceBasicInformation.Structs.ProductAppearanceStruct]),
+                ClusterObjectFieldDescriptor(Label="deviceLocation", Tag=0x00000017, Type=typing.Union[None, Nullable, Globals.Structs.LocationDescriptorStruct]),
                 ClusterObjectFieldDescriptor(Label="configurationVersion", Tag=0x00000018, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -11714,6 +11715,7 @@ class BridgedDeviceBasicInformation(Cluster):
     reachable: bool = False
     uniqueID: typing.Optional[str] = None
     productAppearance: typing.Optional[BridgedDeviceBasicInformation.Structs.ProductAppearanceStruct] = None
+    deviceLocation: typing.Union[None, Nullable, Globals.Structs.LocationDescriptorStruct] = None
     configurationVersion: typing.Optional[uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -12072,6 +12074,22 @@ class BridgedDeviceBasicInformation(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[BridgedDeviceBasicInformation.Structs.ProductAppearanceStruct])
 
             value: typing.Optional[BridgedDeviceBasicInformation.Structs.ProductAppearanceStruct] = None
+
+        @dataclass
+        class DeviceLocation(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000039
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000017
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, Globals.Structs.LocationDescriptorStruct])
+
+            value: typing.Union[None, Nullable, Globals.Structs.LocationDescriptorStruct] = None
 
         @dataclass
         class ConfigurationVersion(ClusterAttributeDescriptor):

@@ -115,7 +115,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxPathsPerInvoke::Id,
 } // namespace MaxPathsPerInvoke
 namespace DeviceLocation {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(DeviceLocation::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+                                                          Access::Privilege::kView, Access::Privilege::kAdminister);
 } // namespace DeviceLocation
 namespace ConfigurationVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ConfigurationVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),

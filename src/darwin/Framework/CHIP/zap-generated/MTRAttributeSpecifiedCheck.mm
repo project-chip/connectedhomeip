@@ -1469,6 +1469,9 @@ static BOOL AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(Attribute
     case Attributes::ProductAppearance::Id: {
         return YES;
     }
+    case Attributes::DeviceLocation::Id: {
+        return YES;
+    }
     case Attributes::ConfigurationVersion::Id: {
         return YES;
     }

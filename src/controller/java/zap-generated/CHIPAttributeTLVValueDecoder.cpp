@@ -3256,59 +3256,67 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            jobject value_locationName;
-            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.locationName, value_locationName));
-            jobject value_floorNumber;
-            if (cppValue.floorNumber.IsNull())
+            if (cppValue.IsNull())
             {
-                value_floorNumber = nullptr;
+                value = nullptr;
             }
             else
             {
-                std::string value_floorNumberClassName     = "java/lang/Integer";
-                std::string value_floorNumberCtorSignature = "(I)V";
-                jint jnivalue_floorNumber                  = static_cast<jint>(cppValue.floorNumber.Value());
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    value_floorNumberClassName.c_str(), value_floorNumberCtorSignature.c_str(), jnivalue_floorNumber,
-                    value_floorNumber);
-            }
-            jobject value_areaType;
-            if (cppValue.areaType.IsNull())
-            {
-                value_areaType = nullptr;
-            }
-            else
-            {
-                std::string value_areaTypeClassName     = "java/lang/Integer";
-                std::string value_areaTypeCtorSignature = "(I)V";
-                jint jnivalue_areaType                  = static_cast<jint>(cppValue.areaType.Value());
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    value_areaTypeClassName.c_str(), value_areaTypeCtorSignature.c_str(), jnivalue_areaType, value_areaType);
-            }
-
-            {
-                jclass locationDescriptorStructStructClass_0;
-                err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                    env, "chip/devicecontroller/ChipStructs$BasicInformationClusterLocationDescriptorStruct",
-                    locationDescriptorStructStructClass_0);
-                if (err != CHIP_NO_ERROR)
+                jobject value_locationName;
+                LogErrorOnFailure(
+                    chip::JniReferences::GetInstance().CharToStringUTF(cppValue.Value().locationName, value_locationName));
+                jobject value_floorNumber;
+                if (cppValue.Value().floorNumber.IsNull())
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$BasicInformationClusterLocationDescriptorStruct");
-                    return nullptr;
+                    value_floorNumber = nullptr;
+                }
+                else
+                {
+                    std::string value_floorNumberClassName     = "java/lang/Integer";
+                    std::string value_floorNumberCtorSignature = "(I)V";
+                    jint jnivalue_floorNumber                  = static_cast<jint>(cppValue.Value().floorNumber.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_floorNumberClassName.c_str(), value_floorNumberCtorSignature.c_str(), jnivalue_floorNumber,
+                        value_floorNumber);
+                }
+                jobject value_areaType;
+                if (cppValue.Value().areaType.IsNull())
+                {
+                    value_areaType = nullptr;
+                }
+                else
+                {
+                    std::string value_areaTypeClassName     = "java/lang/Integer";
+                    std::string value_areaTypeCtorSignature = "(I)V";
+                    jint jnivalue_areaType                  = static_cast<jint>(cppValue.Value().areaType.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_areaTypeClassName.c_str(), value_areaTypeCtorSignature.c_str(), jnivalue_areaType, value_areaType);
                 }
 
-                jmethodID locationDescriptorStructStructCtor_0;
-                err = chip::JniReferences::GetInstance().FindMethod(env, locationDescriptorStructStructClass_0, "<init>",
-                                                                    "(Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;)V",
-                                                                    &locationDescriptorStructStructCtor_0);
-                if (err != CHIP_NO_ERROR || locationDescriptorStructStructCtor_0 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$BasicInformationClusterLocationDescriptorStruct constructor");
-                    return nullptr;
-                }
+                    jclass locationDescriptorStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$BasicInformationClusterLocationDescriptorStruct",
+                        locationDescriptorStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$BasicInformationClusterLocationDescriptorStruct");
+                        return nullptr;
+                    }
 
-                value = env->NewObject(locationDescriptorStructStructClass_0, locationDescriptorStructStructCtor_0,
-                                       value_locationName, value_floorNumber, value_areaType);
+                    jmethodID locationDescriptorStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, locationDescriptorStructStructClass_1, "<init>",
+                        "(Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;)V", &locationDescriptorStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || locationDescriptorStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$BasicInformationClusterLocationDescriptorStruct constructor");
+                        return nullptr;
+                    }
+
+                    value = env->NewObject(locationDescriptorStructStructClass_1, locationDescriptorStructStructCtor_1,
+                                           value_locationName, value_floorNumber, value_areaType);
+                }
             }
             return value;
         }
@@ -9957,6 +9965,82 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 value = env->NewObject(productAppearanceStructStructClass_0, productAppearanceStructStructCtor_0, value_finish,
                                        value_primaryColor);
+            }
+            return value;
+        }
+        case Attributes::DeviceLocation::Id: {
+            using TypeInfo = Attributes::DeviceLocation::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                jobject value_locationName;
+                LogErrorOnFailure(
+                    chip::JniReferences::GetInstance().CharToStringUTF(cppValue.Value().locationName, value_locationName));
+                jobject value_floorNumber;
+                if (cppValue.Value().floorNumber.IsNull())
+                {
+                    value_floorNumber = nullptr;
+                }
+                else
+                {
+                    std::string value_floorNumberClassName     = "java/lang/Integer";
+                    std::string value_floorNumberCtorSignature = "(I)V";
+                    jint jnivalue_floorNumber                  = static_cast<jint>(cppValue.Value().floorNumber.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_floorNumberClassName.c_str(), value_floorNumberCtorSignature.c_str(), jnivalue_floorNumber,
+                        value_floorNumber);
+                }
+                jobject value_areaType;
+                if (cppValue.Value().areaType.IsNull())
+                {
+                    value_areaType = nullptr;
+                }
+                else
+                {
+                    std::string value_areaTypeClassName     = "java/lang/Integer";
+                    std::string value_areaTypeCtorSignature = "(I)V";
+                    jint jnivalue_areaType                  = static_cast<jint>(cppValue.Value().areaType.Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_areaTypeClassName.c_str(), value_areaTypeCtorSignature.c_str(), jnivalue_areaType, value_areaType);
+                }
+
+                {
+                    jclass locationDescriptorStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$BridgedDeviceBasicInformationClusterLocationDescriptorStruct",
+                        locationDescriptorStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(
+                            Zcl, "Could not find class ChipStructs$BridgedDeviceBasicInformationClusterLocationDescriptorStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID locationDescriptorStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, locationDescriptorStructStructClass_1, "<init>",
+                        "(Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;)V", &locationDescriptorStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || locationDescriptorStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(
+                            Zcl,
+                            "Could not find ChipStructs$BridgedDeviceBasicInformationClusterLocationDescriptorStruct constructor");
+                        return nullptr;
+                    }
+
+                    value = env->NewObject(locationDescriptorStructStructClass_1, locationDescriptorStructStructCtor_1,
+                                           value_locationName, value_floorNumber, value_areaType);
+                }
             }
             return value;
         }

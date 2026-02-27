@@ -334,9 +334,11 @@ struct TypeInfo
 namespace DeviceLocation {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type;
-    using DecodableType    = chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType &;
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BasicInformation::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DeviceLocation::Id; }

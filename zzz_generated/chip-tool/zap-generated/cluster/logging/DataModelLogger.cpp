@@ -13758,7 +13758,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("MaxPathsPerInvoke", 1, value);
         }
         case BasicInformation::Attributes::DeviceLocation::Id: {
-            chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("DeviceLocation", 1, value);
         }
@@ -15306,6 +15306,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::Clusters::BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ProductAppearance", 1, value);
+        }
+        case BridgedDeviceBasicInformation::Attributes::DeviceLocation::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DeviceLocation", 1, value);
         }
         case BridgedDeviceBasicInformation::Attributes::ConfigurationVersion::Id: {
             uint32_t value;
