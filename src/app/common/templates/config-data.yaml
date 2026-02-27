@@ -23,7 +23,6 @@ CommandHandlerInterfaceOnlyClusters:
     # CommandHandlerInterface and hence do not need generated command dispatch.
     # This uses asUpperCamelCase versions of the cluster name.
     # keep-sorted start
-    - Actions
     - Camera AV Settings User Level Management
     - Closure Control
     - Closure Dimension
@@ -114,6 +113,7 @@ CodeDrivenClusters:
     # keep-sorted start
     - Access Control
     - Activated Carbon Filter Monitoring
+    - Actions
     - Administrator Commissioning
     - Basic Information
     - Binding

@@ -11,23 +11,30 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-static_library("actions-server") {
-  sources = [
-    "ActionsCluster.cpp",
-    "ActionsCluster.h",
-    "actions-server.cpp",
-    "actions-server.h",
-  ]
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libTestAAAAAACluster"
+
+  test_sources = [ "TestActionsCluster.cpp" ]
+
+  # deps = [
+  #   "${chip_root}/src/app/clusters/actions-server",
+  #   "${chip_root}/src/app/server-cluster/testing:testing",
+  # ]
 
   public_deps = [
-    "${chip_root}/src/app:constants",
-    "${chip_root}/src/app:interaction-model",
-    "${chip_root}/src/app/server",
-    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/clusters/actions-server",
+    "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
+
+  cflags = [ "-Wconversion" ]
 }
