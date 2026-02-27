@@ -62,6 +62,7 @@ source_set("siwx-ncp") {
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sli_net_si91x_utility.c",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sli_wifi_power_profile.c",
 
     # wifi component
     "${wifi_sdk_root}/components/protocol/wifi/src/sl_wifi_basic_credentials.c",

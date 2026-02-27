@@ -130,7 +130,6 @@ source_set("wifi-platform") {
     sources += [
       "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
-      "${wifi_sdk_root}/components/protocol/wifi/src/sli_wifi_callback_framework.c",
       "${wifi_sdk_root}/components/service/network_manager/src/sli_net_common_utility.c",
     ]
 
