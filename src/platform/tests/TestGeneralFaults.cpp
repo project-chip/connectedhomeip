@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <pw_unit_test/framework.h>
 #include <platform/GeneralFaults.h>
+#include <pw_unit_test/framework.h>
 
 using namespace chip;
 using namespace chip::DeviceLayer;

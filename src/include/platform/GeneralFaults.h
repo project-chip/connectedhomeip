@@ -89,7 +89,7 @@ template <size_t N>
 inline CHIP_ERROR GeneralFaults<N>::remove(const uint8_t value)
 {
     int originalSize = mSize;
-    mSize = 0;
+    mSize            = 0;
     for (int i = 0; i < originalSize; ++i)
     {
         if (mData[i] != value)

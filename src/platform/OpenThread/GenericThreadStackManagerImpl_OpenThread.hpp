@@ -228,7 +228,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
 
                     // Remove kLinkDown fault if it was set, as the device is now connected.
                     GeneralFaults<kMaxNetworkFaults> current = mNetworkFaults;
-                    if (current.remove(to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown)) == CHIP_NO_ERROR)
+                    if (current.remove(to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown)) ==
+                        CHIP_NO_ERROR)
                     {
                         delegate->OnNetworkFaultChanged(mNetworkFaults, current);
                         mNetworkFaults = current;
