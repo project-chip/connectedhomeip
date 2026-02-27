@@ -125,7 +125,6 @@ CHIP_ERROR GroupcastLogic::ReadMaxMembershipCount(EndpointId endpoint, Attribute
     return aEncoder.Encode(groups.getMaxMembershipCount());
 }
 
-<<<<<<< HEAD
 CHIP_ERROR GroupcastLogic::ReadMaxMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     GroupDataProvider & groups = Provider();
@@ -137,11 +136,7 @@ CHIP_ERROR GroupcastLogic::ReadUsedMcastAddrCount(EndpointId endpoint, Attribute
     return aEncoder.Encode(mUsedMcastAddrCount);
 }
 
-Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data)
-=======
-Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data,
-                                 const chip::Access::SubjectDescriptor & subjectDescriptor)
->>>>>>> b7926c91a7 (Create event, but failing tests)
+Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data, const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     GroupDataProvider & groups = Provider();
     CHIP_ERROR err             = CHIP_NO_ERROR;

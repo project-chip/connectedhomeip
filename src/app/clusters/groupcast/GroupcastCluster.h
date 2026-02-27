@@ -64,7 +64,7 @@ private:
     // GroupcastLogic::Listener implementation
     void OnMembershipChanged() override;
     void OnUsedMcastAddrCountChange() override;
-    TimerDelegate & GetTimerDelegate() const { return mContext.timerDelegate; }
+    TimerDelegate & GetTimerDelegate() const { return mGroupcastContext.timerDelegate; }
 
     GroupcastContext mGroupcastContext;
     GroupcastLogic mLogic;
