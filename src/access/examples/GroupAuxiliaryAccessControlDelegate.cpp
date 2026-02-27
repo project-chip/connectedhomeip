@@ -201,76 +201,62 @@ private:
     GroupId mGroupId                                                       = kUndefinedGroupId;
 };
 
-class GroupAuxiliaryAccessControlDelegate : public AccessControl::Delegate
-{
-public:
-    GroupAuxiliaryAccessControlDelegate(Credentials::GroupDataProvider * groupDataProvider) : mGroupDataProvider(groupDataProvider) {}
-    ~GroupAuxiliaryAccessControlDelegate() override = default;
-
-    // Delegate implementation
-    CHIP_ERROR AuxiliaryEntries(EntryIterator & iterator, const FabricIndex * fabricIndex) const override
-    {
-        VerifyOrReturnError(fabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-        auto * delegate = Platform::New<AuxiliaryEntryIteratorDelegate>(mGroupDataProvider, *fabricIndex);
-        if (delegate)
-        {
-            iterator.SetDelegate(*delegate);
-            return CHIP_NO_ERROR;
-        }
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
-                     Privilege requestPrivilege) override
-    {
-        EntryIterator iterator;
-        ReturnErrorOnFailure(AuxiliaryEntries(iterator, &subjectDescriptor.fabricIndex));
-
-        Entry entry;
-        while (iterator.Next(entry) == CHIP_NO_ERROR)
-        {
-            // Simplest form of Auxliliary ACL Entry format assumes only 1 subject and 1 target per entry.
-            // With more compelx ACL entry format, checks should be done accross all subjects and targets
-            size_t numSubjects;
-            size_t numTargets;
-            ReturnErrorOnFailure(entry.GetSubjectCount(numSubjects));
-            ReturnErrorOnFailure(entry.GetTargetCount(numTargets));
-            VerifyOrReturnError(numSubjects == 1, CHIP_ERROR_SENTINEL);
-            VerifyOrReturnError(numTargets == 1, CHIP_ERROR_SENTINEL);
-
-            NodeId subjectFromEntry;
-            ReturnErrorOnFailure(entry.GetSubject(0, subjectFromEntry));
-            if (subjectFromEntry != subjectDescriptor.subject) {
-                continue;
-            }
-
-            Target targetFromEntry;
-            ReturnErrorOnFailure(entry.GetTarget(0, targetFromEntry));
-            if (targetFromEntry.endpoint != requestPath.endpoint) {
-                continue;
-            }
-
-            return CHIP_NO_ERROR;
-        }
-
-        return CHIP_ERROR_ACCESS_DENIED;
-    }
-
-private:
-    Credentials::GroupDataProvider * mGroupDataProvider;
-};
-
 } // namespace
 
 namespace chip {
 namespace Access {
 namespace Examples {
 
-AccessControl::Delegate * GetGroupAuxiliaryAccessControlDelegate()
+CHIP_ERROR GroupAuxiliaryAccessControlDelegate::AuxiliaryEntries(AccessControl::EntryIterator & iterator,
+                                                                 const FabricIndex * fabricIndex) const
 {
-    static GroupAuxiliaryAccessControlDelegate accessControlDelegate(Credentials::GetGroupDataProvider());
-    return &accessControlDelegate;
+    VerifyOrReturnError(fabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto * delegate = Platform::New<AuxiliaryEntryIteratorDelegate>(mGroupDataProvider, *fabricIndex);
+    if (delegate)
+    {
+        iterator.SetDelegate(*delegate);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_NO_MEMORY;
+}
+
+CHIP_ERROR GroupAuxiliaryAccessControlDelegate::Check(const SubjectDescriptor & subjectDescriptor,
+                                                      const RequestPath & requestPath, Privilege requestPrivilege)
+{
+    AccessControl::EntryIterator iterator;
+    ReturnErrorOnFailure(AuxiliaryEntries(iterator, &subjectDescriptor.fabricIndex));
+
+    AccessControl::Entry entry;
+    while (iterator.Next(entry) == CHIP_NO_ERROR)
+    {
+        // Simplest form of Auxliliary ACL Entry format assumes only 1 subject and 1 target per entry.
+        // With more compelx ACL entry format, checks should be done accross all subjects and targets
+        size_t numSubjects;
+        size_t numTargets;
+        ReturnErrorOnFailure(entry.GetSubjectCount(numSubjects));
+        ReturnErrorOnFailure(entry.GetTargetCount(numTargets));
+        VerifyOrReturnError(numSubjects == 1, CHIP_ERROR_SENTINEL);
+        VerifyOrReturnError(numTargets == 1, CHIP_ERROR_SENTINEL);
+
+        NodeId subjectFromEntry;
+        ReturnErrorOnFailure(entry.GetSubject(0, subjectFromEntry));
+        if (subjectFromEntry != subjectDescriptor.subject)
+        {
+            continue;
+        }
+
+        AccessControl::Entry::Target targetFromEntry;
+        ReturnErrorOnFailure(entry.GetTarget(0, targetFromEntry));
+        if (targetFromEntry.endpoint != requestPath.endpoint)
+        {
+            continue;
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_ACCESS_DENIED;
 }
 
 } // namespace Examples

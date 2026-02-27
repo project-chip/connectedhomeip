@@ -19,23 +19,29 @@
 #pragma once
 
 #include "access/AccessControl.h"
+#include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
 namespace Access {
 namespace Examples {
 
-/**
- * @brief Get a global instance of the access control delegate implemented in this module.
- *        This delegate will only be used for group auxiliary access control, and should be 
- *        used seperately from the regular delegate used in the access control module. 
- *
- * NOTE: This function should be followed by an ::Init() method call. This function does
- *       not manage lifecycle considerations.
- *
- * @return a pointer to the AccessControl::Delegate singleton.
- */
-AccessControl::Delegate * GetGroupAuxiliaryAccessControlDelegate();
+class GroupAuxiliaryAccessControlDelegate : public AccessControl::Delegate
+{
+public:
+    GroupAuxiliaryAccessControlDelegate(Credentials::GroupDataProvider * groupDataProvider) : mGroupDataProvider(groupDataProvider) {}
+    ~GroupAuxiliaryAccessControlDelegate() override = default;
+
+    // Delegate implementation
+    CHIP_ERROR AuxiliaryEntries(AccessControl::EntryIterator & iterator, const FabricIndex * fabricIndex) const override;
+
+    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                     Privilege requestPrivilege) override;
+
+
+private:
+    Credentials::GroupDataProvider * mGroupDataProvider;
+};
 
 } // namespace Examples
 } // namespace Access

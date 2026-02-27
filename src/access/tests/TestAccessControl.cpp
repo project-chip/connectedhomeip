@@ -42,6 +42,7 @@ constexpr uint16_t kMaxGroupKeysPerFabric        = 8;
 chip::TestPersistentStorageDelegate gTestStorage;
 chip::Crypto::DefaultSessionKeystore gSessionKeystore;
 chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+chip::Access::Examples::GroupAuxiliaryAccessControlDelegate gGroupAuxiliaryAccessControlDelegate(&gGroupsProvider);
 
 } // namespace
 
@@ -1220,9 +1221,7 @@ public: // protected
         chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
 
         // Register group auxilary access control delegate
-        AccessControl::Delegate * groupAuxiliaryAccessDelegate = Examples::GetGroupAuxiliaryAccessControlDelegate();
-        ASSERT_NE(groupAuxiliaryAccessDelegate, nullptr);
-        SuccessOrDie(GetAccessControl().RegisterGroupAuxiliaryDelegate(groupAuxiliaryAccessDelegate));
+        SuccessOrDie(GetAccessControl().RegisterGroupAuxiliaryDelegate(&gGroupAuxiliaryAccessControlDelegate));
 
     }
     static void TearDownTestSuite()
@@ -2019,7 +2018,7 @@ TEST_F(TestAccessControl, TestFabricFilteredReadEntry)
 TEST_F(TestAccessControl, TestGroupAuxiliaryDelegateRegistration)
 {
     // The delegate is already registered in SetUpTestSuite.
-    AccessControl::Delegate * delegate = Examples::GetGroupAuxiliaryAccessControlDelegate();
+    AccessControl::Delegate * delegate = &gGroupAuxiliaryAccessControlDelegate;
 
     // Verify registering again fails.
     EXPECT_EQ(accessControl.RegisterGroupAuxiliaryDelegate(delegate), CHIP_ERROR_INCORRECT_STATE);
@@ -2072,15 +2071,17 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntries)
         info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
         EXPECT_EQ(provider->SetGroupInfo(fabric2, info), CHIP_NO_ERROR);
         EXPECT_EQ(provider->AddEndpoint(fabric2, info.group_id, 30), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric2, info.group_id, 40), CHIP_NO_ERROR);
     }
 
-    // Set up group data for fabric 2, WITHOUT kHasAuxiliaryACL
+    // Set up group data for fabric 2, WITHOUT kHasAuxiliaryACL. This group information
+    // should not appear in any auxiliary ACL entry.
     {
         Credentials::GroupDataProvider::GroupInfo info;
         info.group_id = 0x4444;
         info.SetName("Group 4");
         EXPECT_EQ(provider->SetGroupInfo(fabric2, info), CHIP_NO_ERROR);
-        EXPECT_EQ(provider->AddEndpoint(fabric2, info.group_id, 40), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric2, info.group_id, 50), CHIP_NO_ERROR);
     }
 
     // Define Golden Sets (The base equivalence classes) that are expected
@@ -2090,7 +2091,8 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntries)
     };
 
     std::set<AuxiliaryEquivalenceEntry> expectedFabric2 = {
-        { .fabricIndex = fabric2, .groupId = 0x3333, .endpointId = 30 }
+        { .fabricIndex = fabric2, .groupId = 0x3333, .endpointId = 30 },
+        { .fabricIndex = fabric2, .groupId = 0x3333, .endpointId = 40 },
     };
 
     // Execute Validation
