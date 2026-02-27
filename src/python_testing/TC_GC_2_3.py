@@ -84,7 +84,7 @@ class TC_GC_2_3(MatterBaseTest):
         self.step("1a")
         ln_enabled, sd_enabled, pga_enabled = await get_feature_map(self)
         endpoints_list = await valid_endpoints_list(self, ln_enabled)
-        if ln_enabled and not endpoints_list:
+        if ln_enabled and endpoints_list:
             endpoints_list = [endpoints_list[0]]
 
         self.step("1b")
