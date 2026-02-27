@@ -54,6 +54,10 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
     SuccessOrExit(err);
 
+#if CHIP_DEVICE_LAYER_TARGET_BL702 || CHIP_DEVICE_LAYER_TARGET_BL702L
+    mbedtls_platform_set_calloc_free(pvPortCalloc, vPortFree);
+#endif
+
 exit:
     return err;
 }
@@ -156,16 +160,9 @@ extern "C" ot_system_event_t otrGetNotifyEvent(void)
 
 extern "C" void otrNotifyEvent(ot_system_event_t sevent)
 {
-    if (xPortIsInsideInterrupt())
-    {
-        ot_system_event_var = (ot_system_event_t) (ot_system_event_var | sevent);
-    }
-    else
-    {
-        uint32_t tag        = otrEnterCrit();
-        ot_system_event_var = (ot_system_event_t) (ot_system_event_var | sevent);
-        otrExitCrit(tag);
-    }
+    uint32_t tag        = otrEnterCrit();
+    ot_system_event_var = (ot_system_event_t) (ot_system_event_var | sevent);
+    otrExitCrit(tag);
 
     otSysEventSignalPending();
 }

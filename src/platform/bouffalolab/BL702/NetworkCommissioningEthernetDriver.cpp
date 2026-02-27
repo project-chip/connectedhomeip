@@ -1,6 +1,6 @@
 /*
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+ *
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,25 +15,31 @@
  *    limitations under the License.
  */
 
+extern "C" {
 #include <eth_bd.h>
+}
 #include <lwip/dhcp6.h>
 #include <lwip/netifapi.h>
 
-#include "EthernetInterface.h"
+#include <lib/support/SafePointerCast.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
+
+#include <EthernetInterface.h>
+
+using namespace chip::DeviceLayer::Internal;
+
+extern "C" struct netif * deviceInterface_getNetif(void)
+{
+    return &eth_mac;
+}
+
+namespace chip {
+namespace DeviceLayer {
+namespace NetworkCommissioning {
+
 static struct dhcp6 dhcp6_val;
 static netif_ext_callback_t netifExtCallback;
-
-static void netif_status_callback(struct netif * netif)
-{
-    if ((netif->flags & NETIF_FLAG_UP) && !ip4_addr_isany(netif_ip4_addr(netif)))
-    {
-        printf("IP: %s\r\n", ip4addr_ntoa(netif_ip4_addr(netif)));
-        printf("MASK: %s\r\n", ip4addr_ntoa(netif_ip4_netmask(netif)));
-        printf("Gateway: %s\r\n", ip4addr_ntoa(netif_ip4_gw(netif)));
-
-        ethernetInterface_eventGotIP(netif);
-    }
-}
 
 static int ethernet_callback(eth_link_state val)
 {
@@ -61,19 +67,37 @@ static int ethernet_callback(eth_link_state val)
     return 0;
 }
 
-void ethernetInterface_init(void)
+CHIP_ERROR BflbEthernetDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     netif_add(&eth_mac, NULL, NULL, NULL, NULL, eth_init, ethernet_input);
 
     ethernet_init(ethernet_callback);
 
-    /* Set callback to be called when interface is brought up/down or address is changed while up */
-    netif_set_status_callback(&eth_mac, netif_status_callback);
-
     netif_add_ext_callback(&netifExtCallback, network_netif_ext_callback);
+
+    return CHIP_NO_ERROR;
 }
 
-struct netif * deviceInterface_getNetif(void)
+NetworkIterator * BflbEthernetDriver::GetNetworks()
 {
-    return &eth_mac;
+    auto ret = new EthernetNetworkIterator();
+    memset(ret->interfaceName, 0, sizeof(ret->interfaceName));
+    if (netif_index_to_name(0, SafePointerCast<char *>(ret->interfaceName)))
+    {
+        ret->interfaceNameLen = NETIF_NAMESIZE;
+    }
+    else
+    {
+        ret->interfaceNameLen = 0;
+    }
+    return ret;
 }
+
+void BflbEthernetDriver::Shutdown()
+{
+    netif_remove_ext_callback(&netifExtCallback);
+}
+
+} // namespace NetworkCommissioning
+} // namespace DeviceLayer
+} // namespace chip
