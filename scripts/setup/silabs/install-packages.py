@@ -63,23 +63,6 @@ def make_executable(path):
     else:
         logger.warning("Path %s does not exist to make executable.", path)
 
-
-def find_slt_in_path():
-    """Return path to slt if found in PATH, else None."""
-    try:
-        result = subprocess.run(
-            ["which", "slt"],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if result.returncode == 0 and result.stdout.strip():
-            return result.stdout.strip()
-    except (subprocess.SubprocessError, FileNotFoundError):
-        pass
-    return None
-
-
 def download_slt_cli():
     """Download and extract SLT CLI tool to script directory."""
     platform_name, slt_cli_url = get_platform_vars()
