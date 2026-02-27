@@ -31,7 +31,6 @@
 #include <platform/ThreadStackManager.h>
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
