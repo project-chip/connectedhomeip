@@ -69,3 +69,13 @@ source_set("deferred") {
     "${chip_root}/src/system",
   ]
 }
+
+source_set("migration") {
+  sources = [
+    "AttributePersistenceMigration.cpp",
+    "AttributePersistenceMigration.h",
+  ]
+
+  public_deps = [ ":default" ]
+  deps = [ "${chip_root}/src/app:attribute-persistence" ]
+}
