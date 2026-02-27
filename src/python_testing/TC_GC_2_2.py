@@ -38,7 +38,7 @@ import logging
 import secrets
 
 from mobly import asserts
-from TC_GCAST_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
+from TC_GC_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
@@ -51,15 +51,15 @@ from matter.tlv import uint
 logger = logging.getLogger(__name__)
 
 
-class TC_GCAST_2_2(MatterBaseTest):
-    def desc_TC_GCAST_2_2(self):
-        return "[TC-GCAST-2.2] JoinGroup as Listener or Sender with DUT as Server - Provisional"
+class TC_GC_2_2(MatterBaseTest):
+    def desc_TC_GC_2_2(self):
+        return "[TC-GC-2.2] JoinGroup as Listener or Sender with DUT as Server - Provisional"
 
-    def steps_TC_GCAST_2_2(self):
+    def steps_TC_GC_2_2(self):
         return [TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
                 TestStep("1b", "TH removes any existing group and KeySetID on the DUT"),
                 TestStep("1c", "Th subscribes to Membership attribute with min interval 0s and max interval 30s"),
-                TestStep(2, "If GCAST.S.F00(LN) feature is not supported on the cluster, skip to step 14"),
+                TestStep(2, "If GC.S.F00(LN) feature is not supported on the cluster, skip to step 14"),
                 TestStep("3a", "Attempt to join Group G1 with a new Key with KeySetID K1 on Endpoint EP1"),
                 TestStep("3b", "TH awaits subscription report of new membership within max interval"),
                 TestStep("4a", "If DUT only support one non-root and non-aggregator endpoint, skip to step 6a"),
@@ -91,19 +91,20 @@ class TC_GCAST_2_2(MatterBaseTest):
                 TestStep(20, "JoinGroup with invalid GroupID (result: constraint error)"),
                 TestStep(21, "JoinGroup with Key length != 16 (result: constraint error)")]
 
-    def pics_TC_GCAST_2_2(self) -> list[str]:
-        return ["GCAST.S"]
+    def pics_TC_GC_2_2(self) -> list[str]:
+        return ["GC.S"]
 
     @run_if_endpoint_matches(has_cluster(Clusters.Groupcast))
-    async def test_TC_GCAST_2_2(self):
+    async def test_TC_GC_2_2(self):
         groupcast_cluster = Clusters.Objects.Groupcast
         membership_attribute = Clusters.Groupcast.Attributes.Membership
+        endpoints_list_empty = []
 
         # Commission DUT to TH (can be skipped if done in a preceding test)
         self.step("1a")
         ln_enabled, sd_enabled, pga_enabled = await get_feature_map(self)
         endpoints_list = await valid_endpoints_list(self, ln_enabled)
-        if endpoints_list[0] is None:
+        if ln_enabled and not endpoints_list:
             self.mark_all_remaining_steps_skipped("1b")
             return
 
@@ -127,7 +128,7 @@ class TC_GCAST_2_2(MatterBaseTest):
         membership_sub = AttributeSubscriptionHandler(groupcast_cluster, membership_attribute)
         await membership_sub.start(self.default_controller, self.dut_node_id, self.get_endpoint(), min_interval_sec=0, max_interval_sec=30)
 
-        # If GCAST.S.F00(LN) feature is not supported on the cluster, skip to step 12
+        # If GC.S.F00(LN) feature is not supported on the cluster, skip to step 12
         self.step(2)
         if not ln_enabled:
             self.mark_step_range_skipped("3a", 13)
@@ -266,7 +267,6 @@ class TC_GCAST_2_2(MatterBaseTest):
                                      f"Send JoinGroup command error should be {Status.UnsupportedEndpoint} instead of {e.status}")
 
             # If Sender is supported in DUT, skip this step. Else, attempt to join Group G3 with an empty endpoints list (result: constraint error)
-            endpoints_list_empty = []
             if sd_enabled:
                 self.skip_step(11)
             else:
@@ -313,7 +313,7 @@ class TC_GCAST_2_2(MatterBaseTest):
                         groupID=groupID3,
                         endpoints=[endpoint1],
                         keySetID=keySetID1,
-                        mcastAddrPolicy=Clusters.Groupcast.McastAddrPolicy.PerGroup)
+                        mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kPerGroup)
                     )
                     asserts.fail(
                         "JoinGroup command should have failed because McastAddrPolicy is not supported, but it still succeeded")
