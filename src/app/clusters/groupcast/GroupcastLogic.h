@@ -102,7 +102,7 @@ private:
     Status RemoveGroup(FabricIndex fabric_index, GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
                        EndpointList * endpoints);
     Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id, EndpointList * endpoints);
-    uint16_t GetUsedMcastAddrCount();
+    uint16_t UpdateUsedMcastAddrCount();
     // GroupListener implementation
     void OnGroupAdded(FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group) override;
     void OnGroupRemoved(FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override;
@@ -114,6 +114,7 @@ private:
     const BitFlags<Groupcast::Feature> mFeatures;
     DataModel::Provider * mDataModelProvider = nullptr;
     uint16_t mUsedMcastAddrCount             = 0;
+    bool mIanaAddressUsed                    = false;
     Listener * mListener                     = nullptr;
 };
 
