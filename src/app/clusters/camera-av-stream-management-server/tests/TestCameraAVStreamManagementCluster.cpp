@@ -92,8 +92,9 @@ public:
     MockCameraAVStreamManagementDelegate(std::vector<VideoStreamStruct> * videoStreams,
                                          std::vector<AudioStreamStruct> * audioStreams,
                                          std::vector<SnapshotStreamStruct> * snapshotStreams) :
-        mAllocatedVideoStreams(videoStreams), mAllocatedAudioStreams(audioStreams), mAllocatedSnapshotStreams(snapshotStreams),
-        mAudioStreamCount(0), mVideoStreamCount(0), mSnapshotStreamCount(0)
+        mAllocatedVideoStreams(videoStreams),
+        mAllocatedAudioStreams(audioStreams), mAllocatedSnapshotStreams(snapshotStreams), mAudioStreamCount(0),
+        mVideoStreamCount(0), mSnapshotStreamCount(0)
     {}
 
     Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs, uint16_t & outStreamID) override

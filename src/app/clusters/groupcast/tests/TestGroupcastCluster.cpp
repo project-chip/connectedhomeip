@@ -147,8 +147,7 @@ struct TestGroupcastCluster : public ::testing::Test
                       const Protocols::InteractionModel::Status expected)
     {
         ASSERT_TRUE(status.has_value());
-        EXPECT_EQ(status->GetStatusCode().GetStatus(),
-                  expected);
+        EXPECT_EQ(status->GetStatusCode().GetStatus(), expected);
     }
 
     TestServerClusterContext mTestContext;

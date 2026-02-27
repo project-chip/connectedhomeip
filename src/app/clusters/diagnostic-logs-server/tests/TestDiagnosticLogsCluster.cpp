@@ -151,8 +151,7 @@ TEST_F(TestDiagnosticLogsCluster, Bdx_WithDelegate_kExhausted_with_buffer_greate
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
     EXPECT_EQ(result.response->status, DiagnosticLogs::StatusEnum::kExhausted);
-    EXPECT_EQ(result.response->logContent.size(),
-              static_cast<size_t>(chip::bdx::DiagnosticLogs::kMaxLogContentSize));
+    EXPECT_EQ(result.response->logContent.size(), static_cast<size_t>(chip::bdx::DiagnosticLogs::kMaxLogContentSize));
 }
 
 TEST_F(TestDiagnosticLogsCluster, ResponsePayload_NoDelegate_NoLogs)
