@@ -26,7 +26,7 @@ namespace LaundryDryerControls {
 
 CHIP_ERROR ChefDelegate::GetSupportedDrynessLevelAtIndex(size_t index, DrynessLevelEnum & supportedDryness)
 {
-    if (index >= ArraySize(mSupportedDrynessLevels))
+    if (index >= MATTER_ARRAY_SIZE(mSupportedDrynessLevels))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
