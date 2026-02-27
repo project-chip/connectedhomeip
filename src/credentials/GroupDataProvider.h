@@ -218,6 +218,19 @@ public:
          *  @param[in] old_group  GroupInfo structure of the removed group.
          */
         virtual void OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group) = 0;
+        /**
+         *  Callback invoked when an existing group is modified.
+         *  The modifications may be any of the following:
+         *  - Endpoints List modified
+         *  - KeySetID modified
+         *  - Flags modified (kHasAuxiliaryACL or kMcastAddrPolicy)
+         *
+         * Note that this callback is not invoked when the group is added or removed.
+         * Those events are handled by the OnGroupAdded and OnGroupRemoved callbacks respectively.
+         *
+         *  @param[in] modified_group_id  ID of the modified group.
+         */
+        virtual void OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id){};
     };
 
     using GroupInfoIterator    = CommonIterator<GroupInfo>;
@@ -402,6 +415,16 @@ protected:
             if (listener != nullptr)
             {
                 listener->OnGroupRemoved(fabric_index, old_group);
+            }
+        }
+    }
+    void GroupModified(FabricIndex fabric_index, const GroupId & modified_group_id)
+    {
+        for (auto * listener : mListeners)
+        {
+            if (listener != nullptr)
+            {
+                listener->OnGroupModified(fabric_index, modified_group_id);
             }
         }
     }

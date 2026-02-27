@@ -159,37 +159,32 @@ config CHIP_SE05X_RND_GEN
 	help
 		Enable SE05x Secure element for offloading random number generation.
 
-config CHIP_SE05X_GENERATE_EC_KEY
-	bool "Enable SE05x Secure element for EC key Generate"
-	default y
-	help
-		Enable SE05x Secure element for EC key Generate.
-
-config CHIP_SE05X_ECDSA_VERIFY
-	bool "Enable SE05x Secure element for ECDSA Verify"
-	default y
-	help
-		Enable SE05x Secure element for ECDSA Verify.
-
-config CHIP_SE05X_PBKDF2_SHA256
-	bool "Enable SE05x Secure element for PBKDF2_SHA256"
-	help
-		Enable SE05x Secure element for PBKDF2_SHA256.
-
-config CHIP_SE05X_HKDF_SHA256
-	bool "Enable SE05x Secure element for HKDF_SHA256"
-	help
-		Enable SE05x Secure element for HKDF_SHA256.
-
-config CHIP_SE05X_HMAC_SHA256
-	bool "Enable SE05x Secure element for HMAC_SHA256"
-	help
-		Enable SE05x Secure element for HMAC_SHA256.
-
 config CHIP_SE05X_DEVICE_ATTESTATION
 	bool "Enable SE05x Secure element for offloading Device attestation Sign"
 	help
 		Enable SE05x Secure element for offloading Device attestation Sign.
+
+config CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
+	bool "Enable SE05x Secure element for offloading spake verifier and use the trust provisioned w0 and L values"
+	depends on CHIP_SE05X_SPAKE_VERIFIER
+	depends on CHIP_FACTORY_DATA
+	default n
+	help
+		Enable SE05x Secure element for offloading spake verifier and use the trust provisioned w0 and L values. This
+		should be enable only if factory data is configured.
+
+config CHIP_SE05X_SPAKE_VERIFIER_TP_SET_NO
+	int "SE05x Trust Provisioned spake verifier set number"
+	default 1
+	range 1 3
+	help
+		SE05x Trust Provisioned spake verifier set number.
+
+config CHIP_SE05X_SPAKE_VERIFIER_TP_ITER_CNT
+	int "SE05x Trust Provisioned spake verifier iteration count"
+	default 1000
+	help
+		SE05x Trust Provisioned spake verifier iteration count.
 
 endif # CHIP_SE05X
 

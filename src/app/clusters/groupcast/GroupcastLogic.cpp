@@ -40,7 +40,7 @@ CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor 
 
     GroupDataProvider * groups = &Provider();
 
-    CHIP_ERROR err = aEncoder.EncodeList([fabric_index, groups](const auto & encoder) -> CHIP_ERROR {
+    CHIP_ERROR err = aEncoder.EncodeList([fabric_index, groups, this](const auto & encoder) -> CHIP_ERROR {
         EndpointList endpoints;
         CHIP_ERROR status              = CHIP_NO_ERROR;
         GroupInfoIterator * group_iter = groups->IterateGroupInfo(fabric_index);
@@ -70,9 +70,13 @@ CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor 
             group.fabricIndex     = fabric_index;
             group.groupID         = info.group_id;
             group.keySetID        = keyset_id;
-            group.hasAuxiliaryACL = MakeOptional(info.HasAuxiliaryACL());
             group.mcastAddrPolicy = info.UsePerGroupAddress() ? Groupcast::MulticastAddrPolicyEnum::kPerGroup
                                                               : Groupcast::MulticastAddrPolicyEnum::kIanaAddr;
+            if (mFeatures.Has(Groupcast::Feature::kListener))
+            {
+                group.hasAuxiliaryACL = MakeOptional(info.HasAuxiliaryACL());
+            }
+
             // Return endpoints in kMaxMembershipEndpoints chunks or less
             size_t group_total = end_iter->Count();
             size_t group_count = 0;
@@ -92,6 +96,12 @@ CHIP_ERROR GroupcastLogic::ReadMembership(const chip::Access::SubjectDescriptor 
             end_iter->Release();
             if (group_count == 0)
             {
+                if (mFeatures.Has(Groupcast::Feature::kListener))
+                {
+                    // If listener is supported, the membership SHALL contain the endpoints list.
+                    group.endpoints = MakeOptional(DataModel::List<const chip::EndpointId>());
+                }
+
                 status = encoder.Encode(group);
             }
         }
@@ -258,6 +268,12 @@ Status GroupcastLogic::LeaveGroup(FabricIndex fabric_index, const Groupcast::Com
 
 Status GroupcastLogic::UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data)
 {
+    // Validate that the group exists early before trying to set the keyset
+    GroupDataProvider::GroupInfo info;
+    CHIP_ERROR err = Provider().GetGroupInfo(fabric_index, data.groupID, info);
+    VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
+    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+
     return SetKeySet(fabric_index, data.groupID, data.keySetID, data.key);
 }
 
@@ -417,12 +433,7 @@ void GroupcastLogic::OnGroupAdded(FabricIndex fabric_index, const GroupInfo & ne
     (void) fabric_index;
     (void) new_group;
     NotifyMembershipChanged();
-    uint16_t address_count = GetUsedMcastAddrCount();
-    if (address_count != mUsedMcastAddrCount)
-    {
-        mUsedMcastAddrCount = address_count;
-        NotifyUsedMcastAddrCountChange();
-    }
+    NotifyUsedMcastAddrCountOnChange();
 }
 
 void GroupcastLogic::OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group)
@@ -430,12 +441,15 @@ void GroupcastLogic::OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & 
     (void) fabric_index;
     (void) old_group;
     NotifyMembershipChanged();
-    uint16_t address_count = GetUsedMcastAddrCount();
-    if (address_count != mUsedMcastAddrCount)
-    {
-        mUsedMcastAddrCount = address_count;
-        NotifyUsedMcastAddrCountChange();
-    }
+    NotifyUsedMcastAddrCountOnChange();
+}
+
+void GroupcastLogic::OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id)
+{
+    (void) fabric_index;
+    (void) modified_group_id;
+    NotifyMembershipChanged();
+    NotifyUsedMcastAddrCountOnChange();
 }
 
 uint16_t GroupcastLogic::GetUsedMcastAddrCount()
@@ -473,11 +487,16 @@ void GroupcastLogic::NotifyMembershipChanged()
     }
 }
 
-void GroupcastLogic::NotifyUsedMcastAddrCountChange()
+void GroupcastLogic::NotifyUsedMcastAddrCountOnChange()
 {
-    if (mListener != nullptr)
+    uint16_t new_count = GetUsedMcastAddrCount();
+    if (new_count != mUsedMcastAddrCount)
     {
-        mListener->OnUsedMcastAddrCountChange();
+        mUsedMcastAddrCount = new_count;
+        if (mListener != nullptr)
+        {
+            mListener->OnUsedMcastAddrCountChange();
+        }
     }
 }
 

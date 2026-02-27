@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -249,6 +249,12 @@
 #ifdef CONFIG_CHIP_EXTENDED_DISCOVERY
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
 #endif // CONFIG_CHIP_EXTENDED_DISCOVERY
+
+#ifdef CONFIG_CHIP_BLE_EXT_ADVERTISING
+#define CHIP_DEVICE_CONFIG_EXT_ADVERTISING 1
+#endif // CONFIG_CHIP_BLE_EXT_ADVERTISING
+
+#define CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS (CONFIG_CHIP_BLE_ADVERTISING_DURATION * 60)
 
 #ifndef CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL
 #ifdef CONFIG_CHIP_ICD_SLOW_POLL_INTERVAL
