@@ -38,7 +38,14 @@ namespace ClosureControl {
 
 ClosureControlCluster::ClosureControlCluster(EndpointId endpointId, const Context & context) :
     DefaultServerCluster({ endpointId, ClosureControl::Id }), mMatterContext(endpointId), mDelegate(context.delegate),
-    mConformance(context.conformance)
+    mConformance(context.conformance), mEnabledOptionalAttributes([&]() {
+        OptionalAttributesSet attrs;
+        attrs.Set<ClosureControl::Attributes::CountdownTime::Id>(
+            context.conformance.OptionalAttributes().Has(OptionalAttributeEnum::kCountdownTime) &&
+            context.conformance.HasFeature(Feature::kPositioning) && !context.conformance.HasFeature(Feature::kInstantaneous));
+        attrs.Set<ClosureControl::Attributes::LatchControlModes::Id>(context.conformance.HasFeature(Feature::kMotionLatching));
+        return attrs;
+    }())
 {
     VerifyOrDieWithMsg(context.conformance.Valid(), AppServer, "Invalid conformance");
     LogErrorOnFailure(SetMainState(context.initParams.mMainState));
@@ -50,17 +57,14 @@ ClosureControlCluster::~ClosureControlCluster() {}
 CHIP_ERROR ClosureControlCluster::Attributes(const ConcreteClusterPath & path,
                                              ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    AttributeListBuilder listBuilder(builder);
-
-    const ClusterConformance & conformance = mConformance;
-
-    const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { conformance.HasFeature(Feature::kPositioning) && !conformance.HasFeature(Feature::kInstantaneous),
-          CountdownTime::kMetadataEntry },
-        { conformance.HasFeature(Feature::kMotionLatching), LatchControlModes::kMetadataEntry },
+    static constexpr DataModel::AttributeEntry optionalAttributes[] = {
+        CountdownTime::kMetadataEntry,
+        LatchControlModes::kMetadataEntry,
     };
 
-    return listBuilder.Append(Span(ClosureControl::Attributes::kMandatoryMetadata), Span(optionalAttributes));
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(ClosureControl::Attributes::kMandatoryMetadata), Span(optionalAttributes),
+                              mEnabledOptionalAttributes);
 }
 
 CHIP_ERROR ClosureControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
@@ -80,12 +84,12 @@ CHIP_ERROR ClosureControlCluster::AcceptedCommands(const ConcreteClusterPath & p
         ClosureControl::Commands::Calibrate::kMetadataEntry,
     };
 
-    ReturnErrorOnFailure(builder.ReferenceExisting(kMandatoryCommands));
-
     if (!conformance.HasFeature(Feature::kInstantaneous))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kStopCommand));
     }
+
+    ReturnErrorOnFailure(builder.ReferenceExisting(kMandatoryCommands));
 
     if (conformance.HasFeature(Feature::kCalibration))
     {

@@ -20,6 +20,7 @@
 
 #include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/ClosureControl/Attributes.h>
 #include <clusters/ClosureControl/Commands.h>
 #include <clusters/ClosureControl/Metadata.h>
@@ -147,6 +148,12 @@ struct ClusterInitParameters
  */
 class ClosureControlCluster : public DefaultServerCluster
 {
+private:
+    using OptionalAttributesSet = OptionalAttributeSet<   //
+        ClosureControl::Attributes::CountdownTime::Id,    //
+        ClosureControl::Attributes::LatchControlModes::Id //
+        >;
+
 public:
     /**
      * @brief Context structure for injecting dependencies into the cluster.
@@ -383,6 +390,7 @@ private:
     ClosureControlClusterDelegate & mDelegate;
     ClusterConformance mConformance;
     ClusterState mState;
+    const OptionalAttributesSet mEnabledOptionalAttributes;
 
     DataModel::ActionReturnStatus HandleStopCommand(CommandHandler & handler, const ConcreteCommandPath & path);
     DataModel::ActionReturnStatus HandleMoveToCommand(CommandHandler & handler, const ConcreteCommandPath & path,

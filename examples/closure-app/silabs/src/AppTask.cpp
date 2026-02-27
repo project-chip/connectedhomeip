@@ -167,7 +167,7 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
                 if (ClosureManager::GetInstance().IsClosureControlMotionInProgress())
                 {
                     // Stop the current action
-                    auto status = ClosureManager::GetInstance().GetClosureControlLogic().HandleStop();
+                    auto status = ClosureManager::GetInstance().GetClosureControlCluster().HandleStop();
                     if (status != Protocols::InteractionModel::Status::Success)
                     {
                         ChipLogError(AppServer, "Failed to stop closure action: %u", to_underlying(status));
@@ -176,7 +176,7 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
                 else
                 {
                     DataModel::Nullable<ClosureControl::GenericOverallCurrentState> currentState;
-                    CHIP_ERROR err = ClosureManager::GetInstance().GetClosureControlLogic().GetOverallCurrentState(currentState);
+                    CHIP_ERROR err = ClosureManager::GetInstance().GetClosureControlCluster().GetOverallCurrentState(currentState);
 
                     if (err != CHIP_NO_ERROR)
                     {
@@ -217,8 +217,8 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
                     }
 
                     // Move to the target position with latch set to false and preserved speed value
-                    auto status = ClosureManager::GetInstance().GetClosureControlLogic().HandleMoveTo(MakeOptional(targetPosition),
-                                                                                                      latch, speed);
+                    auto status = ClosureManager::GetInstance().GetClosureControlCluster().HandleMoveTo(
+                        MakeOptional(targetPosition), latch, speed);
                     if (status != Protocols::InteractionModel::Status::Success)
                     {
                         ChipLogError(AppServer, "Failed to move closure to target position: %u", to_underlying(status));

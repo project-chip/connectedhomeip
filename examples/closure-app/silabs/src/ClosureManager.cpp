@@ -802,8 +802,8 @@ void ClosureManager::HandleClosureMotionAction()
                         mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(false);
                     }
                 }
-                TEMPORARY_RETURN_IGNORED instance.mClosureEndpoint1.GetClusterInstance().SetOverallCurrentState(
-                    mClosureEndpoint1CurrentState);
+                LogErrorOnFailure(
+                    instance.mClosureEndpoint1.GetClusterInstance().SetOverallCurrentState(mClosureEndpoint1CurrentState));
                 mClosurePanelEndpoint2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
                 TEMPORARY_RETURN_IGNORED instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(
                     mClosurePanelEndpoint2CurrentState);
@@ -978,8 +978,8 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
 
             mClosureEndpoint1OverallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
             mClosureEndpoint1OverallCurrentState.Value().secureState.SetNonNull(false);
-            TEMPORARY_RETURN_IGNORED mClosureEndpoint1.GetClusterInstance().SetOverallCurrentState(
-                mClosureEndpoint1OverallCurrentState);
+            LogErrorOnFailure(mClosureEndpoint1.GetClusterInstance().SetOverallCurrentState(
+                mClosureEndpoint1OverallCurrentState));
 
             panelCurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
             TEMPORARY_RETURN_IGNORED panelEp->GetLogic().SetCurrentState(panelCurrentState);
@@ -1041,8 +1041,8 @@ void ClosureManager::HandleClosureUnlatchAction()
             ChipLogProgress(AppServer, "Performing unlatch action");
             mClosureEndpoint1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
             mClosureEndpoint1CurrentState.Value().secureState.SetNonNull(false);
-            TEMPORARY_RETURN_IGNORED instance.mClosureEndpoint1.GetClusterInstance().SetOverallCurrentState(
-                mClosureEndpoint1CurrentState);
+            LogErrorOnFailure(
+                instance.mClosureEndpoint1.GetClusterInstance().SetOverallCurrentState(mClosureEndpoint1CurrentState));
             mClosurePanelEndpoint2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
             TEMPORARY_RETURN_IGNORED instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(mClosurePanelEndpoint2CurrentState);
             mClosurePanelEndpoint3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
@@ -1095,8 +1095,8 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
 
         mClosureEndpoint1OverallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
         mClosureEndpoint1OverallCurrentState.Value().secureState.SetNonNull(false);
-        TEMPORARY_RETURN_IGNORED mClosureEndpoint1.GetClusterInstance().SetOverallCurrentState(
-            mClosureEndpoint1OverallCurrentState);
+        LogErrorOnFailure(mClosureEndpoint1.GetClusterInstance().SetOverallCurrentState(
+            mClosureEndpoint1OverallCurrentState));
 
         panelCurrentState.Value().latch.SetValue(false);
         TEMPORARY_RETURN_IGNORED panelEp->GetLogic().SetCurrentState(panelCurrentState);
@@ -1305,8 +1305,8 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
 ClosureUIData ClosureManager::GetClosureUIData()
 {
     ClosureUIData uiData;
-    TEMPORARY_RETURN_IGNORED mClosureEndpoint1.GetClusterInstance().GetMainState(uiData.mainState);
-    TEMPORARY_RETURN_IGNORED mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState(uiData.overallCurrentState);
+    LogErrorOnFailure(mClosureEndpoint1.GetClusterInstance().GetMainState(uiData.mainState));
+    LogErrorOnFailure(mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState(uiData.overallCurrentState));
     return uiData;
 }
 #endif // DISPLAY_ENABLED

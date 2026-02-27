@@ -233,8 +233,20 @@ TEST_F(TestClosureControlCluster, TestAttributesList)
 {
     std::vector<DataModel::AttributeEntry> expectedAttributes(ClosureControl::Attributes::kMandatoryMetadata.begin(),
                                                               ClosureControl::Attributes::kMandatoryMetadata.end());
-    expectedAttributes.push_back(ClosureControl::Attributes::CountdownTime::kMetadataEntry);
     EXPECT_TRUE(IsAttributesListEqualTo(mCluster, expectedAttributes));
+
+    MockClusterConformance testConformance;
+    testConformance.OptionalAttributes().Set(OptionalAttributeEnum::kCountdownTime);
+    ClosureControlCluster testCluster(kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, testConformance, initParams });
+    expectedAttributes.push_back(ClosureControl::Attributes::CountdownTime::kMetadataEntry);
+    EXPECT_TRUE(IsAttributesListEqualTo(testCluster, expectedAttributes));
+
+    testConformance.FeatureMap().Set(Feature::kMotionLatching);
+    testConformance.OptionalAttributes().Set(OptionalAttributeEnum::kCountdownTime);
+    ClosureControlCluster motionLatchingCluster(kTestEndpointId,
+                                                ClosureControlCluster::Context{ mockDelegate, testConformance, initParams });
+    expectedAttributes.push_back(ClosureControl::Attributes::LatchControlModes::kMetadataEntry);
+    EXPECT_TRUE(IsAttributesListEqualTo(motionLatchingCluster, expectedAttributes));
 }
 
 TEST_F(TestClosureControlCluster, TestMandatoryAcceptedCommands)
