@@ -15,9 +15,10 @@ out/
 /src/test_driver/nrfconnect/build/
 /src/darwin/Framework/build/
 /src/python_testing/matter_testing_infrastructure/build/
-/scripts/setup/silabs/autogen
-/scripts/setup/silabs/sdk-pkg.lock
-/scripts/setup/silabs/user.slconf
+/integrations/docker/images/stage-2/chip-build-efr32/files-slt/autogen
+/integrations/docker/images/stage-2/chip-build-efr32/files-slt/*.lock
+/integrations/docker/images/stage-2/chip-build-efr32/files-slt/user.slconf
+/scripts/setup/silabs/slt
 
 # Pigweed Environment
 .environment*/
