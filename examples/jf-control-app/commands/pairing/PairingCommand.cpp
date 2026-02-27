@@ -77,16 +77,37 @@ CHIP_ERROR PairingCommand::RunCommand()
     commissioner.RegisterPairingDelegate(this);
     commissioner.RegisterTrustVerificationDelegate(this);
 
-    /* TODO: if JFA is onboarded get the administrator CAT initial version from JF_DS@GroupList (through RPC)
-     * https://github.com/project-chip/connectedhomeip/issues/39443
-     */
-    chip::CASEAuthTag administratorCAT   = GetAdminCATWithVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
+    NodeId anchorNodeId = GetAnchorNodeId();
+
+    uint16_t administratorCATVersion = CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION;
+    uint16_t anchorCATVersion        = CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION;
+
+    if (anchorNodeId != chip::kUndefinedNodeId)
+    {
+        // When the anchor is onboarded (anchorNodeId is defined), attempt to pull CAT versions from Datastore GroupList via
+        // RPC.
+        std::optional<uint16_t> datastoreAdministratorCATVersion;
+        std::optional<uint16_t> datastoreAnchorCATVersion;
+        bool hasRPCData = GetDatastoreCATVersions(datastoreAdministratorCATVersion, datastoreAnchorCATVersion);
+        if (hasRPCData)
+        {
+            if (datastoreAdministratorCATVersion.has_value())
+            {
+                administratorCATVersion = *datastoreAdministratorCATVersion;
+                ChipLogProgress(JointFabric, "Retrieved Administrator CAT version from JFDS GroupList");
+            }
+            if (datastoreAnchorCATVersion.has_value())
+            {
+                anchorCATVersion = *datastoreAnchorCATVersion;
+                ChipLogProgress(JointFabric, "Retrieved Anchor CAT version from JFDS GroupList");
+            }
+        }
+    }
+
+    chip::CASEAuthTag administratorCAT   = GetAdminCATWithVersion(administratorCATVersion);
     NodeId administratorCaseAdminSubject = NodeIdFromCASEAuthTag(administratorCAT);
 
-    /* TODO: if JFA is onboarded get the Anchor CAT initial version from JF_DS@GroupList (through RPC)
-     * https://github.com/project-chip/connectedhomeip/issues/39443
-     */
-    chip::CASEAuthTag anchorCAT   = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
+    chip::CASEAuthTag anchorCAT   = GetAnchorCATWithVersion(anchorCATVersion);
     NodeId anchorCaseAdminSubject = NodeIdFromCASEAuthTag(anchorCAT);
 
     // This check is to ensure that the --anchor and --jcm options are not used together.  If they are return an immediate error.
@@ -95,8 +116,6 @@ CHIP_ERROR PairingCommand::RunCommand()
         ChipLogError(JointFabric, "--anchor and --jcm options are not allowed simultaneously!");
         return CHIP_ERROR_BAD_REQUEST;
     }
-
-    NodeId anchorNodeId = GetAnchorNodeId();
 
     // Check if the Anchor Administrator is not already commissioned.
     if (anchorNodeId == chip::kUndefinedNodeId)
@@ -568,6 +587,7 @@ std::mutex responseMutex;
 std::condition_variable responseCv;
 bool responseReceived                                  = false;
 CHIP_ERROR responseError                               = CHIP_NO_ERROR;
+GetCatVersionsResponse catVersionsResponse             = {};
 CredentialIssuerCommands * pkiProviderCredentialIssuer = nullptr;
 
 // By passing the `call` parameter into WaitForResponse we are explicitly trying to insure the caller takes into consideration that
@@ -605,6 +625,22 @@ void OnRPCTransferDone(const _pw_protobuf_Empty & response, ::pw::Status status)
     {
         ChipLogProgress(JointFabric, "OnRPCTransferDone RPC call failed with status: %d\n", status.code());
     }
+}
+
+void OnGetCATVersionsDone(const GetCatVersionsResponse & response, ::pw::Status status)
+{
+    std::lock_guard<std::mutex> lock(responseMutex);
+    responseReceived = true;
+    if (status.ok())
+    {
+        responseError       = CHIP_NO_ERROR;
+        catVersionsResponse = response;
+    }
+    else
+    {
+        responseError = CHIP_ERROR_INTERNAL;
+    }
+    responseCv.notify_one();
 }
 
 static void GenerateReplyWork(intptr_t arg)
@@ -677,6 +713,42 @@ void OnGetStreamOnDone(::pw::Status status)
 }
 
 } // namespace
+
+bool PairingCommand::GetDatastoreCATVersions(std::optional<uint16_t> & administratorCATVersion,
+                                             std::optional<uint16_t> & anchorCATVersion)
+{
+    administratorCATVersion.reset();
+    anchorCATVersion.reset();
+    catVersionsResponse = {};
+
+    GetCatVersionsRequest request = {};
+    auto call                     = rpcClient.GetCatVersions(request, OnGetCATVersionsDone);
+    if (!call.active())
+    {
+        ChipLogError(JointFabric, "RPC: GetCatVersions call failed");
+        return false;
+    }
+
+    CHIP_ERROR err = WaitForResponse(call);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(JointFabric, "RPC: GetCatVersions wait failed: %s", ErrorStr(err));
+        return false;
+    }
+
+    if (catVersionsResponse.has_admin_cat_version)
+    {
+        VerifyOrReturnValue(CanCastTo<uint16_t>(catVersionsResponse.admin_cat_version), false);
+        administratorCATVersion = static_cast<uint16_t>(catVersionsResponse.admin_cat_version);
+    }
+    if (catVersionsResponse.has_anchor_cat_version)
+    {
+        VerifyOrReturnValue(CanCastTo<uint16_t>(catVersionsResponse.anchor_cat_version), false);
+        anchorCATVersion = static_cast<uint16_t>(catVersionsResponse.anchor_cat_version);
+    }
+
+    return true;
+}
 
 void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {

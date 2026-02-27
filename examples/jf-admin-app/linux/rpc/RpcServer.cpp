@@ -2,6 +2,7 @@
 
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
+#include <lib/core/CASEAuthTag.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -37,6 +38,40 @@ MutableByteSpan icacCSRSpan{ icacCSRBuf };
         request.peerAdminJFAdminClusterEndpointId);
     VerifyOrReturnValue(data, pw::Status::Internal());
     TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(FinalizeCommissioningWork, reinterpret_cast<intptr_t>(data));
+
+    return pw::OkStatus();
+}
+
+::pw::Status JointFabric::GetCatVersions(const ::GetCatVersionsRequest & request, ::GetCatVersionsResponse & response)
+{
+    IgnoreUnusedVariable(request);
+
+    const auto & groupEntries = Server::GetInstance().GetJointFabricDatastore().GetGroupEntries();
+
+    for (const auto & entry : groupEntries)
+    {
+        if (entry.groupCAT.IsNull() || entry.groupCATVersion.IsNull())
+        {
+            continue;
+        }
+
+        const auto groupCat = entry.groupCAT.Value();
+        const auto version  = entry.groupCATVersion.Value();
+
+        if (groupCat == kAdminCATIdentifier)
+        {
+            response.has_admin_cat_version = true;
+            response.admin_cat_version     = version;
+        }
+        else if (groupCat == kAnchorCATIdentifier)
+        {
+            response.has_anchor_cat_version = true;
+            response.anchor_cat_version     = version;
+        }
+    }
+
+    ChipLogProgress(JointFabric, "RPC GetCatVersions: admin=%u anchor=%u", static_cast<unsigned>(response.has_admin_cat_version),
+                    static_cast<unsigned>(response.has_anchor_cat_version));
 
     return pw::OkStatus();
 }
