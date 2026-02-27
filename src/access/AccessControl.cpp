@@ -363,9 +363,11 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 
     CHIP_ERROR result = CheckACL(subjectDescriptor, requestPath, requestPrivilege);
     // TODO: Combine this with the exisiting condition below with group data
-    if (result != CHIP_NO_ERROR && IsGroupAuxiliaryDelegateRegistered() && subjectDescriptor.authMode == AuthMode::kGroup && IsGroupId(subjectDescriptor.subject)) {
+    if (result != CHIP_NO_ERROR && IsGroupAuxiliaryDelegateRegistered() && subjectDescriptor.authMode == AuthMode::kGroup &&
+        IsGroupId(subjectDescriptor.subject))
+    {
         CHIP_ERROR groupCheckErr = mGroupAuxDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
-        result = groupCheckErr!=CHIP_ERROR_NOT_IMPLEMENTED ? groupCheckErr : result;
+        result                   = groupCheckErr != CHIP_ERROR_NOT_IMPLEMENTED ? groupCheckErr : result;
     }
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     if (result == CHIP_NO_ERROR)
@@ -427,7 +429,6 @@ CHIP_ERROR AccessControl::CheckACL(const SubjectDescriptor & subjectDescriptor, 
 
             return result;
         }
-
     }
 
     // Operational PASE not supported for v1.0, so PASE implies commissioning, which has highest privilege.
@@ -678,12 +679,12 @@ bool AccessControl::Entry::IsValid() const
     const char * log = "unexpected error";
     IgnoreUnusedVariable(log); // logging may be disabled
 
-    AuthMode authMode       = AuthMode::kNone;
-    FabricIndex fabricIndex = kUndefinedFabricIndex;
-    Privilege privilege     = static_cast<Privilege>(0);
+    AuthMode authMode           = AuthMode::kNone;
+    FabricIndex fabricIndex     = kUndefinedFabricIndex;
+    Privilege privilege         = static_cast<Privilege>(0);
     AuxiliaryType auxiliaryType = AuxiliaryType::kSystem;
-    size_t subjectCount     = 0;
-    size_t targetCount      = 0;
+    size_t subjectCount         = 0;
+    size_t targetCount          = 0;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     SuccessOrExit(err = GetAuthMode(authMode));

@@ -106,7 +106,7 @@ public:
             target.flags    = Target::kEndpoint;
             target.endpoint = mEndpointId;
             // TODO: These are inaccurate and need to be updated
-            target.cluster  = 0;
+            target.cluster    = 0;
             target.deviceType = 0;
             return CHIP_NO_ERROR;
         }
@@ -221,8 +221,8 @@ CHIP_ERROR GroupAuxiliaryAccessControlDelegate::AuxiliaryEntries(AccessControl::
     return CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR GroupAuxiliaryAccessControlDelegate::Check(const SubjectDescriptor & subjectDescriptor,
-                                                      const RequestPath & requestPath, Privilege requestPrivilege)
+CHIP_ERROR GroupAuxiliaryAccessControlDelegate::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                                                      Privilege requestPrivilege)
 {
     AccessControl::EntryIterator iterator;
     ReturnErrorOnFailure(AuxiliaryEntries(iterator, &subjectDescriptor.fabricIndex));

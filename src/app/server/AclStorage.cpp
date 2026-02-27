@@ -23,13 +23,13 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::Access;
 
-using Entry                  = AccessControl::Entry;
-using EntryListener          = AccessControl::EntryListener;
-using StagingAuthMode        = Clusters::AccessControl::AccessControlEntryAuthModeEnum;
-using StagingPrivilege       = Clusters::AccessControl::AccessControlEntryPrivilegeEnum;
-using StagingAuxiliaryType   = Clusters::AccessControl::AccessControlAuxiliaryTypeEnum;
-using StagingTarget          = Clusters::AccessControl::Structs::AccessControlTargetStruct::Type;
-using Target                 = AccessControl::Entry::Target;
+using Entry                = AccessControl::Entry;
+using EntryListener        = AccessControl::EntryListener;
+using StagingAuthMode      = Clusters::AccessControl::AccessControlEntryAuthModeEnum;
+using StagingPrivilege     = Clusters::AccessControl::AccessControlEntryPrivilegeEnum;
+using StagingAuxiliaryType = Clusters::AccessControl::AccessControlAuxiliaryTypeEnum;
+using StagingTarget        = Clusters::AccessControl::Structs::AccessControlTargetStruct::Type;
+using Target               = AccessControl::Entry::Target;
 
 namespace {
 

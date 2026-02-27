@@ -1,10 +1,10 @@
 #include "GroupcastLogic.h"
 #include <access/AccessControl.h>
 #include <app/util/endpoint-config-api.h>
+#include <clusters/AccessControl/Events.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
-#include <clusters/AccessControl/Events.h>
 
 using chip::Protocols::InteractionModel::Status;
 using namespace chip::Credentials;
@@ -136,7 +136,8 @@ CHIP_ERROR GroupcastLogic::ReadUsedMcastAddrCount(EndpointId endpoint, Attribute
     return aEncoder.Encode(mUsedMcastAddrCount);
 }
 
-Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data, const chip::Access::SubjectDescriptor & subjectDescriptor)
+Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data,
+                                 const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     GroupDataProvider & groups = Provider();
     CHIP_ERROR err             = CHIP_NO_ERROR;

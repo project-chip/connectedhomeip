@@ -474,7 +474,7 @@ DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataMode
         return ReadAclEntries(mClusterContext.fabricTable, mClusterContext.accessControl, encoder, &Access::AccessControl::Entries);
     case AccessControl::Attributes::AuxiliaryACL::Id:
         return ReadAclEntries(mClusterContext.fabricTable, mClusterContext.accessControl, encoder,
-                             &Access::AccessControl::AuxiliaryEntries);
+                              &Access::AccessControl::AuxiliaryEntries);
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
     case AccessControl::Attributes::Extension::Id:
         return ReadExtension(mClusterContext.persistentStorage, mClusterContext.fabricTable, encoder);
@@ -534,7 +534,7 @@ CHIP_ERROR AccessControlCluster::Attributes(const ConcreteClusterPath & path,
     AttributeListBuilder listBuilder(builder);
 
     AttributeListBuilder::OptionalAttributeEntry kOptionalAttributes[] = {
-        { .enabled = mFeatureFlags.Has(Feature::kAuxiliary), .metadata = Attributes::AuxiliaryACL::kMetadataEntry},
+        { .enabled = mFeatureFlags.Has(Feature::kAuxiliary), .metadata = Attributes::AuxiliaryACL::kMetadataEntry },
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
         { .enabled = true, .metadata = Attributes::Extension::kMetadataEntry },
 #endif

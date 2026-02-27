@@ -116,10 +116,10 @@ struct TestGroupcastCluster : public ::testing::Test
         // with our Mock DataModel Provider so we can test endpoints validations on JoinGroup command.
         ServerClusterContext context = mTestContext.Get();
         clusterContext               = std::make_unique<ServerClusterContext>(ServerClusterContext{
-                          .provider           = customDataModel,
-                          .storage            = context.storage,
-                          .attributeStorage   = context.attributeStorage,
-                          .interactionContext = context.interactionContext,
+            .provider           = customDataModel,
+            .storage            = context.storage,
+            .attributeStorage   = context.attributeStorage,
+            .interactionContext = context.interactionContext,
         });
 
         ASSERT_EQ(mSender.Startup(*clusterContext), CHIP_NO_ERROR);

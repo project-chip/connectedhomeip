@@ -16,22 +16,21 @@
  *    limitations under the License.
  */
 
-#include <set>
 #include "access/AccessControl.h"
 #include "access/examples/ExampleAccessControlDelegate.h"
 #include "access/examples/GroupAuxiliaryAccessControlDelegate.h"
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <set>
 
 #include <pw_unit_test/framework.h>
 
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
-
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 namespace {
 
@@ -569,14 +568,14 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    FabricIndex mFabricIndex = 1;
-    Privilege mPrivilege     = Privilege::kView;
-    AuthMode mAuthMode       = AuthMode::kCase;
+    FabricIndex mFabricIndex     = 1;
+    Privilege mPrivilege         = Privilege::kView;
+    AuthMode mAuthMode           = AuthMode::kCase;
     AuxiliaryType mAuxiliaryType = AuxiliaryType::kSystem;
-    NodeId mSubject          = kOperationalNodeId0;
-    Target mTarget           = { .flags = Target::kCluster, .cluster = kOnOffCluster };
-    size_t mSubjectCount     = 1;
-    size_t mTargetCount      = 1;
+    NodeId mSubject              = kOperationalNodeId0;
+    Target mTarget               = { .flags = Target::kCluster, .cluster = kOnOffCluster };
+    size_t mSubjectCount         = 1;
+    size_t mTargetCount          = 1;
 };
 
 bool operator==(const Target & a, const Target & b)
@@ -693,21 +692,24 @@ struct EntryData
     }
 };
 
-struct AuxiliaryEquivalenceEntry {
+struct AuxiliaryEquivalenceEntry
+{
     chip::FabricIndex fabricIndex;
     chip::GroupId groupId;
     chip::EndpointId endpointId;
 
-    bool operator<(const AuxiliaryEquivalenceEntry& other) const {
-        if (fabricIndex != other.fabricIndex) return fabricIndex < other.fabricIndex;
-        if (groupId != other.groupId) return groupId < other.groupId;
+    bool operator<(const AuxiliaryEquivalenceEntry & other) const
+    {
+        if (fabricIndex != other.fabricIndex)
+            return fabricIndex < other.fabricIndex;
+        if (groupId != other.groupId)
+            return groupId < other.groupId;
         return endpointId < other.endpointId;
     }
 
-    bool operator==(const AuxiliaryEquivalenceEntry& other) const {
-        return fabricIndex == other.fabricIndex &&
-               groupId == other.groupId &&
-               endpointId == other.endpointId;
+    bool operator==(const AuxiliaryEquivalenceEntry & other) const
+    {
+        return fabricIndex == other.fabricIndex && groupId == other.groupId && endpointId == other.endpointId;
     }
 };
 
@@ -794,42 +796,42 @@ CHIP_ERROR LoadAccessControl(AccessControl & ac, const EntryData * entryData, si
 }
 
 /**
- * The format of Auxiliary entries is up to the implementation of the appropriate 
+ * The format of Auxiliary entries is up to the implementation of the appropriate
  * access control delegate. This means there is not only 1 valid format of entries, rather
  * there is a set of rules that the collection of entries follows. This function reduces
  * the entries reported to the base equivalence class to compare with an expected set.
  */
-void ValidateAuxiliaryEntries(AccessControl& ac, 
-                             FabricIndex fabric, 
-                             const std::set<AuxiliaryEquivalenceEntry>& expectedSet) 
+void ValidateAuxiliaryEntries(AccessControl & ac, FabricIndex fabric, const std::set<AuxiliaryEquivalenceEntry> & expectedSet)
 {
     EntryIterator iterator;
     EXPECT_EQ(ac.AuxiliaryEntries(fabric, iterator), CHIP_NO_ERROR);
 
     std::set<AuxiliaryEquivalenceEntry> actualSet;
     Entry entry;
-    
-    while (iterator.Next(entry) == CHIP_NO_ERROR) {
+
+    while (iterator.Next(entry) == CHIP_NO_ERROR)
+    {
         FabricIndex entryFabric;
         size_t subjectCount = 0;
-        size_t targetCount = 0;
+        size_t targetCount  = 0;
 
         EXPECT_EQ(entry.GetFabricIndex(entryFabric), CHIP_NO_ERROR);
         EXPECT_EQ(entry.GetSubjectCount(subjectCount), CHIP_NO_ERROR);
         EXPECT_EQ(entry.GetTargetCount(targetCount), CHIP_NO_ERROR);
 
-        for (size_t s = 0; s < subjectCount; ++s) {
+        for (size_t s = 0; s < subjectCount; ++s)
+        {
             NodeId subject;
-            if (entry.GetSubject(s, subject) == CHIP_NO_ERROR && IsGroupId(subject)) {
-                
-                for (size_t t = 0; t < targetCount; ++t) {
+            if (entry.GetSubject(s, subject) == CHIP_NO_ERROR && IsGroupId(subject))
+            {
+
+                for (size_t t = 0; t < targetCount; ++t)
+                {
                     Entry::Target target;
-                    if (entry.GetTarget(t, target) == CHIP_NO_ERROR) {
-                        actualSet.insert({
-                            .fabricIndex = entryFabric,
-                            .groupId = GroupIdFromNodeId(subject),
-                            .endpointId = target.endpoint
-                        });
+                    if (entry.GetTarget(t, target) == CHIP_NO_ERROR)
+                    {
+                        actualSet.insert(
+                            { .fabricIndex = entryFabric, .groupId = GroupIdFromNodeId(subject), .endpointId = target.endpoint });
                     }
                 }
             }
@@ -1180,24 +1182,24 @@ constexpr CheckData checkData1[] = {
 
 constexpr CheckData groupCheckData[] = {
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x1111) },
-        .requestPath       = { .cluster = 0, .endpoint = 10 },
-        .privilege         = Privilege::kOperate,
-        .allow    = true },
+      .requestPath       = { .cluster = 0, .endpoint = 10 },
+      .privilege         = Privilege::kOperate,
+      .allow             = true },
 
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x1111) },
-        .requestPath       = { .cluster = 0, .endpoint = 20 },
-        .privilege         = Privilege::kOperate,
-        .allow    = false },
+      .requestPath       = { .cluster = 0, .endpoint = 20 },
+      .privilege         = Privilege::kOperate,
+      .allow             = false },
 
     { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x2222) },
-        .requestPath       = { .cluster = 0, .endpoint = 30 },
-        .privilege         = Privilege::kOperate,
-        .allow    = true },
+      .requestPath       = { .cluster = 0, .endpoint = 30 },
+      .privilege         = Privilege::kOperate,
+      .allow             = true },
 
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x2222) },
-        .requestPath       = { .cluster = 0, .endpoint = 30 },
-        .privilege         = Privilege::kOperate,
-        .allow    = false },
+      .requestPath       = { .cluster = 0, .endpoint = 30 },
+      .privilege         = Privilege::kOperate,
+      .allow             = false },
 };
 
 class TestAccessControl : public ::testing::Test
@@ -1222,7 +1224,6 @@ public: // protected
 
         // Register group auxilary access control delegate
         SuccessOrDie(GetAccessControl().RegisterGroupAuxiliaryDelegate(&gGroupAuxiliaryAccessControlDelegate));
-
     }
     static void TearDownTestSuite()
     {
@@ -2085,10 +2086,8 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntries)
     }
 
     // Define Golden Sets (The base equivalence classes) that are expected
-    std::set<AuxiliaryEquivalenceEntry> expectedFabric1 = {
-        { .fabricIndex = fabric1, .groupId = 0x1111, .endpointId = 10 },
-        { .fabricIndex = fabric1, .groupId = 0x2222, .endpointId = 20 }
-    };
+    std::set<AuxiliaryEquivalenceEntry> expectedFabric1 = { { .fabricIndex = fabric1, .groupId = 0x1111, .endpointId = 10 },
+                                                            { .fabricIndex = fabric1, .groupId = 0x2222, .endpointId = 20 } };
 
     std::set<AuxiliaryEquivalenceEntry> expectedFabric2 = {
         { .fabricIndex = fabric2, .groupId = 0x3333, .endpointId = 30 },
