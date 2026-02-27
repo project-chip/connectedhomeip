@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/basic-information/BasicInformationCluster.h>
@@ -441,15 +442,13 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommand)
 
     // validate that an event is generated
     std::optional<LogOnlyEvents::EventInformation> eventInfo = mContext.EventsGenerator().GetNextEvent();
-    ASSERT_NE(eventInfo, std::nullopt);
-    // NOLINTBEGIN(bugprone-unchecked-optional-access)
+    ASSERT_TRUE(eventInfo.has_value());
     EXPECT_EQ(eventInfo->eventOptions.mPath.mClusterId, Id);
     EXPECT_EQ(eventInfo->eventOptions.mPath.mEventId, Events::ActiveChanged::Id);
 
     Events::ActiveChanged::DecodableType decodedEvent;
     ASSERT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.promisedActiveDuration, kStayActiveDurationMs);
-    // NOLINTEND(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestNotifyDeviceActiveWithoutRequestedDuration)
@@ -665,15 +664,13 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestReachableChangedEvent)
     cluster.SetReachable(true);
 
     std::optional<LogOnlyEvents::EventInformation> eventInfo = mContext.EventsGenerator().GetNextEvent();
-    ASSERT_NE(eventInfo, std::nullopt);
-    // NOLINTBEGIN(bugprone-unchecked-optional-access)
+    ASSERT_TRUE(eventInfo.has_value());
     EXPECT_EQ(eventInfo->eventOptions.mPath.mClusterId, Id);
     EXPECT_EQ(eventInfo->eventOptions.mPath.mEventId, Events::ReachableChanged::Id);
 
     Events::ReachableChanged::DecodableType decodedEvent;
     ASSERT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_TRUE(decodedEvent.reachableNewValue);
-    // NOLINTEND(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestLeaveEvent)
@@ -693,11 +690,9 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestLeaveEvent)
     cluster.GenerateLeaveEvent();
 
     std::optional<LogOnlyEvents::EventInformation> eventInfo = mContext.EventsGenerator().GetNextEvent();
-    ASSERT_NE(eventInfo, std::nullopt);
-    // NOLINTBEGIN(bugprone-unchecked-optional-access)
+    ASSERT_TRUE(eventInfo.has_value());
     EXPECT_EQ(eventInfo->eventOptions.mPath.mClusterId, Id);
     EXPECT_EQ(eventInfo->eventOptions.mPath.mEventId, Events::Leave::Id);
-    // NOLINTEND(bugprone-unchecked-optional-access)
     // This event has no fields, so no data to decode.
 }
 

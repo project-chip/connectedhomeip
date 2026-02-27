@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/AttributeValueDecoder.h>
@@ -41,6 +42,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::Testing;
+using namespace chip::Protocols::InteractionModel;
 
 static constexpr chip::EndpointId kTestEndpointId = 1;
 
@@ -90,9 +92,8 @@ public:
     MockCameraAVStreamManagementDelegate(std::vector<VideoStreamStruct> * videoStreams,
                                          std::vector<AudioStreamStruct> * audioStreams,
                                          std::vector<SnapshotStreamStruct> * snapshotStreams) :
-        mAllocatedVideoStreams(videoStreams),
-        mAllocatedAudioStreams(audioStreams), mAllocatedSnapshotStreams(snapshotStreams), mAudioStreamCount(0),
-        mVideoStreamCount(0), mSnapshotStreamCount(0)
+        mAllocatedVideoStreams(videoStreams), mAllocatedAudioStreams(audioStreams), mAllocatedSnapshotStreams(snapshotStreams),
+        mAudioStreamCount(0), mVideoStreamCount(0), mSnapshotStreamCount(0)
     {}
 
     Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs, uint16_t & outStreamID) override
@@ -966,64 +967,47 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamAllocateCommand)
     request.bitDepth     = 24;
 
     auto result = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(result.response->audioStreamID, 1);
 
     // channelCount out of bounds
     request.channelCount = 0;
     result               = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
 
     request.channelCount = 9;
     result               = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     request.channelCount = 2; // Restore
 
     // sampleRate 0
     request.sampleRate = 0;
     result             = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     request.sampleRate = 48000; // Restore
 
     // bitRate 0
     request.bitRate = 0;
     result          = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     request.bitRate = 128000; // Restore
 
     // Invalid bitDepth
     request.bitDepth = 12;
     result           = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     request.bitDepth = 24; // Restore
 
     // streamUsage not supported by test fixture priorities
     request.streamUsage = StreamUsageEnum::kAnalysis;
     result              = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidInState);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidInState));
     request.streamUsage = StreamUsageEnum::kLiveView; // Restore
 
     // Attempt to allocate a second stream, expecting ResourceExhausted
     result = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ResourceExhausted);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamAllocateCommandUnsupportedBitDepth)
@@ -1044,9 +1028,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamAllocateCommandUnsupp
     request.bitDepth     = 8; // Unsupported bitDepth
 
     auto result = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::DynamicConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::DynamicConstraintError));
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamDeallocateCommand)
@@ -1067,11 +1049,8 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamDeallocateCommand)
     allocRequest.bitDepth     = 24;
 
     auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
-    ASSERT_TRUE(allocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_TRUE(allocResult.IsSuccess());
     ASSERT_TRUE(allocResult.response.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     uint16_t streamId = allocResult.response->audioStreamID;
     EXPECT_EQ(mServer.GetAllocatedAudioStreams().size(), 1u);
 
@@ -1079,23 +1058,17 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamDeallocateCommand)
     DeallocateRequest deallocRequest;
     deallocRequest.audioStreamID = streamId;
     auto deallocResult           = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
-    ASSERT_TRUE(deallocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(deallocResult.IsSuccess());
     EXPECT_EQ(mServer.GetAllocatedAudioStreams().size(), 0u);
 
     // Attempt to deallocate again, should fail
     deallocResult = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
-    ASSERT_TRUE(deallocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(deallocResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(deallocResult.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 
     // Attempt to deallocate a non-existent ID
     deallocRequest.audioStreamID = 999;
     deallocResult                = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
-    ASSERT_TRUE(deallocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(deallocResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(deallocResult.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamAllocateCommand)
@@ -1120,67 +1093,50 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamAllocateCommand)
     request.watermarkEnabled = chip::MakeOptional(false);
 
     auto result = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(result.response->videoStreamID, 1);
     EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 1u);
 
     // Invalid streamUsage
     request.streamUsage = StreamUsageEnum::kAnalysis;
     result              = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidInState);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidInState));
     request.streamUsage = StreamUsageEnum::kLiveView; // Restore
 
     // minFrameRate > maxFrameRate
     request.minFrameRate = 121;
     result               = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     request.minFrameRate = 30; // Restore
 
     // minResolution > maxResolution
     request.minResolution = { 1281, 720 };
     result                = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     request.minResolution = { 640, 480 }; // Restore
 
     // minBitRate > maxBitRate
     request.minBitRate = 10001;
     result             = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     request.minBitRate = 10000; // Restore
 
     // keyFrameInterval 65501
     request.keyFrameInterval = 65501;
     result                   = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     request.keyFrameInterval = 4; // Restore
 
     // Unsupported videoCodec
     request.videoCodec = VideoCodecEnum::kHevc;
     result             = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::DynamicConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::DynamicConstraintError));
     request.videoCodec = VideoCodecEnum::kH264; // Restore
 
     // Attempt to allocate a second stream, expecting ResourceExhausted
     result = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ResourceExhausted);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamDeallocateCommand)
@@ -1205,11 +1161,8 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamDeallocateCommand)
     allocRequest.watermarkEnabled = chip::MakeOptional(false);
 
     auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
-    ASSERT_TRUE(allocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_TRUE(allocResult.IsSuccess());
     ASSERT_TRUE(allocResult.response.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     uint16_t streamId = allocResult.response->videoStreamID;
     EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 1u);
 
@@ -1217,23 +1170,17 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamDeallocateCommand)
     DeallocateRequest deallocRequest;
     deallocRequest.videoStreamID = streamId;
     auto deallocResult           = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
-    ASSERT_TRUE(deallocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(deallocResult.IsSuccess());
     EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 0u);
 
     // Attempt to deallocate again, should fail
     deallocResult = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
-    ASSERT_TRUE(deallocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(deallocResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(deallocResult.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 
     // Attempt to deallocate a non-existent ID
     deallocRequest.videoStreamID = 999;
     deallocResult                = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
-    ASSERT_TRUE(deallocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(deallocResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(deallocResult.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamModifyCommand)
@@ -1258,11 +1205,8 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamModifyCommand)
     allocRequest.watermarkEnabled = chip::MakeOptional(false);
 
     auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
-    ASSERT_TRUE(allocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_TRUE(allocResult.IsSuccess());
     ASSERT_TRUE(allocResult.response.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     uint16_t streamId = allocResult.response->videoStreamID;
     EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 1u);
 
@@ -1272,8 +1216,6 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamModifyCommand)
     modifyRequest.watermarkEnabled = chip::MakeOptional(true);
 
     auto modifyResult = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
-    ASSERT_TRUE(modifyResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(modifyResult.IsSuccess());
 
     // Verify the changes
@@ -1291,8 +1233,6 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamModifyCommand)
     modifyRequest.watermarkEnabled = chip::MakeOptional(false);
     modifyRequest.OSDEnabled       = chip::Optional<bool>::Missing();
     modifyResult                   = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
-    ASSERT_TRUE(modifyResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(modifyResult.IsSuccess());
 
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedVideoStreams::Id, allocatedVideoStreams), CHIP_NO_ERROR);
@@ -1307,9 +1247,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestVideoStreamModifyCommand)
     // Attempt to modify a non-existent ID
     modifyRequest.videoStreamID = 999;
     modifyResult                = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
-    ASSERT_TRUE(modifyResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(modifyResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(modifyResult.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamAllocateCommand)
@@ -1330,59 +1268,44 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamAllocateCommand)
     request.watermarkEnabled = chip::MakeOptional(false);
 
     auto result = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(result.response->snapshotStreamID, 1);
     EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 1u);
 
     // maxFrameRate 0
     request.maxFrameRate = 0;
     result               = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     request.maxFrameRate = 30; // Restore
 
     // minResolution > maxResolution
     request.minResolution = { 1281, 720 };
     result                = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     request.minResolution = { 640, 480 }; // Restore
 
     // quality 0
     request.quality = 0;
     result          = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     request.quality = 80; // Restore
 
     // quality 101
     request.quality = 101;
     result          = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
     request.quality = 80; // Restore
 
     // Unsupported maxFrameRate
     request.maxFrameRate = 200;
     result               = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::DynamicConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::DynamicConstraintError));
     request.maxFrameRate = 30; // Restore
 
     // Attempt to allocate a second stream, expecting ResourceExhausted
     result = mClusterTester.Invoke<Request, Response>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ResourceExhausted);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamDeallocateCommand)
@@ -1403,11 +1326,8 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamDeallocateCommand)
     allocRequest.watermarkEnabled = chip::MakeOptional(false);
 
     auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
-    ASSERT_TRUE(allocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_TRUE(allocResult.IsSuccess());
     ASSERT_TRUE(allocResult.response.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     uint16_t streamId = allocResult.response->snapshotStreamID;
     EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 1u);
 
@@ -1415,23 +1335,17 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamDeallocateCommand)
     DeallocateRequest deallocRequest;
     deallocRequest.snapshotStreamID = streamId;
     auto deallocResult              = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
-    ASSERT_TRUE(deallocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(deallocResult.IsSuccess());
     EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 0u);
 
     // Attempt to deallocate again, should fail
     deallocResult = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
-    ASSERT_TRUE(deallocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(deallocResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(deallocResult.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 
     // Attempt to deallocate a non-existent ID
     deallocRequest.snapshotStreamID = 999;
     deallocResult                   = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
-    ASSERT_TRUE(deallocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(deallocResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(deallocResult.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamModifyCommand)
@@ -1452,11 +1366,8 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamModifyCommand)
     allocRequest.watermarkEnabled = chip::MakeOptional(false);
 
     auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
-    ASSERT_TRUE(allocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_TRUE(allocResult.IsSuccess());
     ASSERT_TRUE(allocResult.response.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     uint16_t streamId = allocResult.response->snapshotStreamID;
     EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 1u);
 
@@ -1466,8 +1377,6 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamModifyCommand)
     modifyRequest.watermarkEnabled = chip::MakeOptional(true);
 
     auto modifyResult = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
-    ASSERT_TRUE(modifyResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(modifyResult.IsSuccess());
 
     // Verify the changes
@@ -1485,8 +1394,6 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamModifyCommand)
     modifyRequest.watermarkEnabled = chip::MakeOptional(false);
     modifyRequest.OSDEnabled       = chip::Optional<bool>::Missing();
     modifyResult                   = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
-    ASSERT_TRUE(modifyResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(modifyResult.IsSuccess());
 
     EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::AllocatedSnapshotStreams::Id, allocatedSnapshotStreams), CHIP_NO_ERROR);
@@ -1501,9 +1408,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSnapshotStreamModifyCommand)
     // Attempt to modify a non-existent ID
     modifyRequest.snapshotStreamID = 999;
     modifyResult                   = mClusterTester.Invoke<ModifyRequest, DataModel::NullObjectType>(modifyRequest);
-    ASSERT_TRUE(modifyResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(modifyResult.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(modifyResult.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestSetStreamPrioritiesCommand)
@@ -1522,8 +1427,6 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSetStreamPrioritiesCommand)
     priorities.push_back(StreamUsageEnum::kLiveView);
     request.streamPriorities = DataModel::List<const StreamUsageEnum>(priorities.data(), priorities.size());
     auto result              = mClusterTester.Invoke<Request, DataModel::NullObjectType>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(result.IsSuccess());
 
     Attributes::StreamUsagePriorities::TypeInfo::DecodableType readPriorities;
@@ -1541,9 +1444,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSetStreamPrioritiesCommand)
     priorities.push_back(static_cast<StreamUsageEnum>(0xFF));
     request.streamPriorities = DataModel::List<const StreamUsageEnum>(priorities.data(), priorities.size());
     result                   = mClusterTester.Invoke<Request, DataModel::NullObjectType>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
 
     // Duplicate enum value
     priorities.clear();
@@ -1551,18 +1452,14 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSetStreamPrioritiesCommand)
     priorities.push_back(StreamUsageEnum::kLiveView);
     request.streamPriorities = DataModel::List<const StreamUsageEnum>(priorities.data(), priorities.size());
     result                   = mClusterTester.Invoke<Request, DataModel::NullObjectType>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::AlreadyExists);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::AlreadyExists));
 
     // Unsupported enum value
     priorities.clear();
     priorities.push_back(StreamUsageEnum::kAnalysis);
     request.streamPriorities = DataModel::List<const StreamUsageEnum>(priorities.data(), priorities.size());
     result                   = mClusterTester.Invoke<Request, DataModel::NullObjectType>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::DynamicConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::DynamicConstraintError));
 
     // Invalid state - stream allocated
     {
@@ -1584,8 +1481,6 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSetStreamPrioritiesCommand)
         allocRequest.watermarkEnabled = chip::MakeOptional(false);
 
         auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
-        ASSERT_TRUE(allocResult.status.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         ASSERT_TRUE(allocResult.IsSuccess());
         EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 1u);
     }
@@ -1594,9 +1489,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSetStreamPrioritiesCommand)
     priorities.push_back(StreamUsageEnum::kLiveView);
     request.streamPriorities = DataModel::List<const StreamUsageEnum>(priorities.data(), priorities.size());
     result                   = mClusterTester.Invoke<Request, DataModel::NullObjectType>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidInState);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidInState));
 
     // Clean up
     {
@@ -1604,8 +1497,6 @@ TEST_F(TestCameraAVStreamManagementCluster, TestSetStreamPrioritiesCommand)
         DeallocateRequest deallocRequest;
         deallocRequest.videoStreamID = 1;
         auto deallocResult           = mClusterTester.Invoke<DeallocateRequest, DataModel::NullObjectType>(deallocRequest);
-        ASSERT_TRUE(deallocResult.status.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
         EXPECT_TRUE(deallocResult.IsSuccess());
         EXPECT_EQ(mServer.GetAllocatedVideoStreams().size(), 0u);
 
@@ -1632,11 +1523,8 @@ TEST_F(TestCameraAVStreamManagementCluster, TestCaptureSnapshotCommand)
     allocRequest.watermarkEnabled = chip::MakeOptional(false);
 
     auto allocResult = mClusterTester.Invoke<AllocateRequest, AllocateResponse>(allocRequest);
-    ASSERT_TRUE(allocResult.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     ASSERT_TRUE(allocResult.IsSuccess());
     ASSERT_TRUE(allocResult.response.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     uint16_t streamId = allocResult.response->snapshotStreamID;
     EXPECT_EQ(mServer.GetAllocatedSnapshotStreams().size(), 1u);
 
@@ -1649,21 +1537,13 @@ TEST_F(TestCameraAVStreamManagementCluster, TestCaptureSnapshotCommand)
     request.requestedResolution = { 640, 480 };
 
     auto result = mClusterTester.Invoke<CaptureRequest, CaptureResponse>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(result.response->imageCodec, ImageCodecEnum::kJpeg);
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(result.response->resolution.width, 640);
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(result.response->resolution.height, 480);
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_GT(result.response->data.size(), 0u);
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(result.response->data.data()[0], 0xFF); // Basic check on dummy data
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
     EXPECT_EQ(result.response->data.data()[1], 0xD8); // Basic check on dummy data
 
     // Restore privacy modes
@@ -1672,16 +1552,12 @@ TEST_F(TestCameraAVStreamManagementCluster, TestCaptureSnapshotCommand)
 
     // Check for InvalidInState error
     result = mClusterTester.Invoke<CaptureRequest, CaptureResponse>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidInState);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidInState));
 
     // Check for NotFound error with invalid stream ID
     request.snapshotStreamID.SetNonNull(999);
     result = mClusterTester.Invoke<CaptureRequest, CaptureResponse>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 }
 
 TEST_F(TestCameraAVStreamManagementCluster, TestCaptureSnapshotCommand_NoStreamAllocated)
@@ -1700,9 +1576,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestCaptureSnapshotCommand_NoStreamA
     request.requestedResolution = { 640, 480 };
 
     auto result = mClusterTester.Invoke<CaptureRequest, CaptureResponse>(request);
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::NotFound);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::NotFound));
 }
 
 } // namespace
