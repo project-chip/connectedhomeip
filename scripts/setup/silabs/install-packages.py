@@ -110,11 +110,15 @@ def update_slt_cli(slt_cli_path):
 
 
 def get_pkg_manifest_paths():
-    """Return paths to sisdk-pkg.lock and wiseconnect-pkg.slt (lock files used automatically alongside)."""
+    """Return paths to sisdk-pkg.lock and wiseconnect-pkg.slt from chip-build-efr32 files-slt."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
+    repo_root = os.path.normpath(os.path.join(script_dir, "..", "..", ".."))
+    files_slt_dir = os.path.join(
+        repo_root, "integrations", "docker", "images", "stage-2", "chip-build-efr32", "files-slt"
+    )
     return [
-        os.path.join(script_dir, "wiseconnect-pkg.slt"),
-        os.path.join(script_dir, "sisdk-pkg.lock"),
+        os.path.join(files_slt_dir, "wiseconnect-pkg.slt"),
+        os.path.join(files_slt_dir, "sisdk-pkg.lock"),
     ]
 
 
