@@ -114,6 +114,10 @@
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
 #endif
 
+#if CONFIG_NXP_USE_POWER_DOWN
+#include "ICDUtil.h"
+#endif // CONFIG_NXP_USE_POWER_DOWN
+
 using namespace chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
@@ -226,6 +230,10 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
     VerifyOrDie(WifiConnectAtboot(chip::NXP::App::GetAppTask().GetWifiDriverInstance()) == CHIP_NO_ERROR);
 #endif
+
+#if CONFIG_NXP_USE_POWER_DOWN
+    VerifyOrDie(chip::Server::GetInstance().GetICDManager().RegisterObserver(&chip::NXP::App::GetAppICDObserver()));
+#endif // CONFIG_NXP_USE_POWER_DOWN
 }
 
 CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
