@@ -722,7 +722,7 @@ bool PairingCommand::GetDatastoreCATVersions(std::optional<uint16_t> & administr
     catVersionsResponse = {};
 
     ::pw_protobuf_Empty request = {};
-    auto call                     = rpcClient.GetCatVersions(request, OnGetCATVersionsDone);
+    auto call                   = rpcClient.GetCatVersions(request, OnGetCATVersionsDone);
     if (!call.active())
     {
         ChipLogError(JointFabric, "RPC: GetCatVersions call failed");
