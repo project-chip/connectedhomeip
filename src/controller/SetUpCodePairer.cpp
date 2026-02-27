@@ -405,7 +405,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverThreadMeshcop()
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 
-    if (mThreadMeshcopCommissionParams.HasValue() &&
+    if (!mThreadMeshcopCommissionParams.HasValue() ||
         mThreadMeshcopCommissionParams.Value().mBorderAgentAddress.GetTransportType() != Transport::Type::kThreadMeshcop)
     {
         ChipLogError(Controller, "The meshcopCommissioningParams is not set");
