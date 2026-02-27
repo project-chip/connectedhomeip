@@ -34,7 +34,10 @@
 #include <clusters/BridgedDeviceBasicInformation/Enums.h>
 #include <clusters/BridgedDeviceBasicInformation/Events.h>
 #include <clusters/BridgedDeviceBasicInformation/Metadata.h>
+#include <clusters/shared/Enums.h>
+#include <clusters/shared/Structs.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
@@ -238,6 +241,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestEmptyAttributes)
                                             Attributes::Reachable::kMetadataEntry,
                                             Attributes::NodeLabel::kMetadataEntry,
                                             Attributes::ConfigurationVersion::kMetadataEntry,
+                                            Attributes::DeviceLocation::kMetadataEntry,
                                         }));
 }
 
@@ -265,6 +269,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestPartialAttributes)
                                             Attributes::NodeLabel::kMetadataEntry,
                                             Attributes::PartNumber::kMetadataEntry,
                                             Attributes::ConfigurationVersion::kMetadataEntry,
+                                            Attributes::DeviceLocation::kMetadataEntry,
                                         }));
 }
 
@@ -317,6 +322,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestAllAttributes)
                                             Attributes::UniqueID::kMetadataEntry,
                                             Attributes::ProductAppearance::kMetadataEntry,
                                             Attributes::ConfigurationVersion::kMetadataEntry,
+                                            Attributes::DeviceLocation::kMetadataEntry,
                                         }));
 }
 
@@ -363,37 +369,37 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestAttributeReads)
     bool boolVal;
 
     EXPECT_EQ(tester.ReadAttribute(Attributes::UniqueID::Id, charSpanVal), CHIP_NO_ERROR);
-    EXPECT_TRUE(charSpanVal.data_equal(CharSpan::fromCharString("test-unique-id")));
+    EXPECT_TRUE(charSpanVal.data_equal("test-unique-id"_span));
     EXPECT_EQ(tester.ReadAttribute(Attributes::Reachable::Id, boolVal), CHIP_NO_ERROR);
     EXPECT_TRUE(boolVal);
     EXPECT_EQ(tester.ReadAttribute(Attributes::VendorName::Id, charSpanVal), CHIP_NO_ERROR);
-    EXPECT_TRUE(charSpanVal.data_equal(CharSpan::fromCharString("TestVendor")));
+    EXPECT_TRUE(charSpanVal.data_equal("TestVendor"_span));
     EXPECT_EQ(tester.ReadAttribute(Attributes::VendorID::Id, vendorIdVal), CHIP_NO_ERROR);
     EXPECT_EQ(vendorIdVal, VendorId::TestVendor1);
     EXPECT_EQ(tester.ReadAttribute(Attributes::ProductName::Id, charSpanVal), CHIP_NO_ERROR);
-    EXPECT_TRUE(charSpanVal.data_equal(CharSpan::fromCharString("TestProduct")));
+    EXPECT_TRUE(charSpanVal.data_equal("TestProduct"_span));
     EXPECT_EQ(tester.ReadAttribute(Attributes::ProductID::Id, u16Val), CHIP_NO_ERROR);
     EXPECT_EQ(u16Val, 0xABCD);
     EXPECT_EQ(tester.ReadAttribute(Attributes::NodeLabel::Id, charSpanVal), CHIP_NO_ERROR);
-    EXPECT_TRUE(charSpanVal.data_equal(CharSpan::fromCharString("TestLabel")));
+    EXPECT_TRUE(charSpanVal.data_equal("TestLabel"_span));
     EXPECT_EQ(tester.ReadAttribute(Attributes::HardwareVersion::Id, u16Val), CHIP_NO_ERROR);
     EXPECT_EQ(u16Val, 1u);
     EXPECT_EQ(tester.ReadAttribute(Attributes::HardwareVersionString::Id, charSpanVal), CHIP_NO_ERROR);
-    EXPECT_TRUE(charSpanVal.data_equal(CharSpan::fromCharString("v1.0")));
+    EXPECT_TRUE(charSpanVal.data_equal("v1.0"_span));
     EXPECT_EQ(tester.ReadAttribute(Attributes::SoftwareVersion::Id, u32Val), CHIP_NO_ERROR);
     EXPECT_EQ(u32Val, 2u);
     EXPECT_EQ(tester.ReadAttribute(Attributes::SoftwareVersionString::Id, charSpanVal), CHIP_NO_ERROR);
-    EXPECT_TRUE(charSpanVal.data_equal(CharSpan::fromCharString("v2.0")));
+    EXPECT_TRUE(charSpanVal.data_equal("v2.0"_span));
     EXPECT_EQ(tester.ReadAttribute(Attributes::ManufacturingDate::Id, charSpanVal), CHIP_NO_ERROR);
-    EXPECT_TRUE(charSpanVal.data_equal(CharSpan::fromCharString("20240101")));
+    EXPECT_TRUE(charSpanVal.data_equal("20240101"_span));
     EXPECT_EQ(tester.ReadAttribute(Attributes::PartNumber::Id, charSpanVal), CHIP_NO_ERROR);
-    EXPECT_TRUE(charSpanVal.data_equal(CharSpan::fromCharString("PN123")));
+    EXPECT_TRUE(charSpanVal.data_equal("PN123"_span));
     EXPECT_EQ(tester.ReadAttribute(Attributes::ProductURL::Id, charSpanVal), CHIP_NO_ERROR);
-    EXPECT_TRUE(charSpanVal.data_equal(CharSpan::fromCharString("http://test.com")));
+    EXPECT_TRUE(charSpanVal.data_equal("http://test.com"_span));
     EXPECT_EQ(tester.ReadAttribute(Attributes::ProductLabel::Id, charSpanVal), CHIP_NO_ERROR);
-    EXPECT_TRUE(charSpanVal.data_equal(CharSpan::fromCharString("Test Product Label")));
+    EXPECT_TRUE(charSpanVal.data_equal("Test Product Label"_span));
     EXPECT_EQ(tester.ReadAttribute(Attributes::SerialNumber::Id, charSpanVal), CHIP_NO_ERROR);
-    EXPECT_TRUE(charSpanVal.data_equal(CharSpan::fromCharString("SN789")));
+    EXPECT_TRUE(charSpanVal.data_equal("SN789"_span));
     EXPECT_EQ(tester.ReadAttribute(Attributes::ConfigurationVersion::Id, u32Val), CHIP_NO_ERROR);
     EXPECT_EQ(u32Val, 5u);
 
@@ -762,7 +768,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestSetNodeLabel)
 
     CharSpan nodeLabel;
     EXPECT_EQ(tester.ReadAttribute(Attributes::NodeLabel::Id, nodeLabel), CHIP_NO_ERROR);
-    EXPECT_TRUE(nodeLabel.data_equal(CharSpan::fromCharString("NewLabel")));
+    EXPECT_TRUE(nodeLabel.data_equal("NewLabel"_span));
 
     // Test no change
     mDelegate.mNodeLabelChangedCalled = false;
@@ -1046,6 +1052,154 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestStartupPersistence)
     // Delegate should have been called because stored value != constructor value
     EXPECT_TRUE(mDelegate.mNodeLabelChangedCalled);
     EXPECT_EQ(mDelegate.mLastNodeLabel, "StoredLabel");
+}
+
+bool LocationDescriptorStructEquals(const Globals::Structs::LocationDescriptorStruct::Type & a,
+                                    const Globals::Structs::LocationDescriptorStruct::Type & b)
+{
+    return a.locationName.data_equal(b.locationName) && (a.floorNumber == b.floorNumber) && (a.areaType == b.areaType);
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationWriteRead)
+{
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId = "test-devicelocation",
+                                                 },
+                                                 {},
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                 });
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    // Check initial read (should be null)
+    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> readLocationNullable;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
+    EXPECT_TRUE(readLocationNullable.IsNull());
+
+    Globals::Structs::LocationDescriptorStruct::Type testLocation;
+    testLocation.locationName = "Living Room"_span;
+    testLocation.floorNumber.SetNonNull(1);
+    testLocation.areaType.SetNonNull(Globals::AreaTypeTag::kLivingRoom);
+
+    // Write the location
+    EXPECT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, testLocation), CHIP_NO_ERROR);
+
+    // Read it back
+    EXPECT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
+    EXPECT_FALSE(readLocationNullable.IsNull());
+    EXPECT_TRUE(LocationDescriptorStructEquals(readLocationNullable.Value(), testLocation));
+
+    // Test clear (write valid location with null optionals)
+    Globals::Structs::LocationDescriptorStruct::Type clearLocation;
+    clearLocation.locationName = "Here"_span;
+    clearLocation.floorNumber.SetNull();
+    clearLocation.areaType.SetNull();
+    EXPECT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, clearLocation), CHIP_NO_ERROR);
+
+    EXPECT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
+    EXPECT_FALSE(readLocationNullable.IsNull());
+    EXPECT_TRUE(LocationDescriptorStructEquals(readLocationNullable.Value(), clearLocation));
+
+    // Test writing null
+    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> nullLocation;
+    nullLocation.SetNull();
+    EXPECT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, nullLocation), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
+    EXPECT_TRUE(readLocationNullable.IsNull());
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationValidation)
+{
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId = "test-devicelocation",
+                                                 },
+                                                 {},
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                 });
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Globals::Structs::LocationDescriptorStruct::Type invalidLocation;
+    invalidLocation.locationName = ""_span;
+    invalidLocation.floorNumber.SetNull();
+    invalidLocation.areaType.SetNull();
+
+    // Attempt to write invalid location
+    EXPECT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, invalidLocation), Status::ConstraintError);
+
+    // Check that the value is still null
+    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> readLocationNullable;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
+    EXPECT_TRUE(readLocationNullable.IsNull());
+}
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationPersistence)
+{
+    const ConcreteAttributePath path = { kTestEndpointId, BridgedDeviceBasicInformation::Id, Attributes::DeviceLocation::Id };
+
+    // Clear any previous persistence to ensure we start fresh
+    {
+        CHIP_ERROR err = mContext.StorageDelegate().SyncDeleteKeyValue(
+            DefaultStorageKeyAllocator::AttributeValue(kTestEndpointId, BridgedDeviceBasicInformation::Id,
+                                                       Attributes::DeviceLocation::Id)
+                .KeyName());
+        if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            EXPECT_EQ(err, CHIP_NO_ERROR);
+        }
+    }
+
+    Globals::Structs::LocationDescriptorStruct::Type testLocation;
+    testLocation.locationName = "Kitchen"_span;
+    testLocation.floorNumber.SetNonNull(0);
+    testLocation.areaType.SetNull();
+
+    // Scope to ensure cluster is destroyed and re-created
+    {
+        BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                     {
+                                                         .uniqueId = "test-devicelocation",
+                                                     },
+                                                     {},
+                                                     {
+                                                         .parentVersionConfiguration = mMockVersionConfiguration,
+                                                         .delegate                   = mDelegate,
+                                                         .timerDelegate              = mMockTimer,
+                                                     });
+        EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+        ClusterTester tester(cluster);
+
+        // Write the location
+        EXPECT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, testLocation), CHIP_NO_ERROR);
+    }
+
+    // Re-initialize cluster, it should load from persistence
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId = "test-devicelocation",
+                                                 },
+                                                 {},
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                 });
+    EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    // Read back and check
+    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> readLocationNullable;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
+    ASSERT_FALSE(readLocationNullable.IsNull());
+    EXPECT_TRUE(LocationDescriptorStructEquals(readLocationNullable.Value(), testLocation));
 }
 
 } // namespace

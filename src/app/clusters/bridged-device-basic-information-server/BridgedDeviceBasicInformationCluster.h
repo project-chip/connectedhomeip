@@ -22,6 +22,7 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/BridgedDeviceBasicInformation/ClusterId.h>
 #include <clusters/BridgedDeviceBasicInformation/Structs.h>
+#include <clusters/shared/Structs.h>
 #include <lib/support/TimerDelegate.h>
 
 #include <optional>
@@ -39,12 +40,31 @@ namespace chip::app::Clusters {
 ///   - Node-wide startup/shutdown events are provided by the Node's Basic Information cluster.
 ///   - Per-endpoint (bridged device) lifecycle is detectable via the Descriptor cluster.
 ///   - They are marked as Optional (O) in the Bridged Device Basic Information specification.
-///
-/// Note: DeviceLocation attribute (0x0017) is not supported as it is not in the standard Bridged Device Basic Information Cluster
-/// XML.
 class BridgedDeviceBasicInformationCluster : public DefaultServerCluster, public TimerContext
 {
 public:
+    // A device location, however without using Span (i.e. using actual strings and owning the storage)
+    struct OwnedDeviceLocation
+    {
+        std::string locationName;
+        std::optional<int16_t> floorNumber;
+        std::optional<Globals::AreaTypeTag> areaType;
+
+        OwnedDeviceLocation() = default;
+        OwnedDeviceLocation(const Globals::Structs::LocationDescriptorStruct::Type & other) { *this = other; }
+
+        // Return a view of this value as a LocationDescriptorStruct. The locationName
+        // will point into "this" so the lifetime of this MUST exceed the usage of the returned value.
+        Globals::Structs::LocationDescriptorStruct::Type ToView() const;
+
+        // compare with a non-owned version
+        bool operator==(const Globals::Structs::LocationDescriptorStruct::Type & other) const;
+        bool operator!=(const Globals::Structs::LocationDescriptorStruct::Type & other) const { return !(*this == other); }
+
+        // set the current value from a non-owned version
+        OwnedDeviceLocation & operator=(const Globals::Structs::LocationDescriptorStruct::Type & value);
+    };
+
     struct Context
     {
         // NOTE: These delegate references are used throughout the cluster's lifetime.
@@ -85,6 +105,7 @@ public:
         bool reachable = false; // initial value for reachable
         std::string nodeLabel;
         uint32_t configurationVersion = 1;
+        std::optional<OwnedDeviceLocation> deviceLocation;
     };
 
     BridgedDeviceBasicInformationCluster(EndpointId endpointId, RequiredData && required, FixedData && fixedData,
@@ -104,6 +125,14 @@ public:
     DataModel::ActionReturnStatus SetNodeLabel(CharSpan nodeLabel);
 
     uint32_t GetConfigurationVersion() const { return mRequiredData.configurationVersion; }
+
+    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> GetDeviceLocation() const
+    {
+        VerifyOrReturnValue(mRequiredData.deviceLocation.has_value(), DataModel::NullNullable);
+        return DataModel::MakeNullable(mRequiredData.deviceLocation->ToView());
+    }
+    DataModel::ActionReturnStatus
+    SetDeviceLocation(const DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> & location);
 
     /// Increases the configuration version and ALSO increases the device
     /// configuration version. Specifically handles the spec requirement of:
@@ -159,6 +188,21 @@ private:
     /// @param mode Whether to persist the new value to NVM.
     /// @return Status code indicating the result of the operation.
     DataModel::ActionReturnStatus SetNodeLabelInternal(CharSpan nodeLabel, PersistenceMode mode);
+
+    /// Updates the DeviceLocation attribute value with optional persistence.
+    ///
+    /// This internal helper validates the new value via the delegate, persists it to NVM if requested,
+    /// and then updates the in-memory state and notifies subscribers.
+    ///
+    /// @param location The new device location to set.
+    /// @param mode Whether to persist the new value to NVM.
+    /// @return Status code indicating the result of the operation.
+    DataModel::ActionReturnStatus
+    SetDeviceLocationInternal(const DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> & location,
+                              PersistenceMode mode);
+
+    /// Store the current DeviceLocation to persistent storage
+    CHIP_ERROR PersistDeviceLocation();
 
     // TimerContext
     void TimerFired() override;

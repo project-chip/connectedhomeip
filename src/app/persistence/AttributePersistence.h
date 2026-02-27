@@ -18,8 +18,11 @@
 #include <app/AttributeValueDecoder.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/String.h>
+#include <lib/core/TLV.h>
 
 #include <type_traits>
 
@@ -161,7 +164,57 @@ public:
     /// not use internal classes directly.
     CHIP_ERROR StoreString(const ConcreteAttributePath & path, const Storage::Internal::ShortString & value);
 
+    /// Validates that the value is different from the current one and writes to storage.
+    /// Uses the provided buffer for TLV encoding.
+    ///
+    /// The encoding format is:
+    ///   Structure (Anonymous Tag)
+    ///     <Value> (Context Tag 1)
+    ///   EndContainer
+    ///
+    /// This wrapper ensures valid top-level TLV elements and allows future extensibility.
+    template <typename T>
+    CHIP_ERROR StoreTLV(const ConcreteAttributePath & path, const T & value, MutableByteSpan buffer)
+    {
+        return InternalStoreTLV(path, buffer, const_cast<T *>(&value), [](void * context, TLV::TLVWriter & writer) -> CHIP_ERROR {
+            return DataModel::Encode(writer, kTLVEncodingTag, *static_cast<const T *>(context));
+        });
+    }
+
+    /// Stack-allocating overload for convenience.
+    template <size_t kMaxBufferSize, typename T>
+    CHIP_ERROR StoreTLV(const ConcreteAttributePath & path, const T & value)
+    {
+        uint8_t buffer[kMaxBufferSize];
+        return StoreTLV(path, value, MutableByteSpan(buffer));
+    }
+
+    /// Loads a TLV value from storage using the provided buffer.
+    ///
+    /// WARNING: If T contains views (e.g. Spans, DataModel::List), they will point into `buffer`.
+    /// The `buffer` MUST outlive the usage of `value`.
+    template <typename T>
+    CHIP_ERROR LoadTLV(const ConcreteAttributePath & path, T & value, MutableByteSpan buffer)
+    {
+        return InternalLoadTLV(path, buffer, &value, [](void * context, TLV::TLVReader & reader) -> CHIP_ERROR {
+            return DataModel::Decode(reader, *static_cast<T *>(context));
+        });
+    }
+
+    /// Stack-allocating overload for convenience.
+    template <size_t kMaxBufferSize, typename T>
+    CHIP_ERROR LoadTLV(const ConcreteAttributePath & path, T & value)
+    {
+        // NOTE: This overload assumes T does NOT contain views pointing to the buffer,
+        // because the buffer is destroyed when this function returns.
+        // Use the buffer-passing overload if T contains Views (like Span or List).
+        // Static assert is not available for "HasView", so we rely on documentation and careful usage.
+        uint8_t buffer[kMaxBufferSize];
+        return LoadTLV(path, value, MutableByteSpan(buffer));
+    }
+
 private:
+    static constexpr TLV::Tag kTLVEncodingTag = TLV::ContextTag(1);
     AttributePersistenceProvider & mProvider;
 
     /// Loads a raw value of size `size` into the memory pointed to by `data`.
@@ -171,6 +224,14 @@ private:
     /// reason for the load failure).
     bool InternalRawLoadNativeEndianValue(const ConcreteAttributePath & path, void * data, const void * valueOnLoadFailure,
                                           size_t size);
+
+    using TLVEncoderCallback = CHIP_ERROR (*)(void * context, TLV::TLVWriter & writer);
+    using TLVDecoderCallback = CHIP_ERROR (*)(void * context, TLV::TLVReader & reader);
+
+    CHIP_ERROR InternalStoreTLV(const ConcreteAttributePath & path, MutableByteSpan buffer, void * context,
+                                TLVEncoderCallback encoder);
+    CHIP_ERROR InternalLoadTLV(const ConcreteAttributePath & path, MutableByteSpan buffer, void * context,
+                               TLVDecoderCallback decoder);
 };
 
 } // namespace chip::app
