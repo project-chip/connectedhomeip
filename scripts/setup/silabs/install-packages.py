@@ -63,6 +63,7 @@ def make_executable(path):
     else:
         logger.warning("Path %s does not exist to make executable.", path)
 
+
 def download_slt_cli():
     """Download and extract SLT CLI tool to script directory."""
     platform_name, slt_cli_url = get_platform_vars()
