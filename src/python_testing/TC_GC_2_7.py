@@ -40,8 +40,8 @@ import random
 import secrets
 
 from mobly import asserts
-from TC_GCAST_common import (generate_membership_entry_matcher, generate_usedMcastAddrCount_entry_matcher, get_feature_map,
-                             valid_endpoints_list)
+from TC_GC_common import (generate_membership_entry_matcher, generate_usedMcastAddrCount_entry_matcher, get_feature_map,
+                          valid_endpoints_list)
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -54,11 +54,11 @@ from matter.testing.runner import TestStep, default_matter_test_main
 logger = logging.getLogger(__name__)
 
 
-class TC_GCAST_2_7(MatterBaseTest):
-    def desc_TC_GCAST_2_7(self):
-        return "[TC-GCAST-2.7] Multicast address policy and UsedMcastAddrCount with DUT as Server - PROVISIONAL"
+class TC_GC_2_7(MatterBaseTest):
+    def desc_TC_GC_2_7(self):
+        return "[TC-GC-2.7] Multicast address policy and UsedMcastAddrCount with DUT as Server - PROVISIONAL"
 
-    def steps_TC_GCAST_2_7(self):
+    def steps_TC_GC_2_7(self):
         return [
             TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test). This fabric is F1", is_commissioning=True),
             TestStep("1b", "TH removes any existing group and KeySetID on the DUT"),
@@ -81,11 +81,11 @@ class TC_GCAST_2_7(MatterBaseTest):
             TestStep(10, "Attempt to join 1 additional PerGroup group beyond A_max"),
         ]
 
-    def pics_TC_GCAST_2_7(self) -> list[str]:
-        return ["GCAST.S"]
+    def pics_TC_GC_2_7(self) -> list[str]:
+        return ["GC.S"]
 
     @run_if_endpoint_matches(has_cluster(Clusters.Groupcast))
-    async def test_TC_GCAST_2_7(self):
+    async def test_TC_GC_2_7(self):
         groupcast_cluster = Clusters.Objects.Groupcast
         membership_attribute = Clusters.Groupcast.Attributes.Membership
         max_membership_count_attribute = Clusters.Groupcast.Attributes.MaxMembershipCount

@@ -38,7 +38,7 @@ import logging
 import secrets
 
 from mobly import asserts
-from TC_GCAST_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
+from TC_GC_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
@@ -50,11 +50,11 @@ from matter.testing.runner import TestStep, default_matter_test_main
 logger = logging.getLogger(__name__)
 
 
-class TC_GCAST_2_3(MatterBaseTest):
-    def desc_TC_GCAST_2_3(self):
-        return "[TC-GCAST-2.3] UpdateGroupKey KeySetID assignment and key creation with DUT as Server - PROVISIONAL"
+class TC_GC_2_3(MatterBaseTest):
+    def desc_TC_GC_2_3(self):
+        return "[TC-GC-2.3] UpdateGroupKey KeySetID assignment and key creation with DUT as Server - PROVISIONAL"
 
-    def steps_TC_GCAST_2_3(self):
+    def steps_TC_GC_2_3(self):
         return [
             TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
             TestStep("1b", "TH removes any existing group and KeySetID on the DUT"),
@@ -73,18 +73,19 @@ class TC_GCAST_2_3(MatterBaseTest):
             TestStep(11, "TH awaits subscription report showing new Membership within max interval. (G1 shows KeySetID=K1)"),
         ]
 
-    def pics_TC_GCAST_2_3(self) -> list[str]:
-        return ["GCAST.S"]
+    def pics_TC_GC_2_3(self) -> list[str]:
+        return ["GC.S"]
 
     @run_if_endpoint_matches(has_cluster(Clusters.Groupcast))
-    async def test_TC_GCAST_2_3(self):
+    async def test_TC_GC_2_3(self):
         groupcast_cluster = Clusters.Objects.Groupcast
         membership_attribute = Clusters.Groupcast.Attributes.Membership
 
         self.step("1a")
         ln_enabled, sd_enabled, pga_enabled = await get_feature_map(self)
         endpoints_list = await valid_endpoints_list(self, ln_enabled)
-        endpoints_list = [endpoints_list[0]]
+        if ln_enabled and not endpoints_list:
+            endpoints_list = [endpoints_list[0]]
 
         self.step("1b")
         # Check if there are any groups on the DUT.

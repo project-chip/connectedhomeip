@@ -46,11 +46,11 @@ from matter.testing.runner import TestStep, default_matter_test_main
 logger = logging.getLogger(__name__)
 
 
-class TC_GCAST_2_1(MatterBaseTest):
-    def desc_TC_GCAST_2_1(self):
-        return "[TC-GCAST-2.1] Attributes with DUT as Server - Provisional"
+class TC_GC_2_1(MatterBaseTest):
+    def desc_TC_GC_2_1(self):
+        return "[TC-GC-2.1] Attributes with DUT as Server - Provisional"
 
-    def steps_TC_GCAST_2_1(self):
+    def steps_TC_GC_2_1(self):
         return [TestStep(1, "Commissioning, already done", is_commissioning=True),
                 TestStep(2, "TH reads from the DUT the Membership attribute"),
                 TestStep(3, "TH reads from the DUT the MaxMembershipCount attribute"),
@@ -58,11 +58,11 @@ class TC_GCAST_2_1(MatterBaseTest):
                 TestStep(5, "TH reads from the DUT the UsedMcastAddrCount attribute"),
                 TestStep(6, "TH reads from the DUT the FabricUnderTest attribute")]
 
-    def pics_TC_GCAST_2_1(self) -> list[str]:
-        return ["GCAST.S"]
+    def pics_TC_GC_2_1(self) -> list[str]:
+        return ["GC.S"]
 
     @run_if_endpoint_matches(has_cluster(Clusters.Groupcast))
-    async def test_TC_GCAST_2_1(self):
+    async def test_TC_GC_2_1(self):
         if self.matter_test_config.endpoint is None:
             self.matter_test_config.endpoint = 0
         groupcast_cluster = Clusters.Objects.Groupcast
