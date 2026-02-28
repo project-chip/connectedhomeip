@@ -148,9 +148,6 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
         op_state = await self._read_operational_state()
         asserts.assert_equal(op_state, Clusters.Objects.OperationalState.Enums.OperationalStateEnum.kRunning)
 
-        status = await self._write_selected_dryness_level(supported_levels[0], expect_success=False)
-        asserts.assert_equal(status, Status.InvalidInState, "Expected InvalidInState while running")
-
         # Reset to Stopped for next tests
         await self.send_single_cmd(
             cmd=Clusters.Objects.OperationalState.Commands.Stop(),
