@@ -39,15 +39,15 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
 
     def steps_TC_LAUNDRYDRYER(self):
         return [TestStep(1, "Commissioning already done.", is_commissioning=True),
-                TestStep(2, "Verification of Initial State."),
-                TestStep(3, "Valid Write Transaction."),
-                TestStep(4, "Nullable Support."),
-                TestStep(5, "Constraint Error: Value Not in Supported List."),
-                TestStep(6, "Constraint Error: Out-of-Bounds Enum."),
-                TestStep(7, "Invalid State Transition."),
-                TestStep(8, "Dynamic List Update (Mode Dependency)."),
-                TestStep(9, "Dead Front (Off State) Behavior."),
-                TestStep(10, "Test Identify.")]
+                TestStep(2, "[TC_LAUNDRY_DRYER_CONTROLS] Verification of Initial State."),
+                TestStep(3, "[TC_OPERATIONAL_STATE] Stop operational cycle if running."),
+                TestStep(4, "[TC_LAUNDRY_DRYER_CONTROLS] Nullable Support."),
+                TestStep(5, "[TC_LAUNDRY_DRYER_CONTROLS] Constraint Error: Value Not in Supported List."),
+                TestStep(6, "[TC_LAUNDRY_DRYER_CONTROLS] Constraint Error: Out-of-Bounds Enum."),
+                TestStep(7, "[TC_OPERATIONAL_STATE] Operational State Start Stop."),
+                TestStep(8, "[TC_LAUNDRY_WASHER_MODE] Dynamic List Update (Mode Dependency)."),
+                TestStep(9, "[TC_ON_OFF] Dead Front (Off State) Behavior."),
+                TestStep(10, "[TC_IDENTIFY] Test Identify.")]
 
     async def _read_supported_dryness_levels(self):
         return await self.read_single_attribute_check_success(
@@ -151,7 +151,7 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
         status = await self._write_selected_dryness_level(invalid_enum_value, expect_success=False)
         asserts.assert_equal(status, Status.ConstraintError, "Expected ConstraintError for invalid enum value")
 
-        # Step 7: Invalid State Transition
+        # Step 7: Operational State Start Stop
         self.step(7)
         # Change state to Running
         await self.send_single_cmd(
