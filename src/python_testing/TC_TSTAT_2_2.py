@@ -47,8 +47,6 @@ from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
-logger = logging.getLogger(__name__)
-
 cluster = Clusters.Thermostat
 
 
@@ -115,7 +113,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
                                    occupancy: Clusters.Thermostat.Bitmaps.OccupancyBitmap,
                                    endpoint: Optional[int] = None) -> None:
 
-        event_data = events_callback.wait_for_event_report(cluster.Events.SetpointChange)
+        event_data = events_callback.wait_for_event_type_report(cluster.Events.SetpointChange)
 
         asserts.assert_equal(system_mode, event_data.systemMode)
         asserts.assert_equal(occupancy, event_data.occupancy)
@@ -123,8 +121,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
         setpoint = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
         asserts.assert_equal(setpoint, event_data.currentSetpoint)
 
-    def flush_events(self, events_callback: EventSubscriptionHandler, wait_sec: float = 0.5):
-        time.sleep(wait_sec)
+    async def flush_events(self, events_callback: EventSubscriptionHandler, wait_sec: float = 0.5):
+        asyncio.sleep(wait_sec)
         events_callback.flush_events()
 
     @async_test_body
@@ -758,7 +756,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(OccupiedHeatingSetpointValue), endpoint_id=endpoint)
 
             if hasEventsFeature:
-                self.flush_events(events_callback)
+                await self.flush_events(events_callback)
 
             # Sends SetpointRaise Command Heat Only
             await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30), endpoint=endpoint)
@@ -777,7 +775,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(OccupiedHeatingSetpointValue), endpoint_id=endpoint)
 
             if hasEventsFeature:
-                self.flush_events(events_callback)
+                await self.flush_events(events_callback)
 
             # Test Harness Sends SetpointRaise Command Heat Only
             await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=30), endpoint=endpoint)
@@ -794,7 +792,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
         if self.pics_guard(hasCoolingFeature):
 
             if hasEventsFeature:
-                self.flush_events(events_callback)
+                await self.flush_events(events_callback)
 
             # Test Harness Sends SetpointRaise Command Cool Only
             await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kCool, amount=-30), endpoint=endpoint)
@@ -804,7 +802,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
             asserts.assert_equal(val, OccupiedCoolingSetpointValue - 30 * 10)
 
             if hasEventsFeature:
-                await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedHeatingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kHeat,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
+                if hasHeatingFeature:
+                    await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedHeatingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kHeat,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
                 await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
 
         self.step("16")
@@ -814,7 +813,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
             await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(OccupiedCoolingSetpointValue), endpoint_id=endpoint)
 
             if hasEventsFeature:
-                self.flush_events(events_callback)
+                await self.flush_events(events_callback)
 
             # Test Harness Sends SetpointRaise Command Cool Only
             await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kCool, amount=30), endpoint=endpoint)
@@ -838,7 +837,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
             if hasEventsFeature:
-                self.flush_events(events_callback)
+                await self.flush_events(events_callback)
 
             # Test Harness Sends SetpointRaise Command Heat & Cool
             await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=-30), endpoint=endpoint)
@@ -854,8 +853,10 @@ class TC_TSTAT_2_2(MatterBaseTest):
                 asserts.assert_equal(val, OccupiedHeatingSetpointValue - 30 * 10)
 
             if hasEventsFeature:
-                await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
-                await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedHeatingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kHeat,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
+                if hasCoolingFeature:
+                    await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
+                if hasHeatingFeature:
+                    await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedHeatingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kHeat,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
 
         self.step("18")
 
@@ -869,7 +870,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
             if hasEventsFeature:
-                self.flush_events(events_callback)
+                await self.flush_events(events_callback)
 
             # Test Harness Sends SetpointRaise Command Heat & Cool
             await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=Clusters.Objects.Thermostat.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=30), endpoint=endpoint)
@@ -885,8 +886,10 @@ class TC_TSTAT_2_2(MatterBaseTest):
                 asserts.assert_equal(val, OccupiedHeatingSetpointValue + 30 * 10)
 
             if hasEventsFeature:
-                await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
-                await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedHeatingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kHeat,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
+                if hasCoolingFeature:
+                    await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
+                if hasHeatingFeature:
+                    await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedHeatingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kHeat,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
 
         if self.pics_guard(hasCoolingFeature):
             # Restores OccupiedCoolingSetpoint to original value
