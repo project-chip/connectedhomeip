@@ -109,8 +109,7 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
             cmd=Clusters.Objects.TemperatureControl.Commands.SetTemperature(targetTemperatureLevel=level),
             endpoint=self._LAUNDRYDRYER_ENDPOINT)
 
-    async def _read_identify_time(self):
-
+    async def _send_on_off_command(self, on: bool):
         command = Clusters.Objects.OnOff.Commands.On() if on else Clusters.Objects.OnOff.Commands.Off()
         return await self.send_single_cmd(
             cmd=command,
