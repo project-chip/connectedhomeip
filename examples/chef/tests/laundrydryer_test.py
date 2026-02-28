@@ -46,7 +46,8 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
                 TestStep(6, "Constraint Error: Out-of-Bounds Enum."),
                 TestStep(7, "Invalid State Transition."),
                 TestStep(8, "Dynamic List Update (Mode Dependency)."),
-                TestStep(9, "Dead Front (Off State) Behavior.")]
+                TestStep(9, "Dead Front (Off State) Behavior."),
+                TestStep(10, "Test Identify.")]
 
     async def _read_supported_dryness_levels(self):
         return await self.read_single_attribute_check_success(
@@ -77,6 +78,12 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
             endpoint=self._LAUNDRYDRYER_ENDPOINT,
             cluster=Clusters.Objects.OnOff,
             attribute=Clusters.Objects.OnOff.Attributes.OnOff)
+
+    async def _read_identify_time(self):
+        return await self.read_single_attribute_check_success(
+            endpoint=self._LAUNDRYDRYER_ENDPOINT,
+            cluster=Clusters.Objects.Identify,
+            attribute=Clusters.Objects.Identify.Attributes.IdentifyTime)
 
     async def _send_on_off_command(self, on: bool):
         command = Clusters.Objects.OnOff.Commands.On() if on else Clusters.Objects.OnOff.Commands.Off()
@@ -205,6 +212,17 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
         # Recommended to be null
         if selected_level is not NullValue:
             logger.warning("SelectedDrynessLevel is not null in Dead Front state (recommended best effort).")
+
+        # Step 10: Test Identify
+        self.step(10)
+        asserts.assert_equal(await self._read_identify_time(), 0)
+        await self.send_single_cmd(
+            cmd=Clusters.Objects.Identify.Commands.Identify(identifyTime=5),
+            endpoint=self._LAUNDRYDRYER_ENDPOINT
+        )
+        identify_time = await self._read_identify_time()
+        asserts.assert_greater(identify_time, 0)
+        asserts.assert_less_equal(identify_time, 5)
 
 if __name__ == "__main__":
     default_matter_test_main()
