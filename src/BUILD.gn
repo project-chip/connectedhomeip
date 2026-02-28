@@ -59,6 +59,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/bindings/tests",
       "${chip_root}/src/app/clusters/boolean-state-configuration-server/tests",
       "${chip_root}/src/app/clusters/boolean-state-server/tests",
+      "${chip_root}/src/app/clusters/bridged-device-basic-information-server/tests",
       "${chip_root}/src/app/clusters/camera-av-stream-management-server/tests",
       "${chip_root}/src/app/clusters/camera-av-settings-user-level-management-server/tests",
       "${chip_root}/src/app/clusters/chime-server/tests",
@@ -104,6 +105,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/webrtc-transport-provider-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
+      "${chip_root}/src/app/clusters/wifi-network-management-server/tests",
       "${chip_root}/src/app/clusters/zone-management-server/tests",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
@@ -145,6 +147,14 @@ if (chip_build_tests) {
 
     if (current_os != "zephyr") {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
+    }
+
+    if (chip_device_platform == "darwin") {
+      # Darwin does not include the uriparser submodule, which is required by
+      # push-av-stream-transport-server tests.
+      tests -= [
+        "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
+      ]
     }
 
     if (current_os != "zephyr") {
