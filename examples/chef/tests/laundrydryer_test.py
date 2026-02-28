@@ -78,11 +78,11 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
             cluster=Clusters.Objects.OnOff,
             attribute=Clusters.Objects.OnOff.Attributes.OnOff)
 
-    async def _write_on_off(self, on_off: bool):
-        return await self.write_single_attribute(
-            attribute_value=Clusters.Objects.OnOff.Attributes.OnOff(value=on_off),
-            endpoint_id=self._LAUNDRYDRYER_ENDPOINT,
-            expect_success=True)
+    async def _send_on_off_command(self, on: bool):
+        command = Clusters.Objects.OnOff.Commands.On() if on else Clusters.Objects.OnOff.Commands.Off()
+        return await self.send_single_cmd(
+            cmd=command,
+            endpoint=self._LAUNDRYDRYER_ENDPOINT)
 
     @async_test_body
     async def test_TC_LAUNDRYDRYER(self):
@@ -196,10 +196,10 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
         self.step(9)
         # Ensure OnOff is True first
         if not await self._read_on_off():
-            await self._write_on_off(True)
+            await self._send_on_off_command(True)
         
-        # Set OnOff to False
-        await self._write_on_off(False)
+        # Set OnOff to False using Off command
+        await self._send_on_off_command(False)
         
         selected_level = await self._read_selected_dryness_level()
         # Recommended to be null
