@@ -328,6 +328,23 @@ class CertificateAuthorityManager:
 
         return ca
 
+    def new_fabric_admin(self, vendorId: int, fabricId: int):
+        """
+        Create a new certificate authority with a new fabric admin.
+
+        This is a convenience method that creates a new CertificateAuthority
+        and initializes it with a FabricAdmin with the specified vendorId and fabricId.
+
+        Arguments:
+            vendorId: The vendor ID for the fabric admin
+            fabricId: The fabric ID for the fabric admin
+
+        Returns:
+            FabricAdmin: The newly created fabric admin instance
+        """
+        new_cert_auth = self.NewCertificateAuthority()
+        return new_cert_auth.NewFabricAdmin(vendorId=vendorId, fabricId=fabricId)
+
     def Shutdown(self):
         ''' Shuts down all active CertificateAuthority instances tracked by this manager, before shutting itself down.
 
