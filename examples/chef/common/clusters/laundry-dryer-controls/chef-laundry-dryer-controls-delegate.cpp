@@ -19,10 +19,13 @@
 #include "chef-laundry-dryer-controls-delegate.h"
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 
+#if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace LaundryDryerControls {
+namespace Chef {
 
 CHIP_ERROR ChefDelegate::GetSupportedDrynessLevelAtIndex(size_t index, DrynessLevelEnum & supportedDryness)
 {
@@ -39,7 +42,10 @@ void ChefDelegate::Register(EndpointId endpoint)
     LaundryDryerControlsServer::SetDefaultDelegate(endpoint, this);
 }
 
+} // namespace Chef
 } // namespace LaundryDryerControls
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+#endif // #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT

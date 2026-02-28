@@ -20,13 +20,17 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-delegate.h>
+#include <app/util/config.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+
+#if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace LaundryDryerControls {
+namespace Chef {
 
 /**
  * @brief The ChefDelegate class implements the LaundryDryerControls::Delegate.
@@ -56,7 +60,10 @@ private:
                                                           DrynessLevelEnum::kExtra };
 };
 
+} // namespace Chef
 } // namespace LaundryDryerControls
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+#endif // #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT
