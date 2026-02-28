@@ -7,6 +7,7 @@
 #include <app/util/endpoint-config-api.h>
 #include <devices/Types.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/CHIPMem.h> // For chip::Platform
 
 using chip::app::DataModel::Nullable;
 
@@ -167,6 +168,10 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp2TagList[] = { P
 #ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
 #include "microwave-oven-control/chef-microwave-oven-control.h"
 #endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+
+#if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "laundry-dryer-controls/chef-laundry-dryer-controls-delegate.h"
+#endif // #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT
 
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
@@ -577,6 +582,21 @@ void GenericSwitchInit()
     }
 }
 
+/**
+ * This initializer is for the laundry dryer application rootnode_laundrydryer_01796fe396. To not have this initialiser affect
+ * new laundry dryer chef apps, use a different endpoint.
+ */
+void LaundryDryerInit()
+{
+#if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    // Only initialises Laundry Dryer Controls. Other clusters are initialised through ember calls.
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kLaundryDryerDeviceTypeId))
+    {
+        Platform::New<LaundryDryerControls::Chef::ChefDelegate>()->Register(1);
+    }
+#endif // #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT
+}
+
 void ApplicationInit()
 {
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
@@ -584,6 +604,7 @@ void ApplicationInit()
     RefrigeratorTemperatureControlledCabinetInit();
     OvenTemperatureControlledCabinetCooktopCookSurfaceInit();
     GenericSwitchInit();
+    LaundryDryerInit();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
