@@ -21,7 +21,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.interaction_model import Status
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
@@ -272,11 +272,14 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
 
         # Step 11.4: Execute Invalid Change
         invalid_temp_level = len(supported_temp_levels) + 1
-        await self.send_single_cmd(
-            cmd=Clusters.Objects.TemperatureControl.Commands.SetTemperature(targetTemperatureLevel=invalid_temp_level),
-            endpoint=self._LAUNDRYDRYER_ENDPOINT,
-            expect_status=Status.ConstraintError
-        )
+        try:
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.TemperatureControl.Commands.SetTemperature(targetTemperatureLevel=invalid_temp_level),
+                endpoint=self._LAUNDRYDRYER_ENDPOINT
+            )
+            asserts.fail("Expected ConstraintError for invalid temperature level but it succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError, "Expected ConstraintError for invalid temperature level")
         
         # Verify it remained unchanged
         current_temp_level = await self._read_selected_temperature_level()
