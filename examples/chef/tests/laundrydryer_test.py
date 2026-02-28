@@ -175,7 +175,7 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
         await self.send_single_cmd(
             cmd=Clusters.Objects.OperationalState.Commands.Start(),
             endpoint=self._LAUNDRYDRYER_ENDPOINT)
-        
+
         op_state = await self._read_operational_state()
         asserts.assert_equal(op_state, Clusters.Objects.OperationalState.Enums.OperationalStateEnum.kRunning)
 
@@ -191,10 +191,10 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
             endpoint=self._LAUNDRYDRYER_ENDPOINT,
             cluster=Clusters.Objects.LaundryWasherMode,
             attribute=Clusters.Objects.LaundryWasherMode.Attributes.SupportedModes)
-        
+
         if len(supported_modes) > 1:
             initial_supported_dryness = await self._read_supported_dryness_levels()
-            
+
             # Try to find Delicates and Heavy labels
             delicates_mode = next((m.mode for m in supported_modes if "Delicate" in m.label), None)
             heavy_mode = next((m.mode for m in supported_modes if "Heavy" in m.label), None)
@@ -231,10 +231,10 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
         # Ensure OnOff is True first
         if not await self._read_on_off():
             await self._send_on_off_command(True)
-        
+
         # Set OnOff to False using Off command
         await self._send_on_off_command(False)
-        
+
         selected_level = await self._read_selected_dryness_level()
         # Recommended to be null
         if selected_level is not NullValue:
@@ -266,7 +266,7 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
         # Try to change to a different level if possible
         target_temp_level = (initial_temp_level + 1) % len(supported_temp_levels)
         await self._send_set_temperature_level_command(target_temp_level)
-        
+
         current_temp_level = await self._read_selected_temperature_level()
         asserts.assert_equal(current_temp_level, target_temp_level, "SelectedTemperatureLevel should match target")
 
@@ -280,7 +280,7 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
             asserts.fail("Expected ConstraintError for invalid temperature level but it succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError, "Expected ConstraintError for invalid temperature level")
-        
+
         # Verify it remained unchanged
         current_temp_level = await self._read_selected_temperature_level()
         asserts.assert_equal(current_temp_level, target_temp_level, "SelectedTemperatureLevel should remain unchanged after invalid write")
