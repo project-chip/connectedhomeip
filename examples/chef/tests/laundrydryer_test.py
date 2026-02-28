@@ -47,7 +47,8 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
                 TestStep(7, "[TC_OPERATIONAL_STATE] Operational State Start Stop."),
                 TestStep(8, "[TC_LAUNDRY_WASHER_MODE] Dynamic List Update (Mode Dependency)."),
                 TestStep(9, "[TC_ON_OFF] Dead Front (Off State) Behavior."),
-                TestStep(10, "[TC_IDENTIFY] Test Identify.")]
+                TestStep(10, "[TC_IDENTIFY] Test Identify."),
+                TestStep(11, "[TC_TEMPERATURE_CONTROL] Test Temperature Control.")]
 
     async def _read_supported_dryness_levels(self):
         return await self.read_single_attribute_check_success(
@@ -91,7 +92,25 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
             cluster=Clusters.Objects.LaundryWasherMode,
             attribute=Clusters.Objects.LaundryWasherMode.Attributes.CurrentMode)
 
-    async def _send_on_off_command(self, on: bool):
+    async def _read_supported_temperature_levels(self):
+        return await self.read_single_attribute_check_success(
+            endpoint=self._LAUNDRYDRYER_ENDPOINT,
+            cluster=Clusters.Objects.TemperatureControl,
+            attribute=Clusters.Objects.TemperatureControl.Attributes.SupportedTemperatureLevels)
+
+    async def _read_selected_temperature_level(self):
+        return await self.read_single_attribute_check_success(
+            endpoint=self._LAUNDRYDRYER_ENDPOINT,
+            cluster=Clusters.Objects.TemperatureControl,
+            attribute=Clusters.Objects.TemperatureControl.Attributes.SelectedTemperatureLevel)
+
+    async def _send_set_temperature_level_command(self, level):
+        return await self.send_single_cmd(
+            cmd=Clusters.Objects.TemperatureControl.Commands.SetTemperature(targetTemperatureLevel=level),
+            endpoint=self._LAUNDRYDRYER_ENDPOINT)
+
+    async def _read_identify_time(self):
+
         command = Clusters.Objects.OnOff.Commands.On() if on else Clusters.Objects.OnOff.Commands.Off()
         return await self.send_single_cmd(
             cmd=command,
@@ -232,6 +251,37 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
         identify_time = await self._read_identify_time()
         asserts.assert_greater(identify_time, 0)
         asserts.assert_less_equal(identify_time, 5)
+
+        # Step 11: Test Temperature Control
+        self.step(11)
+        # Step 11.1: Discover Capabilities
+        supported_temp_levels = await self._read_supported_temperature_levels()
+        asserts.assert_greater(len(supported_temp_levels), 0, "SupportedTemperatureLevels should not be empty")
+        logger.info(f"Supported temperature levels: {supported_temp_levels}")
+
+        # Step 11.2: Read Initial State
+        initial_temp_level = await self._read_selected_temperature_level()
+        logger.info(f"Initial temperature level: {initial_temp_level}")
+
+        # Step 11.3: Execute Valid Change
+        # Try to change to a different level if possible
+        target_temp_level = (initial_temp_level + 1) % len(supported_temp_levels)
+        await self._send_set_temperature_level_command(target_temp_level)
+        
+        current_temp_level = await self._read_selected_temperature_level()
+        asserts.assert_equal(current_temp_level, target_temp_level, "SelectedTemperatureLevel should match target")
+
+        # Step 11.4: Execute Invalid Change
+        invalid_temp_level = len(supported_temp_levels) + 1
+        await self.send_single_cmd(
+            cmd=Clusters.Objects.TemperatureControl.Commands.SetTemperature(targetTemperatureLevel=invalid_temp_level),
+            endpoint=self._LAUNDRYDRYER_ENDPOINT,
+            expect_status=Status.ConstraintError
+        )
+        
+        # Verify it remained unchanged
+        current_temp_level = await self._read_selected_temperature_level()
+        asserts.assert_equal(current_temp_level, target_temp_level, "SelectedTemperatureLevel should remain unchanged after invalid write")
 
 if __name__ == "__main__":
     default_matter_test_main()
