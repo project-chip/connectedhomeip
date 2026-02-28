@@ -34,8 +34,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-import time
 from typing import Optional
 
 from mobly import asserts
