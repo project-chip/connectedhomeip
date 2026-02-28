@@ -38,7 +38,7 @@ namespace Chef {
 class ChefDelegate : public Delegate
 {
 public:
-    ChefDelegate()          = default;
+    ChefDelegate()           = default;
     ~ChefDelegate() override = default;
 
     /**
