@@ -218,6 +218,19 @@ public:
          *  @param[in] old_group  GroupInfo structure of the removed group.
          */
         virtual void OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group) = 0;
+        /**
+         *  Callback invoked when an existing group is modified.
+         *  The modifications may be any of the following:
+         *  - Endpoints List modified
+         *  - KeySetID modified
+         *  - Flags modified (kHasAuxiliaryACL or kMcastAddrPolicy)
+         *
+         * Note that this callback is not invoked when the group is added or removed.
+         * Those events are handled by the OnGroupAdded and OnGroupRemoved callbacks respectively.
+         *
+         *  @param[in] modified_group_id  ID of the modified group.
+         */
+        virtual void OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id){};
     };
 
     using GroupInfoIterator    = CommonIterator<GroupInfo>;
@@ -229,6 +242,12 @@ public:
     GroupDataProvider(uint16_t maxGroupsPerFabric, uint16_t maxGroupKeysPerFabric) :
         mMaxGroupsPerFabric(maxGroupsPerFabric), mMaxGroupKeysPerFabric(maxGroupKeysPerFabric)
     {}
+
+    enum class GroupCleanupPolicy
+    {
+        kDeleteGroupIfEmpty, // Default behavior for legacy Groups
+        kKeepGroupIfEmpty    // Required for Groupcast Sender feature
+    };
 
     virtual ~GroupDataProvider() = default;
 
@@ -265,6 +284,10 @@ public:
     // Endpoints
     virtual bool HasEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id)          = 0;
     virtual CHIP_ERROR AddEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id)    = 0;
+    virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id,
+                                      GroupCleanupPolicy cleanupPolicy)                                   = 0;
+    virtual CHIP_ERROR RemoveEndpointAllGroups(FabricIndex fabric_index, EndpointId endpoint_id,
+                                               GroupCleanupPolicy cleanupPolicy)                          = 0;
     virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) = 0;
     virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, EndpointId endpoint_id)                   = 0;
     virtual CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id)                        = 0;
@@ -392,6 +415,16 @@ protected:
             if (listener != nullptr)
             {
                 listener->OnGroupRemoved(fabric_index, old_group);
+            }
+        }
+    }
+    void GroupModified(FabricIndex fabric_index, const GroupId & modified_group_id)
+    {
+        for (auto * listener : mListeners)
+        {
+            if (listener != nullptr)
+            {
+                listener->OnGroupModified(fabric_index, modified_group_id);
             }
         }
     }

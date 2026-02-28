@@ -100,19 +100,21 @@ private:
 
     Status SetKeySet(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id, const chip::Optional<chip::ByteSpan> & key);
     Status RemoveGroup(FabricIndex fabric_index, GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                       EndpointList & endpoints);
-    Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id, EndpointList & endpoints);
-    uint16_t GetUsedMcastAddrCount();
+                       EndpointList * endpoints);
+    Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id, EndpointList * endpoints);
+    void UpdateUsedMcastAddrCount();
     // GroupListener implementation
     void OnGroupAdded(FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group) override;
     void OnGroupRemoved(FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override;
-    void NotifyUsedMcastAddrCountChange();
+    void OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id) override;
+    void NotifyUsedMcastAddrCountOnChange();
     void NotifyMembershipChanged();
 
     GroupcastContext & mContext;
     const BitFlags<Groupcast::Feature> mFeatures;
     DataModel::Provider * mDataModelProvider = nullptr;
     uint16_t mUsedMcastAddrCount             = 0;
+    bool mIanaAddressUsed                    = false;
     Listener * mListener                     = nullptr;
 };
 

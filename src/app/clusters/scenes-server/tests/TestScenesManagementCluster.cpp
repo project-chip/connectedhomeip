@@ -176,6 +176,8 @@ public:
     CHIP_ERROR RemoveGroupInfoAt(FabricIndex, size_t) override { return CHIP_NO_ERROR; }
     bool HasEndpoint(FabricIndex fabric, GroupId group, EndpointId endpoint) override { return mHasEndpoint; }
     CHIP_ERROR AddEndpoint(FabricIndex, GroupId, EndpointId) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR RemoveEndpoint(FabricIndex, GroupId, EndpointId, GroupCleanupPolicy) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR RemoveEndpointAllGroups(FabricIndex, EndpointId, GroupCleanupPolicy) override { return CHIP_NO_ERROR; }
     CHIP_ERROR RemoveEndpoint(FabricIndex, GroupId, EndpointId) override { return CHIP_NO_ERROR; }
     CHIP_ERROR RemoveEndpoint(FabricIndex, EndpointId) override { return CHIP_NO_ERROR; }
     CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id) override { return CHIP_NO_ERROR; }

@@ -23,6 +23,79 @@
 namespace chip {
 namespace app {
 
+void JointFabricDatastore::CopyGroupKeySetWithOwnedSpans(
+    const Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & source,
+    Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & destination)
+{
+    auto & storage = mGroupKeySetStorage[source.groupKeySetID];
+
+    destination.groupKeySetID           = source.groupKeySetID;
+    destination.groupKeySecurityPolicy  = source.groupKeySecurityPolicy;
+    destination.groupKeyMulticastPolicy = source.groupKeyMulticastPolicy;
+
+    CopyByteSpanWithOwnedStorage(source.epochKey0, storage.epochKey0, destination.epochKey0);
+    CopyByteSpanWithOwnedStorage(source.epochKey1, storage.epochKey1, destination.epochKey1);
+    CopyByteSpanWithOwnedStorage(source.epochKey2, storage.epochKey2, destination.epochKey2);
+
+    CopyNullableValue(source.epochStartTime0, destination.epochStartTime0);
+    CopyNullableValue(source.epochStartTime1, destination.epochStartTime1);
+    CopyNullableValue(source.epochStartTime2, destination.epochStartTime2);
+}
+
+void JointFabricDatastore::RemoveGroupKeySetStorage(uint16_t groupKeySetId)
+{
+    mGroupKeySetStorage.erase(groupKeySetId);
+}
+
+void JointFabricDatastore::SetGroupInformationFriendlyNameWithOwnedStorage(
+    GroupId groupId, const CharSpan & friendlyName,
+    Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type & destination)
+{
+    auto & storage = mGroupInformationStorage[groupId];
+    storage.friendlyName.assign(friendlyName.data(), friendlyName.data() + friendlyName.size());
+    destination.friendlyName = CharSpan(storage.friendlyName.data(), storage.friendlyName.size());
+}
+
+void JointFabricDatastore::RemoveGroupInformationStorage(GroupId groupId)
+{
+    mGroupInformationStorage.erase(groupId);
+}
+
+CHIP_ERROR JointFabricDatastore::SetAdminEntryWithOwnedStorage(
+    NodeId nodeId, const CharSpan & friendlyName, const ByteSpan & icac,
+    Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type & destination)
+{
+    auto & storage = mAdminEntryStorage[nodeId];
+
+    storage.friendlyName.assign(friendlyName.data(), friendlyName.data() + friendlyName.size());
+    destination.friendlyName = CharSpan(storage.friendlyName.data(), storage.friendlyName.size());
+
+    storage.icac.assign(icac.data(), icac.data() + icac.size());
+    destination.icac = ByteSpan(storage.icac.data(), storage.icac.size());
+
+    return CHIP_NO_ERROR;
+}
+
+void JointFabricDatastore::RemoveAdminEntryStorage(NodeId nodeId)
+{
+    mAdminEntryStorage.erase(nodeId);
+}
+
+void JointFabricDatastore::CopyByteSpanWithOwnedStorage(const DataModel::Nullable<ByteSpan> & source,
+                                                        std::vector<uint8_t> & storage, DataModel::Nullable<ByteSpan> & destination)
+{
+    if (!source.IsNull())
+    {
+        storage.assign(source.Value().data(), source.Value().data() + source.Value().size());
+        destination = ByteSpan(storage.data(), storage.size());
+    }
+    else
+    {
+        storage.clear();
+        destination.SetNull();
+    }
+}
+
 void JointFabricDatastore::AddListener(Listener & listener)
 {
     if (mListeners == nullptr)
@@ -540,24 +613,33 @@ CHIP_ERROR JointFabricDatastore::ContinueRefresh()
 
                         if (it == mGroupKeySetList.end())
                         {
-                            mGroupKeySetList.push_back(groupKeySet);
+                            Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type copiedKeySet;
+                            CopyGroupKeySetWithOwnedSpans(groupKeySet, copiedKeySet);
+                            mGroupKeySetList.push_back(copiedKeySet);
                         }
                         else
                         {
                             // Update existing entry
-                            *it = groupKeySet;
+                            CopyGroupKeySetWithOwnedSpans(groupKeySet, *it);
                         }
                     }
 
                     // Remove entries not in groupKeySets
-                    mGroupKeySetList.erase(std::remove_if(mGroupKeySetList.begin(), mGroupKeySetList.end(),
-                                                          [&](const auto & entry) {
-                                                              return !std::any_of(
-                                                                  groupKeySets.begin(), groupKeySets.end(), [&](const auto & gks) {
-                                                                      return entry.groupKeySetID == gks.groupKeySetID;
-                                                                  });
-                                                          }),
-                                           mGroupKeySetList.end());
+                    for (auto it = mGroupKeySetList.begin(); it != mGroupKeySetList.end();)
+                    {
+                        const bool existsOnNode = std::any_of(groupKeySets.begin(), groupKeySets.end(), [&](const auto & gks) {
+                            return it->groupKeySetID == gks.groupKeySetID;
+                        });
+                        if (!existsOnNode)
+                        {
+                            RemoveGroupKeySetStorage(it->groupKeySetID);
+                            it = mGroupKeySetList.erase(it);
+                        }
+                        else
+                        {
+                            ++it;
+                        }
+                    }
 
                     // Advance the state machine to process the group key sets.
                     mRefreshState = kRefreshingGroupKeySets;
@@ -859,12 +941,16 @@ CHIP_ERROR JointFabricDatastore::IsNodeIDInDatastore(NodeId nodeId, size_t & ind
 }
 
 CHIP_ERROR
-JointFabricDatastore::AddGroupKeySetEntry(Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet)
+JointFabricDatastore::AddGroupKeySetEntry(
+    const Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet)
 {
     VerifyOrReturnError(IsGroupKeySetEntryPresent(groupKeySet.groupKeySetID) == false, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(mGroupKeySetList.size() < kMaxGroupKeySet, CHIP_ERROR_NO_MEMORY);
 
-    mGroupKeySetList.push_back(groupKeySet);
+    Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type copiedKeySet;
+    CopyGroupKeySetWithOwnedSpans(groupKeySet, copiedKeySet);
+
+    mGroupKeySetList.push_back(copiedKeySet);
 
     return CHIP_NO_ERROR;
 }
@@ -890,6 +976,7 @@ CHIP_ERROR JointFabricDatastore::RemoveGroupKeySetEntry(uint16_t groupKeySetId)
     {
         if (it->groupKeySetID == groupKeySetId)
         {
+            RemoveGroupKeySetStorage(groupKeySetId);
             mGroupKeySetList.erase(it);
             return CHIP_NO_ERROR;
         }
@@ -914,7 +1001,7 @@ JointFabricDatastore::UpdateGroupKeySetEntry(
                                         Clusters::JointFabricDatastore::DatastoreGroupKeyMulticastPolicyEnum::kUnknownEnumValue,
                                 CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-            entry = groupKeySet;
+            CopyGroupKeySetWithOwnedSpans(groupKeySet, entry);
 
             return CHIP_NO_ERROR;
         }
@@ -929,6 +1016,8 @@ JointFabricDatastore::AddAdmin(
 {
     VerifyOrReturnError(IsAdminEntryPresent(adminId.nodeID) == false, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(mAdminEntries.size() < kMaxAdminNodes, CHIP_ERROR_NO_MEMORY);
+
+    ReturnErrorOnFailure(SetAdminEntryWithOwnedStorage(adminId.nodeID, adminId.friendlyName, adminId.icac, adminId));
 
     mAdminEntries.push_back(adminId);
 
@@ -954,8 +1043,7 @@ CHIP_ERROR JointFabricDatastore::UpdateAdmin(NodeId nodeId, CharSpan friendlyNam
     {
         if (entry.nodeID == nodeId)
         {
-            entry.friendlyName = friendlyName;
-            entry.icac         = icac;
+            ReturnErrorOnFailure(SetAdminEntryWithOwnedStorage(nodeId, friendlyName, icac, entry));
             return CHIP_NO_ERROR;
         }
     }
@@ -970,6 +1058,7 @@ CHIP_ERROR JointFabricDatastore::RemoveAdmin(NodeId nodeId)
         if (it->nodeID == nodeId)
         {
             mAdminEntries.erase(it);
+            RemoveAdminEntryStorage(nodeId);
             return CHIP_NO_ERROR;
         }
     }
@@ -1049,11 +1138,11 @@ CHIP_ERROR JointFabricDatastore::AddGroup(const Clusters::JointFabricDatastore::
 
     Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type groupEntry;
     groupEntry.groupID         = commandData.groupID;
-    groupEntry.friendlyName    = commandData.friendlyName;
     groupEntry.groupKeySetID   = commandData.groupKeySetID;
     groupEntry.groupCAT        = commandData.groupCAT;
     groupEntry.groupCATVersion = commandData.groupCATVersion;
     groupEntry.groupPermission = commandData.groupPermission;
+    SetGroupInformationFriendlyNameWithOwnedStorage(commandData.groupID, commandData.friendlyName, groupEntry);
 
     // Add the group entry to the datastore
     mGroupInformationEntries.push_back(groupEntry);
@@ -1071,11 +1160,11 @@ JointFabricDatastore::ForceAddGroup(const Clusters::JointFabricDatastore::Comman
 
     Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type groupEntry;
     groupEntry.groupID         = commandData.groupID;
-    groupEntry.friendlyName    = commandData.friendlyName;
     groupEntry.groupKeySetID   = commandData.groupKeySetID;
     groupEntry.groupCAT        = commandData.groupCAT;
     groupEntry.groupCATVersion = commandData.groupCATVersion;
     groupEntry.groupPermission = commandData.groupPermission;
+    SetGroupInformationFriendlyNameWithOwnedStorage(commandData.groupID, commandData.friendlyName, groupEntry);
 
     // Add the group entry to the datastore
     mGroupInformationEntries.push_back(groupEntry);
@@ -1126,14 +1215,16 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
 
                     if (syncErr != CHIP_NO_ERROR)
                     {
-                        ChipLogError(DataManagement, "Failed to sync node for group friendly name update, leaving as pending: %s",
-                                     ErrorStr(syncErr));
+                        ChipLogError(DataManagement,
+                                     "Failed to sync node for group friendly name update, leaving as pending: %" CHIP_ERROR_FORMAT,
+                                     syncErr.Format());
                     }
                 }
             }
 
             // Update the friendly name in the datastore
-            mGroupInformationEntries[index].friendlyName = commandData.friendlyName.Value();
+            SetGroupInformationFriendlyNameWithOwnedStorage(static_cast<GroupId>(mGroupInformationEntries[index].groupID),
+                                                            commandData.friendlyName.Value(), mGroupInformationEntries[index]);
         }
     }
     if (commandData.groupKeySetID.IsNull() == false)
@@ -1254,7 +1345,9 @@ JointFabricDatastore::RemoveGroup(const Clusters::JointFabricDatastore::Commands
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
+    const GroupId removedGroupId = static_cast<GroupId>(it->groupID);
     mGroupInformationEntries.erase(it);
+    RemoveGroupInformationStorage(removedGroupId);
 
     return CHIP_NO_ERROR;
 }

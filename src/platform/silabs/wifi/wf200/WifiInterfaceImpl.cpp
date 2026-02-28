@@ -43,7 +43,7 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
-using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
+using namespace ::chip::app::Clusters::NetworkCommissioning;
 
 // TODO: This is a workaround because we depend on the platform lib which depends on the platform implementation.
 //       As such we can't depend on the platform here as well
@@ -440,27 +440,27 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
     TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(scannedSsid, outputSsid);
     ap->scan.ssid_length = outputSsid.size();
 
-    // Set Network Security - We start by WPA3 to set the most secure type
-    ap->scan.security = WFX_SEC_UNSPECIFIED;
+    // Set Network Security using Matter WiFiSecurityBitmap
+    ap->scan.security.ClearAll();
     if (scan_result->security_mode.wpa3)
     {
-        ap->scan.security = WFX_SEC_WPA3;
+        ap->scan.security.Set(WiFiSecurityBitmap::kWpa3Personal);
     }
-    else if (scan_result->security_mode.wpa2)
+    if (scan_result->security_mode.wpa2)
     {
-        ap->scan.security = WFX_SEC_WPA2;
+        ap->scan.security.Set(WiFiSecurityBitmap::kWpa2Personal);
     }
-    else if (scan_result->security_mode.wpa)
+    if (scan_result->security_mode.wpa)
     {
-        ap->scan.security = WFX_SEC_WPA;
+        ap->scan.security.Set(WiFiSecurityBitmap::kWpaPersonal);
     }
-    else if (scan_result->security_mode.wep)
+    if (scan_result->security_mode.wep)
     {
-        ap->scan.security = WFX_SEC_WEP;
+        ap->scan.security.Set(WiFiSecurityBitmap::kWep);
     }
-    else
+    if (!ap->scan.security.HasAny())
     {
-        ap->scan.security = WFX_SEC_NONE;
+        ap->scan.security.Set(WiFiSecurityBitmap::kUnencrypted);
     }
 
     ap->scan.chan = scan_result->channel;
@@ -718,7 +718,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
     ChipLogDetail(DeviceLayer, "WIFI:SSID     : %s", ap_info.ssid);
     ChipLogDetail(DeviceLayer, "WIFI:BSSID    : %02x:%02x:%02x:%02x:%02x:%02x", ap_info.bssid[0], ap_info.bssid[1],
                   ap_info.bssid[2], ap_info.bssid[3], ap_info.bssid[4], ap_info.bssid[5]);
-    ChipLogDetail(DeviceLayer, "WIFI:security : %d", info.security);
+    ChipLogDetail(DeviceLayer, "WIFI:security : 0x%x", static_cast<unsigned>(info.security.Raw()));
     ChipLogDetail(DeviceLayer, "WIFI:channel  :  %d", info.chan);
     ChipLogDetail(DeviceLayer, "signal_strength: %ld", signal_strength);
 
@@ -798,23 +798,26 @@ CHIP_ERROR WifiInterfaceImpl::ConnectToAccessPoint(void)
                   "Time: %d, Number of prob: %d",
                   ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
     (void) sl_wfx_set_scan_parameters(ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
-    switch (wifi_provision.security)
+    const chip::BitFlags<WiFiSecurityBitmap> & sec = wifi_provision.security;
+    if (sec.Has(WiFiSecurityBitmap::kWpa3Personal))
     {
-    case WFX_SEC_WEP:
-        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WEP;
-        break;
-    case WFX_SEC_WPA:
-    case WFX_SEC_WPA2:
-        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA2_WPA1_PSK;
-        break;
-    case WFX_SEC_WPA3:
         connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA3_SAE;
-        break;
-    case WFX_SEC_NONE:
+    }
+    else if (sec.HasAny(WiFiSecurityBitmap::kWpa2Personal, WiFiSecurityBitmap::kWpaPersonal))
+    {
+        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA2_WPA1_PSK;
+    }
+    else if (sec.Has(WiFiSecurityBitmap::kWep))
+    {
+        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WEP;
+    }
+    else if (sec.Has(WiFiSecurityBitmap::kUnencrypted))
+    {
         connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_OPEN;
-        break;
-    default:
-        ChipLogError(DeviceLayer, "error: unknown security type.");
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "error: unknown or unsupported security type.");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -874,10 +877,8 @@ void WifiInterfaceImpl::ConnectionEventCallback(sl_wfx_connect_ind_body_t connec
     case WFM_STATUS_SUCCESS: {
         ChipLogProgress(DeviceLayer, "STA-Connected");
 
-        ap_info.chan = connect_indication_body.channel;
-        chip::ByteSpan securitySpan(reinterpret_cast<const uint8_t *>(&wifi_provision.security), sizeof(wifi_provision.security));
-        chip::MutableByteSpan apSecurityMutableSpan(reinterpret_cast<uint8_t *>(&ap_info.security), sizeof(ap_info.security));
-        TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(securitySpan, apSecurityMutableSpan);
+        ap_info.chan     = connect_indication_body.channel;
+        ap_info.security = wifi_provision.security;
 
         // Store SSID
         chip::ByteSpan apSsidSpan(wifi_provision.ssid, wifi_provision.ssidLength);
