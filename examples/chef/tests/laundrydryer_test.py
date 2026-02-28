@@ -85,6 +85,12 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
             cluster=Clusters.Objects.Identify,
             attribute=Clusters.Objects.Identify.Attributes.IdentifyTime)
 
+    async def _read_laundry_washer_current_mode(self):
+        return await self.read_single_attribute_check_success(
+            endpoint=self._LAUNDRYDRYER_ENDPOINT,
+            cluster=Clusters.Objects.LaundryWasherMode,
+            attribute=Clusters.Objects.LaundryWasherMode.Attributes.CurrentMode)
+
     async def _send_on_off_command(self, on: bool):
         command = Clusters.Objects.OnOff.Commands.On() if on else Clusters.Objects.OnOff.Commands.Off()
         return await self.send_single_cmd(
@@ -179,6 +185,7 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.LaundryWasherMode.Commands.ChangeToMode(newMode=delicates_mode),
                     endpoint=self._LAUNDRYDRYER_ENDPOINT)
+                asserts.assert_equal(await self._read_laundry_washer_current_mode(), delicates_mode, "Mode should be Delicate")
                 # Check if it changes (optional but good)
                 updated_dryness = await self._read_supported_dryness_levels()
                 logger.info(f"Delicate mode supported dryness levels: {updated_dryness}")
@@ -187,6 +194,7 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.LaundryWasherMode.Commands.ChangeToMode(newMode=heavy_mode),
                     endpoint=self._LAUNDRYDRYER_ENDPOINT)
+                asserts.assert_equal(await self._read_laundry_washer_current_mode(), heavy_mode, "Mode should be Heavy")
                 updated_dryness = await self._read_supported_dryness_levels()
                 logger.info(f"Heavy mode supported dryness levels: {updated_dryness}")
 
@@ -196,6 +204,7 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.LaundryWasherMode.Commands.ChangeToMode(newMode=mode_option.mode),
                         endpoint=self._LAUNDRYDRYER_ENDPOINT)
+                    asserts.assert_equal(await self._read_laundry_washer_current_mode(), mode_option.mode, f"Mode should be {mode_option.label}")
                     updated_supported_dryness = await self._read_supported_dryness_levels()
                     logger.info(f"Mode {mode_option.label} supports dryness levels: {updated_supported_dryness}")
 
