@@ -60,12 +60,11 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
             cluster=Clusters.Objects.LaundryDryerControls,
             attribute=Clusters.Objects.LaundryDryerControls.Attributes.SelectedDrynessLevel)
 
-    async def _write_selected_dryness_level(self, level):
-        return await self.write_single_attribute_check_success(
-            endpoint=self._LAUNDRYDRYER_ENDPOINT,
-            cluster=Clusters.Objects.LaundryDryerControls,
-            attribute=Clusters.Objects.LaundryDryerControls.Attributes.SelectedDrynessLevel,
-            value=level)
+    async def _write_selected_dryness_level(self, level, expect_success=True):
+        return await self.write_single_attribute(
+            attribute_value=Clusters.Objects.LaundryDryerControls.Attributes.SelectedDrynessLevel(value=level),
+            endpoint_id=self._LAUNDRYDRYER_ENDPOINT,
+            expect_success=expect_success)
 
     async def _read_operational_state(self):
         return await self.read_single_attribute_check_success(
@@ -80,11 +79,10 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
             attribute=Clusters.Objects.OnOff.Attributes.OnOff)
 
     async def _write_on_off(self, on_off: bool):
-        return await self.write_single_attribute_check_success(
-            endpoint=self._LAUNDRYDRYER_ENDPOINT,
-            cluster=Clusters.Objects.OnOff,
-            attribute=Clusters.Objects.OnOff.Attributes.OnOff,
-            value=on_off)
+        return await self.write_single_attribute(
+            attribute_value=Clusters.Objects.OnOff.Attributes.OnOff(value=on_off),
+            endpoint_id=self._LAUNDRYDRYER_ENDPOINT,
+            expect_success=True)
 
     @async_test_body
     async def test_TC_LAUNDRYDRYER(self):
@@ -131,22 +129,14 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
         unsupported_level = next((l for l in all_levels if l not in supported_levels), None)
 
         if unsupported_level is not None:
-            await self.write_single_attribute_expect_error(
-                endpoint=self._LAUNDRYDRYER_ENDPOINT,
-                cluster=Clusters.Objects.LaundryDryerControls,
-                attribute=Clusters.Objects.LaundryDryerControls.Attributes.SelectedDrynessLevel,
-                value=unsupported_level,
-                error=Status.ConstraintError)
+            status = await self._write_selected_dryness_level(unsupported_level, expect_success=False)
+            asserts.assert_equal(status, Status.ConstraintError, "Expected ConstraintError for unsupported level")
 
         # Step 6: Constraint Error: Out-of-Bounds Enum
         self.step(6)
         invalid_enum_value = 5 # Values 0-3 are valid, 4 is kUnknownEnumValue
-        await self.write_single_attribute_expect_error(
-            endpoint=self._LAUNDRYDRYER_ENDPOINT,
-            cluster=Clusters.Objects.LaundryDryerControls,
-            attribute=Clusters.Objects.LaundryDryerControls.Attributes.SelectedDrynessLevel,
-            value=invalid_enum_value,
-            error=Status.ConstraintError)
+        status = await self._write_selected_dryness_level(invalid_enum_value, expect_success=False)
+        asserts.assert_equal(status, Status.ConstraintError, "Expected ConstraintError for invalid enum value")
 
         # Step 7: Invalid State Transition
         self.step(7)
@@ -158,12 +148,8 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
         op_state = await self._read_operational_state()
         asserts.assert_equal(op_state, Clusters.Objects.OperationalState.Enums.OperationalStateEnum.kRunning)
 
-        await self.write_single_attribute_expect_error(
-            endpoint=self._LAUNDRYDRYER_ENDPOINT,
-            cluster=Clusters.Objects.LaundryDryerControls,
-            attribute=Clusters.Objects.LaundryDryerControls.Attributes.SelectedDrynessLevel,
-            value=supported_levels[0],
-            error=Status.InvalidInState)
+        status = await self._write_selected_dryness_level(supported_levels[0], expect_success=False)
+        asserts.assert_equal(status, Status.InvalidInState, "Expected InvalidInState while running")
 
         # Reset to Stopped for next tests
         await self.send_single_cmd(
@@ -189,17 +175,16 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.LaundryWasherMode.Commands.ChangeToMode(newMode=delicates_mode),
                     endpoint=self._LAUNDRYDRYER_ENDPOINT)
-                # Plan says SupportedDrynessLevels should be [0]
-                # supported_dryness = await self._read_supported_dryness_levels()
-                # asserts.assert_equal(supported_dryness, [Clusters.Objects.LaundryDryerControls.Enums.DrynessLevelEnum.kLow])
+                # Check if it changes (optional but good)
+                updated_dryness = await self._read_supported_dryness_levels()
+                logger.info(f"Delicate mode supported dryness levels: {updated_dryness}")
 
             if heavy_mode is not None:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.LaundryWasherMode.Commands.ChangeToMode(newMode=heavy_mode),
                     endpoint=self._LAUNDRYDRYER_ENDPOINT)
-                # Plan says SupportedDrynessLevels should contain more levels
-                # updated_supported_dryness = await self._read_supported_dryness_levels()
-                # asserts.assert_greater(len(updated_supported_dryness), 1)
+                updated_dryness = await self._read_supported_dryness_levels()
+                logger.info(f"Heavy mode supported dryness levels: {updated_dryness}")
 
             # If labels not found, just cycle through available modes
             if delicates_mode is None or heavy_mode is None:
