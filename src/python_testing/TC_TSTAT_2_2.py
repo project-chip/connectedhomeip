@@ -35,7 +35,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-
 from typing import Optional
 
 from mobly import asserts
