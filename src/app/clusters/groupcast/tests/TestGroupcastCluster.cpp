@@ -566,6 +566,131 @@ TEST_F(TestGroupcastCluster, TestReadUsedMcastAddrCount)
     }
 }
 
+TEST_F(TestGroupcastCluster, TestMaxMcastAddrCount)
+{
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints1[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    const EndpointId kEndpoints2[] = { 101, 102 };
+    KeysetId kKeyset               = 0xabcd;
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    // Read MaxMcastAddrCount
+    app::Clusters::Groupcast::Attributes::MaxMcastAddrCount::TypeInfo::DecodableType maxMcastAddrCount;
+    ASSERT_EQ(tester.ReadAttribute(app::Clusters::Groupcast::Attributes::MaxMcastAddrCount::Id, maxMcastAddrCount), CHIP_NO_ERROR);
+    ASSERT_GT(maxMcastAddrCount, 0u);
+
+    // Group
+    Commands::JoinGroup::Type data;
+    data.groupID         = 1;
+    data.keySetID        = kKeyset;
+    data.key             = MakeOptional(ByteSpan(key));
+    data.useAuxiliaryACL = MakeOptional(true);
+    data.endpoints       = DataModel::List<const EndpointId>(kEndpoints1, MATTER_ARRAY_SIZE(kEndpoints1));
+
+    // Join MaxMcastAddrCount IANA address groups
+    {
+        for (GroupId i = 0; i < maxMcastAddrCount; i++)
+        {
+            data.groupID = i + 1;
+            auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+            ASSERT_TRUE(result.status.has_value());
+            EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                      Protocols::InteractionModel::Status::Success);
+            data.key.ClearValue();
+        }
+    }
+    // Join MaxMcastAddrCount+1
+    {
+        data.groupID = maxMcastAddrCount + 1;
+        auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+    }
+    // Leave all groups
+    {
+        data.groupID = 0;
+        auto result  = tester.Invoke(Commands::LeaveGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+    }
+    // Join MaxMcastAddrCount PerGroup address groups
+    {
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+
+        for (GroupId i = 0; i < maxMcastAddrCount; i++)
+        {
+            data.groupID = i + 1;
+            auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+            ASSERT_TRUE(result.status.has_value());
+            EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                      Protocols::InteractionModel::Status::Success);
+        }
+    }
+    // Join MaxMcastAddrCount+1
+    {
+        data.groupID = maxMcastAddrCount + 1;
+        auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::ResourceExhausted);
+    }
+    // Leave all groups
+    {
+        data.groupID = 0;
+        auto result  = tester.Invoke(Commands::LeaveGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+    }
+    // Join 1 IANA address plus (MaxMcastAddrCount - 1) PerGroup groups
+    {
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+
+        for (GroupId i = 0; i < maxMcastAddrCount; i++)
+        {
+            data.groupID         = i + 1;
+            data.mcastAddrPolicy = MakeOptional((0 == i) ? app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr
+                                                         : app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+            auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
+            ASSERT_TRUE(result.status.has_value());
+            EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                      Protocols::InteractionModel::Status::Success);
+        }
+    }
+    // Join MaxMcastAddrCount+1
+    {
+        data.groupID         = maxMcastAddrCount + 1;
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+    }
+    // Join MaxMcastAddrCount+2
+    {
+        data.groupID         = maxMcastAddrCount + 2;
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+        auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::ResourceExhausted);
+    }
+    // Join MaxMcastAddrCount+1 (existing group)
+    {
+        data.groupID         = 2;
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints2, MATTER_ARRAY_SIZE(kEndpoints2));
+        auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
+        ASSERT_TRUE(result.status.has_value());
+        EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+                  Protocols::InteractionModel::Status::Success);
+    }
+}
+
 TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 {
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
