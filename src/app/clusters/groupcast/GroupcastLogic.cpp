@@ -145,6 +145,9 @@ Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Comm
         VerifyOrReturnError(mFeatures.Has(Groupcast::Feature::kListener), Status::ConstraintError);
     }
 
+    // ReplaceEndpoints can only be present if kListener feature is supported
+    VerifyOrReturnError(!data.replaceEndpoints.HasValue() || mFeatures.Has(Groupcast::Feature::kListener), Status::ConstraintError);
+
     // Check endpoints
     size_t endpoint_count = 0;
     err                   = data.endpoints.ComputeSize(&endpoint_count);
