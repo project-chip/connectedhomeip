@@ -37,7 +37,6 @@ namespace DeviceLayer {
 static Se05xDataProviderImpl sInstance;
 
 #if CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
-static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
 constexpr size_t kSpake2p_PBKDF_Salt_Length_SE05x = 32;
 constexpr size_t kSpake2p_Passcode_Length_SE05x   = 4;
 constexpr uint32_t kSpake2p_Pwd_Salt_Bin_File_id  = 0x7FFF2000;
@@ -88,10 +87,10 @@ CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSaltBuffer(uint8_t * buf, uint16_t b
 CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSalt(MutableByteSpan & saltBuf)
 {
 
-    CHIP_ERROR err                             = CHIP_NO_ERROR;
-    uint8_t saltRaw[kSpake2pSalt_MaxBase64Len] = { 0 };
-    uint16_t saltRawLen                        = 0;
-    err                                        = GetSpake2pSaltBuffer(saltRaw, sizeof(saltRaw), &saltRawLen);
+    CHIP_ERROR err                                    = CHIP_NO_ERROR;
+    uint8_t saltRaw[kSpake2p_PBKDF_Salt_Length_SE05x] = { 0 };
+    uint16_t saltRawLen                               = 0;
+    err                                               = GetSpake2pSaltBuffer(saltRaw, sizeof(saltRaw), &saltRawLen);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "Failed to generate PASE salt: %" CHIP_ERROR_FORMAT, err.Format());
