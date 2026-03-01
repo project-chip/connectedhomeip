@@ -162,12 +162,11 @@ Refer to [SE05x Type Configurations](#se05x_type_configurations) to select the
 correct secure element variant.
 
 **Note:** -
-1. It is not recommended to enable random number generation from SE05x
-when using with W72.
+
+1. It is not recommended to enable random number generation from SE05x when
+   using with W72.
 2. Offloading Device attestation and Spake2+ to SE05x is not yet supported on
-MCXW72 platform.
-
-
+   MCXW72 platform.
 
 <a name="se05x_crypto_configurations"></a>
 

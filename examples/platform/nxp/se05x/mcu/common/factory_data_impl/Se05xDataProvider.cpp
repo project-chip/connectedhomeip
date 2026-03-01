@@ -88,10 +88,10 @@ CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSaltBuffer(uint8_t * buf, uint16_t b
 CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSalt(MutableByteSpan & saltBuf)
 {
 
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
-    char uint8_t[kSpake2pSalt_MaxBase64Len] = { 0 };
-    uint16_t saltRawLen                     = 0;
-    err                                     = GetSpake2pSaltBuffer(saltRaw, sizeof(saltRaw), &saltRawLen);
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    uint8_t saltRaw[kSpake2pSalt_MaxBase64Len] = { 0 };
+    uint16_t saltRawLen                        = 0;
+    err                                        = GetSpake2pSaltBuffer(saltRaw, sizeof(saltRaw), &saltRawLen);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "Failed to generate PASE salt: %" CHIP_ERROR_FORMAT, err.Format());
