@@ -37,6 +37,7 @@ common_15_4
 devices
 freertos
 glib
+lwip
 openthread
 openthread_stack
 platform
