@@ -339,6 +339,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeAmbientContextSensingID:
         result = @"AmbientContextSensing";
         break;
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+        result = @"NetworkIdentityManagement";
+        break;
     case MTRClusterIDTypeWiFiNetworkManagementID:
         result = @"WiFiNetworkManagement";
         break;
@@ -7517,6 +7520,50 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (attributeID) {
+
+            // Cluster NetworkIdentityManagement attributes
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeActiveNetworkIdentitiesID:
+            result = @"ActiveNetworkIdentities";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClientsID:
+            result = @"Clients";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClientTableSizeID:
+            result = @"ClientTableSize";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known NetworkIdentityManagement attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWiFiNetworkManagementID:
 
         switch (attributeID) {
@@ -11625,6 +11672,36 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandAddClientID:
+            result = @"AddClient";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandRemoveClientID:
+            result = @"RemoveClient";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandQueryIdentityID:
+            result = @"QueryIdentity";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandImportAdminSecretID:
+            result = @"ImportAdminSecret";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandExportAdminSecretID:
+            result = @"ExportAdminSecret";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWiFiNetworkManagementID:
 
         switch (commandID) {
@@ -13965,6 +14042,28 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandAddClientResponseID:
+            result = @"AddClientResponse";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandQueryIdentityResponseID:
+            result = @"QueryIdentityResponse";
+            break;
+
+        case MTRCommandIDTypeClusterNetworkIdentityManagementCommandExportAdminSecretResponseID:
+            result = @"ExportAdminSecretResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWiFiNetworkManagementID:
 
         switch (commandID) {
@@ -16112,6 +16211,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         case MTREventIDTypeClusterAmbientContextSensingEventAmbientContextDetectEndedID:
             result = @"AmbientContextDetectEnded";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeNetworkIdentityManagementID:
+
+        switch (eventID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

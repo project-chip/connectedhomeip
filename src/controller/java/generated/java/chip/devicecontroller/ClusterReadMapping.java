@@ -16216,6 +16216,98 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readNetworkIdentityManagementInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readNetworkIdentityManagementActiveNetworkIdentitiesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNetworkIdentityManagementActiveNetworkIdentitiesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NetworkIdentityManagementCluster) cluster).readActiveNetworkIdentitiesAttribute(
+              (ChipClusters.NetworkIdentityManagementCluster.ActiveNetworkIdentitiesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedNetworkIdentityManagementClusterActiveNetworkIdentitiesAttributeCallback(),
+          readNetworkIdentityManagementActiveNetworkIdentitiesCommandParams
+        );
+        result.put("readActiveNetworkIdentitiesAttribute", readNetworkIdentityManagementActiveNetworkIdentitiesAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNetworkIdentityManagementClientsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNetworkIdentityManagementClientsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NetworkIdentityManagementCluster) cluster).readClientsAttribute(
+              (ChipClusters.NetworkIdentityManagementCluster.ClientsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedNetworkIdentityManagementClusterClientsAttributeCallback(),
+          readNetworkIdentityManagementClientsCommandParams
+        );
+        result.put("readClientsAttribute", readNetworkIdentityManagementClientsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNetworkIdentityManagementClientTableSizeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNetworkIdentityManagementClientTableSizeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NetworkIdentityManagementCluster) cluster).readClientTableSizeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readNetworkIdentityManagementClientTableSizeCommandParams
+        );
+        result.put("readClientTableSizeAttribute", readNetworkIdentityManagementClientTableSizeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNetworkIdentityManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNetworkIdentityManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NetworkIdentityManagementCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.NetworkIdentityManagementCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedNetworkIdentityManagementClusterGeneratedCommandListAttributeCallback(),
+          readNetworkIdentityManagementGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readNetworkIdentityManagementGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNetworkIdentityManagementAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNetworkIdentityManagementAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NetworkIdentityManagementCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.NetworkIdentityManagementCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedNetworkIdentityManagementClusterAcceptedCommandListAttributeCallback(),
+          readNetworkIdentityManagementAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readNetworkIdentityManagementAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNetworkIdentityManagementAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNetworkIdentityManagementAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NetworkIdentityManagementCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.NetworkIdentityManagementCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedNetworkIdentityManagementClusterAttributeListAttributeCallback(),
+          readNetworkIdentityManagementAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readNetworkIdentityManagementAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNetworkIdentityManagementFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNetworkIdentityManagementFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NetworkIdentityManagementCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readNetworkIdentityManagementFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readNetworkIdentityManagementFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNetworkIdentityManagementClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNetworkIdentityManagementClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NetworkIdentityManagementCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readNetworkIdentityManagementClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readNetworkIdentityManagementClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readWiFiNetworkManagementInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readWiFiNetworkManagementSsidCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWiFiNetworkManagementSsidAttributeInteractionInfo = new InteractionInfo(
@@ -21080,6 +21172,7 @@ public class ClusterReadMapping {
             put("radonConcentrationMeasurement", readRadonConcentrationMeasurementInteractionInfo());
             put("soilMeasurement", readSoilMeasurementInteractionInfo());
             put("ambientContextSensing", readAmbientContextSensingInteractionInfo());
+            put("networkIdentityManagement", readNetworkIdentityManagementInteractionInfo());
             put("wiFiNetworkManagement", readWiFiNetworkManagementInteractionInfo());
             put("threadBorderRouterManagement", readThreadBorderRouterManagementInteractionInfo());
             put("threadNetworkDirectory", readThreadNetworkDirectoryInteractionInfo());

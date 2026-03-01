@@ -1031,6 +1031,24 @@ static BOOL CommandNeedsTimedInvokeInAmbientContextSensingCluster(AttributeId aA
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInNetworkIdentityManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::NetworkIdentityManagement;
+    switch (aAttributeId) {
+    case Commands::AddClient::Id: {
+        return YES;
+    }
+    case Commands::RemoveClient::Id: {
+        return YES;
+    }
+    case Commands::ImportAdminSecret::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -1703,6 +1721,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::AmbientContextSensing::Id: {
         return CommandNeedsTimedInvokeInAmbientContextSensingCluster(commandID);
+    }
+    case Clusters::NetworkIdentityManagement::Id: {
+        return CommandNeedsTimedInvokeInNetworkIdentityManagementCluster(commandID);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(commandID);

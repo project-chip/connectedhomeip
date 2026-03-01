@@ -5569,6 +5569,108 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::AmbientContextSensing:
     ComplexArgumentParser::Finalize(request.confidence);
 }
 
+CHIP_ERROR
+ComplexArgumentParser::Setup(const char * label,
+                             chip::app::Clusters::NetworkIdentityManagement::Structs::ActiveNetworkIdentityStruct::Type & request,
+                             Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ActiveNetworkIdentityStruct.index", "index", value.isMember("index")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ActiveNetworkIdentityStruct.type", "type", value.isMember("type")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ActiveNetworkIdentityStruct.identifier", "identifier",
+                                                                  value.isMember("identifier")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ActiveNetworkIdentityStruct.createdTimestamp",
+                                                                  "createdTimestamp", value.isMember("createdTimestamp")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ActiveNetworkIdentityStruct.current", "current", value.isMember("current")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ActiveNetworkIdentityStruct.remainingClients",
+                                                                  "remainingClients", value.isMember("remainingClients")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "index");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.index, value["index"]));
+    valueCopy.removeMember("index");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "type");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.type, value["type"]));
+    valueCopy.removeMember("type");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "identifier");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.identifier, value["identifier"]));
+    valueCopy.removeMember("identifier");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "createdTimestamp");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.createdTimestamp, value["createdTimestamp"]));
+    valueCopy.removeMember("createdTimestamp");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "current");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.current, value["current"]));
+    valueCopy.removeMember("current");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "remainingClients");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.remainingClients, value["remainingClients"]));
+    valueCopy.removeMember("remainingClients");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(
+    chip::app::Clusters::NetworkIdentityManagement::Structs::ActiveNetworkIdentityStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.index);
+    ComplexArgumentParser::Finalize(request.type);
+    ComplexArgumentParser::Finalize(request.identifier);
+    ComplexArgumentParser::Finalize(request.createdTimestamp);
+    ComplexArgumentParser::Finalize(request.current);
+    ComplexArgumentParser::Finalize(request.remainingClients);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::NetworkIdentityManagement::Structs::ClientStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ClientStruct.clientIndex", "clientIndex", value.isMember("clientIndex")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ClientStruct.clientIdentifier", "clientIdentifier",
+                                                                  value.isMember("clientIdentifier")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ClientStruct.networkIdentityIndex", "networkIdentityIndex",
+                                                                  value.isMember("networkIdentityIndex")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "clientIndex");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.clientIndex, value["clientIndex"]));
+    valueCopy.removeMember("clientIndex");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "clientIdentifier");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.clientIdentifier, value["clientIdentifier"]));
+    valueCopy.removeMember("clientIdentifier");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "networkIdentityIndex");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.networkIdentityIndex, value["networkIdentityIndex"]));
+    valueCopy.removeMember("networkIdentityIndex");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::NetworkIdentityManagement::Structs::ClientStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.clientIndex);
+    ComplexArgumentParser::Finalize(request.clientIdentifier);
+    ComplexArgumentParser::Finalize(request.networkIdentityIndex);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::ThreadNetworkDirectory::Structs::ThreadNetworkStruct::Type & request,
                                         Json::Value & value)

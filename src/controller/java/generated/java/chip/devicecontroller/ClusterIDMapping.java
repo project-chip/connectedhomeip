@@ -349,6 +349,9 @@ public class ClusterIDMapping {
         if (clusterId == AmbientContextSensing.ID) {
             return new AmbientContextSensing();
         }
+        if (clusterId == NetworkIdentityManagement.ID) {
+            return new NetworkIdentityManagement();
+        }
         if (clusterId == WiFiNetworkManagement.ID) {
             return new WiFiNetworkManagement();
         }
@@ -15291,6 +15294,181 @@ public class ClusterIDMapping {
                 throw new NoSuchFieldError();
             }
         }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class NetworkIdentityManagement implements BaseCluster {
+        public static final long ID = 1104L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            ActiveNetworkIdentities(0L),
+            Clients(1L),
+            ClientTableSize(2L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            AddClient(0L),
+            RemoveClient(2L),
+            QueryIdentity(3L),
+            ImportAdminSecret(64L),
+            ExportAdminSecret(65L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum AddClientCommandField {ClientIdentity(0),;
+                    private final int id;
+                    AddClientCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static AddClientCommandField value(int id) throws NoSuchFieldError {
+                        for (AddClientCommandField field : AddClientCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RemoveClientCommandField {ClientIndex(0),ClientIdentifier(1),;
+                    private final int id;
+                    RemoveClientCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RemoveClientCommandField value(int id) throws NoSuchFieldError {
+                        for (RemoveClientCommandField field : RemoveClientCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum QueryIdentityCommandField {NetworkIdentityIndex(0),NetworkIdentityType(1),Identifier(2),;
+                    private final int id;
+                    QueryIdentityCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static QueryIdentityCommandField value(int id) throws NoSuchFieldError {
+                        for (QueryIdentityCommandField field : QueryIdentityCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ImportAdminSecretCommandField {NetworkAdministratorSharedSecret(0),;
+                    private final int id;
+                    ImportAdminSecretCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ImportAdminSecretCommandField value(int id) throws NoSuchFieldError {
+                        for (ImportAdminSecretCommandField field : ImportAdminSecretCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
         public String getAttributeName(long id) throws NoSuchFieldError {
             return Attribute.value(id).toString();
         }

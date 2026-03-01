@@ -27027,6 +27027,695 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 }
 @end
 
+@implementation MTRNetworkIdentityManagementClusterAddClientParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientIdentity = [NSData data];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterAddClientParams alloc] init];
+
+    other.clientIdentity = self.clientIdentity;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientIdentity:%@; >", NSStringFromClass([self class]), [_clientIdentity base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterAddClientParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::NetworkIdentityManagement::Commands::AddClient::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.clientIdentity = AsByteSpan(self.clientIdentity);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRNetworkIdentityManagementClusterAddClientResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterAddClientResponseParams alloc] init];
+
+    other.clientIndex = self.clientIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientIndex:%@; >", NSStringFromClass([self class]), _clientIndex];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::NetworkIdentityManagement::Commands::AddClientResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    LogAndConvertDecodingError(err, error);
+    return nil;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterAddClientResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::AddClientResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::AddClientResponse::DecodableType &)decodableStruct
+{
+    {
+        self.clientIndex = [NSNumber numberWithUnsignedShort:decodableStruct.clientIndex];
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterRemoveClientParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientIndex = nil;
+
+        _clientIdentifier = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterRemoveClientParams alloc] init];
+
+    other.clientIndex = self.clientIndex;
+    other.clientIdentifier = self.clientIdentifier;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientIndex:%@; clientIdentifier:%@; >", NSStringFromClass([self class]), _clientIndex, [_clientIdentifier base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterRemoveClientParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::NetworkIdentityManagement::Commands::RemoveClient::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        if (self.clientIndex != nil) {
+            auto & definedValue_0 = encodableStruct.clientIndex.Emplace();
+            definedValue_0 = self.clientIndex.unsignedShortValue;
+        }
+    }
+    {
+        if (self.clientIdentifier != nil) {
+            auto & definedValue_0 = encodableStruct.clientIdentifier.Emplace();
+            definedValue_0 = AsByteSpan(self.clientIdentifier);
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRNetworkIdentityManagementClusterQueryIdentityParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _networkIdentityIndex = nil;
+
+        _networkIdentityType = nil;
+
+        _identifier = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterQueryIdentityParams alloc] init];
+
+    other.networkIdentityIndex = self.networkIdentityIndex;
+    other.networkIdentityType = self.networkIdentityType;
+    other.identifier = self.identifier;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkIdentityIndex:%@; networkIdentityType:%@; identifier:%@; >", NSStringFromClass([self class]), _networkIdentityIndex, _networkIdentityType, [_identifier base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterQueryIdentityParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentity::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        if (self.networkIdentityIndex != nil) {
+            auto & definedValue_0 = encodableStruct.networkIdentityIndex.Emplace();
+            definedValue_0 = self.networkIdentityIndex.unsignedShortValue;
+        }
+    }
+    {
+        if (self.networkIdentityType != nil) {
+            auto & definedValue_0 = encodableStruct.networkIdentityType.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.networkIdentityType.unsignedCharValue);
+        }
+    }
+    {
+        if (self.identifier != nil) {
+            auto & definedValue_0 = encodableStruct.identifier.Emplace();
+            definedValue_0 = AsByteSpan(self.identifier);
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRNetworkIdentityManagementClusterQueryIdentityResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _identity = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterQueryIdentityResponseParams alloc] init];
+
+    other.identity = self.identity;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: identity:%@; >", NSStringFromClass([self class]), [_identity base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentityResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    LogAndConvertDecodingError(err, error);
+    return nil;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterQueryIdentityResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentityResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentityResponse::DecodableType &)decodableStruct
+{
+    {
+        self.identity = AsData(decodableStruct.identity);
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterImportAdminSecretParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _networkAdministratorSharedSecret = [NSData data];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterImportAdminSecretParams alloc] init];
+
+    other.networkAdministratorSharedSecret = self.networkAdministratorSharedSecret;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkAdministratorSharedSecret:%@; >", NSStringFromClass([self class]), [_networkAdministratorSharedSecret base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterImportAdminSecretParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::NetworkIdentityManagement::Commands::ImportAdminSecret::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.networkAdministratorSharedSecret = AsByteSpan(self.networkAdministratorSharedSecret);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRNetworkIdentityManagementClusterExportAdminSecretParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterExportAdminSecretParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterExportAdminSecretParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecret::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRNetworkIdentityManagementClusterExportAdminSecretResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _networkAdministratorSharedSecret = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRNetworkIdentityManagementClusterExportAdminSecretResponseParams alloc] init];
+
+    other.networkAdministratorSharedSecret = self.networkAdministratorSharedSecret;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkAdministratorSharedSecret:%@; >", NSStringFromClass([self class]), [_networkAdministratorSharedSecret base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecretResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    LogAndConvertDecodingError(err, error);
+    return nil;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterExportAdminSecretResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecretResponse::DecodableType &)decodableStruct
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    CHIP_ERROR err = [self _setFieldsFromDecodableStruct:decodableStruct];
+    if (err == CHIP_NO_ERROR) {
+        return self;
+    }
+
+    LogAndConvertDecodingError(err, nil);
+    return nil;
+}
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecretResponse::DecodableType &)decodableStruct
+{
+    {
+        self.networkAdministratorSharedSecret = AsData(decodableStruct.networkAdministratorSharedSecret);
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
 @implementation MTRWiFiNetworkManagementClusterNetworkPassphraseRequestParams
 - (instancetype)init
 {

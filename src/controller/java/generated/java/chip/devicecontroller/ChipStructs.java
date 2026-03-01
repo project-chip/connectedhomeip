@@ -12052,6 +12052,203 @@ public static class AmbientContextSensingClusterPredictedActivityStruct {
     return output.toString();
   }
 }
+public static class NetworkIdentityManagementClusterActiveNetworkIdentityStruct {
+  public Integer index;
+  public Integer type;
+  public byte[] identifier;
+  public Long createdTimestamp;
+  public Boolean current;
+  public @Nullable Integer remainingClients;
+  private static final long INDEX_ID = 0L;
+  private static final long TYPE_ID = 1L;
+  private static final long IDENTIFIER_ID = 2L;
+  private static final long CREATED_TIMESTAMP_ID = 3L;
+  private static final long CURRENT_ID = 4L;
+  private static final long REMAINING_CLIENTS_ID = 5L;
+
+  public NetworkIdentityManagementClusterActiveNetworkIdentityStruct(
+    Integer index,
+    Integer type,
+    byte[] identifier,
+    Long createdTimestamp,
+    Boolean current,
+    @Nullable Integer remainingClients
+  ) {
+    this.index = index;
+    this.type = type;
+    this.identifier = identifier;
+    this.createdTimestamp = createdTimestamp;
+    this.current = current;
+    this.remainingClients = remainingClients;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(INDEX_ID, new UIntType(index)));
+    values.add(new StructElement(TYPE_ID, new UIntType(type)));
+    values.add(new StructElement(IDENTIFIER_ID, new ByteArrayType(identifier)));
+    values.add(new StructElement(CREATED_TIMESTAMP_ID, new UIntType(createdTimestamp)));
+    values.add(new StructElement(CURRENT_ID, new BooleanType(current)));
+    values.add(new StructElement(REMAINING_CLIENTS_ID, remainingClients != null ? new UIntType(remainingClients) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static NetworkIdentityManagementClusterActiveNetworkIdentityStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer index = null;
+    Integer type = null;
+    byte[] identifier = null;
+    Long createdTimestamp = null;
+    Boolean current = null;
+    @Nullable Integer remainingClients = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          index = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          type = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == IDENTIFIER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          identifier = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == CREATED_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          createdTimestamp = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == CURRENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          current = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == REMAINING_CLIENTS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          remainingClients = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new NetworkIdentityManagementClusterActiveNetworkIdentityStruct(
+      index,
+      type,
+      identifier,
+      createdTimestamp,
+      current,
+      remainingClients
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("NetworkIdentityManagementClusterActiveNetworkIdentityStruct {\n");
+    output.append("\tindex: ");
+    output.append(index);
+    output.append("\n");
+    output.append("\ttype: ");
+    output.append(type);
+    output.append("\n");
+    output.append("\tidentifier: ");
+    output.append(Arrays.toString(identifier));
+    output.append("\n");
+    output.append("\tcreatedTimestamp: ");
+    output.append(createdTimestamp);
+    output.append("\n");
+    output.append("\tcurrent: ");
+    output.append(current);
+    output.append("\n");
+    output.append("\tremainingClients: ");
+    output.append(remainingClients);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class NetworkIdentityManagementClusterClientStruct {
+  public Integer clientIndex;
+  public byte[] clientIdentifier;
+  public @Nullable Integer networkIdentityIndex;
+  private static final long CLIENT_INDEX_ID = 0L;
+  private static final long CLIENT_IDENTIFIER_ID = 1L;
+  private static final long NETWORK_IDENTITY_INDEX_ID = 2L;
+
+  public NetworkIdentityManagementClusterClientStruct(
+    Integer clientIndex,
+    byte[] clientIdentifier,
+    @Nullable Integer networkIdentityIndex
+  ) {
+    this.clientIndex = clientIndex;
+    this.clientIdentifier = clientIdentifier;
+    this.networkIdentityIndex = networkIdentityIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CLIENT_INDEX_ID, new UIntType(clientIndex)));
+    values.add(new StructElement(CLIENT_IDENTIFIER_ID, new ByteArrayType(clientIdentifier)));
+    values.add(new StructElement(NETWORK_IDENTITY_INDEX_ID, networkIdentityIndex != null ? new UIntType(networkIdentityIndex) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static NetworkIdentityManagementClusterClientStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer clientIndex = null;
+    byte[] clientIdentifier = null;
+    @Nullable Integer networkIdentityIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CLIENT_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          clientIndex = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CLIENT_IDENTIFIER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          clientIdentifier = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == NETWORK_IDENTITY_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          networkIdentityIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new NetworkIdentityManagementClusterClientStruct(
+      clientIndex,
+      clientIdentifier,
+      networkIdentityIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("NetworkIdentityManagementClusterClientStruct {\n");
+    output.append("\tclientIndex: ");
+    output.append(clientIndex);
+    output.append("\n");
+    output.append("\tclientIdentifier: ");
+    output.append(Arrays.toString(clientIdentifier));
+    output.append("\n");
+    output.append("\tnetworkIdentityIndex: ");
+    output.append(networkIdentityIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ThreadNetworkDirectoryClusterThreadNetworkStruct {
   public byte[] extendedPanID;
   public String networkName;

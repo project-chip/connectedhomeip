@@ -154,6 +154,8 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/NetworkCommissioningClusterNetworkInfoStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/NetworkCommissioningClusterThreadInterfaceScanResultStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/NetworkCommissioningClusterWiFiInterfaceScanResultStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/NetworkIdentityManagementClusterActiveNetworkIdentityStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/NetworkIdentityManagementClusterClientStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/OccupancySensingClusterHoldTimeLimitsStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/OccupancySensingClusterPredictedOccupancyStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/OperationalCredentialsClusterFabricDescriptorStruct.kt",

@@ -187,6 +187,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeRadonConcentrationMeasurementID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0000042F,
     MTRClusterIDTypeSoilMeasurementID MTR_PROVISIONALLY_AVAILABLE = 0x00000430,
     MTRClusterIDTypeAmbientContextSensingID MTR_PROVISIONALLY_AVAILABLE = 0x00000431,
+    MTRClusterIDTypeNetworkIdentityManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000450,
     MTRClusterIDTypeWiFiNetworkManagementID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000451,
     MTRClusterIDTypeThreadBorderRouterManagementID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000452,
     MTRClusterIDTypeThreadNetworkDirectoryID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000453,
@@ -3527,6 +3528,16 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterAmbientContextSensingAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterAmbientContextSensingAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
+    // Cluster NetworkIdentityManagement attributes
+    MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeActiveNetworkIdentitiesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClientsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClientTableSizeID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterNetworkIdentityManagementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
     // Cluster WiFiNetworkManagement attributes
     MTRAttributeIDTypeClusterWiFiNetworkManagementAttributeSSIDID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
     MTRAttributeIDTypeClusterWiFiNetworkManagementAttributePassphraseSurrogateID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000001,
@@ -6008,6 +6019,16 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterColorControlCommandStopMoveStepID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000047,
     MTRCommandIDTypeClusterColorControlCommandMoveColorTemperatureID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000004B,
     MTRCommandIDTypeClusterColorControlCommandStepColorTemperatureID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000004C,
+
+    // Cluster NetworkIdentityManagement commands
+    MTRCommandIDTypeClusterNetworkIdentityManagementCommandAddClientID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterNetworkIdentityManagementCommandAddClientResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterNetworkIdentityManagementCommandRemoveClientID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterNetworkIdentityManagementCommandQueryIdentityID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterNetworkIdentityManagementCommandQueryIdentityResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterNetworkIdentityManagementCommandImportAdminSecretID MTR_PROVISIONALLY_AVAILABLE = 0x00000040,
+    MTRCommandIDTypeClusterNetworkIdentityManagementCommandExportAdminSecretID MTR_PROVISIONALLY_AVAILABLE = 0x00000041,
+    MTRCommandIDTypeClusterNetworkIdentityManagementCommandExportAdminSecretResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000042,
 
     // Cluster WiFiNetworkManagement commands
     MTRCommandIDTypeClusterWiFiNetworkManagementCommandNetworkPassphraseRequestID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,

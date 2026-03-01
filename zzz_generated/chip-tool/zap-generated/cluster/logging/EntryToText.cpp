@@ -239,6 +239,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "SoilMeasurement";
     case chip::app::Clusters::AmbientContextSensing::Id:
         return "AmbientContextSensing";
+    case chip::app::Clusters::NetworkIdentityManagement::Id:
+        return "NetworkIdentityManagement";
     case chip::app::Clusters::WiFiNetworkManagement::Id:
         return "WiFiNetworkManagement";
     case chip::app::Clusters::ThreadBorderRouterManagement::Id:
@@ -4003,6 +4005,29 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::NetworkIdentityManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::ActiveNetworkIdentities::Id:
+            return "ActiveNetworkIdentities";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::Clients::Id:
+            return "Clients";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::ClientTableSize::Id:
+            return "ClientTableSize";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::NetworkIdentityManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WiFiNetworkManagement::Id: {
         switch (id)
         {
@@ -6019,6 +6044,23 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::NetworkIdentityManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::AddClient::Id:
+            return "AddClient";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::RemoveClient::Id:
+            return "RemoveClient";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentity::Id:
+            return "QueryIdentity";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::ImportAdminSecret::Id:
+            return "ImportAdminSecret";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecret::Id:
+            return "ExportAdminSecret";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WiFiNetworkManagement::Id: {
         switch (id)
         {
@@ -6923,6 +6965,19 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "AddThermostatSuggestionResponse";
         case chip::app::Clusters::Thermostat::Commands::AtomicResponse::Id:
             return "AtomicResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::NetworkIdentityManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::AddClientResponse::Id:
+            return "AddClientResponse";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentityResponse::Id:
+            return "QueryIdentityResponse";
+        case chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecretResponse::Id:
+            return "ExportAdminSecretResponse";
         default:
             return "Unknown";
         }

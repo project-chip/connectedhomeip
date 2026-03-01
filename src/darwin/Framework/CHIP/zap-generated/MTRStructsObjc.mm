@@ -8790,6 +8790,81 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRNetworkIdentityManagementClusterActiveNetworkIdentityStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _index = @(0);
+
+        _type = @(0);
+
+        _identifier = [NSData data];
+
+        _createdTimestamp = @(0);
+
+        _current = @(0);
+
+        _remainingClients = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRNetworkIdentityManagementClusterActiveNetworkIdentityStruct alloc] init];
+
+    other.index = self.index;
+    other.type = self.type;
+    other.identifier = self.identifier;
+    other.createdTimestamp = self.createdTimestamp;
+    other.current = self.current;
+    other.remainingClients = self.remainingClients;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: index:%@; type:%@; identifier:%@; createdTimestamp:%@; current:%@; remainingClients:%@; >", NSStringFromClass([self class]), _index, _type, [_identifier base64EncodedStringWithOptions:0], _createdTimestamp, _current, _remainingClients];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRNetworkIdentityManagementClusterClientStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clientIndex = @(0);
+
+        _clientIdentifier = [NSData data];
+
+        _networkIdentityIndex = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRNetworkIdentityManagementClusterClientStruct alloc] init];
+
+    other.clientIndex = self.clientIndex;
+    other.clientIdentifier = self.clientIdentifier;
+    other.networkIdentityIndex = self.networkIdentityIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clientIndex:%@; clientIdentifier:%@; networkIdentityIndex:%@; >", NSStringFromClass([self class]), _clientIndex, [_clientIdentifier base64EncodedStringWithOptions:0], _networkIdentityIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRThreadNetworkDirectoryClusterThreadNetworkStruct
 - (instancetype)init
 {

@@ -1770,6 +1770,57 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRNetworkIdentityManagementClusterAddClientParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterAddClientResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::AddClientResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::AddClientResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterRemoveClientParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterQueryIdentityParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterQueryIdentityResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentityResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentityResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterImportAdminSecretParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterExportAdminSecretParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRNetworkIdentityManagementClusterExportAdminSecretResponseParams (InternalMethods)
+
+- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecretResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecretResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRWiFiNetworkManagementClusterNetworkPassphraseRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

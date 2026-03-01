@@ -142,6 +142,7 @@
 | RadonConcentrationMeasurement                                       | 0x042F |
 | SoilMeasurement                                                     | 0x0430 |
 | AmbientContextSensing                                               | 0x0431 |
+| NetworkIdentityManagement                                           | 0x0450 |
 | WiFiNetworkManagement                                               | 0x0451 |
 | ThreadBorderRouterManagement                                        | 0x0452 |
 | ThreadNetworkDirectory                                              | 0x0453 |
@@ -11604,6 +11605,221 @@ private:
 | * AmbientContextDetectStarted                                       | 0x0000 |
 | * AmbientContextDetectEnded                                         | 0x0001 |
 \*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster NetworkIdentityManagement                                   | 0x0450 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * AddClient                                                         |   0x00 |
+| * RemoveClient                                                      |   0x02 |
+| * QueryIdentity                                                     |   0x03 |
+| * ImportAdminSecret                                                 |   0x40 |
+| * ExportAdminSecret                                                 |   0x41 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ActiveNetworkIdentities                                           | 0x0000 |
+| * Clients                                                           | 0x0001 |
+| * ClientTableSize                                                   | 0x0002 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command AddClient
+ */
+class NetworkIdentityManagementAddClient : public ClusterCommand
+{
+public:
+    NetworkIdentityManagementAddClient(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("add-client", credsIssuerConfig)
+    {
+        AddArgument("ClientIdentity", &mRequest.clientIdentity);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkIdentityManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::NetworkIdentityManagement::Commands::AddClient::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkIdentityManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::NetworkIdentityManagement::Commands::AddClient::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::NetworkIdentityManagement::Commands::AddClient::Type mRequest;
+};
+
+/*
+ * Command RemoveClient
+ */
+class NetworkIdentityManagementRemoveClient : public ClusterCommand
+{
+public:
+    NetworkIdentityManagementRemoveClient(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("remove-client", credsIssuerConfig)
+    {
+        AddArgument("ClientIndex", 0, UINT16_MAX, &mRequest.clientIndex);
+        AddArgument("ClientIdentifier", &mRequest.clientIdentifier);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkIdentityManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::NetworkIdentityManagement::Commands::RemoveClient::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkIdentityManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::NetworkIdentityManagement::Commands::RemoveClient::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::NetworkIdentityManagement::Commands::RemoveClient::Type mRequest;
+};
+
+/*
+ * Command QueryIdentity
+ */
+class NetworkIdentityManagementQueryIdentity : public ClusterCommand
+{
+public:
+    NetworkIdentityManagementQueryIdentity(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("query-identity", credsIssuerConfig)
+    {
+        AddArgument("NetworkIdentityIndex", 0, UINT16_MAX, &mRequest.networkIdentityIndex);
+        AddArgument("NetworkIdentityType", 0, UINT8_MAX, &mRequest.networkIdentityType);
+        AddArgument("Identifier", &mRequest.identifier);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkIdentityManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentity::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkIdentityManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentity::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::NetworkIdentityManagement::Commands::QueryIdentity::Type mRequest;
+};
+
+/*
+ * Command ImportAdminSecret
+ */
+class NetworkIdentityManagementImportAdminSecret : public ClusterCommand
+{
+public:
+    NetworkIdentityManagementImportAdminSecret(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("import-admin-secret", credsIssuerConfig)
+    {
+        AddArgument("NetworkAdministratorSharedSecret", &mRequest.networkAdministratorSharedSecret);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkIdentityManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::NetworkIdentityManagement::Commands::ImportAdminSecret::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkIdentityManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::NetworkIdentityManagement::Commands::ImportAdminSecret::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::NetworkIdentityManagement::Commands::ImportAdminSecret::Type mRequest;
+};
+
+/*
+ * Command ExportAdminSecret
+ */
+class NetworkIdentityManagementExportAdminSecret : public ClusterCommand
+{
+public:
+    NetworkIdentityManagementExportAdminSecret(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("export-admin-secret", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkIdentityManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecret::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::NetworkIdentityManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecret::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::NetworkIdentityManagement::Commands::ExportAdminSecret::Type mRequest;
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster WiFiNetworkManagement                                       | 0x0451 |
@@ -29511,6 +29727,74 @@ void registerClusterAmbientContextSensing(Commands & commands, CredentialIssuerC
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterNetworkIdentityManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::NetworkIdentityManagement;
+
+    const char * clusterName = "NetworkIdentityManagement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                         //
+        make_unique<NetworkIdentityManagementAddClient>(credsIssuerConfig),         //
+        make_unique<NetworkIdentityManagementRemoveClient>(credsIssuerConfig),      //
+        make_unique<NetworkIdentityManagementQueryIdentity>(credsIssuerConfig),     //
+        make_unique<NetworkIdentityManagementImportAdminSecret>(credsIssuerConfig), //
+        make_unique<NetworkIdentityManagementExportAdminSecret>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "active-network-identities", Attributes::ActiveNetworkIdentities::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "clients", Attributes::Clients::Id, credsIssuerConfig),                                   //
+        make_unique<ReadAttribute>(Id, "client-table-size", Attributes::ClientTableSize::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                  //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                    //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::NetworkIdentityManagement::Structs::ActiveNetworkIdentityStruct::Type>>>(
+            Id, "active-network-identities", Attributes::ActiveNetworkIdentities::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::NetworkIdentityManagement::Structs::ClientStruct::Type>>>(
+            Id, "clients", Attributes::Clients::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "client-table-size", 0, UINT16_MAX, Attributes::ClientTableSize::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                  //
+        make_unique<SubscribeAttribute>(Id, "active-network-identities", Attributes::ActiveNetworkIdentities::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "clients", Attributes::Clients::Id, credsIssuerConfig),                             //
+        make_unique<SubscribeAttribute>(Id, "client-table-size", Attributes::ClientTableSize::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterWiFiNetworkManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::WiFiNetworkManagement;
@@ -32789,6 +33073,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterRadonConcentrationMeasurement(commands, credsIssuerConfig);
     registerClusterSoilMeasurement(commands, credsIssuerConfig);
     registerClusterAmbientContextSensing(commands, credsIssuerConfig);
+    registerClusterNetworkIdentityManagement(commands, credsIssuerConfig);
     registerClusterWiFiNetworkManagement(commands, credsIssuerConfig);
     registerClusterThreadBorderRouterManagement(commands, credsIssuerConfig);
     registerClusterThreadNetworkDirectory(commands, credsIssuerConfig);
