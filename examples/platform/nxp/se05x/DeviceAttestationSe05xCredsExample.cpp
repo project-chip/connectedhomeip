@@ -55,7 +55,10 @@ CHIP_ERROR ExampleSe05xDACProvider::GetDeviceAttestationCert(MutableByteSpan & o
     ChipLogDetail(Crypto, "Get DA certificate from se05x");
     ReturnErrorOnFailure(se05x_get_certificate(DEV_ATTESTATION_CERT_SE05X_ID, out_dac_buffer.data(), &buflen));
     out_dac_buffer.reduce_size(buflen);
-    out_dac_buffer = out_dac_buffer.SubSpan(4); // ignoring TLV of DA certificate
+    if (buflen > 4 && out_dac_buffer.data()[0] == 0x31)
+    {
+        out_dac_buffer = out_dac_buffer.SubSpan(4); // ignoring TLV of DA certificate
+    }
     return CHIP_NO_ERROR;
 #endif
 }

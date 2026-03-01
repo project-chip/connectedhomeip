@@ -52,7 +52,7 @@ constexpr uint32_t kSpake2p_Pwd_Salt_Bin_File_id  = 0x7FFF2000;
 #endif
 
 #if CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
-CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSaltBuffer(char * buf, uint16_t bufLen, uint16_t * outLen)
+CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSaltBuffer(uint8_t * buf, uint16_t bufLen, uint16_t * outLen)
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
     constexpr size_t kSaltLen = kSpake2p_PBKDF_Salt_Length_SE05x;
@@ -64,10 +64,12 @@ CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSaltBuffer(char * buf, uint16_t bufL
 
     if (certLen == 0)
     {
-        certLen = sizeof(cert);
+        size_t buflen = sizeof(cert);
 
-        err = se05x_get_certificate(kSpake2p_Pwd_Salt_Bin_File_id, cert, &certLen);
+        err = se05x_get_certificate(kSpake2p_Pwd_Salt_Bin_File_id, cert, &buflen);
         VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+        certLen = buflen;
     }
 
     VerifyOrReturnError(certLen >= (offset + kSpake2p_PBKDF_Salt_Length_SE05x + kSpake2p_Passcode_Length_SE05x),
@@ -87,17 +89,17 @@ CHIP_ERROR Se05xDataProviderImpl::GetSpake2pSalt(MutableByteSpan & saltBuf)
 {
 
     CHIP_ERROR err                          = CHIP_NO_ERROR;
-    char saltB64[kSpake2pSalt_MaxBase64Len] = { 0 };
-    uint16_t saltB64Len                     = 0;
-    err                                     = GetSpake2pSaltBuffer(saltB64, sizeof(saltB64), &saltB64Len);
+    char uint8_t[kSpake2pSalt_MaxBase64Len] = { 0 };
+    uint16_t saltRawLen                     = 0;
+    err                                     = GetSpake2pSaltBuffer(saltRaw, sizeof(saltRaw), &saltRawLen);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "Failed to generate PASE salt: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
-    VerifyOrReturnError(saltB64Len <= saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(saltBuf.data(), saltB64, saltB64Len);
-    saltBuf.reduce_size(saltB64Len);
+    VerifyOrReturnError(saltRawLen <= saltBuf.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(saltBuf.data(), saltRaw, saltRawLen);
+    saltBuf.reduce_size(saltRawLen);
     return err;
 }
 
@@ -163,7 +165,7 @@ CHIP_ERROR Se05xDataProviderImpl::SignWithDeviceAttestationKey(const ByteSpan & 
 
     // Add public key + reference private key (ref to key inside SE)
 
-    serialized_keypair.SetLength(Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length);
+    ReturnErrorOnFailure(serialized_keypair.SetLength(Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length));
 
     memset(serialized_keypair.Bytes(), 0, Crypto::kP256_PublicKey_Length);
     memcpy(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length, magic_bytes, sizeof(magic_bytes));
