@@ -377,7 +377,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     err = chip::NXP::App::Se05x::PostInit();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Error during chip::NXP::App::Se05x::PostInit()");
+        ChipLogError(DeviceLayer, "Error during chip::NXP::App::Se05x::PostInit(): %s", ErrorStr(err));
     }
 #endif
 
