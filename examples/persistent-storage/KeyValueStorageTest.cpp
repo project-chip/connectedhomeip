@@ -61,6 +61,18 @@ CHIP_ERROR TestEmptyString()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TestKeyExistence()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    static const char kTestKey[]   = "str_key";
+    static const char kTestValue[] = "test_value";
+    ReturnErrorOnFailure(KeyValueStoreMgr().Put(kTestKey, kTestValue));
+    err = KeyValueStoreMgr().Get(kTestKey, nullptr, 0);
+    VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(KeyValueStoreMgr().Delete(kTestKey));
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR TestString()
 {
     static const char kTestKey[]   = "str_key";
@@ -155,6 +167,7 @@ CHIP_ERROR TestMultiRead()
 void RunKvsTest(TestConfigurations test_config)
 {
     RUN_TEST(TestEmptyString());
+    RUN_TEST(TestKeyExistence());
     RUN_TEST(TestString());
     RUN_TEST(TestUint32());
     RUN_TEST(TestArray());
