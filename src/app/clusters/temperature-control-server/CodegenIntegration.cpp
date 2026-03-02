@@ -47,7 +47,7 @@ public:
     {
         app::OptionalAttributeSet<TemperatureSetpoint::Id, MinTemperature::Id, MaxTemperature::Id, Step::Id,
                                   SelectedTemperatureLevel::Id>
-            optionalAttributeSet;
+            optionalAttributeSet(optionalAttributeBits);
         BitFlags<Feature> features(featureMap);
         using namespace chip::Protocols::InteractionModel;
 
@@ -76,7 +76,7 @@ public:
         }
         if (features.Has(Feature::kTemperatureLevel))
         {
-            // VerifyOrDie(optionalAttributeSet.IsSet(SelectedTemperatureLevel::Id));
+            VerifyOrDie(optionalAttributeSet.IsSet(SelectedTemperatureLevel::Id));
             VerifyOrDie(SelectedTemperatureLevel::Get(endpointId, &selectedTemperatureLevel) == Status::Success);
         }
 
