@@ -136,49 +136,21 @@ std::optional<DataModel::ActionReturnStatus> ClosureControlCluster::InvokeComman
     switch (request.path.mCommandId)
     {
     case Commands::Stop::Id:
-        return HandleStopCommand(*handler, request.path);
+        return HandleStop();
     case Commands::MoveTo::Id: {
         Commands::MoveTo::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(input_arguments));
-        return HandleMoveToCommand(*handler, request.path, commandData);
+        return HandleMoveTo(commandData.position, commandData.latch, commandData.speed);
     }
     case Commands::Calibrate::Id:
-        return HandleCalibrateCommand(*handler, request.path);
+        return HandleCalibrate();
     default:
         return Status::UnsupportedCommand;
     }
 }
 
-DataModel::ActionReturnStatus ClosureControlCluster::HandleStopCommand(CommandHandler & handler, const ConcreteCommandPath & path)
-{
-    ChipLogDetail(Zcl, "ClosureControl: Stop");
-    Status status = HandleStop();
-    handler.AddStatus(path, status);
-    return status;
-}
-
-DataModel::ActionReturnStatus ClosureControlCluster::HandleMoveToCommand(CommandHandler & handler, const ConcreteCommandPath & path,
-                                                                         const Commands::MoveTo::DecodableType & commandData)
-{
-    ChipLogDetail(Zcl, "ClosureControl: MoveTo");
-    Status status = HandleMoveTo(commandData.position, commandData.latch, commandData.speed);
-    handler.AddStatus(path, status);
-    return status;
-}
-
-DataModel::ActionReturnStatus ClosureControlCluster::HandleCalibrateCommand(CommandHandler & handler,
-                                                                            const ConcreteCommandPath & path)
-{
-    ChipLogDetail(Zcl, "ClosureControl: Calibrate");
-    Status status = HandleCalibrate();
-    handler.AddStatus(path, status);
-    return status;
-}
-
 bool ClosureControlCluster::IsSupportedMainState(MainStateEnum mainState) const
 {
-    bool isSupported = false;
-
     switch (mainState)
     {
     case MainStateEnum::kStopped:
@@ -187,87 +159,53 @@ bool ClosureControlCluster::IsSupportedMainState(MainStateEnum mainState) const
     case MainStateEnum::kError:
     case MainStateEnum::kSetupRequired:
         // Mandatory states are always supported
-        isSupported = true;
-        break;
-
+        return true;
     case MainStateEnum::kCalibrating:
-        isSupported = mConformance.HasFeature(Feature::kCalibration);
-        break;
-
+        return mConformance.HasFeature(Feature::kCalibration);
     case MainStateEnum::kProtected:
-        isSupported = mConformance.HasFeature(Feature::kProtection);
-        break;
-
+        return mConformance.HasFeature(Feature::kProtection);
     case MainStateEnum::kDisengaged:
-        // Disengaged requires the ManuallyOperable feature
-        isSupported = mConformance.HasFeature(Feature::kManuallyOperable);
-        break;
-
+        return mConformance.HasFeature(Feature::kManuallyOperable);
     default:
-        isSupported = false;
-        break;
+        return false;
     }
-
-    return isSupported;
 }
 
 bool ClosureControlCluster::IsSupportedOverallCurrentStatePositioning(CurrentPositionEnum positioning) const
 {
-    bool isSupported = false;
-
     switch (positioning)
     {
     case CurrentPositionEnum::kFullyClosed:
     case CurrentPositionEnum::kFullyOpened:
     case CurrentPositionEnum::kPartiallyOpened:
     case CurrentPositionEnum::kOpenedAtSignature:
-        // Mandatory states are always supported
-        isSupported = true;
-        break;
-
+        // Mandatory positions are always supported
+        return true;
     case CurrentPositionEnum::kOpenedForPedestrian:
-        isSupported = mConformance.HasFeature(Feature::kPedestrian);
-        break;
-
+        return mConformance.HasFeature(Feature::kPedestrian);
     case CurrentPositionEnum::kOpenedForVentilation:
-        isSupported = mConformance.HasFeature(Feature::kVentilation);
-        break;
-
+        return mConformance.HasFeature(Feature::kVentilation);
     default:
-        isSupported = false;
-        break;
+        return false;
     }
-
-    return isSupported;
 }
 
 bool ClosureControlCluster::IsSupportedOverallTargetStatePositioning(TargetPositionEnum positioning) const
 {
-    bool isSupported = false;
-
     switch (positioning)
     {
     case TargetPositionEnum::kMoveToFullyClosed:
     case TargetPositionEnum::kMoveToFullyOpen:
     case TargetPositionEnum::kMoveToSignaturePosition:
-        // Mandatory states are always supported
-        isSupported = true;
-        break;
-
+        // Mandatory positions are always supported
+        return true;
     case TargetPositionEnum::kMoveToPedestrianPosition:
-        isSupported = mConformance.HasFeature(Feature::kPedestrian);
-        break;
-
+        return mConformance.HasFeature(Feature::kPedestrian);
     case TargetPositionEnum::kMoveToVentilationPosition:
-        isSupported = mConformance.HasFeature(Feature::kVentilation);
-        break;
-
+        return mConformance.HasFeature(Feature::kVentilation);
     default:
-        isSupported = false;
-        break;
+        return false;
     }
-
-    return isSupported;
 }
 
 CHIP_ERROR ClosureControlCluster::SetCountdownTime(const DataModel::Nullable<ElapsedS> & countdownTime, bool fromDelegate)
@@ -546,7 +484,9 @@ void ClosureControlCluster::ClearCurrentErrorList()
 // TODO: Move the CountdownTime handling to Delegate
 DataModel::Nullable<ElapsedS> ClosureControlCluster::GetCountdownTime() const
 {
-    VerifyOrReturnValue(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous), DataModel::NullNullable, ChipLogError(AppServer, "Cluster should support Positioning and not Instantaneous feature"));
+    VerifyOrReturnValue(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
+                        DataModel::NullNullable,
+                        ChipLogError(AppServer, "Cluster should support Positioning and not Instantaneous feature"));
     return mState.mCountdownTime.value();
 }
 
@@ -635,7 +575,7 @@ Protocols::InteractionModel::Status ClosureControlCluster::HandleMoveTo(Optional
     VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState = GetOverallCurrentState();
-    DataModel::Nullable<GenericOverallTargetState> overallTargetState = GetOverallTargetState();
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState   = GetOverallTargetState();
     VerifyOrReturnError(!overallCurrentState.IsNull(), Status::InvalidInState,
                         ChipLogError(AppServer, "OverallCurrentState is null on endpoint : %d", mMatterContext.GetEndpointId()));
 

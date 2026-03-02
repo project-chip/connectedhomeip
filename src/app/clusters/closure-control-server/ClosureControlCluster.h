@@ -198,17 +198,6 @@ public:
     CHIP_ERROR GetCurrentErrorList(Span<ClosureErrorEnum> & outputSpan);
 
     /**
-     * @brief Reads the CurrentErrorList attribute.
-     *        This method is used to read the CurrentErrorList attribute and encode it using the provided encoder.
-     *
-     * @param[in] encoder The encoder to use for encoding the CurrentErrorList attribute.
-     *
-     * @return CHIP_NO_ERROR if the read was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
-     */
-    CHIP_ERROR ReadCurrentErrorListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder);
-
-    /**
      * @brief Set SetOverallCurrentState.
      *
      * @param[in] overallCurrentState SetOverallCurrentState Position, Latch and Speed.
@@ -374,11 +363,6 @@ private:
     ClusterConformance mConformance;
     ClusterState mState;
 
-    DataModel::ActionReturnStatus HandleStopCommand(CommandHandler & handler, const ConcreteCommandPath & path);
-    DataModel::ActionReturnStatus HandleMoveToCommand(CommandHandler & handler, const ConcreteCommandPath & path,
-                                                      const Commands::MoveTo::DecodableType & commandData);
-    DataModel::ActionReturnStatus HandleCalibrateCommand(CommandHandler & handler, const ConcreteCommandPath & path);
-
     /**
      * @brief Function validates if the requested mainState is supported by the closure.
      *        Function validates agaisnt the FeatureMap conformance to validate support.
@@ -440,6 +424,17 @@ private:
     {
         return SetCountdownTime(countdownTime, false);
     }
+
+    /**
+     * @brief Reads the CurrentErrorList attribute.
+     *        This method is used to read the CurrentErrorList attribute and encode it using the provided encoder.
+     *
+     * @param[in] encoder The encoder to use for encoding the CurrentErrorList attribute.
+     *
+     * @return CHIP_NO_ERROR if the read was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     */
+    CHIP_ERROR ReadCurrentErrorListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder);
 };
 
 } // namespace ClosureControl
