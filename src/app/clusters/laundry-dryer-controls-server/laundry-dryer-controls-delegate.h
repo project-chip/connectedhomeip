@@ -19,6 +19,8 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeValueEncoder.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -41,6 +43,22 @@ public:
      * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the list of supported dryness.
      */
     virtual CHIP_ERROR GetSupportedDrynessLevelAtIndex(size_t index, DrynessLevelEnum & supportedDryness) = 0;
+
+    /**
+     * Optional method to allow apps to enforce additional checks before setting the dryness level if required.
+     * @param newSelectedDrynessLevel The targetted dryness level.
+     * @return Protocols::InteractionModel::Status::Success if the action is allowed, an error code otherwise.
+     */
+    virtual Protocols::InteractionModel::Status CanSetSelectedDrynessLevel(const DrynessLevelEnum & newSelectedDrynessLevel);
+
+    /**
+     * Optional API to get the SelectedDrynessLevel attribute from delegate.
+     * @param selectedDrynessLevel To store the read result.
+     * @return Protocols::InteractionModel::Status::Success if the read was successful, Protocols::InteractionModel::Status::Failure
+     * otherwise.
+     */
+    virtual Protocols::InteractionModel::Status
+    GetSelectedDrynessLevel(DataModel::Nullable<DrynessLevelEnum> & selectedDrynessLevel);
 };
 
 } // namespace LaundryDryerControls
