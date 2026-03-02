@@ -34,7 +34,8 @@ constexpr uint8_t kMaxSelectedTemperatureLevel = 31;
 
 TemperatureControlCluster::TemperatureControlCluster(EndpointId endpointId, const BitFlags<Feature> features,
                                                      const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, TemperatureControl::Id }), mFeatures(features), mDelegate(config.delegate)
+    DefaultServerCluster({ endpointId, TemperatureControl::Id }),
+    mFeatures(features), mDelegate(config.delegate)
 {
     if (mFeatures.Has(Feature::kTemperatureNumber))
     {
