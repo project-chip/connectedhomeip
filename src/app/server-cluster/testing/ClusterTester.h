@@ -207,6 +207,15 @@ public:
             else
                 return status.has_value() && status->IsSuccess() && response.has_value();
         }
+
+        // Returns the ClusterStatusCode if available, otherwise returns std::nullopt.
+        // This allows tests to check the status code with a single EXPECT_EQ()
+        // (i.e. without having to ASSERT_TRUE(status.has_value()) first).
+        std::optional<Protocols::InteractionModel::ClusterStatusCode> GetStatusCode() const
+        {
+            VerifyOrReturnValue(status.has_value(), std::nullopt);
+            return status->GetStatusCode();
+        }
     };
 
     // Invoke a command and return the decoded result.
