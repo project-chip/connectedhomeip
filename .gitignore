@@ -19,7 +19,7 @@ out/
 /integrations/docker/images/stage-2/chip-build-efr32/files-slt/*.lock
 /integrations/docker/images/stage-2/chip-build-efr32/files-slt/user.slconf
 /scripts/setup/silabs/slt
-.//scripts/setup/silabs/.install-packages-done
+/scripts/setup/silabs/.install-packages-done
 /third_party/silabs/simplicity_sdk
 /third_party/silabs/wifi_sdk
 
