@@ -155,9 +155,7 @@ void ClosureControlEndpoint::OnStopCalibrateActionComplete()
 
 void ClosureControlEndpoint::OnStopMotionActionComplete()
 {
-    MainStateEnum presentMainState;
-    VerifyOrReturn(mClusterInstance->GetMainState(presentMainState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get main state in OnStopMotionActionComplete"));
+    MainStateEnum presentMainState = mClusterInstance->GetMainState();
 
     // If the current main state is WaitingForMotion, it means the device hasn't started moving yet,
     // so we don't need to update the current state.
@@ -167,9 +165,7 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
         // and the closure is not fully closed or fully opened.
         auto position = MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened));
 
-        DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
-        VerifyOrReturn(mClusterInstance->GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
-                       ChipLogError(AppServer, "Failed to get overall state in OnStopMotionActionComplete"));
+        DataModel::Nullable<GenericOverallCurrentState> overallCurrentState = mClusterInstance->GetOverallCurrentState();
 
         if (overallCurrentState.IsNull())
         {
@@ -224,13 +220,8 @@ void ClosureControlEndpoint::OnMoveToActionComplete()
 
 void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
 {
-    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
-    DataModel::Nullable<GenericOverallTargetState> overallTargetState;
-
-    VerifyOrReturn(mClusterInstance->GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get overall state from closure Endpoint"));
-    VerifyOrReturn(mClusterInstance->GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get overall target from closure Endpoint"));
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState = mClusterInstance->GetOverallCurrentState();
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState = mClusterInstance->GetOverallTargetState();
 
     VerifyOrReturn(!overallTargetState.IsNull(), ChipLogError(AppServer, "Current overall target is null, Move to action Failed"));
     VerifyOrReturn(!overallCurrentState.IsNull(), ChipLogError(AppServer, "Current overall state is null, Move to action Failed"));
@@ -301,13 +292,8 @@ void ClosureControlEndpoint::OnPanelMotionActionComplete()
     // Set the OverallState position to PartiallyOpened as motion has been stopped
     auto position = MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened));
 
-    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
-    DataModel::Nullable<GenericOverallTargetState> overallTargetState;
-
-    VerifyOrReturn(mClusterInstance->GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get OverallCurrentState"));
-    VerifyOrReturn(mClusterInstance->GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get OverallTargetState"));
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState = mClusterInstance->GetOverallCurrentState();
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState = mClusterInstance->GetOverallTargetState();
 
     if (overallCurrentState.IsNull())
     {

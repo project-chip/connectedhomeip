@@ -334,23 +334,22 @@ TEST_F(TestClosureControlCluster, TestSetMainStateUpdatesCountdownTime)
     ClosureControlCluster cluster(kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, testConformance, initParams });
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kMoving), CHIP_NO_ERROR);
-    DataModel::Nullable<ElapsedS> countdownTime;
-    EXPECT_EQ(cluster.GetCountdownTime(countdownTime), CHIP_NO_ERROR);
+    DataModel::Nullable<ElapsedS> countdownTime = cluster.GetCountdownTime();
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_EQ(countdownTime.Value(), 22u);
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kWaitingForMotion), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.GetCountdownTime(countdownTime), CHIP_NO_ERROR);
+    countdownTime = cluster.GetCountdownTime();
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_EQ(countdownTime.Value(), 11u);
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kCalibrating), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.GetCountdownTime(countdownTime), CHIP_NO_ERROR);
+    countdownTime = cluster.GetCountdownTime();
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_EQ(countdownTime.Value(), 33u);
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kStopped), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.GetCountdownTime(countdownTime), CHIP_NO_ERROR);
+    countdownTime = cluster.GetCountdownTime();
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_EQ(countdownTime.Value(), 0u);
 }
@@ -379,13 +378,12 @@ TEST_F(TestClosureControlCluster, TestSetCountdownTimeFromDelegateAndRead)
                                   ClosureControlCluster::Context{ mockDelegate, positioningConformance, initParams });
 
     EXPECT_EQ(cluster.SetCountdownTimeFromDelegate(DataModel::MakeNullable<ElapsedS>(1)), CHIP_NO_ERROR);
-    DataModel::Nullable<ElapsedS> countdownTime;
-    EXPECT_EQ(cluster.GetCountdownTime(countdownTime), CHIP_NO_ERROR);
+    DataModel::Nullable<ElapsedS> countdownTime = cluster.GetCountdownTime();
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_EQ(countdownTime.Value(), 1u);
 
     EXPECT_EQ(cluster.SetCountdownTimeFromDelegate(DataModel::MakeNullable<ElapsedS>(2)), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.GetCountdownTime(countdownTime), CHIP_NO_ERROR);
+    countdownTime = cluster.GetCountdownTime();
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_EQ(countdownTime.Value(), 2u);
 }
@@ -446,8 +444,7 @@ TEST_F(TestClosureControlCluster, TestHandleCalibrate)
     EXPECT_EQ(cluster.HandleCalibrate(), Status::Success);
     EXPECT_EQ(mockDelegate.calibrateCommandCalls, 1);
 
-    MainStateEnum state = MainStateEnum::kUnknownEnumValue;
-    EXPECT_EQ(cluster.GetMainState(state), CHIP_NO_ERROR);
+    MainStateEnum state = cluster.GetMainState();
     EXPECT_EQ(state, MainStateEnum::kCalibrating);
 }
 
@@ -473,8 +470,7 @@ TEST_F(TestClosureControlCluster, TestHandleStop)
     EXPECT_EQ(cluster.HandleStop(), Status::Success);
     EXPECT_EQ(mockDelegate.stopCommandCalls, 1);
 
-    MainStateEnum state = MainStateEnum::kUnknownEnumValue;
-    EXPECT_EQ(cluster.GetMainState(state), CHIP_NO_ERROR);
+    MainStateEnum state = cluster.GetMainState();
     EXPECT_EQ(state, MainStateEnum::kStopped);
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kError), CHIP_NO_ERROR);
@@ -530,15 +526,13 @@ TEST_F(TestClosureControlCluster, TestHandleMoveToAllFeatures)
               Status::Success);
     EXPECT_EQ(mockDelegate.moveToCommandCalls, 1);
 
-    DataModel::Nullable<GenericOverallTargetState> targetState;
-    EXPECT_EQ(cluster.GetOverallTargetState(targetState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallTargetState> targetState = cluster.GetOverallTargetState();
     EXPECT_FALSE(targetState.IsNull());
     EXPECT_EQ(targetState.Value().position.Value().Value(), TargetPositionEnum::kMoveToFullyOpen);
     EXPECT_EQ(targetState.Value().latch.Value().Value(), false);
     EXPECT_EQ(targetState.Value().speed.Value(), Globals::ThreeLevelAutoEnum::kHigh);
 
-    MainStateEnum state = MainStateEnum::kUnknownEnumValue;
-    EXPECT_EQ(cluster.GetMainState(state), CHIP_NO_ERROR);
+    MainStateEnum state = cluster.GetMainState();
     EXPECT_EQ(state, MainStateEnum::kMoving);
 }
 
@@ -551,8 +545,7 @@ TEST_F(TestClosureControlCluster, TestHandleMoveToTransitionsToWaitingWhenNotRea
     EXPECT_EQ(cluster.SetOverallCurrentState(PositioningState(CurrentPositionEnum::kPartiallyOpened)), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.HandleMoveTo(Optional(TargetPositionEnum::kMoveToFullyOpen), NullOptional, NullOptional), Status::Success);
-    MainStateEnum state = MainStateEnum::kUnknownEnumValue;
-    EXPECT_EQ(cluster.GetMainState(state), CHIP_NO_ERROR);
+    MainStateEnum state = cluster.GetMainState();
     EXPECT_EQ(state, MainStateEnum::kWaitingForMotion);
 }
 
@@ -638,8 +631,7 @@ TEST_F(TestClosureControlCluster, TestErrorListLifecycle)
     EXPECT_EQ(errorSpan.size(), 1u);
     EXPECT_EQ(errorSpan[0], ClosureErrorEnum::kBlockedBySensor);
 
-    MainStateEnum state = MainStateEnum::kUnknownEnumValue;
-    EXPECT_EQ(cluster.GetMainState(state), CHIP_NO_ERROR);
+    MainStateEnum state = cluster.GetMainState();
     EXPECT_EQ(state, MainStateEnum::kError);
 
     cluster.ClearCurrentErrorList();
@@ -678,18 +670,17 @@ TEST_F(TestClosureControlCluster, TestLatchControlModesFeatureValidation)
     EXPECT_EQ(
         positioningCluster.SetLatchControlModes(BitFlags<LatchControlModesBitmap>().Set(LatchControlModesBitmap::kRemoteLatching)),
         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    BitFlags<LatchControlModesBitmap> modes;
-    EXPECT_EQ(positioningCluster.GetLatchControlModes(modes), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    BitFlags<LatchControlModesBitmap> modes = positioningCluster.GetLatchControlModes();
+    EXPECT_EQ(modes, BitFlags<LatchControlModesBitmap>());
 
     MockClusterConformance latchConformance;
     latchConformance.FeatureMap().Set(Feature::kMotionLatching);
     ClosureControlCluster latchCluster(kTestEndpointId,
                                        ClosureControlCluster::Context{ mockDelegate, latchConformance, initParams });
-    BitFlags<LatchControlModesBitmap> configuredModes;
+    BitFlags<LatchControlModesBitmap> configuredModes = latchCluster.GetLatchControlModes();
     configuredModes.Set(LatchControlModesBitmap::kRemoteLatching).Set(LatchControlModesBitmap::kRemoteUnlatching);
     EXPECT_EQ(latchCluster.SetLatchControlModes(configuredModes), CHIP_NO_ERROR);
-    EXPECT_EQ(latchCluster.GetLatchControlModes(modes), CHIP_NO_ERROR);
-    EXPECT_EQ(modes, configuredModes);
+    EXPECT_EQ(latchCluster.GetLatchControlModes(), configuredModes);
 }
 
 TEST_F(TestClosureControlCluster, TestGenerateMovementCompletedEvent)

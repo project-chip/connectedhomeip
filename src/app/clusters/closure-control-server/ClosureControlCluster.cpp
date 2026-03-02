@@ -98,43 +98,29 @@ DataModel::ActionReturnStatus ClosureControlCluster::ReadAttribute(const DataMod
     switch (request.path.mAttributeId)
     {
     case ClusterRevision::Id: {
-        Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
-        ReturnErrorOnFailure(GetClusterRevision(clusterRevision));
-        return encoder.Encode(clusterRevision);
+        return encoder.Encode(ClosureControl::kRevision);
     }
     case FeatureMap::Id: {
-        BitFlags<Feature> featureMap;
-        ReturnErrorOnFailure(GetFeatureMap(featureMap));
-        return encoder.Encode(featureMap);
+        return encoder.Encode(GetFeatureMap());
     }
     case MainState::Id: {
-        MainStateEnum mainState;
-        ReturnErrorOnFailure(GetMainState(mainState));
-        return encoder.Encode(mainState);
+        return encoder.Encode(GetMainState());
     }
     case CountdownTime::Id: {
-        DataModel::Nullable<ElapsedS> countdownTime;
-        ReturnErrorOnFailure(GetCountdownTime(countdownTime));
-        return encoder.Encode(countdownTime);
+        return encoder.Encode(GetCountdownTime());
     }
     case CurrentErrorList::Id: {
         return encoder.EncodeList(
             [this](const auto & subEncoder) -> CHIP_ERROR { return ReadCurrentErrorListAttribute(subEncoder); });
     }
     case OverallCurrentState::Id: {
-        DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
-        ReturnErrorOnFailure(GetOverallCurrentState(overallCurrentState));
-        return encoder.Encode(overallCurrentState);
+        return encoder.Encode(GetOverallCurrentState());
     }
     case OverallTargetState::Id: {
-        DataModel::Nullable<GenericOverallTargetState> overallTargetState;
-        ReturnErrorOnFailure(GetOverallTargetState(overallTargetState));
-        return encoder.Encode(overallTargetState);
+        return encoder.Encode(GetOverallTargetState());
     }
     case LatchControlModes::Id: {
-        BitFlags<LatchControlModesBitmap> latchControlModes;
-        ReturnErrorOnFailure(GetLatchControlModes(latchControlModes));
-        return encoder.Encode(latchControlModes);
+        return encoder.Encode(GetLatchControlModes());
     }
     default:
         return Status::UnsupportedAttribute;
@@ -558,42 +544,25 @@ void ClosureControlCluster::ClearCurrentErrorList()
 }
 
 // TODO: Move the CountdownTime handling to Delegate
-CHIP_ERROR ClosureControlCluster::GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime)
+DataModel::Nullable<ElapsedS> ClosureControlCluster::GetCountdownTime() const
 {
-    assertChipStackLockedByCurrentThread();
-
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
-                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    countdownTime = mState.mCountdownTime.value();
-
-    return CHIP_NO_ERROR;
+    VerifyOrReturnValue(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous), DataModel::NullNullable, ChipLogError(AppServer, "Cluster should support Positioning and not Instantaneous feature"));
+    return mState.mCountdownTime.value();
 }
 
-CHIP_ERROR ClosureControlCluster::GetMainState(MainStateEnum & mainState)
+MainStateEnum ClosureControlCluster::GetMainState() const
 {
-    assertChipStackLockedByCurrentThread();
-
-    mainState = mState.mMainState;
-    return CHIP_NO_ERROR;
+    return mState.mMainState;
 }
 
-CHIP_ERROR ClosureControlCluster::GetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState)
+DataModel::Nullable<GenericOverallCurrentState> ClosureControlCluster::GetOverallCurrentState() const
 {
-    assertChipStackLockedByCurrentThread();
-
-    overallCurrentState = mState.mOverallCurrentState;
-
-    return CHIP_NO_ERROR;
+    return mState.mOverallCurrentState;
 }
 
-CHIP_ERROR ClosureControlCluster::GetOverallTargetState(DataModel::Nullable<GenericOverallTargetState> & overallTarget)
+DataModel::Nullable<GenericOverallTargetState> ClosureControlCluster::GetOverallTargetState() const
 {
-    assertChipStackLockedByCurrentThread();
-
-    overallTarget = mState.mOverallTargetState;
-
-    return CHIP_NO_ERROR;
+    return mState.mOverallTargetState;
 }
 
 CHIP_ERROR ClosureControlCluster::GetCurrentErrorList(Span<ClosureErrorEnum> & outputSpan)
@@ -623,27 +592,17 @@ CHIP_ERROR ClosureControlCluster::ReadCurrentErrorListAttribute(const AttributeV
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClosureControlCluster::GetLatchControlModes(BitFlags<LatchControlModesBitmap> & latchControlModes)
+BitFlags<LatchControlModesBitmap> ClosureControlCluster::GetLatchControlModes() const
 {
-
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    latchControlModes = mState.mLatchControlModes;
-    return CHIP_NO_ERROR;
+    VerifyOrReturnValue(mConformance.HasFeature(Feature::kMotionLatching), BitFlags<LatchControlModesBitmap>(),
+                        ChipLogError(AppServer, "LatchControlModes feature is not supported"));
+    return mState.mLatchControlModes;
 }
 
-CHIP_ERROR ClosureControlCluster::GetFeatureMap(BitFlags<Feature> & featureMap)
+BitFlags<Feature> ClosureControlCluster::GetFeatureMap() const
 {
 
-    featureMap = mConformance.FeatureMap();
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ClosureControlCluster::GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision)
-{
-
-    clusterRevision = ClosureControl::kRevision;
-    return CHIP_NO_ERROR;
+    return mConformance.FeatureMap();
 }
 
 Protocols::InteractionModel::Status ClosureControlCluster::HandleStop()
@@ -652,8 +611,7 @@ Protocols::InteractionModel::Status ClosureControlCluster::HandleStop()
     // Stop command can only be supported if closure doesnt support instantaneous features
     VerifyOrReturnError(!mConformance.HasFeature(Feature::kInstantaneous), Status::UnsupportedCommand);
 
-    MainStateEnum state;
-    VerifyOrReturnError(GetMainState(state) == CHIP_NO_ERROR, Status::Failure);
+    MainStateEnum state = GetMainState();
 
     // Stop action is supported only if the closure is in one of the following states Moving, WaitingForMotion or Calibrating.
     // A status code of SUCCESS SHALL always be returned, regardless if it is in above states or not.
@@ -676,10 +634,8 @@ Protocols::InteractionModel::Status ClosureControlCluster::HandleMoveTo(Optional
 
     VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
-    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
-    DataModel::Nullable<GenericOverallTargetState> overallTargetState;
-    VerifyOrReturnError(GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure);
-    VerifyOrReturnError(GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR, Status::Failure);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState = GetOverallCurrentState();
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState = GetOverallTargetState();
     VerifyOrReturnError(!overallCurrentState.IsNull(), Status::InvalidInState,
                         ChipLogError(AppServer, "OverallCurrentState is null on endpoint : %d", mMatterContext.GetEndpointId()));
 
@@ -717,8 +673,7 @@ Protocols::InteractionModel::Status ClosureControlCluster::HandleMoveTo(Optional
         overallTargetState.Value().speed.SetValue(speed.Value());
     }
 
-    MainStateEnum state;
-    VerifyOrReturnError(GetMainState(state) == CHIP_NO_ERROR, Status::Failure);
+    MainStateEnum state = GetMainState();
 
     // If the MoveTo command is received in any state other than 'Moving', 'WaitingForMotion', or 'Stopped', an error code
     // INVALID_IN_STATE shall be returned.
@@ -765,8 +720,7 @@ Protocols::InteractionModel::Status ClosureControlCluster::HandleCalibrate()
 {
     VerifyOrReturnError(mConformance.HasFeature(Feature::kCalibration), Status::UnsupportedCommand);
 
-    MainStateEnum state;
-    VerifyOrReturnError(GetMainState(state) == CHIP_NO_ERROR, Status::Failure);
+    MainStateEnum state = GetMainState();
 
     // If Calibrate command is received when already in the Calibrating state,
     // the server SHALL respond with a status code of SUCCESS.

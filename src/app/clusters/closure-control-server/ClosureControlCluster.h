@@ -164,7 +164,6 @@ public:
     ~ClosureControlCluster();
 
     const ClusterConformance & GetConformance() const { return mConformance; }
-    const ClusterState & GetState() const { return mState; }
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
@@ -178,18 +177,12 @@ public:
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
 
-    // All Get functions
-    // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
-    // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
-    // Otherwise return CHIP_NO_ERROR and set the input parameter value to the current cluster state value
-
-    CHIP_ERROR GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime);
-    CHIP_ERROR GetMainState(MainStateEnum & mainState);
-    CHIP_ERROR GetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState);
-    CHIP_ERROR GetOverallTargetState(DataModel::Nullable<GenericOverallTargetState> & overallTarget);
-    CHIP_ERROR GetLatchControlModes(BitFlags<LatchControlModesBitmap> & latchControlModes);
-    CHIP_ERROR GetFeatureMap(BitFlags<Feature> & featureMap);
-    CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
+    DataModel::Nullable<ElapsedS> GetCountdownTime() const;
+    MainStateEnum GetMainState() const;
+    DataModel::Nullable<GenericOverallCurrentState> GetOverallCurrentState() const;
+    DataModel::Nullable<GenericOverallTargetState> GetOverallTargetState() const;
+    BitFlags<LatchControlModesBitmap> GetLatchControlModes() const;
+    BitFlags<Feature> GetFeatureMap() const;
 
     /**
      * @brief Gets the current error list.

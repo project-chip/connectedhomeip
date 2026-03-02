@@ -392,9 +392,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
                                                                              const Optional<Globals::ThreeLevelAutoEnum> & speed,
                                                                              const chip::EndpointId endpointId)
 {
-    MainStateEnum ep1MainState;
-    VerifyOrReturnError(mClosureEndpoint1.GetClusterInstance().GetMainState(ep1MainState) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to get main state for Step command on Endpoint 1"));
+    MainStateEnum ep1MainState = mClosureEndpoint1.GetClusterInstance().GetMainState();
 
     // If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
     //  SetupRequired or Error, then a status code of INVALID_IN_STATE shall be returned.
@@ -405,9 +403,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
                         ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(ep1MainState)));
 
     // Update OverallTarget of Closure based on SetTarget command.
-    DataModel::Nullable<GenericOverallTargetState> overallTargetState;
-    VerifyOrReturnError(mClosureEndpoint1.GetClusterInstance().GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR,
-                        Status::Failure, ChipLogError(AppServer, "Failed to get overall target for SetTarget command"));
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState = mClosureEndpoint1.GetClusterInstance().GetOverallTargetState();
 
     if (overallTargetState.IsNull())
     {
@@ -481,10 +477,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
                                                                         const Optional<Globals::ThreeLevelAutoEnum> & speed,
                                                                         const chip::EndpointId endpointId)
 {
-    MainStateEnum ep1MainState;
-    VerifyOrReturnError(mClosureEndpoint1.GetClusterInstance().GetMainState(ep1MainState) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to get main state for Step command on Endpoint 1"));
-
+    MainStateEnum ep1MainState = mClosureEndpoint1.GetClusterInstance().GetMainState();
     // If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
     //  SetupRequired or Error, then a status code of INVALID_IN_STATE shall be returned.
     VerifyOrReturnError(ep1MainState != MainStateEnum::kDisengaged && ep1MainState != MainStateEnum::kProtected &&
@@ -500,10 +493,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
                         ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
 
     // Update Overall Target to Null for the Closure Control on Endpoint 1
-    DataModel::Nullable<GenericOverallTargetState> ep1Target;
-
-    VerifyOrReturnValue(mClosureEndpoint1.GetClusterInstance().GetOverallTargetState(ep1Target) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to get overall target for Step command"));
+    DataModel::Nullable<GenericOverallTargetState> ep1Target = mClosureEndpoint1.GetClusterInstance().GetOverallTargetState();
 
     if (ep1Target.IsNull())
     {
@@ -652,10 +642,7 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
         panelTargetState.Value().latch.HasValue() && !panelTargetState.Value().latch.Value().IsNull() &&
         (panelCurrentState.Value().latch.Value().Value() && !panelTargetState.Value().latch.Value().Value()))
     {
-        DataModel::Nullable<GenericOverallCurrentState> ep1OverallCurrentState = DataModel::NullNullable;
-
-        VerifyOrReturn(mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState(ep1OverallCurrentState) == CHIP_NO_ERROR,
-                       ChipLogError(AppServer, "Failed to get current state for Endpoint 1"));
+        DataModel::Nullable<GenericOverallCurrentState> ep1OverallCurrentState = mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
         VerifyOrReturn(!ep1OverallCurrentState.IsNull(), ChipLogError(AppServer, "Current state is not set for Endpoint 1"));
 
         // In Real application, this would be replaced with actual unlatch logic.
@@ -757,10 +744,7 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
         {
             if (!panelCurrentState.Value().latch.Value().Value() && panelTargetState.Value().latch.Value().Value())
             {
-                DataModel::Nullable<GenericOverallCurrentState> ep1OverallCurrentState = DataModel::NullNullable;
-                VerifyOrReturn(mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState(ep1OverallCurrentState) ==
-                                   CHIP_NO_ERROR,
-                               ChipLogError(AppServer, "Failed to get overall current state for Endpoint 1"));
+                DataModel::Nullable<GenericOverallCurrentState> ep1OverallCurrentState = mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
                 VerifyOrReturn(!ep1OverallCurrentState.IsNull(),
                                ChipLogError(AppServer, "Overall current state is not set for Endpoint 1"));
 
@@ -871,18 +855,13 @@ void ClosureManager::HandleClosureMotionAction()
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    DataModel::Nullable<GenericOverallCurrentState> ep1CurrentState;
+    DataModel::Nullable<GenericOverallCurrentState> ep1CurrentState = mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
     DataModel::Nullable<GenericDimensionStateStruct> ep2CurrentState;
     DataModel::Nullable<GenericDimensionStateStruct> ep3CurrentState;
 
-    DataModel::Nullable<GenericOverallTargetState> ep1TargetState;
+    DataModel::Nullable<GenericOverallTargetState> ep1TargetState = mClosureEndpoint1.GetClusterInstance().GetOverallTargetState();
     DataModel::Nullable<GenericDimensionStateStruct> ep2TargetState;
     DataModel::Nullable<GenericDimensionStateStruct> ep3TargetState;
-
-    VerifyOrReturn(mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState(ep1CurrentState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get current state for Endpoint 1"));
-    VerifyOrReturn(mClosureEndpoint1.GetClusterInstance().GetOverallTargetState(ep1TargetState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get target state for Endpoint 1"));
 
     VerifyOrReturn(mClosurePanelEndpoint2.GetLogic().GetCurrentState(ep2CurrentState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get current state for Endpoint 2"));
