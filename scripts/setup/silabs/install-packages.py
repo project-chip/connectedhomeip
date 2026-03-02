@@ -52,6 +52,12 @@ def get_tools_path():
     return script_dir
 
 
+def get_install_done_marker_path():
+    """Return path to marker file indicating install-packages has completed successfully."""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(script_dir, ".install-packages-done")
+
+
 def make_executable(path):
     """Make a file executable on Unix-like systems."""
     if path and os.path.exists(path):
@@ -203,6 +209,12 @@ def setup_slt_environment(verbose=False):
     simplicity_sdk_path = slt_where(slt_cli_path, "simplicity-sdk/2025.12.1-alpha")
     wiseconnect_path = slt_where(slt_cli_path, "wiseconnect")
     create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path)
+
+    try:
+        with open(get_install_done_marker_path(), "w"):
+            pass
+    except OSError as e:
+        logger.warning("Could not write install-done marker: %s", e)
 
     return slt_cli_path
 
