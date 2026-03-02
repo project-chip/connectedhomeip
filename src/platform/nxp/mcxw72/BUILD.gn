@@ -109,9 +109,7 @@ static_library("nxp_platform") {
       ]
     }
 
-    sources += [
-        "../common/crypto/S200/CHIPCryptoPalS200.cpp",
-      ]
+    sources += [ "../common/crypto/S200/CHIPCryptoPalS200.cpp" ]
 
     include_dirs = [ "${nxp_sdk_build_root}/mbedtls/config" ]
   } else if (chip_crypto == "psa") {
