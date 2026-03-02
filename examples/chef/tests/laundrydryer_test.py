@@ -142,7 +142,7 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
             asserts.assert_in(selected_level, supported_levels,
                               "SelectedDrynessLevel should be in SupportedDrynessLevels")
 
-        # Step 3: Valid Write Transaction
+        # Step 3: Stop operational cycle if running.
         self.step(3)
         # Ensure we are in a state that allows changes (Stopped)
         # OperationalStateEnum: kStopped = 0x00
@@ -169,7 +169,7 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
                       Clusters.Objects.LaundryDryerControls.Enums.DrynessLevelEnum.kExtra,
                       Clusters.Objects.LaundryDryerControls.Enums.DrynessLevelEnum.kMax]
         unsupported_level = next(
-            (l for l in all_levels if l not in supported_levels), None)
+            (level for level in all_levels if level not in supported_levels), None)
 
         if unsupported_level is not None:
             status = await self._write_selected_dryness_level(unsupported_level, expect_success=False)
@@ -208,8 +208,6 @@ class TC_LAUNDRYDRYER(MatterBaseTest):
             attribute=Clusters.Objects.LaundryWasherMode.Attributes.SupportedModes)
 
         if len(supported_modes) > 1:
-            initial_supported_dryness = await self._read_supported_dryness_levels()
-
             # Try to find Delicates and Heavy labels
             delicates_mode = next(
                 (m.mode for m in supported_modes if "Delicate" in m.label), None)
