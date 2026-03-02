@@ -193,21 +193,17 @@ class WpaSupplicantMock(threading.Thread):
         async def CreateInterface(self, args: DictVariantT) -> str:
             ifname = ''
             if 'Ifname' in args:
-                value = args['Ifname']
-                # value may be GVariant (type_string, actual_value) or a raw value.
-                if isinstance(value, tuple) and len(value) == 2:
-                    raw = value[1]
-                else:
-                    raw = value
+                raw = args['Ifname'][1]
                 # Ensure we provide a str to GetInterface
                 ifname = raw if isinstance(raw, str) else str(raw)
             return await self.GetInterface(ifname)
 
         @sdbus.dbus_method_async("s", "o")
         async def GetInterface(self, name: str) -> str:
-            # if the interface is not app, the last index is returned
-            idx = self.mock.get_interface_index(name)
-            return self.mock.interfaces[idx].path
+            for interface in self.mock.interfaces:
+                if interface.interface_name_in_sim in name.lower():  # Case-insensitive match
+                    return interface.path
+            return next(reversed(self.mock.interfaces)).path
 
     class WpaInterface(sdbus.DbusInterfaceCommonAsync,
                        interface_name="fi.w1.wpa_supplicant1.Interface"):
@@ -240,7 +236,7 @@ class WpaSupplicantMock(threading.Thread):
 
         @sdbus.dbus_method_async("a{sv}")
         async def Scan(self, args: DictVariantT) -> None:
-            await self.State.set_async("scanning")
+            pass
 
         @sdbus.dbus_method_async("a{sv}", "o")
         async def AddNetwork(self, args: DictVariantT) -> str:
@@ -254,9 +250,8 @@ class WpaSupplicantMock(threading.Thread):
                 await self.State.set_async("associating")
                 await self.State.set_async("associated")
                 self.mock.networking.app_link.up()
-                await self.State.set_async("completed")
-
                 self.ScanDone.emit(True)
+                await self.State.set_async("completed")
 
             await self.CurrentNetwork.set_async(path)
             asyncio.create_task(associate())
@@ -377,8 +372,7 @@ class WpaSupplicantMock(threading.Thread):
             """Cancel a NAN subscribe session."""
             log.debug("NANCancelSubscribe: subscribe_id=%d", subscribe_id)
 
-            if subscribe_id in self.nan_sessions:
-                del self.nan_sessions[subscribe_id]
+            self.nan_sessions.pop(subscribe_id, None)
 
             if self.nan_simulator:
                 self.nan_simulator.on_subscribe_cancelled(subscribe_id)
@@ -410,11 +404,7 @@ class WpaSupplicantMock(threading.Thread):
             """Extract values from GVariant a{sv} format to plain dict."""
             result = {}
             for key, value in variant_dict.items():
-                if isinstance(value, tuple) and len(value) == 2:
-                    # GVariant format: (type_string, actual_value)
-                    result[key] = value[1]
-                else:
-                    result[key] = value
+                result[key] = value[1]
             return result
 
         # =====================================================================
@@ -494,11 +484,11 @@ class WpaSupplicantMock(threading.Thread):
 
     class WpaNetwork(sdbus.DbusInterfaceCommonAsync,
                      interface_name="fi.w1.wpa_supplicant1.Network"):
-        def __init__(self, ssid: str, interface_index: int, network_id: int):
+        def __init__(self, ssid: str, interface_index: int):
             super().__init__()
             self.ssid = ssid
             self.interface_index = interface_index
-            self.path = f"/fi/w1/wpa_supplicant1/Interfaces/{interface_index}/Networks/{network_id}"
+            self.path = f"/fi/w1/wpa_supplicant1/Interfaces/{interface_index}/Networks/1"
             self.enabled = False
 
         @sdbus.dbus_property_async("a{sv}")
@@ -531,18 +521,7 @@ class WpaSupplicantMock(threading.Thread):
 
         log.info("WiFi-PAF mode enabled with NAN simulator")
 
-    def get_interface_index(self, name: str) -> int:
-        """Return the index of the inteface containing given 'name'.
-        If no match is found, returns the index of the last available interface.
-        """
-        name_lower = name.lower()
-        for idx, interface in enumerate(self.interfaces):
-            if interface.interface_name_in_sim in name_lower:  # Case-insensitive match
-                return idx
-
-        return -1  # Default to last interface if no app found in the interface name
-
-    def __init__(self, interfaces_names: list[str], ssid: str, password: str, network_id: int, ns: IsolatedNetworkNamespace):
+    def __init__(self, interfaces_names: list[str], ssid: str, password: str, ns: IsolatedNetworkNamespace):
         self.ssid = ssid
         self.password = password
         self.networking = ns
@@ -553,7 +532,7 @@ class WpaSupplicantMock(threading.Thread):
         for interface_idx, name in enumerate(interfaces_names):
             self.interfaces.append(
                 interface := WpaSupplicantMock.WpaInterface(self,
-                                                            interface_idx, WpaSupplicantMock.WpaNetwork(self.ssid, interface_idx, network_id)))
+                                                            interface_idx, WpaSupplicantMock.WpaNetwork(self.ssid, interface_idx)))
             # Assign interfaces to given names
             self.nan_simulator.register_interface(name, interface)
 
