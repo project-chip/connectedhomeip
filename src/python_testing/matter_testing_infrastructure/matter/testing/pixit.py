@@ -24,12 +24,12 @@ timeouts, or configuration flags.
 
 Usage example:
 
-    from matter.testing.pixit import requires_pixit
+    from matter.testing.pixit import pixit
 
     class TC_Example(MatterBaseTest):
 
-        @requires_pixit("th_server_app_path", str, "Path to TH server application")
-        @requires_pixit("timeout_sec", int, "Timeout in seconds", required=False, default=30)
+        @pixit("th_server_app_path", str, "Path to TH server application")
+        @pixit("timeout_sec", int, "Timeout in seconds", required=False, default=30)
         @async_test_body
         async def test_TC_Example_1_1(self):
             app_path = self.pixit("th_server_app_path")
@@ -66,14 +66,14 @@ class PixitDefinition:
     default: Any = _PIXIT_NO_DEFAULT
 
 
-def requires_pixit(name: str, type: Type, description: str, required: bool = True, default: Any = _PIXIT_NO_DEFAULT):
+def pixit(name: str, type: Type, description: str, required: bool = True, default: Any = _PIXIT_NO_DEFAULT):
     """Decorator that declares a PIXIT parameter requirement for a test method.
 
     This decorator attaches PIXIT metadata to the test method. When the test runs,
     MatterBaseTest.setup_test() automatically validates that all required PIXITs
     are present in the test's user_params.
 
-    Multiple @requires_pixit decorators can be stacked on a single test method
+    Multiple @pixit decorators can be stacked on a single test method
     to declare multiple PIXIT parameters.
 
     The decorator should be placed ABOVE @async_test_body and
@@ -88,8 +88,8 @@ def requires_pixit(name: str, type: Type, description: str, required: bool = Tru
                  If required=True, this argument is ignored.
 
     Example:
-        @requires_pixit("app_path", str, "Path to the server application")
-        @requires_pixit("retry_count", int, "Number of retries", required=False, default=3)
+        @pixit("app_path", str, "Path to the server application")
+        @pixit("retry_count", int, "Number of retries", required=False, default=3)
         @async_test_body
         async def test_TC_Example_1_1(self):
             path = self.pixit("app_path")      # guaranteed to exist
@@ -104,7 +104,7 @@ def requires_pixit(name: str, type: Type, description: str, required: bool = Tru
     )
 
     def decorator(func):
-        # Initialize the list if this is the first @requires_pixit on this function
+        # Initialize the list if this is the first @pixit on this function
         if not hasattr(func, "_pixit_definitions"):
             func._pixit_definitions = []
         func._pixit_definitions.insert(0, pixit_def)
@@ -117,7 +117,7 @@ def get_pixit_definitions(test_method) -> list[PixitDefinition]:
     """Extract PIXIT definitions from a decorated test method.
 
     Args:
-        test_method: A test method potentially decorated with @requires_pixit.
+        test_method: A test method potentially decorated with @pixit.
 
     Returns:
         List of PixitDefinition objects attached to the method, or empty list

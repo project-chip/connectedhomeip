@@ -520,11 +520,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Get a declared PIXIT value by name.
 
         Retrieves the value from user_params. If not found, falls back to the
-        default specified in the @requires_pixit decorator, or the default
+        default specified in the @pixit decorator, or the default
         argument provided to this method.
 
         Args:
-            name: The PIXIT parameter name (as declared in @requires_pixit).
+            name: The PIXIT parameter name (as declared in @pixit).
             default: Fallback default if no value is found and no decorator default exists.
 
         Returns:
@@ -546,7 +546,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return default
 
     def _validate_pixits(self):
-        """Validate that all required PIXITs declared via @requires_pixit are present.
+        """Validate that all required PIXITs declared via @pixit are present.
 
         Called automatically by setup_test() before each test method.
         If required PIXITs are missing, the test fails immediately with a clear
