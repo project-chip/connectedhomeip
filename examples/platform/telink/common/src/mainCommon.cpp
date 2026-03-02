@@ -41,6 +41,18 @@
 #include "Rpc.h"
 #endif
 
+K_SEM_DEFINE(gThreadPrescanDoneSem, 0, 1);
+
+class InternalScanCallback : public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
+{
+public:
+    void OnFinished(NetworkCommissioning::Status err, CharSpan debugText,
+                    NetworkCommissioning::ThreadScanResponseIterator * networks) override
+    {
+        k_sem_give(&gThreadPrescanDoneSem);
+    }
+};
+
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
@@ -176,6 +188,15 @@ int main(void)
     }
 
     TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    {
+        static InternalScanCallback sInternalScanCallback;
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ThreadStackMgrImpl().StartThreadScan(&sInternalScanCallback);
+        k_sem_take(&gThreadPrescanDoneSem, K_SECONDS(15));
+    }
+#endif
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     TEMPORARY_RETURN_IGNORED sWiFiCommissioningInstance.Init();

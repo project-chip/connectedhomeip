@@ -39,7 +39,6 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
-    mRadioBlocked               = false;
     otInstance * const instance = openthread_get_default_instance();
 
     ReturnErrorOnFailure(GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(instance));
@@ -56,9 +55,7 @@ CHIP_ERROR ThreadStackManagerImpl::StartNonConcurrentThreadManagement()
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     ChipLogProgress(DeviceLayer, "Switch to Thread");
-
-    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(false);
-    ThreadStackMgrImpl().SetRadioBlocked(false);
+    k_sleep(K_MSEC(50)); // Small delay to ensure BLE stack is fully disabled before Thread attach
     TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(true);
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
@@ -103,26 +100,26 @@ void ThreadStackManagerImpl::_NotifySrpClearAllComplete()
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
 {
-    mpScanCallback = callback;
-
-    /* On Telink platform it's not possible to rise Thread network when its used by BLE,
-       so Thread networks scanning performed before start BLE and also available after switch into Thread */
-    if (mRadioBlocked)
+    /* In non-concurrent mode, BLE and Thread cannot run simultaneously.
+     *
+     * This request corresponds to a Thread prescan. If BLE is currently active,
+     * a new scan cannot be started, so the cached prescan results are returned
+     * instead. Once the device switches to Thread mode, scanning is available again.
+     */
+    if (bt_is_ready())
     {
-        if (mpScanCallback != nullptr)
+        ChipLogProgress(DeviceLayer, "Thread prescan: BLE active, using cached results");
+
+        if (callback != nullptr)
         {
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-                mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
-                mpScanCallback = nullptr;
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, callback]() {
+                callback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
             });
         }
-    }
-    else
-    {
-        return Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_StartThreadScan(mpScanCallback);
+        return CHIP_NO_ERROR;
     }
 
-    return CHIP_NO_ERROR;
+    return Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_StartThreadScan(callback);
 }
 
 } // namespace DeviceLayer

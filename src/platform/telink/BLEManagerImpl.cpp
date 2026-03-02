@@ -165,9 +165,8 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 
 CHIP_ERROR BLEManagerImpl::_Init(void)
 {
-    mBLERadioInitialized  = false;
-    mconId                = NULL;
-    mInternalScanCallback = new InternalScanCallback(this);
+    mBLERadioInitialized = false;
+    mconId               = NULL;
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
@@ -210,6 +209,14 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 
 void BLEManagerImpl::DriveBLEState()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (ThreadStackMgr().IsThreadEnabled())
+    {
+        ChipLogProgress(DeviceLayer, "BLE skipped (Thread active)");
+        return;
+    }
+#endif
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Perform any initialization actions that must occur after the CHIP task is running.
@@ -328,30 +335,14 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest(void)
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (ConnectivityMgr().IsThreadProvisioned())
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (ThreadStackMgr().IsThreadEnabled())
     {
-        ChipLogProgress(DeviceLayer, "Device provisioned, can't StartAdvertising");
-
-        err = CHIP_ERROR_INCORRECT_STATE;
+        ChipLogProgress(DeviceLayer, "BLE adv start skipped (Thread active)");
+        return CHIP_ERROR_INCORRECT_STATE;
     }
-    else if (!mBLERadioInitialized)
-    {
-        TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().StartThreadScan(mInternalScanCallback);
-    }
-    else
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    {
-        err = StartAdvertisingProcess();
-    }
+#endif
 
-    return err;
-}
-
-CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
-{
     int err;
 
     if (!mBLERadioInitialized)
@@ -359,7 +350,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         // Deinit Thread
         TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(false);
-        ThreadStackMgrImpl().SetRadioBlocked(true);
 #endif
 
         if (!BleLayer::IsInitialized())
@@ -442,14 +432,13 @@ CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
 
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (ConnectivityMgr().IsThreadProvisioned())
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (ThreadStackMgr().IsThreadEnabled())
     {
-        ChipLogProgress(DeviceLayer, "Device provisioned, StopAdvertising done");
-
+        ChipLogProgress(DeviceLayer, "BLE adv stop skipped (Thread active)");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#endif
 
     ReturnErrorOnFailure(System::MapErrorZephyr(bt_le_adv_stop()));
 
@@ -992,7 +981,7 @@ CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * eve
         pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
         TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().StartNonConcurrentThreadManagement();
 #endif
     }

@@ -60,7 +60,6 @@ public:
     // ===== Methods that implement the ThreadStackManager abstract interface.
     CHIP_ERROR _InitThreadStack();
     CHIP_ERROR StartNonConcurrentThreadManagement();
-    void SetRadioBlocked(bool state) { mRadioBlocked = state; }
 
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
@@ -87,16 +86,13 @@ private:
     friend ThreadStackManager & ::chip::DeviceLayer::ThreadStackMgr(void);
     friend ThreadStackManagerImpl & ::chip::DeviceLayer::ThreadStackMgrImpl(void);
 
-    static ThreadStackManagerImpl sInstance;
-
-    // ===== Private members for use by this class only.
-    bool mRadioBlocked;
-
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     k_sem mSrpClearAllSemaphore;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
-    NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
+    static ThreadStackManagerImpl sInstance;
+
+    // ===== Private members for use by this class only.
 };
 
 /**
