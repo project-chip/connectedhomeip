@@ -55,6 +55,10 @@ public:
     CHIP_ERROR SetTemperatureSetpoint(int16_t temperatureSetpoint);
     int16_t GetTemperatureSetpoint() const { return mTemperatureSetpoint; }
 
+    CHIP_ERROR SetSelectedTemperatureLevel(uint8_t selectedTemperatureLevel);
+    uint8_t GetSelectedTemperatureLevel() const { return mSelectedTemperatureLevel; }
+
+    int16_t GetStep() const { return mStep; }
     int16_t GetMinTemperature() const { return mMinTemperature; }
     int16_t GetMaxTemperature() const { return mMaxTemperature; }
 

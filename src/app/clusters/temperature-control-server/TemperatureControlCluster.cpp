@@ -34,8 +34,7 @@ constexpr uint8_t kMaxSelectedTemperatureLevel = 31;
 
 TemperatureControlCluster::TemperatureControlCluster(EndpointId endpointId, const BitFlags<Feature> features,
                                                      const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, TemperatureControl::Id }),
-    mFeatures(features), mDelegate(config.delegate)
+    DefaultServerCluster({ endpointId, TemperatureControl::Id }), mFeatures(features), mDelegate(config.delegate)
 {
     if (mFeatures.Has(Feature::kTemperatureNumber))
     {
@@ -121,25 +120,27 @@ CHIP_ERROR TemperatureControlCluster::Attributes(const ConcreteClusterPath & pat
 
 CHIP_ERROR TemperatureControlCluster::SetTemperatureSetpoint(int16_t temperatureSetpoint)
 {
-    if (mFeatures.Has(Feature::kTemperatureNumber))
+    VerifyOrReturnError(mFeatures.Has(Feature::kTemperatureNumber), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    VerifyOrReturnError(temperatureSetpoint >= mMinTemperature && temperatureSetpoint <= mMaxTemperature,
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    if (mFeatures.Has(Feature::kTemperatureStep))
     {
-        VerifyOrReturnError(temperatureSetpoint >= mMinTemperature && temperatureSetpoint <= mMaxTemperature,
-                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-        if (mFeatures.Has(Feature::kTemperatureStep))
-        {
-            VerifyOrReturnError((temperatureSetpoint - mMinTemperature) % mStep == 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        }
+        VerifyOrReturnError((temperatureSetpoint - mMinTemperature) % mStep == 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
-    if (mFeatures.Has(Feature::kTemperatureLevel))
-    {
-        VerifyOrReturnError(mDelegate != nullptr, CHIP_IM_GLOBAL_STATUS(NotFound));
 
-        VerifyOrReturnError(temperatureSetpoint < mDelegate->Size(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-        mDelegate->Reset(mPath.mEndpointId);
-    }
     SetAttributeValue(mTemperatureSetpoint, temperatureSetpoint, TemperatureSetpoint::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TemperatureControlCluster::SetSelectedTemperatureLevel(uint8_t selectedTemperatureLevel)
+{
+    VerifyOrReturnError(mFeatures.Has(Feature::kTemperatureLevel), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_IM_GLOBAL_STATUS(NotFound));
+    VerifyOrReturnError(selectedTemperatureLevel < mDelegate->Size(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    mDelegate->Reset(mPath.mEndpointId);
+    SetAttributeValue(mSelectedTemperatureLevel, selectedTemperatureLevel, SelectedTemperatureLevel::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -204,7 +205,7 @@ TemperatureControlCluster::HandleSetTemperature(CommandHandler * commandObj, con
     {
         if (targetTemperatureLevel.HasValue())
         {
-            CHIP_ERROR err = SetTemperatureSetpoint(targetTemperatureLevel.Value());
+            CHIP_ERROR err = SetSelectedTemperatureLevel(targetTemperatureLevel.Value());
             if (err == CHIP_IM_GLOBAL_STATUS(NotFound))
             {
                 return Status::NotFound;
