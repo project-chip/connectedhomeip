@@ -839,23 +839,28 @@ void MdnsAvahi::FreeResolveContext(size_t handle)
 
 void MdnsAvahi::StopResolve(const char * name)
 {
-    // Cancel and immediately delete any pending resolves for this instance name.
+    // Cancel and delete any pending resolves for this instance name.
+    //
+    // Note: callbacks may re-enter into dnssd logic, so first detach matching contexts from
+    // `mAllocatedResolves`, then invoke callbacks and delete outside of the list iteration.
+    std::vector<ResolveContext *> contexts;
     for (auto it = mAllocatedResolves.begin(); it != mAllocatedResolves.end();)
     {
         if (strcmp((*it)->mName, name) == 0)
         {
-            ResolveContext * context = *it;
-            // Remove from the allocated list before invoking the callback to avoid
-            // re-entrant use-after-free or double-free if the callback calls back
-            // into resolve cancellation logic.
+            contexts.push_back(*it);
             it = mAllocatedResolves.erase(it);
-            context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
-            chip::Platform::Delete(context);
         }
         else
         {
             ++it;
         }
+    }
+
+    for (auto * context : contexts)
+    {
+        context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
+        chip::Platform::Delete(context);
     }
 }
 
