@@ -265,6 +265,7 @@ CHIP_ERROR ClosureControlCluster::SetMainState(MainStateEnum mainState)
             return SetCountdownTimeFromCluster(DataModel::Nullable<ElapsedS>(0));
         }
     }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR

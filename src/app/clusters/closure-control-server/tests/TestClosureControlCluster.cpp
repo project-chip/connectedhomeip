@@ -119,9 +119,15 @@ public:
 
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
-    void SetUp() override {}
+    void SetUp() override
+    {
+        // Initialize cluster with test context to enable event generation
+        ASSERT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+        initParams.mMainState           = MainStateEnum::kStopped;
+        initParams.mOverallCurrentState = DataModel::NullNullable;
+    }
 
-    void TearDown() override {}
+    void TearDown() override { mCluster.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     static DataModel::Nullable<GenericOverallCurrentState> PositioningState(CurrentPositionEnum position)
     {
@@ -226,9 +232,11 @@ TEST_F(TestClosureControlCluster, TestInstantaneousFeatureMapAndAcceptedCommands
 
 TEST_F(TestClosureControlCluster, TestMainState)
 {
+    TestServerClusterContext testContext;
     MockClusterConformance stateConformance;
     ClosureControlCluster cluster(kTestEndpointId,
                                   ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, stateConformance, initParams });
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kCalibrating), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kProtected), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -237,6 +245,7 @@ TEST_F(TestClosureControlCluster, TestMainState)
     stateConformance.FeatureMap().Set(Feature::kCalibration).Set(Feature::kProtection).Set(Feature::kManuallyOperable);
     ClosureControlCluster featureCluster(
         kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, stateConformance, initParams });
+    ASSERT_EQ(featureCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     EXPECT_EQ(featureCluster.SetMainState(MainStateEnum::kCalibrating), CHIP_NO_ERROR);
     EXPECT_EQ(featureCluster.GetMainState(), MainStateEnum::kCalibrating);
     EXPECT_EQ(featureCluster.SetMainState(MainStateEnum::kProtected), CHIP_NO_ERROR);
@@ -279,7 +288,7 @@ TEST_F(TestClosureControlCluster, TestSetMainStateUpdatesCountdownTime)
 TEST_F(TestClosureControlCluster, TestSetCountdownTimeFromDelegateUnsupportedFeatures)
 {
     MockClusterConformance motionOnlyConformance;
-    motionOnlyConformance.FeatureMap().ClearAll().Set(Feature::kMotionLatching);
+    motionOnlyConformance.FeatureMap().ClearAll().Set(Feature::kMotionLatching).Set(Feature::kInstantaneous);
     ClosureControlCluster motionOnlyCluster(
         kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, motionOnlyConformance, initParams });
     EXPECT_EQ(motionOnlyCluster.SetCountdownTimeFromDelegate(DataModel::MakeNullable<ElapsedS>(5)),
@@ -333,9 +342,11 @@ TEST_F(TestClosureControlCluster, TestSetOverallCurrentStateFeatureValidation)
 
 TEST_F(TestClosureControlCluster, TestSetOverallCurrentStateSecureStateValidation)
 {
+    TestServerClusterContext testContext;
     MockClusterConformance positioningConformance;
     ClosureControlCluster cluster(
         kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     DataModel::Nullable<GenericOverallCurrentState> invalidSecureState(
         GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), NullOptional,
@@ -626,23 +637,28 @@ TEST_F(TestClosureControlCluster, TestLatchControlModesFeatureValidation)
 // Event generation failure is expected.
 TEST_F(TestClosureControlCluster, TestGenerateMovementCompletedEvent)
 {
+    TestServerClusterContext testContext;
     MockClusterConformance positioningConformance;
     ClosureControlCluster positioningCluster(
         kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
+    ASSERT_EQ(positioningCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     EXPECT_NE(positioningCluster.GenerateMovementCompletedEvent(), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     MockClusterConformance instantaneousConformance;
     instantaneousConformance.FeatureMap().Set(Feature::kInstantaneous);
     ClosureControlCluster instantaneousCluster(
         kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, instantaneousConformance, initParams });
+    ASSERT_EQ(instantaneousCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     EXPECT_EQ(instantaneousCluster.GenerateMovementCompletedEvent(), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 }
 
 TEST_F(TestClosureControlCluster, TestGenerateEngageStateChangedEvent)
 {
+    TestServerClusterContext testContext;
     MockClusterConformance positioningConformance;
     ClosureControlCluster positioningCluster(
         kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
+    ASSERT_EQ(positioningCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     EXPECT_EQ(positioningCluster.GenerateEngageStateChangedEvent(true), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     MockClusterConformance manuallyOperableConformance;
@@ -650,5 +666,6 @@ TEST_F(TestClosureControlCluster, TestGenerateEngageStateChangedEvent)
     ClosureControlCluster manuallyOperableCluster(
         kTestEndpointId,
         ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, manuallyOperableConformance, initParams });
+    ASSERT_EQ(manuallyOperableCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     EXPECT_NE(manuallyOperableCluster.GenerateEngageStateChangedEvent(true), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 }
