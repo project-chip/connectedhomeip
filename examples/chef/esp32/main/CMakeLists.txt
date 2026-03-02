@@ -40,8 +40,11 @@ set(SRC_DIRS_LIST
                       ${SRC_DIRS_LIST}
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CHEF}/common"
+                      "${CHEF}/common/clusters/application-basic/"
+                      "${CHEF}/common/clusters/application-launch/"
                       "${CHEF}/common/clusters/audio-output/"
                       "${CHEF}/common/clusters/channel/"
+                      "${CHEF}/common/clusters/content-launch/"
                       "${CHEF}/common/clusters/door-lock/"
                       "${CHEF}/common/clusters/keypad-input/"
                       "${CHEF}/common/clusters/low-power/"
