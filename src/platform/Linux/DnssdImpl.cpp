@@ -839,16 +839,20 @@ void MdnsAvahi::FreeResolveContext(size_t handle)
 
 void MdnsAvahi::StopResolve(const char * name)
 {
-    auto truncate_end = std::remove_if(mAllocatedResolves.begin(), mAllocatedResolves.end(),
-                                       [name](ResolveContext * ctx) { return strcmp(ctx->mName, name) == 0; });
-
-    for (auto it = truncate_end; it != mAllocatedResolves.end(); it++)
+    // Cancel and immediately delete any pending resolves for this instance name.
+    for (auto it = mAllocatedResolves.begin(); it != mAllocatedResolves.end();)
     {
-        (*it)->mCallback((*it)->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
-        chip::Platform::Delete(*it);
+        if (strcmp((*it)->mName, name) == 0)
+        {
+            (*it)->mCallback((*it)->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
+            chip::Platform::Delete(*it);
+            it = mAllocatedResolves.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
     }
-
-    mAllocatedResolves.erase(truncate_end, mAllocatedResolves.end());
 }
 
 CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
