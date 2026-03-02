@@ -99,14 +99,11 @@ void Device::SetReachable(bool aReachable)
 void Device::SetName(const char * szName)
 {
     ChipLogProgress(DeviceLayer, "Device[%s]: New Name=\"%s\"", mName, szName);
+    chip::Platform::CopyString(mName, szName);
 
     if (mBridgedDevice.IsConstructed())
     {
         mBridgedDevice.Cluster().SetNodeLabel(CharSpan::fromCharString(szName));
-    }
-    else
-    {
-        chip::Platform::CopyString(mName, szName);
     }
 }
 
@@ -114,24 +111,27 @@ void Device::SetUniqueId(const char * szDeviceUniqueId)
 {
     if (mBridgedDevice.IsConstructed())
     {
+        // TODO: We could implement a version bump here if this functionality is required.
         ChipLogError(DeviceLayer, "Unique id is FIXED and cannot be changed after bridged device startup.") return;
+        return;
     }
+
     chip::Platform::CopyString(mUniqueId, szDeviceUniqueId);
     ChipLogProgress(DeviceLayer, "Device[%s]: New UniqueId=\"%s\"", mName, mUniqueId);
 }
 
 void Device::SetLocation(std::string szLocation)
 {
-    if (mBridgedDevice.IsConstructed())
-    {
-        // TODO: set location in bridge device
-    }
-    else
-    {
-        // retain for when the cluster is constructed
-        mLocation = szLocation;
-    }
+    bool changed = (mLocation.compare(szLocation) != 0);
+
+    mLocation = szLocation;
+
     ChipLogProgress(DeviceLayer, "Device[%s]: Location=\"%s\"", mName, mLocation.c_str());
+
+    if (changed)
+    {
+        HandleDeviceChange(this, kChanged_Location);
+    }
 }
 
 void Device::GenerateUniqueId()
