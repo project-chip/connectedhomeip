@@ -26,8 +26,8 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <system/SystemError.h>
 #include <stdlib.h>
+#include <system/SystemError.h>
 
 #ifdef CONFIG_ENABLE_HTTPS_REQUESTS
 #if (CHIP_CRYPTO_OPENSSL || CHIP_CRYPTO_BORINGSSL)
