@@ -63,7 +63,7 @@ CHIP_ERROR TestEmptyString()
 
 CHIP_ERROR TestKeyExistence()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
     static const char kTestKey[]   = "str_key";
     static const char kTestValue[] = "test_value";
     ReturnErrorOnFailure(KeyValueStoreMgr().Put(kTestKey, kTestValue));
