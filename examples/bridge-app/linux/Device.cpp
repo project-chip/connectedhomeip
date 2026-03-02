@@ -58,7 +58,7 @@ Status Device::OnNodeLabelChanged(const std::string & newNodeLabel)
 {
     VerifyOrReturnValue(mName != newNodeLabel, Status::Success);
     chip::Platform::CopyString(mName, newNodeLabel.c_str());
-    // NOTE: WE do NOT call device change as that handles attribute chance callbacks and those
+    // NOTE: WE do NOT call device change as that handles attribute change callbacks and those
     //       are handled by the cluster code.
     // HandleDeviceChange(this, kChanged_Name);
     return chip::Protocols::InteractionModel::Status::Success;
