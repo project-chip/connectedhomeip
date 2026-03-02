@@ -77,7 +77,7 @@ RUN set -x \
 RUN set -x \
     && mkdir -p /tmp/workdir && cd /tmp/workdir \
     && SYSTEMD_SYSTEM=/usr/lib/systemd/system \
-    && SYSTEMD_REQUIRES_LOCAL_FS=$SYSTEMD_SYSTEM/local-fs.target.requires \
+    && SYSTEMD_TARGET_LOCAL_FS_WANTS=$SYSTEMD_SYSTEM/local-fs.target.wants \
     # Download Tizen images
     && wget --progress=dot:giga -r -nd --no-parent -e robots=off -A 'tizen-*.tar.gz' \
     http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/images/standard/tizen-headless-armv7l/  \
@@ -115,7 +115,7 @@ RUN set -x \
     # Mount Tizen system partition on /opt-ro instead of /opt
     && SYSTEMD_UNIT_OPT_RO_MOUNT=$SYSTEMD_SYSTEM/opt\\x2dro.mount \
     && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda \
-    ln-sf $SYSTEMD_UNIT_OPT_RO_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS : \
+    ln-sf $SYSTEMD_UNIT_OPT_RO_MOUNT $SYSTEMD_TARGET_LOCAL_FS_WANTS : \
     mkdir /opt-ro \
     && echo -n \
     "[Unit]\n" \
@@ -152,7 +152,7 @@ RUN set -x \
     "Type=overlay\n" \
     "Options=lowerdir=/opt-ro,upperdir=/tmp/.opt-upper,workdir=/tmp/.opt-work\n" \
     | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_OPT_MOUNT : \
-    ln-sf $SYSTEMD_UNIT_OPT_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS \
+    ln-sf $SYSTEMD_UNIT_OPT_MOUNT $SYSTEMD_TARGET_LOCAL_FS_WANTS \
     # Fix SMACK label for /tmp/.opt-work/work
     && SYSTEMD_UNIT_OPT_POST_MOUNT=$SYSTEMD_SYSTEM/opt.post-mount.service \
     && echo -n \
@@ -164,7 +164,7 @@ RUN set -x \
     "ExecStart=chsmack -a * /tmp/.opt-work/work\n" \
     "RemainAfterExit=yes\n" \
     | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_OPT_POST_MOUNT : \
-    ln-sf $SYSTEMD_UNIT_OPT_POST_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS \
+    ln-sf $SYSTEMD_UNIT_OPT_POST_MOUNT $SYSTEMD_TARGET_LOCAL_FS_WANTS \
     # Mount using 9P at /mnt/chip
     && SYSTEMD_UNIT_9P_MOUNT=$SYSTEMD_SYSTEM/mnt-chip.mount \
     && echo -n \
@@ -176,7 +176,7 @@ RUN set -x \
     "Type=9p\n" \
     "Options=nofail,trans=virtio\n" \
     | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_9P_MOUNT : \
-    ln-sf $SYSTEMD_UNIT_9P_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS : \
+    ln-sf $SYSTEMD_UNIT_9P_MOUNT $SYSTEMD_TARGET_LOCAL_FS_WANTS : \
     mkdir /mnt/chip \
     # Setup crash manager
     && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda download /etc/crash-manager.conf crash-manager.conf \
