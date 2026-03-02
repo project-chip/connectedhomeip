@@ -342,6 +342,12 @@ config CHIP_COMMISSIONABLE_DEVICE_TYPE
 	  record. This allows a commissioner to find the node when looking for
 	  a specific device type.
 
+config CHIP_ENABLE_ACL_EXTENSIONS
+	bool "Enable Access Control's Extension attribute into FeatureMap"
+	help
+	  Set Access Control's Extension attribute bit into the FeatureMap
+	  attribute of the same cluster.
+
 config CHIP_EXTENDED_DISCOVERY
 	bool "Extended discovery"
 	help
