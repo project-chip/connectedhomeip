@@ -1,1 +1,1 @@
-188 : [Silabs] Fix Dockerfile paths
+189 : [Silabs] Keep lwip directories in Docker image
