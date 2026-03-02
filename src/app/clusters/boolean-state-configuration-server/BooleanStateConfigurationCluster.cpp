@@ -192,21 +192,25 @@ BooleanStateConfigurationCluster::InvokeCommand(const DataModel::InvokeRequest &
         bool generateEvent = false;
         if (mAlarmsActive.HasAny(alarmsToDisable))
         {
+            AlarmModeBitMask newActive = mAlarmsActive;
+            newActive.Clear(alarmsToDisable);
             if (mDelegate != nullptr)
             {
-                VerifyOrReturnError(mDelegate->OnAlarmsActiveChanged(mAlarmsActive), Status::Failure);
+                VerifyOrReturnError(mDelegate->OnAlarmsActiveChanged(newActive), Status::Failure);
             }
-            mAlarmsActive.Clear(alarmsToDisable);
+            mAlarmsActive = newActive;
             NotifyAttributeChanged(AlarmsActive::Id);
             generateEvent = true;
         }
         if (mAlarmsSuppressed.HasAny(alarmsToDisable))
         {
+            AlarmModeBitMask newSuppressed = mAlarmsSuppressed;
+            newSuppressed.Clear(alarmsToDisable);
             if (mDelegate != nullptr)
             {
-                VerifyOrReturnError(mDelegate->OnAlarmsSuppressedChanged(mAlarmsSuppressed), Status::Failure);
+                VerifyOrReturnError(mDelegate->OnAlarmsSuppressedChanged(newSuppressed), Status::Failure);
             }
-            mAlarmsSuppressed.Clear(alarmsToDisable);
+            mAlarmsSuppressed = newSuppressed;
             NotifyAttributeChanged(AlarmsSuppressed::Id);
             generateEvent = true;
         }
@@ -312,7 +316,7 @@ void BooleanStateConfigurationCluster::GenerateSensorFault(SensorFaultBitMask fa
     {
         if (mDelegate != nullptr)
         {
-            TEMPORARY_RETURN_IGNORED mDelegate->OnSensorFaultChanged(mSensorFault);
+            TEMPORARY_RETURN_IGNORED mDelegate->OnSensorFaultChanged(fault);
         }
         mSensorFault = fault;
         NotifyAttributeChanged(SensorFault::Id);
@@ -414,18 +418,16 @@ Status BooleanStateConfigurationCluster::SuppressAlarms(AlarmModeBitMask alarms)
     // validate this is not a NOOP
     VerifyOrReturnError(!mAlarmsSuppressed.HasAll(alarms), Status::Success);
 
+    AlarmModeBitMask newAlarmsSuppressed = mAlarmsSuppressed;
+    newAlarmsSuppressed.Set(alarms);
     if (mDelegate != nullptr)
     {
         // TODO: To preserve original logic, we ignore error code from the
         //       delegate, however this feels off.
         TEMPORARY_RETURN_IGNORED mDelegate->HandleSuppressAlarm(alarms);
-    }
-
-    if (mDelegate != nullptr)
-    {
         VerifyOrReturnError(mDelegate->OnAlarmsSuppressedChanged(alarms), Status::Failure);
     }
-    mAlarmsSuppressed.Set(alarms);
+    mAlarmsSuppressed = newAlarmsSuppressed;
     NotifyAttributeChanged(AlarmsSuppressed::Id);
     GenerateAlarmsStateChangedEvent();
     return Status::Success;

@@ -42,7 +42,7 @@ public:
     virtual CHIP_ERROR HandleEnableDisableAlarms(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarms) = 0;
 
     // These methods are called when the corresponding attributes are updated by the server, whether
-    //  via WriteAttribute, InvokeCommand, or direct server APIs. Default implementations are empty
+    //  via WriteAttribute, InvokeCommand, or direct server APIs. Default implementations return true;
     //  override only the callbacks you need.
 
     virtual bool OnCurrentSensitivityLevelChanged(uint8_t newValue) { return true; }
