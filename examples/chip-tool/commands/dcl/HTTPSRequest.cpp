@@ -27,6 +27,7 @@
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemError.h>
+#include <stdlib.h>
 
 #ifdef CONFIG_ENABLE_HTTPS_REQUESTS
 #if (CHIP_CRYPTO_OPENSSL || CHIP_CRYPTO_BORINGSSL)
@@ -347,7 +348,7 @@ CHIP_ERROR ExtractHostAndPort(const std::string & hostAndPort, std::string & out
     {
         outHostName     = hostAndPort.substr(0, position);
         auto portString = hostAndPort.substr(position + 1);
-        outPort         = static_cast<uint16_t>(std::atoi(portString.c_str()));
+        outPort         = static_cast<uint16_t>(strtol(portString.c_str(), NULL, 10));
         VerifyOrReturnError(0 != outPort, CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(chipTool, "%s", kErrorHTTPSPort));
     }
 
