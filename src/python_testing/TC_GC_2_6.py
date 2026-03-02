@@ -40,7 +40,7 @@ import random
 import secrets
 
 from mobly import asserts
-from TC_GCAST_common import get_feature_map, valid_endpoints_list
+from TC_GC_common import get_feature_map, valid_endpoints_list
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
@@ -52,11 +52,11 @@ from matter.testing.runner import TestStep, default_matter_test_main
 logger = logging.getLogger(__name__)
 
 
-class TC_GCAST_2_6(MatterBaseTest):
-    def desc_TC_GCAST_2_6(self):
-        return "[TC-GCAST-2.6] Capacity & MaxMembershipCount enforcement with DUT as Server - PROVISIONAL"
+class TC_GC_2_6(MatterBaseTest):
+    def desc_TC_GC_2_6(self):
+        return "[TC-GC-2.6] Capacity & MaxMembershipCount enforcement with DUT as Server - PROVISIONAL"
 
-    def steps_TC_GCAST_2_6(self):
+    def steps_TC_GC_2_6(self):
         return [
             TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
             TestStep("1b", "Commission DUT to TH2 (can be skipped if done in a preceding test)"),
@@ -71,11 +71,11 @@ class TC_GCAST_2_6(MatterBaseTest):
             TestStep(9, "On F2, attempt to join 1 additional group. TH2 sends command JoinGroup (GroupID=Gi+1, Endpoints='see notes', KeySetID=K1)"),
         ]
 
-    def pics_TC_GCAST_2_6(self) -> list[str]:
-        return ["GCAST.S"]
+    def pics_TC_GC_2_6(self) -> list[str]:
+        return ["GC.S"]
 
     @run_if_endpoint_matches(has_cluster(Clusters.Groupcast))
-    async def test_TC_GCAST_2_6(self):
+    async def test_TC_GC_2_6(self):
         groupcast_cluster = Clusters.Objects.Groupcast
         max_membership_count_attribute = Clusters.Groupcast.Attributes.MaxMembershipCount
 

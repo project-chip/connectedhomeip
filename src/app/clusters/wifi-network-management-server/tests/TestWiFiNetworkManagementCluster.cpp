@@ -15,6 +15,7 @@
  */
 
 #include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <access/SubjectDescriptor.h>
@@ -29,6 +30,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WiFiNetworkManagement;
 using namespace chip::app::Clusters::WiFiNetworkManagement::Attributes;
+using namespace chip::Protocols::InteractionModel;
 using namespace chip::Testing;
 
 namespace {
@@ -222,11 +224,7 @@ TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestRequiresCaseSes
 
     Commands::NetworkPassphraseRequest::Type request;
     auto result = tester.Invoke(request);
-
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode(),
-              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::UnsupportedAccess));
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::UnsupportedAccess));
 }
 
 TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestRequiresCredentials)
@@ -239,11 +237,7 @@ TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestRequiresCredent
 
     Commands::NetworkPassphraseRequest::Type request;
     auto result = tester.Invoke(request);
-
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode(),
-              Protocols::InteractionModel::ClusterStatusCode(Protocols::InteractionModel::Status::InvalidInState));
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidInState));
 }
 
 TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestSuccess)
@@ -263,6 +257,5 @@ TEST_F(TestWiFiNetworkManagementCluster, NetworkPassphraseRequestSuccess)
 
     ASSERT_TRUE(result.IsSuccess());
     ASSERT_TRUE(result.response.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_TRUE(result.response.value().passphrase.data_equal(ByteSpan(passphraseData)));
+    EXPECT_TRUE(result.response->passphrase.data_equal(ByteSpan(passphraseData)));
 }

@@ -526,7 +526,10 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
         # Use namespace to get more disk space and slightly better performance (Compile and unit tests
         # are CPU bound)
-        runs-on: namespace-profile-4x8
+        #
+        # Extra RAM is to try to avoid "Killed by exit code 137" which seems to occur during test runs
+        # on a 4x8 machine.
+        runs-on: namespace-profile-4x16
 
         container:
             image: ghcr.io/project-chip/chip-build:181
