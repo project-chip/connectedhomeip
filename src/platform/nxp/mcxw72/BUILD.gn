@@ -100,13 +100,18 @@ static_library("nxp_platform") {
   deps = [ "${chip_root}/src/app:app_config" ]
 
   if (chip_crypto == "platform") {
+    if (nxp_crypto_impl != "se05x") {
+      sources += [
+        "../common/crypto/PersistentStorageOpKeystoreBase.cpp",
+        "../common/crypto/PersistentStorageOpKeystoreBase.h",
+        "../common/crypto/S200/PersistentStorageOpKeystoreS200.cpp",
+        "../common/crypto/S200/PersistentStorageOpKeystoreS200.h",
+      ]
+    }
+
     sources += [
-      "../common/crypto/PersistentStorageOpKeystoreBase.cpp",
-      "../common/crypto/PersistentStorageOpKeystoreBase.h",
-      "../common/crypto/S200/CHIPCryptoPalS200.cpp",
-      "../common/crypto/S200/PersistentStorageOpKeystoreS200.cpp",
-      "../common/crypto/S200/PersistentStorageOpKeystoreS200.h",
-    ]
+        "../common/crypto/S200/CHIPCryptoPalS200.cpp",
+      ]
 
     include_dirs = [ "${nxp_sdk_build_root}/mbedtls/config" ]
   } else if (chip_crypto == "psa") {

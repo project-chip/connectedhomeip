@@ -16,9 +16,9 @@
  */
 #pragma once
 
-#if FRDM_RW612
+#if CONFIG_CHIP_NXP_PLATFORM_RW61X
 #include <platform/nxp/rt/rw61x/FactoryDataProviderImpl.h>
-#elif IMX_RT
+#elif CONFIG_CHIP_NXP_PLATFORM_RT1060
 #include <platform/nxp/rt/rt1060/FactoryDataProviderImpl.h>
 #else
 #error "The selected platform is not supported for SE05x data provider"
@@ -55,7 +55,7 @@ public:
 
 private:
 #if CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
-    uint8_t cert[128];
+    uint8_t cert[128] = {0};
     size_t certLen = 0;
 
     CHIP_ERROR GetSpake2pSaltBuffer(uint8_t * buf, uint16_t bufLen, uint16_t * outLen);
