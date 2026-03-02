@@ -122,13 +122,15 @@ private:
 class AuxiliaryEntryIteratorDelegate : public EntryIterator::Delegate
 {
 public:
-    AuxiliaryEntryIteratorDelegate(Credentials::GroupDataProvider * groupDataProvider, FabricIndex fabric) :
-        mGroupDataProvider(groupDataProvider), mFabric(fabric)
+    void Init(EntryIterator & iterator, Credentials::GroupDataProvider * groupDataProvider, FabricIndex fabric)
     {
+        mGroupDataProvider = groupDataProvider;
+        mFabric            = fabric;
         if (mGroupDataProvider)
         {
             mGroupInfoIterator = mGroupDataProvider->IterateGroupInfo(mFabric);
         }
+        iterator.SetDelegate(*this);
     }
 
     ~AuxiliaryEntryIteratorDelegate() override
@@ -212,10 +214,10 @@ CHIP_ERROR GroupAuxiliaryAccessControlDelegate::AuxiliaryEntries(AccessControl::
 {
     VerifyOrReturnError(fabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto * delegate = Platform::New<AuxiliaryEntryIteratorDelegate>(mGroupDataProvider, *fabricIndex);
+    auto * delegate = Platform::New<AuxiliaryEntryIteratorDelegate>();
     if (delegate)
     {
-        iterator.SetDelegate(*delegate);
+        delegate->Init(iterator, mGroupDataProvider, *fabricIndex);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_NO_MEMORY;
