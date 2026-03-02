@@ -33,7 +33,7 @@ CHIP_ERROR AppTask::Init(void)
 {
     CHIP_ERROR err;
 
-    InitCommonParts();
+    ReturnErrorOnFailure(InitCommonParts());
 
     err = SensorMgr().Init();
     if (err != CHIP_NO_ERROR)

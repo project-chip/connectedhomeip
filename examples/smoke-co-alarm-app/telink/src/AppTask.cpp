@@ -27,7 +27,7 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(SelfTestEventHandler);
-    InitCommonParts();
+    ReturnErrorOnFailure(InitCommonParts());
 
     CHIP_ERROR err = AlarmMgr().Init();
     if (err != CHIP_NO_ERROR)
