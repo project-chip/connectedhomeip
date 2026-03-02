@@ -265,8 +265,6 @@ CHIP_ERROR ClosureControlCluster::SetMainState(MainStateEnum mainState)
             return SetCountdownTimeFromCluster(DataModel::Nullable<ElapsedS>(0));
         }
     }
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR
@@ -448,8 +446,7 @@ CHIP_ERROR ClosureControlCluster::AddErrorToCurrentErrorList(ClosureErrorEnum er
     mState.mCurrentErrorList[mState.mCurrentErrorCount++] = error;
     DataModel::List<const ClosureErrorEnum> currentErrorList(mState.mCurrentErrorList, mState.mCurrentErrorCount);
     NotifyAttributeChanged(Attributes::CurrentErrorList::Id);
-    ReturnLogErrorOnFailure(GenerateOperationalErrorEvent(currentErrorList));
-    return CHIP_NO_ERROR;
+    return GenerateOperationalErrorEvent(currentErrorList);
 }
 
 void ClosureControlCluster::ClearCurrentErrorList()
