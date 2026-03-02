@@ -216,6 +216,7 @@ Over-The-Air software updates are supported with the MCXW72 examples. The
 process to follow in order to perform a software update is described in the
 dedicated guide
 ['Matter Over-The-Air Software Update with NXP MCXW example applications'](./nxp_mcxw_ota_guide.md).
+
 ## Enabling SE05x Secure Element with MCXW72
 
 ### Hardware connections
