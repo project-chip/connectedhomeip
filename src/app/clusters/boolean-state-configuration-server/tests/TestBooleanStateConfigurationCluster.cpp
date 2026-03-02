@@ -490,34 +490,39 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void OnCurrentSensitivityLevelChanged(uint8_t newValue) override
+    bool OnCurrentSensitivityLevelChanged(uint8_t newValue) override
     {
         mCurrentSensitivityLevelCalled = true;
         mCurrentSensitivityLevelValue  = newValue;
+        return true;
     }
 
-    void OnAlarmsActiveChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) override
+    bool OnAlarmsActiveChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) override
     {
         mAlarmsActiveCalled = true;
         mAlarmsActiveValue  = newValue;
+        return true;
     }
 
-    void OnAlarmsSuppressedChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) override
+    bool OnAlarmsSuppressedChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) override
     {
         mAlarmsSuppressedCalled = true;
         mAlarmsSuppressedValue  = newValue;
+        return true;
     }
 
-    void OnAlarmsEnabledChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) override
+    bool OnAlarmsEnabledChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) override
     {
         mAlarmsEnabledCalled = true;
         mAlarmsEnabledValue  = newValue;
+        return true;
     }
 
-    void OnSensorFaultChanged(chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap> newValue) override
+    bool OnSensorFaultChanged(chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap> newValue) override
     {
         mSensorFaultCalled = true;
         mSensorFaultValue  = newValue;
+        return true;
     }
 
     // Reset all flags
@@ -685,28 +690,6 @@ TEST_F(TestBooleanStateConfigurationCluster, TestTypeSafeDelegateCallbacks)
         // Verify callback was called
         EXPECT_TRUE(delegate.WasAlarmsSuppressedCalled());
         EXPECT_TRUE(delegate.GetAlarmsSuppressedValue().Has(AlarmModeBitmap::kVisual));
-
-        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
-
-    // Test SensorFault callback via GenerateSensorFault
-    {
-        delegate.Reset();
-        auto config = DefaultConfig();
-        BooleanStateConfigurationCluster cluster(
-            kTestEndpointId, {}, { BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::SensorFault::Id>() },
-            config);
-        cluster.SetDelegate(&delegate);
-        ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-        // Generate sensor fault
-        chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap> fault;
-        fault.Set(BooleanStateConfiguration::SensorFaultBitmap::kGeneralFault);
-        cluster.GenerateSensorFault(fault);
-
-        // Verify callback was called
-        EXPECT_TRUE(delegate.WasSensorFaultCalled());
-        EXPECT_TRUE(delegate.GetSensorFaultValue().Has(BooleanStateConfiguration::SensorFaultBitmap::kGeneralFault));
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }

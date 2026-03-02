@@ -45,11 +45,11 @@ public:
     //  via WriteAttribute, InvokeCommand, or direct server APIs. Default implementations are empty
     //  override only the callbacks you need.
 
-    virtual void OnCurrentSensitivityLevelChanged(uint8_t newValue) {}
-    virtual void OnAlarmsActiveChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) {}
-    virtual void OnAlarmsSuppressedChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) {}
-    virtual void OnAlarmsEnabledChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) {}
-    virtual void OnSensorFaultChanged(chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap> newValue) {}
+    virtual bool OnCurrentSensitivityLevelChanged(uint8_t newValue) { return true; }
+    virtual bool OnAlarmsActiveChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) { return true; }
+    virtual bool OnAlarmsSuppressedChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) { return true; }
+    virtual bool OnAlarmsEnabledChanged(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> newValue) { return true; }
+    virtual bool OnSensorFaultChanged(chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap> newValue) { return true; }
 };
 
 } // namespace BooleanStateConfiguration
