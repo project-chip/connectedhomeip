@@ -1181,22 +1181,22 @@ constexpr CheckData checkData1[] = {
 
 constexpr CheckData groupCheckData[] = {
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x1111) },
-      .requestPath       = { .cluster = 0, .endpoint = 10 },
-      .privilege         = Privilege::kOperate,
-      .allow             = true },
-
-    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x1111) },
-      .requestPath       = { .cluster = 0, .endpoint = 20 },
-      .privilege         = Privilege::kOperate,
-      .allow             = false },
-
-    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x2222) },
-      .requestPath       = { .cluster = 0, .endpoint = 30 },
+      .requestPath       = { .endpoint = 10, .requestType = Access::RequestType::kCommandInvokeRequest },
       .privilege         = Privilege::kOperate,
       .allow             = true },
 
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x2222) },
-      .requestPath       = { .cluster = 0, .endpoint = 30 },
+      .requestPath       = { .endpoint = 20, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate,
+      .allow             = false },
+
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x3333) },
+      .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate,
+      .allow             = true },
+
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x4444) },
+      .requestPath       = { .endpoint = 40, .requestType = Access::RequestType::kCommandInvokeRequest },
       .privilege         = Privilege::kOperate,
       .allow             = false },
 };
@@ -2118,14 +2118,32 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryCheck)
         EXPECT_EQ(provider->AddEndpoint(1, info.group_id, 10), CHIP_NO_ERROR);
     }
 
-    // Set up group 2 data for fabric 2
+    // Set up group 2 data for fabric 1
     {
         Credentials::GroupDataProvider::GroupInfo info;
         info.group_id = 0x2222;
         info.SetName("Group 2");
+        EXPECT_EQ(provider->SetGroupInfo(1, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(1, info.group_id, 20), CHIP_NO_ERROR);
+    }
+
+    // Set up group 3 data for fabric 2
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x3333;
+        info.SetName("Group 3");
         info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
         EXPECT_EQ(provider->SetGroupInfo(2, info), CHIP_NO_ERROR);
         EXPECT_EQ(provider->AddEndpoint(2, info.group_id, 30), CHIP_NO_ERROR);
+    }
+
+    // Set up group 4 data for fabric 2
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x4444;
+        info.SetName("Group 4");
+        EXPECT_EQ(provider->SetGroupInfo(2, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(2, info.group_id, 40), CHIP_NO_ERROR);
     }
 
     for (const auto & data : groupCheckData)

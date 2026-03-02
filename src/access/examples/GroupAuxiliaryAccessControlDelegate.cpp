@@ -105,9 +105,6 @@ public:
         {
             target.flags    = Target::kEndpoint;
             target.endpoint = mEndpointId;
-            // TODO: These are inaccurate and need to be updated
-            target.cluster    = 0;
-            target.deviceType = 0;
             return CHIP_NO_ERROR;
         }
         return CHIP_ERROR_SENTINEL;

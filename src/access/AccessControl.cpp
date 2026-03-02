@@ -362,13 +362,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     VerifyOrReturnError(IsValidPrivilege(requestPrivilege), CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR result = CheckACL(subjectDescriptor, requestPath, requestPrivilege);
-    // TODO: Combine this with the exisiting condition below with group data
-    if (result != CHIP_NO_ERROR && IsGroupAuxiliaryDelegateRegistered() && subjectDescriptor.authMode == AuthMode::kGroup &&
-        IsGroupId(subjectDescriptor.subject))
-    {
-        CHIP_ERROR groupCheckErr = mGroupAuxDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
-        result                   = groupCheckErr != CHIP_ERROR_NOT_IMPLEMENTED ? groupCheckErr : result;
-    }
+
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     if (result == CHIP_NO_ERROR)
     {
@@ -378,16 +372,16 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
 
     if ((CHIP_NO_ERROR != result) && (Access::AuthMode::kGroup == subjectDescriptor.authMode) &&
         (Access::RequestType::kCommandInvokeRequest == requestPath.requestType) &&
-        (Access::Privilege::kOperate == requestPrivilege))
+        (Access::Privilege::kOperate == requestPrivilege) && IsGroupId(subjectDescriptor.subject))
     {
         Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
         VerifyOrReturnError(nullptr != groups, result);
         Credentials::GroupDataProvider::GroupInfo info;
         GroupId gid = GroupIdFromNodeId(subjectDescriptor.subject);
         ReturnErrorOnFailure(groups->GetGroupInfo(subjectDescriptor.fabricIndex, gid, info));
-        if (info.HasAuxiliaryACL())
+        if (info.HasAuxiliaryACL() && IsGroupAuxiliaryDelegateRegistered())
         {
-            return CHIP_NO_ERROR;
+            return mGroupAuxDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
         }
     }
     return result;
