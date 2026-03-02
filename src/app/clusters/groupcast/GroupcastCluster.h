@@ -17,8 +17,6 @@
 #pragma once
 
 #include "GroupcastContext.h"
-#include <app/AttributeValueEncoder.h>
-#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groupcast/ClusterId.h>
@@ -35,8 +33,6 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-
-using Status = chip::Protocols::InteractionModel::Status;
 
 /**
  * @brief Provides code-driven implementation for the Groupcast cluster server.
@@ -68,7 +64,8 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
-    Status GroupcastTesting(FabricIndex fabricIndex, Groupcast::Commands::GroupcastTesting::DecodableType data);
+    Protocols::InteractionModel::Status GroupcastTesting(FabricIndex fabricIndex,
+                                                         Groupcast::Commands::GroupcastTesting::DecodableType data);
 
     inline FabricIndex GetFabricUnderTest() const { return mFabricUnderTest; }
     const BitFlags<Groupcast::Feature> & Features() const { return mFeatures; }
@@ -80,11 +77,14 @@ public:
     CHIP_ERROR ReadMaxMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadUsedMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 
-    Status JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data);
-    Status LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                      EndpointList & endpoints);
-    Status UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
-    Status ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
+    Protocols::InteractionModel::Status JoinGroup(FabricIndex fabric_index,
+                                                  const Groupcast::Commands::JoinGroup::DecodableType & data);
+    Protocols::InteractionModel::Status
+    LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList & endpoints);
+    Protocols::InteractionModel::Status UpdateGroupKey(FabricIndex fabric_index,
+                                                       const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
+    Protocols::InteractionModel::Status
+    ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
 
     void SetDataModelProvider(DataModel::Provider & provider) { mDataModelProvider = &provider; }
     void ResetDataModelProvider() { mDataModelProvider = nullptr; }
@@ -102,10 +102,13 @@ private:
     Credentials::GroupDataProvider & Provider() { return mContext.groupDataProvider; }
     chip::FabricTable & Fabrics() { return mContext.fabricTable; }
 
-    Status SetKeySet(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id, const chip::Optional<chip::ByteSpan> & key);
-    Status RemoveGroup(FabricIndex fabric_index, GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                       EndpointList * endpoints);
-    Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id, EndpointList * endpoints);
+    Protocols::InteractionModel::Status SetKeySet(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id,
+                                                  const chip::Optional<chip::ByteSpan> & key);
+    Protocols::InteractionModel::Status RemoveGroup(FabricIndex fabric_index, GroupId group_id,
+                                                    const Groupcast::Commands::LeaveGroup::DecodableType & data,
+                                                    EndpointList * endpoints);
+    Protocols::InteractionModel::Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id,
+                                                            EndpointList * endpoints);
     void UpdateUsedMcastAddrCount();
     void NotifyUsedMcastAddrCountOnChange();
     void NotifyMembershipChanged();

@@ -1,7 +1,6 @@
 #include "GroupcastCluster.h"
 #include <access/AccessControl.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/util/endpoint-config-api.h>
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groupcast/Attributes.h>
 #include <clusters/Groupcast/Metadata.h>
@@ -28,13 +27,7 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 };
 } // namespace
 
-GroupcastCluster::GroupcastCluster(GroupcastContext && context) :
-    DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mContext(std::move(context)), mFeatures(),
-    mMembershipChangedTimer(*this), mGroupcastTestingTimer(*this)
-{
-    mContext.groupDataProvider.SetListener(this);
-    UpdateUsedMcastAddrCount();
-}
+GroupcastCluster::GroupcastCluster(GroupcastContext && context) : GroupcastCluster(std::move(context), {}) {}
 
 GroupcastCluster::GroupcastCluster(GroupcastContext && context, BitFlags<Groupcast::Feature> features) :
     DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mContext(std::move(context)), mFeatures(features),
@@ -44,14 +37,12 @@ GroupcastCluster::GroupcastCluster(GroupcastContext && context, BitFlags<Groupca
     UpdateUsedMcastAddrCount();
 }
 
-GroupcastCluster::~GroupcastCluster()
-{
-    mContext.groupDataProvider.RemoveListener(this);
-}
+GroupcastCluster::~GroupcastCluster() {}
 
 CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    mContext.groupDataProvider.SetListener(this);
     SetDataModelProvider(context.provider);
 
     return CHIP_NO_ERROR;
@@ -61,6 +52,7 @@ void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     mGroupcastTestingTimer.Cancel();
     mMembershipChangedTimer.Cancel();
+    mContext.groupDataProvider.RemoveListener(this);
     ResetDataModelProvider();
     DefaultServerCluster::Shutdown(shutdownType);
 }
@@ -406,7 +398,7 @@ Status GroupcastCluster::JoinGroup(FabricIndex fabric_index, const Groupcast::Co
 
     // Gather group info
     info.group_id = data.groupID;
-    info.flags     = 0;
+    info.flags    = 0;
     if (data.useAuxiliaryACL.HasValue() && data.useAuxiliaryACL.Value())
     {
         info.flags |= chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL);
@@ -496,7 +488,7 @@ Status GroupcastCluster::UpdateGroupKey(FabricIndex fabric_index, const Groupcas
 }
 
 Status GroupcastCluster::ConfigureAuxiliaryACL(FabricIndex fabric_index,
-                                                const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data)
+                                               const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data)
 {
     GroupDataProvider & groups = Provider();
     CHIP_ERROR err             = CHIP_NO_ERROR;
@@ -578,7 +570,7 @@ Status GroupcastCluster::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
                                      const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList * endpoints)
 {
     GroupDataProvider & groups = Provider();
-    Status stat                 = Status::Success;
+    Status stat                = Status::Success;
 
     if (data.endpoints.HasValue())
     {
