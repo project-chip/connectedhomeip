@@ -55,8 +55,8 @@ public:
 
 private:
 #if CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
-    uint8_t cert[128] = {0};
-    size_t certLen = 0;
+    uint8_t cert[128] = { 0 };
+    size_t certLen    = 0;
 
     CHIP_ERROR GetSpake2pSaltBuffer(uint8_t * buf, uint16_t bufLen, uint16_t * outLen);
 #endif
