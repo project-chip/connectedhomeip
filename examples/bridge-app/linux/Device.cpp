@@ -112,7 +112,7 @@ void Device::SetUniqueId(const char * szDeviceUniqueId)
     if (mBridgedDevice.IsConstructed())
     {
         // TODO: We could implement a version bump here if this functionality is required.
-        ChipLogError(DeviceLayer, "Unique id is FIXED and cannot be changed after bridged device startup.") return;
+        ChipLogError(DeviceLayer, "Unique id is FIXED and cannot be changed after bridged device startup.");
         return;
     }
 
