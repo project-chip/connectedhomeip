@@ -171,7 +171,7 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
         testMeasurementAccuracyRanges[0].percentMin = MakeOptional(static_cast<chip::Percent100ths>(999));
     }
 
-    // Verify the that the MeasurementAccuracyStruct is preserved past the scope of the previous test
+    // Verify that the MeasurementAccuracyStruct is preserved past the scope of the previous test
     Structs::MeasurementAccuracyStruct::Type readAccuracy;
     cluster->GetMeasurementAccuracy(readAccuracy);
     EXPECT_EQ(readAccuracy.measurementType, MeasurementTypeEnum::kApparentEnergy);
