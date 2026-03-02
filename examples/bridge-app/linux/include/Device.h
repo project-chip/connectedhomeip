@@ -39,7 +39,7 @@ public:
     {
         // NOTE: device changes are handled automatically by the cluster, there
         //       is no separate notification needed
-        // Only remaining nontifications are non-cluster changes
+        // Only remaining notifications are non-cluster changes
         kChanged_Location = 1,
         kChanged_Last     = kChanged_Location,
     } Changed;
