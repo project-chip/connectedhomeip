@@ -48,7 +48,7 @@ static constexpr size_t kLaundryDryerControlsDelegateTableSize =
 // Delegate Implementation
 //
 
-Status Delegate::CanSetSelectedDrynessLevel(const DrynessLevelEnum & newSelectedDrynessLevel)
+Status Delegate::CanSetSelectedDrynessLevel(DrynessLevelEnum newSelectedDrynessLevel)
 {
     return Status::Success;
 }

@@ -49,7 +49,7 @@ public:
      * @param newSelectedDrynessLevel The targetted dryness level.
      * @return Protocols::InteractionModel::Status::Success if the action is allowed, an error code otherwise.
      */
-    virtual Protocols::InteractionModel::Status CanSetSelectedDrynessLevel(const DrynessLevelEnum & newSelectedDrynessLevel);
+    virtual Protocols::InteractionModel::Status CanSetSelectedDrynessLevel(DrynessLevelEnum newSelectedDrynessLevel);
 
     /**
      * Optional API to get the SelectedDrynessLevel attribute from delegate.
