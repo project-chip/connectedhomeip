@@ -31,13 +31,10 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/data-model/Nullable.h>
 #include <app/server/Server.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/Linux/NetworkCommissioningDriver.h>
 
 using namespace chip;
 using namespace chip::app;

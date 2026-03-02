@@ -38,7 +38,7 @@ import logging
 import secrets
 
 from mobly import asserts
-from TC_GCAST_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
+from TC_GC_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
@@ -50,11 +50,11 @@ from matter.testing.runner import TestStep, default_matter_test_main
 logger = logging.getLogger(__name__)
 
 
-class TC_GCAST_2_5(MatterBaseTest):
-    def desc_TC_GCAST_2_5(self):
-        return "[TC-GCAST-2.5] ConfigureAuxiliaryACL (Listener feature) with DUT as Server - PROVISIONAL"
+class TC_GC_2_5(MatterBaseTest):
+    def desc_TC_GC_2_5(self):
+        return "[TC-GC-2.5] ConfigureAuxiliaryACL (Listener feature) with DUT as Server - PROVISIONAL"
 
-    def steps_TC_GCAST_2_5(self):
+    def steps_TC_GC_2_5(self):
         return [
             TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
             TestStep("1b", "TH removes any existing group and KeyID on the DUT."),
@@ -66,15 +66,15 @@ class TC_GCAST_2_5(MatterBaseTest):
             TestStep(4, "Disable Auxiliary ACL on group G1: TH sends command ConfigureAuxiliaryACL (GroupID=G1, UseAuxiliaryACL=false)."),
             TestStep(5, "TH awaits subscription report of new Membership within max interval."),
             TestStep(6, "Attempt to enable Auxiliary ACL on a unknown GroupId: TH sends command ConfigureAuxiliaryACL (GroupID=G_UNKNOWN, UseAuxiliaryACL=true)."),
-            TestStep(7, "If GCAST.S.F01(SD) feature is supported on the cluster, join group G2 as Sender: TH sends command JoinGroup (GroupID=G2, Endpoints=[],KeyId=K1) to join group as sender only."),
-            TestStep(8, "If GCAST.S.F01(SD) feature is supported on the cluster, attempt to enable Auxiliary ACL on group G2: TH sends command ConfigureAuxiliaryACL (GroupID=G2, UseAuxiliaryACL=true) on Sender-only membership"),
+            TestStep(7, "If GC.S.F01(SD) feature is supported on the cluster, join group G2 as Sender: TH sends command JoinGroup (GroupID=G2, Endpoints=[],KeyId=K1) to join group as sender only."),
+            TestStep(8, "If GC.S.F01(SD) feature is supported on the cluster, attempt to enable Auxiliary ACL on group G2: TH sends command ConfigureAuxiliaryACL (GroupID=G2, UseAuxiliaryACL=true) on Sender-only membership"),
         ]
 
-    def pics_TC_GCAST_2_5(self) -> list[str]:
-        return ["GCAST.S"]
+    def pics_TC_GC_2_5(self) -> list[str]:
+        return ["GC.S"]
 
     @run_if_endpoint_matches(has_cluster(Clusters.Groupcast))
-    async def test_TC_GCAST_2_5(self):
+    async def test_TC_GC_2_5(self):
         groupcast_cluster = Clusters.Objects.Groupcast
         membership_attribute = Clusters.Groupcast.Attributes.Membership
 
@@ -86,7 +86,8 @@ class TC_GCAST_2_5(MatterBaseTest):
             return
 
         endpoints_list = await valid_endpoints_list(self, ln_enabled)
-        endpoints_list = [endpoints_list[0]]
+        if len(endpoints_list) > 1:
+            endpoints_list = [endpoints_list[0]]
 
         self.step("1b")
         # Check if there are any groups on the DUT.
