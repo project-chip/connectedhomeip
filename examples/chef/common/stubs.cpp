@@ -613,6 +613,9 @@ void LaundryDryerInit()
         Platform::New<LaundryDryerControls::Chef::ChefDelegate>()->Register(1);
     }
 #endif // #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT
+}
+
+/*
  * This initializer is for the casting video player application rootnode_castingvideoplayer_contentapp_34699714e7. To not have this
  * initialiser affect new apps video player device types, use different endpoints.
  */
