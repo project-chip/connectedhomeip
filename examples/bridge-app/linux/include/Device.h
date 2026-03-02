@@ -72,6 +72,12 @@ public:
 
     );
 
+    chip::app::ServerClusterInterface * GetBridgedDeviceInfoCluster()
+    {
+        VerifyOrReturnValue(mBridgedDevice.IsConstructed(), nullptr);
+        return &mBridgedDevice.Cluster();
+    }
+
     // BridgedDeviceBasicInformationDelegate
     chip::Protocols::InteractionModel::Status OnNodeLabelChanged(const std::string & newNodeLabel) override;
 
