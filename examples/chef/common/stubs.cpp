@@ -606,6 +606,9 @@ void GenericSwitchInit()
  */
 void LaundryDryerInit()
 {
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: LaundryDryerInit called more than once");
+    called = true;
 #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT > 0
     // Only initialises Laundry Dryer Controls. Other clusters are initialised through ember calls.
     if (DeviceTypes::EndpointHasDeviceType(1, Device::kLaundryDryerDeviceTypeId))
@@ -621,6 +624,9 @@ void LaundryDryerInit()
  */
 void CastingvideoplayerContentappInit()
 {
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: CastingvideoplayerContentappInit called more than once");
+    called = true;
 
 #if (MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                              \
     (MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                             \
