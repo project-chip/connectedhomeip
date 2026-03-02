@@ -147,14 +147,14 @@ class NetworkResource:
         for netcmd in self.up_cmds:
             self._run_netcmd(netcmd)
 
-            self.up_flag = True
+        self.up_flag = True
 
     def down(self):
         """Run commands to bring down the resource."""
         for netcmd in self.down_cmds:
             self._run_netcmd(netcmd)
 
-            self.up_flag = False
+        self.up_flag = False
 
 
 class NetworkLink(NetworkResource):

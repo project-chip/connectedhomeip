@@ -39,21 +39,9 @@ import python_path
 import tabulate
 import yaml
 
-fallback_import_path = "../../src/python_testing/matter_testing_infrastructure"
-
-# These may fail if python environment is not built yet
-try:
+with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
     from matter.testing.metadata import extract_runs_args
-except ImportError:
-    # Fallback to manual import from source tree
-    with python_path.PythonPath(fallback_import_path, relative_to=__file__):
-        from matter.testing.metadata import extract_runs_args
-
-try:
     from matter.testing.tasks import SubprocessKind
-except ImportError:
-    with python_path.PythonPath(fallback_import_path, relative_to=__file__):
-        from matter.testing.tasks import SubprocessKind
 
 
 log = logging.getLogger(__name__)
