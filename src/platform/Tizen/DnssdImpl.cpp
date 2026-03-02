@@ -404,8 +404,8 @@ DnssdTizen DnssdTizen::sInstance;
 
 RegisterContext::RegisterContext(DnssdTizen & instance, const char * type, const DnssdService & service,
                                  DnssdPublishCallback callback, void * context) :
-    mInstance(instance), mInterfaceId(service.mInterface.GetPlatformInterface()), mPort(service.mPort), mCallback(callback),
-    mCbContext(context)
+    mInstance(instance),
+    mInterfaceId(service.mInterface.GetPlatformInterface()), mPort(service.mPort), mCallback(callback), mCbContext(context)
 {
     Platform::CopyString(mName, service.mName);
     Platform::CopyString(mType, type);
@@ -425,7 +425,8 @@ RegisterContext::~RegisterContext()
 
 BrowseContext::BrowseContext(DnssdTizen & instance, const char * type, Dnssd::DnssdServiceProtocol protocol, uint32_t interfaceId,
                              DnssdBrowseCallback callback, void * context) :
-    mInstance(instance), mProtocol(protocol), mInterfaceId(interfaceId), mCallback(callback), mCbContext(context)
+    mInstance(instance),
+    mProtocol(protocol), mInterfaceId(interfaceId), mCallback(callback), mCbContext(context)
 {
     Platform::CopyString(mType, type);
 }
@@ -441,7 +442,8 @@ BrowseContext::~BrowseContext()
 
 ResolveContext::ResolveContext(DnssdTizen & instance, const char * name, const char * type, uint32_t interfaceId,
                                DnssdResolveCallback callback, void * context) :
-    mInstance(instance), mInterfaceId(interfaceId), mCallback(callback), mCbContext(context)
+    mInstance(instance),
+    mInterfaceId(interfaceId), mCallback(callback), mCbContext(context)
 {
     Platform::CopyString(mName, name);
     Platform::CopyString(mType, type);
