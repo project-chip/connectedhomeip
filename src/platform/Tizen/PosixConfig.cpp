@@ -26,7 +26,9 @@
 
 #include "PosixConfig.h"
 
+#include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceError.h>
 #include <platform/KeyValueStoreManager.h>
 
 namespace chip {
@@ -78,23 +80,43 @@ CHIP_ERROR PosixConfig::Init()
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
 {
-    return PersistedStorage::KeyValueStoreMgr().Get(key.Name, &val);
+    auto err = PersistedStorage::KeyValueStoreMgr().Get(key.Name, &val);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint16_t & val)
 
 {
-    return PersistedStorage::KeyValueStoreMgr().Get(key.Name, &val);
+    auto err = PersistedStorage::KeyValueStoreMgr().Get(key.Name, &val);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint32_t & val)
 {
-    return PersistedStorage::KeyValueStoreMgr().Get(key.Name, &val);
+    auto err = PersistedStorage::KeyValueStoreMgr().Get(key.Name, &val);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint64_t & val)
 {
-    return PersistedStorage::KeyValueStoreMgr().Get(key.Name, &val);
+    auto err = PersistedStorage::KeyValueStoreMgr().Get(key.Name, &val);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
@@ -102,6 +124,11 @@ CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
     VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     auto err = PersistedStorage::KeyValueStoreMgr().Get(key.Name, buf, bufSize, &outLen);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
     // We are storing string values in the config store without
@@ -115,7 +142,12 @@ CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
 CHIP_ERROR PosixConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return PersistedStorage::KeyValueStoreMgr().Get(key.Name, buf, bufSize, &outLen);
+    auto err = PersistedStorage::KeyValueStoreMgr().Get(key.Name, buf, bufSize, &outLen);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    return err;
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, bool val)
