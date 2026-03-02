@@ -312,7 +312,7 @@ void BooleanStateConfigurationCluster::GenerateSensorFault(SensorFaultBitMask fa
             TEMPORARY_RETURN_IGNORED mDelegate->OnSensorFaultChanged(mSensorFault);
         }
         mSensorFault = fault;
-        NotifyAttributeChanged(SensorFault::Id);     
+        NotifyAttributeChanged(SensorFault::Id);
     }
 }
 
@@ -346,7 +346,7 @@ Status BooleanStateConfigurationCluster::SetAlarmsActive(AlarmModeBitMask alarms
     }
     mAlarmsActive = alarms;
     NotifyAttributeChanged(AlarmsActive::Id);
-    
+
     GenerateAlarmsStateChangedEvent();
 
     return Status::Success;
@@ -364,7 +364,7 @@ Status BooleanStateConfigurationCluster::SetAllEnabledAlarmsActive()
     }
     mAlarmsActive = mAlarmsEnabled;
     NotifyAttributeChanged(AlarmsActive::Id);
-    
+
     GenerateAlarmsStateChangedEvent();
     return Status::Success;
 }
