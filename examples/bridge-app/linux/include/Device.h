@@ -72,11 +72,9 @@ public:
 
     );
 
-    chip::app::ServerClusterInterface * GetBridgedDeviceInfoCluster()
-    {
-        VerifyOrReturnValue(mBridgedDevice.IsConstructed(), nullptr);
-        return &mBridgedDevice.Cluster();
-    }
+    /// Clears internal status: unregisters dynamic endpoints and resets internal
+    /// state.
+    void Unregister();
 
     // BridgedDeviceBasicInformationDelegate
     chip::Protocols::InteractionModel::Status OnNodeLabelChanged(const std::string & newNodeLabel) override;

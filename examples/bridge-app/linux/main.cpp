@@ -331,8 +331,7 @@ int RemoveDeviceEndpoint(Device * dev)
             // Todo: Update this to schedule the work rather than use this lock
             DeviceLayer::StackLock lock;
 
-            LogErrorOnFailure(
-                CodegenDataModelProvider::Instance().Registry().Unregister(gDevices[index]->GetBridgedDeviceInfoCluster()));
+            gDevices[index]->Unregister();
 
             // Silence complaints about unused ep when progress logging
             // disabled.

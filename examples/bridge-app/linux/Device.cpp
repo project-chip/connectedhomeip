@@ -21,6 +21,7 @@
 
 #include <app/clusters/basic-information/CodegenIntegration.h>
 #include <crypto/RandUtils.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DefaultTimerDelegate.h>
 
@@ -52,6 +53,15 @@ Device::Device(const char * szDeviceName, std::string szLocation)
     chip::Platform::CopyString(mName, szDeviceName);
     chip::Platform::CopyString(mUniqueId, "");
     mLocation = szLocation;
+}
+
+void Device::Unregister()
+{
+    if (mBridgedDevice.IsConstructed())
+    {
+        LogErrorOnFailure(chip::app::CodegenDataModelProvider::Instance().Registry().Unregister(&mBridgedDevice.Cluster()));
+        mBridgedDevice.Destroy();
+    }
 }
 
 Status Device::OnNodeLabelChanged(const std::string & newNodeLabel)
