@@ -587,9 +587,9 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             if commissioning_method == 'ble-wifi':
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
                 to_terminate.append(chiptest.linux.BluetoothMock())
+                to_terminate.append(chiptest.linux.WpaSupplicantMock([app_name], "MatterAP", "MatterAPPassword", ns))
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
-                to_terminate.append(chiptest.linux.WpaSupplicantMock([app_name], "MatterAP", "MatterAPPassword", 1, ns))
             elif commissioning_method == 'ble-thread':
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
                 to_terminate.append(chiptest.linux.BluetoothMock())
@@ -602,7 +602,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 thread_ba_port = tbr.get_border_agent_port()
             elif commissioning_method == 'wifipaf-wifi':
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                to_terminate.append(chiptest.linux.WpaSupplicantMock([app_name, tool_name], "MatterAP", "MatterAPPassword", 1, ns))
+                to_terminate.append(chiptest.linux.WpaSupplicantMock([app_name, tool_name], "MatterAP", "MatterAPPassword", ns))
 
             to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
