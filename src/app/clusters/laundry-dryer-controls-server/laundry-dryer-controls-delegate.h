@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeValueEncoder.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
