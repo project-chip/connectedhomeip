@@ -50,7 +50,7 @@ void ApplicationInit()
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
     SuccessOrDie(sEthernetNetworkCommissioningInstance.Init());
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 }
 

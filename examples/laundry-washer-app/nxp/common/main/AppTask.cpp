@@ -44,7 +44,7 @@ using namespace chip::app::Clusters;
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
 {
-    TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 #ifdef ENABLE_CHIP_SHELL

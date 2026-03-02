@@ -74,7 +74,7 @@ CHIP_ERROR RefrigeratorManager::Init()
     TEMPORARY_RETURN_IGNORED SetTagList(kFreezeCabinetEndpointId,
                                         Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
 
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
     return CHIP_NO_ERROR;
 }
 

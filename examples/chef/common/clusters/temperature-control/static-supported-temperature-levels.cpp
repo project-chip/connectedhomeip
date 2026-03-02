@@ -86,6 +86,6 @@ void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
         chef::Configuration::TemperatureControl::EndpointPair(
             endpoint /* endpointId */, Span<const CharSpan>(chef::Configuration::TemperatureControl::kTemperatureLevelOptions)));
 
-    chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    chip::app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
 }
 #endif // MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER

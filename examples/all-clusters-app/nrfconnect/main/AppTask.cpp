@@ -297,7 +297,7 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
     }
 
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
     app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     return err;
 }

@@ -49,6 +49,7 @@
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
@@ -198,7 +199,7 @@ void ApplicationInit()
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
     MatterDishwasherAlarmServerInit();
 #endif
-    Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);

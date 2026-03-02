@@ -124,7 +124,7 @@ static void InitServer(intptr_t context)
     SetupPretendDevices();
 #endif
 
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
     app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 }
 

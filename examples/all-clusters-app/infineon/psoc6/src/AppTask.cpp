@@ -146,7 +146,7 @@ static void InitServer(intptr_t context)
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     GetAppTask().InitOTARequestor();
 #endif
-    chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    chip::app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
     chip::app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 }
 

@@ -134,7 +134,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     TEMPORARY_RETURN_IGNORED SetTagList(kFreezeCabinetEndpointId,
                                         Span<const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
 
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
 
     /* Delete task */
     lega_rtos_delete_thread(NULL);
