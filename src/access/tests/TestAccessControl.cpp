@@ -34,8 +34,8 @@
 
 namespace {
 
-constexpr uint16_t kMaxGroupsPerFabric           = 5;
-constexpr uint16_t kMaxGroupKeysPerFabric        = 8;
+constexpr uint16_t kMaxGroupsPerFabric    = 5;
+constexpr uint16_t kMaxGroupKeysPerFabric = 8;
 
 chip::TestPersistentStorageDelegate gTestStorage;
 chip::Crypto::DefaultSessionKeystore gSessionKeystore;
