@@ -279,7 +279,6 @@ public:
             attestationChallengeBuffer(attestationChallenge), attestationSignatureBuffer(attestationSignature),
             paiDerBuffer(paiDer), dacDerBuffer(dacDer), attestationNonceBuffer(attestationNonce), vendorId(remoteVendorId),
             productId(remoteProductId)
-
         {}
         const ByteSpan
             attestationElementsBuffer; // Buffer containing attestation elements portion of Attestation Response (raw TLV)
