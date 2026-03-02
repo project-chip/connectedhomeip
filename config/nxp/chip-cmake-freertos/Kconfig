@@ -162,7 +162,6 @@ config CHIP_SE05X_RND_GEN
 config CHIP_SE05X_DEVICE_ATTESTATION
 	bool "Enable SE05x Secure element for offloading Device attestation Sign"
 	default y if CHIP_FACTORY_DATA
-	default n
 	help
 		Enable SE05x Secure element for offloading Device attestation Sign.
 
