@@ -82,8 +82,8 @@ protected:
     char mName[kDeviceNameSize + 1]         = { 0 };
     char mUniqueId[kDeviceUniqueIdSize + 1] = { 0 };
     std::string mLocation;
-    chip::EndpointId mEndpointId = 0;
-    chip::EndpointId mParentEndpointId;
+    chip::EndpointId mEndpointId       = 0;
+    chip::EndpointId mParentEndpointId = chip::kInvalidEndpointId;
     std::string mZone;
 
     chip::app::LazyRegisteredServerCluster<chip::app::Clusters::BridgedDeviceBasicInformationCluster> mBridgedDevice;

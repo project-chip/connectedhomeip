@@ -122,7 +122,7 @@ void Device::SetUniqueId(const char * szDeviceUniqueId)
 
 void Device::SetLocation(std::string szLocation)
 {
-    bool changed = (mLocation.compare(szLocation) != 0);
+    bool changed = (mLocation != szLocation);
 
     mLocation = szLocation;
 
@@ -153,7 +153,7 @@ void Device::GenerateUniqueId()
 
 uint32_t Device::GetConfigurationVersion()
 {
-    VerifyOrReturnValue(mBridgedDevice.IsConstructed(), 0);
+    VerifyOrReturnValue(mBridgedDevice.IsConstructed(), 1);
     return mBridgedDevice.Cluster().GetConfigurationVersion();
 }
 
