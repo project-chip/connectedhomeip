@@ -40,6 +40,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, maxGroupsPerFabric);
     case Attributes::MaxGroupKeysPerFabric::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, maxGroupKeysPerFabric);
+    case Attributes::GroupcastAdoption::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, groupcastAdoption);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

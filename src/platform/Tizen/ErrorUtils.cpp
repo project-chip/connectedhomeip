@@ -17,32 +17,43 @@
 
 #include "ErrorUtils.h"
 
-#include <app_preference.h>
-#include <dns-sd.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/ErrorStr.h>
+#include <platform/PlatformError.h>
+
+#include <tizen.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-CHIP_ERROR TizenToChipError(int tizenError)
+namespace {
+
+bool FormatTizenPlatformError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 {
-    switch (tizenError)
+    if (!err.IsRange(ChipError::Range::kPlatformExtended))
     {
-    case TIZEN_ERROR_NONE:
-        return CHIP_NO_ERROR;
-    case TIZEN_ERROR_OUT_OF_MEMORY:
-        return CHIP_ERROR_NO_MEMORY;
-    default:
-        return CHIP_ERROR_INTERNAL;
-
-    // Tizen DNSSD API errors
-    case DNSSD_ERROR_NAME_CONFLICT:
-        return CHIP_ERROR_MDNS_COLLISION;
-
-    // Tizen Preference API errors
-    case PREFERENCE_ERROR_NO_KEY:
-        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        return false;
     }
+
+    const char * desc = nullptr;
+#if !CHIP_CONFIG_SHORT_ERROR_STR
+    // The get_error_message() returns a pointer to a thread local storage. Subsequent
+    // call will override it, however, FormatError() should consume it before the next
+    // call to FormatTizenPlatformError() on the same thread.
+    desc = get_error_message(err.GetValue());
+#endif
+
+    FormatError(buf, bufSize, "Platform", err, desc);
+    return true;
+}
+
+}; // namespace
+
+void RegisterTizenPlatformErrorFormatter()
+{
+    static ErrorFormatter sTizenPlatformErrorFormatter = { FormatTizenPlatformError, nullptr };
+    RegisterErrorFormatter(&sTizenPlatformErrorFormatter);
 }
 
 } // namespace Internal

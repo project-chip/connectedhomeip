@@ -41,6 +41,7 @@ source_set("testing") {
     "${chip_root}/src/app/data-model-provider:core",
     "${chip_root}/src/app/data-model-provider:data-model-provider",
     "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/app/data-model-provider:string-builder-adapters",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/persistence:default",
     "${chip_root}/src/app/server-cluster:server-cluster",

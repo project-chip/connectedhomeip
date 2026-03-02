@@ -225,5 +225,6 @@ complete -F _chip_app chip-refrigerator-app
 complete -F _chip_app chip-rvc-app
 complete -F _chip_app chip-tv-app
 complete -F _chip_app chip-tv-casting-app
+complete -F _chip_app matter-water-heater-app
 
 complete -F _chip_tool chip-tool

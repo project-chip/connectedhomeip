@@ -35,6 +35,7 @@ class Esp32App(Enum):
     ALL_DEVICES = auto()
     ENERGY_GATEWAY = auto()
     EVSE = auto()
+    WATER_HEATER = auto()
     LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
@@ -56,6 +57,8 @@ class Esp32App(Enum):
             return 'examples/energy-gateway-app'
         if self == Esp32App.EVSE:
             return 'examples/evse-app'
+        if self == Esp32App.WATER_HEATER:
+            return 'examples/water-heater-app'
         if self == Esp32App.LIGHT:
             return 'examples/lighting-app'
         if self == Esp32App.LOCK:
@@ -86,6 +89,8 @@ class Esp32App(Enum):
             return 'chip-energy-gateway-app'
         if self == Esp32App.EVSE:
             return 'chip-evse-app'
+        if self == Esp32App.WATER_HEATER:
+            return 'matter-water-heater-app'
         if self == Esp32App.LIGHT:
             return 'chip-lighting-app'
         if self == Esp32App.LOCK:

@@ -64,6 +64,7 @@ RUN set -x \
     libdbus-1-dev \
     libdbus-glib-1-dev \
     libdmalloc-dev \
+    libevent-dev \
     libgif-dev \
     libgirepository1.0-dev \
     libglib2.0-dev \
@@ -174,7 +175,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-simulated-app1-ipv6only \
     --target linux-x64-lit-icd-ipv6only \
     --target linux-x64-energy-gateway-ipv6only \
-    --target linux-x64-energy-management-ipv6only \
+    --target linux-x64-evse-ipv6only \
     --target linux-x64-microwave-oven-ipv6only \
     --target linux-x64-rvc-ipv6only \
     --target linux-x64-fabric-bridge-rpc-ipv6only \
@@ -207,7 +208,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
     && mv out/linux-x64-lit-icd-ipv6only/lit-icd-app out/lit-icd-app \
     && mv out/linux-x64-energy-gateway-ipv6only/chip-energy-gateway-app out/chip-energy-gateway-app \
-    && mv out/linux-x64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
+    && mv out/linux-x64-evse-ipv6only/chip-evse-app out/chip-evse-app \
     && mv out/linux-x64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
     && mv out/linux-x64-rvc-ipv6only/chip-rvc-app out/chip-rvc-app \
     && mv out/linux-x64-fabric-bridge-rpc-ipv6only/fabric-bridge-app out/fabric-bridge-app \
@@ -244,7 +245,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-simulated-app1-ipv6only \
     --target linux-arm64-lit-icd-ipv6only \
     --target linux-arm64-energy-gateway-ipv6only \
-    --target linux-arm64-energy-management-ipv6only \
+    --target linux-arm64-evse-ipv6only \
     --target linux-arm64-microwave-oven-ipv6only \
     --target linux-arm64-rvc-ipv6only \
     --target linux-arm64-fabric-bridge-rpc-ipv6only \
@@ -277,7 +278,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
     && mv out/linux-arm64-lit-icd-ipv6only/lit-icd-app out/lit-icd-app \
     && mv out/linux-arm64-energy-gateway-ipv6only/chip-energy-gateway-app out/chip-energy-gateway-app \
-    && mv out/linux-arm64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
+    && mv out/linux-arm64-evse-ipv6only/chip-evse-app out/chip-evse-app \
     && mv out/linux-arm64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
     && mv out/linux-arm64-rvc-ipv6only/chip-rvc-app out/chip-rvc-app \
     && mv out/linux-arm64-fabric-bridge-rpc-ipv6only/fabric-bridge-app out/fabric-bridge-app \
@@ -332,6 +333,7 @@ RUN apt-get install -y           \
   libcairo2-dev                  \
   libcurl4                       \
   libdbus-1-dev                  \
+  libevent-dev                   \
   libgirepository1.0-dev         \
   libglib2.0-dev                 \
   libgstreamer1.0-0              \
@@ -365,7 +367,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lock-app apps/ch
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 apps/chip-app1
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/lit-icd-app apps/lit-icd-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-gateway-app apps/chip-energy-gateway-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-management-app apps/chip-energy-management-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-evse-app apps/chip-evse-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-microwave-oven-app apps/chip-microwave-oven-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-rvc-app apps/chip-rvc-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/examples/fabric-admin/scripts/fabric-sync-app.py apps/fabric-sync-app
@@ -380,6 +382,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-camera-controlle
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/closure-app apps/closure-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/jfc-app apps/jfc-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/jfa-app apps/jfa-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/src/tools/push_av_server apps/push_av_server
 
 # Create symbolic links for now since this allows users to use existing configurations
 # for running just `app-name` instead of `apps/app-name`
@@ -395,10 +398,8 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/data_model python_testing
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
 RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
-# Copy PushAV Server to apps and install dependencies
-COPY --from=chip-build-cert-bins /root/connectedhomeip/src/tools/push_av_server apps/push_av_server
-RUN pip install --break-system-packages -r apps/push_av_server/requirements.txt \
-    && patch -d $(pip show hypercorn | grep "Location: " | sed "s/Location: //") -p0 < apps/push_av_server/hypercorn.patch
+COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.nfc.txt /tmp/requirements.nfc.txt
+RUN pip install --break-system-packages -r /tmp/requirements.nfc.txt && rm /tmp/requirements.nfc.txt
 
 # Stage 3.2: Setup the Mock Server
 COPY --from=chip-build-cert-bins /root/connectedhomeip/integrations/mock_server mock_server

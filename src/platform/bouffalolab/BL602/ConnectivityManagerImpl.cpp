@@ -15,12 +15,14 @@
  *    limitations under the License.
  */
 
+#include <bl60x_wifi_driver/wifi_mgmr.h>
+
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <NetworkCommissioningDriver.h>
-
 #include <platform/DiagnosticDataProvider.h>
+
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+#include <platform/bouffalolab/common/NetworkCommissioningDriver.h>
 
 using namespace ::chip;
 
@@ -29,8 +31,8 @@ namespace DeviceLayer {
 
 void ConnectivityManagerImpl::OnWiFiStationDisconnected()
 {
-    NetworkCommissioning::BLWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
-    uint16_t reason = NetworkCommissioning::BLWiFiDriver::GetInstance().GetLastDisconnectReason();
+    TEMPORARY_RETURN_IGNORED NetworkCommissioning::BflbWiFiDriver::GetInstance().SetLastDisconnectReason(NULL);
+    uint16_t reason = NetworkCommissioning::BflbWiFiDriver::GetInstance().GetLastDisconnectReason();
     uint8_t associationFailureCause =
         chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
     WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();

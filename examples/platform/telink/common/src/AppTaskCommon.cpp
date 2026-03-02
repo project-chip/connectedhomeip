@@ -132,41 +132,48 @@ public:
 AppCallbacks sCallbacks;
 } // namespace
 
+static void DoDelayedFactoryReset(struct k_work * work)
+{
+    ChipLogProgress(DeviceLayer, "Erasing settings partition");
+
+    // TC-OPCREDS-3.6 (device doesn't need to reboot automatically after the last fabric is removed) can't use FactoryReset
+    void * storage = nullptr;
+    int status     = settings_storage_get(&storage);
+
+    if (!status)
+    {
+        status = nvs_clear(static_cast<nvs_fs *>(storage));
+    }
+
+    if (!status)
+    {
+        status = nvs_mount(static_cast<nvs_fs *>(storage));
+    }
+
+    if (status)
+    {
+        ChipLogError(DeviceLayer, "Storage clear failed: %d", status);
+    }
+#ifdef CONFIG_TFLM_FEATURE
+    AppTask::MicroSpeechProcessStop();
+#endif
+    // Reboot in case of failed commissioning to allow new pairing via BLE
+    if (sIsCommissioningFailed)
+    {
+        ChipLogProgress(DeviceLayer, "Rebooting board");
+        sys_reboot(SYS_REBOOT_WARM);
+    }
+}
+
+static k_work_delayable sDelayedFactoryResetWork = Z_WORK_DELAYABLE_INITIALIZER(DoDelayedFactoryReset);
+
 class AppFabricTableDelegate : public FabricTable::Delegate
 {
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
     {
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
         {
-            ChipLogProgress(DeviceLayer, "Erasing settings partition");
-
-            // TC-OPCREDS-3.6 (device doesn't need to reboot automatically after the last fabric is removed) can't use FactoryReset
-            void * storage = nullptr;
-            int status     = settings_storage_get(&storage);
-
-            if (!status)
-            {
-                status = nvs_clear(static_cast<nvs_fs *>(storage));
-            }
-
-            if (!status)
-            {
-                status = nvs_mount(static_cast<nvs_fs *>(storage));
-            }
-
-            if (status)
-            {
-                ChipLogError(DeviceLayer, "Storage clear failed: %d", status);
-            }
-#ifdef CONFIG_TFLM_FEATURE
-            AppTask::MicroSpeechProcessStop();
-#endif
-            // Reboot in case of failed commissioning to allow new pairing via BLE
-            if (sIsCommissioningFailed)
-            {
-                ChipLogProgress(DeviceLayer, "Rebooting board");
-                sys_reboot(SYS_REBOOT_WARM);
-            }
+            k_work_schedule(&sDelayedFactoryResetWork, K_SECONDS(2));
         }
     }
 };

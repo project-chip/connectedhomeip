@@ -35,9 +35,9 @@ declare_args() {
 import("${silabs_common_plat_dir}/args.gni")
 
 # Sanity check
-assert(!(chip_enable_wifi && chip_enable_openthread))
-assert(!(use_SiWx917 && chip_enable_openthread))
-assert(!(use_wf200 && chip_enable_openthread))
+assert(!(chip_enable_wifi && chip_enable_thread))
+assert(!(use_SiWx917 && chip_enable_thread))
+assert(!(use_wf200 && chip_enable_thread))
 
 config("chip_examples_project_config") {
   include_dirs = [ "project_include" ]
@@ -58,7 +58,7 @@ config("chip_examples_project_config") {
 }
 
 source_set("openthread_core_config_efr32_chip_examples") {
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources = [ "project_include/OpenThreadConfig.h" ]
 
     public_deps = [ "${silabs_sdk_build_root}:silabs_sdk" ]
@@ -175,7 +175,7 @@ source_set("efr32-common") {
   }
 
   # OpenThread Settings
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     deps += [
       "${chip_root}/third_party/openthread:openthread",
       "${chip_root}/third_party/openthread:openthread-platform",

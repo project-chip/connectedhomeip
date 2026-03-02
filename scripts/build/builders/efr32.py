@@ -25,6 +25,7 @@ from .gn import GnBuilder
 
 class Efr32App(Enum):
     EVSE = auto()
+    WATER_HEATER = auto()
     LIGHT = auto()
     LOCK = auto()
     SWITCH = auto()
@@ -38,6 +39,8 @@ class Efr32App(Enum):
     def ExampleName(self):
         if self == Efr32App.EVSE:
             return 'evse-app'
+        if self == Efr32App.WATER_HEATER:
+            return 'water-heater-app'
         if self == Efr32App.LIGHT:
             return 'lighting-app'
         if self == Efr32App.LOCK:
@@ -59,6 +62,8 @@ class Efr32App(Enum):
     def AppNamePrefix(self):
         if self == Efr32App.EVSE:
             return 'matter-silabs-evse-example'
+        if self == Efr32App.WATER_HEATER:
+            return 'matter-silabs-water-heater-example'
         if self == Efr32App.LIGHT:
             return 'matter-silabs-lighting-example'
         if self == Efr32App.LOCK:
@@ -82,6 +87,8 @@ class Efr32App(Enum):
     def FlashBundleName(self):
         if self == Efr32App.EVSE:
             return 'evse_app.flashbundle.txt'
+        if self == Efr32App.WATER_HEATER:
+            return 'water_heater_app.flashbundle.txt'
         if self == Efr32App.LIGHT:
             return 'lighting_app.flashbundle.txt'
         if self == Efr32App.LOCK:

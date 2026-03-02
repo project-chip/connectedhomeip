@@ -17,9 +17,9 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MTRClusters.h"
-#import "MTRCommandPayloadsObjc_Private.h"
-#import "MTRDevice.h"
+#import <Matter/MTRClusters.h>
+#import <Matter/MTRCommandPayloadsObjc_Private.h>
+#import <Matter/MTRDevice.h>
 
 NS_ASSUME_NONNULL_BEGIN
 // Nothing here for now, but leaving this file in place in case we need to add

@@ -30,7 +30,7 @@ from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuild
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.realtek import RealtekApp, RealtekBoard, RealtekBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
-from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
+from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder, TelinkLogLevel
 from builders.ti import TIApp, TIBoard, TIBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 
@@ -145,6 +145,7 @@ def BuildHostTarget():
         TargetPart('air-quality-sensor', app=HostApp.AIR_QUALITY_SENSOR),
         TargetPart('network-manager', app=HostApp.NETWORK_MANAGER),
         TargetPart('energy-gateway', app=HostApp.ENERGY_GATEWAY),
+        TargetPart('water-heater', app=HostApp.WATER_HEATER),
         TargetPart('evse', app=HostApp.EVSE),
         TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
         TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
@@ -245,6 +246,7 @@ def BuildEsp32Target():
         TargetPart('all-devices', app=Esp32App.ALL_DEVICES),
         TargetPart('energy-gateway', app=Esp32App.ENERGY_GATEWAY),
         TargetPart('evse', app=Esp32App.EVSE),
+        TargetPart('water-heater', app=Esp32App.WATER_HEATER),
         TargetPart('ota-provider', app=Esp32App.OTA_PROVIDER),
         TargetPart('ota-requestor', app=Esp32App.OTA_REQUESTOR),
         TargetPart('shell', app=Esp32App.SHELL),
@@ -293,6 +295,7 @@ def BuildEfr32Target():
         TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
         TargetPart('closure', app=Efr32App.CLOSURE),
         TargetPart('evse', app=Efr32App.EVSE),
+        TargetPart('water-heater', app=Efr32App.WATER_HEATER),
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
         TargetPart('pump', app=Efr32App.PUMP),
@@ -544,7 +547,7 @@ def BuildNxpTarget():
     target.AppendModifier(name="ota", enable_ota=True).ExceptIfRe('zephyr')
     target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="ethernet", enable_ethernet=True).OnlyIfRe('rw61x')
-    target.AppendModifier(name="thread", enable_thread=True).ExceptIfRe('zephyr')
+    target.AppendModifier(name="thread", enable_thread=True)
     target.AppendModifier(name="matter-shell", enable_shell=True)
     target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x|mcxw71|mcxw72')
@@ -706,10 +709,6 @@ def BuildBouffalolabTarget():
                    board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602", enable_resetCnt=True),
         TargetPart('BL706-NIGHT-LIGHT',
                    board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22", enable_resetCnt=True),
-        TargetPart('BL602-IoT-Matter-V1',
-                   board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
-        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit,
-                   module_type="BL706C-22"),
     ])
 
     target.AppendFixedTargets([
@@ -718,11 +717,11 @@ def BuildBouffalolabTarget():
     ])
 
     target.AppendFixedTargets([
-        TargetPart('ethernet', enable_ethernet=True),
-        TargetPart('wifi', enable_wifi=True),
-        TargetPart('thread', enable_thread_type=BouffalolabThreadType.THREAD_FTD),
-        TargetPart('thread-ftd', enable_thread_type=BouffalolabThreadType.THREAD_FTD),
-        TargetPart('thread-mtd', enable_thread_type=BouffalolabThreadType.THREAD_MTD),
+        TargetPart('ethernet', enable_ethernet=True).OnlyIfRe('-(bl616dk|bl706dk)'),
+        TargetPart('wifi', enable_wifi=True).OnlyIfRe('-(bl602dk|bl706dk|bl616dk)'),
+        TargetPart('thread', enable_thread_type=BouffalolabThreadType.THREAD_FTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
+        TargetPart('thread-ftd', enable_thread_type=BouffalolabThreadType.THREAD_FTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
+        TargetPart('thread-mtd', enable_thread_type=BouffalolabThreadType.THREAD_MTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
     ])
 
     target.AppendFixedTargets([
@@ -818,6 +817,10 @@ def BuildTelinkTarget():
     target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
     target.AppendModifier('tflm', tflm_config=True)
     target.AppendModifier('nfc-payload', chip_enable_nfc_onboarding_payload=True)
+    target.AppendModifier("log-progress", log_level=TelinkLogLevel.PROGRESS).ExceptIfRe("-log-(all|error|none)")
+    target.AppendModifier("log-error", log_level=TelinkLogLevel.ERROR).ExceptIfRe("-log-(progress|all|none)")
+    target.AppendModifier("log-none", log_level=TelinkLogLevel.NONE).ExceptIfRe("-log-(progress|error|all)")
+    target.AppendModifier("log-all", log_level=TelinkLogLevel.ALL).ExceptIfRe("-log-(progress|error|none)")
 
     return target
 

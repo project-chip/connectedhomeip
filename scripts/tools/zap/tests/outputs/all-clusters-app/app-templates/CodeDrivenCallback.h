@@ -28,6 +28,10 @@ void MatterIdentifyClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterIdentifyClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterGroupsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterGroupsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterDescriptorClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterDescriptorClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
@@ -88,6 +92,10 @@ void MatterTimeSynchronizationClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterTimeSynchronizationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterSwitchClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterSwitchClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterAdministratorCommissioningClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterAdministratorCommissioningClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
@@ -141,6 +149,10 @@ void MatterDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointId
 
 void MatterDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterEnergyEvseClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterEnergyEvseClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterPowerTopologyClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterPowerTopologyClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
@@ -148,6 +160,10 @@ void MatterPowerTopologyClusterShutdownCallback(chip::EndpointId endpointId, Mat
 void MatterIlluminanceMeasurementClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterIlluminanceMeasurementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
+void MatterTemperatureMeasurementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterTemperatureMeasurementClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
 

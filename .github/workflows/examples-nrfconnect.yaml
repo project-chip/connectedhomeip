@@ -143,8 +143,10 @@ jobs:
                     /tmp/bloat_reports/
                   rm -rf examples/shell/nrfconnect/build/nrfconnect
             - name: Build example nRF Connect SDK All Clusters App on nRF52840 DK
+              # Matter log level 2 == log_error only (no progress, no detail). We do this for all-clusters
+              # to reduce flash usage a bit.
               run: |
-                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf52840dk/nrf52840
+                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf52840dk/nrf52840 -DCONFIG_MATTER_LOG_LEVEL=2
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840 all-clusters-app \
                     examples/all-clusters-app/nrfconnect/build/nrfconnect/zephyr/zephyr.elf \
@@ -152,8 +154,10 @@ jobs:
                   rm -rf examples/all-clusters-app/nrfconnect/build/nrfconnect
             - name: Build example nRF Connect SDK All Clusters App on nRF54L15 DK
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
+              # Matter log level 2 == log_error only (no progress, no detail). We do this for all-clusters
+              # to reduce flash usage a bit.
               run: |
-                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf54l15dk/nrf54l15/cpuapp
+                  scripts/examples/nrfconnect_example.sh all-clusters-app nrf54l15dk/nrf54l15/cpuapp -DCONFIG_MATTER_LOG_LEVEL=2
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf54l15dk_nrf54l15_cpuapp all-clusters-app \
                     examples/all-clusters-app/nrfconnect/build/nrfconnect/zephyr/zephyr.elf \

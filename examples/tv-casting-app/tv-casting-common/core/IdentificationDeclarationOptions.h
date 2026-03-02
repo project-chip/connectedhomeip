@@ -129,6 +129,11 @@ public:
             id.SetCommissionerPasscodeReady(true);
             id.SetInstanceName(mCommissioneeInstanceName);
         }
+        // mCommissioneeInstanceName cannot be null
+        else if ((mCancelPasscode || mNoPasscode) && strlen(mCommissioneeInstanceName) != 0)
+        {
+            id.SetInstanceName(mCommissioneeInstanceName);
+        }
         else
         {
             ChipLogProgress(AppServer,

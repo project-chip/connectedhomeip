@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/data-model-provider/ActionReturnStatus.h"
 #include <app/data-model-provider/StringBuilderAdapters.h>
 
 #include <lib/core/StringBuilderAdapters.h>
@@ -27,8 +28,20 @@ StatusWithSize ToString<chip::app::DataModel::ActionReturnStatus>(const chip::ap
     return pw::string::Format(buffer, "ActionReturnStatus<%s>", status.c_str(storage));
 }
 
+template <>
+StatusWithSize ToString<chip::Protocols::InteractionModel::Status>(const chip::Protocols::InteractionModel::Status & status,
+                                                                   pw::span<char> buffer)
+{
+#if CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
+    return pw::string::Format(buffer, "Status<%s/%d>", chip::Protocols::InteractionModel::StatusName(status),
+                              static_cast<int>(status));
+#else
+    return pw::string::Format(buffer, "Status<%d>", static_cast<int>(status));
+#endif
+}
+
 } // namespace pw
-//
+
 #if CHIP_CONFIG_TEST_GOOGLETEST
 namespace chip {
 
@@ -36,6 +49,15 @@ void PrintTo(const chip::app::DataModel::ActionReturnStatus & status, std::ostre
 {
     chip::app::DataModel::ActionReturnStatus::StringStorage storage;
     *os << "ActionReturnStatus<" << status.c_str(storage) << ">";
+}
+
+void PrintTo(const chip::Protocols::InteractionModel::Status & status, std::ostream * os)
+{
+    *os << "Status<"
+#if CHIP_CONFIG_IM_STATUS_CODE_VERBOSE_FORMAT
+        << chip::Protocols::InteractionModel::StatusName(status) << "/"
+#endif
+        << static_cast<int>(status) << ">";
 }
 
 } // namespace chip

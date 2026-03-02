@@ -2543,6 +2543,15 @@ class ChipDeviceControllerBase():
                 c_void_p, c_void_p, c_uint64, c_uint32, c_uint8, c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_OnNetworkCommission.restype = PyChipError
 
+            if hasattr(self._dmLib, "pychip_DeviceController_ThreadMeshcopCommission"):
+                self._dmLib.pychip_DeviceController_ThreadMeshcopCommission.argtypes = [
+                    c_void_p, c_void_p, c_uint64, c_uint32, c_uint16, c_char_p, c_uint16]
+                self._dmLib.pychip_DeviceController_ThreadMeshcopCommission.restype = PyChipError
+            else:
+                logging.getLogger(__name__).warning(
+                    "pychip_DeviceController_ThreadMeshcopCommission is not available in the loaded CHIP library; "
+                    "Thread Meshcop commissioning is disabled.")
+
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.argtypes = [
                 c_void_p, c_uint8, c_char_p]
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.restype = PyChipError
@@ -2891,6 +2900,23 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.SetThreadOperationalDataset(threadOperationalDataset)
         return await self.ConnectNFC(discriminator, setupPinCode, nodeId)
 
+    async def CommissionNfcWiFi(self, discriminator, setupPinCode, nodeId: int, ssid: str, credentials: str) -> int:
+        '''
+        Commissions a Wi-Fi device over NFC.
+
+        Args:
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+            setupPinCode (int): The setup pin code of the device.
+            nodeId (int): The node ID of the device.
+            ssid (str): SSID of the WiFi network.
+            credentials (str): WiFi network password.
+
+        Returns:
+            int: Effective Node ID of the device (as defined by the assigned NOC).
+        '''
+        self.SetWiFiCredentials(ssid, credentials)
+        return await self.ConnectNFC(discriminator, setupPinCode, nodeId)
+
     async def CommissionBleWiFi(self, discriminator, setupPinCode, nodeId: int, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> int:
         '''
         Commissions a Wi-Fi device over BLE.
@@ -3161,6 +3187,33 @@ class ChipDeviceController(ChipDeviceControllerBase):
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
                     self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") if filter is not None else None, discoveryTimeoutMsec)
+            )
+
+            return await asyncio.futures.wrap_future(ctx.future)
+
+    async def CommissionThreadMeshcop(self, nodeId: int, setupPinCode: int,
+                                      discriminator: int, borderAgentIPAddr: str,
+                                      borderAgentPort: int, threadOperationalDataset: bytes) -> int:
+        '''
+        Commission with the given node ID from the setupPinCode and discriminator
+        over Thread MeshCoP transport
+
+        Args:
+            nodeId (int): The node ID of the device.
+            setupPinCode (int): The setup pin code of the device.
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+            borderAgentIPAddr (str): IP address of Border Agent in Thread network
+            borderAgentPort (int): The port of Border Agent in Thread network
+            threadOperationalDataset (bytes): The operational dataset of Thread network
+        '''
+        self.CheckIsActive()
+
+        self.SetThreadOperationalDataset(threadOperationalDataset)
+        async with self._commissioning_context as ctx:
+            self._enablePairingCompleteCallback(True)
+            await self._ChipStack.CallAsync(
+                lambda: self._dmLib.pychip_DeviceController_ThreadMeshcopCommission(
+                    self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, discriminator, borderAgentIPAddr.encode("utf-8"), borderAgentPort)
             )
 
             return await asyncio.futures.wrap_future(ctx.future)

@@ -110,6 +110,15 @@ public:
 
     CHIP_ERROR _GetThreadVersion(uint16_t & version);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    CHIP_ERROR _RendezvousStart(RendezvousAnnouncementRequestCallback announcementRequest, void * context)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    void _CancelRendezvousAnnouncement() {}
+    void _RendezvousStop() {}
+#endif
+
     void _ResetThreadNetworkDiagnosticsCounts();
 
     CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);

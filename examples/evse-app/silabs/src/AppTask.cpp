@@ -137,7 +137,6 @@ void ApplicationShutdown()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     EvseApplicationShutdown();
-
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
@@ -218,7 +217,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::EnergyManagementActionEventHandler(AppEvent * aEvent)
 {
-    bool initiated = false;
     int32_t actor;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -232,13 +230,7 @@ void AppTask::EnergyManagementActionEventHandler(AppEvent * aEvent)
         err = APP_ERROR_UNHANDLED_EVENT;
     }
 
-    if (err == CHIP_NO_ERROR)
-    {
-        if (!initiated)
-        {
-            SILABS_LOG("Action is already in progress or active.");
-        }
-    }
+    // TODO: Implement evse action here (ex: Simulate car just plugged in or call event trigger)
 }
 
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)

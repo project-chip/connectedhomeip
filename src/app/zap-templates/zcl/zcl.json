@@ -180,7 +180,7 @@
             "AdminFabricIndex",
             "AdminVendorId"
         ],
-        "Ambient Context Sensing": ["HoldTimeLimits"],
+        "Ambient Context Sensing": ["HoldTimeLimits", "ObjectCountConfig"],
         "Basic Information": [
             "FeatureMap",
             "ClusterRevision",
@@ -412,6 +412,7 @@
             "FeatureMap",
             "ThreadMetrics"
         ],
+        "Switch": ["ClusterRevision", "CurrentPosition"],
         "Unit Testing": [
             "struct_attr",
             "nullable_struct",
@@ -421,6 +422,11 @@
             "nullable_global_struct"
         ],
         "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
+        "Temperature Measurement": [
+            "ClusterRevision",
+            "FeatureMap",
+            "MeasuredValue"
+        ],
         "Thread Border Router Management": [
             "BorderRouterName",
             "BorderAgentID",

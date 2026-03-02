@@ -31,6 +31,7 @@ DEFAULT_TARGETS = [
     "linux-x64-thermostat-no-ble",
     "linux-x64-tv-app-no-ble-clang-boringssl",
     "linux-x64-tv-casting-app-no-ble",
+    "linux-x64-water-heater-no-ble-clang-boringssl",
     "linux-x64-water-leak-detector-no-ble"
 ]
 DEFAULT_TESTS = ["TC_DeviceBasicComposition", "TC_DeviceConformance"]

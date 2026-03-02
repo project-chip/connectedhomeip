@@ -246,7 +246,8 @@ void CYW30739MatterConfig::InitApp(void)
      * this to work and replace the old global instance call to the cluster
      */
     static Clusters::GeneralDiagnosticsCluster cluster(
-        Clusters::GeneralDiagnosticsCluster::OptionalAttributeSet{}, chip::BitFlags<Clusters::GeneralDiagnostics::Feature>{},
+        Clusters::GeneralDiagnosticsCluster::OptionalAttributeSet{},
+        chip::BitFlags<Clusters::GeneralDiagnostics::Feature>(Clusters::GeneralDiagnostics::Feature::kDeviceLoad),
         Clusters::GeneralDiagnosticsCluster::Context{
             .deviceLoadStatusProvider = *chip::app::InteractionModelEngine::GetInstance(),
             .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),

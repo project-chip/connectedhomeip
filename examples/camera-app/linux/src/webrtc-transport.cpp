@@ -150,13 +150,13 @@ void WebrtcTransport::SendAudioVideo(const chip::ByteSpan & data, uint16_t video
 // Implementation of CanSendVideo method
 bool WebrtcTransport::CanSendVideo()
 {
-    return mLocalVideoTrack != nullptr;
+    return mLocalVideoTrack != nullptr && mLocalVideoTrack->IsReady();
 }
 
 // Implementation of CanSendAudio method
 bool WebrtcTransport::CanSendAudio()
 {
-    return mLocalAudioTrack != nullptr;
+    return mLocalAudioTrack != nullptr && mLocalAudioTrack->IsReady();
 }
 
 const char * WebrtcTransport::GetStateStr() const

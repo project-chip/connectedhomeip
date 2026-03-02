@@ -103,8 +103,8 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
 
     case Attributes::RoutingRole::Id: {
         using ThreadNetworkDiagnostics::RoutingRoleEnum;
-        RoutingRoleEnum routingRole;
-        otDeviceRole otRole = otThreadGetDeviceRole(otInst);
+        RoutingRoleEnum routingRole = RoutingRoleEnum::kUnspecified;
+        otDeviceRole otRole         = otThreadGetDeviceRole(otInst);
 
         if (otRole == OT_DEVICE_ROLE_DISABLED)
         {
@@ -730,6 +730,23 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
     }
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
     return err;
+}
+
+uint16_t GetPanId()
+{
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+    otInstance * otInst = ThreadStackMgrImpl().OTInstance();
+    if (otInst != nullptr)
+    {
+        otOperationalDataset aDataset;
+        otError otErr = otDatasetGetActive(otInst, &aDataset);
+        if (otErr == OT_ERROR_NONE && aDataset.mComponents.mIsPanIdPresent)
+        {
+            return aDataset.mPanId;
+        }
+    }
+#endif             // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+    return 0xffff; // 0xFFFF is an invalid PAN ID and indicates it is unconfigured/unavailable
 }
 
 } // namespace chip::app::Clusters::ThreadNetworkDiagnostics

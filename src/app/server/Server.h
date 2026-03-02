@@ -551,8 +551,11 @@ private:
                 return;
             }
 
-            if (mServer->GetTransportManager().MulticastGroupJoinLeave(
-                    Transport::PeerAddress::Multicast(fabric->GetFabricId(), new_group.group_id), true) != CHIP_NO_ERROR)
+            const Transport::PeerAddress & address = new_group.UsePerGroupAddress()
+                ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), new_group.group_id)
+                : Transport::PeerAddress::Groupcast();
+
+            if (CHIP_NO_ERROR != mServer->GetTransportManager().MulticastGroupJoinLeave(address, true))
             {
                 ChipLogError(AppServer, "Unable to listen to group");
             }
@@ -560,15 +563,50 @@ private:
 
         void OnGroupRemoved(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override
         {
-            const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
-            if (fabric == nullptr)
+            if (old_group.UsePerGroupAddress())
             {
-                ChipLogError(AppServer, "Group removed from nonexistent fabric?");
-                return;
+                // Per group address no longer in use, unsubscribe
+                const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
+                if (fabric == nullptr)
+                {
+                    ChipLogError(AppServer, "Group removed from nonexistent fabric?");
+                    return;
+                }
+                const Transport::PeerAddress & address =
+                    Transport::PeerAddress::Multicast(fabric->GetFabricId(), old_group.group_id);
+                VerifyOrReturn(CHIP_NO_ERROR == mServer->GetTransportManager().MulticastGroupJoinLeave(address, false));
             }
-
-            TEMPORARY_RETURN_IGNORED mServer->GetTransportManager().MulticastGroupJoinLeave(
-                Transport::PeerAddress::Multicast(fabric->GetFabricId(), old_group.group_id), false);
+            else
+            {
+                // Check if the address is still in use
+                Credentials::GroupDataProvider * provider = mServer->GetGroupDataProvider();
+                bool in_use                               = false;
+                if (nullptr != provider)
+                {
+                    // Check all groups from all fabrics
+                    Credentials::GroupDataProvider::GroupInfo group;
+                    for (const FabricInfo & fabric : mServer->GetFabricTable())
+                    {
+                        auto * iter = provider->IterateGroupInfo(fabric.GetFabricIndex());
+                        if (iter)
+                        {
+                            while (iter->Next(group) && !in_use)
+                            {
+                                in_use = !group.UsePerGroupAddress();
+                            }
+                        }
+                        iter->Release();
+                        if (in_use)
+                            break;
+                    }
+                }
+                if (!in_use)
+                {
+                    // Groupcast address no longer in use, unsubscribe
+                    const Transport::PeerAddress & address = Transport::PeerAddress::Groupcast();
+                    VerifyOrReturn(CHIP_NO_ERROR == mServer->GetTransportManager().MulticastGroupJoinLeave(address, false));
+                }
+            }
         };
 
     private:

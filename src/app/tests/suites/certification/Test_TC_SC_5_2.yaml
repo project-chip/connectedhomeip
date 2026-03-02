@@ -81,7 +81,7 @@ tests:
           d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0:1 5)EpochKey1:
           d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
           18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
-          8)EpochStartTime2: 18446744073709551614"
+          8)EpochStartTime2: 18446744073709551614 9)GroupKeyMulticastPolicy: 0"
       PICS: GRPKEY.S.C00.Rsp
       cluster: "Group Key Management"
       command: "KeySetWrite"
@@ -98,6 +98,7 @@ tests:
                         EpochStartTime1: 18446744073709551613,
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 18446744073709551614,
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label:

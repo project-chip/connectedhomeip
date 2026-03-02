@@ -18,5 +18,4 @@
 
 #pragma once
 
-#include <app/clusters/energy-evse-server/EnergyEvseCluster.h>
-#include <app/clusters/energy-evse-server/EnergyEvseDelegate.h>
+#include <app/clusters/energy-evse-server/CodegenIntegration.h>
