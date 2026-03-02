@@ -844,9 +844,13 @@ void MdnsAvahi::StopResolve(const char * name)
     {
         if (strcmp((*it)->mName, name) == 0)
         {
-            (*it)->mCallback((*it)->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
-            chip::Platform::Delete(*it);
+            ResolveContext * context = *it;
+            // Remove from the allocated list before invoking the callback to avoid
+            // re-entrant use-after-free or double-free if the callback calls back
+            // into resolve cancellation logic.
             it = mAllocatedResolves.erase(it);
+            context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
+            chip::Platform::Delete(context);
         }
         else
         {
