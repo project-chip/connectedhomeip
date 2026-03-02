@@ -236,13 +236,12 @@ TEST_F(TestClosureControlCluster, TestAttributesList)
     EXPECT_TRUE(IsAttributesListEqualTo(mCluster, expectedAttributes));
 
     MockClusterConformance testConformance;
-    testConformance.OptionalAttributes().Set(OptionalAttributeEnum::kCountdownTime);
+    testConformance.OptionalAttributes().Set<Attributes::CountdownTime::Id>();
     ClosureControlCluster testCluster(kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, testConformance, initParams });
     expectedAttributes.push_back(ClosureControl::Attributes::CountdownTime::kMetadataEntry);
     EXPECT_TRUE(IsAttributesListEqualTo(testCluster, expectedAttributes));
 
     testConformance.FeatureMap().Set(Feature::kMotionLatching);
-    testConformance.OptionalAttributes().Set(OptionalAttributeEnum::kCountdownTime);
     ClosureControlCluster motionLatchingCluster(kTestEndpointId,
                                                 ClosureControlCluster::Context{ mockDelegate, testConformance, initParams });
     expectedAttributes.push_back(ClosureControl::Attributes::LatchControlModes::kMetadataEntry);

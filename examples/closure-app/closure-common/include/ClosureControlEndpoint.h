@@ -97,7 +97,7 @@ public:
             .Set(Feature::kCalibration)
             .Set(Feature::kProtection)
             .Set(Feature::kManuallyOperable);
-        conformance.OptionalAttributes().Set(OptionalAttributeEnum::kCountdownTime);
+        conformance.OptionalAttributes().Set<Attributes::CountdownTime::Id>();
 
         ClusterInitParameters initParams;
 

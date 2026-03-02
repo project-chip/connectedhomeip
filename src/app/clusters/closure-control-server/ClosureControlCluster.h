@@ -38,13 +38,8 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
-/**
- * @brief Closure Control optional attribute enum class
- */
-enum class OptionalAttributeEnum : uint32_t
-{
-    kCountdownTime = 0x1
-};
+using OptionalAttributesSet = OptionalAttributeSet<ClosureControl::Attributes::CountdownTime::Id>;
+
 // As per the spec, the maximum allowed CurrentErrorList size is 10.
 constexpr int kCurrentErrorListMaxSize = 10;
 
@@ -58,8 +53,8 @@ public:
     BitFlags<Feature> & FeatureMap() { return mFeatureMap; }
     const BitFlags<Feature> & FeatureMap() const { return mFeatureMap; }
 
-    BitFlags<OptionalAttributeEnum> & OptionalAttributes() { return mOptionalAttributes; }
-    const BitFlags<OptionalAttributeEnum> & OptionalAttributes() const { return mOptionalAttributes; }
+    OptionalAttributesSet & OptionalAttributes() { return mOptionalAttributes; }
+    const OptionalAttributesSet & OptionalAttributes() const { return mOptionalAttributes; }
 
     inline bool HasFeature(Feature aFeature) const { return mFeatureMap.Has(aFeature); }
 
@@ -101,7 +96,7 @@ public:
 
 private:
     BitFlags<Feature> mFeatureMap;
-    BitFlags<OptionalAttributeEnum> mOptionalAttributes;
+    OptionalAttributesSet mOptionalAttributes;
 };
 
 /**
@@ -148,11 +143,6 @@ struct ClusterInitParameters
  */
 class ClosureControlCluster : public DefaultServerCluster
 {
-private:
-    using OptionalAttributesSet = OptionalAttributeSet<   //
-        ClosureControl::Attributes::CountdownTime::Id,    //
-        ClosureControl::Attributes::LatchControlModes::Id //
-        >;
 
 public:
     /**
@@ -390,7 +380,6 @@ private:
     ClosureControlClusterDelegate & mDelegate;
     ClusterConformance mConformance;
     ClusterState mState;
-    const OptionalAttributesSet mEnabledOptionalAttributes;
 
     DataModel::ActionReturnStatus HandleStopCommand(CommandHandler & handler, const ConcreteCommandPath & path);
     DataModel::ActionReturnStatus HandleMoveToCommand(CommandHandler & handler, const ConcreteCommandPath & path,
