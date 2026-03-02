@@ -403,7 +403,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
                         ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(ep1MainState)));
 
     // Update OverallTarget of Closure based on SetTarget command.
-    DataModel::Nullable<GenericOverallTargetState> overallTargetState = mClosureEndpoint1.GetClusterInstance().GetOverallTargetState();
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState =
+        mClosureEndpoint1.GetClusterInstance().GetOverallTargetState();
 
     if (overallTargetState.IsNull())
     {
@@ -642,7 +643,8 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
         panelTargetState.Value().latch.HasValue() && !panelTargetState.Value().latch.Value().IsNull() &&
         (panelCurrentState.Value().latch.Value().Value() && !panelTargetState.Value().latch.Value().Value()))
     {
-        DataModel::Nullable<GenericOverallCurrentState> ep1OverallCurrentState = mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
+        DataModel::Nullable<GenericOverallCurrentState> ep1OverallCurrentState =
+            mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
         VerifyOrReturn(!ep1OverallCurrentState.IsNull(), ChipLogError(AppServer, "Current state is not set for Endpoint 1"));
 
         // In Real application, this would be replaced with actual unlatch logic.
@@ -744,7 +746,8 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
         {
             if (!panelCurrentState.Value().latch.Value().Value() && panelTargetState.Value().latch.Value().Value())
             {
-                DataModel::Nullable<GenericOverallCurrentState> ep1OverallCurrentState = mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
+                DataModel::Nullable<GenericOverallCurrentState> ep1OverallCurrentState =
+                    mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
                 VerifyOrReturn(!ep1OverallCurrentState.IsNull(),
                                ChipLogError(AppServer, "Overall current state is not set for Endpoint 1"));
 
@@ -855,7 +858,8 @@ void ClosureManager::HandleClosureMotionAction()
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    DataModel::Nullable<GenericOverallCurrentState> ep1CurrentState = mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
+    DataModel::Nullable<GenericOverallCurrentState> ep1CurrentState =
+        mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
     DataModel::Nullable<GenericDimensionStateStruct> ep2CurrentState;
     DataModel::Nullable<GenericDimensionStateStruct> ep3CurrentState;
 

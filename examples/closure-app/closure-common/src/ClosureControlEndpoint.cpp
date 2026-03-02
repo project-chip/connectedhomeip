@@ -221,7 +221,7 @@ void ClosureControlEndpoint::OnMoveToActionComplete()
 void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
 {
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState = mClusterInstance->GetOverallCurrentState();
-    DataModel::Nullable<GenericOverallTargetState> overallTargetState = mClusterInstance->GetOverallTargetState();
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState   = mClusterInstance->GetOverallTargetState();
 
     VerifyOrReturn(!overallTargetState.IsNull(), ChipLogError(AppServer, "Current overall target is null, Move to action Failed"));
     VerifyOrReturn(!overallCurrentState.IsNull(), ChipLogError(AppServer, "Current overall state is null, Move to action Failed"));
@@ -293,7 +293,7 @@ void ClosureControlEndpoint::OnPanelMotionActionComplete()
     auto position = MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened));
 
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState = mClusterInstance->GetOverallCurrentState();
-    DataModel::Nullable<GenericOverallTargetState> overallTargetState = mClusterInstance->GetOverallTargetState();
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState   = mClusterInstance->GetOverallTargetState();
 
     if (overallCurrentState.IsNull())
     {

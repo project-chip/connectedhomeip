@@ -38,7 +38,7 @@ namespace ClosureControl {
 
 ClosureControlCluster::ClosureControlCluster(EndpointId endpointId, const Context & context) :
     DefaultServerCluster({ endpointId, ClosureControl::Id }), mMatterContext(endpointId), mDelegate(context.delegate),
-    mConformance(context.conformance)
+    mTimerDelegate(context.timerDelegate), mConformance(context.conformance)
 {
     VerifyOrDieWithMsg(context.conformance.Valid(), AppServer, "Invalid conformance");
     LogErrorOnFailure(SetMainState(context.initParams.mMainState));
@@ -215,7 +215,7 @@ CHIP_ERROR ClosureControlCluster::SetCountdownTime(const DataModel::Nullable<Ela
     VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
                         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    auto now       = System::SystemClock().GetMonotonicTimestamp();
+    auto now       = mTimerDelegate.GetCurrentMonotonicTimestamp();
     bool markDirty = false;
 
     // When fromDelegate=true (delegate updates), we rely on the QuieterReportingAttribute policies
@@ -246,35 +246,34 @@ CHIP_ERROR ClosureControlCluster::SetMainState(MainStateEnum mainState)
     // EngageStateChanged event SHALL be generated when the MainStateEnum attribute changes state to and from disengaged state
     if (mState.mMainState == MainStateEnum::kDisengaged)
     {
-        TEMPORARY_RETURN_IGNORED GenerateEngageStateChangedEvent(true);
+        LogErrorOnFailure(GenerateEngageStateChangedEvent(true));
     }
 
     if (mainState == MainStateEnum::kDisengaged)
     {
-        TEMPORARY_RETURN_IGNORED GenerateEngageStateChangedEvent(false);
+        LogErrorOnFailure(GenerateEngageStateChangedEvent(false));
     }
 
-    mState.mMainState = mainState;
-    NotifyAttributeChanged(Attributes::MainState::Id);
+    SetAttributeValue(mState.mMainState, mainState, Attributes::MainState::Id);
 
     if (!mConformance.HasFeature(Feature::kInstantaneous))
     {
         if (mainState == MainStateEnum::kCalibrating)
         {
-            TEMPORARY_RETURN_IGNORED SetCountdownTimeFromCluster(mDelegate.GetCalibrationCountdownTime());
+            LogErrorOnFailure(SetCountdownTimeFromCluster(mDelegate.GetCalibrationCountdownTime()));
         }
         else if (mainState == MainStateEnum::kMoving)
         {
-            TEMPORARY_RETURN_IGNORED SetCountdownTimeFromCluster(mDelegate.GetMovingCountdownTime());
+            LogErrorOnFailure(SetCountdownTimeFromCluster(mDelegate.GetMovingCountdownTime()));
         }
         else if (mainState == MainStateEnum::kWaitingForMotion)
         {
-            TEMPORARY_RETURN_IGNORED SetCountdownTimeFromCluster(mDelegate.GetWaitingForMotionCountdownTime());
+            LogErrorOnFailure(SetCountdownTimeFromCluster(mDelegate.GetWaitingForMotionCountdownTime()));
         }
         else
         {
             // Reset the countdown time to 0 when the main state is not in motion or calibration.
-            TEMPORARY_RETURN_IGNORED SetCountdownTimeFromCluster(DataModel::Nullable<ElapsedS>(0));
+            LogErrorOnFailure(SetCountdownTimeFromCluster(DataModel::Nullable<ElapsedS>(0)));
         }
     }
 
@@ -362,7 +361,7 @@ ClosureControlCluster::SetOverallCurrentState(const DataModel::Nullable<GenericO
             {
                 // As secureState field is not set in present current state and incoming current state has value, we generate the
                 // event
-                TEMPORARY_RETURN_IGNORED GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value());
+                LogErrorOnFailure(GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value()));
             }
             else
             {
@@ -370,15 +369,13 @@ ClosureControlCluster::SetOverallCurrentState(const DataModel::Nullable<GenericO
                 // value has changed.
                 if (mState.mOverallCurrentState.Value().secureState.Value() != incomingOverallCurrentState.secureState.Value())
                 {
-                    TEMPORARY_RETURN_IGNORED GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value());
+                    LogErrorOnFailure(GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value()));
                 }
             }
         }
     }
 
-    mState.mOverallCurrentState = overallCurrentState;
-    NotifyAttributeChanged(Attributes::OverallCurrentState::Id);
-
+    SetAttributeValue(mState.mOverallCurrentState, overallCurrentState, Attributes::OverallCurrentState::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -430,8 +427,7 @@ CHIP_ERROR ClosureControlCluster::SetOverallTargetState(const DataModel::Nullabl
         }
     }
 
-    mState.mOverallTargetState = overallTarget;
-    NotifyAttributeChanged(Attributes::OverallTargetState::Id);
+    SetAttributeValue(mState.mOverallTargetState, overallTarget, Attributes::OverallTargetState::Id);
 
     return CHIP_NO_ERROR;
 }
@@ -442,8 +438,7 @@ CHIP_ERROR ClosureControlCluster::SetLatchControlModes(const BitFlags<LatchContr
 
     VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    mState.mLatchControlModes = latchControlModes;
-    NotifyAttributeChanged(Attributes::LatchControlModes::Id);
+    SetAttributeValue(mState.mLatchControlModes, latchControlModes, Attributes::LatchControlModes::Id);
 
     return CHIP_NO_ERROR;
 }
@@ -477,8 +472,7 @@ void ClosureControlCluster::ClearCurrentErrorList()
         mState.mCurrentErrorList[i] = ClosureErrorEnum::kUnknownEnumValue;
     }
     // Reset the current error count to 0
-    mState.mCurrentErrorCount = 0;
-    NotifyAttributeChanged(Attributes::CurrentErrorList::Id);
+    SetAttributeValue(mState.mCurrentErrorCount, size_t(0), Attributes::CurrentErrorList::Id);
 }
 
 // TODO: Move the CountdownTime handling to Delegate

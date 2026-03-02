@@ -26,91 +26,16 @@
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/TimerDelegateMock.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <system/SystemClock.h>
-#include <system/SystemTimer.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::ClosureControl;
 using namespace chip::app::Clusters;
-using namespace chip::System::Clock::Literals;
 using namespace chip::Testing;
 
 using Status = chip::Protocols::InteractionModel::Status;
-
-namespace chip {
-namespace System {
-
-// TODO: This might be worthwhile to generalize and put into the system layer, but it too will need unit tests.
-// This was taken from the Valve control cluster rework - what we do there should be done here as well.
-class TimerAndMockClock : public Clock::Internal::MockClock, public Layer
-{
-public:
-    // System Layer overrides
-    CriticalFailure Init() override { return CHIP_NO_ERROR; }
-    void Shutdown() override { Clear(); }
-    void Clear()
-    {
-        mTimerList.Clear();
-        mTimerNodes.ReleaseAll();
-    }
-    bool IsInitialized() const override { return true; }
-
-    CriticalFailure StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) override
-    {
-        Clock::Timestamp awakenTime = GetMonotonicMilliseconds64() + std::chrono::duration_cast<Clock::Milliseconds64>(aDelay);
-        TimerList::Node * node      = mTimerNodes.Create(*this, awakenTime, aComplete, aAppState);
-        mTimerList.Add(node);
-        return CHIP_NO_ERROR;
-    }
-    void CancelTimer(TimerCompleteCallback aComplete, void * aAppState) override
-    {
-        TimerList::Node * cancelled = mTimerList.Remove(aComplete, aAppState);
-        if (cancelled != nullptr)
-        {
-            mTimerNodes.Release(cancelled);
-        }
-    }
-    CHIP_ERROR ExtendTimerTo(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) override
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-    bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) override
-    {
-        return mTimerList.GetRemainingTime(onComplete, appState) != Clock::Timeout(0);
-    }
-    Clock::Timeout GetRemainingTime(TimerCompleteCallback onComplete, void * appState) override
-    {
-        return mTimerList.GetRemainingTime(onComplete, appState);
-    }
-    CriticalFailure ScheduleWork(TimerCompleteCallback aComplete, void * aAppState) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    // Clock overrides
-    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
-    void SetMonotonic(Clock::Milliseconds64 timestamp)
-    {
-        MockClock::SetMonotonic(timestamp);
-        // Find all the timers that fired at this time or before and invoke the callbacks
-        TimerList::Node * node;
-        while ((node = mTimerList.Earliest()) != nullptr && node->AwakenTime() <= timestamp)
-        {
-            mTimerList.PopEarliest();
-            // Invoke auto-releases
-            mTimerNodes.Invoke(node);
-        }
-    }
-
-    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
-    void AdvanceMonotonic(Clock::Milliseconds64 increment) { SetMonotonic(GetMonotonicMilliseconds64() + increment); }
-
-private:
-    TimerPool<> mTimerNodes;
-    TimerList mTimerList;
-};
-
-} // namespace System
-} // namespace chip
 
 // Mock callback functions
 __attribute__((unused)) void
@@ -121,9 +46,7 @@ MatterClosureControlClusterServerAttributeChangedCallback(const chip::app::Concr
 
 namespace {
 
-// These are globals because SetUpTestSuite is static which requires static variables
-System::TimerAndMockClock gSystemLayerAndClock = System::TimerAndMockClock();
-System::Clock::ClockBase * gSavedClock         = nullptr;
+TimerDelegateMock mockTimerDelegate;
 
 // Simple mock implementation of DelegateBase
 class MockDelegate : public ClosureControlClusterDelegate
@@ -176,32 +99,25 @@ public:
 class MockClusterConformance : public ClusterConformance
 {
 public:
-    MockClusterConformance() { FeatureMap().Set(Feature::kPositioning); }
+    MockClusterConformance()
+    {
+        // We need at least one feature to be supported from Positioning or MotionLatching (O.a+)
+        // So, we set the Positioning feature by default.
+        FeatureMap().Set(Feature::kPositioning);
+    }
 };
 
 class TestClosureControlCluster : public ::testing::Test
 {
 public:
     TestClosureControlCluster() :
-        mCluster(kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockConformance, initParams }),
+        mCluster(kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, mockConformance, initParams }),
         mClusterTester(mCluster)
     {}
 
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
-        gSavedClock = &System::SystemClock();
-        System::Clock::Internal::SetSystemClockForTesting(&gSystemLayerAndClock);
-        DeviceLayer::SetSystemLayerForTesting(&gSystemLayerAndClock);
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
 
-    static void TearDownTestSuite()
-    {
-        gSystemLayerAndClock.Shutdown();
-        DeviceLayer::SetSystemLayerForTesting(nullptr);
-        System::Clock::Internal::SetSystemClockForTesting(gSavedClock);
-        Platform::MemoryShutdown();
-    }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
     void SetUp() override {}
 
@@ -237,13 +153,14 @@ TEST_F(TestClosureControlCluster, TestAttributesList)
 
     MockClusterConformance testConformance;
     testConformance.OptionalAttributes().Set<Attributes::CountdownTime::Id>();
-    ClosureControlCluster testCluster(kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, testConformance, initParams });
+    ClosureControlCluster testCluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, testConformance, initParams });
     expectedAttributes.push_back(ClosureControl::Attributes::CountdownTime::kMetadataEntry);
     EXPECT_TRUE(IsAttributesListEqualTo(testCluster, expectedAttributes));
 
     testConformance.FeatureMap().Set(Feature::kMotionLatching);
-    ClosureControlCluster motionLatchingCluster(kTestEndpointId,
-                                                ClosureControlCluster::Context{ mockDelegate, testConformance, initParams });
+    ClosureControlCluster motionLatchingCluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, testConformance, initParams });
     expectedAttributes.push_back(ClosureControl::Attributes::LatchControlModes::kMetadataEntry);
     EXPECT_TRUE(IsAttributesListEqualTo(motionLatchingCluster, expectedAttributes));
 }
@@ -275,8 +192,8 @@ TEST_F(TestClosureControlCluster, TestCalibrationFeatureMapAndAcceptedCommands)
 {
     MockClusterConformance calibrateConformance;
     calibrateConformance.FeatureMap().Set(Feature::kCalibration);
-    ClosureControlCluster calibrateCluster(kTestEndpointId,
-                                           ClosureControlCluster::Context{ mockDelegate, calibrateConformance, initParams });
+    ClosureControlCluster calibrateCluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, calibrateConformance, initParams });
     ClusterTester tester(calibrateCluster);
     BitFlags<Feature> featureMap;
     EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
@@ -295,7 +212,7 @@ TEST_F(TestClosureControlCluster, TestInstantaneousFeatureMapAndAcceptedCommands
     MockClusterConformance instantaneousConformance;
     instantaneousConformance.FeatureMap().Set(Feature::kInstantaneous);
     ClosureControlCluster instantaneousCluster(
-        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, instantaneousConformance, initParams });
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, instantaneousConformance, initParams });
     ClusterTester tester(instantaneousCluster);
     BitFlags<Feature> featureMap;
     EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
@@ -310,18 +227,22 @@ TEST_F(TestClosureControlCluster, TestInstantaneousFeatureMapAndAcceptedCommands
 TEST_F(TestClosureControlCluster, TestMainState)
 {
     MockClusterConformance stateConformance;
-    ClosureControlCluster cluster(kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, stateConformance, initParams });
+    ClosureControlCluster cluster(kTestEndpointId,
+                                  ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, stateConformance, initParams });
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kCalibrating), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kProtected), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kDisengaged), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     stateConformance.FeatureMap().Set(Feature::kCalibration).Set(Feature::kProtection).Set(Feature::kManuallyOperable);
-    ClosureControlCluster featureCluster(kTestEndpointId,
-                                         ClosureControlCluster::Context{ mockDelegate, stateConformance, initParams });
+    ClosureControlCluster featureCluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, stateConformance, initParams });
     EXPECT_EQ(featureCluster.SetMainState(MainStateEnum::kCalibrating), CHIP_NO_ERROR);
+    EXPECT_EQ(featureCluster.GetMainState(), MainStateEnum::kCalibrating);
     EXPECT_EQ(featureCluster.SetMainState(MainStateEnum::kProtected), CHIP_NO_ERROR);
+    EXPECT_EQ(featureCluster.GetMainState(), MainStateEnum::kProtected);
     EXPECT_EQ(featureCluster.SetMainState(MainStateEnum::kDisengaged), CHIP_NO_ERROR);
+    EXPECT_EQ(featureCluster.GetMainState(), MainStateEnum::kDisengaged);
 }
 
 TEST_F(TestClosureControlCluster, TestSetMainStateUpdatesCountdownTime)
@@ -331,7 +252,8 @@ TEST_F(TestClosureControlCluster, TestSetMainStateUpdatesCountdownTime)
     mockDelegate.calibrationCountdownTime      = 33;
     mockDelegate.movingCountdownTime           = 22;
     mockDelegate.waitingForMotionCountdownTime = 11;
-    ClosureControlCluster cluster(kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, testConformance, initParams });
+    ClosureControlCluster cluster(kTestEndpointId,
+                                  ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, testConformance, initParams });
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kMoving), CHIP_NO_ERROR);
     DataModel::Nullable<ElapsedS> countdownTime = cluster.GetCountdownTime();
@@ -354,19 +276,19 @@ TEST_F(TestClosureControlCluster, TestSetMainStateUpdatesCountdownTime)
     EXPECT_EQ(countdownTime.Value(), 0u);
 }
 
-TEST_F(TestClosureControlCluster, TestSetCountdownTimeFromDelegate)
+TEST_F(TestClosureControlCluster, TestSetCountdownTimeFromDelegateUnsupportedFeatures)
 {
     MockClusterConformance motionOnlyConformance;
     motionOnlyConformance.FeatureMap().ClearAll().Set(Feature::kMotionLatching);
-    ClosureControlCluster motionOnlyCluster(kTestEndpointId,
-                                            ClosureControlCluster::Context{ mockDelegate, motionOnlyConformance, initParams });
+    ClosureControlCluster motionOnlyCluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, motionOnlyConformance, initParams });
     EXPECT_EQ(motionOnlyCluster.SetCountdownTimeFromDelegate(DataModel::MakeNullable<ElapsedS>(5)),
               CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     MockClusterConformance instantaneousConformance;
     instantaneousConformance.FeatureMap().Set(Feature::kInstantaneous);
     ClosureControlCluster instantaneousCluster(
-        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, instantaneousConformance, initParams });
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, instantaneousConformance, initParams });
     EXPECT_EQ(instantaneousCluster.SetCountdownTimeFromDelegate(DataModel::MakeNullable<ElapsedS>(5)),
               CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 }
@@ -374,8 +296,8 @@ TEST_F(TestClosureControlCluster, TestSetCountdownTimeFromDelegate)
 TEST_F(TestClosureControlCluster, TestSetCountdownTimeFromDelegateAndRead)
 {
     MockClusterConformance positioningConformance;
-    ClosureControlCluster cluster(kTestEndpointId,
-                                  ClosureControlCluster::Context{ mockDelegate, positioningConformance, initParams });
+    ClosureControlCluster cluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
 
     EXPECT_EQ(cluster.SetCountdownTimeFromDelegate(DataModel::MakeNullable<ElapsedS>(1)), CHIP_NO_ERROR);
     DataModel::Nullable<ElapsedS> countdownTime = cluster.GetCountdownTime();
@@ -391,8 +313,8 @@ TEST_F(TestClosureControlCluster, TestSetCountdownTimeFromDelegateAndRead)
 TEST_F(TestClosureControlCluster, TestSetOverallCurrentStateFeatureValidation)
 {
     MockClusterConformance positioningConformance;
-    ClosureControlCluster cluster(kTestEndpointId,
-                                  ClosureControlCluster::Context{ mockDelegate, positioningConformance, initParams });
+    ClosureControlCluster cluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
 
     DataModel::Nullable<GenericOverallCurrentState> validState(GenericOverallCurrentState(
         Optional(DataModel::MakeNullable(CurrentPositionEnum::kFullyOpened)), NullOptional, NullOptional));
@@ -412,8 +334,8 @@ TEST_F(TestClosureControlCluster, TestSetOverallCurrentStateFeatureValidation)
 TEST_F(TestClosureControlCluster, TestSetOverallCurrentStateSecureStateValidation)
 {
     MockClusterConformance positioningConformance;
-    ClosureControlCluster cluster(kTestEndpointId,
-                                  ClosureControlCluster::Context{ mockDelegate, positioningConformance, initParams });
+    ClosureControlCluster cluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
 
     DataModel::Nullable<GenericOverallCurrentState> invalidSecureState(
         GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), NullOptional,
@@ -429,14 +351,14 @@ TEST_F(TestClosureControlCluster, TestSetOverallCurrentStateSecureStateValidatio
 TEST_F(TestClosureControlCluster, TestHandleCalibrate)
 {
     MockClusterConformance positioningConformance;
-    ClosureControlCluster positioningCluster(kTestEndpointId,
-                                             ClosureControlCluster::Context{ mockDelegate, positioningConformance, initParams });
+    ClosureControlCluster positioningCluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
     EXPECT_EQ(positioningCluster.HandleCalibrate(), Status::UnsupportedCommand);
 
     MockClusterConformance calibratingConformance;
     calibratingConformance.FeatureMap().Set(Feature::kCalibration);
-    ClosureControlCluster cluster(kTestEndpointId,
-                                  ClosureControlCluster::Context{ mockDelegate, calibratingConformance, initParams });
+    ClosureControlCluster cluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, calibratingConformance, initParams });
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kMoving), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.HandleCalibrate(), Status::InvalidInState);
 
@@ -453,7 +375,8 @@ TEST_F(TestClosureControlCluster, TestHandleCalibrateDelegateFailure)
     MockClusterConformance testConformance;
     testConformance.FeatureMap().Set(Feature::kCalibration);
     mockDelegate.calibrateCommandStatus = Status::Busy;
-    ClosureControlCluster cluster(kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, testConformance, initParams });
+    ClosureControlCluster cluster(kTestEndpointId,
+                                  ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, testConformance, initParams });
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kStopped), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.HandleCalibrate(), Status::Busy);
@@ -464,7 +387,8 @@ TEST_F(TestClosureControlCluster, TestHandleStop)
 {
     MockClusterConformance testConformance;
     testConformance.FeatureMap().Set(Feature::kCalibration);
-    ClosureControlCluster cluster(kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, testConformance, initParams });
+    ClosureControlCluster cluster(kTestEndpointId,
+                                  ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, testConformance, initParams });
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kMoving), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.HandleStop(), Status::Success);
@@ -483,13 +407,13 @@ TEST_F(TestClosureControlCluster, TestHandleStopFeatureAndDelegateFailure)
     MockClusterConformance instantaneousConformance;
     instantaneousConformance.FeatureMap().Set(Feature::kInstantaneous);
     ClosureControlCluster instantaneousCluster(
-        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, instantaneousConformance, initParams });
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, instantaneousConformance, initParams });
     EXPECT_EQ(instantaneousCluster.HandleStop(), Status::UnsupportedCommand);
 
     MockClusterConformance positioningConformance;
     mockDelegate.stopCommandStatus = Status::Busy;
-    ClosureControlCluster busyCluster(kTestEndpointId,
-                                      ClosureControlCluster::Context{ mockDelegate, positioningConformance, initParams });
+    ClosureControlCluster busyCluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
     EXPECT_EQ(busyCluster.SetMainState(MainStateEnum::kMoving), CHIP_NO_ERROR);
     EXPECT_EQ(busyCluster.HandleStop(), Status::Busy);
     EXPECT_EQ(mockDelegate.stopCommandCalls, 1);
@@ -498,8 +422,8 @@ TEST_F(TestClosureControlCluster, TestHandleStopFeatureAndDelegateFailure)
 TEST_F(TestClosureControlCluster, TestHandleMoveToNoArgumentsAndInvalidState)
 {
     MockClusterConformance positioningConformance;
-    ClosureControlCluster cluster(kTestEndpointId,
-                                  ClosureControlCluster::Context{ mockDelegate, positioningConformance, initParams });
+    ClosureControlCluster cluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
     EXPECT_EQ(cluster.SetOverallCurrentState(PositioningState(CurrentPositionEnum::kPartiallyOpened)), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.HandleMoveTo(NullOptional, NullOptional, NullOptional), Status::InvalidCommand);
@@ -513,7 +437,8 @@ TEST_F(TestClosureControlCluster, TestHandleMoveToAllFeatures)
 {
     MockClusterConformance testConformance;
     testConformance.FeatureMap().Set(Feature::kMotionLatching).Set(Feature::kSpeed);
-    ClosureControlCluster cluster(kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, testConformance, initParams });
+    ClosureControlCluster cluster(kTestEndpointId,
+                                  ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, testConformance, initParams });
     EXPECT_EQ(cluster.SetLatchControlModes(BitFlags<LatchControlModesBitmap>()
                                                .Set(LatchControlModesBitmap::kRemoteLatching)
                                                .Set(LatchControlModesBitmap::kRemoteUnlatching)),
@@ -540,8 +465,8 @@ TEST_F(TestClosureControlCluster, TestHandleMoveToTransitionsToWaitingWhenNotRea
 {
     MockClusterConformance positioningConformance;
     mockDelegate.isReadyToMove = false;
-    ClosureControlCluster cluster(kTestEndpointId,
-                                  ClosureControlCluster::Context{ mockDelegate, positioningConformance, initParams });
+    ClosureControlCluster cluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
     EXPECT_EQ(cluster.SetOverallCurrentState(PositioningState(CurrentPositionEnum::kPartiallyOpened)), CHIP_NO_ERROR);
 
     EXPECT_EQ(cluster.HandleMoveTo(Optional(TargetPositionEnum::kMoveToFullyOpen), NullOptional, NullOptional), Status::Success);
@@ -553,7 +478,8 @@ TEST_F(TestClosureControlCluster, TestHandleMoveToLatchedPositionChangeRequiresU
 {
     MockClusterConformance testConformance;
     testConformance.FeatureMap().Set(Feature::kMotionLatching);
-    ClosureControlCluster cluster(kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, testConformance, initParams });
+    ClosureControlCluster cluster(kTestEndpointId,
+                                  ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, testConformance, initParams });
     EXPECT_EQ(cluster.SetLatchControlModes(BitFlags<LatchControlModesBitmap>()
                                                .Set(LatchControlModesBitmap::kRemoteLatching)
                                                .Set(LatchControlModesBitmap::kRemoteUnlatching)),
@@ -571,7 +497,8 @@ TEST_F(TestClosureControlCluster, TestHandleMoveToRemoteLatchingConformanceCheck
 {
     MockClusterConformance testConformance;
     testConformance.FeatureMap().Set(Feature::kMotionLatching);
-    ClosureControlCluster cluster(kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, testConformance, initParams });
+    ClosureControlCluster cluster(kTestEndpointId,
+                                  ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, testConformance, initParams });
     EXPECT_EQ(cluster.SetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState>(
                   GenericOverallCurrentState(NullOptional, Optional(DataModel::MakeNullable(true)), NullOptional))),
               CHIP_NO_ERROR);
@@ -590,8 +517,8 @@ TEST_F(TestClosureControlCluster, TestHandleMoveToDelegateFailure)
     MockClusterConformance positioningConformance;
     positioningConformance.FeatureMap().Set(Feature::kPositioning);
     mockDelegate.moveToCommandStatus = Status::Busy;
-    ClosureControlCluster cluster(kTestEndpointId,
-                                  ClosureControlCluster::Context{ mockDelegate, positioningConformance, initParams });
+    ClosureControlCluster cluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
     EXPECT_EQ(cluster.SetOverallCurrentState(PositioningState(CurrentPositionEnum::kPartiallyOpened)), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.HandleMoveTo(Optional(TargetPositionEnum::kMoveToFullyOpen), NullOptional, NullOptional), Status::Busy);
 }
@@ -600,7 +527,8 @@ TEST_F(TestClosureControlCluster, TestHandleMoveToConstraintValidation)
 {
     MockClusterConformance testConformance;
     testConformance.FeatureMap().Set(Feature::kMotionLatching).Set(Feature::kSpeed);
-    ClosureControlCluster cluster(kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, testConformance, initParams });
+    ClosureControlCluster cluster(kTestEndpointId,
+                                  ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, testConformance, initParams });
     EXPECT_EQ(cluster.SetOverallCurrentState(
                   LatchedState(CurrentPositionEnum::kPartiallyOpened, false, Optional(Globals::ThreeLevelAutoEnum::kLow))),
               CHIP_NO_ERROR);
@@ -615,8 +543,8 @@ TEST_F(TestClosureControlCluster, TestErrorListLifecycle)
 {
     MockClusterConformance positioningConformance;
     positioningConformance.FeatureMap().Set(Feature::kPositioning);
-    ClosureControlCluster cluster(kTestEndpointId,
-                                  ClosureControlCluster::Context{ mockDelegate, positioningConformance, initParams });
+    ClosureControlCluster cluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
 
     ClosureErrorEnum list[kCurrentErrorListMaxSize] = {};
     Span<ClosureErrorEnum> errorSpan(list);
@@ -638,13 +566,24 @@ TEST_F(TestClosureControlCluster, TestErrorListLifecycle)
     errorSpan = Span<ClosureErrorEnum>(list);
     EXPECT_EQ(cluster.GetCurrentErrorList(errorSpan), CHIP_NO_ERROR);
     EXPECT_TRUE(errorSpan.empty());
+
+    // Event generation errors are expected hence only logging the errors
+    LogErrorOnFailure(cluster.AddErrorToCurrentErrorList(ClosureErrorEnum::kPhysicallyBlocked));
+    LogErrorOnFailure(cluster.AddErrorToCurrentErrorList(ClosureErrorEnum::kTemperatureLimited));
+    LogErrorOnFailure(cluster.AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor));
+    errorSpan = Span<ClosureErrorEnum>(list);
+    EXPECT_EQ(cluster.GetCurrentErrorList(errorSpan), CHIP_NO_ERROR);
+    EXPECT_EQ(errorSpan.size(), 3u);
+    EXPECT_EQ(errorSpan[0], ClosureErrorEnum::kPhysicallyBlocked);
+    EXPECT_EQ(errorSpan[1], ClosureErrorEnum::kTemperatureLimited);
+    EXPECT_EQ(errorSpan[2], ClosureErrorEnum::kBlockedBySensor);
 }
 
 TEST_F(TestClosureControlCluster, TestErrorListBufferSizeValidation)
 {
     MockClusterConformance positioningConformance;
-    ClosureControlCluster cluster(kTestEndpointId,
-                                  ClosureControlCluster::Context{ mockDelegate, positioningConformance, initParams });
+    ClosureControlCluster cluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
     EXPECT_NE(cluster.AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED);
 
     ClosureErrorEnum shortList[1] = {};
@@ -655,8 +594,8 @@ TEST_F(TestClosureControlCluster, TestErrorListBufferSizeValidation)
 TEST_F(TestClosureControlCluster, TestErrorListInvalidUnknownValue)
 {
     MockClusterConformance positioningConformance;
-    ClosureControlCluster cluster(kTestEndpointId,
-                                  ClosureControlCluster::Context{ mockDelegate, positioningConformance, initParams });
+    ClosureControlCluster cluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
 
     EXPECT_EQ(cluster.AddErrorToCurrentErrorList(ClosureErrorEnum::kUnknownEnumValue), CHIP_ERROR_INVALID_ARGUMENT);
 }
@@ -664,8 +603,8 @@ TEST_F(TestClosureControlCluster, TestErrorListInvalidUnknownValue)
 TEST_F(TestClosureControlCluster, TestLatchControlModesFeatureValidation)
 {
     MockClusterConformance positioningConformance;
-    ClosureControlCluster positioningCluster(kTestEndpointId,
-                                             ClosureControlCluster::Context{ mockDelegate, positioningConformance, initParams });
+    ClosureControlCluster positioningCluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
 
     EXPECT_EQ(
         positioningCluster.SetLatchControlModes(BitFlags<LatchControlModesBitmap>().Set(LatchControlModesBitmap::kRemoteLatching)),
@@ -675,24 +614,41 @@ TEST_F(TestClosureControlCluster, TestLatchControlModesFeatureValidation)
 
     MockClusterConformance latchConformance;
     latchConformance.FeatureMap().Set(Feature::kMotionLatching);
-    ClosureControlCluster latchCluster(kTestEndpointId,
-                                       ClosureControlCluster::Context{ mockDelegate, latchConformance, initParams });
+    ClosureControlCluster latchCluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, latchConformance, initParams });
     BitFlags<LatchControlModesBitmap> configuredModes = latchCluster.GetLatchControlModes();
     configuredModes.Set(LatchControlModesBitmap::kRemoteLatching).Set(LatchControlModesBitmap::kRemoteUnlatching);
     EXPECT_EQ(latchCluster.SetLatchControlModes(configuredModes), CHIP_NO_ERROR);
     EXPECT_EQ(latchCluster.GetLatchControlModes(), configuredModes);
 }
 
+// Testing only feature validation.
+// Event generation failure is expected.
 TEST_F(TestClosureControlCluster, TestGenerateMovementCompletedEvent)
 {
     MockClusterConformance positioningConformance;
-    ClosureControlCluster positioningCluster(kTestEndpointId,
-                                             ClosureControlCluster::Context{ mockDelegate, positioningConformance, initParams });
+    ClosureControlCluster positioningCluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
     EXPECT_NE(positioningCluster.GenerateMovementCompletedEvent(), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     MockClusterConformance instantaneousConformance;
     instantaneousConformance.FeatureMap().Set(Feature::kInstantaneous);
     ClosureControlCluster instantaneousCluster(
-        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, instantaneousConformance, initParams });
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, instantaneousConformance, initParams });
     EXPECT_EQ(instantaneousCluster.GenerateMovementCompletedEvent(), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+}
+
+TEST_F(TestClosureControlCluster, TestGenerateEngageStateChangedEvent)
+{
+    MockClusterConformance positioningConformance;
+    ClosureControlCluster positioningCluster(
+        kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
+    EXPECT_EQ(positioningCluster.GenerateEngageStateChangedEvent(true), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+    MockClusterConformance manuallyOperableConformance;
+    manuallyOperableConformance.FeatureMap().Set(Feature::kManuallyOperable);
+    ClosureControlCluster manuallyOperableCluster(
+        kTestEndpointId,
+        ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, manuallyOperableConformance, initParams });
+    EXPECT_NE(manuallyOperableCluster.GenerateEngageStateChangedEvent(true), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 }

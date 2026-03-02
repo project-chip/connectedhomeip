@@ -31,6 +31,7 @@
 #include <app/clusters/closure-control-server/ClosureControlClusterObjects.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/TimerDelegate.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -151,6 +152,7 @@ public:
     struct Context
     {
         ClosureControlClusterDelegate & delegate;
+        TimerDelegate & timerDelegate;
         const ClusterConformance & conformance;
         const ClusterInitParameters & initParams;
     };
@@ -192,7 +194,6 @@ public:
      * @param[out] outputSpan The span to fill with the current error list.
      *
      * @return CHIP_NO_ERROR if the retrieval was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *         CHIP_ERROR_BUFFER_TOO_SMALL if the outputSpan size is not equal to kCurrentErrorListMaxSize.
      */
     CHIP_ERROR GetCurrentErrorList(Span<ClosureErrorEnum> & outputSpan);
@@ -203,7 +204,6 @@ public:
      * @param[in] overallCurrentState SetOverallCurrentState Position, Latch and Speed.
      *
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
@@ -215,7 +215,6 @@ public:
      * @param[in] overallTarget OverallTargetState Position, Latch and Speed.
      *
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
@@ -229,7 +228,6 @@ public:
      * @param[in] mainState - The new main state to be set.
      *
      * @return CHIP_NO_ERROR if the main state is set successfully.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if new MainState is not supported.
      *         CHIP_ERROR_INCORRECT_STATE if the transition to new MainState is not supported.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
@@ -266,7 +264,6 @@ public:
      * @param[in] error The error to be added to the current error list.
      *
      * @return CHIP_NO_ERROR if the error was added successfully.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
     CHIP_ERROR AddErrorToCurrentErrorList(ClosureErrorEnum error);
@@ -280,8 +277,7 @@ public:
     /**
      *  @brief Calls delegate HandleStopCommand function after validating MainState, parameters and conformance.
      *
-     *  @return Exits if the cluster is not initialized.
-     *          Success if the Stop command not supported from present Mainstate.
+     *  @return Success if the Stop command not supported from present Mainstate.
      *          UnsupportedCommand if Instantaneous feature is supported.
      *          Success on succesful handling or Error Otherwise
      */
@@ -294,8 +290,7 @@ public:
      *  @param [in] latch Target latch
      *  @param [in] speed Target speed
      *
-     *  @return Exits if the cluster is not initialized.
-     *          ConstraintError if the input values are out is out of range.
+     *  @return ConstraintError if the input values are out of range.
      *          InvalidInState if the MoveTo command not supported from present Mainstate.
      *          Success on succesful handling.
      */
@@ -305,8 +300,7 @@ public:
     /**
      *  @brief Calls delegate HandleCalibrateCommand function after validating the parameters and conformance.
      *
-     *  @return Exits if the cluster is not initialized.
-     *          ConstraintError if the input values are out is out of range.
+     *  @return ConstraintError if the input values are out of range.
      *          InvalidInState if the Calibrate command not supported from present Mainstate.
      *          Success on succesful handling.
      */
@@ -360,6 +354,7 @@ public:
 private:
     ClosureControlClusterMatterContext mMatterContext;
     ClosureControlClusterDelegate & mDelegate;
+    TimerDelegate & mTimerDelegate;
     ClusterConformance mConformance;
     ClusterState mState;
 
@@ -432,7 +427,6 @@ private:
      * @param[in] encoder The encoder to use for encoding the CurrentErrorList attribute.
      *
      * @return CHIP_NO_ERROR if the read was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      */
     CHIP_ERROR ReadCurrentErrorListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder);
 };

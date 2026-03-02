@@ -24,6 +24,7 @@
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <platform/DefaultTimerDelegate.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -41,6 +42,7 @@ LazyRegisteredServerCluster<ClosureControlCluster> gServer[kClosureControlMaxClu
 ClosureControlClusterDelegate * gDelegates[kClosureControlMaxClusterCount] = { nullptr };
 ClusterConformance gConformances[kClosureControlMaxClusterCount];
 ClusterInitParameters gInitParams[kClosureControlMaxClusterCount];
+DefaultTimerDelegate gTimerDelegate;
 } // namespace
 
 namespace chip {
@@ -60,16 +62,22 @@ ClosureControlCluster * GetInstance(EndpointId endpointId)
 
 void MatterClosureControlSetDelegate(EndpointId endpointId, ClosureControlClusterDelegate & delegate)
 {
+    VerifyOrReturn(!gServer[endpointId].IsConstructed(),
+                   ChipLogError(Zcl, "Closure Control Cluster already initialized. Cannot set delegate."));
     gDelegates[endpointId] = &delegate;
 }
 
 void MatterClosureControlSetConformance(EndpointId endpointId, const ClusterConformance & conformance)
 {
+    VerifyOrReturn(!gServer[endpointId].IsConstructed(),
+                   ChipLogError(Zcl, "Closure Control Cluster already initialized. Cannot set conformance."));
     gConformances[endpointId] = conformance;
 }
 
 void MatterClosureControlSetInitParams(EndpointId endpointId, const ClusterInitParameters & initParams)
 {
+    VerifyOrReturn(!gServer[endpointId].IsConstructed(),
+                   ChipLogError(Zcl, "Closure Control Cluster already initialized. Cannot set init params."));
     gInitParams[endpointId] = initParams;
 }
 
@@ -94,7 +102,8 @@ void MatterClosureControlClusterInitCallback(EndpointId endpointId)
         return;
     }
 
-    ClosureControlCluster::Context context{ *gDelegates[endpointId], gConformances[endpointId], gInitParams[endpointId] };
+    ClosureControlCluster::Context context{ *gDelegates[endpointId], gTimerDelegate, gConformances[endpointId],
+                                            gInitParams[endpointId] };
     gServer[endpointId].Create(endpointId, context);
     LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(gServer[endpointId].Registration()));
 }

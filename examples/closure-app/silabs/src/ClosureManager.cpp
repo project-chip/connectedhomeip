@@ -761,8 +761,10 @@ void ClosureManager::HandleClosureMotionAction()
         return;
     }
 
-    DataModel::Nullable<GenericOverallCurrentState> mClosureEndpoint1CurrentState = mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
-    DataModel::Nullable<GenericOverallTargetState> mClosureEndpoint1TargetState = mClosureEndpoint1.GetClusterInstance().GetOverallTargetState();
+    DataModel::Nullable<GenericOverallCurrentState> mClosureEndpoint1CurrentState =
+        mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
+    DataModel::Nullable<GenericOverallTargetState> mClosureEndpoint1TargetState =
+        mClosureEndpoint1.GetClusterInstance().GetOverallTargetState();
 
     VerifyOrReturn(!mClosureEndpoint1CurrentState.IsNull(),
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 1"));
@@ -837,7 +839,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
     }
 
     // Update OverallTarget of Closure based on SetTarget command.
-    DataModel::Nullable<GenericOverallTargetState> overallTargetState = mClosureEndpoint1.GetClusterInstance().GetOverallTargetState();
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState =
+        mClosureEndpoint1.GetClusterInstance().GetOverallTargetState();
     if (overallTargetState.IsNull())
     {
         overallTargetState.SetNonNull(GenericOverallTargetState{});
@@ -956,7 +959,8 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
     {
         if (!panelCurrentState.Value().latch.Value().Value() && panelTargetState.Value().latch.Value().Value())
         {
-            DataModel::Nullable<GenericOverallCurrentState> mClosureEndpoint1OverallCurrentState = mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
+            DataModel::Nullable<GenericOverallCurrentState> mClosureEndpoint1OverallCurrentState =
+                mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
             VerifyOrReturn(!mClosureEndpoint1OverallCurrentState.IsNull(),
                            ChipLogError(AppServer, "Overall current state is not set for Endpoint 1"));
 
@@ -981,8 +985,10 @@ void ClosureManager::HandleClosureUnlatchAction()
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    DataModel::Nullable<GenericOverallCurrentState> mClosureEndpoint1CurrentState = mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
-    DataModel::Nullable<GenericOverallTargetState> mClosureEndpoint1TargetState = mClosureEndpoint1.GetClusterInstance().GetOverallTargetState();
+    DataModel::Nullable<GenericOverallCurrentState> mClosureEndpoint1CurrentState =
+        mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
+    DataModel::Nullable<GenericOverallTargetState> mClosureEndpoint1TargetState =
+        mClosureEndpoint1.GetClusterInstance().GetOverallTargetState();
     DataModel::Nullable<GenericDimensionStateStruct> mClosurePanelEndpoint2CurrentState;
     DataModel::Nullable<GenericDimensionStateStruct> mClosurePanelEndpoint3CurrentState;
 
@@ -1063,7 +1069,8 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
         panelTargetState.Value().latch.HasValue() && !panelTargetState.Value().latch.Value().IsNull() &&
         (panelCurrentState.Value().latch.Value().Value() && !panelTargetState.Value().latch.Value().Value()))
     {
-        DataModel::Nullable<GenericOverallCurrentState> mClosureEndpoint1OverallCurrentState = mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
+        DataModel::Nullable<GenericOverallCurrentState> mClosureEndpoint1OverallCurrentState =
+            mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
         VerifyOrReturn(!mClosureEndpoint1OverallCurrentState.IsNull(),
                        ChipLogError(AppServer, "Current state is not set for Endpoint 1"));
 
@@ -1116,7 +1123,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
                         ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
 
     // Update Overall Target to Null for the Closure Control on Endpoint 1
-    DataModel::Nullable<GenericOverallTargetState> mClosureEndpoint1Target = mClosureEndpoint1.GetClusterInstance().GetOverallTargetState();
+    DataModel::Nullable<GenericOverallTargetState> mClosureEndpoint1Target =
+        mClosureEndpoint1.GetClusterInstance().GetOverallTargetState();
 
     if (mClosureEndpoint1Target.IsNull())
     {
@@ -1276,7 +1284,7 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
 ClosureUIData ClosureManager::GetClosureUIData()
 {
     ClosureUIData uiData;
-    uiData.mainState = mClosureEndpoint1.GetClusterInstance().GetMainState();
+    uiData.mainState           = mClosureEndpoint1.GetClusterInstance().GetMainState();
     uiData.overallCurrentState = mClosureEndpoint1.GetClusterInstance().GetOverallCurrentState();
     return uiData;
 }
