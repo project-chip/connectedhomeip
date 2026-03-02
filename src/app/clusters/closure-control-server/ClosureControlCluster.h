@@ -27,7 +27,6 @@
 
 #include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
-#include <app/clusters/closure-control-server/ClosureControlClusterMatterContext.h>
 #include <app/clusters/closure-control-server/ClosureControlClusterObjects.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
@@ -352,7 +351,6 @@ public:
     CHIP_ERROR GenerateSecureStateChangedEvent(const bool secureValue);
 
 private:
-    ClosureControlClusterMatterContext mMatterContext;
     ClosureControlClusterDelegate & mDelegate;
     TimerDelegate & mTimerDelegate;
     ClusterConformance mConformance;
@@ -429,6 +427,8 @@ private:
      * @return CHIP_NO_ERROR if the read was successful.
      */
     CHIP_ERROR ReadCurrentErrorListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder);
+
+    EndpointId GetEndpointId() { return mPath.mEndpointId; }
 };
 
 } // namespace ClosureControl
