@@ -175,14 +175,9 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
                 }
                 else
                 {
-                    DataModel::Nullable<ClosureControl::GenericOverallCurrentState> currentState;
-                    CHIP_ERROR err = ClosureManager::GetInstance().GetClosureControlCluster().GetOverallCurrentState(currentState);
+                    DataModel::Nullable<ClosureControl::GenericOverallCurrentState> currentState =
+                        ClosureManager::GetInstance().GetClosureControlCluster().GetOverallCurrentState();
 
-                    if (err != CHIP_NO_ERROR)
-                    {
-                        ChipLogError(AppServer, "Failed to get current closure state: %s", chip::ErrorStr(err));
-                        return;
-                    }
                     if (currentState.IsNull())
                     {
                         ChipLogError(AppServer, "Failed to get current closure state: currentState is null");
