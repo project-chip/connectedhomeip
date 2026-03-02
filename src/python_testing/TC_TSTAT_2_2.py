@@ -112,7 +112,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
                                    occupancy: Clusters.Thermostat.Bitmaps.OccupancyBitmap,
                                    endpoint: Optional[int] = None) -> None:
 
-        event_data = events_callback.wait_for_event_type_report(cluster.Events.SetpointChange)
+        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+        event_data = events_callback.wait_for_event_type_report(cluster.Events.SetpointChange, timeout_sec=timeout)
 
         asserts.assert_equal(system_mode, event_data.systemMode)
         asserts.assert_equal(occupancy, event_data.occupancy)
