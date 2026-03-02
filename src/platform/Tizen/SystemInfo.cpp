@@ -44,14 +44,13 @@ CHIP_ERROR SystemInfo::GetPlatformVersion(PlatformVersion & version)
     }
 
     ret = system_info_get_platform_string("http://tizen.org/feature/platform.version", &platformVersion);
-    if (ret != SYSTEM_INFO_ERROR_NONE)
-    {
-        ChipLogError(DeviceLayer, "system_info_get_platform_string() failed: %s", get_error_message(ret));
-        return MATTER_PLATFORM_ERROR(ret);
-    }
+    VerifyOrReturnError(ret == SYSTEM_INFO_ERROR_NONE, MATTER_PLATFORM_ERROR(ret));
 
-    sscanf(platformVersion, "%hhu.%hhu", &sInstance.mMajor, &sInstance.mMinor);
+    ret = sscanf(platformVersion, "%hhu.%hhu", &sInstance.mMajor, &sInstance.mMinor);
     free(platformVersion);
+
+    // Make sure we got both major and minor version numbers.
+    VerifyOrReturnError(ret == 2, CHIP_ERROR_INVALID_ARGUMENT);
 
     version.mMajor = sInstance.mMajor;
     version.mMinor = sInstance.mMinor;
