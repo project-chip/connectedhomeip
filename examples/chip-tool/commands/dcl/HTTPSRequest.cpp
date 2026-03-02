@@ -24,7 +24,7 @@
 
 #include <lib/support/Base64.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemError.h>
 
@@ -106,6 +106,7 @@ public:
         hints.ai_family                             = AF_INET;
         hints.ai_socktype                           = SOCK_STREAM;
         int err                                     = getaddrinfo(hostname.c_str(), std::to_string(port).c_str(), &hints, &mRes);
+
 #if CHIP_ERROR_LOGGING
         constexpr const char * kErrorGetAddressInfo = "Failed to get address info: ";
         VerifyOrDo(nullptr != mRes, ChipLogError(chipTool, "%s%s", kErrorGetAddressInfo, gai_strerror(err)));
