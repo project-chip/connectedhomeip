@@ -41,6 +41,21 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
 constexpr EndpointId kTestEndpointId = 1;
 
+const Structs::MeasurementAccuracyRangeStruct::Type kTestAccuracyRanges[] = {
+    { .rangeMin   = 0,
+      .rangeMax   = 1'000'000'000'000'000, // 1 million Mwh
+      .percentMax = MakeOptional(static_cast<chip::Percent100ths>(500)),
+      .percentMin = MakeOptional(static_cast<chip::Percent100ths>(50)) }
+};
+
+const Structs::MeasurementAccuracyStruct::Type kTestAccuracy = {
+    .measurementType  = MeasurementTypeEnum::kElectricalEnergy,
+    .measured         = true,
+    .minMeasuredValue = 0,
+    .maxMeasuredValue = 1'000'000'000'000'000,
+    .accuracyRanges   = DataModel::List<const Structs::MeasurementAccuracyRangeStruct::Type>(kTestAccuracyRanges)
+};
+
 struct TestElectricalEnergyMeasurementClusterBackwardsCompatibility : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -95,7 +110,7 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestAttrAcc
     EXPECT_FALSE(minimalAttrAccess.HasFeature(Feature::kExportedEnergy));
     EXPECT_FALSE(minimalAttrAccess.HasFeature(Feature::kCumulativeEnergy));
     EXPECT_FALSE(minimalAttrAccess.HasFeature(Feature::kPeriodicEnergy));
-    minimalAttrAccess.Shutdown(ClusterShutdownType::kClusterShutdown);
+    minimalAttrAccess.Shutdown();
 
     // Test optional attribute checking methods
     EXPECT_TRUE(attrAccess.SupportsOptAttr(OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
@@ -104,10 +119,10 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestAttrAcc
     ElectricalEnergyMeasurementAttrAccess noOptAttrAccess(features, noOptionalAttrs, kTestEndpointId + 2);
     EXPECT_EQ(noOptAttrAccess.Init(), CHIP_NO_ERROR);
     EXPECT_FALSE(noOptAttrAccess.SupportsOptAttr(OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
-    noOptAttrAccess.Shutdown(ClusterShutdownType::kClusterShutdown);
+    noOptAttrAccess.Shutdown();
 
     // Test shutdown
-    attrAccess.Shutdown(ClusterShutdownType::kClusterShutdown);
+    attrAccess.Shutdown();
 
     // Verify cluster is unregistered from the registry
     EXPECT_EQ(FindElectricalEnergyMeasurementClusterOnEndpoint(kTestEndpointId), nullptr);
@@ -130,23 +145,44 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
     // Initialize the cluster with test context for event logging
     EXPECT_EQ(cluster->Startup(mContext.Get()), CHIP_NO_ERROR);
 
-    // Test SetMeasurementAccuracy
+    // Test SetMeasurementAccuracy and verify accuracyRanges survives source data destruction
     {
+        Structs::MeasurementAccuracyRangeStruct::Type testMeasurementAccuracyRanges[] = {
+            { .rangeMin   = 0,
+              .rangeMax   = 1'000'000'000'000'000, // 1 million Mwh
+              .percentMax = MakeOptional(static_cast<chip::Percent100ths>(500)),
+              .percentMin = MakeOptional(static_cast<chip::Percent100ths>(50)) }
+        };
+
         Structs::MeasurementAccuracyStruct::Type accuracy;
         accuracy.measurementType  = MeasurementTypeEnum::kApparentEnergy;
         accuracy.measured         = true;
         accuracy.minMeasuredValue = 0;
         accuracy.maxMeasuredValue = 1000000;
-        accuracy.accuracyRanges   = DataModel::List<Structs::MeasurementAccuracyRangeStruct::Type>();
+        accuracy.accuracyRanges   = DataModel::List<const Structs::MeasurementAccuracyRangeStruct::Type>(
+            testMeasurementAccuracyRanges, MATTER_ARRAY_SIZE(testMeasurementAccuracyRanges));
 
         EXPECT_EQ(SetMeasurementAccuracy(kTestEndpointId, accuracy), CHIP_NO_ERROR);
 
-        // Verify the value was set
-        Structs::MeasurementAccuracyStruct::Type readAccuracy;
-        cluster->GetMeasurementAccuracy(readAccuracy);
-        EXPECT_EQ(readAccuracy.measurementType, MeasurementTypeEnum::kApparentEnergy);
-        EXPECT_TRUE(readAccuracy.measured);
+        // Overwrite source data; if the cluster only holds a Span, reads will return these values instead
+        testMeasurementAccuracyRanges[0].rangeMin   = 999;
+        testMeasurementAccuracyRanges[0].rangeMax   = 999;
+        testMeasurementAccuracyRanges[0].percentMax = MakeOptional(static_cast<chip::Percent100ths>(999));
+        testMeasurementAccuracyRanges[0].percentMin = MakeOptional(static_cast<chip::Percent100ths>(999));
     }
+
+    // Verify the that the MeasurementAccuracyStruct is preserved past the scope of the previous test
+    Structs::MeasurementAccuracyStruct::Type readAccuracy;
+    cluster->GetMeasurementAccuracy(readAccuracy);
+    EXPECT_EQ(readAccuracy.measurementType, MeasurementTypeEnum::kApparentEnergy);
+    EXPECT_TRUE(readAccuracy.measured);
+    EXPECT_EQ(readAccuracy.minMeasuredValue, 0);
+    EXPECT_EQ(readAccuracy.maxMeasuredValue, 1000000);
+    EXPECT_EQ(readAccuracy.accuracyRanges.size(), 1u);
+    EXPECT_EQ(readAccuracy.accuracyRanges[0].rangeMin, 0);
+    EXPECT_EQ(readAccuracy.accuracyRanges[0].rangeMax, 1'000'000'000'000'000);
+    EXPECT_EQ(readAccuracy.accuracyRanges[0].percentMax.Value(), 500);
+    EXPECT_EQ(readAccuracy.accuracyRanges[0].percentMin.Value(), 50);
 
     // Test SetCumulativeReset
     {
@@ -272,7 +308,36 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
     }
 
     // Cleanup
-    attrAccess.Shutdown(ClusterShutdownType::kClusterShutdown);
+    attrAccess.Shutdown();
+}
+
+TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestConstructorWithAccuracy)
+{
+    BitMask<Feature> features(Feature::kImportedEnergy, Feature::kCumulativeEnergy);
+    BitMask<OptionalAttributes> noOptionalAttrs;
+
+    ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
+        .endpointId         = kTestEndpointId + 10,
+        .featureFlags       = features,
+        .optionalAttributes = noOptionalAttrs,
+        .accuracyStruct     = kTestAccuracy,
+    });
+
+    Structs::MeasurementAccuracyStruct::Type readAccuracy;
+    cluster.GetMeasurementAccuracy(readAccuracy);
+
+    EXPECT_EQ(readAccuracy.measurementType, MeasurementTypeEnum::kElectricalEnergy);
+    EXPECT_TRUE(readAccuracy.measured);
+    EXPECT_EQ(readAccuracy.minMeasuredValue, 0);
+    EXPECT_EQ(readAccuracy.maxMeasuredValue, 1'000'000'000'000'000);
+    ASSERT_EQ(readAccuracy.accuracyRanges.size(), 1u);
+    EXPECT_EQ(readAccuracy.accuracyRanges[0].rangeMin, 0);
+    EXPECT_EQ(readAccuracy.accuracyRanges[0].rangeMax, 1'000'000'000'000'000);
+    EXPECT_EQ(readAccuracy.accuracyRanges[0].percentMax.Value(), 500);
+    EXPECT_EQ(readAccuracy.accuracyRanges[0].percentMin.Value(), 50);
+
+    // Verify zero-copy: the ranges Span should point directly at the static data
+    EXPECT_EQ(readAccuracy.accuracyRanges.data(), kTestAccuracyRanges);
 }
 
 } // namespace

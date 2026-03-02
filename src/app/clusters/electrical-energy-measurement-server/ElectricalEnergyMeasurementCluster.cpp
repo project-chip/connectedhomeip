@@ -101,6 +101,27 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyImported(Optio
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ElectricalEnergyMeasurementCluster::SetMeasurementAccuracy(const MeasurementAccuracyStruct & value)
+{
+    if (ValueChanged(mMeasurementData.measurementAccuracy, value))
+    {
+        mMeasurementData.measurementAccuracy.measurementType  = value.measurementType;
+        mMeasurementData.measurementAccuracy.measured         = value.measured;
+        mMeasurementData.measurementAccuracy.minMeasuredValue = value.minMeasuredValue;
+        mMeasurementData.measurementAccuracy.maxMeasuredValue = value.maxMeasuredValue;
+        NotifyAttributeChanged(Accuracy::Id);
+    }
+
+    // Always update ranges since ValueChanged intentionally skips comparing them
+    using RangeType = MeasurementAccuracyRangeStruct::Type;
+    ReadOnlyBufferBuilder<RangeType> rangesBuilder;
+    ReturnErrorOnFailure(rangesBuilder.AppendElements(value.accuracyRanges));
+    mAccuracyRangesStorage                              = rangesBuilder.TakeBuffer();
+    mMeasurementData.measurementAccuracy.accuracyRanges = mAccuracyRangesStorage;
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyExported(Optional<EnergyMeasurementStruct> & outValue) const
 {
     if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy,
@@ -148,16 +169,6 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyReset(Optional
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
     outValue = mMeasurementData.cumulativeReset;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ElectricalEnergyMeasurementCluster::SetMeasurementAccuracy(const MeasurementAccuracyStruct & value)
-{
-    if (ValueChanged(mMeasurementData.measurementAccuracy, value))
-    {
-        mMeasurementData.measurementAccuracy = value;
-        NotifyAttributeChanged(Accuracy::Id);
-    }
     return CHIP_NO_ERROR;
 }
 
