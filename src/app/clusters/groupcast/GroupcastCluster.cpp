@@ -21,7 +21,6 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-
     mLogic.SetDataModelProvider(context.provider);
     mLogic.SetListener(this);
 
@@ -30,8 +29,10 @@ CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
 
 void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    DeviceLayer::SystemLayer().CancelTimer(OnGroupcastTestingDone, this);
+    mGroupcastTestingTimer.Cancel();
+    mMembershipChangedTimer.Cancel();
     mLogic.ResetDataModelProvider();
+    mLogic.RemoveListener();
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
@@ -136,25 +137,24 @@ Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Co
     if (data.testOperation == Groupcast::GroupcastTestingEnum::kDisableTesting)
     {
         // cancel any existing GroupcastTesting timer
-        DeviceLayer::SystemLayer().CancelTimer(OnGroupcastTestingDone, this);
+        mGroupcastTestingTimer.Cancel();
         mTestingState = data.testOperation;
         SetFabricUnderTest(kUndefinedFabricIndex);
         return Status::Success;
     }
 
     constexpr uint16_t kDefaultDurationSeconds = 60;
-    System::Clock::Seconds32 duration          = System::Clock::Seconds32(kDefaultDurationSeconds);
+    uint16_t durationSeconds                   = kDefaultDurationSeconds;
     if (data.durationSeconds.HasValue())
     {
         constexpr uint16_t kMinDurationSeconds = 10, kMaxDurationSeconds = 1200;
         VerifyOrReturnError(data.durationSeconds.Value() >= kMinDurationSeconds &&
                                 data.durationSeconds.Value() <= kMaxDurationSeconds,
                             Status::ConstraintError);
-        duration = System::Clock::Seconds32(data.durationSeconds.Value());
+        durationSeconds = data.durationSeconds.Value();
     }
 
-    VerifyOrReturnError(CHIP_NO_ERROR == DeviceLayer::SystemLayer().StartTimer(duration, OnGroupcastTestingDone, this),
-                        Status::Failure);
+    mGroupcastTestingTimer.Start(durationSeconds);
 
     mTestingState = data.testOperation;
     SetFabricUnderTest(fabricIndex);
@@ -166,16 +166,9 @@ void GroupcastCluster::SetFabricUnderTest(FabricIndex fabricUnderTest)
     SetAttributeValue(mFabricUnderTest, fabricUnderTest, Groupcast::Attributes::FabricUnderTest::Id);
 }
 
-void GroupcastCluster::OnGroupcastTestingDone(System::Layer * aLayer, void * appState)
-{
-    GroupcastCluster * cluster = reinterpret_cast<GroupcastCluster *>(appState);
-    cluster->SetFabricUnderTest(kUndefinedFabricIndex);
-    cluster->mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
-}
-
 void GroupcastCluster::OnMembershipChanged()
 {
-    NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
+    mMembershipChangedTimer.Start();
 }
 
 void GroupcastCluster::OnUsedMcastAddrCountChange()
@@ -183,6 +176,46 @@ void GroupcastCluster::OnUsedMcastAddrCountChange()
     NotifyAttributeChanged(Groupcast::Attributes::UsedMcastAddrCount::Id);
 }
 
+// MembershipChangedTimer implementation
+void GroupcastCluster::MembershipChangedTimer::Start()
+{
+    VerifyOrReturn(!mCluster.GetTimerDelegate().IsTimerActive(this));
+    constexpr System::Clock::Milliseconds32 kChangeTemporisation = System::Clock::Milliseconds32(250);
+    ReturnAndLogOnFailure(mCluster.GetTimerDelegate().StartTimer(this, kChangeTemporisation), AppServer,
+                          "Failed to start MembershipChangedTimer");
+}
+
+void GroupcastCluster::MembershipChangedTimer::Cancel()
+{
+    mCluster.GetTimerDelegate().CancelTimer(this);
+}
+
+void GroupcastCluster::MembershipChangedTimer::TimerFired()
+{
+    mCluster.NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
+}
+
+// GroupcastTestingTimer implementation
+void GroupcastCluster::GroupcastTestingTimer::Start(uint32_t seconds)
+{
+    Cancel();
+    ReturnAndLogOnFailure(mCluster.GetTimerDelegate().StartTimer(this, System::Clock::Seconds32(seconds)), AppServer,
+                          "Failed to start GroupcastTestingTimer");
+}
+
+void GroupcastCluster::GroupcastTestingTimer::Cancel()
+{
+    if (mCluster.GetTimerDelegate().IsTimerActive(this))
+    {
+        mCluster.GetTimerDelegate().CancelTimer(this);
+    }
+}
+
+void GroupcastCluster::GroupcastTestingTimer::TimerFired()
+{
+    mCluster.SetFabricUnderTest(kUndefinedFabricIndex);
+    mCluster.mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
+}
 } // namespace Clusters
 } // namespace app
 } // namespace chip

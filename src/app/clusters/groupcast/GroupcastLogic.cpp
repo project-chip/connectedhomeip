@@ -17,14 +17,14 @@ using EndpointIterator  = GroupDataProvider::EndpointIterator;
 GroupcastLogic::GroupcastLogic(GroupcastContext & context) : mContext(context), mFeatures()
 {
     mContext.groupDataProvider.SetListener(this);
-    mUsedMcastAddrCount = GetUsedMcastAddrCount();
+    UpdateUsedMcastAddrCount();
 }
 
 GroupcastLogic::GroupcastLogic(GroupcastContext & context, BitFlags<Groupcast::Feature> features) :
     mContext(context), mFeatures(features)
 {
     mContext.groupDataProvider.SetListener(this);
-    mUsedMcastAddrCount = GetUsedMcastAddrCount();
+    UpdateUsedMcastAddrCount();
 }
 
 GroupcastLogic::~GroupcastLogic()
@@ -145,6 +145,9 @@ Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Comm
         VerifyOrReturnError(mFeatures.Has(Groupcast::Feature::kListener), Status::ConstraintError);
     }
 
+    // ReplaceEndpoints can only be present if kListener feature is supported
+    VerifyOrReturnError(!data.replaceEndpoints.HasValue() || mFeatures.Has(Groupcast::Feature::kListener), Status::ConstraintError);
+
     // Check endpoints
     size_t endpoint_count = 0;
     err                   = data.endpoints.ComputeSize(&endpoint_count);
@@ -187,30 +190,39 @@ Status GroupcastLogic::JoinGroup(FabricIndex fabric_index, const Groupcast::Comm
 
     // Check fabric membership entries limit
     GroupDataProvider::GroupInfo info;
-    err = groups.GetGroupInfo(fabric_index, data.groupID, info);
-    VerifyOrReturnError(CHIP_ERROR_NOT_FOUND == err || CHIP_NO_ERROR == err, Status::Failure);
+    err               = groups.GetGroupInfo(fabric_index, data.groupID, info);
+    bool is_new_group = (CHIP_ERROR_NOT_FOUND == err);
+    VerifyOrReturnError(is_new_group || (CHIP_NO_ERROR == err), Status::Failure);
     // If the group is new, the fabric entries will increase
-    uint16_t new_count              = (CHIP_ERROR_NOT_FOUND == err) ? info.count + 1 : info.count;
+    uint16_t new_count              = (is_new_group) ? info.count + 1 : info.count;
     uint16_t max_fabric_memberships = static_cast<uint16_t>(groups.getMaxMembershipCount() / 2);
     VerifyOrReturnError(new_count <= max_fabric_memberships, Status::ResourceExhausted);
 
-    // Key handling
-    Status stat = SetKeySet(fabric_index, data.groupID, data.keySetID, data.key);
-    VerifyOrReturnError(Status::Success == stat, stat);
-
-    // Add/update entry in the group table
+    // Gather group info
     info.group_id = data.groupID;
     info.flags    = 0;
     if (data.useAuxiliaryACL.HasValue() && data.useAuxiliaryACL.Value())
     {
         info.flags |= chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL);
     }
-
     if (data.mcastAddrPolicy.HasValue() && (Groupcast::MulticastAddrPolicyEnum::kPerGroup == data.mcastAddrPolicy.Value()))
     {
+        // PerGroup address
+        VerifyOrReturnError(!is_new_group || (mUsedMcastAddrCount < groups.getMaxMcastAddrCount()), Status::ResourceExhausted);
         info.flags |= chip::to_underlying(GroupInfo::Flags::kMcastAddrPolicy);
     }
+    else
+    {
+        // Iana address
+        VerifyOrReturnError(!is_new_group || (mIanaAddressUsed || (mUsedMcastAddrCount < groups.getMaxMcastAddrCount())),
+                            Status::ResourceExhausted);
+    }
 
+    // Key handling
+    Status stat = SetKeySet(fabric_index, data.groupID, data.keySetID, data.key);
+    VerifyOrReturnError(Status::Success == stat, stat);
+
+    // Add/update entry in the group table
     err = groups.SetGroupInfo(fabric_index, info);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
 
@@ -268,6 +280,12 @@ Status GroupcastLogic::LeaveGroup(FabricIndex fabric_index, const Groupcast::Com
 
 Status GroupcastLogic::UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data)
 {
+    // Validate that the group exists early before trying to set the keyset
+    GroupDataProvider::GroupInfo info;
+    CHIP_ERROR err = Provider().GetGroupInfo(fabric_index, data.groupID, info);
+    VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
+    VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
+
     return SetKeySet(fabric_index, data.groupID, data.keySetID, data.key);
 }
 
@@ -427,12 +445,7 @@ void GroupcastLogic::OnGroupAdded(FabricIndex fabric_index, const GroupInfo & ne
     (void) fabric_index;
     (void) new_group;
     NotifyMembershipChanged();
-    uint16_t address_count = GetUsedMcastAddrCount();
-    if (address_count != mUsedMcastAddrCount)
-    {
-        mUsedMcastAddrCount = address_count;
-        NotifyUsedMcastAddrCountChange();
-    }
+    NotifyUsedMcastAddrCountOnChange();
 }
 
 void GroupcastLogic::OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group)
@@ -440,15 +453,18 @@ void GroupcastLogic::OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & 
     (void) fabric_index;
     (void) old_group;
     NotifyMembershipChanged();
-    uint16_t address_count = GetUsedMcastAddrCount();
-    if (address_count != mUsedMcastAddrCount)
-    {
-        mUsedMcastAddrCount = address_count;
-        NotifyUsedMcastAddrCountChange();
-    }
+    NotifyUsedMcastAddrCountOnChange();
 }
 
-uint16_t GroupcastLogic::GetUsedMcastAddrCount()
+void GroupcastLogic::OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id)
+{
+    (void) fabric_index;
+    (void) modified_group_id;
+    NotifyMembershipChanged();
+    NotifyUsedMcastAddrCountOnChange();
+}
+
+void GroupcastLogic::UpdateUsedMcastAddrCount()
 {
     uint16_t per_group_count = 0;
     uint16_t iana_address    = 0;
@@ -457,7 +473,7 @@ uint16_t GroupcastLogic::GetUsedMcastAddrCount()
     {
         // Count distinct group addresses
         GroupInfoIterator * iter = Provider().IterateGroupInfo(fabric.GetFabricIndex());
-        VerifyOrReturnValue(nullptr != iter, 0);
+        VerifyOrReturn(nullptr != iter);
         GroupInfo group;
         while (iter->Next(group))
         {
@@ -472,7 +488,8 @@ uint16_t GroupcastLogic::GetUsedMcastAddrCount()
         }
         iter->Release();
     }
-    return per_group_count + iana_address;
+    mIanaAddressUsed    = (iana_address > 0);
+    mUsedMcastAddrCount = per_group_count + iana_address;
 }
 
 void GroupcastLogic::NotifyMembershipChanged()
@@ -483,9 +500,11 @@ void GroupcastLogic::NotifyMembershipChanged()
     }
 }
 
-void GroupcastLogic::NotifyUsedMcastAddrCountChange()
+void GroupcastLogic::NotifyUsedMcastAddrCountOnChange()
 {
-    if (mListener != nullptr)
+    uint16_t old_count = mUsedMcastAddrCount;
+    UpdateUsedMcastAddrCount();
+    if (old_count != mUsedMcastAddrCount && mListener != nullptr)
     {
         mListener->OnUsedMcastAddrCountChange();
     }
