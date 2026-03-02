@@ -185,15 +185,15 @@ static void PrintLog(const char * msg)
         size_t sz;
         sz = strlen(msg);
 
-#if PW_RPC_ENABLED
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
         PigweedLogger::putString(msg, sz);
 #endif // PW_RPC_ENABLED
         SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, msg, sz);
 
-#if PW_RPC_ENABLED
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
         const char * newline = "\r\n";
         sz                   = strlen(newline);
-#if PW_RPC_ENABLED
+#if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
         PigweedLogger::putString(newline, sz);
 #endif // PW_RPC_ENABLED
         SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
