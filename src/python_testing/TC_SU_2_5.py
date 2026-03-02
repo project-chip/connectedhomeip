@@ -488,36 +488,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             asserts.assert_equal(True, ota_file_data['exists'], f"File is was not downloaded  at {ota_file_data['path']}")
             asserts.assert_greater(ota_file_data['size'], 0, "Downloaded file is still at 0")
 
-        # # Device is downloading the image
-        # progress_seen = False
-        # last_progress = 0
-
-        # def check_ota_download_matcher(report):
-        #     """Check for the UpdateStateProgress and confirms it downloaded the image when the
-        #         status reach to NullValue
-        #     Args:
-        #         report : Report value
-        #     """
-        #     value = report.value
-        #     nonlocal progress_seen, last_progress
-        #     if value is not NullValue and isinstance(value, int) and 1 <= value <= 100:
-        #         # Just check if we see some progress to confirm is downloading
-        #         last_progress = value
-        #         if not progress_seen:
-        #             progress_seen = True
-        #     return bool(value is NullValue and progress_seen)
-
-        # download_progress_attr_matcher_obj = AttributeMatcher.from_callable(
-        #     description="Waiting Download to Complete ", matcher=check_ota_download_matcher)
-        # download_progress_attr_handler.await_all_expected_report_matches(
-        #     [download_progress_attr_matcher_obj], timeout_sec=self.ota_image_download_timeout)
-        # download_progress_attr_handler.reset()
-        # download_progress_attr_handler.cancel()
-
-        # Did not apply the software update
-        # update_state_attr_handler.await_all_expected_report_matches(
-        #     [update_state_match], timeout_sec=self.ota_image_download_timeout)
-
         # Track the download, as is set to discontinue the device should reach the kIdle State
         await self.track_download_progress(controller=self.controller, requestor_node_id=self.requestor_node_id, max_progress=99)
 

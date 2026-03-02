@@ -29,9 +29,8 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
-from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher
+from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
 
 log = logging.getLogger(__name__)
 
