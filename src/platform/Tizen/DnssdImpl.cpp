@@ -668,22 +668,34 @@ ResolveContext * DnssdTizen::CreateResolveContext(const char * name, const char 
 void DnssdTizen::RemoveContext(RegisterContext * context)
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    mRegisterContexts.erase(std::find_if(mRegisterContexts.begin(), mRegisterContexts.end(),
-                                         [context](const auto & ctx) { return ctx.get() == context; }));
+    auto it = std::find_if(mRegisterContexts.begin(), mRegisterContexts.end(),
+                           [context](const auto & ctx) { return ctx.get() == context; });
+    if (it != mRegisterContexts.end())
+    {
+        mRegisterContexts.erase(it);
+    }
 }
 
 void DnssdTizen::RemoveContext(BrowseContext * context)
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    mBrowseContexts.erase(
-        std::find_if(mBrowseContexts.begin(), mBrowseContexts.end(), [context](const auto & ctx) { return ctx.get() == context; }));
+    auto it =
+        std::find_if(mBrowseContexts.begin(), mBrowseContexts.end(), [context](const auto & ctx) { return ctx.get() == context; });
+    if (it != mBrowseContexts.end())
+    {
+        mBrowseContexts.erase(it);
+    }
 }
 
 void DnssdTizen::RemoveContext(ResolveContext * context)
 {
     std::lock_guard<std::mutex> lock(mMutex);
-    mResolveContexts.erase(std::find_if(mResolveContexts.begin(), mResolveContexts.end(),
-                                        [context](const auto & ctx) { return ctx.get() == context; }));
+    auto it = std::find_if(mResolveContexts.begin(), mResolveContexts.end(),
+                           [context](const auto & ctx) { return ctx.get() == context; });
+    if (it != mResolveContexts.end())
+    {
+        mResolveContexts.erase(it);
+    }
 }
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
