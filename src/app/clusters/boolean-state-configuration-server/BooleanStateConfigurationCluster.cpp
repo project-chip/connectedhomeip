@@ -192,7 +192,8 @@ BooleanStateConfigurationCluster::InvokeCommand(const DataModel::InvokeRequest &
         bool generateEvent = false;
         if (mAlarmsActive.HasAny(alarmsToDisable))
         {
-            if (mDelegate != nullptr) {
+            if (mDelegate != nullptr)
+            {
                 VerifyOrReturnError(mDelegate->OnAlarmsActiveChanged(mAlarmsActive), Status::Failure);
             }
             mAlarmsActive.Clear(alarmsToDisable);
@@ -201,7 +202,8 @@ BooleanStateConfigurationCluster::InvokeCommand(const DataModel::InvokeRequest &
         }
         if (mAlarmsSuppressed.HasAny(alarmsToDisable))
         {
-            if (mDelegate != nullptr) {
+            if (mDelegate != nullptr)
+            {
                 VerifyOrReturnError(mDelegate->OnAlarmsSuppressedChanged(mAlarmsSuppressed), Status::Failure);
             }
             mAlarmsSuppressed.Clear(alarmsToDisable);
@@ -308,7 +310,8 @@ void BooleanStateConfigurationCluster::GenerateSensorFault(SensorFaultBitMask fa
 
     if (mOptionalAttributes.IsSet(SensorFault::Id) && (mSensorFault != fault))
     {
-        if (mDelegate != nullptr) {
+        if (mDelegate != nullptr)
+        {
             TEMPORARY_RETURN_IGNORED mDelegate->OnSensorFaultChanged(mSensorFault);
         }
         mSensorFault = fault;
@@ -321,7 +324,8 @@ CHIP_ERROR BooleanStateConfigurationCluster::SetCurrentSensitivityLevel(uint8_t 
     VerifyOrReturnError(level < mSupportedSensitivityLevels, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(mCurrentSensitivityLevel != level, CHIP_NO_ERROR);
 
-    if (mDelegate != nullptr) {
+    if (mDelegate != nullptr)
+    {
         VerifyOrReturnError(mDelegate->OnCurrentSensitivityLevelChanged(level), CHIP_ERROR_INCORRECT_STATE);
     }
     mCurrentSensitivityLevel = level;
@@ -341,7 +345,8 @@ Status BooleanStateConfigurationCluster::SetAlarmsActive(AlarmModeBitMask alarms
     // No change is a noop
     VerifyOrReturnError(mAlarmsActive != alarms, Status::Success);
 
-    if (mDelegate != nullptr) {
+    if (mDelegate != nullptr)
+    {
         VerifyOrReturnError(mDelegate->OnAlarmsActiveChanged(alarms), Status::Failure);
     }
     mAlarmsActive = alarms;
@@ -359,7 +364,8 @@ Status BooleanStateConfigurationCluster::SetAllEnabledAlarmsActive()
     // No change is a noop
     VerifyOrReturnError(mAlarmsActive != mAlarmsEnabled, Status::Success);
 
-    if (mDelegate != nullptr) {
+    if (mDelegate != nullptr)
+    {
         VerifyOrReturnError(mDelegate->OnAlarmsActiveChanged(mAlarmsEnabled), Status::Failure);
     }
     mAlarmsActive = mAlarmsEnabled;
@@ -375,7 +381,8 @@ void BooleanStateConfigurationCluster::ClearAllAlarms()
 
     if (mAlarmsActive.HasAny())
     {
-        if (mDelegate != nullptr) {
+        if (mDelegate != nullptr)
+        {
             TEMPORARY_RETURN_IGNORED mDelegate->OnAlarmsActiveChanged(BitMask<AlarmModeBitmap>());
         }
         mAlarmsActive.ClearAll();
@@ -383,7 +390,8 @@ void BooleanStateConfigurationCluster::ClearAllAlarms()
     }
     if (mAlarmsSuppressed.HasAny())
     {
-        if (mDelegate != nullptr) {
+        if (mDelegate != nullptr)
+        {
             TEMPORARY_RETURN_IGNORED mDelegate->OnAlarmsSuppressedChanged(BitMask<AlarmModeBitmap>());
         }
         mAlarmsSuppressed.ClearAll();
@@ -413,7 +421,8 @@ Status BooleanStateConfigurationCluster::SuppressAlarms(AlarmModeBitMask alarms)
         TEMPORARY_RETURN_IGNORED mDelegate->HandleSuppressAlarm(alarms);
     }
 
-    if (mDelegate != nullptr) {
+    if (mDelegate != nullptr)
+    {
         VerifyOrReturnError(mDelegate->OnAlarmsSuppressedChanged(alarms), Status::Failure);
     }
     mAlarmsSuppressed.Set(alarms);

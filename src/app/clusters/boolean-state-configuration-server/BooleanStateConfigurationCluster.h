@@ -132,7 +132,6 @@ private:
     SensorFaultBitMask mSensorFault{ 0 };
 
     void GenerateAlarmsStateChangedEvent();
-
 };
 
 } // namespace chip::app::Clusters
