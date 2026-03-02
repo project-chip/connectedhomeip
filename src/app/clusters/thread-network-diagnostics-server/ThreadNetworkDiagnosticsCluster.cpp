@@ -177,16 +177,14 @@ void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatus
     if (newConnectionStatus == ConnectionStatusEnum::kConnected)
     {
 #if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
-        chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
-        ChipLogDetail(Zcl, "ThdDiag: Conn, PAN: 0x%04x", chip::DeviceLayer::Internal::GetOpenThreadPanId(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance()));
-        chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+        ChipLogProgress(Zcl, "ThdDiag: Conn, PAN: 0x%04x", chip::DeviceLayer::Internal::GetOpenThreadPanId(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance()));
 #else
-        ChipLogDetail(Zcl, "ThdDiag: Conn");
+        ChipLogProgress(Zcl, "ThdDiag: Conn");
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
     }
     else
     {
-        ChipLogDetail(Zcl, "ThdDiag: Disconn");
+        ChipLogProgress(Zcl, "ThdDiag: Disconn");
     }
 
     VerifyOrReturn(mContext != nullptr);
