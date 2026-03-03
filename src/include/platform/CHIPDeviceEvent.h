@@ -25,6 +25,7 @@
 #pragma once
 #include <stdint.h>
 
+#include <clusters/AdministratorCommissioning/Enums.h>
 #include <inet/IPAddress.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -200,6 +201,11 @@ enum PublicEventTypes
      * wifi/ethernet interface.
      */
     kInterfaceIpAddressChanged,
+
+    /**
+     *  Indicates that there has been a change in the commissioning window status.
+     */
+    kCommissioningWindowStatusChanged,
 
     /**
      * Commissioning has completed by a call to the general commissioning cluster command.
@@ -536,7 +542,10 @@ struct ChipDeviceEvent final
         {
             InterfaceIpChangeType Type;
         } InterfaceIpAddressChanged;
-
+        struct
+        {
+            chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum status;
+        } CommissioningWindowStatusChanged;
         struct
         {
             uint64_t nodeId;
