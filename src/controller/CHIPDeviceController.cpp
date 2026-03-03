@@ -708,7 +708,7 @@ CHIP_ERROR DeviceCommissioner::PairThreadMeshcop(RendezvousParameters & rendezvo
                                                  CommissioningParameters & commissioningParams)
 {
     VerifyOrReturnError(rendezvousParams.GetSetupDiscriminator().has_value(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(commissioningParams.GetThreadOperationalDataset().(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(commissioningParams.GetThreadOperationalDataset().HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     auto discriminator = rendezvousParams.GetSetupDiscriminator().value();
     Thread::DiscoveryCode code;
     if (rendezvousParams.GetSetupDiscriminator().value().IsShortDiscriminator())
