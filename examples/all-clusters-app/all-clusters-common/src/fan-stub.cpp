@@ -16,6 +16,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -23,6 +24,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/attribute-table.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -147,7 +149,7 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
         }
     }
 
-    return SpeedSetting::Set(mEndpoint, newSpeedSetting);
+    return emberAfWriteAttribute(mEndpoint, FanControl::Id, SpeedSetting::Id, &newSpeedSetting, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
