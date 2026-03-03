@@ -261,15 +261,14 @@ exit:
     return;
 }
 
-void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint16_t size,
+                                                         uint8_t * value)
 {
-    static HsvColor_t hsv;
-    static XyColor_t xy;
-
     /* Ignore several attributes that are currently not processed */
     if ((attributeId == ColorControl::Attributes::RemainingTime::Id) ||
         (attributeId == ColorControl::Attributes::EnhancedColorMode::Id) ||
-        (attributeId == ColorControl::Attributes::ColorMode::Id))
+        (attributeId == ColorControl::Attributes::ColorMode::Id) ||
+        (attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id))
     {
         return;
     }
@@ -277,13 +276,29 @@ void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, 
     /* XY color space */
     if (attributeId == ColorControl::Attributes::CurrentX::Id || attributeId == ColorControl::Attributes::CurrentY::Id)
     {
+        if (size != sizeof(uint16_t))
+        {
+            ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
+            return;
+        }
+
+        XyColor_t xy;
+
         if (attributeId == ColorControl::Attributes::CurrentX::Id)
         {
             xy.x = *reinterpret_cast<uint16_t *>(value);
+            // get Y from cluster value storage
+            Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentY::Get(endpointId, &xy.y);
+            VerifyOrExit(status == Protocols::InteractionModel::Status::Success,
+                         ChipLogError(Zcl, "Failed to read CurrentY value"));
         }
         else if (attributeId == ColorControl::Attributes::CurrentY::Id)
         {
             xy.y = *reinterpret_cast<uint16_t *>(value);
+            // get X from cluster value storage
+            Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentX::Get(endpointId, &xy.x);
+            VerifyOrExit(status == Protocols::InteractionModel::Status::Success,
+                         ChipLogError(Zcl, "Failed to read CurrentX value"));
         }
 
         ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
@@ -291,22 +306,33 @@ void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, 
     }
     /* HSV color space */
     else if (attributeId == ColorControl::Attributes::CurrentHue::Id ||
-             attributeId == ColorControl::Attributes::CurrentSaturation::Id ||
-             attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
+             attributeId == ColorControl::Attributes::CurrentSaturation::Id)
     {
-        if (attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
+        if (size != sizeof(uint8_t))
         {
-            hsv.h = (uint8_t) (((*reinterpret_cast<uint16_t *>(value)) & 0xFF00) >> 8);
-            hsv.s = (uint8_t) ((*reinterpret_cast<uint16_t *>(value)) & 0xFF);
+            ChipLogError(Zcl, "Wrong length for ColorControl value: %d", size);
+            return;
         }
-        else if (attributeId == ColorControl::Attributes::CurrentHue::Id)
+
+        HsvColor_t hsv;
+
+        if (attributeId == ColorControl::Attributes::CurrentHue::Id)
         {
             hsv.h = *value;
+            // get saturation from cluster value storage
+            Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentSaturation::Get(endpointId, &hsv.s);
+            VerifyOrExit(status == Protocols::InteractionModel::Status::Success,
+                         ChipLogError(Zcl, "Failed to read CurrentSaturation value"));
         }
         else if (attributeId == ColorControl::Attributes::CurrentSaturation::Id)
         {
             hsv.s = *value;
+            // get hue from cluster value storage
+            Protocols::InteractionModel::Status status = ColorControl::Attributes::CurrentHue::Get(endpointId, &hsv.h);
+            VerifyOrExit(status == Protocols::InteractionModel::Status::Success,
+                         ChipLogError(Zcl, "Failed to read CurrentHue value"));
         }
+
         ChipLogProgress(Zcl, "New HSV color: hue = %u| saturation = %u", hsv.h, hsv.s);
         LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_HSV, 0, sizeof(HsvColor_t), (uint8_t *) &hsv);
     }
@@ -320,6 +346,9 @@ void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, 
     {
         ChipLogProgress(Zcl, "Ignore ColorControl attribute (%u) that is not currently processed!", attributeId);
     }
+
+exit:
+    return;
 }
 
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t type,
@@ -340,7 +369,7 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
         break;
 
     case app::Clusters::ColorControl::Id:
-        OnColorPostAttributeChangeCallback(endpointId, attributeId, value);
+        OnColorPostAttributeChangeCallback(endpointId, attributeId, size, value);
         break;
 
     default:
