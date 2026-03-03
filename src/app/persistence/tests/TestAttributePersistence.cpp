@@ -968,13 +968,6 @@ TEST(TestAttributePersistence, TestStoreAndLoadTLV)
         EXPECT_EQ(persistence.StoreTLV<kBufferSize>(kPath, valueToStore2), CHIP_NO_ERROR);
     }
 
-    // Test LoadTLV with stack allocation (convenience overload)
-    {
-        TestTLVStruct loadedValue;
-        EXPECT_EQ(persistence.LoadTLV<kBufferSize>(kPath, loadedValue), CHIP_NO_ERROR);
-        EXPECT_EQ(loadedValue, valueToStore2);
-    }
-
     // Test StoreTLV with too small buffer
     {
         uint8_t buffer[4]; // Too small for TestTLVStruct
@@ -1009,8 +1002,9 @@ TEST(TestAttributePersistence, TestAttributePersistenceTLVValidation)
         ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
         uint32_t value = 0;
+        uint8_t readBuffer[128];
         // Should fail because it expects a Structure
-        EXPECT_EQ(persistence.LoadTLV<128>(path, value), CHIP_ERROR_WRONG_TLV_TYPE);
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_ERROR_WRONG_TLV_TYPE);
     }
 
     // 2. Empty Structure
@@ -1025,8 +1019,9 @@ TEST(TestAttributePersistence, TestAttributePersistenceTLVValidation)
         ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
         uint32_t value = 0;
+        uint8_t readBuffer[128];
         // Should fail because it expects an element inside
-        EXPECT_EQ(persistence.LoadTLV<128>(path, value), CHIP_END_OF_TLV);
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_END_OF_TLV);
     }
 
     // 3. Structure with Wrong Element Tag (Context Tag 2 instead of 1)
@@ -1042,8 +1037,9 @@ TEST(TestAttributePersistence, TestAttributePersistenceTLVValidation)
         ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
         uint32_t value = 0;
+        uint8_t readBuffer[128];
         // Should fail on tag check
-        EXPECT_EQ(persistence.LoadTLV<128>(path, value), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // 4. Structure with Extra Element
@@ -1060,8 +1056,9 @@ TEST(TestAttributePersistence, TestAttributePersistenceTLVValidation)
         ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
         uint32_t value = 0;
+        uint8_t readBuffer[128];
         // Should fail on VerifyEndOfContainer inside container
-        EXPECT_EQ(persistence.LoadTLV<128>(path, value), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
     }
 
     // 5. Trailing Data after Structure
@@ -1078,8 +1075,9 @@ TEST(TestAttributePersistence, TestAttributePersistenceTLVValidation)
         ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
         uint32_t value = 0;
+        uint8_t readBuffer[128];
         // Should fail on VerifyEndOfContainer outside container
-        EXPECT_EQ(persistence.LoadTLV<128>(path, value), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+        EXPECT_EQ(persistence.LoadTLV(path, value, MutableByteSpan(readBuffer)), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
     }
 }
 

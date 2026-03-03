@@ -201,25 +201,6 @@ public:
         });
     }
 
-    /// Stack-allocating overload for convenience.
-    ///
-    /// @warning CRITICAL WARNING: Do NOT use this overload if T contains any data views
-    /// (e.g., CharSpan, ByteSpan, DataModel::List). The backing buffer for these views is allocated
-    /// on the stack and will be DESTROYED when this function returns, leading to DANGLING POINTERS
-    /// and undefined behavior.
-    ///
-    /// If T contains any view types, you MUST use the overload that accepts an external MutableByteSpan
-    /// to ensure the buffer outlives the usage of the decoded value.
-    template <size_t kMaxBufferSize, typename T>
-    CHIP_ERROR LoadTLV(const ConcreteAttributePath & path, T & value)
-    {
-        // NOTE: This overload assumes T does NOT contain views pointing to the buffer,
-        // because the buffer is destroyed when this function returns.
-        // Use the buffer-passing overload if T contains Views (like Span or List).
-        uint8_t buffer[kMaxBufferSize];
-        return LoadTLV(path, value, MutableByteSpan(buffer));
-    }
-
 private:
     static constexpr TLV::Tag kTLVEncodingTag = TLV::ContextTag(1);
     AttributePersistenceProvider & mProvider;

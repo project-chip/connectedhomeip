@@ -439,7 +439,8 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Attributes(const ConcreteCluste
         { true, UniqueID::kMetadataEntry }, // mandatory for new revisions
         { mFixedData.productAppearance.has_value(), ProductAppearance::kMetadataEntry },
         { mMutableData.configurationVersion.has_value(), ConfigurationVersion::kMetadataEntry },
-        { mMutableData.deviceLocation.has_value(), DeviceLocation::kMetadataEntry }, // Present when supported (Provisionally Mandatory)
+        { mMutableData.deviceLocation.has_value(),
+          DeviceLocation::kMetadataEntry }, // Present when supported (Provisionally Mandatory)
     };
 
     AttributeListBuilder listBuilder(builder);
