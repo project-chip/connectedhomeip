@@ -83,15 +83,13 @@ OptionSet * AppOptions::GetOptions()
         {},
     };
 
-    static OptionSet options = {
-        AppOptions::HandleOptions, optionsDef, "PROGRAM OPTIONS",
-        "  --end_user_support_log <value>\n"
-        "       The end user support log file to be used for diagnostic logs transfer.\n"
-        "  --network_diagnostics_log <value>\n"
-        "       The network diagnostics log file to be used for diagnostic logs transfer.\n"
-        "  --crash_log <value>\n"
-        "       The crash log file to be used for diagnostic logs transfer.\n"
-    };
+    static OptionSet options = { AppOptions::HandleOptions, optionsDef, "PROGRAM OPTIONS",
+                                 "  --end_user_support_log <value>\n"
+                                 "       The end user support log file to be used for diagnostic logs transfer.\n"
+                                 "  --network_diagnostics_log <value>\n"
+                                 "       The network diagnostics log file to be used for diagnostic logs transfer.\n"
+                                 "  --crash_log <value>\n"
+                                 "       The crash log file to be used for diagnostic logs transfer.\n" };
 
     return &options;
 }

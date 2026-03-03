@@ -53,8 +53,8 @@ public:
     void SetCrashLogFilePath(Optional<std::string> filePath) { mCrashLogFilePath = filePath; }
 
 private:
-    LogProvider()                         = default;
-    LogProvider(const LogProvider &)      = delete;
+    LogProvider()                                = default;
+    LogProvider(const LogProvider &)             = delete;
     LogProvider & operator=(const LogProvider &) = delete;
 
     Optional<std::string> GetFilePathForIntent(IntentEnum intent) const;
