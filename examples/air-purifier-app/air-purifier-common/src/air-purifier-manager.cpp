@@ -17,6 +17,8 @@
  */
 
 #include <air-purifier-manager.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app/util/attribute-table.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -149,7 +151,9 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
         }
     }
 
-    return FanControl::Attributes::SpeedSetting::Set(mEndpointId, newSpeedSetting);
+    // Fan Control is a CodeDriven cluster, so SpeedSetting::Set is not generated in Accessors.
+    return emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::SpeedSetting::Id, &newSpeedSetting,
+                                 ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
@@ -213,7 +217,7 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         // than practical.
         DataModel::Nullable<Percent> percent = GetPercentSetting();
         DataModel::Nullable<uint8_t> speed   = GetSpeedSetting();
-        uint8_t speedMax                     = GetSpeedMax();
+        uint8_t speedMax                     = GetSpeedMax().value_or(1);
         if (speedMax == 0)
         {
             ChipLogError(NotSpecified, "Out of bounds value for SpeedMax, setting to default (1)");
@@ -254,8 +258,10 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         new_percent = 0;
         new_speed   = 0;
     }
-    FanControl::Attributes::SpeedCurrent::Set(mEndpointId, new_speed);
-    FanControl::Attributes::PercentCurrent::Set(mEndpointId, new_percent);
+    emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::SpeedCurrent::Id, &new_speed,
+                          ZCL_INT8U_ATTRIBUTE_TYPE);
+    emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::PercentCurrent::Id, &new_percent,
+                          ZCL_INT8U_ATTRIBUTE_TYPE);
     mOnOffClusterOn = on;
 }
 
@@ -264,7 +270,8 @@ void AirPurifierManager::PercentSettingWriteCallback(uint8_t aNewPercentSetting)
     ChipLogDetail(NotSpecified, "AirPurifierManager::PercentSettingWriteCallback: %d", static_cast<int>(aNewPercentSetting));
     if (mOnOffClusterOn)
     {
-        Status status = FanControl::Attributes::PercentCurrent::Set(mEndpointId, aNewPercentSetting);
+        Status status = emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::PercentCurrent::Id,
+                                              &aNewPercentSetting, ZCL_INT8U_ATTRIBUTE_TYPE);
         if (status != Status::Success)
         {
             ChipLogError(NotSpecified,
@@ -279,7 +286,8 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
     ChipLogDetail(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: %d", static_cast<int>(aNewSpeedSetting));
     if (mOnOffClusterOn)
     {
-        Status status = FanControl::Attributes::SpeedCurrent::Set(mEndpointId, aNewSpeedSetting);
+        Status status = emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::SpeedCurrent::Id,
+                                              &aNewSpeedSetting, ZCL_INT8U_ATTRIBUTE_TYPE);
         if (status != Status::Success)
         {
             ChipLogError(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: failed to set SpeedCurrent attribute: %d",
@@ -288,22 +296,30 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
     }
 
     // Determine if the speed change should also change the fan mode
+    FanControl::FanModeEnum fanMode;
     if (aNewSpeedSetting == 0)
     {
-        FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kOff);
+        fanMode = FanControl::FanModeEnum::kOff;
     }
     else if (aNewSpeedSetting <= FAN_MODE_LOW_UPPER_BOUND)
     {
-        FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kLow);
+        fanMode = FanControl::FanModeEnum::kLow;
     }
     else if (aNewSpeedSetting <= FAN_MODE_MEDIUM_UPPER_BOUND)
     {
-        FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kMedium);
+        fanMode = FanControl::FanModeEnum::kMedium;
     }
     else if (aNewSpeedSetting <= FAN_MODE_HIGH_UPPER_BOUND)
     {
-        FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kHigh);
+        fanMode = FanControl::FanModeEnum::kHigh;
     }
+    else
+    {
+        return;
+    }
+    uint8_t fanModeRaw = to_underlying(fanMode);
+    emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::FanMode::Id, &fanModeRaw,
+                          ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 void AirPurifierManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode)
@@ -366,7 +382,9 @@ void AirPurifierManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedS
         return;
     }
 
-    Status status = FanControl::Attributes::SpeedSetting::Set(mEndpointId, aNewSpeedSetting);
+    uint8_t value = aNewSpeedSetting.Value();
+    Status status = emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::SpeedSetting::Id, &value,
+                                          ZCL_INT8U_ATTRIBUTE_TYPE);
     if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "AirPurifierManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d",
@@ -402,14 +420,15 @@ DataModel::Nullable<Percent> AirPurifierManager::GetPercentSetting()
     return percentSetting;
 }
 
-uint8_t AirPurifierManager::GetSpeedMax()
+std::optional<uint8_t> AirPurifierManager::GetSpeedMax()
 {
     uint8_t speedMax = 1;
     Status status    = FanControl::Attributes::SpeedMax::Get(mEndpointId, &speedMax);
     if (status != Status::Success)
     {
-        ChipLogError(NotSpecified, "AirPurifierManager::GetPercentSetting: failed to get SpeedMax attribute: %d",
+        ChipLogError(NotSpecified, "AirPurifierManager::GetSpeedMax: failed to get SpeedMax attribute: %d",
                      to_underlying(status));
+        return std::nullopt;
     }
     return speedMax;
 }
