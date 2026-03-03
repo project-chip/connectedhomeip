@@ -13,11 +13,14 @@
 # limitations under the License.
 
 import logging
+import pathlib
 import re
 import shlex
 import subprocess
 import sys
 import threading
+from dataclasses import dataclass, replace
+from enum import StrEnum
 from typing import BinaryIO, Callable, Optional, Union
 
 LOGGER = logging.getLogger(__name__)
@@ -39,6 +42,32 @@ def forward_f(f_in: BinaryIO,
             line = cb(line, is_stderr)
         f_out.write(line)
         f_out.flush()
+
+
+class SubprocessKind(StrEnum):
+    APP = 'app'
+    TOOL = 'tool'
+    MGMT = 'mgmt'
+
+
+@dataclass
+class SubprocessInfo:
+    kind: SubprocessKind
+    path: pathlib.Path
+    wrapper: tuple[str, ...] = ()
+    args: tuple[str, ...] = ()
+
+    def __post_init__(self):
+        self.path = pathlib.Path(self.path)
+
+    def with_args(self, *args: str):
+        return replace(self, args=self.args + tuple(args))
+
+    def wrap_with(self, *args: str):
+        return replace(self, wrapper=tuple(args) + self.wrapper)
+
+    def to_cmd(self) -> list[str]:
+        return list(self.wrapper) + [str(self.path)] + list(self.args)
 
 
 class Subprocess(threading.Thread):
