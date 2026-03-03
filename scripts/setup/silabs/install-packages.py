@@ -71,16 +71,18 @@ def parse_version_from_slt(file_path):
     """Extract dependency version from a .slt file (version = \"X\" in [dependency] block). Returns None if missing."""
     if not file_path or not os.path.isfile(file_path):
         return None
-    pattern = re.compile(r'version\s*=\s*"([^"]+)"')
+    # This regex finds the [dependency] section and captures the first version string in it.
+    pattern = re.compile(r"\[dependency\][^\[]*version\s*=\s*\"([^\"]+)\"")
     try:
         with open(file_path, "r") as f:
             content = f.read()
     except OSError:
         return None
-    matches = pattern.findall(content)
-    for m in matches:
-        if m != "0" and "." in m:
-            return m.split("@")[0].strip()
+    match = pattern.search(content)
+    if match:
+        version_str = match.group(1)
+        if "." in version_str:
+            return version_str.split("@")[0].strip()
     return None
 
 
@@ -365,8 +367,8 @@ def parse_key_from_file(file_path, key):
                 line = line.strip()
                 if line.startswith(prefix):
                     return line[len(prefix):].strip()
-    except OSError:
-        pass
+    except OSError as e:
+        logger.warning("Could not read file %s: %s", file_path, e)
     return None
 
 
