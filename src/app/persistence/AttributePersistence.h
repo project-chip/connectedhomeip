@@ -164,7 +164,7 @@ public:
     /// not use internal classes directly.
     CHIP_ERROR StoreString(const ConcreteAttributePath & path, const Storage::Internal::ShortString & value);
 
-    /// Validates that the value is different from the current one and writes to storage.
+    /// Writes a TLV-encodable value (using DataModel::Encode) to the attribute storage.
     /// Uses the provided buffer for TLV encoding.
     ///
     /// The encoding format is:
