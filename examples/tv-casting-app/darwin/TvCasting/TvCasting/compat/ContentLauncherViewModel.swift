@@ -18,6 +18,7 @@
 
 import Foundation
 import os.log
+import MatterTvCastingBridge
 
 class ContentLauncherViewModel: ObservableObject {
     let Log = Logger(subsystem: "com.matter.casting",

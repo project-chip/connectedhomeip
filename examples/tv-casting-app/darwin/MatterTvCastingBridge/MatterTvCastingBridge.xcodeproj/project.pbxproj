@@ -690,6 +690,9 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/MatterTvCastingBridge",
+					"$(SRCROOT)/MatterTvCastingBridge/compat-shim",
+					"$(SRCROOT)/MatterTvCastingBridge/zap-generated",
 					"${CHIP_ROOT}/examples/tv-casting-app/tv-casting-common/include",
 					"${CHIP_ROOT}/examples/tv-casting-app/tv-casting-common",
 					"$(CHIP_ROOT)/src",
@@ -770,6 +773,9 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/MatterTvCastingBridge",
+					"$(SRCROOT)/MatterTvCastingBridge/compat-shim",
+					"$(SRCROOT)/MatterTvCastingBridge/zap-generated",
 					"${CHIP_ROOT}/examples/tv-casting-app/tv-casting-common/include",
 					"${CHIP_ROOT}/examples/tv-casting-app/tv-casting-common",
 					"$(CHIP_ROOT)/src",

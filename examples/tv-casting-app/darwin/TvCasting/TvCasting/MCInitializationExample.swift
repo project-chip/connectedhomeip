@@ -18,6 +18,7 @@
 import Foundation
 import Security
 import os.log
+import MatterTvCastingBridge
 
 // This class needs to be imlemented by the client.
 class MCAppParametersDataSource : NSObject, MCDataSource

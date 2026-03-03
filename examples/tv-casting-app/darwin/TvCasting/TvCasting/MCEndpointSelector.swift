@@ -17,6 +17,7 @@
 
 import Foundation
 import os.log
+import MatterTvCastingBridge
 
 class MCEndpointSelector {
     static let Log = Logger(subsystem: "com.matter.casting", category: "MCEndpointSelector")
