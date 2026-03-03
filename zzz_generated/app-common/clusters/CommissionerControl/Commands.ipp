@@ -43,7 +43,12 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kRequestID)) |
+        (1 << to_underlying(Fields::kVendorID)) | (1 << to_underlying(Fields::kProductID));
+    static_assert(to_underlying(Fields::kRequestID) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kVendorID) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kProductID) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -84,7 +89,11 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap =
+        0 | (1 << to_underlying(Fields::kRequestID)) | (1 << to_underlying(Fields::kResponseTimeoutSeconds));
+    static_assert(to_underlying(Fields::kRequestID) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kResponseTimeoutSeconds) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -120,7 +129,15 @@ CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCommissioningTimeout)) |
+        (1 << to_underlying(Fields::kPAKEPasscodeVerifier)) | (1 << to_underlying(Fields::kDiscriminator)) |
+        (1 << to_underlying(Fields::kIterations)) | (1 << to_underlying(Fields::kSalt));
+    static_assert(to_underlying(Fields::kCommissioningTimeout) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kPAKEPasscodeVerifier) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kDiscriminator) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kIterations) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kSalt) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;

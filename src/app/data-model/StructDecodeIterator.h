@@ -53,7 +53,9 @@ namespace detail {
 class StructDecodeIterator
 {
 public:
-    StructDecodeIterator(TLV::TLVReader & reader) : mReader(reader) {}
+    StructDecodeIterator(TLV::TLVReader & reader, uint32_t requiredFieldBitmap = 0) :
+        mReader(reader), mRequiredFieldBitmap(requiredFieldBitmap)
+    {}
 
     /// Iterate through structure elements.
     /// Reader MUST be positioned on a kTLVType_Structure element and iterator
@@ -73,6 +75,7 @@ private:
     bool mEntered = false;
     TLV::TLVType mOuter;
     TLV::TLVReader & mReader;
+    uint32_t mRequiredFieldBitmap;
 };
 
 } // namespace detail

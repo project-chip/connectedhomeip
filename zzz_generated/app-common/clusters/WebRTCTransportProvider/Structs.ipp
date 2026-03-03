@@ -41,7 +41,12 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCipherSuite)) |
+        (1 << to_underlying(Fields::kBaseKey)) | (1 << to_underlying(Fields::kKid));
+    static_assert(to_underlying(Fields::kCipherSuite) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kBaseKey) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kKid) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;

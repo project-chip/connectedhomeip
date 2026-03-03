@@ -43,7 +43,17 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kCurrentSubscriptions)) |
+        (1 << to_underlying(Fields::kCurrentSubscriptionsForFabric)) |
+        (1 << to_underlying(Fields::kTotalSubscriptionsEstablished)) |
+        (1 << to_underlying(Fields::kTotalInteractionModelMessagesSent)) |
+        (1 << to_underlying(Fields::kTotalInteractionModelMessagesReceived));
+    static_assert(to_underlying(Fields::kCurrentSubscriptions) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kCurrentSubscriptionsForFabric) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kTotalSubscriptionsEstablished) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kTotalInteractionModelMessagesSent) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kTotalInteractionModelMessagesReceived) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;
@@ -95,7 +105,20 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    detail::StructDecodeIterator __iterator(reader);
+    constexpr uint32_t kRequiredFieldsBitmap = 0 | (1 << to_underlying(Fields::kName)) |
+        (1 << to_underlying(Fields::kIsOperational)) | (1 << to_underlying(Fields::kOffPremiseServicesReachableIPv4)) |
+        (1 << to_underlying(Fields::kOffPremiseServicesReachableIPv6)) | (1 << to_underlying(Fields::kHardwareAddress)) |
+        (1 << to_underlying(Fields::kIPv4Addresses)) | (1 << to_underlying(Fields::kIPv6Addresses)) |
+        (1 << to_underlying(Fields::kType));
+    static_assert(to_underlying(Fields::kName) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kIsOperational) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kOffPremiseServicesReachableIPv4) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kOffPremiseServicesReachableIPv6) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kHardwareAddress) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kIPv4Addresses) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kIPv6Addresses) < sizeof(kRequiredFieldsBitmap) * 8);
+    static_assert(to_underlying(Fields::kType) < sizeof(kRequiredFieldsBitmap) * 8);
+    detail::StructDecodeIterator __iterator(reader, kRequiredFieldsBitmap);
     while (true)
     {
         uint8_t __context_tag = 0;

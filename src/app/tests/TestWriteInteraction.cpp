@@ -488,9 +488,13 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
         app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataTx;
         dataTx.a = 12;
         dataTx.b = true;
+        dataTx.c = Clusters::UnitTesting::SimpleEnum::kValueA;
         dataTx.d = chip::ByteSpan(byteSpanData);
         // Spec A.11.2 strings SHALL NOT include a terminating null character to mark the end of a string.
         dataTx.e = chip::Span<const char>(charSpanData, strlen(charSpanData));
+        dataTx.f.Set(Clusters::UnitTesting::SimpleBitmap::kValueC);
+        dataTx.g = 0;
+        dataTx.h = 0;
 
         if (encoding == EncodingMethod::Standard)
         {
@@ -499,7 +503,7 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
         else if (encoding == EncodingMethod::PreencodedTLV)
         {
             // Encode AttributeData into TLV
-            uint8_t buffer[50];
+            uint8_t buffer[60];
             TLV::TLVWriter writer;
             writer.Init(buffer, sizeof(buffer));
             TLV::TLVType outerContainer;
@@ -507,8 +511,12 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
             EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainer));
             EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(0), dataTx.a));
             EXPECT_EQ(CHIP_NO_ERROR, writer.PutBoolean(TLV::ContextTag(1), dataTx.b));
+            EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(2), dataTx.c));
             EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(3), dataTx.d));
             EXPECT_EQ(CHIP_NO_ERROR, writer.PutString(TLV::ContextTag(4), dataTx.e));
+            EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(5), dataTx.f));
+            EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(6), dataTx.g));
+            EXPECT_EQ(CHIP_NO_ERROR, writer.Put(TLV::ContextTag(7), dataTx.h));
             EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(outerContainer));
 
             // Put Preencoded Data into AttributeDataIB
@@ -536,9 +544,11 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
             EXPECT_EQ(CHIP_NO_ERROR, DataModel::Decode(reader, dataRx));
             EXPECT_EQ(dataRx.a, dataTx.a);
             EXPECT_EQ(dataRx.b, dataTx.b);
+            EXPECT_EQ(dataRx.c, dataRx.c);
             EXPECT_TRUE(dataRx.d.data_equal(dataTx.d));
             // Equals to dataRx.e.size() == dataTx.e.size() && memncmp(dataRx.e.data(), dataTx.e.data(), dataTx.e.size()) == 0
             EXPECT_TRUE(dataRx.e.data_equal(dataTx.e));
+            EXPECT_EQ(dataRx.f, dataTx.f);
         }
 
         EXPECT_EQ(callback.mOnSuccessCalled, 1);
