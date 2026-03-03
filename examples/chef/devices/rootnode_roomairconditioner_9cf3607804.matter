@@ -1205,7 +1205,6 @@ cluster GeneralDiagnostics = 51 {
 
   bitmap Feature : bitmap32 {
     kDataModelTest = 0x1;
-    kDeviceLoad = 0x2;
   }
 
   struct DeviceLoadStruct {
@@ -2458,14 +2457,14 @@ endpoint 2 {
   }
 
   server cluster TemperatureMeasurement {
-    ram      attribute measuredValue default = 2800;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 1500;
     ram      attribute maxMeasuredValue default = 4500;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 }
 endpoint 3 {

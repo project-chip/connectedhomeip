@@ -192,7 +192,11 @@ public:
 
     void Shutdown(ClusterShutdownType shutdownType) override
     {
-        shutdownCallCount++;
+        // Respect idempotent shutdown - only count first shutdown
+        if (!mIsShutdown)
+        {
+            shutdownCallCount++;
+        }
         DefaultServerCluster::Shutdown(shutdownType);
     }
 

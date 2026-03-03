@@ -172,7 +172,17 @@ class Subprocess(threading.Thread):
 
     def terminate(self):
         """Terminate the subprocess and wait for it to finish."""
+        import time
+
         self.p.terminate()
+
+        # WORKAROUND: Give kernel time to complete socket cleanup after SIGTERM.
+        # Rapid test succession can cause "Address already in use" errors when processes
+        # exit so quickly that the kernel hasn't finished releasing TCP ports (especially
+        # with optimized shutdown paths like idempotent cleanup patterns).
+        # This ensures the port is fully released before the next test starts.
+        time.sleep(2)
+
         self.join()
 
     def wait(self, timeout: Optional[float] = None) -> Optional[int]:

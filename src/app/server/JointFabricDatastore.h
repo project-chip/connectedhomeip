@@ -25,6 +25,7 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/NodeId.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <unordered_map>
 #include <vector>
 
 namespace chip {
@@ -323,7 +324,7 @@ public:
 
     CHIP_ERROR SetNode(NodeId nodeId, Clusters::JointFabricDatastore::DatastoreStateEnum state);
 
-    CHIP_ERROR AddGroupKeySetEntry(Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet);
+    CHIP_ERROR AddGroupKeySetEntry(const Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet);
     bool IsGroupKeySetEntryPresent(uint16_t groupKeySetId);
     CHIP_ERROR RemoveGroupKeySetEntry(uint16_t groupKeySetId);
     CHIP_ERROR UpdateGroupKeySetEntry(Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet);
@@ -411,6 +412,27 @@ public:
     }
 
 private:
+    struct GroupKeySetStorage
+    {
+        std::vector<uint8_t> epochKey0;
+        std::vector<uint8_t> epochKey1;
+        std::vector<uint8_t> epochKey2;
+    };
+
+    struct GroupInformationStorage
+    {
+        // Friendly names are surfaced as CharSpan and may come from non-null-terminated buffers.
+        // Keep raw owned bytes in vector<char> to preserve exact length semantics for Span use.
+        std::vector<char> friendlyName;
+    };
+
+    struct AdminEntryStorage
+    {
+        // Friendly names are stored as owned raw bytes for CharSpan (not C-string) semantics.
+        std::vector<char> friendlyName;
+        std::vector<uint8_t> icac;
+    };
+
     static constexpr size_t kMaxNodes            = 256;
     static constexpr size_t kMaxAdminNodes       = 32;
     static constexpr size_t kMaxGroups           = kMaxNodes / 16;
@@ -429,8 +451,11 @@ private:
     // TODO: Persist these members to local storage
     std::vector<GenericDatastoreNodeInformationEntry> mNodeInformationEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type> mGroupKeySetList;
+    std::unordered_map<uint16_t, GroupKeySetStorage> mGroupKeySetStorage;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type> mAdminEntries;
+    std::unordered_map<NodeId, AdminEntryStorage> mAdminEntryStorage;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type> mGroupInformationEntries;
+    std::unordered_map<GroupId, GroupInformationStorage> mGroupInformationStorage;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type> mEndpointGroupIDEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> mEndpointBindingEntries;
     std::vector<Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type> mNodeKeySetEntries;
@@ -463,6 +488,34 @@ private:
 
     CHIP_ERROR AddNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
     CHIP_ERROR RemoveNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
+
+    void CopyGroupKeySetWithOwnedSpans(const Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & source,
+                                       Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & destination);
+    void RemoveGroupKeySetStorage(uint16_t groupKeySetId);
+
+    void SetGroupInformationFriendlyNameWithOwnedStorage(
+        GroupId groupId, const CharSpan & friendlyName,
+        Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type & destination);
+    void RemoveGroupInformationStorage(GroupId groupId);
+
+    CHIP_ERROR SetAdminEntryWithOwnedStorage(
+        NodeId nodeId, const CharSpan & friendlyName, const ByteSpan & icac,
+        Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type & destination);
+    void RemoveAdminEntryStorage(NodeId nodeId);
+
+    // Helper methods for copying optional ByteSpan and simple nullable values
+    void CopyByteSpanWithOwnedStorage(const DataModel::Nullable<ByteSpan> & source, std::vector<uint8_t> & storage,
+                                      DataModel::Nullable<ByteSpan> & destination);
+
+    template <typename T>
+    void CopyNullableValue(const DataModel::Nullable<T> & source, DataModel::Nullable<T> & destination)
+    {
+        // Only update destination if source has a value; leave destination unchanged if source is null.
+        if (!source.IsNull())
+        {
+            static_cast<void>(destination.Update(source));
+        }
+    }
 
     Delegate * mDelegate = nullptr;
 

@@ -46,12 +46,17 @@ set(CHIP_CFLAGS
 
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/third_party/pigweed/repo)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
-set(CONFIG_ZEPHYR_PIGWEED_MODULE 1)
-set(CONFIG_PIGWEED_ASSERT 1)
-set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
-add_subdirectory(${PIGWEED_ROOT} "${CMAKE_BINARY_DIR}/pigweed")
+# ==================================================
+# Setup Pigweed
+# ==================================================
+
+pw_set_backend(pw_log pw_log_basic)
+pw_set_backend(pw_assert.check pw_assert_log.check_backend)
+pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
+pw_set_backend(pw_sys_io pw_sys_io.zephyr)
 
 # ==================================================
 # Build 'all tests' runner

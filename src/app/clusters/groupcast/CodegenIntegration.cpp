@@ -21,6 +21,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <platform/DefaultTimerDelegate.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -32,6 +33,7 @@ using chip::Protocols::InteractionModel::Status;
 namespace {
 
 LazyRegisteredServerCluster<GroupcastCluster> gServer;
+DefaultTimerDelegate sTimerDelegate;
 
 // Groupcast implementation is specifically implemented
 // only for the root endpoint (endpoint 0)
@@ -54,8 +56,9 @@ public:
 
         gServer.Create(
             GroupcastContext{
-                .fabrics  = Server::GetInstance().GetFabricTable(),
-                .provider = *groupDataProvider,
+                .fabricTable       = Server::GetInstance().GetFabricTable(),
+                .groupDataProvider = *groupDataProvider,
+                .timerDelegate     = sTimerDelegate,
             },
             BitFlags<Groupcast::Feature>(featureMap));
         return gServer.Registration();

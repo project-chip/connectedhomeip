@@ -283,7 +283,7 @@ class Efr32Builder(GnBuilder):
             self.extra_gn_options.append(f"efr32_sdk_root=\"{sdk_path}\"")
 
         if "GSDK_ROOT" in os.environ and not enable_wifi:
-            self.extra_gn_options.append(f"openthread_root=\"{sdk_path}/util/third_party/openthread\"")
+            self.extra_gn_options.append(f"openthread_root=\"{sdk_path}/openthread_stack/util/third_party/openthread\"")
 
         if "WIFI_SDK_ROOT" in os.environ:
             wifi_sdk_path = shlex.quote(os.environ['WIFI_SDK_ROOT'])
