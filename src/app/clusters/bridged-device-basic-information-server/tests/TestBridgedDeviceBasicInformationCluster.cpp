@@ -1214,8 +1214,6 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationValidation)
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationPersistence)
 {
-    const ConcreteAttributePath path = { kTestEndpointId, BridgedDeviceBasicInformation::Id, Attributes::DeviceLocation::Id };
-
     // Clear any previous persistence to ensure we start fresh
     {
         CHIP_ERROR err = mContext.StorageDelegate().SyncDeleteKeyValue(
