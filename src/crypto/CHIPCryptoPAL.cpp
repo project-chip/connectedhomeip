@@ -1320,5 +1320,11 @@ CHIP_ERROR P256Keypair::HazardousOperationLoadKeypairFromRaw(ByteSpan private_ke
     return this->Deserialize(serialized_keypair);
 }
 
+__attribute__((weak)) CHIP_ERROR P256Keypair::ECDSA_sign_msg_det(const uint8_t * msg, size_t msg_length,
+                                                                 P256ECDSASignature & out_signature) const
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
 } // namespace Crypto
 } // namespace chip
