@@ -18,23 +18,10 @@
 Support module for ICD test modules containing shared functionality.
 """
 
-import asyncio
 import logging
-import random
-from dataclasses import dataclass
-from datetime import datetime, timedelta
 from enum import IntEnum
-from typing import Optional
 
-from mdns_discovery import mdns_discovery
-from mobly import asserts
 
-import matter.clusters as Clusters
-from matter import ChipDeviceCtrl
-from matter.interaction_model import Status
-from matter.testing.commissioning import CustomCommissioningParameters
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
 
 log = logging.getLogger(__name__)
 

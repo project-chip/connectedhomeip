@@ -44,8 +44,6 @@
 import os
 import asyncio
 import logging
-import random
-from enum import IntEnum
 
 from mobly import asserts
 
