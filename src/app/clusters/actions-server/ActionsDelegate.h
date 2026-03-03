@@ -46,7 +46,7 @@ public:
      * Get the EndpointList at the Nth index from list of endpointList.
      * @param index The index of the endpointList to be returned. It is assumed that endpoint lists are indexable from 0 and with no
      * gaps.
-     * @param action A reference to the EndpointListStorage which should be initialized via copy/assignments or calling Set().
+     * @param epList A reference to the EndpointListStorage which should be initialized via copy/assignments or calling Set().
      * @return Returns a CHIP_NO_ERROR if there was no error and the epList was returned successfully.
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is past the end of the list of endpointLists.
      */
