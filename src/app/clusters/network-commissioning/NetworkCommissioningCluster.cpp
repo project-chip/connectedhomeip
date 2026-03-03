@@ -27,6 +27,7 @@
 #include <app/clusters/network-commissioning/WifiScanResponse.h>
 #include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
+#include <app/server/Server.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/NetworkCommissioning/AttributeIds.h>
@@ -39,6 +40,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/AutoRelease.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SortUtils.h>
@@ -48,6 +50,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <transport/SecureSession.h>
 #include <tracing/macros.h>
 
 namespace chip {
@@ -60,6 +63,13 @@ using namespace DeviceLayer::NetworkCommissioning;
 using namespace chip::app::Clusters::NetworkCommissioning;
 
 namespace {
+
+bool IsConnectNetworkRequestOverPASE(CommandHandler & handler)
+{
+    Messaging::ExchangeContext * exchangeCtx = handler.GetExchangeContext();
+    return exchangeCtx && exchangeCtx->HasSessionHandle() && exchangeCtx->GetSessionHandle()->IsSecureSession() &&
+        exchangeCtx->GetSessionHandle()->AsSecureSession()->GetSecureSessionType() == Transport::SecureSession::Type::kPASE;
+}
 
 // Note: CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE can be 0, this disables debug text
 using DebugTextStorage = std::array<char, CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE>;
@@ -640,9 +650,18 @@ NetworkCommissioningCluster::HandleConnectNetwork(CommandHandler & handler, cons
 #else
     // In Non-concurrent mode postpone the final execution of ConnectNetwork until the operational
     // network has been fully brought up and kOperationalNetworkStarted is delivered.
-    // mConnectingNetworkIDLen and mConnectingNetworkID contain the received SSID
-    // As per spec, send the ConnectNetworkResponse(Success) prior to releasing the commissioning channel
-    SendNonConcurrentConnectNetworkResponse();
+    // mConnectingNetworkIDLen and mConnectingNetworkID contain the received SSID.
+    //
+    // For PASE/BLE requests, reply before tearing down the commissioning transport.
+    // For CASE requests, keep the command open and reply from OnResult after attach finishes.
+    if (IsConnectNetworkRequestOverPASE(handler))
+    {
+        SendNonConcurrentConnectNetworkResponse();
+    }
+    else
+    {
+        HandleNonConcurrentConnectNetwork();
+    }
 #endif
     return std::nullopt;
 }
@@ -650,8 +669,26 @@ NetworkCommissioningCluster::HandleConnectNetwork(CommandHandler & handler, cons
 std::optional<ActionReturnStatus> NetworkCommissioningCluster::HandleNonConcurrentConnectNetwork()
 {
     ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
-    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%s",
-                    NullTerminated(mConnectingNetworkID, mConnectingNetworkIDLen).c_str());
+    if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
+    {
+        constexpr size_t kThreadNetworkIdHexMax = (2 * kMaxNetworkIDLen) + 1;
+        char threadNetworkIdHex[kThreadNetworkIdHexMax];
+        if (Encoding::BytesToUppercaseHexString(nonConcurrentNetworkID.data(), nonConcurrentNetworkID.size(), threadNetworkIdHex,
+                                                sizeof(threadNetworkIdHex)) == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Thread Network ID=%s", threadNetworkIdHex);
+        }
+        else
+        {
+            ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Thread Network ID (len=%u)",
+                            static_cast<unsigned>(nonConcurrentNetworkID.size()));
+        }
+    }
+    else
+    {
+        ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Wi-Fi SSID=%s",
+                        NullTerminated(mConnectingNetworkID, mConnectingNetworkIDLen).c_str());
+    }
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
     return std::nullopt;
 }
