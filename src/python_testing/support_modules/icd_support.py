@@ -34,10 +34,10 @@ class ICDTestEventTriggerOperations(IntEnum):
     Mirrors ICDTestEventTriggerEvent from ICDManager.cpp.
     Values are derived from the SDK cluster ID to stay in sync automatically.
     """
-    kAddActiveModeReq                = _ICD_CLUSTER_CODE | 0x0000_00000001
-    kRemoveActiveModeReq             = _ICD_CLUSTER_CODE | 0x0000_00000002
-    kInvalidateHalfCounterValues     = _ICD_CLUSTER_CODE | 0x0000_00000003
-    kInvalidateAllCounterValues      = _ICD_CLUSTER_CODE | 0x0000_00000004
+    kAddActiveModeReq = _ICD_CLUSTER_CODE | 0x0000_00000001
+    kRemoveActiveModeReq = _ICD_CLUSTER_CODE | 0x0000_00000002
+    kInvalidateHalfCounterValues = _ICD_CLUSTER_CODE | 0x0000_00000003
+    kInvalidateAllCounterValues = _ICD_CLUSTER_CODE | 0x0000_00000004
     kForceMaximumCheckInBackOffState = _ICD_CLUSTER_CODE | 0x0000_00000005
-    kDSLSForceSitMode                = _ICD_CLUSTER_CODE | 0x0000_00000006
-    kDSLSWithdrawSitMode             = _ICD_CLUSTER_CODE | 0x0000_00000007
+    kDSLSForceSitMode = _ICD_CLUSTER_CODE | 0x0000_00000006
+    kDSLSWithdrawSitMode = _ICD_CLUSTER_CODE | 0x0000_00000007
