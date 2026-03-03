@@ -110,7 +110,7 @@ bool ESP32Diagnostics::IsEnabled(const char * scope)
     return mEnabledFilters.count(MurmurHash(scope)) > 0;
 }
 
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS
+#ifdef CONFIG_ESP_DIAGNOSTIC_METRICS_ENABLED
 void ESP32Diagnostics::LogMessageReceived(MessageReceivedInfo & info) {}
 
 void ESP32Diagnostics::LogMessageSend(MessageSendInfo & info) {}
@@ -161,9 +161,9 @@ void ESP32Diagnostics::TraceCounter(const char * label)
     counter.IncreaseCount(label);
     ReturnOnFailure(counter.ReportMetrics(label, mStorageInstance));
 }
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS
+#endif // CONFIG_ESP_DIAGNOSTIC_METRICS_ENABLED
 
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTIC_TRACES
+#ifdef CONFIG_ESP_DIAGNOSTIC_TRACES_ENABLED
 void ESP32Diagnostics::TraceBegin(const char * label, const char * group)
 {
     VerifyOrReturn(IsEnabled(group));
@@ -177,7 +177,7 @@ void ESP32Diagnostics::TraceInstant(const char * label, const char * value)
     VerifyOrReturn(IsEnabled(value));
     ReturnOnFailure(StoreDiagnostics(label, value));
 }
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTIC_TRACES
+#endif // CONFIG_ESP_DIAGNOSTIC_TRACES_ENABLED
 
 CHIP_ERROR ESP32Diagnostics::StoreDiagnostics(const char * label, const char * group)
 {

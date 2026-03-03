@@ -219,3 +219,14 @@ menu "Energy Gateway Example App Configuration"
             Enable test triggers used by the Commodity Tariff tests
 
 endmenu
+
+menu "Platform Diagnostics"
+
+    config END_USER_BUFFER_SIZE
+        int "Set buffer size for end user diagnostic data"
+        depends on ESP_DIAGNOSTICS_ENABLED
+        default 4096
+        help
+            Defines the buffer size (in bytes) for storing diagnostic data related to end user activity.
+            This buffer will hold logs and traces relevant to user interactions with the Matter protocol.
+endmenu

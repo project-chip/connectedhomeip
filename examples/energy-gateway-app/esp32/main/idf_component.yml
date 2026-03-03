@@ -1,2 +1,9 @@
 dependencies:
     espressif/led_strip: "^1.0.0-alpha"
+
+    espressif/esp_insights:
+        version: "^1.2.4"
+        require: public
+        rules:
+            - if: "idf_version >=5.0"
+            - if: "target != esp32h2"

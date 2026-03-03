@@ -38,16 +38,16 @@ public:
     ESP32Diagnostics(const ESP32Diagnostics &)             = delete;
     ESP32Diagnostics & operator=(const ESP32Diagnostics &) = delete;
 
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTIC_TRACES
+#ifdef CONFIG_ESP_DIAGNOSTIC_TRACES_ENABLED
     void TraceBegin(const char * label, const char * group) override;
 
     void TraceEnd(const char * label, const char * group) override;
 
     /// Trace a zero-sized event
     void TraceInstant(const char * label, const char * group) override;
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTIC_TRACES
+#endif // CONFIG_ESP_DIAGNOSTIC_TRACES_ENABLED
 
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS
+#ifdef CONFIG_ESP_DIAGNOSTIC_METRICS_ENABLED
     void TraceCounter(const char * label) override;
 
     void LogMessageSend(MessageSendInfo &) override;
@@ -57,7 +57,7 @@ public:
     void LogNodeDiscovered(NodeDiscoveredInfo &) override;
     void LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo &) override;
     void LogMetricEvent(const MetricEvent &) override;
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS
+#endif // CONFIG_ESP_DIAGNOSTIC_METRICS_ENABLED
 
     /*
      * @brief Add a filter to the diagnostic backend. Only traces and metrics with the given scope will be stored while other

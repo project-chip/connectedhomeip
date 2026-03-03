@@ -22,8 +22,8 @@ config("tracing") {
 
 config("diagnostic_config") {
   defines = [
-    "CONFIG_ENABLE_ESP_DIAGNOSTIC_TRACES",
-    "CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS",
+    "CONFIG_ESP_DIAGNOSTIC_TRACES_ENABLED",
+    "CONFIG_ESP_DIAGNOSTIC_METRICS_ENABLED",
   ]
 }
 
