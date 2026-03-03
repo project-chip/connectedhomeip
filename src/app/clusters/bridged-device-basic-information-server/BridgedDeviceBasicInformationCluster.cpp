@@ -77,12 +77,6 @@ bool operator==(const LocationDescriptorStructType & a, const LocationDescriptor
     return a.locationName.data_equal(b.locationName) && (a.floorNumber == b.floorNumber) && (a.areaType == b.areaType);
 }
 
-bool operator==(const std::optional<BridgedDeviceBasicInformationCluster::OwnedDeviceLocation> & a,
-                const DataModel::Nullable<LocationDescriptorStructType> & b)
-{
-    return (a.has_value() == !b.IsNull()) && (!a.has_value() || (a->ToView() == b.Value()));
-}
-
 } // namespace
 
 Globals::Structs::LocationDescriptorStruct::Type BridgedDeviceBasicInformationCluster::OwnedDeviceLocation::ToView() const
@@ -174,16 +168,25 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::PersistDeviceLocation()
     VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
     AttributePersistence persistence(mContext->attributeStorage);
 
+    // When persisting, we persist the Nullable<LocationDescriptorStructType> directly.
+    // We reconstruct it from our internal state.
+    auto locationToStore = GetDeviceLocation();
+
+    // Only persist if attribute exists on the cluster.
+    VerifyOrReturnError(locationToStore.has_value(), CHIP_NO_ERROR);
+
     uint8_t buffer[kMaxLocationDescriptorTLVEncodingSize];
     MutableByteSpan span(buffer);
     return persistence.StoreTLV({ mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::DeviceLocation::Id },
-                                GetDeviceLocation(), span);
+                                *locationToStore, span);
 }
 
-DataModel::ActionReturnStatus
-BridgedDeviceBasicInformationCluster::SetDeviceLocationInternal(const DataModel::Nullable<LocationDescriptorStructType> & location,
-                                                                PersistenceMode mode)
+DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetDeviceLocationInternal(
+    const DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> & location, PersistenceMode mode)
 {
+    // Cluster must support this attribute
+    VerifyOrReturnError(mRequiredData.deviceLocation.has_value(), Status::UnsupportedAttribute);
+
     if (!location.IsNull())
     {
         // Validation: At least one field must be non-null/empty
@@ -195,26 +198,39 @@ BridgedDeviceBasicInformationCluster::SetDeviceLocationInternal(const DataModel:
         VerifyOrReturnError(location.Value().locationName.size() <= 128, Status::ConstraintError);
     }
 
-    if (mRequiredData.deviceLocation == location)
+    // Check for equality
+    if (mRequiredData.deviceLocation->IsNull())
     {
-        return Status::Success; // No change
-    }
-
-    std::optional<OwnedDeviceLocation> oldValue = mRequiredData.deviceLocation;
-
-    if (location.IsNull())
-    {
-        mRequiredData.deviceLocation.reset();
+        if (location.IsNull())
+        {
+            return Status::Success; // No change
+        }
     }
     else
     {
-        mRequiredData.deviceLocation = location.Value();
+        if (!location.IsNull())
+        {
+            if (mRequiredData.deviceLocation->Value().ToView() == location.Value())
+            {
+                return Status::Success; // No change
+            }
+        }
+    }
+
+    auto oldValue = mRequiredData.deviceLocation;
+
+    if (location.IsNull())
+    {
+        mRequiredData.deviceLocation->SetNull();
+    }
+    else
+    {
+        mRequiredData.deviceLocation->SetNonNull(location.Value());
     }
 
     if (mode == PersistenceMode::kPersist)
     {
-        CHIP_ERROR err = PersistDeviceLocation();
-        if (err != CHIP_NO_ERROR)
+        if (auto err = PersistDeviceLocation(); err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Failed to persist DeviceLocation: %" CHIP_ERROR_FORMAT, err.Format());
             // Revert the change
@@ -227,8 +243,8 @@ BridgedDeviceBasicInformationCluster::SetDeviceLocationInternal(const DataModel:
     return Status::Success;
 }
 
-DataModel::ActionReturnStatus
-BridgedDeviceBasicInformationCluster::SetDeviceLocation(const DataModel::Nullable<LocationDescriptorStructType> & location)
+DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetDeviceLocation(
+    const DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> & location)
 {
     return SetDeviceLocationInternal(location, PersistenceMode::kPersist);
 }
@@ -273,17 +289,25 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Startup(ServerClusterContext & 
     MutableByteSpan span(buffer);
     DataModel::Nullable<LocationDescriptorStructType> loaded;
 
-    if (persistence.LoadTLV({ mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::DeviceLocation::Id }, loaded,
-                            span) == CHIP_NO_ERROR)
+    if (mRequiredData.deviceLocation.has_value())
     {
-        // Best effort: SetDeviceLocationInternal is called with kDoNotPersist, so it will not fail due to persistence errors.
-        // Other failures (like constraint errors) are not expected here as the value comes from storage.
-        LogErrorOnFailure(SetDeviceLocationInternal(loaded, PersistenceMode::kDoNotPersist).GetUnderlyingError());
-    }
-    else
-    {
-        // Best effort: Failure to store here should not cause the cluster to stop initializing
-        LogErrorOnFailure(PersistDeviceLocation());
+        CHIP_ERROR err = persistence.LoadTLV(
+            { mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::DeviceLocation::Id }, loaded, span);
+        if (err == CHIP_NO_ERROR)
+        {
+            // Best effort: SetDeviceLocationInternal is called with kDoNotPersist, so it will not fail due to persistence errors.
+            // Other failures (like constraint errors) are not expected here as the value comes from storage.
+            LogErrorOnFailure(SetDeviceLocationInternal(loaded, PersistenceMode::kDoNotPersist).GetUnderlyingError());
+        }
+        else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            // Nothing in storage, keep the initial value (from mRequiredData).
+            // This is a best-effort attempt to keep persisted data in sync with startup value
+            // and what is read through `ReadAttribute`.
+            //
+            // Failure to store here should not cause the cluster to stop initializing.
+            LogErrorOnFailure(PersistDeviceLocation());
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -351,7 +375,11 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::ReadAttribut
     case ConfigurationVersion::Id:
         return encoder.Encode(mRequiredData.configurationVersion);
     case DeviceLocation::Id:
-        return encoder.Encode(GetDeviceLocation());
+        if (auto location = GetDeviceLocation(); location.has_value())
+        {
+            return encoder.Encode(*location);
+        }
+        return Status::UnsupportedAttribute;
     default:
         return Status::UnsupportedAttribute;
     }
@@ -402,8 +430,8 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Attributes(const ConcreteCluste
         { mFixedData.serialNumber.has_value(), SerialNumber::kMetadataEntry },
         { true, UniqueID::kMetadataEntry }, // mandatory for new revisions
         { mFixedData.productAppearance.has_value(), ProductAppearance::kMetadataEntry },
-        { true, ConfigurationVersion::kMetadataEntry }, // Always present
-        { true, DeviceLocation::kMetadataEntry },       // Always present (Provisionally Mandatory)
+        { true, ConfigurationVersion::kMetadataEntry },                               // Always present
+        { mRequiredData.deviceLocation.has_value(), DeviceLocation::kMetadataEntry }, // Always present (Provisionally Mandatory)
     };
 
     AttributeListBuilder listBuilder(builder);

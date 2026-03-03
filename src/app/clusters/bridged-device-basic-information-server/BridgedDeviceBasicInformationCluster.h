@@ -105,7 +105,7 @@ public:
         bool reachable = false; // initial value for reachable
         std::string nodeLabel;
         uint32_t configurationVersion = 1;
-        std::optional<OwnedDeviceLocation> deviceLocation;
+        std::optional<DataModel::Nullable<OwnedDeviceLocation>> deviceLocation;
     };
 
     BridgedDeviceBasicInformationCluster(EndpointId endpointId, RequiredData && required, FixedData && fixedData,
@@ -126,11 +126,23 @@ public:
 
     uint32_t GetConfigurationVersion() const { return mRequiredData.configurationVersion; }
 
-    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> GetDeviceLocation() const
+    std::optional<DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type>> GetDeviceLocation() const
     {
-        VerifyOrReturnValue(mRequiredData.deviceLocation.has_value(), DataModel::NullNullable);
-        return DataModel::MakeNullable(mRequiredData.deviceLocation->ToView());
+        if (!mRequiredData.deviceLocation.has_value())
+        {
+            return std::nullopt;
+        }
+
+        if (mRequiredData.deviceLocation->IsNull())
+        {
+            return DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type>(DataModel::NullNullable);
+        }
+
+        return DataModel::MakeNullable(mRequiredData.deviceLocation->Value().ToView());
     }
+
+    /// Device location can only be set if the cluster supports device location
+    /// (i.e. the RequiredData has a location that is not std::nullopt)
     DataModel::ActionReturnStatus
     SetDeviceLocation(const DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> & location);
 

@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/core/Optional.h"
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
@@ -134,7 +135,7 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    virtual void RunUnitTests() override {}
+    void RunUnitTests() override {}
 
     uint32_t mConfigurationVersion = 10;
     uint32_t mStoreCalled          = 0;
@@ -241,7 +242,6 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestEmptyAttributes)
                                             Attributes::Reachable::kMetadataEntry,
                                             Attributes::NodeLabel::kMetadataEntry,
                                             Attributes::ConfigurationVersion::kMetadataEntry,
-                                            Attributes::DeviceLocation::kMetadataEntry,
                                         }));
 }
 
@@ -269,39 +269,44 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestPartialAttributes)
                                             Attributes::NodeLabel::kMetadataEntry,
                                             Attributes::PartNumber::kMetadataEntry,
                                             Attributes::ConfigurationVersion::kMetadataEntry,
-                                            Attributes::DeviceLocation::kMetadataEntry,
                                         }));
 }
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestAllAttributes)
 {
-    BridgedDeviceBasicInformationCluster cluster(
-        kTestEndpointId, { .uniqueId = "foo-bar", .reachable = true, .nodeLabel = "Remote", .configurationVersion = 123u },
-        {
-            .vendorName            = "ACME",
-            .vendorId              = VendorId::Common,
-            .productName           = "Bridge",
-            .productId             = 0x1234,
-            .hardwareVersion       = 0x1122,
-            .hardwareVersionString = "NewVersion-A",
-            .softwareVersion       = 0x11223344,
-            .softwareVersionString = "FancyBuild",
-            .manufacturingDate     = "010203",
-            .partNumber            = "A-B-C",
-            .productUrl            = "http://example.com",
-            .productLabel          = "New",
-            .serialNumber          = "SN123456",
-            .productAppearance =
-                Structs::ProductAppearanceStruct::Type{
-                    .finish       = ProductFinishEnum::kPolished,
-                    .primaryColor = ColorEnum::kFuchsia,
-                },
-        },
-        {
-            .parentVersionConfiguration = mMockVersionConfiguration,
-            .delegate                   = mDelegate,
-            .timerDelegate              = mMockTimer,
-        });
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
+                                                 {
+                                                     .uniqueId             = "foo-bar",
+                                                     .reachable            = true,
+                                                     .nodeLabel            = "Remote",
+                                                     .configurationVersion = 123u,
+                                                     .deviceLocation       = NullOptional,
+                                                 },
+                                                 {
+                                                     .vendorName            = "ACME",
+                                                     .vendorId              = VendorId::Common,
+                                                     .productName           = "Bridge",
+                                                     .productId             = 0x1234,
+                                                     .hardwareVersion       = 0x1122,
+                                                     .hardwareVersionString = "NewVersion-A",
+                                                     .softwareVersion       = 0x11223344,
+                                                     .softwareVersionString = "FancyBuild",
+                                                     .manufacturingDate     = "010203",
+                                                     .partNumber            = "A-B-C",
+                                                     .productUrl            = "http://example.com",
+                                                     .productLabel          = "New",
+                                                     .serialNumber          = "SN123456",
+                                                     .productAppearance =
+                                                         Structs::ProductAppearanceStruct::Type{
+                                                             .finish       = ProductFinishEnum::kPolished,
+                                                             .primaryColor = ColorEnum::kFuchsia,
+                                                         },
+                                                 },
+                                                 {
+                                                     .parentVersionConfiguration = mMockVersionConfiguration,
+                                                     .delegate                   = mDelegate,
+                                                     .timerDelegate              = mMockTimer,
+                                                 });
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
                                             Attributes::VendorName::kMetadataEntry,
@@ -334,6 +339,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestAttributeReads)
                                                      .reachable            = true,
                                                      .nodeLabel            = "TestLabel",
                                                      .configurationVersion = 5u,
+                                                     .deviceLocation       = NullOptional,
                                                  },
                                                  {
                                                      .vendorName            = "TestVendor",
@@ -1064,7 +1070,8 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationWriteRead)
 {
     BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
                                                  {
-                                                     .uniqueId = "test-devicelocation",
+                                                     .uniqueId       = "test-devicelocation",
+                                                     .deviceLocation = NullOptional, // mark attribute supported
                                                  },
                                                  {},
                                                  {
@@ -1077,7 +1084,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationWriteRead)
 
     // Check initial read (should be null)
     DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> readLocationNullable;
-    EXPECT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
     EXPECT_TRUE(readLocationNullable.IsNull());
 
     Globals::Structs::LocationDescriptorStruct::Type testLocation;
@@ -1089,7 +1096,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationWriteRead)
     EXPECT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, testLocation), CHIP_NO_ERROR);
 
     // Read it back
-    EXPECT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
     EXPECT_FALSE(readLocationNullable.IsNull());
     EXPECT_TRUE(LocationDescriptorStructEquals(readLocationNullable.Value(), testLocation));
 
@@ -1100,7 +1107,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationWriteRead)
     clearLocation.areaType.SetNull();
     EXPECT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, clearLocation), CHIP_NO_ERROR);
 
-    EXPECT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
     EXPECT_FALSE(readLocationNullable.IsNull());
     EXPECT_TRUE(LocationDescriptorStructEquals(readLocationNullable.Value(), clearLocation));
 
@@ -1116,7 +1123,8 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationValidation)
 {
     BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
                                                  {
-                                                     .uniqueId = "test-devicelocation",
+                                                     .uniqueId       = "test-devicelocation",
+                                                     .deviceLocation = NullOptional, // mark attribute supported
                                                  },
                                                  {},
                                                  {
@@ -1133,11 +1141,11 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationValidation)
     invalidLocation.areaType.SetNull();
 
     // Attempt to write invalid location
-    EXPECT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, invalidLocation), Status::ConstraintError);
+    ASSERT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, invalidLocation), Status::ConstraintError);
 
     // Check that the value is still null
     DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> readLocationNullable;
-    EXPECT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
     EXPECT_TRUE(readLocationNullable.IsNull());
 }
 
@@ -1166,7 +1174,8 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationPersistence)
     {
         BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
                                                      {
-                                                         .uniqueId = "test-devicelocation",
+                                                         .uniqueId       = "test-devicelocation",
+                                                         .deviceLocation = NullOptional, // mark attribute supported
                                                      },
                                                      {},
                                                      {
@@ -1178,13 +1187,14 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationPersistence)
         ClusterTester tester(cluster);
 
         // Write the location
-        EXPECT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, testLocation), CHIP_NO_ERROR);
+        ASSERT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, testLocation), CHIP_NO_ERROR);
     }
 
     // Re-initialize cluster, it should load from persistence
     BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
                                                  {
-                                                     .uniqueId = "test-devicelocation",
+                                                     .uniqueId       = "test-devicelocation",
+                                                     .deviceLocation = NullOptional, // mark attribute supported
                                                  },
                                                  {},
                                                  {
@@ -1197,7 +1207,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationPersistence)
 
     // Read back and check
     DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> readLocationNullable;
-    EXPECT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readLocationNullable), CHIP_NO_ERROR);
     ASSERT_FALSE(readLocationNullable.IsNull());
     EXPECT_TRUE(LocationDescriptorStructEquals(readLocationNullable.Value(), testLocation));
 }
