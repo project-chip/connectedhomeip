@@ -184,7 +184,8 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::PersistDeviceLocation()
     // Only persist if attribute exists on the cluster.
     VerifyOrReturnError(locationToStore.has_value(), CHIP_NO_ERROR);
 
-    return persistence.StoreTLV<kMaxLocationDescriptorTLVEncodingSize>({ mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::DeviceLocation::Id }, *locationToStore);
+    return persistence.StoreTLV<kMaxLocationDescriptorTLVEncodingSize>(
+        { mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::DeviceLocation::Id }, *locationToStore);
 }
 
 DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetDeviceLocationInternal(

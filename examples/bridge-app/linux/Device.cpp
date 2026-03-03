@@ -88,10 +88,10 @@ Device::CreateBridgedDeviceInfo(chip::EndpointId endpointId,
     // Otherwise default to 1 and use our delegate.
     uint32_t version = mutableData.configurationVersion.has_value() ? mutableData.configurationVersion->version : 1;
 
-mutableData.configurationVersion.emplace(app::Clusters::BridgedDeviceBasicInformationCluster::Versioning{
-    .version = version,
-    .delegate = gEmberVersionUpdate,
-});
+    mutableData.configurationVersion.emplace(app::Clusters::BridgedDeviceBasicInformationCluster::Versioning{
+        .version  = version,
+        .delegate = gEmberVersionUpdate,
+    });
 
     mBridgedDevice.Create(endpointId, std::move(mutableData), std::move(fixedData),
                           app::Clusters::BridgedDeviceBasicInformationCluster::Context{

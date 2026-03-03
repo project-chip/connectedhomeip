@@ -216,7 +216,6 @@ public:
         // NOTE: This overload assumes T does NOT contain views pointing to the buffer,
         // because the buffer is destroyed when this function returns.
         // Use the buffer-passing overload if T contains Views (like Span or List).
-        // Static assert is not available for "HasView", so we rely on documentation and careful usage.
         uint8_t buffer[kMaxBufferSize];
         return LoadTLV(path, value, MutableByteSpan(buffer));
     }
