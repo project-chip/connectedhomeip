@@ -32,10 +32,12 @@ constexpr int16_t kMinStep = 1;
 // According to the spec, maximum selected temperature level value is 31
 constexpr uint8_t kMaxSelectedTemperatureLevel = 31;
 
+TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * TemperatureControlCluster::mDelegate = nullptr;
+
 TemperatureControlCluster::TemperatureControlCluster(EndpointId endpointId, const BitFlags<Feature> features,
                                                      const StartupConfiguration & config) :
     DefaultServerCluster({ endpointId, TemperatureControl::Id }),
-    mFeatures(features), mDelegate(config.delegate)
+    mFeatures(features)
 {
     if (mFeatures.Has(Feature::kTemperatureNumber))
     {

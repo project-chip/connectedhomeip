@@ -35,7 +35,6 @@ public:
         int16_t maxTemperature{};
         int16_t step{};
         uint8_t selectedTemperatureLevel{};
-        TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * delegate{ nullptr };
     };
 
     TemperatureControlCluster(EndpointId endpointId, const BitFlags<TemperatureControl::Feature> features,
@@ -62,9 +61,12 @@ public:
     int16_t GetMinTemperature() const { return mMinTemperature; }
     int16_t GetMaxTemperature() const { return mMaxTemperature; }
 
+    static TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * GetDelegate() { return mDelegate; }
+    static void SetDelegate(TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * delegate) { mDelegate = delegate; }
+
 protected:
     const BitFlags<TemperatureControl::Feature> mFeatures;
-    TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * mDelegate{};
+    static TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * mDelegate;
     int16_t mTemperatureSetpoint{};
     int16_t mMinTemperature{};
     int16_t mMaxTemperature{};

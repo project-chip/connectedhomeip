@@ -37,8 +37,6 @@ constexpr size_t kTemperatureControlMaxClusterCount =
 
 LazyRegisteredServerCluster<TemperatureControlCluster> gServers[kTemperatureControlMaxClusterCount];
 
-static SupportedTemperatureLevelsIteratorDelegate * gDelegate = nullptr;
-
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
@@ -86,8 +84,7 @@ public:
                                                              .minTemperature           = minTemperature,
                                                              .maxTemperature           = maxTemperature,
                                                              .step                     = step,
-                                                             .selectedTemperatureLevel = selectedTemperatureLevel,
-                                                             .delegate                 = gDelegate });
+                                                             .selectedTemperatureLevel = selectedTemperatureLevel });
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -162,12 +159,12 @@ CHIP_ERROR SetTemperatureSetpoint(EndpointId endpointId, int16_t temperatureSetp
 
 SupportedTemperatureLevelsIteratorDelegate * GetDelegate()
 {
-    return gDelegate;
+    return TemperatureControlCluster::GetDelegate();
 }
 
 void SetDelegate(SupportedTemperatureLevelsIteratorDelegate * delegate)
 {
-    gDelegate = delegate;
+    TemperatureControlCluster::SetDelegate(delegate);
 }
 
 } // namespace chip::app::Clusters::TemperatureControl
