@@ -1,0 +1,62 @@
+{{> clusters_src_header clustersHeader="MTRClusters_Private.h" isPrivate=true}}
+{{> placeholder_comment}}
+
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+@implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
+
+{{#zcl_commands}}
+{{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
+{{#*inline "commandImpl"}}
+{{#if (isSupported cluster command=command)}}
+{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}{{else}}CommandSuccess{{/if}}{{/inline}}
+{{#*inline "paramsType"}}MTR{{cluster}}Cluster{{command}}Params{{/inline}}
+{{> clusters_command_impl cluster=cluster}}
+{{/if}}
+{{/inline}}
+{{#if (is_str_equal source 'client')}}
+{{> commandImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                command=(asUpperCamelCase name preserveAcronyms=true)}}
+{{/if}}
+{{/zcl_commands}}
+
+{{#zcl_attributes_server}}
+{{#if (and
+        (or clusterRef
+            (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true)))
+        (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true)))}}
+{{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
+{{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
+- (NSDictionary<NSString *, id> * _Nullable)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRPrivateClusterIDType{{>cluster}}ID) attributeID:@(MTRPrivateAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
+}
+
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
+{{#*inline "callbackName"}}DefaultSuccess{{/inline}}
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+  [self write{{>attribute}}WithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber *timedWriteTimeout = params.timedWriteTimeout;
+    {{#if mustUseTimedWrite}}
+    if (!timedWriteTimeout) {
+        timedWriteTimeout = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+    {{/if}}
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRPrivateClusterIDType{{>cluster}}ID) attributeID:@(MTRPrivateAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+{{/if}}
+
+{{/if}}
+{{/zcl_attributes_server}}
+
+@end
+{{/if}}
+{{/zcl_clusters}}
+
+// NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)

@@ -876,7 +876,7 @@ def main() -> int:
                 'import("${chip_root}/config/standalone/args.gni")',
                 'chip_shell_cmd_server = false',
                 'chip_build_libshell = true',
-                'chip_enable_openthread = false',
+                'chip_enable_thread = false',
                 'chip_generate_link_map_file = true',
                 'chip_config_network_layer_ble = false',
                 'chip_device_project_config_include = "<CHIPProjectAppConfig.h>"',

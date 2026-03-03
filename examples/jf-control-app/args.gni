@@ -38,3 +38,4 @@ chip_tlv_validate_char_string_on_write = true
 # enable Joint Fabric features in the core SDK code
 # (e.g.: commissioner related code from src/controller)
 chip_device_config_enable_joint_fabric = true
+chip_support_thread_meshcop = false

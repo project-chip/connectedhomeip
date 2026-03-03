@@ -289,39 +289,6 @@ config CHIP_MEMORY_PROFILING
 	help
 	  Enables features for tracking memory usage in Matter.
 
-config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
-	int "Define the minimum connection recovery time interval in milliseconds"
-	depends on CHIP_WIFI
-	default 500
-	help
-	  Specifies the minimum connection recovery interval (in milliseconds).
-
-config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
-	int "Define the maximum connection recovery time interval in milliseconds"
-	depends on CHIP_WIFI
-	default 3600000 # 1 hour
-	help
-	  Specifies the maximum connection recovery interval (in milliseconds).
-
-config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
-	int "Define the maximum amount of connection recovery occurrences"
-	depends on CHIP_WIFI
-	default 0
-	help
-	  Specifies the maximum number of connection recovery attempts.
-	  If set to 0, no limitation is applied and attempts
-	  to recover the connection are performed indefinitely.
-
-config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
-	int "Define the connection recovery jitter in milliseconds"
-	depends on CHIP_WIFI
-	default 2000
-	help
-	  Specifies the maximum connection recovery jitter interval (in milliseconds).
-	  Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
-	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
-	  within range [-JITTER; +JITTER].
-
 choice CHIP_LAST_FABRIC_REMOVED_ACTION
 	prompt "An action to perform after removing the last fabric"
 	default CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT

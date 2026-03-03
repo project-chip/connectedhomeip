@@ -116,12 +116,11 @@ CHIP_ERROR UnitLocalizationCluster::SetTemperatureUnit(TempUnitEnum newTempUnit)
         }
     }
     VerifyOrReturnError(isValid, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    VerifyOrReturnValue(mTemperatureUnit != newTempUnit, CHIP_NO_ERROR);
-    mTemperatureUnit = newTempUnit;
-    NotifyAttributeChanged(TemperatureUnit::Id);
-    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
-        ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), to_underlying(mTemperatureUnit)));
-    return CHIP_NO_ERROR;
+
+    VerifyOrReturnError(SetAttributeValue(mTemperatureUnit, newTempUnit, TemperatureUnit::Id), CHIP_NO_ERROR);
+
+    return GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(kRootEndpointId, UnitLocalization::Id, TemperatureUnit::Id), to_underlying(mTemperatureUnit));
 }
 
 CHIP_ERROR UnitLocalizationCluster::Attributes(const ConcreteClusterPath & path,

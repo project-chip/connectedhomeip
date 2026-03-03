@@ -35,6 +35,7 @@
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
+#import "zap-generated/MTRCommandPayloads_Private.h"
 
 #import "app/ConcreteAttributePath.h"
 #import "app/ConcreteCommandPath.h"

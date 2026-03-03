@@ -37,6 +37,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace pw {
 
@@ -44,12 +45,17 @@ template <>
 StatusWithSize ToString<chip::app::DataModel::ActionReturnStatus>(const chip::app::DataModel::ActionReturnStatus & status,
                                                                   pw::span<char> buffer);
 
+template <>
+StatusWithSize ToString<chip::Protocols::InteractionModel::Status>(const chip::Protocols::InteractionModel::Status & status,
+                                                                   pw::span<char> buffer);
+
 } // namespace pw
 
 #if CHIP_CONFIG_TEST_GOOGLETEST
 namespace chip {
 
 void PrintTo(const chip::app::DataModel::ActionReturnStatus & status, std::ostream * os);
+void PrintTo(const chip::Protocols::InteractionModel::Status & status, std::ostream * os);
 
 } // namespace chip
 #endif // CHIP_CONFIG_TEST_GOOGLETEST

@@ -35,7 +35,9 @@ from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Attribute import AttributeCache, ValueDecodeFailure
 from matter.MatterTlvJson import TLVJsonConverter
 from matter.testing.conformance import ConformanceException
-from matter.testing.matter_testing import MatterBaseTest, MatterTestConfig, ProblemNotice
+from matter.testing.matter_test_config import MatterTestConfig
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.problem_notices import ProblemNotice
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 
 LOGGER = logging.getLogger(__name__)

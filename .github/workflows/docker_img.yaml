@@ -47,7 +47,7 @@ jobs:
                     - "-minimal"
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -80,7 +80,7 @@ jobs:
                     - "-crosscompile"
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -121,7 +121,7 @@ jobs:
                     - "-tizen"
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -147,7 +147,7 @@ jobs:
                     - "-tizen-qemu"
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -170,7 +170,7 @@ jobs:
                     - "-vscode"
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |

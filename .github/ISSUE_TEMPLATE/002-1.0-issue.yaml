@@ -51,6 +51,7 @@ body:
               - freeRTOS
               - IMX8
               - k32w
+              - linux
               - nrf connect
               - nrf
               - python

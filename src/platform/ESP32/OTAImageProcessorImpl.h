@@ -33,12 +33,6 @@
 #define IMG_HEADER_LEN sizeof(esp_image_header_t)
 #endif // CONFIG_ENABLE_DELTA_OTA
 
-#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
-#include "esp_check.h"
-#include "esp_rcp_ota.h"
-#include "esp_rcp_update.h"
-#endif
-
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
@@ -53,6 +47,18 @@ public:
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; };
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
+
+#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+    class OTARcpProcessorDelegate
+    {
+    public:
+        virtual esp_err_t OnOtaRcpPrepareDownload()                                                               = 0;
+        virtual esp_err_t OnOtaRcpProcessBlock(const uint8_t * buffer, size_t bufLen, size_t & rcpOtaReceivedLen) = 0;
+        virtual esp_err_t OnOtaRcpFinalize()                                                                      = 0;
+        virtual esp_err_t OnOtaRcpAbort()                                                                         = 0;
+    };
+    void SetOtaRcpDelegate(OTARcpProcessorDelegate * delegate) { mOtaRcpDelegate = delegate; };
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER
 
 #ifdef CONFIG_ENABLE_ENCRYPTED_OTA
     // @brief This API initializes the handling of encrypted OTA image
@@ -106,11 +112,8 @@ private:
     esp_decrypt_handle_t mOTADecryptionHandle = nullptr;
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
-#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
-    esp_rcp_ota_handle_t mRcpOtaHandle;
-    bool mRcpFirmwareDownloaded;
-    uint32_t mBrFirmwareSize;
-    esp_err_t ProcessRcpImage(const uint8_t * buffer, uint32_t bufLen);
+#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+    OTARcpProcessorDelegate * mOtaRcpDelegate = nullptr;
 #endif
 };
 

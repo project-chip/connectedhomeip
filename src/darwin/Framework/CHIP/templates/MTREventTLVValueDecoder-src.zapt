@@ -20,6 +20,7 @@ using namespace chip;
 using namespace chip::app;
 
 {{#zcl_clusters}}
+{{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
 static id _Nullable DecodeEventPayloadFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
@@ -61,17 +62,20 @@ static id _Nullable DecodeEventPayloadFor{{asUpperCamelCase name preserveAcronym
     return nil;
 }
 {{/if}}
+{{/unless}}
 {{/zcl_clusters}}
 
 id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     switch (aPath.mClusterId) {
         {{#zcl_clusters}}
+        {{#unless (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
         {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
         case Clusters::{{asUpperCamelCase name}}::Id: {
             return DecodeEventPayloadFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aPath.mEventId, aReader, aError);
         }
         {{/if}}
+        {{/unless}}
         {{/zcl_clusters}}
         default: {
             break;

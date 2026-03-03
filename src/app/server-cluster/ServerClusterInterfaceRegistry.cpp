@@ -43,21 +43,58 @@ ServerClusterInterfaceRegistry::~ServerClusterInterfaceRegistry()
 
 CHIP_ERROR ServerClusterInterfaceRegistry::Register(ServerClusterRegistration & entry)
 {
-    // we have no strong way to check if entry is already registered somewhere else, so we use "next" as some
-    // form of double-check
-    VerifyOrReturnError(entry.next == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(entry.serverClusterInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     Span<const ConcreteClusterPath> paths = entry.serverClusterInterface->GetPaths();
     VerifyOrReturnError(!paths.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
+    // Check early if this cluster is already registered (idempotent case)
+    // This prevents unnecessary validation work and ensures we don't modify the linked list structure
+    bool isAlreadyRegistered = false;
+    for (const ConcreteClusterPath & path : paths)
+    {
+        ServerClusterInterface * existing = Get(path);
+        if (existing == entry.serverClusterInterface)
+        {
+            isAlreadyRegistered = true;
+            break;
+        }
+    }
+
+    // Validate entry.next is nullptr (unless already registered)
+    // A non-null entry.next when not registered indicates the entry is
+    // already part of another list or improperly initialized
+    if (entry.next != nullptr && !isAlreadyRegistered)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // If already registered (idempotent case), return early
+    if (isAlreadyRegistered)
+    {
+#if CHIP_DETAIL_LOGGING
+        const ConcreteClusterPath path = entry.serverClusterInterface->GetPaths().front();
+        ChipLogDetail(DataManagement, "Cluster already registered for %u/" ChipLogFormatMEI ", skipping re-registration",
+                      path.mEndpointId, ChipLogValueMEI(path.mClusterId));
+#endif
+        return CHIP_NO_ERROR;
+    }
+
+    // Validate paths and check for duplicate registrations
+    // Note: Same cluster re-registering is OK (handled above), but a DIFFERENT
+    // cluster with the same endpoint/cluster ID is an error
+    // Duplicate checking makes this O(n^2) on total registered items. We preserve this to ensure
+    // cluster integrity during Stop/Start cycles, but this may be optimized in the future if needed.
     for (const ConcreteClusterPath & path : paths)
     {
         VerifyOrReturnError(path.HasValidIds(), CHIP_ERROR_INVALID_ARGUMENT);
 
-        // Double-checking for duplicates makes the checks O(n^2) on the total number of registered
-        // items. We preserve this however we may want to make this optional at some point in time.
-        VerifyOrReturnError(Get(path) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID);
+        // A different cluster is already registered for this path
+        ServerClusterInterface * existing = Get(path);
+        if (existing != nullptr)
+        {
+            return CHIP_ERROR_DUPLICATE_KEY_ID;
+        }
     }
 
     if (mContext.has_value())

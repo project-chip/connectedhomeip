@@ -13,11 +13,14 @@
 # limitations under the License.
 
 import logging
+import pathlib
 import re
 import shlex
 import subprocess
 import sys
 import threading
+from dataclasses import dataclass, replace
+from enum import StrEnum
 from typing import BinaryIO, Callable, Optional, Union
 
 LOGGER = logging.getLogger(__name__)
@@ -39,6 +42,32 @@ def forward_f(f_in: BinaryIO,
             line = cb(line, is_stderr)
         f_out.write(line)
         f_out.flush()
+
+
+class SubprocessKind(StrEnum):
+    APP = 'app'
+    TOOL = 'tool'
+    MGMT = 'mgmt'
+
+
+@dataclass
+class SubprocessInfo:
+    kind: SubprocessKind
+    path: pathlib.Path
+    wrapper: tuple[str, ...] = ()
+    args: tuple[str, ...] = ()
+
+    def __post_init__(self):
+        self.path = pathlib.Path(self.path)
+
+    def with_args(self, *args: str):
+        return replace(self, args=self.args + tuple(args))
+
+    def wrap_with(self, *args: str):
+        return replace(self, wrapper=tuple(args) + self.wrapper)
+
+    def to_cmd(self) -> list[str]:
+        return list(self.wrapper) + [str(self.path)] + list(self.args)
 
 
 class Subprocess(threading.Thread):
@@ -172,7 +201,17 @@ class Subprocess(threading.Thread):
 
     def terminate(self):
         """Terminate the subprocess and wait for it to finish."""
+        import time
+
         self.p.terminate()
+
+        # WORKAROUND: Give kernel time to complete socket cleanup after SIGTERM.
+        # Rapid test succession can cause "Address already in use" errors when processes
+        # exit so quickly that the kernel hasn't finished releasing TCP ports (especially
+        # with optimized shutdown paths like idempotent cleanup patterns).
+        # This ensures the port is fully released before the next test starts.
+        time.sleep(2)
+
         self.join()
 
     def wait(self, timeout: Optional[float] = None) -> Optional[int]:

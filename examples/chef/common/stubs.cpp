@@ -5,7 +5,9 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
+#include <devices/Types.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/CHIPMem.h> // For chip::Platform
 
 using chip::app::DataModel::Nullable;
 
@@ -81,6 +83,19 @@ void InitIdentifyCluster()
 }
 } // namespace
 #endif // MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
+
+#if MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "content-launch/chef-content-launch-delegate.h"
+#endif // MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
+
+#if MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "application-basic/chef-application-basic-delegate.h"
+#endif // MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT
+
+#if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "application-launch/chef-application-launch-delegate.h"
+#endif // MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
+
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -107,6 +122,18 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kMiddle = { .namesp
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTopTagList[]  = { PostionSemanticTag::kTop };
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { PostionSemanticTag::kLeft };
 } // namespace PostionSemanticTag
+
+namespace NumberSemanticTag {
+constexpr const uint8_t kNamespace                                = 0x07; // Common Number Namespace
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kOne = { .namespaceID = kNamespace, .tag = 0x01 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTwo = { .namespaceID = kNamespace, .tag = 0x02 };
+} // namespace NumberSemanticTag
+
+namespace GenericSwitch { // Tag lists for rootnode_genericswitch_9866e35d0b app
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp1TagList[] = { PostionSemanticTag::kTop, NumberSemanticTag::kOne };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp2TagList[] = { PostionSemanticTag::kBottom,
+                                                                               NumberSemanticTag::kTwo };
+} // namespace GenericSwitch
 
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
 #include "chef-rvc-operational-state-delegate.h"
@@ -154,6 +181,10 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { 
 #ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
 #include "microwave-oven-control/chef-microwave-oven-control.h"
 #endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+
+#if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "laundry-dryer-controls/chef-laundry-dryer-controls-delegate.h"
+#endif // #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT
 
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
@@ -330,7 +361,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
-        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
+        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, Device::kPumpDeviceTypeId))
         {
             chef::pump::postOnOff(attributePath.mEndpointId, bool(*value));
         }
@@ -345,7 +376,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
-        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
+        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, Device::kPumpDeviceTypeId))
         {
             chef::pump::postMoveToLevel(attributePath.mEndpointId, *value);
         }
@@ -396,34 +427,39 @@ void emberAfChannelClusterInitCallback(EndpointId endpoint)
 
 #ifdef MATTER_DM_PLUGIN_KEYPAD_INPUT_SERVER
 #include "keypad-input/KeypadInputManager.h"
-static KeypadInputManager keypadInputManager;
+static KeypadInputManager keypadInputManager[MATTER_DM_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 void emberAfKeypadInputClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: KeypadInput::SetDefaultDelegate");
-    KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager);
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, KeypadInput::Id, MATTER_DM_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager[ep]);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_LOW_POWER_SERVER
 #include "low-power/LowPowerManager.h"
-static LowPowerManager lowPowerManager;
+static LowPowerManager lowPowerManager[MATTER_DM_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
-    LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, LowPower::Id, MATTER_DM_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT);
+    LowPower::SetDefaultDelegate(endpoint, &lowPowerManager[ep]);
 }
 #endif
 
 #ifdef MATTER_DM_PLUGIN_TARGET_NAVIGATOR_SERVER
 #include "target-navigator/TargetNavigatorManager.h"
-static TargetNavigatorManager targetNavigatorManager;
+static TargetNavigatorManager targetNavigatorManager[MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: TargetNavigator::SetDefaultDelegate");
-    TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, TargetNavigator::Id,
+                                                       MATTER_DM_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT);
+    TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager[ep]);
 }
 #endif
 
@@ -447,14 +483,14 @@ void RefrigeratorTemperatureControlledCabinetInit()
     EndpointId kRefEndpointId           = DeviceTypes::ExpectedEndpointId::kRefrigerator;
     EndpointId kColdCabinetEndpointId   = DeviceTypes::ExpectedEndpointId::kColdCabinetPartOfRefrigerator;
     EndpointId kFreezeCabinetEndpointId = DeviceTypes::ExpectedEndpointId::kFreezeCabinetPartOfRefrigerator;
-    if (!DeviceTypes::EndpointHasDeviceType(kRefEndpointId, DeviceTypes::kRefrigeratorDeviceId))
+    if (!DeviceTypes::EndpointHasDeviceType(kRefEndpointId, Device::kRefrigeratorDeviceTypeId))
     {
         return;
     }
     ChipLogDetail(NotSpecified, "Refrigerator device type on EP: %d", kRefEndpointId);
     TEMPORARY_RETURN_IGNORED SetTreeCompositionForEndpoint(kRefEndpointId);
 
-    if (DeviceTypes::EndpointHasDeviceType(kColdCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    if (DeviceTypes::EndpointHasDeviceType(kColdCabinetEndpointId, Device::kTemperatureControlledCabinetDeviceTypeId))
     {
         ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kColdCabinetEndpointId);
         TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
@@ -462,7 +498,7 @@ void RefrigeratorTemperatureControlledCabinetInit()
             kColdCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gRefrigeratorTagList));
     }
 
-    if (DeviceTypes::EndpointHasDeviceType(kFreezeCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    if (DeviceTypes::EndpointHasDeviceType(kFreezeCabinetEndpointId, Device::kTemperatureControlledCabinetDeviceTypeId))
     {
         ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kFreezeCabinetEndpointId);
         TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
@@ -483,11 +519,11 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
     switch (kCooktopEpId)
     {
     case DeviceTypes::ExpectedEndpointId::kCooktopStandAlone:
-        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId))
+        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, Device::kCooktopDeviceTypeId))
         {
             ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
             EndpointId kCookSurfaceEpId = DeviceTypes::ExpectedEndpointId::kCookSurfacePartOfCooktop;
-            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
+            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, Device::kCookSurfaceDeviceTypeId))
             {
                 ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
                 TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
@@ -499,13 +535,13 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
         break;
     case DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven:
         EndpointId kOvenEpId = DeviceTypes::ExpectedEndpointId::kOven;
-        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId) &&
-            DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
+        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, Device::kCooktopDeviceTypeId) &&
+            DeviceTypes::EndpointHasDeviceType(kOvenEpId, Device::kOvenDeviceTypeId))
         {
             ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
             TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kCooktopEpId, kOvenEpId);
             EndpointId kCookSurfaceEpId = DeviceTypes::ExpectedEndpointId::kCookSurfacePartOfCooktopOven;
-            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
+            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, Device::kCookSurfaceDeviceTypeId))
             {
                 ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
                 TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
@@ -526,7 +562,7 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
     EndpointId kOvenEpId                         = DeviceTypes::ExpectedEndpointId::kOven;
     EndpointId kTemperatureControlledCabinetEpId = DeviceTypes::ExpectedEndpointId::kTopCabinetPartOfOven;
     EndpointId kCooktopEpId                      = DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven;
-    if (!DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
+    if (!DeviceTypes::EndpointHasDeviceType(kOvenEpId, Device::kOvenDeviceTypeId))
     {
         return;
     }
@@ -534,7 +570,7 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
     ChipLogDetail(NotSpecified, "Oven device type on EP: %d", kOvenEpId);
     TEMPORARY_RETURN_IGNORED SetTreeCompositionForEndpoint(kOvenEpId);
 
-    if (DeviceTypes::EndpointHasDeviceType(kTemperatureControlledCabinetEpId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    if (DeviceTypes::EndpointHasDeviceType(kTemperatureControlledCabinetEpId, Device::kTemperatureControlledCabinetDeviceTypeId))
     {
         ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kTemperatureControlledCabinetEpId);
         TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
@@ -548,12 +584,102 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
     CooktopCookSurfaceInit(kCooktopEpId);
 }
 
+/**
+ * This initializer is for the generic switch application rootnode_genericswitch_9866e35d0b. To not have this initialiser affect
+ * new generic switch chef app, use a different set of endpoints.
+ */
+void GenericSwitchInit()
+{
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kGenericSwitchDeviceTypeId))
+    {
+        LogErrorOnFailure(SetTagList(1, Span(GenericSwitch::kEp1TagList)));
+    }
+    if (DeviceTypes::EndpointHasDeviceType(2, Device::kGenericSwitchDeviceTypeId))
+    {
+        LogErrorOnFailure(SetTagList(2, Span(GenericSwitch::kEp2TagList)));
+    }
+}
+
+/**
+ * This initializer is for the laundry dryer application rootnode_laundrydryer_01796fe396. To not have this initialiser affect
+ * new laundry dryer chef apps, use a different endpoint.
+ */
+void LaundryDryerInit()
+{
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: LaundryDryerInit called more than once");
+    called = true;
+#if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    // Only initialises Laundry Dryer Controls. Other clusters are initialised through ember calls.
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kLaundryDryerDeviceTypeId))
+    {
+        Platform::New<LaundryDryerControls::Chef::ChefDelegate>()->Register(1);
+    }
+#endif // #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT
+}
+
+/*
+ * This initializer is for the casting video player application rootnode_castingvideoplayer_contentapp_34699714e7. To not have this
+ * initialiser affect new apps video player device types, use different endpoints.
+ */
+void CastingvideoplayerContentappInit()
+{
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: CastingvideoplayerContentappInit called more than once");
+    called = true;
+
+#if (MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                              \
+    (MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                             \
+    (MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
+    chip::EndpointId kPlatformEndpoint             = 1;
+    chip::EndpointId kAppAEndpoint                 = 2;
+    static constexpr uint16_t kAllowedVendorList[] = { 0xFFF1 };
+
+    if (!DeviceTypes::EndpointHasDeviceType(kPlatformEndpoint, Device::kCastingVideoPlayerDeviceTypeId) ||
+        !DeviceTypes::EndpointHasDeviceType(kAppAEndpoint, Device::kContentAppDeviceTypeId))
+    {
+        return;
+    }
+    ChipLogProgress(NotSpecified, "This is a Casting Video Player Platform");
+
+    // Content Launcher Delegates
+    Platform::New<ContentLauncher::Chef::ChefDelegate>(kPlatformEndpoint)->Register();
+    Platform::New<ContentLauncher::Chef::ChefDelegate>(kAppAEndpoint)->Register();
+
+    // App basic delegates
+    ApplicationBasic::Chef::ChefDelegate * appABasic =
+        Platform::New<ApplicationBasic::Chef::ChefDelegate>(kAppAEndpoint,                            // Endpoint ID
+                                                            "TEST_VENDOR",                            // vendorName
+                                                            0xFFF1,                                   // catalogVendorId
+                                                            "Application_A_ID",                       // applicationId
+                                                            "Application_A_Name",                     // applicationName
+                                                            "Version_1",                              // applicationVersion
+                                                            Span<const uint16_t>(kAllowedVendorList), // allowedVendorList
+                                                            32768                                     // productId
+        );
+    appABasic->Register();
+
+    // Application Launcher Delegates
+    ApplicationLauncher::Chef::PlatformDelegate * platformLauncher =
+        Platform::New<ApplicationLauncher::Chef::PlatformDelegate>(kPlatformEndpoint, Span<const uint16_t>(kAllowedVendorList));
+    platformLauncher->Register();
+    ApplicationLauncher::Chef::AppDelegate * appALauncher =
+        Platform::New<ApplicationLauncher::Chef::AppDelegate>(kAppAEndpoint, appABasic);
+    appALauncher->Register();
+    VerifyOrDie(platformLauncher->AddAppDelegate(appALauncher) == CHIP_NO_ERROR);
+    appALauncher->setPlatformDelegate(platformLauncher);
+#endif
+}
+
 void ApplicationInit()
 {
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
 
     RefrigeratorTemperatureControlledCabinetInit();
     OvenTemperatureControlledCabinetCooktopCookSurfaceInit();
+    GenericSwitchInit();
+    LaundryDryerInit();
+    CastingvideoplayerContentappInit();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER

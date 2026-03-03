@@ -100,13 +100,13 @@ defined:
     Pull Docker Images
 
     ```
-    docker pull ghcr.io/project-chip/chip-build-crosscompile:177
+    docker pull ghcr.io/project-chip/chip-build-crosscompile:181
     ```
 
     Run docker
 
     ```
-    docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:177 /bin/bash
+    docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:181 /bin/bash
     ```
 
     Build

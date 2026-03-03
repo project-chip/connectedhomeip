@@ -17,16 +17,16 @@
 CI:
     - name: "Test against all clusters app"
       app: all-clusters
-    - name: "Test against rvc app"
-      app: rvc
-      # These arguments are not needed, just testing that arguments work
-      args: ["--vendor-name", "Testing"]
-    - name: "Test against lit-icd app"
-      app: lit-icd
-      # These arguments are not needed, just testing that arguments work
+    - name: "Test against all-devices/occupancy-sensor"
+      app: all-devices
       args:
-          - --vendor-name
-          - test123
+          - --device
+          - occupancy-sensor
+    - name: "Test against all-devices/on-off-light"
+      app: all-devices
+      args:
+          - --device
+          - on-off-light
 
 name: 12.2.2. [TC-BINFO-2.2] Events [DUT-Server]
 

@@ -173,7 +173,7 @@ void BaseApplicationDelegate::OnCommissioningSessionStarted()
 {
     isComissioningStarted = true;
 
-#if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
     WifiSleepManager::GetInstance().HandleCommissioningSessionStarted();
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
@@ -182,7 +182,7 @@ void BaseApplicationDelegate::OnCommissioningSessionStopped()
 {
     isComissioningStarted = false;
 
-#if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
     WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
@@ -191,7 +191,7 @@ void BaseApplicationDelegate::OnCommissioningSessionEstablishmentError(CHIP_ERRO
 {
     isComissioningStarted = false;
 
-#if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
     WifiSleepManager::GetInstance().HandleCommissioningSessionStopped();
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
@@ -239,6 +239,11 @@ void BaseApplicationDelegate::OnFabricRemoved(const FabricTable & fabricTable, F
 
 CHIP_ERROR BaseApplication::StartAppTask(osThreadFunc_t taskFunction)
 {
+
+    // Fix OTA by registering the EvenHandler sooner
+    // MATTER-4889
+    ReturnErrorOnFailure(PlatformMgr().AddEventHandler(OnPlatformEvent, 0));
+
     sAppEventQueue = osMessageQueueNew(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), &appEventQueueAttr);
     if (sAppEventQueue == NULL)
     {
@@ -274,6 +279,7 @@ CHIP_ERROR BaseApplication::Init()
         return err;
     }
 
+    GetPlatform().WatchdogInit();
     return err;
 }
 
@@ -342,7 +348,6 @@ CHIP_ERROR BaseApplication::BaseInit()
     RegisterPerfTestCommands();
 #endif // PERFORMANCE_TEST_ENABLED
 
-    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(OnPlatformEvent, 0);
 #ifdef SL_WIFI
     BaseApplication::sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
 #endif /* SL_WIFI */
@@ -692,7 +697,7 @@ void BaseApplication::StopStatusLEDTimer()
 #ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 void BaseApplication::OnIdentifyStart(Identify * identify)
 {
-    ChipLogProgress(Zcl, "onIdentifyStart");
+    ChipLogDetail(Zcl, "onIdentifyStart");
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     StartStatusLEDTimer();
@@ -701,7 +706,7 @@ void BaseApplication::OnIdentifyStart(Identify * identify)
 
 void BaseApplication::OnIdentifyStop(Identify * identify)
 {
-    ChipLogProgress(Zcl, "onIdentifyStop");
+    ChipLogDetail(Zcl, "onIdentifyStop");
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     StopStatusLEDTimer();
@@ -710,7 +715,7 @@ void BaseApplication::OnIdentifyStop(Identify * identify)
 
 void BaseApplication::OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
-    ChipLogProgress(Zcl, "Trigger Identify Complete");
+    ChipLogDetail(Zcl, "Trigger Identify Complete");
     sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -753,7 +758,7 @@ void BaseApplication::OnTriggerIdentifyEffect(Identify * identify)
         break;
     default:
         sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
-        ChipLogProgress(Zcl, "No identifier effect");
+        ChipLogDetail(Zcl, "No identifier effect");
     }
 }
 
@@ -870,7 +875,7 @@ void BaseApplication::ScheduleFactoryReset()
         {
             TEMPORARY_RETURN_IGNORED Provision::Manager::GetInstance().SetProvisionRequired(true);
         }
-#if SL_WIFI
+#if defined(SL_WIFI) && SL_WIFI
         // Removing the matter services on factory reset
         TEMPORARY_RETURN_IGNORED chip::Dnssd::ServiceAdvertiser::Instance().RemoveServices();
 #endif
@@ -949,7 +954,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
         if ((event->ThreadConnectivityChange.Result == kConnectivity_Established) ||
             (event->InternetConnectivityChange.IPv6 == kConnectivity_Established))
         {
-#if SL_WIFI
+#if defined(SL_WIFI) && SL_WIFI
             chip::app::DnssdServer::Instance().StartServer();
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -977,7 +982,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
     break;
 
     case DeviceEventType::kCommissioningComplete: {
-#if SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
         TEMPORARY_RETURN_IGNORED WifiSleepManager::GetInstance().VerifyAndTransitionToLowPowerMode(
             WifiSleepManager::PowerEvent::kCommissioningComplete);
 #endif // SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER

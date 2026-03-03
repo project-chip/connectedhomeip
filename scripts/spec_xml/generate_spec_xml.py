@@ -46,22 +46,21 @@ except ModuleNotFoundError:
 
 
 CURRENT_IN_PROGRESS_DEFINES = [
-    "access-closure",
+    "ambient-context-sensor",
+    "ambientsensing",
     "cameras",
-    "closures",
-    "electrical-grid-conditions",
-    "energy-mtrid",
-    "energy-price",
-    "energy-tariff",
-    "irrigation-system",
-    "metering",
-    "nfcCommissioning",
-    "q-phase-2",
-    "rvc-direct-mode",
-    "rvc-go-home",
-    "soil-sensor",
-    "temperature-sensor-with-screen",
-    "tls"
+    "cameras-image-rotation",
+    "groupcast",
+    "hrap-pdc",
+    "hrap-tbrd",
+    "hvac-thermostat-events",
+    "hvac-thermostat-suggestions",
+    "improved-capabilities-tcr",
+    "partitioned-crl",
+    "security-sensor-events-tcr",
+    "tcr-smokeco-unmounted-state",
+    "temperature-alarm",
+    "thread-commissioning",
 ]
 
 

@@ -80,9 +80,10 @@ private:
         static_assert(chip::DeviceLayer::Internal::kMaxWiFiSSIDLength <= UINT8_MAX, "SSID length might not fit in item.ssidLen");
         item.ssidLen = static_cast<uint8_t>(
             strnlen(reinterpret_cast<const char *>(ap_record.ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
-        item.channel  = ap_record.primary;
-        item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        item.rssi     = ap_record.rssi;
+        item.channel         = ap_record.primary;
+        item.wiFiBand        = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
+        item.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
+        item.signal.strength = ap_record.rssi;
         memcpy(item.ssid, ap_record.ssid, item.ssidLen);
         memcpy(item.bssid, ap_record.bssid, sizeof(item.bssid));
     }

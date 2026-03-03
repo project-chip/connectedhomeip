@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
-#include <app/clusters/tls-certificate-management-server/TlsCertificateManagementCluster.h>
+#include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
 
 namespace chip {
 namespace app {
@@ -36,13 +36,13 @@ namespace Clusters {
  *
  * @param delegate The delegate to be used by the TLS Certificate Management cluster.
  */
-void MatterTlsCertificateManagementSetDelegate(TlsCertificateManagementDelegate & delegate);
+void MatterTlsCertificateManagementSetDelegate(TLSCertificateManagementDelegate & delegate);
 
 /**
  * Set the certificate table for the TLS Certificate Management cluster.
  *
  * MUST be called before Matter data model initialization (e.g. in main() before ServerInit()).
- * The certificate table is used during cluster initialization via emberAfTlsCertificateManagementClusterInitCallback.
+ * The certificate table is used during cluster initialization via emberAfTLSCertificateManagementClusterInitCallback.
  * If called after cluster initialization, it will have no effect as the cluster instance
  * has already been created with the previous certificate table.
  *
@@ -56,7 +56,7 @@ void MatterTlsCertificateManagementSetCertificateTable(Tls::CertificateTableImpl
  * Set the dependency checker for the TLS Certificate Management cluster.
  *
  * MUST be called before Matter data model initialization (e.g. in main() before ServerInit()).
- * The dependency checker is used during cluster initialization via emberAfTlsCertificateManagementClusterInitCallback.
+ * The dependency checker is used during cluster initialization via emberAfTLSCertificateManagementClusterInitCallback.
  * If called after cluster initialization, it will have no effect as the cluster instance
  * has already been created with the previous dependency checker.
  *

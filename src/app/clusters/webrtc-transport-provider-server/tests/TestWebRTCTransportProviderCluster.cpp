@@ -72,14 +72,10 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode, DataModel::Nullable<uint16_t> videoStreamID,
-                                DataModel::Nullable<uint16_t> audioStreamID) override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                   Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override
+    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<std::vector<uint16_t>> & videoStreams,
+                                   Optional<std::vector<uint16_t>> & audioStreams) override
     {
         return CHIP_NO_ERROR;
     }
@@ -87,6 +83,10 @@ public:
     CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) override { return CHIP_NO_ERROR; }
 
     CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR ValidateVideoStreams(const std::vector<uint16_t> & videoStreams) override { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR ValidateAudioStreams(const std::vector<uint16_t> & audioStreams) override { return CHIP_NO_ERROR; }
 
     CHIP_ERROR IsStreamUsageSupported(Globals::StreamUsageEnum streamUsage) override { return CHIP_NO_ERROR; }
 

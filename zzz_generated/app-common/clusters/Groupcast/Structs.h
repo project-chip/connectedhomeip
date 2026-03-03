@@ -44,6 +44,7 @@ enum class Fields : uint8_t
     kEndpoints       = 1,
     kKeySetID        = 2,
     kHasAuxiliaryACL = 3,
+    kMcastAddrPolicy = 4,
     kFabricIndex     = 254,
 };
 
@@ -51,10 +52,11 @@ struct Type
 {
 public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
-    DataModel::List<const chip::EndpointId> endpoints;
-    uint16_t keySetID             = static_cast<uint16_t>(0);
-    bool hasAuxiliaryACL          = static_cast<bool>(0);
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    Optional<DataModel::List<const chip::EndpointId>> endpoints;
+    uint16_t keySetID = static_cast<uint16_t>(0);
+    Optional<bool> hasAuxiliaryACL;
+    MulticastAddrPolicyEnum mcastAddrPolicy = static_cast<MulticastAddrPolicyEnum>(0);
+    chip::FabricIndex fabricIndex           = static_cast<chip::FabricIndex>(0);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -73,10 +75,11 @@ struct DecodableType
 {
 public:
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
-    DataModel::DecodableList<chip::EndpointId> endpoints;
-    uint16_t keySetID             = static_cast<uint16_t>(0);
-    bool hasAuxiliaryACL          = static_cast<bool>(0);
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    Optional<DataModel::DecodableList<chip::EndpointId>> endpoints;
+    uint16_t keySetID = static_cast<uint16_t>(0);
+    Optional<bool> hasAuxiliaryACL;
+    MulticastAddrPolicyEnum mcastAddrPolicy = static_cast<MulticastAddrPolicyEnum>(0);
+    chip::FabricIndex fabricIndex           = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

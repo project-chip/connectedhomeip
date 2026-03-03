@@ -36,6 +36,13 @@ CHIP_ERROR DishwasherModeDelegate::Init()
 // todo refactor code by making a parent class for all ModeInstance classes to reduce flash usage.
 void DishwasherModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
+    if (gDishwasherModeInstance->GetFailTransition())
+    {
+        response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
+        response.statusText.SetValue(chip::CharSpan::fromCharString("Mode change not allowed due to device state"));
+        return;
+    }
+
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 

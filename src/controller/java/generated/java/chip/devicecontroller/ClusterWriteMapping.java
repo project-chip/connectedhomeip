@@ -2901,28 +2901,6 @@ public class ClusterWriteMapping {
       writeAmbientContextSensingSimultaneousDetectionLimitCommandParams
     );
     writeAmbientContextSensingInteractionInfo.put("writeSimultaneousDetectionLimitAttribute", writeAmbientContextSensingSimultaneousDetectionLimitAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeAmbientContextSensingCountThresholdCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo ambientContextSensingcountThresholdCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeAmbientContextSensingCountThresholdCommandParams.put(
-        "value",
-        ambientContextSensingcountThresholdCommandParameterInfo
-    );
-    InteractionInfo writeAmbientContextSensingCountThresholdAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.AmbientContextSensingCluster) cluster).writeCountThresholdAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeAmbientContextSensingCountThresholdCommandParams
-    );
-    writeAmbientContextSensingInteractionInfo.put("writeCountThresholdAttribute", writeAmbientContextSensingCountThresholdAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeAmbientContextSensingHoldTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo ambientContextSensingholdTimeCommandParameterInfo =
         new CommandParameterInfo(

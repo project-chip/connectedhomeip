@@ -222,6 +222,7 @@ CHIP_ERROR EndpointListLoader::ReadVendorId(EndpointAttributes * endpointAttribu
             ChipLogError(AppServer,
                          "EndpointListLoader::ReadAttribute(VendorID) failed for endpointID %d. Err: %" CHIP_ERROR_FORMAT,
                          _endpointAttributes->mId, err.Format());
+            IgnoreUnusedVariable(_endpointAttributes); // May be unused when logging is disabled
             EndpointListLoader::GetInstance()->Complete();
         });
 }
@@ -245,6 +246,7 @@ CHIP_ERROR EndpointListLoader::ReadProductId(EndpointAttributes * endpointAttrib
             ChipLogError(AppServer,
                          "EndpointListLoader::ReadAttribute(ProductID) failed for endpointID %d. Err: %" CHIP_ERROR_FORMAT,
                          _endpointAttributes->mId, err.Format());
+            IgnoreUnusedVariable(_endpointAttributes); // May be unused when logging is disabled
             EndpointListLoader::GetInstance()->Complete();
         });
 }
@@ -271,6 +273,7 @@ CHIP_ERROR EndpointListLoader::ReadDeviceTypeList(EndpointAttributes * endpointA
             ChipLogError(AppServer,
                          "EndpointListLoader::ReadAttribute(DeviceTypeList) failed for endpointID %d. Err: %" CHIP_ERROR_FORMAT,
                          _endpointAttributes->mId, err.Format());
+            IgnoreUnusedVariable(_endpointAttributes); // May be unused when logging is disabled
             EndpointListLoader::GetInstance()->Complete();
         });
 }

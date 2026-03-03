@@ -189,16 +189,6 @@
 	url = https://github.com/SiliconLabsSoftware/matter_support.git
 	branch = main
 	platforms = silabs,silabs_docker,unit_tests
-[submodule "third_party/silabs/simplicity_sdk"]
-	path = third_party/silabs/simplicity_sdk
-	url = https://github.com/SiliconLabs/simplicity_sdk.git
-	branch = v2025.6.0
-	platforms = silabs
-[submodule "third_party/silabs/wifi_sdk"]
-	path = third_party/silabs/wifi_sdk
-	url = https://github.com/SiliconLabs/wiseconnect.git
-	branch = v3.5.0
-	platforms = silabs
 [submodule "editline"]
 	path = third_party/editline/repo
 	url = https://github.com/troglobit/editline.git
@@ -227,6 +217,7 @@
 	url = https://github.com/bouffalolab/bl_iot_sdk_tiny.git
 	branch = main
 	platforms = bouffalolab
+	recursive = true
 [submodule "third_party/libwebsockets/repo"]
 	path = third_party/libwebsockets/repo
 	url = https://github.com/warmcat/libwebsockets
@@ -339,3 +330,17 @@
 	url = https://github.com/awslabs/amazon-kinesis-video-streams-webrtc-sdk-c
 	platforms = esp32
 	recursive = true
+[submodule "third_party/ot-commissioner/repo"]
+	path = third_party/ot-commissioner/repo
+	url = https://github.com/openthread/ot-commissioner.git
+	platforms = linux
+	recursive = true
+[submodule "third_party/uriparser/repo"]
+	path = third_party/uriparser/repo
+	url = https://github.com/uriparser/uriparser.git
+	branch = uriparser-1.0.0
+[submodule "third_party/bouffalolab/repo_bouffalo_sdk"]
+	path = third_party/bouffalolab/repo_bouffalo_sdk
+	url = https://github.com/bouffalolab/bouffalo_sdk.git
+	branch = main
+	platforms = bouffalolab
