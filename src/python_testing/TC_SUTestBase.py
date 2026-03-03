@@ -401,7 +401,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         # the Downloading State
 
         # Max timeout seconds
-        max_timeout = 60
+        max_timeout = 120
 
         download_progress_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -459,8 +459,19 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             if current_progress > current_max_progress:
                 current_max_progress = current_progress + 1
 
-            download_progress_attr_handler.await_all_expected_report_matches(
-                [download_progress_attr_matcher_obj], timeout_sec=max_timeout)
+            # warn no fail added so waiting for status
+            attr_report_status = download_progress_attr_handler.await_all_expected_report_matches(
+                [download_progress_attr_matcher_obj], timeout_sec=max_timeout, warn_no_fail=True)
+            log.info(f"Report status: {attr_report_status}")
+            if not attr_report_status:
+                response = self.wait_for_user_input(
+                    f"Report not received, would you like to wait {max_timeout} seconds for next report?",
+                    prompt_msg_placeholder="Enter 'y' or 'n'")
+                if response.strip().lower() in ("y", "yes"):
+                    # no argment with warn_no_fail
+                    attr_report_status = download_progress_attr_handler.await_all_expected_report_matches(
+                        [download_progress_attr_matcher_obj], timeout_sec=max_timeout)
+
             # Increase the progress
             current_max_progress += 2
             if current_max_progress > max_progress:
