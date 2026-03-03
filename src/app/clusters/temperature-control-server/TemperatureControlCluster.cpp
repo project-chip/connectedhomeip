@@ -186,7 +186,7 @@ TemperatureControlCluster::HandleSetTemperature(CommandHandler * commandObj, con
             {
                 return Status::ConstraintError;
             }
-            else if (err != CHIP_NO_ERROR)
+            if (err != CHIP_NO_ERROR)
             {
                 /**
                  * If the server is unable to execute the command at the time the command is received
@@ -211,11 +211,11 @@ TemperatureControlCluster::HandleSetTemperature(CommandHandler * commandObj, con
             {
                 return Status::NotFound;
             }
-            else if (err == CHIP_IM_GLOBAL_STATUS(ConstraintError))
+            if (err == CHIP_IM_GLOBAL_STATUS(ConstraintError))
             {
                 return Status::ConstraintError;
             }
-            else if (err != CHIP_NO_ERROR)
+            if (err != CHIP_NO_ERROR)
             {
                 /**
                  * If the server is unable to execute the command at the time the command is received
