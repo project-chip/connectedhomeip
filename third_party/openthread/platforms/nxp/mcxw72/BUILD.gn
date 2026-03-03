@@ -42,6 +42,18 @@ config("openthread_mcxw72_config") {
     ]
   }
 
+  if (chip_openthread_ftd) {
+    defines += [
+      "OPENTHREAD_FTD=1",
+      "OPENTHREAD_MTD=0",
+    ]
+  } else {
+    defines += [
+      "OPENTHREAD_FTD=0",
+      "OPENTHREAD_MTD=1",
+    ]
+  }
+
   if (nxp_nvm_component == "nvs") {
     defines += [ "CONFIG_SETTINGS_RUNTIME=1" ]
   }
@@ -68,7 +80,6 @@ source_set("openthread_core_config_mcxw72") {
 
 source_set("libopenthread-mcxw72") {
   sources = [
-    "${openthread_nxp_root}/src/common/crypto.c",
     "${openthread_nxp_root}/src/mcxw/platform/alarm.c",
     "${openthread_nxp_root}/src/mcxw/platform/entropy.c",
     "${openthread_nxp_root}/src/mcxw/platform/misc.c",
