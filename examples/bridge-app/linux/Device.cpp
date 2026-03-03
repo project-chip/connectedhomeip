@@ -76,16 +76,35 @@ Status Device::OnNodeLabelChanged(const std::string & newNodeLabel)
 
 app::ServerClusterRegistration &
 Device::CreateBridgedDeviceInfo(chip::EndpointId endpointId,
-                                chip::app::Clusters::BridgedDeviceBasicInformationCluster::RequiredData && required,
-                                chip::app::Clusters::BridgedDeviceBasicInformationCluster::FixedData && fixed)
+                                chip::app::Clusters::BridgedDeviceBasicInformationCluster::MutableData && mutableData,
+                                chip::app::Clusters::BridgedDeviceBasicInformationCluster::FixedData && fixedData)
 {
     VerifyOrDie(!mBridgedDevice.IsConstructed());
 
     static chip::app::DefaultTimerDelegate timerDelegate;
 
-    mBridgedDevice.Create(endpointId, std::move(required), std::move(fixed),
+    // Ensure configuration version is set.
+    // If we were passed a version in mutableData (e.g. from restore), keep it.
+    // Otherwise default to 1 and use our delegate.
+    if (!mutableData.configurationVersion.has_value())
+    {
+        mutableData.configurationVersion.emplace(app::Clusters::BridgedDeviceBasicInformationCluster::Versioning{
+            .version = 1,
+            .delegate = gEmberVersionUpdate,
+        });
+    }
+    else
+    {
+         // If it WAS set (e.g. by caller), we still need to ensure the delegate is set is valid.
+         // Since 'delegate' is a reference, we cannot rebind it. We must reconstruct the Versioning object.
+         mutableData.configurationVersion.emplace(app::Clusters::BridgedDeviceBasicInformationCluster::Versioning{
+            .version = mutableData.configurationVersion->version,
+            .delegate = gEmberVersionUpdate,
+         });
+    }
+
+    mBridgedDevice.Create(endpointId, std::move(mutableData), std::move(fixedData),
                           app::Clusters::BridgedDeviceBasicInformationCluster::Context{
-                              .parentVersionConfiguration = gEmberVersionUpdate,
                               .delegate                   = *this,
                               .timerDelegate              = timerDelegate,
                           });
@@ -164,7 +183,7 @@ void Device::GenerateUniqueId()
 uint32_t Device::GetConfigurationVersion()
 {
     VerifyOrReturnValue(mBridgedDevice.IsConstructed(), 1);
-    return mBridgedDevice.Cluster().GetConfigurationVersion();
+    return mBridgedDevice.Cluster().GetConfigurationVersion().value_or(1);
 }
 
 void Device::IncreaseConfigurationVersion()
@@ -172,7 +191,7 @@ void Device::IncreaseConfigurationVersion()
     VerifyOrReturn(mBridgedDevice.IsConstructed());
     LogErrorOnFailure(mBridgedDevice.Cluster().IncreaseConfigurationVersion());
     ChipLogProgress(DeviceLayer, "Device[%s]: New Configuration Version=\"%d\"", mName,
-                    mBridgedDevice.Cluster().GetConfigurationVersion());
+                    mBridgedDevice.Cluster().GetConfigurationVersion().value_or(0));
 }
 
 DeviceOnOff::DeviceOnOff(const char * szDeviceName, std::string szLocation) : Device(szDeviceName, szLocation)
