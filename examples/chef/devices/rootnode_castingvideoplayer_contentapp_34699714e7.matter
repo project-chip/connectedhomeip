@@ -341,7 +341,7 @@ struct SemanticTagStruct {
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
-  optional nullable TestGlobalEnum myEnum = 2;
+  nullable TestGlobalEnum myEnum = 2;
 }
 
 struct ViewportStruct {
@@ -356,8 +356,8 @@ fabric_scoped struct WebRTCSessionStruct {
   node_id peerNodeID = 1;
   endpoint_no peerEndpointID = 2;
   StreamUsageEnum streamUsage = 3;
-  nullable int16u videoStreamID = 4;
-  nullable int16u audioStreamID = 5;
+  optional nullable int16u videoStreamID = 4;
+  optional nullable int16u audioStreamID = 5;
   boolean metadataEnabled = 6;
   optional int16u videoStreams[] = 7;
   optional int16u audioStreams[] = 8;
@@ -738,6 +738,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
+  attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
   readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;

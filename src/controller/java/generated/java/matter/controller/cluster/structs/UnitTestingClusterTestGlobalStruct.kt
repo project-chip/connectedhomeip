@@ -27,7 +27,7 @@ import matter.tlv.TlvWriter
 class UnitTestingClusterTestGlobalStruct(
   val name: String,
   val myBitmap: UInt?,
-  val myEnum: Optional<UByte>?
+  val myEnum: UByte?
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestGlobalStruct {\n")
@@ -47,10 +47,7 @@ class UnitTestingClusterTestGlobalStruct(
         putNull(ContextSpecificTag(TAG_MY_BITMAP))
       }
       if (myEnum != null) {
-        if (myEnum.isPresent) {
-        val optmyEnum = myEnum.get()
-        put(ContextSpecificTag(TAG_MY_ENUM), optmyEnum)
-      }
+        put(ContextSpecificTag(TAG_MY_ENUM), myEnum)
       } else {
         putNull(ContextSpecificTag(TAG_MY_ENUM))
       }
@@ -73,11 +70,7 @@ class UnitTestingClusterTestGlobalStruct(
       null
     }
       val myEnum = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_MY_ENUM))) {
-      Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_MY_ENUM)))
-    } else {
-      Optional.empty()
-    }
+      tlvReader.getUByte(ContextSpecificTag(TAG_MY_ENUM))
     } else {
       tlvReader.getNull(ContextSpecificTag(TAG_MY_ENUM))
       null

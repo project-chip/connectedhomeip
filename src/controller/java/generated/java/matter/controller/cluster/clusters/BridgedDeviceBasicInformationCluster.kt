@@ -70,23 +70,24 @@ class BridgedDeviceBasicInformationCluster(private val controller: MatterControl
     
     data class Error(val exception: Exception) : ProductAppearanceAttributeSubscriptionState()
 
-    object SubscriptionEstablished : ProductAppearanceAttributeSubscriptionState()
-  }
-
-  class DeviceLocationAttribute(
+    object SubscriptionEstablished : ProductAppearanceAttributeSubscriptionState()    
+  }  
+class DeviceLocationAttribute(
     val value: BridgedDeviceBasicInformationClusterLocationDescriptorStruct?
   )
 
   sealed class DeviceLocationAttributeSubscriptionState {
-    data class Success(val value: BridgedDeviceBasicInformationClusterLocationDescriptorStruct?) :
-      DeviceLocationAttributeSubscriptionState()
-
+    data class Success(
+    val value: BridgedDeviceBasicInformationClusterLocationDescriptorStruct?
+    ) : DeviceLocationAttributeSubscriptionState()
+    
     data class Error(val exception: Exception) : DeviceLocationAttributeSubscriptionState()
 
-    object SubscriptionEstablished : DeviceLocationAttributeSubscriptionState()
-  }
-
-  class GeneratedCommandListAttribute(val value: List<UInt>)
+    object SubscriptionEstablished : DeviceLocationAttributeSubscriptionState()    
+  }  
+class GeneratedCommandListAttribute(
+    val value: List<UInt>
+  )
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
     data class Success(
@@ -1980,11 +1981,9 @@ suspend fun readDeviceLocationAttribute(): DeviceLocationAttribute {val ATTRIBUT
           emit(DeviceLocationAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
-    }
+    }    
   }
-
-  suspend fun readConfigurationVersionAttribute(): UInt? {
-    val ATTRIBUTE_ID: UInt = 24u
+suspend fun readConfigurationVersionAttribute(): UInt? {val ATTRIBUTE_ID: UInt = 24u
 
     val attributePath = AttributePath(
       endpointId = endpointId, 
