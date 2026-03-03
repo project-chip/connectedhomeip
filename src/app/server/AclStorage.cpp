@@ -348,10 +348,20 @@ CHIP_ERROR AclStorage::EncodableEntry::Stage() const
 
     {
         AuxiliaryType auxiliaryType;
-        ReturnErrorOnFailure(mEntry.GetAuxiliaryType(auxiliaryType));
-        StagingAuxiliaryType stagingAuxiliaryType;
-        ReturnErrorOnFailure(Convert(auxiliaryType, stagingAuxiliaryType));
-        mStagingEntry.auxiliaryType.SetValue(stagingAuxiliaryType);
+        CHIP_ERROR err = mEntry.GetAuxiliaryType(auxiliaryType);
+        if (err == CHIP_NO_ERROR)
+        {
+            StagingAuxiliaryType stagingAuxiliaryType;
+            ReturnErrorOnFailure(Convert(auxiliaryType, stagingAuxiliaryType));
+            mStagingEntry.auxiliaryType.SetValue(stagingAuxiliaryType);
+        }
+        else if (err != CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            // CHIP_ERROR_NOT_IMPLEMENTED is okay since this field is optional, and doesn't
+            // need to be set in all cases (the implementation will be up to the delegate). 
+            // Any other sort of error is unexepcted so we return it here.
+            return err;
+        }
     }
 
     {

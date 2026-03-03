@@ -611,8 +611,14 @@ CHIP_ERROR AccessControl::Dump(const Entry & entry)
 
     {
         AuxiliaryType auxiliaryType;
-        SuccessOrExit(err = entry.GetAuxiliaryType(auxiliaryType));
-        ChipLogDetail(DataManagement, "auxiliaryType: %d", to_underlying(auxiliaryType));
+        // Auxiliary type is optional, so it not being implemented
+        // is still a valid configuration, all other errors should 
+        // be handled appropriately.
+        err = GetAuxiliaryType(auxiliaryType);
+        if(err != CHIP_ERROR_NOT_IMPLEMENTED) {
+            SuccessOrExit(err);
+            ChipLogDetail(DataManagement, "auxiliaryType: %d", to_underlying(auxiliaryType));
+        }
     }
 
     {
@@ -684,9 +690,16 @@ bool AccessControl::Entry::IsValid() const
     SuccessOrExit(err = GetAuthMode(authMode));
     SuccessOrExit(err = GetFabricIndex(fabricIndex));
     SuccessOrExit(err = GetPrivilege(privilege));
-    SuccessOrExit(err = GetAuxiliaryType(auxiliaryType));
     SuccessOrExit(err = GetSubjectCount(subjectCount));
     SuccessOrExit(err = GetTargetCount(targetCount));
+
+    // Auxiliary type is optional, so it not being implemented
+    // is still a valid configuration, all other errors should 
+    // be handled appropriately.
+    err = GetAuxiliaryType(auxiliaryType);
+    if(err != CHIP_ERROR_NOT_IMPLEMENTED) {
+        SuccessOrExit(err);
+    }
 
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 1
     ChipLogProgress(DataManagement, "AccessControl: validating f=%u p=%c a=%c x=%d s=%d t=%d", fabricIndex,
