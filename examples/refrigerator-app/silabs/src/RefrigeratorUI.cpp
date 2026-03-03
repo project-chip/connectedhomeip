@@ -27,7 +27,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 // Only needed for wifi NCP devices
-#if defined (SL_WIFI) && SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
+#if defined(SL_WIFI) && SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
 #include <platform/silabs/wifi/ncp/spi_multiplex.h>
 #endif // defined (SL_WIFI) && SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
 

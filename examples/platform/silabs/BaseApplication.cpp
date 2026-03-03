@@ -914,7 +914,7 @@ void BaseApplication::DoProvisioningReset()
     });
 }
 
-#if defined (SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
 void BaseApplication::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 {
     OTAConfig::Init();
@@ -963,7 +963,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SL_WIFI
 
-#if defined (SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
             ChipLogProgress(AppServer, "Scheduling OTA Requestor initialization");
             TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
                 chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec), InitOTARequestorHandler, nullptr);
@@ -973,7 +973,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
     break;
 
     case DeviceEventType::kDnssdInitialized: {
-#if defined (SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
+#if defined(SILABS_OTA_ENABLED) && SILABS_OTA_ENABLED
         ChipLogProgress(AppServer, "DNS-SD initialized, scheduling OTA Requestor initialization");
         TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
             chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec), InitOTARequestorHandler, nullptr);
