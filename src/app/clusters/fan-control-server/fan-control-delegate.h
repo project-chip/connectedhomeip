@@ -53,6 +53,17 @@ protected:
     EndpointId mEndpoint = 0;
 };
 
+/** Default delegate that returns Failure for Step. Used when no app delegate is set. */
+class DefaultDelegate : public Delegate
+{
+public:
+    DefaultDelegate(EndpointId aEndpoint) : Delegate(aEndpoint) {}
+    Protocols::InteractionModel::Status HandleStep(StepDirectionEnum, bool, bool) override
+    {
+        return Protocols::InteractionModel::Status::Failure;
+    }
+};
+
 } // namespace FanControl
 } // namespace Clusters
 } // namespace app
