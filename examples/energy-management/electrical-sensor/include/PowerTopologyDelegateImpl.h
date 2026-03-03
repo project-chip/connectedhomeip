@@ -70,7 +70,7 @@ private:
  * @return CHIP_NO_ERROR if the PowerTopology cluster is initialized successfully, otherwise an error code
  */
 CHIP_ERROR PowerTopologyInit(chip::EndpointId endpointId, std::unique_ptr<PowerTopologyDelegate> & aDelegate,
-                             std::unique_ptr<PowerTopologyInstance> & aInstance);
+                             std::unique_ptr<PowerTopologyInstance> & aInstance, Feature aFeature);
 
 CHIP_ERROR PowerTopologyShutdown(std::unique_ptr<PowerTopologyInstance> & aInstance,
                                  std::unique_ptr<PowerTopologyDelegate> & aDelegate);

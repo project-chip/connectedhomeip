@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +17,10 @@
  */
 #pragma once
 #include "ElectricalEnergyMeasurementCluster.h"
+#include "ElectricalEnergyMeasurementDelegate.h"
 
 #include <lib/core/Optional.h>
+#include <lib/support/TimerDelegate.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
@@ -31,11 +33,16 @@ namespace ElectricalEnergyMeasurement {
 
 constexpr EndpointId kDefaultEndpointId = 1;
 
+enum class OptionalAttributes : uint32_t
+{
+    kOptionalAttributeCumulativeEnergyReset = 0x1,
+};
+
 class ElectricalEnergyMeasurementAttrAccess
 {
 public:
     ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature, BitMask<OptionalAttributes> aOptionalAttrs,
-                                          EndpointId endpointId = kDefaultEndpointId);
+                                          EndpointId endpointId, Delegate & delegate, TimerDelegate & timerDelegate);
 
     ~ElectricalEnergyMeasurementAttrAccess() {}
 
