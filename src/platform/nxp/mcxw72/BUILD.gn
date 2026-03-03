@@ -116,6 +116,7 @@ static_library("nxp_platform") {
     if (chip_crypto_spake2p == "custom") {
       sources += [ "../common/crypto/SecLibSpake2p.cpp" ]
     }
+    sources += [ "../common/crypto/S200/S200KeyAllocator.h" ]
   }
 
   if (chip_enable_ble) {
