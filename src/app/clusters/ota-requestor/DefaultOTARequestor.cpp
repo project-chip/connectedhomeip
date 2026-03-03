@@ -729,7 +729,17 @@ CHIP_ERROR DefaultOTARequestor::SendQueryImageRequest(Messaging::ExchangeManager
 {
     VerifyOrReturnError(mProviderLocation.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
-    constexpr OTADownloadProtocol kProtocolsSupported[] = { OTADownloadProtocol::kBDXSynchronous };
+    #if CHIP_DEVICE_CONFIG_ENABLE_OTA_IMAGE_URI
+    constexpr OTADownloadProtocol kProtocolsSupported[] = {
+        OTADownloadProtocol::kBDXSynchronous,
+        OTADownloadProtocol::kHttps
+    };
+    #else
+    constexpr OTADownloadProtocol kProtocolsSupported[] = {
+        OTADownloadProtocol::kBDXSynchronous,
+    };
+    #endif
+
     QueryImage::Type args;
     uint16_t vendorId;
     bool localConfigDisabled;
