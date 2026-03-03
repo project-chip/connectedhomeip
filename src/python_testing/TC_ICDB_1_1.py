@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -95,7 +95,7 @@ class TC_ICDB_1_1(MatterBaseTest):
                      "Check if RegisteredClients is empty, if not, TH sends command UnregisterClient to clear all clients in RegisteredClients by checkInNodeID."),
             TestStep(2, "TH reads from the DUT the IdleModeDuration and ActiveModeDuration attributes",
                      "Store values as idle_mode_duration_s and active_mode_duration_ms."),
-            TestStep(3, "TH sends RegisterClient command with parameters: CheckInNodeID: <any_node_id>, MonitoredSubject: <any_monitored_subject_id>, and Key: <any_16_byte_octstr>.", """
+            TestStep(3, "TH sends RegisterClient command with parameters: CheckInNodeID: <th_node_id>, MonitoredSubject: <th_node_id>, and Key: <any_16_byte_octstr>.", """
                         Verify DUT command response is successful (no exception).
                         Store ICDCounter value from response as icd_counter_at_registration."""),
             TestStep(4, "TH sends the RemoveActiveModeReq test event trigger."
