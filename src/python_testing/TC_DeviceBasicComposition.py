@@ -976,8 +976,14 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
         return [TestStep(0, "TH performs a wildcard read of all attributes and endpoints on the device"),
                 TestStep(1, "TH creates a MatterTlvJson dump of the wildcard attributes for submission to certification.")]
 
-    def test_TC_IDM_12_1(self):
+    @async_test_body
+    async def test_TC_IDM_12_1(self):
         # wildcard read - already done.
+
+        do_test_over_pase = self.user_params.get("use_pase_only", False)
+        if do_test_over_pase:
+            setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
+            await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
         self.step(0)
 
         # Create the dump
