@@ -227,14 +227,7 @@ class TC_ICDB_1_1(MatterBaseTest):
         # TH sends command UnregisterClient to the DUT
         # All clients in RegisteredClients are cleared, if any
         self.step("7")
-        registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
-        for client in registeredClients:
-            try:
-                log.info(f"Unregistering client: {client.checkInNodeID}...")
-                await self._send_single_icdm_command(
-                    commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
-            except InteractionModelError as e:
-                asserts.assert_fail(f"Unexpected error returned when unregistering client: {e}")
+        await self._unregister_all_clients()
 
 
 if __name__ == "__main__":
