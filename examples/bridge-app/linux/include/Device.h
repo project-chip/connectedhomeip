@@ -45,7 +45,6 @@ public:
     } Changed;
 
     Device(const char * szDeviceName, std::string szLocation);
-    ~Device() override = default;
 
     bool IsReachable();
     void SetReachable(bool aReachable);
