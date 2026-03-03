@@ -14,6 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/core/CHIPError.h"
+#include "lib/support/CodeUtils.h"
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationCluster.h>
 
 #include <app/data-model/Encode.h>
@@ -132,7 +134,7 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel
     // std::string may not like a nullptr .data() when the charspan is empty.
     const std::string newValue = nodeLabel.empty() ? std::string() : std::string{ nodeLabel.data(), nodeLabel.size() };
 
-    if (mRequiredData.nodeLabel == newValue)
+    if (mMutableData.nodeLabel == newValue)
     {
         return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
     }
@@ -157,7 +159,7 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel
         }
     }
 
-    mRequiredData.nodeLabel = newValue;
+    mMutableData.nodeLabel = newValue;
     NotifyAttributeChanged(Attributes::NodeLabel::Id);
 
     return Status::Success;
@@ -185,7 +187,7 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetDeviceLoc
     const DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> & location, PersistenceMode mode)
 {
     // Cluster must support this attribute
-    VerifyOrReturnError(mRequiredData.deviceLocation.has_value(), Status::UnsupportedAttribute);
+    VerifyOrReturnError(mMutableData.deviceLocation.has_value(), Status::UnsupportedAttribute);
 
     if (!location.IsNull())
     {
@@ -199,7 +201,7 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetDeviceLoc
     }
 
     // Check for equality
-    if (mRequiredData.deviceLocation->IsNull())
+    if (mMutableData.deviceLocation->IsNull())
     {
         if (location.IsNull())
         {
@@ -210,22 +212,22 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetDeviceLoc
     {
         if (!location.IsNull())
         {
-            if (mRequiredData.deviceLocation->Value().ToView() == location.Value())
+            if (mMutableData.deviceLocation->Value().ToView() == location.Value())
             {
                 return Status::Success; // No change
             }
         }
     }
 
-    auto oldValue = mRequiredData.deviceLocation;
+    auto oldValue = mMutableData.deviceLocation;
 
     if (location.IsNull())
     {
-        mRequiredData.deviceLocation->SetNull();
+        mMutableData.deviceLocation->SetNull();
     }
     else
     {
-        mRequiredData.deviceLocation->SetNonNull(location.Value());
+        mMutableData.deviceLocation->SetNonNull(location.Value());
     }
 
     if (mode == PersistenceMode::kPersist)
@@ -234,7 +236,7 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetDeviceLoc
         {
             ChipLogError(Zcl, "Failed to persist DeviceLocation: %" CHIP_ERROR_FORMAT, err.Format());
             // Revert the change
-            mRequiredData.deviceLocation = oldValue;
+            mMutableData.deviceLocation = oldValue;
             return Status::Failure;
         }
     }
@@ -269,7 +271,7 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Startup(ServerClusterContext & 
     {
         // missing label, we keep whatever is already in the cluster (e.g. set at start up);
         Storage::String<Attributes::NodeLabel::TypeInfo::MaxLength()> initialLabel;
-        initialLabel.SetContent(ToSpan(mRequiredData.nodeLabel));
+        initialLabel.SetContent(ToSpan(mMutableData.nodeLabel));
 
         // Ignore errors on purpose: not stored, but already an initial value from the app, so
         // same value is likely to be provided again. Failure to store here should not cause the cluster
@@ -289,7 +291,7 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Startup(ServerClusterContext & 
     MutableByteSpan span(buffer);
     DataModel::Nullable<LocationDescriptorStructType> loaded;
 
-    if (mRequiredData.deviceLocation.has_value())
+    if (mMutableData.deviceLocation.has_value())
     {
         CHIP_ERROR err = persistence.LoadTLV(
             { mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::DeviceLocation::Id }, loaded, span);
@@ -301,7 +303,7 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Startup(ServerClusterContext & 
         }
         else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
-            // Nothing in storage, keep the initial value (from mRequiredData).
+            // Nothing in storage, keep the initial value (from mMutableData).
             // This is a best-effort attempt to keep persisted data in sync with startup value
             // and what is read through `ReadAttribute`.
             //
@@ -315,9 +317,10 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Startup(ServerClusterContext & 
 
 CHIP_ERROR BridgedDeviceBasicInformationCluster::IncreaseConfigurationVersion()
 {
-    ReturnErrorOnFailure(mClusterContext.parentVersionConfiguration.IncreaseConfigurationVersion());
+    VerifyOrReturnError(mMutableData.configurationVersion.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
-    mRequiredData.configurationVersion++;
+    ReturnErrorOnFailure(mMutableData.configurationVersion->delegate.IncreaseConfigurationVersion());
+    mMutableData.configurationVersion->version++;
     NotifyAttributeChanged(Attributes::ConfigurationVersion::Id);
 
     return CHIP_NO_ERROR;
@@ -346,7 +349,7 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::ReadAttribut
     case ProductID::Id:
         return encoder.Encode(mFixedData.productId.value_or(0));
     case NodeLabel::Id:
-        return encoder.Encode(ToSpan(mRequiredData.nodeLabel));
+        return encoder.Encode(ToSpan(mMutableData.nodeLabel));
     case HardwareVersion::Id:
         return encoder.Encode(mFixedData.hardwareVersion.value_or(0));
     case HardwareVersionString::Id:
@@ -366,14 +369,14 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::ReadAttribut
     case SerialNumber::Id:
         return encoder.Encode(ToSpan(mFixedData.serialNumber));
     case Reachable::Id:
-        return encoder.Encode(mRequiredData.reachable);
+        return encoder.Encode(mMutableData.reachable);
     case UniqueID::Id:
-        return encoder.Encode(ToSpan(mRequiredData.uniqueId));
+        return encoder.Encode(ToSpan(mFixedData.uniqueId));
     case ProductAppearance::Id:
         return encoder.Encode(
             mFixedData.productAppearance.value_or(BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::Type{}));
     case ConfigurationVersion::Id:
-        return encoder.Encode(mRequiredData.configurationVersion);
+        return encoder.Encode(mMutableData.configurationVersion.has_value() ? mMutableData.configurationVersion->version : 1);
     case DeviceLocation::Id:
         if (auto location = GetDeviceLocation(); location.has_value())
         {
@@ -430,8 +433,8 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Attributes(const ConcreteCluste
         { mFixedData.serialNumber.has_value(), SerialNumber::kMetadataEntry },
         { true, UniqueID::kMetadataEntry }, // mandatory for new revisions
         { mFixedData.productAppearance.has_value(), ProductAppearance::kMetadataEntry },
-        { true, ConfigurationVersion::kMetadataEntry },                               // Always present
-        { mRequiredData.deviceLocation.has_value(), DeviceLocation::kMetadataEntry }, // Always present (Provisionally Mandatory)
+        { mMutableData.configurationVersion.has_value(), ConfigurationVersion::kMetadataEntry },
+        { mMutableData.deviceLocation.has_value(), DeviceLocation::kMetadataEntry }, // Always present (Provisionally Mandatory)
     };
 
     AttributeListBuilder listBuilder(builder);
@@ -515,9 +518,9 @@ void BridgedDeviceBasicInformationCluster::GenerateLeaveEvent()
 
 void BridgedDeviceBasicInformationCluster::SetReachable(bool reachable)
 {
-    VerifyOrReturn(mRequiredData.reachable != reachable);
+    VerifyOrReturn(mMutableData.reachable != reachable);
 
-    mRequiredData.reachable = reachable;
+    mMutableData.reachable = reachable;
     NotifyAttributeChanged(Attributes::Reachable::Id);
 
     VerifyOrReturn(mContext != nullptr);

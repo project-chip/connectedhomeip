@@ -69,10 +69,15 @@ public:
     {
         // NOTE: These delegate references are used throughout the cluster's lifetime.
         // Their lifetimes MUST be greater than or equal to the lifetime of this cluster instance.
-        ConfigurationVersionDelegate & parentVersionConfiguration;
         BridgedDeviceBasicInformationDelegate & delegate;
         TimerDelegate & timerDelegate;
         BridgedDeviceIcdDelegate * icdDelegate = nullptr; // if nullptr, ICD support feature is disabled
+    };
+
+    struct Versioning
+    {
+        uint32_t version;
+        ConfigurationVersionDelegate & delegate;
     };
 
     /// Most attributes in the bridged device basic information cluster are fixed
@@ -82,6 +87,8 @@ public:
     /// Attribute will be exposed if the optional values have a value.
     struct FixedData
     {
+        std::string uniqueId; // Mandatory, fixed once set
+
         std::optional<std::string> vendorName;
         std::optional<VendorId> vendorId;
         std::optional<std::string> productName;
@@ -98,51 +105,56 @@ public:
         std::optional<BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::Type> productAppearance;
     };
 
-    /// Mandatory data for every bridged device
-    struct RequiredData
+    /// Mutable data for bridged device
+    struct MutableData
     {
-        std::string uniqueId;   // Fixed once set
         bool reachable = false; // initial value for reachable
         std::string nodeLabel;
-        uint32_t configurationVersion = 1;
         std::optional<DataModel::Nullable<OwnedDeviceLocation>> deviceLocation;
+        std::optional<Versioning> configurationVersion;
     };
 
-    BridgedDeviceBasicInformationCluster(EndpointId endpointId, RequiredData && required, FixedData && fixedData,
+    BridgedDeviceBasicInformationCluster(EndpointId endpointId, MutableData && mutableData, FixedData && fixedData,
                                          Context && context) :
         DefaultServerCluster({ endpointId, BridgedDeviceBasicInformation::Id }),
-        mRequiredData(std::move(required)), mFixedData(std::move(fixedData)), mClusterContext(std::move(context))
-
+        mMutableData(std::move(mutableData)), mFixedData(std::move(fixedData)), mClusterContext(std::move(context))
     {}
 
-    bool GetReachable() const { return mRequiredData.reachable; }
+    bool GetReachable() const { return mMutableData.reachable; }
     void SetReachable(bool reachable);
 
-    const std::string & GetUniqueId() const { return mRequiredData.uniqueId; }
+    const std::string & GetUniqueId() const { return mFixedData.uniqueId; }
     const FixedData & GetFixedData() const { return mFixedData; }
 
-    const std::string & GetNodeLabel() const { return mRequiredData.nodeLabel; }
+    const std::string & GetNodeLabel() const { return mMutableData.nodeLabel; }
     DataModel::ActionReturnStatus SetNodeLabel(CharSpan nodeLabel);
 
-    uint32_t GetConfigurationVersion() const { return mRequiredData.configurationVersion; }
+    std::optional<uint32_t> GetConfigurationVersion() const
+    {
+        if (!mMutableData.configurationVersion.has_value())
+        {
+            return std::nullopt;
+        }
+        return mMutableData.configurationVersion->version;
+    }
 
     std::optional<DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type>> GetDeviceLocation() const
     {
-        if (!mRequiredData.deviceLocation.has_value())
+        if (!mMutableData.deviceLocation.has_value())
         {
             return std::nullopt;
         }
 
-        if (mRequiredData.deviceLocation->IsNull())
+        if (mMutableData.deviceLocation->IsNull())
         {
             return DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type>(DataModel::NullNullable);
         }
 
-        return DataModel::MakeNullable(mRequiredData.deviceLocation->Value().ToView());
+        return DataModel::MakeNullable(mMutableData.deviceLocation->Value().ToView());
     }
 
     /// Device location can only be set if the cluster supports device location
-    /// (i.e. the RequiredData has a location that is not std::nullopt)
+    /// (i.e. the MutableData has a location that is not std::nullopt)
     DataModel::ActionReturnStatus
     SetDeviceLocation(const DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> & location);
 
@@ -222,7 +234,7 @@ private:
     void StartPendingActiveTimer(System::Clock::Milliseconds32 timeoutMs);
     void CancelPendingActiveTimer();
 
-    RequiredData mRequiredData;
+    MutableData mMutableData;
     const FixedData mFixedData;
     const Context mClusterContext;
 
