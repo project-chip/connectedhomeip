@@ -69,8 +69,8 @@ public:
             config.WithRockSupport(delegate->GetRockSupport().value_or(
                 BitMask<RockBitmap>(RockBitmap::kRockLeftRight, RockBitmap::kRockUpDown, RockBitmap::kRockRound)));
         if (features.Has(FanControl::Feature::kWind))
-            config.WithWindSupport(delegate->GetWindSupport().value_or(
-                BitMask<WindBitmap>(WindBitmap::kSleepWind, WindBitmap::kNaturalWind)));
+            config.WithWindSupport(
+                delegate->GetWindSupport().value_or(BitMask<WindBitmap>(WindBitmap::kSleepWind, WindBitmap::kNaturalWind)));
         if (features.Has(FanControl::Feature::kAirflowDirection))
             config.WithAirflowDirection();
         if (features.Has(FanControl::Feature::kStep))
