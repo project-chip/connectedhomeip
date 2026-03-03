@@ -647,6 +647,7 @@ NetworkCommissioningCluster::HandleConnectNetwork(CommandHandler & handler, cons
     return std::nullopt;
 }
 
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 std::optional<ActionReturnStatus> NetworkCommissioningCluster::HandleNonConcurrentConnectNetwork()
 {
     ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
@@ -655,6 +656,7 @@ std::optional<ActionReturnStatus> NetworkCommissioningCluster::HandleNonConcurre
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
     return std::nullopt;
 }
+#endif
 
 std::optional<ActionReturnStatus>
 NetworkCommissioningCluster::HandleReorderNetwork(CommandHandler & handler, const ConcreteCommandPath & commandPath,
@@ -911,6 +913,7 @@ void NetworkCommissioningCluster::OnPlatformEventHandler(const DeviceLayer::Chip
     {
         this_->OnFailSafeTimerExpired();
     }
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     else if ((event->Type == DeviceLayer::DeviceEventType::kWiFiDeviceAvailable) ||
              (event->Type == DeviceLayer::DeviceEventType::kOperationalNetworkStarted))
 
@@ -918,6 +921,7 @@ void NetworkCommissioningCluster::OnPlatformEventHandler(const DeviceLayer::Chip
         // In Non-Concurrent mode connect the operational channel, as BLE has been stopped
         this_->HandleNonConcurrentConnectNetwork();
     }
+#endif
 }
 
 void NetworkCommissioningCluster::OnCommissioningComplete()
