@@ -401,7 +401,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         # the Downloading State
 
         # Max timeout seconds
-        max_timeout = 120
+        max_timeout = 60
 
         download_progress_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
