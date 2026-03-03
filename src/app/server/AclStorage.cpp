@@ -358,7 +358,7 @@ CHIP_ERROR AclStorage::EncodableEntry::Stage() const
         else if (err != CHIP_ERROR_NOT_IMPLEMENTED)
         {
             // CHIP_ERROR_NOT_IMPLEMENTED is okay since this field is optional, and doesn't
-            // need to be set in all cases (the implementation will be up to the delegate). 
+            // need to be set in all cases (the implementation will be up to the delegate).
             // Any other sort of error is unexepcted so we return it here.
             return err;
         }

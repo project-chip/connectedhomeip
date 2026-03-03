@@ -612,7 +612,7 @@ CHIP_ERROR AccessControl::Dump(const Entry & entry)
     {
         AuxiliaryType auxiliaryType;
         // Auxiliary type is optional, so it not being implemented
-        // is still a valid configuration, all other errors should 
+        // is still a valid configuration, all other errors should
         // be handled appropriately.
         err = GetAuxiliaryType(auxiliaryType);
         if(err != CHIP_ERROR_NOT_IMPLEMENTED) {
@@ -694,7 +694,7 @@ bool AccessControl::Entry::IsValid() const
     SuccessOrExit(err = GetTargetCount(targetCount));
 
     // Auxiliary type is optional, so it not being implemented
-    // is still a valid configuration, all other errors should 
+    // is still a valid configuration, all other errors should
     // be handled appropriately.
     err = GetAuxiliaryType(auxiliaryType);
     if(err != CHIP_ERROR_NOT_IMPLEMENTED) {
