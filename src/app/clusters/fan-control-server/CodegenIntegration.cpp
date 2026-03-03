@@ -15,14 +15,14 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/callback.h>
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/clusters/fan-control-server/fan-control-delegate.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
-#include <app/util/attribute-storage.h>
-#include <app-common/zap-generated/callback.h>
 #include <app/static-cluster-config/FanControl.h>
+#include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
@@ -100,7 +100,7 @@ void MatterFanControlClusterInitCallback(EndpointId endpointId)
             .endpointId                = endpointId,
             .clusterId                 = FanControl::Id,
             .fixedClusterInstanceCount = kFanControlFixedClusterCount,
-            .maxClusterInstanceCount  = kFanControlMaxClusterCount,
+            .maxClusterInstanceCount   = kFanControlMaxClusterCount,
             .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = false,
         },
@@ -116,7 +116,7 @@ void MatterFanControlClusterShutdownCallback(EndpointId endpointId, MatterCluste
             .endpointId                = endpointId,
             .clusterId                 = FanControl::Id,
             .fixedClusterInstanceCount = kFanControlFixedClusterCount,
-            .maxClusterInstanceCount  = kFanControlMaxClusterCount,
+            .maxClusterInstanceCount   = kFanControlMaxClusterCount,
         },
         integrationDelegate, shutdownType);
 }
@@ -132,7 +132,7 @@ FanControlCluster * FindClusterOnEndpoint(EndpointId endpointId)
             .endpointId                = endpointId,
             .clusterId                 = FanControl::Id,
             .fixedClusterInstanceCount = kFanControlFixedClusterCount,
-            .maxClusterInstanceCount  = kFanControlMaxClusterCount,
+            .maxClusterInstanceCount   = kFanControlMaxClusterCount,
         },
         integrationDelegate);
 

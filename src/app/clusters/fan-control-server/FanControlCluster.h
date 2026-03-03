@@ -40,21 +40,15 @@ namespace chip::app::Clusters {
 class FanControlCluster : public DefaultServerCluster
 {
 public:
-    using OptionalAttributes = app::OptionalAttributeSet<
-        FanControl::Attributes::SpeedMax::Id,
-        FanControl::Attributes::SpeedSetting::Id,
-        FanControl::Attributes::SpeedCurrent::Id,
-        FanControl::Attributes::RockSupport::Id,
-        FanControl::Attributes::RockSetting::Id,
-        FanControl::Attributes::WindSupport::Id,
-        FanControl::Attributes::WindSetting::Id,
-        FanControl::Attributes::AirflowDirection::Id>;
+    using OptionalAttributes =
+        app::OptionalAttributeSet<FanControl::Attributes::SpeedMax::Id, FanControl::Attributes::SpeedSetting::Id,
+                                  FanControl::Attributes::SpeedCurrent::Id, FanControl::Attributes::RockSupport::Id,
+                                  FanControl::Attributes::RockSetting::Id, FanControl::Attributes::WindSupport::Id,
+                                  FanControl::Attributes::WindSetting::Id, FanControl::Attributes::AirflowDirection::Id>;
 
     struct Config
     {
-        Config(EndpointId endpointId, FanControl::Delegate & delegate) :
-            mEndpointId(endpointId), mDelegate(delegate)
-        {}
+        Config(EndpointId endpointId, FanControl::Delegate & delegate) : mEndpointId(endpointId), mDelegate(delegate) {}
 
         Config & WithFanModeSequence(FanControl::FanModeSequenceEnum fanModeSequence)
         {
@@ -96,9 +90,9 @@ public:
 
         EndpointId mEndpointId;
         FanControl::Delegate & mDelegate;
-        bool mSupportsStep = false;
+        bool mSupportsStep                               = false;
         FanControl::FanModeSequenceEnum mFanModeSequence = FanControl::FanModeSequenceEnum::kOffLowHigh;
-        uint8_t mSpeedMax                               = 0;
+        uint8_t mSpeedMax                                = 0;
         BitMask<FanControl::RockBitmap> mRockSupport;
         BitMask<FanControl::WindBitmap> mWindSupport;
         OptionalAttributes mOptionalAttributes;
@@ -118,8 +112,7 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) override;
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     // Getters
     FanControl::FanModeEnum GetFanMode() const { return mFanMode; }
@@ -161,7 +154,7 @@ private:
     FanControl::Delegate & mDelegate;
 
     // Avoid circular callback when adjusting SpeedSetting and PercentSetting together
-    bool mSpeedWriteInProgress  = false;
+    bool mSpeedWriteInProgress   = false;
     bool mPercentWriteInProgress = false;
     bool mFanModeWriteInProgress = false;
 };

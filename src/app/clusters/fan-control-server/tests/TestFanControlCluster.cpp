@@ -17,8 +17,8 @@
 
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/clusters/fan-control-server/fan-control-delegate.h>
-#include <pw_unit_test/framework.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <pw_unit_test/framework.h>
 
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -73,8 +73,7 @@ FanControlCluster::Config MakeTestConfigWithMultiSpeed()
 
 FanControlCluster::Config MakeTestConfigWithAuto()
 {
-    return FanControlCluster::Config(kTestEndpointId, gTestDelegate)
-        .WithFanModeSequence(FanModeSequenceEnum::kOffLowHighAuto);
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHighAuto);
 }
 
 FanControlCluster::Config MakeTestConfigWithMultiSpeedAndAuto()
@@ -86,23 +85,20 @@ FanControlCluster::Config MakeTestConfigWithMultiSpeedAndAuto()
 
 FanControlCluster::Config MakeTestConfigOffHigh()
 {
-    return FanControlCluster::Config(kTestEndpointId, gTestDelegate)
-        .WithFanModeSequence(FanModeSequenceEnum::kOffHigh);
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffHigh);
 }
 
 FanControlCluster::Config MakeTestConfigOffHighAuto()
 {
-    return FanControlCluster::Config(kTestEndpointId, gTestDelegate)
-        .WithFanModeSequence(FanModeSequenceEnum::kOffHighAuto);
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffHighAuto);
 }
 
 FanControlCluster::Config MakeTestConfigOffLowMedHigh()
 {
-    return FanControlCluster::Config(kTestEndpointId, gTestDelegate)
-        .WithFanModeSequence(FanModeSequenceEnum::kOffLowMedHigh);
+    return FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowMedHigh);
 }
 
-template<FanControlCluster::Config (*ConfigFn)()>
+template <FanControlCluster::Config (*ConfigFn)()>
 struct TestFanControlClusterFixture : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -115,14 +111,14 @@ struct TestFanControlClusterFixture : public ::testing::Test
     FanControlCluster cluster{ ConfigFn() };
 };
 
-using TestFanControlCluster                    = TestFanControlClusterFixture<MakeTestConfig>;
-using TestFanControlClusterWithStep            = TestFanControlClusterFixture<MakeTestConfigWithStep>;
-using TestFanControlClusterWithMultiSpeed      = TestFanControlClusterFixture<MakeTestConfigWithMultiSpeed>;
-using TestFanControlClusterWithAuto            = TestFanControlClusterFixture<MakeTestConfigWithAuto>;
+using TestFanControlCluster                      = TestFanControlClusterFixture<MakeTestConfig>;
+using TestFanControlClusterWithStep              = TestFanControlClusterFixture<MakeTestConfigWithStep>;
+using TestFanControlClusterWithMultiSpeed        = TestFanControlClusterFixture<MakeTestConfigWithMultiSpeed>;
+using TestFanControlClusterWithAuto              = TestFanControlClusterFixture<MakeTestConfigWithAuto>;
 using TestFanControlClusterWithMultiSpeedAndAuto = TestFanControlClusterFixture<MakeTestConfigWithMultiSpeedAndAuto>;
-using TestFanControlClusterOffHigh             = TestFanControlClusterFixture<MakeTestConfigOffHigh>;
-using TestFanControlClusterOffHighAuto         = TestFanControlClusterFixture<MakeTestConfigOffHighAuto>;
-using TestFanControlClusterOffLowMedHigh       = TestFanControlClusterFixture<MakeTestConfigOffLowMedHigh>;
+using TestFanControlClusterOffHigh               = TestFanControlClusterFixture<MakeTestConfigOffHigh>;
+using TestFanControlClusterOffHighAuto           = TestFanControlClusterFixture<MakeTestConfigOffHighAuto>;
+using TestFanControlClusterOffLowMedHigh         = TestFanControlClusterFixture<MakeTestConfigOffLowMedHigh>;
 
 } // namespace
 
