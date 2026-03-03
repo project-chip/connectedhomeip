@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "diagnostic-logs-provider-delegate-impl.h"
+#include "include/diagnostic-logs-provider-delegate-impl.h"
 
 #include <lib/support/SafeInt.h>
 
@@ -97,9 +97,13 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     VerifyOrReturnValue(!(nullptr == fp && errno == ENOENT), CHIP_ERROR_NOT_FOUND);
     VerifyOrReturnValue(nullptr != fp, CHIP_ERROR_INTERNAL);
 
-    mLogSessionHandle++;
-    // If the session handle rolls over to UINT16_MAX which is invalid, reset to 0.
-    VerifyOrDo(mLogSessionHandle != kInvalidLogSessionHandle, mLogSessionHandle = 0);
+    // Select the next unused session handle, skipping the invalid handle.
+    do
+    {
+        mLogSessionHandle++;
+        // If the session handle rolls over to UINT16_MAX which is invalid, reset to 0.
+        VerifyOrDo(mLogSessionHandle != kInvalidLogSessionHandle, mLogSessionHandle = 0);
+    } while (mFiles.count(mLogSessionHandle) != 0);
 
     outHandle                 = mLogSessionHandle;
     mFiles[mLogSessionHandle] = fp;
@@ -129,13 +133,15 @@ CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSp
     auto fileSize = GetFileSize(fp);
     auto count    = std::min(fileSize, outBuffer.size());
 
-    VerifyOrReturnError(CanCastTo<off_t>(count), CHIP_ERROR_INVALID_ARGUMENT, outBuffer.reduce_size(0));
-
+    clearerr(fp);
     auto bytesRead = fread(outBuffer.data(), 1, count, fp);
-    VerifyOrReturnError(CanCastTo<size_t>(bytesRead), CHIP_ERROR_INTERNAL, outBuffer.reduce_size(0));
+    VerifyOrReturnError(ferror(fp) == 0, CHIP_ERROR_POSIX(errno), outBuffer.reduce_size(0));
 
-    outBuffer.reduce_size(static_cast<size_t>(bytesRead));
-    outIsEndOfLog = fileSize == static_cast<size_t>(ftell(fp));
+    outBuffer.reduce_size(bytesRead);
+
+    auto currentPos = ftell(fp);
+    VerifyOrReturnError(currentPos != -1, CHIP_ERROR_POSIX(errno), outBuffer.reduce_size(0));
+    outIsEndOfLog = fileSize == static_cast<size_t>(currentPos);
     return CHIP_NO_ERROR;
 }
 

@@ -19,10 +19,15 @@
 #pragma once
 
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
-#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 #include <map>
+#include <string>
 
-class LogProvider : public chip::app::Clusters::DiagnosticLogs::DiagnosticLogsProviderDelegate
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DiagnosticLogs {
+
+class LogProvider : public DiagnosticLogsProviderDelegate
 {
 public:
     static LogProvider & GetInstance() { return sInstance; }
@@ -30,41 +35,41 @@ public:
     ~LogProvider();
 
     /////////// DiagnosticLogsProviderDelegate Interface /////////
-    CHIP_ERROR StartLogCollection(chip::app::Clusters::DiagnosticLogs::IntentEnum intent,
-                                  chip::app::Clusters::DiagnosticLogs::LogSessionHandle & outHandle,
-                                  chip::Optional<uint64_t> & outTimeStamp,
-                                  chip::Optional<uint64_t> & outTimeSinceBoot) override;
+    CHIP_ERROR StartLogCollection(IntentEnum intent, LogSessionHandle & outHandle, Optional<uint64_t> & outTimeStamp,
+                                  Optional<uint64_t> & outTimeSinceBoot) override;
 
-    CHIP_ERROR EndLogCollection(chip::app::Clusters::DiagnosticLogs::LogSessionHandle sessionHandle) override;
+    CHIP_ERROR EndLogCollection(LogSessionHandle sessionHandle) override;
 
-    CHIP_ERROR CollectLog(chip::app::Clusters::DiagnosticLogs::LogSessionHandle sessionHandle,
-                          chip::MutableByteSpan & outBuffer, bool & outIsEndOfLog) override;
+    CHIP_ERROR CollectLog(LogSessionHandle sessionHandle, MutableByteSpan & outBuffer, bool & outIsEndOfLog) override;
 
-    size_t GetSizeForIntent(chip::app::Clusters::DiagnosticLogs::IntentEnum intent) override;
+    size_t GetSizeForIntent(IntentEnum intent) override;
 
-    CHIP_ERROR GetLogForIntent(chip::app::Clusters::DiagnosticLogs::IntentEnum intent,
-                               chip::MutableByteSpan & outBuffer,
-                               chip::Optional<uint64_t> & outTimeStamp,
-                               chip::Optional<uint64_t> & outTimeSinceBoot) override;
+    CHIP_ERROR GetLogForIntent(IntentEnum intent, MutableByteSpan & outBuffer, Optional<uint64_t> & outTimeStamp,
+                               Optional<uint64_t> & outTimeSinceBoot) override;
     /////////// DiagnosticLogsProviderDelegate Interface /////////
 
-    void SetEndUserSupportLogFilePath(chip::Optional<std::string> filePath) { mEndUserSupportLogFilePath = filePath; }
-    void SetNetworkDiagnosticsLogFilePath(chip::Optional<std::string> filePath) { mNetworkDiagnosticsLogFilePath = filePath; }
-    void SetCrashLogFilePath(chip::Optional<std::string> filePath) { mCrashLogFilePath = filePath; }
+    void SetEndUserSupportLogFilePath(Optional<std::string> filePath) { mEndUserSupportLogFilePath = filePath; }
+    void SetNetworkDiagnosticsLogFilePath(Optional<std::string> filePath) { mNetworkDiagnosticsLogFilePath = filePath; }
+    void SetCrashLogFilePath(Optional<std::string> filePath) { mCrashLogFilePath = filePath; }
 
 private:
-    LogProvider()          = default;
-    LogProvider(LogProvider &)  = delete;
-    void operator=(const LogProvider &) = delete;
+    LogProvider()                         = default;
+    LogProvider(const LogProvider &)      = delete;
+    LogProvider & operator=(const LogProvider &) = delete;
 
-    chip::Optional<std::string> GetFilePathForIntent(chip::app::Clusters::DiagnosticLogs::IntentEnum intent) const;
+    Optional<std::string> GetFilePathForIntent(IntentEnum intent) const;
 
     static LogProvider sInstance;
 
-    chip::Optional<std::string> mEndUserSupportLogFilePath;
-    chip::Optional<std::string> mNetworkDiagnosticsLogFilePath;
-    chip::Optional<std::string> mCrashLogFilePath;
+    Optional<std::string> mEndUserSupportLogFilePath;
+    Optional<std::string> mNetworkDiagnosticsLogFilePath;
+    Optional<std::string> mCrashLogFilePath;
 
-    chip::app::Clusters::DiagnosticLogs::LogSessionHandle mLogSessionHandle = chip::app::Clusters::DiagnosticLogs::kInvalidLogSessionHandle;
-    std::map<chip::app::Clusters::DiagnosticLogs::LogSessionHandle, FILE *> mFiles;
+    LogSessionHandle mLogSessionHandle = kInvalidLogSessionHandle;
+    std::map<LogSessionHandle, FILE *> mFiles;
 };
+
+} // namespace DiagnosticLogs
+} // namespace Clusters
+} // namespace app
+} // namespace chip

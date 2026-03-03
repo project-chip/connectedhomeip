@@ -19,7 +19,7 @@
 #include "AppOptions.h"
 #include "LightingAppCommandDelegate.h"
 #include "LightingManager.h"
-#include "include/diagnostic-logs-provider-delegate-impl.h"
+#include "diagnostic-logs-provider-delegate-impl.h"
 #include <AppMain.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
