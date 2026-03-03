@@ -263,29 +263,63 @@ exit:
 
 void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    using namespace app::Clusters::ColorControl::Attributes;
+    static HsvColor_t hsv;
+    static XyColor_t xy;
 
-    uint8_t hue, saturation;
-
-    if ((attributeId != CurrentHue::Id) && (attributeId != CurrentSaturation::Id))
+    /* Ignore several attributes that are currently not processed */
+    if ((attributeId == ColorControl::Attributes::RemainingTime::Id) ||
+        (attributeId == ColorControl::Attributes::EnhancedColorMode::Id) ||
+        (attributeId == ColorControl::Attributes::ColorMode::Id))
     {
-        ChipLogProgress(DeviceLayer, "Unknown attribute ID: %" PRIx32, attributeId);
         return;
     }
 
-    if (attributeId == CurrentHue::Id)
+    /* XY color space */
+    if (attributeId == ColorControl::Attributes::CurrentX::Id || attributeId == ColorControl::Attributes::CurrentY::Id)
     {
-        hue = *value;
-        CurrentSaturation::Get(endpointId, &saturation);
-    }
-    if (attributeId == CurrentSaturation::Id)
-    {
-        saturation = *value;
-        CurrentHue::Get(endpointId, &hue);
-    }
+        if (attributeId == ColorControl::Attributes::CurrentX::Id)
+        {
+            xy.x = *reinterpret_cast<uint16_t *>(value);
+        }
+        else if (attributeId == ColorControl::Attributes::CurrentY::Id)
+        {
+            xy.y = *reinterpret_cast<uint16_t *>(value);
+        }
 
-    ChipLogProgress(DeviceLayer, "New hue: %d, New saturation: %d", hue, saturation);
-    // statusLED1.SetColor(hue, saturation);
+        ChipLogProgress(Zcl, "New XY color: %u|%u", xy.x, xy.y);
+        LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_XY, 0, sizeof(XyColor_t), (uint8_t *) &xy);
+    }
+    /* HSV color space */
+    else if (attributeId == ColorControl::Attributes::CurrentHue::Id ||
+             attributeId == ColorControl::Attributes::CurrentSaturation::Id ||
+             attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
+    {
+        if (attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
+        {
+            hsv.h = (uint8_t) (((*reinterpret_cast<uint16_t *>(value)) & 0xFF00) >> 8);
+            hsv.s = (uint8_t) ((*reinterpret_cast<uint16_t *>(value)) & 0xFF);
+        }
+        else if (attributeId == ColorControl::Attributes::CurrentHue::Id)
+        {
+            hsv.h = *value;
+        }
+        else if (attributeId == ColorControl::Attributes::CurrentSaturation::Id)
+        {
+            hsv.s = *value;
+        }
+        ChipLogProgress(Zcl, "New HSV color: hue = %u| saturation = %u", hsv.h, hsv.s);
+        LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_HSV, 0, sizeof(HsvColor_t), (uint8_t *) &hsv);
+    }
+    /* Temperature Mireds color space */
+    else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
+    {
+        ChipLogProgress(Zcl, "New Temperature Mireds color = %u", *(uint16_t *) value);
+        LightingMgr().InitiateAction(LightingManager::COLOR_ACTION_CT, 0, sizeof(CtColor_t), value);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "Ignore ColorControl attribute (%u) that is not currently processed!", attributeId);
+    }
 }
 
 void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t type,
@@ -320,12 +354,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 {
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
-
-    // ChipLogProgress(DeviceLayer,
-    //                 "MatterPostAttributeChangeCallback - Cluster ID: " ChipLogFormatMEI
-    //                 ", EndPoint ID: '0x%02x', Attribute ID: " ChipLogFormatMEI,
-    //                 ChipLogValueMEI(attributePath.mClusterId), attributePath.mEndpointId,
-    //                 ChipLogValueMEI(attributePath.mAttributeId));
 
     if (cb != nullptr)
     {
