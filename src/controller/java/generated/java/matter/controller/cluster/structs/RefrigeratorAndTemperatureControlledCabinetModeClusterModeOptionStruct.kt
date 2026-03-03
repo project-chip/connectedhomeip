@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -27,7 +26,7 @@ import matter.tlv.TlvWriter
 class RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct(
   val label: String,
   val mode: UByte,
-  val modeTags: List<RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct>
+  val modeTags: List<RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct>,
 ) {
   override fun toString(): String = buildString {
     append("RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct {\n")
@@ -56,21 +55,34 @@ class RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct(
     private const val TAG_MODE = 1
     private const val TAG_MODE_TAGS = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct {
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val mode = tlvReader.getUByte(ContextSpecificTag(TAG_MODE))
-      val modeTags = buildList<RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val modeTags =
+        buildList<RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(
+              RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct.fromTlv(
+                AnonymousTag,
+                tlvReader,
+              )
+            )
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
-      return RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct(label, mode, modeTags)
+      return RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct(
+        label,
+        mode,
+        modeTags,
+      )
     }
   }
 }

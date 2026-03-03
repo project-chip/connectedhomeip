@@ -17,22 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class GeneralDiagnosticsClusterDeviceLoadStruct (
-    val currentSubscriptions: UInt,
-    val currentSubscriptionsForFabric: UInt,
-    val totalSubscriptionsEstablished: ULong,
-    val totalInteractionModelMessagesSent: ULong,
-    val totalInteractionModelMessagesReceived: ULong) {
-  override fun toString(): String  = buildString {
+class GeneralDiagnosticsClusterDeviceLoadStruct(
+  val currentSubscriptions: UInt,
+  val currentSubscriptionsForFabric: UInt,
+  val totalSubscriptionsEstablished: ULong,
+  val totalInteractionModelMessagesSent: ULong,
+  val totalInteractionModelMessagesReceived: ULong,
+) {
+  override fun toString(): String = buildString {
     append("GeneralDiagnosticsClusterDeviceLoadStruct {\n")
     append("\tcurrentSubscriptions : $currentSubscriptions\n")
     append("\tcurrentSubscriptionsForFabric : $currentSubscriptionsForFabric\n")
@@ -48,8 +45,14 @@ class GeneralDiagnosticsClusterDeviceLoadStruct (
       put(ContextSpecificTag(TAG_CURRENT_SUBSCRIPTIONS), currentSubscriptions)
       put(ContextSpecificTag(TAG_CURRENT_SUBSCRIPTIONS_FOR_FABRIC), currentSubscriptionsForFabric)
       put(ContextSpecificTag(TAG_TOTAL_SUBSCRIPTIONS_ESTABLISHED), totalSubscriptionsEstablished)
-      put(ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_SENT), totalInteractionModelMessagesSent)
-      put(ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED), totalInteractionModelMessagesReceived)
+      put(
+        ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_SENT),
+        totalInteractionModelMessagesSent,
+      )
+      put(
+        ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED),
+        totalInteractionModelMessagesReceived,
+      )
       endStructure()
     }
   }
@@ -61,17 +64,27 @@ class GeneralDiagnosticsClusterDeviceLoadStruct (
     private const val TAG_TOTAL_INTERACTION_MODEL_MESSAGES_SENT = 3
     private const val TAG_TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : GeneralDiagnosticsClusterDeviceLoadStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GeneralDiagnosticsClusterDeviceLoadStruct {
       tlvReader.enterStructure(tlvTag)
       val currentSubscriptions = tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_SUBSCRIPTIONS))
-      val currentSubscriptionsForFabric = tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_SUBSCRIPTIONS_FOR_FABRIC))
-      val totalSubscriptionsEstablished = tlvReader.getULong(ContextSpecificTag(TAG_TOTAL_SUBSCRIPTIONS_ESTABLISHED))
-      val totalInteractionModelMessagesSent = tlvReader.getULong(ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_SENT))
-      val totalInteractionModelMessagesReceived = tlvReader.getULong(ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED))
-      
+      val currentSubscriptionsForFabric =
+        tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_SUBSCRIPTIONS_FOR_FABRIC))
+      val totalSubscriptionsEstablished =
+        tlvReader.getULong(ContextSpecificTag(TAG_TOTAL_SUBSCRIPTIONS_ESTABLISHED))
+      val totalInteractionModelMessagesSent =
+        tlvReader.getULong(ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_SENT))
+      val totalInteractionModelMessagesReceived =
+        tlvReader.getULong(ContextSpecificTag(TAG_TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED))
+
       tlvReader.exitContainer()
 
-      return GeneralDiagnosticsClusterDeviceLoadStruct(currentSubscriptions, currentSubscriptionsForFabric, totalSubscriptionsEstablished, totalInteractionModelMessagesSent, totalInteractionModelMessagesReceived)
+      return GeneralDiagnosticsClusterDeviceLoadStruct(
+        currentSubscriptions,
+        currentSubscriptionsForFabric,
+        totalSubscriptionsEstablished,
+        totalInteractionModelMessagesSent,
+        totalInteractionModelMessagesReceived,
+      )
     }
   }
 }

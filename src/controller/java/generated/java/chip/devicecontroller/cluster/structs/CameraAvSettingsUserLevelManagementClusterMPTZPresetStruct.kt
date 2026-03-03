@@ -17,20 +17,17 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct (
-    val presetID: UInt,
-    val name: String,
-    val settings: CameraAvSettingsUserLevelManagementClusterMPTZStruct) {
-  override fun toString(): String  = buildString {
+class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(
+  val presetID: UInt,
+  val name: String,
+  val settings: CameraAvSettingsUserLevelManagementClusterMPTZStruct,
+) {
+  override fun toString(): String = buildString {
     append("CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct {\n")
     append("\tpresetID : $presetID\n")
     append("\tname : $name\n")
@@ -53,12 +50,19 @@ class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct (
     private const val TAG_NAME = 1
     private const val TAG_SETTINGS = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct {
       tlvReader.enterStructure(tlvTag)
       val presetID = tlvReader.getUInt(ContextSpecificTag(TAG_PRESET_ID))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      val settings = CameraAvSettingsUserLevelManagementClusterMPTZStruct.fromTlv(ContextSpecificTag(TAG_SETTINGS), tlvReader)
-      
+      val settings =
+        CameraAvSettingsUserLevelManagementClusterMPTZStruct.fromTlv(
+          ContextSpecificTag(TAG_SETTINGS),
+          tlvReader,
+        )
+
       tlvReader.exitContainer()
 
       return CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct(presetID, name, settings)

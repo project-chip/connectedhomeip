@@ -28,8 +28,9 @@ class PushAvStreamTransportClusterTransportTriggerOptionsStruct(
   val triggerType: UByte,
   val motionZones: Optional<List<PushAvStreamTransportClusterTransportZoneOptionsStruct>>?,
   val motionSensitivity: Optional<UByte>?,
-  val motionTimeControl: Optional<PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct>,
-  val maxPreRollLen: Optional<UShort>
+  val motionTimeControl:
+    Optional<PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct>,
+  val maxPreRollLen: Optional<UShort>,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportTriggerOptionsStruct {\n")
@@ -47,21 +48,21 @@ class PushAvStreamTransportClusterTransportTriggerOptionsStruct(
       put(ContextSpecificTag(TAG_TRIGGER_TYPE), triggerType)
       if (motionZones != null) {
         if (motionZones.isPresent) {
-        val optmotionZones = motionZones.get()
-        startArray(ContextSpecificTag(TAG_MOTION_ZONES))
-      for (item in optmotionZones.iterator()) {
-        item.toTlv(AnonymousTag, this)
-      }
-      endArray()
-      }
+          val optmotionZones = motionZones.get()
+          startArray(ContextSpecificTag(TAG_MOTION_ZONES))
+          for (item in optmotionZones.iterator()) {
+            item.toTlv(AnonymousTag, this)
+          }
+          endArray()
+        }
       } else {
         putNull(ContextSpecificTag(TAG_MOTION_ZONES))
       }
       if (motionSensitivity != null) {
         if (motionSensitivity.isPresent) {
-        val optmotionSensitivity = motionSensitivity.get()
-        put(ContextSpecificTag(TAG_MOTION_SENSITIVITY), optmotionSensitivity)
-      }
+          val optmotionSensitivity = motionSensitivity.get()
+          put(ContextSpecificTag(TAG_MOTION_SENSITIVITY), optmotionSensitivity)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_MOTION_SENSITIVITY))
       }
@@ -84,49 +85,74 @@ class PushAvStreamTransportClusterTransportTriggerOptionsStruct(
     private const val TAG_MOTION_TIME_CONTROL = 3
     private const val TAG_MAX_PRE_ROLL_LEN = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterTransportTriggerOptionsStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterTransportTriggerOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val triggerType = tlvReader.getUByte(ContextSpecificTag(TAG_TRIGGER_TYPE))
-      val motionZones = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_MOTION_ZONES))) {
-      Optional.of(buildList<PushAvStreamTransportClusterTransportZoneOptionsStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_MOTION_ZONES))
-      while(!tlvReader.isEndOfContainer()) {
-        add(PushAvStreamTransportClusterTransportZoneOptionsStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_MOTION_ZONES))
-      null
-    }
-      val motionSensitivity = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_MOTION_SENSITIVITY))) {
-      Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_MOTION_SENSITIVITY)))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_MOTION_SENSITIVITY))
-      null
-    }
-      val motionTimeControl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MOTION_TIME_CONTROL))) {
-      Optional.of(PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct.fromTlv(ContextSpecificTag(TAG_MOTION_TIME_CONTROL), tlvReader))
-    } else {
-      Optional.empty()
-    }
-      val maxPreRollLen = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_PRE_ROLL_LEN))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MAX_PRE_ROLL_LEN)))
-    } else {
-      Optional.empty()
-    }
-      
+      val motionZones =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_MOTION_ZONES))) {
+            Optional.of(
+              buildList<PushAvStreamTransportClusterTransportZoneOptionsStruct> {
+                tlvReader.enterArray(ContextSpecificTag(TAG_MOTION_ZONES))
+                while (!tlvReader.isEndOfContainer()) {
+                  add(
+                    PushAvStreamTransportClusterTransportZoneOptionsStruct.fromTlv(
+                      AnonymousTag,
+                      tlvReader,
+                    )
+                  )
+                }
+                tlvReader.exitContainer()
+              }
+            )
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_MOTION_ZONES))
+          null
+        }
+      val motionSensitivity =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_MOTION_SENSITIVITY))) {
+            Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_MOTION_SENSITIVITY)))
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_MOTION_SENSITIVITY))
+          null
+        }
+      val motionTimeControl =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MOTION_TIME_CONTROL))) {
+          Optional.of(
+            PushAvStreamTransportClusterTransportMotionTriggerTimeControlStruct.fromTlv(
+              ContextSpecificTag(TAG_MOTION_TIME_CONTROL),
+              tlvReader,
+            )
+          )
+        } else {
+          Optional.empty()
+        }
+      val maxPreRollLen =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_PRE_ROLL_LEN))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MAX_PRE_ROLL_LEN)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterTransportTriggerOptionsStruct(triggerType, motionZones, motionSensitivity, motionTimeControl, maxPreRollLen)
+      return PushAvStreamTransportClusterTransportTriggerOptionsStruct(
+        triggerType,
+        motionZones,
+        motionSensitivity,
+        motionTimeControl,
+        maxPreRollLen,
+      )
     }
   }
 }

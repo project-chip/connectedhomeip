@@ -20,16 +20,14 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CommodityTariffClusterCalendarPeriodStruct (
-    val startDate: ULong?,
-    val dayPatternIDs: List<ULong>) {
-  override fun toString(): String  = buildString {
+class CommodityTariffClusterCalendarPeriodStruct(
+  val startDate: ULong?,
+  val dayPatternIDs: List<ULong>,
+) {
+  override fun toString(): String = buildString {
     append("CommodityTariffClusterCalendarPeriodStruct {\n")
     append("\tstartDate : $startDate\n")
     append("\tdayPatternIDs : $dayPatternIDs\n")
@@ -40,10 +38,10 @@ class CommodityTariffClusterCalendarPeriodStruct (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (startDate != null) {
-      put(ContextSpecificTag(TAG_START_DATE), startDate)
-    } else {
-      putNull(ContextSpecificTag(TAG_START_DATE))
-    }
+        put(ContextSpecificTag(TAG_START_DATE), startDate)
+      } else {
+        putNull(ContextSpecificTag(TAG_START_DATE))
+      }
       startArray(ContextSpecificTag(TAG_DAY_PATTERN_I_DS))
       for (item in dayPatternIDs.iterator()) {
         put(AnonymousTag, item)
@@ -57,22 +55,24 @@ class CommodityTariffClusterCalendarPeriodStruct (
     private const val TAG_START_DATE = 0
     private const val TAG_DAY_PATTERN_I_DS = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommodityTariffClusterCalendarPeriodStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterCalendarPeriodStruct {
       tlvReader.enterStructure(tlvTag)
-      val startDate = if (!tlvReader.isNull()) {
-      tlvReader.getULong(ContextSpecificTag(TAG_START_DATE))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_START_DATE))
-      null
-    }
-      val dayPatternIDs = buildList<ULong> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_DAY_PATTERN_I_DS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getULong(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val startDate =
+        if (!tlvReader.isNull()) {
+          tlvReader.getULong(ContextSpecificTag(TAG_START_DATE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_START_DATE))
+          null
+        }
+      val dayPatternIDs =
+        buildList<ULong> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_DAY_PATTERN_I_DS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getULong(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return CommodityTariffClusterCalendarPeriodStruct(startDate, dayPatternIDs)

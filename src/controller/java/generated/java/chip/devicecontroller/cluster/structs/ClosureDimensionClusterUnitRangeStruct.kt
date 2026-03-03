@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ClosureDimensionClusterUnitRangeStruct (
-    val min: Int,
-    val max: Int) {
-  override fun toString(): String  = buildString {
+class ClosureDimensionClusterUnitRangeStruct(val min: Int, val max: Int) {
+  override fun toString(): String = buildString {
     append("ClosureDimensionClusterUnitRangeStruct {\n")
     append("\tmin : $min\n")
     append("\tmax : $max\n")
@@ -49,11 +43,11 @@ class ClosureDimensionClusterUnitRangeStruct (
     private const val TAG_MIN = 0
     private const val TAG_MAX = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ClosureDimensionClusterUnitRangeStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ClosureDimensionClusterUnitRangeStruct {
       tlvReader.enterStructure(tlvTag)
       val min = tlvReader.getInt(ContextSpecificTag(TAG_MIN))
       val max = tlvReader.getInt(ContextSpecificTag(TAG_MAX))
-      
+
       tlvReader.exitContainer()
 
       return ClosureDimensionClusterUnitRangeStruct(min, max)

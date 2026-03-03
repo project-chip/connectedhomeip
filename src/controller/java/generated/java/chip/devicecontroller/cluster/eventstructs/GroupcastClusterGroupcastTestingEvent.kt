@@ -17,26 +17,24 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class GroupcastClusterGroupcastTestingEvent (
-    val sourceIpAddress: Optional<ByteArray>,
-    val destinationIpAddress: Optional<ByteArray>,
-    val groupID: Optional<UInt>,
-    val endpointID: Optional<UInt>,
-    val clusterID: Optional<ULong>,
-    val elementID: Optional<ULong>,
-    val accessAllowed: Optional<Boolean>,
-    val groupcastTestResult: UInt,
-    val fabricIndex: UInt) {
-  override fun toString(): String  = buildString {
+class GroupcastClusterGroupcastTestingEvent(
+  val sourceIpAddress: Optional<ByteArray>,
+  val destinationIpAddress: Optional<ByteArray>,
+  val groupID: Optional<UInt>,
+  val endpointID: Optional<UInt>,
+  val clusterID: Optional<ULong>,
+  val elementID: Optional<ULong>,
+  val accessAllowed: Optional<Boolean>,
+  val groupcastTestResult: UInt,
+  val fabricIndex: UInt,
+) {
+  override fun toString(): String = buildString {
     append("GroupcastClusterGroupcastTestingEvent {\n")
     append("\tsourceIpAddress : $sourceIpAddress\n")
     append("\tdestinationIpAddress : $destinationIpAddress\n")
@@ -54,33 +52,33 @@ class GroupcastClusterGroupcastTestingEvent (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (sourceIpAddress.isPresent) {
-      val optsourceIpAddress = sourceIpAddress.get()
-      put(ContextSpecificTag(TAG_SOURCE_IP_ADDRESS), optsourceIpAddress)
-    }
+        val optsourceIpAddress = sourceIpAddress.get()
+        put(ContextSpecificTag(TAG_SOURCE_IP_ADDRESS), optsourceIpAddress)
+      }
       if (destinationIpAddress.isPresent) {
-      val optdestinationIpAddress = destinationIpAddress.get()
-      put(ContextSpecificTag(TAG_DESTINATION_IP_ADDRESS), optdestinationIpAddress)
-    }
+        val optdestinationIpAddress = destinationIpAddress.get()
+        put(ContextSpecificTag(TAG_DESTINATION_IP_ADDRESS), optdestinationIpAddress)
+      }
       if (groupID.isPresent) {
-      val optgroupID = groupID.get()
-      put(ContextSpecificTag(TAG_GROUP_ID), optgroupID)
-    }
+        val optgroupID = groupID.get()
+        put(ContextSpecificTag(TAG_GROUP_ID), optgroupID)
+      }
       if (endpointID.isPresent) {
-      val optendpointID = endpointID.get()
-      put(ContextSpecificTag(TAG_ENDPOINT_ID), optendpointID)
-    }
+        val optendpointID = endpointID.get()
+        put(ContextSpecificTag(TAG_ENDPOINT_ID), optendpointID)
+      }
       if (clusterID.isPresent) {
-      val optclusterID = clusterID.get()
-      put(ContextSpecificTag(TAG_CLUSTER_ID), optclusterID)
-    }
+        val optclusterID = clusterID.get()
+        put(ContextSpecificTag(TAG_CLUSTER_ID), optclusterID)
+      }
       if (elementID.isPresent) {
-      val optelementID = elementID.get()
-      put(ContextSpecificTag(TAG_ELEMENT_ID), optelementID)
-    }
+        val optelementID = elementID.get()
+        put(ContextSpecificTag(TAG_ELEMENT_ID), optelementID)
+      }
       if (accessAllowed.isPresent) {
-      val optaccessAllowed = accessAllowed.get()
-      put(ContextSpecificTag(TAG_ACCESS_ALLOWED), optaccessAllowed)
-    }
+        val optaccessAllowed = accessAllowed.get()
+        put(ContextSpecificTag(TAG_ACCESS_ALLOWED), optaccessAllowed)
+      }
       put(ContextSpecificTag(TAG_GROUPCAST_TEST_RESULT), groupcastTestResult)
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
@@ -98,49 +96,66 @@ class GroupcastClusterGroupcastTestingEvent (
     private const val TAG_GROUPCAST_TEST_RESULT = 7
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : GroupcastClusterGroupcastTestingEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GroupcastClusterGroupcastTestingEvent {
       tlvReader.enterStructure(tlvTag)
-      val sourceIpAddress = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_IP_ADDRESS))) {
-      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_SOURCE_IP_ADDRESS)))
-    } else {
-      Optional.empty()
-    }
-      val destinationIpAddress = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DESTINATION_IP_ADDRESS))) {
-      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_DESTINATION_IP_ADDRESS)))
-    } else {
-      Optional.empty()
-    }
-      val groupID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_GROUP_ID))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_ID)))
-    } else {
-      Optional.empty()
-    }
-      val endpointID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT_ID))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT_ID)))
-    } else {
-      Optional.empty()
-    }
-      val clusterID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLUSTER_ID))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER_ID)))
-    } else {
-      Optional.empty()
-    }
-      val elementID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ELEMENT_ID))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_ELEMENT_ID)))
-    } else {
-      Optional.empty()
-    }
-      val accessAllowed = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ACCESS_ALLOWED))) {
-      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_ACCESS_ALLOWED)))
-    } else {
-      Optional.empty()
-    }
+      val sourceIpAddress =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOURCE_IP_ADDRESS))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_SOURCE_IP_ADDRESS)))
+        } else {
+          Optional.empty()
+        }
+      val destinationIpAddress =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DESTINATION_IP_ADDRESS))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_DESTINATION_IP_ADDRESS)))
+        } else {
+          Optional.empty()
+        }
+      val groupID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_GROUP_ID))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_ID)))
+        } else {
+          Optional.empty()
+        }
+      val endpointID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT_ID))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT_ID)))
+        } else {
+          Optional.empty()
+        }
+      val clusterID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLUSTER_ID))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER_ID)))
+        } else {
+          Optional.empty()
+        }
+      val elementID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ELEMENT_ID))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_ELEMENT_ID)))
+        } else {
+          Optional.empty()
+        }
+      val accessAllowed =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ACCESS_ALLOWED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_ACCESS_ALLOWED)))
+        } else {
+          Optional.empty()
+        }
       val groupcastTestResult = tlvReader.getUInt(ContextSpecificTag(TAG_GROUPCAST_TEST_RESULT))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return GroupcastClusterGroupcastTestingEvent(sourceIpAddress, destinationIpAddress, groupID, endpointID, clusterID, elementID, accessAllowed, groupcastTestResult, fabricIndex)
+      return GroupcastClusterGroupcastTestingEvent(
+        sourceIpAddress,
+        destinationIpAddress,
+        groupID,
+        endpointID,
+        clusterID,
+        elementID,
+        accessAllowed,
+        groupcastTestResult,
+        fabricIndex,
+      )
     }
   }
 }

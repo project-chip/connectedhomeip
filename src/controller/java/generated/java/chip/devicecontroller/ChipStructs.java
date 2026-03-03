@@ -1011,7 +1011,7 @@ public static class BasicInformationClusterLocationDescriptorStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    String locationName = "";
+    String locationName = null;
     @Nullable Integer floorNumber = null;
     @Nullable Integer areaType = null;
     for (StructElement element: ((StructType)tlvValue).value()) {

@@ -17,19 +17,16 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class PushAvStreamTransportClusterAudioStreamStruct (
-    val audioStreamName: String,
-    val audioStreamID: UInt) {
-  override fun toString(): String  = buildString {
+class PushAvStreamTransportClusterAudioStreamStruct(
+  val audioStreamName: String,
+  val audioStreamID: UInt,
+) {
+  override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterAudioStreamStruct {\n")
     append("\taudioStreamName : $audioStreamName\n")
     append("\taudioStreamID : $audioStreamID\n")
@@ -49,11 +46,11 @@ class PushAvStreamTransportClusterAudioStreamStruct (
     private const val TAG_AUDIO_STREAM_NAME = 0
     private const val TAG_AUDIO_STREAM_ID = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : PushAvStreamTransportClusterAudioStreamStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterAudioStreamStruct {
       tlvReader.enterStructure(tlvTag)
       val audioStreamName = tlvReader.getString(ContextSpecificTag(TAG_AUDIO_STREAM_NAME))
       val audioStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
-      
+
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterAudioStreamStruct(audioStreamName, audioStreamID)

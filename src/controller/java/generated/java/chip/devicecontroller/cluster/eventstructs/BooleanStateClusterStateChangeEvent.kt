@@ -17,18 +17,13 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class BooleanStateClusterStateChangeEvent (
-    val stateValue: Boolean) {
-  override fun toString(): String  = buildString {
+class BooleanStateClusterStateChangeEvent(val stateValue: Boolean) {
+  override fun toString(): String = buildString {
     append("BooleanStateClusterStateChangeEvent {\n")
     append("\tstateValue : $stateValue\n")
     append("}\n")
@@ -45,10 +40,10 @@ class BooleanStateClusterStateChangeEvent (
   companion object {
     private const val TAG_STATE_VALUE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : BooleanStateClusterStateChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BooleanStateClusterStateChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val stateValue = tlvReader.getBoolean(ContextSpecificTag(TAG_STATE_VALUE))
-      
+
       tlvReader.exitContainer()
 
       return BooleanStateClusterStateChangeEvent(stateValue)

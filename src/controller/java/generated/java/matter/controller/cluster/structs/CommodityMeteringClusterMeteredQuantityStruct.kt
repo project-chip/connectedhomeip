@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -26,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class CommodityMeteringClusterMeteredQuantityStruct(
   val tariffComponentIDs: List<UInt>,
-  val quantity: Long
+  val quantity: Long,
 ) {
   override fun toString(): String = buildString {
     append("CommodityMeteringClusterMeteredQuantityStruct {\n")
@@ -54,15 +53,16 @@ class CommodityMeteringClusterMeteredQuantityStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityMeteringClusterMeteredQuantityStruct {
       tlvReader.enterStructure(tlvTag)
-      val tariffComponentIDs = buildList<UInt> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_TARIFF_COMPONENT_I_DS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getUInt(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
+      val tariffComponentIDs =
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_TARIFF_COMPONENT_I_DS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
       val quantity = tlvReader.getLong(ContextSpecificTag(TAG_QUANTITY))
-      
+
       tlvReader.exitContainer()
 
       return CommodityMeteringClusterMeteredQuantityStruct(tariffComponentIDs, quantity)

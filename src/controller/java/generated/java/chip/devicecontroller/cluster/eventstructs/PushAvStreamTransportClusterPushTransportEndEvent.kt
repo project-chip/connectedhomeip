@@ -17,20 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class PushAvStreamTransportClusterPushTransportEndEvent (
-    val connectionID: UInt,
-    val containerType: UInt,
-    val CMAFSessionNumber: Optional<ULong>) {
-  override fun toString(): String  = buildString {
+class PushAvStreamTransportClusterPushTransportEndEvent(
+  val connectionID: UInt,
+  val containerType: UInt,
+  val CMAFSessionNumber: Optional<ULong>,
+) {
+  override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterPushTransportEndEvent {\n")
     append("\tconnectionID : $connectionID\n")
     append("\tcontainerType : $containerType\n")
@@ -44,9 +42,9 @@ class PushAvStreamTransportClusterPushTransportEndEvent (
       put(ContextSpecificTag(TAG_CONNECTION_ID), connectionID)
       put(ContextSpecificTag(TAG_CONTAINER_TYPE), containerType)
       if (CMAFSessionNumber.isPresent) {
-      val optCMAFSessionNumber = CMAFSessionNumber.get()
-      put(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER), optCMAFSessionNumber)
-    }
+        val optCMAFSessionNumber = CMAFSessionNumber.get()
+        put(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER), optCMAFSessionNumber)
+      }
       endStructure()
     }
   }
@@ -56,19 +54,27 @@ class PushAvStreamTransportClusterPushTransportEndEvent (
     private const val TAG_CONTAINER_TYPE = 1
     private const val TAG_CMAF_SESSION_NUMBER = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : PushAvStreamTransportClusterPushTransportEndEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterPushTransportEndEvent {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_ID))
       val containerType = tlvReader.getUInt(ContextSpecificTag(TAG_CONTAINER_TYPE))
-      val CMAFSessionNumber = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER)))
-    } else {
-      Optional.empty()
-    }
-      
+      val CMAFSessionNumber =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterPushTransportEndEvent(connectionID, containerType, CMAFSessionNumber)
+      return PushAvStreamTransportClusterPushTransportEndEvent(
+        connectionID,
+        containerType,
+        CMAFSessionNumber,
+      )
     }
   }
 }

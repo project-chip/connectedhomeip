@@ -17,19 +17,16 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class AmbientContextSensingClusterObjectCountConfigStruct (
-    val countingObject: AmbientContextSensingClusterSemanticTagStruct,
-    val objectCountThreshold: UInt) {
-  override fun toString(): String  = buildString {
+class AmbientContextSensingClusterObjectCountConfigStruct(
+  val countingObject: AmbientContextSensingClusterSemanticTagStruct,
+  val objectCountThreshold: UInt,
+) {
+  override fun toString(): String = buildString {
     append("AmbientContextSensingClusterObjectCountConfigStruct {\n")
     append("\tcountingObject : $countingObject\n")
     append("\tobjectCountThreshold : $objectCountThreshold\n")
@@ -49,14 +46,24 @@ class AmbientContextSensingClusterObjectCountConfigStruct (
     private const val TAG_COUNTING_OBJECT = 0
     private const val TAG_OBJECT_COUNT_THRESHOLD = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AmbientContextSensingClusterObjectCountConfigStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): AmbientContextSensingClusterObjectCountConfigStruct {
       tlvReader.enterStructure(tlvTag)
-      val countingObject = AmbientContextSensingClusterSemanticTagStruct.fromTlv(ContextSpecificTag(TAG_COUNTING_OBJECT), tlvReader)
+      val countingObject =
+        AmbientContextSensingClusterSemanticTagStruct.fromTlv(
+          ContextSpecificTag(TAG_COUNTING_OBJECT),
+          tlvReader,
+        )
       val objectCountThreshold = tlvReader.getUInt(ContextSpecificTag(TAG_OBJECT_COUNT_THRESHOLD))
-      
+
       tlvReader.exitContainer()
 
-      return AmbientContextSensingClusterObjectCountConfigStruct(countingObject, objectCountThreshold)
+      return AmbientContextSensingClusterObjectCountConfigStruct(
+        countingObject,
+        objectCountThreshold,
+      )
     }
   }
 }

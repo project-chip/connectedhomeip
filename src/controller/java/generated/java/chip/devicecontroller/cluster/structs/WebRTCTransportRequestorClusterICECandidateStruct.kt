@@ -17,20 +17,17 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class WebRTCTransportRequestorClusterICECandidateStruct (
-    val candidate: String,
-    val SDPMid: String?,
-    val SDPMLineIndex: UInt?) {
-  override fun toString(): String  = buildString {
+class WebRTCTransportRequestorClusterICECandidateStruct(
+  val candidate: String,
+  val SDPMid: String?,
+  val SDPMLineIndex: UInt?,
+) {
+  override fun toString(): String = buildString {
     append("WebRTCTransportRequestorClusterICECandidateStruct {\n")
     append("\tcandidate : $candidate\n")
     append("\tSDPMid : $SDPMid\n")
@@ -43,15 +40,15 @@ class WebRTCTransportRequestorClusterICECandidateStruct (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CANDIDATE), candidate)
       if (SDPMid != null) {
-      put(ContextSpecificTag(TAG_SDP_MID), SDPMid)
-    } else {
-      putNull(ContextSpecificTag(TAG_SDP_MID))
-    }
+        put(ContextSpecificTag(TAG_SDP_MID), SDPMid)
+      } else {
+        putNull(ContextSpecificTag(TAG_SDP_MID))
+      }
       if (SDPMLineIndex != null) {
-      put(ContextSpecificTag(TAG_SDPM_LINE_INDEX), SDPMLineIndex)
-    } else {
-      putNull(ContextSpecificTag(TAG_SDPM_LINE_INDEX))
-    }
+        put(ContextSpecificTag(TAG_SDPM_LINE_INDEX), SDPMLineIndex)
+      } else {
+        putNull(ContextSpecificTag(TAG_SDPM_LINE_INDEX))
+      }
       endStructure()
     }
   }
@@ -61,22 +58,27 @@ class WebRTCTransportRequestorClusterICECandidateStruct (
     private const val TAG_SDP_MID = 1
     private const val TAG_SDPM_LINE_INDEX = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WebRTCTransportRequestorClusterICECandidateStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): WebRTCTransportRequestorClusterICECandidateStruct {
       tlvReader.enterStructure(tlvTag)
       val candidate = tlvReader.getString(ContextSpecificTag(TAG_CANDIDATE))
-      val SDPMid = if (!tlvReader.isNull()) {
-      tlvReader.getString(ContextSpecificTag(TAG_SDP_MID))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_SDP_MID))
-      null
-    }
-      val SDPMLineIndex = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_SDPM_LINE_INDEX))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_SDPM_LINE_INDEX))
-      null
-    }
-      
+      val SDPMid =
+        if (!tlvReader.isNull()) {
+          tlvReader.getString(ContextSpecificTag(TAG_SDP_MID))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_SDP_MID))
+          null
+        }
+      val SDPMLineIndex =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_SDPM_LINE_INDEX))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_SDPM_LINE_INDEX))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return WebRTCTransportRequestorClusterICECandidateStruct(candidate, SDPMid, SDPMLineIndex)

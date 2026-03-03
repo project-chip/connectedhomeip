@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +25,7 @@ import matter.tlv.TlvWriter
 class WebRTCTransportProviderClusterICECandidateStruct(
   val candidate: String,
   val SDPMid: String?,
-  val SDPMLineIndex: UShort?
+  val SDPMLineIndex: UShort?,
 ) {
   override fun toString(): String = buildString {
     append("WebRTCTransportProviderClusterICECandidateStruct {\n")
@@ -60,22 +58,27 @@ class WebRTCTransportProviderClusterICECandidateStruct(
     private const val TAG_SDP_MID = 1
     private const val TAG_SDPM_LINE_INDEX = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): WebRTCTransportProviderClusterICECandidateStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): WebRTCTransportProviderClusterICECandidateStruct {
       tlvReader.enterStructure(tlvTag)
       val candidate = tlvReader.getString(ContextSpecificTag(TAG_CANDIDATE))
-      val SDPMid = if (!tlvReader.isNull()) {
-      tlvReader.getString(ContextSpecificTag(TAG_SDP_MID))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_SDP_MID))
-      null
-    }
-      val SDPMLineIndex = if (!tlvReader.isNull()) {
-      tlvReader.getUShort(ContextSpecificTag(TAG_SDPM_LINE_INDEX))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_SDPM_LINE_INDEX))
-      null
-    }
-      
+      val SDPMid =
+        if (!tlvReader.isNull()) {
+          tlvReader.getString(ContextSpecificTag(TAG_SDP_MID))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_SDP_MID))
+          null
+        }
+      val SDPMLineIndex =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUShort(ContextSpecificTag(TAG_SDPM_LINE_INDEX))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_SDPM_LINE_INDEX))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return WebRTCTransportProviderClusterICECandidateStruct(candidate, SDPMid, SDPMLineIndex)

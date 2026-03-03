@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class PushAvStreamTransportClusterSupportedFormatStruct(
   val containerFormat: UByte,
-  val ingestMethod: UByte
+  val ingestMethod: UByte,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterSupportedFormatStruct {\n")
@@ -48,11 +46,14 @@ class PushAvStreamTransportClusterSupportedFormatStruct(
     private const val TAG_CONTAINER_FORMAT = 0
     private const val TAG_INGEST_METHOD = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterSupportedFormatStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterSupportedFormatStruct {
       tlvReader.enterStructure(tlvTag)
       val containerFormat = tlvReader.getUByte(ContextSpecificTag(TAG_CONTAINER_FORMAT))
       val ingestMethod = tlvReader.getUByte(ContextSpecificTag(TAG_INGEST_METHOD))
-      
+
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterSupportedFormatStruct(containerFormat, ingestMethod)

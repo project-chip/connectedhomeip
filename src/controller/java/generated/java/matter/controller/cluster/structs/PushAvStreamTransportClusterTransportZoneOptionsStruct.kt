@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class PushAvStreamTransportClusterTransportZoneOptionsStruct(
   val zone: UShort?,
-  val sensitivity: Optional<UByte>
+  val sensitivity: Optional<UByte>,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportZoneOptionsStruct {\n")
@@ -55,20 +54,25 @@ class PushAvStreamTransportClusterTransportZoneOptionsStruct(
     private const val TAG_ZONE = 0
     private const val TAG_SENSITIVITY = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterTransportZoneOptionsStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterTransportZoneOptionsStruct {
       tlvReader.enterStructure(tlvTag)
-      val zone = if (!tlvReader.isNull()) {
-      tlvReader.getUShort(ContextSpecificTag(TAG_ZONE))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_ZONE))
-      null
-    }
-      val sensitivity = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SENSITIVITY))) {
-      Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_SENSITIVITY)))
-    } else {
-      Optional.empty()
-    }
-      
+      val zone =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUShort(ContextSpecificTag(TAG_ZONE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_ZONE))
+          null
+        }
+      val sensitivity =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SENSITIVITY))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_SENSITIVITY)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterTransportZoneOptionsStruct(zone, sensitivity)

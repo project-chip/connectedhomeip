@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ZoneManagementClusterZoneStoppedEvent (
-    val zone: UInt,
-    val reason: UInt) {
-  override fun toString(): String  = buildString {
+class ZoneManagementClusterZoneStoppedEvent(val zone: UInt, val reason: UInt) {
+  override fun toString(): String = buildString {
     append("ZoneManagementClusterZoneStoppedEvent {\n")
     append("\tzone : $zone\n")
     append("\treason : $reason\n")
@@ -49,11 +43,11 @@ class ZoneManagementClusterZoneStoppedEvent (
     private const val TAG_ZONE = 0
     private const val TAG_REASON = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ZoneManagementClusterZoneStoppedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ZoneManagementClusterZoneStoppedEvent {
       tlvReader.enterStructure(tlvTag)
       val zone = tlvReader.getUInt(ContextSpecificTag(TAG_ZONE))
       val reason = tlvReader.getUInt(ContextSpecificTag(TAG_REASON))
-      
+
       tlvReader.exitContainer()
 
       return ZoneManagementClusterZoneStoppedEvent(zone, reason)

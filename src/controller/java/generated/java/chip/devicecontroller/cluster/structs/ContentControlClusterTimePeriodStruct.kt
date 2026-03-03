@@ -17,21 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ContentControlClusterTimePeriodStruct (
-    val startHour: UInt,
-    val startMinute: UInt,
-    val endHour: UInt,
-    val endMinute: UInt) {
-  override fun toString(): String  = buildString {
+class ContentControlClusterTimePeriodStruct(
+  val startHour: UInt,
+  val startMinute: UInt,
+  val endHour: UInt,
+  val endMinute: UInt,
+) {
+  override fun toString(): String = buildString {
     append("ContentControlClusterTimePeriodStruct {\n")
     append("\tstartHour : $startHour\n")
     append("\tstartMinute : $startMinute\n")
@@ -57,13 +54,13 @@ class ContentControlClusterTimePeriodStruct (
     private const val TAG_END_HOUR = 2
     private const val TAG_END_MINUTE = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ContentControlClusterTimePeriodStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentControlClusterTimePeriodStruct {
       tlvReader.enterStructure(tlvTag)
       val startHour = tlvReader.getUInt(ContextSpecificTag(TAG_START_HOUR))
       val startMinute = tlvReader.getUInt(ContextSpecificTag(TAG_START_MINUTE))
       val endHour = tlvReader.getUInt(ContextSpecificTag(TAG_END_HOUR))
       val endMinute = tlvReader.getUInt(ContextSpecificTag(TAG_END_MINUTE))
-      
+
       tlvReader.exitContainer()
 
       return ContentControlClusterTimePeriodStruct(startHour, startMinute, endHour, endMinute)

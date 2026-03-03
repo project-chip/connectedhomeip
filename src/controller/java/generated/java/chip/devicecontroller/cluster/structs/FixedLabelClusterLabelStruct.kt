@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class FixedLabelClusterLabelStruct (
-    val label: String,
-    val value: String) {
-  override fun toString(): String  = buildString {
+class FixedLabelClusterLabelStruct(val label: String, val value: String) {
+  override fun toString(): String = buildString {
     append("FixedLabelClusterLabelStruct {\n")
     append("\tlabel : $label\n")
     append("\tvalue : $value\n")
@@ -49,11 +43,11 @@ class FixedLabelClusterLabelStruct (
     private const val TAG_LABEL = 0
     private const val TAG_VALUE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : FixedLabelClusterLabelStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): FixedLabelClusterLabelStruct {
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val value = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
-      
+
       tlvReader.exitContainer()
 
       return FixedLabelClusterLabelStruct(label, value)

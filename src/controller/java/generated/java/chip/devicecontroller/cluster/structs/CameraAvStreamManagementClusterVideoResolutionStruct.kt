@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CameraAvStreamManagementClusterVideoResolutionStruct (
-    val width: UInt,
-    val height: UInt) {
-  override fun toString(): String  = buildString {
+class CameraAvStreamManagementClusterVideoResolutionStruct(val width: UInt, val height: UInt) {
+  override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterVideoResolutionStruct {\n")
     append("\twidth : $width\n")
     append("\theight : $height\n")
@@ -49,11 +43,14 @@ class CameraAvStreamManagementClusterVideoResolutionStruct (
     private const val TAG_WIDTH = 0
     private const val TAG_HEIGHT = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CameraAvStreamManagementClusterVideoResolutionStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): CameraAvStreamManagementClusterVideoResolutionStruct {
       tlvReader.enterStructure(tlvTag)
       val width = tlvReader.getUInt(ContextSpecificTag(TAG_WIDTH))
       val height = tlvReader.getUInt(ContextSpecificTag(TAG_HEIGHT))
-      
+
       tlvReader.exitContainer()
 
       return CameraAvStreamManagementClusterVideoResolutionStruct(width, height)

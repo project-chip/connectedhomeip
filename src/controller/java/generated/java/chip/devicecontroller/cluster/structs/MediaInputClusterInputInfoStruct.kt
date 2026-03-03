@@ -17,21 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class MediaInputClusterInputInfoStruct (
-    val index: UInt,
-    val inputType: UInt,
-    val name: String,
-    val description: String) {
-  override fun toString(): String  = buildString {
+class MediaInputClusterInputInfoStruct(
+  val index: UInt,
+  val inputType: UInt,
+  val name: String,
+  val description: String,
+) {
+  override fun toString(): String = buildString {
     append("MediaInputClusterInputInfoStruct {\n")
     append("\tindex : $index\n")
     append("\tinputType : $inputType\n")
@@ -57,13 +54,13 @@ class MediaInputClusterInputInfoStruct (
     private const val TAG_NAME = 2
     private const val TAG_DESCRIPTION = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : MediaInputClusterInputInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MediaInputClusterInputInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val index = tlvReader.getUInt(ContextSpecificTag(TAG_INDEX))
       val inputType = tlvReader.getUInt(ContextSpecificTag(TAG_INPUT_TYPE))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val description = tlvReader.getString(ContextSpecificTag(TAG_DESCRIPTION))
-      
+
       tlvReader.exitContainer()
 
       return MediaInputClusterInputInfoStruct(index, inputType, name, description)

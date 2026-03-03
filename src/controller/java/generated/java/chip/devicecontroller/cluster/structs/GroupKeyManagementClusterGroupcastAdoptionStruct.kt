@@ -17,19 +17,16 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class GroupKeyManagementClusterGroupcastAdoptionStruct (
-    val groupcastAdopted: Boolean,
-    val fabricIndex: UInt) {
-  override fun toString(): String  = buildString {
+class GroupKeyManagementClusterGroupcastAdoptionStruct(
+  val groupcastAdopted: Boolean,
+  val fabricIndex: UInt,
+) {
+  override fun toString(): String = buildString {
     append("GroupKeyManagementClusterGroupcastAdoptionStruct {\n")
     append("\tgroupcastAdopted : $groupcastAdopted\n")
     append("\tfabricIndex : $fabricIndex\n")
@@ -49,11 +46,14 @@ class GroupKeyManagementClusterGroupcastAdoptionStruct (
     private const val TAG_GROUPCAST_ADOPTED = 0
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : GroupKeyManagementClusterGroupcastAdoptionStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): GroupKeyManagementClusterGroupcastAdoptionStruct {
       tlvReader.enterStructure(tlvTag)
       val groupcastAdopted = tlvReader.getBoolean(ContextSpecificTag(TAG_GROUPCAST_ADOPTED))
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
       return GroupKeyManagementClusterGroupcastAdoptionStruct(groupcastAdopted, fabricIndex)

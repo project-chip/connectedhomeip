@@ -17,25 +17,22 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CameraAvStreamManagementClusterAudioStreamStruct (
-    val audioStreamID: UInt,
-    val streamUsage: UInt,
-    val audioCodec: UInt,
-    val channelCount: UInt,
-    val sampleRate: ULong,
-    val bitRate: ULong,
-    val bitDepth: UInt,
-    val referenceCount: UInt) {
-  override fun toString(): String  = buildString {
+class CameraAvStreamManagementClusterAudioStreamStruct(
+  val audioStreamID: UInt,
+  val streamUsage: UInt,
+  val audioCodec: UInt,
+  val channelCount: UInt,
+  val sampleRate: ULong,
+  val bitRate: ULong,
+  val bitDepth: UInt,
+  val referenceCount: UInt,
+) {
+  override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterAudioStreamStruct {\n")
     append("\taudioStreamID : $audioStreamID\n")
     append("\tstreamUsage : $streamUsage\n")
@@ -73,7 +70,10 @@ class CameraAvStreamManagementClusterAudioStreamStruct (
     private const val TAG_BIT_DEPTH = 6
     private const val TAG_REFERENCE_COUNT = 7
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CameraAvStreamManagementClusterAudioStreamStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): CameraAvStreamManagementClusterAudioStreamStruct {
       tlvReader.enterStructure(tlvTag)
       val audioStreamID = tlvReader.getUInt(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
       val streamUsage = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE))
@@ -83,10 +83,19 @@ class CameraAvStreamManagementClusterAudioStreamStruct (
       val bitRate = tlvReader.getULong(ContextSpecificTag(TAG_BIT_RATE))
       val bitDepth = tlvReader.getUInt(ContextSpecificTag(TAG_BIT_DEPTH))
       val referenceCount = tlvReader.getUInt(ContextSpecificTag(TAG_REFERENCE_COUNT))
-      
+
       tlvReader.exitContainer()
 
-      return CameraAvStreamManagementClusterAudioStreamStruct(audioStreamID, streamUsage, audioCodec, channelCount, sampleRate, bitRate, bitDepth, referenceCount)
+      return CameraAvStreamManagementClusterAudioStreamStruct(
+        audioStreamID,
+        streamUsage,
+        audioCodec,
+        channelCount,
+        sampleRate,
+        bitRate,
+        bitDepth,
+        referenceCount,
+      )
     }
   }
 }

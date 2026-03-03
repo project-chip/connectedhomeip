@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +25,7 @@ import matter.tlv.TlvWriter
 class JointFabricDatastoreClusterDatastoreStatusEntryStruct(
   val state: UByte,
   val updateTimestamp: UInt,
-  val failureCode: UByte
+  val failureCode: UByte,
 ) {
   override fun toString(): String = buildString {
     append("JointFabricDatastoreClusterDatastoreStatusEntryStruct {\n")
@@ -52,15 +50,22 @@ class JointFabricDatastoreClusterDatastoreStatusEntryStruct(
     private const val TAG_UPDATE_TIMESTAMP = 1
     private const val TAG_FAILURE_CODE = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): JointFabricDatastoreClusterDatastoreStatusEntryStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): JointFabricDatastoreClusterDatastoreStatusEntryStruct {
       tlvReader.enterStructure(tlvTag)
       val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
       val updateTimestamp = tlvReader.getUInt(ContextSpecificTag(TAG_UPDATE_TIMESTAMP))
       val failureCode = tlvReader.getUByte(ContextSpecificTag(TAG_FAILURE_CODE))
-      
+
       tlvReader.exitContainer()
 
-      return JointFabricDatastoreClusterDatastoreStatusEntryStruct(state, updateTimestamp, failureCode)
+      return JointFabricDatastoreClusterDatastoreStatusEntryStruct(
+        state,
+        updateTimestamp,
+        failureCode,
+      )
     }
   }
 }

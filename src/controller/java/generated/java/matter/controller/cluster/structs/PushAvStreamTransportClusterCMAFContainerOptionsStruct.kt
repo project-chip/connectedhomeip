@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -32,7 +31,7 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
   val trackName: String,
   val CENCKey: Optional<ByteArray>,
   val CENCKeyID: Optional<ByteArray>,
-  val metadataEnabled: Optional<Boolean>
+  val metadataEnabled: Optional<Boolean>,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterCMAFContainerOptionsStruct {\n")
@@ -81,32 +80,47 @@ class PushAvStreamTransportClusterCMAFContainerOptionsStruct(
     private const val TAG_CENC_KEY_ID = 6
     private const val TAG_METADATA_ENABLED = 7
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterCMAFContainerOptionsStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterCMAFContainerOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val CMAFInterface = tlvReader.getUByte(ContextSpecificTag(TAG_CMAF_INTERFACE))
       val segmentDuration = tlvReader.getUShort(ContextSpecificTag(TAG_SEGMENT_DURATION))
       val chunkDuration = tlvReader.getUShort(ContextSpecificTag(TAG_CHUNK_DURATION))
       val sessionGroup = tlvReader.getUByte(ContextSpecificTag(TAG_SESSION_GROUP))
       val trackName = tlvReader.getString(ContextSpecificTag(TAG_TRACK_NAME))
-      val CENCKey = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CENC_KEY))) {
-      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CENC_KEY)))
-    } else {
-      Optional.empty()
-    }
-      val CENCKeyID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CENC_KEY_ID))) {
-      Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CENC_KEY_ID)))
-    } else {
-      Optional.empty()
-    }
-      val metadataEnabled = if (tlvReader.isNextTag(ContextSpecificTag(TAG_METADATA_ENABLED))) {
-      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_METADATA_ENABLED)))
-    } else {
-      Optional.empty()
-    }
-      
+      val CENCKey =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CENC_KEY))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CENC_KEY)))
+        } else {
+          Optional.empty()
+        }
+      val CENCKeyID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CENC_KEY_ID))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CENC_KEY_ID)))
+        } else {
+          Optional.empty()
+        }
+      val metadataEnabled =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_METADATA_ENABLED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_METADATA_ENABLED)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterCMAFContainerOptionsStruct(CMAFInterface, segmentDuration, chunkDuration, sessionGroup, trackName, CENCKey, CENCKeyID, metadataEnabled)
+      return PushAvStreamTransportClusterCMAFContainerOptionsStruct(
+        CMAFInterface,
+        segmentDuration,
+        chunkDuration,
+        sessionGroup,
+        trackName,
+        CENCKey,
+        CENCKeyID,
+        metadataEnabled,
+      )
     }
   }
 }

@@ -17,21 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class OccupancySensingClusterPredictedOccupancyStruct (
-    val startTimestamp: ULong,
-    val endTimestamp: ULong,
-    val occupancy: UInt,
-    val confidence: UInt) {
-  override fun toString(): String  = buildString {
+class OccupancySensingClusterPredictedOccupancyStruct(
+  val startTimestamp: ULong,
+  val endTimestamp: ULong,
+  val occupancy: UInt,
+  val confidence: UInt,
+) {
+  override fun toString(): String = buildString {
     append("OccupancySensingClusterPredictedOccupancyStruct {\n")
     append("\tstartTimestamp : $startTimestamp\n")
     append("\tendTimestamp : $endTimestamp\n")
@@ -57,16 +54,24 @@ class OccupancySensingClusterPredictedOccupancyStruct (
     private const val TAG_OCCUPANCY = 2
     private const val TAG_CONFIDENCE = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : OccupancySensingClusterPredictedOccupancyStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): OccupancySensingClusterPredictedOccupancyStruct {
       tlvReader.enterStructure(tlvTag)
       val startTimestamp = tlvReader.getULong(ContextSpecificTag(TAG_START_TIMESTAMP))
       val endTimestamp = tlvReader.getULong(ContextSpecificTag(TAG_END_TIMESTAMP))
       val occupancy = tlvReader.getUInt(ContextSpecificTag(TAG_OCCUPANCY))
       val confidence = tlvReader.getUInt(ContextSpecificTag(TAG_CONFIDENCE))
-      
+
       tlvReader.exitContainer()
 
-      return OccupancySensingClusterPredictedOccupancyStruct(startTimestamp, endTimestamp, occupancy, confidence)
+      return OccupancySensingClusterPredictedOccupancyStruct(
+        startTimestamp,
+        endTimestamp,
+        occupancy,
+        confidence,
+      )
     }
   }
 }

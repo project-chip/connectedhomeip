@@ -17,22 +17,20 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class PushAvStreamTransportClusterPushTransportBeginEvent (
-    val connectionID: UInt,
-    val triggerType: UInt,
-    val activationReason: Optional<UInt>,
-    val containerType: UInt,
-    val CMAFSessionNumber: Optional<ULong>) {
-  override fun toString(): String  = buildString {
+class PushAvStreamTransportClusterPushTransportBeginEvent(
+  val connectionID: UInt,
+  val triggerType: UInt,
+  val activationReason: Optional<UInt>,
+  val containerType: UInt,
+  val CMAFSessionNumber: Optional<ULong>,
+) {
+  override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterPushTransportBeginEvent {\n")
     append("\tconnectionID : $connectionID\n")
     append("\ttriggerType : $triggerType\n")
@@ -48,14 +46,14 @@ class PushAvStreamTransportClusterPushTransportBeginEvent (
       put(ContextSpecificTag(TAG_CONNECTION_ID), connectionID)
       put(ContextSpecificTag(TAG_TRIGGER_TYPE), triggerType)
       if (activationReason.isPresent) {
-      val optactivationReason = activationReason.get()
-      put(ContextSpecificTag(TAG_ACTIVATION_REASON), optactivationReason)
-    }
+        val optactivationReason = activationReason.get()
+        put(ContextSpecificTag(TAG_ACTIVATION_REASON), optactivationReason)
+      }
       put(ContextSpecificTag(TAG_CONTAINER_TYPE), containerType)
       if (CMAFSessionNumber.isPresent) {
-      val optCMAFSessionNumber = CMAFSessionNumber.get()
-      put(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER), optCMAFSessionNumber)
-    }
+        val optCMAFSessionNumber = CMAFSessionNumber.get()
+        put(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER), optCMAFSessionNumber)
+      }
       endStructure()
     }
   }
@@ -67,25 +65,36 @@ class PushAvStreamTransportClusterPushTransportBeginEvent (
     private const val TAG_CONTAINER_TYPE = 3
     private const val TAG_CMAF_SESSION_NUMBER = 4
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : PushAvStreamTransportClusterPushTransportBeginEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterPushTransportBeginEvent {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_ID))
       val triggerType = tlvReader.getUInt(ContextSpecificTag(TAG_TRIGGER_TYPE))
-      val activationReason = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ACTIVATION_REASON))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ACTIVATION_REASON)))
-    } else {
-      Optional.empty()
-    }
+      val activationReason =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ACTIVATION_REASON))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ACTIVATION_REASON)))
+        } else {
+          Optional.empty()
+        }
       val containerType = tlvReader.getUInt(ContextSpecificTag(TAG_CONTAINER_TYPE))
-      val CMAFSessionNumber = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER)))
-    } else {
-      Optional.empty()
-    }
-      
+      val CMAFSessionNumber =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterPushTransportBeginEvent(connectionID, triggerType, activationReason, containerType, CMAFSessionNumber)
+      return PushAvStreamTransportClusterPushTransportBeginEvent(
+        connectionID,
+        triggerType,
+        activationReason,
+        containerType,
+        CMAFSessionNumber,
+      )
     }
   }
 }

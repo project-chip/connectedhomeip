@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class ServiceAreaClusterAreaInfoStruct(
   val locationInfo: ServiceAreaClusterLocationDescriptorStruct?,
-  val landmarkInfo: ServiceAreaClusterLandmarkInfoStruct?
+  val landmarkInfo: ServiceAreaClusterLandmarkInfoStruct?,
 ) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterAreaInfoStruct {\n")
@@ -58,19 +56,27 @@ class ServiceAreaClusterAreaInfoStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterAreaInfoStruct {
       tlvReader.enterStructure(tlvTag)
-      val locationInfo = if (!tlvReader.isNull()) {
-      ServiceAreaClusterLocationDescriptorStruct.fromTlv(ContextSpecificTag(TAG_LOCATION_INFO), tlvReader)
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_LOCATION_INFO))
-      null
-    }
-      val landmarkInfo = if (!tlvReader.isNull()) {
-      ServiceAreaClusterLandmarkInfoStruct.fromTlv(ContextSpecificTag(TAG_LANDMARK_INFO), tlvReader)
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_LANDMARK_INFO))
-      null
-    }
-      
+      val locationInfo =
+        if (!tlvReader.isNull()) {
+          ServiceAreaClusterLocationDescriptorStruct.fromTlv(
+            ContextSpecificTag(TAG_LOCATION_INFO),
+            tlvReader,
+          )
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_LOCATION_INFO))
+          null
+        }
+      val landmarkInfo =
+        if (!tlvReader.isNull()) {
+          ServiceAreaClusterLandmarkInfoStruct.fromTlv(
+            ContextSpecificTag(TAG_LANDMARK_INFO),
+            tlvReader,
+          )
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_LANDMARK_INFO))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return ServiceAreaClusterAreaInfoStruct(locationInfo, landmarkInfo)

@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +27,7 @@ class ZoneManagementClusterZoneInformationStruct(
   val zoneID: UShort,
   val zoneType: UByte,
   val zoneSource: UByte,
-  val twoDCartesianZone: Optional<ZoneManagementClusterTwoDCartesianZoneStruct>
+  val twoDCartesianZone: Optional<ZoneManagementClusterTwoDCartesianZoneStruct>,
 ) {
   override fun toString(): String = buildString {
     append("ZoneManagementClusterZoneInformationStruct {\n")
@@ -64,15 +63,26 @@ class ZoneManagementClusterZoneInformationStruct(
       val zoneID = tlvReader.getUShort(ContextSpecificTag(TAG_ZONE_ID))
       val zoneType = tlvReader.getUByte(ContextSpecificTag(TAG_ZONE_TYPE))
       val zoneSource = tlvReader.getUByte(ContextSpecificTag(TAG_ZONE_SOURCE))
-      val twoDCartesianZone = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TWO_D_CARTESIAN_ZONE))) {
-      Optional.of(ZoneManagementClusterTwoDCartesianZoneStruct.fromTlv(ContextSpecificTag(TAG_TWO_D_CARTESIAN_ZONE), tlvReader))
-    } else {
-      Optional.empty()
-    }
-      
+      val twoDCartesianZone =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TWO_D_CARTESIAN_ZONE))) {
+          Optional.of(
+            ZoneManagementClusterTwoDCartesianZoneStruct.fromTlv(
+              ContextSpecificTag(TAG_TWO_D_CARTESIAN_ZONE),
+              tlvReader,
+            )
+          )
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return ZoneManagementClusterZoneInformationStruct(zoneID, zoneType, zoneSource, twoDCartesianZone)
+      return ZoneManagementClusterZoneInformationStruct(
+        zoneID,
+        zoneType,
+        zoneSource,
+        twoDCartesianZone,
+      )
     }
   }
 }

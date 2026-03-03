@@ -17,31 +17,28 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ThreadNetworkDiagnosticsClusterNeighborTableStruct (
-    val extAddress: ULong,
-    val age: ULong,
-    val rloc16: UInt,
-    val linkFrameCounter: ULong,
-    val mleFrameCounter: ULong,
-    val lqi: UInt,
-    val averageRssi: Int?,
-    val lastRssi: Int?,
-    val frameErrorRate: UInt,
-    val messageErrorRate: UInt,
-    val rxOnWhenIdle: Boolean,
-    val fullThreadDevice: Boolean,
-    val fullNetworkData: Boolean,
-    val isChild: Boolean) {
-  override fun toString(): String  = buildString {
+class ThreadNetworkDiagnosticsClusterNeighborTableStruct(
+  val extAddress: ULong,
+  val age: ULong,
+  val rloc16: UInt,
+  val linkFrameCounter: ULong,
+  val mleFrameCounter: ULong,
+  val lqi: UInt,
+  val averageRssi: Int?,
+  val lastRssi: Int?,
+  val frameErrorRate: UInt,
+  val messageErrorRate: UInt,
+  val rxOnWhenIdle: Boolean,
+  val fullThreadDevice: Boolean,
+  val fullNetworkData: Boolean,
+  val isChild: Boolean,
+) {
+  override fun toString(): String = buildString {
     append("ThreadNetworkDiagnosticsClusterNeighborTableStruct {\n")
     append("\textAddress : $extAddress\n")
     append("\tage : $age\n")
@@ -70,15 +67,15 @@ class ThreadNetworkDiagnosticsClusterNeighborTableStruct (
       put(ContextSpecificTag(TAG_MLE_FRAME_COUNTER), mleFrameCounter)
       put(ContextSpecificTag(TAG_LQI), lqi)
       if (averageRssi != null) {
-      put(ContextSpecificTag(TAG_AVERAGE_RSSI), averageRssi)
-    } else {
-      putNull(ContextSpecificTag(TAG_AVERAGE_RSSI))
-    }
+        put(ContextSpecificTag(TAG_AVERAGE_RSSI), averageRssi)
+      } else {
+        putNull(ContextSpecificTag(TAG_AVERAGE_RSSI))
+      }
       if (lastRssi != null) {
-      put(ContextSpecificTag(TAG_LAST_RSSI), lastRssi)
-    } else {
-      putNull(ContextSpecificTag(TAG_LAST_RSSI))
-    }
+        put(ContextSpecificTag(TAG_LAST_RSSI), lastRssi)
+      } else {
+        putNull(ContextSpecificTag(TAG_LAST_RSSI))
+      }
       put(ContextSpecificTag(TAG_FRAME_ERROR_RATE), frameErrorRate)
       put(ContextSpecificTag(TAG_MESSAGE_ERROR_RATE), messageErrorRate)
       put(ContextSpecificTag(TAG_RX_ON_WHEN_IDLE), rxOnWhenIdle)
@@ -105,7 +102,10 @@ class ThreadNetworkDiagnosticsClusterNeighborTableStruct (
     private const val TAG_FULL_NETWORK_DATA = 12
     private const val TAG_IS_CHILD = 13
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThreadNetworkDiagnosticsClusterNeighborTableStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): ThreadNetworkDiagnosticsClusterNeighborTableStruct {
       tlvReader.enterStructure(tlvTag)
       val extAddress = tlvReader.getULong(ContextSpecificTag(TAG_EXT_ADDRESS))
       val age = tlvReader.getULong(ContextSpecificTag(TAG_AGE))
@@ -113,28 +113,45 @@ class ThreadNetworkDiagnosticsClusterNeighborTableStruct (
       val linkFrameCounter = tlvReader.getULong(ContextSpecificTag(TAG_LINK_FRAME_COUNTER))
       val mleFrameCounter = tlvReader.getULong(ContextSpecificTag(TAG_MLE_FRAME_COUNTER))
       val lqi = tlvReader.getUInt(ContextSpecificTag(TAG_LQI))
-      val averageRssi = if (!tlvReader.isNull()) {
-      tlvReader.getInt(ContextSpecificTag(TAG_AVERAGE_RSSI))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_AVERAGE_RSSI))
-      null
-    }
-      val lastRssi = if (!tlvReader.isNull()) {
-      tlvReader.getInt(ContextSpecificTag(TAG_LAST_RSSI))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_LAST_RSSI))
-      null
-    }
+      val averageRssi =
+        if (!tlvReader.isNull()) {
+          tlvReader.getInt(ContextSpecificTag(TAG_AVERAGE_RSSI))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_AVERAGE_RSSI))
+          null
+        }
+      val lastRssi =
+        if (!tlvReader.isNull()) {
+          tlvReader.getInt(ContextSpecificTag(TAG_LAST_RSSI))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_LAST_RSSI))
+          null
+        }
       val frameErrorRate = tlvReader.getUInt(ContextSpecificTag(TAG_FRAME_ERROR_RATE))
       val messageErrorRate = tlvReader.getUInt(ContextSpecificTag(TAG_MESSAGE_ERROR_RATE))
       val rxOnWhenIdle = tlvReader.getBoolean(ContextSpecificTag(TAG_RX_ON_WHEN_IDLE))
       val fullThreadDevice = tlvReader.getBoolean(ContextSpecificTag(TAG_FULL_THREAD_DEVICE))
       val fullNetworkData = tlvReader.getBoolean(ContextSpecificTag(TAG_FULL_NETWORK_DATA))
       val isChild = tlvReader.getBoolean(ContextSpecificTag(TAG_IS_CHILD))
-      
+
       tlvReader.exitContainer()
 
-      return ThreadNetworkDiagnosticsClusterNeighborTableStruct(extAddress, age, rloc16, linkFrameCounter, mleFrameCounter, lqi, averageRssi, lastRssi, frameErrorRate, messageErrorRate, rxOnWhenIdle, fullThreadDevice, fullNetworkData, isChild)
+      return ThreadNetworkDiagnosticsClusterNeighborTableStruct(
+        extAddress,
+        age,
+        rloc16,
+        linkFrameCounter,
+        mleFrameCounter,
+        lqi,
+        averageRssi,
+        lastRssi,
+        frameErrorRate,
+        messageErrorRate,
+        rxOnWhenIdle,
+        fullThreadDevice,
+        fullNetworkData,
+        isChild,
+      )
     }
   }
 }

@@ -16,17 +16,13 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ThermostatClusterLocalTemperatureChangeEvent(
-  val currentLocalTemperature: Short?
-) {
+class ThermostatClusterLocalTemperatureChangeEvent(val currentLocalTemperature: Short?) {
   override fun toString(): String = buildString {
     append("ThermostatClusterLocalTemperatureChangeEvent {\n")
     append("\tcurrentLocalTemperature : $currentLocalTemperature\n")
@@ -48,15 +44,16 @@ class ThermostatClusterLocalTemperatureChangeEvent(
   companion object {
     private const val TAG_CURRENT_LOCAL_TEMPERATURE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThermostatClusterLocalTemperatureChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterLocalTemperatureChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val currentLocalTemperature = if (!tlvReader.isNull()) {
-        tlvReader.getShort(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE))
-      } else {
-        tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE))
-        null
-      }
-      
+      val currentLocalTemperature =
+        if (!tlvReader.isNull()) {
+          tlvReader.getShort(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_CURRENT_LOCAL_TEMPERATURE))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return ThermostatClusterLocalTemperatureChangeEvent(currentLocalTemperature)

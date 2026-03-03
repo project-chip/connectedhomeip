@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -26,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class AmbientContextSensingClusterObjectCountConfigStruct(
   val countingObject: AmbientContextSensingClusterSemanticTagStruct,
-  val objectCountThreshold: UShort
+  val objectCountThreshold: UShort,
 ) {
   override fun toString(): String = buildString {
     append("AmbientContextSensingClusterObjectCountConfigStruct {\n")
@@ -48,14 +46,24 @@ class AmbientContextSensingClusterObjectCountConfigStruct(
     private const val TAG_COUNTING_OBJECT = 0
     private const val TAG_OBJECT_COUNT_THRESHOLD = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AmbientContextSensingClusterObjectCountConfigStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): AmbientContextSensingClusterObjectCountConfigStruct {
       tlvReader.enterStructure(tlvTag)
-      val countingObject = AmbientContextSensingClusterSemanticTagStruct.fromTlv(ContextSpecificTag(TAG_COUNTING_OBJECT), tlvReader)
+      val countingObject =
+        AmbientContextSensingClusterSemanticTagStruct.fromTlv(
+          ContextSpecificTag(TAG_COUNTING_OBJECT),
+          tlvReader,
+        )
       val objectCountThreshold = tlvReader.getUShort(ContextSpecificTag(TAG_OBJECT_COUNT_THRESHOLD))
-      
+
       tlvReader.exitContainer()
 
-      return AmbientContextSensingClusterObjectCountConfigStruct(countingObject, objectCountThreshold)
+      return AmbientContextSensingClusterObjectCountConfigStruct(
+        countingObject,
+        objectCountThreshold,
+      )
     }
   }
 }

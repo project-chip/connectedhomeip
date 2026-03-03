@@ -17,19 +17,16 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class PushAvStreamTransportClusterSupportedFormatStruct (
-    val containerFormat: UInt,
-    val ingestMethod: UInt) {
-  override fun toString(): String  = buildString {
+class PushAvStreamTransportClusterSupportedFormatStruct(
+  val containerFormat: UInt,
+  val ingestMethod: UInt,
+) {
+  override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterSupportedFormatStruct {\n")
     append("\tcontainerFormat : $containerFormat\n")
     append("\tingestMethod : $ingestMethod\n")
@@ -49,11 +46,14 @@ class PushAvStreamTransportClusterSupportedFormatStruct (
     private const val TAG_CONTAINER_FORMAT = 0
     private const val TAG_INGEST_METHOD = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : PushAvStreamTransportClusterSupportedFormatStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): PushAvStreamTransportClusterSupportedFormatStruct {
       tlvReader.enterStructure(tlvTag)
       val containerFormat = tlvReader.getUInt(ContextSpecificTag(TAG_CONTAINER_FORMAT))
       val ingestMethod = tlvReader.getUInt(ContextSpecificTag(TAG_INGEST_METHOD))
-      
+
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterSupportedFormatStruct(containerFormat, ingestMethod)

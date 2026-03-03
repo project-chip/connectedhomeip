@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ContentControlClusterAppInfoStruct (
-    val catalogVendorID: UInt,
-    val applicationID: String) {
-  override fun toString(): String  = buildString {
+class ContentControlClusterAppInfoStruct(val catalogVendorID: UInt, val applicationID: String) {
+  override fun toString(): String = buildString {
     append("ContentControlClusterAppInfoStruct {\n")
     append("\tcatalogVendorID : $catalogVendorID\n")
     append("\tapplicationID : $applicationID\n")
@@ -49,11 +43,11 @@ class ContentControlClusterAppInfoStruct (
     private const val TAG_CATALOG_VENDOR_ID = 0
     private const val TAG_APPLICATION_ID = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ContentControlClusterAppInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentControlClusterAppInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val catalogVendorID = tlvReader.getUInt(ContextSpecificTag(TAG_CATALOG_VENDOR_ID))
       val applicationID = tlvReader.getString(ContextSpecificTag(TAG_APPLICATION_ID))
-      
+
       tlvReader.exitContainer()
 
       return ContentControlClusterAppInfoStruct(catalogVendorID, applicationID)

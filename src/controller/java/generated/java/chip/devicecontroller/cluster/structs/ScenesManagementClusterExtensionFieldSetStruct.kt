@@ -20,16 +20,14 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ScenesManagementClusterExtensionFieldSetStruct (
-    val clusterID: ULong,
-    val attributeValueList: List<ScenesManagementClusterAttributeValuePairStruct>) {
-  override fun toString(): String  = buildString {
+class ScenesManagementClusterExtensionFieldSetStruct(
+  val clusterID: ULong,
+  val attributeValueList: List<ScenesManagementClusterAttributeValuePairStruct>,
+) {
+  override fun toString(): String = buildString {
     append("ScenesManagementClusterExtensionFieldSetStruct {\n")
     append("\tclusterID : $clusterID\n")
     append("\tattributeValueList : $attributeValueList\n")
@@ -53,17 +51,18 @@ class ScenesManagementClusterExtensionFieldSetStruct (
     private const val TAG_CLUSTER_ID = 0
     private const val TAG_ATTRIBUTE_VALUE_LIST = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ScenesManagementClusterExtensionFieldSetStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesManagementClusterExtensionFieldSetStruct {
       tlvReader.enterStructure(tlvTag)
       val clusterID = tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER_ID))
-      val attributeValueList = buildList<ScenesManagementClusterAttributeValuePairStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
-      while(!tlvReader.isEndOfContainer()) {
-        add(ScenesManagementClusterAttributeValuePairStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val attributeValueList =
+        buildList<ScenesManagementClusterAttributeValuePairStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
+          while (!tlvReader.isEndOfContainer()) {
+            add(ScenesManagementClusterAttributeValuePairStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return ScenesManagementClusterExtensionFieldSetStruct(clusterID, attributeValueList)

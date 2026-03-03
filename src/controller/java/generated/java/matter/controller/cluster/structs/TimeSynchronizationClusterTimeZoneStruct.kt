@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +26,7 @@ import matter.tlv.TlvWriter
 class TimeSynchronizationClusterTimeZoneStruct(
   val offset: Int,
   val validAt: ULong,
-  val name: Optional<String>
+  val name: Optional<String>,
 ) {
   override fun toString(): String = buildString {
     append("TimeSynchronizationClusterTimeZoneStruct {\n")
@@ -59,12 +58,13 @@ class TimeSynchronizationClusterTimeZoneStruct(
       tlvReader.enterStructure(tlvTag)
       val offset = tlvReader.getInt(ContextSpecificTag(TAG_OFFSET))
       val validAt = tlvReader.getULong(ContextSpecificTag(TAG_VALID_AT))
-      val name = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
-    } else {
-      Optional.empty()
-    }
-      
+      val name =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return TimeSynchronizationClusterTimeZoneStruct(offset, validAt, name)

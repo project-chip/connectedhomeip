@@ -17,19 +17,16 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct (
-    val number: UInt,
-    val requiredState: UInt) {
-  override fun toString(): String  = buildString {
+class CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct(
+  val number: UInt,
+  val requiredState: UInt,
+) {
+  override fun toString(): String = buildString {
     append("CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct {\n")
     append("\tnumber : $number\n")
     append("\trequiredState : $requiredState\n")
@@ -49,11 +46,14 @@ class CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct (
     private const val TAG_NUMBER = 0
     private const val TAG_REQUIRED_STATE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct {
       tlvReader.enterStructure(tlvTag)
       val number = tlvReader.getUInt(ContextSpecificTag(TAG_NUMBER))
       val requiredState = tlvReader.getUInt(ContextSpecificTag(TAG_REQUIRED_STATE))
-      
+
       tlvReader.exitContainer()
 
       return CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct(number, requiredState)

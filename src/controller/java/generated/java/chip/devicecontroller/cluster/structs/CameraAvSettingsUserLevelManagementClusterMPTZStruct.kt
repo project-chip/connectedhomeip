@@ -17,20 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class CameraAvSettingsUserLevelManagementClusterMPTZStruct (
-    val pan: Optional<Int>,
-    val tilt: Optional<Int>,
-    val zoom: Optional<UInt>) {
-  override fun toString(): String  = buildString {
+class CameraAvSettingsUserLevelManagementClusterMPTZStruct(
+  val pan: Optional<Int>,
+  val tilt: Optional<Int>,
+  val zoom: Optional<UInt>,
+) {
+  override fun toString(): String = buildString {
     append("CameraAvSettingsUserLevelManagementClusterMPTZStruct {\n")
     append("\tpan : $pan\n")
     append("\ttilt : $tilt\n")
@@ -42,17 +40,17 @@ class CameraAvSettingsUserLevelManagementClusterMPTZStruct (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (pan.isPresent) {
-      val optpan = pan.get()
-      put(ContextSpecificTag(TAG_PAN), optpan)
-    }
+        val optpan = pan.get()
+        put(ContextSpecificTag(TAG_PAN), optpan)
+      }
       if (tilt.isPresent) {
-      val opttilt = tilt.get()
-      put(ContextSpecificTag(TAG_TILT), opttilt)
-    }
+        val opttilt = tilt.get()
+        put(ContextSpecificTag(TAG_TILT), opttilt)
+      }
       if (zoom.isPresent) {
-      val optzoom = zoom.get()
-      put(ContextSpecificTag(TAG_ZOOM), optzoom)
-    }
+        val optzoom = zoom.get()
+        put(ContextSpecificTag(TAG_ZOOM), optzoom)
+      }
       endStructure()
     }
   }
@@ -62,24 +60,30 @@ class CameraAvSettingsUserLevelManagementClusterMPTZStruct (
     private const val TAG_TILT = 1
     private const val TAG_ZOOM = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CameraAvSettingsUserLevelManagementClusterMPTZStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): CameraAvSettingsUserLevelManagementClusterMPTZStruct {
       tlvReader.enterStructure(tlvTag)
-      val pan = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PAN))) {
-      Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_PAN)))
-    } else {
-      Optional.empty()
-    }
-      val tilt = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TILT))) {
-      Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_TILT)))
-    } else {
-      Optional.empty()
-    }
-      val zoom = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ZOOM))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ZOOM)))
-    } else {
-      Optional.empty()
-    }
-      
+      val pan =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PAN))) {
+          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_PAN)))
+        } else {
+          Optional.empty()
+        }
+      val tilt =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TILT))) {
+          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_TILT)))
+        } else {
+          Optional.empty()
+        }
+      val zoom =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ZOOM))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ZOOM)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return CameraAvSettingsUserLevelManagementClusterMPTZStruct(pan, tilt, zoom)

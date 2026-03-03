@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -28,7 +26,7 @@ class OccupancySensingClusterPredictedOccupancyStruct(
   val startTimestamp: UInt,
   val endTimestamp: UInt,
   val occupancy: UByte,
-  val confidence: UByte
+  val confidence: UByte,
 ) {
   override fun toString(): String = buildString {
     append("OccupancySensingClusterPredictedOccupancyStruct {\n")
@@ -56,16 +54,24 @@ class OccupancySensingClusterPredictedOccupancyStruct(
     private const val TAG_OCCUPANCY = 2
     private const val TAG_CONFIDENCE = 3
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): OccupancySensingClusterPredictedOccupancyStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader,
+    ): OccupancySensingClusterPredictedOccupancyStruct {
       tlvReader.enterStructure(tlvTag)
       val startTimestamp = tlvReader.getUInt(ContextSpecificTag(TAG_START_TIMESTAMP))
       val endTimestamp = tlvReader.getUInt(ContextSpecificTag(TAG_END_TIMESTAMP))
       val occupancy = tlvReader.getUByte(ContextSpecificTag(TAG_OCCUPANCY))
       val confidence = tlvReader.getUByte(ContextSpecificTag(TAG_CONFIDENCE))
-      
+
       tlvReader.exitContainer()
 
-      return OccupancySensingClusterPredictedOccupancyStruct(startTimestamp, endTimestamp, occupancy, confidence)
+      return OccupancySensingClusterPredictedOccupancyStruct(
+        startTimestamp,
+        endTimestamp,
+        occupancy,
+        confidence,
+      )
     }
   }
 }
