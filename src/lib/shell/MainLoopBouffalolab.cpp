@@ -26,7 +26,7 @@ using chip::Shell::Engine;
 
 void cmd_matter(size_t argc, char ** argv)
 {
-    Engine::Root().ExecCommand(argc - 1, argv + 1);
+    TEMPORARY_RETURN_IGNORED Engine::Root().ExecCommand(argc - 1, argv + 1);
 }
 
 SHELL_CMD_EXPORT_ALIAS(cmd_matter, matter, matter command);

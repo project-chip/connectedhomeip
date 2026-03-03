@@ -380,6 +380,15 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const Data
     return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
 }
 
+CHIP_ERROR BasicInformationCluster::IncreaseConfigurationVersion()
+{
+    uint32_t globalConfig = 0;
+    ReturnErrorOnFailure(mClusterContext.configurationManager.GetConfigurationVersion(globalConfig));
+    ReturnErrorOnFailure(mClusterContext.configurationManager.StoreConfigurationVersion(globalConfig + 1));
+    NotifyAttributeChanged(ConfigurationVersion::Id);
+    return CHIP_NO_ERROR;
+}
+
 DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
                                                                  AttributeValueDecoder & decoder)
 {

@@ -17,6 +17,7 @@
  */
 
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -350,15 +351,11 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
 
         using CumulativeEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::Type;
         ASSERT_TRUE(event.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-        EXPECT_EQ(event.value().eventOptions.mPath,
+        EXPECT_EQ((*event).eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, CumulativeEventType::GetClusterId(), CumulativeEventType::GetEventId()));
         chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::DecodableType decodedEvent;
 
-        // Check again for Tidy
-        ASSERT_TRUE(event.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-        ASSERT_EQ(event.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
+        ASSERT_EQ((*event).GetEventData(decodedEvent), CHIP_NO_ERROR);
 
         ASSERT_TRUE(decodedEvent.energyImported.HasValue());
         EXPECT_EQ(decodedEvent.energyImported.Value().energy, 10000);
@@ -386,15 +383,11 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
 
         using PeriodicEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::Type;
         ASSERT_TRUE(event.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-        EXPECT_EQ(event.value().eventOptions.mPath,
+        EXPECT_EQ((*event).eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, PeriodicEventType::GetClusterId(), PeriodicEventType::GetEventId()));
         chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::DecodableType decodedEvent;
 
-        // Check again for Tidy
-        ASSERT_TRUE(event.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-        ASSERT_EQ(event.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
+        ASSERT_EQ((*event).GetEventData(decodedEvent), CHIP_NO_ERROR);
 
         ASSERT_TRUE(decodedEvent.energyImported.HasValue());
         EXPECT_EQ(decodedEvent.energyImported.Value().energy, 10000);

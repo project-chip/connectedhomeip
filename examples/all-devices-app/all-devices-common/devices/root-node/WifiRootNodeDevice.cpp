@@ -47,9 +47,9 @@ CHIP_ERROR WifiRootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataMod
     return CHIP_NO_ERROR;
 }
 
-void WifiRootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+void WifiRootNodeDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    RootNodeDevice::UnRegister(provider);
+    RootNodeDevice::Unregister(provider);
     if (mNetworkCommissioningCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mNetworkCommissioningCluster.Cluster()));
