@@ -164,7 +164,7 @@ private:
     void SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedSetting);
     DataModel::Nullable<uint8_t> GetSpeedSetting();
     DataModel::Nullable<Percent> GetPercentSetting();
-    uint8_t GetSpeedMax();
+    std::optional<uint8_t> GetSpeedMax() override;
 
     void HandleThermostatAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
     void ThermostatHeatingSetpointWriteCallback(int16_t aNewHeatingSetpoint);
