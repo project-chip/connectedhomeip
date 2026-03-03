@@ -64,21 +64,24 @@ public:
     template <typename T>
     CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
     {
-        struct
+        struct Invoke
         {
             CHIP_ERROR returnValue = CHIP_NO_ERROR;
             CHIP_ERROR (*functionToCall)(T *);
             T * userData;
-        } context;
+        } invoke;
 
-        context.functionToCall = func;
-        context.userData       = userData;
+        invoke.functionToCall = func;
+        invoke.userData       = userData;
 
-        LambdaBridge bridge;
-        bridge.Initialize([&context]() { context.returnValue = context.functionToCall(context.userData); });
+        _GLibMatterContextInvokeSync(
+            [](void * context) {
+                auto & invoke_      = *static_cast<Invoke *>(context);
+                invoke_.returnValue = invoke_.functionToCall(invoke_.userData);
+            },
+            &invoke);
 
-        _GLibMatterContextInvokeSync(std::move(bridge));
-        return context.returnValue;
+        return invoke.returnValue;
     }
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
@@ -101,13 +104,11 @@ private:
     /**
      * @brief Invoke a function on the Matter GLib context.
      *
-     * @param[in] bridge a LambdaBridge object that holds the lambda to be invoked within the GLib context.
+     * @param[in] callback  A callback to be invoked within the GLib context.
+     * @param[in] context   The context for the callback.
      *
-     * @note This function moves the LambdaBridge into the GLib context for invocation.
-     *       The LambdaBridge is created and initialised in GLibMatterContextInvokeSync().
-     *       use the GLibMatterContextInvokeSync() template function instead of this one.
      */
-    void _GLibMatterContextInvokeSync(LambdaBridge && bridge);
+    void _GLibMatterContextInvokeSync(void (*callback)(void * context), void * context);
 
     GMainLoop * mGLibMainLoop;
     GThread * mGLibMainLoopThread;
