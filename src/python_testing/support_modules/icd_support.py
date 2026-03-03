@@ -21,13 +21,23 @@ Support module for ICD test modules containing shared functionality.
 import logging
 from enum import IntEnum
 
+import matter.clusters as Clusters
+
 log = logging.getLogger(__name__)
+
+# Base for ICD test-event triggers: (IcdManagement cluster ID << 48).
+_ICD_CLUSTER_CODE = Clusters.Objects.IcdManagement.id << 48
 
 
 class ICDTestEventTriggerOperations(IntEnum):
     """
-    Copy of ICDTestEventTriggerEvent from ICDManager.cpp.
-    Both enum classes must use the same values to maintain compatibility.
+    Mirrors ICDTestEventTriggerEvent from ICDManager.cpp.
+    Values are derived from the SDK cluster ID to stay in sync automatically.
     """
-    kAddActiveModeReq = 0x0046000000000001
-    kRemoveActiveModeReq = 0x0046000000000002
+    kAddActiveModeReq                = _ICD_CLUSTER_CODE | 0x0000_00000001
+    kRemoveActiveModeReq             = _ICD_CLUSTER_CODE | 0x0000_00000002
+    kInvalidateHalfCounterValues     = _ICD_CLUSTER_CODE | 0x0000_00000003
+    kInvalidateAllCounterValues      = _ICD_CLUSTER_CODE | 0x0000_00000004
+    kForceMaximumCheckInBackOffState = _ICD_CLUSTER_CODE | 0x0000_00000005
+    kDSLSForceSitMode                = _ICD_CLUSTER_CODE | 0x0000_00000006
+    kDSLSWithdrawSitMode             = _ICD_CLUSTER_CODE | 0x0000_00000007
