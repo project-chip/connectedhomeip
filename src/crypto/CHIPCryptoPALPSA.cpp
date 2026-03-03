@@ -902,6 +902,12 @@ exit:
     return error;
 }
 
+CHIP_ERROR P256Keypair::InitializeFromBitsOrReject(FixedByteSpan<kP256_PrivateKey_Length> privateKeyBits)
+{
+    // Not implemented for the PSA backend; Direct HKDF to EC key derivation should be used instead.
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
 void P256Keypair::Clear()
 {
     if (mInitialized)
