@@ -872,7 +872,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
             // for later.
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
-
+            VerifyOrExit(params.GetSetupDiscriminator().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
             ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(params.GetSetupDiscriminator().value(), this,
                                                                                     OnDiscoveredDeviceOverBleSuccess,
                                                                                     OnDiscoveredDeviceOverBleError));
