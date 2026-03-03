@@ -1199,6 +1199,11 @@ constexpr CheckData groupCheckData[] = {
       .requestPath       = { .endpoint = 40, .requestType = Access::RequestType::kCommandInvokeRequest },
       .privilege         = Privilege::kOperate,
       .allow             = false },
+
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x3333) },
+      .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kManage,
+      .allow             = false },
 };
 
 class TestAccessControl : public ::testing::Test
@@ -2137,7 +2142,7 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryCheck)
         EXPECT_EQ(provider->AddEndpoint(2, info.group_id, 30), CHIP_NO_ERROR);
     }
 
-    // Set up group 4 data for fabric 2
+    // Set up group 4 data for fabric 2, with no kHasAuxiliaryACL
     {
         Credentials::GroupDataProvider::GroupInfo info;
         info.group_id = 0x4444;
