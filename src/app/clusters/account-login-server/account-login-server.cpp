@@ -142,6 +142,11 @@ CHIP_ERROR AccountLoginAttrAccess::Read(const app::ConcreteReadAttributePath & a
     {
     case app::Clusters::AccountLogin::Attributes::ClusterRevision::Id:
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
+    case app::Clusters::AccountLogin::Attributes::FeatureMap::Id: {
+            uint32_t featureMap = 0;
+            return aEncoder.Encode(featureMap);
+
+    }
     default:
         break;
     }
