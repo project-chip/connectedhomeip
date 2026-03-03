@@ -22,8 +22,8 @@ import logging
 from enum import IntEnum
 
 
-
 log = logging.getLogger(__name__)
+
 
 class ICDTestEventTriggerOperations(IntEnum):
     """

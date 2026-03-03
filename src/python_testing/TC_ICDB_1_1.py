@@ -76,6 +76,7 @@ commands = cluster.Commands
 clientTypeEnum = cluster.Enums.ClientTypeEnum
 features = cluster.Bitmaps.Feature
 
+
 class TC_ICDB_1_1(MatterBaseTest):
 
     def desc_TC_ICDB_1_1(self) -> str:
@@ -97,7 +98,7 @@ class TC_ICDB_1_1(MatterBaseTest):
                      "DUT sends a check-in message upon transitioning from Idle Mode to Active Mode."),
             TestStep("5", "TH sends the AddActiveModeReq test event trigger to hold DUT in active mode.",
                      "TH is able to read attributes from the DUT."),
-            TestStep("6", "TH reads the current ICDCounter attribute from the DUT","""
+            TestStep("6", "TH reads the current ICDCounter attribute from the DUT", """
                       Store ICDCounter value as current_icd_counter.
                       Verify that current_icd_counter is greater than icd_counter_at_registration."""),
             TestStep("7", "TH sends command UnregisterClient to the DUT",
