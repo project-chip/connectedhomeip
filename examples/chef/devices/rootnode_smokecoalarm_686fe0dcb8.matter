@@ -1876,6 +1876,92 @@ cluster SmokeCoAlarm = 92 {
   command SelfTestRequest(): DefaultSuccess = 0;
 }
 
+/** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
+cluster TemperatureMeasurement = 1026 {
+  revision 4;
+
+  readonly attribute nullable temperature measuredValue = 0;
+  readonly attribute nullable temperature minMeasuredValue = 1;
+  readonly attribute nullable temperature maxMeasuredValue = 2;
+  readonly attribute optional int16u tolerance = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements. */
+cluster RelativeHumidityMeasurement = 1029 {
+  revision 3;
+
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
+  readonly attribute optional int16u tolerance = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes for reporting carbon monoxide concentration measurements */
+cluster CarbonMonoxideConcentrationMeasurement = 1036 {
+  revision 3;
+
+  shared enum LevelValueEnum : enum8 {
+    kUnknown = 0;
+    kLow = 1;
+    kMedium = 2;
+    kHigh = 3;
+    kCritical = 4;
+  }
+
+  shared enum MeasurementMediumEnum : enum8 {
+    kAir = 0;
+    kWater = 1;
+    kSoil = 2;
+  }
+
+  shared enum MeasurementUnitEnum : enum8 {
+    kPPM = 0 [spec_name = "PPM"];
+    kPPB = 1 [spec_name = "PPB"];
+    kPPT = 2 [spec_name = "PPT"];
+    kMGM3 = 3 [spec_name = "MGM3"];
+    kUGM3 = 4 [spec_name = "UGM3"];
+    kNGM3 = 5 [spec_name = "NGM3"];
+    kPM3 = 6 [spec_name = "PM3"];
+    kBQM3 = 7 [spec_name = "BQM3"];
+  }
+
+  bitmap Feature : bitmap32 {
+    kNumericMeasurement = 0x1;
+    kLevelIndication = 0x2;
+    kMediumLevel = 0x4;
+    kCriticalLevel = 0x8;
+    kPeakMeasurement = 0x10;
+    kAverageMeasurement = 0x20;
+  }
+
+  readonly attribute optional nullable single measuredValue = 0;
+  readonly attribute optional nullable single minMeasuredValue = 1;
+  readonly attribute optional nullable single maxMeasuredValue = 2;
+  readonly attribute optional nullable single peakMeasuredValue = 3;
+  readonly attribute optional elapsed_s peakMeasuredValueWindow = 4;
+  readonly attribute optional nullable single averageMeasuredValue = 5;
+  readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
+  readonly attribute optional single uncertainty = 7;
+  readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute optional LevelValueEnum levelValue = 10;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 5;
 
@@ -2131,6 +2217,49 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command SelfTestRequest;
+  }
+
+  server cluster TemperatureMeasurement {
+    callback attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
+    ram      attribute tolerance default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster RelativeHumidityMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue;
+    ram      attribute maxMeasuredValue;
+    ram      attribute tolerance;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster CarbonMonoxideConcentrationMeasurement {
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 3;
   }
 }
 
