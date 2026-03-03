@@ -109,6 +109,8 @@ protected:
     // Tracks if shutdown has been called to make it idempotent
     bool mIsShutdown = false;
 
+    bool IsStarted() const { return mContext != nullptr; }
+
     void IncreaseDataVersion() { mDataVersion++; }
 
     /// Marks that a specific attribute has changed value

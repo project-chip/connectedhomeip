@@ -122,7 +122,6 @@ public:
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
-    chip::BitFlags<WiFiSecurity> ConvertSecuritytype(wfx_sec_t security);
     uint32_t GetSupportedWiFiBandsMask() const override;
 
     void OnConnectWiFiNetwork();

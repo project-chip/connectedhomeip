@@ -2715,6 +2715,7 @@ cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute boolean reachable = 17;
   readonly attribute optional char_string<32> uniqueID = 18;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
+  attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
   readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -9340,12 +9341,12 @@ endpoint 0 {
   }
 
   server cluster TemperatureMeasurement {
-    ram      attribute measuredValue default = 0x8000;
+    callback attribute measuredValue;
     ram      attribute minMeasuredValue default = 0x8000;
     ram      attribute maxMeasuredValue default = 0x8000;
     ram      attribute tolerance;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster PressureMeasurement {

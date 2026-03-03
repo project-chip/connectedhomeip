@@ -92,12 +92,16 @@ target_sources(app PRIVATE
     ${CHEF}/common/chef-pump.cpp
     ${CHEF}/common/chef-rvc-mode-delegate.cpp
     ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
+    ${CHEF}/common/clusters/application-basic/chef-application-basic-delegate.cpp
+    ${CHEF}/common/clusters/application-launch/chef-application-launch-delegate.cpp
     ${CHEF}/common/clusters/audio-output/AudioOutputManager.cpp
     ${CHEF}/common/clusters/channel/ChannelManager.cpp
+    ${CHEF}/common/clusters/content-launch/chef-content-launch-delegate.cpp
     ${CHEF}/common/clusters/door-lock/chef-doorlock-stubs.cpp
     ${CHEF}/common/clusters/door-lock/chef-lock-endpoint.cpp
     ${CHEF}/common/clusters/door-lock/chef-lock-manager.cpp
     ${CHEF}/common/clusters/keypad-input/KeypadInputManager.cpp
+    ${CHEF}/common/clusters/laundry-dryer-controls/chef-laundry-dryer-controls-delegate.cpp
     ${CHEF}/common/clusters/low-power/LowPowerManager.cpp
     ${CHEF}/common/clusters/media-input/MediaInputManager.cpp
     ${CHEF}/common/clusters/media-playback/MediaPlaybackManager.cpp

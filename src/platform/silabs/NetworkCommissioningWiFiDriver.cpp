@@ -77,13 +77,15 @@ CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
 
 CHIP_ERROR SlWiFiDriver::CommitConfiguration()
 {
-    uint8_t securityType = WFX_SEC_WPA2;
+    constexpr uint8_t kDefaultSecurityBitmap =
+        static_cast<uint8_t>(chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpa2Personal);
 
     ReturnErrorOnFailure(
         SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
     ReturnErrorOnFailure(SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiPSK, mStagingNetwork.credentials,
                                                            mStagingNetwork.credentialsLen));
-    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_WiFiSEC, &securityType, sizeof(securityType)));
+    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_WiFiSEC, &kDefaultSecurityBitmap,
+                                                           sizeof(kDefaultSecurityBitmap)));
 
     mSavedNetwork = mStagingNetwork;
     return CHIP_NO_ERROR;
@@ -160,7 +162,7 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     memcpy(wifiConfig.passkey, key, keyLen);
     wifiConfig.passkeyLength = keyLen;
 
-    wifiConfig.security = WFX_SEC_WPA2;
+    wifiConfig.security.Set(chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpa2Personal);
 
     ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %s", NullTerminated(ssid, ssidLen).c_str());
     // Resetting the retry connection state machine for a new access point connection
@@ -233,38 +235,6 @@ exit:
     }
 }
 
-chip::BitFlags<WiFiSecurity> SlWiFiDriver::ConvertSecuritytype(wfx_sec_t security)
-{
-    chip::BitFlags<WiFiSecurity> securityType;
-    if (security == WFX_SEC_NONE)
-    {
-        securityType = WiFiSecurity::kUnencrypted;
-    }
-    else if (security == WFX_SEC_WEP)
-    {
-        securityType = WiFiSecurity::kWep;
-    }
-    else if (security == WFX_SEC_WPA)
-    {
-        securityType = WiFiSecurity::kWpaPersonal;
-    }
-    else if (security == WFX_SEC_WPA2)
-    {
-        securityType = WiFiSecurity::kWpa2Personal;
-    }
-    else if (security == WFX_SEC_WPA3)
-    {
-        securityType = WiFiSecurity::kWpa3Personal;
-    }
-    else
-    {
-        // wfx_sec_t support more type
-        securityType = WiFiSecurity::kUnencrypted;
-    }
-
-    return securityType;
-}
-
 uint32_t SlWiFiDriver::GetSupportedWiFiBandsMask() const
 {
     return WifiInterface::GetInstance().GetSupportedWiFiBandsMask();
@@ -315,7 +285,7 @@ void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
     {
         NetworkCommissioning::WiFiScanResponse scanResponse = {};
 
-        scanResponse.security.Set(nwDriver->ConvertSecuritytype(aScanResult->security));
+        scanResponse.security        = aScanResult->security;
         scanResponse.channel         = aScanResult->chan;
         scanResponse.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
         scanResponse.signal.strength = aScanResult->rssi;

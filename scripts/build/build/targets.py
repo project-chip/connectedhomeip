@@ -709,10 +709,6 @@ def BuildBouffalolabTarget():
                    board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602", enable_resetCnt=True),
         TargetPart('BL706-NIGHT-LIGHT',
                    board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22", enable_resetCnt=True),
-        TargetPart('BL602-IoT-Matter-V1',
-                   board=BouffalolabBoard.BL602_IoT_Matter_V1, module_type="BL602"),
-        TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit,
-                   module_type="BL706C-22"),
     ])
 
     target.AppendFixedTargets([
@@ -721,11 +717,11 @@ def BuildBouffalolabTarget():
     ])
 
     target.AppendFixedTargets([
-        TargetPart('ethernet', enable_ethernet=True),
-        TargetPart('wifi', enable_wifi=True),
-        TargetPart('thread', enable_thread_type=BouffalolabThreadType.THREAD_FTD),
-        TargetPart('thread-ftd', enable_thread_type=BouffalolabThreadType.THREAD_FTD),
-        TargetPart('thread-mtd', enable_thread_type=BouffalolabThreadType.THREAD_MTD),
+        TargetPart('ethernet', enable_ethernet=True).OnlyIfRe('-(bl616dk|bl706dk)'),
+        TargetPart('wifi', enable_wifi=True).OnlyIfRe('-(bl602dk|bl706dk|bl616dk)'),
+        TargetPart('thread', enable_thread_type=BouffalolabThreadType.THREAD_FTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
+        TargetPart('thread-ftd', enable_thread_type=BouffalolabThreadType.THREAD_FTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
+        TargetPart('thread-mtd', enable_thread_type=BouffalolabThreadType.THREAD_MTD).OnlyIfRe('-(bl616dk|bl704l|bl706dk)'),
     ])
 
     target.AppendFixedTargets([

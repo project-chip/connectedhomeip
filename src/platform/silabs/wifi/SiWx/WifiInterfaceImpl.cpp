@@ -74,7 +74,7 @@ extern "C" {
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 using namespace chip::DeviceLayer::Silabs;
-using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
+using namespace chip::app::Clusters::NetworkCommissioning;
 
 // The REGION_CODE macro defines the regulatory region for the Wi-Fi device.
 // The default value is 'US'. Users can override this macro to specify a different region code.
@@ -204,30 +204,41 @@ constexpr uint8_t kWfxQueueSize = 10;
 // TODO: Figure out why we actually need this, we are already handling failure and retries somewhere else.
 constexpr uint16_t kWifiScanTimeoutTicks = 10000;
 
-// Convert sl_wifi_security_t to wfx_sec_t
-static wfx_sec_t ConvertSlWifiSecurityToWfx(sl_wifi_security_t security)
+// Convert sl_wifi_security_t to Matter WiFiSecurityBitmap flags
+static chip::BitFlags<WiFiSecurityBitmap> ConvertSlWifiSecurityToBitmap(const sl_wifi_security_t security)
 {
+    chip::BitFlags<WiFiSecurityBitmap> flags;
     switch (security)
     {
     case SL_WIFI_OPEN:
-        return WFX_SEC_NONE;
+        flags.Set(WiFiSecurityBitmap::kUnencrypted);
+        break;
     case SL_WIFI_WEP:
-        return WFX_SEC_WEP;
+        flags.Set(WiFiSecurityBitmap::kWep);
+        break;
     case SL_WIFI_WPA:
-    case SL_WIFI_WPA_ENTERPRISE: // map enterprise to WPA as closest
-        return WFX_SEC_WPA;
+    case SL_WIFI_WPA_ENTERPRISE:
+        flags.Set(WiFiSecurityBitmap::kWpaPersonal);
+        break;
     case SL_WIFI_WPA2:
-    case SL_WIFI_WPA2_ENTERPRISE: // map enterprise to WPA2 as closest
+    case SL_WIFI_WPA2_ENTERPRISE:
+        flags.Set(WiFiSecurityBitmap::kWpa2Personal);
+        break;
     case SL_WIFI_WPA_WPA2_MIXED:
-        return WFX_SEC_WPA2;
+        flags.Set(WiFiSecurityBitmap::kWpaPersonal).Set(WiFiSecurityBitmap::kWpa2Personal);
+        break;
     case SL_WIFI_WPA3_TRANSITION:
-    case SL_WIFI_WPA3_TRANSITION_ENTERPRISE: // map enterprise to WPA3 transition
+    case SL_WIFI_WPA3_TRANSITION_ENTERPRISE:
+        flags.Set(WiFiSecurityBitmap::kWpa2Personal).Set(WiFiSecurityBitmap::kWpa3Personal);
+        break;
     case SL_WIFI_WPA3:
     case SL_WIFI_WPA3_ENTERPRISE:
-        return WFX_SEC_WPA3; // map enterprise to WPA3
+        flags.Set(WiFiSecurityBitmap::kWpa3Personal);
+        break;
     default:
-        return WFX_SEC_UNSPECIFIED;
+        break;
     }
+    return flags;
 }
 
 /**
@@ -271,9 +282,8 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
         chip::MutableByteSpan outBssid(currentScanResult.bssid, kWifiMacAddressLength);
         ReturnValueOnFailure(chip::CopySpanToMutableSpan(inBssid, outBssid), SL_STATUS_SI91X_MEMORY_IS_NOT_SUFFICIENT);
 
-        // Convert sl_wifi_security_t to wfx_sec_t
         currentScanResult.security =
-            ConvertSlWifiSecurityToWfx(static_cast<sl_wifi_security_t>(result->scan_info[i].security_mode));
+            ConvertSlWifiSecurityToBitmap(static_cast<sl_wifi_security_t>(result->scan_info[i].security_mode));
         currentScanResult.rssi = (-1) * result->scan_info[i].rssi_val; // The returned value is positive - we need to flip it
         currentScanResult.chan = result->scan_info[i].rf_channel;
         // TODO: change this when SDK provides values
@@ -384,8 +394,9 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
     }
     else
     {
-        security        = static_cast<sl_wifi_security_t>(scan_result->scan_info[0].security_mode);
-        wfx_rsi.ap_chan = scan_result->scan_info[0].rf_channel;
+        security                     = static_cast<sl_wifi_security_t>(scan_result->scan_info[0].security_mode);
+        wfx_rsi.ap_chan              = scan_result->scan_info[0].rf_channel;
+        wfx_rsi.credentials.security = ConvertSlWifiSecurityToBitmap(security);
 
         chip::MutableByteSpan bssidSpan(wfx_rsi.ap_bssid.data(), kWifiMacAddressLength);
         chip::ByteSpan inBssid(scan_result->scan_info[0].bssid, kWifiMacAddressLength);
@@ -773,23 +784,41 @@ sl_status_t WifiInterfaceImpl::JoinCallback(sl_wifi_event_t event, char * result
 CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
 {
     // TODO: Convert this to a int8
-    int32_t rssi  = 0;
+    int32_t rssi = 0;
+
+    // TODO: sl_wifi_get_wireless_info API is being deprecated with WiseConnect v4.0.x, we need to use the new API
+    // sl_wifi_get_interface_info after upgrading to WiseConnect v4.0.x
+    sl_si91x_rsp_wireless_info_t wireless_info = { 0 };
+    if (sl_wifi_get_wireless_info(&wireless_info) == SL_STATUS_OK)
+    {
+        size_t ssid_len = strnlen(reinterpret_cast<const char *>(wireless_info.ssid), WFX_MAX_SSID_LENGTH);
+        VerifyOrReturnError(ssid_len <= WFX_MAX_SSID_LENGTH, CHIP_ERROR_INVALID_STRING_LENGTH);
+
+        // Update wfx_rsi with values from sl_wifi_get_wireless_info
+        wfx_rsi.ap_chan = static_cast<uint16_t>(wireless_info.channel_number & 0xFF);
+        chip::ByteSpan bssidSrc(wireless_info.bssid, kWifiMacAddressLength);
+        chip::MutableByteSpan bssidDst(wfx_rsi.ap_bssid.data(), kWifiMacAddressLength);
+        ReturnErrorOnFailure(chip::CopySpanToMutableSpan(bssidSrc, bssidDst));
+        chip::ByteSpan ssidSrc(wireless_info.ssid, ssid_len);
+        chip::MutableByteSpan ssidDst(wfx_rsi.credentials.ssid, WFX_MAX_SSID_LENGTH);
+        ReturnErrorOnFailure(chip::CopySpanToMutableSpan(ssidSrc, ssidDst));
+        wfx_rsi.credentials.ssidLength = static_cast<uint8_t>(ssid_len);
+        wfx_rsi.credentials.security   = ConvertSlWifiSecurityToBitmap(static_cast<sl_wifi_security_t>(wireless_info.sec_type));
+    }
+
     info.security = wfx_rsi.credentials.security;
     info.chan     = wfx_rsi.ap_chan;
-
     chip::MutableByteSpan output(info.ssid, WFX_MAX_SSID_LENGTH);
     chip::ByteSpan ssid(wfx_rsi.credentials.ssid, wfx_rsi.credentials.ssidLength);
-    TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(ssid, output);
+    ReturnErrorOnFailure(chip::CopySpanToMutableSpan(ssid, output));
     info.ssid_length = output.size();
-
     chip::ByteSpan apBssidSpan(wfx_rsi.ap_bssid.data(), wfx_rsi.ap_bssid.size());
     chip::MutableByteSpan bssidSpan(info.bssid, kWifiMacAddressLength);
-    TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(apBssidSpan, bssidSpan);
+    ReturnErrorOnFailure(chip::CopySpanToMutableSpan(apBssidSpan, bssidSpan));
 
     // TODO: add error processing
     sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &(rssi));
     info.rssi = rssi;
-
     return CHIP_NO_ERROR;
 }
 

@@ -29,7 +29,7 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
   chip_test_suite("tests") {
     output_name = "libPlatformTests"
 
-    test_sources = []
+    test_sources = [ "TestGeneralFaults.cpp" ]
     defines = [ "CALLER_HANDLES_CRITICAL_FAILURE=1" ]
 
     if (current_os != "zephyr") {

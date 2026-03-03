@@ -264,12 +264,12 @@ CHIP_ERROR SmokeCoAlarmManager::HandleEventTrigger(uint64_t eventTrigger)
         break;
     case SmokeCOTrigger::kForceUnmountedState:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force Unmounted State");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetUnmountedState(kSmokeCoAlarmEndpointId, true), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetUnmountedState(kSmokeCoAlarmEndpointId, true), CHIP_ERROR_INTERNAL);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(kSmokeCoAlarmEndpointId, sPriorityOrder);
         break;
     case SmokeCOTrigger::kClearUnmountedState:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Clear Unmounted State");
-        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetUnmountedState(kSmokeCoAlarmEndpointId, false), true);
+        VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetUnmountedState(kSmokeCoAlarmEndpointId, false), CHIP_ERROR_INTERNAL);
         SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(kSmokeCoAlarmEndpointId, sPriorityOrder);
         break;
     default:

@@ -221,6 +221,7 @@ void ApplicationInit()
         Clusters::GroupcastContext{
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .groupDataProvider = *Credentials::GetGroupDataProvider(),
+            .timerDelegate     = sTimerDelegate,
         },
         BitFlags<Clusters::Groupcast::Feature>(Clusters::Groupcast::Feature::kListener, Clusters::Groupcast::Feature::kSender,
                                                Clusters::Groupcast::Feature::kPerGroup));

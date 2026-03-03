@@ -324,6 +324,13 @@ else
         } &>/dev/null
     fi
 
+    # Run install-packages once (creates .install-packages-done when done)
+    INSTALL_MARKER="$CHIP_ROOT/scripts/setup/silabs/.install-packages-done"
+    if [ ! -f "$INSTALL_MARKER" ]; then
+        echo "Running install-packages (first-time setup)..."
+        python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
+    fi
+
     # Zap generation requires activation
     source "$CHIP_ROOT/scripts/activate.sh"
 
@@ -344,7 +351,7 @@ else
 
     if [ "$USE_DOCKER" == true ] && [ "$USE_WIFI" == false ]; then
         echo "Switching OpenThread ROOT"
-        optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
+        optArgs+="openthread_root=\"$GSDK_ROOT/openthread_stack/util/third_party/openthread\" "
     fi
 
     if [ "$VERBOSE_MODE" == false ]; then
