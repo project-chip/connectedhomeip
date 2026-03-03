@@ -354,6 +354,12 @@ public:
      */
     static constexpr size_t Capacity() { return kCapacity; }
 
+    void Clear()
+    {
+        mLength = 0;
+        ClearSecretData(mBytes);
+    }
+
 private:
     uint8_t mBytes[kCapacity];
     size_t mLength = 0;
@@ -390,7 +396,7 @@ public:
     /**
      * @brief Returns fixed length of the buffer
      */
-    constexpr size_t Length() const { return kCapacity; }
+    static constexpr size_t Length() { return kCapacity; }
 
     /**
      * @brief Returns non-const pointer to start of the underlying buffer
@@ -411,6 +417,8 @@ public:
      * @brief Returns capacity of the buffer
      */
     static constexpr size_t Capacity() { return kCapacity; }
+
+    void Clear() { ClearSecretData(mBytes); }
 
 private:
     uint8_t mBytes[kCapacity];
