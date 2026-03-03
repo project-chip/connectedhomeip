@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import contextlib
 import importlib
 import importlib.resources as pkg_resources
 import logging
@@ -85,6 +86,44 @@ class DataTypeEnum(StrEnum):
 
 
 @dataclass
+class ConstraintReference:
+    """Reference to another attribute for dynamic constraint values."""
+    attribute: str
+    field: Optional[str] = None
+
+
+@dataclass
+class Constraints:
+    """Constraint information for attributes, commands, and device types."""
+    min_value: Optional[Union[int, float]] = None
+    max_value: Optional[Union[int, float]] = None
+    min_length: Optional[int] = None
+    max_length: Optional[int] = None
+    min_count: Optional[int] = None
+    max_count: Optional[int] = None
+    # Dynamic constraint references
+    min_value_ref: Optional[ConstraintReference] = None
+    max_value_ref: Optional[ConstraintReference] = None
+    min_count_ref: Optional[ConstraintReference] = None
+    max_count_ref: Optional[ConstraintReference] = None
+
+    def has_constraints(self) -> bool:
+        """Check if any constraints are defined."""
+        return any([
+            self.min_value is not None,
+            self.max_value is not None,
+            self.min_length is not None,
+            self.max_length is not None,
+            self.min_count is not None,
+            self.max_count is not None,
+            self.min_value_ref is not None,
+            self.max_value_ref is not None,
+            self.min_count_ref is not None,
+            self.max_count_ref is not None,
+        ])
+
+
+@dataclass
 class XmlDataTypeComponent:
     value: uint
     name: str
@@ -94,7 +133,7 @@ class XmlDataTypeComponent:
     type_info: Optional[str] = None  # Data type for struct fields
     is_optional: bool = False  # Whether field is optional
     is_nullable: bool = False  # Whether field can be null
-    constraints: Optional[dict] = None  # For min/max values, lists, etc.
+    constraints: Optional[Constraints] = None  # For min/max values, lists, etc.
 
 
 @dataclass
@@ -128,6 +167,7 @@ class XmlAttribute:
     read_access: int
     write_access: int
     write_optional: bool
+    constraints: Optional[Constraints] = None
 
     def access_string(self):
         read_marker = "R" if self.read_access is not ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue else ""
@@ -593,7 +633,7 @@ class ClusterParser:
         quality = xml_field.find('./quality')
         return quality is not None and 'nullable' in quality.attrib and quality.attrib['nullable'].lower() == 'true'
 
-    def _parse_field_constraints(self, xml_field: ElementTree.Element) -> dict | None:
+    def _parse_field_constraints(self, xml_field: ElementTree.Element) -> Optional[Constraints]:
         """
         Parse constraint information from XML field element.
 
@@ -604,31 +644,62 @@ class ClusterParser:
             xml_field: XML element representing the field
 
         Returns:
-            Dictionary of constraints if any found, None otherwise
+            Constraints object if any found, None otherwise
         """
         constraint_elements = xml_field.findall('./constraint')
         if not constraint_elements:
             return None
 
-        constraints = {}
+        # Helper to parse numeric values
+        def parse_value(value_str: str) -> Optional[Union[int, float]]:
+            """Parse numeric constraint value."""
+            try:
+                if value_str.startswith(('0x', '0X')):
+                    return int(value_str, 16)
+                value = float(value_str)
+                return int(value) if value.is_integer() else value
+            except ValueError:
+                return None
+
+        # Helper to parse integer values (for counts)
+        def parse_int_value(value_str: str) -> Optional[int]:
+            """Parse integer constraint value (for counts)."""
+            try:
+                return int(value_str, 0)
+            except ValueError:
+                return None
+
+        min_value = None
+        max_value = None
+        max_count = None
+        max_count_ref = None
+
         for constraint in constraint_elements:
             # Handle direct attributes like min/max
-            for attr_name in ['min', 'max']:
-                if attr_name in constraint.attrib:
-                    constraints[attr_name] = constraint.attrib[attr_name]
+            if 'min' in constraint.attrib:
+                min_value = parse_value(constraint.attrib['min'])
+            if 'max' in constraint.attrib:
+                max_value = parse_value(constraint.attrib['max'])
 
             # Handle maxCount child element
-            max_count = constraint.find('./maxCount')
-            if max_count is not None and max_count.text is not None:
-                constraints['maxCount'] = max_count.text
+            max_count_elem = constraint.find('./maxCount')
+            if max_count_elem is not None and max_count_elem.text is not None:
+                max_count = parse_int_value(max_count_elem.text)
                 # If maxCount references an attribute, store that reference
-                attr_element = max_count.find('./attribute')
+                attr_element = max_count_elem.find('./attribute')
                 if attr_element is not None and 'name' in attr_element.attrib:
-                    constraints['maxCountAttribute'] = attr_element.attrib['name']
+                    max_count_ref = ConstraintReference(attribute=attr_element.attrib['name'], field=None)
 
-        # Return None instead of {} to clearly distinguish "no constraints found" from "empty constraints"
-        # This matches the Optional[dict] type in XmlDataTypeComponent.constraints
-        return constraints if constraints else None
+        # Only return Constraints object if we found any constraints
+        if min_value is not None or max_value is not None or max_count is not None or max_count_ref is not None:
+            return Constraints(
+                min_value=min_value,
+                max_value=max_value,
+                max_count=max_count,
+                max_count_ref=max_count_ref
+            )
+
+        return None
 
     def _parse_field_conformance(self, xml_field: ElementTree.Element) -> ConformanceCallable:
         """
@@ -774,6 +845,172 @@ class ClusterParser:
                                         conformance=conformance)
         return features
 
+    def parse_attribute_constraints(self, element: ElementTree.Element) -> Optional[Constraints]:
+        """Parse constraint information from an attribute element.
+
+        Args:
+            element: The attribute XML element
+
+        Returns:
+            Constraints object, or None if no constraints are defined
+        """
+        # Find the constraint element
+        constraint_elem = element.find('./constraint')
+        if constraint_elem is None:
+            return None
+
+        # Helper to parse numeric values (handles both int and float)
+        def parse_numeric_value(value_str: str) -> Optional[Union[int, float]]:
+            """Parse a numeric constraint value, handling integers, floats, and hex strings."""
+            try:
+                # Handle hexadecimal strings (e.g., '0x001F')
+                if value_str.startswith(('0x', '0X')):
+                    return int(value_str, 16)
+
+                # Try parsing as float (handles both int and float strings)
+                value = float(value_str)
+                # Return as int if it's a whole number, otherwise as float
+                return int(value) if value.is_integer() else value
+            except ValueError:
+                # Value contains non-numeric content (e.g., 'MaxMeasuredValue - 1')
+                # Return None to indicate this should be handled as a reference
+                return None
+
+        # Helper to parse constraint reference from attribute value or element
+        def parse_reference(elem: ElementTree.Element, value_str: Optional[str] = None) -> Optional[ConstraintReference]:
+            """Parse dynamic constraint reference to another attribute."""
+            # First try to find a child attribute element
+            attr_ref = elem.find('./attribute')
+            if attr_ref is not None and 'name' in attr_ref.attrib:
+                attr_name = attr_ref.attrib['name']
+                field_ref = attr_ref.find('./field')
+                field_name = field_ref.attrib['name'] if field_ref is not None and 'name' in field_ref.attrib else None
+                return ConstraintReference(attribute=attr_name, field=field_name)
+
+            # If no child element but we have a value string, try to extract attribute name
+            # Handle cases like 'MaxMeasuredValue - 1' or 'SomeAttribute'
+            if value_str and not value_str.replace('.', '').replace('-', '').replace('+', '').replace(' ', '').isdigit():
+                # Extract the first identifier (attribute name) from the expression
+                # Match word characters before any operators or whitespace
+                import re
+                match = re.match(r'^([A-Za-z_][A-Za-z0-9_]*)', value_str.strip())
+                if match:
+                    return ConstraintReference(attribute=match.group(1), field=None)
+
+            return None
+
+        # Initialize constraint values
+        min_value = None
+        max_value = None
+        min_length = None
+        max_length = None
+        min_count = None
+        max_count = None
+        min_value_ref = None
+        max_value_ref = None
+        min_count_ref = None
+        max_count_ref = None
+
+        # Parse min/max/between constraints
+        min_elem = constraint_elem.find('./min')
+        if min_elem is not None:
+            if 'value' in min_elem.attrib:
+                value_str = min_elem.attrib['value']
+                min_value = parse_numeric_value(value_str)
+                # If numeric parsing failed, try to parse as reference
+                if min_value is None:
+                    min_value_ref = parse_reference(min_elem, value_str)
+            else:
+                min_value_ref = parse_reference(min_elem)
+
+        max_elem = constraint_elem.find('./max')
+        if max_elem is not None:
+            if 'value' in max_elem.attrib:
+                value_str = max_elem.attrib['value']
+                max_value = parse_numeric_value(value_str)
+                # If numeric parsing failed, try to parse as reference
+                if max_value is None:
+                    max_value_ref = parse_reference(max_elem, value_str)
+            else:
+                max_value_ref = parse_reference(max_elem)
+
+        between_elem = constraint_elem.find('./between')
+        if between_elem is not None:
+            from_elem = between_elem.find('./from')
+            to_elem = between_elem.find('./to')
+
+            if from_elem is not None:
+                if 'value' in from_elem.attrib:
+                    value_str = from_elem.attrib['value']
+                    min_value = parse_numeric_value(value_str)
+                    # If numeric parsing failed, try to parse as reference
+                    if min_value is None:
+                        min_value_ref = parse_reference(from_elem, value_str)
+                else:
+                    min_value_ref = parse_reference(from_elem)
+
+            if to_elem is not None:
+                if 'value' in to_elem.attrib:
+                    value_str = to_elem.attrib['value']
+                    max_value = parse_numeric_value(value_str)
+                    # If numeric parsing failed, try to parse as reference
+                    if max_value is None:
+                        max_value_ref = parse_reference(to_elem, value_str)
+                else:
+                    max_value_ref = parse_reference(to_elem)
+
+        # Parse string length constraints
+        min_length_elem = constraint_elem.find('./minLength')
+        if min_length_elem is not None and 'value' in min_length_elem.attrib:
+            with contextlib.suppress(ValueError):
+                # Value is not a simple integer, ignore for now
+                min_length = int(min_length_elem.attrib['value'], 0)
+
+        max_length_elem = constraint_elem.find('./maxLength')
+        if max_length_elem is not None and 'value' in max_length_elem.attrib:
+            with contextlib.suppress(ValueError):
+                # Value is not a simple integer, ignore for now
+                max_length = int(max_length_elem.attrib['value'], 0)
+
+        # Parse list count constraints
+        min_count_elem = constraint_elem.find('./minCount')
+        if min_count_elem is not None:
+            if 'value' in min_count_elem.attrib:
+                value_str = min_count_elem.attrib['value']
+                try:
+                    min_count = int(value_str, 0)
+                except ValueError:
+                    # Value is not a simple integer, try parsing as reference
+                    min_count_ref = parse_reference(min_count_elem, value_str)
+            else:
+                min_count_ref = parse_reference(min_count_elem)
+
+        max_count_elem = constraint_elem.find('./maxCount')
+        if max_count_elem is not None:
+            if 'value' in max_count_elem.attrib:
+                value_str = max_count_elem.attrib['value']
+                try:
+                    max_count = int(value_str, 0)
+                except ValueError:
+                    # Value is not a simple integer, try parsing as reference
+                    max_count_ref = parse_reference(max_count_elem, value_str)
+            else:
+                max_count_ref = parse_reference(max_count_elem)
+
+        # Create and return the Constraints object
+        return Constraints(
+            min_value=min_value,
+            max_value=max_value,
+            min_length=min_length,
+            max_length=max_length,
+            min_count=min_count,
+            max_count=max_count,
+            min_value_ref=min_value_ref,
+            max_value_ref=max_value_ref,
+            min_count_ref=min_count_ref,
+            max_count_ref=max_count_ref
+        )
+
     def parse_attributes(self) -> dict[uint, XmlAttribute]:
         attributes: dict[uint, XmlAttribute] = {}
         for element, conformance_xml, access_xml in self.attribute_elements:
@@ -794,11 +1031,14 @@ class ClusterParser:
             write_optional = False
             if write_access not in [None, ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue]:
                 write_optional = self.parse_write_optional(element, access_xml)
+            # Parse constraints for this attribute
+            constraints = self.parse_attribute_constraints(element)
             attributes[code] = XmlAttribute(name=element.attrib['name'], datatype=datatype,
                                             conformance=conformance,
                                             read_access=get_access_privilege_or_unknown(read_access),
                                             write_access=get_access_privilege_or_unknown(write_access),
-                                            write_optional=write_optional)
+                                            write_optional=write_optional,
+                                            constraints=constraints)
         # Add in the global attributes for the base class
         for id in GlobalAttributeIds:
             # TODO: Add data type here. Right now it's unused. We should parse this from the spec.

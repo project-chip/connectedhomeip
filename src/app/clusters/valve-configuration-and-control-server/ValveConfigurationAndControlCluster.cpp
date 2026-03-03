@@ -153,8 +153,23 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::WriteImpl(con
 
     if (request.path.mAttributeId == ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id)
     {
-        AttributePersistence persistence{ mContext->attributeStorage };
-        return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mDefaultOpenDuration);
+        DataModel::Nullable<uint32_t> value;
+        ReturnErrorOnFailure(decoder.Decode(value));
+
+        // DefaultOpenDuration has a constraint: min value = 1 (when not null)
+        if (!value.IsNull() && value.Value() < 1)
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
+        // Avoid rewriting storage if unchanged
+        VerifyOrReturnValue(value != mDefaultOpenDuration, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+
+        mDefaultOpenDuration = value;
+
+        // Persist (same style as DefaultOpenLevel block)
+        return mContext->attributeStorage.WriteValue(
+            request.path, { reinterpret_cast<const uint8_t *>(&mDefaultOpenDuration), sizeof(mDefaultOpenDuration) });
     }
 
     if (request.path.mAttributeId == ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id)
