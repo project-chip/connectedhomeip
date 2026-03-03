@@ -231,7 +231,7 @@ class TC_ICDB_1_1(MatterBaseTest):
         asserts.assert_greater(
             current_icd_counter, icd_counter_at_registration,
             "ICDCounter should have changed after IdleModeDuration cycle. "
-            "Registration ICDCounter: {icd_counter_at_registration}, Current: {current_icd_counter}")
+            f"Registration ICDCounter: {icd_counter_at_registration}, Current: {current_icd_counter}")
 
         # *** STEP 8 ***
         # TH sends command UnregisterClient to the DUT
