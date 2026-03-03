@@ -118,6 +118,8 @@ static_library("nxp_platform") {
       "../../common/crypto/S50/PersistentStorageOpKeystoreS50.cpp",
       "../../common/crypto/S50/PersistentStorageOpKeystoreS50.h",
     ]
+  } else if (nxp_crypto_impl == "psa") {
+    sources += [ "../../common/crypto/S50/S50KeyAllocator.h" ]
   }
 
   if (nxp_nvm_component == "nvm_fwk" || nxp_nvm_component == "littlefs") {

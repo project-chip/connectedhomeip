@@ -37,7 +37,19 @@
 
 #include <lwip/tcpip.h>
 
+
+#if CONFIG_CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+static_assert(CHIP_CONFIG_SHA256_CONTEXT_SIZE == sizeof(psa_hash_operation_t),
+              "CHIP_CONFIG_SHA256_CONTEXT_SIZE is too small for psa_hash_operation_t");
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+#include "mbedtls/threading.h"
+#include "threading_alt.h"
+#endif
+
+#else
 #include "els_pkc_mbedtls.h"
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include "OtaSupport.h"
@@ -46,6 +58,16 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include "fwk_platform_ot.h"
 #include "ot_platform_common.h"
+#endif
+
+#if CONFIG_CHIP_CRYPTO_PSA
+#include <crypto/PSAKeyAllocator.h>
+#include "crypto/S50/S50KeyAllocator.h"
+#include "psa/crypto.h"
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+#include "mbedtls/threading.h"
+#include "threading_alt.h"
+#endif
 #endif
 
 extern "C" void BOARD_InitHardware(void);
@@ -111,8 +133,16 @@ CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
     status_t status;
     CHIP_ERROR chipRes = CHIP_NO_ERROR;
 
+    /* Initialize the mbedtls mutex and call mbedtls_threading_set_alt(...) 
+    as required by mbedTLS3x threading documentation*/
+#if CONFIG_CHIP_CRYPTO_PSA
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+    config_mbedtls_threading_alt();
+#endif /* (MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
+    status = psa_crypto_init();
+#else
     status = CRYPTO_InitHardware();
-
+#endif /* CHIP_CRYPTO_PSA */
     if (status != 0)
     {
         chipRes = CHIP_ERROR_INTERNAL;
@@ -153,6 +183,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     /* Mask of combined controllers to initialize */
     uint8_t controllerMask = 0U;
 
+#if CONFIG_CHIP_CRYPTO_PSA
+    static chip::DeviceLayer::S50KeyAllocator s50KeyAllocator;
+#endif
+
     // Initialize the configuration system.
     err = Internal::NXPConfig::Init();
     SuccessOrExit(err);
@@ -188,6 +222,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     /* Initialize platform services */
     err = ServiceInit();
     SuccessOrExit(err);
+
+#if CONFIG_CHIP_CRYPTO_PSA
+    chip::Crypto::SetPSAKeyAllocator(&s50KeyAllocator);
+#endif
 
 #endif
 

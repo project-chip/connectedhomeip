@@ -29,7 +29,17 @@
 #include "DiagnosticDataProviderImpl.h"
 #include "fsl_os_abstraction.h"
 #include "fwk_platform_coex.h"
+#if CONFIG_CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+static_assert(CHIP_CONFIG_SHA256_CONTEXT_SIZE == sizeof(psa_hash_operation_t),
+              "CHIP_CONFIG_SHA256_CONTEXT_SIZE is too small for psa_hash_operation_t");
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+#include "mbedtls/threading.h"
+#include "threading_alt.h"
+#endif
+#else
 #include "ksdk_mbedtls.h"
+#endif
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
@@ -212,7 +222,14 @@ CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
     status_t status;
     CHIP_ERROR chipRes = CHIP_NO_ERROR;
 
+#if CONFIG_CHIP_CRYPTO_PSA
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+    config_mbedtls_threading_alt();
+#endif /* (MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
+    status = psa_crypto_init();
+#else
     status = CRYPTO_InitHardware();
+#endif /* CONFIG_CHIP_CRYPTO_PSA */
 
     if (status != 0)
     {

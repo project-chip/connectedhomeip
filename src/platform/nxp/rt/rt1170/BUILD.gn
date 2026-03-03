@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021, 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -195,8 +195,8 @@ static_library("nxp_platform") {
 
   if (nxp_use_factory_data) {
     sources += [
-      "../../common/factory_data/FactoryDataProviderFwkImpl.cpp",
-      "../../common/factory_data/FactoryDataProviderFwkImpl.h",
+      "../../common/factory_data/FactoryDataProviderDefaultImpl.cpp",
+      "../../common/factory_data/FactoryDataProviderDefaultImpl.h",
       "../../common/factory_data/legacy/FactoryDataProvider.cpp",
       "../../common/factory_data/legacy/FactoryDataProvider.h",
     ]
