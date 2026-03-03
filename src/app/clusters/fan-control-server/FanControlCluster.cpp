@@ -23,11 +23,11 @@
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/FanControl/Attributes.h>
-#include <lib/support/TypeTraits.h>
 #include <clusters/FanControl/Commands.h>
 #include <clusters/FanControl/Enums.h>
 #include <clusters/FanControl/Metadata.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -42,10 +42,9 @@ using Protocols::InteractionModel::Status;
 namespace chip::app::Clusters {
 
 FanControlCluster::FanControlCluster(const Config & config) :
-    DefaultServerCluster({ config.mEndpointId, FanControl::Id }),
-    mFanModeSequence(config.mFanModeSequence), mSupportsStep(config.mSupportsStep), mSpeedMax(config.mSpeedMax),
-    mRockSupport(config.mRockSupport), mWindSupport(config.mWindSupport), mOptionalAttributes(config.mOptionalAttributes),
-    mDelegate(config.mDelegate)
+    DefaultServerCluster({ config.mEndpointId, FanControl::Id }), mFanModeSequence(config.mFanModeSequence),
+    mSupportsStep(config.mSupportsStep), mSpeedMax(config.mSpeedMax), mRockSupport(config.mRockSupport),
+    mWindSupport(config.mWindSupport), mOptionalAttributes(config.mOptionalAttributes), mDelegate(config.mDelegate)
 {}
 
 CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
@@ -111,9 +110,9 @@ void FanControlCluster::ApplyPercentSettingChanged()
     if (SupportsMultiSpeed())
     {
         // Spec 4.4.6.3.1: speed = ceil(SpeedMax * (percent * 0.01))
-        uint8_t speedMax   = mSpeedMax;
-        uint16_t percent   = mPercentSetting.Value();
-        uint8_t speedSetting = static_cast<uint8_t>((speedMax * percent + 99) / 100);
+        uint8_t speedMax      = mSpeedMax;
+        uint16_t percent      = mPercentSetting.Value();
+        uint8_t speedSetting  = static_cast<uint8_t>((speedMax * percent + 99) / 100);
         mSpeedWriteInProgress = true;
         mSpeedSetting.SetNonNull(speedSetting);
         mSpeedWriteInProgress = false;
@@ -133,17 +132,17 @@ void FanControlCluster::ApplySpeedSettingChanged()
     }
 
     // Spec 4.4.6.6.1: percent = floor(speed/SpeedMax * 100)
-    uint8_t speedMax     = mSpeedMax;
-    float speed          = static_cast<float>(mSpeedSetting.Value());
+    uint8_t speedMax             = mSpeedMax;
+    float speed                  = static_cast<float>(mSpeedSetting.Value());
     chip::Percent percentSetting = static_cast<chip::Percent>(speed / speedMax * 100);
-    mPercentWriteInProgress = true;
+    mPercentWriteInProgress      = true;
     mPercentSetting.SetNonNull(percentSetting);
     mPercentWriteInProgress = false;
     NotifyAttributeChanged(PercentSetting::Id);
 }
 
 DataModel::ActionReturnStatus FanControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                              AttributeValueEncoder & encoder)
+                                                               AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -197,7 +196,7 @@ DataModel::ActionReturnStatus FanControlCluster::ReadAttribute(const DataModel::
 }
 
 DataModel::ActionReturnStatus FanControlCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                               AttributeValueDecoder & decoder)
+                                                                AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -349,16 +348,12 @@ DataModel::ActionReturnStatus FanControlCluster::WriteAttribute(const DataModel:
 CHIP_ERROR FanControlCluster::Attributes(const ConcreteClusterPath & path,
                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    using OptionalEntry = AttributeListBuilder::OptionalAttributeEntry;
+    using OptionalEntry                = AttributeListBuilder::OptionalAttributeEntry;
     OptionalEntry optionalAttributes[] = {
-        { SupportsMultiSpeed(), SpeedMax::kMetadataEntry },
-        { SupportsMultiSpeed(), SpeedSetting::kMetadataEntry },
-        { SupportsMultiSpeed(), SpeedCurrent::kMetadataEntry },
-        { SupportsRocking(), RockSupport::kMetadataEntry },
-        { SupportsRocking(), RockSetting::kMetadataEntry },
-        { SupportsWind(), WindSupport::kMetadataEntry },
-        { SupportsWind(), WindSetting::kMetadataEntry },
-        { SupportsAirflowDirection(), AirflowDirection::kMetadataEntry },
+        { SupportsMultiSpeed(), SpeedMax::kMetadataEntry },     { SupportsMultiSpeed(), SpeedSetting::kMetadataEntry },
+        { SupportsMultiSpeed(), SpeedCurrent::kMetadataEntry }, { SupportsRocking(), RockSupport::kMetadataEntry },
+        { SupportsRocking(), RockSetting::kMetadataEntry },     { SupportsWind(), WindSupport::kMetadataEntry },
+        { SupportsWind(), WindSetting::kMetadataEntry },        { SupportsAirflowDirection(), AirflowDirection::kMetadataEntry },
     };
 
     AttributeListBuilder listBuilder(builder);
