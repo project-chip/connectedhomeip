@@ -120,16 +120,17 @@ public:
     DataModel::Nullable<uint8_t> GetSpeedSetting() const { return mSpeedSetting; }
 
 private:
-    bool SupportsMultiSpeed() const { return mOptionalAttributes.Has(FanControl::Attributes::SpeedMax::Id); }
+    bool SupportsMultiSpeed() const { return mOptionalAttributes.IsSet(FanControl::Attributes::SpeedMax::Id); }
     bool SupportsAuto() const
     {
-        return mFanModeSequence == FanModeSequenceEnum::kOffLowHighAuto ||
-            mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto || mFanModeSequence == FanModeSequenceEnum::kOffHighAuto;
+        return mFanModeSequence == FanControl::FanModeSequenceEnum::kOffLowHighAuto ||
+            mFanModeSequence == FanControl::FanModeSequenceEnum::kOffLowMedHighAuto ||
+            mFanModeSequence == FanControl::FanModeSequenceEnum::kOffHighAuto;
     }
-    bool SupportsRocking() const { return mOptionalAttributes.Has(FanControl::Attributes::RockSupport::Id); }
-    bool SupportsWind() const { return mOptionalAttributes.Has(FanControl::Attributes::WindSupport::Id); }
+    bool SupportsRocking() const { return mOptionalAttributes.IsSet(FanControl::Attributes::RockSupport::Id); }
+    bool SupportsWind() const { return mOptionalAttributes.IsSet(FanControl::Attributes::WindSupport::Id); }
     bool SupportsStep() const { return mSupportsStep; }
-    bool SupportsAirflowDirection() const { return mOptionalAttributes.Has(FanControl::Attributes::AirflowDirection::Id); }
+    bool SupportsAirflowDirection() const { return mOptionalAttributes.IsSet(FanControl::Attributes::AirflowDirection::Id); }
 
     Protocols::InteractionModel::Status SetFanModeToOff();
     void ApplyFanModeOffSideEffects();
