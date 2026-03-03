@@ -99,7 +99,16 @@ bool BridgedDeviceBasicInformationCluster::OwnedDeviceLocation::operator==(
 BridgedDeviceBasicInformationCluster::OwnedDeviceLocation &
 BridgedDeviceBasicInformationCluster::OwnedDeviceLocation::operator=(const Globals::Structs::LocationDescriptorStruct::Type & value)
 {
-    locationName = std::string{ value.locationName.data(), value.locationName.size() };
+    // Special handling since empty char-span will return nullptr for data() and
+    // std::string does not like that
+    if (value.locationName.empty())
+    {
+        locationName.clear();
+    }
+    else
+    {
+        locationName = std::string{ value.locationName.data(), value.locationName.size() };
+    }
 
     if (value.floorNumber.IsNull())
     {

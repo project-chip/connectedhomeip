@@ -1279,3 +1279,19 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationPersistence)
 }
 
 } // namespace
+
+TEST_F(TestBridgedDeviceBasicInformationCluster, TestOwnedDeviceLocationAssignmentWithEmptySpan)
+{
+    BridgedDeviceBasicInformationCluster::OwnedDeviceLocation ownedLocation;
+    Globals::Structs::LocationDescriptorStruct::Type locationStruct;
+
+    // Default constructed CharSpan has nullptr data and 0 size
+    locationStruct.locationName = CharSpan();
+    locationStruct.floorNumber.SetNull();
+    locationStruct.areaType.SetNull();
+
+    // This should NOT crash (it was causing UB/crash because of std::string(nullptr, 0))
+    ownedLocation = locationStruct;
+
+    EXPECT_TRUE(ownedLocation.locationName.empty());
+}
