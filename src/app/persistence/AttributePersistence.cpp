@@ -91,6 +91,7 @@ CHIP_ERROR AttributePersistence::InternalStoreTLV(const ConcreteAttributePath & 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
     ReturnErrorOnFailure(encoder(context, writer));
     ReturnErrorOnFailure(writer.EndContainer(container));
+    ReturnErrorOnFailure(writer.Finalize());
 
     return mProvider.WriteValue(path, ByteSpan(buffer.data(), writer.GetLengthWritten()));
 }
