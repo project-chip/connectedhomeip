@@ -21,7 +21,6 @@ Support module for ICD test modules containing shared functionality.
 import logging
 from enum import IntEnum
 
-
 log = logging.getLogger(__name__)
 
 

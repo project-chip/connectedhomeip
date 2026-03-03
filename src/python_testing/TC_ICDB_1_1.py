@@ -41,18 +41,18 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import os
 import asyncio
 import logging
+import os
 
 from mobly import asserts
+from support_modules.icd_support import ICDTestEventTriggerOperations
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from support_modules.icd_support import ICDTestEventTriggerOperations
 
 log = logging.getLogger(__name__)
 
