@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandResponseHelper.h>
+#include <clusters/FanControl/Enums.h>
 
 namespace chip {
 namespace app {

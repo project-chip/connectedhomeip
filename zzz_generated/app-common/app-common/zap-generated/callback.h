@@ -7377,12 +7377,6 @@ bool emberAfThermostatClusterAtomicRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData);
 /**
- * @brief Fan Control Cluster Step Command callback (from client)
- */
-bool emberAfFanControlClusterStepCallback(chip::app::CommandHandler * commandObj,
-                                          const chip::app::ConcreteCommandPath & commandPath,
-                                          const chip::app::Clusters::FanControl::Commands::Step::DecodableType & commandData);
-/**
  * @brief Color Control Cluster MoveToHue Command callback (from client)
  */
 bool emberAfColorControlClusterMoveToHueCallback(

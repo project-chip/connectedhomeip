@@ -21,9 +21,11 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/clusters/fan-control-server/CodegenIntegration.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/attribute-table.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -123,7 +125,7 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
         });
     }
 
-    return SpeedSetting::Set(mEndpoint, newSpeedSetting);
+    return FanControl::SetSpeedSetting(mEndpoint, DataModel::Nullable<uint8_t>(newSpeedSetting));
 }
 
 void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
@@ -171,7 +173,7 @@ void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attribut
         // When not Null, SpeedCurrent tracks SpeedSetting's value.
         SetSpeedCurrent(speedSetting.ValueOr(0));
         // Determine if the speed change should also change the fan mode
-        FanControl::Attributes::FanMode::Set(mEndpoint, SpeedToFanMode(mSpeedCurrent));
+        FanControl::SetFanMode(mEndpoint, SpeedToFanMode(mSpeedCurrent));
         break;
     }
 
@@ -211,7 +213,7 @@ void ChefFanControlManager::SetPercentCurrent(uint8_t aNewPercentCurrent)
 {
     ChipLogDetail(NotSpecified, "ChefFanControlManager::SetPercentCurrent: %d", aNewPercentCurrent);
     mPercentCurrent = aNewPercentCurrent;
-    Status status   = FanControl::Attributes::PercentCurrent::Set(mEndpoint, mPercentCurrent);
+    Status status   = FanControl::SetPercentSetting(mEndpoint, DataModel::Nullable<Percent>(mPercentCurrent));
     if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "ChefFanControlManager::SetPercentCurrent: failed to set PercentCurrent attribute: %d",
@@ -222,7 +224,7 @@ void ChefFanControlManager::SetPercentCurrent(uint8_t aNewPercentCurrent)
 void ChefFanControlManager::SetSpeedCurrent(uint8_t aNewSpeedCurrent)
 {
     mSpeedCurrent = aNewSpeedCurrent;
-    Status status = FanControl::Attributes::SpeedCurrent::Set(mEndpoint, aNewSpeedCurrent);
+    Status status = FanControl::SetSpeedSetting(mEndpoint, DataModel::Nullable<uint8_t>(aNewSpeedCurrent));
     if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedCurrent: failed to set SpeedCurrent attribute: %d",
@@ -279,7 +281,12 @@ void ChefFanControlManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFan
 
 void ChefFanControlManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedSetting)
 {
-    Status status = FanControl::Attributes::SpeedSetting::Set(mEndpoint, aNewSpeedSetting);
+    if (aNewSpeedSetting.IsNull())
+    {
+        ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedSetting: invalid null value");
+        return;
+    }
+    Status status = FanControl::SetSpeedSetting(mEndpoint, aNewSpeedSetting);
     if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d",
@@ -344,7 +351,7 @@ Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(EndpointId 
         Status status = SpeedMax::Get(mEndpoint, &speedMax);
         if (status == Status::Success)
         {
-            status = FanControl::Attributes::SpeedSetting::Set(mEndpoint, speedMax);
+            status = FanControl::SetSpeedSetting(mEndpoint, DataModel::Nullable<uint8_t>(speedMax));
             if (status == Status::Success)
             {
                 // Atribute change handler sets SpeedCurrent equal to SpeedSetting and updates FanMode.
@@ -361,7 +368,8 @@ Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(EndpointId 
             // Not returning error as speed is optional.
             ChipLogError(DeviceLayer, "Error getting SpeedMax: %d", to_underlying(status));
         }
-        status = FanControl::Attributes::PercentSetting::Set(mEndpoint, 100);
+        uint8_t percentSettingValue = 100;
+        status                      = FanControl::SetPercentSetting(mEndpoint, DataModel::Nullable<Percent>(percentSettingValue));
         if (status == Status::Success)
         {
             // Atribute change handler sets PercentCurrent equal to PercentSetting.
@@ -379,7 +387,8 @@ Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(EndpointId 
 
     if (!speedSetting.IsNull() && speedSetting.Value())
     {
-        status = FanControl::Attributes::SpeedCurrent::Set(endpointId, speedSetting.Value());
+        uint8_t speedValue = speedSetting.Value();
+        status             = FanControl::SetSpeedSetting(endpointId, DataModel::Nullable<uint8_t>(speedValue));
         if (status != Status::Success)
         {
             ChipLogError(DeviceLayer, "Error setting SpeedCurrent: %d", to_underlying(status));
@@ -392,7 +401,8 @@ Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(EndpointId 
 
     if (!percentSetting.IsNull() && percentSetting.Value())
     {
-        status = FanControl::Attributes::PercentCurrent::Set(endpointId, percentSetting.Value());
+        uint8_t percentValue = percentSetting.Value();
+        status               = FanControl::SetPercentSetting(endpointId, DataModel::Nullable<Percent>(percentValue));
         if (status != Status::Success)
         {
             ChipLogError(DeviceLayer, "Error setting PercentCurrent: %d", to_underlying(status));
@@ -423,7 +433,8 @@ Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(EndpointId
 
     if (status == Protocols::InteractionModel::Status::Success && speedCurrent)
     {
-        status = FanControl::Attributes::SpeedCurrent::Set(endpointId, 0);
+        uint8_t zero = 0;
+        status       = FanControl::SetSpeedSetting(endpointId, DataModel::Nullable<uint8_t>(zero));
         if (status != Status::Success)
         {
             ChipLogError(DeviceLayer, "Error setting SpeedCurrent: %d", to_underlying(status));
@@ -438,7 +449,8 @@ Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(EndpointId
 
     if (percentCurrent)
     {
-        status = FanControl::Attributes::PercentCurrent::Set(endpointId, 0);
+        uint8_t zero = 0;
+        status       = FanControl::SetPercentSetting(endpointId, DataModel::Nullable<Percent>(zero));
         if (status != Status::Success)
         {
             ChipLogError(DeviceLayer, "Error setting PercentCurrent: %d", to_underlying(status));
