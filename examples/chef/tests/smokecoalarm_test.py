@@ -17,7 +17,10 @@
 
 import logging
 
+from attributes_service import attributes_service_pb2
 from mobly import asserts
+from pw_hdlc import rpc
+from pw_system.device_connection import create_device_serial_or_socket_connection
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
@@ -32,6 +35,9 @@ class TC_SMOKECOALARM(MatterBaseTest):
 
     ENDPOINT = 1
 
+    _PW_RPC_SOCKET_ADDR = "0.0.0.0:33000"
+    _PW_RPC_BAUD_RATE = 115200
+
     def desc_TC_SMOKECOALARM(self) -> str:
         return "[TC_SMOKECOALARM] chef smokecoalarm functionality test."
 
@@ -42,7 +48,9 @@ class TC_SMOKECOALARM(MatterBaseTest):
                 TestStep(4, "[TC_IDENTIFY] Test Identify."),
                 TestStep(5, "[TC_RELATIVE_HUMIDITY_MEASUREMENT] Test Relative Humidity Measurement."),
                 TestStep(6, "[TC_SMOKE_CO_ALARM] Test Smoke CO Alarm."),
-                TestStep(7, "[TC_TEMPERATURE_MEASUREMENT] Test Temperature Measurement.")]
+                TestStep(7, "[TC_TEMPERATURE_MEASUREMENT] Test Temperature Measurement."),
+                TestStep(8, "[TC_SMOKECOALARM] Set up PwRPC connection."),
+                TestStep(9, "[TC_TEMPERATURE_MEASUREMENT] Test Temperature Measurement via PwRPC.")]
 
     # CarbonMonoxideConcentrationMeasurement Cluster Helper Methods
     async def _read_co_measured_value(self, endpoint):
@@ -106,6 +114,18 @@ class TC_SMOKECOALARM(MatterBaseTest):
         return await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=Clusters.Objects.TemperatureMeasurement, attribute=Clusters.Objects.TemperatureMeasurement.Attributes.MeasuredValue)
 
+    def _write_temperature_measured_value_pwrpc(self, device, value: int):
+        result = device.rpcs.chip.rpc.Attributes.Write(
+            data=attributes_service_pb2.AttributeData(data_int16=value),
+            metadata=attributes_service_pb2.AttributeMetadata(
+                endpoint=self.ENDPOINT,
+                cluster=Clusters.Objects.TemperatureMeasurement.id,
+                attribute_id=Clusters.Objects.TemperatureMeasurement.Attributes.MeasuredValue.attribute_id,
+                type=attributes_service_pb2.AttributeType.ZCL_INT16S_ATTRIBUTE_TYPE
+            )
+        )
+        asserts.assert_true(result.status.ok(), msg="PwRPC status not ok.")
+
     # Cluster Tests
     async def carbon_monoxide_concentration_measurement_test(self, endpoint):
         measured_value = await self._read_co_measured_value(endpoint)
@@ -118,6 +138,7 @@ class TC_SMOKECOALARM(MatterBaseTest):
     async def identify_test(self, endpoint):
         identify_time = await self._read_identify_identify_time(endpoint)
         asserts.assert_equal(identify_time, 0, "IdentifyTime should be 0 initially.")
+
 
         identify_type = await self._read_identify_identify_type(endpoint)
         asserts.assert_true(identify_type is not None, "IdentifyType should not be None.")
@@ -167,6 +188,12 @@ class TC_SMOKECOALARM(MatterBaseTest):
         measured_value = await self._read_temperature_measured_value(endpoint)
         asserts.assert_true(measured_value is not None, "Temperature MeasuredValue should not be None.")
 
+    async def temperature_measurement_pwrpc_test(self, endpoint, device):
+        for value in [2000, 2500, 3000]:
+            self._write_temperature_measured_value_pwrpc(device, value)
+            measured_value = await self._read_temperature_measured_value(endpoint)
+            asserts.assert_equal(measured_value, value, "Temperature MeasuredValue should match the value set via PwRPC.")
+
     @async_test_body
     async def test_TC_SMOKECOALARM(self):
         """Run all steps."""
@@ -197,6 +224,27 @@ class TC_SMOKECOALARM(MatterBaseTest):
         # [TC_TEMPERATURE_MEASUREMENT] Test Temperature Measurement.
         self.step(7)
         await self.temperature_measurement_test(self.ENDPOINT)
+
+
+        # Tests below use PwRPC
+        # [TC_SMOKECOALARM] Set up PwRPC connection.
+        self.step(8)
+        device_connection = create_device_serial_or_socket_connection(
+            device="",
+            baudrate=self._PW_RPC_BAUD_RATE,
+            token_databases=[],
+            socket_addr=self._PW_RPC_SOCKET_ADDR,
+            compiled_protos=[attributes_service_pb2],
+            rpc_logging=True,
+            channel_id=rpc.DEFAULT_CHANNEL_ID,
+            hdlc_encoding=True,
+            device_tracing=False,
+        )
+
+        # [TC_TEMPERATURE_MEASUREMENT] Test Temperature Measurement via PwRPC.
+        self.step(9)
+        with device_connection as device:
+            await self.temperature_measurement_pwrpc_test(self.ENDPOINT, device)
 
 
 if __name__ == "__main__":
