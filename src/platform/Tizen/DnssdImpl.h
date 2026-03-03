@@ -124,11 +124,8 @@ public:
                        void * context);
 
     // TODO (a.bokowy): Make these methods private
-    friend class RegisterContext;
     void RemoveContext(RegisterContext * context);
-    friend class BrowseContext;
     void RemoveContext(BrowseContext * context);
-    friend class ResolveContext;
     void RemoveContext(ResolveContext * context);
 
     static DnssdTizen & GetInstance() { return sInstance; }
