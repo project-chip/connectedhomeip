@@ -708,7 +708,7 @@ CHIP_ERROR DeviceCommissioner::PairThreadMeshcop(RendezvousParameters & rendezvo
                                                  CommissioningParameters & commissioningParams)
 {
     VerifyOrReturnError(rendezvousParams.GetSetupDiscriminator().has_value(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(commissioningParams.GetThreadOperationalDataset().HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(commissioningParams.GetThreadOperationalDataset().(), CHIP_ERROR_INVALID_ARGUMENT);
     auto discriminator = rendezvousParams.GetSetupDiscriminator().value();
     Thread::DiscoveryCode code;
     if (rendezvousParams.GetSetupDiscriminator().value().IsShortDiscriminator())
@@ -872,7 +872,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
             // for later.
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
-            VerifyOrExit(params.GetSetupDiscriminator().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrExit(params.GetSetupDiscriminator().has_value(), err = CHIP_ERROR_INVALID_ARGUMENT);
             ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(params.GetSetupDiscriminator().value(), this,
                                                                                     OnDiscoveredDeviceOverBleSuccess,
                                                                                     OnDiscoveredDeviceOverBleError));
