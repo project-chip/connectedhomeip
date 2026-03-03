@@ -91,14 +91,14 @@ class TC_ICDB_1_1(MatterBaseTest):
     def steps_TC_ICDB_1_1(self) -> list[TestStep]:
         return [
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
-            TestStep(1, "TH reads from the DUT the RegisteredClients attribute. ",
+            TestStep(1, "TH reads from the DUT the RegisteredClients attribute.",
                      "Check if RegisteredClients is empty, if not, TH sends command UnregisterClient to clear all clients in RegisteredClients by checkInNodeID."),
             TestStep(2, "TH reads from the DUT the IdleModeDuration and ActiveModeDuration attributes",
                      "Store values as idle_mode_duration_s and active_mode_duration_ms."),
             TestStep(3, "TH sends RegisterClient command with parameters: CheckInNodeID: <any_node_id>, MonitoredSubject: <any_monitored_subject_id>, and Key: <any_16_byte_octstr>.", """
                         Verify DUT command response is successful (no exception).
                         Store ICDCounter value from response as icd_counter_at_registration."""),
-            TestStep(4, "TH sends the RemoveActiveModeReq test event trigger. "
+            TestStep(4, "TH sends the RemoveActiveModeReq test event trigger."
                      "Wait for DUT to transition to Idle Mode after active_mode_duration_ms."),
             TestStep(5, "Wait for at least one IdleModeDuration cycle."
                      "DUT sends a check-in message upon transitioning from Idle Mode to Active Mode."),
