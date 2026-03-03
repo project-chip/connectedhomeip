@@ -182,6 +182,10 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp2TagList[] = { P
 #include "microwave-oven-control/chef-microwave-oven-control.h"
 #endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
 
+#if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "laundry-dryer-controls/chef-laundry-dryer-controls-delegate.h"
+#endif // #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT
+
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
                                                                          uint8_t * buffer, uint16_t maxReadLength)
@@ -597,11 +601,32 @@ void GenericSwitchInit()
 }
 
 /**
+ * This initializer is for the laundry dryer application rootnode_laundrydryer_01796fe396. To not have this initialiser affect
+ * new laundry dryer chef apps, use a different endpoint.
+ */
+void LaundryDryerInit()
+{
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: LaundryDryerInit called more than once");
+    called = true;
+#if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    // Only initialises Laundry Dryer Controls. Other clusters are initialised through ember calls.
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kLaundryDryerDeviceTypeId))
+    {
+        Platform::New<LaundryDryerControls::Chef::ChefDelegate>()->Register(1);
+    }
+#endif // #if MATTER_DM_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER_ENDPOINT_COUNT
+}
+
+/*
  * This initializer is for the casting video player application rootnode_castingvideoplayer_contentapp_34699714e7. To not have this
  * initialiser affect new apps video player device types, use different endpoints.
  */
 void CastingvideoplayerContentappInit()
 {
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: CastingvideoplayerContentappInit called more than once");
+    called = true;
 
 #if (MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                              \
     (MATTER_DM_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                             \
@@ -653,6 +678,7 @@ void ApplicationInit()
     RefrigeratorTemperatureControlledCabinetInit();
     OvenTemperatureControlledCabinetCooktopCookSurfaceInit();
     GenericSwitchInit();
+    LaundryDryerInit();
     CastingvideoplayerContentappInit();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
