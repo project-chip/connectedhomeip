@@ -1004,7 +1004,7 @@ TEST(TestAttributePersistence, TestAttributePersistenceTLVValidation)
         uint8_t buffer[128];
         TLV::TLVWriter writer;
         writer.Init(buffer);
-        ASSERT_EQ(writer.Put(TLV::ContextTag(1), (uint32_t) 100), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::AnonymousTag(), (uint32_t) 100), CHIP_NO_ERROR);
         ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
         ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
@@ -1073,7 +1073,7 @@ TEST(TestAttributePersistence, TestAttributePersistenceTLVValidation)
         ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container), CHIP_NO_ERROR);
         ASSERT_EQ(writer.Put(TLV::ContextTag(1), (uint32_t) 100), CHIP_NO_ERROR);
         ASSERT_EQ(writer.EndContainer(container), CHIP_NO_ERROR);
-        ASSERT_EQ(writer.Put(TLV::ContextTag(2), (uint32_t) 200), CHIP_NO_ERROR); // Trailing
+        ASSERT_EQ(writer.Put(TLV::AnonymousTag(), (uint32_t) 200), CHIP_NO_ERROR); // Trailing
         ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
         ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
 
