@@ -176,7 +176,7 @@ public:
     template <typename T>
     CHIP_ERROR StoreTLV(const ConcreteAttributePath & path, const T & value, MutableByteSpan buffer)
     {
-        return InternalStoreTLV(path, buffer, const_cast<T *>(&value), [](void * context, TLV::TLVWriter & writer) -> CHIP_ERROR {
+        return InternalStoreTLV(path, buffer, &value, [](const void * context, TLV::TLVWriter & writer) -> CHIP_ERROR {
             return DataModel::Encode(writer, kTLVEncodingTag, *static_cast<const T *>(context));
         });
     }
@@ -233,10 +233,10 @@ private:
     bool InternalRawLoadNativeEndianValue(const ConcreteAttributePath & path, void * data, const void * valueOnLoadFailure,
                                           size_t size);
 
-    using TLVEncoderCallback = CHIP_ERROR (*)(void * context, TLV::TLVWriter & writer);
+    using TLVEncoderCallback = CHIP_ERROR (*)(const void * context, TLV::TLVWriter & writer);
     using TLVDecoderCallback = CHIP_ERROR (*)(void * context, TLV::TLVReader & reader);
 
-    CHIP_ERROR InternalStoreTLV(const ConcreteAttributePath & path, MutableByteSpan buffer, void * context,
+    CHIP_ERROR InternalStoreTLV(const ConcreteAttributePath & path, MutableByteSpan buffer, const void * context,
                                 TLVEncoderCallback encoder);
     CHIP_ERROR InternalLoadTLV(const ConcreteAttributePath & path, MutableByteSpan buffer, void * context,
                                TLVDecoderCallback decoder);

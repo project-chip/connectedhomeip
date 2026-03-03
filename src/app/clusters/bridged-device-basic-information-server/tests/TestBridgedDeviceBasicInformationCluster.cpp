@@ -252,8 +252,8 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestPartialAttributes)
     };
     BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
                                                  {
-                                                     .reachable = true,
-                                                     .nodeLabel = "mylabel",
+                                                     .reachable            = true,
+                                                     .nodeLabel            = "mylabel",
                                                      .configurationVersion = versioning,
                                                  },
                                                  {
@@ -426,8 +426,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestAttributeReads)
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestKeepActiveCommand)
 {
     TestBridgedDeviceIcdDelegate icdDelegate;
-    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
-                                                 {},
+    BridgedDeviceBasicInformationCluster cluster(kTestEndpointId, {},
                                                  {
                                                      .uniqueId = "icd-dev",
                                                  },
@@ -1257,19 +1256,19 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestDeviceLocationPersistence)
 
     // New cluster instance
     {
-        BridgedDeviceBasicInformationCluster cluster(kTestEndpointId,
-                                                     {
-                                                         .reachable      = true,
-                                                         .deviceLocation = NullOptional, // mark attribute supported
-                                                     },
-                                                     {
-                                                         .uniqueId = "test-devicelocation",
-                                                     },
-                                                     {
-                                                         .delegate      = mDelegate,
-                                                         .timerDelegate = mMockTimer,
-                                                         // No parent version config needed for this test as we don't check version behavior here
-                                                     });
+        BridgedDeviceBasicInformationCluster cluster(
+            kTestEndpointId,
+            {
+                .reachable      = true,
+                .deviceLocation = NullOptional, // mark attribute supported
+            },
+            {
+                .uniqueId = "test-devicelocation",
+            },
+            {
+                .delegate = mDelegate, .timerDelegate = mMockTimer,
+                // No parent version config needed for this test as we don't check version behavior here
+            });
         EXPECT_EQ(cluster.Startup(mContext.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
         DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> readLocationNullable;

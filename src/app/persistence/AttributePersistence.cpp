@@ -80,7 +80,7 @@ CHIP_ERROR AttributePersistence::StoreString(const ConcreteAttributePath & path,
     return mProvider.WriteValue(path, io.ContentWithPrefix());
 }
 
-CHIP_ERROR AttributePersistence::InternalStoreTLV(const ConcreteAttributePath & path, MutableByteSpan buffer, void * context,
+CHIP_ERROR AttributePersistence::InternalStoreTLV(const ConcreteAttributePath & path, MutableByteSpan buffer, const void * context,
                                                   TLVEncoderCallback encoder)
 {
     TLV::TLVWriter writer;
