@@ -120,7 +120,7 @@ types or functionality) as well as individual examples.
 | `examples/lighting-app`                        | Junior Martinez              |              |
 | `examples/lighting-app-data-mode-no-unique-id` |                              | UNMAINTAINED |
 | `examples/light-switch-app`                    |                              | UNMAINTAINED |
-| `examples/lit-icd-app`                         |                              | UNMAINTAINED |
+| `examples/lit-icd-app`                         | Junior Martinez               |              |
 | `examples/lock-app`                            |                              | UNMAINTAINED |
 | `examples/log-source-app`                      |                              | UNMAINTAINED |
 | `examples/microwave-oven-app`                  | Rob Bultman                  |              |
