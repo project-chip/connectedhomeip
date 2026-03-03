@@ -90,6 +90,8 @@ static_library("SiWx") {
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/platform/logging:headers",
     "${sl_provision_root}:headers",
+    "${silabs_platform_dir}/ble:ble",
+    "${silabs_platform_dir}/ble/SiWx:ble-siwx",
   ]
 
   if (chip_enable_multi_ota_requestor) {

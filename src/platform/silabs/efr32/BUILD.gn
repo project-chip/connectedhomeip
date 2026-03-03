@@ -88,10 +88,17 @@ static_library("efr32") {
   } else {
     sources += [ "BLEManagerImpl.cpp" ]
   }
+
   deps = [
     "${chip_root}/src/app/common:ids",
     "${sl_provision_root}:headers",
+    "${silabs_platform_dir}/ble:ble",
   ]
+  if (sl_matter_enable_siwx_ble) {
+    deps += [ "${silabs_platform_dir}/ble/SiWx:ble-siwx" ]
+  } else {
+    deps += [ "${silabs_platform_dir}/ble/efr32:ble-efr32" ]
+  }
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {
