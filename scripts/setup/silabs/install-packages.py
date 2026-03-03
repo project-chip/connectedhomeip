@@ -364,7 +364,7 @@ def parse_key_from_file(file_path, key):
             for line in f:
                 line = line.strip()
                 if line.startswith(prefix):
-                    return line[len(prefix) :].strip()
+                    return line[len(prefix):].strip()
     except OSError:
         pass
     return None
