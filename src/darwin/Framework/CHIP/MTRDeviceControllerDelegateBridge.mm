@@ -97,7 +97,9 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
         // to mark end of commissioning request.
         // Since OnPairingComplete(failure_code) might not be invoked in all cases, use this opportunity to inform of failed commissioning
         // and default the error to timeout since that is best guess in this layer.
-        if (status == chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed && [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
+        if (status == chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed
+            && strongDelegate != static_cast<id<MTRDeviceControllerDelegate>>(strongController)
+            && [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
             OnCommissioningComplete(mDeviceNodeId, CHIP_ERROR_TIMEOUT);
         }
     }
