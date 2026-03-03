@@ -31,12 +31,18 @@ from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.matter_testing import MatterBaseTest
 
+# Type aliases for AccessControl cluster types
+AccessControlCluster = Clusters.AccessControl
+AccessControlEntryStruct = AccessControlCluster.Structs.AccessControlEntryStruct
+AccessControlTargetStruct = AccessControlCluster.Structs.AccessControlTargetStruct
+AccessControlEntryPrivilegeEnum = AccessControlCluster.Enums.AccessControlEntryPrivilegeEnum
+AccessControlEntryAuthModeEnum = AccessControlCluster.Enums.AccessControlEntryAuthModeEnum
+
 log = logging.getLogger(__name__)
 
 
 class SoftwareUpdateBaseTest(MatterBaseTest):
     """This is the base test class for SoftwareUpdate Test Cases"""
-
     current_provider_app_proc: Optional[OTAProviderSubprocess] = None
     provider_app_path: Optional[str] = None
 
@@ -261,7 +267,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                          dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
                          provider_node_id: int,
                          requestor_node_id: Optional[int] = None,
-                         acl_entries: Optional[list[Clusters.AccessControl.Structs.AccessControlEntryStruct]] = None,
+                         acl_entries: Optional[list[AccessControlEntryStruct]] = None,
                          ):
         """Create ACL entries to allow OTA requestors to access the provider.
 
@@ -269,7 +275,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             dev_ctrl: Device controller for sending commands
             provider_node_id: Node ID of the OTA provider
             requestor_node_id: Optional specific requestor node ID for targeted access
-            acl_entries: Optional[list[Clusters.AccessControl.Structs.AccessControlEntryStruct]]. ACL list to write ino the requestor.
+            acl_entries: Optional[list[AccessControlEntryStruct]]. ACL list to write ino the requestor.
 
         Returns:
             Result of the ACL write operation
@@ -282,20 +288,20 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             # If there are not ACL entries using proper struct constructors create the default.
             acl_entries = [
                 # Admin entry
-                Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
-                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,  # type: ignore
-                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
-                    subjects=[admin_node_id],  # type: ignore
+                AccessControlEntryStruct(
+                    privilege=AccessControlEntryPrivilegeEnum.kAdminister,
+                    authMode=AccessControlEntryAuthModeEnum.kCase,
+                    subjects=[admin_node_id],
                     targets=NullValue
                 ),
                 # Operate entry
-                Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
-                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,  # type: ignore
-                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
-                    subjects=requestor_subjects,  # type: ignore
+                AccessControlEntryStruct(
+                    privilege=AccessControlEntryPrivilegeEnum.kOperate,
+                    authMode=AccessControlEntryAuthModeEnum.kCase,
+                    subjects=requestor_subjects,
                     targets=[
-                        Clusters.AccessControl.Structs.AccessControlTargetStruct(  # type: ignore
-                            cluster=Clusters.OtaSoftwareUpdateProvider.id,  # type: ignore
+                        AccessControlTargetStruct(
+                            cluster=Clusters.OtaSoftwareUpdateProvider.id,
                             endpoint=NullValue,
                             deviceType=NullValue
                         )
@@ -304,7 +310,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             ]
 
         # Create the attribute descriptor for the ACL attribute
-        acl_attribute = Clusters.AccessControl.Attributes.Acl(acl_entries)
+        acl_attribute = AccessControlCluster.Attributes.Acl(acl_entries)
 
         return dev_ctrl.WriteAttribute(
             nodeId=provider_node_id,
