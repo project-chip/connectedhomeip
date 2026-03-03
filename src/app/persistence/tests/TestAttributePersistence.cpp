@@ -983,4 +983,104 @@ TEST(TestAttributePersistence, TestStoreAndLoadTLV)
     }
 }
 
+TEST(TestAttributePersistence, TestAttributePersistenceTLVValidation)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    AttributePersistence persistence(ramProvider);
+    const ConcreteAttributePath path(1, 2, 3);
+
+    // Helper to write raw bytes to storage
+    auto writeRaw = [&](const ByteSpan & data) {
+        return storageDelegate.SyncSetKeyValue(
+            DefaultStorageKeyAllocator::AttributeValue(path.mEndpointId, path.mClusterId, path.mAttributeId).KeyName(), data.data(),
+            static_cast<uint16_t>(data.size()));
+    };
+
+    // 1. Not a structure (Just an integer)
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(1), (uint32_t) 100), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        // Should fail because it expects a Structure
+        EXPECT_EQ(persistence.LoadTLV<128>(path, value), CHIP_ERROR_WRONG_TLV_TYPE);
+    }
+
+    // 2. Empty Structure
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType container;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        // Should fail because it expects an element inside
+        EXPECT_EQ(persistence.LoadTLV<128>(path, value), CHIP_END_OF_TLV);
+    }
+
+    // 3. Structure with Wrong Element Tag (Context Tag 2 instead of 1)
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType container;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(2), (uint32_t) 100), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        // Should fail on tag check
+        EXPECT_EQ(persistence.LoadTLV<128>(path, value), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // 4. Structure with Extra Element
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType container;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(1), (uint32_t) 100), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(2), (uint32_t) 200), CHIP_NO_ERROR); // Extra
+        ASSERT_EQ(writer.EndContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        // Should fail on VerifyEndOfContainer inside container
+        EXPECT_EQ(persistence.LoadTLV<128>(path, value), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    }
+
+    // 5. Trailing Data after Structure
+    {
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        TLV::TLVType container;
+        ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(1), (uint32_t) 100), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.EndContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Put(TLV::ContextTag(2), (uint32_t) 200), CHIP_NO_ERROR); // Trailing
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+        ASSERT_EQ(writeRaw(ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
+
+        uint32_t value = 0;
+        // Should fail on VerifyEndOfContainer outside container
+        EXPECT_EQ(persistence.LoadTLV<128>(path, value), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    }
+}
+
 } // namespace

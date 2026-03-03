@@ -103,13 +103,19 @@ CHIP_ERROR AttributePersistence::InternalLoadTLV(const ConcreteAttributePath & p
     TLV::TLVReader reader;
     reader.Init(buffer);
 
-    TLV::TLVType container;
     ReturnErrorOnFailure(reader.Next());
-    ReturnErrorOnFailure(reader.EnterContainer(container));
-    ReturnErrorOnFailure(reader.Next()); // Move to the element inside structure (Context Tag 1)
-    VerifyOrReturnError(reader.GetTag() == kTLVEncodingTag, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(decoder(context, reader));
-    ReturnErrorOnFailure(reader.ExitContainer(container));
+    VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
+
+    {
+        TLV::TLVType container;
+        ReturnErrorOnFailure(reader.EnterContainer(container));
+        ReturnErrorOnFailure(reader.Next()); // Move to the element inside structure (Context Tag 1)
+        VerifyOrReturnError(reader.GetTag() == kTLVEncodingTag, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(decoder(context, reader));
+        ReturnErrorOnFailure(reader.VerifyEndOfContainer());
+        ReturnErrorOnFailure(reader.ExitContainer(container));
+    }
+    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
 
     return CHIP_NO_ERROR;
 }
