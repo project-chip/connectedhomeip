@@ -36,15 +36,15 @@ tests:
       verification: |
           This step is required only for the reference platform(e.g., RPI). Please skip this step when validating with real devices.
 
-          The reference platform advertises only a single QR code, which is not sufficient to validate concatenated QR code onboarding payloads.
-          Therefore, the QR code payloads must be manually generated using chip-tool.
+          The reference platform advertises only a single QR code per device, which is not sufficient to validate concatenated QR code onboarding payloads. Therefore, QR code payloads must be collected from two separate devices and combined for validation.
 
-          Use the following commands to generate individual QR codes:
+          RPI 1:
+          Advertise the TH: ./chip-all-clusters-app --discriminator 3841 --passcode 20202021
 
-          ./chip-tool payload generate-qrcode --discriminator 3840 --setup-pin-code 20202021 --vendor-id 65521 --product-id 32768
-          ./chip-tool payload generate-qrcode --discriminator 3841 --setup-pin-code 20202021 --vendor-id 65522 --product-id 32770
+          RPI 2:
+          Advertise the TH: ./chip-all-clusters-app --discriminator 3842 --passcode 20202022
 
-          Save the generated QR codes for future validation.
+          Save the QR code payloads from both devices for future concatenation and validation.
 
           Example QR code payload: MT:Y.K90-Q000KA0648G00
       disabled: true
@@ -57,7 +57,7 @@ tests:
 
           ./chip-tool payload parse-setup-payload "MT:<payload1>*<payload2>"
 
-          Example: ./chip-tool payload parse-setup-payload "MT:Y.K90-Q000KA0648G00*Y.K9061901KA0648G00"
+          Example: ./chip-tool payload parse-setup-payload "MT:-24J061901KA0648G00*-24J0EDH020O0648G00"
 
           Verify the DUT(chip-tool) is able to scan and parse the payloads from concatenated QR code:
 
@@ -65,111 +65,49 @@ tests:
           [1768813041.471] [132802:132802] [SPL] Parsing base38Representation: MT:Y.K90-Q000KA0648G00*Y.K9061901KA0648G00
           [1768813041.495] [132802:132802] [SPL] Version:             0
           [1768813041.495] [132802:132802] [SPL] VendorID:            65521
-          [1768813041.495] [132802:132802] [SPL] ProductID:           32768
-          [1768813041.495] [132802:132802] [SPL] Custom flow:         0    (STANDARD)
-          [1768813041.495] [132802:132802] [SPL] Discovery Bitmask:   0x00 (NONE)
-          [1768813041.495] [132802:132802] [SPL] Long discriminator:  3840   (0xf00)
-          [1768813041.495] [132802:132802] [SPL] Passcode:            20202021
-          [1768813041.495] [132802:132802] [SPL] ----------
-          [1768813041.495] [132802:132802] [SPL] Version:             0
-          [1768813041.495] [132802:132802] [SPL] VendorID:            65522
-          [1768813041.495] [132802:132802] [SPL] ProductID:           32770
+          [1768813041.495] [132802:132802] [SPL] ProductID:           32769
           [1768813041.495] [132802:132802] [SPL] Custom flow:         0    (STANDARD)
           [1768813041.495] [132802:132802] [SPL] Discovery Bitmask:   0x00 (NONE)
           [1768813041.495] [132802:132802] [SPL] Long discriminator:  3841   (0xf01)
           [1768813041.495] [132802:132802] [SPL] Passcode:            20202021
-
-      disabled: true
-
-    - label:
-          "Step 2: Verify the DUT follows the correct order of onboarding the TH
-          devices which must be from first to last starting from left to right.
-          Example -
-          MT:<onboarding-base-38-content_bulb1>*<onboarding-base-38-content_bulb2>*<onboarding-base-38-content_bulb3>*<onboarding-base-38-content_bulb4>
-          content_bulb1 gets onboarded first, content_bulb2 gets onboarded
-          second and so forth."
-      PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1_INORDER
-      verification: |
-          Verify that the DUT (chip-tool) follows the correct onboarding order for the TH devices, which must proceed from first to last, left to right.
-
-          In this case, the QR code payload Y.K90-Q000KA0648G00 must be onboarded first, followed by Y.K9061901KA0648G00.
-
-
-          [1768813041.471] [132802:132802] [DL] ChipLinuxStorage::Init: Using KVS config file: /tmp/chip_tool_kvs
-          [1768813041.471] [132802:132802] [SPL] Parsing base38Representation: MT:Y.K90-Q000KA0648G00*Y.K9061901KA0648G00
-          [1768813041.495] [132802:132802] [SPL] Version:             0
-          [1768813041.495] [132802:132802] [SPL] VendorID:            65521
-          [1768813041.495] [132802:132802] [SPL] ProductID:           32768
-          [1768813041.495] [132802:132802] [SPL] Custom flow:         0    (STANDARD)
-          [1768813041.495] [132802:132802] [SPL] Discovery Bitmask:   0x00 (NONE)
-          [1768813041.495] [132802:132802] [SPL] Long discriminator:  3840   (0xf00)
-          [1768813041.495] [132802:132802] [SPL] Passcode:            20202021
           [1768813041.495] [132802:132802] [SPL] ----------
           [1768813041.495] [132802:132802] [SPL] Version:             0
           [1768813041.495] [132802:132802] [SPL] VendorID:            65522
-          [1768813041.495] [132802:132802] [SPL] ProductID:           32770
+          [1768813041.495] [132802:132802] [SPL] ProductID:           32769
           [1768813041.495] [132802:132802] [SPL] Custom flow:         0    (STANDARD)
           [1768813041.495] [132802:132802] [SPL] Discovery Bitmask:   0x00 (NONE)
-          [1768813041.495] [132802:132802] [SPL] Long discriminator:  3841   (0xf01)
-          [1768813041.495] [132802:132802] [SPL] Passcode:            20202021
+          [1768813041.495] [132802:132802] [SPL] Long discriminator:  3842   (0xf02)
+          [1768813041.495] [132802:132802] [SPL] Passcode:            20202022
+
       disabled: true
 
     - label:
-          "Step 3: Verify the DUT indicates to the user the need to commission
-          TH devices one by one by scanning their individual QR codes."
-      PICS:
-          "!(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) &&
-          MCORE.DD.CTRL_CONCATENATED_QR_CODE_2"
+          "Step 2: Commission each TH device one by one using parsed payload
+          data"
       verification: |
-          The reference platform (Raspberry Pi running sample applications) does not support user-facing commissioning flows or QR scanning behavior associated with MCORE.DD.CTRL_CONCATENATED_QR_CODE_2.
-          Therefore, this test step is not verifiable on the RPI reference platform.
 
-          This test step can be validated using real Commissioner devices that support user interaction and concatenated QR code handling when
-          !(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) && MCORE.DD.CTRL_CONCATENATED_QR_CODE_2.
-      disabled: true
+          Commission the TH devices one by one using parsed payloads in Step-1.
 
-    - label:
-          "Step 4: Verify the DUT does NOT indicate to the user the need to
-          commission TH devices one by one by scanning their individual QR
-          codes, but instead warns the user (in a way described by the provider
-          of the DUT) that the QR code cannot be processed."
-      PICS:
-          "!(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) &&
-          !(MCORE.DD.CTRL_CONCATENATED_QR_CODE_2)"
-      verification: |
-          The reference platform (Raspberry Pi running sample applications) does not support user-facing commissioning flows or QR scanning behavior associated with MCORE.DD.CTRL_CONCATENATED_QR_CODE_2.
-          Therefore, this test step is not verifiable on the RPI reference platform.
+          Example commands to commission the TH devices:
 
-          This test step can be validated using real Commissioner devices that support user interaction and concatenated QR code handling when
-          !(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) && !MCORE.DD.CTRL_CONCATENATED_QR_CODE_2.
-      disabled: true
+          TH device 1:
+          ./chip-tool pairing onnetwork 1 20202021
 
-    - label:
-          "Step 5: Scan QR code using concatenation (which supports the
-          commissioning of all the TH devices)"
-      verification: |
-          ./chip-tool payload parse-setup-payload "MT:<payload1>*<payload2>"
+          Verify the DUT (chip-tool) successfully commissions the TH device using the parsed payload data.
 
-          Example: ./chip-tool payload parse-setup-payload "MT:Y.K90-Q000KA0648G00*Y.K9061901KA0648G00"
+          [1771308802.157] [9230:9232] [CTL] Commissioning complete for node ID 0x0000000000000001: success
+          [1771308802.157] [9230:9232] [TOO] Device commissioning completed with success
+          [1771308802.157] [9230:9232] [DMG] ICR moving to [AwaitingDe]
 
-          Verify the DUT(chip-tool) recognizes the * separator from the QR code as an indication concatenation is used by parsing the QR code successfully as multiple TH QR codes.
+          TH device 2:
+          ./chip-tool pairing onnetwork 2 20202022
 
-          [1768813041.471] [132802:132802] [DL] ChipLinuxStorage::Init: Using KVS config file: /tmp/chip_tool_kvs
-          [1768813041.471] [132802:132802] [SPL] Parsing base38Representation: MT:Y.K90-Q000KA0648G00*Y.K9061901KA0648G00
-          [1768813041.495] [132802:132802] [SPL] Version:             0
-          [1768813041.495] [132802:132802] [SPL] VendorID:            65521
-          [1768813041.495] [132802:132802] [SPL] ProductID:           32768
-          [1768813041.495] [132802:132802] [SPL] Custom flow:         0    (STANDARD)
-          [1768813041.495] [132802:132802] [SPL] Discovery Bitmask:   0x00 (NONE)
-          [1768813041.495] [132802:132802] [SPL] Long discriminator:  3840   (0xf00)
-          [1768813041.495] [132802:132802] [SPL] Passcode:            20202021
-          [1768813041.495] [132802:132802] [SPL] ----------
-          [1768813041.495] [132802:132802] [SPL] Version:             0
-          [1768813041.495] [132802:132802] [SPL] VendorID:            65522
-          [1768813041.495] [132802:132802] [SPL] ProductID:           32770
-          [1768813041.495] [132802:132802] [SPL] Custom flow:         0    (STANDARD)
-          [1768813041.495] [132802:132802] [SPL] Discovery Bitmask:   0x00 (NONE)
-          [1768813041.495] [132802:132802] [SPL] Long discriminator:  3841   (0xf01)
-          [1768813041.495] [132802:132802] [SPL] Passcode:            20202021
+          Verify the DUT (chip-tool) successfully commissions the TH device using the parsed payload data.
+
+          [1771308802.157] [9230:9232] [CTL] Commissioning complete for node ID 0x0000000000000002: success
+          [1771308802.157] [9230:9232] [TOO] Device commissioning completed with success
+          [1771308802.157] [9230:9232] [DMG] ICR moving to [AwaitingDe]
+
+          Note: Update the passcode values according to the parsed QR payload data of each TH device.
 
       disabled: true
