@@ -51,6 +51,17 @@ enum keyid_values
     kKeyId_case_ephemeral_keyid, // Used for ECDH
 };
 
+#define CHIP_SE05X_NFC_COMM_SELECT_RSP_BIN_ID (SE051H_SELECT_RESPONSE_ID)
+#define CHIP_SE05X_NFC_COMM_SELECT_RSP_VAL                                                                                         \
+    {                                                                                                                              \
+        SE051H_SELECT_RESPONSE                                                                                                     \
+    }
+
+#define CHIP_SE05X_NFC_COMM_DESELECT_RSP_VAL                                                                                       \
+    {                                                                                                                              \
+        SE051H_DESELECT_RESPONSE                                                                                                   \
+    }
+
 // Enable the below macro to make spake HSM implementation re-entrant.
 #define ENABLE_REENTRANCY 0
 
@@ -172,12 +183,21 @@ void se05x_setCryptoObjID(SE05x_CryptoObjectID_t objId, uint8_t status);
 #endif // #if ENABLE_REENTRANCY
 
 /**
- * @brief Read the size of a secure object in SE05x.
- * @param[in] objid - Object identifier
- * @param[out] psize - Pointer to store the object size
+ * @brief Disable NFC commissioning mode in SE05x.
+ * Writes zero bytes to the NFC commissioning select response binary object
+ * to prevent the device from responding to NFC commissioning requests.
  * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
  */
-CHIP_ERROR se05x_read_object_size(uint32_t objid, uint16_t * psize);
+CHIP_ERROR se05x_disable_nfc_commision();
+
+/**
+ * @brief Enable NFC commissioning mode in SE05x.
+ * Writes the NFC commissioning select response to the binary object
+ * to allow the device to respond to NFC commissioning requests.
+ * @return CHIP_ERROR_INTERNAL on error, CHIP_NO_ERROR otherwise
+ */
+CHIP_ERROR se05x_enable_nfc_commision();
+
 #ifdef __cplusplus
 }
 #endif
