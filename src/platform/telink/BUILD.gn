@@ -83,7 +83,7 @@ static_library("telink") {
   if (chip_enable_thread) {
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
-      "ThreadStackManagerImpl.cpp",
+      "../Zephyr/ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
     deps += [ "${chip_root}/src/app:app_config" ]

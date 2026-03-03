@@ -972,6 +972,8 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
 
 CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * event)
 {
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
     if (mState == kState_NotInitialized) // Expected BLE disconnect: switching to Thread
     {
         bt_disable();
@@ -982,7 +984,15 @@ CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * eve
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-        TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().StartNonConcurrentThreadManagement();
+        ChipLogProgress(DeviceLayer, "Switch to Thread");
+        k_sleep(K_MSEC(50)); // Small delay to ensure BLE stack is fully disabled before Thread attach
+        TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(true);
+
+        ChipDeviceEvent opEvent;
+        opEvent.Type = DeviceEventType::kOperationalNetworkStarted;
+
+        error = PlatformMgr().PostEvent(&opEvent);
+        ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format());
 #endif
     }
     else // Unexpected BLE disconnect during commissioning
@@ -990,7 +1000,7 @@ CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * eve
         ChipLogDetail(DeviceLayer, "BLE disconnected during commissioning");
         chip::Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
     }
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 } // namespace Internal
