@@ -46,40 +46,38 @@ public:
     virtual ~BleChannel() = default;
 
     // ----- Initialization -----
-    virtual CHIP_ERROR Init()                                             = 0;
-    virtual CHIP_ERROR Shutdown()                                        = 0;
+    virtual CHIP_ERROR Init()     = 0;
+    virtual CHIP_ERROR Shutdown() = 0;
 
     // ----- Advertising -----
-    virtual CHIP_ERROR StartAdvertising(const BleAdvertisingParams & params) = 0;
-    virtual CHIP_ERROR StopAdvertising()                                 = 0;
+    virtual CHIP_ERROR StartAdvertising(const BleAdvertisingParams & params)   = 0;
+    virtual CHIP_ERROR StopAdvertising()                                       = 0;
     virtual CHIP_ERROR SetAdvertisingData(const uint8_t * data, size_t length) = 0;
 
     // ----- Connection -----
-    virtual CHIP_ERROR CloseConnection(BleConnectionHandle conId)         = 0;
-    virtual CHIP_ERROR UpdateConnectionParams(BleConnectionHandle conId,
-                                              const BleConnectionParams & params) = 0;
+    virtual CHIP_ERROR CloseConnection(BleConnectionHandle conId)                                            = 0;
+    virtual CHIP_ERROR UpdateConnectionParams(BleConnectionHandle conId, const BleConnectionParams & params) = 0;
 
     // ----- GATT -----
-    virtual CHIP_ERROR SendIndication(BleConnectionHandle conId, uint16_t charHandle,
-                                     const uint8_t * data, size_t length) = 0;
-    virtual uint16_t GetMTU(BleConnectionHandle conId) const             = 0;
+    virtual CHIP_ERROR SendIndication(BleConnectionHandle conId, uint16_t charHandle, const uint8_t * data, size_t length) = 0;
+    virtual uint16_t GetMTU(BleConnectionHandle conId) const                                                               = 0;
 
     // ----- Event handling -----
     /** Callback invoked when channel parses an event and produces a BleEvent (e.g. for Matter BLE). */
     virtual void SetEventCallback(BleEventCallback callback, void * context) = 0;
     /** Returns true if this channel handles the given platform event id. */
-    virtual bool CanHandleEvent(uint32_t eventId) const                  = 0;
+    virtual bool CanHandleEvent(uint32_t eventId) const = 0;
     /** Single entry point: parse platform event, optionally build BleEvent and invoke callback. */
-    virtual void ParseEvent(void * platformEvent)                        = 0;
+    virtual void ParseEvent(void * platformEvent) = 0;
 
     // ----- Address / identity -----
-    virtual CHIP_ERROR GetAddress(uint8_t * addr, size_t * length)        = 0;
-    virtual CHIP_ERROR SetDeviceName(const char * name)                   = 0;
+    virtual CHIP_ERROR GetAddress(uint8_t * addr, size_t * length) = 0;
+    virtual CHIP_ERROR SetDeviceName(const char * name)            = 0;
 
     // ----- Indication timer -----
-    virtual CHIP_ERROR StartIndicationTimer(BleConnectionHandle conId, uint32_t timeoutMs,
-                                            void (*callback)(void *), void * context) = 0;
-    virtual CHIP_ERROR CancelIndicationTimer(BleConnectionHandle conId)  = 0;
+    virtual CHIP_ERROR StartIndicationTimer(BleConnectionHandle conId, uint32_t timeoutMs, void (*callback)(void *),
+                                            void * context)             = 0;
+    virtual CHIP_ERROR CancelIndicationTimer(BleConnectionHandle conId) = 0;
 };
 
 } // namespace Internal

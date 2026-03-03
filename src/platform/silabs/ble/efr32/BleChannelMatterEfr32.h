@@ -32,7 +32,7 @@ namespace Internal {
 class BleChannelMatterEfr32 : public BleChannel
 {
 public:
-    BleChannelMatterEfr32()          = default;
+    BleChannelMatterEfr32()           = default;
     ~BleChannelMatterEfr32() override = default;
 
     CHIP_ERROR Init() override;
@@ -43,11 +43,9 @@ public:
     CHIP_ERROR SetAdvertisingData(const uint8_t * data, size_t length) override;
 
     CHIP_ERROR CloseConnection(BleConnectionHandle conId) override;
-    CHIP_ERROR UpdateConnectionParams(BleConnectionHandle conId,
-                                      const BleConnectionParams & params) override;
+    CHIP_ERROR UpdateConnectionParams(BleConnectionHandle conId, const BleConnectionParams & params) override;
 
-    CHIP_ERROR SendIndication(BleConnectionHandle conId, uint16_t charHandle,
-                              const uint8_t * data, size_t length) override;
+    CHIP_ERROR SendIndication(BleConnectionHandle conId, uint16_t charHandle, const uint8_t * data, size_t length) override;
     uint16_t GetMTU(BleConnectionHandle conId) const override;
 
     void SetEventCallback(BleEventCallback callback, void * context) override;
@@ -57,8 +55,8 @@ public:
     CHIP_ERROR GetAddress(uint8_t * addr, size_t * length) override;
     CHIP_ERROR SetDeviceName(const char * name) override;
 
-    CHIP_ERROR StartIndicationTimer(BleConnectionHandle conId, uint32_t timeoutMs,
-                                    void (*callback)(void *), void * context) override;
+    CHIP_ERROR StartIndicationTimer(BleConnectionHandle conId, uint32_t timeoutMs, void (*callback)(void *),
+                                    void * context) override;
     CHIP_ERROR CancelIndicationTimer(BleConnectionHandle conId) override;
 };
 

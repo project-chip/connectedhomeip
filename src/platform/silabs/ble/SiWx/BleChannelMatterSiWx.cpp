@@ -57,14 +57,12 @@ CHIP_ERROR BleChannelMatterSiWx::CloseConnection(BleConnectionHandle conId)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR BleChannelMatterSiWx::UpdateConnectionParams(BleConnectionHandle conId,
-                                                        const BleConnectionParams & params)
+CHIP_ERROR BleChannelMatterSiWx::UpdateConnectionParams(BleConnectionHandle conId, const BleConnectionParams & params)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR BleChannelMatterSiWx::SendIndication(BleConnectionHandle conId, uint16_t charHandle,
-                                                const uint8_t * data, size_t length)
+CHIP_ERROR BleChannelMatterSiWx::SendIndication(BleConnectionHandle conId, uint16_t charHandle, const uint8_t * data, size_t length)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -93,8 +91,8 @@ CHIP_ERROR BleChannelMatterSiWx::SetDeviceName(const char * name)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR BleChannelMatterSiWx::StartIndicationTimer(BleConnectionHandle conId, uint32_t timeoutMs,
-                                                      void (*callback)(void *), void * context)
+CHIP_ERROR BleChannelMatterSiWx::StartIndicationTimer(BleConnectionHandle conId, uint32_t timeoutMs, void (*callback)(void *),
+                                                      void * context)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

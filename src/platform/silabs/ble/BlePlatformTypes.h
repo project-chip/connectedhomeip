@@ -61,12 +61,12 @@ enum class BleEventType : uint32_t
  */
 struct BleEvent
 {
-    BleEventType type = BleEventType::kUnknown;
-    BleConnectionHandle connection  = nullptr;
-    void * data                     = nullptr;
-    size_t dataLength               = 0;
+    BleEventType type              = BleEventType::kUnknown;
+    BleConnectionHandle connection = nullptr;
+    void * data                    = nullptr;
+    size_t dataLength              = 0;
     uint16_t attributeHandle       = 0;
-    uint32_t timerId                = 0;
+    uint32_t timerId               = 0;
 };
 
 /**
@@ -74,10 +74,10 @@ struct BleEvent
  */
 struct BleAdvertisingParams
 {
-    uint16_t minInterval  = 0;
-    uint16_t maxInterval  = 0;
-    bool connectable      = true;
-    uint8_t * customData  = nullptr;
+    uint16_t minInterval    = 0;
+    uint16_t maxInterval    = 0;
+    bool connectable        = true;
+    uint8_t * customData    = nullptr;
     size_t customDataLength = 0;
 };
 

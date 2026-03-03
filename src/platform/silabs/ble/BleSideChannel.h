@@ -54,14 +54,14 @@ public:
     virtual CHIP_ERROR ConfigureAdvertising(const BleSideChannelAdvConfig & config) = 0;
 
     // ----- GATT server (side channel) -----
-    virtual void HandleReadRequest(void * platformEvent, const uint8_t * data, size_t length)   = 0;
-    virtual void HandleWriteRequest(void * platformEvent, uint8_t * data, size_t length)       = 0;
-    virtual void HandleCCCDWriteRequest(void * platformEvent, bool & isNewSubscription)        = 0;
-    virtual void UpdateMtu(void * platformEvent)                                               = 0;
+    virtual void HandleReadRequest(void * platformEvent, const uint8_t * data, size_t length) = 0;
+    virtual void HandleWriteRequest(void * platformEvent, uint8_t * data, size_t length)      = 0;
+    virtual void HandleCCCDWriteRequest(void * platformEvent, bool & isNewSubscription)       = 0;
+    virtual void UpdateMtu(void * platformEvent)                                              = 0;
 
     // ----- Connection state (side channel) -----
-    virtual CHIP_ERROR AddConnection(BleConnectionHandle conId, uint16_t mtu)                  = 0;
-    virtual CHIP_ERROR RemoveConnection(BleConnectionHandle conId)                             = 0;
+    virtual CHIP_ERROR AddConnection(BleConnectionHandle conId, uint16_t mtu) = 0;
+    virtual CHIP_ERROR RemoveConnection(BleConnectionHandle conId)            = 0;
 };
 
 } // namespace Internal
