@@ -42,13 +42,15 @@ static_library("nxp_crypto_lib") {
     "${chip_root}/src/platform/nxp/crypto/se05x/PersistentStorageOperationalKeystore_se05x.cpp",
   ]
 
-  if (chip_device_platform == "linux" || nxp_platform == "rt/rw61x" ||
-      nxp_platform == "rt/rt1060") {
-    sources += [
-      "${chip_root}/src/crypto/CHIPCryptoPALmbedTLS.cpp",
-      "${chip_root}/src/crypto/CHIPCryptoPALmbedTLS.h",
-      "${chip_root}/src/crypto/CHIPCryptoPALmbedTLSCert.cpp",
-    ]
+  if (chip_crypto != "psa") {
+    if (chip_device_platform == "linux" || nxp_platform == "rt/rw61x" ||
+        nxp_platform == "rt/rt1060") {
+      sources += [
+        "${chip_root}/src/crypto/CHIPCryptoPALmbedTLS.cpp",
+        "${chip_root}/src/crypto/CHIPCryptoPALmbedTLS.h",
+        "${chip_root}/src/crypto/CHIPCryptoPALmbedTLSCert.cpp",
+      ]
+    }
   }
 
   if (chip_device_platform == "linux") {
