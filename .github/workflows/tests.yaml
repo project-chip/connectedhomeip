@@ -1011,6 +1011,7 @@ jobs:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
+            CHIP_IP_PACKET_CAPTURE: 1
 
         # Tests are I/O bound, so run on a smaller machine
         runs-on: namespace-profile-1x2
@@ -1226,3 +1227,9 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
+            - name: Uploading packet captures for debugging
+              uses: actions/upload-artifact@v6
+              if: ${{ failure() && !env.ACT }}
+              with:
+                  name: ip-packet-captures
+                  path: out/ip_packet_captures
