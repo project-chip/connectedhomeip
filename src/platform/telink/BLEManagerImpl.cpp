@@ -63,6 +63,13 @@ extern __attribute__((noinline)) int tlx_bt_blc_mac_init(uint8_t * bt_mac);
 #elif defined(CONFIG_BT_W91)
 extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac);
 #endif
+
+#if defined(CONFIG_PM) &&                                                                                                          \
+    (defined(CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION) || defined(CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
+#include <zephyr/sys/reboot.h>
+
+extern bool pm_has_deep_sleep_retention_occurred(void);
+#endif
 }
 
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
@@ -344,6 +351,17 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 #endif
 
     int err;
+
+#if defined(CONFIG_PM) &&                                                                                                          \
+    (defined(CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION) || defined(CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
+    if (pm_has_deep_sleep_retention_occurred())
+    {
+        ChipLogError(DeviceLayer,
+                     "BLE functionality in non-retention RAM corrupted after deep sleep retention."
+                     "Reboot system to start BLE advertising...");
+        sys_reboot(SYS_REBOOT_WARM);
+    }
+#endif
 
     if (!mBLERadioInitialized)
     {

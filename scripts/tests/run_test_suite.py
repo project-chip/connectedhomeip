@@ -172,7 +172,6 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     default='chip_tool_python',
     help='Run YAML tests using the specified runner.')
 @click.option(
-
     '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
@@ -368,7 +367,7 @@ class Terminable(Protocol):
 )
 @click.option(
     '--tool-path', multiple=True, metavar="<key>:<path>",
-    help='Set path for a tool (run in tool network namespace), use `--help-paths` to list known keys'
+    help='Set path for a controller (run in controller network namespace), use `--help-paths` to list known keys'
 )
 @click.option(
     '--discover-paths',
@@ -380,7 +379,7 @@ class Terminable(Protocol):
     '--help-paths',
     is_flag=True,
     default=False,
-    help="Print keys for known application and tool paths"
+    help="Print keys for known application and controller paths"
 )
 @click.option(
     '--pics-file',
@@ -518,7 +517,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
-                setup_app_link_up=not wifi_required,
+                app_link_up=not wifi_required,
                 add_ula=not thread_required,
                 # Change the app link name so the interface will be recognized as WiFi or Ethernet
                 # depending on the commissioning method used.

@@ -38,6 +38,7 @@ CHIP_ERROR HMAC_sha_SE05x::HMAC_SHA256(const uint8_t * key, size_t key_length, c
     uint32_t keyid         = kKeyId_hmac_sha256_keyid;
     sss_mac_t ctx_mac      = { 0 };
     sss_object_t keyObject = { 0 };
+    sss_status_t status    = kStatus_SSS_Fail;
 
     ChipLogDetail(Crypto, "HMAC_SHA256 : Using se05x for HMAC");
 
@@ -56,17 +57,17 @@ CHIP_ERROR HMAC_sha_SE05x::HMAC_SHA256(const uint8_t * key, size_t key_length, c
     VerifyOrReturnError(keyid != kKeyId_NotInitialized, CHIP_ERROR_HSM);
 
     VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(gex_sss_chip_ctx.ks.session != NULL, error = CHIP_ERROR_INTERNAL);
 
-    sss_status_t status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
-    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = sss_key_object_allocate_handle(&keyObject, keyid, kSSS_KeyPart_Default, kSSS_CipherType_HMAC, key_length,
                                             kKeyObject_Mode_Transient);
-    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, key, key_length, key_length * 8, NULL, 0);
-    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = sss_mac_context_init(&ctx_mac, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_HMAC_SHA256, kMode_SSS_Mac);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
@@ -109,7 +110,10 @@ exit:
     {
         sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &keyObject);
     }
-
+    if (se05x_close_session() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x::Error in se05x_close_session.");
+    }
     return error;
 }
 

@@ -40,7 +40,9 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     CHIP_ERROR err = CHIP_NO_ERROR;
     size_t read_bytes;
 
-    VerifyOrExit((key != NULL) && (value != NULL), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(key != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
+    /* Allow call with value == NULL && value_size == 0 to check key existence */
+    VerifyOrExit(!(value == NULL && value_size != 0), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogProgress(DeviceLayer, "KVS, get key id:: %s", key);
 

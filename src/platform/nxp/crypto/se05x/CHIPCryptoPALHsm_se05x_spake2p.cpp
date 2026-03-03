@@ -390,7 +390,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
     /* Using TP values.*/
     uint32_t tp_w0in_id_v = 0;
     uint32_t tp_Lin_id_v  = 0;
-    CHIP_ERROR err        = get_trust_provisioned_w0L_ids(SE05X_SPAKE_VERIFIER_TP_ITER_CNT, &tp_w0in_id_v, &tp_Lin_id_v);
+    CHIP_ERROR err        = get_trust_provisioned_w0L_ids(&tp_w0in_id_v, &tp_Lin_id_v);
     if (CHIP_NO_ERROR != err)
     {
         ChipLogProgress(Crypto, "SE05x: Error in getting W0 and L TP ids");
@@ -571,7 +571,10 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
     }
 
     Spake2p_Finish_HSM(&hsm_pake_context);
-
+    if (se05x_close_session() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x::Error in se05x_close_session.");
+    }
     return error;
 }
 
