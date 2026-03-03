@@ -78,10 +78,6 @@ commands = cluster.Commands
 clientTypeEnum = cluster.Enums.ClientTypeEnum
 features = cluster.Bitmaps.Feature
 
-checkInNodeId = random.randint(1, 256)
-monitoredSubjectId = random.randint(1, 256)
-key = bytes.fromhex(os.urandom(16).hex())
-
 class TC_ICDB_1_1(MatterBaseTest):
 
     def desc_TC_ICDB_1_1(self) -> str:
@@ -161,9 +157,9 @@ class TC_ICDB_1_1(MatterBaseTest):
         self.step("2")
         try:
             cmd = commands.RegisterClient(
-                checkInNodeID=checkInNodeId,
-                monitoredSubject=monitoredSubjectId,
-                key=key,
+                checkInNodeID=self.default_controller.nodeId,
+                monitoredSubject=self.default_controller.nodeId,
+                key=bytes.fromhex(os.urandom(16).hex()),
                 clientType=clientTypeEnum.kPermanent)
             response = await self._send_single_icdm_command(cmd)
         # Verify DUT command response is successful (no exception)
