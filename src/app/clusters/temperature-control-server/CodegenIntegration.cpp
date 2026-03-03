@@ -44,7 +44,7 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         app::OptionalAttributeSet<TemperatureSetpoint::Id, MinTemperature::Id, MaxTemperature::Id, Step::Id,
-                                  SelectedTemperatureLevel::Id>
+                                  SelectedTemperatureLevel::Id, SupportedTemperatureLevels::Id>
             optionalAttributeSet(optionalAttributeBits);
         BitFlags<Feature> features(featureMap);
         using namespace chip::Protocols::InteractionModel;
@@ -76,6 +76,8 @@ public:
         {
             VerifyOrDie(optionalAttributeSet.IsSet(SelectedTemperatureLevel::Id));
             VerifyOrDie(SelectedTemperatureLevel::Get(endpointId, &selectedTemperatureLevel) == Status::Success);
+
+            VerifyOrDie(optionalAttributeSet.IsSet(SupportedTemperatureLevels::Id));
         }
 
         gServers[clusterInstanceIndex].Create(
