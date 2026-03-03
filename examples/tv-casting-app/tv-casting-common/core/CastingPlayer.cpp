@@ -342,15 +342,30 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
 {
     ChipLogProgress(AppServer, "CastingPlayer::StopConnecting() called, while ChipDeviceEventHandler.sUdcInProgress: %s",
                     support::ChipDeviceEventHandler::isUdcInProgress() ? "true" : "false");
-    VerifyOrReturnValue(mConnectionState == CASTING_PLAYER_CONNECTING, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(AppServer, "CastingPlayer::StopConnecting() called while not in connecting state"););
+    //VerifyOrReturnValue(mConnectionState == CASTING_PLAYER_CONNECTING, CHIP_ERROR_INCORRECT_STATE,
+    //                    ChipLogError(AppServer, "CastingPlayer::StopConnecting() called while not in connecting state"););
     CHIP_ERROR err = CHIP_NO_ERROR;
-    mIdOptions.resetState();
+    mTargetCastingPlayer = weak_from_this();
+    mIdOptions.LogDetail();
+
+    // hack to re-populate mUdcClients cache on TV in order to allow cancel to pass through
+    // mIdOptions.resetState();
+    mIdOptions.mCommissionerPasscode     = true;
+    mIdOptions.mNoPasscode = true;
+    mIdOptions.mCancelPasscode     = false;
+    mIdOptions.mCommissionerPasscodeReady = false;
+    err = SendUserDirectedCommissioningRequest();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingPlayer::StopConnecting() hack failed with %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    // mIdOptions.resetState();
     mIdOptions.mCancelPasscode     = true;
     mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
     mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
-    mTargetCastingPlayer.reset();
-    CastingPlayerDiscovery::GetInstance()->ClearCastingPlayersInternal();
+    // mTargetCastingPlayer.reset();
+    // CastingPlayerDiscovery::GetInstance()->ClearCastingPlayersInternal();
 
     if (!shouldSendIdentificationDeclarationMessage)
     {
@@ -712,6 +727,8 @@ void CastingPlayer::OnCommissioningSessionStarted()
 void CastingPlayer::OnCommissioningSessionEstablishmentError(CHIP_ERROR err)
 {
     ChipLogProgress(AppServer, "CastingPlayer::OnCommissioningSessionEstablishmentError() err: %" CHIP_ERROR_FORMAT, err.Format());
+    mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+    TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
     if (mOnCompleted != nullptr)
     {
         // err = 0x38 = CHIP_ERROR_INVALID_PASE_PARAMETER upon bad passcode
