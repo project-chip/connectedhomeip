@@ -131,10 +131,7 @@ public:
 
     std::optional<uint32_t> GetConfigurationVersion() const
     {
-        if (!mMutableData.configurationVersion.has_value())
-        {
-            return std::nullopt;
-        }
+        VerifyOrReturnValue(mMutableData.configurationVersion.has_value(), std::nullopt);
         return mMutableData.configurationVersion->version;
     }
 
