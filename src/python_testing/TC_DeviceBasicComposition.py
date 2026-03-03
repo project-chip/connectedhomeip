@@ -1179,8 +1179,8 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 tag_key = (mfg_code_key, int(tag_struct.namespaceID), int(tag_struct.tag))
                 if tag_key in no_duplicate_tag_keys:
                     self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
-                                      problem="duplicate Tags found in taglist struct", spec_location="TagList")
-                    self.fail_current_test("Duplicate tag found")
+                                      problem=f"duplicate Tag found in taglist struct: {tag_key}", spec_location="TagList")
+                    self.fail_current_test(f"Duplicate tag found: {tag_key}")
                 no_duplicate_tag_keys.add(tag_key)
                 self.print_step(5.2, "verifying namespaceID value falls under defined namespaces for endpoint: {endpoint_id}".format(
                     endpoint_id=endpoint_id))
