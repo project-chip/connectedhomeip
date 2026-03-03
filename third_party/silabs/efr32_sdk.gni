@@ -906,9 +906,9 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/bluetooth_le_host/src/sl_bt_stack_init.c",
         "${efr32_sdk_root}/bluetooth_le_host/src/sli_bt_advertiser_config.c",
         "${efr32_sdk_root}/bluetooth_le_host/src/sli_bt_connection_config.c",
+        "${efr32_sdk_root}/bluetooth_le_host/src/sli_bt_dynamic_gattdb_config.c",
         "${efr32_sdk_root}/bluetooth_le_host/src/sli_bt_hci_event_table.c",
         "${efr32_sdk_root}/bluetooth_le_host/src/sli_bt_host_adaptation.c",
-        "${efr32_sdk_root}/bluetooth_le_host/src/sli_bt_dynamic_gattdb_config.c",
       ]
     }
 
