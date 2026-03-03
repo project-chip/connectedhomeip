@@ -139,7 +139,7 @@ public:
     {
         VerifyOrReturnValue(mMutableData.deviceLocation.has_value(), std::nullopt);
         VerifyOrReturnValue(!mMutableData.deviceLocation->IsNull(),
-                            DataModel::Nullable<LocationDescriptorStructType>(DataModel::NullNullable));
+                            DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type>(DataModel::NullNullable));
 
         return DataModel::MakeNullable(mMutableData.deviceLocation->Value().ToView());
     }
