@@ -25,7 +25,7 @@
 #include "demo-ui-bitmaps.h"
 #include "dmd.h"
 #include <air-quality-sensor-manager.h>
-#if DISPLAY_ENABLED
+#if defined (DISPLAY_ENABLED) && DISPLAY_ENABLED
 #include "glib.h"
 #include "lcd.h"
 #endif

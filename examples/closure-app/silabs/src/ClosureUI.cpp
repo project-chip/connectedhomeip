@@ -27,9 +27,9 @@
 #include "lcd.h"
 
 // Only needed for wifi NCP devices
-#if SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
+#if defined (SL_WIFI) && SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
 #include <platform/silabs/wifi/ncp/spi_multiplex.h>
-#endif // SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
+#endif // defined (SL_WIFI) && SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
 
 // Layout positions
 #define STATUS_ICON_LINE 0
