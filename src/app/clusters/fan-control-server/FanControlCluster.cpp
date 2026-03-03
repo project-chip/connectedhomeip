@@ -285,23 +285,7 @@ DataModel::ActionReturnStatus FanControlCluster::WriteAttribute(const DataModel:
         uint8_t rawSupport = mRockSupport.Raw();
         if ((rawValue & rawSupport) != rawValue)
             return Status::ConstraintError;
-        if (rawValue != 0)
-        {
-            uint8_t lowest = 0;
-            for (uint8_t mask = 0x01; mask != 0; mask <<= 1)
-            {
-                if ((rawValue & mask) && (rawSupport & mask))
-                {
-                    lowest = mask;
-                    break;
-                }
-            }
-            mRockSetting = BitMask<RockBitmap>(lowest);
-        }
-        else
-        {
-            mRockSetting = value;
-        }
+        mRockSetting = value;
         return NotifyAttributeChangedIfSuccess(RockSetting::Id, Status::Success);
     }
     case WindSetting::Id: {
@@ -313,23 +297,7 @@ DataModel::ActionReturnStatus FanControlCluster::WriteAttribute(const DataModel:
         uint8_t rawSupport = mWindSupport.Raw();
         if ((rawValue & rawSupport) != rawValue)
             return Status::ConstraintError;
-        if (rawValue != 0)
-        {
-            uint8_t lowest = 0;
-            for (uint8_t mask = 0x01; mask != 0; mask <<= 1)
-            {
-                if ((rawValue & mask) && (rawSupport & mask))
-                {
-                    lowest = mask;
-                    break;
-                }
-            }
-            mWindSetting = BitMask<WindBitmap>(lowest);
-        }
-        else
-        {
-            mWindSetting = value;
-        }
+        mWindSetting = value;
         return NotifyAttributeChangedIfSuccess(WindSetting::Id, Status::Success);
     }
     case AirflowDirection::Id: {
