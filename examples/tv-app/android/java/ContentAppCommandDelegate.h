@@ -77,6 +77,7 @@ public:
     NavigateTargetResponseType FormatNavigateTargetResponse(Json::Value value, Status & status);
     PlaybackResponseType FormatMediaPlaybackResponse(Json::Value value, Status & status);
     Status FormatStatusResponse(Json::Value value);
+    chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type FormatSendKeyResponse(Json::Value value, Status & status);
 
 private:
     void InitializeJNIObjects(jobject manager)
