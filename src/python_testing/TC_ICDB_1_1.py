@@ -117,6 +117,27 @@ class TC_ICDB_1_1(MatterBaseTest):
     async def _send_single_icdm_command(self, command):
         return await self.send_single_cmd(command, endpoint=kRootEndpointId)
 
+    async def unregister_all_clients(self, registeredClients=None):
+        """Unregisters all entries in the DUT's `RegisteredClients` attribute.
+
+        If `registeredClients` is provided, it is treated as the list of entries to
+        unregister; otherwise, the method reads `RegisteredClients` from the DUT.
+        """
+        if registeredClients is None:
+            registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
+
+        if not registeredClients:
+            log.info("RegisteredClients is empty.")
+            return
+
+        log.info("RegisteredClients is not empty; unregistering all clients...")
+        for client in registeredClients:
+            try:
+                log.info(f"Unregistering client: {client}...")
+                await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
+            except InteractionModelError as e:
+                asserts.assert_fail(f"Unexpected error returned when unregistering client: {e}")
+
     def pics_TC_ICDB_1_1(self) -> list[str]:
         return [
             "ICDB.S",
@@ -136,19 +157,8 @@ class TC_ICDB_1_1(MatterBaseTest):
         registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
 
         # Check if RegisteredClients is empty
-        if len(registeredClients) == 0:
-            # If empty, move on to the next step
-            log.info("RegisteredClients is empty.")
-        else:
-            # If not empty, unregister all clients
-            log.info("RegisteredClients is not empty, unregistering all clients...")
-            for client in registeredClients:
-                try:
-                    log.info(f"Unregistering client: {client}...")
-                    await self._send_single_icdm_command(
-                        commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
-                except InteractionModelError as e:
-                    asserts.assert_fail(f"Unexpected error returned when unregistering client: {e}")
+        # If empty, move on to the next step, if not empty, unregister all clients
+        await self.unregister_all_clients(registeredClients)
 
         # *** STEP 1b ***
         # TH reads from the DUT the IdleModeDuration and ActiveModeDuration attributes
@@ -227,7 +237,7 @@ class TC_ICDB_1_1(MatterBaseTest):
         # TH sends command UnregisterClient to the DUT
         # All clients in RegisteredClients are cleared, if any
         self.step("7")
-        await self._unregister_all_clients()
+        await self.unregister_all_clients()
 
 
 if __name__ == "__main__":
