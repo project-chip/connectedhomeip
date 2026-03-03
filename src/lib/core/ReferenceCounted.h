@@ -25,6 +25,8 @@
 
 #include <atomic>
 #include <limits>
+#include <type_traits>
+
 #include <stdlib.h>
 
 #include <lib/support/CHIPMem.h>
@@ -49,6 +51,25 @@ public:
 template <typename T>
 class ReferenceCountedPtr;
 
+template <typename DesiredCounterType>
+struct FinalCounterType
+{
+    using Type = DesiredCounterType;
+};
+
+#ifdef __riscv_atomic // some riscv toolchain doesn't support atomic less than 32-bit.
+template <>
+struct FinalCounterType<uint8_t>
+{
+    using Type = uint32_t;
+};
+template <>
+struct FinalCounterType<uint16_t>
+{
+    using Type = uint32_t;
+};
+#endif
+
 /**
  * Like ReferenceCounted but with protected visibility of reference count management.
  * Use ReferenceCountedPtr<T> to automatically increment/decrement the ref count.
@@ -57,13 +78,20 @@ class ReferenceCountedPtr;
  * The reason for this is that the expectation is that the owner of this object will
  * immediately wrap it in a `ReferenceCountedPtr` before exposing it to callers, which
  * will increment the count to 1.
+ *
+ * NOTE:  CounterType may differ from DesiredCounterType on some platforms (e.g. RISC-V),
+ * due to FinalCounterType specializations that widen small unsigned types to 32-bit
+ * to satisfy atomic operation requirements.
  */
-template <class Subclass, class Deletor, int kInitRefCount = 0, typename CounterType = uint32_t>
+template <class Subclass, class Deletor, int kInitRefCount = 0, typename DesiredCounterType = uint32_t>
 class ReferenceCountedProtected
 {
+    static_assert(std::is_unsigned<DesiredCounterType>::value, "CounterType should be unsigned");
+    using CounterType = typename FinalCounterType<DesiredCounterType>::Type;
+
 public:
     /** Get the current reference counter value */
-    CounterType GetReferenceCount() const { return mRefCount; }
+    CounterType GetReferenceCount() const { return mRefCount.load(std::memory_order_acquire); }
 
 protected:
     friend class ReferenceCountedPtr<Subclass>;
@@ -71,12 +99,13 @@ protected:
     /** Adds one to the usage count of this class */
     Subclass * Ref()
     {
+        CounterType oldRefCount = mRefCount.fetch_add(1, std::memory_order_relaxed);
+
         if constexpr (kInitRefCount)
         {
-            VerifyOrDie(mRefCount > 0);
+            VerifyOrDie(oldRefCount > 0);
         }
-        VerifyOrDie(mRefCount < std::numeric_limits<CounterType>::max());
-        ++mRefCount;
+        VerifyOrDie(oldRefCount < std::numeric_limits<CounterType>::max());
 
         return static_cast<Subclass *>(this);
     }
@@ -87,16 +116,18 @@ protected:
      */
     void Unref()
     {
-        VerifyOrDie(mRefCount != 0);
+        CounterType oldRefCount = mRefCount.fetch_sub(1, std::memory_order_acq_rel);
 
-        if (--mRefCount == 0)
+        VerifyOrDie(oldRefCount > 0);
+
+        if (oldRefCount == 1)
         {
             Deletor::Release(static_cast<Subclass *>(this));
         }
     }
 
 private:
-    CounterType mRefCount = kInitRefCount;
+    std::atomic<CounterType> mRefCount = kInitRefCount;
 };
 
 /**
