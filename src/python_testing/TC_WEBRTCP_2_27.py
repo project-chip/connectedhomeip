@@ -253,13 +253,11 @@ class TC_WebRTCP_2_27(MatterBaseTest, WEBRTCPTestBase):
                                  "StreamUsage should be a valid known StreamUsageEnum value")
 
         # Verify VideoStreams contains the allocated VideoStreamID
-        # asserts.assert_is_not_none(session.videoStreams, "VideoStreams should not be None")
         asserts.assert_true(len(session.videoStreams) > 0, "VideoStreams should not be empty")
         asserts.assert_true(videoStreamID in session.videoStreams,
                             f"VideoStreams should contain allocated VideoStreamID {videoStreamID}")
 
         # Verify AudioStreams contains the allocated AudioStreamID
-        # asserts.assert_is_not_none(session.audioStreams, "AudioStreams should not be None")
         asserts.assert_true(len(session.audioStreams) > 0, "AudioStreams should not be empty")
         asserts.assert_true(audioStreamID in session.audioStreams,
                             f"AudioStreams should contain allocated AudioStreamID {audioStreamID}")
