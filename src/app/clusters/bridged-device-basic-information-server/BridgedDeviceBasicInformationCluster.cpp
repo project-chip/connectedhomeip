@@ -46,14 +46,12 @@ namespace {
 //    - locationName: string (up to 128 bytes)
 //    - floorNumber: int16 (2 bytes)
 //    - areaType: enum (1 byte)
-// TLV Encoding Size Estimation:
-//   - Outer anonymous container: Tag (1) + Length (1) = 2 bytes
-//   - Structure container: Tag (2) + Length (1) = 3 bytes
-//   - locationName: Context Tag (2) + Length (2) + Value (128) = 132 bytes
-//   - floorNumber: Context Tag (2) + Value (2) = 4 bytes
-//   - areaType: Context Tag (2) + Value (1) = 3 bytes
-// Total estimated max size: 2 + 3 + 132 + 4 + 3 = 144 bytes.
-// Using 160 bytes to provide a small buffer.
+//
+// The TLV encoding size for this structure depends on tag and length
+// encoding details, which can vary. The constant below is a conservative
+// upper bound chosen to comfortably hold a LocationDescriptorStruct with a
+// locationName of up to 128 bytes plus associated metadata and TLV
+// overhead, with additional headroom for future changes.
 constexpr size_t kMaxLocationDescriptorTLVEncodingSize = 160;
 
 static constexpr uint32_t kMinKeepActiveTimeoutMs = 30 * 1000;
