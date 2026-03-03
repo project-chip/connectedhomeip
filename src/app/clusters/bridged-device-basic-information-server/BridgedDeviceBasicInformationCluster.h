@@ -140,15 +140,8 @@ public:
 
     std::optional<DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type>> GetDeviceLocation() const
     {
-        if (!mMutableData.deviceLocation.has_value())
-        {
-            return std::nullopt;
-        }
-
-        if (mMutableData.deviceLocation->IsNull())
-        {
-            return DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type>(DataModel::NullNullable);
-        }
+        VerifyOrReturnValue(mMutableData.deviceLocation.has_value(), std::nullopt);
+        VerifyOrReturnValue(!mMutableData.deviceLocation->IsNull(), DataModel::Nullable<LocationDescriptorStructType>(DataModel::NullNullable));
 
         return DataModel::MakeNullable(mMutableData.deviceLocation->Value().ToView());
     }
