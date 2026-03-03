@@ -72,7 +72,7 @@ CharSpan ToSpan(const std::optional<std::string> & s)
     return ToSpan(*s);
 }
 
-bool operator==(const LocationDescriptorStructType & a, const LocationDescriptorStructType & b)
+bool IsLocationEqual(const LocationDescriptorStructType & a, const LocationDescriptorStructType & b)
 {
     return a.locationName.data_equal(b.locationName) && (a.floorNumber == b.floorNumber) && (a.areaType == b.areaType);
 }
@@ -91,7 +91,7 @@ Globals::Structs::LocationDescriptorStruct::Type BridgedDeviceBasicInformationCl
 bool BridgedDeviceBasicInformationCluster::OwnedDeviceLocation::operator==(
     const Globals::Structs::LocationDescriptorStruct::Type & other) const
 {
-    return ToView() == other;
+    return IsLocationEqual(ToView(), other);
 }
 
 BridgedDeviceBasicInformationCluster::OwnedDeviceLocation &
@@ -219,7 +219,7 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetDeviceLoc
     {
         if (!location.IsNull())
         {
-            if (mMutableData.deviceLocation->Value().ToView() == location.Value())
+            if (IsLocationEqual(mMutableData.deviceLocation->Value().ToView(), location.Value()))
             {
                 return Status::Success; // No change
             }
