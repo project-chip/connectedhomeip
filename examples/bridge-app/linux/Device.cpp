@@ -89,24 +89,24 @@ Device::CreateBridgedDeviceInfo(chip::EndpointId endpointId,
     if (!mutableData.configurationVersion.has_value())
     {
         mutableData.configurationVersion.emplace(app::Clusters::BridgedDeviceBasicInformationCluster::Versioning{
-            .version = 1,
+            .version  = 1,
             .delegate = gEmberVersionUpdate,
         });
     }
     else
     {
-         // If it WAS set (e.g. by caller), we still need to ensure the delegate is set is valid.
-         // Since 'delegate' is a reference, we cannot rebind it. We must reconstruct the Versioning object.
-         mutableData.configurationVersion.emplace(app::Clusters::BridgedDeviceBasicInformationCluster::Versioning{
-            .version = mutableData.configurationVersion->version,
+        // If it WAS set (e.g. by caller), we still need to ensure the delegate is set is valid.
+        // Since 'delegate' is a reference, we cannot rebind it. We must reconstruct the Versioning object.
+        mutableData.configurationVersion.emplace(app::Clusters::BridgedDeviceBasicInformationCluster::Versioning{
+            .version  = mutableData.configurationVersion->version,
             .delegate = gEmberVersionUpdate,
-         });
+        });
     }
 
     mBridgedDevice.Create(endpointId, std::move(mutableData), std::move(fixedData),
                           app::Clusters::BridgedDeviceBasicInformationCluster::Context{
-                              .delegate                   = *this,
-                              .timerDelegate              = timerDelegate,
+                              .delegate      = *this,
+                              .timerDelegate = timerDelegate,
                           });
     return mBridgedDevice.Registration();
 }

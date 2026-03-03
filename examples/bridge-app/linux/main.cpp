@@ -294,11 +294,11 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                     LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(
                         dev->CreateBridgedDeviceInfo(gCurrentEndpointId,
                                                      {
-                                                         .reachable            = true,
-                                                         .nodeLabel            = dev->GetName(),
+                                                         .reachable = true,
+                                                         .nodeLabel = dev->GetName(),
                                                      },
                                                      {
-                                                         .uniqueId             = dev->GetUniqueId(),
+                                                         .uniqueId = dev->GetUniqueId(),
                                                      })));
 
                     return index;
