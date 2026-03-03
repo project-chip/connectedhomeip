@@ -19,6 +19,7 @@
 #include <DEMManufacturerDelegate.h>
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <EVSEManufacturerImpl.h>
+#include <ElectricalSensorManager.h>
 #include <EnergyEvseDelegateImpl.h>
 #include <EnergyEvseManager.h>
 #include <EnergyTimeUtils.h>
@@ -26,7 +27,6 @@
 #include <FakeReadings.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
-#include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #include <app/clusters/power-source-server/power-source-server.h>
 #include <app/server/Server.h>
@@ -467,178 +467,6 @@ CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpo
     // Note per API - we do not need to maintain the span after the SetEndpointList has been called
     // since it takes a copy (see power-source-server/CodegenIntegration.cpp)
     return PowerSourceServer::Instance().SetEndpointList(endpointId, endpointList);
-}
-
-/**
- * @brief   Allows a client application to send in power readings into the system
- *
- * @param[in]  aEndpointId       - Endpoint to send to EPM Cluster
- * @param[in]  aActivePower_mW   - ActivePower measured in milli-watts
- * @param[in]  aVoltage_mV       - Voltage measured in milli-volts
- * @param[in]  aActiveCurrent_mA - ActiveCurrent measured in milli-amps
- */
-CHIP_ERROR EVSEManufacturer::SendPowerReading(EndpointId aEndpointId, int64_t aActivePower_mW, int64_t aVoltage_mV,
-                                              int64_t aActiveCurrent_mA)
-{
-    EVSEManufacturer * mn = GetEvseManufacturer();
-    VerifyOrReturnError(mn != nullptr, CHIP_ERROR_UNINITIALIZED);
-
-    ElectricalPowerMeasurementDelegate * dg = mn->GetEPMDelegate();
-    VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
-
-    TEMPORARY_RETURN_IGNORED dg->SetActivePower(MakeNullable(aActivePower_mW));
-    TEMPORARY_RETURN_IGNORED dg->SetVoltage(MakeNullable(aVoltage_mV));
-    TEMPORARY_RETURN_IGNORED dg->SetActiveCurrent(MakeNullable(aActiveCurrent_mA));
-
-    return CHIP_NO_ERROR;
-}
-
-using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
-
-/**
- * @brief   Allows a client application to send cumulative energy readings into the system
- *
- *          This is a helper function to add timestamps to the readings
- *
- * @param[in]  aCumulativeEnergyImported -total energy imported in milli-watthours
- * @param[in]  aCumulativeEnergyExported -total energy exported in milli-watthours
- */
-CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
-                                                         int64_t aCumulativeEnergyExported)
-{
-    const MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
-    VerifyOrReturnError(data != nullptr, CHIP_ERROR_UNINITIALIZED);
-
-    EnergyMeasurementStruct::Type energyImported;
-    EnergyMeasurementStruct::Type energyExported;
-
-    /** IMPORT */
-    // Copy last endTimestamp into new startTimestamp if it exists
-    energyImported.startTimestamp.ClearValue();
-    energyImported.startSystime.ClearValue();
-    if (data->cumulativeImported.HasValue())
-    {
-        energyImported.startTimestamp = data->cumulativeImported.Value().endTimestamp;
-        energyImported.startSystime   = data->cumulativeImported.Value().endSystime;
-    }
-
-    energyImported.energy = aCumulativeEnergyImported;
-
-    /** EXPORT */
-    // Copy last endTimestamp into new startTimestamp if it exists
-    energyExported.startTimestamp.ClearValue();
-    energyExported.startSystime.ClearValue();
-    if (data->cumulativeExported.HasValue())
-    {
-        energyExported.startTimestamp = data->cumulativeExported.Value().endTimestamp;
-        energyExported.startSystime   = data->cumulativeExported.Value().endSystime;
-    }
-
-    energyExported.energy = aCumulativeEnergyExported;
-
-    // Get current timestamp
-    uint32_t currentTimestamp;
-    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(currentTimestamp);
-    if (err == CHIP_NO_ERROR)
-    {
-        // use EpochTS
-        energyImported.endTimestamp.SetValue(currentTimestamp);
-        energyExported.endTimestamp.SetValue(currentTimestamp);
-    }
-    else
-    {
-        ChipLogError(AppServer, "GetClock_MatterEpochS returned error getting timestamp %" CHIP_ERROR_FORMAT, err.Format());
-
-        // use systemTime as a fallback
-        System::Clock::Milliseconds64 system_time_ms =
-            std::chrono::duration_cast<System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
-        uint64_t nowMS = static_cast<uint64_t>(system_time_ms.count());
-
-        energyImported.endSystime.SetValue(nowMS);
-        energyExported.endSystime.SetValue(nowMS);
-    }
-
-    // call the SDK to update attributes and generate an event
-    if (!NotifyCumulativeEnergyMeasured(aEndpointId, MakeOptional(energyImported), MakeOptional(energyExported)))
-    {
-        ChipLogError(AppServer, "Failed to notify Cumulative Energy reading.");
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-/**
- * @brief   Allows a client application to send periodic energy readings into the system
- *
- *          This is a helper function to add timestamps to the readings
- *
- * @param[in]  aPeriodicEnergyImported - energy imported in milli-watthours in last period
- * @param[in]  aPeriodicEnergyExported - energy exported in milli-watthours in last period
- */
-CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, int64_t aPeriodicEnergyImported,
-                                                       int64_t aPeriodicEnergyExported)
-{
-    const MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
-    VerifyOrReturnError(data != nullptr, CHIP_ERROR_UNINITIALIZED);
-
-    EnergyMeasurementStruct::Type energyImported;
-    EnergyMeasurementStruct::Type energyExported;
-
-    /** IMPORT */
-    // Copy last endTimestamp into new startTimestamp if it exists
-    energyImported.startTimestamp.ClearValue();
-    energyImported.startSystime.ClearValue();
-    if (data->periodicImported.HasValue())
-    {
-        energyImported.startTimestamp = data->periodicImported.Value().endTimestamp;
-        energyImported.startSystime   = data->periodicImported.Value().endSystime;
-    }
-
-    energyImported.energy = aPeriodicEnergyImported;
-
-    /** EXPORT */
-    // Copy last endTimestamp into new startTimestamp if it exists
-    energyExported.startTimestamp.ClearValue();
-    energyExported.startSystime.ClearValue();
-    if (data->periodicExported.HasValue())
-    {
-        energyExported.startTimestamp = data->periodicExported.Value().endTimestamp;
-        energyExported.startSystime   = data->periodicExported.Value().endSystime;
-    }
-
-    energyExported.energy = aPeriodicEnergyExported;
-
-    // Get current timestamp
-    uint32_t currentTimestamp;
-    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(currentTimestamp);
-    if (err == CHIP_NO_ERROR)
-    {
-        // use EpochTS
-        energyImported.endTimestamp.SetValue(currentTimestamp);
-        energyExported.endTimestamp.SetValue(currentTimestamp);
-    }
-    else
-    {
-        ChipLogError(AppServer, "GetClock_MatterEpochS returned error getting timestamp");
-
-        // use systemTime as a fallback
-        System::Clock::Milliseconds64 system_time_ms =
-            std::chrono::duration_cast<System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
-        uint64_t nowMS = static_cast<uint64_t>(system_time_ms.count());
-
-        energyImported.endSystime.SetValue(nowMS);
-        energyExported.endSystime.SetValue(nowMS);
-    }
-
-    // call the SDK to update attributes and generate an event
-    if (!NotifyPeriodicEnergyMeasured(aEndpointId, MakeOptional(energyImported), MakeOptional(energyExported)))
-    {
-        ChipLogError(AppServer, "Failed to notify Cumulative Energy reading.");
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    return CHIP_NO_ERROR;
 }
 
 void EVSEManufacturer::UpdateEVFakeReadings(const Amperage_mA maximumChargeCurrent)

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,12 +21,14 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <app/EventLogging.h>
+#include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementDelegate.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <zap-generated/gen_config.h>
@@ -74,6 +76,20 @@ inline void UnregisterLegacyEEM(SingleLinkedListNode<ElectricalEnergyMeasurement
 
 // Default empty accuracy used at construction time; real values are set later via SetMeasurementAccuracy.
 const MeasurementAccuracyStruct::Type kDefaultAccuracy = {};
+
+// No-op delegate for legacy CodegenIntegration path (readings are pushed via snapshot methods)
+class NoOpEEMDelegate : public ElectricalEnergyMeasurement::Delegate
+{
+public:
+    DataModel::Nullable<int64_t> GetCumulativeEnergyImported() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetCumulativeEnergyExported() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetPeriodicEnergyImported() override { return DataModel::NullNullable; }
+    DataModel::Nullable<int64_t> GetPeriodicEnergyExported() override { return DataModel::NullNullable; }
+};
+
+NoOpEEMDelegate gNoOpDelegate;
+DefaultTimerDelegate gDefaultTimerDelegate;
+
 } // namespace
 
 namespace chip {
@@ -83,12 +99,17 @@ namespace ElectricalEnergyMeasurement {
 
 ElectricalEnergyMeasurementAttrAccess::ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature,
                                                                              BitMask<OptionalAttributes> aOptionalAttrs,
-                                                                             EndpointId endpointId) :
+                                                                             EndpointId endpointId, Delegate & delegate,
+                                                                             TimerDelegate & timerDelegate) :
     mCluster(ElectricalEnergyMeasurementCluster::Config{
-        .endpointId         = endpointId,
-        .featureFlags       = aFeature,
-        .optionalAttributes = aOptionalAttrs,
-        .accuracyStruct     = kDefaultAccuracy,
+        .endpointId   = endpointId,
+        .featureFlags = aFeature,
+        .optionalAttributes =
+            ElectricalEnergyMeasurementCluster::OptionalAttributesSet().Set<Attributes::CumulativeEnergyReset::Id>(
+                aOptionalAttrs.Has(OptionalAttributes::kOptionalAttributeCumulativeEnergyReset)),
+        .accuracyStruct = kDefaultAccuracy,
+        .delegate       = delegate,
+        .timerDelegate  = timerDelegate,
     })
 {
     mClusterListNode.mValue = &mCluster.Cluster();
