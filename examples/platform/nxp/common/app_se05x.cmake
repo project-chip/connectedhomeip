@@ -29,7 +29,9 @@ if(CONFIG_CHIP_SE05X)
     )
 
     target_sources(app PRIVATE
-        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_se05x/source/AppSe05x.cpp
+        ${CHIP_ROOT}/src/platform/nxp/crypto/se05x/mcu_kvs/NFCDataRetrievalInfo.cpp
+        ${CHIP_ROOT}/src/platform/nxp/crypto/se05x/kvs_utilities/CHIPCryptoPALHsm_se05x_readClusters.cpp
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_se05x/source/AppSe05xCustom.cpp
     )
 
 endif()
