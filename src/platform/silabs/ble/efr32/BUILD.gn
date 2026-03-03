@@ -17,9 +17,7 @@ import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 
 # Matter BLE channel implementation for EFR32 (skeleton; full impl in Phase 2).
 source_set("ble-efr32") {
-  sources = [
-    "${silabs_platform_dir}/ble/efr32/BleChannelMatterEfr32.cpp",
-  ]
+  sources = [ "${silabs_platform_dir}/ble/efr32/BleChannelMatterEfr32.cpp" ]
 
   public_deps = [
     "${chip_root}/src/platform:platform_base",

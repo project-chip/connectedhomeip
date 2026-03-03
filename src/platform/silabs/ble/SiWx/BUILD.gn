@@ -17,9 +17,7 @@ import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 
 # Matter BLE channel implementation for SiWx917 (skeleton; full impl in Phase 3).
 source_set("ble-siwx") {
-  sources = [
-    "${silabs_platform_dir}/ble/SiWx/BleChannelMatterSiWx.cpp",
-  ]
+  sources = [ "${silabs_platform_dir}/ble/SiWx/BleChannelMatterSiWx.cpp" ]
 
   public_deps = [
     "${chip_root}/src/platform:platform_base",

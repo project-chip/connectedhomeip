@@ -91,8 +91,8 @@ static_library("efr32") {
 
   deps = [
     "${chip_root}/src/app/common:ids",
-    "${sl_provision_root}:headers",
     "${silabs_platform_dir}/ble:ble",
+    "${sl_provision_root}:headers",
   ]
   if (sl_matter_enable_siwx_ble) {
     deps += [ "${silabs_platform_dir}/ble/SiWx:ble-siwx" ]
