@@ -1,5 +1,5 @@
-# Copyright (c) 2020-2022 Project CHIP Authors
-# Copyright 2023 NXP
+# Copyright (c) 2020-2022, 2026 Project CHIP Authors
+# Copyright 2023, 2026 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ config("openthread_rw61x_config") {
       "OT_APP_BR_LWIP_HOOKS_EN=1",
       "OPENTHREAD_CONFIG_DNS_UPSTREAM_QUERY_ENABLE=1",
       "OPENTHREAD_CONFIG_NAT64_TRANSLATOR_ENABLE=1",
-      "OPENTHREAD_CONFIG_NAT64_IDLE_TIMEOUT_SECONDS=60",
+      "OPENTHREAD_CONFIG_NAT64_IDLE_TIMEOUT_SECONDS=120",
       "OPENTHREAD_CONFIG_NAT64_PORT_TRANSLATION_ENABLE=1",
       "OPENTHREAD_CONFIG_NAT64_BORDER_ROUTING_ENABLE=1",
       "DISABLE_TCPIP_INIT=1",
@@ -114,6 +114,13 @@ source_set("libopenthread-rw61x") {
     "${openthread_nxp_root}/src/common/entropy.c",
     "${openthread_nxp_root}/src/common/logging.c",
     "${openthread_nxp_root}/src/rw/rw612/platform/reset.c",
+  ]
+
+  cflags = [
+# avoid defined but not used error like for static void otPlatLogImpl
+    "-Wno-unused-function",
+# avoid ot-nxp debug_cli.c error due to type format
+    "-Wno-error=format",
   ]
 
   if (chip_enable_wifi && chip_enable_thread) {
@@ -166,7 +173,6 @@ source_set("libopenthread-rw61x") {
   }
 
   defines = [
-    "OPENTHREAD_FTD=1",
     "OT_PLAT_UART_INSTANCE=3",
     "OT_NXP_INDEPENDENT_RST=1",  # Adding support for RCP independent reset
                                  # feature
@@ -184,5 +190,11 @@ source_set("libopenthread-rw61x") {
   }
 
   defines += [ "OT_PLAT_SPINEL_OVER_HDLC" ]
-  deps += [ "${openthread_root}:libopenthread-spinel-rcp" ]
+  deps += [ "${openthread_root}:libopenthread-radio-spinel" ]
+  if(chip_openthread_ftd){
+    public_configs += [ "${openthread_root}:openthread_ftd_config" ]
+  }
+  else{
+    public_configs += [ "${openthread_root}:openthread_mtd_config" ]
+  }
 }
