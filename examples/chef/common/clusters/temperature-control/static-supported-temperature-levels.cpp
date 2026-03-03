@@ -20,7 +20,7 @@
 
 #ifdef MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
 #include "static-supported-temperature-levels.h"
-#include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
+#include <app/clusters/temperature-control-server/CodegenIntegration.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 

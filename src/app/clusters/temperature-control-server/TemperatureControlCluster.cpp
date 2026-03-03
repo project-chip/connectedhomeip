@@ -88,7 +88,7 @@ DataModel::ActionReturnStatus TemperatureControlCluster::ReadAttribute(const Dat
         mDelegate->Reset(request.path.mEndpointId);
         return encoder.EncodeList([&](const auto & encod) -> CHIP_ERROR {
             constexpr uint8_t kMaxTemperatureLevelStringSize = 32;
-            char buffer[kMaxTemperatureLevelStringSize];
+            char buffer[kMaxTemperatureLevelStringSize]      = { 0 };
             MutableCharSpan item(buffer);
             while (mDelegate->Next(item) == CHIP_NO_ERROR)
             {

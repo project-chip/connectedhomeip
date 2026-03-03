@@ -86,7 +86,8 @@ public:
                                                              .minTemperature           = minTemperature,
                                                              .maxTemperature           = maxTemperature,
                                                              .step                     = step,
-                                                             .selectedTemperatureLevel = selectedTemperatureLevel });
+                                                             .selectedTemperatureLevel = selectedTemperatureLevel,
+                                                             .delegate                 = gDelegate });
         return gServers[clusterInstanceIndex].Registration();
     }
 

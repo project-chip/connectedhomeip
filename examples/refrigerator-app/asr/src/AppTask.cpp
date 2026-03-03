@@ -37,6 +37,7 @@
 #include "matter_shell.h"
 #endif
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/temperature-control-server/CodegenIntegration.h>
 #include <static-supported-temperature-levels.h>
 
 namespace {

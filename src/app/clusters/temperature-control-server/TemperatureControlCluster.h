@@ -70,7 +70,6 @@ protected:
     int16_t mMaxTemperature{};
     int16_t mStep{};
     uint8_t mSelectedTemperatureLevel{};
-    chip::app::DataModel::List<const chip::CharSpan> mSupportedTemperatureLevels;
 
 private:
     std::optional<DataModel::ActionReturnStatus>
