@@ -86,22 +86,12 @@ Device::CreateBridgedDeviceInfo(chip::EndpointId endpointId,
     // Ensure configuration version is set.
     // If we were passed a version in mutableData (e.g. from restore), keep it.
     // Otherwise default to 1 and use our delegate.
-    if (!mutableData.configurationVersion.has_value())
-    {
-        mutableData.configurationVersion.emplace(app::Clusters::BridgedDeviceBasicInformationCluster::Versioning{
-            .version  = 1,
-            .delegate = gEmberVersionUpdate,
-        });
-    }
-    else
-    {
-        // If it WAS set (e.g. by caller), we still need to ensure the delegate is set is valid.
-        // Since 'delegate' is a reference, we cannot rebind it. We must reconstruct the Versioning object.
-        mutableData.configurationVersion.emplace(app::Clusters::BridgedDeviceBasicInformationCluster::Versioning{
-            .version  = mutableData.configurationVersion->version,
-            .delegate = gEmberVersionUpdate,
-        });
-    }
+    uint32_t version = mutableData.configurationVersion.has_value() ? mutableData.configurationVersion->version : 1;
+
+mutableData.configurationVersion.emplace(app::Clusters::BridgedDeviceBasicInformationCluster::Versioning{
+    .version = version,
+    .delegate = gEmberVersionUpdate,
+});
 
     mBridgedDevice.Create(endpointId, std::move(mutableData), std::move(fixedData),
                           app::Clusters::BridgedDeviceBasicInformationCluster::Context{
