@@ -20,6 +20,9 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandResponseHelper.h>
+#include <clusters/FanControl/Enums.h>
+#include <lib/support/BitMask.h>
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -44,6 +47,28 @@ public:
      *   @return Other Value indicating it failed to execute the command.
      */
     virtual Protocols::InteractionModel::Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) = 0;
+
+    /**
+     * @brief Optional: Provide FanModeSequence. Return nullopt to use platform default (kOffLowHigh).
+     */
+    virtual std::optional<FanModeSequenceEnum> GetFanModeSequence() { return std::nullopt; }
+
+    /**
+     * @brief Optional: Provide SpeedMax when MultiSpeed feature is enabled. Return nullopt to use platform default (1).
+     */
+    virtual std::optional<uint8_t> GetSpeedMax() { return std::nullopt; }
+
+    /**
+     * @brief Optional: Provide RockSupport when Rocking feature is enabled. Return nullopt to use platform default
+     *        (all modes: RockLeftRight | RockUpDown | RockRound). Must not return BitMask(0) as that indicates no modes.
+     */
+    virtual std::optional<BitMask<RockBitmap>> GetRockSupport() { return std::nullopt; }
+
+    /**
+     * @brief Optional: Provide WindSupport when Wind feature is enabled. Return nullopt to use platform default
+     *        (all modes: SleepWind | NaturalWind). Must not return BitMask(0) as that indicates no modes.
+     */
+    virtual std::optional<BitMask<WindBitmap>> GetWindSupport() { return std::nullopt; }
 
     Delegate(EndpointId aEndpoint) : mEndpoint(aEndpoint) {}
 

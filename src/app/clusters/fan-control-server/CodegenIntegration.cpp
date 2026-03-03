@@ -60,14 +60,17 @@ public:
         if (delegate == nullptr)
             delegate = &gDefaultDelegate;
         FanControlCluster::Config config(endpointId, *delegate);
-        config.WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh);
+
+        config.WithFanModeSequence(delegate->GetFanModeSequence().value_or(FanModeSequenceEnum::kOffLowHigh));
 
         if (features.Has(FanControl::Feature::kMultiSpeed))
-            config.WithSpeedMax(1);
+            config.WithSpeedMax(delegate->GetSpeedMax().value_or(1));
         if (features.Has(FanControl::Feature::kRocking))
-            config.WithRockSupport(BitMask<RockBitmap>(0));
+            config.WithRockSupport(delegate->GetRockSupport().value_or(
+                BitMask<RockBitmap>(RockBitmap::kRockLeftRight, RockBitmap::kRockUpDown, RockBitmap::kRockRound)));
         if (features.Has(FanControl::Feature::kWind))
-            config.WithWindSupport(BitMask<WindBitmap>(0));
+            config.WithWindSupport(delegate->GetWindSupport().value_or(
+                BitMask<WindBitmap>(WindBitmap::kSleepWind, WindBitmap::kNaturalWind)));
         if (features.Has(FanControl::Feature::kAirflowDirection))
             config.WithAirflowDirection();
         if (features.Has(FanControl::Feature::kStep))
