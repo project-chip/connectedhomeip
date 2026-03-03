@@ -411,10 +411,10 @@ public:
 
     void Clear()
     {
-        mInUse         = false;
-        mFabricIndex   = chip::kUndefinedFabricIndex;
-        mAuthMode      = AuthMode::kPase;
-        mPrivilege     = Privilege::kView;
+        mInUse       = false;
+        mFabricIndex = chip::kUndefinedFabricIndex;
+        mAuthMode    = AuthMode::kPase;
+        mPrivilege   = Privilege::kView;
         for (auto & subject : mSubjects)
         {
             subject.Clear();
