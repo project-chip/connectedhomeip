@@ -127,7 +127,7 @@ namespace DeviceLayer {
     {
         mRunLoopSem = dispatch_semaphore_create(0);
 
-        _StartEventLoopTask();
+        TEMPORARY_RETURN_IGNORED _StartEventLoopTask();
 
         //
         // Block on the semaphore till we're signalled to stop by

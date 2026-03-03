@@ -39,13 +39,13 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:174
+            image: ghcr.io/project-chip/chip-build-telink:190
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -58,7 +58,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             # - name: Update Zephyr version 4.1.0 (develop) to specific revision (for developers purpose)
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 86fb5f1142c99e04abc923f4c0aa5fafb2ea9ace"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 1f4804a19fe7ba792bfc315948043d5515e74cd2"
 
             - name: Build tools required for Factory Data
               # Run test for master and all PRs
@@ -99,15 +99,15 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B92) All Clusters Minimal App
+            - name: Build example Telink (B92) All Clusters Minimal App with NFC onboarding payload
               # Run test for master and s07641069 PRs
               if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-all-clusters-minimal' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-all-clusters-minimal-nfc-payload' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9528a all-clusters-minimal-app \
-                    out/telink-tlsr9528a-all-clusters-minimal/zephyr/zephyr.elf \
+                    out/telink-tlsr9528a-all-clusters-minimal-nfc-payload/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -142,12 +142,19 @@ jobs:
 
             - name: Build example Telink (W91) Lighting App with OTA, Factory Data
               # Run test for master and all PRs
+              #
+              # TODO: full logging is not enabled here; logging is reduced to progress/error
+              #       (via the *-log-progress target) because with full logging this runs
+              #       out of flash. This is generally NOT expected/intentional.
+              #       At the time this was checked:
+              #         - a 4K flash increase occurred due to the group cast cluster
+              #         - flash runs out by about 1.2K
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-light-ota-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-light-ota-factory-data-log-progress' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9118bdk40d lighting-app-ota-factory-data \
-                    out/telink-tlsr9118bdk40d-light-ota-factory-data/zephyr/zephyr.elf \
+                    out/telink-tlsr9118bdk40d-light-ota-factory-data-log-progress/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -192,14 +199,14 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (tl721x) Lighting App with OTA, Shell, Factory Data
+            - name: Build example Telink (tl721x) Lighting App with OTA (LZMA), Shell, Factory Data
               # Run test for master and all PRs
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl7218x-light-ota-shell-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x-light-ota-compress-lzma-shell-factory-data' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl7218x light-app-ota-shell-factory-data \
-                    out/telink-tl7218x-light-ota-shell-factory-data/zephyr/zephyr.elf \
+                    telink tl7218x light-app-ota-compress-lzma-shell-factory-data \
+                    out/telink-tl7218x-light-ota-compress-lzma-shell-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -386,13 +393,13 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:174
+            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:190
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -405,7 +412,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             # - name: Update Zephyr version 3.3.0 (develop_3.3) to specific revision (for developers purpose)
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 0b56f3a0b56d720ba5b4c1108ccda4ccc19c1932"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py a5be7391771c64062e0cbd7fd6f7ef6e05d27a8b"
 
             - name: Build tools required for Factory Data
               # Run test for master and all PRs

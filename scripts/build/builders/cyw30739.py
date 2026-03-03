@@ -28,14 +28,13 @@ class Cyw30739App(Enum):
     def ExampleName(self):
         if self == Cyw30739App.LIGHT:
             return "lighting-app"
-        elif self == Cyw30739App.LIGHT_SWITCH:
+        if self == Cyw30739App.LIGHT_SWITCH:
             return "light-switch-app"
-        elif self == Cyw30739App.LOCK:
+        if self == Cyw30739App.LOCK:
             return "lock-app"
-        elif self == Cyw30739App.THERMOSTAT:
+        if self == Cyw30739App.THERMOSTAT:
             return "thermostat"
-        else:
-            raise Exception("Unknown app type: %r" % self)
+        raise Exception("Unknown app type: %r" % self)
 
     def AppNamePrefix(self):
         return self.ExampleName().replace("-", "_")
@@ -54,16 +53,15 @@ class Cyw30739Board(Enum):
     def GnArgName(self):
         if self == Cyw30739Board.CYW30739B2_P5_EVK_01:
             return "CYW30739B2-P5-EVK-01"
-        elif self == Cyw30739Board.CYW30739B2_P5_EVK_02:
+        if self == Cyw30739Board.CYW30739B2_P5_EVK_02:
             return "CYW30739B2-P5-EVK-02"
-        elif self == Cyw30739Board.CYW30739B2_P5_EVK_03:
+        if self == Cyw30739Board.CYW30739B2_P5_EVK_03:
             return "CYW30739B2-P5-EVK-03"
-        elif self == Cyw30739Board.CYW930739M2EVB_01:
+        if self == Cyw30739Board.CYW930739M2EVB_01:
             return "CYW930739M2EVB-01"
-        elif self == Cyw30739Board.CYW930739M2EVB_02:
+        if self == Cyw30739Board.CYW930739M2EVB_02:
             return "CYW930739M2EVB-02"
-        else:
-            raise Exception("Unknown board #: %r" % self)
+        raise Exception("Unknown board #: %r" % self)
 
 
 class Cyw30739Builder(GnBuilder):

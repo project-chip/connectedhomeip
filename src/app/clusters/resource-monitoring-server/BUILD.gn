@@ -11,5 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("resource-monitoring-server") {
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("resource-monitoring-server") {
+  sources = [
+    "ResourceMonitoringCluster.cpp",
+    "ResourceMonitoringCluster.h",
+    "ResourceMonitoringDelegate.h",
+    "resource-monitoring-cluster-objects.cpp",
+    "resource-monitoring-cluster-objects.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/ActivatedCarbonFilterMonitoring",
+    "${chip_root}/zzz_generated/app-common/clusters/HepaFilterMonitoring",
+  ]
 }

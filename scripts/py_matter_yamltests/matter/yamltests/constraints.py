@@ -183,43 +183,42 @@ class BaseConstraint(ABC):
     def _raise_error(self, reason):
         if isinstance(self, _ConstraintType):
             raise ConstraintTypeError(self._context, reason)
-        elif isinstance(self, _ConstraintContains):
+        if isinstance(self, _ConstraintContains):
             raise ConstraintContainsError(self._context, reason)
-        elif isinstance(self, _ConstraintExcludes):
+        if isinstance(self, _ConstraintExcludes):
             raise ConstraintExcludesError(self._context, reason)
-        elif isinstance(self, _ConstraintHasMaskClear):
+        if isinstance(self, _ConstraintHasMaskClear):
             raise ConstraintHasMaskClearError(self._context, reason)
-        elif isinstance(self, _ConstraintHasMaskSet):
+        if isinstance(self, _ConstraintHasMaskSet):
             raise ConstraintHasMaskSetError(self._context, reason)
-        elif isinstance(self, _ConstraintMinLength):
+        if isinstance(self, _ConstraintMinLength):
             raise ConstraintMinLengthError(self._context, reason)
-        elif isinstance(self, _ConstraintMaxLength):
+        if isinstance(self, _ConstraintMaxLength):
             raise ConstraintMaxLengthError(self._context, reason)
-        elif isinstance(self, _ConstraintIsHexString):
+        if isinstance(self, _ConstraintIsHexString):
             raise ConstraintIsHexStringError(self._context, reason)
-        elif isinstance(self, _ConstraintStartsWith):
+        if isinstance(self, _ConstraintStartsWith):
             raise ConstraintStartsWithError(self._context, reason)
-        elif isinstance(self, _ConstraintEndsWith):
+        if isinstance(self, _ConstraintEndsWith):
             raise ConstraintEndsWithError(self._context, reason)
-        elif isinstance(self, _ConstraintIsUpperCase):
+        if isinstance(self, _ConstraintIsUpperCase):
             raise ConstraintIsUpperCaseError(self._context, reason)
-        elif isinstance(self, _ConstraintIsLowerCase):
+        if isinstance(self, _ConstraintIsLowerCase):
             raise ConstraintIsLowerCaseError(self._context, reason)
-        elif isinstance(self, _ConstraintIsSetOfValues):
+        if isinstance(self, _ConstraintIsSetOfValues):
             raise ConstraintIsSetOfValuesError(self._context, reason)
-        elif isinstance(self, _ConstraintMinValue):
+        if isinstance(self, _ConstraintMinValue):
             raise ConstraintMinValueError(self._context, reason)
-        elif isinstance(self, _ConstraintMaxValue):
+        if isinstance(self, _ConstraintMaxValue):
             raise ConstraintMaxValueError(self._context, reason)
-        elif isinstance(self, _ConstraintNotValue):
+        if isinstance(self, _ConstraintNotValue):
             raise ConstraintNotValueError(self._context, reason)
-        elif isinstance(self, _ConstraintAnyOf):
+        if isinstance(self, _ConstraintAnyOf):
             raise ConstraintAnyOfError(self._context, reason)
-        elif isinstance(self, _ConstraintPython):
+        if isinstance(self, _ConstraintPython):
             raise ConstraintPythonError(self._context, reason)
-        else:
-            # This should not happens.
-            raise ConstraintParseError('Unknown constraint instance.')
+        # This should not happens.
+        raise ConstraintParseError('Unknown constraint instance.')
 
 
 class _ConstraintHasValue(BaseConstraint):
@@ -647,7 +646,7 @@ class _ConstraintIsUpperCase(BaseConstraint):
             chars = []
 
             for char in value:
-                if not char.upper() == char:
+                if char.upper() != char:
                     chars.append(char)
 
             if len(chars) == 1:
@@ -675,7 +674,7 @@ class _ConstraintIsLowerCase(BaseConstraint):
             chars = []
 
             for char in value:
-                if not char.lower() == char:
+                if char.lower() != char:
                     chars.append(char)
 
             if len(chars) == 1:
@@ -724,14 +723,13 @@ def _values_match(expected_value, received_value):
             if not _values_match(expected_item, received_item):
                 return False
         return True
-    elif isinstance(expected_value, dict):
+    if isinstance(expected_value, dict):
         for key, expected_item in expected_value.items():
             received_item = received_value.get(key)
             if not _values_match(expected_item, received_item):
                 return False
         return True
-    else:
-        return expected_value == received_value
+    return expected_value == received_value
 
 
 class _ConstraintContains(BaseConstraint):
@@ -929,60 +927,60 @@ def get_constraints(constraints: dict) -> List[BaseConstraint]:
     context = constraints
 
     for constraint, constraint_value in constraints.items():
-        if 'hasValue' == constraint:
+        if constraint == "hasValue":
             _constraints.append(_ConstraintHasValue(
                 context, constraint_value))
-        elif 'type' == constraint:
+        elif constraint == "type":
             _constraints.append(_ConstraintType(context, constraint_value))
-        elif 'minLength' == constraint:
+        elif constraint == "minLength":
             _constraints.append(_ConstraintMinLength(
                 context, constraint_value))
-        elif 'maxLength' == constraint:
+        elif constraint == "maxLength":
             _constraints.append(_ConstraintMaxLength(
                 context, constraint_value))
-        elif 'isHexString' == constraint:
+        elif constraint == "isHexString":
             _constraints.append(_ConstraintIsHexString(
                 context, constraint_value))
-        elif 'startsWith' == constraint:
+        elif constraint == "startsWith":
             _constraints.append(_ConstraintStartsWith(
                 context, constraint_value))
-        elif 'endsWith' == constraint:
+        elif constraint == "endsWith":
             _constraints.append(_ConstraintEndsWith(
                 context, constraint_value))
-        elif 'isUpperCase' == constraint:
+        elif constraint == "isUpperCase":
             _constraints.append(_ConstraintIsUpperCase(
                 context, constraint_value))
-        elif 'isLowerCase' == constraint:
+        elif constraint == "isLowerCase":
             _constraints.append(_ConstraintIsLowerCase(
                 context, constraint_value))
-        elif 'isSetOfValues' == constraint:
+        elif constraint == "isSetOfValues":
             _constraints.append(_ConstraintIsSetOfValues(
                 context, constraint_value))
-        elif 'minValue' == constraint:
+        elif constraint == "minValue":
             _constraints.append(_ConstraintMinValue(
                 context, constraint_value))
-        elif 'maxValue' == constraint:
+        elif constraint == "maxValue":
             _constraints.append(_ConstraintMaxValue(
                 context, constraint_value))
-        elif 'contains' == constraint:
+        elif constraint == "contains":
             _constraints.append(_ConstraintContains(
                 context, constraint_value))
-        elif 'excludes' == constraint:
+        elif constraint == "excludes":
             _constraints.append(_ConstraintExcludes(
                 context, constraint_value))
-        elif 'hasMasksSet' == constraint:
+        elif constraint == "hasMasksSet":
             _constraints.append(_ConstraintHasMaskSet(
                 context, constraint_value))
-        elif 'hasMasksClear' == constraint:
+        elif constraint == "hasMasksClear":
             _constraints.append(_ConstraintHasMaskClear(
                 context, constraint_value))
-        elif 'notValue' == constraint:
+        elif constraint == "notValue":
             _constraints.append(_ConstraintNotValue(
                 context, constraint_value))
-        elif 'anyOf' == constraint:
+        elif constraint == "anyOf":
             _constraints.append(_ConstraintAnyOf(
                 context, constraint_value))
-        elif 'python' == constraint:
+        elif constraint == "python":
             _constraints.append(_ConstraintPython(
                 context, constraint_value))
         else:

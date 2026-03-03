@@ -16,11 +16,12 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/soil-measurement-server/soil-measurement-cluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ClusterTester.h>
+#include <app/clusters/soil-measurement-server/SoilMeasurementCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/SoilMeasurement/Attributes.h>
 #include <clusters/SoilMeasurement/Metadata.h>
 
@@ -29,7 +30,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoilMeasurement;
 using namespace chip::app::Clusters::SoilMeasurement::Attributes;
-using namespace chip::Test;
+using namespace chip::Testing;
+using chip::Testing::IsAttributesListEqualTo;
 
 namespace {
 
@@ -69,11 +71,11 @@ struct TestSoilMeasurementCluster : public ::testing::Test
 
     void SetUp() override { ASSERT_EQ(soilMeasurement.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
-    void TearDown() override { soilMeasurement.Shutdown(); }
+    void TearDown() override { soilMeasurement.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
     TestSoilMeasurementCluster() : soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits) {}
 
-    chip::Test::TestServerClusterContext testContext;
+    TestServerClusterContext testContext;
     SoilMeasurementClusterLocal soilMeasurement;
 };
 
@@ -81,14 +83,11 @@ struct TestSoilMeasurementCluster : public ::testing::Test
 
 TEST_F(TestSoilMeasurementCluster, AttributeTest)
 {
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    ASSERT_EQ(soilMeasurement.Attributes(ConcreteClusterPath(kEndpointWithSoilMeasurement, SoilMeasurement::Id), attributes),
-              CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    ASSERT_EQ(listBuilder.Append(Span(SoilMeasurement::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
-    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+    ASSERT_TRUE(IsAttributesListEqualTo(soilMeasurement,
+                                        {
+                                            SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::kMetadataEntry,
+                                            SoilMeasurement::Attributes::SoilMoistureMeasuredValue::kMetadataEntry,
+                                        }));
 }
 
 TEST_F(TestSoilMeasurementCluster, ReadAttributeTest)

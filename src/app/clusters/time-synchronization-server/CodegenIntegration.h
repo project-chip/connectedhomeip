@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
+#include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 
 namespace chip::app::Clusters::TimeSynchronization {
 
@@ -27,5 +27,9 @@ TimeSynchronizationCluster * GetClusterInstance();
 // Delegate functions
 void SetDefaultDelegate(Delegate * delegate);
 Delegate * GetDefaultDelegate();
+
+// Force a specific time source value. Overrides ember setting.
+// MAY only be called before the cluster instance was created.
+void ForceTimeSource(std::optional<TimeSourceEnum> value);
 
 } // namespace chip::app::Clusters::TimeSynchronization

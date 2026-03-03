@@ -62,7 +62,7 @@ class Step:
         if output_msg is not None and input_cmd is not None:
             raise ValueError(
                 'Step cannot contain both `output_msg` and `input_cmd`. Either `output_msg` or `input_cmd` should be provided.')
-        elif output_msg is None and input_cmd is None:
+        if output_msg is None and input_cmd is None:
             raise ValueError('Step must contain either `output_msg` or `input_cmd`. Both are `None`.')
 
         # Define either `App.TV_APP` or `App.TV_CASTING_APP` on which we need to parse for `output_msg` or send `input_cmd`.

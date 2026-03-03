@@ -120,17 +120,15 @@ if (CONFIG_CHIP_APP_FACTORY_DATA)
             )
         endif()
     elseif (CONFIG_CHIP_APP_FACTORY_DATA_IMPL_COMMON)
-        if (CONFIG_CHIP_SE05X)
-            target_sources(app PRIVATE
-                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../se05x/rw61x_factory_data/AppFactoryDataDefaultImpl.cpp
-            )
-            target_include_directories(app PRIVATE
-                ${CHIP_ROOT}/examples)
-        else ()
-            target_sources(app PRIVATE
-                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataDefaultImpl.cpp
-            )
-        endif()
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataDefaultImpl.cpp
+        )
+    endif()
+
+    if (CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES OR CONFIG_CHIP_SE05X_DEVICE_ATTESTATION)
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../se05x/mcu/common/factory_data_impl/Se05xDataProvider.cpp
+        )
     endif()
 endif()
 
@@ -255,9 +253,10 @@ if (CONFIG_CHIP_APP_OTA_REQUESTOR)
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorZephyr.cpp
         )
-    elseif (CONFIG_CHIP_APP_OTA_REQUESTOR_INITIATOR_MULTI_IMAGE)
+    elseif (CONFIG_CHIP_APP_OTA_REQUESTOR_INITIATOR_EMPTY_SELF_TEST)
         target_sources(app PRIVATE
-            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorMultiImage.cpp
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorEmptySelfTest.cpp
         )
     endif()
     if (CONFIG_CHIP_APP_PLATFORM_OTA_UTILS)

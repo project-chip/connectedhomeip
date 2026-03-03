@@ -175,6 +175,7 @@ static_library("interaction-model") {
     "CASESessionManager.h",
     "CommandSender.cpp",
     "CommandSender.h",
+    "DeviceLoadStatusProvider.h",
     "DeviceProxy.cpp",
     "DeviceProxy.h",
     "InteractionModelDelegatePointers.cpp",
@@ -192,6 +193,7 @@ static_library("interaction-model") {
                      # fixing
     "ReadPrepareParams.h",
     "SubscriptionResumptionStorage.h",
+    "SubscriptionStats.h",
     "TimedHandler.cpp",
     "TimedHandler.h",
     "TimedRequest.cpp",
@@ -200,6 +202,7 @@ static_library("interaction-model") {
     "WriteClient.h",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
+    "reporting/Generations.h",
     "reporting/ReportScheduler.h",
     "reporting/ReportSchedulerImpl.cpp",
     "reporting/ReportSchedulerImpl.h",
@@ -236,6 +239,7 @@ static_library("interaction-model") {
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
+    "${chip_root}/src/transport",
   ]
 
   if (chip_enable_icd_server) {
@@ -358,9 +362,7 @@ source_set("required-privileges") {
   visibility = [
     # Test data models: mock models for testing
     # TODO: Some of these are questionable as they would not work as part of a monolith
-    #       (single app) test build: in particular the energy management bits seem wrong
     "${chip_root}/examples/common/server-cluster-shim:mock_data_model_with_shim",
-    "${chip_root}/examples/energy-management-app/energy-management-common",
     "${chip_root}/src/app/util/mock/*",
     "${chip_root}/src/data-model-providers/codegen/tests/*",
 

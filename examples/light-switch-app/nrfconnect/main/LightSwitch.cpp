@@ -62,7 +62,8 @@ void LightSwitch::InitiateActionSwitch(Action mAction)
             return;
         }
         data->IsGroup = BindingHandler::GetInstance().IsGroupBound();
-        DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler,
+                                                                         reinterpret_cast<intptr_t>(data));
     }
 }
 
@@ -83,31 +84,40 @@ void LightSwitch::DimmerChangeBrightness()
         }
         data->Value   = (uint8_t) sBrightness;
         data->IsGroup = BindingHandler::GetInstance().IsGroupBound();
-        DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler,
+                                                                         reinterpret_cast<intptr_t>(data));
     }
 }
 
 void LightSwitch::GenericSwitchInitialPress()
 {
-    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
         // Press moves Position from 0 (idle) to 1 (press)
         uint8_t newPosition = 1;
 
-        Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, newPosition);
-        // InitialPress event takes newPosition as event data
-        Clusters::SwitchServer::Instance().OnInitialPress(mLightGenericSwitchEndpointId, newPosition);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(mLightGenericSwitchEndpointId);
+        VerifyOrReturn(switchCluster != nullptr);
+
+        CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
+        VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+
+        RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(newPosition);
     });
 }
 
 void LightSwitch::GenericSwitchReleasePress()
 {
-    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
         // Release moves Position from 1 (press) to 0 (idle)
         uint8_t previousPosition = 1;
         uint8_t newPosition      = 0;
 
-        Clusters::Switch::Attributes::CurrentPosition::Set(mLightGenericSwitchEndpointId, newPosition);
-        // ShortRelease event takes previousPosition as event data
-        Clusters::SwitchServer::Instance().OnShortRelease(mLightGenericSwitchEndpointId, previousPosition);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(mLightGenericSwitchEndpointId);
+        VerifyOrReturn(switchCluster != nullptr);
+
+        CHIP_ERROR status = switchCluster->SetCurrentPosition(newPosition);
+        VerifyOrReturn(CHIP_NO_ERROR == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+
+        RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
     });
 }

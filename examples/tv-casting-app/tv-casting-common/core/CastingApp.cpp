@@ -23,12 +23,19 @@
 #include "support/CastingStore.h"
 #include "support/ChipDeviceEventHandler.h"
 
+#include <DeviceInfoProviderImpl.h>
+#include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
+namespace {
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+}
 namespace matter {
 namespace casting {
 namespace core {
@@ -111,10 +118,20 @@ CHIP_ERROR CastingApp::Start()
     ChipLogProgress(Discovery, "CastingApp::Start()");
     VerifyOrReturnError(mState == CASTING_APP_NOT_RUNNING, CHIP_ERROR_INCORRECT_STATE);
 
+    // DeviceInfoProvider is needed by localization configuration cluster, so we set it before Server::Init to set up the storage of
+    // DeviceInfoProvider properly.
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     // Start Matter server
     chip::ServerInitParams * serverInitParams = mAppParameters->GetServerInitParamsProvider()->Get();
     VerifyOrReturnError(serverInitParams != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(chip::Server::GetInstance().Init(*serverInitParams));
+
+    CHIP_ERROR initError = chip::Server::GetInstance().Init(*serverInitParams);
+    if (initError != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "CastingApp::Start() Server::Init failed: %s", initError.AsString());
+        return initError;
+    }
 
     // Perform post server startup registrations
     ReturnErrorOnFailure(PostStartRegistrations());
@@ -133,6 +150,7 @@ CHIP_ERROR CastingApp::Start()
         CastingPlayer::GetTargetCastingPlayer()->VerifyOrEstablishConnection(connectionCallbacks);
     }
 
+    ChipLogProgress(Discovery, "CastingApp::Start() completed");
     return CHIP_NO_ERROR;
 }
 
@@ -146,11 +164,11 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
     // &server.GetCommissioningWindowManager().SetAppDelegate(??);
 
     // Initialize binding handlers
-    chip::app::Clusters::Binding::Manager::GetInstance().Init(
+    TEMPORARY_RETURN_IGNORED chip::app::Clusters::Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
 
     // Set FabricDelegate
-    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(support::CastingStore::GetInstance());
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(support::CastingStore::GetInstance());
 
     // Register DeviceEvent Handler
     ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(ChipDeviceEventHandler::Handle, 0));
@@ -179,10 +197,21 @@ CHIP_ERROR CastingApp::Stop()
     chip::Server::GetInstance().GetUserDirectedCommissioningClient()->SetCommissionerDeclarationHandler(nullptr);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
-    // Shutdown the Matter server
+    // Shutdown the Matter server to clean up active sessions
     chip::Server::GetInstance().Shutdown();
 
+    // Shutdown the CodegenDataModelProvider to reset mContext
+    CHIP_ERROR providerShutdownErr = chip::app::CodegenDataModelProvider::Instance().Shutdown();
+    if (providerShutdownErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "CastingApp::Stop() CodegenDataModelProvider::Shutdown failed: %s", providerShutdownErr.AsString());
+    }
+
+    // Destroy EventManagement to reset its state
+    chip::app::EventManagement::DestroyEventManagement();
+
     mState = CASTING_APP_NOT_RUNNING; // CastingApp stopped successfully, set state to NOT_RUNNING
+    ChipLogProgress(Discovery, "CastingApp::Stop() completed");
 
     return CHIP_NO_ERROR;
 }
@@ -196,6 +225,7 @@ CHIP_ERROR CastingApp::ShutdownAllSubscriptions()
 
 CHIP_ERROR CastingApp::ClearCache()
 {
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
     return support::CastingStore::GetInstance()->DeleteAll();
 }
 

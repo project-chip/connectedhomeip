@@ -39,7 +39,8 @@ declare_args() {
 declare_args() {
   # Use BSD/POSIX socket API.
   chip_system_config_use_sockets =
-      current_os != "freertos" && !chip_system_config_use_network_framework
+      current_os != "freertos" && !chip_system_config_use_network_framework &&
+      !chip_system_config_use_openthread_inet_endpoints
 }
 
 declare_args() {
@@ -57,8 +58,9 @@ declare_args() {
   # Event loop type.
   if (current_os == "zephyr" && !chip_system_config_use_sockets) {
     chip_system_config_event_loop = "Zephyr"
-  } else if (chip_system_config_use_lwip ||
-             chip_system_config_use_openthread_inet_endpoints) {
+  } else if (current_os != "linux" &&
+             (chip_system_config_use_lwip ||
+              chip_system_config_use_openthread_inet_endpoints)) {
     chip_system_config_event_loop = "FreeRTOS"
   } else if (chip_system_config_use_dispatch) {
     chip_system_config_event_loop = "Dispatch"

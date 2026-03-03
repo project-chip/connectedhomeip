@@ -166,10 +166,7 @@ class _PendingDiscoveries:
         if item.expireTime <= now:
             return True
 
-        if (item.firstResultTime > 0) and (item.firstResultTime + _RESULT_WAIT_TIME_SEC <= now):
-            return True
-
-        return False
+        return bool(item.firstResultTime > 0 and item.firstResultTime + _RESULT_WAIT_TIME_SEC <= now)
 
     def ComputeNextEventTimeoutSeconds(self):
         """Compute how much a thread needs to sleep based on the active discoveries list."""

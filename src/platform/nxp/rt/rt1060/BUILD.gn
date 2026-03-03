@@ -148,7 +148,7 @@ static_library("nxp_platform") {
     }
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       # Temporary fix, to be revert once PR #34662 is merged, build issue when using GN check argument
       "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
@@ -208,5 +208,12 @@ static_library("nxp_platform") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:syscalls_stub",
   ]
+
+  if (nxp_crypto_impl == "se05x") {
+    deps += [
+      "${chip_root}/src/platform/nxp/crypto/${nxp_crypto_impl}:nxp_crypto_lib",
+    ]
+  }
+
   public_configs = [ ":nxp_platform_config" ]
 }

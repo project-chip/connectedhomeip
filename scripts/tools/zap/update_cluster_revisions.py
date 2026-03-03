@@ -24,6 +24,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+log = logging.getLogger(__name__)
+
 BASIC_INFORMATION_CLUSTER_ID = int("0x0039", 16)
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../../..'))
@@ -76,11 +78,11 @@ def runArgumentsParser():
     args = parser.parse_args()
 
     if args.cluster_id is None:
-        logging.error("Must have a cluster id")
+        log.error("Must have a cluster id")
         sys.exit(1)
 
     if args.new_revision is None:
-        logging.error("Must have a new cluster revision")
+        log.error("Must have a new cluster revision")
         sys.exit(1)
 
     args.cluster_id = int(args.cluster_id, 16)
@@ -96,7 +98,7 @@ def isClusterRevisionAttribute(attribute):
         return False
 
     if attribute['name'] != "ClusterRevision":
-        logging.error("Attribute has ClusterRevision id but wrong name")
+        log.error("Attribute has ClusterRevision id but wrong name")
         return False
 
     return True

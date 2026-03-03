@@ -38,12 +38,9 @@ from typing import Dict, Set
 import click
 import coloredlogs
 
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARNING,
-    'fatal': logging.FATAL,
-}
+log = logging.getLogger(__name__)
+
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 class OrphanChecker:
@@ -59,7 +56,7 @@ class OrphanChecker:
 
         Will read the entire content of the GN file in memory for future reference.
         """
-        logging.debug(f'Adding GN {gn!s} for {gn.parent!s}')
+        log.debug("Adding GN '%s' for '%s'", gn, gn.parent)
         self.gn_data[str(gn.parent)] += gn.read_text('utf-8')
 
     def AddKnownFailure(self, k: str):
@@ -94,15 +91,15 @@ class OrphanChecker:
             # Search for the full file name
             # e.g. `cluster-config.h` should not match `config.h`
             if re.search("(^|\\s|[/'\"])" + re.escape(file.name) + r"\W", data):
-                logging.debug("%s found in BUILD.gn for %s", file, p)
+                log.debug("'%s' found in BUILD.gn for '%s'", file, p)
                 return
 
         path = str(file.relative_to(top_dir))
         if not self._IsKnownFailure(path):
-            logging.error("UNKNOWN to gn: %s", path)
+            log.error("UNKNOWN to gn: '%s'", path)
             self.fatal_failures += 1
         else:
-            logging.warning("UNKNOWN to gn: %s (known error)", path)
+            log.warning("UNKNOWN to gn: '%s' (known error)", path)
 
         self.failures += 1
 
@@ -147,11 +144,11 @@ def main(log_level, gn_extra, extension, known_failure, skip_dir, dirs):
                         fmt='%(asctime)s %(levelname)-7s %(message)s')
 
     if not dirs:
-        logging.error("Please provide at least one directory to scan")
+        log.error("Please provide at least one directory to scan")
         sys.exit(1)
 
     if not extension:
-        logging.error("Need at least one extension")
+        log.error("Need at least one extension")
         sys.exit(1)
 
     checker = OrphanChecker()
@@ -180,13 +177,13 @@ def main(log_level, gn_extra, extension, known_failure, skip_dir, dirs):
                 checker.Check(directory, full_path)
 
     if checker.failures:
-        logging.warning("%d files not known to GN (%d fatal)", checker.failures, checker.fatal_failures)
+        log.warning("%d files not known to GN (%d fatal)", checker.failures, checker.fatal_failures)
 
     if checker.known_failures != checker.found_failures:
         not_failing = checker.known_failures - checker.found_failures
-        logging.warning("NOTE: %d failures are not found anymore:", len(not_failing))
+        log.warning("NOTE: %d failures are not found anymore:", len(not_failing))
         for name in not_failing:
-            logging.warning("   - %s", name)
+            log.warning("   - '%s'", name)
         # Assume this is fatal - remove some of the "known-failing" should be easy.
         # This forces scripts to always be correct and not accumulate bad input.
         sys.exit(1)

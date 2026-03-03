@@ -42,7 +42,67 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Groupcast {
-namespace Events {} // namespace Events
+namespace Events {
+namespace GroupcastTesting {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kSourceIpAddress      = 0,
+    kDestinationIpAddress = 1,
+    kGroupID              = 2,
+    kEndpointID           = 3,
+    kClusterID            = 4,
+    kElementID            = 5,
+    kAccessAllowed        = 6,
+    kGroupcastTestResult  = 7,
+    kFabricIndex          = 254,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::GroupcastTesting::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groupcast::Id; }
+    static constexpr bool kIsFabricScoped = true;
+
+    Optional<chip::ByteSpan> sourceIpAddress;
+    Optional<chip::ByteSpan> destinationIpAddress;
+    Optional<chip::GroupId> groupID;
+    Optional<chip::EndpointId> endpointID;
+    Optional<chip::ClusterId> clusterID;
+    Optional<uint32_t> elementID;
+    Optional<bool> accessAllowed;
+    GroupcastTestResultEnum groupcastTestResult = static_cast<GroupcastTestResultEnum>(0);
+    chip::FabricIndex fabricIndex               = static_cast<chip::FabricIndex>(0);
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::GroupcastTesting::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Groupcast::Id; }
+
+    Optional<chip::ByteSpan> sourceIpAddress;
+    Optional<chip::ByteSpan> destinationIpAddress;
+    Optional<chip::GroupId> groupID;
+    Optional<chip::EndpointId> endpointID;
+    Optional<chip::ClusterId> clusterID;
+    Optional<uint32_t> elementID;
+    Optional<bool> accessAllowed;
+    GroupcastTestResultEnum groupcastTestResult = static_cast<GroupcastTestResultEnum>(0);
+    chip::FabricIndex fabricIndex               = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace GroupcastTesting
+} // namespace Events
 } // namespace Groupcast
 } // namespace Clusters
 } // namespace app

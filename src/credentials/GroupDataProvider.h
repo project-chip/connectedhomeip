@@ -35,21 +35,37 @@ class GroupDataProvider
 public:
     using SecurityPolicy                                  = app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum;
     static constexpr KeysetId kIdentityProtectionKeySetId = 0;
+    static constexpr size_t kMaxListeners                 = 2;
 
     struct GroupInfo
     {
         static constexpr size_t kGroupNameMax = CHIP_CONFIG_MAX_GROUP_NAME_LENGTH;
+        enum class Flags : uint8_t
+        {
+            kHasAuxiliaryACL = 0b00000001,
+            kMcastAddrPolicy = 0b00000010,
+        };
+        static constexpr uint8_t kFlagsDefault = to_underlying(GroupInfo::Flags::kMcastAddrPolicy);
 
         // Identifies group within the scope of the given Fabric
         GroupId group_id = kUndefinedGroupId;
         // Lastest group name written for a given GroupId on any Endpoint via the Groups cluster
         char name[kGroupNameMax + 1] = { 0 };
+        uint8_t flags                = kFlagsDefault;
+        uint16_t count               = 0;
 
         GroupInfo() { SetName(nullptr); }
+        GroupInfo(const GroupInfo & other) { Copy(other); }
         GroupInfo(const char * groupName) { SetName(groupName); }
         GroupInfo(const CharSpan & groupName) { SetName(groupName); }
-        GroupInfo(GroupId id, const char * groupName) : group_id(id) { SetName(groupName); }
-        GroupInfo(GroupId id, const CharSpan & groupName) : group_id(id) { SetName(groupName); }
+        GroupInfo(GroupId id, const char * groupName, uint8_t groupFlags = kFlagsDefault) : group_id(id), flags(groupFlags)
+        {
+            SetName(groupName);
+        }
+        GroupInfo(GroupId id, const CharSpan & groupName, uint8_t groupFlags = kFlagsDefault) : group_id(id), flags(groupFlags)
+        {
+            SetName(groupName);
+        }
         void SetName(const char * groupName)
         {
             if (nullptr == groupName)
@@ -72,9 +88,26 @@ public:
                 Platform::CopyString(name, groupName);
             }
         }
+        void Copy(const GroupInfo & other)
+        {
+            if (this != &other)
+            {
+                group_id = other.group_id;
+                flags    = other.flags;
+                SetName(other.name);
+            }
+        }
+        bool HasAuxiliaryACL() const { return (flags & static_cast<uint8_t>(Flags::kHasAuxiliaryACL)); }
+        bool UsePerGroupAddress() const { return (flags & static_cast<uint8_t>(Flags::kMcastAddrPolicy)); }
+
         bool operator==(const GroupInfo & other) const
         {
             return (this->group_id == other.group_id) && !strncmp(this->name, other.name, kGroupNameMax);
+        }
+        GroupInfo & operator=(const GroupInfo & other)
+        {
+            Copy(other);
+            return *this;
         }
     };
 
@@ -185,6 +218,19 @@ public:
          *  @param[in] old_group  GroupInfo structure of the removed group.
          */
         virtual void OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group) = 0;
+        /**
+         *  Callback invoked when an existing group is modified.
+         *  The modifications may be any of the following:
+         *  - Endpoints List modified
+         *  - KeySetID modified
+         *  - Flags modified (kHasAuxiliaryACL or kMcastAddrPolicy)
+         *
+         * Note that this callback is not invoked when the group is added or removed.
+         * Those events are handled by the OnGroupAdded and OnGroupRemoved callbacks respectively.
+         *
+         *  @param[in] modified_group_id  ID of the modified group.
+         */
+        virtual void OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id){};
     };
 
     using GroupInfoIterator    = CommonIterator<GroupInfo>;
@@ -193,11 +239,15 @@ public:
     using KeySetIterator       = CommonIterator<KeySet>;
     using GroupSessionIterator = CommonIterator<GroupSession>;
 
-    GroupDataProvider(uint16_t maxGroupsPerFabric    = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC,
-                      uint16_t maxGroupKeysPerFabric = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC) :
-        mMaxGroupsPerFabric(maxGroupsPerFabric),
-        mMaxGroupKeysPerFabric(maxGroupKeysPerFabric)
+    GroupDataProvider(uint16_t maxGroupsPerFabric, uint16_t maxGroupKeysPerFabric) :
+        mMaxGroupsPerFabric(maxGroupsPerFabric), mMaxGroupKeysPerFabric(maxGroupKeysPerFabric)
     {}
+
+    enum class GroupCleanupPolicy
+    {
+        kDeleteGroupIfEmpty, // Default behavior for legacy Groups
+        kKeepGroupIfEmpty    // Required for Groupcast Sender feature
+    };
 
     virtual ~GroupDataProvider() = default;
 
@@ -234,8 +284,13 @@ public:
     // Endpoints
     virtual bool HasEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id)          = 0;
     virtual CHIP_ERROR AddEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id)    = 0;
+    virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id,
+                                      GroupCleanupPolicy cleanupPolicy)                                   = 0;
+    virtual CHIP_ERROR RemoveEndpointAllGroups(FabricIndex fabric_index, EndpointId endpoint_id,
+                                               GroupCleanupPolicy cleanupPolicy)                          = 0;
     virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) = 0;
     virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, EndpointId endpoint_id)                   = 0;
+    virtual CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id)                        = 0;
     // Iterators
     /**
      *  Creates an iterator that may be used to obtain the list of groups associated with the given fabric.
@@ -259,10 +314,12 @@ public:
     // Group-Key map
     //
 
-    virtual CHIP_ERROR SetGroupKeyAt(FabricIndex fabric_index, size_t index, const GroupKey & info) = 0;
-    virtual CHIP_ERROR GetGroupKeyAt(FabricIndex fabric_index, size_t index, GroupKey & info)       = 0;
-    virtual CHIP_ERROR RemoveGroupKeyAt(FabricIndex fabric_index, size_t index)                     = 0;
-    virtual CHIP_ERROR RemoveGroupKeys(FabricIndex fabric_index)                                    = 0;
+    virtual CHIP_ERROR SetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id)   = 0;
+    virtual CHIP_ERROR SetGroupKeyAt(FabricIndex fabric_index, size_t index, const GroupKey & info)  = 0;
+    virtual CHIP_ERROR GetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId & keyset_id) = 0;
+    virtual CHIP_ERROR GetGroupKeyAt(FabricIndex fabric_index, size_t index, GroupKey & info)        = 0;
+    virtual CHIP_ERROR RemoveGroupKeyAt(FabricIndex fabric_index, size_t index)                      = 0;
+    virtual CHIP_ERROR RemoveGroupKeys(FabricIndex fabric_index)                                     = 0;
 
     /**
      *  Creates an iterator that may be used to obtain the list of (group, keyset) pairs associated with the given fabric.
@@ -313,27 +370,67 @@ public:
     virtual Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex fabric_index, GroupId group_id) = 0;
 
     // Listener
-    void SetListener(GroupListener * listener) { mListener = listener; };
-    void RemoveListener() { mListener = nullptr; };
+    void SetListener(GroupListener * listener)
+    {
+        for (size_t i = 0; listener && (i < kMaxListeners); ++i)
+        {
+            if (nullptr == mListeners[i])
+            {
+                mListeners[i] = listener;
+                return;
+            }
+        }
+    }
+    void RemoveListener(GroupListener * listener)
+    {
+        for (size_t i = 0; listener && (i < kMaxListeners); ++i)
+        {
+            if (listener == mListeners[i])
+            {
+                mListeners[i] = nullptr;
+                return;
+            }
+        }
+    }
+
+    // Groupcast
+    virtual uint16_t getMaxMembershipCount() = 0;
+    virtual uint16_t getMaxMcastAddrCount()  = 0;
 
 protected:
     void GroupAdded(FabricIndex fabric_index, const GroupInfo & new_group)
     {
-        if (mListener)
+        for (auto * listener : mListeners)
         {
-            mListener->OnGroupAdded(fabric_index, new_group);
+            if (listener != nullptr)
+            {
+                listener->OnGroupAdded(fabric_index, new_group);
+            }
         }
     }
     void GroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group)
     {
-        if (mListener)
+        for (auto * listener : mListeners)
         {
-            mListener->OnGroupRemoved(fabric_index, old_group);
+            if (listener != nullptr)
+            {
+                listener->OnGroupRemoved(fabric_index, old_group);
+            }
+        }
+    }
+    void GroupModified(FabricIndex fabric_index, const GroupId & modified_group_id)
+    {
+        for (auto * listener : mListeners)
+        {
+            if (listener != nullptr)
+            {
+                listener->OnGroupModified(fabric_index, modified_group_id);
+            }
         }
     }
     const uint16_t mMaxGroupsPerFabric;
     const uint16_t mMaxGroupKeysPerFabric;
-    GroupListener * mListener = nullptr;
+    GroupListener * mListeners[kMaxListeners] = { nullptr };
 };
 
 /**

@@ -209,7 +209,7 @@ class CommissioningFlowBlocks:
         if Clusters.NetworkCommissioning.id not in clusters[commissioning.ROOT_ENDPOINT_ID][Clusters.Descriptor].serverList:
             self._logger.info(
                 f"Network commissioning cluster {commissioning.ROOT_ENDPOINT_ID} is not enabled on this device.")
-            return
+            return None
 
         network_commissioning_cluster_state = (await self._devCtrl.ReadAttribute(
             nodeId=node_id,
@@ -220,16 +220,17 @@ class CommissioningFlowBlocks:
                 if networks.connected:
                     self._logger.info(
                         f"Device already connected to {networks.networkID.hex()} skip network commissioning")
-                    return
+                    return None
 
         if parameter.commissionee_info.is_wifi_device:
             if network_commissioning_cluster_state.featureMap != commissioning.NetworkCommissioningFeatureMap.WIFI_NETWORK_FEATURE_MAP:
                 raise AssertionError("Device is expected to be a WiFi device")
             return await self.network_commissioning_wifi(parameter=parameter, node_id=node_id)
-        elif parameter.commissionee_info.is_thread_device:
+        if parameter.commissionee_info.is_thread_device:
             if network_commissioning_cluster_state.featureMap != commissioning.NetworkCommissioningFeatureMap.THREAD_NETWORK_FEATURE_MAP:
                 raise AssertionError("Device is expected to be a Thread device")
             return await self.network_commissioning_thread(parameter=parameter, node_id=node_id)
+        return None
 
     async def send_regulatory_config(self, parameter: commissioning.Parameters, node_id: int):
         self._logger.info("Sending Regulatory Config")

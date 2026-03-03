@@ -25,10 +25,9 @@ class RtkOsUsed(Enum):
     def OsEnv(self):
         if self == RtkOsUsed.ZEPHYR:
             return 'zephyr'
-        elif self == RtkOsUsed.FREERTOS:
+        if self == RtkOsUsed.FREERTOS:
             return 'freertos'
-        else:
-            raise Exception('Unknown OS type: %r' % self)
+        raise Exception('Unknown OS type: %r' % self)
 
 
 class RealtekBoard(Enum):
@@ -39,10 +38,9 @@ class RealtekBoard(Enum):
     def BoardName(self):
         if self == RealtekBoard.RTL8777G:
             return 'rtl8777g'
-        elif self == RealtekBoard.RTL87X2G:
+        if self == RealtekBoard.RTL87X2G:
             return 'rtl87x2g'
-        else:
-            raise Exception('Unknown board type: %r' % self)
+        raise Exception('Unknown board type: %r' % self)
 
 
 class RealtekApp(Enum):
@@ -58,58 +56,55 @@ class RealtekApp(Enum):
     def ExampleName(self):
         if self == RealtekApp.LIGHT:
             return 'lighting-app'
-        elif self == RealtekApp.LIGHT_SWITCH:
+        if self == RealtekApp.LIGHT_SWITCH:
             return 'light-switch-app'
-        elif self == RealtekApp.LOCK:
+        if self == RealtekApp.LOCK:
             return 'lock-app'
-        elif self == RealtekApp.WINDOW:
+        if self == RealtekApp.WINDOW:
             return 'window-app'
-        elif self == RealtekApp.ALL_CLUSTERS:
+        if self == RealtekApp.ALL_CLUSTERS:
             return 'all-clusters-app'
-        elif self == RealtekApp.OTA_REQUESTOR:
+        if self == RealtekApp.OTA_REQUESTOR:
             return 'ota-requestor-app'
-        elif self == RealtekApp.THERMOSTAT:
+        if self == RealtekApp.THERMOSTAT:
             return 'thermostat'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     @property
     def TargetName(self):
         if self == RealtekApp.LIGHT:
             return 'matter-cli-ftd'
-        elif self == RealtekApp.LIGHT_SWITCH:
+        if self == RealtekApp.LIGHT_SWITCH:
             return 'matter-cli-mtd'
-        elif self == RealtekApp.LOCK:
+        if self == RealtekApp.LOCK:
             return 'matter-cli-mtd'
-        elif self == RealtekApp.WINDOW:
+        if self == RealtekApp.WINDOW:
             return 'matter-cli-mtd'
-        elif self == RealtekApp.ALL_CLUSTERS:
+        if self == RealtekApp.ALL_CLUSTERS:
             return 'matter-cli-ftd'
-        elif self == RealtekApp.OTA_REQUESTOR:
+        if self == RealtekApp.OTA_REQUESTOR:
             return 'matter-cli-ftd'
-        elif self == RealtekApp.THERMOSTAT:
+        if self == RealtekApp.THERMOSTAT:
             return 'matter-cli-mtd'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     @property
     def AppNamePrefix(self):
         if self == RealtekApp.LIGHT:
             return 'chip-rtl8777g-lighting-app'
-        elif self == RealtekApp.LIGHT_SWITCH:
+        if self == RealtekApp.LIGHT_SWITCH:
             return 'chip-rtl8777g-light-switch-app'
-        elif self == RealtekApp.LOCK:
+        if self == RealtekApp.LOCK:
             return 'chip-rtl8777g-lock-app'
-        elif self == RealtekApp.WINDOW:
+        if self == RealtekApp.WINDOW:
             return 'chip-rtl8777g-window-app'
-        elif self == RealtekApp.ALL_CLUSTERS:
+        if self == RealtekApp.ALL_CLUSTERS:
             return 'chip-rtl8777g-all-clusters-app'
-        elif self == RealtekApp.OTA_REQUESTOR:
+        if self == RealtekApp.OTA_REQUESTOR:
             return 'chip-rtl8777g-ota-requestor-app'
-        elif self == RealtekApp.THERMOSTAT:
+        if self == RealtekApp.THERMOSTAT:
             return 'chip-rtl8777g-thermostat-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
 
 class RealtekBuilder(Builder):
@@ -128,7 +123,8 @@ class RealtekBuilder(Builder):
         self.enable_cli = enable_cli
         self.enable_rpc = enable_rpc
         self.enable_shell = enable_shell
-        self.ot_src_dir = os.path.join(os.getcwd(), 'third_party/openthread/ot-realtek')
+        self.ot_src_dir = os.path.join(self.root, 'third_party/openthread/ot-realtek')
+        self.rtk_matter_dir = os.path.join(self.ot_src_dir, 'third_party/Realtek/rtl87x2g_sdk/subsys/matter')
 
         if self.board == RealtekBoard.RTL87X2G:
             self.os_env = RtkOsUsed.ZEPHYR
@@ -140,7 +136,7 @@ class RealtekBuilder(Builder):
     def CmakeBuildFlags(self) -> str:
         flags = [
             "-DCMAKE_BUILD_TYPE=Release",
-            "-DCMAKE_TOOLCHAIN_FILE=src/bee4/arm-none-eabi.cmake",
+            f"-DCMAKE_TOOLCHAIN_FILE={self.ot_src_dir}/src/bee4/arm-none-eabi.cmake",
             "-DBUILD_TYPE=sdk",
             f"-DBUILD_TARGET={self.board.BoardName}",
             f"-DBUILD_BOARD_TARGET={self.board.BoardName}",
@@ -177,16 +173,15 @@ class RealtekBuilder(Builder):
         if self.os_env != RtkOsUsed.FREERTOS:
             # For freertos, app.ld needs to be precompiled with gcc
             return
-        else:
-            cmd = 'arm-none-eabi-gcc -D BUILD_BANK=0 -E -P -x c {ot_src_dir}/src/bee4/{board_name}/app.ld -o {ot_src_dir}/src/bee4/{board_name}/app.ld.gen'.format(
-                ot_src_dir=self.ot_src_dir,
-                board_name=self.board.BoardName)
-            self._Execute(['bash', '-c', cmd])
-            cmd = 'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {build_flags} {example_folder} -B{out_folder}'.format(
-                build_flags=self.CmakeBuildFlags(),
-                example_folder=self.ot_src_dir,
-                out_folder=self.output_dir)
-            self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
+        cmd = 'arm-none-eabi-gcc -D BUILD_BANK=0 -E -P -x c {ot_src_dir}/src/bee4/{board_name}/app.ld -o {ot_src_dir}/src/bee4/{board_name}/app.ld.gen'.format(
+            ot_src_dir=self.ot_src_dir,
+            board_name=self.board.BoardName)
+        self._Execute(['bash', '-c', cmd])
+        cmd = 'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {build_flags} {example_folder} -B{out_folder}'.format(
+            build_flags=self.CmakeBuildFlags(),
+            example_folder=self.rtk_matter_dir,
+            out_folder=self.output_dir)
+        self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
     def _build(self):
         if self.os_env == RtkOsUsed.FREERTOS:

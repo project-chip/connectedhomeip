@@ -142,7 +142,7 @@ void CancelRequest(Request & request)
     // If cancelled request was top-priority, restart the advertising.
     if (isTopPriority)
     {
-        RestartAdvertising();
+        TEMPORARY_RETURN_IGNORED RestartAdvertising();
     }
 }
 

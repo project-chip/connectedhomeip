@@ -20,6 +20,19 @@ source_set("windows") {
   sources = [ "window.h" ]
 }
 
+source_set("accessor_updaters") {
+  sources = [ "accessor_updaters.h" ]
+}
+
+source_set("weak_ember") {
+  sources = [ "weak_ember.cpp" ]
+
+  deps = [
+    "${chip_root}/src/app/clusters/boolean-state-server",
+    "${chip_root}/src/app/clusters/occupancy-sensor-server",
+  ]
+}
+
 static_library("connectivity") {
   sources = [
     "connectivity.cpp",
@@ -73,6 +86,54 @@ static_library("light") {
   public_configs = [ "${chip_root}/src:includes" ]
 }
 
+static_library("humidity_measurement") {
+  sources = [
+    "humidity_measurement.cpp",
+    "humidity_measurement.h",
+  ]
+
+  deps = [
+    ":accessor_updaters",
+    ":windows",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/third_party/imgui",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
+static_library("temperature_measurement") {
+  sources = [
+    "temperature_measurement.cpp",
+    "temperature_measurement.h",
+  ]
+
+  deps = [
+    ":accessor_updaters",
+    ":windows",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/third_party/imgui",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
+static_library("fan_control") {
+  sources = [
+    "fan_control.cpp",
+    "fan_control.h",
+  ]
+
+  deps = [
+    ":accessor_updaters",
+    ":windows",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/third_party/imgui",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
 static_library("boolean_state") {
   sources = [
     "boolean_state.cpp",
@@ -95,8 +156,9 @@ static_library("occupancy_sensing") {
   ]
 
   deps = [
+    ":weak_ember",
     ":windows",
-    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/clusters/occupancy-sensor-server",
     "${chip_root}/third_party/imgui",
   ]
 

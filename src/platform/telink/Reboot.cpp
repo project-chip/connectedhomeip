@@ -32,7 +32,7 @@ static constexpr char kRebootReason[] = "RebootReason";
 
 void Reboot(SoftwareRebootReason reason)
 {
-    KeyValueStoreMgr().Put(kRebootReason, &reason, sizeof(reason));
+    TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Put(kRebootReason, &reason, sizeof(reason));
 
     sys_reboot(SYS_REBOOT_WARM);
 }
@@ -45,7 +45,7 @@ SoftwareRebootReason GetSoftwareRebootReason()
 
     if (KeyValueStoreMgr().Get(kRebootReason, &reason, sizeof(reason)) == CHIP_NO_ERROR)
     {
-        KeyValueStoreMgr().Delete(kRebootReason);
+        TEMPORARY_RETURN_IGNORED KeyValueStoreMgr().Delete(kRebootReason);
     }
 
     return reason;

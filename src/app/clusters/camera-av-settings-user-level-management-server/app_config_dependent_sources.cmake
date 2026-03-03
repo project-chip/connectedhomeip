@@ -16,6 +16,15 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/camera-av-settings-user-level-management-server.cpp"
-    "${CLUSTER_DIR}/camera-av-settings-user-level-management-server.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/CameraAvSettingsUserLevelManagementCluster.cpp"
+    "${CLUSTER_DIR}/CameraAvSettingsUserLevelManagementCluster.h"
+    "${CLUSTER_DIR}/CameraAvSettingsUserLevelManagementLogic.cpp"
+    "${CLUSTER_DIR}/CameraAvSettingsUserLevelManagementLogic.h"   
 )

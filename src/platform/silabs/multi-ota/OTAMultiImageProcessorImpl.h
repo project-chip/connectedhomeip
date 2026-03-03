@@ -32,8 +32,11 @@
  */
 
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
-class OTAMultiImageProcessorImpl : public OTAImageProcessorInterface
+class OTAMultiImageProcessorImpl : public chip::OTAImageProcessorInterface
 {
 public:
     using ProviderLocation = chip::OTARequestorInterface::ProviderLocationType;
@@ -96,4 +99,7 @@ private:
     std::map<OTAProcessorTag, OTATlvProcessor *> mProcessorMap;
 };
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

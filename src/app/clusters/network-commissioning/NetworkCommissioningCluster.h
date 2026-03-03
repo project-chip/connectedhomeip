@@ -19,12 +19,14 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/FailSafeContext.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/NetworkCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
+#include <include/platform/DeviceControlServer.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -69,11 +71,19 @@ public:
     using WiFiDriver     = DeviceLayer::NetworkCommissioning::WiFiDriver;
     using EthernetDriver = DeviceLayer::NetworkCommissioning::EthernetDriver;
 
-    NetworkCommissioningCluster(EndpointId endpointId, WiFiDriver * driver, BreadCrumbTracker & tracker);
+    struct Context
+    {
+        BreadCrumbTracker & breadcrumbTracker;
+        FailSafeContext & failSafeContext;
+        DeviceLayer::PlatformManager & platformManager;
+        DeviceLayer::DeviceControlServer & deviceControlServer;
+    };
 
-    NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver, BreadCrumbTracker & tracker);
+    NetworkCommissioningCluster(EndpointId endpointId, WiFiDriver * driver, const Context & context);
 
-    NetworkCommissioningCluster(EndpointId endpointId, EthernetDriver * driver, BreadCrumbTracker & tracker);
+    NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver, const Context & context);
+
+    NetworkCommissioningCluster(EndpointId endpointId, EthernetDriver * driver, const Context & context);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -93,9 +103,6 @@ public:
     // Note: This can't be named `Shutdown` because the server cluster API already has a method
     // with that name, with different semantics.
     void Deinit();
-
-    // Sets the breadcrumb attribute in GeneralCommissioning cluster, no-op when breadcrumbValue is NullOptional.
-    void UpdateBreadcrumb(const Optional<uint64_t> & breadcrumbValue);
 
     // BaseDriver::NetworkStatusChangeCallback
     void OnNetworkingStatusChange(DeviceLayer::NetworkCommissioning::Status aCommissioningError, Optional<ByteSpan> aNetworkId,
@@ -188,8 +195,13 @@ public:
 
 private:
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
     void OnCommissioningComplete();
     void OnFailSafeTimerExpired();
+
+    // Sets the breadcrumb attribute in GeneralCommissioning cluster, no-op when breadcrumbValue is NullOptional.
+    void UpdateBreadcrumb(const Optional<uint64_t> & breadcrumbValue);
+
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     void SendNonConcurrentConnectNetworkResponse();
 #endif
@@ -228,7 +240,7 @@ private:
     uint8_t mLastNetworkIDLen = 0;
     Optional<uint64_t> mCurrentOperationBreadcrumb;
     bool mScanningWasDirected = false;
-    BreadCrumbTracker & mBreadcrumbTracker;
+    Context mClusterContext;
 
     void SetLastNetworkingStatusValue(NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo::Type networkingStatusValue);
     void SetLastConnectErrorValue(NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo::Type connectErrorValue);

@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2023-2024 Project CHIP Authors
+#   Copyright (c) 2023-2025 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -97,25 +97,33 @@ config NET_IPV6_MLD
     default n if PM
     default y
 
+config NET_IF_UNICAST_IPV6_ADDR_COUNT
+    default 6
+
 config NET_IF_MCAST_IPV6_ADDR_COUNT
     default 8 if PM
     default 15
 
+config NET_IF_IPV6_PREFIX_COUNT
+    default NET_IF_UNICAST_IPV6_ADDR_COUNT if CHIP_WIFI
+
 # Network buffers
 config NET_PKT_RX_COUNT
-    default 4 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 16 if SOC_RISCV_TELINK_W91
+    default 4 if PM || SOC_RISCV_TELINK_TL321X
     default 8
 
 config NET_PKT_TX_COUNT
-    default 4 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 16 if SOC_RISCV_TELINK_W91
+    default 4 if PM || SOC_RISCV_TELINK_TL321X
     default 8
 
 config NET_BUF_RX_COUNT
-    default 12 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 12 if (PM && !SOC_RISCV_TELINK_W91) || SOC_RISCV_TELINK_TL321X
     default 32
 
 config NET_BUF_TX_COUNT
-    default 12 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 12 if (PM && !SOC_RISCV_TELINK_W91) || SOC_RISCV_TELINK_TL321X
     default 32
 
 config GPIO
@@ -163,7 +171,7 @@ config BT_GATT_CACHING
 
 config BT_RX_STACK_SIZE
     default 1352 if BT_B9X || BT_TLX
-    default 896 if BT_W91
+    default 1024 if BT_W91
 
 config BT_HCI_TX_STACK_SIZE
     default 664 if BT_B9X || BT_TLX
@@ -244,6 +252,13 @@ config RISCV_MTVEC_VECTORED_MODE
 config CHIP_OTA_REQUESTOR
     default y
 
+if CHIP_OTA_REQUESTOR
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+    default 256
+
+endif # CHIP_OTA_REQUESTOR
+
 config MCUBOOT_SIGNATURE_KEY_FILE
     default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
     depends on BOOTLOADER_MCUBOOT
@@ -275,6 +290,10 @@ config NVS_LOOKUP_CACHE_SIZE
 # nvs_sector_size = flash_page_size * mult = 4KB * 1 = 4KB
 config SETTINGS_NVS_SECTOR_SIZE_MULT
     default 1
+
+# Enable extended discovery
+config CHIP_EXTENDED_DISCOVERY
+    default y
 
 # Enable OpenThread
 config NET_L2_OPENTHREAD
@@ -320,12 +339,16 @@ config IEEE802154_TLX_OPTIMIZATION
     help
       Improve RF performance in IEEE 802.15.4 communication on TLX SoCs.
 
+config IEEE802154_TLX_ACTIVE_STAGE_OPTIMIZATION
+    bool "Active Stage Optimization"
+    default n if BOARD_TL3218X_RETENTION
+
 config OPENTHREAD_THREAD_STACK_SIZE
     default 2400 if PM || SOC_RISCV_TELINK_TL321X
 
 config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
-    default 440 if PM
-    default 608
+    default 496 if PM && ZEPHYR_VERSION_3_3
+    default 640
 
 config OPENTHREAD_SLAAC
     default y
@@ -374,9 +397,8 @@ config NET_MAX_CONTEXTS
 config NET_CONFIG_INIT_TIMEOUT
     default 0
 
-
+# See config/common/cmake/Kconfig for full definition
 config CHIP_WIFI
-    bool "Enable Telink Wi-Fi support"
     default y if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
     select WIFI_W91
     select WIFI
@@ -405,39 +427,6 @@ config DEFAULT_WIFI_PASSWORD
     help
       The password for the default WiFi network.
       This option is for testing only and should be disabled in production releases.
-
-config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
-    int "Define the minimum connection recovery time interval in milliseconds"
-    depends on CHIP_WIFI
-    default 500
-    help
-      Specifies the minimum connection recovery interval (in milliseconds).
-
-config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
-    int "Define the maximum connection recovery time interval in milliseconds"
-    depends on CHIP_WIFI
-    default 3600000 # 1 hour
-    help
-      Specifies the maximum connection recovery interval (in milliseconds).
-
-config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
-    int "Define the maximum amount of connection recovery occurrences"
-    depends on CHIP_WIFI
-    default 0
-    help
-      Specifies the maximum number of connection recovery attempts.
-      If set to 0, no limitation is applied and attempts
-      to recover the connection are performed indefinitely.
-
-config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
-    int "Define the connection recovery jitter in milliseconds"
-    depends on CHIP_WIFI
-    default 2000
-    help
-      Specifies the maximum connection recovery jitter interval (in milliseconds).
-      Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
-      a random jitter interval is added to it to avoid periodicity. The random jitter is selected
-      within range [-JITTER; +JITTER].
 
 config NET_MGMT_EVENT_STACK_SIZE
     default 2048
@@ -508,10 +497,6 @@ config MBEDTLS_PSA_STATIC_KEY_SLOTS
 
 config MBEDTLS_PSA_CRYPTO_C
     bool "MBEDTLS_PSA_CRYPTO_C"
-    default n
-
-config CHIP_CRYPTO_PSA
-    bool "CHIP_CRYPTO_PSA"
     default n
 
 endif # !ZEPHYR_VERSION_3_3

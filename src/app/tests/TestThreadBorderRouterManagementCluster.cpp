@@ -57,7 +57,8 @@ public:
         size_t nameIndex = mUseInvalidBorderRouterName ? 1 : 0;
         if (borderRouterName.size() >= strlen(kTestName[nameIndex]))
         {
-            CopyCharSpanToMutableCharSpan(CharSpan(kTestName[nameIndex], strlen(kTestName[nameIndex])), borderRouterName);
+            TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(CharSpan(kTestName[nameIndex], strlen(kTestName[nameIndex])),
+                                                                   borderRouterName);
         }
     }
 
@@ -65,8 +66,7 @@ public:
     {
         if (borderAgentId.size() >= mTestBorderAgentIdLen)
         {
-            CopySpanToMutableSpan(ByteSpan(kTestBorderAgentId, mTestBorderAgentIdLen), borderAgentId);
-            return CHIP_NO_ERROR;
+            return CopySpanToMutableSpan(ByteSpan(kTestBorderAgentId, mTestBorderAgentIdLen), borderAgentId);
         }
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
@@ -79,13 +79,11 @@ public:
     {
         if (type == DatasetType::kActive && mStoredActiveDatasetLen)
         {
-            dataset.Init(ByteSpan(mStoredActiveDataset, mStoredActiveDatasetLen));
-            return CHIP_NO_ERROR;
+            return dataset.Init(ByteSpan(mStoredActiveDataset, mStoredActiveDatasetLen));
         }
         if (type == DatasetType::kPending && mPendingDatasetLen)
         {
-            dataset.Init(ByteSpan(mPendingDataset, mPendingDatasetLen));
-            return CHIP_NO_ERROR;
+            return dataset.Init(ByteSpan(mPendingDataset, mPendingDatasetLen));
         }
         return CHIP_IM_GLOBAL_STATUS(NotFound);
     }

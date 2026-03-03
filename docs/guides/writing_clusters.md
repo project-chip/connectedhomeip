@@ -85,6 +85,50 @@ cluster is a good example of this pattern.
         interactions. We recommend the term `Driver` to avoid confusion with the
         overloaded term `Delegate`.
 
+### Design Principles
+
+When designing and implementing a cluster, adhere to the following principles to
+ensure a high-quality and developer-friendly experience:
+
+#### Prioritize Easy Application Development
+
+Clusters should aim to do as much work as possible autonomously, reducing the
+burden on the application developer.
+
+-   **Handle Common Logic Internally:** Implement persistence (NVM), timers, and
+    complex state machines within the cluster itself. The application should
+    only be notified of significant events or changes it needs to act upon. _For
+    example, a state machine managing a multi-step process like a firmware
+    update, door lock/unlock sequence with retries, or a calibration procedure
+    should typically reside within the cluster, rather than requiring the
+    application to manage the intermediate steps and timeouts._
+-   **Provide Helper Abstractions:** If a cluster requires the application to
+    implement complex logic, consider providing helper classes or default
+    implementations that simplify the task.
+-   **Encapsulate Complexity:** Avoid deferring low-level details (like raw
+    storage keys or individual timer management) to the application.
+
+#### Delegate/Driver Pattern for Validation
+
+When an application needs to be involved in a cluster operation (especially
+writes or commands), use a delegate (or driver) interface that acts as a
+"pre-check."
+
+-   **Pre-Write Validation:** For writable attributes, provide a callback that
+    allows the application to accept or reject the new value _before_ it is
+    applied to the cluster's internal state or persisted.
+-   **Delegate Veto:** Callbacks must return a
+    `Protocols::InteractionModel::Status`. Returning any status other than
+    Success allows the application to reject the proposed change. The cluster
+    MUST honor this by failing the operation and propagating the delegate's
+    status code to the initiator.
+-   **Perform Cluster-Level Checks First:** The cluster remains responsible for
+    all spec-defined validations (e.g., range checks, constraint validations, or
+    state-based restrictions) before involving the application delegate.
+-   **Avoid Redundant Notifications:** Ensure that no-op operations (e.g.,
+    writing the same value that is already present) are handled early and do not
+    trigger delegate callbacks or change notifications.
+
 ### Choosing the Right Implementation Pattern
 
 When implementing a cluster, you have two primary architectural choices: a
@@ -205,6 +249,40 @@ available based on the enabled features and optional items.
 -   Ensure your unit tests cover different combinations of enabled features and
     optional attributes/commands.
 
+#### Attribute Accessors
+
+Your cluster implementation must provide public getter and setter APIs for each
+attribute to allow applications to interact with cluster state.
+
+-   **Getter Methods:** Provide a getter method for every attribute (e.g.,
+    `GetCurrentSensitivityLevel()`, `GetAlarmsActive()`). Applications need
+    these to read the current cluster state.
+
+    -   **Return by value (preferred):** Getters should return copies of data
+        whenever practical. This avoids lifetime and ownership concerns.
+
+    -   **Avoid returning pointers or references:** Returning pointers or
+        references to internal cluster data create lifetime risks—if the
+        underlying memory is deallocated while the caller still holds the
+        pointer, use-after-free bugs can occur. If you must return a pointer or
+        reference, clearly document that the returned value is only valid for
+        immediate use and must not be stored.
+
+-   **Setter Methods:** Provide methods to modify all non-fixed (mutable)
+    attributes in spec-compliant ways. For simple attributes, this may be a
+    straightforward setter (e.g., `SetCurrentSensitivityLevel()`). However, spec
+    compliance may require updating multiple attributes together atomically—in
+    such cases, provide a higher-level API that encapsulates the required
+    behavior rather than individual setters. When the application's driver state
+    changes, these methods can be used to update the cluster's state
+    accordingly. Setters are also responsible for triggering attribute change
+    notifications (see
+    [Attribute Change Notifications](#attribute-change-notifications)).
+
+-   **Example:** The
+    [Boolean State Configuration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h)
+    cluster demonstrates this pattern.
+
 #### Attribute Change Notifications
 
 For subscriptions to work correctly, you must notify the system whenever an
@@ -233,14 +311,31 @@ attribute's value changes.
     -   For the `NotifyAttributeChangedIfSuccess` ensure that WriteImpl is
         returning
         [ActionReturnStatus::FixedStatus::kWriteSuccessNoOp](https://github.com/project-chip/connectedhomeip/blob/master/src/app/data-model-provider/ActionReturnStatus.h)
-        when no notification should be sent (e.g. write was a `noop` because
-        existing value was already the same).
+        when no notification should be sent.
+
+        **Crucial:** No-op writes (where the value remains unchanged) MUST NOT
+        trigger:
+
+        -   Network attribute change notifications.
+        -   Application-level delegate/driver callbacks.
 
         Canonical example is:
 
         ```cpp
-        VerifyOrReturnValue(mValue != value, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+        VerifyOrReturnValue(mValue != newValue, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         ```
+
+-   **OnClusterAttributeChanged Pattern:** Each cluster should implement a
+    centralized helper method (e.g., `OnClusterAttributeChanged(AttributeId)`)
+    that combines both network and application notifications.
+    -   Call `NotifyAttributeChanged()` to notify network subscribers.
+    -   Call delegate callbacks to notify the application layer of the _actual_
+        change.
+    -   Invoke this method only when a value has truly changed.
+    -   **Example:** See
+        [Boolean State Configuration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h)
+        which declares `OnClusterAttributeChanged(AttributeId)` as a private
+        helper.
 
 #### Persistent Storage
 
@@ -338,9 +433,6 @@ implementation.
 6. **Update ZAP Configuration:** To prevent the Ember framework from allocating
    memory for your cluster's attributes (which are now managed by your
    `ClusterLogic`), you must:
-    - In `src/app/common/templates/config-data.yaml`, consider adding your
-      cluster to `CommandHandlerInterfaceOnlyClusters` if it does not need Ember
-      command dispatch.
     - In `src/app/zap-templates/zcl/zcl.json` and
       `zcl-with-test-extensions.json`, add all non-list attributes of your
       cluster to `attributeAccessInterfaceAttributes`. This marks them as

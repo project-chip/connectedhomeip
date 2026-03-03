@@ -227,7 +227,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     {
         initParams.appDelegate = sAppDelegate;
     }
-    chip::Server::GetInstance().Init(initParams);
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
 
     ESPOpenThreadInit();
 
@@ -238,7 +238,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 #endif
 
 #if CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
-    sWiFiNetworkCommissioningInstance.Init();
+    TEMPORARY_RETURN_IGNORED sWiFiNetworkCommissioningInstance.Init();
 #endif // CHIP_DEVICE_CONFIG_WIFI_NETWORK_DRIVER
 #if CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
     sEthernetNetworkCommissioningInstance.Init();

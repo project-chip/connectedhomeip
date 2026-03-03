@@ -44,7 +44,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_SEAR_1_5(MatterBaseTest):
@@ -61,7 +65,7 @@ class TC_SEAR_1_5(MatterBaseTest):
         self.print_step(step, "Read SupportedAreas attribute")
         supported_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SupportedAreas)
-        logging.info("SupportedAreas: %s" % supported_areas)
+        log.info("SupportedAreas: %s" % supported_areas)
 
         return [a.areaID for a in supported_areas]
 
@@ -69,7 +73,7 @@ class TC_SEAR_1_5(MatterBaseTest):
         self.print_step(step, "Read SelectedAreas attribute")
         selected_areas = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.SelectedAreas)
-        logging.info(f"SelectedAreas {selected_areas}")
+        log.info(f"SelectedAreas {selected_areas}")
 
         return selected_areas
 
@@ -77,7 +81,7 @@ class TC_SEAR_1_5(MatterBaseTest):
         self.print_step(step, "Read Progress attribute")
         progress = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.Progress)
-        logging.info(f"Progress {progress}")
+        log.info(f"Progress {progress}")
 
         return progress
 
@@ -85,7 +89,7 @@ class TC_SEAR_1_5(MatterBaseTest):
         self.print_step(step, "Read CurrentArea attribute")
         current_area = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.CurrentArea)
-        logging.info(f"CurrentArea {current_area}")
+        log.info(f"CurrentArea {current_area}")
 
         return current_area
 

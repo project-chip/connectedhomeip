@@ -19,7 +19,6 @@
 #include <app/MessageDef/ReportDataMessage.h>
 
 namespace chip {
-namespace app {
 namespace Testing {
 namespace {
 
@@ -56,10 +55,10 @@ CHIP_ERROR DecodeAttributeReportIBs(ByteSpan data, std::vector<DecodedAttributeD
     while (CHIP_NO_ERROR == (err = reportIBsReader.Next()))
     {
         TLV::TLVReader attributeReportReader = reportIBsReader;
-        AttributeReportIB::Parser attributeReportParser;
+        app::AttributeReportIB::Parser attributeReportParser;
         ReturnErrorOnFailure(attributeReportParser.Init(attributeReportReader));
 
-        AttributeDataIB::Parser dataParser;
+        app::AttributeDataIB::Parser dataParser;
         // NOTE: to also grab statuses, use GetAttributeStatus and check for CHIP_END_OF_TLV
         ReturnErrorOnFailure(attributeReportParser.GetAttributeData(&dataParser));
 
@@ -93,7 +92,7 @@ CHIP_ERROR DecodeAttributeReportIBs(ByteSpan data, std::vector<DecodedAttributeD
 
 } // namespace
 
-std::unique_ptr<AttributeValueEncoder> ReadOperation::StartEncoding(const EncodingParams & params)
+std::unique_ptr<app::AttributeValueEncoder> ReadOperation::StartEncoding(const EncodingParams & params)
 {
     VerifyOrDie((mState == State::kEncoding) || (mState == State::kInitializing));
     mState = State::kEncoding;
@@ -107,9 +106,9 @@ std::unique_ptr<AttributeValueEncoder> ReadOperation::StartEncoding(const Encodi
 
     // mRequest.subjectDescriptor is known non-null because it is set in the constructor
     // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    return std::make_unique<AttributeValueEncoder>(mAttributeReportIBsBuilder, *mRequest.subjectDescriptor, mRequest.path,
-                                                   params.GetDataVersion(), params.GetIsFabricFiltered(),
-                                                   params.GetAttributeEncodeState());
+    return std::make_unique<app::AttributeValueEncoder>(mAttributeReportIBsBuilder, *mRequest.subjectDescriptor, mRequest.path,
+                                                        params.GetDataVersion(), params.GetIsFabricFiltered(),
+                                                        params.GetAttributeEncodeState());
 }
 
 CHIP_ERROR ReadOperation::FinishEncoding()
@@ -119,13 +118,13 @@ CHIP_ERROR ReadOperation::FinishEncoding()
     return mEncodedIBs.FinishEncoding(mAttributeReportIBsBuilder);
 }
 
-CHIP_ERROR DecodedAttributeData::DecodeFrom(const AttributeDataIB::Parser & parser)
+CHIP_ERROR DecodedAttributeData::DecodeFrom(const app::AttributeDataIB::Parser & parser)
 {
     ReturnErrorOnFailure(parser.GetDataVersion(&dataVersion));
 
-    AttributePathIB::Parser pathParser;
+    app::AttributePathIB::Parser pathParser;
     ReturnErrorOnFailure(parser.GetPath(&pathParser));
-    ReturnErrorOnFailure(pathParser.GetConcreteAttributePath(attributePath, AttributePathIB::ValidateIdRanges::kNo));
+    ReturnErrorOnFailure(pathParser.GetConcreteAttributePath(attributePath, app::AttributePathIB::ValidateIdRanges::kNo));
     ReturnErrorOnFailure(parser.GetData(&dataReader));
 
     return CHIP_NO_ERROR;
@@ -135,7 +134,7 @@ CHIP_ERROR EncodedReportIBs::StartEncoding(app::AttributeReportIBs::Builder & bu
 {
     mEncodeWriter.Init(mTlvDataBuffer);
     ReturnErrorOnFailure(mEncodeWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, mOuterStructureType));
-    return builder.Init(&mEncodeWriter, to_underlying(ReportDataMessage::Tag::kAttributeReportIBs));
+    return builder.Init(&mEncodeWriter, to_underlying(app::ReportDataMessage::Tag::kAttributeReportIBs));
 }
 
 CHIP_ERROR EncodedReportIBs::FinishEncoding(app::AttributeReportIBs::Builder & builder)
@@ -154,5 +153,4 @@ CHIP_ERROR EncodedReportIBs::Decode(std::vector<DecodedAttributeData> & decoded_
 }
 
 } // namespace Testing
-} // namespace app
 } // namespace chip

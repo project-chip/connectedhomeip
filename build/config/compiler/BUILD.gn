@@ -325,15 +325,6 @@ config("strict_warnings") {
     ]
 
     configs += [ "$dir_pw_build:clang_thread_safety_warnings" ]
-
-    # TODO: can make this back fatal in once pigweed updates can be taken again.
-    #       See https://github.com/project-chip/connectedhomeip/pull/22079
-    #
-    # Currently `./scripts/build/build_examples.py --target linux-arm64-light-rpc-ipv6only-clang build`
-    # fails in third_party/pigweed/repo/pw_protobuf
-    if (current_cpu == "arm64" && current_os == "linux") {
-      cflags += [ "-Wno-error=shorten-64-to-32" ]
-    }
   }
 
   if (!is_asan && (current_os == "linux" || current_os == "android")) {
@@ -456,11 +447,15 @@ config("runtime_default") {
 config("sanitize_address") {
   defines = []
   cflags = [
-    "-fsanitize-coverage=inline-8bit-counters,trace-cmp",
-    "-fno-sanitize-coverage=pc-table",
     "-fsanitize=address",
     "-fno-omit-frame-pointer",
   ]
+  if (is_clang) {
+    cflags += [
+      "-fsanitize-coverage=inline-8bit-counters,trace-cmp",
+      "-fno-sanitize-coverage=pc-table",
+    ]
+  }
   ldflags = cflags
 
   if ((target_os == "mac" || target_os == "ios") && !is_clang) {
@@ -487,6 +482,7 @@ config("sanitize_undefined_behavior") {
     "-fvisibility=hidden",
     "-fsanitize=undefined",
     "-fsanitize=float-divide-by-zero",
+    "-fsanitize=integer-divide-by-zero",
   ]
   if (is_clang) {
     cflags += [

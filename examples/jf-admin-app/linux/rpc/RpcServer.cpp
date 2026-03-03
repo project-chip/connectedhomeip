@@ -36,7 +36,7 @@ MutableByteSpan icacCSRSpan{ icacCSRBuf };
         request.node_id, request.jcm, ByteSpan(request.trustedIcacPublicKeyB.bytes, request.trustedIcacPublicKeyB.size),
         request.peerAdminJFAdminClusterEndpointId);
     VerifyOrReturnValue(data, pw::Status::Internal());
-    DeviceLayer::PlatformMgr().ScheduleWork(FinalizeCommissioningWork, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(FinalizeCommissioningWork, reinterpret_cast<intptr_t>(data));
 
     return pw::OkStatus();
 }
@@ -53,7 +53,8 @@ void JointFabric::GetStream(const ::pw_protobuf_Empty & request, ServerWriter<::
 {
     ChipLogProgress(JointFabric, "RPC ReplyWithICACCSR");
 
-    CopySpanToMutableSpan(ByteSpan(ICACCSRBytes.response_bytes.bytes, ICACCSRBytes.response_bytes.size), icacCSRSpan);
+    TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(ByteSpan(ICACCSRBytes.response_bytes.bytes, ICACCSRBytes.response_bytes.size),
+                                                   icacCSRSpan);
 
     responseReceived = true;
     responseCv.notify_one();
@@ -80,7 +81,7 @@ CHIP_ERROR JointFabric::GetICACCSRForJF(MutableByteSpan & icacCSR)
     // wait for the ICAC CSR from JFC
     if (responseCv.wait_for(lock, std::chrono::milliseconds(kRpcTimeoutMs), [] { return responseReceived; }))
     {
-        CopySpanToMutableSpan(ByteSpan(icacCSRSpan.data(), icacCSRSpan.size()), icacCSR);
+        ReturnErrorOnFailure(CopySpanToMutableSpan(ByteSpan(icacCSRSpan.data(), icacCSRSpan.size()), icacCSR));
         responseReceived = false;
 
         return CHIP_NO_ERROR;

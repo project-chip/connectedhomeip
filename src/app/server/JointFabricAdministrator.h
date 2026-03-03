@@ -20,7 +20,10 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
+
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -48,6 +51,13 @@ public:
         mPeerJFAdminClusterEndpointId = peerJFAdminClusterEndpointId;
     }
 
+    void SetVidVerificationForFabric(chip::FabricIndex fabricIndex) { mVidVerificationFabricIndex = fabricIndex; }
+    void ClearVidVerificationForFabric() { mVidVerificationFabricIndex.reset(); }
+    bool WasVidVerificationExecutedForFabric(chip::FabricIndex fabricIndex) const
+    {
+        return mVidVerificationFabricIndex.has_value() && (mVidVerificationFabricIndex.value() == fabricIndex);
+    }
+
     CHIP_ERROR SetDelegate(JointFabricAdministrator::Delegate * delegate)
     {
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -62,6 +72,7 @@ public:
 
 private:
     chip::EndpointId mPeerJFAdminClusterEndpointId = chip::kInvalidEndpointId;
+    std::optional<chip::FabricIndex> mVidVerificationFabricIndex;
     JointFabricAdministrator::Delegate * mDelegate = nullptr;
 };
 

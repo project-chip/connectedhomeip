@@ -143,20 +143,19 @@ def test_case(func):
     def CheckEnableBeforeRun(*args, **kwargs):
         if TestIsEnabled(test_name=test_name):
             return func(*args, **kwargs)
-        elif inspect.iscoroutinefunction(func):
+        if inspect.iscoroutinefunction(func):
             # noop, so users can use await as usual
             return asyncio.sleep(0)
+        return None
     return CheckEnableBeforeRun
 
 
 def configurable_tests():
-    res = sorted(_configurable_test_sets)
-    return res
+    return sorted(_configurable_test_sets)
 
 
 def configurable_test_cases():
-    res = sorted(_configurable_tests)
-    return res
+    return sorted(_configurable_tests)
 
 
 class TestTimeout(threading.Thread):
@@ -434,9 +433,7 @@ class BaseTestHelper:
             self.logger.error(
                 "Failed to send arm failsafe command error is {}".format(ex.status))
             return False
-        if resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kBusyWithOtherAdmin:
-            return True
-        return False
+        return resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kBusyWithOtherAdmin
 
     async def TestControllerCATValues(self, nodeId: int):
         ''' This tests controllers using CAT Values
@@ -1287,7 +1284,7 @@ class BaseTestHelper:
                 # is declared failed.
                 await taskAttributeChange
 
-            return True if receivedUpdate == 5 else False
+            return receivedUpdate == 5
 
         except Exception as ex:
             self.logger.exception(f"Failed to finish API test: {ex}")
@@ -1458,7 +1455,7 @@ class BaseTestHelper:
             restartRemoteThread.start()
 
             # Wait for some time so that the device will be resolving the address of the first controller after restarting
-            time.sleep(8)
+            await asyncio.sleep(8)
             restartRemoteThread.join(10.0)
 
             self.logger.info("Send a new subscription request from the second controller")

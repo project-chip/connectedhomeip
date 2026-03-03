@@ -88,4 +88,35 @@ TEST_F(TestAutoRelease, TestOperators)
     EXPECT_TRUE(other.IsNull());
 }
 
+TEST_F(TestAutoRelease, TestMove)
+{
+    TestCounterRelease releasable;
+    TestCounterRelease releasable2;
+
+    EXPECT_EQ(releasable.Counter(), 1);
+    EXPECT_EQ(releasable2.Counter(), 1);
+    {
+        AutoRelease r1(&releasable); // template type should be auto-detected for pointers
+        EXPECT_EQ(releasable.Counter(), 1);
+
+        // move
+        AutoRelease<TestCounterRelease> r2{ std::move(r1) };
+        EXPECT_EQ(releasable.Counter(), 1);
+
+        AutoRelease<TestCounterRelease> r3(&releasable2);
+        EXPECT_EQ(releasable.Counter(), 1);
+        EXPECT_EQ(releasable2.Counter(), 1);
+
+        r3 = std::move(r2);
+
+        // r3 now owns releasable, and releasable2 should have been released by the move-assignment.
+        EXPECT_EQ(releasable.Counter(), 1);
+        EXPECT_EQ(releasable2.Counter(), 0);
+    }
+
+    // cleanup done
+    EXPECT_EQ(releasable.Counter(), 0);
+    EXPECT_EQ(releasable2.Counter(), 0);
+}
+
 } // namespace

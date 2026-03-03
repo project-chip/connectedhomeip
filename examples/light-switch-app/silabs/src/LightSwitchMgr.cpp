@@ -83,7 +83,7 @@ void LightSwitchMgr::GenericSwitchOnInitialPress()
     data->endpoint = mGenericSwitchEndpoint;
     data->event    = Switch::Events::InitialPress::Id;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 /**
@@ -96,7 +96,7 @@ void LightSwitchMgr::GenericSwitchOnShortRelease()
     data->endpoint = mGenericSwitchEndpoint;
     data->event    = Switch::Events::ShortRelease::Id;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 StepModeEnum LightSwitchMgr::getStepMode()
@@ -139,7 +139,7 @@ void LightSwitchMgr::TriggerLightSwitchAction(LightSwitchAction action, bool isG
         break;
     }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 void LightSwitchMgr::TriggerLevelControlAction(LevelControl::StepModeEnum stepMode, bool isGroupCommand)
@@ -155,12 +155,11 @@ void LightSwitchMgr::TriggerLevelControlAction(LevelControl::StepModeEnum stepMo
     stepData.optionsMask.Set(LightSwitchMgr::stepCommand.optionsMask);
     stepData.optionsOverride.Set(LightSwitchMgr::stepCommand.optionsOverride);
     data->commandData = stepData;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
 {
-
     GenericSwitchEventData * data = reinterpret_cast<GenericSwitchEventData *>(context);
 
     switch (data->event)
@@ -168,22 +167,32 @@ void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
     case Switch::Events::InitialPress::Id: {
         uint8_t currentPosition = 1;
 
-        // Set new attribute value
-        Clusters::Switch::Attributes::CurrentPosition::Set(data->endpoint, currentPosition);
-
-        // Trigger event
-        Clusters::SwitchServer::Instance().OnInitialPress(data->endpoint, currentPosition);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint);
+        if (switchCluster != nullptr)
+        {
+            // Set new attribute value
+            if (switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
+            {
+                // Trigger event
+                RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(currentPosition);
+            }
+        }
         break;
     }
     case Switch::Events::ShortRelease::Id: {
         uint8_t previousPosition = 1;
         uint8_t currentPosition  = 0;
 
-        // Set new attribute value
-        Clusters::Switch::Attributes::CurrentPosition::Set(data->endpoint, currentPosition);
-
-        // Trigger event
-        Clusters::SwitchServer::Instance().OnShortRelease(data->endpoint, previousPosition);
+        auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(data->endpoint);
+        if (switchCluster != nullptr)
+        {
+            // Set new attribute value
+            if (switchCluster->SetCurrentPosition(currentPosition) == CHIP_NO_ERROR)
+            {
+                // Trigger event
+                RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
+            }
+        }
         break;
     }
     default:

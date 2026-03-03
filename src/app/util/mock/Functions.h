@@ -31,7 +31,7 @@
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const app::ConcreteAttributePath & aPath,
                                      app::AttributeReportIBs::Builder & aAttributeReports,
@@ -56,5 +56,5 @@ void SetMockNodeConfig(const MockNodeConfig & config);
 /// Resets the mock attribute storage to the default configuration.
 void ResetMockNodeConfig();
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

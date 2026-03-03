@@ -100,8 +100,7 @@ class InteractionModelError(ChipStackException):
     def __str__(self):
         if self.hasClusterStatus:
             return f"InteractionModelError: {self._status.name} (0x{self._status.value:x}, clusterStatus: {self._clusterStatus})"
-        else:
-            return f"InteractionModelError: {self._status.name} (0x{self._status.value:x})"
+        return f"InteractionModelError: {self._status.name} (0x{self._status.value:x})"
 
     @property
     def hasClusterStatus(self) -> bool:

@@ -269,7 +269,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
                 PeerConnectionState.INVALID,
             ]:
                 return False
-            elif self._peer_state == PeerConnectionState.CONNECTED:
+            if self._peer_state == PeerConnectionState.CONNECTED:
                 return True
             self._peer_state = await event_queue.get(timeout=30)
 

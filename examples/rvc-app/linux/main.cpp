@@ -42,14 +42,14 @@ void ApplicationInit()
     if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sRvcAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
-        sChipNamedPipeCommands.Stop();
+        TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 
     gRvcDevice = new RvcDevice(RVC_ENDPOINT);
     gRvcDevice->Init();
 
     sRvcAppCommandDelegate.SetRvcDevice(gRvcDevice);
-    IdentifyInit();
+    TEMPORARY_RETURN_IGNORED IdentifyInit();
 }
 
 void ApplicationShutdown()
@@ -57,7 +57,7 @@ void ApplicationShutdown()
     delete gRvcDevice;
     gRvcDevice = nullptr;
 
-    sChipNamedPipeCommands.Stop();
+    TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
 }
 
 int main(int argc, char * argv[])

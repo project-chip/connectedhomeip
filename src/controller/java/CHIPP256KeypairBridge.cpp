@@ -64,7 +64,7 @@ CHIP_ERROR CHIPP256KeypairBridge::Initialize(ECPKeyTarget key_target)
 {
     if (HasKeypair())
     {
-        SetPubkey();
+        TEMPORARY_RETURN_IGNORED SetPubkey();
     }
     return CHIP_NO_ERROR;
 }

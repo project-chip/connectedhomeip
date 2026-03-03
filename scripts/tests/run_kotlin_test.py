@@ -30,6 +30,8 @@ from java.base import DumpProgramOutputToQueue
 from java.commissioning_test import CommissioningTest
 from java.im_test import IMTest
 
+log = logging.getLogger(__name__)
+
 
 @click.command()
 @click.option("--app", type=click.Path(exists=True), default=None,
@@ -45,13 +47,11 @@ from java.im_test import IMTest
 @click.option("--factoryreset", is_flag=True,
               help='Remove app configs (/tmp/chip*) before running the tests.')
 def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: str, factoryreset: bool):
-    logging.info("Execute: {script_command}")
-
     if factoryreset:
         # Remove native app config
         retcode = subprocess.call("rm -rf /tmp/chip*", shell=True)
         if retcode != 0:
-            raise Exception("Failed to remove /tmp/chip* for factory reset.")
+            raise RuntimeError("Failed to remove /tmp/chip* for factory reset.")
 
         # Remove native app KVS if that was used
         kvs_match = re.search(r"--KVS (?P<kvs_path>[^ ]+)", app_args)
@@ -60,7 +60,7 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
             retcode = subprocess.call("rm -f %s" % kvs_path_to_remove, shell=True)
             print("Trying to remove KVS path %s" % kvs_path_to_remove)
             if retcode != 0:
-                raise Exception("Failed to remove %s for factory reset." % kvs_path_to_remove)
+                raise RuntimeError(f"Failed to remove {kvs_path_to_remove} for factory reset.")
 
     coloredlogs.install(level='INFO')
 
@@ -78,7 +78,7 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
             if app is None:
                 raise FileNotFoundError(f"{app} not found")
         app_args = [app] + shlex.split(app_args)
-        logging.info(f"Execute: {app_args}")
+        log.info("Execute: %s", shlex.join(app_args))
         app_process = subprocess.Popen(
             app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
         DumpProgramOutputToQueue(
@@ -95,27 +95,27 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
                'com.matter.controller.MainKt']
 
     if tool_cluster == 'pairing':
-        logging.info("Testing pairing")
+        log.info("Testing pairing")
 
         test = CommissioningTest(log_cooking_threads, log_queue, command, tool_args)
         try:
             test.RunTest()
         except Exception as e:
-            logging.error(e)
+            log.exception(e)
             sys.exit(1)
     elif tool_cluster == 'im':
-        logging.info("Testing IM")
+        log.info("Testing IM")
 
         test = IMTest(log_cooking_threads, log_queue, command, tool_args)
         try:
             test.RunTest()
         except Exception as e:
-            logging.error(e)
+            log.exception(e)
             sys.exit(1)
 
     app_exit_code = 0
     if app_process:
-        logging.warning("Stopping app with SIGINT")
+        log.warning("Stopping app with SIGINT")
         app_process.send_signal(signal.SIGINT.value)
         app_exit_code = app_process.wait()
 

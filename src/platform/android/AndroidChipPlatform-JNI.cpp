@@ -80,7 +80,7 @@ CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
 
     ChipLogProgress(DeviceLayer, "AndroidChipPlatform JNI_OnLoad() called");
 
-    chip::Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
     // Save a reference to the JVM.  Will need this to call back into Java.
     JniReferences::GetInstance().SetJavaVm(jvm, "chip/platform/AndroidChipPlatform");
@@ -163,7 +163,8 @@ JNI_METHOD(void, onNfcTagResponse)(JNIEnv * env, jobject self, jbyteArray jbArra
         System::PacketBufferHandle::NewWithData(reinterpret_cast<const uint8_t *>(data), static_cast<size_t>(length));
     VerifyOrReturn(!buffer.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer"));
 
-    chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().OnNfcTagResponse(Transport::PeerAddress::NFC(), std::move(buffer));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().OnNfcTagResponse(Transport::PeerAddress::NFC(),
+                                                                                                     std::move(buffer));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 }
 
@@ -175,7 +176,7 @@ JNI_METHOD(void, onNfcTagError)(JNIEnv * env, jobject self)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     chip::DeviceLayer::StackLock lock;
-    chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().OnNfcTagError(Transport::PeerAddress::NFC());
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().OnNfcTagError(Transport::PeerAddress::NFC());
 #endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 }
 

@@ -166,7 +166,7 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-    sThreadNetworkDriver.Init();
+    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
 #else
     return CHIP_ERROR_INTERNAL;
 #endif // CONFIG_NET_L2_OPENTHREAD
@@ -219,7 +219,7 @@ CHIP_ERROR AppTask::Init()
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
@@ -240,7 +240,7 @@ CHIP_ERROR AppTask::StartApp()
 {
     ReturnErrorOnFailure(Init());
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(AppTask::InitServer);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(AppTask::InitServer);
 
     return CHIP_NO_ERROR;
 }
@@ -314,14 +314,15 @@ void AppTask::IcdDslsEventHandler(const AppEvent &)
     if (sIsSitModeRequested)
     {
         ChipLogProgress(AppServer, "IcdDslsEventHandler: NotifySITModeRequestWithdrawal");
-        PlatformMgr().ScheduleWork([](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+            [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
         sIsSitModeRequested = false;
     }
     else
     {
         ChipLogProgress(AppServer, "IcdDslsEventHandler: NotifySITModeRequestNotification");
-        PlatformMgr().ScheduleWork([](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); },
-                                   0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+            [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); }, 0);
         sIsSitModeRequested = true;
     }
 }
@@ -331,7 +332,8 @@ void AppTask::IcdUatEventHandler(const AppEvent &)
 {
 #ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
     // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
-    PlatformMgr().ScheduleWork([](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+        [](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
 #endif
 }
 
@@ -469,7 +471,7 @@ void AppTask::PostEvent(const AppEvent & event)
         return;
     }
     ChipLogProgress(AppServer, "MsgQ set event.Type = %u", chip::to_underlying(event.Type));
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(AppTask::MsgQConsume);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(AppTask::MsgQConsume);
 }
 
 void AppTask::DispatchEvent(const AppEvent & event)

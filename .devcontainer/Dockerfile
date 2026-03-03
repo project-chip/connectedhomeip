@@ -32,14 +32,25 @@ ENV LANG=en_US.utf8
 RUN apt-get update \
     && apt-get install -y locales \
     && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
-    && apt-get -fy install vim emacs sudo \
-    apt-utils dialog zsh \
-    lsb-release \
-    bash-completion \
-    valgrind \
-    docker.io \
-    iputils-ping \
-    icecc \
+    && apt-get -fy install \
+        apt-utils \
+        bash-completion \
+        dialog \
+        docker.io \
+        emacs \
+        fish \
+        gnupg2 \
+        icecc \
+        iputils-ping \
+        lsb-release \
+        openssh-client \
+        sudo \
+        valgrind \
+        vim \
+        zsh \
+        # emacs pulls in libgccjit0 -> libgcc-14-dev without libstdc++-14-dev which causes clang++ to fail \
+        # See-Also: https://bugs.launchpad.net/ubuntu/+source/llvm-defaults/+bug/2077130 \
+        libstdc++-14-dev \
     && :
 
 RUN (getent passwd $USER_UID && userdel -f $(getent passwd $USER_UID | cut -d: -f1) || true) \
@@ -60,6 +71,7 @@ RUN mkdir -p /opt/android/sdk \
     && chown -R $USERNAME:$USERNAME \
     $ANDROID_HOME \
     $IDF_TOOLS_PATH \
+    $ZEPHYR_BASE/.. `# Assume $ZEPHYR_BASE is inside the west workspace` \
     && find $AMEBA_PATH \
     -name "inc_lp" -print0      -or \
     -name "inc_hp" -print0      -or \

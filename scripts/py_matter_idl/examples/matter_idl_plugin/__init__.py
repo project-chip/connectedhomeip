@@ -159,8 +159,7 @@ def toEncodedTag(tag, typeNum: EncodingDataType):
     """ Return the final encoded tag from the given field number and field encoded data type.
         The Matter field type information is encoded into the upper range of the protobuf field
         tag for stateless translation to Matter TLV. """
-    tag = (int(typeNum) << 19) | int(tag)
-    return tag
+    return (int(typeNum) << 19) | int(tag)
 
 
 def toProtobufFullType(field: Field):
@@ -177,16 +176,14 @@ def toProtobufFullType(field: Field):
 def toFieldTag(field: Field):
     protobufType = toProtobufType(field.data_type.name)
     typeNum = EncodingDataType.fromType(protobufType)
-    tag = toEncodedTag(field.code, typeNum)
-    return tag
+    return toEncodedTag(field.code, typeNum)
 
 
 def toFieldComment(field: Field):
     protobufType = toProtobufType(field.data_type.name)
     typeNum = EncodingDataType.fromType(protobufType)
-    tagComment = "/** %s Type: %d IsList: %d FieldId: %d */" % (
+    return "/** %s Type: %d IsList: %d FieldId: %d */" % (
         field.data_type.name, typeNum, field.is_list, field.code)
-    return tagComment
 
 
 class CustomGenerator(CodeGenerator):

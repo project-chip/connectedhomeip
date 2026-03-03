@@ -43,6 +43,7 @@
 #import "MTRUnfairLock.h"
 #import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
+#import "zap-generated/MTRCommandPayloads_Private.h"
 
 #import "lib/core/CHIPError.h"
 #import "lib/core/DataModelTypes.h"
@@ -406,6 +407,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error;
 - (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device;
 - (BOOL)unitTestTimeSynchronizationLossDetectionCadenceIsZero:(MTRDevice *)device;
+- (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device;
 @end
 #endif
 
@@ -741,7 +743,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return YES;
     }
 
-    __block uint64_t cadence = MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE;
+    __block NSTimeInterval cadence = MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE;
 
 #ifdef DEBUG
     [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
@@ -2149,7 +2151,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                 cumulativeIntervals += intervalSinceLastReport;
             }
         }
-        NSTimeInterval averageTimeBetweenReports = cumulativeIntervals / (_mostRecentReportTimes.count - 1);
+        NSTimeInterval averageTimeBetweenReports = cumulativeIntervals / static_cast<double>(_mostRecentReportTimes.count - 1);
 
         if (averageTimeBetweenReports < _storageBehaviorConfiguration.timeBetweenReportsTooShortThreshold) {
             // Multiplier goes from 1 to _reportToPersistenceDelayMaxMultiplier uniformly, as
@@ -4529,22 +4531,38 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 [self _setCachedAttributeValue:attributeDataValue forPath:attributePath fromSubscription:isFromSubscription];
 
                 [self _attributeValue:attributeDataValue reportedForPath:attributePath];
+            }
 
-                // If we've never detected a time synchronization loss, or it's
-                // been a while since we last detected a time synchronization
-                // loss then check for a time synchronization loss now.
-                if (attributePath.cluster.unsignedLongValue == MTRClusterIDTypeTimeSynchronizationID
-                    && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID
-                    && [self shouldDetectTimeSynchronizationLoss]) {
-                    auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:attributeResponseValue error:nil];
-                    if (attrReport) {
-                        NSNumber * deviceUTCTime = attrReport.value;
-                        auto * deviceDate = MatterEpochMicrosecondsAsDate(deviceUTCTime.unsignedLongLongValue);
-                        if (std::abs([deviceDate timeIntervalSinceNow]) > MTR_DEVICE_TIME_DIFFERENCE_TRIGGERING_TIME_SYNC) {
-                            MTR_LOG("%@ Time synchronization loss detected", self);
-                            _timeSynchronizationLossDetected = YES;
-                            _timeSynchronizationLossDetectedTime = [NSDate now];
-                        }
+            // If we've never detected a time synchronization loss, or it's
+            // been a while since we last detected a time synchronization
+            // loss then check for a time synchronization loss now.
+            //
+            // This check must be done unconditionally (not just when the
+            // cache value changed) because CurrentTime has the C (non-
+            // reportable) quality.  After we set time on a device that
+            // lost time sync, our cached value stays null even though the
+            // device now has a valid time.  If the device power-cycles
+            // again and reports null, the value matches the cache and the
+            // check would be skipped.
+            if (isFromSubscription
+                && attributePath.cluster.unsignedLongValue == MTRClusterIDTypeTimeSynchronizationID
+                && attributePath.attribute.unsignedLongValue == MTRAttributeIDTypeClusterTimeSynchronizationAttributeUTCTimeID
+                && [self shouldDetectTimeSynchronizationLoss]) {
+                auto * attrReport = [[MTRAttributeReport alloc] initWithResponseValue:attributeResponseValue error:nil];
+                if (attrReport) {
+                    NSNumber * deviceUTCTime = attrReport.value;
+                    auto * deviceDate = MatterEpochMicrosecondsAsDate(deviceUTCTime.unsignedLongLongValue);
+                    if (std::abs([deviceDate timeIntervalSinceNow]) > MTR_DEVICE_TIME_DIFFERENCE_TRIGGERING_TIME_SYNC) {
+                        MTR_LOG("%@ Time synchronization loss detected", self);
+                        _timeSynchronizationLossDetected = YES;
+                        _timeSynchronizationLossDetectedTime = [NSDate now];
+#ifdef DEBUG
+                        [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+                            if ([testDelegate respondsToSelector:@selector(unitTestTimeSynchronizationLossDetectedForDevice:)]) {
+                                [testDelegate unitTestTimeSynchronizationLossDetectedForDevice:self];
+                            }
+                        }];
+#endif
                     }
                 }
             }
@@ -4585,7 +4603,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 // verify that the uptime is indeed the data type we want
                 if ([attributeDataValue[MTRTypeKey] isEqual:MTRUnsignedIntegerValueType]) {
                     NSNumber * upTimeNumber = attributeDataValue[MTRValueKey];
-                    NSTimeInterval upTime = upTimeNumber.unsignedLongLongValue; // UpTime unit is defined as seconds in the spec
+                    NSTimeInterval upTime = static_cast<NSTimeInterval>(upTimeNumber.unsignedLongLongValue); // UpTime unit is defined as seconds in the spec
                     NSDate * potentialSystemStartTime = [NSDate dateWithTimeIntervalSinceNow:-upTime];
                     NSDate * oldSystemStartTime = _estimatedStartTime;
                     if (!_estimatedStartTime || ([potentialSystemStartTime compare:_estimatedStartTime] == NSOrderedAscending)) {

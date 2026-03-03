@@ -241,7 +241,7 @@ CHIP_ERROR SendQuery(FullQName qname)
 class TestAdvertiser : public ::testing::Test
 {
 public:
-    static chip::Test::IOContext context;
+    static chip::Testing::IOContext context;
     static CheckOnlyServer server;
     static chip::Dnssd::ServiceAdvertiser * mdnsAdvertiser;
 
@@ -265,7 +265,7 @@ public:
     }
 };
 
-chip::Test::IOContext TestAdvertiser::context;
+chip::Testing::IOContext TestAdvertiser::context;
 CheckOnlyServer TestAdvertiser::server;
 chip::Dnssd::ServiceAdvertiser * TestAdvertiser::mdnsAdvertiser;
 

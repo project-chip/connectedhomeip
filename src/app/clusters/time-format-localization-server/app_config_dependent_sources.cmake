@@ -23,6 +23,6 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/time-format-localization-cluster.cpp"
-    "${CLUSTER_DIR}/time-format-localization-cluster.h"
+    "${CLUSTER_DIR}/TimeFormatLocalizationCluster.cpp"
+    "${CLUSTER_DIR}/TimeFormatLocalizationCluster.h"
 )

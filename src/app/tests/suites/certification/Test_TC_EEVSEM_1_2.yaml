@@ -99,3 +99,9 @@ tests:
           [1705995474.391347][7551:7553] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_009D Attribute 0x0000_0001 DataVersion: 1324786556
           [1705995474.391367][7551:7553] CHIP:TOO:   CurrentMode: 0
       disabled: true
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: evse
+      app: evse

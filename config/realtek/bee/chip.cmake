@@ -78,6 +78,14 @@ list(
     ${CHIP_ROOT}/third_party/nlio/repo/include
 )
 
+if (matter_enable_cg_secure_dac_vendor)
+    list(
+        APPEND CHIP_INC
+
+        ${CGCRYPTO_PATH}
+    )
+endif (matter_enable_cg_secure_dac_vendor)
+
 execute_process(
     COMMAND echo "mkdir CHIP output folder ..."
     COMMAND mkdir -p ${CHIP_OUTPUT}
@@ -119,7 +127,7 @@ string(APPEND CHIP_GN_ARGS "bee_ar = \"arm-none-eabi-ar\"\n")
 string(APPEND CHIP_GN_ARGS "bee_cc = \"arm-none-eabi-gcc\"\n")
 string(APPEND CHIP_GN_ARGS "bee_cxx = \"arm-none-eabi-c++\"\n")
 string(APPEND CHIP_GN_ARGS "bee_cpu = \"arm\"\n")
-string(APPEND CHIP_GN_ARGS "chip_enable_openthread = true\n")
+string(APPEND CHIP_GN_ARGS "chip_enable_thread = true\n")
 string(APPEND CHIP_GN_ARGS "chip_inet_config_enable_ipv4 = false\n")
 string(APPEND CHIP_GN_ARGS "chip_use_transitional_commissionable_data_provider = false\n")
 string(APPEND CHIP_GN_ARGS "chip_logging = true\n")
@@ -162,6 +170,13 @@ string(APPEND CHIP_GN_ARGS "chip_enable_icd_server = false\n")
 else()
 string(APPEND CHIP_GN_ARGS "chip_enable_icd_server = true\n")
 endif(matter_enable_med)
+
+if(matter_enable_icd_lit)
+string(APPEND CHIP_GN_ARGS "chip_enable_icd_lit = true\n")
+string(APPEND CHIP_GN_ARGS "chip_enable_icd_checkin = true\n")
+string(APPEND CHIP_GN_ARGS "chip_enable_icd_user_active_mode_trigger = true\n")
+endif(matter_enable_icd_lit)
+
 endif(matter_enable_mtd)
 
 # Build Matter Shell

@@ -20,11 +20,13 @@
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/FabricScoped.h>
+#include <app/data-model/List.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/TLVReader.h>
+#include <type_traits>
 
 namespace chip {
-namespace app {
 namespace Testing {
 
 /// Contains support for setting up a WriteAttributeRequest and underlying data.
@@ -44,14 +46,14 @@ namespace Testing {
 class WriteOperation
 {
 public:
-    WriteOperation(const ConcreteDataAttributePath & path)
+    WriteOperation(const app::ConcreteDataAttributePath & path)
     {
         mRequest.path              = path;
         mRequest.subjectDescriptor = &kDenySubjectDescriptor;
     }
 
     WriteOperation(EndpointId endpoint, ClusterId cluster, AttributeId attribute) :
-        WriteOperation(ConcreteAttributePath(endpoint, cluster, attribute))
+        WriteOperation(app::ConcreteAttributePath(endpoint, cluster, attribute))
     {}
 
     WriteOperation & SetSubjectDescriptor(const chip::Access::SubjectDescriptor & descriptor)
@@ -66,13 +68,13 @@ public:
         return *this;
     }
 
-    WriteOperation & SetWriteFlags(const BitFlags<DataModel::WriteFlags> & flags)
+    WriteOperation & SetWriteFlags(const BitFlags<app::DataModel::WriteFlags> & flags)
     {
         mRequest.writeFlags = flags;
         return *this;
     }
 
-    WriteOperation & SetOperationFlags(const BitFlags<DataModel::OperationFlags> & flags)
+    WriteOperation & SetOperationFlags(const BitFlags<app::DataModel::OperationFlags> & flags)
     {
         mRequest.operationFlags = flags;
         return *this;
@@ -84,7 +86,21 @@ public:
         return *this;
     }
 
-    const DataModel::WriteAttributeRequest & GetRequest() const { return mRequest; }
+    const app::DataModel::WriteAttributeRequest & GetRequest() const { return mRequest; }
+
+    // Helper to encode a value, using EncodeForWrite for fabric-scoped types
+    template <typename T>
+    CHIP_ERROR EncodeValue(TLV::TLVWriter & writer, TLV::Tag tag, const T & value)
+    {
+        if constexpr (chip::app::DataModel::IsFabricScoped<T>::value)
+        {
+            return chip::app::DataModel::EncodeForWrite(writer, tag, value);
+        }
+        else
+        {
+            return chip::app::DataModel::Encode(writer, tag, value);
+        }
+    }
 
     template <typename T>
     TLV::TLVReader ReadEncodedValue(const T & value)
@@ -98,7 +114,7 @@ public:
         //   - END_STRUCT
         TLV::TLVType outerContainerType;
         SuccessOrDie(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
-        SuccessOrDie(chip::app::DataModel::Encode(writer, TLV::ContextTag(1), value));
+        SuccessOrDie(EncodeValue(writer, TLV::ContextTag(1), value));
         SuccessOrDie(writer.EndContainer(outerContainerType));
         SuccessOrDie(writer.Finalize());
 
@@ -113,20 +129,20 @@ public:
     }
 
     template <class T>
-    AttributeValueDecoder DecoderFor(const T & value)
+    app::AttributeValueDecoder DecoderFor(const T & value)
     {
         mTLVReader = ReadEncodedValue(value);
         if (mRequest.subjectDescriptor == nullptr)
         {
-            AttributeValueDecoder(mTLVReader, kDenySubjectDescriptor);
+            app::AttributeValueDecoder(mTLVReader, kDenySubjectDescriptor);
         }
-        return AttributeValueDecoder(mTLVReader, *mRequest.subjectDescriptor);
+        return app::AttributeValueDecoder(mTLVReader, *mRequest.subjectDescriptor);
     }
 
 private:
     constexpr static size_t kMaxTLVBufferSize = 1024;
 
-    DataModel::WriteAttributeRequest mRequest;
+    app::DataModel::WriteAttributeRequest mRequest;
 
     // where data is being written
     uint8_t mTLVBuffer[kMaxTLVBufferSize] = { 0 };
@@ -136,5 +152,4 @@ private:
 };
 
 } // namespace Testing
-} // namespace app
 } // namespace chip

@@ -80,7 +80,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 void PlatformManagerImpl::OperationalHoursSavingTimerEventHandler(k_timer * timer)
 {
-    PlatformMgr().ScheduleWork([](intptr_t arg) {
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t arg) {
         CHIP_ERROR error = sInstance.UpdateOperationalHours(nullptr);
         if (error != CHIP_NO_ERROR)
         {
@@ -105,7 +105,7 @@ CHIP_ERROR PlatformManagerImpl::UpdateOperationalHours(uint32_t * totalOperation
 
     if (deltaTime > 0)
     {
-        ConfigurationMgr().StoreTotalOperationalHours(totalTime);
+        TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalTime);
         mSavedOperationalHoursSinceBoot = upTimeH;
     }
 

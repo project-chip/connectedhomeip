@@ -25,13 +25,12 @@ def get_chip_root():
     chip_root = os.getenv('PW_PROJECT_ROOT')
     if chip_root:
         return chip_root
-    else:
-        try:
-            return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-        except Exception as e:
-            raise EnvironmentError(
-                "Unable to determine CHIP root directory. Please ensure the environment is activated."
-            ) from e
+    try:
+        return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+    except Exception as e:
+        raise EnvironmentError(
+            "Unable to determine CHIP root directory. Please ensure the environment is activated."
+        ) from e
 
 
 def get_data_model_path():

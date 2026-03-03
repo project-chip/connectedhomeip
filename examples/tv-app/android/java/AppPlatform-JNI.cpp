@@ -44,7 +44,7 @@ std::vector<ContentApp::SupportedCluster> convert_to_cpp(JNIEnv * env, jobject s
 JNI_METHOD(void, nativeInit)(JNIEnv *, jobject app, jobject contentAppEndpointManager)
 {
     chip::DeviceLayer::StackLock lock;
-    InitVideoPlayerPlatform(contentAppEndpointManager);
+    TEMPORARY_RETURN_IGNORED InitVideoPlayerPlatform(contentAppEndpointManager);
 }
 
 JNI_METHOD(jint, addContentApp)

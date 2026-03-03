@@ -608,126 +608,125 @@ def main():
     if not os.path.exists(icac_key):
         raise Exception('Path not found: %s' % icac_key)
 
-    with open(args.outfile + '.h', "w") as hfile:
-        with open(args.outfile + '.cpp', "w") as cfile:
-            h_cert_arrays_declarations = ''
-            c_cert_arrays_definitions = ''
+    with open(args.outfile + '.h', "w") as hfile, open(args.outfile + '.cpp', "w") as cfile:
+        h_cert_arrays_declarations = ''
+        c_cert_arrays_definitions = ''
 
-            c_x509_to_chip_error_cases = ''
-            x509_to_chip_error_cases_count = 0
-            for test_case in DER_CERT_ERROR_TEST_CASES:
-                for cert_type in [CertType.NOC, CertType.ICAC, CertType.RCAC]:
-                    # The following error cases are applicable only for NOC
-                    if (test_case["error_flag"] == 'subject-node-id-invalid' or
-                            test_case["error_flag"] == 'ext-basic-pathlen-presence-wrong') and cert_type != CertType.NOC:
-                        break
+        c_x509_to_chip_error_cases = ''
+        x509_to_chip_error_cases_count = 0
+        for test_case in DER_CERT_ERROR_TEST_CASES:
+            for cert_type in [CertType.NOC, CertType.ICAC, CertType.RCAC]:
+                # The following error cases are applicable only for NOC
+                if (test_case["error_flag"] == 'subject-node-id-invalid' or
+                        test_case["error_flag"] == 'ext-basic-pathlen-presence-wrong') and cert_type != CertType.NOC:
+                    break
 
-                    if cert_type == CertType.NOC:
-                        signer_cert = icac_cert
-                        signer_key = icac_key
-                    elif cert_type == CertType.ICAC:
-                        signer_cert = rcac_cert
-                        signer_key = rcac_key
-                    else:
-                        signer_cert = ""
-                        signer_key = ""
+                if cert_type == CertType.NOC:
+                    signer_cert = icac_cert
+                    signer_key = icac_key
+                elif cert_type == CertType.ICAC:
+                    signer_cert = rcac_cert
+                    signer_key = rcac_key
+                else:
+                    signer_cert = ""
+                    signer_key = ""
 
-                    # Generate Cert/Key
-                    builder = OpCertBuilder(cert_type, CertFormat.DER, signer_cert, signer_key,
-                                            test_case["error_flag"], test_case["test_name"], args.testdir, chipcert)
-                    builder.make_certs_and_keys()
+                # Generate Cert/Key
+                builder = OpCertBuilder(cert_type, CertFormat.DER, signer_cert, signer_key,
+                                        test_case["error_flag"], test_case["test_name"], args.testdir, chipcert)
+                builder.make_certs_and_keys()
 
-                    c_x509_to_chip_error_cases += builder.add_cert_to_error_cases()
+                c_x509_to_chip_error_cases += builder.add_cert_to_error_cases()
 
-                    [h, c] = builder.full_arrays()
-                    h_cert_arrays_declarations += h
-                    c_cert_arrays_definitions += c
-                    x509_to_chip_error_cases_count += 1
+                [h, c] = builder.full_arrays()
+                h_cert_arrays_declarations += h
+                c_cert_arrays_definitions += c
+                x509_to_chip_error_cases_count += 1
 
-            c_chip_to_x509_error_cases = ''
-            c_chip_cert_load_error_cases = ''
-            c_validate_chip_rcac_error_cases = ''
-            c_get_cert_type_error_cases = ''
-            chip_to_x509_error_cases_count = 0
-            chip_cert_load_error_cases_count = 0
-            validate_chip_rcac_error_cases_count = 0
-            get_cert_type_error_cases_count = 0
-            for test_case in CHIP_TLV_CERT_ERROR_TEST_CASES:
-                for cert_type in [CertType.NOC, CertType.ICAC, CertType.RCAC]:
-                    if not (test_case["is_chip_to_x509_expected_to_fail"] or
-                            test_case["is_chip_cert_load_expected_to_fail"] or
-                            test_case["is_validate_chip_rcac_expected_to_fail"] or
-                            test_case["is_get_cert_type_expected_to_fail"]):
-                        break
+        c_chip_to_x509_error_cases = ''
+        c_chip_cert_load_error_cases = ''
+        c_validate_chip_rcac_error_cases = ''
+        c_get_cert_type_error_cases = ''
+        chip_to_x509_error_cases_count = 0
+        chip_cert_load_error_cases_count = 0
+        validate_chip_rcac_error_cases_count = 0
+        get_cert_type_error_cases_count = 0
+        for test_case in CHIP_TLV_CERT_ERROR_TEST_CASES:
+            for cert_type in [CertType.NOC, CertType.ICAC, CertType.RCAC]:
+                if not (test_case["is_chip_to_x509_expected_to_fail"] or
+                        test_case["is_chip_cert_load_expected_to_fail"] or
+                        test_case["is_validate_chip_rcac_expected_to_fail"] or
+                        test_case["is_get_cert_type_expected_to_fail"]):
+                    break
 
-                    # The following error cases are applicable only for NOC
-                    if (test_case["error_flag"] == 'subject-node-id-invalid'
-                            or test_case["error_flag"] == 'subject-fabric-id-missing') and cert_type != CertType.NOC:
-                        break
+                # The following error cases are applicable only for NOC
+                if (test_case["error_flag"] == 'subject-node-id-invalid'
+                        or test_case["error_flag"] == 'subject-fabric-id-missing') and cert_type != CertType.NOC:
+                    break
 
-                    if cert_type == CertType.NOC:
-                        signer_cert = icac_cert
-                        signer_key = icac_key
-                    elif cert_type == CertType.ICAC:
-                        signer_cert = rcac_cert
-                        signer_key = rcac_key
-                    else:
-                        signer_cert = ""
-                        signer_key = ""
+                if cert_type == CertType.NOC:
+                    signer_cert = icac_cert
+                    signer_key = icac_key
+                elif cert_type == CertType.ICAC:
+                    signer_cert = rcac_cert
+                    signer_key = rcac_key
+                else:
+                    signer_cert = ""
+                    signer_key = ""
 
-                    # Generate Cert/Key
-                    builder = OpCertBuilder(cert_type, CertFormat.CHIP, signer_cert, signer_key,
-                                            test_case["error_flag"], test_case["test_name"], args.testdir, chipcert)
-                    builder.make_certs_and_keys()
+                # Generate Cert/Key
+                builder = OpCertBuilder(cert_type, CertFormat.CHIP, signer_cert, signer_key,
+                                        test_case["error_flag"], test_case["test_name"], args.testdir, chipcert)
+                builder.make_certs_and_keys()
 
-                    if test_case["is_chip_to_x509_expected_to_fail"]:
-                        c_chip_to_x509_error_cases += builder.add_cert_to_error_cases()
-                        chip_to_x509_error_cases_count += 1
-                    if test_case["is_chip_cert_load_expected_to_fail"]:
-                        c_chip_cert_load_error_cases += builder.add_cert_to_error_cases()
-                        chip_cert_load_error_cases_count += 1
-                    if test_case["is_validate_chip_rcac_expected_to_fail"]:
-                        c_validate_chip_rcac_error_cases += builder.add_cert_to_error_cases()
-                        validate_chip_rcac_error_cases_count += 1
-                    if test_case["is_get_cert_type_expected_to_fail"] and not (test_case["error_flag"] == 'subject-cat-twice'
-                                                                               and cert_type == CertType.NOC):
-                        c_get_cert_type_error_cases += builder.add_cert_to_error_cases()
-                        get_cert_type_error_cases_count += 1
+                if test_case["is_chip_to_x509_expected_to_fail"]:
+                    c_chip_to_x509_error_cases += builder.add_cert_to_error_cases()
+                    chip_to_x509_error_cases_count += 1
+                if test_case["is_chip_cert_load_expected_to_fail"]:
+                    c_chip_cert_load_error_cases += builder.add_cert_to_error_cases()
+                    chip_cert_load_error_cases_count += 1
+                if test_case["is_validate_chip_rcac_expected_to_fail"]:
+                    c_validate_chip_rcac_error_cases += builder.add_cert_to_error_cases()
+                    validate_chip_rcac_error_cases_count += 1
+                if test_case["is_get_cert_type_expected_to_fail"] and not (test_case["error_flag"] == 'subject-cat-twice'
+                                                                           and cert_type == CertType.NOC):
+                    c_get_cert_type_error_cases += builder.add_cert_to_error_cases()
+                    get_cert_type_error_cases_count += 1
 
-                    [h, c] = builder.full_arrays()
-                    h_cert_arrays_declarations += h
-                    c_cert_arrays_definitions += c
+                [h, c] = builder.full_arrays()
+                h_cert_arrays_declarations += h
+                c_cert_arrays_definitions += c
 
-            [h_top, c_top] = headers(args.outfile)
-            [h_x509_to_chip_error_cases, c_x509_to_chip_error_cases_head] = start_test_cases_array(
-                'gTestCert_X509ToChip_ErrorCases', x509_to_chip_error_cases_count)
-            [h_chip_to_x509_error_cases, c_chip_to_x509_error_cases_head] = start_test_cases_array(
-                'gTestCert_ChipToX509_ErrorCases', chip_to_x509_error_cases_count)
-            [h_chip_cert_load_error_cases, c_chip_cert_load_error_cases_head] = start_test_cases_array(
-                'gTestCert_ChipCertLoad_ErrorCases', chip_cert_load_error_cases_count)
-            [h_validate_chip_rcac_error_cases, c_validate_chip_rcac_error_cases_head] = start_test_cases_array(
-                'gTestCert_ValidateChipRCAC_ErrorCases', validate_chip_rcac_error_cases_count)
-            [h_get_cert_type_error_cases, c_get_cert_type_error_cases_head] = start_test_cases_array(
-                'gTestCert_GetCertType_ErrorCases', get_cert_type_error_cases_count)
-            foot = footer()
+        [h_top, c_top] = headers(args.outfile)
+        [h_x509_to_chip_error_cases, c_x509_to_chip_error_cases_head] = start_test_cases_array(
+            'gTestCert_X509ToChip_ErrorCases', x509_to_chip_error_cases_count)
+        [h_chip_to_x509_error_cases, c_chip_to_x509_error_cases_head] = start_test_cases_array(
+            'gTestCert_ChipToX509_ErrorCases', chip_to_x509_error_cases_count)
+        [h_chip_cert_load_error_cases, c_chip_cert_load_error_cases_head] = start_test_cases_array(
+            'gTestCert_ChipCertLoad_ErrorCases', chip_cert_load_error_cases_count)
+        [h_validate_chip_rcac_error_cases, c_validate_chip_rcac_error_cases_head] = start_test_cases_array(
+            'gTestCert_ValidateChipRCAC_ErrorCases', validate_chip_rcac_error_cases_count)
+        [h_get_cert_type_error_cases, c_get_cert_type_error_cases_head] = start_test_cases_array(
+            'gTestCert_GetCertType_ErrorCases', get_cert_type_error_cases_count)
+        foot = footer()
 
-            hfile.write(h_top)
-            hfile.write(h_x509_to_chip_error_cases)
-            hfile.write(h_chip_to_x509_error_cases)
-            hfile.write(h_chip_cert_load_error_cases)
-            hfile.write(h_validate_chip_rcac_error_cases)
-            hfile.write(h_get_cert_type_error_cases)
-            hfile.write(h_cert_arrays_declarations)
-            hfile.write(foot)
+        hfile.write(h_top)
+        hfile.write(h_x509_to_chip_error_cases)
+        hfile.write(h_chip_to_x509_error_cases)
+        hfile.write(h_chip_cert_load_error_cases)
+        hfile.write(h_validate_chip_rcac_error_cases)
+        hfile.write(h_get_cert_type_error_cases)
+        hfile.write(h_cert_arrays_declarations)
+        hfile.write(foot)
 
-            cfile.write(c_top)
-            cfile.write(c_x509_to_chip_error_cases_head + c_x509_to_chip_error_cases + '};\n\n')
-            cfile.write(c_chip_to_x509_error_cases_head + c_chip_to_x509_error_cases + '};\n\n')
-            cfile.write(c_chip_cert_load_error_cases_head + c_chip_cert_load_error_cases + '};\n\n')
-            cfile.write(c_validate_chip_rcac_error_cases_head + c_validate_chip_rcac_error_cases + '};\n\n')
-            cfile.write(c_get_cert_type_error_cases_head + c_get_cert_type_error_cases + '};\n\n')
-            cfile.write(c_cert_arrays_definitions)
-            cfile.write(foot)
+        cfile.write(c_top)
+        cfile.write(c_x509_to_chip_error_cases_head + c_x509_to_chip_error_cases + '};\n\n')
+        cfile.write(c_chip_to_x509_error_cases_head + c_chip_to_x509_error_cases + '};\n\n')
+        cfile.write(c_chip_cert_load_error_cases_head + c_chip_cert_load_error_cases + '};\n\n')
+        cfile.write(c_validate_chip_rcac_error_cases_head + c_validate_chip_rcac_error_cases + '};\n\n')
+        cfile.write(c_get_cert_type_error_cases_head + c_get_cert_type_error_cases + '};\n\n')
+        cfile.write(c_cert_arrays_definitions)
+        cfile.write(foot)
 
 
 if __name__ == '__main__':

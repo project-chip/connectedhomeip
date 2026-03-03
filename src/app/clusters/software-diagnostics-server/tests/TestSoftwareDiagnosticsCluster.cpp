@@ -13,13 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
-#include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
+#include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/SoftwareDiagnostics/Enums.h>
 #include <clusters/SoftwareDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -34,6 +35,8 @@ namespace {
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoftwareDiagnostics;
+
+using chip::app::ClusterShutdownType;
 
 template <class T>
 class ScopedDiagnosticsProvider
@@ -67,7 +70,7 @@ struct TestSoftwareDiagnosticsCluster : public ::testing::Test
 TEST_F(TestSoftwareDiagnosticsCluster, CompileTest)
 {
     // The cluster should compile for any logic
-    SoftwareDiagnosticsServerCluster cluster({});
+    SoftwareDiagnosticsServerCluster cluster({}, DeviceLayer::GetDiagnosticDataProvider());
 
     // Essentially say "code executes"
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, SoftwareDiagnostics::Id }),
@@ -82,8 +85,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         {
         };
         ScopedDiagnosticsProvider<NullProvider> nullProvider;
-        SoftwareDiagnosticsServerCluster cluster({});
-        chip::Test::ClusterTester tester(cluster);
+        SoftwareDiagnosticsServerCluster cluster({}, DeviceLayer::GetDiagnosticDataProvider());
+        chip::Testing::ClusterTester tester(cluster);
 
         // without watermarks, no commands are accepted
         EXPECT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, {}));
@@ -115,8 +118,9 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
 
         ScopedDiagnosticsProvider<WatermarksProvider> watermarksProvider;
         SoftwareDiagnosticsServerCluster cluster(
-            SoftwareDiagnosticsLogic::OptionalAttributeSet().Set<Attributes::CurrentHeapHighWatermark::Id>());
-        chip::Test::ClusterTester tester(cluster);
+            SoftwareDiagnosticsServerCluster::OptionalAttributeSet().Set<Attributes::CurrentHeapHighWatermark::Id>(),
+            DeviceLayer::GetDiagnosticDataProvider());
+        chip::Testing::ClusterTester tester(cluster);
 
         ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, { Commands::ResetWatermarks::kMetadataEntry }));
 
@@ -172,13 +176,14 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         };
 
         ScopedDiagnosticsProvider<AllProvider> allProvider;
-        SoftwareDiagnosticsServerCluster cluster(SoftwareDiagnosticsLogic::OptionalAttributeSet()
+        SoftwareDiagnosticsServerCluster cluster(SoftwareDiagnosticsServerCluster::OptionalAttributeSet()
                                                      .Set<Attributes::ThreadMetrics::Id>()
                                                      .Set<Attributes::CurrentHeapFree::Id>()
                                                      .Set<Attributes::CurrentHeapUsed::Id>()
-                                                     .Set<Attributes::CurrentHeapHighWatermark::Id>());
+                                                     .Set<Attributes::CurrentHeapHighWatermark::Id>(),
+                                                 DeviceLayer::GetDiagnosticDataProvider());
 
-        chip::Test::ClusterTester tester(cluster);
+        chip::Testing::ClusterTester tester(cluster);
 
         // accepted commands list
         ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, { Commands::ResetWatermarks::kMetadataEntry }));
@@ -252,8 +257,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
 
 TEST_F(TestSoftwareDiagnosticsCluster, TestEventGeneration)
 {
-    SoftwareDiagnosticsServerCluster cluster({});
-    chip::Test::ClusterTester tester(cluster);
+    SoftwareDiagnosticsServerCluster cluster({}, DeviceLayer::GetDiagnosticDataProvider());
+    chip::Testing::ClusterTester tester(cluster);
 
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
@@ -270,7 +275,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, TestEventGeneration)
     Events::SoftwareFault::DecodableType decodedFault;
     auto event = tester.GetNextGeneratedEvent();
     ASSERT_TRUE(event.has_value());
-    ASSERT_EQ(event->GetEventData(decodedFault), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(event->GetEventData(decodedFault), CHIP_NO_ERROR);
 
     EXPECT_EQ(decodedFault.id, fault.id);
     ASSERT_TRUE(decodedFault.name.HasValue());
@@ -278,7 +283,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, TestEventGeneration)
     ASSERT_TRUE(decodedFault.faultRecording.HasValue());
     EXPECT_TRUE(decodedFault.faultRecording.Value().data_equal(fault.faultRecording.Value()));
 
-    cluster.Shutdown();
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

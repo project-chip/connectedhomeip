@@ -69,6 +69,7 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
     mCertificateValidityPolicy = params.certificateValidityPolicy;
     mSessionResumptionStorage  = params.sessionResumptionStorage;
     mEnableServerInteractions  = params.enableServerInteractions;
+    mDataModelProvider         = params.dataModelProvider;
 
     // Initialize the system state. Note that it is left in a somewhat
     // special state where it is initialized, but has a ref count of 0.
@@ -102,10 +103,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.opCertStore               = mOpCertStore;
     params.certificateValidityPolicy = mCertificateValidityPolicy;
     params.sessionResumptionStorage  = mSessionResumptionStorage;
-
-    // re-initialization keeps any previously initialized values. The only place where
-    // a provider exists is in the InteractionModelEngine, so just say "keep it as is".
-    params.dataModelProvider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    params.dataModelProvider         = mDataModelProvider;
 
     return InitSystemState(params);
 }
@@ -481,6 +479,7 @@ void DeviceControllerFactory::Shutdown()
     mOpCertStore               = nullptr;
     mCertificateValidityPolicy = nullptr;
     mSessionResumptionStorage  = nullptr;
+    mDataModelProvider         = nullptr;
 }
 
 void DeviceControllerSystemState::Shutdown()
@@ -563,6 +562,7 @@ void DeviceControllerSystemState::Shutdown()
 
     // Shut down the interaction model
     app::InteractionModelEngine::GetInstance()->Shutdown();
+    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(nullptr);
 
     // Shut down the TransportMgr. This holds Inet::UDPEndPoints so it must be shut down
     // before PlatformMgr().Shutdown() shuts down Inet.

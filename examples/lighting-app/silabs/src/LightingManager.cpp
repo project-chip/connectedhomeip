@@ -366,8 +366,8 @@ bool LightingManager::InitiateLightCtrlAction(int32_t aActor, Action_t aAction, 
 
         if (aAttributeId == ColorControl::Attributes::CurrentX::Id)
         {
-            VerifyOrReturnValue(colorData.xy.y != *reinterpret_cast<uint16_t *>(value), action_initiated);
-            colorData.xy.y   = *reinterpret_cast<uint16_t *>(value);
+            VerifyOrReturnValue(colorData.xy.x != *reinterpret_cast<uint16_t *>(value), action_initiated);
+            colorData.xy.x   = *reinterpret_cast<uint16_t *>(value);
             action_initiated = true;
         }
         else if (aAttributeId == ColorControl::Attributes::CurrentY::Id)
@@ -385,13 +385,15 @@ bool LightingManager::InitiateLightCtrlAction(int32_t aActor, Action_t aAction, 
         {
             VerifyOrReturnValue(colorData.hsv.h != *value, action_initiated);
             colorData.hsv.h  = *value;
+            mCurrentHue      = *value;
             action_initiated = true;
         }
         else if (aAttributeId == ColorControl::Attributes::CurrentSaturation::Id)
         {
             VerifyOrReturnValue(colorData.hsv.s != *value, action_initiated);
-            colorData.hsv.s  = *value;
-            action_initiated = true;
+            colorData.hsv.s    = *value;
+            mCurrentSaturation = *value;
+            action_initiated   = true;
         }
         break;
 

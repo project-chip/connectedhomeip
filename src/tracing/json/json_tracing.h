@@ -17,9 +17,11 @@
  */
 #pragma once
 
+#include <lib/core/CHIPError.h>
+#include <tracing/backend.h>
+
 #include <fstream>
 #include <string>
-#include <tracing/backend.h>
 #include <unordered_map>
 
 namespace Json {

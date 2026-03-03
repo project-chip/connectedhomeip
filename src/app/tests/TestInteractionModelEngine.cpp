@@ -58,7 +58,7 @@ public:
 
 namespace chip {
 namespace app {
-class TestInteractionModelEngine : public chip::Test::AppContext
+class TestInteractionModelEngine : public chip::Testing::AppContext
 {
 public:
     void TestSubjectHasActiveSubscriptionSingleSubOneEntry();
@@ -132,17 +132,17 @@ TEST_F(TestInteractionModelEngine, TestRemoveDuplicateConcreteAttribute)
     AttributePathParams attributePathParams3;
 
     // Three concrete paths, no duplicates
-    attributePathParams1.mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams1.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams1.mAttributeId = chip::Test::MockAttributeId(1);
+    attributePathParams1.mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams1.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams1.mAttributeId = chip::Testing::MockAttributeId(1);
 
-    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams2.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams2.mAttributeId = chip::Test::MockAttributeId(2);
+    attributePathParams2.mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams2.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams2.mAttributeId = chip::Testing::MockAttributeId(2);
 
-    attributePathParams3.mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams3.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams3.mAttributeId = chip::Test::MockAttributeId(3);
+    attributePathParams3.mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams3.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams3.mAttributeId = chip::Testing::MockAttributeId(3);
 
     EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1));
     EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams2));
@@ -155,13 +155,13 @@ TEST_F(TestInteractionModelEngine, TestRemoveDuplicateConcreteAttribute)
     attributePathParams1.mClusterId   = kInvalidClusterId;
     attributePathParams1.mAttributeId = kInvalidAttributeId;
 
-    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams2.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams2.mAttributeId = chip::Test::MockAttributeId(2);
+    attributePathParams2.mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams2.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams2.mAttributeId = chip::Testing::MockAttributeId(2);
 
-    attributePathParams3.mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams3.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams3.mAttributeId = chip::Test::MockAttributeId(3);
+    attributePathParams3.mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams3.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams3.mAttributeId = chip::Testing::MockAttributeId(3);
 
     // 1st path is wildcard endpoint, 2nd, 3rd paths are concrete paths, the concrete ones would be removed.
     EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1));
@@ -187,17 +187,17 @@ TEST_F(TestInteractionModelEngine, TestRemoveDuplicateConcreteAttribute)
     EXPECT_EQ(GetAttributePathListLength(attributePathParamsList), 1);
     engine->ReleaseAttributePathList(attributePathParamsList);
 
-    attributePathParams1.mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams1.mClusterId   = chip::Test::MockClusterId(2);
+    attributePathParams1.mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams1.mClusterId   = chip::Testing::MockClusterId(2);
     attributePathParams1.mAttributeId = kInvalidAttributeId;
 
-    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint2;
-    attributePathParams2.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams2.mAttributeId = chip::Test::MockAttributeId(2);
+    attributePathParams2.mEndpointId  = chip::Testing::kMockEndpoint2;
+    attributePathParams2.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams2.mAttributeId = chip::Testing::MockAttributeId(2);
 
-    attributePathParams3.mEndpointId  = chip::Test::kMockEndpoint2;
-    attributePathParams3.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams3.mAttributeId = chip::Test::MockAttributeId(3);
+    attributePathParams3.mEndpointId  = chip::Testing::kMockEndpoint2;
+    attributePathParams3.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams3.mAttributeId = chip::Testing::MockAttributeId(3);
 
     // 1st is wildcard one, but not intersect with the latter two concrete paths, so the paths in total are 3 finally
     EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1));
@@ -211,13 +211,13 @@ TEST_F(TestInteractionModelEngine, TestRemoveDuplicateConcreteAttribute)
     attributePathParams1.mClusterId   = kInvalidClusterId;
     attributePathParams1.mAttributeId = kInvalidAttributeId;
 
-    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint3;
+    attributePathParams2.mEndpointId  = chip::Testing::kMockEndpoint3;
     attributePathParams2.mClusterId   = kInvalidClusterId;
     attributePathParams2.mAttributeId = kInvalidAttributeId;
 
     attributePathParams3.mEndpointId  = kInvalidEndpointId;
     attributePathParams3.mClusterId   = kInvalidClusterId;
-    attributePathParams3.mAttributeId = chip::Test::MockAttributeId(3);
+    attributePathParams3.mAttributeId = chip::Testing::MockAttributeId(3);
 
     // Wildcards cannot be deduplicated.
     EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1));
@@ -228,12 +228,12 @@ TEST_F(TestInteractionModelEngine, TestRemoveDuplicateConcreteAttribute)
     engine->ReleaseAttributePathList(attributePathParamsList);
 
     attributePathParams1.mEndpointId  = kInvalidEndpointId;
-    attributePathParams1.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams1.mAttributeId = chip::Test::MockAttributeId(10);
+    attributePathParams1.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams1.mAttributeId = chip::Testing::MockAttributeId(10);
 
-    attributePathParams2.mEndpointId  = chip::Test::kMockEndpoint3;
-    attributePathParams2.mClusterId   = chip::Test::MockClusterId(2);
-    attributePathParams2.mAttributeId = chip::Test::MockAttributeId(10);
+    attributePathParams2.mEndpointId  = chip::Testing::kMockEndpoint3;
+    attributePathParams2.mClusterId   = chip::Testing::MockClusterId(2);
+    attributePathParams2.mAttributeId = chip::Testing::MockAttributeId(10);
 
     // 1st path is wildcard endpoint, 2nd path is invalid attribute
     EXPECT_SUCCESS(engine->PushFrontAttributePathList(attributePathParamsList, attributePathParams1));

@@ -318,7 +318,7 @@ void InitChefOvenCavityOperationalStateCluster()
         gDelegateTable[epIndex] = std::make_unique<ChefDelegate>();
 
         gInstanceTable[epIndex] = std::make_unique<Instance>(gDelegateTable[epIndex].get(), endpointId);
-        gInstanceTable[epIndex]->Init();
+        TEMPORARY_RETURN_IGNORED gInstanceTable[epIndex]->Init();
 
         ChipLogProgress(DeviceLayer, "Endpoint %d OvenCavityOperationalState Initialized.", endpointId);
     }

@@ -60,14 +60,14 @@ void TargetNavigatorManager::HandleNavigateTarget(CommandResponseHelper<Navigate
     {
         response.data   = chip::MakeOptional(CharSpan::fromCharString("error"));
         response.status = StatusEnum::kTargetNotFound;
-        helper.Success(response);
+        TEMPORARY_RETURN_IGNORED helper.Success(response);
         return;
     }
     mCurrentTarget = static_cast<uint8_t>(target);
 
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 uint16_t TargetNavigatorManager::GetClusterRevision(chip::EndpointId endpoint)

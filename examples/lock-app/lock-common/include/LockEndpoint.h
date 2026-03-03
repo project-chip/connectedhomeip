@@ -62,7 +62,8 @@ public:
         }
         DoorLockServer::Instance().SetDoorState(endpointId, mDoorState);
         DoorLockServer::Instance().SetLockState(endpointId, mLockState);
-        chip::Crypto::DRBG_get_bytes(mAliroReaderGroupSubIdentifier, sizeof(mAliroReaderGroupSubIdentifier));
+        TEMPORARY_RETURN_IGNORED chip::Crypto::DRBG_get_bytes(mAliroReaderGroupSubIdentifier,
+                                                              sizeof(mAliroReaderGroupSubIdentifier));
     }
 
     inline chip::EndpointId GetEndpointId() const { return mEndpointId; }

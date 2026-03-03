@@ -27,11 +27,11 @@
 
 namespace chip {
 
-namespace Test {
+namespace Testing {
 
 class AutoCommissionerTestAccess;
 
-} // namespace Test
+} // namespace Testing
 
 namespace Controller {
 
@@ -40,7 +40,7 @@ class DeviceCommissioner;
 class AutoCommissioner : public CommissioningDelegate
 {
 
-    friend class chip::Test::AutoCommissionerTestAccess;
+    friend class chip::Testing::AutoCommissionerTestAccess;
 
 public:
     AutoCommissioner();
@@ -57,6 +57,8 @@ public:
     ByteSpan GetAttestationElements() const { return ByteSpan(mAttestationElements, mAttestationElementsLen); }
     ByteSpan GetAttestationSignature() const { return ByteSpan(mAttestationSignature, mAttestationSignatureLen); }
     ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce); }
+
+    void SetNetworkSetupNeeded(bool needed) { mNeedsNetworkSetup = needed; }
 
 protected:
     virtual void CleanupCommissioning();

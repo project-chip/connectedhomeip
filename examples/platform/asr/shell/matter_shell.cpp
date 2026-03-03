@@ -37,6 +37,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include "init_OTARequestor.h"
 #endif
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -57,7 +58,7 @@ void asr_matter_reset(Reset_t type)
     {
         ConnectivityMgr().ClearWiFiStationProvision();
         chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
-        chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
     else if (type == FACTORY_RESET)
     {
@@ -67,15 +68,15 @@ void asr_matter_reset(Reset_t type)
     {
         chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
         auto & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
-        commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
-                                                   CommissioningWindowAdvertisement::kDnssdOnly);
+        TEMPORARY_RETURN_IGNORED commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                                            CommissioningWindowAdvertisement::kDnssdOnly);
     }
 }
 
 void ShutdownChip()
 {
     Server::GetInstance().Shutdown();
-    PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask();
     PlatformMgr().Shutdown();
 }
 
@@ -97,8 +98,8 @@ void asr_matter_sensors(bool enable, int temp, int humi, int pressure)
 #ifdef ASR_BOARD_ENABLE_SENSORS
     if (enable)
     {
-        chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(
-            /* endpoint ID */ 1, static_cast<int16_t>(temp));
+        LogErrorOnFailure(
+            chip::app::Clusters::TemperatureMeasurement::SetMeasuredValue(/* endpoint ID */ 1, static_cast<int16_t>(temp)));
 
         chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(
             /* endpoint ID */ 1, static_cast<int16_t>(humi));

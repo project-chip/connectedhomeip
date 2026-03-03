@@ -16,22 +16,31 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
+#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
-#include <app/util/odd-sized-integers.h>
+#include <clusters/ColorControl/Ids.h>
+#include <clusters/LevelControl/Ids.h>
+#include <clusters/OnOff/Ids.h>
+#include <clusters/ScenesManagement/Ids.h>
 #include <crypto/DefaultSessionKeystore.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/odd-sized-integers.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
+
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Globals::Attributes;
 
 using SceneTable        = scenes::SceneTable<scenes::ExtensionFieldSetsImpl>;
@@ -49,31 +58,27 @@ constexpr uint8_t defaultTestTableSize      = 16;
 constexpr uint8_t defaultTestFabricCapacity = (defaultTestTableSize - 1) / 2;
 
 // Test Cluster ID
-constexpr chip::ClusterId kOnOffClusterId        = 0x0006;
-constexpr chip::ClusterId kLevelControlClusterId = 0x0008;
-constexpr chip::ClusterId kFakeClusterId         = 0x0007;
-constexpr chip::ClusterId kColorControlClusterId = 0x0300;
-constexpr chip::ClusterId kScenesClusterId       = 0x0062;
+constexpr chip::ClusterId kFakeClusterId = 0x0007;
 
 // Test Endpoint ID
-constexpr chip::EndpointId kTestEndpoint1 = chip::Test::kMockEndpoint1;
-constexpr chip::EndpointId kTestEndpoint2 = chip::Test::kMockEndpoint2;
-constexpr chip::EndpointId kTestEndpoint3 = chip::Test::kMockEndpoint3;
+constexpr chip::EndpointId kTestEndpoint1 = kMockEndpoint1;
+constexpr chip::EndpointId kTestEndpoint2 = kMockEndpoint2;
+constexpr chip::EndpointId kTestEndpoint3 = kMockEndpoint3;
 constexpr chip::EndpointId kTestEndpoint4 = kMockEndpointMin;
 
 // Test Attribute ID
-constexpr uint32_t kOnOffAttId               = app::Clusters::OnOff::Attributes::OnOff::Id;
-constexpr uint32_t kCurrentLevelId           = app::Clusters::LevelControl::Attributes::CurrentLevel::Id;
-constexpr uint32_t kCurrentFrequencyId       = app::Clusters::LevelControl::Attributes::CurrentFrequency::Id;
-constexpr uint32_t kCurrentSaturationId      = app::Clusters::ColorControl::Attributes::CurrentSaturation::Id;
-constexpr uint32_t kCurrentXId               = app::Clusters::ColorControl::Attributes::CurrentX::Id;
-constexpr uint32_t kCurrentYId               = app::Clusters::ColorControl::Attributes::CurrentY::Id;
-constexpr uint32_t kColorTemperatureMiredsId = app::Clusters::ColorControl::Attributes::ColorTemperatureMireds::Id;
-constexpr uint32_t kEnhancedCurrentHueId     = app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::Id;
-constexpr uint32_t kEnhancedColorMode        = app::Clusters::ColorControl::Attributes::EnhancedColorMode::Id;
-constexpr uint32_t kColorLoopActiveId        = app::Clusters::ColorControl::Attributes::ColorLoopActive::Id;
-constexpr uint32_t kColorLoopDirectionId     = app::Clusters::ColorControl::Attributes::ColorLoopDirection::Id;
-constexpr uint32_t kColorLoopTimeId          = app::Clusters::ColorControl::Attributes::ColorLoopTime::Id;
+constexpr uint32_t kOnOffAttId               = OnOff::Attributes::OnOff::Id;
+constexpr uint32_t kCurrentLevelId           = LevelControl::Attributes::CurrentLevel::Id;
+constexpr uint32_t kCurrentFrequencyId       = LevelControl::Attributes::CurrentFrequency::Id;
+constexpr uint32_t kCurrentSaturationId      = ColorControl::Attributes::CurrentSaturation::Id;
+constexpr uint32_t kCurrentXId               = ColorControl::Attributes::CurrentX::Id;
+constexpr uint32_t kCurrentYId               = ColorControl::Attributes::CurrentY::Id;
+constexpr uint32_t kColorTemperatureMiredsId = ColorControl::Attributes::ColorTemperatureMireds::Id;
+constexpr uint32_t kEnhancedCurrentHueId     = ColorControl::Attributes::EnhancedCurrentHue::Id;
+constexpr uint32_t kEnhancedColorMode        = ColorControl::Attributes::EnhancedColorMode::Id;
+constexpr uint32_t kColorLoopActiveId        = ColorControl::Attributes::ColorLoopActive::Id;
+constexpr uint32_t kColorLoopDirectionId     = ColorControl::Attributes::ColorLoopDirection::Id;
+constexpr uint32_t kColorLoopTimeId          = ColorControl::Attributes::ColorLoopTime::Id;
 
 // Test Group ID
 constexpr chip::GroupId kGroup1 = 0x101;
@@ -147,13 +152,13 @@ SceneTableEntry scene14(sceneId11, sceneData14);
 SceneTableEntry scene15(sceneId12, sceneData15);
 
 // Clusters EFS data
-static app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type OOextensionFieldSet;
-static app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type LCextensionFieldSet;
-static app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type CCextensionFieldSet;
+static ScenesManagement::Structs::ExtensionFieldSetStruct::Type OOextensionFieldSet;
+static ScenesManagement::Structs::ExtensionFieldSetStruct::Type LCextensionFieldSet;
+static ScenesManagement::Structs::ExtensionFieldSetStruct::Type CCextensionFieldSet;
 
-static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type OOPairs[1];
-static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type LCPairs[2];
-static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type CCPairs[9];
+static ScenesManagement::Structs::AttributeValuePairStruct::Type OOPairs[1];
+static ScenesManagement::Structs::AttributeValuePairStruct::Type LCPairs[2];
+static ScenesManagement::Structs::AttributeValuePairStruct::Type CCPairs[9];
 
 static uint8_t OO_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
 static uint8_t LC_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
@@ -319,20 +324,20 @@ static EmberAfAttributeMetadata mockMetadataInt64 = {
 // clang-format off
 static const MockNodeConfig SceneMockNodeConfig({
     MockEndpointConfig(kTestEndpoint1, {
-        MockClusterConfig(kScenesClusterId, {}),
-        MockClusterConfig(kOnOffClusterId, {
+        MockClusterConfig(ScenesManagement::Id, {}),
+        MockClusterConfig(OnOff::Id, {
             MockAttributeConfig(kOnOffAttId, mockMetadataBool)
         }),
-        MockClusterConfig(kLevelControlClusterId, {
+        MockClusterConfig(LevelControl::Id, {
             MockAttributeConfig(kCurrentLevelId, mockMetadataUint8Max), MockAttributeConfig(kCurrentFrequencyId, mockMetadataUint16)
         }),
     }),
     MockEndpointConfig(kTestEndpoint2, {
-        MockClusterConfig(kScenesClusterId, {}),
-        MockClusterConfig(kOnOffClusterId, {
+        MockClusterConfig(ScenesManagement::Id, {}),
+        MockClusterConfig(OnOff::Id, {
             MockAttributeConfig(kOnOffAttId, mockMetadataBool)
         }),
-        MockClusterConfig(kColorControlClusterId, {
+        MockClusterConfig(ColorControl::Id, {
             MockAttributeConfig(kCurrentSaturationId, mockMetadataUint8), MockAttributeConfig(kCurrentXId, mockMetadataUint16),
             MockAttributeConfig(kCurrentYId, mockMetadataUint16), MockAttributeConfig(kColorTemperatureMiredsId, mockMetadataUint16),
             MockAttributeConfig(kEnhancedCurrentHueId, mockMetadataUint16), MockAttributeConfig(kEnhancedColorMode, mockMetadataUint8),
@@ -341,14 +346,14 @@ static const MockNodeConfig SceneMockNodeConfig({
         }),
     }),
     MockEndpointConfig(kTestEndpoint3, {
-        MockClusterConfig(kScenesClusterId, {}),
-        MockClusterConfig(kOnOffClusterId, {
+        MockClusterConfig(ScenesManagement::Id, {}),
+        MockClusterConfig(OnOff::Id, {
             MockAttributeConfig(kOnOffAttId, mockMetadataBool)
         }),
-        MockClusterConfig(kLevelControlClusterId, {
+        MockClusterConfig(LevelControl::Id, {
             MockAttributeConfig(kCurrentLevelId, mockMetadataUint8Max), MockAttributeConfig(kCurrentFrequencyId, mockMetadataUint16)
         }),
-        MockClusterConfig(kColorControlClusterId, {
+        MockClusterConfig(ColorControl::Id, {
             MockAttributeConfig(kCurrentSaturationId, mockMetadataUint8), MockAttributeConfig(kCurrentXId, mockMetadataUint16),
             MockAttributeConfig(kCurrentYId, mockMetadataUint16), MockAttributeConfig(kColorTemperatureMiredsId, mockMetadataUint16),
             MockAttributeConfig(kEnhancedCurrentHueId, mockMetadataUint16), MockAttributeConfig(kEnhancedColorMode, mockMetadataUint8),
@@ -358,18 +363,18 @@ static const MockNodeConfig SceneMockNodeConfig({
     }),
 
     MockEndpointConfig(kTestEndpoint4, {
-        MockClusterConfig(kScenesClusterId, {}),
-        MockClusterConfig(MockClusterId(kColorControlClusterId), {
+        MockClusterConfig(ScenesManagement::Id, {}),
+        MockClusterConfig(MockClusterId(ColorControl::Id), {
             MockAttributeConfig(MockAttributeId(kCurrentSaturationId), mockMetadataUint24), MockAttributeConfig(MockAttributeId(kCurrentXId), mockMetadataUint32),
             MockAttributeConfig(MockAttributeId(kCurrentYId), mockMetadataUint48), MockAttributeConfig(MockAttributeId(kColorTemperatureMiredsId), mockMetadataUint56),
             MockAttributeConfig(MockAttributeId(kEnhancedCurrentHueId), mockMetadataUint64), MockAttributeConfig(MockAttributeId(kEnhancedColorMode), mockMetadataInt8),
             MockAttributeConfig(MockAttributeId(kColorLoopActiveId), mockMetadataInt16), MockAttributeConfig(MockAttributeId(kColorLoopDirectionId), mockMetadataInt24),
             MockAttributeConfig(MockAttributeId(kColorLoopTimeId), mockMetadataInt32)
         }),
-        MockClusterConfig(MockClusterId(kOnOffClusterId), {
+        MockClusterConfig(MockClusterId(OnOff::Id), {
             MockAttributeConfig(MockAttributeId(kOnOffAttId), mockMetadataInt48)
         }),
-        MockClusterConfig(MockClusterId(kLevelControlClusterId), {
+        MockClusterConfig(MockClusterId(LevelControl::Id), {
             MockAttributeConfig(MockAttributeId(kCurrentLevelId), mockMetadataInt56), MockAttributeConfig(MockAttributeId(kCurrentFrequencyId), mockMetadataInt64)
         }),
         MockClusterConfig(MockClusterId(kFakeClusterId), {
@@ -383,63 +388,15 @@ static const MockNodeConfig SceneMockNodeConfig({
 class TestSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
-    TestSceneHandler() = default;
-    ~TestSceneHandler() override {}
-
-    // Fills in cluster buffer and adjusts its size to lower than the maximum number of cluster per scenes
-    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
-    {
-        ClusterId * buffer = clusterBuffer.data();
-        if (endpoint == kTestEndpoint1)
-        {
-            if (clusterBuffer.size() >= 2)
-            {
-                buffer[0] = kOnOffClusterId;
-                buffer[1] = kLevelControlClusterId;
-                clusterBuffer.reduce_size(2);
-            }
-        }
-        else if (endpoint == kTestEndpoint2)
-        {
-            if (clusterBuffer.size() >= 2)
-            {
-                buffer[0] = kOnOffClusterId;
-                buffer[1] = kColorControlClusterId;
-                clusterBuffer.reduce_size(2);
-            }
-        }
-        else if (endpoint == kTestEndpoint3)
-        {
-            if (clusterBuffer.size() >= 3)
-            {
-                buffer[0] = kOnOffClusterId;
-                buffer[1] = kLevelControlClusterId;
-                buffer[2] = kColorControlClusterId;
-                clusterBuffer.reduce_size(3);
-            }
-        }
-        else if (endpoint == kTestEndpoint4)
-        {
-            if (clusterBuffer.size() >= 3)
-            {
-                buffer[0] = MockClusterId(kOnOffClusterId);
-                buffer[1] = MockClusterId(kLevelControlClusterId);
-                buffer[2] = MockClusterId(kColorControlClusterId);
-                clusterBuffer.reduce_size(3);
-            }
-        }
-        else
-        {
-            clusterBuffer.reduce_size(0);
-        }
-    }
+    TestSceneHandler() : DefaultSceneHandlerImpl(scenes::CodegenAttributeValuePairValidator::Instance()) {}
+    ~TestSceneHandler() override = default;
 
     // Default function only checks if endpoint and clusters are valid
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
     {
         if (endpoint == kTestEndpoint1)
         {
-            if (cluster == kOnOffClusterId || cluster == kLevelControlClusterId)
+            if (cluster == OnOff::Id || cluster == LevelControl::Id)
             {
                 return true;
             }
@@ -447,7 +404,7 @@ public:
 
         if (endpoint == kTestEndpoint2)
         {
-            if (cluster == kOnOffClusterId || cluster == kColorControlClusterId)
+            if (cluster == OnOff::Id || cluster == ColorControl::Id)
             {
                 return true;
             }
@@ -455,7 +412,7 @@ public:
 
         if (endpoint == kTestEndpoint3)
         {
-            if (cluster == kOnOffClusterId || cluster == kLevelControlClusterId || cluster == kColorControlClusterId)
+            if (cluster == OnOff::Id || cluster == LevelControl::Id || cluster == ColorControl::Id)
             {
                 return true;
             }
@@ -463,8 +420,8 @@ public:
 
         if (endpoint == kTestEndpoint4)
         {
-            if (cluster == MockClusterId(kColorControlClusterId) || cluster == MockClusterId(kLevelControlClusterId) ||
-                cluster == MockClusterId(kColorControlClusterId) || cluster == MockClusterId(kFakeClusterId))
+            if (cluster == MockClusterId(ColorControl::Id) || cluster == MockClusterId(LevelControl::Id) ||
+                cluster == MockClusterId(kFakeClusterId))
             {
                 return true;
             }
@@ -486,14 +443,14 @@ public:
         {
             switch (cluster)
             {
-            case kOnOffClusterId:
+            case OnOff::Id:
                 err = CHIP_NO_ERROR;
                 // Warning: OO_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldBytesPerCluster);
                 // Warning: serialized size of the buffer must also be computed before calling this function
                 serialisedBytes.reduce_size(OO_buffer_serialized_length); // Used memory for OnOff TLV
                 break;
-            case kLevelControlClusterId:
+            case LevelControl::Id:
                 err = CHIP_NO_ERROR;
                 // Warning: LC_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), LC_buffer, scenes::kMaxFieldBytesPerCluster);
@@ -508,14 +465,14 @@ public:
         {
             switch (cluster)
             {
-            case kOnOffClusterId:
+            case OnOff::Id:
                 err = CHIP_NO_ERROR;
                 // Warning: OO_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldBytesPerCluster);
                 // Warning: serialized size of the buffer must also be computed before calling this function
                 serialisedBytes.reduce_size(OO_buffer_serialized_length); // Used memory for OnOff TLV
                 break;
-            case kColorControlClusterId:
+            case ColorControl::Id:
                 err = CHIP_NO_ERROR;
                 // Warning: CC_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), CC_buffer, scenes::kMaxFieldBytesPerCluster);
@@ -530,21 +487,21 @@ public:
         {
             switch (cluster)
             {
-            case kOnOffClusterId:
+            case OnOff::Id:
                 err = CHIP_NO_ERROR;
                 // Warning: OO_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldBytesPerCluster);
                 // Warning: serialized size of the buffer must also be computed before calling this function
                 serialisedBytes.reduce_size(OO_buffer_serialized_length); // Used memory for OnOff TLV
                 break;
-            case kLevelControlClusterId:
+            case LevelControl::Id:
                 err = CHIP_NO_ERROR;
                 // Warning: LC_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), LC_buffer, scenes::kMaxFieldBytesPerCluster);
                 // Warning: serialized size of the buffer must also be computed before calling this function
                 serialisedBytes.reduce_size(LC_buffer_serialized_length); // Used memory for Level Control TLV
                 break;
-            case kColorControlClusterId:
+            case ColorControl::Id:
                 err = CHIP_NO_ERROR;
                 // Warning: CC_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), CC_buffer, scenes::kMaxFieldBytesPerCluster);
@@ -575,13 +532,13 @@ public:
         {
             switch (cluster)
             {
-            case kOnOffClusterId:
+            case OnOff::Id:
                 if (!memcmp(serialisedBytes.data(), OO_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
                 }
                 break;
-            case kLevelControlClusterId:
+            case LevelControl::Id:
                 if (!memcmp(serialisedBytes.data(), LC_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
@@ -597,13 +554,13 @@ public:
         {
             switch (cluster)
             {
-            case kOnOffClusterId:
+            case OnOff::Id:
                 if (!memcmp(serialisedBytes.data(), OO_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
                 }
                 break;
-            case kColorControlClusterId:
+            case ColorControl::Id:
                 if (!memcmp(serialisedBytes.data(), CC_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
@@ -619,19 +576,19 @@ public:
         {
             switch (cluster)
             {
-            case kOnOffClusterId:
+            case OnOff::Id:
                 if (!memcmp(serialisedBytes.data(), OO_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
                 }
                 break;
-            case kLevelControlClusterId:
+            case LevelControl::Id:
                 if (!memcmp(serialisedBytes.data(), LC_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
                 }
                 break;
-            case kColorControlClusterId:
+            case ColorControl::Id:
                 if (!memcmp(serialisedBytes.data(), CC_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
@@ -655,20 +612,16 @@ public:
     ~TestSceneTableImpl() override {}
 
 protected:
-    uint8_t GetClustersFromEndpoint(ClusterId * clusterList, uint8_t listLen) override
+    CHIP_ERROR ServerClusters(ReadOnlyBufferBuilder<app::DataModel::ServerClusterEntry> & builder) override
     {
-        if (listLen >= 3)
-        {
-            clusterList[0] = kOnOffClusterId;
-            clusterList[1] = kLevelControlClusterId;
-            clusterList[2] = kColorControlClusterId;
-            return 3;
-        }
+        static constexpr app::DataModel::ServerClusterEntry testEntries[] = {
+            { OnOff::Id, 0 /* dataVersion */, {} /* flags */ },
+            { LevelControl::Id, 0 /* dataVersion */, {} /* flags */ },
+            { ColorControl::Id, 0 /* dataVersion */, {} /* flags */ },
+        };
 
-        return 0;
+        return builder.ReferenceExisting(testEntries);
     }
-
-    uint8_t GetClusterCountFromEndpoint() override { return 3; }
 };
 
 // Test Fixture Class
@@ -677,16 +630,17 @@ class TestSceneTable : public ::testing::Test
 public:
     static void SetUpTestSuite()
     {
-        mpTestStorage  = new chip::TestPersistentStorageDelegate;
+        mpTestStorage  = new TestPersistentStorageDelegate;
         mpSceneHandler = new TestSceneHandler;
 
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
 
         // Initialize Scene Table
         SceneTable * sceneTable = scenes::GetSceneTableImpl();
         ASSERT_NE(sceneTable, nullptr);
-        ASSERT_EQ(sceneTable->Init(*mpTestStorage), CHIP_NO_ERROR);
+        ASSERT_EQ(sceneTable->Init(*mpTestStorage, app::CodegenDataModelProvider::Instance()), CHIP_NO_ERROR);
         SetMockNodeConfig(SceneMockNodeConfig);
+        app::InteractionModelEngine::GetInstance()->SetDataModelProvider(&app::CodegenDataModelProvider::Instance());
     }
 
     static void TearDownTestSuite()
@@ -699,17 +653,17 @@ public:
         delete mpSceneHandler;
         mpTestStorage  = nullptr;
         mpSceneHandler = nullptr;
-        chip::Platform::MemoryShutdown();
+        Platform::MemoryShutdown();
     }
 
     // Storage
-    static chip::TestPersistentStorageDelegate * mpTestStorage;
+    static TestPersistentStorageDelegate * mpTestStorage;
     // Scene
     static TestSceneHandler * mpSceneHandler;
 };
 
-chip::TestPersistentStorageDelegate * TestSceneTable::mpTestStorage = nullptr;
-TestSceneHandler * TestSceneTable::mpSceneHandler                   = nullptr;
+TestPersistentStorageDelegate * TestSceneTable::mpTestStorage = nullptr;
+TestSceneHandler * TestSceneTable::mpSceneHandler             = nullptr;
 
 void ResetSceneTable(SceneTable * sceneTable)
 {
@@ -774,8 +728,8 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
 {
     SceneTable * sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);
     ASSERT_NE(nullptr, sceneTable);
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type extensionFieldSetOut;
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType extensionFieldSetIn;
+    ScenesManagement::Structs::ExtensionFieldSetStruct::Type extensionFieldSetOut;
+    ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType extensionFieldSetIn;
 
     TLV::TLVReader reader;
     TLV::TLVWriter writer;
@@ -808,11 +762,11 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     CCPairs[8].valueUnsigned16.SetValue(0);
 
     // Initialize Extension Field sets as if they were received by add commands
-    OOextensionFieldSet.clusterID          = kOnOffClusterId;
+    OOextensionFieldSet.clusterID          = OnOff::Id;
     OOextensionFieldSet.attributeValueList = OOPairs;
-    LCextensionFieldSet.clusterID          = kLevelControlClusterId;
+    LCextensionFieldSet.clusterID          = LevelControl::Id;
     LCextensionFieldSet.attributeValueList = LCPairs;
-    CCextensionFieldSet.clusterID          = kColorControlClusterId;
+    CCextensionFieldSet.clusterID          = ColorControl::Id;
     CCextensionFieldSet.attributeValueList = CCPairs;
 
     ByteSpan OO_list(OO_buffer);
@@ -842,7 +796,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
 
     // Setup the On Off Extension field set in the expected state from a command
     reader.Init(OO_list);
-    extensionFieldSetIn.clusterID = kOnOffClusterId;
+    extensionFieldSetIn.clusterID = OnOff::Id;
     EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
     EXPECT_EQ(CHIP_NO_ERROR, extensionFieldSetIn.attributeValueList.Decode(reader));
 
@@ -856,7 +810,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
 
     // Setup the Level Control Extension field set in the expected state from a command
     reader.Init(LC_list);
-    extensionFieldSetIn.clusterID = kLevelControlClusterId;
+    extensionFieldSetIn.clusterID = LevelControl::Id;
     EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
     EXPECT_EQ(CHIP_NO_ERROR, extensionFieldSetIn.attributeValueList.Decode(reader));
 
@@ -870,7 +824,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
 
     // Setup the Color control Extension field set in the expected state from a command
     reader.Init(CC_list);
-    extensionFieldSetIn.clusterID = kColorControlClusterId;
+    extensionFieldSetIn.clusterID = ColorControl::Id;
     EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
     EXPECT_EQ(CHIP_NO_ERROR, extensionFieldSetIn.attributeValueList.Decode(reader));
 
@@ -883,8 +837,8 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     buff_span = MutableByteSpan(buffer);
 
     // Verify Deserializing is properly filling out output extension field set for on off
-    EXPECT_TRUE(mpSceneHandler->SupportsCluster(kTestEndpoint1, kOnOffClusterId));
-    EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->Deserialize(kTestEndpoint1, kOnOffClusterId, OO_list, extensionFieldSetOut));
+    EXPECT_TRUE(mpSceneHandler->SupportsCluster(kTestEndpoint1, OnOff::Id));
+    EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->Deserialize(kTestEndpoint1, OnOff::Id, OO_list, extensionFieldSetOut));
 
     // Verify Encoding the Extension field set returns the same data as the one serialized for on off previously
     writer.Init(buff_span);
@@ -893,8 +847,8 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     memset(buffer, 0, buff_span.size());
 
     // Verify Deserializing is properly filling out output extension field set for level control
-    EXPECT_TRUE(mpSceneHandler->SupportsCluster(kTestEndpoint1, kLevelControlClusterId));
-    EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->Deserialize(kTestEndpoint1, kLevelControlClusterId, LC_list, extensionFieldSetOut));
+    EXPECT_TRUE(mpSceneHandler->SupportsCluster(kTestEndpoint1, LevelControl::Id));
+    EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->Deserialize(kTestEndpoint1, LevelControl::Id, LC_list, extensionFieldSetOut));
 
     // Verify Encoding the Extension field set returns the same data as the one serialized for level control previously
     writer.Init(buff_span);
@@ -903,8 +857,8 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     memset(buffer, 0, buff_span.size());
 
     // Verify Deserializing is properly filling out output extension field set for color control
-    EXPECT_TRUE(mpSceneHandler->SupportsCluster(kTestEndpoint2, kColorControlClusterId));
-    EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->Deserialize(kTestEndpoint2, kColorControlClusterId, CC_list, extensionFieldSetOut));
+    EXPECT_TRUE(mpSceneHandler->SupportsCluster(kTestEndpoint2, ColorControl::Id));
+    EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->Deserialize(kTestEndpoint2, ColorControl::Id, CC_list, extensionFieldSetOut));
 
     // Verify Encoding the Extension field set returns the same data as the one serialized for color control previously
     writer.Init(buff_span);
@@ -913,16 +867,16 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     memset(buffer, 0, buff_span.size());
 
     // To test failure on serialize and deserialize when too many pairs are in the field sets
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type extensionFieldFailTestOut;
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType extensionFieldFailTestIn;
-    app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type TooManyPairs[16];
+    ScenesManagement::Structs::ExtensionFieldSetStruct::Type extensionFieldFailTestOut;
+    ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType extensionFieldFailTestIn;
+    ScenesManagement::Structs::AttributeValuePairStruct::Type TooManyPairs[16];
 
     for (uint8_t i = 0; i < 16; i++)
     {
         TooManyPairs[i].valueUnsigned8.SetValue(0);
     }
 
-    extensionFieldFailTestOut.clusterID          = kColorControlClusterId;
+    extensionFieldFailTestOut.clusterID          = ColorControl::Id;
     extensionFieldFailTestOut.attributeValueList = TooManyPairs;
 
     // Give a bigger buffer given we are using too many pairs on purpose
@@ -935,14 +889,14 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
 
     // Setup the On Off Extension field set in the expected state from a command
     reader.Init(fail_list);
-    extensionFieldFailTestIn.clusterID = kColorControlClusterId;
+    extensionFieldFailTestIn.clusterID = ColorControl::Id;
     EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
     EXPECT_EQ(CHIP_NO_ERROR, extensionFieldFailTestIn.attributeValueList.Decode(reader));
 
     // Verify failure on both serialize and deserialize
     EXPECT_EQ(CHIP_ERROR_BUFFER_TOO_SMALL, mpSceneHandler->SerializeAdd(kTestEndpoint1, extensionFieldFailTestIn, buff_span));
     EXPECT_EQ(CHIP_ERROR_BUFFER_TOO_SMALL,
-              mpSceneHandler->Deserialize(kTestEndpoint1, kColorControlClusterId, fail_list, extensionFieldFailTestOut));
+              mpSceneHandler->Deserialize(kTestEndpoint1, ColorControl::Id, fail_list, extensionFieldFailTestOut));
 
     memset(failBuffer, 0, fail_list.size());
     memset(buffer, 0, buff_span.size());
@@ -951,10 +905,10 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     OOPairs[0].valueUnsigned8.SetValue(0xFF);
 
     // EFS to test caping of value once a variable above the mock attribute size is serialized
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type extensionFieldValueCapOut;
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType extensionFieldValueCapIn;
+    ScenesManagement::Structs::ExtensionFieldSetStruct::Type extensionFieldValueCapOut;
+    ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType extensionFieldValueCapIn;
 
-    extensionFieldValueCapOut.clusterID          = kOnOffClusterId;
+    extensionFieldValueCapOut.clusterID          = OnOff::Id;
     extensionFieldValueCapOut.attributeValueList = OOPairs;
 
     /// Setup of input EFS (by temporary using the output one)
@@ -962,19 +916,19 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     EXPECT_EQ(CHIP_NO_ERROR, app::DataModel::Encode(writer, TLV::AnonymousTag(), extensionFieldValueCapOut.attributeValueList));
 
     reader.Init(buffer);
-    extensionFieldValueCapIn.clusterID = kOnOffClusterId;
+    extensionFieldValueCapIn.clusterID = OnOff::Id;
     EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
     EXPECT_EQ(CHIP_NO_ERROR, extensionFieldValueCapIn.attributeValueList.Decode(reader));
 
     // Verify that the initial value is not capped
     auto pair_iterator = extensionFieldValueCapIn.attributeValueList.begin();
     pair_iterator.Next();
-    app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type pair = pair_iterator.GetValue();
+    ScenesManagement::Structs::AttributeValuePairStruct::Type pair = pair_iterator.GetValue();
     EXPECT_EQ(pair.valueUnsigned8.Value(), OOPairs[0].valueUnsigned8.Value());
 
     // Verify that we cap the value to the mock attribute size when serializing
     EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->SerializeAdd(kTestEndpoint1, extensionFieldValueCapIn, buff_span));
-    EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->Deserialize(kTestEndpoint1, kOnOffClusterId, buff_span, extensionFieldValueCapOut));
+    EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->Deserialize(kTestEndpoint1, OnOff::Id, buff_span, extensionFieldValueCapOut));
 
     // Verify that the output value is capped to 1
     EXPECT_EQ(1, extensionFieldValueCapOut.attributeValueList[0].valueUnsigned8.Value());
@@ -985,7 +939,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     // Test Serialize Add of an attribute value that is smaller than the mock attribute min (1) for LC current level
     LCPairs[0].valueUnsigned8.SetValue(0);
 
-    extensionFieldValueCapOut.clusterID          = kLevelControlClusterId;
+    extensionFieldValueCapOut.clusterID          = LevelControl::Id;
     extensionFieldValueCapOut.attributeValueList = LCPairs;
 
     /// Setup of input EFS (by temporary using the output one)
@@ -994,7 +948,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     EXPECT_EQ(CHIP_NO_ERROR, app::DataModel::Encode(writer, TLV::AnonymousTag(), extensionFieldValueCapOut.attributeValueList));
 
     reader.Init(buffer);
-    extensionFieldValueCapIn.clusterID = kLevelControlClusterId;
+    extensionFieldValueCapIn.clusterID = LevelControl::Id;
     EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
     EXPECT_EQ(CHIP_NO_ERROR, extensionFieldValueCapIn.attributeValueList.Decode(reader));
 
@@ -1006,8 +960,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
 
     // Verify that we cap the value to the mock attribute size when serializing
     EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->SerializeAdd(kTestEndpoint1, extensionFieldValueCapIn, buff_span));
-    EXPECT_EQ(CHIP_NO_ERROR,
-              mpSceneHandler->Deserialize(kTestEndpoint1, kLevelControlClusterId, buff_span, extensionFieldValueCapOut));
+    EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->Deserialize(kTestEndpoint1, LevelControl::Id, buff_span, extensionFieldValueCapOut));
 
     // Verify that the output value is capped to 255 (NULL) as Level Control Current Level is a nullable uint8_t
     EXPECT_EQ(255, extensionFieldValueCapOut.attributeValueList[0].valueUnsigned8.Value());
@@ -1018,7 +971,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     // Test Serialize Add of an attribute value that is higher than the mock attribute max (0xFE) for LC current level
     LCPairs[0].valueUnsigned8.SetValue(0xFF);
 
-    extensionFieldValueCapOut.clusterID          = kLevelControlClusterId;
+    extensionFieldValueCapOut.clusterID          = LevelControl::Id;
     extensionFieldValueCapOut.attributeValueList = LCPairs;
 
     /// Setup of input EFS (by temporary using the output one)
@@ -1027,7 +980,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     EXPECT_EQ(CHIP_NO_ERROR, app::DataModel::Encode(writer, TLV::AnonymousTag(), extensionFieldValueCapOut.attributeValueList));
 
     reader.Init(buffer);
-    extensionFieldValueCapIn.clusterID = kLevelControlClusterId;
+    extensionFieldValueCapIn.clusterID = LevelControl::Id;
     EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
     EXPECT_EQ(CHIP_NO_ERROR, extensionFieldValueCapIn.attributeValueList.Decode(reader));
 
@@ -1037,8 +990,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     pair = iteratorMax.GetValue();
     EXPECT_EQ(pair.valueUnsigned8.Value(), LCPairs[0].valueUnsigned8.Value());
     EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->SerializeAdd(kTestEndpoint1, extensionFieldValueCapIn, buff_span));
-    EXPECT_EQ(CHIP_NO_ERROR,
-              mpSceneHandler->Deserialize(kTestEndpoint1, kLevelControlClusterId, buff_span, extensionFieldValueCapOut));
+    EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->Deserialize(kTestEndpoint1, LevelControl::Id, buff_span, extensionFieldValueCapOut));
 
     // Verify that the output value is 0xFF (NULL) as Level Control Current Level is a nullable uint8_t
     EXPECT_EQ(0xFF, extensionFieldValueCapOut.attributeValueList[0].valueUnsigned8.Value());
@@ -1050,10 +1002,10 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     // Test for attribtues types that are in no Real clusters yet but are supported in scenes
     {
         // Setup EFS for mock cluster testing all attributes types
-        app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type MockOOPairs[1];
-        app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type MockLCPairs[2];
-        app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type MockCCPairs[9];
-        app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type MockFKPairs[2];
+        ScenesManagement::Structs::AttributeValuePairStruct::Type MockOOPairs[1];
+        ScenesManagement::Structs::AttributeValuePairStruct::Type MockLCPairs[2];
+        ScenesManagement::Structs::AttributeValuePairStruct::Type MockCCPairs[9];
+        ScenesManagement::Structs::AttributeValuePairStruct::Type MockFKPairs[2];
         // Mock CC
         MockCCPairs[0].attributeID = MockAttributeId(kCurrentSaturationId);
         MockCCPairs[0].valueUnsigned32.SetValue(UINT32_MAX); // will cap to 0x00FFFFFF (uint24)
@@ -1089,11 +1041,11 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
         MockFKPairs[1].valueSigned64.SetValue(INT64_MAX); // will cap to INT40_MIN
 
         // Initialize Extension Field sets as if they were received by add commands
-        OOextensionFieldSet.clusterID          = MockClusterId(kOnOffClusterId);
+        OOextensionFieldSet.clusterID          = MockClusterId(OnOff::Id);
         OOextensionFieldSet.attributeValueList = MockOOPairs;
-        LCextensionFieldSet.clusterID          = MockClusterId(kLevelControlClusterId);
+        LCextensionFieldSet.clusterID          = MockClusterId(LevelControl::Id);
         LCextensionFieldSet.attributeValueList = MockLCPairs;
-        CCextensionFieldSet.clusterID          = MockClusterId(kColorControlClusterId);
+        CCextensionFieldSet.clusterID          = MockClusterId(ColorControl::Id);
         CCextensionFieldSet.attributeValueList = MockCCPairs;
 
         uint8_t mock_OO_buffer[scenes::kMaxFieldBytesPerCluster]     = { 0 };
@@ -1120,7 +1072,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
 
         // Setup the On Off Extension field set in the expected state from a command
         reader.Init(Mock_OO_list);
-        extensionFieldValueCapIn.clusterID = MockClusterId(kOnOffClusterId);
+        extensionFieldValueCapIn.clusterID = MockClusterId(OnOff::Id);
         EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
         EXPECT_EQ(CHIP_NO_ERROR, extensionFieldValueCapIn.attributeValueList.Decode(reader));
 
@@ -1132,9 +1084,8 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
 
         // Verify that we cap the value to the mock attribute size when serializing
         EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->SerializeAdd(kTestEndpoint4, extensionFieldValueCapIn, buff_span));
-        EXPECT_EQ(
-            CHIP_NO_ERROR,
-            mpSceneHandler->Deserialize(kTestEndpoint4, MockClusterId(kOnOffClusterId), buff_span, extensionFieldValueCapOut));
+        EXPECT_EQ(CHIP_NO_ERROR,
+                  mpSceneHandler->Deserialize(kTestEndpoint4, MockClusterId(OnOff::Id), buff_span, extensionFieldValueCapOut));
 
         // Verify that the output value is capped to int48 max value
         int64_t int48Max = static_cast<int64_t>(0x00007FFFFFFFFFFF);
@@ -1146,7 +1097,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
         buff_span = MutableByteSpan(buffer);
 
         reader.Init(Mock_LC_list);
-        extensionFieldValueCapIn.clusterID = MockClusterId(kLevelControlClusterId);
+        extensionFieldValueCapIn.clusterID = MockClusterId(LevelControl::Id);
         EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
         EXPECT_EQ(CHIP_NO_ERROR, extensionFieldValueCapIn.attributeValueList.Decode(reader));
 
@@ -1161,9 +1112,9 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
 
         // Verify that we cap the value to the mock attribute size when serializing
         EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->SerializeAdd(kTestEndpoint4, extensionFieldValueCapIn, buff_span));
-        EXPECT_EQ(CHIP_NO_ERROR,
-                  mpSceneHandler->Deserialize(kTestEndpoint4, MockClusterId(kLevelControlClusterId), buff_span,
-                                              extensionFieldValueCapOut));
+        EXPECT_EQ(
+            CHIP_NO_ERROR,
+            mpSceneHandler->Deserialize(kTestEndpoint4, MockClusterId(LevelControl::Id), buff_span, extensionFieldValueCapOut));
 
         // Verify that the output value is capped to int56 min value
         int64_t int56Min = static_cast<int64_t>(0xFF80000000000000);
@@ -1178,7 +1129,7 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
         buff_span = MutableByteSpan(buffer);
 
         reader.Init(Mock_CC_list);
-        extensionFieldValueCapIn.clusterID = MockClusterId(kColorControlClusterId);
+        extensionFieldValueCapIn.clusterID = MockClusterId(ColorControl::Id);
         EXPECT_EQ(CHIP_NO_ERROR, reader.Next());
         EXPECT_EQ(CHIP_NO_ERROR, extensionFieldValueCapIn.attributeValueList.Decode(reader));
 
@@ -1214,9 +1165,9 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
 
         // Verify that we cap the value to the mock attribute size when serializing
         EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->SerializeAdd(kTestEndpoint4, extensionFieldValueCapIn, buff_span));
-        EXPECT_EQ(CHIP_NO_ERROR,
-                  mpSceneHandler->Deserialize(kTestEndpoint4, MockClusterId(kColorControlClusterId), buff_span,
-                                              extensionFieldValueCapOut));
+        EXPECT_EQ(
+            CHIP_NO_ERROR,
+            mpSceneHandler->Deserialize(kTestEndpoint4, MockClusterId(ColorControl::Id), buff_span, extensionFieldValueCapOut));
 
         // Verify that the output value is capped to uint24t max value
         uint32_t uint24Max = static_cast<uint32_t>(0x00FFFFFF);
@@ -2166,7 +2117,7 @@ TEST_F(TestSceneTable, TestOTAChanges)
 
     // Create a scene table with a greater capacity than the original one (Max allowed capacity from gen_config.h)
     TestSceneTableImpl ExpandedSceneTable(scenes::kMaxScenesPerFabric, scenes::kMaxScenesPerEndpoint);
-    EXPECT_EQ(CHIP_NO_ERROR, ExpandedSceneTable.Init(*mpTestStorage));
+    EXPECT_EQ(CHIP_NO_ERROR, ExpandedSceneTable.Init(*mpTestStorage, app::CodegenDataModelProvider::Instance()));
     ExpandedSceneTable.SetEndpoint(kTestEndpoint1);
 
     EXPECT_EQ(CHIP_NO_ERROR, ExpandedSceneTable.GetRemainingCapacity(kFabric1, fabric_capacity));
@@ -2204,11 +2155,13 @@ TEST_F(TestSceneTable, TestOTAChanges)
 
     // Test failure to init a SceneTable with sizes above the defined max scenes per fabric or globaly
     TestSceneTableImpl SceneTableTooManyPerFabric(scenes::kMaxScenesPerFabric + 1, scenes::kMaxScenesPerEndpoint);
-    EXPECT_EQ(CHIP_ERROR_INVALID_INTEGER_VALUE, SceneTableTooManyPerFabric.Init(*mpTestStorage));
+    EXPECT_EQ(CHIP_ERROR_INVALID_INTEGER_VALUE,
+              SceneTableTooManyPerFabric.Init(*mpTestStorage, app::CodegenDataModelProvider::Instance()));
     SceneTableTooManyPerFabric.Finish();
 
     TestSceneTableImpl SceneTableTooManyGlobal(scenes::kMaxScenesPerFabric, scenes::kMaxScenesPerEndpoint + 1);
-    EXPECT_EQ(CHIP_ERROR_INVALID_INTEGER_VALUE, SceneTableTooManyGlobal.Init(*mpTestStorage));
+    EXPECT_EQ(CHIP_ERROR_INVALID_INTEGER_VALUE,
+              SceneTableTooManyGlobal.Init(*mpTestStorage, app::CodegenDataModelProvider::Instance()));
     SceneTableTooManyGlobal.Finish();
 
     // Create a new table with a lower limit of scenes per fabric
@@ -2216,7 +2169,7 @@ TEST_F(TestSceneTable, TestOTAChanges)
     uint8_t newTableSize       = defaultTestTableSize - 2;
     uint8_t capacityDifference = static_cast<uint8_t>(scenes::kMaxScenesPerFabric - newCapacity);
     TestSceneTableImpl ReducedSceneTable(newCapacity, newTableSize);
-    EXPECT_EQ(CHIP_NO_ERROR, ReducedSceneTable.Init(*mpTestStorage));
+    EXPECT_EQ(CHIP_NO_ERROR, ReducedSceneTable.Init(*mpTestStorage, app::CodegenDataModelProvider::Instance()));
     ReducedSceneTable.SetEndpoint(kTestEndpoint1);
 
     // Global count should not have been modified

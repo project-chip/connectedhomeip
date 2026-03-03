@@ -25,7 +25,7 @@
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 using namespace TestCerts;
 
@@ -431,5 +431,5 @@ void MessageCapturer::OnMessageReceived(const PacketHeader & packetHeader, const
     mOriginalDelegate.OnMessageReceived(packetHeader, payloadHeader, session, isDuplicate, std::move(msgBuf));
 }
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

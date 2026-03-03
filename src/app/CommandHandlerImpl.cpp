@@ -146,7 +146,7 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
     TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
     VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    auto context = GetExchangeContext();
+    auto context = TryGetExchangeContextWhenAsync();
     // If we have no exchange or it has no session, we won't be able to send a
     // response anyway, so it doesn't matter how we encode it, but we have unit
     // tests that have a kinda-broken CommandHandler with no session... just use
@@ -536,11 +536,6 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             request.subjectDescriptor = &subjectDescriptor;
             request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
 
-            // SPEC-DIVERGENCE: The spec mandates only one ACL check after the existence check for non-concrete paths (Group
-            // Commands). However, calling ValidateCommandCanBeDispatched here introduces an additional ACL check before the
-            // existence check, because that function also performs an early access check (it is shared with the concrete path
-            // case). This results in two ACL checks for group commands. In practice, this divergence is not observable if all
-            // commands require at least Operate privilege.
             Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
             if (preCheckStatus != Status::Success)
             {
@@ -919,7 +914,13 @@ void CommandHandlerImpl::AddResponse(const ConcreteCommandPath & aRequestCommand
 
 Messaging::ExchangeContext * CommandHandlerImpl::GetExchangeContext() const
 {
-    VerifyOrDie(mpResponder);
+    VerifyOrReturnValue((mpResponder != nullptr) && !mGoneAsync, nullptr);
+    return mpResponder->GetExchangeContext();
+}
+
+Messaging::ExchangeContext * CommandHandlerImpl::TryGetExchangeContextWhenAsync() const
+{
+    VerifyOrReturnValue(mpResponder, nullptr);
     return mpResponder->GetExchangeContext();
 }
 

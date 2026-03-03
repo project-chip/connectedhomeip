@@ -43,22 +43,23 @@ static chip::ota::UserConsentState gUserConsentState = chip::ota::UserConsentSta
 extern "C" void asrQueryImageCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling asrQueryImageCmdHandler");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->TriggerImmediateQuery(); });
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+        [](intptr_t) { TEMPORARY_RETURN_IGNORED GetRequestorInstance()->TriggerImmediateQuery(); });
 }
 
 extern "C" void asrApplyUpdateCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling asrApplyUpdateCmdHandler");
-    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
 }
 
 void OTAInitializer::InitOTARequestor(void)
 {
     SetRequestorInstance(&gRequestorCore);
-    ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     // Set server instance used for session establishment
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    TEMPORARY_RETURN_IGNORED gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     // Connect the Downloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);

@@ -23,6 +23,7 @@
 #include "camera-device-interface.h"
 #include <app/util/config.h>
 #include <cstring>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <utility>
 
@@ -45,15 +46,18 @@ private:
     CameraDeviceInterface * mCameraDevice;
 
     // SDK cluster servers
-    std::unique_ptr<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderServer> mWebRTCTransportProviderPtr;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster>
+        mWebRTCTransportProviderServer;
     std::unique_ptr<chip::app::Clusters::ChimeServer> mChimeServerPtr;
-    std::unique_ptr<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer> mAVStreamMgmtServerPtr;
-    std::unique_ptr<chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelMgmtServer>
-        mAVSettingsUserLevelMgmtServerPtr;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvSettingsUserLevelManagementCluster>
+        mAVSettingsUserLevelMgmtServer;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManagementCluster>
+        mAVStreamMgmtServer;
     std::unique_ptr<chip::app::Clusters::ZoneManagement::ZoneMgmtServer> mZoneMgmtServerPtr;
 
-    // Helper to set attribute defaults for CameraAVStreamMgmt
-    void InitializeCameraAVStreamMgmt();
+    // Method to instantiate CameraAVStreamMgmt and set attribute defaults for initialization.
+    void CreateAndInitializeCameraAVStreamMgmt();
+    CHIP_ERROR InitializeCameraAVStreamMgmt();
 };
 
 void CameraAppInit(CameraDeviceInterface * cameraDevice);

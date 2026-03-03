@@ -152,7 +152,7 @@ void InitSystemLayer()
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // LwIP implementation uses the event loop for servicing events.
     // The CHIP stack initialization is required then.
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().InitChipStack();
 #ifndef CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
     AcquireLwIP();
 #endif // !CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
@@ -184,7 +184,7 @@ static void PrintNetworkState()
     for (size_t j = 0; j < gNetworkOptions.TapDeviceName.size(); j++)
     {
         struct netif * netIF = &(sNetIFs[j]);
-        InterfaceId(netIF).GetInterfaceName(intfName, sizeof(intfName));
+        TEMPORARY_RETURN_IGNORED InterfaceId(netIF).GetInterfaceName(intfName, sizeof(intfName));
 
         printf("LwIP interface ready\n");
         printf("  Interface Name: %s\n", intfName);
@@ -385,8 +385,13 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
             // We need to terminate event loop after performance single step.
             // Event loop processing work items until StopEventLoopTask is called.
             // Scheduling StopEventLoop task guarantees correct operation of the loop.
+            TEMPORARY_RETURN_IGNORED
             chip::DeviceLayer::PlatformMgr().ScheduleWork(
-                [](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, (intptr_t) nullptr);
+                [](intptr_t) -> void {
+                    TEMPORARY_RETURN_IGNORED
+                    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+                },
+                (intptr_t) nullptr);
 #endif // CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK
             chip::DeviceLayer::PlatformMgr().RunEventLoop();
             sRemainingSystemLayerEventDelay = gNetworkOptions.EventDelay;
@@ -394,7 +399,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
         else
             sRemainingSystemLayerEventDelay--;
 
-        gSystemLayer.HandlePlatformTimer();
+        TEMPORARY_RETURN_IGNORED gSystemLayer.HandlePlatformTimer();
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 }

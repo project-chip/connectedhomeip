@@ -375,6 +375,9 @@ DCL
 DCMAKE
 DCONF
 DCONFIG
+deallocate
+deallocated
+deallocation
 debianutils
 debugText
 decrypt
@@ -395,10 +398,13 @@ delayedQueryActionTimeSec
 delayQuery
 deliverables
 demangle
+Depacketization
 deployable
 depottools
 deps
 der
+dereference
+dereferencing
 desc
 descheduled
 detokenization
@@ -546,6 +552,7 @@ EvalCode
 EvalCodeWithName
 EvalFrameDefault
 EVB
+EVKBMIMXRT
 EventLogging
 evk
 EVSE
@@ -595,6 +602,7 @@ forkpty
 formatter
 formatters
 FOTA
+framerate
 FreeRTOS
 FreeRTOSConfig
 FRDM
@@ -603,6 +611,7 @@ fsl
 fstab
 fsync
 ftd
+ftr
 fullclean
 fuzzer
 fuzzers
@@ -706,6 +715,7 @@ ICD
 ICDs
 iCloud
 ICMP
+idempotency
 IDF
 IDL
 IDLs
@@ -774,6 +784,7 @@ JCM
 JDK
 jf
 jinja
+jitter
 JLink
 JLinkExe
 JLinkRTTClient
@@ -850,6 +861,7 @@ LightingState
 LinkSoftwareAndDocumentationPack
 linter
 linters
+Livestream
 lladdr
 LocalConfigDisabled
 localedef
@@ -949,6 +961,7 @@ MLD
 mmevk
 moal
 Mobly
+Mockito
 ModeSelect
 modprobe
 Modustoolbox
@@ -964,6 +977,7 @@ MTR
 MTU
 Multiband
 Multicast
+multicasts
 multilib
 Multiprotocol
 multithreaded
@@ -1029,6 +1043,7 @@ nwk
 NXP
 objcopy
 OccupancySensing
+OCMock
 OctetString
 OECORE
 OID
@@ -1107,8 +1122,10 @@ params
 PartNumber
 PASE
 Passcode
+passcodes
 passRetained
 passwd
+Pausable
 PBKDF
 pbuf
 pbufs
@@ -1233,6 +1250,9 @@ Realtek
 rebase
 recommand
 recommanded
+Reconnection
+reconnection
+reconnections
 recurse
 refrigeratoralarm
 regen
@@ -1354,6 +1374,7 @@ Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
+simw
 SiWx
 sizedb
 sl
@@ -1560,6 +1581,7 @@ UnitLocalization
 unittest
 unpair
 unprovisioned
+unregistration
 Unsecure
 Unselect
 untrusted
@@ -1600,6 +1622,7 @@ Verifier
 Verifiers
 VID
 vids
+viewport
 virtualenv
 visualstudio
 vlatest

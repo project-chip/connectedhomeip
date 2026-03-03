@@ -23,6 +23,6 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/ethernet-diagnostics-cluster.h"
-    "${CLUSTER_DIR}/ethernet-diagnostics-cluster.cpp"
+    "${CLUSTER_DIR}/EthernetDiagnosticsCluster.h"
+    "${CLUSTER_DIR}/EthernetDiagnosticsCluster.cpp"
 )

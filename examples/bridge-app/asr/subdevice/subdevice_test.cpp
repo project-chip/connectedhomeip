@@ -155,6 +155,6 @@ void Remove_SubDevice_test()
     gLight2.SetChangeCallback(NULL);
     gLight2.SetReachable(false);
     // Remove Light 2 -- Others Lights remain
-    RemoveDeviceEndpoint(&gLight2);
+    TEMPORARY_RETURN_IGNORED RemoveDeviceEndpoint(&gLight2);
 }
 #endif // ENABLE_ASR_BRIDGE_SUBDEVICE_TEST

@@ -24,24 +24,24 @@ namespace chip {
 
 CHIP_ERROR ASROTAImageProcessor::PrepareDownload()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ASROTAImageProcessor::Finalize()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR ASROTAImageProcessor::Apply()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ASROTAImageProcessor::Abort()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -59,7 +59,7 @@ CHIP_ERROR ASROTAImageProcessor::ProcessBlock(ByteSpan & block)
         ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -118,7 +118,7 @@ void ASROTAImageProcessor::HandlePrepareDownload(intptr_t context)
 
     imageProcessor->mHeaderParser.Init();
 
-    imageProcessor->mDownloader->OnPreparedForDownload(
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(
         ((err == LEGA_OTA_OK) || (err == LEGA_OTA_INIT_ALREADY)) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
 }
 
@@ -130,7 +130,7 @@ void ASROTAImageProcessor::HandleFinalize(intptr_t context)
         return;
     }
 
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully");
 }
@@ -161,7 +161,7 @@ void ASROTAImageProcessor::HandleAbort(intptr_t context)
     }
 
     // Not clearing the image storage area as it is done during each write
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
 }
 
 void ASROTAImageProcessor::HandleProcessBlock(intptr_t context)
@@ -200,7 +200,7 @@ void ASROTAImageProcessor::HandleProcessBlock(intptr_t context)
     }
 
     imageProcessor->mParams.downloadedBytes += block.size();
-    imageProcessor->mDownloader->FetchNextData();
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
 }
 
 CHIP_ERROR ASROTAImageProcessor::ProcessHeader(ByteSpan & block)
@@ -233,7 +233,7 @@ CHIP_ERROR ASROTAImageProcessor::SetBlock(ByteSpan & block)
     // Allocate memory for block data if we don't have enough already
     if (mBlock.size() < block.size())
     {
-        ReleaseBlock();
+        TEMPORARY_RETURN_IGNORED ReleaseBlock();
 
         mBlock = MutableByteSpan(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size())), block.size());
         if (mBlock.data() == nullptr)

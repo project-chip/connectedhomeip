@@ -96,3 +96,9 @@ tests:
           value: { MajorNumber: majornumber2, MinorNumber: minornumber2 }
           constraints:
               type: ChannelInfoStruct
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: tv
+      app: tv

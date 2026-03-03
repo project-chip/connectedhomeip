@@ -143,19 +143,17 @@ Important tests to consider:
     changed from the driver side.
 -   Others - very dependent on the cluster.
 
-# Unit testing ClusterServer
+## Simplified Unit Testing ClusterServer with ClusterTester
 
--   Best to have the lightest wrapping possible
-    -   If the wrapper is light, the code can be covered by integration or unit
-        tests, or a combination.
-    -   Correctness can mostly be validated by inspection if it’s trivial.
--   Important tests
-    -   Errors when ClusterLogic instances aren’t properly registered.
-    -   Flow through to ClusterLogic for all reads/writes/commands.
--   Can unit test this class by generating the TLV / path for input, parsing the
-    TLV output.
+For complex `ClusterServer` testing or existing cluster implementations, the
+`ClusterTester` helper class significantly reduces boilerplate code. It provides
+high-level, strongly-typed wrappers for reading/writing attributes and invoking
+commands without manually handling TLV encoding or path construction.
 
-# Unit testing existing clusters
+For detailed API usage and examples, please see the
+[ClusterTester Helper Class Guide](cluster_tester.md).
+
+## Unit testing existing clusters
 
 -   Important for clusters where there are multiple configurations that cannot
     easily be represented with example apps
@@ -167,6 +165,3 @@ Important tests to consider:
     -   Read / Write TLV and use TLV encode/decode functions to verify
         correctness.
     -   See TestPowerSourceCluster for an example of how to do this
--   Additional test coverage on clusters, especially for hard to trigger
-    conditions, is important. However, **don’t let perfection be the enemy of
-    progress** .

@@ -8,38 +8,40 @@ import pandas as pd
 import yaml
 from slugify import slugify
 
+log = logging.getLogger(__name__)
+
 yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
 
 with open("scripts/tools/build_fail_definitions.yaml", "r") as fail_defs:
     try:
         error_catalog = yaml.safe_load(fail_defs)
     except Exception:
-        logging.exception("Could not load fail definition file.")
+        log.exception("Could not load fail definition file.")
 
 
 def pass_fail_rate(workflow):
-    logging.info(f"Checking recent pass/fail rate of workflow {workflow}.")
+    log.info("Checking recent pass/fail rate of workflow '%s'", workflow)
     workflow_fail_rate_output_path = f"workflow_pass_rate/{slugify(workflow)}"
     if not os.path.exists(workflow_fail_rate_output_path):
         os.makedirs(workflow_fail_rate_output_path)
         subprocess.run(
             f"gh run list -R project-chip/connectedhomeip -b master -w '{workflow}' -L 500 --created {yesterday} --json conclusion > {workflow_fail_rate_output_path}/run_list.json", shell=True)
     else:
-        logging.info("This workflow has already been processed.")
+        log.info("This workflow has already been processed.")
 
 
 def process_fail(id, pr, start_time, workflow):
-    logging.info(f"Processing failure in {pr}, workflow {workflow} that started at {start_time}.")
+    log.info("Processing failure in PR '%s', workflow '%s' that started at '%s'", pr, workflow, start_time)
 
-    logging.info("Building output file structure.")
+    log.info("Building output file structure.")
     output_path = f"recent_fails_logs/{slugify(pr)}/{slugify(workflow)}/{slugify(start_time)}"
     os.makedirs(output_path)
 
-    logging.info("Gathering raw fail logs.")
+    log.info("Gathering raw fail logs.")
     subprocess.run(f"gh run view -R project-chip/connectedhomeip {id} --log-failed > {output_path}/fail_log.txt", shell=True)
 
     # Eventually turn this into a catalog of error messages per workflow
-    logging.info("Collecting info on likely cause of failure.")
+    log.info("Collecting info on likely cause of failure.")
     root_cause = "Unknown cause"
     with open(f"{output_path}/fail_log.txt") as fail_log_file:
         fail_log = fail_log_file.read()
@@ -54,21 +56,21 @@ def process_fail(id, pr, start_time, workflow):
 
 
 def main():
-    logging.info("Gathering recent fails information into fail_run_list.json.")
+    log.info("Gathering recent fails information into fail_run_list.json.")
     subprocess.run(
         f"gh run list -R project-chip/connectedhomeip -b master -s failure -L 500 --created {yesterday} --json databaseId,displayTitle,startedAt,workflowName > fail_run_list.json", shell=True)
 
-    logging.info("Reading fail_run_list.json into a DataFrame.")
+    log.info("Reading fail_run_list.json into a DataFrame.")
     df = pd.read_json("fail_run_list.json")
 
-    logging.info(f"Listing recent fails from {yesterday}.")
+    log.info("Listing recent fails from '%s'", yesterday)
     df.columns = ["ID", "Pull Request", "Start Time", "Workflow"]
     print(f"Recent Fails From {yesterday}:")
     print(df.to_string(columns=["Pull Request", "Workflow"], index=False))
     print()
     df.to_csv("recent_fails.csv", index=False)
 
-    logging.info("Listing frequency of recent fails by workflow.")
+    log.info("Listing frequency of recent fails by workflow.")
     frequency = df["Workflow"].value_counts(normalize=True).mul(100).round().astype(
         str).reset_index(name="Percentage")  # Reformat this from "50.0" to "50%"
     print("Share of Recent Fails by Workflow:")
@@ -76,18 +78,18 @@ def main():
     print()
     frequency.to_csv("recent_workflow_fails_frequency.csv")
 
-    logging.info("Gathering recent runs information into all_run_list.json.")
+    log.info("Gathering recent runs information into all_run_list.json.")
     subprocess.run(
         f"gh run list -R project-chip/connectedhomeip -b master -L 5000 --created {yesterday} --json workflowName > all_run_list.json", shell=True)
 
-    logging.info("Reading all_run_list.json into a DataFrame.")
+    log.info("Reading all_run_list.json into a DataFrame.")
     all_df = pd.read_json("all_run_list.json")
 
-    logging.info("Gathering pass/fail rate info.")
+    log.info("Gathering pass/fail rate info.")
     all_df.columns = ["Workflow"]
     all_df.apply(lambda row: pass_fail_rate(row["Workflow"]), axis=1)
 
-    logging.info("Conducting fail information parsing.")
+    log.info("Conducting fail information parsing.")
     root_causes = df.apply(lambda row: process_fail(row["ID"], row["Pull Request"],
                            row["Start Time"], row["Workflow"]), axis=1, result_type="expand")
     root_causes.columns = ["Pull Request", "Workflow", "Cause of Failure"]
@@ -96,14 +98,14 @@ def main():
     print()
     root_causes.to_csv("failure_cause_summary.csv")
 
-    logging.info("Listing percent pass rate of recent fails by workflow.")
+    log.info("Listing percent pass rate of recent fails by workflow.")
     pass_rate = {}
     for workflow in next(os.walk("workflow_pass_rate"))[1]:
         try:
             info = pd.read_json(f"workflow_pass_rate/{workflow}/run_list.json")
             info = info[info["conclusion"].str.len() > 0]
         except Exception:
-            logging.exception(f"Recent runs info for {workflow} was not collected.")
+            log.exception("Recent runs info for '%s' was not collected.", workflow)
         try:
             pass_rate[workflow] = [info.value_counts(normalize=True).mul(100).round()["success"]]
         except Exception:

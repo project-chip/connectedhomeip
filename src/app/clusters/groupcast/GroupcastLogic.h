@@ -16,45 +16,106 @@
  */
 #pragma once
 
-#include <app/AttributeValueDecoder.h>
+#include "GroupcastContext.h"
 #include <app/AttributeValueEncoder.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/server/Server.h>
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groupcast/ClusterId.h>
 #include <clusters/Groupcast/CommandIds.h>
 #include <clusters/Groupcast/Commands.h>
 #include <clusters/Groupcast/Enums.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
+using Status = chip::Protocols::InteractionModel::Status;
+
 /**
  * @brief Implements the Matter specifications for the Groupcast cluster
  */
-class GroupcastLogic
+
+class GroupcastLogic : public Credentials::GroupDataProvider::GroupListener
 {
 public:
-    GroupcastLogic(BitFlags<Groupcast::Feature> features) : mFeatures(features) {}
+    /**
+     * @brief Interface to listen for changes in the per-group address count.
+     */
+    class Listener
+    {
+    public:
+        virtual ~Listener() = default;
+        /**
+         *  Callback invoked when membership changes (groups added or removed).
+         */
+        virtual void OnMembershipChanged() = 0;
+        /**
+         *  Callback invoked when used multicast addresses count changes.
+         */
+        virtual void OnUsedMcastAddrCountChange() = 0;
+    };
+
+public:
+    static constexpr uint16_t kMaxMembershipEndpoints = 255;
+    static constexpr uint16_t kMaxCommandEndpoints    = 20;
+
+    struct EndpointList
+    {
+        EndpointId entries[kMaxMembershipEndpoints];
+        uint16_t count = 0;
+    };
+
+    GroupcastLogic(GroupcastContext & context);
+    GroupcastLogic(GroupcastContext & context, BitFlags<Groupcast::Feature> features);
+    ~GroupcastLogic() override;
     const BitFlags<Groupcast::Feature> & Features() const { return mFeatures; }
 
-    CHIP_ERROR ReadMembership(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadMembership(const chip::Access::SubjectDescriptor * subject, EndpointId endpoint,
+                              AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadMaxMembershipCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadMaxMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadUsedMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 
-    CHIP_ERROR JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data);
-    CHIP_ERROR LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                          Groupcast::Commands::LeaveGroupResponse::Type & response);
-    CHIP_ERROR UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
-    CHIP_ERROR ExpireGracePeriod(FabricIndex fabric_index, const Groupcast::Commands::ExpireGracePeriod::DecodableType & data);
-    CHIP_ERROR ConfigureAuxiliaryACL(FabricIndex fabric_index,
-                                     const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
+    Status JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data);
+    Status LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data,
+                      EndpointList & endpoints);
+    Status UpdateGroupKey(FabricIndex fabric_index, const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
+    Status ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
+
+    void SetDataModelProvider(DataModel::Provider & provider) { mDataModelProvider = &provider; }
+    void ResetDataModelProvider() { mDataModelProvider = nullptr; }
+
+    // Listener
+    void SetListener(Listener * listener) { mListener = listener; }
+    void RemoveListener() { mListener = nullptr; }
 
 private:
-    CHIP_ERROR RegisterAccessControl(FabricIndex fabric_index, GroupId group_id);
+    Credentials::GroupDataProvider & Provider() { return mContext.groupDataProvider; }
+    chip::FabricTable & Fabrics() { return mContext.fabricTable; }
 
+    Status SetKeySet(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id, const chip::Optional<chip::ByteSpan> & key);
+    Status RemoveGroup(FabricIndex fabric_index, GroupId group_id, const Groupcast::Commands::LeaveGroup::DecodableType & data,
+                       EndpointList * endpoints);
+    Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id, EndpointList * endpoints);
+    void UpdateUsedMcastAddrCount();
+    // GroupListener implementation
+    void OnGroupAdded(FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group) override;
+    void OnGroupRemoved(FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override;
+    void OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id) override;
+    void NotifyUsedMcastAddrCountOnChange();
+    void NotifyMembershipChanged();
+
+    GroupcastContext & mContext;
     const BitFlags<Groupcast::Feature> mFeatures;
+    DataModel::Provider * mDataModelProvider = nullptr;
+    uint16_t mUsedMcastAddrCount             = 0;
+    bool mIanaAddressUsed                    = false;
+    Listener * mListener                     = nullptr;
 };
 
 } // namespace Clusters

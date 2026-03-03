@@ -171,7 +171,7 @@ CHIP_ERROR PersistentStorageOpKeystoreS50::SignWithOpKeypair(FabricIndex fabricI
     els_delete_key(key_index);
 
     /* Generate MutableByteSpan with ECC signature and ECC signature size */
-    outSignature.SetLength(MCUXCLELS_ECC_SIGNATURE_SIZE);
+    TEMPORARY_RETURN_IGNORED outSignature.SetLength(MCUXCLELS_ECC_SIGNATURE_SIZE);
     memcpy(outSignature.Bytes(), ecc_signature, outSignature.Length());
     PLOG_DEBUG_BUFFER("ECDSA signature", ecc_signature, MCUXCLELS_ECC_SIGNATURE_SIZE);
     return CHIP_NO_ERROR;

@@ -60,7 +60,6 @@
         "Test_TC_DA_1_8"
     ],
     "DishwasherAlarm": [
-        "Test_TC_DISHALM_2_1",
         "Test_TC_DISHALM_3_1",
         "Test_TC_DISHALM_3_2",
         "Test_TC_DISHALM_3_3",
@@ -76,7 +75,6 @@
         "Test_TC_DISHM_3_3"
     ],
     "DeviceManagement": [
-        "Test_TC_BINFO_3_1",
         "Test_TC_OPCREDS_3_1",
         "Test_TC_OPCREDS_3_3",
         "Test_TC_OPCREDS_3_6",
@@ -164,7 +162,6 @@
         "Test_TC_CADMIN_1_17",
         "Test_TC_CADMIN_1_18",
         "Test_TC_CADMIN_1_6",
-        "Test_TC_CADMIN_1_10",
         "Test_TC_CADMIN_1_13",
         "Test_TC_CADMIN_1_25"
     ],
@@ -177,7 +174,6 @@
         "Test_TC_SU_2_4",
         "Test_TC_SU_2_5",
         "Test_TC_SU_2_6",
-        "Test_TC_SU_2_7",
         "Test_TC_SU_2_8",
         "Test_TC_SU_3_1",
         "Test_TC_SU_3_2",
@@ -201,7 +197,6 @@
         "Test_TC_SC_3_2",
         "Test_TC_SC_3_3",
         "Test_TC_SC_3_4",
-        "Test_TC_SC_4_1",
         "Test_TC_SC_4_2",
         "Test_TC_SC_4_4",
         "Test_TC_SC_4_5",
@@ -221,7 +216,7 @@
     "GroupKeyManagement": ["Test_TC_GRPKEY_5_4"],
     "OccupancySensing": ["Test_TC_OCC_3_1"],
     "PowerSource": ["Test_TC_PS_2_2"],
-    "BooleanState": ["Test_TC_BOOL_2_2"],
+    "BooleanState": [],
     "ColorControl": [
         "Test_TC_CC_3_1",
         "Test_TC_CC_7_1",
@@ -265,10 +260,7 @@
     "PumpConfigurationControl": [],
     "AccessControl": [],
     "UserLabel": [],
-    "BridgedDeviceBasicInformation": [
-        "Test_TC_BRBINFO_2_2",
-        "Test_TC_BRBINFO_3_1"
-    ],
+    "BridgedDeviceBasicInformation": ["Test_TC_BRBINFO_2_2"],
     "LaundryWasherControl": [],
     "OvenMode": ["Test_TC_OTCCM_1_2", "Test_TC_OTCCM_3_2", "Test_TC_OTCCM_3_3"],
     "AccessControlEnforcement": [],

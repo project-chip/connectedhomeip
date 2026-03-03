@@ -113,7 +113,7 @@ def _get_board_serial_number(tools_path):
 def _find_tools_path():
     """Obtains the path to the latest ModusToolbox tools package"""
     tools_version = ""
-    tools_path = os.environ.get("CY_TOOLS_PATHS", None)
+    tools_path = os.getenv("CY_TOOLS_PATHS")
     # If `CY_TOOLS_PATHS` env variable is set, return that value
     if tools_path is not None:
         return tools_path

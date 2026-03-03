@@ -76,7 +76,7 @@ static void OnResponseTimeout(chip::System::Layer *, void * appState)
 
 CHIP_ERROR CHIPCommand::StartWaiting(chip::System::Clock::Timeout duration)
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
     ReturnLogErrorOnFailure(chip::DeviceLayer::SystemLayer().StartTimer(duration, OnResponseTimeout, this));
     return mCommandExitStatus;
 }

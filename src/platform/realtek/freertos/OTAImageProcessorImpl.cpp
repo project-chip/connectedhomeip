@@ -60,7 +60,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     ChipLogProgress(SoftwareUpdate, "Prepare download");
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -89,7 +89,7 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
     ChipLogProgress(SoftwareUpdate, "Finalize");
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -97,7 +97,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
     ChipLogProgress(SoftwareUpdate, "Apply");
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -105,7 +105,7 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
     ChipLogProgress(SoftwareUpdate, "Abort");
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -123,7 +123,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
         return err;
     }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -151,7 +151,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     }
 
     imageProcessor->mHeaderParser.Init();
-    imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
@@ -170,7 +170,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded size %lldB", imageProcessor->mParams.downloadedBytes);
 
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
     imageProcessor->mParams.downloadedBytes = 0;
 }
 
@@ -186,7 +186,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 
     ChipLogError(SoftwareUpdate, "OTA upgrade was aborted");
 
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
     imageProcessor->mParams.downloadedBytes = 0;
 }
 
@@ -223,7 +223,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "HandleProcessBlock 0x%x bytes", block.size());
 
     imageProcessor->mParams.downloadedBytes += block.size();
-    imageProcessor->mDownloader->FetchNextData();
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
 }
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
@@ -237,7 +237,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "Rebooting in 10 seconds...");
 
-    DeviceLayer::SystemLayer().StartTimer(
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
         System::Clock::Seconds32(10),
         [](chip::System::Layer *, void *) {
             ChipLogProgress(SoftwareUpdate, "Rebooting...");
@@ -250,7 +250,7 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
     if (!IsSpanUsable(block))
     {
-        ReleaseBlock();
+        TEMPORARY_RETURN_IGNORED ReleaseBlock();
         return CHIP_NO_ERROR;
     }
 
@@ -258,7 +258,7 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
     {
         if (!mBlock.empty())
         {
-            ReleaseBlock();
+            TEMPORARY_RETURN_IGNORED ReleaseBlock();
         }
 
         uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));

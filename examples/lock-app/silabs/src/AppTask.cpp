@@ -80,7 +80,8 @@ void UpdateClusterStateAfterUnlatch(intptr_t context)
 
 void UnlatchTimerCallback(TimerHandle_t xTimer)
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterStateAfterUnlatch, reinterpret_cast<intptr_t>(nullptr));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterStateAfterUnlatch,
+                                                                           reinterpret_cast<intptr_t>(nullptr));
 }
 
 void CancelUnlatchTimer(void)
@@ -227,7 +228,7 @@ CHIP_ERROR AppTask::AppInit()
 #endif // QR_CODE_ENABLED
 #endif
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -370,7 +371,8 @@ void AppTask::ActionCompleted(LockManager::Action_t aAction)
 
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState,
+                                                                               reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
 }

@@ -51,7 +51,7 @@ using Milliseconds64      = System::Clock::Milliseconds64;
 
 static const size_t kNumMaxReadHandlers = 16;
 
-class TestReportScheduler : public chip::Test::AppContext
+class TestReportScheduler : public chip::Testing::AppContext
 {
 public:
     void TestReadHandlerList();
@@ -156,7 +156,7 @@ public:
         context->TimerFired();
         ChipLogProgress(DataManagement, "Simluating engine run for Handler: %p", aAppState);
     }
-    virtual CHIP_ERROR StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
+    virtual CriticalFailure StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
     {
         return insertPair(static_cast<ReadHandlerNode *>(context), aTimeout + mMockSystemTimestamp);
     }
@@ -201,7 +201,7 @@ public:
         TimerContext * context = static_cast<TimerContext *>(aAppState);
         context->TimerFired();
     }
-    virtual CHIP_ERROR StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
+    virtual CriticalFailure StartTimer(TimerContext * context, System::Clock::Timeout aTimeout) override
     {
         if (nullptr == context)
         {

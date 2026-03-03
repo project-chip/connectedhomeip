@@ -38,6 +38,7 @@ class GlobalAttributeIds(IntEnum):
             return "FeatureMap"
         if self == GlobalAttributeIds.CLUSTER_REVISION_ID:
             return "ClusterRevision"
+        return None
 
 
 class DeviceTypeIdType(Enum):

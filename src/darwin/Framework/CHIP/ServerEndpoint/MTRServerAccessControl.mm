@@ -132,7 +132,7 @@ class AccessControlDelegate : public AccessControl::Delegate {
 struct ControllerAccessControl {
     DeviceTypeResolver mDeviceTypeResolver;
     AccessControlDelegate mDelegate;
-    ControllerAccessControl() { GetAccessControl().Init(&mDelegate, mDeviceTypeResolver); }
+    ControllerAccessControl() { TEMPORARY_RETURN_IGNORED GetAccessControl().Init(&mDelegate, mDeviceTypeResolver); }
 };
 
 Global<ControllerAccessControl> gControllerAccessControl;

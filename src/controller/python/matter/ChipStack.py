@@ -120,6 +120,11 @@ class AsyncioCallableHandle:
         return self._future
 
     def _done(self):
+        if self._future.cancelled():
+            # If this helper is used with the asyncio.wait_for(), it might
+            # happen that the future will be cancelled before the callback
+            # is called. Do not raise an exception in this case.
+            return
         if self._exception:
             self._future.set_exception(self._exception)
         else:

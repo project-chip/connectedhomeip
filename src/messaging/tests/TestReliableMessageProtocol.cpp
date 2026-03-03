@@ -71,7 +71,7 @@ public:
     std::queue<ReliableMessageAnalyticsDelegate::TransmitEvent> mTransmitEvents;
 };
 
-class TestReliableMessageProtocol : public chip::Test::LoopbackMessagingContext
+class TestReliableMessageProtocol : public chip::Testing::LoopbackMessagingContext
 {
 public:
     // Performs setup for each individual test in the test suite
@@ -80,7 +80,7 @@ public:
 #if CHIP_CRYPTO_PSA
         ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
 #endif
-        chip::Test::LoopbackMessagingContext::SetUp();
+        chip::Testing::LoopbackMessagingContext::SetUp();
         GetSessionAliceToBob()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
         GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
     }

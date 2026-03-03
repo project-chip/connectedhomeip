@@ -131,7 +131,7 @@ app::Clusters::NetworkCommissioning::Instance
 
 void NetWorkCommissioningInstInit()
 {
-    sWiFiNetworkCommissioningInstance.Init();
+    TEMPORARY_RETURN_IGNORED sWiFiNetworkCommissioningInstance.Init();
 }
 
 void OnIdentifyStart(Identify *)
@@ -153,21 +153,22 @@ static Identify gIdentify1 = {
 
 static void InitServer(intptr_t context)
 {
-    // Init ZCL Data Model
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    chip::Server::GetInstance().Init(initParams);
-
-    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-
-    // Initialize device attestation config
+    // Initialize device attestation config before server init so Operational
+    // Credentials sees the configured provider during cluster construction.
 #if ENABLE_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleTrustMDACProvider());
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
+
+    // Init ZCL Data Model
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     GetAppTask().InitOTARequestor();
@@ -313,7 +314,7 @@ void AppTask::Init()
     }
 
     // Register the callback to init the MDNS server when connectivity is available
-    PlatformMgr().AddEventHandler(
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(
         [](const ChipDeviceEvent * event, intptr_t arg) {
             // Restart the server whenever an ip address is renewed
             if (event->Type == DeviceEventType::kInternetConnectivityChange)
@@ -327,7 +328,7 @@ void AppTask::Init()
         },
         0);
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }
 
 void AppTask::AppTaskMain(void * pvParameter)
@@ -683,7 +684,7 @@ void AppTask::UpdateCluster(intptr_t context)
 
 void AppTask::UpdateClusterState(void)
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateCluster, reinterpret_cast<intptr_t>(nullptr));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateCluster, reinterpret_cast<intptr_t>(nullptr));
 }
 
 void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTaskName)

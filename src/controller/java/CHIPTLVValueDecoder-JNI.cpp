@@ -39,7 +39,7 @@ JNI_METHOD(jobject, decodeAttributeValue)(JNIEnv * env, jclass clazz, jobject at
 
     chip::TLV::TLVReader reader;
     reader.Init(tlv.byteSpan());
-    reader.Next();
+    TEMPORARY_RETURN_IGNORED reader.Next();
 
     jobject ret = DecodeAttributeValue(path, reader, &err);
 
@@ -70,7 +70,7 @@ JNI_METHOD(jobject, decodeEventValue)(JNIEnv * env, jclass clazz, jobject eventP
     chip::TLV::TLVReader reader;
 
     reader.Init(tlv.byteSpan());
-    reader.Next();
+    TEMPORARY_RETURN_IGNORED reader.Next();
 
     jobject ret = DecodeEventValue(path, reader, &err);
 
