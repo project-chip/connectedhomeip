@@ -274,6 +274,12 @@ class TC_CNET_4_23(MatterBaseTest):
             TestStep(16, "TH sends CommissioningComplete to finalize commissioning",
                          "Verify that DUT sends CommissioningCompleteResponse with the following fields:\n"
                          "1. ErrorCode field set to OK (0)"),
+            TestStep(17, "ArmFailSafe in operational to allow NC commands", ""),
+            TestStep(18, "AddOrUpdateWiFiNetwork with WRONG password", ""),
+            TestStep(19, "ConnectNetwork should FAIL", ""),
+            TestStep(20, "check LastNetworkingStatus again", ""),
+            TestStep(21, "AddOrUpdateWiFiNetwork with CORRECT password", ""),
+            TestStep(22, "ConnectNetwork should SUCCEED", "")
         ]
 
     def desc_TC_CNET_4_23(self):
@@ -292,6 +298,10 @@ class TC_CNET_4_23(MatterBaseTest):
         # Create incorrect credentials for test commands
         incorrect_ssid = b"IncorrectSSID_12345"
         incorrect_password = b"IncorrectPassword123"
+
+        # Second network for CASE
+        correct_ssid_case = self.user_params.get("second_ssid", None)
+        correct_password_case = self.user_params.get("second_password", None)
 
         # Step 0: TH begins commissioning the DUT over the initial commissioning radio (PASE):
         self.step(0)
@@ -331,7 +341,7 @@ class TC_CNET_4_23(MatterBaseTest):
 
         if not (feature_map & cnet.Bitmaps.Feature.kWiFiNetworkInterface):
             logger.info(" --- Device does not support WiFi on endpoint 0, skipping remaining steps")
-            self.skip_all_remaining_steps(1)
+            self.mark_all_remaining_steps_skipped(1)
             return
 
         # Step 1: TH reads Networks attribute and removes all configured networks
@@ -615,6 +625,103 @@ class TC_CNET_4_23(MatterBaseTest):
         asserts.assert_equal(response.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
                              f"Expected CommissioningCompleteResponse errorCode to be OK (0), but got {response.errorCode}")
         logger.info(" --- CommissioningComplete command sent successfully, commissioning finalized.")
+
+        # --- CASE PHASE (post-commissioning) ---
+        if correct_ssid_case is None or correct_password_case is None:
+            logger.info("Cannot test CASE phase because of missing arguments")
+            self.mark_all_remaining_steps_skipped(17)
+            return
+
+        correct_ssid_case = correct_ssid_case.encode('utf-8')
+        correct_password_case = correct_password_case.encode('utf-8')
+
+        # (Opcional) Step 17: ArmFailSafe in operational to allow NC commands
+        self.step(17)
+        logger.info(" --- CASE phase: arming failsafe for operational network commands...")
+        afs = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=120, breadcrumb=100),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+        )
+        asserts.assert_true(isinstance(afs, cgen.Commands.ArmFailSafeResponse),
+                            "Expected ArmFailSafeResponse in CASE phase")
+
+        # Step 18: AddOrUpdateWiFiNetwork with WRONG password
+        self.step(18)
+        logger.info(" --- CASE phase: AddOrUpdateWiFiNetwork with WRONG password")
+        resp = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
+                ssid=correct_ssid_case,
+                credentials=incorrect_password,
+                breadcrumb=101
+            ),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+        )
+        await self._validate_network_config_response(resp)
+
+        # Step 19: ConnectNetwork should FAIL
+        self.step(19)
+        logger.info(" --- CASE phase: ConnectNetwork with WRONG password (expect fail)")
+        resp = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.ConnectNetwork(networkID=correct_ssid_case, breadcrumb=102),
+            timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
+        )
+        await self._validate_connect_network_response(resp, expect_success=False)
+
+        await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
+
+        # (Opcional) check LastNetworkingStatus again
+        self.step(20)
+        await self._read_last_networking_status(
+            endpoint,
+            valid_statuses=[
+                cnet.Enums.NetworkCommissioningStatusEnum.kAuthFailure,
+                cnet.Enums.NetworkCommissioningStatusEnum.kOtherConnectionFailure
+            ]
+        )
+
+        # Step 21: AddOrUpdateWiFiNetwork with CORRECT password
+        self.step(21)
+        logger.info(" --- CASE phase: AddOrUpdateWiFiNetwork with CORRECT password")
+        resp = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
+                ssid=correct_ssid_case,
+                credentials=correct_password_case,
+                breadcrumb=103
+            ),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+        )
+        await self._validate_network_config_response(resp)
+
+        await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
+
+        # Step 22: ConnectNetwork should SUCCEED
+        self.step(22)
+        logger.info(" --- CASE phase: ConnectNetwork with CORRECT password (expect success)")
+        resp = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.ConnectNetwork(networkID=correct_ssid_case, breadcrumb=104),
+            timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
+        )
+        await self._validate_connect_network_response(resp, expect_success=True)
+
+        await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
+
+        await self._read_last_networking_status(
+            endpoint,
+            expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kSuccess
+        )
+
+        # Disarm failsafe
+        logger.info(" --- CASE phase: disarming failsafe")
+        await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=105),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+        )
 
 
 if __name__ == "__main__":
