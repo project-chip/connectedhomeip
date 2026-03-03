@@ -65,6 +65,12 @@ Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/icdbehavior.adoc#tc-icdb-1-1-icd-check-in-protocol-register-client-idle-mode-duration-dut_server
 '''
 
+'''
+Notes/Considerations
+For a real DUT, the --timeout xxxx (in seconds) script argument can be used to extend
+the testing time so the test does not time out due to long IdleModeDuration values
+'''
+
 kRootEndpointId = 0
 
 # Safety cap so CI wait time does not hang the test
@@ -190,7 +196,7 @@ class TC_ICDB_1_1(MatterBaseTest):
             # so we cap the wait at kMaxCIWaitTimeSeconds to avoid long test runs.
             wait_time_for_checkin_s = kMaxCIWaitTimeSeconds
         else:
-            # On a real DUT, the reported IdleModeDuration matches the actual timer,
+            # On a real DUT, the reported IdleModeDuration should match the actual timer,
             # so we wait the full duration to ensure the check-in is received.
             wait_time_for_checkin_s = idle_mode_duration_s + 1.0
 
