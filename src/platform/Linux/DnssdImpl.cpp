@@ -844,18 +844,14 @@ void MdnsAvahi::StopResolve(const char * name)
     // Note: callbacks may re-enter into dnssd logic, so first detach matching contexts from
     // `mAllocatedResolves`, then invoke callbacks and delete outside of the list iteration.
     std::vector<ResolveContext *> contexts;
-    for (auto it = mAllocatedResolves.begin(); it != mAllocatedResolves.end();)
-    {
-        if (strcmp((*it)->mName, name) == 0)
+    mAllocatedResolves.remove_if([&contexts, name](ResolveContext * ctx) {
+        if (strcmp(ctx->mName, name) == 0)
         {
-            contexts.push_back(*it);
-            it = mAllocatedResolves.erase(it);
+            contexts.push_back(ctx);
+            return true;
         }
-        else
-        {
-            ++it;
-        }
-    }
+        return false;
+    });
 
     for (auto * context : contexts)
     {
