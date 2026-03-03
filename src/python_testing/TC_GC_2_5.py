@@ -154,7 +154,7 @@ class TC_GC_2_5(MatterBaseTest):
                                  f"Send ConfigureAuxiliaryACL command error should be {Status.NotFound} instead of {e.status}")
 
         if not sd_enabled:
-            self.mark_all_remaining_steps_skipped("7")
+            self.mark_all_remaining_steps_skipped(7)
             return
 
         self.step(7)
