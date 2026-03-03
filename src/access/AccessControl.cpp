@@ -678,7 +678,7 @@ exit:
 bool AccessControl::Entry::IsValid() const
 {
     const char * log = "unexpected error";
-    IgnoreUnusedVariable(log); // logging may be disabled.
+    IgnoreUnusedVariable(log); // logging may be disabled
 
     AuthMode authMode           = AuthMode::kNone;
     FabricIndex fabricIndex     = kUndefinedFabricIndex;
