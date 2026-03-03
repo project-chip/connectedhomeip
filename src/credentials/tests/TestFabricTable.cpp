@@ -46,6 +46,10 @@
 
 #include <lib/support/BytesToHex.h>
 
+#if CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
+
 using namespace chip;
 using namespace chip::Credentials;
 

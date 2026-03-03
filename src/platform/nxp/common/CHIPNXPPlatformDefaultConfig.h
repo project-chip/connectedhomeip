@@ -65,9 +65,15 @@
 #define CHIP_CONFIG_ERROR_CLASS 1
 #endif // CHIP_CONFIG_ERROR_CLASS
 
+#ifndef CONFIG_CHIP_CRYPTO_PSA
 #ifndef CHIP_CONFIG_SHA256_CONTEXT_SIZE
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE (sizeof(unsigned int) * 98)
 #endif // CHIP_CONFIG_SHA256_CONTEXT_SIZE
+#else
+#ifndef CHIP_CONFIG_SHA256_CONTEXT_SIZE
+#error "CHIP_CONFIG_SHA256_CONTEXT_SIZE must be defined per platform when CONFIG_CHIP_CRYPTO_PSA is enabled"
+#endif // CHIP_CONFIG_SHA256_CONTEXT_SIZE
+#endif // CONFIG_CHIP_CRYPTO_PSA
 
 // ==================== Security Adaptations ====================
 
@@ -162,6 +168,10 @@
 #ifndef CHIP_CONFIG_ENABLE_PROVISIONING_BUNDLE_SUPPORT
 #define CHIP_CONFIG_ENABLE_PROVISIONING_BUNDLE_SUPPORT 0
 #endif // CHIP_CONFIG_ENABLE_PROVISIONING_BUNDLE_SUPPORT
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#define CHIP_CONFIG_SHA256_CONTEXT_ALIGN max_align_t
+#endif // CONFIG_CHIP_CRYPTO_PSA
 
 // ==================== General Configuration Overrides ====================
 

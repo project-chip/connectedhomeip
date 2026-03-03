@@ -1,8 +1,8 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
- *    Copyright (c) 2020 Nest Labs, Inc.
- *    Copyright 2023-2024 NXP
+ *    Copyright (c) 2020-2022, 2026 Project CHIP Authors
+ *    Copyright (c) 2020, 2026 Nest Labs, Inc.
+ *    Copyright 2023-2024, 2026 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -619,7 +619,6 @@ void ConnectivityManagerImpl::BrHandleStateChange()
         struct netif * extNetIfPtr = static_cast<struct netif *>(net_get_mlan_handle());
         struct netif * thrNetIfPtr = ThreadStackMgrImpl().ThreadNetIf();
 
-        otMdnsHost mdnsHost;
         uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
         MutableByteSpan mac(macBuffer);
 

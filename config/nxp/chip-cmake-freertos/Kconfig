@@ -84,6 +84,7 @@ config CHIP_NXP_PLATFORM_FAMILY
 config CHIP_NXP_CRYPTO_IMPL
 	string "NXP Crypto Implementation chosen"
 	default "se05x" if CHIP_SE05X
+	default "psa" if CHIP_CRYPTO_PSA
 	default ""
 	help
 		Defines crypto implementation to be used
@@ -292,4 +293,10 @@ config NXP_USE_PLAIN_DAC_KEY
 	help
 	  Store DAC private key in plaintext.
 
+config NXP_FACTORY_DAC_BLOB_GENERATION
+	bool "Enable factory DAC private key blob generation"
+	depends on CHIP_FACTORY_DATA 
+	help
+		Enable factory DAC private key blob generation for secure storage.
+		To be used only during factory process.
 endif # CHIP
