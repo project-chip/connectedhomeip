@@ -19,75 +19,120 @@
 
 #include "Device.h"
 
+#include <app/clusters/basic-information/CodegenIntegration.h>
 #include <crypto/RandUtils.h>
-#include <cstdio>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #include <string>
 #include <sys/types.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::Actions;
+using chip::Protocols::InteractionModel::Status;
+
+// We cannot use the proxy since we need ember support.
+// As a result we update the version at runtime by fetching the Basic Information cluster
+// during processing.
+class EmberBridgeVersionUpdate : public chip::app::Clusters::ConfigurationVersionDelegate
+{
+public:
+    CHIP_ERROR IncreaseConfigurationVersion() override
+    {
+        auto cluster = app::Clusters::BasicInformation::GetClusterInstance();
+        VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
+        return cluster->IncreaseConfigurationVersion();
+    }
+};
+
+static EmberBridgeVersionUpdate gEmberVersionUpdate;
 
 Device::Device(const char * szDeviceName, std::string szLocation)
 {
     chip::Platform::CopyString(mName, szDeviceName);
     chip::Platform::CopyString(mUniqueId, "");
-    mLocation             = szLocation;
-    mReachable            = false;
-    mConfigurationVersion = 1;
-    mEndpointId           = 0;
+    mLocation = szLocation;
+}
+
+void Device::Unregister()
+{
+    if (mBridgedDevice.IsConstructed())
+    {
+        LogErrorOnFailure(chip::app::CodegenDataModelProvider::Instance().Registry().Unregister(&mBridgedDevice.Cluster()));
+        mBridgedDevice.Destroy();
+    }
+}
+
+Status Device::OnNodeLabelChanged(const std::string & newNodeLabel)
+{
+    VerifyOrReturnValue(mName != newNodeLabel, Status::Success);
+    chip::Platform::CopyString(mName, newNodeLabel.c_str());
+    // NOTE: WE do NOT call device change as that handles attribute change callbacks and those
+    //       are handled by the cluster code.
+    // HandleDeviceChange(this, kChanged_Name);
+    return chip::Protocols::InteractionModel::Status::Success;
+}
+
+app::ServerClusterRegistration &
+Device::CreateBridgedDeviceInfo(chip::EndpointId endpointId,
+                                chip::app::Clusters::BridgedDeviceBasicInformationCluster::RequiredData && required,
+                                chip::app::Clusters::BridgedDeviceBasicInformationCluster::FixedData && fixed)
+{
+    VerifyOrDie(!mBridgedDevice.IsConstructed());
+
+    static chip::app::DefaultTimerDelegate timerDelegate;
+
+    mBridgedDevice.Create(endpointId, std::move(required), std::move(fixed),
+                          app::Clusters::BridgedDeviceBasicInformationCluster::Context{
+                              .parentVersionConfiguration = gEmberVersionUpdate,
+                              .delegate                   = *this,
+                              .timerDelegate              = timerDelegate,
+                          });
+    return mBridgedDevice.Registration();
 }
 
 bool Device::IsReachable()
 {
-    return mReachable;
+    return mBridgedDevice.IsConstructed() && mBridgedDevice.Cluster().GetReachable();
 }
 
 void Device::SetReachable(bool aReachable)
 {
-    bool changed = (mReachable != aReachable);
+    VerifyOrReturn(mBridgedDevice.IsConstructed());
+    VerifyOrReturn(mBridgedDevice.Cluster().GetReachable() != aReachable);
 
-    mReachable = aReachable;
-
-    if (aReachable)
-    {
-        ChipLogProgress(DeviceLayer, "Device[%s]: ONLINE", mName);
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "Device[%s]: OFFLINE", mName);
-    }
-
-    if (changed)
-    {
-        HandleDeviceChange(this, kChanged_Reachable);
-    }
+    mBridgedDevice.Cluster().SetReachable(aReachable);
+    ChipLogProgress(DeviceLayer, "Device[%s]: %s", mName, aReachable ? "ONLINE" : "OFFLINE");
 }
 
 void Device::SetName(const char * szName)
 {
-    bool changed = (strncmp(mName, szName, sizeof(mName)) != 0);
-
     ChipLogProgress(DeviceLayer, "Device[%s]: New Name=\"%s\"", mName, szName);
-
     chip::Platform::CopyString(mName, szName);
 
-    if (changed)
+    if (mBridgedDevice.IsConstructed())
     {
-        HandleDeviceChange(this, kChanged_Name);
+        mBridgedDevice.Cluster().SetNodeLabel(CharSpan::fromCharString(szName));
     }
 }
 
 void Device::SetUniqueId(const char * szDeviceUniqueId)
 {
+    if (mBridgedDevice.IsConstructed())
+    {
+        // TODO: We could implement a version bump here if this functionality is required.
+        ChipLogError(DeviceLayer, "Unique id is FIXED and cannot be changed after bridged device startup.");
+        return;
+    }
+
     chip::Platform::CopyString(mUniqueId, szDeviceUniqueId);
     ChipLogProgress(DeviceLayer, "Device[%s]: New UniqueId=\"%s\"", mName, mUniqueId);
 }
 
 void Device::SetLocation(std::string szLocation)
 {
-    bool changed = (mLocation.compare(szLocation) != 0);
+    bool changed = (mLocation != szLocation);
 
     mLocation = szLocation;
 
@@ -118,21 +163,16 @@ void Device::GenerateUniqueId()
 
 uint32_t Device::GetConfigurationVersion()
 {
-    return mConfigurationVersion;
+    VerifyOrReturnValue(mBridgedDevice.IsConstructed(), 1);
+    return mBridgedDevice.Cluster().GetConfigurationVersion();
 }
 
-void Device::SetConfigurationVersion(uint32_t configurationVersion)
+void Device::IncreaseConfigurationVersion()
 {
-    bool changed = (mConfigurationVersion != configurationVersion);
-
-    mConfigurationVersion = configurationVersion;
-
-    ChipLogProgress(DeviceLayer, "Device[%s]: New Configuration Version=\"%d\"", mName, mConfigurationVersion);
-
-    if (changed)
-    {
-        HandleDeviceChange(this, kChanged_ConfigurationVersion);
-    }
+    VerifyOrReturn(mBridgedDevice.IsConstructed());
+    LogErrorOnFailure(mBridgedDevice.Cluster().IncreaseConfigurationVersion());
+    ChipLogProgress(DeviceLayer, "Device[%s]: New Configuration Version=\"%d\"", mName,
+                    mBridgedDevice.Cluster().GetConfigurationVersion());
 }
 
 DeviceOnOff::DeviceOnOff(const char * szDeviceName, std::string szLocation) : Device(szDeviceName, szLocation)
