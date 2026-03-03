@@ -39,24 +39,9 @@ namespace Dnssd {
 
 class DnssdTizen;
 
-enum class ContextType
+struct RegisterContext
 {
-    Register,
-    Browse,
-    Resolve,
-};
-
-struct GenericContext
-{
-    ContextType mContextType;
-    DnssdTizen * mInstance;
-
-    GenericContext(ContextType contextType, DnssdTizen * instance) : mContextType(contextType), mInstance(instance) {}
-    virtual ~GenericContext() = default;
-};
-
-struct RegisterContext : public GenericContext
-{
+    DnssdTizen & mInstance;
     char mName[Common::kInstanceNameMaxLength + 1];
     char mType[kDnssdTypeAndProtocolMaxSize + 1];
     uint32_t mInterfaceId;
@@ -68,13 +53,14 @@ struct RegisterContext : public GenericContext
     dnssd_service_h mServiceHandle = 0;
     bool mIsRegistered             = false;
 
-    RegisterContext(DnssdTizen * instance, const char * type, const DnssdService & service, DnssdPublishCallback callback,
+    RegisterContext(DnssdTizen & instance, const char * type, const DnssdService & service, DnssdPublishCallback callback,
                     void * context);
-    ~RegisterContext() override;
+    ~RegisterContext();
 };
 
-struct BrowseContext : public GenericContext
+struct BrowseContext
 {
+    DnssdTizen & mInstance;
     char mType[kDnssdTypeAndProtocolMaxSize + 1];
     Dnssd::DnssdServiceProtocol mProtocol;
     uint32_t mInterfaceId;
@@ -89,13 +75,14 @@ struct BrowseContext : public GenericContext
     std::vector<DnssdService> mServices;
     bool mIsBrowsing = false;
 
-    BrowseContext(DnssdTizen * instance, const char * type, Dnssd::DnssdServiceProtocol protocol, uint32_t interfaceId,
+    BrowseContext(DnssdTizen & instance, const char * type, Dnssd::DnssdServiceProtocol protocol, uint32_t interfaceId,
                   DnssdBrowseCallback callback, void * context);
-    ~BrowseContext() override;
+    ~BrowseContext();
 };
 
-struct ResolveContext : public GenericContext
+struct ResolveContext
 {
+    DnssdTizen & mInstance;
     char mName[Common::kInstanceNameMaxLength + 1];
     char mType[kDnssdTypeAndProtocolMaxSize + 1];
     uint32_t mInterfaceId;
@@ -111,9 +98,9 @@ struct ResolveContext : public GenericContext
     GAutoPtr<char> mResultTxtRecord;
     unsigned short mResultTxtRecordLen = 0;
 
-    ResolveContext(DnssdTizen * instance, const char * name, const char * type, uint32_t interfaceId, DnssdResolveCallback callback,
+    ResolveContext(DnssdTizen & instance, const char * name, const char * type, uint32_t interfaceId, DnssdResolveCallback callback,
                    void * context);
-    ~ResolveContext() override = default;
+    ~ResolveContext() = default;
 
     void Finalize(CHIP_ERROR error);
 };
@@ -136,8 +123,13 @@ public:
     CHIP_ERROR Resolve(const DnssdService & browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                        void * context);
 
-    // TODO (a.bokowy): Make this method private
-    CHIP_ERROR RemoveContext(GenericContext * context);
+    // TODO (a.bokowy): Make these methods private
+    friend class RegisterContext;
+    void RemoveContext(RegisterContext * context);
+    friend class BrowseContext;
+    void RemoveContext(BrowseContext * context);
+    friend class ResolveContext;
+    void RemoveContext(ResolveContext * context);
 
     static DnssdTizen & GetInstance() { return sInstance; }
 
@@ -153,7 +145,9 @@ private:
                                           void * context);
 
     std::mutex mMutex;
-    std::set<std::unique_ptr<GenericContext>> mContexts;
+    std::set<std::unique_ptr<RegisterContext>> mRegisterContexts;
+    std::set<std::unique_ptr<BrowseContext>> mBrowseContexts;
+    std::set<std::unique_ptr<ResolveContext>> mResolveContexts;
 };
 
 } // namespace Dnssd
