@@ -91,23 +91,23 @@ class TC_ICDB_1_1(MatterBaseTest):
     def steps_TC_ICDB_1_1(self) -> list[TestStep]:
         return [
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
-            TestStep("1a", "TH reads from the DUT the RegisteredClients attribute. ",
+            TestStep(1, "TH reads from the DUT the RegisteredClients attribute. ",
                      "Check if RegisteredClients is empty, if not, TH sends command UnregisterClient to clear all clients in RegisteredClients by checkInNodeID."),
-            TestStep("1b", "TH reads from the DUT the IdleModeDuration and ActiveModeDuration attributes",
+            TestStep(2, "TH reads from the DUT the IdleModeDuration and ActiveModeDuration attributes",
                      "Store values as idle_mode_duration_s and active_mode_duration_ms."),
-            TestStep("2", "TH sends RegisterClient command with parameters: CheckInNodeID: <any_node_id>, MonitoredSubject: <any_monitored_subject_id>, and Key: <any_16_byte_octstr>.", """
+            TestStep(3, "TH sends RegisterClient command with parameters: CheckInNodeID: <any_node_id>, MonitoredSubject: <any_monitored_subject_id>, and Key: <any_16_byte_octstr>.", """
                         Verify DUT command response is successful (no exception).
                         Store ICDCounter value from response as icd_counter_at_registration."""),
-            TestStep("3", "TH sends the RemoveActiveModeReq test event trigger. "
+            TestStep(4, "TH sends the RemoveActiveModeReq test event trigger. "
                      "Wait for DUT to transition to Idle Mode after active_mode_duration_ms."),
-            TestStep("4", "Wait for at least one IdleModeDuration cycle."
+            TestStep(5, "Wait for at least one IdleModeDuration cycle."
                      "DUT sends a check-in message upon transitioning from Idle Mode to Active Mode."),
-            TestStep("5", "TH sends the AddActiveModeReq test event trigger to hold DUT in active mode.",
+            TestStep(6, "TH sends the AddActiveModeReq test event trigger to hold DUT in active mode.",
                      "TH is able to read attributes from the DUT."),
-            TestStep("6", "TH reads the current ICDCounter attribute from the DUT", """
+            TestStep(7, "TH reads the current ICDCounter attribute from the DUT", """
                       Store ICDCounter value as current_icd_counter.
                       Verify that current_icd_counter is greater than icd_counter_at_registration."""),
-            TestStep("7", "TH sends command UnregisterClient to the DUT",
+            TestStep(8, "TH sends command UnregisterClient to the DUT",
                      "All clients in RegisteredClients are cleared, if any"),
         ]
 
@@ -151,25 +151,25 @@ class TC_ICDB_1_1(MatterBaseTest):
         # Commissioning, already done
         self.step("precondition")
 
-        # *** STEP 1a ***
+        # *** STEP 1 ***
         # TH reads from the DUT the RegisteredClients attribute
-        self.step("1a")
+        self.step(1)
         registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
 
         # Check if RegisteredClients is empty
         # If empty, move on to the next step, if not empty, unregister all clients
         await self.unregister_all_clients(registeredClients)
 
-        # *** STEP 1b ***
+        # *** STEP 2 ***
         # TH reads from the DUT the IdleModeDuration and ActiveModeDuration attributes
-        self.step("1b")
+        self.step(2)
         idle_mode_duration_s = await self._read_icdm_attribute_expect_success(attributes.IdleModeDuration)
         active_mode_duration_ms = await self._read_icdm_attribute_expect_success(attributes.ActiveModeDuration)
         log.info(f"IdleModeDuration: {idle_mode_duration_s}s, ActiveModeDuration: {active_mode_duration_ms}ms")
 
-        # *** STEP 2 ***
+        # *** STEP 3 ***
         # TH sends RegisterClient command
-        self.step("2")
+        self.step(3)
         try:
             cmd = commands.RegisterClient(
                 checkInNodeID=self.default_controller.nodeId,
@@ -184,9 +184,9 @@ class TC_ICDB_1_1(MatterBaseTest):
         icd_counter_at_registration = response.ICDCounter
         log.info(f"RegisterClient response ICDCounter: {icd_counter_at_registration}")
 
-        # *** STEP 3 ***
+        # *** STEP 4 ***
         # TH sends the RemoveActiveModeReq test event trigger
-        self.step("3")
+        self.step(4)
         await self.check_test_event_triggers_enabled()
         await self.send_test_event_triggers(
             eventTrigger=ICDTestEventTriggerOperations.kRemoveActiveModeReq)
@@ -196,10 +196,10 @@ class TC_ICDB_1_1(MatterBaseTest):
         log.info(f"Waiting {wait_time_for_idle_s}s for DUT to transition to Idle Mode...")
         await asyncio.sleep(wait_time_for_idle_s)
 
-        # *** STEP 4 ***
+        # *** STEP 5 ***
         # Wait for at least one IdleModeDuration cycle.
         # DUT sends a check-in message upon transitioning from Idle Mode to Active Mode.
-        self.step("4")
+        self.step(5)
         is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         if is_ci:
             # In CI, the test app internally cycles faster than its reported IdleModeDuration,
@@ -214,16 +214,16 @@ class TC_ICDB_1_1(MatterBaseTest):
                  f"({'CI mode' if is_ci else 'real DUT mode'}, IdleModeDuration: {idle_mode_duration_s}s)...")
         await asyncio.sleep(wait_time_for_checkin_s)
 
-        # *** STEP 5 ***
+        # *** STEP 6 ***
         # TH sends AddActiveModeReq to hold DUT in active mode.
         # TH is able to read attributes from the DUT
-        self.step("5")
+        self.step(6)
         await self.send_test_event_triggers(
             eventTrigger=ICDTestEventTriggerOperations.kAddActiveModeReq)
 
-        # *** STEP 6 ***
+        # *** STEP 7 ***
         # TH reads the current ICDCounter attribute from the DUT
-        self.step("6")
+        self.step(7)
         current_icd_counter = await self._read_icdm_attribute_expect_success(attributes.ICDCounter)
         log.info(f"ICDCounter after idle cycle: {current_icd_counter} (was {icd_counter_at_registration} at registration)")
 
@@ -233,10 +233,10 @@ class TC_ICDB_1_1(MatterBaseTest):
             "ICDCounter should have changed after IdleModeDuration cycle. "
             "Registration ICDCounter: {icd_counter_at_registration}, Current: {current_icd_counter}")
 
-        # *** STEP 7 ***
+        # *** STEP 8 ***
         # TH sends command UnregisterClient to the DUT
         # All clients in RegisteredClients are cleared, if any
-        self.step("7")
+        self.step(8)
         await self.unregister_all_clients()
 
 
