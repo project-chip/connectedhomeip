@@ -1,7 +1,7 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
- *    Copyright 2023 NXP
+ *    Copyright (c) 2023, 2026 Project CHIP Authors
+ *    Copyright 2023, 2026 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 #pragma once
 
 #include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
-
+#define FACTORY_DATA_MAX_SIZE 4096
 namespace chip {
 namespace DeviceLayer {
 
@@ -36,11 +36,17 @@ class FactoryDataProviderImpl : public FactoryDataProvider
 public:
     CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                            uint32_t * contentAddr = NULL);
+
     ~FactoryDataProviderImpl(){};
 
     CHIP_ERROR Init(void);
-    CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
     CHIP_ERROR SetEncryptionMode(EncryptionMode mode);
+
+private:
+    uint8_t factoryDataRamBuffer[FACTORY_DATA_MAX_SIZE];
+    CHIP_ERROR DecryptAesEcb(uint8_t * dest, uint8_t * source);
+
+    CHIP_ERROR ReadAndCheckFactoryDataInFlash(void);
 };
 
 FactoryDataProvider & FactoryDataPrvdImpl();

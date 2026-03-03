@@ -22,6 +22,8 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
 
+#include "psa/crypto_types.h"
+
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #endif
@@ -149,6 +151,7 @@ public:
     virtual CHIP_ERROR SetKeyType(KeyType type) { return CHIP_NO_ERROR; };
     virtual CHIP_ERROR SetCbcInitialVector(const uint8_t * iv, uint16_t ivSize);
 
+    virtual void UpdateKeyAttributes(psa_key_attributes_t & attrs) { /* Empty Default implementation - can be overridden by derived classes */  }
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
     using RestoreMechanism = CHIP_ERROR (*)(void);
 

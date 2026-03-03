@@ -1,7 +1,7 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
- *    Copyright 2023-2024 NXP
+ *    Copyright (c) 2022-2024, 2026 Project CHIP Authors
+ *    Copyright 2023, 2024, 2026 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -61,7 +61,6 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
     CHIP_ERROR err               = CHIP_ERROR_NOT_FOUND;
     uint8_t type                 = 0;
     uint32_t index               = 0;
-    uint8_t * addrContent        = NULL;
     uint8_t * factoryDataAddress = &factoryDataRamBuffer[0];
     uint32_t factoryDataSize     = sizeof(factoryDataRamBuffer);
     uint16_t currentLen          = 0;
@@ -113,47 +112,12 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
     return err;
 }
 
-CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer)
-{
-    Crypto::P256ECDSASignature signature;
-    Crypto::P256Keypair keypair;
-
-    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(digestToSign), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
-    // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-    Crypto::P256PublicKey dacPublicKey;
-    uint16_t certificateSize = 0;
-    uint32_t certificateAddr;
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacCertificateId, NULL, 0, certificateSize, &certificateAddr));
-    MutableByteSpan dacCertSpan((uint8_t *) certificateAddr, certificateSize);
-
-    /* Extract Public Key of DAC certificate from itself */
-    ReturnErrorOnFailure(Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
-
-    /* Get private key of DAC certificate from reserved section */
-    uint16_t keySize = 0;
-    uint32_t keyAddr;
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, NULL, 0, keySize, &keyAddr));
-    MutableByteSpan dacPrivateKeySpan((uint8_t *) keyAddr, keySize);
-
-    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()),
-                                                                      ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
-
-    ReturnErrorOnFailure(keypair.ECDSA_sign_msg(digestToSign.data(), digestToSign.size(), signature));
-
-    return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
-}
-
 CHIP_ERROR FactoryDataProviderImpl::Init(void)
 {
     uint16_t len;
     status_t status;
     uint32_t factoryDataAddress = (uint32_t) __FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize    = (uint32_t) __FACTORY_DATA_SIZE;
-    uint32_t hashId;
     uint8_t currentBlock[BLOCK_SIZE_16_BYTES];
     uint8_t calculatedHash[SHA256_OUTPUT_SIZE];
     size_t outputHashSize = sizeof(calculatedHash);

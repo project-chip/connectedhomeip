@@ -1,7 +1,7 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
- *    Copyright 2023-2025 NXP
+ *    Copyright (c) 2020-2022, 2026 Project CHIP Authors
+ *    Copyright 2023-2026 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,14 +22,18 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#include "ELSFactoryData.h"
 #include "mflash_drv.h"
 
 #include "fsl_adapter_flash.h"
 
-/* mbedtls */
-#include "mbedtls/aes.h"
-#include "mbedtls/sha256.h"
+#include "els_pkc_driver.h"
+#include "psa/crypto.h"
+
+#ifdef CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
+#include "ELSFactoryData.h"
+
+#define DAC_KEY_BLOB_SIZE 48
+#endif /* CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION */
 
 #if defined(__cplusplus)
 }
@@ -53,6 +57,9 @@ extern "C" {
 #error("OTA FACTORY DATA PROCESSOR NOT SUPPORTED WITH THIS FACTORY DATA PRVD IMPL")
 #endif
 
+#define HASH_ID 0xCE47BA5E
+#define HASH_LEN 4
+
 /* Grab symbol for the base address from the linker file. */
 extern uint32_t __FACTORY_DATA_START_OFFSET[];
 extern uint32_t __FACTORY_DATA_SIZE[];
@@ -63,24 +70,48 @@ using namespace ::chip::Crypto;
 namespace chip {
 namespace DeviceLayer {
 
-static constexpr size_t kPrivateKeyBlobLength = Crypto::kP256_PrivateKey_Length + ELS_BLOB_METADATA_SIZE + ELS_WRAP_OVERHEAD;
 
 CHIP_ERROR FactoryDataProviderImpl::DecryptAesEcb(uint8_t * dest, uint8_t * source)
 {
-    uint8_t res = 0;
-    mbedtls_aes_context aesCtx;
+    psa_status_t status;
+    psa_key_attributes_t key_attr = PSA_KEY_ATTRIBUTES_INIT;
+    psa_key_id_t key_id = 0;
 
-    mbedtls_aes_init(&aesCtx);
-    res = mbedtls_aes_setkey_dec(&aesCtx, pAesKey, pAESKeySize);
-    VerifyOrReturnError(res == 0, CHIP_ERROR_INTERNAL);
+    // Configure key attributes
+    psa_set_key_usage_flags(&key_attr, PSA_KEY_USAGE_DECRYPT);
+    psa_set_key_algorithm(&key_attr, PSA_ALG_ECB_NO_PADDING);
+    psa_set_key_type(&key_attr, PSA_KEY_TYPE_AES);
+    psa_set_key_bits(&key_attr, pAESKeySize);
 
-    res = mbedtls_aes_crypt_ecb(&aesCtx, MBEDTLS_AES_DECRYPT, source, dest);
-    VerifyOrReturnError(res == 0, CHIP_ERROR_INTERNAL);
+    // Import AES key into PSA
+    status = psa_import_key(&key_attr, pAesKey, PSA_BITS_TO_BYTES(pAESKeySize), &key_id);
+    if (status != PSA_SUCCESS)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
 
-    mbedtls_aes_free(&aesCtx);
+    // Perform AES-ECB decrypt
+    size_t out_len = 0;
+    status = psa_cipher_decrypt(
+        key_id,
+        PSA_ALG_ECB_NO_PADDING,
+        source,
+        16,        // ECB always processes 16‑byte blocks
+        dest,
+        16,
+        &out_len);
+
+    // Clean up key regardless of outcome
+    psa_destroy_key(key_id);
+
+    if (status != PSA_SUCCESS || out_len != 16)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
 
     return CHIP_NO_ERROR;
 }
+
 
 CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                                                 uint32_t * contentAddr)
@@ -139,68 +170,14 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
     return err;
 }
 
-CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer)
+void FactoryDataProviderImpl::UpdateKeyAttributes(psa_key_attributes_t & attrs)
 {
-    CHIP_ERROR res = CHIP_NO_ERROR;
-    uint8_t els_key_blob[kPrivateKeyBlobLength];
-    size_t els_key_blob_size = sizeof(els_key_blob);
-    uint16_t keySize         = 0;
-    status_t status          = STATUS_SUCCESS;
-    uint8_t digest[kSHA256_Hash_Length];
-
-    mcuxClEls_KeyIndex_t key_index           = MCUXCLELS_KEY_SLOTS;
-    mcuxClEls_KeyProp_t plain_key_properties = {
-        .word = { .value = MCUXCLELS_KEYPROPERTY_VALUE_SECURE | MCUXCLELS_KEYPROPERTY_VALUE_PRIVILEGED |
-                      MCUXCLELS_KEYPROPERTY_VALUE_KEY_SIZE_256 | MCUXCLELS_KEYPROPERTY_VALUE_KGSRC }
-    };
-
-    mcuxClEls_EccSignOption_t sign_options = { 0 };
-    mcuxClEls_EccByte_t ecc_signature[MCUXCLELS_ECC_SIGNATURE_SIZE];
-
-    uint8_t public_key[64] = { 0 };
-    size_t public_key_size = sizeof(public_key);
-
-    /* Search key ID FactoryDataId::kDacPrivateKeyId */
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, els_key_blob, els_key_blob_size, keySize));
-
-    PLOG_DEBUG_BUFFER("els_key_blob", els_key_blob, els_key_blob_size);
-
-    /* Calculate message HASH to sign */
-    memset(&digest[0], 0, sizeof(digest));
-    res = Hash_SHA256(digestToSign.data(), digestToSign.size(), &digest[0]);
-    if (res != CHIP_NO_ERROR)
+    if (psa_get_key_lifetime(&attrs) == PSA_KEY_LIFETIME_VOLATILE)
     {
-        return res;
+        psa_set_key_lifetime(&attrs,
+                             PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_VOLATILE,
+                                                                            PSA_CRYPTO_ELS_PKC_LOCATION_S50_RFC3394_STORAGE));
     }
-
-    PLOG_DEBUG_BUFFER("digestToSign", digestToSign.data(), digestToSign.size());
-
-    /* Import blob DAC key into SE50 (reserved key slot) */
-    status = import_die_int_wrapped_key_into_els(els_key_blob, els_key_blob_size, plain_key_properties, &key_index);
-    STATUS_SUCCESS_OR_EXIT_MSG("import_die_int_wrapped_key_into_els failed: 0x%08x", status);
-
-    /* For ECC keys that were created from plain key material, there is the
-     neceessity to convert them to a key. Converting to a key also yields the public key.
-     The conversion can be done either before re-wrapping (when importing the plain key)
-     or after (when importing the blob).*/
-    status = els_keygen(key_index, &public_key[0], &public_key_size);
-    STATUS_SUCCESS_OR_EXIT_MSG("els_keygen failed: 0x%08x", status);
-
-    /* The key is usable for signing. */
-    PLOG_DEBUG_BUFFER("public_key", public_key, public_key_size);
-
-    /* ECC sign message hash with the key index slot reserved during the blob importation */
-    ELS_sign_hash(digest, ecc_signature, &sign_options, key_index);
-
-    /* Delete SE50 key with the index slot reserved during the blob importation (free key slot) */
-    els_delete_key(key_index);
-
-    /* Generate MutableByteSpan with ECC signature and ECC signature size */
-    return CopySpanToMutableSpan(ByteSpan{ ecc_signature, MCUXCLELS_ECC_SIGNATURE_SIZE }, outSignBuffer);
-
-exit:
-    els_delete_key(key_index);
-    return CHIP_ERROR_INVALID_SIGNATURE;
 }
 
 CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
@@ -208,7 +185,7 @@ CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
     status_t status;
     uint32_t factoryDataAddress = (uint32_t) __FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize    = (uint32_t) __FACTORY_DATA_SIZE;
-    uint8_t calculatedHash[SHA256_OUTPUT_SIZE];
+    uint8_t calculatedHash[kSHA256_Hash_Length];
     CHIP_ERROR res;
     uint8_t currentBlock[16];
 
@@ -288,17 +265,17 @@ CHIP_ERROR FactoryDataProviderImpl::SetEncryptionMode(EncryptionMode mode)
 
 CHIP_ERROR FactoryDataProviderImpl::Init(void)
 {
-    uint16_t keySize = 0;
-
     ReturnLogErrorOnFailure(ReadAndCheckFactoryDataInFlash());
 
-    els_enable();
+#ifdef CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
+
+    uint16_t keySize = 0;
 
     ChipLogProgress(DeviceLayer, "init: only protect DAC private key\n");
 
     /* check whether the kDacPrivateKeyId data is converted or not*/
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, NULL, 0, keySize));
-    if (keySize == kPrivateKeyBlobLength)
+    if (keySize == DAC_KEY_BLOB_SIZE)
     {
         /* the kDacPrivateKeyId data is converted already, do nothing */
         ChipLogProgress(DeviceLayer, "SSS: DAC private key already converted to blob");
@@ -309,45 +286,53 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
         /* provison the dac private key into Edge Lock and the returned wrapped key is stored the previous area of factory data,
          update the hash and re-write the factory data in Flash */
         ChipLogProgress(DeviceLayer, "SSS: convert DAC private key to blob");
+        els_enable();
         ReturnLogErrorOnFailure(ELS_ConvertDacKey());
         ChipLogProgress(DeviceLayer, "System restarting");
     }
 
+#endif
+
     return CHIP_NO_ERROR;
 }
 
+#ifdef CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION
 CHIP_ERROR FactoryDataProviderImpl::ELS_ConvertDacKey()
 {
-    size_t blobSize                     = kPrivateKeyBlobLength;
-    size_t newSize                      = sizeof(Header) + mHeader.size + (ELS_BLOB_METADATA_SIZE + ELS_WRAP_OVERHEAD);
-    uint8_t blob[kPrivateKeyBlobLength] = { 0 };
+    CHIP_ERROR error                = CHIP_NO_ERROR;
+    size_t blobSize                 = DAC_KEY_BLOB_SIZE;
+    size_t newSize                  = sizeof(Header) + mHeader.size + (ELS_BLOB_METADATA_SIZE + ELS_WRAP_OVERHEAD);
+    uint8_t blob[DAC_KEY_BLOB_SIZE] = { 0 };
     uint32_t KeyAddr;
     uint32_t factoryDataAddress = (uint32_t) __FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize    = (uint32_t) __FACTORY_DATA_SIZE;
+    hal_flash_status_t status;
 
     uint8_t * data = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(newSize));
     /* Import pain DAC key and generate the blob */
-    ReturnErrorOnFailure(ELS_ExportBlob(blob, &blobSize, KeyAddr));
+    SuccessOrExit(ELS_ExportBlob(blob, &blobSize, KeyAddr));
+
     ChipLogProgress(DeviceLayer, "SSS: extracted blob from DAC private key");
     PLOG_DEBUG_BUFFER("blob", blob, blobSize);
+    VerifyOrExit(blobSize == DAC_KEY_BLOB_SIZE, error = CHIP_ERROR_INTERNAL);
 
     /* Read all factory data */
-    hal_flash_status_t status = HAL_FlashRead(factoryDataAddress + MFLASH_BASE_ADDRESS, sizeof(Header), data);
+    status = HAL_FlashRead(factoryDataAddress + MFLASH_BASE_ADDRESS, sizeof(Header), data);
     memcpy(data + sizeof(Header), factoryDataRamBuffer, mHeader.size);
-    VerifyOrReturnError(status == kStatus_HAL_Flash_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == kStatus_HAL_Flash_Success, error = CHIP_ERROR_INTERNAL);
     ChipLogError(DeviceLayer, "SSS: cached factory data in RAM");
 
     /* Replace private plain DAC key by the blob into factory data RAM buffer (the blob length is higher then the plain key length)
      */
-    ReturnErrorOnFailure(ReplaceWithBlob(data, blob, blobSize, KeyAddr));
+    SuccessOrExit(ReplaceWithBlob(data, blob, blobSize, KeyAddr));
     ChipLogError(DeviceLayer, "SSS: replaced DAC private key with secured blob");
 
     /* Erase flash factory data sectors */
     status = HAL_FlashEraseSector(factoryDataAddress + MFLASH_BASE_ADDRESS, factoryDataSize);
-    VerifyOrReturnError(status == kStatus_HAL_Flash_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == kStatus_HAL_Flash_Success, error = CHIP_ERROR_INTERNAL);
     /* Write new factory data into flash */
     status = HAL_FlashProgramUnaligned(factoryDataAddress + MFLASH_BASE_ADDRESS, newSize, data);
-    VerifyOrReturnError(status == kStatus_HAL_Flash_Success, CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == kStatus_HAL_Flash_Success, error = CHIP_ERROR_INTERNAL);
     ChipLogError(DeviceLayer, "SSS: updated factory data");
 
     /* remove the header section as it will no longer be used */
@@ -357,8 +342,9 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_ConvertDacKey()
     /* Actualisation of the factory data payload size */
     mHeader.size = newSize;
 
+exit:
     chip::Platform::MemoryFree(data);
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 CHIP_ERROR FactoryDataProviderImpl::ELS_ExportBlob(uint8_t * data, size_t * dataLen, uint32_t & addr)
@@ -415,6 +401,8 @@ CHIP_ERROR FactoryDataProviderImpl::ReplaceWithBlob(uint8_t * data, uint8_t * bl
 
     return CHIP_NO_ERROR;
 }
+
+#endif /* CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION */
 
 #ifndef CONFIG_CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 FactoryDataProvider & FactoryDataPrvdImpl()
