@@ -124,6 +124,7 @@
         "temperature-control-cluster.xml",
         "temperature-measurement-cluster.xml",
         "test-cluster.xml",
+        "test-hidden-mei-cluster.xml",
         "thermostat-cluster.xml",
         "thermostat-user-interface-configuration-cluster.xml",
         "thread-border-router-management-cluster.xml",
