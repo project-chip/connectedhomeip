@@ -318,8 +318,7 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
         return;
     }
     uint8_t fanModeRaw = to_underlying(fanMode);
-    emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::FanMode::Id, &fanModeRaw,
-                          ZCL_ENUM8_ATTRIBUTE_TYPE);
+    emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::FanMode::Id, &fanModeRaw, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 void AirPurifierManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode)
@@ -426,8 +425,7 @@ std::optional<uint8_t> AirPurifierManager::GetSpeedMax()
     Status status    = FanControl::Attributes::SpeedMax::Get(mEndpointId, &speedMax);
     if (status != Status::Success)
     {
-        ChipLogError(NotSpecified, "AirPurifierManager::GetSpeedMax: failed to get SpeedMax attribute: %d",
-                     to_underlying(status));
+        ChipLogError(NotSpecified, "AirPurifierManager::GetSpeedMax: failed to get SpeedMax attribute: %d", to_underlying(status));
         return std::nullopt;
     }
     return speedMax;
