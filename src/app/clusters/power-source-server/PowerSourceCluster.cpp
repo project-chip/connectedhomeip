@@ -14,7 +14,8 @@
  *    limitations under the License.
  */
 
-#include "PowerSourceClusterNew.h"
+#include "PowerSourceCluster.h"
+
 #include <server-cluster/AttributeListBuilder.h>
 #include <clusters/PowerSource/Metadata.h>
 
@@ -93,117 +94,71 @@ DataModel::ActionReturnStatus PowerSourceCluster::ReadAttribute(const DataModel:
     switch (request.path.mAttributeId)
     {
     case Status::Id:
-        return encoder.Encode(GetBaseDelegate().GetStatus());
+        return encoder.Encode(mAttrributes.status);
     case Order::Id:
-        return encoder.Encode(GetBaseDelegate().GetOrder());
+        return encoder.Encode(mAttributes.order);
     case Description::Id:
-        return encoder.Encode(GetBaseDelegate().GetDescription());
+        return encoder.Encode(mAttributes.description);
     case WiredAssessedInputVoltage::Id:
-        Optional<uint32_t> value{};
-        CHIP_ERROR err = GetWiredDelegate().GetAssessedInputVoltage(value);
-        return EncodeOptional(encoder, value, err);
+        return EncodeOptional(encoder, mAttributes.wired.assessedInputVoltage);
     case WiredAssessedInputFrequency::Id:
-        Optional<uint16_t> frequency{};
-        CHIP_ERROR err = GetWiredDelegate().GetAssessedInputFrequency(frequency);
-        return EncodeOptional(encoder, frequency, err);
+        return EncodeOptional(encoder, mAttributes.wired.assessedInputFrequency);
     case WiredCurrentType::Id:
-        return encoder.Encode(GetWiredDelegate().GetCurrentType());
+        // Again, Is the use of `WiredCurrentTypeEnum::kUnknownEnumValue` as an invalid value permitted?
+        VerifyOrReturnError(mAttributes.wired.currentType != WiredCurrentTypeEnum::kUnknownEnumValue, CHIP_ERROR_INCORRECT_STATE);
+        return encoder.Encode(mAttributes.wired.currentType);
     case WiredAssessedCurrent::Id:
-        Optional<uint16_t> current{};
-        CHIP_ERROR err = GetWiredDelegate().GetAssessedCurrent(current);
-        return EncodeOptional(encoder, current, err);
+        return EncodeOptional(encoder, mAttributes.wired.assessedCurrent);
     case WiredNominalVoltage::Id:
-        uint32_t nominalVoltage{};
-        CHIP_ERROR err = GetWiredDelegate().GetNominalVoltage(nominalVoltage);
-        return EncodeValue(encoder, nominalVoltage, err);
+        return encoder.Encode(mAttributes.wired.nominalVoltage);
     case WiredMaximumCurrent::Id:
-        uint32_t maximumCurrent{};
-        CHIP_ERROR err = GetWiredDelegate().GetMaximumCurrent(maximumCurrent);
-        return EncodeValue(encoder, maximumCurrent, err);
+        return encoder.Encode(mAttributes.wired.maximumCurrent);
     case WiredPresent::Id:
-        bool present{};
-        CHIP_ERROR err = GetWiredDelegate().IsPresent(present);
-        return EncodeValue(encoder, present, err);
+        return encoder.Encode(mAttributes.wired.isPresent);
     case ActiveWiredFaults::Id:
-        Span<const WiredFaultEnum> activeWiredFaults{};
-        CHIP_ERROR err = GetWiredDelegate().GetActiveWiredFaults(activeWiredFaults);
-        return EncodeListOfValues(encoder, activeWiredFaults, err);
+        return EncodeListOfValues(encoder, mAttributes.wired.GetActiveFaults());
     case BatVoltage::Id:
-        Optional<uint32_t> voltage{};
-        CHIP_ERROR err = GetBatteryDelegate().GetVoltage(voltage);
-        return EncodeOptional(encoder, voltage, err);
+        return EncodeOptional(encoder, mAttributes.battery.voltage);
     case BatPercentRemaining::Id:
-        Optional<uint8_t> percent{};
-        CHIP_ERROR err = GetBatteryDelegate().GetPercentRemaining(percent);
-        return EncodeOptional(encoder, percent, err);
+        return EncodeOptional(encoder, mAttributes.battery.percentRemaining);
     case BatTimeRemaining::Id:
-        Optional<uint32_t> time{};
-        CHIP_ERROR err = GetBatteryDelegate().GetTimeRemaining(time);
-        return EncodeOptional(encoder, time, err);
+        return EncodeOptional(encoder, mAttributes.battery.timeRemaining);
     case BatChargeLevel::Id:
-        return encoder.Encode(GetBatteryDelegate().GetChargeLevel());
+        return encoder.Encode(mAttributes.battery.chargeLevel);
     case BatReplacementNeeded::Id:
-        return encoder.Encode(GetBatteryDelegate().IsReplacmentNeeded());
+        return encoder.Encode(mAttributes.battery.replacementNeeded);
     case BatReplaceability::Id:
-        return encoder.Encode(GetBatteryDelegate().GetReplaceability());
+        return encoder.Encode(mAttributes.battery.replaceability);
     case BatPresent::Id:
-        bool present{};
-        CHIP_ERROR err = GetBatteryDelegate().IsPresent(present);
-        return EncodeValue(encoder, present, err);
+        return encoder.Encode(mAttributes.battery.isPresent);
     case ActiveBatFaults::Id:
-        Span<const BatFaultEnum> activeBatFaults{};
-        CHIP_ERROR err = GetBatteryDelegate().GetActiveFaults(activeBatFaults);
-        return EncodeListOfValues(encoder, activeBatFaults, err);
+        return EncodeListOfValues(encoder, mAttributes.battery.GetActiveFaults());
     case BatReplacementDescription::Id:
-        return encoder.Encode(GetReplacableBatteryDelegate().GetReplacementDescription());
+        return encoder.Encode(mAttributes.battery.replaceable.GetReplacementDescription());
     case BatCommonDesignation::Id:
-        BatCommonDesignationEnum commonDesignation{};
-        CHIP_ERROR err = GetReplacableBatteryDelegate().GetCommonDesignation(commonDesignation);
-        return EncodeValue(encoder, commonDesignation, err);
+        return encoder.Encode(mAttributes.battery.replaceable.GetCommonDesignation());
     case BatANSIDesignation::Id:
-        CharSpan ansiDesignation{};
-        CHIP_ERROR err = GetReplacableBatteryDelegate().GetANSIDesignation(ansiDesignation);
-        return EncodeValue(encoder, ansiDesignation, err);
+        return encoder.Encode(mAttributes.battery.replaceable.GetAnsiDesignation());
     case BatIECDesignation::Id:
-        CharSpan iecDesignation{};
-        CHIP_ERROR err = GetReplacableBatteryDelegate().GetIECDesignation(iecDesignation);
-        return EncodeValue(encoder, iecDesignation, err);
+        return encoder.Encode(mAttributes.battery.replaceable.GetIECDesignation());
     case BatApprovedChemistry::Id:
-        BatApprovedChemistryEnum approvedChemistry{};
-        CHIP_ERROR err = GetReplacableBatteryDelegate().GetApprovedChemistry(approvedChemistry);
-        return EncodeValue(encoder, approvedChemistry, err);
+        return encoder.Encode(mAttributes.battery.replaceable.approvedChemistry);
     case BatCapacity::Id:
-        uint32_t capacity{};
-        if (Features().Has(Feature::kReplaceable))
-        {
-            CHIP_ERROR err = GetReplacableBatteryDelegate().GetCapacity(capacity);
-            return EncodeValue(encoder, capacity, err);
-        }
-        if (Features().Has(Feature::kRechargeable))
-        {
-            CHIP_ERROR err = GetRechargeableBatteryDelegate().GetCapacity(capacity);
-            return EncodeValue(encoder, capacity, err);
-        }
+        return encoder.Encode(mAttributes.battery.capacity);
     case BatQuantity::Id:
-        return encoder.Encode(GetReplacableBatteryDelegate().GetQuantity());
+        return encoder.Encode(mAttributes.battery.replaceable.quantity);
     case BatChargeState::Id:
-        return encoder.Encode(GetRechargeableBatteryDelegate().GetChargeState());
+        return encoder.Encode(mAttributes.battery.rechargeable.chargeState);
     case BatTimeToFullCharge::Id:
-        Optional<uint32_t> timeToFullCharge{};
-        CHIP_ERROR err = GetRechargeableBatteryDelegate().GetTimeToFullCharge(timeToFullCharge);
-        return EncodeOptional(encoder, timeToFullCharge, err);
+        return EncodeOptional(encoder, mAttributes.battery.rechargeable.timeToFullCharge);
     case BatFunctionalWhileCharging::Id:
-        return encoder.Encode(GetRechargeableBatteryDelegate().IsFunctionalWhileCharging());
+        return encoder.Encode(mAttributes.battery.rechargeable.functionalWhileCharging);
     case BatChargingCurrent::Id:
-        Optional<uint32_t> chargingCurrent{};
-        CHIP_ERROR err = GetRechargeableBatteryDelegate().GetChargingCurrent(chargingCurrent);
-        return EncodeOptional(encoder, chargingCurrent, err);
+        return EncodeOptional(encoder, mAttributes.battery.rechargeable.chargingCurrent);
     case ActiveBatChargeFaults::Id:
-        Span<const BatChargeFaultEnum> activeChargeFaults{};
-        CHIP_ERROR err = GetRechargeableBatteryDelegate().GetActiveChargeFaults(activeChargeFaults);
-        return EncodeListOfValues(encoder, activeChargeFaults, err);
+        return EncodeListOfValues(encoder, mAttributes.battery.rechargeable.GetActiveChargeFaults());
     case EndpointList::Id:
-        return EncodeListOfValues(encoder, GetBaseDelegate().GetPoweredEndpoints());
+        return EncodeListOfValues(encoder, mAttributes.GetPoweredEndpoints());
     case Globals::Attributes::FeatureMap::Id:
         return encoder.Encode(Features());
     case Globals::Attributes::ClusterRevision::Id:
