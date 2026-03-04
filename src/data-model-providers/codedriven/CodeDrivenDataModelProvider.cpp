@@ -58,11 +58,6 @@ CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelConte
 
         if (endpointRegistered)
         {
-            // IMPORTANT: Clusters persist across Stop() → Start() cycles. When Stop() is called,
-            // Shutdown() clears cluster state (mContext) but doesn't destroy the cluster objects.
-            // When Start() is called again, we reach here with clusters that may already be initialized.
-            // DefaultServerCluster::Startup() is now idempotent - it detects if already initialized
-            // and just updates the context pointer without re-randomizing mDataVersion.
             if (cluster->Startup(*mServerClusterContext) != CHIP_NO_ERROR)
             {
                 had_failure = true;
@@ -82,24 +77,20 @@ CHIP_ERROR CodeDrivenDataModelProvider::Shutdown()
 {
     bool had_failure = false;
 
-    // Call Shutdown() on all clusters to clear their state (sets mContext = nullptr).
-    // IMPORTANT: Do NOT unregister clusters from the registry. Cluster objects persist
-    // across Stop() → Start() cycles along with their LazyRegisteredServerCluster wrappers.
-    // Only their runtime state is cleared here. This allows Start() to re-initialize
-    // the same cluster objects without destroying/recreating them (preserves mDataVersion).
-    ChipLogDetail(DataManagement, "CodeDrivenDataModelProvider::Shutdown() clearing cluster state (clusters remain registered)");
-
-    for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
-    {
-        cluster->Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
-
-    // Remove all endpoints from mEndpointInterfaceRegistry - but don't remove clusters from mServerClusterRegistry
+    // Remove all endpoints. This will trigger Shutdown() on associated clusters.
     while (mEndpointInterfaceRegistry.begin() != mEndpointInterfaceRegistry.end())
     {
-        EndpointId endpointToRemove = mEndpointInterfaceRegistry.begin()->GetEndpointEntry().id;
-        // Unregister the endpoint but don't shutdown clusters (already done above)
-        if (mEndpointInterfaceRegistry.Unregister(endpointToRemove) != CHIP_NO_ERROR)
+        if (RemoveEndpoint(mEndpointInterfaceRegistry.begin()->GetEndpointEntry().id) != CHIP_NO_ERROR)
+        {
+            had_failure = true;
+        }
+    }
+
+    // Now we're safe to clean up the cluster registry.
+    while (mServerClusterRegistry.AllServerClusterInstances().begin() != mServerClusterRegistry.AllServerClusterInstances().end())
+    {
+        ServerClusterInterface * clusterToRemove = *mServerClusterRegistry.AllServerClusterInstances().begin();
+        if (mServerClusterRegistry.Unregister(clusterToRemove) != CHIP_NO_ERROR)
         {
             had_failure = true;
         }
