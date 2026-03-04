@@ -23,7 +23,7 @@
 #include "ICDUtil.h"
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/operational-state-server/operational-state-cluster-objects.h>
-#include <app/clusters/temperature-control-server/CodegenIntegration.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/util/attribute-storage.h>
 
 #include "static-supported-temperature-levels.h"

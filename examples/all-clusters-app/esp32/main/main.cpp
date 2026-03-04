@@ -33,7 +33,7 @@
 #include "nvs_flash.h"
 #include "platform/PlatformManager.h"
 #include "shell_extension/launch.h"
-#include <app/clusters/temperature-control-server/CodegenIntegration.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/util/endpoint-config-api.h>
 #include <binding-handler.h>
 #include <common/CHIPDeviceManager.h>

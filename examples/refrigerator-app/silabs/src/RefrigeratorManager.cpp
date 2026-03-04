@@ -26,7 +26,7 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/temperature-control-server/CodegenIntegration.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <static-supported-temperature-levels.h>
 
