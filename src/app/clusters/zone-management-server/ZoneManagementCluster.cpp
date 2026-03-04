@@ -76,8 +76,9 @@ namespace ZoneManagement {
 ZoneManagementCluster::ZoneManagementCluster(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
                                              uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
                                              const TwoDCartesianVertexStruct & aTwoDCartesianMax) :
-    DefaultServerCluster({ aEndpointId, ZoneManagement::Id }), mDelegate(aDelegate), mEndpointId(aEndpointId), mRegistration(*this),
-    mFeatures(aFeatures), mMaxUserDefinedZones(aMaxUserDefinedZones), mMaxZones(aMaxZones), mSensitivityMax(aSensitivityMax),
+    DefaultServerCluster({ aEndpointId, ZoneManagement::Id }),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mRegistration(*this), mFeatures(aFeatures),
+    mMaxUserDefinedZones(aMaxUserDefinedZones), mMaxZones(aMaxZones), mSensitivityMax(aSensitivityMax),
     mTwoDCartesianMax(aTwoDCartesianMax)
 {
     mDelegate.SetZoneMgmtServer(this);

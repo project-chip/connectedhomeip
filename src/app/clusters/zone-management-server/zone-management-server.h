@@ -23,7 +23,6 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -351,15 +350,14 @@ private:
     bool ZoneAlreadyExists(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices,
                            const DataModel::Nullable<uint16_t> & excludeZoneId);
 
-    std::optional<ActionReturnStatus> HandleCreateTwoDCartesianZone(
-        const ConcreteCommandPath & requestPath, CommandHandler * handler,
-        const Commands::CreateTwoDCartesianZone::DecodableType & req);
+    std::optional<ActionReturnStatus> HandleCreateTwoDCartesianZone(const ConcreteCommandPath & requestPath,
+                                                                    CommandHandler * handler,
+                                                                    const Commands::CreateTwoDCartesianZone::DecodableType & req);
 
     ActionReturnStatus HandleUpdateTwoDCartesianZone(const Commands::UpdateTwoDCartesianZone::DecodableType & req);
     ActionReturnStatus HandleRemoveZone(const Commands::RemoveZone::DecodableType & req);
     ActionReturnStatus HandleCreateOrUpdateTrigger(const Commands::CreateOrUpdateTrigger::DecodableType & req);
     ActionReturnStatus HandleRemoveTrigger(const Commands::RemoveTrigger::DecodableType & req);
-
 };
 
 using ZoneMgmtServer = ZoneManagementCluster;
