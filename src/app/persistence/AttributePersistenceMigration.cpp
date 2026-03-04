@@ -41,6 +41,17 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
             continue;
         }
 
+        // Verify that the migrator provided is not null.
+        if (entry.migrator == nullptr)
+        {
+            hadMigrationErrors = true;
+            ChipLogError(DataManagement,
+                         "AttributeMigration: Null migrator for attribute '" ChipLogFormatMEI
+                         "' from cluster '" ChipLogFormatMEI "'",
+                         ChipLogValueMEI(entry.attributeId), ChipLogValueMEI(cluster.mClusterId));
+            continue;
+        }
+
         // We make a copy of the buffer so it can be resized
         // Still refers to same internal buffer though
         // Read value from the safe provider, will resize copyOfBuffer to read size

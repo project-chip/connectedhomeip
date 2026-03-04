@@ -386,4 +386,60 @@ TEST(TestAttributePersistenceMigration, TestMigrationWithSafeValueMigrator)
     }
 }
 
+// Null migrator: reports failure for the null entry but still migrates the valid entry.
+TEST(TestAttributePersistenceMigration, TestMigrationWithNullMigrator)
+{
+    TestPersistentStorageDelegate storageDelegate;
+    DefaultAttributePersistenceProvider ramProvider;
+    DefaultSafeAttributePersistenceProvider safeRamProvider;
+    ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(safeRamProvider.Init(&storageDelegate), CHIP_NO_ERROR);
+
+    const ConcreteAttributePath pathA(1, 2, 3);
+    const ConcreteAttributePath pathB(1, 2, 4);
+    const ConcreteClusterPath cluster(1, 2);
+    constexpr uint32_t kValueB = 55;
+
+    // Only attribute B has a value in the safe provider
+    ASSERT_EQ(safeRamProvider.WriteScalarValue(pathB, kValueB), CHIP_NO_ERROR);
+
+    // Attribute A has a null migrator, attribute B has a valid one
+    const AttrMigrationData attributesToMigrate[] = {
+        { 3, nullptr },
+        { 4, &DefaultMigrators::ScalarValue<uint32_t> },
+    };
+    uint8_t buf[128] = {};
+    MutableByteSpan buffer(buf);
+    // Should report failure due to null migrator
+    EXPECT_EQ(
+        MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span(attributesToMigrate), buffer),
+        CHIP_ERROR_HAD_FAILURES);
+
+    // Attribute A should not exist in the normal provider
+    {
+        uint8_t readBuf[sizeof(uint32_t)] = {};
+        MutableByteSpan readBuffer(readBuf);
+        EXPECT_EQ(ramProvider.ReadValue(pathA, readBuffer), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    }
+
+    // Attribute B should still be migrated successfully
+    {
+        uint8_t readBuf[sizeof(uint32_t)] = {};
+        MutableByteSpan readBuffer(readBuf);
+        EXPECT_EQ(ramProvider.ReadValue(pathB, readBuffer), CHIP_NO_ERROR);
+
+        uint32_t readValue = 0;
+        ASSERT_EQ(readBuffer.size(), sizeof(uint32_t));
+        memcpy(&readValue, readBuffer.data(), sizeof(uint32_t));
+        EXPECT_EQ(readValue, kValueB);
+    }
+
+    // Attribute B should be deleted from the safe provider
+    {
+        uint8_t readBuf[sizeof(uint32_t)] = {};
+        MutableByteSpan readBuffer(readBuf);
+        EXPECT_EQ(safeRamProvider.SafeReadValue(pathB, readBuffer), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    }
+}
+
 } // namespace
