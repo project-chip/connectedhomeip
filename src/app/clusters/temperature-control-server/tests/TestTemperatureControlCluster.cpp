@@ -169,6 +169,8 @@ TEST_F(TestTemperatureControlCluster, ReadAttributeTest)
         TemperatureControlCluster cluster(kRootEndpointId, features, TemperatureControlCluster::StartupConfiguration{});
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
+        TemperatureControlCluster::SetDelegate(&gDelegate);
+
         ClusterTester tester(cluster);
 
         uint16_t revision{};
@@ -182,6 +184,18 @@ TEST_F(TestTemperatureControlCluster, ReadAttributeTest)
 
         DataModel::DecodableList<chip::CharSpan> supportedTemperatureLevels;
         ASSERT_EQ(tester.ReadAttribute(SupportedTemperatureLevels::Id, supportedTemperatureLevels), CHIP_NO_ERROR);
+
+        auto it = supportedTemperatureLevels.begin();
+        ASSERT_TRUE(it.Next());
+        auto temperatureLevel = it.GetValue();
+        ASSERT_TRUE(temperatureLevel.data_equal("Low"_span));
+        ASSERT_TRUE(it.Next());
+        temperatureLevel = it.GetValue();
+        ASSERT_TRUE(temperatureLevel.data_equal("Medium"_span));
+        ASSERT_TRUE(it.Next());
+        temperatureLevel = it.GetValue();
+        ASSERT_TRUE(temperatureLevel.data_equal("High"_span));
+        ASSERT_FALSE(it.Next());
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
