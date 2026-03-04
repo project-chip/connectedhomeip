@@ -259,7 +259,11 @@ public:
     {
         app::ConcreteAttributePath path(request.endpoint, request.cluster, request.attribute_id);
         MutableByteSpan tlvBuffer(response.tlv_data.bytes);
+        ChipLogProgress(Support, "DEBUG_DEBUG In ::pw::Status Read Reading Cluster=%d Attribute=%d", path.mClusterId,
+                        path.mAttributeId);
         PW_TRY(ReadAttributeIntoTlvBuffer(path, tlvBuffer));
+        ChipLogProgress(Support, "DEBUG_DEBUG In ::pw::Status Read Reading Cluster=%d Attribute=%d. Attribute read successfully.",
+                        path.mClusterId, path.mAttributeId);
         // NOTE: TLV will be a full AttributeReportIB (so not purely the data)
         response.tlv_data.size = tlvBuffer.size();
         response.has_tlv_data  = true;
