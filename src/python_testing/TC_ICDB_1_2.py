@@ -27,7 +27,7 @@
 #       --passcode 20202021
 #       --KVS kvs1
 #       --trace-to json:${TRACE_TEST_JSON}-app.json
-#       --enable-key 000102030405060708090a0b0c110d0e0f
+#       --enable-key 000102030405060708090a0b0c0d0e0f
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -182,17 +182,6 @@ class TC_ICDB_1_2(MatterBaseTest):
         # *** STEP 4 ***
         # Wait for ActiveModeDuration plus a 1-second buffer so DUT transitions from Active Mode to Idle Mode
         self.step(4)
-        is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if is_ci:
-            log.info("CI environment detected. Clearing any test-level active mode hold...")
-            # In CI, the test framework may hold the DUT active via open IM exchanges.
-            # Send kRemoveActiveModeReq to clear any test-level active mode hold.
-            await self.check_test_event_triggers_enabled()
-            await self.send_test_event_triggers(
-                eventTrigger=ICDTestEventTriggerOperations.kRemoveActiveModeReq)
-        else:
-            log.info("Non-CI environment detected. No need to clear any test-level active mode hold.")
-
         wait_time_for_idle_s = (active_mode_duration_ms / 1000.0) + 1.0
         log.info(f"Waiting {wait_time_for_idle_s}s for DUT to transition to Idle Mode...")
         await asyncio.sleep(wait_time_for_idle_s)
@@ -200,6 +189,7 @@ class TC_ICDB_1_2(MatterBaseTest):
         # *** STEP 5 ***
         # Use UAT hint/instructions to transition DUT from Idle Mode to Active Mode.
         self.step(5)
+        is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
         # For CI, kAddActiveModeReq is a generic trigger regardless of hint
         # bit, so iterating through each hint is unnecessary, limit to one
