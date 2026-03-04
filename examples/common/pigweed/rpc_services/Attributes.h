@@ -407,6 +407,8 @@ private:
 
         app::AttributeValueEncoder encoder(attributeReports, subjectDescriptor, path, info->dataVersion,
                                            false /* isFabricFiltered */, nullptr /* attributeEncodingState */);
+
+        ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d", path.mClusterId, path.mAttributeId);
         app::DataModel::ActionReturnStatus result = provider->ReadAttribute(request, encoder);
 
         if (!result.IsSuccess())
