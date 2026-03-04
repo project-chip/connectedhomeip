@@ -486,7 +486,6 @@ public:
     FabricIndex mFabricIndex;
     AuthMode mAuthMode;
     Privilege mPrivilege;
-    AuxiliaryType mAuxiliaryType;
     SubjectStorage mSubjects[kMaxSubjects];
     TargetStorage mTargets[kMaxTargets];
 };
