@@ -77,7 +77,7 @@ enum class TagIdentifiedSound : uint8_t
 // Identified Human Activity
 constexpr const uint8_t kNamespaceIdentifiedHumanActivity = 0x4B;
 
-enum class TagIdentifiedHumanActivity
+enum class TagIdentifiedHumanActivity : uint8_t
 {
     kUnknown          = 0x00,
     kPresence         = 0x01,
