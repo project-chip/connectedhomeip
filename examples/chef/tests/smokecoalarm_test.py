@@ -43,12 +43,15 @@ class TC_SMOKECOALARM(MatterBaseTest):
 
     def steps_TC_SMOKECOALARM(self):
         return [TestStep(1, "[TC_SMOKECOALARM] Commissioning already done.", is_commissioning=True),
-                TestStep(2, "[TC_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT] Test Carbon Monoxide Concentration Measurement."),
+                TestStep(
+                    2, "[TC_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT] Test Carbon Monoxide Concentration Measurement."),
                 TestStep(3, "[TC_GROUPS] Test Groups."),
                 TestStep(4, "[TC_IDENTIFY] Test Identify."),
-                TestStep(5, "[TC_RELATIVE_HUMIDITY_MEASUREMENT] Test Relative Humidity Measurement."),
+                TestStep(
+                    5, "[TC_RELATIVE_HUMIDITY_MEASUREMENT] Test Relative Humidity Measurement."),
                 TestStep(6, "[TC_SMOKE_CO_ALARM] Test Smoke CO Alarm."),
-                TestStep(7, "[TC_TEMPERATURE_MEASUREMENT] Test Temperature Measurement."),
+                TestStep(
+                    7, "[TC_TEMPERATURE_MEASUREMENT] Test Temperature Measurement."),
                 TestStep(8, "[TC_SMOKECOALARM] Set up PwRPC connection."),
                 TestStep(9, "[TC_TEMPERATURE_MEASUREMENT] Test Temperature Measurement via PwRPC.")]
 
@@ -139,55 +142,68 @@ class TC_SMOKECOALARM(MatterBaseTest):
     # Cluster Tests
     async def carbon_monoxide_concentration_measurement_test(self, endpoint):
         measured_value = await self._read_co_measured_value(endpoint)
-        asserts.assert_true(measured_value is not None, "CO MeasuredValue should not be None.")
+        asserts.assert_true(measured_value is not None,
+                            "CO MeasuredValue should not be None.")
 
     async def groups_test(self, endpoint):
         name_support = await self._read_groups_name_support(endpoint)
-        asserts.assert_true(name_support is not None, "Groups NameSupport should not be None.")
+        asserts.assert_true(name_support is not None,
+                            "Groups NameSupport should not be None.")
 
     async def identify_test(self, endpoint):
         identify_time = await self._read_identify_identify_time(endpoint)
-        asserts.assert_equal(identify_time, 0, "IdentifyTime should be 0 initially.")
-
+        asserts.assert_equal(
+            identify_time, 0, "IdentifyTime should be 0 initially.")
 
         identify_type = await self._read_identify_identify_type(endpoint)
-        asserts.assert_true(identify_type is not None, "IdentifyType should not be None.")
+        asserts.assert_true(identify_type is not None,
+                            "IdentifyType should not be None.")
 
         await self.send_single_cmd(
             cmd=Clusters.Objects.Identify.Commands.Identify(identifyTime=10),
             endpoint=endpoint,
         )
         identify_time = await self._read_identify_identify_time(endpoint)
-        asserts.assert_equal(identify_time, 10, "IdentifyTime should be 10 after Identify command.")
+        asserts.assert_equal(
+            identify_time, 10, "IdentifyTime should be 10 after Identify command.")
 
     async def relative_humidity_measurement_test(self, endpoint):
         measured_value = await self._read_humidity_measured_value(endpoint)
-        asserts.assert_true(measured_value is not None, "Humidity MeasuredValue should not be None.")
+        asserts.assert_true(measured_value is not None,
+                            "Humidity MeasuredValue should not be None.")
 
     async def smoke_co_alarm_test(self, endpoint):
         expressed_state = await self._read_smoke_co_expressed_state(endpoint)
-        asserts.assert_true(expressed_state is not None, "ExpressedState should not be None.")
+        asserts.assert_true(expressed_state is not None,
+                            "ExpressedState should not be None.")
 
         smoke_state = await self._read_smoke_co_smoke_state(endpoint)
-        asserts.assert_true(smoke_state is not None, "SmokeState should not be None.")
+        asserts.assert_true(smoke_state is not None,
+                            "SmokeState should not be None.")
 
         co_state = await self._read_smoke_co_co_state(endpoint)
-        asserts.assert_true(co_state is not None, "COState should not be None.")
+        asserts.assert_true(co_state is not None,
+                            "COState should not be None.")
 
         battery_alert = await self._read_smoke_co_battery_alert(endpoint)
-        asserts.assert_true(battery_alert is not None, "BatteryAlert should not be None.")
+        asserts.assert_true(battery_alert is not None,
+                            "BatteryAlert should not be None.")
 
         device_muted = await self._read_smoke_co_device_muted(endpoint)
-        asserts.assert_true(device_muted is not None, "DeviceMuted should not be None.")
+        asserts.assert_true(device_muted is not None,
+                            "DeviceMuted should not be None.")
 
         test_in_progress = await self._read_smoke_co_test_in_progress(endpoint)
-        asserts.assert_false(test_in_progress, "TestInProgress should be False initially.")
+        asserts.assert_false(
+            test_in_progress, "TestInProgress should be False initially.")
 
         hardware_fault_alert = await self._read_smoke_co_hardware_fault_alert(endpoint)
-        asserts.assert_false(hardware_fault_alert, "HardwareFaultAlert should be False initially.")
+        asserts.assert_false(hardware_fault_alert,
+                             "HardwareFaultAlert should be False initially.")
 
         end_of_service_alert = await self._read_smoke_co_end_of_service_alert(endpoint)
-        asserts.assert_true(end_of_service_alert is not None, "EndOfServiceAlert should not be None.")
+        asserts.assert_true(end_of_service_alert is not None,
+                            "EndOfServiceAlert should not be None.")
 
         await self.send_single_cmd(
             cmd=Clusters.Objects.SmokeCoAlarm.Commands.SelfTestRequest(),
@@ -196,14 +212,17 @@ class TC_SMOKECOALARM(MatterBaseTest):
 
     async def temperature_measurement_test(self, endpoint):
         measured_value = await self._read_temperature_measured_value(endpoint)
-        asserts.assert_true(measured_value is not None, "Temperature MeasuredValue should not be None.")
+        asserts.assert_true(measured_value is not None,
+                            "Temperature MeasuredValue should not be None.")
 
     async def temperature_measurement_pwrpc_test(self, endpoint, device):
         # Tests to check Pw reads and controller reads match.
-        self._write_temperature_measured_value_pwrpc(device, 1000)  # Write a non-null value.
+        # Write a non-null value.
+        self._write_temperature_measured_value_pwrpc(device, 1000)
         pwrpc_value = self._read_temperature_measured_value_pwrpc(device)
         internal_value = await self._read_temperature_measured_value(endpoint)
-        logger.info(f"TemperatureMeasurement Read: pwrpc_read: {pwrpc_value}, controller_read: {internal_value}")
+        logger.info(
+            f"TemperatureMeasurement Read: pwrpc_read: {pwrpc_value}, controller_read: {internal_value}")
         asserts.assert_equal(
             pwrpc_value, internal_value, "Temperature MeasuredValue read via PwRPC should match value read via attribute read.")
 
@@ -211,8 +230,10 @@ class TC_SMOKECOALARM(MatterBaseTest):
         for value in [2000, 2500, 3000]:
             self._write_temperature_measured_value_pwrpc(device, value)
             measured_value = await self._read_temperature_measured_value(endpoint)
-            logger.info(f"TemperatureMeasurement Read: pwrpc_read: {pwrpc_value}, controller_read: {internal_value}")
-            asserts.assert_equal(measured_value, value, "Temperature MeasuredValue should match the value set via PwRPC.")
+            logger.info(
+                f"TemperatureMeasurement Read: pwrpc_read: {pwrpc_value}, controller_read: {internal_value}")
+            asserts.assert_equal(
+                measured_value, value, "Temperature MeasuredValue should match the value set via PwRPC.")
 
     @async_test_body
     async def test_TC_SMOKECOALARM(self):
@@ -244,7 +265,6 @@ class TC_SMOKECOALARM(MatterBaseTest):
         # [TC_TEMPERATURE_MEASUREMENT] Test Temperature Measurement.
         self.step(7)
         await self.temperature_measurement_test(self.ENDPOINT)
-
 
         # Tests below use PwRPC
         # [TC_SMOKECOALARM] Set up PwRPC connection.
