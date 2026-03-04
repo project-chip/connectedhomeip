@@ -54,7 +54,7 @@ public:
     CHIP_ERROR HandleGetCatalogList(chip::app::AttributeValueEncoder & aEncoder) override;
 
     // this attribute should only be enabled for app platform instance
-    CHIP_ERROR HandleGetCurrentApp(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR HandleGetCurrentApp(chip::app::AttributeValueEncoder & aEncoder) override;
 
     chip::EndpointId GetEndpointId() { return mEndpointId; }
 
