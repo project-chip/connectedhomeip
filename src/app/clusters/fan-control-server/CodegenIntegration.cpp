@@ -56,21 +56,19 @@ public:
     {
         BitFlags<FanControl::Feature> features(featureMap);
 
-        FanControl::Delegate * delegate = FanControl::GetDelegate(endpointId);
-        if (delegate == nullptr)
-            delegate = &gDefaultDelegate;
-        FanControlCluster::Config config(endpointId, *delegate);
+        // Create cluster with default delegate. App can set custom delegate later via SetDefaultDelegate().
+        FanControlCluster::Config config(endpointId, gDefaultDelegate);
 
-        config.WithFanModeSequence(delegate->GetFanModeSequence().value_or(FanModeSequenceEnum::kOffLowHigh));
+        config.WithFanModeSequence(gDefaultDelegate.GetFanModeSequence().value_or(FanModeSequenceEnum::kOffLowHigh));
 
         if (features.Has(FanControl::Feature::kMultiSpeed))
-            config.WithSpeedMax(delegate->GetSpeedMax().value_or(1));
+            config.WithSpeedMax(gDefaultDelegate.GetSpeedMax().value_or(1));
         if (features.Has(FanControl::Feature::kRocking))
-            config.WithRockSupport(delegate->GetRockSupport().value_or(
+            config.WithRockSupport(gDefaultDelegate.GetRockSupport().value_or(
                 BitMask<RockBitmap>(RockBitmap::kRockLeftRight, RockBitmap::kRockUpDown, RockBitmap::kRockRound)));
         if (features.Has(FanControl::Feature::kWind))
             config.WithWindSupport(
-                delegate->GetWindSupport().value_or(BitMask<WindBitmap>(WindBitmap::kSleepWind, WindBitmap::kNaturalWind)));
+                gDefaultDelegate.GetWindSupport().value_or(BitMask<WindBitmap>(WindBitmap::kSleepWind, WindBitmap::kNaturalWind)));
         if (features.Has(FanControl::Feature::kAirflowDirection))
             config.WithAirflowDirection();
         if (features.Has(FanControl::Feature::kStep))
@@ -93,9 +91,6 @@ public:
 
 void MatterFanControlClusterInitCallback(EndpointId endpointId)
 {
-    // Allow app to set delegate before we create the cluster (e.g. via emberAfFanControlClusterInitCallback)
-    emberAfFanControlClusterInitCallback(endpointId);
-
     IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::RegisterServer(
@@ -156,6 +151,12 @@ void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate)
     if (ep < kFanControlDelegateTableSize)
     {
         gDelegateTable[ep] = aDelegate;
+    }
+
+    // Update the cluster instance if it already exists (e.g. app sets delegate in emberAfFanControlClusterInitCallback)
+    if (FanControlCluster * cluster = FindClusterOnEndpoint(aEndpoint); cluster != nullptr)
+    {
+        cluster->SetDelegate(aDelegate != nullptr ? aDelegate : &gDefaultDelegate);
     }
 }
 
