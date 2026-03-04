@@ -18,8 +18,8 @@
 
 #pragma once
 
+#include <app/clusters/closure-control-server/CodegenIntegration.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-delegate.h>
-#include <app/clusters/closure-control-server/closure-control-server.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/TestEventTriggerDelegate.h>

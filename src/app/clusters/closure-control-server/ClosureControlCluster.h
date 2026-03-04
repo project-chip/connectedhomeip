@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/ClosureControl/Attributes.h>
