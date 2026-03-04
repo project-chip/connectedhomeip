@@ -17,6 +17,7 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -25,7 +26,7 @@ import matter.tlv.TlvWriter
 class UnitTestingClusterTestGlobalStruct(
   val name: String,
   val myBitmap: ULong?,
-  val myEnum: UInt?,
+  val myEnum: Optional<UInt>?,
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestGlobalStruct {\n")
@@ -45,7 +46,10 @@ class UnitTestingClusterTestGlobalStruct(
         putNull(ContextSpecificTag(TAG_MY_BITMAP))
       }
       if (myEnum != null) {
-        put(ContextSpecificTag(TAG_MY_ENUM), myEnum)
+        if (myEnum.isPresent) {
+          val optmyEnum = myEnum.get()
+          put(ContextSpecificTag(TAG_MY_ENUM), optmyEnum)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_MY_ENUM))
       }
@@ -70,7 +74,11 @@ class UnitTestingClusterTestGlobalStruct(
         }
       val myEnum =
         if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_MY_ENUM))
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_MY_ENUM))) {
+            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MY_ENUM)))
+          } else {
+            Optional.empty()
+          }
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_MY_ENUM))
           null

@@ -22974,10 +22974,14 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
         } else {
             value.myBitmap = [NSNumber numberWithUnsignedInt:cppValue.myBitmap.Value().Raw()];
         }
-        if (cppValue.myEnum.IsNull()) {
-            value.myEnum = nil;
+        if (cppValue.myEnum.HasValue()) {
+            if (cppValue.myEnum.Value().IsNull()) {
+                value.myEnum = nil;
+            } else {
+                value.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.myEnum.Value().Value())];
+            }
         } else {
-            value.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.myEnum.Value())];
+            value.myEnum = nil;
         }
         return value;
     }
@@ -23592,10 +23596,14 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
             } else {
                 value.myBitmap = [NSNumber numberWithUnsignedInt:cppValue.Value().myBitmap.Value().Raw()];
             }
-            if (cppValue.Value().myEnum.IsNull()) {
-                value.myEnum = nil;
+            if (cppValue.Value().myEnum.HasValue()) {
+                if (cppValue.Value().myEnum.Value().IsNull()) {
+                    value.myEnum = nil;
+                } else {
+                    value.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().myEnum.Value().Value())];
+                }
             } else {
-                value.myEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().myEnum.Value())];
+                value.myEnum = nil;
             }
         }
         return value;

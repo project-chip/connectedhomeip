@@ -55981,17 +55981,28 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     value_myBitmapClassName.c_str(), value_myBitmapCtorSignature.c_str(), jnivalue_myBitmap, value_myBitmap);
             }
             jobject value_myEnum;
-            if (cppValue.myEnum.IsNull())
+            if (!cppValue.myEnum.HasValue())
             {
-                value_myEnum = nullptr;
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_myEnum);
             }
             else
             {
-                std::string value_myEnumClassName     = "java/lang/Integer";
-                std::string value_myEnumCtorSignature = "(I)V";
-                jint jnivalue_myEnum                  = static_cast<jint>(cppValue.myEnum.Value());
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    value_myEnumClassName.c_str(), value_myEnumCtorSignature.c_str(), jnivalue_myEnum, value_myEnum);
+                jobject value_myEnumInsideOptional;
+                if (cppValue.myEnum.Value().IsNull())
+                {
+                    value_myEnumInsideOptional = nullptr;
+                }
+                else
+                {
+                    std::string value_myEnumInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_myEnumInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_myEnumInsideOptional                  = static_cast<jint>(cppValue.myEnum.Value().Value());
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_myEnumInsideOptionalClassName.c_str(), value_myEnumInsideOptionalCtorSignature.c_str(),
+                        jnivalue_myEnumInsideOptional, value_myEnumInsideOptional);
+                }
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_myEnumInsideOptional,
+                                                                                           value_myEnum);
             }
 
             {
@@ -56006,7 +56017,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 jmethodID testGlobalStructStructCtor_0;
                 err = chip::JniReferences::GetInstance().FindMethod(env, testGlobalStructStructClass_0, "<init>",
-                                                                    "(Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Integer;)V",
+                                                                    "(Ljava/lang/String;Ljava/lang/Long;Ljava/util/Optional;)V",
                                                                     &testGlobalStructStructCtor_0);
                 if (err != CHIP_NO_ERROR || testGlobalStructStructCtor_0 == nullptr)
                 {
@@ -56987,17 +56998,28 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         value_myBitmapClassName.c_str(), value_myBitmapCtorSignature.c_str(), jnivalue_myBitmap, value_myBitmap);
                 }
                 jobject value_myEnum;
-                if (cppValue.Value().myEnum.IsNull())
+                if (!cppValue.Value().myEnum.HasValue())
                 {
-                    value_myEnum = nullptr;
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr, value_myEnum);
                 }
                 else
                 {
-                    std::string value_myEnumClassName     = "java/lang/Integer";
-                    std::string value_myEnumCtorSignature = "(I)V";
-                    jint jnivalue_myEnum                  = static_cast<jint>(cppValue.Value().myEnum.Value());
-                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                        value_myEnumClassName.c_str(), value_myEnumCtorSignature.c_str(), jnivalue_myEnum, value_myEnum);
+                    jobject value_myEnumInsideOptional;
+                    if (cppValue.Value().myEnum.Value().IsNull())
+                    {
+                        value_myEnumInsideOptional = nullptr;
+                    }
+                    else
+                    {
+                        std::string value_myEnumInsideOptionalClassName     = "java/lang/Integer";
+                        std::string value_myEnumInsideOptionalCtorSignature = "(I)V";
+                        jint jnivalue_myEnumInsideOptional = static_cast<jint>(cppValue.Value().myEnum.Value().Value());
+                        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                            value_myEnumInsideOptionalClassName.c_str(), value_myEnumInsideOptionalCtorSignature.c_str(),
+                            jnivalue_myEnumInsideOptional, value_myEnumInsideOptional);
+                    }
+                    TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(value_myEnumInsideOptional,
+                                                                                               value_myEnum);
                 }
 
                 {
@@ -57012,7 +57034,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     jmethodID testGlobalStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(env, testGlobalStructStructClass_1, "<init>",
-                                                                        "(Ljava/lang/String;Ljava/lang/Long;Ljava/lang/Integer;)V",
+                                                                        "(Ljava/lang/String;Ljava/lang/Long;Ljava/util/Optional;)V",
                                                                         &testGlobalStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || testGlobalStructStructCtor_1 == nullptr)
                     {
