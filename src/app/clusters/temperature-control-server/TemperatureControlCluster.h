@@ -68,9 +68,9 @@ protected:
     const BitFlags<TemperatureControl::Feature> mFeatures;
     static TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * mDelegate;
     int16_t mTemperatureSetpoint{};
-    int16_t mMinTemperature{};
-    int16_t mMaxTemperature{};
-    int16_t mStep{};
+    const int16_t mMinTemperature;
+    const int16_t mMaxTemperature;
+    const int16_t mStep;
     uint8_t mSelectedTemperatureLevel{};
 
 private:

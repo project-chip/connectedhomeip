@@ -43,6 +43,23 @@ struct TestTemperatureControlCluster : public ::testing::Test
     TestServerClusterContext testContext;
 };
 
+constexpr CharSpan kTemperatureLevelOptions[] = { "Low"_span, "Medium"_span, "High"_span };
+
+class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsIteratorDelegate
+{
+public:
+    uint8_t Size() override { return 3; }
+
+    CHIP_ERROR Next(MutableCharSpan & item) override
+    {
+        return CopyCharSpanToMutableCharSpan(kTemperatureLevelOptions[mIndex++], item);
+    }
+
+    ~AppSupportedTemperatureLevelsDelegate() {}
+};
+
+AppSupportedTemperatureLevelsDelegate gDelegate;
+
 } // namespace
 
 TEST_F(TestTemperatureControlCluster, AttributeTest)
@@ -228,6 +245,74 @@ TEST_F(TestTemperatureControlCluster, TemperatureSetpoint)
 
         temperatureSetpoint = 4;
         EXPECT_EQ(cluster.SetTemperatureSetpoint(temperatureSetpoint), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        BitFlags<Feature> features{ Feature::kTemperatureLevel };
+        TemperatureControlCluster cluster(kRootEndpointId, features, TemperatureControlCluster::StartupConfiguration{});
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        int16_t temperatureSetpoint = 0;
+        EXPECT_EQ(cluster.SetTemperatureSetpoint(temperatureSetpoint), CHIP_IM_GLOBAL_STATUS(InvalidInState));
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+TEST_F(TestTemperatureControlCluster, SelectedTemperatureLevel)
+{
+    {
+        BitFlags<Feature> features{ Feature::kTemperatureLevel };
+        TemperatureControlCluster cluster(kRootEndpointId, features, TemperatureControlCluster::StartupConfiguration{});
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        TemperatureControlCluster::SetDelegate(&gDelegate);
+
+        uint8_t selectedTemperatureLevel = 0;
+        EXPECT_EQ(cluster.SetSelectedTemperatureLevel(selectedTemperatureLevel), CHIP_NO_ERROR);
+        uint8_t temperatureLevel = cluster.GetSelectedTemperatureLevel();
+        EXPECT_EQ(temperatureLevel, selectedTemperatureLevel);
+
+        selectedTemperatureLevel = 1;
+        EXPECT_EQ(cluster.SetSelectedTemperatureLevel(selectedTemperatureLevel), CHIP_NO_ERROR);
+        temperatureLevel = cluster.GetSelectedTemperatureLevel();
+        EXPECT_EQ(temperatureLevel, selectedTemperatureLevel);
+
+        selectedTemperatureLevel = 2;
+        EXPECT_EQ(cluster.SetSelectedTemperatureLevel(selectedTemperatureLevel), CHIP_NO_ERROR);
+        temperatureLevel = cluster.GetSelectedTemperatureLevel();
+        EXPECT_EQ(temperatureLevel, selectedTemperatureLevel);
+
+        selectedTemperatureLevel = 3;
+        EXPECT_EQ(cluster.SetSelectedTemperatureLevel(selectedTemperatureLevel), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        BitFlags<Feature> features{ Feature::kTemperatureLevel };
+        TemperatureControlCluster cluster(kRootEndpointId, features, TemperatureControlCluster::StartupConfiguration{});
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        TemperatureControlCluster::SetDelegate(nullptr);
+
+        uint8_t selectedTemperatureLevel = 0;
+        EXPECT_EQ(cluster.SetSelectedTemperatureLevel(selectedTemperatureLevel), CHIP_IM_GLOBAL_STATUS(NotFound));
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        BitFlags<Feature> features{ Feature::kTemperatureNumber };
+        TemperatureControlCluster cluster(
+            kRootEndpointId, features,
+            TemperatureControlCluster::StartupConfiguration{ .temperatureSetpoint = 1, .minTemperature = 1, .maxTemperature = 3 });
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        uint8_t selectedTemperatureLevel = 0;
+        EXPECT_EQ(cluster.SetSelectedTemperatureLevel(selectedTemperatureLevel), CHIP_IM_GLOBAL_STATUS(InvalidInState));
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }

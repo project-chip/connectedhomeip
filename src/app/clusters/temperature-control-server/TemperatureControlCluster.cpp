@@ -35,30 +35,25 @@ TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * TemperatureCont
 TemperatureControlCluster::TemperatureControlCluster(EndpointId endpointId, const BitFlags<Feature> features,
                                                      const StartupConfiguration & config) :
     DefaultServerCluster({ endpointId, TemperatureControl::Id }),
-    mFeatures(features)
+    mFeatures(features), mTemperatureSetpoint(config.temperatureSetpoint), mMinTemperature(config.minTemperature),
+    mMaxTemperature(config.maxTemperature), mStep(config.step), mSelectedTemperatureLevel(config.selectedTemperatureLevel)
 {
     if (mFeatures.Has(Feature::kTemperatureNumber))
     {
         VerifyOrDie(!mFeatures.Has(Feature::kTemperatureLevel));
-        VerifyOrDie(config.minTemperature >= kMinTemperatureRange && config.minTemperature <= kMaxTemperatureRange);
-        VerifyOrDie(config.maxTemperature >= config.minTemperature + 1);
-        VerifyOrDie(config.temperatureSetpoint >= config.minTemperature && config.temperatureSetpoint <= config.maxTemperature);
+        VerifyOrDie(mMinTemperature >= kMinTemperatureRange && mMinTemperature <= kMaxTemperatureRange);
+        VerifyOrDie(mMaxTemperature >= mMinTemperature + 1);
+        VerifyOrDie(mTemperatureSetpoint >= mMinTemperature && mTemperatureSetpoint <= mMaxTemperature);
 
         if (mFeatures.Has(Feature::kTemperatureStep))
         {
-            VerifyOrDie(config.step >= kMinStep && config.step <= (config.maxTemperature - config.minTemperature));
+            VerifyOrDie(mStep >= kMinStep && mStep <= (mMaxTemperature - mMinTemperature));
         }
     }
     if (mFeatures.Has(Feature::kTemperatureLevel))
     {
-        VerifyOrDie(config.selectedTemperatureLevel <= kMaxSelectedTemperatureLevel);
+        VerifyOrDie(mSelectedTemperatureLevel <= kMaxSelectedTemperatureLevel);
     }
-
-    mTemperatureSetpoint      = config.temperatureSetpoint;
-    mMinTemperature           = config.minTemperature;
-    mMaxTemperature           = config.maxTemperature;
-    mStep                     = config.step;
-    mSelectedTemperatureLevel = config.selectedTemperatureLevel;
 }
 
 DataModel::ActionReturnStatus TemperatureControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
