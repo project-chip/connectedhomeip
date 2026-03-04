@@ -19,7 +19,6 @@
 #include "zone-geometry.h"
 
 #include <app/clusters/zone-management-server/zone-management-server.h>
-#include <app/data-model/Encode.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ZoneManagement/Metadata.h>
@@ -42,28 +41,6 @@ size_t CountUserDefinedZones(const std::vector<ZoneInformationStorage> & zones)
 {
     return static_cast<size_t>(std::count_if(
         zones.begin(), zones.end(), [](const ZoneInformationStorage & zone) { return zone.zoneSource == ZoneSourceEnum::kUser; }));
-}
-
-DataModel::ActionReturnStatus PersistSensitivityValueWithHelper(AttributePersistenceProvider & provider,
-                                                                const ConcreteAttributePath & path,
-                                                                const Access::SubjectDescriptor & subjectDescriptor,
-                                                                uint8_t & currentValue, uint8_t newValue)
-{
-    VerifyOrReturnValue(newValue != currentValue, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
-
-    uint8_t encodedValue[8] = { 0 };
-    TLV::TLVWriter writer;
-    writer.Init(encodedValue, sizeof(encodedValue));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag(), newValue));
-    ReturnErrorOnFailure(writer.Finalize());
-
-    TLV::TLVReader reader;
-    reader.Init(ByteSpan(encodedValue, writer.GetLengthWritten()));
-    ReturnErrorOnFailure(reader.Next());
-
-    AttributeValueDecoder syntheticDecoder(reader, subjectDescriptor);
-    AttributePersistence persistence(provider);
-    return persistence.DecodeAndStoreNativeEndianValue(path, syntheticDecoder, currentValue);
 }
 
 } // namespace
@@ -330,17 +307,23 @@ DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataMo
         ReturnErrorOnFailure(decoder.Decode(sensitivity));
         VerifyOrReturnError(sensitivity >= 1 && sensitivity <= mSensitivityMax, Status::ConstraintError);
         VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnValue(sensitivity != mSensitivity, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
         const ConcreteAttributePath path(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
-        auto status = PersistSensitivityValueWithHelper(mContext->attributeStorage, path, decoder.GetSubjectDescriptor(),
-                                                        mSensitivity, sensitivity);
-        if (status.IsSuccess() && !status.IsNoOpSuccess())
+        CHIP_ERROR err =
+            mContext->attributeStorage.WriteValue(path, ByteSpan(reinterpret_cast<const uint8_t *>(&sensitivity), sizeof(sensitivity)));
+        if (err != CHIP_NO_ERROR)
         {
-            mSensitivityConfiguredByApp = true;
-            mDelegate.OnAttributeChanged(request.path.mAttributeId);
+            ChipLogError(DataManagement, "ZoneManagement[ep=%d]: Failed to persist sensitivity: %" CHIP_ERROR_FORMAT, mEndpointId,
+                         err.Format());
+            return err;
         }
 
-        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, status);
+        mSensitivity                = sensitivity;
+        mSensitivityConfiguredByApp = true;
+        mDelegate.OnAttributeChanged(request.path.mAttributeId);
+
+        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, Status::Success);
     }
     default:
         return Status::UnsupportedWrite;
