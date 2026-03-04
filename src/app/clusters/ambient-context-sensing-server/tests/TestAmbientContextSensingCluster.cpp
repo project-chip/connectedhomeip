@@ -38,7 +38,7 @@ using namespace chip::Testing;
 using chip::app::DataModel::DecodableList;
 using TagDecodable                       = Globals::Structs::SemanticTagStruct::DecodableType;
 using AmbientContextSensingTypeDecodable = AmbientContextSensing::Structs::AmbientContextTypeStruct::DecodableType;
-using PredictedActivityDecordable        = AmbientContextSensing::Structs::PredictedActivityStruct::DecodableType;
+using PredictedActivityDecodable         = AmbientContextSensing::Structs::PredictedActivityStruct::DecodableType;
 
 namespace {
 
