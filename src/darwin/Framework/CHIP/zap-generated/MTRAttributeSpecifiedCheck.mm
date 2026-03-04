@@ -6326,6 +6326,9 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::StatusLightBrightness::Id: {
         return YES;
     }
+    case Attributes::ImageRotationDiscreteAngles::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

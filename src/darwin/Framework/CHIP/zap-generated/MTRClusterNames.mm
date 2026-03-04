@@ -8707,6 +8707,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"StatusLightBrightness";
             break;
 
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeImageRotationDiscreteAnglesID:
+            result = @"ImageRotationDiscreteAngles";
+            break;
+
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
