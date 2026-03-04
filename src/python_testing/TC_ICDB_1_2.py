@@ -182,6 +182,13 @@ class TC_ICDB_1_2(MatterBaseTest):
         # *** STEP 4 ***
         # Wait for ActiveModeDuration plus a 1-second buffer so DUT transitions from Active Mode to Idle Mode
         self.step(4)
+        is_ci = self.check_pics("PICS_SDK_CI_ONLY")
+        if is_ci:
+            # In CI, framework exchanges may hold the DUT active. Clear any
+            # test-level active mode hold so the DUT can transition to idle.
+            await self.check_test_event_triggers_enabled()
+            await self.send_test_event_triggers(
+                eventTrigger=ICDTestEventTriggerOperations.kRemoveActiveModeReq)
         wait_time_for_idle_s = (active_mode_duration_ms / 1000.0) + 1.0
         log.info(f"Waiting {wait_time_for_idle_s}s for DUT to transition to Idle Mode...")
         await asyncio.sleep(wait_time_for_idle_s)
@@ -189,7 +196,6 @@ class TC_ICDB_1_2(MatterBaseTest):
         # *** STEP 5 ***
         # Use UAT hint/instructions to transition DUT from Idle Mode to Active Mode.
         self.step(5)
-        is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
         # For CI, kAddActiveModeReq is a generic trigger regardless of hint
         # bit, so iterating through each hint is unnecessary, limit to one
