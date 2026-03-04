@@ -81,7 +81,7 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
-    auto & logProvider = LogProvider::GetInstance();
+    auto & logProvider = chip::app::Clusters::DiagnosticLogs::LogProvider::GetInstance();
 
     logProvider.SetEndUserSupportLogFilePath(AppOptions::GetEndUserSupportLogFilePath());
     logProvider.SetNetworkDiagnosticsLogFilePath(AppOptions::GetNetworkDiagnosticsLogFilePath());
