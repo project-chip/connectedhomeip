@@ -101,6 +101,9 @@ public:
     // Adds audio track to the peerconnection with opus codec with default payload type as 111
     void AddAudioTrack(const std::string & audioMid = "audio", int payloadType = 111);
 
+    // Set ICE servers to use when creating the underlying PeerConnection. Call this before Start().
+    void SetICEServers(const std::vector<ICEServerInfo> & servers);
+
     std::shared_ptr<WebRTCPeerConnection> GetPeerConnection() { return mPeerConnection; }
 
     std::string GetLocalDescription() { return mLocalSdp; }
@@ -145,6 +148,7 @@ private:
     RequestArgs mRequestArgs;
     OnTransportLocalDescriptionCallback mOnLocalDescription = nullptr;
     OnTransportConnectionStateCallback mOnConnectionState   = nullptr;
+    std::vector<ICEServerInfo> mICEServers;
 
     std::mutex mTrackStatusLock;
 };

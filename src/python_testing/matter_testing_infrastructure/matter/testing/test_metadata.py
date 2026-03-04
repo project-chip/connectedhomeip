@@ -41,6 +41,7 @@ class TestMetadataReader(unittest.TestCase):
     CHIP_LOCK_APP: out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app
     ENERGY_GATEWAY_APP: out/linux-x64-energy-gateway-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-energy-gateway-app
     EVSE_APP: out/linux-x64-evse-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-evse-app
+    WATER_HEATER_APP: out/linux-x64-water-heater-ipv6only-no-ble-no-wifi-tsan-clang-test/matter-water-heater-app
     TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}
     TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}
     TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}

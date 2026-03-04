@@ -464,7 +464,7 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
     }
     else
     {
-        ChipLogFailure(initError, Discovery, "DNS-SD initialization failed with");
+        ChipLogError(Discovery, "DNS-SD initialization failed with: %" CHIP_ERROR_FORMAT, initError.Format());
         publisher->mState = State::kUninitialized;
     }
 }

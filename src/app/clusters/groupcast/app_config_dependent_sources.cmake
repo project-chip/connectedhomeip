@@ -19,12 +19,3 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
 )
 
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/GroupcastCluster.cpp"
-    "${CLUSTER_DIR}/GroupcastCluster.h"
-    "${CLUSTER_DIR}/GroupcastLogic.cpp"
-    "${CLUSTER_DIR}/GroupcastLogic.h"
-)

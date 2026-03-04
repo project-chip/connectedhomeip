@@ -21,6 +21,12 @@ to build the Matter “Casting Client” into your consumer-facing mobile app.
     -   [Building \& Installing the app](#building--installing-the-app)
     -   [Common build environment issues](#common-build-environment-issues)
     -   [Running the app](#running-the-app)
+    -   [Running Unit Tests](#running-unit-tests)
+        -   [Running All Tests](#running-all-tests)
+        -   [Running Specific Test Suites](#running-specific-test-suites)
+        -   [Viewing Test Results](#viewing-test-results)
+        -   [Test Coverage](#test-coverage)
+        -   [Troubleshooting Tests](#troubleshooting-tests)
 
 <hr>
 
@@ -142,3 +148,71 @@ brew install kotlin
 This example Matter TV Casting Android app can be tested with the
 [example Matter tv-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/tv-app)
 running on a Raspberry Pi.
+
+## Running Unit Tests
+
+The Android TV Casting app includes unit tests for the SendUDC functionality and
+other features.
+
+### Running All Tests
+
+From the `App` directory, run all unit tests:
+
+```bash
+cd examples/tv-casting-app/android/App
+./gradlew test
+```
+
+### Running Specific Test Suites
+
+To run only the SendUDC tests:
+
+```bash
+cd examples/tv-casting-app/android/App
+./gradlew app:testDebugUnitTest --tests "com.matter.casting.core.CastingPlayerSendUDCTest"
+```
+
+### Viewing Test Results
+
+After running tests, you can view detailed HTML reports:
+
+```bash
+open app/build/reports/tests/testDebugUnitTest/index.html
+```
+
+Or navigate to `app/build/reports/tests/testDebugUnitTest/` in your file
+browser.
+
+### Test Coverage
+
+The SendUDC test suite (`CastingPlayerSendUDCTest.java`) includes 10 test cases
+covering:
+
+1. Basic sendUDC invocation with minimal options
+2. NoPasscode flag handling for app detection
+3. CancelPasscode flag for ending UDC sessions
+4. InstanceName management for unique session identifiers
+5. TargetAppInfo handling with vendor/product IDs
+6. CommissionerDeclarationCallback registration
+7. Complete app detection workflow simulation
+8. Multiple target apps support
+9. Error handling and response validation
+10. Callback validation requirements
+
+### Troubleshooting Tests
+
+**Issue**: Tests don't run or show as "up-to-date"
+
+-   **Solution**: Clean and rebuild: `./gradlew clean test`
+
+**Issue**: Native method errors (UnsatisfiedLinkError)
+
+-   **Solution**: Ensure all native objects are properly mocked in tests
+
+**Issue**: Gradle version compatibility errors
+
+-   **Solution**: Verify you're using JDK 11 (not JDK 17) as per the build
+    requirements above
+
+For more details on the test implementation, see the
+[test documentation](tv-casting-common/core/tests/README.md).

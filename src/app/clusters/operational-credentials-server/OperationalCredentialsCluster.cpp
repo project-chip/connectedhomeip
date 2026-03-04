@@ -68,7 +68,8 @@ const FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler, Fabri
 }
 
 CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::SubjectDescriptor & subjectDescriptor,
-                                                             FabricIndex fabricIndex, uint64_t subject)
+                                                             FabricIndex fabricIndex, uint64_t subject,
+                                                             Access::AccessControl & accessControl)
 {
     NodeId subjectAsNodeID = static_cast<NodeId>(subject);
 
@@ -78,12 +79,12 @@ CHIP_ERROR CreateAccessControlEntryForNewFabricAdministrator(const Access::Subje
     }
 
     Access::AccessControl::Entry entry;
-    ReturnErrorOnFailure(Access::GetAccessControl().PrepareEntry(entry));
+    ReturnErrorOnFailure(accessControl.PrepareEntry(entry));
     ReturnErrorOnFailure(entry.SetFabricIndex(fabricIndex));
     ReturnErrorOnFailure(entry.SetPrivilege(Access::Privilege::kAdminister));
     ReturnErrorOnFailure(entry.SetAuthMode(Access::AuthMode::kCase));
     ReturnErrorOnFailure(entry.AddSubject(nullptr, subject));
-    CHIP_ERROR err = Access::GetAccessControl().CreateEntry(&subjectDescriptor, fabricIndex, nullptr, entry);
+    CHIP_ERROR err = accessControl.CreateEntry(&subjectDescriptor, fabricIndex, nullptr, entry);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -274,7 +275,7 @@ CHIP_ERROR ReadRootCertificates(AttributeValueEncoder & aEncoder, FabricTable & 
 std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                               TLV::TLVReader & input_arguments, FabricTable & fabricTable,
                                                               FailSafeContext & failSafeContext,
-                                                              Credentials::DeviceAttestationCredentialsProvider * dacProvider)
+                                                              Credentials::DeviceAttestationCredentialsProvider & dacProvider)
 {
     MATTER_TRACE_SCOPE("CSRRequest", "OperationalCredentials");
     Commands::CSRRequest::DecodableType commandData;
@@ -373,7 +374,7 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
             MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
 
             // Generate attestation signature
-            err = dacProvider->SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
+            err = dacProvider.SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
             Crypto::ClearSecretData(nocsrElements.Get() + nocsrElementsSpan.size(), attestationChallenge.size());
             VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
             VerifyOrExit(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), errorStatus = Status::Failure);
@@ -399,20 +400,20 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
                                                           TLV::TLVReader & input_arguments, FabricTable & fabricTable,
                                                           FailSafeContext & failSafeContext, DnssdServer & dnssdServer,
                                                           CommissioningWindowManager & commissioningWindowManager,
-                                                          bool & reportChange)
+                                                          Credentials::GroupDataProvider & groupDataProvider,
+                                                          Access::AccessControl & accessControl, bool & reportChange)
 {
     MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
     Commands::AddNOC::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
-    auto & NOCValue          = commandData.NOCValue;
-    auto & ICACValue         = commandData.ICACValue;
-    auto & adminVendorId     = commandData.adminVendorId;
-    auto & ipkValue          = commandData.IPKValue;
-    auto * groupDataProvider = Credentials::GetGroupDataProvider();
-    auto nocResponse         = NodeOperationalCertStatusEnum::kOk;
-    auto errorStatus         = Status::Success;
-    bool needRevert          = false;
+    auto & NOCValue      = commandData.NOCValue;
+    auto & ICACValue     = commandData.ICACValue;
+    auto & adminVendorId = commandData.adminVendorId;
+    auto & ipkValue      = commandData.IPKValue;
+    auto nocResponse     = NodeOperationalCertStatusEnum::kOk;
+    auto errorStatus     = Status::Success;
+    bool needRevert      = false;
 
     CHIP_ERROR err             = CHIP_NO_ERROR;
     FabricIndex newFabricIndex = kUndefinedFabricIndex;
@@ -442,9 +443,6 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     // Must have had a previous CSR request, not tagged for UpdateNOC
     VerifyOrExit(hasPendingKey, nocResponse = NodeOperationalCertStatusEnum::kMissingCsr);
     VerifyOrExit(!csrWasForUpdateNoc, errorStatus = Status::ConstraintError);
-
-    // Internal error that would prevent IPK from being added
-    VerifyOrExit(groupDataProvider != nullptr, errorStatus = Status::Failure);
 
     // We can't possibly have a matching root based on the fact that we don't have
     // a shared root store. Therefore we would later fail path validation due to
@@ -494,7 +492,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     err = newFabricInfo->GetCompressedFabricIdBytes(compressed_fabric_id);
     VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
 
-    err = groupDataProvider->SetKeySet(newFabricIndex, compressed_fabric_id, keyset);
+    err = groupDataProvider.SetKeySet(newFabricIndex, compressed_fabric_id, keyset);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
     /**
@@ -518,7 +516,7 @@ std::optional<DataModel::ActionReturnStatus> HandleAddNOC(CommandHandler * comma
     // Creating the initial ACL must occur after the PASE session has adopted the fabric index
     // (see above) so that the concomitant event, which is fabric scoped, is properly handled.
     err = CreateAccessControlEntryForNewFabricAdministrator(commandObj->GetSubjectDescriptor(), newFabricIndex,
-                                                            commandData.caseAdminSubject);
+                                                            commandData.caseAdminSubject, accessControl);
     VerifyOrExit(err != CHIP_ERROR_INTERNAL, errorStatus = Status::Failure);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
@@ -548,12 +546,8 @@ exit:
 
         // Revert IPK and ACL entries added, ignoring errors, since some steps may have been skipped
         // and error handling does not assist.
-        if (groupDataProvider != nullptr)
-        {
-            (void) groupDataProvider->RemoveFabric(newFabricIndex);
-        }
-
-        (void) Access::GetAccessControl().DeleteAllEntriesForFabric(newFabricIndex);
+        (void) groupDataProvider.RemoveFabric(newFabricIndex);
+        (void) accessControl.DeleteAllEntriesForFabric(newFabricIndex);
 
         reportChange = true;
     }
@@ -914,7 +908,7 @@ std::optional<DataModel::ActionReturnStatus> HandleSignVIDVerificationRequest(Co
 
 std::optional<DataModel::ActionReturnStatus>
 HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                              TLV::TLVReader & input_arguments, Credentials::DeviceAttestationCredentialsProvider * dacProvider)
+                              TLV::TLVReader & input_arguments, Credentials::DeviceAttestationCredentialsProvider & dacProvider)
 {
     MATTER_TRACE_SCOPE("CertificateChainRequest", "OperationalCredentials");
     Commands::CertificateChainRequest::DecodableType commandData;
@@ -932,12 +926,12 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
     if (certificateType == kDACCertificate)
     {
         ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for DAC");
-        SuccessOrExit(err = dacProvider->GetDeviceAttestationCert(derBufSpan));
+        SuccessOrExit(err = dacProvider.GetDeviceAttestationCert(derBufSpan));
     }
     else if (certificateType == kPAICertificate)
     {
         ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for PAI");
-        SuccessOrExit(err = dacProvider->GetProductAttestationIntermediateCert(derBufSpan));
+        SuccessOrExit(err = dacProvider.GetProductAttestationIntermediateCert(derBufSpan));
     }
     else
     {
@@ -956,7 +950,7 @@ exit:
 
 std::optional<DataModel::ActionReturnStatus>
 HandleAttestationRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, TLV::TLVReader & input_arguments,
-                         Credentials::DeviceAttestationCredentialsProvider * dacProvider)
+                         Credentials::DeviceAttestationCredentialsProvider & dacProvider)
 {
     MATTER_TRACE_SCOPE("AttestationRequest", "OperationalCredentials");
     OperationalCredentials::Commands::AttestationRequest::DecodableType commandData;
@@ -987,13 +981,7 @@ HandleAttestationRequest(CommandHandler * commandObj, const ConcreteCommandPath 
 
     VerifyOrExit(attestationNonce.size() == Credentials::kExpectedAttestationNonceSize, errorStatus = Status::InvalidCommand);
 
-    if (dacProvider == nullptr)
-    {
-        err = CHIP_ERROR_INTERNAL;
-        VerifyOrExit(dacProvider != nullptr, errorStatus = Status::Failure);
-    }
-
-    err = dacProvider->GetCertificationDeclaration(certDeclSpan);
+    err = dacProvider.GetCertificationDeclaration(certDeclSpan);
     VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
 
     attestationElementsLen = TLV::EstimateStructOverhead(certDeclSpan.size(), attestationNonce.size(), sizeof(uint64_t) * 8);
@@ -1018,7 +1006,7 @@ HandleAttestationRequest(CommandHandler * commandObj, const ConcreteCommandPath 
         MutableByteSpan signatureSpan{ signature.Bytes(), signature.Capacity() };
 
         // Generate attestation signature
-        err = dacProvider->SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
+        err = dacProvider.SignWithDeviceAttestationKey(tbsSpan, signatureSpan);
         Crypto::ClearSecretData(attestationElements.Get() + attestationElementsSpan.size(), attestationChallenge.size());
         VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
         VerifyOrExit(signatureSpan.size() == Crypto::P256ECDSASignature::Capacity(), errorStatus = Status::Failure);
@@ -1083,17 +1071,17 @@ void OperationalCredentialsCluster::FailSafeCleanup(const DeviceLayer::ChipDevic
     // Session Context at the Server.
     if (nocAddedOrUpdatedDuringFailsafe)
     {
-        cluster->GetSessionManager().ExpireAllSessionsForFabric(fabricIndex);
+        cluster->mOpCredsContext.sessionManager.ExpireAllSessionsForFabric(fabricIndex);
     }
 
-    cluster->GetFabricTable().RevertPendingFabricData();
+    cluster->mOpCredsContext.fabricTable.RevertPendingFabricData();
 
     // If an AddNOC command had been successfully invoked, achieve the equivalent effect of invoking the RemoveFabric command
     // against the Fabric Index stored in the Fail-Safe Context for the Fabric Index that was the subject of the AddNOC
     // command.
     if (nocAddedDuringFailsafe)
     {
-        CHIP_ERROR err = cluster->GetFabricTable().Delete(fabricIndex);
+        CHIP_ERROR err = cluster->mOpCredsContext.fabricTable.Delete(fabricIndex);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "OpCreds: failed to delete fabric at index %u: %" CHIP_ERROR_FORMAT, fabricIndex, err.Format());
@@ -1104,7 +1092,7 @@ void OperationalCredentialsCluster::FailSafeCleanup(const DeviceLayer::ChipDevic
     {
         // Operational identities/records available may have changed due to NodeID update. Need to refresh all records.
         // The case of fabric removal that reverts AddNOC is handled by the `DeleteFabricFromTable` flow above.
-        cluster->GetDNSSDServer().StartServer();
+        cluster->mOpCredsContext.dnssdServer.StartServer();
     }
 }
 
@@ -1112,12 +1100,12 @@ CHIP_ERROR OperationalCredentialsCluster::Startup(ServerClusterContext & context
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     ReturnErrorOnFailure(mOpCredsContext.fabricTable.AddFabricDelegate(this));
-    return DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+    return mOpCredsContext.platformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
 }
 
 void OperationalCredentialsCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler);
+    mOpCredsContext.platformManager.RemoveEventHandler(OnPlatformEventHandler);
     mOpCredsContext.fabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown(shutdownType);
 }
@@ -1191,16 +1179,18 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
     switch (request.path.mCommandId)
     {
     case OperationalCredentials::Commands::AttestationRequest::Id:
-        return HandleAttestationRequest(handler, request.path, input_arguments, GetDACProvider());
+        return HandleAttestationRequest(handler, request.path, input_arguments, mOpCredsContext.dacProvider);
     case OperationalCredentials::Commands::CertificateChainRequest::Id:
-        return HandleCertificateChainRequest(handler, request.path, input_arguments, GetDACProvider());
+        return HandleCertificateChainRequest(handler, request.path, input_arguments, mOpCredsContext.dacProvider);
     case OperationalCredentials::Commands::CSRRequest::Id:
-        return HandleCSRRequest(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDACProvider());
+        return HandleCSRRequest(handler, request.path, input_arguments, mOpCredsContext.fabricTable,
+                                mOpCredsContext.failSafeContext, mOpCredsContext.dacProvider);
     case OperationalCredentials::Commands::AddNOC::Id: {
         bool reportChange = false;
         std::optional<DataModel::ActionReturnStatus> returnStatus =
-            HandleAddNOC(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer(),
-                         GetCommissioningWindowManager(), reportChange);
+            HandleAddNOC(handler, request.path, input_arguments, mOpCredsContext.fabricTable, mOpCredsContext.failSafeContext,
+                         mOpCredsContext.dnssdServer, mOpCredsContext.commissioningWindowManager, mOpCredsContext.groupDataProvider,
+                         mOpCredsContext.accessControl, reportChange);
         if (reportChange)
         {
             // Notify the attributes containing fabric metadata can be read with new data
@@ -1211,10 +1201,11 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
         return returnStatus;
     }
     case OperationalCredentials::Commands::UpdateNOC::Id:
-        return HandleUpdateNOC(handler, input_arguments, request, GetFabricTable(), GetFailSafeContext(), GetDNSSDServer());
+        return HandleUpdateNOC(handler, input_arguments, request, mOpCredsContext.fabricTable, mOpCredsContext.failSafeContext,
+                               mOpCredsContext.dnssdServer);
     case OperationalCredentials::Commands::UpdateFabricLabel::Id: {
         std::optional<DataModel::ActionReturnStatus> returnStatus =
-            HandleUpdateFabricLabel(handler, input_arguments, request, GetFabricTable());
+            HandleUpdateFabricLabel(handler, input_arguments, request, mOpCredsContext.fabricTable);
         if (!returnStatus.has_value())
         {
             // Succeeded at updating the label, mark Fabrics table changed.
@@ -1223,13 +1214,14 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
         return returnStatus;
     }
     case OperationalCredentials::Commands::RemoveFabric::Id:
-        return HandleRemoveFabric(handler, request.path, input_arguments, GetFabricTable());
+        return HandleRemoveFabric(handler, request.path, input_arguments, mOpCredsContext.fabricTable);
     case OperationalCredentials::Commands::AddTrustedRootCertificate::Id:
-        return HandleAddTrustedRootCertificate(handler, request.path, input_arguments, GetFabricTable(), GetFailSafeContext());
+        return HandleAddTrustedRootCertificate(handler, request.path, input_arguments, mOpCredsContext.fabricTable,
+                                               mOpCredsContext.failSafeContext);
     case OperationalCredentials::Commands::SetVIDVerificationStatement::Id: {
         bool reportChange                                         = false;
         std::optional<DataModel::ActionReturnStatus> returnStatus = HandleSetVIDVerificationStatement(
-            handler, input_arguments, request, GetFabricTable(), GetFailSafeContext(), reportChange);
+            handler, input_arguments, request, mOpCredsContext.fabricTable, mOpCredsContext.failSafeContext, reportChange);
         if (reportChange)
         {
             // Handle dirty-marking if anything changed. Only `Fabrics` attribute is reported since `NOCs`
@@ -1241,7 +1233,7 @@ std::optional<DataModel::ActionReturnStatus> OperationalCredentialsCluster::Invo
         return returnStatus;
     }
     case OperationalCredentials::Commands::SignVIDVerificationRequest::Id:
-        return HandleSignVIDVerificationRequest(handler, request.path, input_arguments, GetFabricTable());
+        return HandleSignVIDVerificationRequest(handler, request.path, input_arguments, mOpCredsContext.fabricTable);
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
@@ -1273,9 +1265,9 @@ void OperationalCredentialsCluster::OnFabricRemoved(const FabricTable & fabricTa
 
     // We need to withdraw the advertisement for the now-removed fabric, so need
     // to restart advertising altogether.
-    GetDNSSDServer().StartServer();
+    mOpCredsContext.dnssdServer.StartServer();
 
-    TEMPORARY_RETURN_IGNORED EventManagement::GetInstance().FabricRemoved(fabricIndex);
+    TEMPORARY_RETURN_IGNORED mOpCredsContext.eventManagement.FabricRemoved(fabricIndex);
 
     NotifyAttributeChanged(OperationalCredentials::Attributes::CommissionedFabrics::Id);
     NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
@@ -1285,37 +1277,6 @@ void OperationalCredentialsCluster::OnFabricUpdated(const FabricTable & fabricTa
 {
     NotifyAttributeChanged(OperationalCredentials::Attributes::CommissionedFabrics::Id);
     NotifyAttributeChanged(OperationalCredentials::Attributes::Fabrics::Id);
-}
-
-FabricTable & OperationalCredentialsCluster::GetFabricTable()
-{
-    return mOpCredsContext.fabricTable;
-}
-
-FailSafeContext & OperationalCredentialsCluster::GetFailSafeContext()
-{
-    return mOpCredsContext.failSafeContext;
-}
-
-Credentials::DeviceAttestationCredentialsProvider * OperationalCredentialsCluster::GetDACProvider()
-{
-    // TODO: This dependency should be removed after fixing #41122 so we don't depend on external singletons,
-    return Credentials::GetDeviceAttestationCredentialsProvider();
-}
-
-SessionManager & OperationalCredentialsCluster::GetSessionManager()
-{
-    return mOpCredsContext.sessionManager;
-}
-
-DnssdServer & OperationalCredentialsCluster::GetDNSSDServer()
-{
-    return mOpCredsContext.dnssdServer;
-}
-
-CommissioningWindowManager & OperationalCredentialsCluster::GetCommissioningWindowManager()
-{
-    return mOpCredsContext.commissioningWindowManager;
 }
 
 void OperationalCredentialsCluster::OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex)

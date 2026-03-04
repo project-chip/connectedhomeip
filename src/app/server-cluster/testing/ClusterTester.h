@@ -25,6 +25,7 @@
 #include <app/ConcreteEventPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/StringBuilderAdapters.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/data-model/List.h>
@@ -40,6 +41,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVReader.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
@@ -121,7 +123,7 @@ public:
         mReadOperations.push_back(std::move(readOperation));
         chip::Testing::ReadOperation & readOperationRef = *mReadOperations.back().get();
 
-        Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
+        const Access::SubjectDescriptor subjectDescriptor = mHandler.GetSubjectDescriptor();
         readOperationRef.SetSubjectDescriptor(subjectDescriptor);
 
         std::unique_ptr<app::AttributeValueEncoder> encoder = readOperationRef.StartEncoding();
@@ -158,7 +160,7 @@ public:
         chip::Testing::WriteOperation writeOp(path);
 
         // Create a stable object on the stack
-        Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
+        const Access::SubjectDescriptor subjectDescriptor = mHandler.GetSubjectDescriptor();
         writeOp.SetSubjectDescriptor(subjectDescriptor);
 
         uint8_t buffer[1024];
@@ -205,6 +207,15 @@ public:
             else
                 return status.has_value() && status->IsSuccess() && response.has_value();
         }
+
+        // Returns the ClusterStatusCode if available, otherwise returns std::nullopt.
+        // This allows tests to check the status code with a single EXPECT_EQ()
+        // (i.e. without having to ASSERT_TRUE(status.has_value()) first).
+        std::optional<Protocols::InteractionModel::ClusterStatusCode> GetStatusCode() const
+        {
+            VerifyOrReturnValue(status.has_value(), std::nullopt);
+            return status->GetStatusCode();
+        }
     };
 
     // Invoke a command and return the decoded result.
@@ -231,7 +242,7 @@ public:
             return result;
         }
 
-        const Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
+        const Access::SubjectDescriptor subjectDescriptor = mHandler.GetSubjectDescriptor();
         const app::DataModel::InvokeRequest invokeRequest = [&]() {
             app::DataModel::InvokeRequest req;
             req.path              = { paths[0].mEndpointId, paths[0].mClusterId, commandId };
@@ -315,7 +326,23 @@ public:
 
     std::vector<app::AttributePathParams> & GetDirtyList() { return mTestServerClusterContext.ChangeListener().DirtyList(); }
 
+    // Returns true if the given attribute appears in the dirty list.
+    // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
+    // Will VerifyOrDie that `GetPaths()` returns exactly one path.
+    bool IsAttributeDirty(AttributeId attributeId)
+    {
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrDie(paths.size() == 1);
+        app::AttributePathParams target(paths[0].mEndpointId, paths[0].mClusterId, attributeId);
+        const auto & list = GetDirtyList();
+        return std::find(list.begin(), list.end(), target) != list.end();
+    }
+
     void SetFabricIndex(FabricIndex fabricIndex) { mHandler.SetFabricIndex(fabricIndex); }
+    void SetSubjectDescriptor(const Access::SubjectDescriptor & subjectDescriptor)
+    {
+        mHandler.SetSubjectDescriptor(subjectDescriptor);
+    }
 
     FabricTestFixture * GetFabricHelper() { return mFabricTestFixture; }
 

@@ -49,8 +49,8 @@
 #
 #  There are CI issues to be followed up for the test cases below that implements manually controlling sensor device for
 #  the occupancy state ON/OFF change.
-#  [TC-OCC-3.1] test procedure step 3, 4
-#  [TC-OCC-3.2] test precedure step 3a, 3c
+#  [TC-OCC-3.1] test procedure step 5, 9, 14
+#  [TC-OCC-3.2] test procedure step 3a, 3c
 
 import asyncio
 import logging
@@ -62,7 +62,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import AttributeValue, MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -93,15 +93,22 @@ class TC_OCC_3_1(MatterBaseTest):
     def steps_TC_OCC_3_1(self) -> list[TestStep]:
         return [
             TestStep(1, "Commission DUT to TH.", is_commissioning=True),
-            TestStep(2, "If HoldTime is supported, TH writes HoldTime attribute to 10 sec on DUT."),
-            TestStep(3, "Prompt operator to await until DUT occupancy changes to unoccupied state."),
-            TestStep(4, "TH subscribes to Occupancy sensor attributes and events."),
-            TestStep("5a", "Prompt operator to trigger occupancy change."),
-            TestStep("5b", "TH reads Occupancy attribute from DUT. Verify occupancy changed to occupied and Occupancy attribute was reported as occupied."),
-            TestStep("5c", "If supported, verify OccupancyChangedEvent was reported as occupied."),
-            TestStep(6, "If HoldTime is supported, wait for HoldTime, otherwise prompt operator to wait until no longer occupied."),
-            TestStep("7a", "TH reads Occupancy attribute from DUT. Verify occupancy changed to unoccupied and Occupancy attribute was reported as unoccupied."),
-            TestStep("7b", "If supported, verify OccupancyChangedEvent was reported as unoccupied."),
+            TestStep(2, "TH reads AttributeList attribute."),
+            TestStep(3, "If HoldTime attribute is supported, TH writes HoldTime attribute to 10 sec on DUT."),
+            TestStep(4, "If HoldTime attribute is supported, TH reads HoldTime attribute."),
+            TestStep(5, "Prompt operator to await until DUT occupancy is in unoccupied state and confirm before moving on."),
+            TestStep(6, "TH reads Occupancy attribute."),
+            TestStep(7, "Set up a wildcard subscription for attributes and events of the Occupancy Sensing Cluster."),
+            TestStep(8, "Start accumulating all attribute and event reports on the subscription."),
+            TestStep(9, "Prompt operator to trigger occupancy change to occupied."),
+            TestStep(10, "TH reads Occupancy attribute."),
+            TestStep(11, "Wait for up to 30 seconds for TH to have received an attribute data report."),
+            TestStep(12, "If OCCEVENT feature is supported or OCC.S.E00(OccupancyChanged) is set, TH waits for event data report."),
+            TestStep(13, "TH clears the accumulated subscription reports and restarts accumulating."),
+            TestStep(14, "Prompt operator to ensure sensor no longer detects occupancy. Wait for HoldTime duration if supported."),
+            TestStep(15, "TH reads Occupancy attribute."),
+            TestStep(16, "Wait for up to 30 seconds for TH to have received an attribute data report."),
+            TestStep(17, "If OCCEVENT feature is supported or OCC.S.E00(OccupancyChanged) is set, TH waits for event data report."),
         ]
 
     def pics_TC_OCC_3_1(self) -> list[str]:
@@ -111,104 +118,150 @@ class TC_OCC_3_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_OCC_3_1(self):
-        hold_time = 10 if not self.is_ci else 1.0  # 10 seconds for occupancy state hold time
+        hold_time = 10 if not self.is_ci else 1  # 10 seconds for occupancy state hold time
+        endpoint_id = self.get_endpoint()
+        node_id = self.dut_node_id
+        dev_ctrl = self.default_controller
+
         self.step(1)  # Commissioning already done
 
         self.step(2)
-
         cluster = Clusters.OccupancySensing
         attributes = cluster.Attributes
         attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
 
         has_hold_time = attributes.HoldTime.attribute_id in attribute_list
-        occupancy_event_supported = self.check_pics("OCC.M.OccupancyChange") or self.is_ci
 
-        if has_hold_time:
-            # write HoldTimeLimits HoldtimeMin to be 10 sec.
-            await self.write_single_attribute(cluster.Attributes.HoldTime(hold_time))
-            holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
-            asserts.assert_equal(holdtime_dut, hold_time, "Hold time read-back does not match hold time written")
-        else:
-            log.info("No HoldTime attribute supports. Will test only occupancy attribute triggering functionality only.")
+        # Check for OCCEVENT feature (F09) or OCC.S.E00(OccupancyChanged) PICS
+        feature_map = await self.read_occ_attribute_expect_success(attribute=attributes.FeatureMap)
+
+        # OCCEVENT (F09) requires cluster Rev >= v7
+        try:
+            has_occevent_feature = (feature_map & cluster.Bitmaps.Feature.kOccupancyEventReporting) != 0
+        except AttributeError:
+            has_occevent_feature = False
+
+        occupancy_event_supported = has_occevent_feature or self.check_pics("OCC.S.E00")
+
+        log.info(f"Feature map: 0x{feature_map:x}, OCCEVENT feature: {has_occevent_feature}")
+        log.info(f"HoldTime supported: {has_hold_time}, OccupancyChanged event supported: {occupancy_event_supported}")
 
         self.step(3)
-
-        if self.is_ci:
-            # CI call to trigger unoccupied.
-            self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": 1, "Occupancy": 0})
+        if has_hold_time:
+            # Write HoldTime attribute to 10 sec
+            await self.write_single_attribute(cluster.Attributes.HoldTime(hold_time))
         else:
-            self.wait_for_user_input(
-                prompt_msg="Type any letter and press ENTER after the sensor occupancy is unoccupied state (occupancy attribute = 0)")
-
-        # check sensor occupancy state is 0 for the next test step
-        occupancy_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
-        asserts.assert_equal(occupancy_dut, 0, "Occupancy attribute is not unoccupied.")
+            log.info("HoldTime attribute not supported. Skipping step 3.")
+            self.mark_current_step_skipped()
 
         self.step(4)
-        # Setup Occupancy attribute subscription here
-        endpoint_id = self.get_endpoint()
-        node_id = self.dut_node_id
-        dev_ctrl = self.default_controller
+        if has_hold_time:
+            holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
+            asserts.assert_equal(holdtime_dut, hold_time, f"HoldTime read-back does not match the written value of {hold_time}")
+        else:
+            log.info("HoldTime attribute not supported. Skipping step 4.")
+            self.mark_current_step_skipped()
+
+        self.step(5)
+        if self.is_ci:
+            # CI call to trigger unoccupied.
+            self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": endpoint_id, "Occupancy": 0})
+        else:
+            self.wait_for_user_input(
+                prompt_msg="Type any letter and press ENTER after the sensor occupancy is in unoccupied state (occupancy attribute = 0)")
+
+        self.step(6)
+        # Read and verify Occupancy = 0 (Unoccupied)
+        occupancy_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
+        asserts.assert_equal(occupancy_dut, 0, "Occupancy attribute is not 0 (Unoccupied).")
+
+        self.step(7)
+        # Set up wildcard subscription for attributes and events
+        # MinIntervalFloor = 0, MaxIntervalCeiling = 30, KeepSubscriptions = false (EventSubscriptionHandler has True hardcoded and can't be changed)
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
-        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=30)
+        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         if occupancy_event_supported:
             event_listener = EventSubscriptionHandler(expected_cluster=cluster)
             await event_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=30)
 
-        self.step("5a")
-        # CI call to trigger on
+        self.step(8)
+        # Start accumulating all attribute and event reports on the subscription
+        # (Already being done by the subscription handlers)
+        log.info("Subscription established. Accumulating attribute and event reports.")
+
+        self.step(9)
+        # Prompt operator to trigger occupancy change to occupied
         if self.is_ci:
-            self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": 1, "Occupancy": 1})
+            self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": endpoint_id, "Occupancy": 1})
         else:
-            # Trigger occupancy sensor to change Occupancy attribute value to 1 => TESTER ACTION on DUT
-            self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a sensor occupancy is triggered.")
+            self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after triggering occupancy to occupied.")
 
-        # And then check if Occupancy attribute has changed.
-        self.step("5b")
+        self.step(10)
+        # TH reads Occupancy attribute - verify received value is 1 (Occupied)
         occupancy_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
-        asserts.assert_equal(occupancy_dut, 1, "Occupancy state is not changed to 1")
+        asserts.assert_equal(occupancy_dut, 1, "Occupancy attribute is not 1 (Occupied).")
 
-        # subscription verification
-        post_prompt_settle_delay_seconds = 1.0 if self.is_ci else 10.0
-        attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.Occupancy, sequence=[
-                                                  1], timeout_sec=post_prompt_settle_delay_seconds)
+        self.step(11)
+        # Wait for up to 30 seconds for attribute data report with Occupancy = 1
+        attrib_listener.await_all_final_values_reported(
+            expected_final_values=[AttributeValue(endpoint_id=endpoint_id,
+                                                  attribute=cluster.Attributes.Occupancy, value=1)],
+            timeout_sec=30.0)
+        log.info("Received attribute report for Occupancy = 1 (Occupied).")
 
+        self.step(12)
         if occupancy_event_supported:
-            self.step("5c")
-            event = event_listener.wait_for_event_report(
-                cluster.Events.OccupancyChanged, timeout_sec=post_prompt_settle_delay_seconds)
-            asserts.assert_equal(event.occupancy, 1, "Unexpected occupancy on OccupancyChanged")
+            # Wait for OccupancyChanged event with Occupancy = 1
+            event = event_listener.wait_for_event_report(cluster.Events.OccupancyChanged, timeout_sec=30.0)
+            asserts.assert_equal(event.occupancy, 1, "OccupancyChanged event did not report Occupancy = 1 (Occupied)")
+            log.info("Received OccupancyChanged event with Occupancy = 1 (Occupied).")
         else:
-            self.skip_step("5c")
+            log.info("OccupancyChanged event not supported. Skipping step 12.")
+            self.mark_current_step_skipped()
 
-        self.step(6)
+        self.step(13)
+        # Clear accumulated reports and restart accumulating
+        attrib_listener.reset()
+        if occupancy_event_supported:
+            event_listener.reset()
+        log.info("Cleared accumulated reports. Restarting accumulation.")
+
+        self.step(14)
+        # Prompt operator to ensure sensor no longer detects occupancy. Wait for HoldTime duration if supported
         if self.is_ci:
             # CI call to trigger unoccupied.
-            self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": 1, "Occupancy": 0})
-
-        if has_hold_time:
-            await asyncio.sleep(hold_time + 2.0)  # add some extra 2 seconds to ensure hold time has passed.
+            self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": endpoint_id, "Occupancy": 0})
         else:
             self.wait_for_user_input(
-                prompt_msg="Type any letter and press ENTER after the sensor occupancy is back to unoccupied state (occupancy attribute = 0)")
+                prompt_msg="Ensure the sensor no longer detects occupancy, then press ENTER")
 
-        # Check if Occupancy attribute is back to 0 after HoldTime attribute period
-        # Tester should not be triggering the sensor for this test step.
-        self.step("7a")
+        if has_hold_time:
+            log.info(f"Waiting for HoldTime duration ({hold_time} seconds) plus buffer...")
+            await asyncio.sleep(hold_time + 2.0)  # add extra 2 seconds buffer
+
+        self.step(15)
+        # TH reads Occupancy attribute - verify received value is 0 (Unoccupied)
         occupancy_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
-        asserts.assert_equal(occupancy_dut, 0, "Occupancy state is not back to 0 after HoldTime period")
+        asserts.assert_equal(occupancy_dut, 0, "Occupancy attribute is not 0 (Unoccupied) after HoldTime period.")
 
-        attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.Occupancy, sequence=[
-            0], timeout_sec=post_prompt_settle_delay_seconds)
+        self.step(16)
+        # Wait for up to 30 seconds for attribute data report with Occupancy = 0
+        attrib_listener.await_all_final_values_reported(
+            expected_final_values=[AttributeValue(endpoint_id=endpoint_id,
+                                                  attribute=cluster.Attributes.Occupancy, value=0)],
+            timeout_sec=30.0)
+        log.info("Received attribute report for Occupancy = 0 (Unoccupied).")
 
+        self.step(17)
         if occupancy_event_supported:
-            self.step("7b")
-            event = event_listener.wait_for_event_report(
-                cluster.Events.OccupancyChanged, timeout_sec=post_prompt_settle_delay_seconds)
-            asserts.assert_equal(event.occupancy, 0, "Unexpected occupancy on OccupancyChanged")
+            # Wait for OccupancyChanged event with Occupancy = 0
+            event = event_listener.wait_for_event_report(cluster.Events.OccupancyChanged, timeout_sec=30.0)
+            asserts.assert_equal(event.occupancy, 0, "OccupancyChanged event did not report Occupancy = 0 (Unoccupied)")
+            log.info("Received OccupancyChanged event with Occupancy = 0 (Unoccupied).")
         else:
-            self.skip_step("7b")
+            log.info("OccupancyChanged event not supported. Skipping step 17.")
+            self.mark_current_step_skipped()
 
 
 if __name__ == "__main__":

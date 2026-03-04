@@ -87,12 +87,6 @@ Examples often correspond to specific device types. We have split the contact
 per device type regardless of example (e.g. all-clusters will contain all device
 types or functionality) as well as individual examples.
 
-### Per device type
-
-| Device Type(s)             | Contact                      | Label                                                                                                        | Note(s) |
-| -------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------ | ------- |
-| Fabric Bridge, Fabric Sync | Yufeng Wang, Terence Hampson | [fabric-sync](https://github.com/project-chip/connectedhomeip/pulls?q=is%3Aopen+is%3Apr+label%3Afabric-sync) |         |
-
 ### Per example
 
 | Example path                                   | Contact                      | Note(s)      |
@@ -101,27 +95,32 @@ types or functionality) as well as individual examples.
 | `examples/air-quality-sensor-app`              |                              | UNMAINTAINED |
 | `examples/all-clusters-app`                    |                              | UNMAINTAINED |
 | `examples/all-clusters-minimal-app`            |                              | UNMAINTAINED |
-| `examples/android`                             | Yunhan Wang                  |              |
+| `examples/all-devices-app`                     | Andrei Litvin, Sergio Soares |              |
+| `examples/android`                             |                              | UNMAINTAINED |
 | `examples/bridge-app`                          |                              | UNMAINTAINED |
 | `examples/build_overrides`                     |                              | UNMAINTAINED |
-| `examples/chef`                                | Andrei Litvin                |              |
+| `examples/camera-app`                          |                              | UNMAINTAINED |
+| `examples/camera-controller`                   |                              | UNMAINTAINED |
+| `examples/chef`                                | Shreyas Bhandare             |              |
 | `examples/chip-tool`                           |                              | UNMAINTAINED |
 | `examples/closure-app`                         | Satyanaag Bollimpalli        |              |
 | `examples/contact-sensor-app`                  |                              | UNMAINTAINED |
 | `examples/darwin-framework-tool`               | Boris Zbarsky                |              |
 | `examples/dishwasher-app`                      |                              | UNMAINTAINED |
+| `examples/energy-gateway-app`                  |                              | UNMAINTAINED |
+| `examples/energy-management`                   |                              | UNMAINTAINED |
 | `examples/evse-app`                            | James Harrow                 |              |
-| `examples/fabric-admin`                        | Yufeng Wang, Terence Hampson |              |
-| `examples/fabric-bridge-app`                   | Yufeng Wang, Terence Hampson |              |
-| `examples/java-matter-controller`              | Yunhan Wang, Yufeng Wang     |              |
+| `examples/fabric-admin`                        |                              | UNMAINTAINED |
+| `examples/fabric-bridge-app`                   |                              | UNMAINTAINED |
+| `examples/java-matter-controller`              |                              | UNMAINTAINED |
 | `examples/jf-admin-app`                        | Doru Gucea                   |              |
 | `examples/jf-control-app`                      | Doru Gucea                   |              |
-| `examples/kotlin-matter-controller`            | Yunhan Wang, Yufeng Wang     |              |
+| `examples/kotlin-matter-controller`            |                              | UNMAINTAINED |
 | `examples/laundry-washer-app`                  |                              | UNMAINTAINED |
 | `examples/lighting-app`                        | Junior Martinez              |              |
 | `examples/lighting-app-data-mode-no-unique-id` |                              | UNMAINTAINED |
 | `examples/light-switch-app`                    |                              | UNMAINTAINED |
-| `examples/lit-icd-app`                         | Yunhan Wang                  |              |
+| `examples/lit-icd-app`                         | Junior Martinez              |              |
 | `examples/lock-app`                            |                              | UNMAINTAINED |
 | `examples/log-source-app`                      |                              | UNMAINTAINED |
 | `examples/microwave-oven-app`                  | Rob Bultman                  |              |
@@ -146,5 +145,6 @@ types or functionality) as well as individual examples.
 | `examples/tv-app`                              | Chris DeCenzo, Lazar Kovacic |              |
 | `examples/tv-casting-app`                      | Chris DeCenzo, Lazar Kovacic |              |
 | `examples/virtual-device-app`                  |                              | UNMAINTAINED |
+| `examples/water-heater-app`                    | James Harrow                 |              |
 | `examples/water-leak-detector-app`             |                              | UNMAINTAINED |
 | `examples/window-app`                          |                              | UNMAINTAINED |

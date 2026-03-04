@@ -42,10 +42,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, ambientContextType);
     case Attributes::AmbientContextTypeSupported::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, ambientContextTypeSupported);
-    case Attributes::SimultaneousDetectionLimit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, simultaneousDetectionLimit);
     case Attributes::ObjectCountReached::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, objectCountReached);
+    case Attributes::ObjectCountConfig::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, objectCountConfig);
+    case Attributes::ObjectCount::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, objectCount);
+    case Attributes::SimultaneousDetectionLimit::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, simultaneousDetectionLimit);
     case Attributes::HoldTime::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, holdTime);
     case Attributes::HoldTimeLimits::TypeInfo::GetAttributeId():

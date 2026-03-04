@@ -223,7 +223,7 @@ class AVSUMTestBase:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
     async def dptzstreamentryvalid(self, endpoint, videoStreamID, viewport):
-        dptz_streams_dut = await self.read_avsum_attribute_expect_success(endpoint, Clusters.Objects.CameraAvSettingsUserLevelManagement.attributes.DPTZStreams)
+        dptz_streams_dut = await self.read_avsum_attribute_expect_success(endpoint, Clusters.Objects.CameraAvSettingsUserLevelManagement.Attributes.DPTZStreams)
         match_found = False
         if dptz_streams_dut is not None:
             for streams in dptz_streams_dut:

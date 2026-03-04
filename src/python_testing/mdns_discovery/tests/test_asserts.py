@@ -1585,124 +1585,187 @@ class TestAssertValidTKey(unittest.TestCase):
     RANGE_MSG = "Only bits 0-2 may be present (value must fit in 3 bits)"
     BIT0_MSG = "Bit 0 is reserved and must be 0"
     PROV_MSG = "Bits 1 and 2 are provisional and must not be set (strict mode)"
+    TCP_CAP_MSG = "Value must match TCP capability: {4, 6} if TCP supported, {0} if not"
+    MISMATCH_MSG = "TCP support in the PICS"
 
-    # Valid values (strict mode)
-    VALID_VALUES = [
-        "0",   # allowed, all bits clear
-    ]
-
-    def _fail_msg(self, value: str, enforce_provisional: bool = True) -> str:
-        # Helper: run expecting failure and return assertion message (catch both types)
+    def _fail_msg(self, t_key: str, t_key_present: bool, supports_tcp_dut: bool, supports_tcp_pics: bool, enforce_provisional: bool = True) -> str:
+        """Helper: run expecting failure and return assertion message"""
         try:
-            assert_valid_t_key(value, enforce_provisional=enforce_provisional)
+            assert_valid_t_key(t_key, t_key_present, supports_tcp_dut, supports_tcp_pics, enforce_provisional)
         except (AssertionError, signals.TestFailure) as e:
             return str(e)
         self.fail("Expected failure but assertion passed")
         return None
 
-    def test_valid_values_strict(self):
-        # In strict mode, only "0" should pass
-        for value in self.VALID_VALUES:
-            with self.subTest(value=value):
-                assert_valid_t_key(value)
+    # ========== T Key Not Present ==========
+    def test_t_key_not_present_returns_early(self):
+        """When t_key_present is False, function should return early without validation"""
+        # Should not raise regardless of other parameters
+        assert_valid_t_key(None, t_key_present=False, supports_tcp_dut=False, supports_tcp_pics=True)
+        assert_valid_t_key("invalid", t_key_present=False, supports_tcp_dut=True, supports_tcp_pics=False)
+        assert_valid_t_key("999", t_key_present=False, supports_tcp_dut=False, supports_tcp_pics=False)
 
+    # ========== DUT/PICS TCP Support Mismatch ==========
+    def test_dut_tcp_supported_but_pics_unsupported(self):
+        """DUT supports TCP but PICS says unsupported -> should fail"""
+        msg = self._fail_msg("4", t_key_present=True, supports_tcp_dut=True, supports_tcp_pics=False, enforce_provisional=False)
+        self.assertIn(self.MISMATCH_MSG, msg)
+
+    def test_dut_tcp_unsupported_but_pics_supported(self):
+        """DUT doesn't support TCP but PICS says supported -> should fail"""
+        msg = self._fail_msg("0", t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=True, enforce_provisional=False)
+        self.assertIn(self.MISMATCH_MSG, msg)
+
+    # ========== Valid TCP Capability Values ==========
+    def test_valid_value_4_tcp_supported(self):
+        """T=4 valid when TCP supported"""
+        assert_valid_t_key("4", t_key_present=True, supports_tcp_dut=True, supports_tcp_pics=True, enforce_provisional=False)
+
+    def test_valid_value_6_tcp_supported(self):
+        """T=6 valid when TCP supported"""
+        assert_valid_t_key("6", t_key_present=True, supports_tcp_dut=True, supports_tcp_pics=True, enforce_provisional=False)
+
+    def test_valid_value_0_mrp_only(self):
+        """T=0 valid when MRP-only (TCP unsupported)"""
+        assert_valid_t_key("0", t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=False)
+
+    # ========== Invalid TCP Capability Values ==========
+    def test_invalid_tcp_value_when_mrp_only(self):
+        """T=4 invalid when MRP-only"""
+        msg = self._fail_msg("4", t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=False, enforce_provisional=False)
+        self.assertIn(self.TCP_CAP_MSG, msg)
+
+    def test_invalid_mrp_value_when_tcp_supported(self):
+        """T=0 invalid when TCP supported"""
+        msg = self._fail_msg("0", t_key_present=True, supports_tcp_dut=True, supports_tcp_pics=True, enforce_provisional=False)
+        self.assertIn(self.TCP_CAP_MSG, msg)
+
+    def test_invalid_value_2_for_tcp(self):
+        """T=2 is not a valid TCP value (even though it's bit 1)"""
+        msg = self._fail_msg("2", t_key_present=True, supports_tcp_dut=True, supports_tcp_pics=True, enforce_provisional=False)
+        self.assertIn(self.TCP_CAP_MSG, msg)
+
+    # ========== Format Validation ==========
     def test_invalid_due_to_non_decimal(self):
-        msg = self._fail_msg("A")
+        """Non-decimal string should fail"""
+        msg = self._fail_msg("A", t_key_present=True, supports_tcp_dut=True, supports_tcp_pics=True, enforce_provisional=False)
         self.assertIn(self.INT_MSG, msg)
         self.assertNotIn(self.RANGE_MSG, msg)
-        self.assertNotIn(self.BIT0_MSG, msg)
-        self.assertNotIn(self.PROV_MSG, msg)
 
     def test_invalid_due_to_leading_zero(self):
-        msg = self._fail_msg("01")
+        """Leading zero should fail"""
+        msg = self._fail_msg("04", t_key_present=True, supports_tcp_dut=True, supports_tcp_pics=True, enforce_provisional=False)
         self.assertIn(self.INT_MSG, msg)
 
+    # ========== Bit Range Validation ==========
     def test_invalid_due_to_out_of_range_bit3(self):
-        msg = self._fail_msg("8")
+        """Value with bit 3 set (>= 8) should fail range check"""
+        msg = self._fail_msg("8", t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=False, enforce_provisional=False)
         self.assertIn(self.RANGE_MSG, msg)
-        self.assertNotIn(self.INT_MSG, msg)  # format is fine
+        self.assertNotIn(self.INT_MSG, msg)
 
+    def test_invalid_due_to_out_of_range_large_value(self):
+        """Large value should fail range check"""
+        msg = self._fail_msg("99", t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=False, enforce_provisional=False)
+        self.assertIn(self.RANGE_MSG, msg)
+
+    # ========== Bit 0 Validation ==========
     def test_invalid_due_to_bit0_set(self):
-        msg = self._fail_msg("1")
+        """Bit 0 must always be 0"""
+        msg = self._fail_msg("1", t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=False, enforce_provisional=False)
         self.assertIn(self.BIT0_MSG, msg)
         self.assertNotIn(self.INT_MSG, msg)
 
+    def test_invalid_due_to_bit0_set_with_tcp(self):
+        """T=5 has bit 0 set, invalid even if bits 2 allowed"""
+        msg = self._fail_msg("5", t_key_present=True, supports_tcp_dut=True, supports_tcp_pics=True, enforce_provisional=False)
+        self.assertIn(self.BIT0_MSG, msg)
+
+    # ========== Provisional Bits Validation (Strict Mode) ==========
     def test_invalid_due_to_provisional_bits_in_strict_mode(self):
+        """Provisional bits (1,2) should fail in strict mode"""
         for val in ["2", "4", "6"]:
             with self.subTest(val=val):
-                msg = self._fail_msg(val)
+                msg = self._fail_msg(val, t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=False)
                 self.assertIn(self.PROV_MSG, msg)
 
-    def test_valid_with_provisional_bits_when_relaxed(self):
-        assert_valid_t_key("2", enforce_provisional=False)
-        assert_valid_t_key("4", enforce_provisional=False)
-        assert_valid_t_key("6", enforce_provisional=False)
+    # ========== Provisional Bits Validation (Relaxed Mode) ==========
+    def test_valid_with_provisional_bits_when_relaxed_and_tcp_supported(self):
+        """Provisional bits allowed in relaxed mode with proper TCP capability"""
+        assert_valid_t_key("4", t_key_present=True, supports_tcp_dut=True, supports_tcp_pics=True, enforce_provisional=False)
+        assert_valid_t_key("6", t_key_present=True, supports_tcp_dut=True, supports_tcp_pics=True, enforce_provisional=False)
 
-    def test_invalid_due_to_bit0_even_if_relaxed(self):
-        msg = self._fail_msg("1", enforce_provisional=False)
-        self.assertIn(self.BIT0_MSG, msg)
-        self.assertNotIn(self.PROV_MSG, msg)
+    def test_invalid_provisional_bit_wrong_tcp_capability(self):
+        """Even in relaxed mode, TCP capability must match"""
+        msg = self._fail_msg("2", t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=False, enforce_provisional=False)
+        self.assertIn(self.TCP_CAP_MSG, msg)
+        self.assertNotIn(self.PROV_MSG, msg)  # Relaxed mode
 
-    def test_invalid_due_to_out_of_range_even_if_relaxed(self):
-        msg = self._fail_msg("9", enforce_provisional=False)
-        self.assertIn(self.RANGE_MSG, msg)
-        self.assertNotIn(self.PROV_MSG, msg)
-
-    def test_invalid_due_to_int_and_bit0_strict(self):
-        # Leading zero breaks INT; numeric value 1 sets bit0
-        msg = self._fail_msg("01")
+    # ========== Multiple Failures ==========
+    def test_invalid_due_to_int_and_bit0(self):
+        """Leading zero breaks INT; numeric value 1 sets bit0"""
+        msg = self._fail_msg("01", t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=False)
         self.assertIn(self.INT_MSG, msg)
         self.assertIn(self.BIT0_MSG, msg)
-        self.assertNotIn(self.RANGE_MSG, msg)
-        self.assertNotIn(self.PROV_MSG, msg)
 
     def test_invalid_due_to_int_and_provisional_strict(self):
-        # Leading zero + value 2 sets provisional bit1
-        msg = self._fail_msg("02")
+        """Leading zero + value 2 sets provisional bit1"""
+        msg = self._fail_msg("02", t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=False)
         self.assertIn(self.INT_MSG, msg)
         self.assertIn(self.PROV_MSG, msg)
-        self.assertNotIn(self.RANGE_MSG, msg)
-        self.assertNotIn(self.BIT0_MSG, msg)
 
     def test_invalid_due_to_int_range_and_provisional_strict(self):
-        # "010" -> integer rule fails; 10 (0b1010) sets bit3 (range) and bit1 (provisional)
-        msg = self._fail_msg("010")
+        """010 -> integer rule fails; 10 sets bit3 (range) and bit1 (provisional)"""
+        msg = self._fail_msg("010", t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=False)
         self.assertIn(self.INT_MSG, msg)
         self.assertIn(self.RANGE_MSG, msg)
         self.assertIn(self.PROV_MSG, msg)
         self.assertNotIn(self.BIT0_MSG, msg)
 
     def test_invalid_due_to_range_bit0_and_provisional_strict(self):
-        # 11 (0b1011): bit3 -> range, bit0 set, bit1 -> provisional
-        msg = self._fail_msg("11")
+        """11 (0b1011): bit3 -> range, bit0 set, bit1 -> provisional"""
+        msg = self._fail_msg("11", t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=False)
         self.assertIn(self.RANGE_MSG, msg)
         self.assertIn(self.BIT0_MSG, msg)
         self.assertIn(self.PROV_MSG, msg)
         self.assertNotIn(self.INT_MSG, msg)
 
     def test_invalid_due_to_bit0_and_provisional_strict(self):
-        # 3 (0b0011): within 3-bit range; bit0 set & bit1 (provisional) set
-        msg = self._fail_msg("3")
+        """3 (0b0011): within 3-bit range; bit0 set & bit1 (provisional) set"""
+        msg = self._fail_msg("3", t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=False)
         self.assertIn(self.BIT0_MSG, msg)
         self.assertIn(self.PROV_MSG, msg)
         self.assertNotIn(self.RANGE_MSG, msg)
         self.assertNotIn(self.INT_MSG, msg)
 
     def test_invalid_due_to_range_and_bit0_relaxed(self):
-        # Relaxed: provisional ignored; 9 (0b1001) -> range + bit0
-        msg = self._fail_msg("9", enforce_provisional=False)
+        """Relaxed: provisional ignored; 9 (0b1001) -> range + bit0"""
+        msg = self._fail_msg("9", t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=False, enforce_provisional=False)
         self.assertIn(self.RANGE_MSG, msg)
         self.assertIn(self.BIT0_MSG, msg)
         self.assertNotIn(self.PROV_MSG, msg)
         self.assertNotIn(self.INT_MSG, msg)
 
     def test_invalid_due_to_int_range_and_bit0_relaxed(self):
-        # Leading zero + 9 -> INT + RANGE + BIT0 (relaxed ignores provisional)
-        msg = self._fail_msg("09", enforce_provisional=False)
+        """Leading zero + 9 -> INT + RANGE + BIT0 (relaxed ignores provisional)"""
+        msg = self._fail_msg("09", t_key_present=True, supports_tcp_dut=False, supports_tcp_pics=False, enforce_provisional=False)
         self.assertIn(self.INT_MSG, msg)
         self.assertIn(self.RANGE_MSG, msg)
         self.assertIn(self.BIT0_MSG, msg)
         self.assertNotIn(self.PROV_MSG, msg)
+
+    def test_invalid_tcp_capability_plus_bit_violations(self):
+        """T=5 when TCP supported: wrong value + bit0 + provisional (strict)"""
+        msg = self._fail_msg("5", t_key_present=True, supports_tcp_dut=True, supports_tcp_pics=True)
+        self.assertIn(self.TCP_CAP_MSG, msg)  # 5 not in {4, 6}
+        self.assertIn(self.BIT0_MSG, msg)
+        self.assertIn(self.PROV_MSG, msg)
+
+    def test_mismatch_plus_bit_violations(self):
+        """DUT/PICS mismatch should fail before other validations"""
+        msg = self._fail_msg("1", t_key_present=True, supports_tcp_dut=True, supports_tcp_pics=False)
+        self.assertIn(self.MISMATCH_MSG, msg)
+        # Other validations may or may not run after mismatch, just check mismatch occurs
 
 
 class TestAssertValidVendorId(unittest.TestCase):

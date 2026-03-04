@@ -44,6 +44,7 @@ class CmdLineArgs:
     templateFile: str
     outputDir: str
     runBootstrap: bool
+    retries: int
     parallel: bool = True
     prettify_output: bool = True
     version_check: bool = True
@@ -76,8 +77,34 @@ def checkDirExists(path):
 
 
 def getFilePath(name, prefix_chip_root_dir=True):
-    if prefix_chip_root_dir:
+    """Resolve a file path and verify that it exists.
+
+    Resolution is attempted in the following order:
+
+    1. If ``name`` is absolute, use it directly.
+    2. If ``prefix_chip_root_dir`` is True and ``name`` is relative, resolve
+       it against the repository root (``CHIP_ROOT_DIR``).  This is the
+       legacy behaviour and is tried first to preserve backward compatibility.
+    3. If (2) does not yield an existing file, resolve ``name`` against the
+       current working directory as a fallback.
+
+    In all cases the resolved path is validated with :func:`checkFileExists`;
+    if the file is not found the program exits with an error message.
+
+    Args:
+        name (str): A file path, either absolute or relative.
+        prefix_chip_root_dir (bool): When True (the default), relative paths
+            are first resolved against ``CHIP_ROOT_DIR``.  When False, ``name``
+            is used as-is (typically because the caller has already produced an
+            absolute path, e.g. via environment-variable expansion).
+
+    Returns:
+        str: The resolved, verified absolute path to the file.
+    """
+    if prefix_chip_root_dir and not os.path.isabs(name):
         fullpath = os.path.join(CHIP_ROOT_DIR, name)
+        if not os.path.isfile(fullpath):
+            fullpath = os.path.join(os.getcwd(), name)
     else:
         fullpath = name
     checkFileExists(fullpath)
@@ -85,7 +112,12 @@ def getFilePath(name, prefix_chip_root_dir=True):
 
 
 def getDirPath(name):
-    fullpath = os.path.join(CHIP_ROOT_DIR, name)
+    if not os.path.isabs(name):
+        fullpath = os.path.join(CHIP_ROOT_DIR, name)
+        if not os.path.isdir(fullpath):
+            fullpath = os.path.join(os.getcwd(), name)
+    else:
+        fullpath = name
     checkDirExists(fullpath)
     return fullpath
 
@@ -146,6 +178,7 @@ def runArgumentsParser() -> CmdLineArgs:
     parser.add_argument('--version-check', action='store_true')
     parser.add_argument('--no-version-check',
                         action='store_false', dest='version_check')
+    parser.add_argument('--retries', help='Retry running zap-cli in case of failure', default=1, type=int)
     parser.add_argument('--keep-output-dir', action='store_true',
                         help='Keep any created output directory. Useful for temporary directories.')
     parser.set_defaults(parallel=True)
@@ -191,6 +224,7 @@ def runArgumentsParser() -> CmdLineArgs:
         lock_file=args.lock_file,
         delete_output_dir=delete_output_dir,
         matter_file_name=matter_file_name,
+        retries=args.retries,
     )
 
 
@@ -242,7 +276,17 @@ def runGeneration(cmdLineArgs):
         # Parallel-compatible runs will need separate state
         args.append('--tempState')
 
-    tool.run('generate', *args)
+    for i in range(cmdLineArgs.retries):
+        try:
+            tool.run('generate', *args)
+            break
+        except subprocess.CalledProcessError:
+            if i < cmdLineArgs.retries - 1:
+                log.exception("Failure to generate, retrying (%d retries left)", cmdLineArgs.retries - i - 1)
+                continue
+            if cmdLineArgs.retries > 1:
+                log.error("Zap execution failure after %d retries", cmdLineArgs.retries)
+            raise
 
     if cmdLineArgs.matter_file_name:
         matter_name = cmdLineArgs.matter_file_name

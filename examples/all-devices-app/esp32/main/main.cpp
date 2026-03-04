@@ -16,6 +16,9 @@
  *    limitations under the License.
  */
 
+#include <app/DefaultSafeAttributePersistenceProvider.h>
+#include <app/InteractionModelEngine.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -29,6 +32,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <nvs_flash.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
@@ -93,10 +97,12 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
+chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<WifiRootNodeDevice> gRootNodeDevice;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
+DefaultTimerDelegate gTimerDelegate;
 
 void DeInitBLEIfCommissioned()
 {
@@ -181,7 +187,8 @@ void DeviceEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg
              static_cast<unsigned int>(heap_caps_get_total_size(MALLOC_CAP_8BIT | MALLOC_CAP_SPIRAM)));
 }
 
-chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate)
+chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentStorageDelegate * delegate,
+                                                                     TestEventTriggerDelegate * testEventTriggerDelegate)
 {
     // Initialize the attribute persistence provider with the storage delegate
     CHIP_ERROR err = gAttributePersistenceProvider.Init(delegate);
@@ -191,25 +198,48 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
+    // Initialize the safe attribute persistence provider with the storage delegate
+    err = gSafeAttributePersistenceProvider.Init(delegate);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to init safe attribute persistence provider: %" CHIP_ERROR_FORMAT, err.Format());
+        return nullptr;
+    }
+    SetSafeAttributePersistenceProvider(&gSafeAttributePersistenceProvider);
+
     static chip::app::CodeDrivenDataModelProvider dataModelProvider =
         chip::app::CodeDrivenDataModelProvider(*delegate, gAttributePersistenceProvider);
 
     gDataModelProvider = &dataModelProvider;
 
+    DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
+    if (provider == nullptr)
+    {
+        ESP_LOGE(TAG, "Failed to get DeviceInstanceInfoProvider.");
+        return nullptr;
+    }
+
     gRootNodeDevice = std::make_unique<WifiRootNodeDevice>(
         RootNodeDevice::Context {
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-                .accessControl          = Server::GetInstance().GetAccessControl(),              //
-                .persistentStorage      = Server::GetInstance().GetPersistentStorage(),          //
-                .failSafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-                .platformManager        = DeviceLayer::PlatformMgr(),                            //
-                .groupDataProvider      = gGropupDataProvider,                                   //
-                .sessionManager         = Server::GetInstance().GetSecureSessionManager(),       //
-                .dnssdServer            = DnssdServer::Instance(),                               //
-
+            .commissioningWindowManager           = Server::GetInstance().GetCommissioningWindowManager(),   //
+                .configurationManager             = DeviceLayer::ConfigurationMgr(),                         //
+                .deviceControlServer              = DeviceLayer::DeviceControlServer::DeviceControlSvr(),    //
+                .fabricTable                      = Server::GetInstance().GetFabricTable(),                  //
+                .accessControl                    = Server::GetInstance().GetAccessControl(),                //
+                .persistentStorage                = Server::GetInstance().GetPersistentStorage(),            //
+                .failSafeContext                  = Server::GetInstance().GetFailSafeContext(),              //
+                .deviceInstanceInfoProvider       = *provider,                                               //
+                .platformManager                  = DeviceLayer::PlatformMgr(),                              //
+                .groupDataProvider                = gGroupDataProvider,                                      //
+                .sessionManager                   = Server::GetInstance().GetSecureSessionManager(),         //
+                .dnssdServer                      = DnssdServer::Instance(),                                 //
+                .deviceLoadStatusProvider         = *InteractionModelEngine::GetInstance(),                  //
+                .diagnosticDataProvider           = DeviceLayer::GetDiagnosticDataProvider(),                //
+                .testEventTriggerDelegate         = testEventTriggerDelegate,                                //
+                .dacProvider                      = *Credentials::GetDeviceAttestationCredentialsProvider(), //
+                .eventManagement                  = EventManagement::GetInstance(),                          //
+                .safeAttributePersistenceProvider = gSafeAttributePersistenceProvider,                       //
+                .timerDelegate                    = gTimerDelegate,                                          //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -245,11 +275,10 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
 void InitServer(intptr_t context)
 {
-    static DefaultTimerDelegate timerDelegate;
     DeviceFactory::GetInstance().Init(DeviceFactory::Context{
         .groupDataProvider = gGroupDataProvider,                     //
         .fabricTable       = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate     = timerDelegate,                          //
+        .timerDelegate     = gTimerDelegate,                         //
     });
 
     static chip::CommonCaseDeviceServerInitParams initParams;
@@ -260,7 +289,8 @@ void InitServer(intptr_t context)
         return;
     }
 
-    initParams.dataModelProvider             = PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate);
+    initParams.dataModelProvider =
+        PopulateCodeDrivenDataModelProvider(initParams.persistentStorageDelegate, initParams.testEventTriggerDelegate);
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
@@ -374,6 +404,11 @@ extern "C" void app_main()
     CHIP_ERROR nvsErr =
         ESP32Config::ReadConfigValueStr(kConfigKey_DeviceType, storedDeviceType, sizeof(storedDeviceType), storedLen);
 
+#if CONFIG_ENABLE_CHIP_SHELL
+    chip::LaunchShell();
+    chip::Shell::DeviceCommands::GetInstance().Register();
+#endif // CONFIG_ENABLE_CHIP_SHELL
+
     if (nvsErr == CHIP_NO_ERROR && storedLen > 0)
     {
         ESP_LOGI(TAG, "==================================================");
@@ -384,10 +419,6 @@ extern "C" void app_main()
     }
     else
     {
-#if CONFIG_ENABLE_CHIP_SHELL
-        chip::LaunchShell();
-        chip::Shell::DeviceCommands::GetInstance().Register();
-#endif // CONFIG_ENABLE_CHIP_SHELL
         ESP_LOGI(TAG, "==================================================");
         ESP_LOGI(TAG, "No stored device type found.");
         ESP_LOGI(TAG, "Use command: devtype set <device-type>");

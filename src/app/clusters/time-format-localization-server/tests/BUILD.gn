@@ -23,7 +23,7 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestTimeFormatLocalizationCluster.cpp" ]
 
-  sources = []
+  sources = [ "SampleDeviceProvider.h" ]
 
   cflags = [ "-Wconversion" ]
 

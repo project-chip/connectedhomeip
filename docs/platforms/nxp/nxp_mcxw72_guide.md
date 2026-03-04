@@ -216,3 +216,31 @@ Over-The-Air software updates are supported with the MCXW72 examples. The
 process to follow in order to perform a software update is described in the
 dedicated guide
 ['Matter Over-The-Air Software Update with NXP MCXW example applications'](./nxp_mcxw_ota_guide.md).
+
+## Enabling SE05x Secure Element with MCXW72
+
+### Hardware connections
+
+Connect OM-SE051ARD board on the arduino connector of MCXW72 board.
+
+### Build options
+
+-   Build the example with below options to offload crypto operations to SE05x
+    using CMAKE configuration :
+
+```
+-DCONFIG_CHIP_SE05X=y
+```
+
+Example :
+
+```
+west build -d bin/lighting-app/ftd -b frdmmcxw72 examples/lighting-app/nxp -Dcore_id=cm33_core0 -DCONF_FILE_NAME=prj_thread_ftd.conf -DCONFIG_MCUX_COMPONENT_middleware.freertos-kernel.config=n -DCONFIG_CHIP_SE05X=y
+```
+
+**NOTE** To control secure element using enable pin, ensure to connect jumper
+J14 on OM-SE051ARD board to 3-4 pins. Also build the example with
+-DCONFIG_SE05X_HOST_GPIO=y option to allow rt1060 gpio to control the enable pin
+as required.
+
+Refer [SE05x](nxp_se05x_guide.md) for more details on configurations of SE05x.

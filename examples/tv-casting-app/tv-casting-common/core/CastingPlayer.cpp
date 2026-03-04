@@ -29,6 +29,46 @@ namespace core {
 
 memory::Weak<CastingPlayer> CastingPlayer::mTargetCastingPlayer;
 
+void CastingPlayer::SendUDC(ConnectionCallbacks connectionCallbacks, IdentificationDeclarationOptions idOptions)
+{
+    ChipLogProgress(AppServer, "CastingPlayer::SendUDC() called");
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(connectionCallbacks.mOnConnectionComplete != nullptr,
+                 ChipLogError(AppServer, "CastingPlayer::SendUDC() ConnectionCallbacks.mOnConnectionComplete was not provided"));
+
+    mOnCompleted         = connectionCallbacks.mOnConnectionComplete;
+    mTargetCastingPlayer = weak_from_this();
+    mIdOptions           = idOptions;
+
+    mIdOptions.LogDetail();
+
+    if (connectionCallbacks.mCommissionerDeclarationCallback != nullptr)
+    {
+        ChipLogProgress(AppServer,
+                        "CastingPlayer::SendUDC() Setting CommissionerDeclarationCallback in "
+                        "CommissionerDeclarationHandler");
+        // Set the callback for handling CommissionerDeclaration messages.
+        matter::casting::core::CommissionerDeclarationHandler::GetInstance()->SetCommissionerDeclarationCallback(
+            connectionCallbacks.mCommissionerDeclarationCallback);
+        mClientProvidedCommissionerDeclarationCallback = true;
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    SuccessOrExit(err = SendUserDirectedCommissioningRequest());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    // clear the UdcStatus to allow other UDC messages to be sent
+    TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingPlayer::SendUDC() failed with %" CHIP_ERROR_FORMAT, err.Format());
+        resetState(err);
+    }
+}
+
 void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCallbacks, uint16_t commissioningWindowTimeoutSec,
                                                 IdentificationDeclarationOptions idOptions)
 {
@@ -170,7 +210,14 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                             ChipLogProgress(AppServer,
                                             "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to "
                                             "CastingPlayer successful");
-                            CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_CONNECTED;
+                            CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
+                            VerifyOrReturn(
+                                targetCastingPlayer != nullptr,
+                                ChipLogError(AppServer,
+                                             "CastingPlayer::VerifyOrEstablishConnection() Target CastingPlayer no longer exists, "
+                                             "skipping connection handling"));
+
+                            targetCastingPlayer->mConnectionState = CASTING_PLAYER_CONNECTED;
 
                             // this async call will Load all the endpoints with their respective attributes into the
                             // TargetCastingPlayer.
@@ -183,15 +230,25 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                             ChipLogError(AppServer,
                                          "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to "
                                          "CastingPlayer failed");
-                            CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-                            CHIP_ERROR e = support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
+                            CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
+                            VerifyOrReturn(
+                                targetCastingPlayer != nullptr,
+                                ChipLogError(AppServer,
+                                             "CastingPlayer::VerifyOrEstablishConnection() Target CastingPlayer no longer exists, "
+                                             "skipping cleanup"));
+
+                            targetCastingPlayer->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+                            targetCastingPlayer->RemoveFabric();
+                            CHIP_ERROR e = support::CastingStore::GetInstance()->Delete(*targetCastingPlayer);
                             if (e != CHIP_NO_ERROR)
                             {
                                 ChipLogError(AppServer, "CastingStore::Delete() failed. Err: %" CHIP_ERROR_FORMAT, e.Format());
                             }
 
-                            VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
-                            CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(error, nullptr);
+                            if (targetCastingPlayer->mOnCompleted)
+                            {
+                                targetCastingPlayer->mOnCompleted(error, nullptr);
+                            }
                             mTargetCastingPlayer.reset();
                         });
                     return; // FindOrEstablishSession called. Return early.

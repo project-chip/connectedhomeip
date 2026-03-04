@@ -71,10 +71,6 @@ details.
     For details on controller selection refer to
     [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
--   `--application <evse | water-heater>`
-
-    Emulate either an EVSE or Water Heater example.
-
 -   `--featureSet <feature map for Device Energy Management e.g. 0x7a>`
 
     Sets the run-time FeatureMap value for the Device Energy Management cluster.

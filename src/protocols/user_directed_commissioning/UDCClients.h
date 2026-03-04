@@ -26,7 +26,7 @@ namespace Protocols {
 namespace UserDirectedCommissioning {
 
 // UDC client state times out after 1 hour. This may need to be tweaked.
-inline constexpr const System::Clock::Timestamp kUDCClientTimeout = System::Clock::Milliseconds64(60 * 60 * 1000);
+inline constexpr const System::Clock::Timestamp kUDCClientTimeout = System::Clock::Milliseconds64(30 * 1000);
 
 /**
  * Handles a set of UDC Client Processing States.

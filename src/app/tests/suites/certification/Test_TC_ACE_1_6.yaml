@@ -57,7 +57,8 @@ tests:
           GroupKeySecurityPolicy: TrustFirst (0) EpochKey0:
           d0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime0: 2220000 EpochKey1:
           d1d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime1: 2220001 EpochKey2:
-          d2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2: 2220002"
+          d2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2: 2220002
+          GroupKeyMulticastPolicy: 0"
       cluster: "Group Key Management"
       command: "KeySetWrite"
       arguments:
@@ -73,6 +74,7 @@ tests:
                         EpochStartTime1: 2220001,
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 2220002,
+                        GroupKeyMulticastPolicy: 0,
                     }
     - label:
           "Step 1b: TH sends KeySetWrite command in the GroupKeyManagement
@@ -81,7 +83,8 @@ tests:
           GroupKeySecurityPolicy: TrustFirst (0) EpochKey0:
           a0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime0: 2220000 EpochKey1:
           b1d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime1: 2220001 EpochKey2:
-          c2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2: 2220002"
+          c2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2: 2220002
+          GroupKeyMulticastPolicy: 0"
       cluster: "Group Key Management"
       command: "KeySetWrite"
       arguments:
@@ -97,6 +100,7 @@ tests:
                         EpochStartTime1: 2220001,
                         EpochKey2: "hex:c2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 2220002,
+                        GroupKeyMulticastPolicy: 0,
                     }
 
     - label:

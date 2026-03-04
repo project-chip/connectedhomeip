@@ -24,7 +24,9 @@
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/BooleanState/Attributes.h>
+#include <clusters/BooleanState/Enums.h>
 #include <clusters/BooleanState/Metadata.h>
+#include <lib/support/TypeTraits.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -71,6 +73,7 @@ TEST_F(TestBooleanStateCluster, ReadAttributeTest)
 
     uint32_t features{};
     ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, features), CHIP_NO_ERROR);
+    EXPECT_EQ(features, to_underlying(BooleanState::Feature::kChangeEvent));
 
     bool stateValue{};
     ASSERT_EQ(tester.ReadAttribute(StateValue::Id, stateValue), CHIP_NO_ERROR);

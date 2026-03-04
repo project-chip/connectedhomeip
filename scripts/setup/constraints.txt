@@ -106,7 +106,7 @@ markupsafe==2.1.2
     # via jinja2
 matplotlib-inline==0.1.6
     # via ipython
-mobly==1.12.1
+mobly==1.13.0
     # via -r requirements.all.txt
 mypy==1.16.0
     # via

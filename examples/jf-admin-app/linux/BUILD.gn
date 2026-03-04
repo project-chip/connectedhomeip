@@ -36,6 +36,8 @@ config("includes") {
 
 executable("jfa-app") {
   sources = [
+    "AppOptions.cpp",
+    "AppOptions.h",
     "JFADatastoreSync.cpp",
     "JFAManager.cpp",
     "include/CHIPProjectAppConfig.h",

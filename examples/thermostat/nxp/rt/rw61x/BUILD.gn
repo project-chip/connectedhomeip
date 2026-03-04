@@ -94,7 +94,7 @@ rt_sdk("sdk") {
 
   # For matter with BR feature, increase FreeRTOS heap size and enable TBR cluster
   # Additionally in the context of OTBR support the freeRTOS heap should be big enough to allow to handle a large number of mDNS packets
-  if (chip_enable_wifi && chip_enable_openthread) {
+  if (chip_enable_wifi && chip_enable_thread) {
     defines += [
       "configTOTAL_HEAP_SIZE=(size_t)(250 * 1024)",
       "CHIP_DEVICE_CONFIG_ENABLE_TBR=1",
@@ -123,7 +123,7 @@ rt_executable("thermostat") {
     "CONFIG_APP_FREERTOS_OS=1",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     defines += [ "CONFIG_NET_L2_OPENTHREAD=1" ]
   }
 

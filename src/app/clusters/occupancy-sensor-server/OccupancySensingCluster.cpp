@@ -343,7 +343,7 @@ const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & OccupancySensingCl
     return mHoldTimeLimits;
 }
 
-BitMask<OccupancySensing::Feature> OccupancySensingCluster::GetFeatureMap() const
+BitFlags<OccupancySensing::Feature> OccupancySensingCluster::GetFeatureMap() const
 {
     return mFeatureMap;
 }

@@ -73,7 +73,7 @@ void AppTask::AppShellTask(void * args)
     Shell::Engine::Root().RunMainLoop();
 }
 
-CHIP_ERROR AppTask::StartAppShellTask()
+void AppTask::StartAppShellTask()
 {
     static TaskHandle_t shellTask;
 
@@ -82,8 +82,6 @@ CHIP_ERROR AppTask::StartAppShellTask()
     cmd_misc_init();
 
     xTaskCreate(AppTask::AppShellTask, "chip_shell", 1024 / sizeof(configSTACK_DEPTH_TYPE), NULL, APP_TASK_PRIORITY, &shellTask);
-
-    return CHIP_NO_ERROR;
 }
 #endif
 

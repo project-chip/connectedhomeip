@@ -387,9 +387,18 @@ enum class OptionalAttribute : uint32_t
 class CameraAVStreamManagementCluster : public DefaultServerCluster
 {
 public:
+    struct Context
+    {
+        SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
+    };
+
     /**
      * @brief Creates a Camera AV Stream Management cluster instance. The Init() function needs to be called for this instance
      * to be registered and called by the interaction model at the appropriate times.
+     *
+     * @param aContext                          Context providing injected dependencies (e.g., SafeAttributePersistenceProvider).
+     *                                          Note: the caller must ensure that the provided SafeAttributePersistenceProvider
+     *                                          outlives this instance.
      *
      * @param aDelegate                         A pointer to the delegate to be used by this server.
      *                                          Note: the caller must ensure that the delegate lives throughout the instance's
@@ -422,7 +431,7 @@ public:
      * for the transmission of its media streams.
      *
      */
-    CameraAVStreamManagementCluster(CameraAVStreamManagementDelegate & aDelegate, EndpointId aEndpointId,
+    CameraAVStreamManagementCluster(const Context & aContext, CameraAVStreamManagementDelegate & aDelegate, EndpointId aEndpointId,
                                     const BitFlags<Feature> aFeatures, const BitFlags<OptionalAttribute> aOptionalAttrs,
                                     uint8_t aMaxConcurrentEncoders, uint32_t aMaxEncodedPixelRate,
                                     const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared,
@@ -693,6 +702,7 @@ private:
     template <AttributeId TAttributeId>
     friend struct StreamTraits;
 
+    Context mContext;
     CameraAVStreamManagementDelegate & mDelegate;
     const BitFlags<Feature> mEnabledFeatures;
     const BitFlags<OptionalAttribute> mOptionalAttrs;
@@ -755,7 +765,7 @@ private:
             auto path    = ConcreteAttributePath(mPath.mEndpointId, CameraAvStreamManagement::Id, attributeId);
             if (shouldPersist)
             {
-                ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, currentValue));
+                ReturnErrorOnFailure(mContext.safeAttributePersistenceProvider.WriteScalarValue(path, currentValue));
             }
             mDelegate.OnAttributeChanged(attributeId);
             NotifyAttributeChanged(attributeId);

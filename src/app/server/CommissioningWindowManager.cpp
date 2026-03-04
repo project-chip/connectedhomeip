@@ -192,6 +192,9 @@ void CommissioningWindowManager::HandleFailedAttempt(CHIP_ERROR err)
 
 void CommissioningWindowManager::OnSessionEstablishmentStarted()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    DeviceLayer::ThreadStackMgr().CancelRendezvousAnnouncement();
+#endif
     // As per specifications, section 5.5: Commissioning Flows
     constexpr System::Clock::Timeout kPASESessionEstablishmentTimeout = System::Clock::Seconds16(60);
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeout,
@@ -423,6 +426,9 @@ void CommissioningWindowManager::CloseCommissioningWindow()
             // manually here.
             mServer->GetBleLayerObject()->CloseAllBleConnections();
         }
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+        DeviceLayer::ThreadStackMgr().RendezvousStop();
 #endif
         ChipLogProgress(AppServer, "Closing pairing window");
         Cleanup();

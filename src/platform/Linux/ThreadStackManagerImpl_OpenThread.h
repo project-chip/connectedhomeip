@@ -56,6 +56,7 @@ protected:
 
 private:
     ThreadStackManagerImpl() = default;
+    ~ThreadStackManagerImpl();
 };
 
 } // namespace DeviceLayer

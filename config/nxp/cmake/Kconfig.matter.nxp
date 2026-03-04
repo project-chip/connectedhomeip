@@ -116,6 +116,16 @@ config CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA
 	help
 		This mode allows to protect the matter factory dataset with a AES key protected in the secure element.
 
+config CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
+	bool "Custom factory data provider singleton implementation"
+	default y if CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES || CHIP_SE05X_DEVICE_ATTESTATION
+	help
+		Allows to use a custom factory data provider singleton implementation.
+		If enabled, the user must define a custom singleton implementation.
+		Such feature is useful when an application needs to customize the factory data provider behavior.
+		The application can provide its own singleton, for example by creating
+		a class that inherits from FactoryDataProviderImpl and overrides only the methods that need customization.
+
 endif
 
 if CHIP_FACTORY_DATA_BUILD

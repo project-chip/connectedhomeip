@@ -339,6 +339,10 @@ public:
             }
         }
     }
+    void OnCommissioningStageStart(chip::NodeId nodeId, const char * stage)
+    {
+        ChipLogProgress(Controller, "OpCredsBinding OnCommissioningStageStart %s", stage);
+    }
 
     CHIP_ERROR GetCompletionError() { return mCompletionError; }
 
@@ -454,6 +458,11 @@ void pychip_OnCommissioningFailure(chip::PeerId peerId, CHIP_ERROR error, chip::
 void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted, CHIP_ERROR err)
 {
     return sTestCommissioner.OnCommissioningStatusUpdate(peerId, stageCompleted, err);
+}
+
+void pychip_OnCommissioningStageStart(chip::NodeId nodeId, const char * stage)
+{
+    return sTestCommissioner.OnCommissioningStageStart(nodeId, stage);
 }
 
 /**
@@ -613,6 +622,7 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
         pairingDelegate->SetCommissioningSuccessCallback(pychip_OnCommissioningSuccess);
         pairingDelegate->SetCommissioningFailureCallback(pychip_OnCommissioningFailure);
         pairingDelegate->SetCommissioningStatusUpdateCallback(pychip_OnCommissioningStatusUpdate);
+        pairingDelegate->SetCommissioningStageStartCallback(pychip_OnCommissioningStageStart);
     }
 
     err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);

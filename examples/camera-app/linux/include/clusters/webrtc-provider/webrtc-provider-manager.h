@@ -24,6 +24,7 @@
 #include <app/CASESessionManager.h>
 #include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
 #include <media-controller.h>
+#include <system/SystemLayer.h>
 #include <webrtc-transport.h>
 
 #include <map>
@@ -138,6 +139,16 @@ private:
     void OnLocalDescription(const std::string & sdp, SDPType type, const uint16_t sessionId);
     void OnConnectionStateChanged(bool connected, const uint16_t sessionId);
 
+    void CleanupSession(uint16_t sessionId);
+
+    void StartConnectionTimer(uint16_t sessionId);
+
+    void CancelConnectionTimer(uint16_t sessionId);
+
+    void HandleConnectionTimeout(uint16_t sessionId);
+
+    static void OnConnectionTimeoutCallback(chip::System::Layer * systemLayer, void * context);
+
     WebrtcTransport * GetTransport(uint16_t sessionId);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
@@ -156,6 +167,15 @@ private:
     CameraDeviceInterface * mCameraDevice = nullptr;
 
     bool mSoftLiveStreamPrivacyEnabled = false;
+
+    struct ConnectionTimeoutContext
+    {
+        WebRTCProviderManager * manager;
+        uint16_t sessionId;
+    };
+
+    // Map to track active connection timeout timers for cancellation
+    std::unordered_map<uint16_t, ConnectionTimeoutContext *> mConnectionTimerContexts;
 };
 
 } // namespace WebRTCTransportProvider

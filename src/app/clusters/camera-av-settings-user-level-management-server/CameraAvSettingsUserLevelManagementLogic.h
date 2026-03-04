@@ -25,6 +25,7 @@
 #include <app/clusters/camera-av-settings-user-level-management-server/CameraAvSettingsUserLevelManagementConstants.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -93,7 +94,7 @@ public:
 
     CHIP_ERROR Init() { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR Startup();
+    CHIP_ERROR Startup(AttributePersistenceProvider & aAttributePersistenceProvider);
 
     // Handle any dynamic cleanup required prior to the destructor being called on an app shutdown.  To be invoked by
     // an app as part of its own shutdown sequence and prior to the destruction of the app/delegate.
@@ -155,6 +156,10 @@ public:
      */
     void SetZoom(Optional<uint8_t> aZoom);
 
+    // Helper Read functions for complex attribute types
+    CHIP_ERROR ReadAndEncodeMPTZPresets(AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadAndEncodeDPTZStreams(AttributeValueEncoder & encoder);
+
     // Command handlers
     std::optional<DataModel::ActionReturnStatus>
     HandleMPTZSetPosition(CommandHandler & handler, const ConcreteCommandPath & commandPath,
@@ -211,7 +216,8 @@ public:
     bool IsMoving() const { return mMovementState == CameraAvSettingsUserLevelManagement::PhysicalMovementEnum::kMoving; }
 
 private:
-    CameraAvSettingsUserLevelManagementDelegate * mDelegate = nullptr;
+    CameraAvSettingsUserLevelManagementDelegate * mDelegate      = nullptr;
+    AttributePersistenceProvider * mAttributePersistenceProvider = nullptr;
     MarkDirtyCallback mMarkDirtyCallback;
 
     // Holding variables for values subject to successful physical movement
@@ -219,12 +225,14 @@ private:
     Optional<int16_t> mTargetTilt;
     Optional<uint8_t> mTargetZoom;
 
-    // Helper Read functions for complex attribute types
-    CHIP_ERROR ReadAndEncodeMPTZPresets(AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadAndEncodeDPTZStreams(AttributeValueEncoder & encoder);
-
     CHIP_ERROR StoreMPTZPosition(const CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & mptzPosition);
     CHIP_ERROR LoadMPTZPosition(CameraAvSettingsUserLevelManagement::Structs::MPTZStruct::Type & mptzPosition);
+
+    CHIP_ERROR StoreDPTZStreams();
+    CHIP_ERROR LoadDPTZStreams();
+
+    CHIP_ERROR StoreMPTZPresets();
+    CHIP_ERROR LoadMPTZPresets();
 
     /**
      * Helper function that loads all the persistent attributes from the KVS.

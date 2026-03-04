@@ -46,7 +46,21 @@ except ModuleNotFoundError:
 
 
 CURRENT_IN_PROGRESS_DEFINES = [
-    "cameras"
+    "ambient-context-sensor",
+    "ambientsensing",
+    "cameras",
+    "cameras-image-rotation",
+    "groupcast",
+    "hrap-pdc",
+    "hrap-tbrd",
+    "hvac-thermostat-events",
+    "hvac-thermostat-suggestions",
+    "improved-capabilities-tcr",
+    "partitioned-crl",
+    "security-sensor-events-tcr",
+    "tcr-smokeco-unmounted-state",
+    "temperature-alarm",
+    "thread-commissioning",
 ]
 
 

@@ -48,6 +48,11 @@ ThreadStackManagerImpl & ThreadStackManagerImpl::Instance()
     return instance;
 }
 
+ThreadStackManagerImpl::~ThreadStackManagerImpl()
+{
+    static_cast<chip::System::LayerImpl &>(SystemLayer()).EventSourceRemove(this);
+}
+
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
     return GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(nullptr);

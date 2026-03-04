@@ -12,6 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+CI:
+    - name: "Test against all-devices/speaker"
+      app: all-devices
+      args:
+          - --device
+          - speaker
+
 name: 24.6.1. [TC-LVL-6.1] Stop Verification (DUT as Server)
 
 PICS:

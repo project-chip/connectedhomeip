@@ -291,6 +291,10 @@ config NVS_LOOKUP_CACHE_SIZE
 config SETTINGS_NVS_SECTOR_SIZE_MULT
     default 1
 
+# Enable extended discovery
+config CHIP_EXTENDED_DISCOVERY
+    default y
+
 # Enable OpenThread
 config NET_L2_OPENTHREAD
     default y if !WIFI

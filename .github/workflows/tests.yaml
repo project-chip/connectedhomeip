@@ -61,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:181
+            image: ghcr.io/project-chip/chip-build:184
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -120,6 +120,7 @@ jobs:
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/ambient-context-sensing-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/boolean-state-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/closure-control-cluster.xml \
@@ -282,6 +283,7 @@ jobs:
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target linux-x64-all-clusters-${BUILD_VARIANT} \
                         --target linux-x64-all-clusters-no-wifi-openthread-endpoint-${BUILD_VARIANT} \
+                        --target linux-x64-all-clusters-no-wifi-no-ble-openthread-endpoint-${BUILD_VARIANT} \
                         --target linux-x64-ota-requestor-${BUILD_VARIANT} \
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
@@ -299,6 +301,7 @@ jobs:
                         --target linux-x64-energy-gateway-${BUILD_VARIANT} \
                         --target linux-x64-all-devices-${BUILD_VARIANT} \
                         --target linux-x64-evse-${BUILD_VARIANT} \
+                        --target linux-x64-water-heater-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -313,6 +316,8 @@ jobs:
                    -DCMAKE_BUILD_TYPE=Debug \
                    -DOTBR_BORDER_ROUTING=ON \
                    -DOTBR_MDNS=openthread \
+                   -DOTBR_VENDOR_NAME=MatterTest \
+                   -DOTBR_PRODUCT_NAME=MatterTest \
                    -DOT_POSIX_SETTINGS_PATH='\"tmp\"' \
                    -DOT_FIREWALL=OFF \
                    -DOT_LOG_LEVEL=INFO \
@@ -347,9 +352,6 @@ jobs:
                      "
 
             - name: Run BLE-Thread commissioning test
-              # Disabled due to flakyness. See:
-              # https://github.com/project-chip/connectedhomeip/issues/42869
-              if: false
               env:
                 # Disable TSAN bug reporting, as it reports tons of (hopefully) false positives.
                 # The reason for that is BlueZ and WPA supplicant integration which involves GIO
@@ -362,13 +364,34 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --target TestOperationalState \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
-                     --all-clusters-app ./objdir-clone/linux-x64-all-clusters-no-wifi-openthread-endpoint-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-no-wifi-openthread-endpoint-${BUILD_VARIANT}/chip-all-clusters-app \
                      --commissioning-method ble-thread \
                   "
+                  rm -rf tmp/
+
+            - name: Run Thread-MeshCoP commissioning test
+              env:
+                TSAN_OPTIONS: report_bugs=0
+              run: |
+                  PATH=$PWD/objdir-clone:$PATH ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_test_suite.py \
+                     --find-path $PWD/objdir-clone \
+                     --find-path $PWD/scripts \
+                     --runner chip_tool_python \
+                     --target TestOperationalState \
+                     run \
+                     --iterations 1 \
+                     --test-timeout-seconds 120 \
+                     --tool-path chip-tool:./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --app-path all-clusters:./objdir-clone/linux-x64-all-clusters-no-wifi-no-ble-openthread-endpoint-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --commissioning-method thread-meshcop \
+                  "
+                  rm -rf tmp/
 
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
@@ -377,6 +400,7 @@ jobs:
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -394,6 +418,7 @@ jobs:
                      --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/linux-x64-evse-${BUILD_VARIANT}/chip-evse-app \
+                     --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -404,6 +429,7 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --expected-failures 3 \
@@ -426,6 +452,7 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --target TestOperationalState \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -448,6 +475,7 @@ jobs:
                      --exclude-tags EXTRA_SLOW \
                      --exclude-tags SLOW \
                      --exclude-tags PURPOSEFUL_FAILURE \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -464,6 +492,7 @@ jobs:
                      --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/linux-x64-evse-${BUILD_VARIANT}/chip-evse-app \
+                     --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
                   "
             - name: Run Tests using matter-repl (including slow)
               if: github.event_name == 'push'
@@ -473,6 +502,7 @@ jobs:
                      --find-path $PWD/objdir-clone \
                      --find-path $PWD/scripts \
                      --runner matter_repl_python \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -489,9 +519,10 @@ jobs:
                      --app-path network-manager:./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/linux-x64-evse-${BUILD_VARIANT}/chip-evse-app \
+                     --app-path water-heater:./objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
                   "
             - name: Uploading core files
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -499,7 +530,7 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -603,6 +634,7 @@ jobs:
                         --target darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-evse-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-water-heater-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-all-devices-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
@@ -627,6 +659,7 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -644,6 +677,7 @@ jobs:
                      --app-path network-manager:./objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --app-path energy-gateway:./objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --app-path evse:./objdir-clone/darwin-${{matrix.arch}}-evse-${BUILD_VARIANT}/chip-evse-app \
+                     --app-path water-heater:./objdir-clone/darwin-${{matrix.arch}}-water-heater-${BUILD_VARIANT}/matter-water-heater-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -656,6 +690,7 @@ jobs:
                      --find-path $PWD/scripts \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
+                     --test-order random \
                      run \
                      --iterations 1 \
                      --expected-failures 3 \
@@ -666,7 +701,7 @@ jobs:
                   "
 
             - name: Uploading core files
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -674,13 +709,13 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -813,6 +848,13 @@ jobs:
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-evse-${BUILD_VARIANT}-tsan-clang-test"
 
+            - name: Build linux-x64-water-heater
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-water-heater-${BUILD_VARIANT}-tsan-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-water-heater-${BUILD_VARIANT}-tsan-clang-test"
+
             - name: Build linux-x64-network-manager
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
@@ -880,16 +922,16 @@ jobs:
             - name: Build linux-x64-jf-control-app
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-jf-control-app
+                  --target linux-x64-jf-control-app-${BUILD_VARIANT}-asan-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-jf-control-app"
+                  && rm -rf out/linux-x64-jf-control-app-${BUILD_VARIANT}-asan-clang"
 
             - name: Build linux-x64-jf-admin-app
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-jf-admin-app
+                  --target linux-x64-jf-admin-app-${BUILD_VARIANT}-asan-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-jf-admin-app"
+                  && rm -rf out/linux-x64-jf-admin-app-${BUILD_VARIANT}-asan-clang"
 
             - name: ccache stats
               run: ccache -s
@@ -916,13 +958,6 @@ jobs:
 
             - name: ccache stats
               run: ccache -s
-
-            - name: Install push_av_server dependencies
-              run: >-
-                  ./scripts/run_in_python_env.sh out/venv \
-                  "python3 -m pip install -r src/tools/push_av_server/requirements.txt \
-                    && patch -d \$(python3 -m pip show hypercorn | grep 'Location: ' | sed 's/Location: //') -p0 < src/tools/push_av_server/hypercorn.patch \
-                  "
 
             # We archive ourselves since upload-artifact seems to lose permission bits
             # We also remove some debug info to make artifacts smaller (otherwise they are 2GB for binaries)
@@ -1033,8 +1068,8 @@ jobs:
                   echo "FABRIC_ADMIN_APP: objdir-clone/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang/fabric-admin" >> /tmp/test_env.yaml
                   echo "FABRIC_BRIDGE_APP: objdir-clone/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang/fabric-bridge-app" >> /tmp/test_env.yaml
                   echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
-                  echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app/jfa-app" >> /tmp/test_env.yaml
-                  echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app/jfc-app" >> /tmp/test_env.yaml
+                  echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app-${BUILD_VARIANT}-asan-clang/jfa-app" >> /tmp/test_env.yaml
+                  echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app-${BUILD_VARIANT}-asan-clang/jfc-app" >> /tmp/test_env.yaml
                   echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-app" >> /tmp/test_env.yaml
                   echo "LIT_ICD_APP: objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test/lit-icd-app" >> /tmp/test_env.yaml
                   echo "NETWORK_MANAGEMENT_APP: objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test/matter-network-manager-app" >> /tmp/test_env.yaml
@@ -1044,6 +1079,7 @@ jobs:
                   echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
                   echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+                  echo "WATER_HEATER_APP: objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}-tsan-clang-test/matter-water-heater-app" >> /tmp/test_env.yaml
                   echo "WATER_LEAK_DETECTOR_APP: objdir-clone/linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test-unified/water-leak-detector-app" >> /tmp/test_env.yaml
                   # keep-sorted: end
 
@@ -1072,6 +1108,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingNamespace.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingSelection.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingSupport.py'
+                  scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/TestFactoryResetRequests.py'
                   scripts/run_in_python_env.sh out/venv 'PYTHONPATH=src/python_testing:$PYTHONPATH python3 -m unittest discover -s src/python_testing/mdns_discovery/tests -p "test_*.py"'
             - name: Run Tests (individual)
               if: ${{matrix.filter == ''}}
@@ -1161,7 +1198,7 @@ jobs:
               run: |
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/darwin-${{matrix.arch}}-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factory-reset --quiet --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-python-repl
@@ -1169,20 +1206,20 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading traces on failure
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: trace-data-python-repl
                   path: out/trace_data/
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-python-repl
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-python-repl
