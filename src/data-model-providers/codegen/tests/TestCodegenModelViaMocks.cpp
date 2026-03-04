@@ -3025,16 +3025,15 @@ TEST_F(TestCodegenModelViaMocks, EndpointUniqueID)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    // Mock endpoint 1 has a unique ID
     char buffer[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
     MutableCharSpan span(buffer);
-    // Mock endpoint 4 has a unique ID
+
+    // Mock endpoint 4 has a unique ID that is long (actually max size)
     ASSERT_EQ(model.EndpointUniqueID(kMockEndpoint4, span), CHIP_NO_ERROR);
     EXPECT_TRUE(span.data_equal("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"_span));
 
     // Mock endpoint 2 has a shorter span. This tests truncation
     MutableCharSpan span2(buffer);
-    // Mock endpoint 4 has a unique ID
     ASSERT_EQ(model.EndpointUniqueID(kMockEndpoint2, span2), CHIP_NO_ERROR);
     EXPECT_TRUE(span2.data_equal("shortUniqueId"_span));
 }
