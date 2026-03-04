@@ -33,10 +33,10 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 GroupcastCluster::GroupcastCluster(GroupcastContext && context) : GroupcastCluster(std::move(context), {}) {}
 
 GroupcastCluster::GroupcastCluster(GroupcastContext && context, BitFlags<Groupcast::Feature> features) :
-    DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mContext(std::move(context)), mFeatures(features),
+    DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mGroupcastContext(std::move(context)), mFeatures(features),
     mMembershipChangedTimer(*this), mGroupcastTestingTimer(*this)
 {
-    mContext.groupDataProvider.SetListener(this);
+    mGroupcastContext.groupDataProvider.SetListener(this);
     UpdateUsedMcastAddrCount();
 }
 
@@ -45,7 +45,7 @@ GroupcastCluster::~GroupcastCluster() {}
 CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    mContext.groupDataProvider.SetListener(this);
+    mGroupcastContext.groupDataProvider.SetListener(this);
     SetDataModelProvider(context.provider);
 
     return CHIP_NO_ERROR;
@@ -55,7 +55,7 @@ void GroupcastCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     mGroupcastTestingTimer.Cancel();
     mMembershipChangedTimer.Cancel();
-    mContext.groupDataProvider.RemoveListener(this);
+    mGroupcastContext.groupDataProvider.RemoveListener(this);
     ResetDataModelProvider();
     DefaultServerCluster::Shutdown(shutdownType);
 }
@@ -529,7 +529,7 @@ Status GroupcastCluster::ConfigureAuxiliaryACL(FabricIndex fabric_index,
     {
         EmitAuxiliaryAccessUpdated(subjectDescriptor);
     }
-    
+
     return Status::Success;
 }
 
@@ -735,7 +735,7 @@ void GroupcastCluster::NotifyUsedMcastAddrCountOnChange()
 
 void GroupcastCluster::EmitAuxiliaryAccessUpdated(const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
-    VerifyOrReturn(mServerContext != nullptr);
+    VerifyOrReturn(mContext != nullptr);
 
     AccessControl::Events::AuxiliaryAccessUpdated::Type event;
     event.fabricIndex = subjectDescriptor.fabricIndex;
@@ -748,7 +748,7 @@ void GroupcastCluster::EmitAuxiliaryAccessUpdated(const chip::Access::SubjectDes
         event.adminNodeID.SetNull();
     }
 
-    (void) mServerContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 } // namespace Clusters
