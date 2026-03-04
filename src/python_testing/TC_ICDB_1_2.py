@@ -221,8 +221,7 @@ class TC_ICDB_1_2(MatterBaseTest):
             else:
                 # In a real DUT scenario, we wait for user to perform the UAT to put the DUT in active mode
                 self.wait_for_user_input(
-                    prompt_msg=
-                    f" > \n"
+                    prompt_msg=f" > \n"
                     f" > Perform UAT method '{bit_name}' on the DUT.\n"
                     f" > Follow UAT Instruction: {user_active_mode_trigger_instruction}\n"
                     f" > ")  # looks good in the logs, I promise
