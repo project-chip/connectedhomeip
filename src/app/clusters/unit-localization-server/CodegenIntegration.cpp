@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/clusters/unit-localization-server/CodegenIntegration.h>
 #include <app/clusters/unit-localization-server/MigrateUnitLocalizationServerStorage.h>
 #include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>

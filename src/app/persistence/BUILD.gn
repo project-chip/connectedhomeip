@@ -76,6 +76,8 @@ source_set("migration") {
     "AttributePersistenceMigration.h",
   ]
 
-  public_deps = [ ":default" ]
-  deps = [ "${chip_root}/src/app:attribute-persistence" ]
+  public_deps = [
+    ":default",
+    "${chip_root}/src/app:attribute-persistence",
+  ]
 }
