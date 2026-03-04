@@ -111,8 +111,8 @@ Alchemy: v1.6.10-0.20260226224858-faf2e4896a53
     <item fieldId="1" name="PeerNodeID" type="node_id"/>
     <item fieldId="2" name="PeerEndpointID" type="endpoint_no"/>
     <item fieldId="3" name="StreamUsage" type="StreamUsageEnum" max="0x03"/>
-    <item fieldId="4" name="VideoStreamID" type="int16u" isNullable="true" optional="true"/>
-    <item fieldId="5" name="AudioStreamID" type="int16u" isNullable="true" optional="true"/>
+    <item fieldId="4" name="VideoStreamID" type="int16u" isNullable="true"/>
+    <item fieldId="5" name="AudioStreamID" type="int16u" isNullable="true"/>
     <item fieldId="6" name="MetadataEnabled" type="boolean"/>
     <item fieldId="7" name="VideoStreams" type="int16u" array="true" optional="true" length="16" minLength="1"/>
     <item fieldId="8" name="AudioStreams" type="int16u" array="true" optional="true" length="16" minLength="1"/>
