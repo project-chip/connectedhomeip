@@ -652,7 +652,7 @@ DataModel::ActionReturnStatus ZoneManagementCluster::HandleRemoveZone(const Comm
     VerifyOrReturnValue(foundZone != mZones.end(), Status::NotFound,
                         ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mEndpointId, zoneID));
 
-    VerifyOrReturnValue(foundZone->zoneSource != ZoneSourceEnum::kMfg, Status::ConstraintError);
+    VerifyOrReturnValue(foundZone->zoneSource == ZoneSourceEnum::kUser, Status::ConstraintError);
 
     auto foundTrigger =
         std::find_if(mTriggers.begin(), mTriggers.end(), [&](const ZoneTriggerControlStruct & t) { return t.zoneID == zoneID; });
