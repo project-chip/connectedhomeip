@@ -146,7 +146,7 @@ TEST_F(TestCHIPMemString, TestMemoryAllocString)
     MemoryFree(allocatedStr);
 }
 
-TEST_F(TestCHIPMemString, TestScopedBuffer)
+TEST_F(TestCHIPMemString, TestScopedMemoryBuffer)
 {
     // Scoped buffer has its own tests that check the memory properly. Here we are just testing that the string is copied in
     // properly.

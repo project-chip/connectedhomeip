@@ -23,7 +23,7 @@
 
 namespace {
 
-class TestScopedBuffer : public ::testing::Test
+class TestScopedMemoryBuffer : public ::testing::Test
 {
 public:
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -59,7 +59,7 @@ int TestCounterMemoryManagement::mAllocCount = 0;
 
 using TestCounterScopedBuffer = chip::Platform::ScopedMemoryBuffer<char, TestCounterMemoryManagement>;
 
-TEST_F(TestScopedBuffer, TestAutoFree)
+TEST_F(TestScopedMemoryBuffer, TestAutoFree)
 {
     EXPECT_EQ(TestCounterMemoryManagement::Counter(), 0);
 
@@ -73,7 +73,7 @@ TEST_F(TestScopedBuffer, TestAutoFree)
     EXPECT_EQ(TestCounterMemoryManagement::Counter(), 0);
 }
 
-TEST_F(TestScopedBuffer, TestFreeDuringAllocs)
+TEST_F(TestScopedMemoryBuffer, TestFreeDuringAllocs)
 {
     EXPECT_EQ(TestCounterMemoryManagement::Counter(), 0);
 
@@ -91,7 +91,7 @@ TEST_F(TestScopedBuffer, TestFreeDuringAllocs)
     EXPECT_EQ(TestCounterMemoryManagement::Counter(), 0);
 }
 
-TEST_F(TestScopedBuffer, TestRelease)
+TEST_F(TestScopedMemoryBuffer, TestRelease)
 {
     EXPECT_EQ(TestCounterMemoryManagement::Counter(), 0);
     void * ptr = nullptr;
