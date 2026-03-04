@@ -52,7 +52,11 @@ public:
 
     CHIP_ERROR Next(MutableCharSpan & item) override
     {
-        return CopyCharSpanToMutableCharSpan(kTemperatureLevelOptions[mIndex++], item);
+        if (mIndex < Size())
+        {
+            return CopyCharSpanToMutableCharSpan(kTemperatureLevelOptions[mIndex++], item);
+        }
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
 
     ~AppSupportedTemperatureLevelsDelegate() {}
