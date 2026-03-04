@@ -230,8 +230,8 @@ class TC_ICDB_1_2(MatterBaseTest):
                 # In a real DUT scenario, we wait for user to perform the UAT to put the DUT in active mode
                 self.wait_for_user_input(
                     prompt_msg=f"Perform UAT method '{bit_name}' on the DUT.\n"
-                               f"UserActiveModeTriggerInstruction: {user_active_mode_trigger_instruction}\n"
-                               f"Press Enter when done.\n")
+                    f"UserActiveModeTriggerInstruction: {user_active_mode_trigger_instruction}\n"
+                    f"Press Enter when done.\n")
 
             # Verify the ICDCounter value increased
             current_icd_counter = await self._read_icdm_attribute_expect_success(attributes.ICDCounter)
@@ -241,7 +241,8 @@ class TC_ICDB_1_2(MatterBaseTest):
 
             # Verify the ActiveModeThreshold value is unchanged
             current_active_mode_threshold_ms = await self._read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
-            log.info(f"ActiveModeThreshold after '{bit_name}': {current_active_mode_threshold_ms}ms (expected {active_mode_threshold_ms}ms)")
+            log.info(
+                f"ActiveModeThreshold after '{bit_name}': {current_active_mode_threshold_ms}ms (expected {active_mode_threshold_ms}ms)")
             asserts.assert_equal(current_active_mode_threshold_ms, active_mode_threshold_ms,
                                  f"ActiveModeThreshold value must be unchanged but changed after '{bit_name}'. Expected: {active_mode_threshold_ms}ms, Current: {current_active_mode_threshold_ms}ms")
 
