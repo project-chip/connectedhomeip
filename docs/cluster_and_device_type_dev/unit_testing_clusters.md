@@ -151,7 +151,7 @@ high-level, strongly-typed wrappers for reading/writing attributes and invoking
 commands without manually handling TLV encoding or path construction.
 
 For detailed API usage and examples, please see the
-[ClusterTester Helper Class Guide](cluster_tester.md).
+[ClusterTester Helper Class Guide](https://project-chip.github.io/connectedhomeip-doc/cluster_and_device_type_dev/cluster_tester.html).
 
 ## Unit testing existing clusters
 

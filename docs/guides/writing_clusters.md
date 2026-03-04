@@ -366,9 +366,11 @@ specification.
 
 Unit tests should reside in `src/app/clusters/<cluster-name>/tests/`.
 
--   Use the `chip::Testing::ClusterTester` utility to write your unit tests.
+Use the `chip::Testing::ClusterTester` utility to write your unit tests.
     This modern API removes the need to manually mock encoders, handlers, or raw
     TLV buffers.
+    More on [ClusterTester Helper Class Guide](https://project-chip.github.io/connectedhomeip-doc/cluster_and_device_type_dev/cluster_tester.html).
+
 -   **Test Setup:** Create a mock delegate to inject fake data into your cluster
     instance.
 -   **Menu Verification:** Ensure `Attributes()` and `AcceptedCommands()` return
