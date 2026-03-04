@@ -211,7 +211,8 @@ class TC_SMOKECOALARM(MatterBaseTest):
         )
 
     async def temperature_measurement_test(self, endpoint):
-            logger.info(f"TemperatureMeasurement PwRPC Write: written_value: {value}, controller_read: {measured_value}")
+            logger.info(
+                f"TemperatureMeasurement PwRPC Write: written_value: {value}, controller_read: {measured_value}")
         asserts.assert_true(measured_value is not None,
                             "Temperature MeasuredValue should not be None.")
 
