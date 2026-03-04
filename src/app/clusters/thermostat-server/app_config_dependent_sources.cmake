@@ -16,15 +16,20 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/PresetStructWithOwnedMembers.cpp"
     "${CLUSTER_DIR}/PresetStructWithOwnedMembers.h"
-    "${CLUSTER_DIR}/thermostat-delegate.h"
-    "${CLUSTER_DIR}/thermostat-server-atomic.cpp"
-    "${CLUSTER_DIR}/thermostat-server-presets.cpp"
-    "${CLUSTER_DIR}/thermostat-server-presets.h"
-    "${CLUSTER_DIR}/thermostat-server-suggestions.cpp"
-    "${CLUSTER_DIR}/thermostat-server.cpp"
-    "${CLUSTER_DIR}/thermostat-server.h"
+    "${CLUSTER_DIR}/ThermostatDelegate.h"
+    "${CLUSTER_DIR}/ThermostatClusterAtomic.cpp"
+    "${CLUSTER_DIR}/ThermostatClusterPresets.cpp"
+    "${CLUSTER_DIR}/ThermostatClusterPresets.h"
+    "${CLUSTER_DIR}/ThermostatClusterRead.cpp"
+    "${CLUSTER_DIR}/ThermostatClusterSetpoints.cpp"
+    "${CLUSTER_DIR}/ThermostatClusterSetpoints.h"
+    "${CLUSTER_DIR}/ThermostatClusterSuggestions.cpp"
+    "${CLUSTER_DIR}/ThermostatClusterWrite.cpp"
+    "${CLUSTER_DIR}/ThermostatCluster.cpp"
+    "${CLUSTER_DIR}/ThermostatCluster.h"
     "${CLUSTER_DIR}/ThermostatSuggestionStructWithOwnedMembers.cpp"
     "${CLUSTER_DIR}/ThermostatSuggestionStructWithOwnedMembers.h"
 )

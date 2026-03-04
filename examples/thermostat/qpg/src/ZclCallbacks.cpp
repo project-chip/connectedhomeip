@@ -54,7 +54,9 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     }
 }
 
-void emberAfThermostatClusterInitCallback(EndpointId endpoint)
+void emberAfThermostatClusterInitCallback(EndpointId endpoint) {}
+
+void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
 {
 
     // Temp. code for testing purpose, need to be updated

@@ -3039,9 +3039,9 @@ endpoint 1 {
   }
 
   server cluster Thermostat {
-    ram      attribute localTemperature;
-    ram      attribute controlSequenceOfOperation;
-    ram      attribute systemMode;
+    callback attribute localTemperature;
+    callback attribute controlSequenceOfOperation;
+    callback attribute systemMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

@@ -184,7 +184,9 @@ int8_t TemperatureManager::GetCoolingSetPoint()
     return mCoolingCelsiusSetPoint;
 }
 
-void emberAfThermostatClusterInitCallback(chip::EndpointId endpoint)
+void emberAfThermostatClusterInitCallback(EndpointId endpoint) {}
+
+void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
 {
     auto & delegate = ThermostatDelegate::GetInstance();
     SetDefaultDelegate(endpoint, &delegate);
