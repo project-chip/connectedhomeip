@@ -318,7 +318,7 @@ void SetAmbientContextSupportType(Json::Value & jsonValue)
     AmbientContextSensingCluster * cluster = AmbientContextSensing::FindClusterOnEndpoint(endpointId);
     if (cluster == nullptr)
     {
-        ChipLogError(NotSpecified, "Failed to find AmbientContextSensingCluster");
+        ChipLogError(NotSpecified, "Failed to find AmbientContextSensingCluster on endpoint %u", endpointId);
         return;
     }
 
