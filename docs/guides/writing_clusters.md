@@ -368,9 +368,7 @@ Unit tests should reside in `src/app/clusters/<cluster-name>/tests/`.
 
 Use the `chip::Testing::ClusterTester` utility to write your unit tests. This
 modern API removes the need to manually mock encoders, handlers, or raw TLV
-buffers. More on
-[ClusterTester Helper Class Guide](cluster_tester.md).
-
+buffers. More on [ClusterTester Helper Class Guide](cluster_tester.md).
 
 -   **Test Setup:** Create a mock delegate to inject fake data into your cluster
     instance.
