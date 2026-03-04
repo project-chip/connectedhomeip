@@ -27,7 +27,7 @@
 #       --passcode 20202021
 #       --KVS kvs1
 #       --trace-to json:${TRACE_TEST_JSON}-app.json
-#       --enable-key 000102030405060708090a0b0c0d0e0f
+#       --enable-key 000102030405060708090a0b0c110d0e0f
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -227,7 +227,7 @@ class TC_ICDB_1_2(MatterBaseTest):
                 await self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kAddActiveModeReq)
 
                 # Brief pause to simulate UAT interaction and allow the check-in message to update
-                await asyncio.sleep(1.0)
+                await asyncio.sleep(10.0)
             else:
                 # In a real DUT scenario, we wait for user to perform the UAT to put the DUT in active mode
                 self.wait_for_user_input(
