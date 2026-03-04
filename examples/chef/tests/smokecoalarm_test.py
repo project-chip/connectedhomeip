@@ -127,12 +127,15 @@ class TC_SMOKECOALARM(MatterBaseTest):
         asserts.assert_true(result.status.ok(), msg="PwRPC status not ok.")
 
     def _read_temperature_measured_value_pwrpc(self, device):
+        logger.info("DEBUG_DEBUG: In _read_temperature_measured_value_pwrpc()")
         result = device.rpcs.chip.rpc.Attributes.Read(
             endpoint=self.ENDPOINT,
             cluster=Clusters.Objects.TemperatureMeasurement.id,
             attribute_id=Clusters.Objects.TemperatureMeasurement.Attributes.MeasuredValue.attribute_id,
             type=attributes_service_pb2.AttributeType.ZCL_INT16S_ATTRIBUTE_TYPE
         )
+        # Log the PwRPC status
+        logger.info("DEBUG_DEBUG: PwRPC status: %s", result.status)
         asserts.assert_true(result.status.ok(), msg="PwRPC status not ok.")
         return result.response.data_int16
 
