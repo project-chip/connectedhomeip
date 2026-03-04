@@ -74,13 +74,14 @@ private:
  * @brief Represents a Closure Control cluster endpoint.
  *
  * This class encapsulates the logic and interfaces required to manage a Closure Control cluster endpoint.
- * It integrates the delegate, context, logic, and interface components for the endpoint.
+ * It integrates the conformance, init params, delegate and cluster instance for the endpoint.
+ *
+ * NOTE: Set the Conformance, Init Params and Delegate before initializing the Endpoint.
+ *       The Cluster Instance is initialized in the Init() function.
  *
  * @param mEndpoint The endpoint ID associated with this Closure Control endpoint.
- * @param mContext The Matter context for the endpoint.
  * @param mDelegate The delegate instance for handling commands.
- * @param mLogic The cluster logic associated with the endpoint.
- * @param mInterface The interface for interacting with the cluster.
+ * @param mClusterInstance The cluster instance for interacting with the cluster.
  */
 class ClosureControlEndpoint
 {
@@ -109,7 +110,10 @@ public:
     /**
      * @brief Initializes the ClosureControlEndpoint instance.
      *
-     * @return CHIP_ERROR indicating the result of the initialization.
+     * It initializes the Cluster Instance for the Closure Control Endpoint and sets the same instance to the delegate.
+     *
+     * @return CHIP_ERROR_INTERNAL if the Closure Control Cluster is not Initialized
+     *         CHIP_NO_ERROR in case of success
      */
     CHIP_ERROR Init();
 
