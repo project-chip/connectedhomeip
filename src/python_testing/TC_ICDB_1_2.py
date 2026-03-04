@@ -73,6 +73,9 @@ For a real DUT, use --timeout <seconds> if ActiveModeDuration is large so the te
 '''
 
 kRootEndpointId = 0
+# In CI, the simulated lit-icd-app cycles faster than its reported IdleModeDuration.
+# Cap the wait to avoid long test runs.
+kMaxCIWaitTimeSeconds = 10
 
 cluster = Clusters.Objects.IcdManagement
 attributes = cluster.Attributes
@@ -219,13 +222,18 @@ class TC_ICDB_1_2(MatterBaseTest):
 
             # Transition DUT from Idle Mode to Active Mode
             if is_ci:
-                # In a CI scenario, we use a test event trigger to put the DUT in active mode
-                await self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kAddActiveModeReq)
+                # In CI (TSAN-enabled app on small VM), we cannot rely on kAddActiveModeReq
+                # to trigger a check-in: the command's own exchange wakes the DUT before
+                # the trigger handler runs. Instead, wait for the DUT's natural idle cycle
+                # (it wakes and sends a check-in organically), then hold it active for reads.
+                log.info(f"Waiting {kMaxCIWaitTimeSeconds}s for DUT to complete natural idle cycle...")
+                await asyncio.sleep(kMaxCIWaitTimeSeconds)
 
-                # Brief pause to simulate UAT interaction and allow the check-in message to update
-                await asyncio.sleep(10.0)
+                # Hold DUT in active mode so we can reliably read attributes
+                await self.send_test_event_triggers(
+                    eventTrigger=ICDTestEventTriggerOperations.kAddActiveModeReq)
             else:
-                # In a real DUT scenario, we wait for user to perform the UAT to put the DUT in active mode
+                # In a real DUT scenario, we wait for user to perform the UAT
                 self.wait_for_user_input(
                     prompt_msg=f" > \n"
                     f" > Perform UAT method '{bit_name}' on the DUT.\n"
