@@ -23,10 +23,8 @@ declare_args() {
   chip_se05x_spake_verifier = false
   chip_se05x_spake_prover = false
   chip_se05x_rnd_gen = false
-  chip_se05x_gen_ec_key = true
-  chip_se05x_ecdsa_verify = true
-  chip_se05x_pbkdf2_sha256 = false
-  chip_se05x_hkdf_sha256 = false
-  chip_se05x_hmac_sha256 = false
   chip_se05x_device_attestation = false
+  chip_se05x_spake_verifier_use_tp_values = false
+  chip_se05x_spake_verifier_tp_set_no = 1
+  chip_se05x_spake_verifier_tp_iter_cnt = 1000
 }

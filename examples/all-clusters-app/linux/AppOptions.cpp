@@ -65,7 +65,7 @@ private:
     }
 
 public:
-    MockClock() : mRealClock(SystemClock()) { Clock::Internal::SetSystemClockForTesting(this); }
+    MockClock() : mRealClock(SystemClock()), mOffset(Clock::kZero) { Clock::Internal::SetSystemClockForTesting(this); }
     ~MockClock() { Clock::Internal::SetSystemClockForTesting(&mRealClock); }
 
     void SetUTCTime(Microseconds64 aOverride) { TEMPORARY_RETURN_IGNORED GetOffsetFrom(mRealClock, aOverride, mOffset); }

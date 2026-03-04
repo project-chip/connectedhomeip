@@ -76,9 +76,14 @@ ThreadMeshcopCommissionProxy::ThreadMeshcopCommissionProxy() : mState(State::kCo
 
 ThreadMeshcopCommissionProxy::~ThreadMeshcopCommissionProxy()
 {
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
     if (mProxyFd != -1)
     {
-        close(mProxyFd);
+        if (shutdown(mProxyFd, SHUT_RDWR) == 0 || errno != EBADF)
+        {
+            close(mProxyFd);
+        }
+
         mProxyFd = -1;
     }
 

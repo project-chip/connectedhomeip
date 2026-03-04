@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/valve-configuration-and-control-server/ValveConfigurationAndControlCluster.h>
@@ -37,6 +38,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ValveConfigurationAndControl;
 using namespace chip::app::Clusters::ValveConfigurationAndControl::Attributes;
 using namespace chip::Testing;
+using namespace chip::Protocols::InteractionModel;
 
 class DummyDelegate : public Delegate
 {
@@ -429,9 +431,7 @@ TEST_F(TestValveConfigurationAndControlCluster, OpenCommandFieldsValidation)
 
     auto result = tester.Invoke(request);
     ASSERT_FALSE(result.IsSuccess());
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
 
     // Validate "min 1" constraint in TargetLevel field.
     request.openDuration = Optional<uint32_t>::Missing();
@@ -439,9 +439,7 @@ TEST_F(TestValveConfigurationAndControlCluster, OpenCommandFieldsValidation)
 
     result = tester.Invoke(request);
     ASSERT_FALSE(result.IsSuccess());
-    ASSERT_TRUE(result.status.has_value());
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
-    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
 }
 
 // Test Open command in a no-Level Valve with a DummyDelegate (non instant change).

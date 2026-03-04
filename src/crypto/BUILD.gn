@@ -62,11 +62,16 @@ buildconfig_header("crypto_buildconfig") {
   chip_crypto_keystore_psa = chip_crypto_keystore == "psa"
   chip_crypto_keystore_raw = chip_crypto_keystore == "raw"
   chip_crypto_keystore_app = chip_crypto_keystore == "app"
+  chip_crypto_spake2p_mbedtls = chip_crypto_spake2p == "mbedtls"
+  chip_crypto_spake2p_psa = chip_crypto_spake2p == "psa"
+  chip_crypto_spake2p_custom = chip_crypto_spake2p == "custom"
 
   defines = [
     "CHIP_CRYPTO_MBEDTLS=${chip_crypto_mbedtls}",
     "CHIP_CRYPTO_PSA=${chip_crypto_psa}",
-    "CHIP_CRYPTO_PSA_SPAKE2P=${chip_crypto_psa_spake2p}",
+    "CHIP_CRYPTO_SPAKE2P_MBEDTLS=${chip_crypto_spake2p_mbedtls}",
+    "CHIP_CRYPTO_SPAKE2P_PSA=${chip_crypto_spake2p_psa}",
+    "CHIP_CRYPTO_SPAKE2P_CUSTOM=${chip_crypto_spake2p_custom}",
     "CHIP_CRYPTO_PSA_AEAD_SINGLE_PART=${chip_crypto_psa_aead_single_part}",
     "CHIP_CRYPTO_KEYSTORE_PSA=${chip_crypto_keystore_psa}",
     "CHIP_CRYPTO_KEYSTORE_RAW=${chip_crypto_keystore_raw}",
@@ -209,7 +214,7 @@ static_library("crypto") {
     # Keystore provided by app
   }
 
-  if (chip_crypto_psa_spake2p) {
+  if (chip_crypto_spake2p == "psa") {
     sources += [
       "PSASpake2p.cpp",
       "PSASpake2p.h",

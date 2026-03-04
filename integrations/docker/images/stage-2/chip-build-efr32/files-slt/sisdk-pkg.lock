@@ -1,0 +1,7 @@
+version = "0"
+
+[dependency]
+  simplicity-sdk = [{ installer = "conan", ref = "simplicity-sdk/2025.12.1-alpha@silabs#9f22e7efe2ff3fe28eabf4c78d205883", type = "sdk", version = "2025.12.1-alpha" }]
+
+[engine]
+  conan-repos = ["https://conan-prerelease.silabs.net/"]

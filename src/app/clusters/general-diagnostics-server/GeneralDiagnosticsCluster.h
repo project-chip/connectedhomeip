@@ -49,7 +49,8 @@ public:
                                         GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id,   //
                                         GeneralDiagnostics::Attributes::DeviceLoadStatus::Id       //
                                         // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
-                                        //       it will be forced as mandatory by the cluster constructor
+                                        // DeviceLoadStatus is also listed as mandatory for revision 3 and beyond.
+                                        // They will be forced as mandatory by the cluster constructor.
                                         >;
 
     struct Context
@@ -62,7 +63,8 @@ public:
     GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags,
                               Context && context) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
-        mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()),
+        mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()
+                                  .ForceSet<GeneralDiagnostics::Attributes::DeviceLoadStatus::Id>()),
         mFeatureFlags(featureFlags), mDiagnosticsContext(std::move(context))
     {}
 

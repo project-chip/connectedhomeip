@@ -294,11 +294,10 @@ bool emberAfJointFabricDatastoreClusterAddKeySetCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const JointFabricDatastoreCluster::Commands::AddKeySet::DecodableType & commandData)
 {
-    CHIP_ERROR err                                                                              = CHIP_NO_ERROR;
-    JointFabricDatastoreCluster::Structs::DatastoreGroupKeySetStruct::DecodableType groupKeySet = commandData.groupKeySet;
+    CHIP_ERROR err                                   = CHIP_NO_ERROR;
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
-    SuccessOrExit(err = jointFabricDatastore.AddGroupKeySetEntry(groupKeySet));
+    SuccessOrExit(err = jointFabricDatastore.AddGroupKeySetEntry(commandData.groupKeySet));
 
 exit:
     if (err == CHIP_NO_ERROR)
