@@ -22,10 +22,14 @@
 
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 #include <app/ConcreteAttributePath.h>
-#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 #include <app/data-model/Nullable.h>
+#include <app/util/config.h>
 #include <pigweed/rpc_services/AccessInterceptor.h>
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
+
+#if MATTER_DM_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
+#endif
 
 namespace chip {
 namespace app {
@@ -41,10 +45,11 @@ class AttributeAccessor : public chip::rpc::PigweedDebugAccessInterceptor
 public:
     std::optional<::pw::Status> Write(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder) override
     {
-        ChipLogProgress(Zcl, "Inside AttributeAccessor::Write for Cluster: %d , Attribute: %d", static_cast<int>(path.mClusterId),
-                        static_cast<int>(path.mAttributeId));
+        ChipLogProgress(Zcl, "Inside AttributeAccessor::Write for Cluster: " ChipLogFormatMEI " , Attribute: " ChipLogFormatMEI,
+                        ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         switch (path.mClusterId)
         {
+#if MATTER_DM_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         case TemperatureMeasurement::Id:
             switch (path.mAttributeId)
             {
@@ -75,6 +80,7 @@ public:
                 return ::pw::OkStatus();
             }
             }
+#endif // MATTER_DM_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         }
         return std::nullopt;
     }
