@@ -20,6 +20,7 @@
 #include "fan-control-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af-types.h>
+#include <src/app/clusters/fan-control-server/CodegenIntegration.h>
 
 namespace chip {
 namespace app {
