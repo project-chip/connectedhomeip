@@ -636,8 +636,10 @@ class TC_AVSM_2_7(MatterBaseTest):
         )
         if len(aAllocatedVideoStreams) > 0:
             asserts.fail("Allocated video streams not cleared")
-        minFrameRateConfig = min(15, aVideoSensorParams.maxFPS)
-        maxFrameRateConfig = aVideoSensorParams.maxFPS
+
+        # start initial frame rate range low and gradually increase
+        minFrameRateConfig = 15
+        maxFrameRateConfig = 30
         # Try and allocate up to maxConcurrentEncoders. If all these streams are
         # successfully allocated, the next one should hit a resource exhausted
         # error.
