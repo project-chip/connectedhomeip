@@ -402,6 +402,8 @@ private:
 
         if (!info.has_value())
         {
+            ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d !info.has_value(). Returning NOT_FOUND",
+                            path.mClusterId, path.mAttributeId);
             return ::pw::Status::NotFound();
         }
 
