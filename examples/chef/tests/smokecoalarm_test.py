@@ -53,7 +53,7 @@ class TC_SMOKECOALARM(MatterBaseTest):
                 TestStep(
                     7, "[TC_TEMPERATURE_MEASUREMENT] Test Temperature Measurement."),
                 TestStep(8, "[TC_SMOKECOALARM] Set up PwRPC connection."),
-                TestStep(9, "[TC_TEMPERATURE_MEASUREMENT] Test Temperature Measurement via PwRPC.")]
+                TestStep(9, "[TC_PW_RPC_TESTS] Tests that use PwRPC.")]
 
     # CarbonMonoxideConcentrationMeasurement Cluster Helper Methods
     async def _read_co_measured_value(self, endpoint):
@@ -211,8 +211,7 @@ class TC_SMOKECOALARM(MatterBaseTest):
         )
 
     async def temperature_measurement_test(self, endpoint):
-        logger.info(
-            f"TemperatureMeasurement PwRPC Write: written_value: {value}, controller_read: {measured_value}")
+        measured_value = await self._read_temperature_measured_value(endpoint)
         asserts.assert_true(measured_value is not None,
                             "Temperature MeasuredValue should not be None.")
 
@@ -282,9 +281,10 @@ class TC_SMOKECOALARM(MatterBaseTest):
             device_tracing=False,
         )
 
-        # [TC_TEMPERATURE_MEASUREMENT] Test Temperature Measurement via PwRPC.
+        # [TC_PW_RPC_TESTS] Tests that use PwRPC.
         self.step(9)
         with device_connection as device:
+            # [TC_TEMPERATURE_MEASUREMENT] Test Temperature Measurement via PwRPC.
             await self.temperature_measurement_pwrpc_test(self.ENDPOINT, device)
 
 
