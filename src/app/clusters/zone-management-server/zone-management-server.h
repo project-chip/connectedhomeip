@@ -214,21 +214,21 @@ public:
 
     virtual CHIP_ERROR LoadTriggers(std::vector<ZoneTriggerControlStruct> & aTriggers) = 0;
 
-    ZoneManagementCluster * GetZoneMgmtServer() const { return mZoneMgmtServer; }
+    ZoneManagementCluster * GetZoneMgmtServer() const { return mZoneManagementCluster; }
 
 private:
     friend class ZoneManagementCluster;
 
-    ZoneManagementCluster * mZoneMgmtServer = nullptr;
+    ZoneManagementCluster * mZoneManagementCluster = nullptr;
 
     /**
      * This method is used by the SDK to ensure the delegate points to the server instance it's associated with.
      * When a server instance is created or destroyed, this method will be called to set and clear, respectively,
      * the pointer to the server instance.
      *
-     * @param aZoneMgmtServer  A pointer to the ZoneMgmtServer object related to this delegate object.
+     * @param aZoneManagementCluster  A pointer to the ZoneMgmtServer object related to this delegate object.
      */
-    void SetZoneMgmtServer(ZoneManagementCluster * aZoneMgmtServer) { mZoneMgmtServer = aZoneMgmtServer; }
+    void SetZoneMgmtServer(ZoneManagementCluster * aZoneManagementCluster) { mZoneManagementCluster = aZoneManagementCluster; }
 };
 
 class ZoneManagementCluster : public DefaultServerCluster
