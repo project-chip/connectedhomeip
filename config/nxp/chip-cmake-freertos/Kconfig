@@ -161,6 +161,7 @@ config CHIP_SE05X_RND_GEN
 
 config CHIP_SE05X_DEVICE_ATTESTATION
 	bool "Enable SE05x Secure element for offloading Device attestation Sign"
+	default y if CHIP_FACTORY_DATA
 	help
 		Enable SE05x Secure element for offloading Device attestation Sign.
 
@@ -168,6 +169,7 @@ config CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES
 	bool "Enable SE05x Secure element for offloading spake verifier and use the trust provisioned w0 and L values"
 	depends on CHIP_SE05X_SPAKE_VERIFIER
 	depends on CHIP_FACTORY_DATA
+	default y if CHIP_FACTORY_DATA
 	default n
 	help
 		Enable SE05x Secure element for offloading spake verifier and use the trust provisioned w0 and L values. This

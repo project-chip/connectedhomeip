@@ -26,6 +26,11 @@
 #include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+#include <platform/OpenThread/OpenThreadUtils.h>
+#include <platform/ThreadStackManager.h>
+#endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -171,7 +176,12 @@ void ThreadNetworkDiagnosticsCluster::OnConnectionStatusChanged(ConnectionStatus
 {
     if (newConnectionStatus == ConnectionStatusEnum::kConnected)
     {
-        ChipLogProgress(Zcl, "ThdDiag: Conn, PAN: 0x%04x", GetPanId());
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+        ChipLogProgress(Zcl, "ThdDiag: Conn, PAN: 0x%04x",
+                        chip::DeviceLayer::Internal::GetOpenThreadPanId(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance()));
+#else
+        ChipLogProgress(Zcl, "ThdDiag: Conn");
+#endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
     }
     else
     {
@@ -190,11 +200,11 @@ void ThreadNetworkDiagnosticsCluster::OnNetworkFaultChanged(const GeneralFaults<
     if (current.size() > 0)
     {
         [[maybe_unused]] uint8_t latestFault = current.data()[current.size() - 1];
-        ChipLogProgress(Zcl, "ThdDiag: Fault. Latest: %s (%u)", GetNetworkFaultString(latestFault), latestFault);
+        ChipLogDetail(Zcl, "ThdDiag: Fault. Latest: %s (%u)", GetNetworkFaultString(latestFault), latestFault);
     }
     else
     {
-        ChipLogProgress(Zcl, "ThdDiag: No faults");
+        ChipLogDetail(Zcl, "ThdDiag: No faults");
     }
 
     /* Verify that the data size matches the expected one. */

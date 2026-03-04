@@ -101,6 +101,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/door-lock/chef-lock-endpoint.cpp
     ${CHEF}/common/clusters/door-lock/chef-lock-manager.cpp
     ${CHEF}/common/clusters/keypad-input/KeypadInputManager.cpp
+    ${CHEF}/common/clusters/laundry-dryer-controls/chef-laundry-dryer-controls-delegate.cpp
     ${CHEF}/common/clusters/low-power/LowPowerManager.cpp
     ${CHEF}/common/clusters/media-input/MediaInputManager.cpp
     ${CHEF}/common/clusters/media-playback/MediaPlaybackManager.cpp

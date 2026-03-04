@@ -27,9 +27,9 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 // Only needed for wifi NCP devices
-#if SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
+#if defined(SL_WIFI) && SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
 #include <platform/silabs/wifi/ncp/spi_multiplex.h>
-#endif // SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
+#endif // defined(SL_WIFI) && SL_WIFI && !defined(SLI_SI91X_MCU_INTERFACE)
 
 // LCD line define
 constexpr uint8_t kTempLcdInitialX = 30;
@@ -73,13 +73,13 @@ void RefrigeratorUI::DrawUI(GLIB_Context_t * glibContext)
     DrawCurrentTemp(glibContext, mCurrentTempCelsius);
     DrawFooter(glibContext, false);
 
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     sl_wfx_host_pre_lcd_spi_transfer();
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     DMD_updateDisplay();
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     sl_wfx_host_post_lcd_spi_transfer();
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 }
 
 /**
@@ -115,13 +115,13 @@ void RefrigeratorUI::DrawHeader(GLIB_Context_t * glibContext)
                     WIFI_BITMAP_HEIGHT, (UI_WIFI) ? wifiLogo : threadLogo);
     // Draw Matter Icon
     GLIB_drawBitmap(glibContext, MATTER_ICON_POSITION_X, STATUS_ICON_LINE, MATTER_LOGO_WIDTH, MATTER_LOGO_HEIGHT, matterLogoBitmap);
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     sl_wfx_host_pre_lcd_spi_transfer();
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     DMD_updateDisplay();
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     sl_wfx_host_post_lcd_spi_transfer();
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 }
 
 /**
@@ -133,13 +133,13 @@ void RefrigeratorUI::DrawFooter(GLIB_Context_t * glibContext, bool autoMode)
 {
     // TODO:: Need to implement this function
 
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     sl_wfx_host_pre_lcd_spi_transfer();
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     DMD_updateDisplay();
-#if SL_LCDCTRL_MUX
+#if defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
     sl_wfx_host_post_lcd_spi_transfer();
-#endif // SL_LCDCTRL_MUX
+#endif // defined(SL_LCDCTRL_MUX) && SL_LCDCTRL_MUX
 }
 
 /**
