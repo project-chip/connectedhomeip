@@ -90,21 +90,20 @@ class TC_ICDB_1_2(MatterBaseTest):
         return [
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads from the DUT the RegisteredClients attribute.",
-                     "Unregister all clients in RegisteredClients, if any."),
+                     "If clients are registered, unregister them."),
             TestStep(2, "TH reads from the DUT the IdleModeDuration, ActiveModeDuration, ActiveModeThreshold, UserActiveModeTriggerHint, and UserActiveModeTriggerInstruction attributes.",
                      "Store all values for later use."),
             TestStep(3, "TH sends RegisterClient command with parameters: CheckInNodeID: <th_node_id>, MonitoredSubject: <th_node_id>, and Key: <any_16_byte_octstr>.", """
-                     DUT's ActiveModeDuration timer is reset.
+                     DUT ActiveModeDuration timer is reset.
                      DUT responds with an ICDCounter value, store the value as icd_counter_at_registration."""),
             TestStep(4, "Wait for ActiveModeDuration plus a 1-second buffer.",
                      "DUT transitions from Active Mode to Idle Mode."),
-            TestStep(5, "Use UserActiveModeTriggerHint/UserActiveModeTriggerInstruction to put device in active mode. If more than 1 UserActiveModeTriggerHint, repeat for all available UserActiveModeTriggerHints.", """
-                     For each hint, DUT transitions from Idle to Active Mode and sends a check-in message.
-                     Verify ICDCounter is greater than previous value.
-                     Verify ActiveModeThreshold matches active_mode_threshold_ms from step 2.
-                     In CI, only one generic trigger is available."""),
-            TestStep(6, "TH sends command UnregisterClient to the DUT.",
-                     "All clients in RegisteredClients are cleared, if any."),
+            TestStep(5, "Use UAT hint/instructions to transition DUT from Idle Mode to Active Mode.", """
+                     For each UAT hint, the DUT transitions from Idle to Active Mode and sends back a check-in message.
+                     Verify the ICDCounter value increased.
+                     Verify the ActiveModeThreshold value is unchanged."""),
+            TestStep(6, "TH reads from the DUT the RegisteredClients attribute.",
+                     "If clients are registered, unregister them."),
         ]
 
     async def _read_icdm_attribute_expect_success(self, attribute):
@@ -113,14 +112,9 @@ class TC_ICDB_1_2(MatterBaseTest):
     async def _send_single_icdm_command(self, command):
         return await self.send_single_cmd(command, endpoint=kRootEndpointId)
 
-    async def unregister_all_clients(self, registeredClients=None):
-        """Unregisters all entries in the DUT's RegisteredClients attribute.
-
-        If registeredClients is provided, it is used directly; otherwise the
-        attribute is read from the DUT first.
-        """
-        if registeredClients is None:
-            registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
+    async def unregister_all_clients(self):
+        """Unregisters all entries in the DUT's RegisteredClients attribute."""
+        registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
 
         if not registeredClients:
             log.info("RegisteredClients is empty.")
@@ -149,11 +143,9 @@ class TC_ICDB_1_2(MatterBaseTest):
 
         # *** STEP 1 ***
         # TH reads from the DUT the RegisteredClients attribute
+        # If clients are registered, unregister them
         self.step(1)
-        registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
-
-        # Unregister all clients in RegisteredClients, if any
-        await self.unregister_all_clients(registeredClients)
+        await self.unregister_all_clients()
 
         # *** STEP 2 ***
         # TH reads from the DUT the IdleModeDuration, ActiveModeDuration, ActiveModeThreshold,
@@ -220,7 +212,7 @@ class TC_ICDB_1_2(MatterBaseTest):
                 await asyncio.sleep(wait_time_for_idle_s)
 
             # Transition DUT from Idle Mode to Active Mode
-            if is_ci:
+            if not is_ci:
                 # In a CI scenario, we use a test event trigger to put the DUT in active mode
                 await self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kAddActiveModeReq)
 
@@ -229,9 +221,11 @@ class TC_ICDB_1_2(MatterBaseTest):
             else:
                 # In a real DUT scenario, we wait for user to perform the UAT to put the DUT in active mode
                 self.wait_for_user_input(
-                    prompt_msg=f"Perform UAT method '{bit_name}' on the DUT.\n"
-                    f"UserActiveModeTriggerInstruction: {user_active_mode_trigger_instruction}\n"
-                    f"Press Enter when done.\n")
+                    prompt_msg=
+                    f" > \n"
+                    f" > Perform UAT method '{bit_name}' on the DUT.\n"
+                    f" > Follow UAT Instruction: {user_active_mode_trigger_instruction}\n"
+                    f" > ")  # looks good in the logs, I promise
 
             # Verify the ICDCounter value increased
             current_icd_counter = await self._read_icdm_attribute_expect_success(attributes.ICDCounter)
@@ -249,8 +243,8 @@ class TC_ICDB_1_2(MatterBaseTest):
             previous_icd_counter = current_icd_counter
 
         # *** STEP 6 ***
-        # TH sends command UnregisterClient to the DUT
-        # All clients in RegisteredClients are cleared, if any
+        # TH reads from the DUT the RegisteredClients attribute
+        # If clients are registered, unregister them
         self.step(6)
         await self.unregister_all_clients()
 
