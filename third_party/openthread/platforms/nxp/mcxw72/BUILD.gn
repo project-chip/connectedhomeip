@@ -104,6 +104,10 @@ source_set("libopenthread-mcxw72") {
     }
   }
 
+  if (chip_crypto == "psa") {
+    sources += [ "${openthread_nxp_root}/src/common/crypto/ecdsa_psa.cpp" ]
+  }
+
   if (nxp_enable_ot_cli) {
     sources += [ "${openthread_root}/examples/apps/cli/cli_uart.cpp" ]
   }
