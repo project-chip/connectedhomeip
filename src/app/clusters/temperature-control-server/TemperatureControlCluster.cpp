@@ -23,14 +23,12 @@ namespace chip::app::Clusters {
 using namespace TemperatureControl;
 using namespace TemperatureControl::Attributes;
 
-// According to the spec, absolute minimum value is -27315
-constexpr int16_t kMinTemperatureRange = -27315;
-// According to the spec, maximum minimum value is 32766
-constexpr int16_t kMaxTemperatureRange = 32766;
-// According to the spec, minimum step value is 1
-constexpr int16_t kMinStep = 1;
-// According to the spec, maximum selected temperature level value is 31
-constexpr uint8_t kMaxSelectedTemperatureLevel = 31;
+// Specification defined ranges and limits
+constexpr int16_t kMinTemperatureRange           = -27315;
+constexpr int16_t kMaxTemperatureRange           = 32766;
+constexpr int16_t kMinStep                       = 1;
+constexpr uint8_t kMaxSelectedTemperatureLevel   = 31;
+constexpr uint8_t kMaxTemperatureLevelStringSize = 32;
 
 TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * TemperatureControlCluster::mDelegate = nullptr;
 
@@ -89,8 +87,7 @@ DataModel::ActionReturnStatus TemperatureControlCluster::ReadAttribute(const Dat
         }
         mDelegate->Reset(request.path.mEndpointId);
         return encoder.EncodeList([&](const auto & encod) -> CHIP_ERROR {
-            constexpr uint8_t kMaxTemperatureLevelStringSize = 32;
-            char buffer[kMaxTemperatureLevelStringSize]      = { 0 };
+            char buffer[kMaxTemperatureLevelStringSize] = { 0 };
             MutableCharSpan item(buffer);
             while (mDelegate->Next(item) == CHIP_NO_ERROR)
             {
@@ -181,56 +178,46 @@ TemperatureControlCluster::HandleSetTemperature(CommandHandler * commandObj, con
 
     if (mFeatures.Has(Feature::kTemperatureNumber))
     {
-        if (targetTemperature.HasValue())
+        VerifyOrReturnError(targetTemperature.HasValue(), Status::InvalidCommand);
+
+        CHIP_ERROR err = SetTemperatureSetpoint(targetTemperature.Value());
+        if (err == CHIP_IM_GLOBAL_STATUS(ConstraintError))
         {
-            CHIP_ERROR err = SetTemperatureSetpoint(targetTemperature.Value());
-            if (err == CHIP_IM_GLOBAL_STATUS(ConstraintError))
-            {
-                return Status::ConstraintError;
-            }
-            if (err != CHIP_NO_ERROR)
-            {
-                /**
-                 * If the server is unable to execute the command at the time the command is received
-                 * by the server (e.g. due to the design of a device it cannot accept a change in its
-                 * temperature setting after it has begun operation), then the server SHALL respond
-                 * with a status code of INVALID_IN_STATE, and discard the command.
-                 **/
-                return Status::InvalidInState;
-            }
+            return Status::ConstraintError;
         }
-        else
+        if (err != CHIP_NO_ERROR)
         {
-            return Status::InvalidCommand;
+            /**
+             * If the server is unable to execute the command at the time the command is received
+             * by the server (e.g. due to the design of a device it cannot accept a change in its
+             * temperature setting after it has begun operation), then the server SHALL respond
+             * with a status code of INVALID_IN_STATE, and discard the command.
+             **/
+            return Status::InvalidInState;
         }
     }
     if (mFeatures.Has(Feature::kTemperatureLevel))
     {
-        if (targetTemperatureLevel.HasValue())
+        VerifyOrReturnError(targetTemperatureLevel.HasValue(), Status::InvalidCommand);
+
+        CHIP_ERROR err = SetSelectedTemperatureLevel(targetTemperatureLevel.Value());
+        if (err == CHIP_IM_GLOBAL_STATUS(NotFound))
         {
-            CHIP_ERROR err = SetSelectedTemperatureLevel(targetTemperatureLevel.Value());
-            if (err == CHIP_IM_GLOBAL_STATUS(NotFound))
-            {
-                return Status::NotFound;
-            }
-            if (err == CHIP_IM_GLOBAL_STATUS(ConstraintError))
-            {
-                return Status::ConstraintError;
-            }
-            if (err != CHIP_NO_ERROR)
-            {
-                /**
-                 * If the server is unable to execute the command at the time the command is received
-                 * by the server (e.g. due to the design of a device it cannot accept a change in its
-                 * temperature setting after it has begun operation), then the server SHALL respond
-                 * with a status code of INVALID_IN_STATE, and discard the command.
-                 **/
-                return Status::InvalidInState;
-            }
+            return Status::NotFound;
         }
-        else
+        if (err == CHIP_IM_GLOBAL_STATUS(ConstraintError))
         {
-            return Status::InvalidCommand;
+            return Status::ConstraintError;
+        }
+        if (err != CHIP_NO_ERROR)
+        {
+            /**
+             * If the server is unable to execute the command at the time the command is received
+             * by the server (e.g. due to the design of a device it cannot accept a change in its
+             * temperature setting after it has begun operation), then the server SHALL respond
+             * with a status code of INVALID_IN_STATE, and discard the command.
+             **/
+            return Status::InvalidInState;
         }
     }
 

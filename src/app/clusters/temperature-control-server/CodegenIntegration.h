@@ -25,6 +25,7 @@ namespace chip::app::Clusters::TemperatureControl {
 TemperatureControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
 CHIP_ERROR SetTemperatureSetpoint(EndpointId endpointId, int16_t temperatureSetpoint);
+CHIP_ERROR SetSelectedTemperatureLevel(EndpointId endpointId, uint8_t selectedTemperatureLevel);
 
 SupportedTemperatureLevelsIteratorDelegate * GetDelegate();
 void SetDelegate(SupportedTemperatureLevelsIteratorDelegate * delegate);

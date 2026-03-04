@@ -159,6 +159,14 @@ CHIP_ERROR SetTemperatureSetpoint(EndpointId endpointId, int16_t temperatureSetp
     return temperatureControl->SetTemperatureSetpoint(temperatureSetpoint);
 }
 
+CHIP_ERROR SetSelectedTemperatureLevel(EndpointId endpointId, uint8_t selectedTemperatureLevel)
+{
+    auto temperatureControl = FindClusterOnEndpoint(endpointId);
+    VerifyOrReturnError(temperatureControl != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    return temperatureControl->SetSelectedTemperatureLevel(selectedTemperatureLevel);
+}
+
 SupportedTemperatureLevelsIteratorDelegate * GetDelegate()
 {
     return TemperatureControlCluster::GetDelegate();
