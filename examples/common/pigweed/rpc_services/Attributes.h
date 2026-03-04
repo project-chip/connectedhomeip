@@ -423,8 +423,15 @@ private:
                         path.mAttributeId);
 
         attributeReports.EndOfContainer();
+        ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. attributeReports.EndOfContainer(); Okay",
+                        path.mClusterId, path.mAttributeId);
         PW_TRY(ChipErrorToPwStatus(writer.EndContainer(outer)));
+        ChipLogProgress(Support,
+                        "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. PW_TRY(ChipErrorToPwStatus(writer.EndContainer(outer)));",
+                        path.mClusterId, path.mAttributeId);
         PW_TRY(ChipErrorToPwStatus(writer.Finalize()));
+        ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. PW_TRY(ChipErrorToPwStatus(writer.Finalize()));",
+                        path.mClusterId, path.mAttributeId);
         tlvBuffer.reduce_size(writer.GetLengthWritten());
 
         return ::pw::OkStatus();
