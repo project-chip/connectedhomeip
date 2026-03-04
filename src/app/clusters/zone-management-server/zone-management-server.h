@@ -19,15 +19,10 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
-#include <app/StatusResponse.h>
-
-#include <app/SafeAttributePersistenceProvider.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/support/TypeTraits.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <vector>
+
 
 namespace chip {
 namespace app {
@@ -39,12 +34,15 @@ using TwoDCartesianZoneStruct          = Structs::TwoDCartesianZoneStruct::Type;
 using TwoDCartesianVertexStruct        = Structs::TwoDCartesianVertexStruct::Type;
 using ZoneInformationStruct            = Structs::ZoneInformationStruct::Type;
 using ZoneTriggerControlStruct         = Structs::ZoneTriggerControlStruct::Type;
+using ActionReturnStatus               = DataModel::ActionReturnStatus;
+using AttributeEntry                   = DataModel::AttributeEntry;
+using AcceptedCommandEntry             = DataModel::AcceptedCommandEntry;
 
-class ZoneMgmtServer;
+class ZoneManagementCluster;
 
 struct TwoDCartesianZoneStorage : TwoDCartesianZoneStruct
 {
-    TwoDCartesianZoneStorage(){};
+    TwoDCartesianZoneStorage() = default;
 
     TwoDCartesianZoneStorage(const CharSpan & aName, ZoneUseEnum aUse, const std::vector<TwoDCartesianVertexStruct> & aVertices,
                              Optional<CharSpan> aColor)
@@ -87,7 +85,7 @@ struct TwoDCartesianZoneStorage : TwoDCartesianZoneStruct
 
 struct ZoneInformationStorage : ZoneInformationStruct
 {
-    ZoneInformationStorage(){};
+    ZoneInformationStorage() = default;
 
     ZoneInformationStorage(const uint16_t & aZoneID, ZoneTypeEnum aZoneType, ZoneSourceEnum aZoneSource,
                            const Optional<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage)
@@ -217,12 +215,12 @@ public:
 
     virtual CHIP_ERROR LoadTriggers(std::vector<ZoneTriggerControlStruct> & aTriggers) = 0;
 
-    ZoneMgmtServer * GetZoneMgmtServer() const { return mZoneMgmtServer; }
+    ZoneManagementCluster * GetZoneMgmtServer() const { return mZoneMgmtServer; }
 
 private:
-    friend class ZoneMgmtServer;
+    friend class ZoneManagementCluster;
 
-    ZoneMgmtServer * mZoneMgmtServer = nullptr;
+    ZoneManagementCluster * mZoneMgmtServer = nullptr;
 
     /**
      * This method is used by the SDK to ensure the delegate points to the server instance it's associated with.
@@ -231,10 +229,10 @@ private:
      *
      * @param aZoneMgmtServer  A pointer to the ZoneMgmtServer object related to this delegate object.
      */
-    void SetZoneMgmtServer(ZoneMgmtServer * aZoneMgmtServer) { mZoneMgmtServer = aZoneMgmtServer; }
+    void SetZoneMgmtServer(ZoneManagementCluster * aZoneMgmtServer) { mZoneMgmtServer = aZoneMgmtServer; }
 };
 
-class ZoneMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
+class ZoneManagementCluster : public DefaultServerCluster
 {
 public:
     /**
@@ -256,10 +254,11 @@ public:
      * @param aTwoDCartesianMax                 The maximum X and Y points that are allowed for TwoD Cartesian Zones.
      *
      */
-    ZoneMgmtServer(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures, uint8_t aMaxUserDefinedZones,
-                   uint8_t aMaxZones, uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax);
+    ZoneManagementCluster(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
+                          uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
+                          const TwoDCartesianVertexStruct & aTwoDCartesianMax);
 
-    ~ZoneMgmtServer() override;
+    ~ZoneManagementCluster() override;
 
     /**
      * @brief Initialise the Zone Management server instance.
@@ -269,6 +268,19 @@ public:
      */
     CHIP_ERROR Init();
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType shutdownType) override;
+
+    ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder) override;
+    ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder) override;
+
+    std::optional<ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
+                                                    CommandHandler * handler) override;
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<AttributeEntry> & builder) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+
     bool HasFeature(Feature feature) const;
 
     // Attribute Setters
@@ -276,9 +288,7 @@ public:
 
     // Attribute Getters
     const std::vector<ZoneInformationStorage> & GetZones() const { return mZones; }
-
     const std::vector<ZoneTriggerControlStruct> & GetTriggers() const { return mTriggers; }
-
     const Optional<ZoneTriggerControlStruct> GetTriggerForZone(uint16_t zoneID);
 
     uint8_t GetMaxUserDefinedZones() const { return mMaxUserDefinedZones; }
@@ -301,6 +311,8 @@ public:
 private:
     Delegate & mDelegate;
     EndpointId mEndpointId;
+    ServerClusterRegistration mRegistration;
+
     const BitFlags<Feature> mFeatures;
 
     // Attributes
@@ -310,33 +322,23 @@ private:
     const TwoDCartesianVertexStruct mTwoDCartesianMax;
     uint8_t mUserDefinedZonesCount = 0;
 
+    bool mSensitivityConfiguredByApp = false;
+    bool mIsRegistered               = false;
     std::vector<ZoneInformationStorage> mZones;
     std::vector<ZoneTriggerControlStruct> mTriggers;
-    uint8_t mSensitivity = 0;
+    uint8_t mSensitivity = 1;
 
-    /**
-     * IM-level implementation of read
-     * @return appropriately mapped CHIP_ERROR if applicable
-     */
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-    /**
-     * IM-level implementation of write
-     * @return appropriately mapped CHIP_ERROR if applicable
-     */
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-
+    CHIP_ERROR ValidateConfiguration() const;
     /**
      * Helper function that loads all the persistent attributes from the KVS.
      */
     void LoadPersistentAttributes();
+    void NotifyClusterAttributeChanged(AttributeId attributeId);
 
     CHIP_ERROR ReadAndEncodeZones(const AttributeValueEncoder::ListEncodeHelper & encoder);
-
     CHIP_ERROR ReadAndEncodeTriggers(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     Protocols::InteractionModel::Status ValidateTwoDCartesianZone(const TwoDCartesianZoneDecodableStruct & zone);
-
     Protocols::InteractionModel::Status ValidateTrigger(const ZoneTriggerControlStruct & trigger);
 
     // Utility that matches a given zone's ZoneUse and verices with the given
@@ -349,21 +351,18 @@ private:
     bool ZoneAlreadyExists(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices,
                            const DataModel::Nullable<uint16_t> & excludeZoneId);
 
-    /**
-     * @brief Inherited from CommandHandlerInterface
-     */
-    void InvokeCommand(HandlerContext & ctx) override;
+    std::optional<ActionReturnStatus> HandleCreateTwoDCartesianZone(
+        const ConcreteCommandPath & requestPath, CommandHandler * handler,
+        const Commands::CreateTwoDCartesianZone::DecodableType & req);
 
-    void HandleCreateTwoDCartesianZone(HandlerContext & ctx, const Commands::CreateTwoDCartesianZone::DecodableType & req);
+    ActionReturnStatus HandleUpdateTwoDCartesianZone(const Commands::UpdateTwoDCartesianZone::DecodableType & req);
+    ActionReturnStatus HandleRemoveZone(const Commands::RemoveZone::DecodableType & req);
+    ActionReturnStatus HandleCreateOrUpdateTrigger(const Commands::CreateOrUpdateTrigger::DecodableType & req);
+    ActionReturnStatus HandleRemoveTrigger(const Commands::RemoveTrigger::DecodableType & req);
 
-    void HandleUpdateTwoDCartesianZone(HandlerContext & ctx, const Commands::UpdateTwoDCartesianZone::DecodableType & req);
-
-    void HandleRemoveZone(HandlerContext & ctx, const Commands::RemoveZone::DecodableType & req);
-
-    void HandleCreateOrUpdateTrigger(HandlerContext & ctx, const Commands::CreateOrUpdateTrigger::DecodableType & req);
-
-    void HandleRemoveTrigger(HandlerContext & ctx, const Commands::RemoveTrigger::DecodableType & req);
 };
+
+using ZoneMgmtServer = ZoneManagementCluster;
 
 } // namespace ZoneManagement
 } // namespace Clusters
