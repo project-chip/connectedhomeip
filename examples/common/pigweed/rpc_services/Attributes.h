@@ -259,11 +259,7 @@ public:
     {
         app::ConcreteAttributePath path(request.endpoint, request.cluster, request.attribute_id);
         MutableByteSpan tlvBuffer(response.tlv_data.bytes);
-        ChipLogProgress(Support, "DEBUG_DEBUG In ::pw::Status Read Reading Cluster=%d Attribute=%d", path.mClusterId,
-                        path.mAttributeId);
         PW_TRY(ReadAttributeIntoTlvBuffer(path, tlvBuffer));
-        ChipLogProgress(Support, "DEBUG_DEBUG In ::pw::Status Read Reading Cluster=%d Attribute=%d. Attribute read successfully.",
-                        path.mClusterId, path.mAttributeId);
         // NOTE: TLV will be a full AttributeReportIB (so not purely the data)
         response.tlv_data.size = tlvBuffer.size();
         response.has_tlv_data  = true;
@@ -299,15 +295,7 @@ public:
             response.which_data = chip_rpc_AttributeData_data_int8_tag;
             break;
         case chip_rpc_AttributeType_ZCL_INT16S_ATTRIBUTE_TYPE:
-            ChipLogProgress(Support,
-                            "DEBUG_DEBUG In ::pw::Status Read Reading Cluster=%d Attribute=%d. In "
-                            "chip_rpc_AttributeType_ZCL_INT16S_ATTRIBUTE_TYPE.",
-                            path.mClusterId, path.mAttributeId);
             PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_SignedInteger, response.data.data_int16));
-            ChipLogProgress(Support,
-                            "DEBUG_DEBUG In ::pw::Status Read Reading Cluster=%d Attribute=%d. In "
-                            "TlvBufferGetData was successful.",
-                            path.mClusterId, path.mAttributeId);
             response.which_data = chip_rpc_AttributeData_data_int16_tag;
             break;
         case chip_rpc_AttributeType_ZCL_INT32S_ATTRIBUTE_TYPE:
@@ -414,41 +402,24 @@ private:
 
         if (!info.has_value())
         {
-            ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d !info.has_value(). Returning NOT_FOUND",
-                            path.mClusterId, path.mAttributeId);
             return ::pw::Status::NotFound();
         }
 
         app::AttributeValueEncoder encoder(attributeReports, subjectDescriptor, path, info->dataVersion,
                                            false /* isFabricFiltered */, nullptr /* attributeEncodingState */);
-
-        ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d", path.mClusterId, path.mAttributeId);
         app::DataModel::ActionReturnStatus result = provider->ReadAttribute(request, encoder);
-        ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. Done READING", path.mClusterId, path.mAttributeId);
+
         if (!result.IsSuccess())
         {
-            ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. Not successful", path.mClusterId,
-                            path.mAttributeId);
             app::DataModel::ActionReturnStatus::StringStorage storage;
             ChipLogError(Support, "Failed to read data: %s", result.c_str(storage));
             return ::pw::Status::Internal();
         }
-        ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. Read was sccessful", path.mClusterId,
-                        path.mAttributeId);
 
         attributeReports.EndOfContainer();
-        ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. attributeReports.EndOfContainer(); Okay",
-                        path.mClusterId, path.mAttributeId);
         PW_TRY(ChipErrorToPwStatus(writer.EndContainer(outer)));
-        ChipLogProgress(Support,
-                        "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. PW_TRY(ChipErrorToPwStatus(writer.EndContainer(outer)));",
-                        path.mClusterId, path.mAttributeId);
         PW_TRY(ChipErrorToPwStatus(writer.Finalize()));
-        ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. PW_TRY(ChipErrorToPwStatus(writer.Finalize()));",
-                        path.mClusterId, path.mAttributeId);
         tlvBuffer.reduce_size(writer.GetLengthWritten());
-        ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. Everything Okay, Returning Success.",
-                        path.mClusterId, path.mAttributeId);
 
         return ::pw::OkStatus();
     }

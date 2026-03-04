@@ -131,7 +131,6 @@ BitFlags<ClusterQualityFlags> DefaultServerCluster::GetClusterFlags(const Concre
 
 ActionReturnStatus DefaultServerCluster::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
-    ChipLogProgress(Support, "DEBUG_DEBUG: InsideDefaultServerCluster::WriteAttribute for Cluster=%d", request.path.mClusterId);
     return Protocols::InteractionModel::Status::UnsupportedWrite;
 }
 

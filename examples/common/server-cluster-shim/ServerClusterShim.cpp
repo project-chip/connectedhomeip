@@ -249,14 +249,11 @@ DataModel::ActionReturnStatus ServerClusterShim::ReadAttribute(const DataModel::
     {
         return Status::Failure;
     }
-    ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d via AAI", request.path.mClusterId,
-                    request.path.mAttributeId);
+
     // Read via AAI
     std::optional<CHIP_ERROR> aai_result = TryReadViaAccessInterface(
         request.path, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);
     VerifyOrReturnError(!aai_result.has_value(), *aai_result);
-    ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d not found in AAI. Reading via ember",
-                    request.path.mClusterId, request.path.mAttributeId);
 
     // At this point, we have to use ember directly to read the data.
     EmberAfAttributeSearchRecord record;
@@ -266,8 +263,6 @@ DataModel::ActionReturnStatus ServerClusterShim::ReadAttribute(const DataModel::
     Protocols::InteractionModel::Status status = emAfReadOrWriteAttribute(
         &record, &attributeMetadata, gEmberAttributeIOBufferSpan.data(), static_cast<uint16_t>(gEmberAttributeIOBufferSpan.size()),
         /* write = */ false);
-    ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d Ember result: %d", request.path.mClusterId,
-                    request.path.mAttributeId, to_underlying(status));
 
     if (status != Protocols::InteractionModel::Status::Success)
     {
