@@ -19,14 +19,15 @@
 #pragma once
 
 #include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
+#include <app/persistence/AttributePersistenceMigration.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace UnitLocalization {
 
-CHIP_ERROR MigrateUnitLocalizationServerStorage(EndpointId endpointId, PersistentStorageDelegate & storageDelegate);
-
+CHIP_ERROR MigrateUnitLocalizationServerStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider, 
+                                                AttributePersistenceProvider & dstProvider);
 } // namespace UnitLocalization
 } // namespace Clusters
 } // namespace app

@@ -15,20 +15,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <app/clusters/unit-localization-server/MigrateUnitLocalizationServerStorage.h>
 #include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
-#include <app/persistence/AttributePersistenceMigration.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace UnitLocalization {
 
-CHIP_ERROR MigrateUnitLocalizationServerStorage(EndpointId endpointId, PersistentStorageDelegate & storageDelegate)
+CHIP_ERROR MigrateUnitLocalizationServerStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider, 
+                                                AttributePersistenceProvider & dstProvider)
 {
     static constexpr AttrMigrationData attributesToUpdate[] = { { Attributes::TemperatureUnit::Id,
                                                                   &DefaultMigrators::ScalarValue<uint8_t> } };
-    return MigrateFromSafeToAttributePersistenceProvider<sizeof(uint8_t)>({ endpointId, UnitLocalization::Id },
-                                                                          Span(attributesToUpdate), storageDelegate);
+    // We need to provide a buffer with enough space for the attributes that will be migrated.
+    uint8_t attributeBuffer[sizeof(uint8_t)] = {};
+    MutableByteSpan buffer(attributeBuffer);
+    return MigrateFromSafeToAttributePersistenceProvider(safeProvider, dstProvider, { endpointId, UnitLocalization::Id }, Span(attributesToUpdate), buffer);
 }
 
 } // namespace UnitLocalization

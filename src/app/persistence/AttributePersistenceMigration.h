@@ -15,9 +15,9 @@
  */
 
 #pragma once
-#include <app/DefaultSafeAttributePersistenceProvider.h>
-#include <app/persistence/AttributePersistence.h>
-#include <app/persistence/DefaultAttributePersistenceProvider.h>
+
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/SafeAttributePersistenceProvider.h>
 
 #include <cstring>
 
@@ -60,40 +60,7 @@ struct AttrMigrationData
 CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenceProvider & safeProvider,
                                                          AttributePersistenceProvider & dstProvider,
                                                          const ConcreteClusterPath & cluster,
-                                                         Span<const AttrMigrationData> attributes, MutableByteSpan & buffer);
-
-/**
- * @brief
- * This overload provides a simple function to migrate from the SafeAttributeProvider to the standard provider mechanism using
- * the same storageDelegate.
- *
- *
- * @param attributeBufferSize  The size of the buffer to use as temporary storage between providers
- * @param cluster              The concrete cluster path
- * @param attributes           The attributes that need to be migrated
- * @param storageDelegate      The storage delegate used for persistence
- *
- * @return CHIP_NO_ERROR                        On successful migration.
- *         CHIP_ERROR_HAD_FAILURES              There were errors during migration, some attributes might not be migrated.
- *
- */
-template <int attributeBufferSize>
-CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(const ConcreteClusterPath & cluster,
-                                                         Span<const AttrMigrationData> attributes,
-                                                         PersistentStorageDelegate & storageDelegate)
-{
-    DefaultSafeAttributePersistenceProvider safeProvider;
-
-    ReturnErrorOnFailure(safeProvider.Init(&storageDelegate));
-
-    DefaultAttributePersistenceProvider dstProvider;
-    ReturnErrorOnFailure(dstProvider.Init(&storageDelegate));
-
-    uint8_t attributeBuffer[attributeBufferSize] = {};
-    MutableByteSpan buffer(attributeBuffer);
-
-    return MigrateFromSafeToAttributePersistenceProvider(safeProvider, dstProvider, cluster, attributes, buffer);
-};
+                                                         Span<const AttrMigrationData> attributes, MutableByteSpan buffer);
 
 namespace DefaultMigrators {
 template <class T>

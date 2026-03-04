@@ -19,6 +19,7 @@
 #include <app/clusters/unit-localization-server/CodegenIntegration.h>
 #include <app/clusters/unit-localization-server/MigrateUnitLocalizationServerStorage.h>
 #include <app/clusters/unit-localization-server/UnitLocalizationCluster.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Server.h>
 #include <app/static-cluster-config/UnitLocalization.h>
 #include <clusters/UnitLocalization/Ids.h>
@@ -74,7 +75,13 @@ void MatterUnitLocalizationClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrReturn(endpointId == kRootEndpointId);
 
     // Migrate attributes for this cluster from SafeAttribute to AttributePersistence
-    LogErrorOnFailure(MigrateUnitLocalizationServerStorage(endpointId, chip::Server::GetInstance().GetPersistentStorage()));
+    // This cluster uses the DefaultSafeAttributePersistenceProvider
+    DefaultSafeAttributePersistenceProvider safeProvider;
+    LogErrorOnFailure(safeProvider.Init(&Server::GetInstance().GetPersistentStorage()));
+    // And the DefaultAttributePersistenceProvider
+    DefaultAttributePersistenceProvider dstProvider;
+    LogErrorOnFailure(dstProvider.Init(&Server::GetInstance().GetPersistentStorage()));
+    LogErrorOnFailure(MigrateUnitLocalizationServerStorage(endpointId, safeProvider, dstProvider));
 
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::RegisterServer(

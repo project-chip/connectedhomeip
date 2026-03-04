@@ -16,7 +16,9 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/ConcreteAttributePath.h>
+#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistenceMigration.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -339,48 +341,6 @@ TEST(TestAttributePersistenceMigration, TestMigrationWithEmptyAttributeList)
     EXPECT_EQ(MigrateFromSafeToAttributePersistenceProvider(safeRamProvider, ramProvider, cluster, Span<const AttrMigrationData>(),
                                                             buffer),
               CHIP_NO_ERROR);
-}
-
-// Template overload: end-to-end migration using the convenience wrapper.
-TEST(TestAttributePersistenceMigration, TestTemplateOverload)
-{
-    TestPersistentStorageDelegate storageDelegate;
-    DefaultSafeAttributePersistenceProvider safeRamProvider;
-    ASSERT_EQ(safeRamProvider.Init(&storageDelegate), CHIP_NO_ERROR);
-
-    const ConcreteAttributePath path(1, 2, 3);
-    const ConcreteClusterPath cluster(1, 2);
-    constexpr uint32_t kValueToStore = 55;
-
-    ASSERT_EQ(safeRamProvider.WriteScalarValue(path, kValueToStore), CHIP_NO_ERROR);
-
-    const AttrMigrationData attributesToMigrate[] = {
-        { 3, &DefaultMigrators::ScalarValue<uint32_t> },
-    };
-    EXPECT_EQ(MigrateFromSafeToAttributePersistenceProvider<sizeof(uint32_t)>(cluster, Span(attributesToMigrate), storageDelegate),
-              CHIP_NO_ERROR);
-
-    // Verify by creating a new normal provider and reading back
-    {
-        DefaultAttributePersistenceProvider ramProvider;
-        ASSERT_EQ(ramProvider.Init(&storageDelegate), CHIP_NO_ERROR);
-
-        uint8_t readBuf[sizeof(uint32_t)] = {};
-        MutableByteSpan readBuffer(readBuf);
-        EXPECT_EQ(ramProvider.ReadValue(path, readBuffer), CHIP_NO_ERROR);
-
-        uint32_t readValue = 0;
-        ASSERT_EQ(readBuffer.size(), sizeof(uint32_t));
-        memcpy(&readValue, readBuffer.data(), sizeof(uint32_t));
-        EXPECT_EQ(readValue, kValueToStore);
-    }
-
-    // Safe provider should have the value deleted
-    {
-        uint8_t readBuf[sizeof(uint32_t)] = {};
-        MutableByteSpan readBuffer(readBuf);
-        EXPECT_EQ(safeRamProvider.SafeReadValue(path, readBuffer), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    }
 }
 
 // Migration using DefaultMigrators::SafeValue which reads raw bytes via SafeReadValue.

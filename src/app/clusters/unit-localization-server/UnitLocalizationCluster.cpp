@@ -100,6 +100,8 @@ DataModel::ActionReturnStatus UnitLocalizationCluster::ReadAttribute(const DataM
 
 CHIP_ERROR UnitLocalizationCluster::SetTemperatureUnit(TempUnitEnum newTempUnit)
 {
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     bool isValid       = false;
     const auto & units = GetSupportedTemperatureUnits();
     for (auto const & unit : units)
