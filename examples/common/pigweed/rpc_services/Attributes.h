@@ -433,6 +433,8 @@ private:
         ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. PW_TRY(ChipErrorToPwStatus(writer.Finalize()));",
                         path.mClusterId, path.mAttributeId);
         tlvBuffer.reduce_size(writer.GetLengthWritten());
+        ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. Everything Okay, Returning Success.",
+                        path.mClusterId, path.mAttributeId);
 
         return ::pw::OkStatus();
     }
