@@ -410,9 +410,11 @@ private:
 
         ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d", path.mClusterId, path.mAttributeId);
         app::DataModel::ActionReturnStatus result = provider->ReadAttribute(request, encoder);
-
+        ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. Done READING", path.mClusterId, path.mAttributeId);
         if (!result.IsSuccess())
         {
+            ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. Not successful", path.mClusterId,
+                            path.mAttributeId);
             app::DataModel::ActionReturnStatus::StringStorage storage;
             ChipLogError(Support, "Failed to read data: %s", result.c_str(storage));
             return ::pw::Status::Internal();
