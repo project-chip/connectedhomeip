@@ -144,7 +144,7 @@ CHIP_ERROR se05x_set_certificate(uint32_t keyId, const uint8_t * buf, size_t buf
 
 /**
  * @brief Set binary data in se05x.
- * The certificate is stored with transient option. The contents are lost on session close.
+ * The certificate is stored with Persistent option. The contents are lost on session close.
  * @param[in] keyid - Key id of the object.
  * @param[in] buf - Buffer containing binary data.
  * @param[in] buflen - Buffer length.

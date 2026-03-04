@@ -49,6 +49,7 @@ config("app-main-config") {
     "../",
     "../../../linux",
     "${chip_root}/src/platform/nxp/crypto/se05x",
+    "${chip_root}/examples/platform/nxp/common/app_se05x/include",
   ]
 }
 
@@ -201,6 +202,10 @@ source_set("app-main") {
     "SE05X_SPAKE_VERIFIER_TP_ITER_CNT=$chip_se05x_spake_verifier_tp_iter_cnt",
   ]
 
+  defines += [
+    "CONFIG_CHIP_SE05X=1",
+  ]
+
   sources = [
     "../../../linux/AppMain.h",
     "../../../linux/CommissionableInit.cpp",
@@ -209,6 +214,9 @@ source_set("app-main") {
     "../../../linux/NamedPipeCommands.h",
     "../DeviceAttestationSe05xCredsExample.cpp",
     "AppMain.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/mcu_kvs/NFCDataRetrievalInfo.cpp",
+    "${chip_root}/src/platform/nxp/crypto/se05x/kvs_utilities/CHIPCryptoPALHsm_se05x_readClusters.cpp",
+    "${chip_root}/examples/platform/nxp/common/app_se05x/source/AppSe05xCustom.cpp"
   ]
 
   public_deps = [
