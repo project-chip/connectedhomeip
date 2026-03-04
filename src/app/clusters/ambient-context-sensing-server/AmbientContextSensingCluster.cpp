@@ -668,7 +668,8 @@ static uint8_t TagToIndex(const chip::Span<const T> & SpanId, T tag)
 /*
     Return error if
     1. The feature of the AmbientContextTypeSupported item is not set
-    2. The duplicate ones
+    2. A SemanticTagType is duplicated
+    3. The namespaceId is not known
 */
 CHIP_ERROR AmbientContextSensingCluster::CheckInputSupportedType(const std::vector<SemanticTagType> & ACTSupportedList)
 {
