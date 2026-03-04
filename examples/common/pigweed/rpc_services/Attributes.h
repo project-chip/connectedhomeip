@@ -419,6 +419,8 @@ private:
             ChipLogError(Support, "Failed to read data: %s", result.c_str(storage));
             return ::pw::Status::Internal();
         }
+        ChipLogProgress(Support, "DEBUG_DEBUG Reading Cluster=%d Attribute=%d. Read was sccessful", path.mClusterId,
+                        path.mAttributeId);
 
         attributeReports.EndOfContainer();
         PW_TRY(ChipErrorToPwStatus(writer.EndContainer(outer)));
