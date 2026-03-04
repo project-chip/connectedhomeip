@@ -19543,23 +19543,15 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportProviderCluster(Attrib
                 newElement_0.peerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.peerNodeID];
                 newElement_0.peerEndpointID = [NSNumber numberWithUnsignedShort:entry_0.peerEndpointID];
                 newElement_0.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.streamUsage)];
-                if (entry_0.videoStreamID.HasValue()) {
-                    if (entry_0.videoStreamID.Value().IsNull()) {
-                        newElement_0.videoStreamID = nil;
-                    } else {
-                        newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID.Value().Value()];
-                    }
-                } else {
+                if (entry_0.videoStreamID.IsNull()) {
                     newElement_0.videoStreamID = nil;
-                }
-                if (entry_0.audioStreamID.HasValue()) {
-                    if (entry_0.audioStreamID.Value().IsNull()) {
-                        newElement_0.audioStreamID = nil;
-                    } else {
-                        newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value().Value()];
-                    }
                 } else {
+                    newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID.Value()];
+                }
+                if (entry_0.audioStreamID.IsNull()) {
                     newElement_0.audioStreamID = nil;
+                } else {
+                    newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value()];
                 }
                 newElement_0.metadataEnabled = [NSNumber numberWithBool:entry_0.metadataEnabled];
                 if (entry_0.videoStreams.HasValue()) {
@@ -19646,23 +19638,15 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportRequestorCluster(Attri
                 newElement_0.peerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.peerNodeID];
                 newElement_0.peerEndpointID = [NSNumber numberWithUnsignedShort:entry_0.peerEndpointID];
                 newElement_0.streamUsage = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.streamUsage)];
-                if (entry_0.videoStreamID.HasValue()) {
-                    if (entry_0.videoStreamID.Value().IsNull()) {
-                        newElement_0.videoStreamID = nil;
-                    } else {
-                        newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID.Value().Value()];
-                    }
-                } else {
+                if (entry_0.videoStreamID.IsNull()) {
                     newElement_0.videoStreamID = nil;
-                }
-                if (entry_0.audioStreamID.HasValue()) {
-                    if (entry_0.audioStreamID.Value().IsNull()) {
-                        newElement_0.audioStreamID = nil;
-                    } else {
-                        newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value().Value()];
-                    }
                 } else {
+                    newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID.Value()];
+                }
+                if (entry_0.audioStreamID.IsNull()) {
                     newElement_0.audioStreamID = nil;
+                } else {
+                    newElement_0.audioStreamID = [NSNumber numberWithUnsignedShort:entry_0.audioStreamID.Value()];
                 }
                 newElement_0.metadataEnabled = [NSNumber numberWithBool:entry_0.metadataEnabled];
                 if (entry_0.videoStreams.HasValue()) {
