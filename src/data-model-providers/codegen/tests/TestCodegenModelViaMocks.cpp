@@ -463,6 +463,7 @@ const MockNodeConfig gTestNodeConfig({
         }, {
             { kDeviceTypeId2, kDeviceTypeId2Version},
         },
+        {}, // empty semantic tags
         EndpointComposition::kTree,
         "shortUniqueId"_span
     ),
@@ -640,7 +641,7 @@ const MockNodeConfig gTestNodeConfig({
         },
         {}, // Empty semantic tags
         EndpointComposition::kTree,
-        "AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"_span, // endpoint unique id (if applicable)
+        "AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"_span // endpoint unique id (if applicable)
     ),
 });
 // clang-format on
@@ -3017,6 +3018,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
     EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
     EXPECT_SUCCESS(model.Shutdown());
 }
+
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 TEST_F(TestCodegenModelViaMocks, EndpointUniqueID)
 {
