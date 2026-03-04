@@ -50,7 +50,7 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
         ChipError attributeMigrationError = entry.migrator(attrPath, safeProvider, copyOfBuffer);
         if (attributeMigrationError != CHIP_NO_ERROR)
         {
-            // If the value was not found in SafeAttributePersistence, it means that it was already migrated or that 
+            // If the value was not found in SafeAttributePersistence, it means that it was already migrated or that
             // there wasn't a value stored for this attribute in the first place, so we skip it.
             if (attributeMigrationError != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {

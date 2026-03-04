@@ -24,7 +24,7 @@ namespace app {
 namespace Clusters {
 namespace UnitLocalization {
 
-CHIP_ERROR MigrateUnitLocalizationServerStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider, 
+CHIP_ERROR MigrateUnitLocalizationServerStorage(EndpointId endpointId, SafeAttributePersistenceProvider & safeProvider,
                                                 AttributePersistenceProvider & dstProvider)
 {
     static constexpr AttrMigrationData attributesToUpdate[] = { { Attributes::TemperatureUnit::Id,
