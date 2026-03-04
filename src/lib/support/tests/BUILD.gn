@@ -58,7 +58,7 @@ chip_test_suite("tests") {
     "TestSafeInt.cpp",
     "TestSafeString.cpp",
     "TestScoped.cpp",
-    "TestScopedBuffer.cpp",
+    "TestScopedMemoryBuffer.cpp",
     "TestSorting.cpp",
     "TestSpan.cpp",
     "TestSpanSearchValue.cpp",

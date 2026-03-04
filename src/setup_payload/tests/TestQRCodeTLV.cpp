@@ -21,7 +21,7 @@
 #include <nlbyteorder.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;

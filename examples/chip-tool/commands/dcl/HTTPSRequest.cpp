@@ -24,8 +24,9 @@
 
 #include <lib/support/Base64.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <stdlib.h>
 #include <system/SystemError.h>
 
 #ifdef CONFIG_ENABLE_HTTPS_REQUESTS
@@ -346,7 +347,7 @@ CHIP_ERROR ExtractHostAndPort(const std::string & hostAndPort, std::string & out
     {
         outHostName     = hostAndPort.substr(0, position);
         auto portString = hostAndPort.substr(position + 1);
-        outPort         = static_cast<uint16_t>(std::atoi(portString.c_str()));
+        outPort         = static_cast<uint16_t>(strtol(portString.c_str(), nullptr, 10));
         VerifyOrReturnError(0 != outPort, CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(chipTool, "%s", kErrorHTTPSPort));
     }
 
