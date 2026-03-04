@@ -22,10 +22,10 @@
 
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 #include <app/data-model/Nullable.h>
 #include <pigweed/rpc_services/AccessInterceptor.h>
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
-#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
 namespace chip {
 namespace app {
@@ -39,16 +39,15 @@ namespace Chef {
 class AttributeAccessor : public chip::rpc::PigweedDebugAccessInterceptor
 {
 public:
-    std::optional<::pw::Status> Write(const chip::app::ConcreteDataAttributePath & path,
-                                      chip::app::AttributeValueDecoder & decoder) override
+    std::optional<::pw::Status> Write(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder) override
     {
         ChipLogProgress(Zcl, "Inside AttributeAccessor::Write for Cluster: %d , Attribute: %d", path.mClusterId, path.mAttributeId);
         switch (path.mClusterId)
         {
-        case chip::app::Clusters::TemperatureMeasurement::Id:
+        case TemperatureMeasurement::Id:
             switch (path.mAttributeId)
             {
-            case chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Id: {
+            case TemperatureMeasurement::Attributes::MeasuredValue::Id: {
                 DataModel::Nullable<int16_t> measuredValue;
                 CHIP_ERROR err = decoder.Decode(measuredValue);
                 if (err != CHIP_NO_ERROR)
