@@ -22,6 +22,7 @@ source_set("clusters") {
     "basic-information",
     "boolean-state-configuration-server",
     "boolean-state-server",
+    "bridged-device-basic-information-server",
     "camera-av-settings-user-level-management-server",
     "chime-server",
     "descriptor",
@@ -37,6 +38,7 @@ source_set("clusters") {
     "occupancy-sensor-server",
     "on-off-server",
     "operational-credentials-server",
+    "push-av-stream-transport-server",
     "scenes-server",
     "software-diagnostics-server",
     "temperature-measurement-server",
@@ -48,7 +50,7 @@ source_set("clusters") {
     # keep-sorted: end
   ]
 
-  if (chip_device_platform != "ameba") {
+  if (chip_device_platform == "ameba") {
     # Ameba/Realtek overrides various things in c-headers that are C++ standard items. Generally
     # these get pulled via LWIP and end up overriding things like true/false/isalpha by macros.
     #
@@ -65,6 +67,12 @@ source_set("clusters") {
     # INFO          |     ^~~~~~~
     # INFO    /opt/ameba/ambd_sdk_with_chip_non_NDA/component/soc/realtek/amebad/swlib/string/strproc.h:26:30: error: expected ')' before '>=' token
     # INFO       26 | #define isupper(c)      (((c)>='A')&&((c)<='Z'))
-    public_deps += [ "push-av-stream-transport-server" ]
+    public_deps -= [ "push-av-stream-transport-server" ]
+  }
+
+  if (chip_device_platform == "darwin") {
+    # Darwin does not include the uriparser submodule, which is required by
+    # push-av-stream-transport-server.
+    public_deps -= [ "push-av-stream-transport-server" ]
   }
 }

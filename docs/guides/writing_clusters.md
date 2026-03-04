@@ -85,6 +85,50 @@ cluster is a good example of this pattern.
         interactions. We recommend the term `Driver` to avoid confusion with the
         overloaded term `Delegate`.
 
+### Design Principles
+
+When designing and implementing a cluster, adhere to the following principles to
+ensure a high-quality and developer-friendly experience:
+
+#### Prioritize Easy Application Development
+
+Clusters should aim to do as much work as possible autonomously, reducing the
+burden on the application developer.
+
+-   **Handle Common Logic Internally:** Implement persistence (NVM), timers, and
+    complex state machines within the cluster itself. The application should
+    only be notified of significant events or changes it needs to act upon. _For
+    example, a state machine managing a multi-step process like a firmware
+    update, door lock/unlock sequence with retries, or a calibration procedure
+    should typically reside within the cluster, rather than requiring the
+    application to manage the intermediate steps and timeouts._
+-   **Provide Helper Abstractions:** If a cluster requires the application to
+    implement complex logic, consider providing helper classes or default
+    implementations that simplify the task.
+-   **Encapsulate Complexity:** Avoid deferring low-level details (like raw
+    storage keys or individual timer management) to the application.
+
+#### Delegate/Driver Pattern for Validation
+
+When an application needs to be involved in a cluster operation (especially
+writes or commands), use a delegate (or driver) interface that acts as a
+"pre-check."
+
+-   **Pre-Write Validation:** For writable attributes, provide a callback that
+    allows the application to accept or reject the new value _before_ it is
+    applied to the cluster's internal state or persisted.
+-   **Delegate Veto:** Callbacks must return a
+    `Protocols::InteractionModel::Status`. Returning any status other than
+    Success allows the application to reject the proposed change. The cluster
+    MUST honor this by failing the operation and propagating the delegate's
+    status code to the initiator.
+-   **Perform Cluster-Level Checks First:** The cluster remains responsible for
+    all spec-defined validations (e.g., range checks, constraint validations, or
+    state-based restrictions) before involving the application delegate.
+-   **Avoid Redundant Notifications:** Ensure that no-op operations (e.g.,
+    writing the same value that is already present) are handled early and do not
+    trigger delegate callbacks or change notifications.
+
 ### Choosing the Right Implementation Pattern
 
 When implementing a cluster, you have two primary architectural choices: a
@@ -267,22 +311,27 @@ attribute's value changes.
     -   For the `NotifyAttributeChangedIfSuccess` ensure that WriteImpl is
         returning
         [ActionReturnStatus::FixedStatus::kWriteSuccessNoOp](https://github.com/project-chip/connectedhomeip/blob/master/src/app/data-model-provider/ActionReturnStatus.h)
-        when no notification should be sent (e.g. write was a `noop` because
-        existing value was already the same).
+        when no notification should be sent.
+
+        **Crucial:** No-op writes (where the value remains unchanged) MUST NOT
+        trigger:
+
+        -   Network attribute change notifications.
+        -   Application-level delegate/driver callbacks.
 
         Canonical example is:
 
         ```cpp
-        VerifyOrReturnValue(mValue != value, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+        VerifyOrReturnValue(mValue != newValue, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         ```
 
 -   **OnClusterAttributeChanged Pattern:** Each cluster should implement a
     centralized helper method (e.g., `OnClusterAttributeChanged(AttributeId)`)
     that combines both network and application notifications.
     -   Call `NotifyAttributeChanged()` to notify network subscribers.
-    -   Call delegate callbacks to notify the application layer.
-    -   Invoke this method from `WriteAttribute`, `InvokeCommand`, and setter
-        methods.
+    -   Call delegate callbacks to notify the application layer of the _actual_
+        change.
+    -   Invoke this method only when a value has truly changed.
     -   **Example:** See
         [Boolean State Configuration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h)
         which declares `OnClusterAttributeChanged(AttributeId)` as a private

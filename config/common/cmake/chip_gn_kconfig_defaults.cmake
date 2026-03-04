@@ -30,7 +30,7 @@ matter_add_gn_arg_bool("chip_inet_config_enable_tcp_endpoint" CONFIG_CHIP_INET_E
 matter_add_gn_arg_bool("chip_error_logging" CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 1)
 matter_add_gn_arg_bool("chip_progress_logging" CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 3)
 matter_add_gn_arg_bool("chip_detail_logging" CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
-matter_add_gn_arg_bool("chip_automation_logging" FALSE)
+matter_add_gn_arg_bool("chip_automation_logging" CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 5)
 matter_add_gn_arg_bool("chip_malloc_sys_heap" CONFIG_CHIP_MALLOC_SYS_HEAP)
 matter_add_gn_arg_bool("chip_enable_wifi" CONFIG_CHIP_WIFI)
 matter_add_gn_arg_bool("chip_enable_ethernet" CONFIG_CHIP_ETHERNET)
