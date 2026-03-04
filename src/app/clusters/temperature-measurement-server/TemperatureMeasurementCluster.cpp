@@ -32,8 +32,7 @@ constexpr uint16_t kMaxTolerance = 2048;
 TemperatureMeasurementCluster::TemperatureMeasurementCluster(EndpointId endpointId,
                                                              const OptionalAttributeSet & optionalAttributeSet,
                                                              const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, TemperatureMeasurement::Id }),
-    mOptionalAttributeSet(optionalAttributeSet)
+    DefaultServerCluster({ endpointId, TemperatureMeasurement::Id }), mOptionalAttributeSet(optionalAttributeSet)
 {
     if (!config.minMeasuredValue.IsNull())
     {
@@ -63,6 +62,7 @@ DataModel::ActionReturnStatus TemperatureMeasurementCluster::ReadAttribute(const
     case FeatureMap::Id:
         return encoder.Encode<uint32_t>(0);
     case MeasuredValue::Id:
+        ChipLogProgress(Support, "DEBUG_DEBUG Reading and encoding MeasuredValue emperatureMeasurementCluster::ReadAttribute");
         return encoder.Encode(mMeasuredValue);
     case MinMeasuredValue::Id:
         return encoder.Encode(mMinMeasuredValue);
