@@ -78,13 +78,17 @@ public:
     CHIP_ERROR ReadUsedMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 
     Protocols::InteractionModel::Status JoinGroup(FabricIndex fabric_index,
-                                                  const Groupcast::Commands::JoinGroup::DecodableType & data, const chip::Access::SubjectDescriptor & subjectDescriptor);
-    Protocols::InteractionModel::Status
-    LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList & endpoints, const chip::Access::SubjectDescriptor & subjectDescriptor);
+                                                  const Groupcast::Commands::JoinGroup::DecodableType & data,
+                                                  const chip::Access::SubjectDescriptor & subjectDescriptor);
+    Protocols::InteractionModel::Status LeaveGroup(FabricIndex fabric_index,
+                                                   const Groupcast::Commands::LeaveGroup::DecodableType & data,
+                                                   EndpointList & endpoints,
+                                                   const chip::Access::SubjectDescriptor & subjectDescriptor);
     Protocols::InteractionModel::Status UpdateGroupKey(FabricIndex fabric_index,
                                                        const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
     Protocols::InteractionModel::Status
-    ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data, const chip::Access::SubjectDescriptor & subjectDescriptor);
+    ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data,
+                          const chip::Access::SubjectDescriptor & subjectDescriptor);
 
     void SetDataModelProvider(DataModel::Provider & provider) { mDataModelProvider = &provider; }
     void ResetDataModelProvider() { mDataModelProvider = nullptr; }
@@ -106,7 +110,8 @@ private:
                                                   const chip::Optional<chip::ByteSpan> & key);
     Protocols::InteractionModel::Status RemoveGroup(FabricIndex fabric_index, GroupId group_id,
                                                     const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                                                    EndpointList * endpoints, const chip::Access::SubjectDescriptor & subjectDescriptor);
+                                                    EndpointList * endpoints,
+                                                    const chip::Access::SubjectDescriptor & subjectDescriptor);
     Protocols::InteractionModel::Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id,
                                                             EndpointList * endpoints);
     void UpdateUsedMcastAddrCount();

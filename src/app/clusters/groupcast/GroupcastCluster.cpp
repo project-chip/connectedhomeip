@@ -1,11 +1,11 @@
 #include "GroupcastCluster.h"
 #include <access/AccessControl.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/AccessControl/Events.h>
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groupcast/Attributes.h>
 #include <clusters/Groupcast/Metadata.h>
 #include <credentials/GroupDataProvider.h>
-#include <clusters/AccessControl/Events.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 
@@ -332,7 +332,8 @@ CHIP_ERROR GroupcastCluster::ReadUsedMcastAddrCount(EndpointId endpoint, Attribu
     return aEncoder.Encode(mUsedMcastAddrCount);
 }
 
-Status GroupcastCluster::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data, const chip::Access::SubjectDescriptor & subjectDescriptor)
+Status GroupcastCluster::JoinGroup(FabricIndex fabric_index, const Groupcast::Commands::JoinGroup::DecodableType & data,
+                                   const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     GroupDataProvider & groups = Provider();
     CHIP_ERROR err             = CHIP_NO_ERROR;
@@ -497,7 +498,8 @@ Status GroupcastCluster::UpdateGroupKey(FabricIndex fabric_index, const Groupcas
 }
 
 Status GroupcastCluster::ConfigureAuxiliaryACL(FabricIndex fabric_index,
-                                               const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data, const chip::Access::SubjectDescriptor & subjectDescriptor)
+                                               const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data,
+                                               const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     GroupDataProvider & groups = Provider();
     CHIP_ERROR err             = CHIP_NO_ERROR;
@@ -584,7 +586,8 @@ Status GroupcastCluster::SetKeySet(FabricIndex fabric_index, GroupId group_id, K
 }
 
 Status GroupcastCluster::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
-                                     const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList * endpoints, const chip::Access::SubjectDescriptor & subjectDescriptor)
+                                     const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList * endpoints,
+                                     const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     GroupDataProvider & groups = Provider();
     Status stat                = Status::Success;
