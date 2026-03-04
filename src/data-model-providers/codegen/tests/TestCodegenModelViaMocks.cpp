@@ -436,36 +436,36 @@ const MockNodeConfig gTestNodeConfig({
         { MakeNullable(VendorId::TestVendor3), kNamespaceID3, kTag3, NullOptional},
     }),
     MockEndpointConfig(kMockEndpoint2, {
-        MockClusterConfig(MockClusterId(1), {
-            ClusterRevision::Id, FeatureMap::Id,
-        }),
-        MockClusterConfig(
-            MockClusterId(2),
-            {
-               ClusterRevision::Id,
-               FeatureMap::Id,
-               MockAttributeId(1),
-               MockAttributeConfig(MockAttributeId(2), ZCL_ARRAY_ATTRIBUTE_TYPE),
-            },          /* attributes */
-            {},         /* events */
-            {1, 2, 23}, /* acceptedCommands */
-            {2, 10}     /* generatedCommands */
-        ),
-        MockClusterConfig(
-            MockClusterId(3),
-            {
-                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
-            },    /* attributes */
-            {},   /* events */
-            {11}, /* acceptedCommands */
-            {4, 6},   /* generatedCommands */
-            BitMask<MockClusterSide>().Set(MockClusterSide::kClient).Set(MockClusterSide::kServer)
-        ),
-        MockClusterConfig(MockClusterId(4), {}, {}, {}, {}, MockClusterSide::kClient),
-    }, {
-        { kDeviceTypeId2, kDeviceTypeId2Version},
-    }, {},
-    EndpointComposition::kTree),
+           MockClusterConfig(MockClusterId(1), { ClusterRevision::Id, FeatureMap::Id }),
+           MockClusterConfig(
+               MockClusterId(2),
+               {
+                  ClusterRevision::Id,
+                  FeatureMap::Id,
+                  MockAttributeId(1),
+                  MockAttributeConfig(MockAttributeId(2), ZCL_ARRAY_ATTRIBUTE_TYPE),
+               },          /* attributes */
+               {},         /* events */
+               {1, 2, 23}, /* acceptedCommands */
+               {2, 10}     /* generatedCommands */
+           ),
+           MockClusterConfig(
+               MockClusterId(3),
+               {
+                   ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
+               },      /* attributes */
+               {},     /* events */
+               {11},   /* acceptedCommands */
+               {4, 6}, /* generatedCommands */
+               BitMask<MockClusterSide>().Set(MockClusterSide::kClient).Set(MockClusterSide::kServer)
+           ),
+           MockClusterConfig(MockClusterId(4), {}, {}, {}, {}, MockClusterSide::kClient),
+        }, {
+            { kDeviceTypeId2, kDeviceTypeId2Version},
+        },
+        EndpointComposition::kTree,
+        "shortUniqueId"_span
+    ),
     MockEndpointConfig(kMockEndpoint3, {
         MockClusterConfig(MockClusterId(1), {
             ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
@@ -635,12 +635,12 @@ const MockNodeConfig gTestNodeConfig({
             ClusterRevision::Id, FeatureMap::Id, MockAttributeId(4),
             MockAttributeConfig(Clusters::Descriptor::Attributes::EndpointUniqueID::Id, ZCL_CHAR_STRING_ATTRIBUTE_TYPE),
         }),
-    }, {
-        { kDeviceTypeId4, kDeviceTypeId4Version },
-    },
-    {}, // Empty semantic tags
-    EndpointComposition::kTree,
-    chip::CharSpan("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01", strlen("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01")) // Add endpointUniqueID
+        }, {
+            { kDeviceTypeId4, kDeviceTypeId4Version },
+        },
+        {}, // Empty semantic tags
+        EndpointComposition::kTree,
+        "AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"_span, // endpoint unique id (if applicable)
     ),
 });
 // clang-format on
@@ -3027,8 +3027,13 @@ TEST_F(TestCodegenModelViaMocks, EndpointUniqueID)
     char buffer[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
     MutableCharSpan span(buffer);
     // Mock endpoint 4 has a unique ID
-    // ASSERT_TRUE(builder.IsEmpty()); // ownership taken above, we start fresh
     ASSERT_EQ(model.EndpointUniqueID(kMockEndpoint4, span), CHIP_NO_ERROR);
     EXPECT_TRUE(span.data_equal("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"_span));
+
+    // Mock endpoint 2 has a shorter span. This tests truncation
+    MutableCharSpan span2(buffer);
+    // Mock endpoint 4 has a unique ID
+    ASSERT_EQ(model.EndpointUniqueID(kMockEndpoint2, span2), CHIP_NO_ERROR);
+    EXPECT_TRUE(span2.data_equal("shortUniqueId"_span));
 }
 #endif
