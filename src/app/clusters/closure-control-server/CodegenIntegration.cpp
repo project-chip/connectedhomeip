@@ -88,6 +88,12 @@ void MatterClosureControlSetInitParams(EndpointId endpointId, const ClusterInitP
 
 void MatterClosureControlClusterInitCallback(EndpointId endpointId)
 {
+    if (endpointId > kClosureControlMaxClusterCount)
+    {
+        ChipLogError(Zcl, "Closure Control Cluster cannot be initialized on endpoint %u. Endpoint ID is out of range.", endpointId);
+        return;
+    }
+
     if (gServer[endpointId].IsConstructed())
     {
         ChipLogError(Zcl, "Closure Control Cluster already initialized. Ignoring duplicate initialization.");
