@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/third_party/mbedtls/mbedtls3.gni")
+import("${chip_root}/src/system/system.gni")
 
 mbedtls3_target("ot_commissioner_mbedtls") {
   mbedtls_root = "repo/third_party/mbedtls/repo"
@@ -38,7 +39,6 @@ config("public") {
 
 static_library("ot-commissioner") {
   configs += [
-    ":ot_commissioner_mbedtls_warnings",
     ":warnings",
   ]
   public = [ "repo/include/commissioner/commissioner.hpp" ]
@@ -58,7 +58,6 @@ static_library("ot-commissioner") {
     "repo/third_party/googletest/repo/googletest/include",
     "repo/third_party/json/repo/single_include",
     "repo/third_party/libevent/repo/include",
-    "repo/third_party/mbedtls/repo/include",
     "repo/third_party/mdns/repo/include",
   ]
   sources = [
@@ -86,7 +85,14 @@ static_library("ot-commissioner") {
     "repo/src/library/token_manager.cpp",
     "repo/src/library/udp_proxy.cpp",
   ]
-  deps = [ ":ot_commissioner_mbedtls" ]
+  if (chip_enable_otns) {
+    deps = [ "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+    "${chip_root}/third_party/openthread/repo/third_party/mbedtls", ]
+  } else {
+    configs += [ ":ot_commissioner_mbedtls_warnings" ]
+    include_dirs += [ "repo/third_party/mbedtls/repo/include" ]
+    deps = [ ":ot_commissioner_mbedtls" ]
+  }
   libs = [
     "event_core",
     "event_pthreads",

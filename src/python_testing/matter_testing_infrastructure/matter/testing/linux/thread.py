@@ -20,25 +20,27 @@ import re
 import subprocess
 import threading
 from typing import Optional, Pattern
+from otns.cli import OTNS
 
-from matter.testing.tasks import SubprocessKind
+from matter.testing.tasks import SubprocessKind, ProcessConfigurator
 
 from .namespace import IsolatedNetworkNamespace
 
 log = logging.getLogger(__name__)
 
 
-class ThreadBorderRouter:
+class ThreadBorderRouter(ProcessConfigurator):
 
     # The Thread radio simulation node id, choose other if there is a conflict.
     NODE_ID = 9
 
-    def __init__(self, dataset: str, ns: IsolatedNetworkNamespace):
+    def __init__(self, dataset: str, ns: IsolatedNetworkNamespace, meshcop: bool = False):
         self._event = threading.Event()
         self._pattern: Optional[Pattern[str]] = None
         self._event.set()
         self._netns_app = ns.netns_for_subprocess_kind(SubprocessKind.APP)
         self._link_name_app = ns.app_link.name
+        self._meshcop = meshcop
 
         radio_url = f'spinel+hdlc+forkpty:///usr/bin/env?forkpty-arg=ot-rcp&forkpty-arg={self.NODE_ID}'
         cmd = self._netns_app.wrap_cmd(['otbr-agent', '-d7', '-v', f'-B{self._link_name_app}', radio_url])
@@ -107,3 +109,34 @@ class ThreadBorderRouter:
         if self._otbr:
             self._otbr.terminate()
             self._otbr.wait()
+
+    def apply_args(self, process: SubprocessInfo) -> SubprocessInfo:
+        return process.with_args("--thread-args=2")
+
+    def apply_pairing_args(self, process: SubprocessInfo) -> SubprocessInfo:
+        if self._meshcop:
+            return process.with_args("pairing", "thread-meshcop", "--thread-ba-host", self.get_border_agent_host(), "--thread-ba-port", str(self.get_border_agent_port()))
+        else:
+            return process.with_args("pairing", "code-thread")
+
+class ThreadOtns(ProcessConfigurator):
+
+    # The Thread radio simulation node id, choose other if there is a conflict.
+    NODE_ID = 9
+    RANDOM_SEED = 20242025
+
+    def __init__(self, otns_path: str):
+        self._otns = OTNS(otns_args=['autogo=true', '-seed', str(ThreadOtns.RANDOM_SEED)], otns_path=otns_path)
+
+    def terminate(self):
+        if self._otns:
+            self._otns.close()
+
+    def apply_args(self, process: SubprocessInfo) -> SubprocessInfo:
+        socket = self._otns.get_otns_socket()
+        process = process.with_args("--thread-args=2")
+        process = process.with_args(f"--thread-args={socket}")
+        return process.with_args(f"--thread-args={ThreadOtns.RANDOM_SEED}")
+
+    def apply_pairing_args(self, process: SubprocessInfo) -> SubprocessInfo:
+        return process.with_args("pairing", "thread-meshcop", "--thread-ba-host", self.get_border_agent_host(), "--thread-ba-port", str(self.get_border_agent_port()))

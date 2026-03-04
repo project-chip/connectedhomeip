@@ -12,3 +12,4 @@ tabulate
 
 -e ${PW_PROJECT_ROOT}/scripts/py_matter_idl
 -e ${PW_PROJECT_ROOT}/scripts/py_matter_yamltests
+-e ${PW_PROJECT_ROOT}/third_party/ot-ns/repo/pylibs
