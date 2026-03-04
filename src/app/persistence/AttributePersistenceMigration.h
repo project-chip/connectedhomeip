@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <app/persistence/AttributePersistenceProvider.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 
 #include <cstring>
 
