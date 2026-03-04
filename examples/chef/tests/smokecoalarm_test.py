@@ -126,6 +126,16 @@ class TC_SMOKECOALARM(MatterBaseTest):
         )
         asserts.assert_true(result.status.ok(), msg="PwRPC status not ok.")
 
+    def _read_temperature_measured_value_pwrpc(self, device):
+        result = device.rpcs.chip.rpc.Attributes.Read(
+            endpoint=self.ENDPOINT,
+            cluster=Clusters.Objects.TemperatureMeasurement.id,
+            attribute_id=Clusters.Objects.TemperatureMeasurement.Attributes.MeasuredValue.attribute_id,
+            type=attributes_service_pb2.AttributeType.ZCL_INT16S_ATTRIBUTE_TYPE
+        )
+        asserts.assert_true(result.status.ok(), msg="PwRPC status not ok.")
+        return result.response.data_int16
+
     # Cluster Tests
     async def carbon_monoxide_concentration_measurement_test(self, endpoint):
         measured_value = await self._read_co_measured_value(endpoint)
@@ -189,6 +199,10 @@ class TC_SMOKECOALARM(MatterBaseTest):
         asserts.assert_true(measured_value is not None, "Temperature MeasuredValue should not be None.")
 
     async def temperature_measurement_pwrpc_test(self, endpoint, device):
+        pwrpc_value = self._read_temperature_measured_value_pwrpc(device)
+        internal_value = await self._read_temperature_measured_value(endpoint)
+        asserts.assert_equal(pwrpc_value, internal_value, "Temperature MeasuredValue read via PwRPC should match value read via attribute read.")
+
         for value in [2000, 2500, 3000]:
             self._write_temperature_measured_value_pwrpc(device, value)
             measured_value = await self._read_temperature_measured_value(endpoint)
