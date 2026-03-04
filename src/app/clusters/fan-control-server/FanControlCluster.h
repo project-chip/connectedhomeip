@@ -119,6 +119,8 @@ public:
     DataModel::Nullable<chip::Percent> GetPercentSetting() const { return mPercentSetting; }
     DataModel::Nullable<uint8_t> GetSpeedSetting() const { return mSpeedSetting; }
 
+    void SetDelegate(FanControl::Delegate * delegate);
+
 private:
     bool SupportsMultiSpeed() const { return mOptionalAttributes.IsSet(FanControl::Attributes::SpeedMax::Id); }
     bool SupportsAuto() const
@@ -152,7 +154,7 @@ private:
     BitMask<FanControl::RockBitmap> mRockSupport;
     BitMask<FanControl::WindBitmap> mWindSupport;
     OptionalAttributes mOptionalAttributes;
-    FanControl::Delegate & mDelegate;
+    FanControl::Delegate * mDelegate;
 
     // Avoid circular callback when adjusting SpeedSetting and PercentSetting together
     bool mSpeedWriteInProgress   = false;
