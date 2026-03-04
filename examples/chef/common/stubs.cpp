@@ -1,4 +1,5 @@
 #include "DeviceTypes.h"
+#include "FakeAttributeAccess.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app/data-model/Nullable.h>
@@ -710,6 +711,8 @@ void ApplicationInit()
 #if MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT > 0
     InitIdentifyCluster();
 #endif // MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT
+
+    chip::app::Clusters::Chef::RegisterAttributeAccessor();
 }
 
 void ApplicationShutdown()
