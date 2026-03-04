@@ -41,8 +41,8 @@ class AttributeAccessor : public chip::rpc::PigweedDebugAccessInterceptor
 public:
     std::optional<::pw::Status> Write(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder) override
     {
-        ChipLogProgress(Zcl, "Inside AttributeAccessor::Write for Cluster: %d , Attribute: %d",
-                        static_cast<int32_t>(path.mClusterId), static_cast<int32_t>(path.mAttributeId));
+        ChipLogProgress(Zcl, "Inside AttributeAccessor::Write for Cluster: %d , Attribute: %d", static_cast<int>(path.mClusterId),
+                        static_cast<int>(path.mAttributeId));
         switch (path.mClusterId)
         {
         case TemperatureMeasurement::Id:
