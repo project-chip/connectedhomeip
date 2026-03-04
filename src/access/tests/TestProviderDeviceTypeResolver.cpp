@@ -67,7 +67,7 @@ public:
     }
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
-    CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & id) override
+    CHIP_ERROR EndpointUniqueID(EndpointId, MutableCharSpan & id) override
     {
         return CopyCharSpanToMutableCharSpan("FAKE"_span, id);
     }
