@@ -673,7 +673,7 @@ DataModel::ActionReturnStatus ZoneManagementCluster::HandleRemoveZone(const Comm
 
 Status ZoneManagementCluster::ValidateTrigger(const ZoneTriggerControlStruct & trigger)
 {
-    VerifyOrReturnError(trigger.initialDuration >= 1 && trigger.initialDuration <= 65535, Status::ConstraintError);
+    VerifyOrReturnError(trigger.initialDuration >= 1, Status::ConstraintError);
     VerifyOrReturnError(trigger.augmentationDuration <= trigger.initialDuration, Status::ConstraintError);
     VerifyOrReturnError(trigger.maxDuration >= trigger.initialDuration, Status::ConstraintError);
 
