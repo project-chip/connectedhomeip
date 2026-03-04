@@ -661,6 +661,7 @@ static uint8_t TagToIndex(const chip::Span<const T> & SpanId, T tag)
         }
         i++;
     }
+    // 0 is the index of kUnknown for all the used tags. Return that if not found.
     return 0;
 }
 
