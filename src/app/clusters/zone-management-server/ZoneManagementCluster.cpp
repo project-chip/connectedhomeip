@@ -700,9 +700,9 @@ ZoneManagementCluster::HandleCreateOrUpdateTrigger(const Commands::CreateOrUpdat
     VerifyOrReturnValue(foundZone != mZones.end(), Status::NotFound,
                         ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mEndpointId, trigger.zoneID));
 
-    VerifyOrReturnValue(
-        !foundZone->twoDCartZoneStorage.HasValue() || foundZone->twoDCartZoneStorage.Value().use == ZoneUseEnum::kMotion,
-        Status::ConstraintError);
+    VerifyOrReturnValue(!foundZone->twoDCartZoneStorage.HasValue() ||
+                            foundZone->twoDCartZoneStorage.Value().use == ZoneUseEnum::kMotion,
+                        Status::ConstraintError);
 
     return AddOrUpdateTrigger(trigger);
 }
