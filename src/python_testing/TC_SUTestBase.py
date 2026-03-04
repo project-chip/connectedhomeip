@@ -387,9 +387,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         log.info(f"Removed all KVS files/folders with prefix: {real_kvs_path_prefix}")
 
     async def track_download_progress(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id: int, max_progress: int = 99):
-        """Track the progress of the download using AttribteSubscription.
+        """Track the progress of the download using AttributeSubscription.
         Verify that we have download progress. Fails if there is no progress during the timeout.
-        If no progress is seen, test  will fail as no report received in the timeout.
+        If no progress is seen, the test will fail as no report received in the timeout.
 
         Args:
             controller (ChipDeviceCtrl.ChipDeviceController): Controller
@@ -420,11 +420,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             current_progress = 0
 
         # Log strings
-        base_string = "Current OTA Image Download progress "
-        log.info(base_string + str(current_progress) + "%")
 
+        log.info(f"Current OTA Image Download progress {current_progress}%")
         progress_seen = False
-        last_progress = 0
         current_max_progress = int(current_progress) + 1
 
         # Verify every second the progress
@@ -438,15 +436,15 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 report : Report value
             """
             value = report.value
-            nonlocal progress_seen, last_progress, current_progress, current_max_progress
+            nonlocal progress_seen, current_progress, current_max_progress
             if value is not NullValue and isinstance(value, int) and 0 <= value <= current_max_progress:
                 # Just check if we see some progress to confirm is downloading
-                last_progress = value
+
                 if not progress_seen:
                     progress_seen = True
             # Exit when the progress is under the
             current_progress = value
-            log.warning(f"TEST: {value},  {current_progress}, {current_max_progress}  ")
+            log.info(f"TEST: {value},  {current_progress}, {current_max_progress}  ")
             return bool(value == current_max_progress and progress_seen) or value >= current_max_progress
 
         download_progress_attr_matcher_obj = AttributeMatcher.from_callable(
@@ -477,7 +475,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             if current_max_progress > max_progress:
                 current_max_progress = max_progress
             progress_seen = False
-            log.info(base_string + str(current_progress) + "%")
+            log.info(f"Current OTA Image Download progress {current_progress}%")
             download_progress_attr_handler.reset()
 
         # cancel the AttributeReportHandler
