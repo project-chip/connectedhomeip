@@ -1682,9 +1682,9 @@ cluster OperationalCredentials = 62 {
   }
 
   fabric_scoped struct NOCStruct {
-    octet_string<400> noc = 1;
-    nullable octet_string<400> icac = 2;
-    optional octet_string<400> vvsc = 3;
+    long_octet_string<400> noc = 1;
+    nullable long_octet_string<400> icac = 2;
+    optional long_octet_string<400> vvsc = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1705,7 +1705,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct AttestationResponse = 1 {
-    octet_string attestationElements = 0;
+    long_octet_string<0x384> attestationElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
@@ -1714,7 +1714,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct CertificateChainResponse = 3 {
-    octet_string<600> certificate = 0;
+    long_octet_string<600> certificate = 0;
   }
 
   request struct CSRRequestRequest {
@@ -1723,21 +1723,21 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct CSRResponse = 5 {
-    octet_string NOCSRElements = 0;
+    long_octet_string<0x384> NOCSRElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
   request struct AddNOCRequest {
-    octet_string<400> NOCValue = 0;
-    optional octet_string<400> ICACValue = 1;
+    long_octet_string<400> NOCValue = 0;
+    optional long_octet_string<400> ICACValue = 1;
     octet_string<16> IPKValue = 2;
     int64u caseAdminSubject = 3;
     vendor_id adminVendorId = 4;
   }
 
   request struct UpdateNOCRequest {
-    octet_string<400> NOCValue = 0;
-    optional octet_string<400> ICACValue = 1;
+    long_octet_string<400> NOCValue = 0;
+    optional long_octet_string<400> ICACValue = 1;
   }
 
   response struct NOCResponse = 8 {
@@ -1755,13 +1755,13 @@ cluster OperationalCredentials = 62 {
   }
 
   request struct AddTrustedRootCertificateRequest {
-    octet_string<400> rootCACertificate = 0;
+    long_octet_string<400> rootCACertificate = 0;
   }
 
   request struct SetVIDVerificationStatementRequest {
     optional vendor_id vendorID = 0;
     optional octet_string<85> VIDVerificationStatement = 1;
-    optional octet_string<400> vvsc = 2;
+    optional long_octet_string<400> vvsc = 2;
   }
 
   request struct SignVIDVerificationRequestRequest {
@@ -1775,25 +1775,25 @@ cluster OperationalCredentials = 62 {
     octet_string signature = 2;
   }
 
-  /** Sender is requesting attestation information from the receiver. */
+  /** This command is used to perform an attestation request. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
-  /** Sender is requesting a device attestation certificate from the receiver. */
+  /** This command is used to request a certificate from the device attestation certificate chain. */
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  /** Sender is requesting a certificate signing request (CSR) from the receiver. */
+  /** This command is used to perform a CSR request. */
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
-  /** Sender is requesting to add the new node operational certificates. */
+  /** This command is used to add a new NOC to the device. */
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  /** This command SHALL replace the NOC and optional associated ICAC (if present) scoped under the accessing fabric upon successful validation of all arguments and preconditions. */
+  /** This command is used to update an existing NOC on the device. */
   fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  /** This command SHALL be used by an Administrative Node to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute. */
+  /** This command is used to set the user-visible fabric label for a given Fabric. */
   fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
-  /** This command is used by Administrative Nodes to remove a given fabric index and delete all associated fabric-scoped data. */
+  /** This command is used to remove a Fabric from the device. */
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
-  /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
+  /** This command is used to add a trusted root certificate to the device. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  /** This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate). */
+  /** This command is used to manage the VendorID and VIDVerificationStatement fields of the Fabrics attribute, and the VVSC field of an entry in the NOCs attribute. */
   fabric command access(invoke: administer) SetVIDVerificationStatement(SetVIDVerificationStatementRequest): DefaultSuccess = 12;
-  /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
+  /** This command is used to authenticate the fabric associated with the FabricIndex. */
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 
