@@ -240,19 +240,6 @@ void InteractionModelEngine::Shutdown()
 
     mReadHandlers.ReleaseAll();
 
-    // Shut down the data model provider to clear cluster mContext pointers.
-    // Required for proper Stop() → Start() lifecycle - ensures clusters are reinitialized.
-    if (mDataModelProvider != nullptr)
-    {
-        CHIP_ERROR err = mDataModelProvider->Shutdown();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(InteractionModel,
-                         "InteractionModelEngine::Shutdown() Data model provider shutdown failed: %" CHIP_ERROR_FORMAT,
-                         err.Format());
-        }
-    }
-
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     // Shut down any subscription clients that are still around.  They won't be
     // able to work after this point anyway, since we're about to drop our refs
@@ -1929,20 +1916,14 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     // Altering data model should not be done while IM is actively handling requests.
     VerifyOrDie(mReadHandlers.begin() == mReadHandlers.end());
 
-    // REMOVED: Early return when (model == mDataModelProvider) - breaks Stop() → Start()
-    // After Shutdown(), server clusters are uninitialized even though pointer is unchanged.
-    // Must call Startup() again to reinitialize cluster mContext pointers.
-
     if (model == mDataModelProvider)
     {
-        ChipLogDetail(DataManagement,
-                      "InteractionModelEngine::SetDataModelProvider() re-initializing same provider (Stop/Start cycle)");
+        // no-op, just return
+        return model;
     }
 
     DataModel::Provider * oldModel = mDataModelProvider;
-
-    // Only shutdown if changing to a different provider
-    if (oldModel != nullptr && oldModel != model)
+    if (oldModel != nullptr)
     {
         CHIP_ERROR err = oldModel->Shutdown();
         if (err != CHIP_NO_ERROR)
