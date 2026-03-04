@@ -25,7 +25,6 @@ using Protocols::InteractionModel::Status;
 
 std::optional<ServerClusterEntry> ServerClusterFinder::Find(const ConcreteClusterPath & path)
 {
-    ChipLogProgress(Support, "DEBUG_DEBUG: Inside ServerClusterFinder::Find for Cluster=%d", path.mClusterId);
     VerifyOrReturnValue(mProvider != nullptr, std::nullopt);
 
     if (mEndpointId != path.mEndpointId)
