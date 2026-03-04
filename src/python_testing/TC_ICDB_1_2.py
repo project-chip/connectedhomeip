@@ -212,7 +212,7 @@ class TC_ICDB_1_2(MatterBaseTest):
                 await asyncio.sleep(wait_time_for_idle_s)
 
             # Transition DUT from Idle Mode to Active Mode
-            if not is_ci:
+            if is_ci:
                 # In a CI scenario, we use a test event trigger to put the DUT in active mode
                 await self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kAddActiveModeReq)
 
