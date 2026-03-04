@@ -184,6 +184,31 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
     EXPECT_EQ(readAccuracy.accuracyRanges[0].percentMax.Value(), 500);
     EXPECT_EQ(readAccuracy.accuracyRanges[0].percentMin.Value(), 50);
 
+    // Test SetMeasurementAccuracy and verify empty accuracyRanges doesn't modify the existing accuracyRanges
+    {
+        Structs::MeasurementAccuracyStruct::Type accuracy;
+        accuracy.measurementType  = MeasurementTypeEnum::kApparentEnergy;
+        accuracy.measured         = true;
+        accuracy.minMeasuredValue = 0;
+        accuracy.maxMeasuredValue = 1000000;
+
+        EXPECT_EQ(SetMeasurementAccuracy(kTestEndpointId, accuracy), CHIP_NO_ERROR);
+
+        // Verify the value was set
+        Structs::MeasurementAccuracyStruct::Type readAccuracy;
+        cluster->GetMeasurementAccuracy(readAccuracy);
+        // Verify that the MeasurementAccuracyStruct is not erased by the empty accuracyRanges
+        EXPECT_EQ(readAccuracy.measurementType, MeasurementTypeEnum::kApparentEnergy);
+        EXPECT_TRUE(readAccuracy.measured);
+        EXPECT_EQ(readAccuracy.minMeasuredValue, 0);
+        EXPECT_EQ(readAccuracy.maxMeasuredValue, 1000000);
+        EXPECT_EQ(readAccuracy.accuracyRanges.size(), 1u);
+        EXPECT_EQ(readAccuracy.accuracyRanges[0].rangeMin, 0);
+        EXPECT_EQ(readAccuracy.accuracyRanges[0].rangeMax, 1'000'000'000'000'000);
+        EXPECT_EQ(readAccuracy.accuracyRanges[0].percentMax.Value(), 500);
+        EXPECT_EQ(readAccuracy.accuracyRanges[0].percentMin.Value(), 50);
+    }
+    
     // Test SetCumulativeReset
     {
         Structs::CumulativeEnergyResetStruct::Type resetData;

@@ -112,12 +112,14 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::SetMeasurementAccuracy(const Meas
         NotifyAttributeChanged(Accuracy::Id);
     }
 
-    // Always update ranges since ValueChanged intentionally skips comparing them
-    using RangeType = MeasurementAccuracyRangeStruct::Type;
-    ReadOnlyBufferBuilder<RangeType> rangesBuilder;
-    ReturnErrorOnFailure(rangesBuilder.AppendElements(value.accuracyRanges));
-    mAccuracyRangesStorage                              = rangesBuilder.TakeBuffer();
-    mMeasurementData.measurementAccuracy.accuracyRanges = mAccuracyRangesStorage;
+    // Always update ranges if they are present since ValueChanged intentionally skips comparing them
+    if (!value.accuracyRanges.empty())
+    {
+        ReadOnlyBufferBuilder<MeasurementAccuracyRangeStruct::Type> rangesBuilder;
+        ReturnErrorOnFailure(rangesBuilder.AppendElements(value.accuracyRanges));
+        mAccuracyRangesStorage                              = rangesBuilder.TakeBuffer(); 
+        mMeasurementData.measurementAccuracy.accuracyRanges = mAccuracyRangesStorage;
+    }
 
     return CHIP_NO_ERROR;
 }
