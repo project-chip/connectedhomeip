@@ -46,8 +46,8 @@ CHIP_ERROR MigrateFromSafeToAttributePersistenceProvider(SafeAttributePersistenc
         {
             hadMigrationErrors = true;
             ChipLogError(DataManagement,
-                         "AttributeMigration: Null migrator for attribute '" ChipLogFormatMEI
-                         "' from cluster '" ChipLogFormatMEI "'",
+                         "AttributeMigration: Null migrator for attribute '" ChipLogFormatMEI "' from cluster '" ChipLogFormatMEI
+                         "'",
                          ChipLogValueMEI(entry.attributeId), ChipLogValueMEI(cluster.mClusterId));
             continue;
         }
