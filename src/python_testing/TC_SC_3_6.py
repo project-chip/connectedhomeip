@@ -103,12 +103,14 @@ class ResubscriptionCatcher:
 
 class TC_SC_3_6(MatterBaseTest):
     def setup_class(self):
+        super().setup_class()
         self._subscriptions = []
 
     def teardown_class(self):
         log.info("Teardown: shutting down all subscription to avoid racy callbacks")
         for subscription in self._subscriptions:
             subscription.Shutdown()
+        super().teardown_class()
 
     @async_test_body
     async def test_TC_SC_3_6(self):

@@ -50,6 +50,7 @@ import matter.logging
 import matter.native
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute, ClusterObjects
+from matter.clusters.Types import NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
@@ -223,8 +224,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         # subscription-verification logic does not flag them as missing or stale.
         # The XML parsing is done once per class here (not per test) because it is expensive.
         self.wildcard_subscription_handler = None
+        # Subscription controller: same node_id as default_controller so it shares the
+        # existing admin ACL entry (no extra ACL write needed).  Uses a separate controller
+        # object so keepSubscriptions=False on default_controller does not cancel this
+        # background subscription.  Created lazily in _start_wildcard_subscription;
+        # shut down in teardown_class.
         self.subscription_controller = None
-        self.subscription_controller_node_id: int = self.matter_test_config.controller_node_id + 123456
         self._cq_excluded_attr_ids: frozenset[tuple[int, int]] = self._build_cq_excluded_ids()
 
     def teardown_class(self):
@@ -296,8 +301,14 @@ class MatterBaseTest(base_test.BaseTestClass):
         and caches the priming-read values so tests can query the current device state
         without an extra round-trip read.
 
-        The subscription is stored as `self.wildcard_subscription_handler` and is shut down
-        automatically in teardown_test.
+        A secondary controller with the same node_id as default_controller is used so that
+        keepSubscriptions=False from default_controller (issued by tests that manage their
+        own subscriptions) does not cancel this background subscription.  Using the same
+        node_id means no extra ACL entry is required — the subscription controller is already
+        covered by default_controller's admin ACL entry — so ACL tests see an unmodified ACL.
+
+        The subscription handler is stored as `self.wildcard_subscription_handler` and is
+        shut down automatically in teardown_test.
 
         This is a synchronous wrapper around an async operation; it uses self.event_loop
         (set by the test runner before setup_class is called).
@@ -310,18 +321,26 @@ class MatterBaseTest(base_test.BaseTestClass):
             excluded_attribute_ids=self._cq_excluded_attr_ids
         )
 
-        # Create the secondary controller once and reuse it across tests.
-        # Using a different node ID on the same fabric means the DUT treats it as
-        # a separate initiator, so keepSubscriptions=False from default_controller
-        # will not cancel this subscription.
-        if self.subscription_controller is None:
-            fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
-            self.subscription_controller = fabric_admin.NewController(
-                nodeId=self.subscription_controller_node_id,
-                paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
-            )
+        # Use the same node_id as default_controller.  The ACL lookup is by node_id, so the
+        # subscription controller is already authorised via default_controller's admin entry.
+        # A separate controller object is still used so that keepSubscriptions=False issued
+        # by the test on default_controller does not cancel this background subscription
+        # (they use different CASE sessions).
+        subscription_node_id = self.matter_test_config.controller_node_id
 
         async def _start():
+            # Create the secondary controller once; reused across all tests in the class.
+            if self.subscription_controller is None:
+                fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
+                self.subscription_controller = fabric_admin.NewController(
+                    nodeId=subscription_node_id,
+                    paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
+                )
+                LOGGER.info("[MatterBaseTest] Subscription controller created "
+                            "(node_id=0x%016X, shares ACL entry with default_controller)",
+                            subscription_node_id)
+
+            # Start the wildcard subscription using the subscription controller.
             await handler.start(
                 dev_ctrl=self.subscription_controller,
                 node_id=self.dut_node_id,
@@ -432,6 +451,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 LOGGER.warning("[MatterBaseTest] Error shutting down wildcard subscription: %s", e)
             self.wildcard_subscription_handler = None
         LOGGER.info("Wildcard subscription shut down")
+
         super().teardown_test()
 
     def on_fail(self, record):
