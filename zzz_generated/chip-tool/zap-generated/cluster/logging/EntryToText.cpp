@@ -4520,6 +4520,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "StatusLightEnabled";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::StatusLightBrightness::Id:
             return "StatusLightBrightness";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::ImageRotationDiscreteAngles::Id:
+            return "ImageRotationDiscreteAngles";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AcceptedCommandList::Id:

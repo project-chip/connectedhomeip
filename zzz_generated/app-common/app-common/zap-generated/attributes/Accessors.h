@@ -4917,6 +4917,10 @@ namespace Attributes {} // namespace Attributes
 namespace CameraAvStreamManagement {
 namespace Attributes {
 
+namespace ImageRotationDiscreteAngles {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+} // namespace ImageRotationDiscreteAngles
+
 namespace ClusterRevision {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
 } // namespace ClusterRevision

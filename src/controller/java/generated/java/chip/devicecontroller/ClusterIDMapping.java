@@ -18120,6 +18120,7 @@ public class ClusterIDMapping {
             LocalSnapshotRecordingEnabled(38L),
             StatusLightEnabled(39L),
             StatusLightBrightness(40L),
+            ImageRotationDiscreteAngles(41L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
