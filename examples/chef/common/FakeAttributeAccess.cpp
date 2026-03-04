@@ -25,7 +25,7 @@
 #include <app/data-model/Nullable.h>
 #include <pigweed/rpc_services/AccessInterceptor.h>
 #include <pigweed/rpc_services/AccessInterceptorRegistry.h>
-#include <src/app/clusters/temperature-measurement-server/CodegenIntegration.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
 namespace chip {
 namespace app {
