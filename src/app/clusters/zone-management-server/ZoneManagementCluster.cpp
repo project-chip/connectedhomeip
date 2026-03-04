@@ -17,8 +17,8 @@
  */
 
 #include "zone-geometry.h"
+#include "ZoneManagementCluster.h"
 
-#include <app/clusters/zone-management-server/zone-management-server.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ZoneManagement/Metadata.h>
@@ -193,13 +193,7 @@ void ZoneManagementCluster::LoadPersistentAttributes()
     }
 
     // Signal delegate that all persistent configuration attributes have been loaded.
-    TEMPORARY_RETURN_IGNORED mDelegate.PersistentAttributesLoadedCallback();
-}
-
-void ZoneManagementCluster::NotifyClusterAttributeChanged(AttributeId attributeId)
-{
-    NotifyAttributeChanged(attributeId);
-    mDelegate.OnAttributeChanged(attributeId);
+    LogErrorOnFailure(mDelegate.PersistentAttributesLoadedCallback());
 }
 
 CHIP_ERROR ZoneManagementCluster::ReadAndEncodeZones(const AttributeValueEncoder::ListEncodeHelper & encoder)
@@ -222,7 +216,7 @@ CHIP_ERROR ZoneManagementCluster::ReadAndEncodeTriggers(const AttributeValueEnco
     return CHIP_NO_ERROR;
 }
 
-const Optional<ZoneTriggerControlStruct> ZoneManagementCluster::GetTriggerForZone(uint16_t zoneID)
+Optional<ZoneTriggerControlStruct> ZoneManagementCluster::GetTriggerForZone(uint16_t zoneID) const
 {
     auto foundTrigger = std::find_if(mTriggers.begin(), mTriggers.end(),
                                      [&](const ZoneTriggerControlStruct & zoneTrigger) { return zoneTrigger.zoneID == zoneID; });
@@ -254,7 +248,7 @@ CHIP_ERROR ZoneManagementCluster::SetSensitivity(uint8_t aSensitivity)
         ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(path, value));
     }
 
-    NotifyClusterAttributeChanged(Sensitivity::Id);
+    NotifyAttributeChangedIfSuccess(Sensitivity::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -268,8 +262,6 @@ DataModel::ActionReturnStatus ZoneManagementCluster::ReadAttribute(const DataMod
     case ClusterRevision::Id:
         return encoder.Encode(kRevision);
     case MaxUserDefinedZones::Id:
-        VerifyOrReturnError(HasFeature(Feature::kUserDefined), Status::UnsupportedAttribute,
-                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxUserDefinedZones unsupported", mEndpointId));
         return encoder.Encode(mMaxUserDefinedZones);
     case MaxZones::Id:
         return encoder.Encode(mMaxZones);
@@ -280,17 +272,12 @@ DataModel::ActionReturnStatus ZoneManagementCluster::ReadAttribute(const DataMod
     case SensitivityMax::Id:
         return encoder.Encode(mSensitivityMax);
     case Sensitivity::Id:
-        VerifyOrReturnError(
-            !HasFeature(Feature::kPerZoneSensitivity), Status::UnsupportedAttribute,
-            ChipLogError(Zcl, "ZoneManagement[ep=%d]: Sensitivity unsupported with PerZoneSensitivity", mEndpointId));
         return encoder.Encode(mSensitivity);
     case TwoDCartesianMax::Id:
-        VerifyOrReturnError(HasFeature(Feature::kTwoDimensionalCartesianZone), Status::UnsupportedAttribute,
-                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: TwoDCartesianMax feature is not supported", mEndpointId));
         return encoder.Encode(mTwoDCartesianMax);
-    default:
-        return Status::UnsupportedAttribute;
     }
+
+    chipDie();
 }
 
 DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -299,10 +286,6 @@ DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataMo
     switch (request.path.mAttributeId)
     {
     case Sensitivity::Id: {
-        VerifyOrReturnError(
-            !HasFeature(Feature::kPerZoneSensitivity), Status::UnsupportedWrite,
-            ChipLogError(Zcl, "ZoneManagement[ep=%d]: Sensitivity unsupported with PerZoneSensitivity", mEndpointId));
-
         uint8_t sensitivity = 0;
         ReturnErrorOnFailure(decoder.Decode(sensitivity));
         VerifyOrReturnError(sensitivity >= 1 && sensitivity <= mSensitivityMax, Status::ConstraintError);
@@ -325,9 +308,9 @@ DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataMo
 
         return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, Status::Success);
     }
-    default:
-        return Status::UnsupportedWrite;
     }
+
+    chipDie();
 }
 
 CHIP_ERROR ZoneManagementCluster::Attributes(const ConcreteClusterPath & path,
@@ -377,27 +360,21 @@ std::optional<DataModel::ActionReturnStatus> ZoneManagementCluster::InvokeComman
                                                                                   TLV::TLVReader & input_arguments,
                                                                                   CommandHandler * handler)
 {
+    // Feature-gated command support is enforced by AcceptedCommands() during IM
+    // pre-dispatch validation (ValidateCommandCanBeDispatched).
     switch (request.path.mCommandId)
     {
     case Commands::CreateTwoDCartesianZone::Id: {
-        VerifyOrReturnValue(HasFeature(Feature::kTwoDimensionalCartesianZone) && HasFeature(Feature::kUserDefined),
-                            Status::UnsupportedCommand);
-
         Commands::CreateTwoDCartesianZone::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(input_arguments));
         return HandleCreateTwoDCartesianZone(request.path, handler, commandData);
     }
     case Commands::UpdateTwoDCartesianZone::Id: {
-        VerifyOrReturnValue(HasFeature(Feature::kTwoDimensionalCartesianZone) && HasFeature(Feature::kUserDefined),
-                            Status::UnsupportedCommand);
-
         Commands::UpdateTwoDCartesianZone::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(input_arguments));
         return HandleUpdateTwoDCartesianZone(commandData);
     }
     case Commands::RemoveZone::Id: {
-        VerifyOrReturnValue(HasFeature(Feature::kUserDefined), Status::UnsupportedCommand);
-
         Commands::RemoveZone::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(input_arguments));
         return HandleRemoveZone(commandData);
@@ -412,15 +389,15 @@ std::optional<DataModel::ActionReturnStatus> ZoneManagementCluster::InvokeComman
         ReturnErrorOnFailure(commandData.Decode(input_arguments));
         return HandleRemoveTrigger(commandData);
     }
-    default:
-        return Status::UnsupportedCommand;
     }
+
+    chipDie();
 }
 
 CHIP_ERROR ZoneManagementCluster::AddZone(const ZoneInformationStorage & zone)
 {
     mZones.push_back(zone);
-    NotifyClusterAttributeChanged(Attributes::Zones::Id);
+    NotifyAttributeChangedIfSuccess(Attributes::Zones::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -435,7 +412,7 @@ CHIP_ERROR ZoneManagementCluster::UpdateZone(uint16_t zoneId, const ZoneInformat
     }
 
     *it = zoneInfo;
-    NotifyClusterAttributeChanged(Attributes::Zones::Id);
+    NotifyAttributeChangedIfSuccess(Attributes::Zones::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -450,7 +427,7 @@ CHIP_ERROR ZoneManagementCluster::RemoveZone(uint16_t zoneId)
     }
 
     mZones.erase(it, mZones.end());
-    NotifyClusterAttributeChanged(Attributes::Zones::Id);
+    NotifyAttributeChangedIfSuccess(Attributes::Zones::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -480,7 +457,7 @@ Status ZoneManagementCluster::AddOrUpdateTrigger(const ZoneTriggerControlStruct 
 
     if (status == Status::Success)
     {
-        NotifyClusterAttributeChanged(Attributes::Triggers::Id);
+        NotifyAttributeChangedIfSuccess(Attributes::Triggers::Id);
     }
 
     return status;
@@ -494,7 +471,7 @@ Status ZoneManagementCluster::RemoveTrigger(uint16_t zoneId)
         mTriggers.erase(std::remove_if(mTriggers.begin(), mTriggers.end(),
                                        [&](const ZoneTriggerControlStruct & trigger) { return trigger.zoneID == zoneId; }),
                         mTriggers.end());
-        NotifyClusterAttributeChanged(Attributes::Triggers::Id);
+        NotifyAttributeChangedIfSuccess(Attributes::Triggers::Id);
     }
 
     return status;
@@ -528,11 +505,6 @@ ZoneManagementCluster::HandleCreateTwoDCartesianZone(const ConcreteCommandPath &
     VerifyOrReturnValue(status == Status::Success, status);
 
     VerifyOrReturnValue(mUserDefinedZonesCount < mMaxUserDefinedZones, Status::ResourceExhausted);
-
-    if (zoneToCreate.use == ZoneUseEnum::kFocus && !HasFeature(Feature::kFocusZones))
-    {
-        return Status::ConstraintError;
-    }
 
     std::vector<TwoDCartesianVertexStruct> twoDCartVertices;
 
@@ -677,8 +649,7 @@ Status ZoneManagementCluster::ValidateTrigger(const ZoneTriggerControlStruct & t
     VerifyOrReturnError(trigger.augmentationDuration <= trigger.initialDuration, Status::ConstraintError);
     VerifyOrReturnError(trigger.maxDuration >= trigger.initialDuration, Status::ConstraintError);
 
-    VerifyOrReturnError((HasFeature(Feature::kPerZoneSensitivity) == trigger.sensitivity.HasValue()), Status::InvalidCommand);
-    if (HasFeature(Feature::kPerZoneSensitivity))
+    if (trigger.sensitivity.HasValue())
     {
         VerifyOrReturnError(trigger.sensitivity.Value() >= 1 && trigger.sensitivity.Value() <= mSensitivityMax,
                             Status::ConstraintError);
