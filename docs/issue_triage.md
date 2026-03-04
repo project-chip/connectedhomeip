@@ -99,8 +99,8 @@ types or functionality) as well as individual examples.
 | `examples/android`                             |                              | UNMAINTAINED |
 | `examples/bridge-app`                          |                              | UNMAINTAINED |
 | `examples/build_overrides`                     |                              | UNMAINTAINED |
-| `examples/camera-app`                          |                              | UNMAINTAINED |
-| `examples/camera-controller`                   |                              | UNMAINTAINED |
+| `examples/camera-app`                          | Charles Kim, Mark Trayer     |              |
+| `examples/camera-controller`                   | Charles Kim, Mark Trayer     |              |
 | `examples/chef`                                | Shreyas Bhandare             |              |
 | `examples/chip-tool`                           |                              | UNMAINTAINED |
 | `examples/closure-app`                         | Satyanaag Bollimpalli        |              |
