@@ -753,8 +753,7 @@ void AmbientContextSensingCluster::RemoveExpiredItems(std::list<AmbientContextSe
     {
         if (it->mEndTimestamp <= now)
         {
-            auto item = *it;
-            it        = eventList.erase(it);
+            it = eventList.erase(it);
         }
         else
         {
