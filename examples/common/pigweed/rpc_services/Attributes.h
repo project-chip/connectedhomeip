@@ -299,7 +299,15 @@ public:
             response.which_data = chip_rpc_AttributeData_data_int8_tag;
             break;
         case chip_rpc_AttributeType_ZCL_INT16S_ATTRIBUTE_TYPE:
+            ChipLogProgress(Support,
+                            "DEBUG_DEBUG In ::pw::Status Read Reading Cluster=%d Attribute=%d. In "
+                            "chip_rpc_AttributeType_ZCL_INT16S_ATTRIBUTE_TYPE.",
+                            path.mClusterId, path.mAttributeId);
             PW_TRY(TlvBufferGetData(tlvBuffer, TLV::kTLVType_SignedInteger, response.data.data_int16));
+            ChipLogProgress(Support,
+                            "DEBUG_DEBUG In ::pw::Status Read Reading Cluster=%d Attribute=%d. In "
+                            "TlvBufferGetData was successful.",
+                            path.mClusterId, path.mAttributeId);
             response.which_data = chip_rpc_AttributeData_data_int16_tag;
             break;
         case chip_rpc_AttributeType_ZCL_INT32S_ATTRIBUTE_TYPE:
