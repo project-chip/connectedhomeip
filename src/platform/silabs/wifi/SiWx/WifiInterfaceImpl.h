@@ -66,7 +66,7 @@ public:
     void CancelScanNetworks() override;
     bool IsWifiProvisioned() override;
     CHIP_ERROR InitWiFiStack(void) override;
-    CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info) override;
+    CHIP_ERROR GetAccessPointInfo(chip::DeviceLayer::NetworkCommissioning::WiFiScanResponse & info) override;
     CHIP_ERROR GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info) override;
     CHIP_ERROR ResetCounters() override;
 
