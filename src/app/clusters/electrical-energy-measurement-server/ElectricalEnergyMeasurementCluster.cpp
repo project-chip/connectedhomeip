@@ -117,7 +117,7 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::SetMeasurementAccuracy(const Meas
     {
         ReadOnlyBufferBuilder<MeasurementAccuracyRangeStruct::Type> rangesBuilder;
         ReturnErrorOnFailure(rangesBuilder.AppendElements(value.accuracyRanges));
-        mAccuracyRangesStorage                              = rangesBuilder.TakeBuffer(); 
+        mAccuracyRangesStorage                              = rangesBuilder.TakeBuffer();
         mMeasurementData.measurementAccuracy.accuracyRanges = mAccuracyRangesStorage;
     }
 

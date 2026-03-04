@@ -208,7 +208,7 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
         EXPECT_EQ(readAccuracy.accuracyRanges[0].percentMax.Value(), 500);
         EXPECT_EQ(readAccuracy.accuracyRanges[0].percentMin.Value(), 50);
     }
-    
+
     // Test SetCumulativeReset
     {
         Structs::CumulativeEnergyResetStruct::Type resetData;
