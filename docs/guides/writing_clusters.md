@@ -325,17 +325,47 @@ attribute's value changes.
         VerifyOrReturnValue(mValue != newValue, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         ```
 
--   **OnClusterAttributeChanged Pattern:** Each cluster should implement a
-    centralized helper method (e.g., `OnClusterAttributeChanged(AttributeId)`)
-    that combines both network and application notifications.
-    -   Call `NotifyAttributeChanged()` to notify network subscribers.
-    -   Call delegate callbacks to notify the application layer of the _actual_
-        change.
-    -   Invoke this method only when a value has truly changed.
-    -   **Example:** See
-        [Boolean State Configuration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h)
-        which declares `OnClusterAttributeChanged(AttributeId)` as a private
-        helper.
+
+-   **Per-Attribute Change Callbacks:** As a concrete realization of the
+    [Delegate/Driver Pattern for Validation](#delegate-driver-pattern-for-validation),
+    each mutable attribute should have a corresponding `On<AttributeName>Changed`
+    callback in the delegate interface. These are _pre-write_ hooks—invoked
+    after spec-level validation and the no-op guard, but _before_ the value is
+    committed. The callback must always receive the **proposed new value**, not
+    the current (stale) value. Returning `true` accepts the change; returning
+    `false` vetoes it—the cluster must then fail the operation with
+    `Protocols::InteractionModel::Status::Failure` (for APIs returning `Status`)
+    or `CHIP_ERROR_INCORRECT_STATE` (for APIs returning `CHIP_ERROR`).
+    Default implementations should return `true` so applications only override
+    the callbacks they need.
+
+    **Example:** The
+    [Boolean State Configuration delegate](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/boolean-state-configuration-delegate.h)
+    declares:
+
+    ```cpp
+    virtual bool OnCurrentSensitivityLevelChanged(uint8_t newValue) { return true; }
+    virtual bool OnAlarmsActiveChanged(chip::BitMask<AlarmModeBitmap> newValue) { return true; }
+    virtual bool OnAlarmsSuppressedChanged(chip::BitMask<AlarmModeBitmap> newValue) { return true; }
+    virtual bool OnAlarmsEnabledChanged(chip::BitMask<AlarmModeBitmap> newValue) { return true; }
+    virtual bool OnSensorFaultChanged(chip::BitMask<SensorFaultBitmap> newValue) { return true; }
+    ```
+
+    And the cluster invokes them in the standard order—validate, guard no-op,
+    call delegate, then commit and notify:
+
+    ```cpp
+    VerifyOrReturnError(level < mSupportedSensitivityLevels, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(mCurrentSensitivityLevel != level, CHIP_NO_ERROR);
+
+    if (mDelegate != nullptr)
+    {
+        VerifyOrReturnError(mDelegate->OnCurrentSensitivityLevelChanged(level), CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    mCurrentSensitivityLevel = level;
+    NotifyAttributeChanged(CurrentSensitivityLevel::Id);
+    ```
 
 #### Persistent Storage
 
