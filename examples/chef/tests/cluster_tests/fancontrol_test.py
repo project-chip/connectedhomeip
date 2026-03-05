@@ -51,7 +51,8 @@ class TC_FANCONTROL(MatterBaseTest):
 
     @async_test_body
     async def test_TC_FANCONTROL(self):
-        endpoint = self.user_params.get("fan_endpoint", self.matter_test_config.endpoint)
+        endpoint = self.user_params.get(
+            "fan_endpoint", self.matter_test_config.endpoint)
         if endpoint is None:
             endpoint = 1
         logger.info(f"Testing FanControl on endpoint {endpoint}")
@@ -61,8 +62,10 @@ class TC_FANCONTROL(MatterBaseTest):
 
         # Read FeatureMap to check for MultiSpeed support
         feature_map = await self._read_fan_control_attribute(endpoint, Clusters.Objects.FanControl.Attributes.FeatureMap)
-        has_multi_speed = (feature_map & Clusters.Objects.FanControl.Bitmaps.Feature.kMultiSpeed) != 0
-        logger.info(f"FeatureMap: {feature_map}, MultiSpeed supported: {has_multi_speed}")
+        has_multi_speed = (
+            feature_map & Clusters.Objects.FanControl.Bitmaps.Feature.kMultiSpeed) != 0
+        logger.info(
+            f"FeatureMap: {feature_map}, MultiSpeed supported: {has_multi_speed}")
 
         self.step(2)
         # Read initial speed and percents
@@ -76,11 +79,15 @@ class TC_FANCONTROL(MatterBaseTest):
         logger.info(f"Initial PercentSetting: {percent_setting}")
         logger.info(f"Initial PercentCurrent: {percent_current}")
 
-        asserts.assert_equal(speed_setting, 0, "Initial SpeedSetting should be 0")
-        asserts.assert_equal(speed_current, 0, "Initial SpeedCurrent should be 0")
+        asserts.assert_equal(
+            speed_setting, 0, "Initial SpeedSetting should be 0")
+        asserts.assert_equal(
+            speed_current, 0, "Initial SpeedCurrent should be 0")
         if has_multi_speed:
-            asserts.assert_equal(percent_setting, 0, "Initial PercentSetting should be 0")
-            asserts.assert_equal(percent_current, 0, "Initial PercentCurrent should be 0")
+            asserts.assert_equal(percent_setting, 0,
+                                 "Initial PercentSetting should be 0")
+            asserts.assert_equal(percent_current, 0,
+                                 "Initial PercentCurrent should be 0")
 
         self.step(3)
         # Increase Speed by 1
@@ -103,11 +110,15 @@ class TC_FANCONTROL(MatterBaseTest):
         logger.info(f"PercentSetting: {percent_setting}")
         logger.info(f"PercentCurrent: {percent_current}")
 
-        asserts.assert_equal(speed_setting, 1, "SpeedSetting should be 1 after increase")
-        asserts.assert_equal(speed_current, 1, "SpeedCurrent should be 1 after increase")
+        asserts.assert_equal(
+            speed_setting, 1, "SpeedSetting should be 1 after increase")
+        asserts.assert_equal(
+            speed_current, 1, "SpeedCurrent should be 1 after increase")
         if has_multi_speed:
-            asserts.assert_equal(percent_setting, 10, "PercentSetting should be 10 after increase")
-            asserts.assert_equal(percent_current, 10, "PercentCurrent should be 10 after increase")
+            asserts.assert_equal(percent_setting, 10,
+                                 "PercentSetting should be 10 after increase")
+            asserts.assert_equal(percent_current, 10,
+                                 "PercentCurrent should be 10 after increase")
 
         self.step(4)
         # Increase Speed by 1 again
@@ -130,11 +141,15 @@ class TC_FANCONTROL(MatterBaseTest):
         logger.info(f"PercentSetting: {percent_setting}")
         logger.info(f"PercentCurrent: {percent_current}")
 
-        asserts.assert_equal(speed_setting, 2, "SpeedSetting should be 2 after 2nd increase")
-        asserts.assert_equal(speed_current, 2, "SpeedCurrent should be 2 after 2nd increase")
+        asserts.assert_equal(
+            speed_setting, 2, "SpeedSetting should be 2 after 2nd increase")
+        asserts.assert_equal(
+            speed_current, 2, "SpeedCurrent should be 2 after 2nd increase")
         if has_multi_speed:
-            asserts.assert_equal(percent_setting, 20, "PercentSetting should be 20 after 2nd increase")
-            asserts.assert_equal(percent_current, 20, "PercentCurrent should be 20 after 2nd increase")
+            asserts.assert_equal(
+                percent_setting, 20, "PercentSetting should be 20 after 2nd increase")
+            asserts.assert_equal(
+                percent_current, 20, "PercentCurrent should be 20 after 2nd increase")
 
         self.step(5)
         # Decrease Speed by 1
@@ -157,11 +172,15 @@ class TC_FANCONTROL(MatterBaseTest):
         logger.info(f"PercentSetting: {percent_setting}")
         logger.info(f"PercentCurrent: {percent_current}")
 
-        asserts.assert_equal(speed_setting, 1, "SpeedSetting should be 1 after decrease")
-        asserts.assert_equal(speed_current, 1, "SpeedCurrent should be 1 after decrease")
+        asserts.assert_equal(
+            speed_setting, 1, "SpeedSetting should be 1 after decrease")
+        asserts.assert_equal(
+            speed_current, 1, "SpeedCurrent should be 1 after decrease")
         if has_multi_speed:
-            asserts.assert_equal(percent_setting, 10, "PercentSetting should be 10 after decrease")
-            asserts.assert_equal(percent_current, 10, "PercentCurrent should be 10 after decrease")
+            asserts.assert_equal(percent_setting, 10,
+                                 "PercentSetting should be 10 after decrease")
+            asserts.assert_equal(percent_current, 10,
+                                 "PercentCurrent should be 10 after decrease")
 
 
 if __name__ == "__main__":
