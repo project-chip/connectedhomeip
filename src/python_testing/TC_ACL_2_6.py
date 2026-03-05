@@ -19,7 +19,10 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     factory-reset: true
 #     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -28,6 +31,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 0
+#       --no-wildcard-subscription
 # === END CI TEST ARGUMENTS ===
 
 import logging

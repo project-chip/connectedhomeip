@@ -50,6 +50,7 @@ import matter.logging
 import matter.native
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute, ClusterObjects
+from matter.clusters.Types import NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
@@ -223,12 +224,14 @@ class MatterBaseTest(base_test.BaseTestClass):
         # subscription-verification logic does not flag them as missing or stale.
         # The XML parsing is done once per class here (not per test) because it is expensive.
         self.wildcard_subscription_handler = None
-        # Subscription controller: same node_id as default_controller so it shares the
-        # existing admin ACL entry (no extra ACL write needed).  Uses a separate controller
-        # object so keepSubscriptions=False on default_controller does not cancel this
-        # background subscription.  Created lazily in _start_wildcard_subscription;
-        # shut down in teardown_class.
+        # Secondary controller for the background wildcard subscription.  A separate node_id
+        # is used so that keepSubscriptions=False on default_controller does not cancel this
+        # background subscription (they use different CASE sessions).
+        # Created lazily in _start_wildcard_subscription; shut down in teardown_class.
         self.subscription_controller = None
+        # ACL snapshot taken immediately before the subscription controller's admin entry is
+        # added.  Restored in teardown_test so every test sees a clean, unmodified ACL.
+        self._pre_subscription_acl = None
         self._cq_excluded_attr_ids: frozenset[tuple[int, int]] = self._build_cq_excluded_ids()
 
     def teardown_class(self):
@@ -300,11 +303,18 @@ class MatterBaseTest(base_test.BaseTestClass):
         and caches the priming-read values so tests can query the current device state
         without an extra round-trip read.
 
-        A secondary controller with the same node_id as default_controller is used so that
+        A secondary controller (node_id = controller_node_id + 123456) is used so that
         keepSubscriptions=False from default_controller (issued by tests that manage their
-        own subscriptions) does not cancel this background subscription.  Using the same
-        node_id means no extra ACL entry is required — the subscription controller is already
-        covered by default_controller's admin ACL entry — so ACL tests see an unmodified ACL.
+        own subscriptions) does not cancel this background subscription.
+
+        Before the subscription starts the current ACL is snapshotted into
+        _pre_subscription_acl and a single Administer entry for the secondary controller is
+        appended.  teardown_test restores the ACL from the snapshot so every test sees an
+        unmodified ACL regardless of what the test did to it.
+
+        autoResubscribe=False is intentional: if a test removes the subscription
+        controller's ACL entry (e.g. via a full ACL overwrite), the subscription stops
+        receiving reports rather than repeatedly retrying with failing re-subscriptions.
 
         The subscription handler is stored as `self.wildcard_subscription_handler` and is
         shut down automatically in teardown_test.
@@ -320,15 +330,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             excluded_attribute_ids=self._cq_excluded_attr_ids
         )
 
-        # Use the same node_id as default_controller.  The ACL lookup is by node_id, so the
-        # subscription controller is already authorised via default_controller's admin entry.
-        # A separate controller object is still used so that keepSubscriptions=False issued
-        # by the test on default_controller does not cancel this background subscription
-        # (they use different CASE sessions).
-        subscription_node_id = self.matter_test_config.controller_node_id
+        subscription_node_id = self.matter_test_config.controller_node_id + 123456
 
         async def _start():
-            # Create the secondary controller once; reused across all tests in the class.
+            # Create the secondary controller once per class; reused across all tests.
             if self.subscription_controller is None:
                 fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
                 self.subscription_controller = fabric_admin.NewController(
@@ -336,19 +341,39 @@ class MatterBaseTest(base_test.BaseTestClass):
                     paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
                 )
                 LOGGER.info("[MatterBaseTest] Subscription controller created "
-                            "(node_id=0x%016X, shares ACL entry with default_controller)",
-                            subscription_node_id)
+                            "(node_id=0x%016X)", subscription_node_id)
 
-            # Start the wildcard subscription using the subscription controller.
+            # Snapshot the current ACL, then append an Administer entry for the subscription
+            # controller.  teardown_test will restore from this snapshot after every test.
+            acl_result = await self.default_controller.ReadAttribute(
+                nodeId=self.dut_node_id,
+                attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+            )
+            self._pre_subscription_acl = (
+                acl_result[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
+            )
+            sub_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                subjects=[subscription_node_id],
+                targets=NullValue,
+            )
+            await self.default_controller.WriteAttribute(
+                nodeId=self.dut_node_id,
+                attributes=[(0, Clusters.AccessControl.Attributes.Acl(
+                    list(self._pre_subscription_acl) + [sub_entry]
+                ))],
+            )
+
+            # Start the wildcard subscription using the secondary controller.
             await handler.start(
                 dev_ctrl=self.subscription_controller,
                 node_id=self.dut_node_id,
-                # Wildcard: subscribe to every attribute on every endpoint/cluster.
                 attributes=[Attribute.AttributePath(None, None, None)],
                 min_interval_sec=0,
                 max_interval_sec=30,
                 keepSubscriptions=False,
-                autoResubscribe=True,
+                autoResubscribe=False,
             )
 
         try:
@@ -363,6 +388,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             )
         except Exception as e:
             LOGGER.warning("[MatterBaseTest] Could not start wildcard subscription: %s", e)
+            self._pre_subscription_acl = None
             self.wildcard_subscription_handler = None
 
     def _dump_device_attributes_on_failure(self):
@@ -420,8 +446,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
         self.failed = False
         if self.runner_hook and not self.is_commissioning:
-            # Start the background wildcard subscription.
-            self._start_wildcard_subscription()
+            # Start the background wildcard subscription unless the test has opted out
+            # via --no-wildcard-subscription (e.g. tests that directly manipulate the ACL).
+            if not self.matter_test_config.no_wildcard_subscription:
+                self._start_wildcard_subscription()
             test_name = self.current_test_info.name
             steps = self.get_defined_test_steps(test_name)
             num_steps = 1 if steps is None else len(steps)
@@ -438,18 +466,42 @@ class MatterBaseTest(base_test.BaseTestClass):
     def teardown_test(self):
         """Tear down after each individual test execution.
 
-        Shuts down the background wildcard subscription started in setup_test.
+        Shuts down the background wildcard subscription and restores the DUT ACL to the
+        state captured before the subscription controller's entry was added.  This ensures
+        every test starts with a clean, unmodified ACL regardless of what the test did.
 
         Test authors that implement this method should ensure super().teardown_test() is called
         after any custom teardown code.
         """
-        if self.wildcard_subscription_handler is not None:
-            try:
-                self.wildcard_subscription_handler.shutdown()
-            except Exception as e:
-                LOGGER.warning("[MatterBaseTest] Error shutting down wildcard subscription: %s", e)
-            self.wildcard_subscription_handler = None
-        LOGGER.info("Wildcard subscription shut down")
+        if not self.matter_test_config.no_wildcard_subscription:
+            if self.wildcard_subscription_handler is not None:
+                try:
+                    self.wildcard_subscription_handler.shutdown()
+                except Exception as e:
+                    LOGGER.warning("[MatterBaseTest] Error shutting down wildcard subscription: %s", e)
+                self.wildcard_subscription_handler = None
+            LOGGER.info("Wildcard subscription shut down")
+
+            # Restore ACL to the snapshot taken before the subscription controller entry was
+            # added.  Runs unconditionally so the DUT is always left in the original state
+            # regardless of what the test did to the ACL.
+            if self._pre_subscription_acl is not None:
+                async def _restore_acl():
+                    try:
+                        await self.default_controller.WriteAttribute(
+                            nodeId=self.dut_node_id,
+                            attributes=[(0, Clusters.AccessControl.Attributes.Acl(
+                                self._pre_subscription_acl
+                            ))],
+                        )
+                        LOGGER.info("[MatterBaseTest] ACL restored to pre-subscription state")
+                    except Exception as e:
+                        LOGGER.warning("[MatterBaseTest] Error restoring ACL: %s", e)
+                try:
+                    self.event_loop.run_until_complete(_restore_acl())
+                except Exception as e:
+                    LOGGER.warning("[MatterBaseTest] Error running ACL restore: %s", e)
+                self._pre_subscription_acl = None
 
         super().teardown_test()
 
