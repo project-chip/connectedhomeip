@@ -48,7 +48,7 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [no-shell-tsan-clang]
+                build_variant: [no-shell-asan-clang]
                 chip_tool: [""]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
@@ -87,6 +87,10 @@ jobs:
               with:
                   platform: linux
                   bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+
+            - name: Set ASAN symbolizer path
+              run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
+
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -795,17 +799,14 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-light-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-thermostat-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-tv-app-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-air-purifier-${BUILD_VARIANT}-asan-clang-test-unified \
+                        --target linux-x64-bridge-${BUILD_VARIANT}-asan-clang-test-unified \
+                        --target linux-x64-closure-${BUILD_VARIANT}-asan-clang-test-unified \
+                        --target linux-x64-lock-${BUILD_VARIANT}-asan-clang-test-unified \
+                        --target linux-x64-microwave-oven-${BUILD_VARIANT}-asan-clang-test-unified \
+                        --target linux-x64-ota-provider-${BUILD_VARIANT}-asan-clang-test-unified \
+                        --target linux-x64-rvc-${BUILD_VARIANT}-asan-clang-test-unified \
+                        --target linux-x64-water-leak-detector-${BUILD_VARIANT}-asan-clang-test-unified \
                         --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -815,109 +816,109 @@ jobs:
             - name: Build linux-x64-all-clusters
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
+                  --target linux-x64-all-clusters-${BUILD_VARIANT}-asan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
+                  && rm -rf out/linux-x64-all-clusters-${BUILD_VARIANT}-asan-clang-test
                   "
 
             - name: Build linux-x64-all-devices
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-all-devices-${BUILD_VARIANT}-tsan-clang-test
+                  --target linux-x64-all-devices-${BUILD_VARIANT}-asan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-all-devices-tsan-clang-test"
+                  && rm -rf out/linux-x64-all-devices-${BUILD_VARIANT}-asan-clang-test"
 
             - name: Build linux-x64-lit-icd
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test
+                  --target linux-x64-lit-icd-${BUILD_VARIANT}-asan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test"
+                  && rm -rf out/linux-x64-lit-icd-${BUILD_VARIANT}-asan-clang-test"
 
             - name: Build linux-x64-energy-gateway
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test
+                  --target linux-x64-energy-gateway-${BUILD_VARIANT}-asan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test"
+                  && rm -rf out/linux-x64-energy-gateway-${BUILD_VARIANT}-asan-clang-test"
 
             - name: Build linux-x64-evse
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-evse-${BUILD_VARIANT}-tsan-clang-test
+                  --target linux-x64-evse-${BUILD_VARIANT}-asan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-evse-${BUILD_VARIANT}-tsan-clang-test"
+                  && rm -rf out/linux-x64-evse-${BUILD_VARIANT}-asan-clang-test"
 
             - name: Build linux-x64-water-heater
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-water-heater-${BUILD_VARIANT}-tsan-clang-test
+                  --target linux-x64-water-heater-${BUILD_VARIANT}-asan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-water-heater-${BUILD_VARIANT}-tsan-clang-test"
+                  && rm -rf out/linux-x64-water-heater-${BUILD_VARIANT}-asan-clang-test"
 
             - name: Build linux-x64-network-manager
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test
+                  --target linux-x64-network-manager-${BUILD_VARIANT}-asan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test"
+                  && rm -rf out/linux-x64-network-manager-${BUILD_VARIANT}-asan-clang-test"
 
             - name: Build linux-x64-fabric-admin-rpc
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang
+                  --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-asan-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang"
+                  && rm -rf out/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-asan-clang"
 
             - name: Build linux-x64-fabric-bridge-rpc
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang
+                  --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-asan-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang"
+                  && rm -rf out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-asan-clang"
 
             - name: Build linux-x64-fabric-sync
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang
+                  --target linux-x64-fabric-sync-${BUILD_VARIANT}-asan-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-fabric-sync-${BUILD_VARIANT}-clang"
+                  && rm -rf out/linux-x64-fabric-sync-${BUILD_VARIANT}-asan-clang"
 
             # TODO: camera app needs clang support
             - name: Build linux-x64-camera
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-camera
+                  --target linux-x64-camera-asan-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-camera"
+                  && rm -rf out/linux-x64-camera-asan-clang"
 
             - name: Build linux-x64-camera-controller
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-camera-controller
+                  --target linux-x64-camera-controller-asan-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-camera-controller"
+                  && rm -rf out/linux-x64-camera-controller-asan-clang"
 
             - name: Build linux-x64-light-data-model-no-unique-id
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang
+                  --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-asan-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang"
+                  && rm -rf out/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-asan-clang"
 
             - name: Build linux-x64-terms-and-conditions
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-terms-and-conditions
+                  --target linux-x64-terms-and-conditions-asan-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-terms-and-conditions"
+                  && rm -rf out/linux-x64-terms-and-conditions-asan-clang"
 
             - name: Build linux-x64-python-bindings
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-python-bindings-webrtc
+                  --target linux-x64-python-bindings-webrtc-asan-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-python-bindings-webrtc"
+                  && rm -rf out/linux-x64-python-bindings-webrtc-asan-clang"
 
             - name: Build linux-x64-jf-control-app
               run: >-
@@ -939,16 +940,9 @@ jobs:
             - name: Build linux-x64-requestor-app
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test
+                  --target linux-x64-ota-requestor-${BUILD_VARIANT}-asan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test"
-
-            - name: Build linux-x64-provider-app
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test"
+                  && rm -rf out/linux-x64-ota-requestor-${BUILD_VARIANT}-asan-clang-test"
 
             - name: Build Software Update ota images with new version.
               run: >-
@@ -960,12 +954,10 @@ jobs:
               run: ccache -s
 
             # We archive ourselves since upload-artifact seems to lose permission bits
-            # We also remove some debug info to make artifacts smaller (otherwise they are 2GB for binaries)
             - name: Archive artifacts
               env:
                 XZ_OPT: -T 0 -1
               run: |
-                find objdir-clone -executable -type f | xargs -n 1 strip
                 tar cfJ repl-build-data.tar.xz out/venv objdir-clone
 
             - name: Upload artifacts for running
@@ -1036,7 +1028,16 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v6
-            # NOTE: no bootstrap since we only use compile outputs from previous steps (including python venv in out/venv)
+
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+
+            - name: Set ASAN symbolizer path
+              run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
+
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
 
@@ -1053,34 +1054,34 @@ jobs:
               run: |
                   echo -n "" >/tmp/test_env.yaml
                   # keep-sorted: start
-                  echo "AIR_PURIFIER_APP: objdir-clone/linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test-unified/chip-air-purifier-app" >> /tmp/test_env.yaml
-                  echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
-                  echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-tsan-clang-test/all-devices-app" >> /tmp/test_env.yaml
-                  echo "BRIDGE_APP: objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test-unified/chip-bridge-app" >> /tmp/test_env.yaml
-                  echo "CAMERA_APP: objdir-clone/linux-x64-camera/chip-camera-app" >> /tmp/test_env.yaml
-                  echo "CAMERA_CONTROLLER_APP: objdir-clone/linux-x64-camera-controller/chip-camera-controller" >> /tmp/test_env.yaml
-                  echo "CHIP_LOCK_APP: objdir-clone/linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test-unified/chip-lock-app" >> /tmp/test_env.yaml
-                  echo "CHIP_MICROWAVE_OVEN_APP: objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test-unified/chip-microwave-oven-app" >> /tmp/test_env.yaml
-                  echo "CHIP_RVC_APP: objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test-unified/chip-rvc-app" >> /tmp/test_env.yaml
-                  echo "CLOSURE_APP: objdir-clone/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test-unified/closure-app" >> /tmp/test_env.yaml
-                  echo "ENERGY_GATEWAY_APP: objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test/chip-energy-gateway-app" >> /tmp/test_env.yaml
-                  echo "EVSE_APP: objdir-clone/linux-x64-evse-${BUILD_VARIANT}-tsan-clang-test/chip-evse-app" >> /tmp/test_env.yaml
-                  echo "FABRIC_ADMIN_APP: objdir-clone/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang/fabric-admin" >> /tmp/test_env.yaml
-                  echo "FABRIC_BRIDGE_APP: objdir-clone/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang/fabric-bridge-app" >> /tmp/test_env.yaml
-                  echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
+                  echo "AIR_PURIFIER_APP: objdir-clone/linux-x64-air-purifier-${BUILD_VARIANT}-asan-clang-test-unified/chip-air-purifier-app" >> /tmp/test_env.yaml
+                  echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-asan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
+                  echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-asan-clang-test/all-devices-app" >> /tmp/test_env.yaml
+                  echo "BRIDGE_APP: objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-asan-clang-test-unified/chip-bridge-app" >> /tmp/test_env.yaml
+                  echo "CAMERA_APP: objdir-clone/linux-x64-camera-asan-clang/chip-camera-app" >> /tmp/test_env.yaml
+                  echo "CAMERA_CONTROLLER_APP: objdir-clone/linux-x64-camera-controller-asan-clang/chip-camera-controller" >> /tmp/test_env.yaml
+                  echo "CHIP_LOCK_APP: objdir-clone/linux-x64-lock-${BUILD_VARIANT}-asan-clang-test-unified/chip-lock-app" >> /tmp/test_env.yaml
+                  echo "CHIP_MICROWAVE_OVEN_APP: objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-asan-clang-test-unified/chip-microwave-oven-app" >> /tmp/test_env.yaml
+                  echo "CHIP_RVC_APP: objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-asan-clang-test-unified/chip-rvc-app" >> /tmp/test_env.yaml
+                  echo "CLOSURE_APP: objdir-clone/linux-x64-closure-${BUILD_VARIANT}-asan-clang-test-unified/closure-app" >> /tmp/test_env.yaml
+                  echo "ENERGY_GATEWAY_APP: objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}-asan-clang-test/chip-energy-gateway-app" >> /tmp/test_env.yaml
+                  echo "EVSE_APP: objdir-clone/linux-x64-evse-${BUILD_VARIANT}-asan-clang-test/chip-evse-app" >> /tmp/test_env.yaml
+                  echo "FABRIC_ADMIN_APP: objdir-clone/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-asan-clang/fabric-admin" >> /tmp/test_env.yaml
+                  echo "FABRIC_BRIDGE_APP: objdir-clone/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-asan-clang/fabric-bridge-app" >> /tmp/test_env.yaml
+                  echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-asan-clang/fabric-sync" >> /tmp/test_env.yaml
                   echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app-${BUILD_VARIANT}-asan-clang/jfa-app" >> /tmp/test_env.yaml
                   echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app-${BUILD_VARIANT}-asan-clang/jfc-app" >> /tmp/test_env.yaml
-                  echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-app" >> /tmp/test_env.yaml
-                  echo "LIT_ICD_APP: objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test/lit-icd-app" >> /tmp/test_env.yaml
-                  echo "NETWORK_MANAGEMENT_APP: objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test/matter-network-manager-app" >> /tmp/test_env.yaml
-                  echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test/chip-ota-provider-app" >> /tmp/test_env.yaml
-                  echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
+                  echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-asan-clang/chip-lighting-app" >> /tmp/test_env.yaml
+                  echo "LIT_ICD_APP: objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}-asan-clang-test/lit-icd-app" >> /tmp/test_env.yaml
+                  echo "NETWORK_MANAGEMENT_APP: objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}-asan-clang-test/matter-network-manager-app" >> /tmp/test_env.yaml
+                  echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-asan-clang-test-unified/chip-ota-provider-app" >> /tmp/test_env.yaml
+                  echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-asan-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
                   echo "PUSH_AV_SERVER: src/tools/push_av_server/server.py" >> /tmp/test_env.yaml
                   echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
-                  echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
+                  echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions-asan-clang/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
-                  echo "WATER_HEATER_APP: objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}-tsan-clang-test/matter-water-heater-app" >> /tmp/test_env.yaml
-                  echo "WATER_LEAK_DETECTOR_APP: objdir-clone/linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test-unified/water-leak-detector-app" >> /tmp/test_env.yaml
+                  echo "WATER_HEATER_APP: objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}-asan-clang-test/matter-water-heater-app" >> /tmp/test_env.yaml
+                  echo "WATER_LEAK_DETECTOR_APP: objdir-clone/linux-x64-water-leak-detector-${BUILD_VARIANT}-asan-clang-test-unified/water-leak-detector-app" >> /tmp/test_env.yaml
                   # keep-sorted: end
 
                   # Generic trace setups after applications
@@ -1115,18 +1116,19 @@ jobs:
               run: |
                   mkdir -p out/trace_data
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/tests/scripts/mobile-device-test.py'
-                  scripts/run_in_python_env.sh out/venv "scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app"
+                  scripts/run_in_python_env.sh out/venv "scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-asan-clang-test/chip-all-clusters-app"
 
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
+              #TODO: remove --keep-going , ADDED FOR TESTING
               run: |
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}"'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --keep-going --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}"'
 
             - name: Execute Jupyter Notebooks
               if: ${{matrix.filter == ''}}
               run: |
                   # TODO: ipynb HARD CODES paths to all-clusters app. create a symlink to them
-                  ln -s ../objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test out/linux-x64-all-clusters
+                  ln -s ../objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-asan-clang-test out/linux-x64-all-clusters
 
                   scripts/run_in_python_env.sh out/venv \
                   "jupyter execute docs/development_controllers/matter-repl/Matter_REPL_Intro.ipynb \
