@@ -52,7 +52,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from support_modules.icd_support import ICDBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -82,7 +82,7 @@ clientTypeEnum = cluster.Enums.ClientTypeEnum
 features = cluster.Bitmaps.Feature
 
 
-class TC_ICDB_1_1(MatterBaseTest):
+class TC_ICDB_1_1(ICDBaseTest):
 
     def desc_TC_ICDB_1_1(self) -> str:
         return "[TC-ICDB-1.1] ICD Check-In Protocol - Register client - idle mode duration [DUT as Server]"
@@ -108,26 +108,10 @@ class TC_ICDB_1_1(MatterBaseTest):
         ]
 
     async def _read_icdm_attribute_expect_success(self, attribute):
-        return await self.read_single_attribute_check_success(endpoint=ROOT_ENDPOINT_ID, cluster=cluster, attribute=attribute)
+        return await self.read_single_attribute_check_success(endpoint=self.ROOT_NODE_ENDPOINT_ID, cluster=cluster, attribute=attribute)
 
     async def _send_single_icdm_command(self, command):
-        return await self.send_single_cmd(command, endpoint=ROOT_ENDPOINT_ID)
-
-    async def unregister_all_clients(self):
-        """Unregisters all entries in the DUT's RegisteredClients attribute."""
-        registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
-
-        if not registeredClients:
-            log.info("RegisteredClients is empty.")
-            return
-
-        log.info("RegisteredClients is not empty; unregistering all clients...")
-        for client in registeredClients:
-            try:
-                log.info(f"Unregistering client: {client}...")
-                await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
-            except InteractionModelError as e:
-                asserts.assert_fail(f"Unexpected error returned when unregistering client: {e}")
+        return await self.send_single_cmd(command, endpoint=self.ROOT_NODE_ENDPOINT_ID)
 
     def pics_TC_ICDB_1_1(self) -> list[str]:
         return [

@@ -22,9 +22,20 @@ import logging
 import re
 from enum import IntEnum
 
+from mobly import asserts
+
 import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError
+from matter.testing.matter_testing import MatterBaseTest
 
 log = logging.getLogger(__name__)
+
+cluster = Clusters.Objects.IcdManagement
+attributes = cluster.Attributes
+commands = cluster.Commands
+
+# CI-specific constants
+MAX_CI_IDLE_CYCLE_WAIT_S = 10
 
 # Base for ICD test-event triggers: (IcdManagement cluster ID << 48).
 _ICD_CLUSTER_CODE = Clusters.Objects.IcdManagement.id << 48
@@ -85,3 +96,28 @@ def uat_set_hints(hint_bitmap):
     for bit in hints:
         log.info(f"  - {uat_bit_name(bit)} (0x{bit.value:05X})")
     return hints
+
+# ============================================================================
+# ICDBaseTest - Main Base Class
+# ============================================================================
+
+class ICDBaseTest(MatterBaseTest):
+    """Base test class for ICD tests with shared functionality."""
+
+    ROOT_NODE_ENDPOINT_ID = 0
+
+    async def unregister_all_clients(self):
+        """Unregisters all entries in the DUT's RegisteredClients attribute."""
+        registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
+
+        if not registeredClients:
+            log.info("RegisteredClients is empty.")
+            return
+
+        log.info("RegisteredClients is not empty; unregistering all clients...")
+        for client in registeredClients:
+            try:
+                log.info(f"Unregistering client: {client}...")
+                await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
+            except InteractionModelError as e:
+                asserts.assert_fail(f"Unexpected error returned when unregistering client: {e}")

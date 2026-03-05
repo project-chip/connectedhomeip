@@ -47,12 +47,11 @@ import logging
 import os
 
 from mobly import asserts
-from support_modules.icd_support import ICDTestEventTriggerOperations, uat_bit_name, uat_set_hints
+from support_modules.icd_support import ICDTestEventTriggerOperations, uat_bit_name, uat_set_hints, ICDBaseTest, MAX_CI_IDLE_CYCLE_WAIT_S
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -73,9 +72,6 @@ On a real DUT, the UAT is performed physically per UserActiveModeTriggerHint/Ins
 On a real DUT, use the --timeout <seconds> script argument if wait times are large to prevent the test from timing out.
 '''
 
-ROOT_ENDPOINT_ID = 0
-MAX_CI_IDLE_CYCLE_WAIT_S = 10
-
 cluster = Clusters.Objects.IcdManagement
 attributes = cluster.Attributes
 commands = cluster.Commands
@@ -83,7 +79,7 @@ clientTypeEnum = cluster.Enums.ClientTypeEnum
 features = cluster.Bitmaps.Feature
 
 
-class TC_ICDB_1_2(MatterBaseTest):
+class TC_ICDB_1_2(ICDBaseTest):
 
     def desc_TC_ICDB_1_2(self) -> str:
         return "[TC-ICDB-1.2] ICD Check-In Protocol - Register client - user active mode trigger [DUT as Server]"
@@ -109,26 +105,10 @@ class TC_ICDB_1_2(MatterBaseTest):
         ]
 
     async def _read_icdm_attribute_expect_success(self, attribute):
-        return await self.read_single_attribute_check_success(endpoint=ROOT_ENDPOINT_ID, cluster=cluster, attribute=attribute)
+        return await self.read_single_attribute_check_success(endpoint=self.ROOT_NODE_ENDPOINT_ID, cluster=cluster, attribute=attribute)
 
     async def _send_single_icdm_command(self, command):
-        return await self.send_single_cmd(command, endpoint=ROOT_ENDPOINT_ID)
-
-    async def unregister_all_clients(self):
-        """Unregisters all entries in the DUT's RegisteredClients attribute."""
-        registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
-
-        if not registeredClients:
-            log.info("RegisteredClients is empty.")
-            return
-
-        log.info("RegisteredClients is not empty; unregistering all clients...")
-        for client in registeredClients:
-            try:
-                log.info(f"Unregistering client: {client}...")
-                await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
-            except InteractionModelError as e:
-                asserts.assert_fail(f"Unexpected error returned when unregistering client: {e}")
+        return await self.send_single_cmd(command, endpoint=self.ROOT_NODE_ENDPOINT_ID)
 
     def pics_TC_ICDB_1_2(self) -> list[str]:
         return [
