@@ -80,7 +80,8 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
 
     val attributePaths = request.attributePaths
     val eventPaths = request.eventPaths
-    val successes = mutableListOf<ReadData>()
+    val attributeSuccesses = mutableMapOf<AttributePath, ReadData>()
+    val eventSuccesses = mutableMapOf<EventPath, ReadData>()
     val failures = mutableListOf<ReadFailure>()
 
     return callbackFlow {
@@ -126,7 +127,7 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
                   for (attribute in cluster.value.attributes) {
                     val readData =
                       ReadData.Attribute(attribute.value.path, attribute.value.tlvValue)
-                    successes.add(readData)
+                    attributeSuccesses[attribute.value.path] = readData
                   }
 
                   for (eventList in cluster.value.events) {
@@ -151,12 +152,15 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
                           timeStamp = timestamp,
                           data = event.tlvValue
                         )
-                      successes.add(readData)
+                      eventSuccesses[event.path] = readData
                     }
                   }
                 }
               }
-              trySendBlocking(SubscriptionState.NodeStateUpdate(ReadResponse(successes, failures)))
+              trySendBlocking(SubscriptionState.NodeStateUpdate(ReadResponse(
+                  attributeSuccesses.values.toList() + eventSuccesses.values.toList(), 
+                  failures
+                )))
                 .onFailure { ex ->
                   logger.log(Level.SEVERE, "Error sending NodeStateUpdate to subscriber: %s", ex)
                 }
