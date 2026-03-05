@@ -165,7 +165,7 @@ class IpPacketCaptureManager():
 
         cmd = ['tcpdump', '-qn', '-i', self.interface, '-w', str(self.dump_filename), '-Z', getpass.getuser()]
         if os.getuid() != 0:
-            cmd.insert(0, 'sudo')
+            cmd = ['sudo', '-n'] + cmd
         self.tcpdump_process = Subprocess(cmd[0], *cmd[1:], output_cb=process_mon_output)
 
     def start(self):
@@ -180,7 +180,7 @@ class IpPacketCaptureManager():
             self.tcpdump_process = None
         if not self.keep_dumpfile:
             log.info("Deleting capture file '%s'", self.dump_filename)
-            self.dump_filename.unlink()
+            self.dump_filename.unlink(missing_ok=True)
 
 
 @click.command()
@@ -272,7 +272,7 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-              quiet: bool, run_name: str = None):
+              quiet: bool, run_name: str):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -281,13 +281,12 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
     restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
 
-    tcpdump = None
+    script_name = pathlib.Path(script).name.removesuffix('.py')
+    tcpdump_capture_filename = ip_packet_capture_dir / f"tcpdump_{script_name}-{os.getpid()}-{run_name}-.pcap"
+
+    tcpdump = IpPacketCaptureManager(pathlib.Path(tcpdump_capture_filename))
+
     if ip_packet_capture:
-        script_name = pathlib.Path(script).name.removesuffix('.py')
-
-        tcpdump_capture_filename = ip_packet_capture_dir / f"tcpdump_{script_name}_{os.getpid()}.pcap"
-
-        tcpdump = IpPacketCaptureManager(pathlib.Path(tcpdump_capture_filename))
         tcpdump.start()
 
     # Remove app config and storage if factory reset is requested
@@ -376,6 +375,9 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         # We expect both app and test script should exit with 0
         exit_code = test_script_exit_code or app_exit_code
 
+        if tcpdump and exit_code != 0:
+            tcpdump.keep_dumpfile = True
+
         if quiet:
             if exit_code:
                 sys.stdout.write(stream_output.getvalue().decode('utf-8', errors='replace'))
@@ -394,10 +396,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             log.info("Stopping app restart monitor thread")
             restart_monitor_thread.join(2.0)
 
-        if tcpdump:
-            if exit_code != 0:
-                tcpdump.keep_dumpfile = True
-            tcpdump.stop()
+
+        tcpdump.stop()
 
         # Clean up any leftover flag files if they exist - ensure this always executes
         log.info("Cleaning up flag files")
