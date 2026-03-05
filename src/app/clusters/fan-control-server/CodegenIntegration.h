@@ -24,4 +24,7 @@ namespace chip::app::Clusters::FanControl {
 
 FanControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
+void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate);
+Delegate * GetDelegate(EndpointId aEndpoint);
+
 } // namespace chip::app::Clusters::FanControl
