@@ -14,14 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import enum
+import json
 import logging
 import os
 import random
 import sys
 import time
 import warnings
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -66,6 +68,37 @@ class RunContext:
 
     # Deprecated options passed to `cmd_run`
     deprecated_chip_tool_path: Path | None = None
+
+
+@dataclass
+class TestResult:
+    name: str
+    iteration: int
+    status: str          # "passed" | "failed" | "dry_run"
+    duration_seconds: float
+
+
+@dataclass
+class RunSummary:
+    run_timestamp: str
+    iterations: int
+    total_runs: int
+    passed: int
+    failed: int
+    results: list[TestResult] = field(default_factory=list)
+
+    def record(self, name: str, iteration: int, status: str, duration: float) -> None:
+        self.results.append(TestResult(name=name, iteration=iteration, status=status, duration_seconds=round(duration, 3)))
+        if status == "passed":
+            self.passed += 1
+        elif status == "failed":
+            self.failed += 1
+
+    def write_json(self, path: Path) -> None:
+        data = asdict(self)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(data, indent=2))
+        log.info("Test run summary written to %s", path)
 
 
 # TODO: When we update click to >= 8.2.0 we will be able to use the builtin `deprecated` argument for Option
@@ -409,6 +442,11 @@ class Terminable(Protocol):
     type=click.Choice(['on-network', 'ble-wifi', 'ble-thread', 'thread-meshcop'], case_sensitive=False),
     default='on-network',
     help='Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth and Thread mock servers. "thread-meshcop" performs Thread commissioning using Thread mock server. This option is Linux-only.')
+@click.option(
+    '--summary-file',
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help='If provided, write a JSON test-run summary to this file at the end of the run.')
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             app_path: list[str], tool_path: list[str], discover_paths: bool, help_paths: bool,
@@ -418,7 +456,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None, energy_gateway_app: Path | None,
             water_heater_app: Path | None, evse_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
             chip_tool_with_python: Path | None, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
-            expected_failures: int, commissioning_method: str | None) -> None:
+            expected_failures: int, commissioning_method: str | None, summary_file: Path | None) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
@@ -503,6 +541,14 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
     thread_ba_port = None
     to_terminate: list[Terminable] = []
 
+    run_summary = RunSummary(
+        run_timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        iterations=iterations,
+        total_runs=0,
+        passed=0,
+        failed=0,
+    )
+
     def cleanup() -> None:
         for item in reversed(to_terminate):
             try:
@@ -511,6 +557,11 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             except Exception as e:
                 log.warning("Encountered exception during cleanup: %r", e)
         to_terminate.clear()
+        if summary_file is not None:
+            try:
+                run_summary.write_json(summary_file)
+            except Exception as e:
+                log.warning("Failed to write summary file: %r", e)
 
     try:
         if sys.platform == 'linux':
@@ -574,17 +625,23 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                         thread_ba_host=thread_ba_host,
                         thread_ba_port=thread_ba_port,
                     )
-                    if not dry_run:
-                        test_end = time.monotonic()
+                    test_end = time.monotonic()
+                    if dry_run:
+                        run_summary.record(test.name, i + 1, "dry_run", test_end - test_start)
+                    else:
                         log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
+                        run_summary.record(test.name, i + 1, "passed", test_end - test_start)
                 except Exception:
                     if os.path.exists('thread.pcap'):
                         os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
                     test_end = time.monotonic()
                     log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
+                    run_summary.record(test.name, i + 1, "failed", test_end - test_start)
                     observed_failures += 1
                     if not keep_going:
                         sys.exit(2)
+
+            run_summary.total_runs = len(run_summary.results)
 
             if observed_failures != expected_failures:
                 log.error("Iteration %d: expected failure count %d, but got %d",
@@ -598,6 +655,87 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         raise
     finally:
         cleanup()
+
+
+@main.command(
+    'summarize',
+    help='Pretty-print a JSON summary file produced by the "run" command.')
+@click.option(
+    '--summary-file',
+    required=True,
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    help='Path to the JSON summary file to display.')
+@click.option(
+    '--top-slowest',
+    default=20,
+    show_default=True,
+    type=click.IntRange(min=1),
+    help='Number of slowest tests to include in the timing table.')
+def cmd_summarize(summary_file: Path, top_slowest: int) -> None:
+    raw = json.loads(summary_file.read_text())
+    results: list[dict] = raw.get("results", [])
+
+    passed = raw.get("passed", 0)
+    failed = raw.get("failed", 0)
+    total = raw.get("total_runs", len(results))
+    iterations = raw.get("iterations", 1)
+    ts = raw.get("run_timestamp", "unknown")
+
+    sep = "=" * 72
+
+    print(sep)
+    print("  TEST RUN SUMMARY")
+    print(sep)
+    print(f"  Run timestamp : {ts}")
+    print(f"  Iterations    : {iterations}")
+    print(f"  Total runs    : {total}")
+    print(f"  Passed        : {passed}")
+    print(f"  Failed        : {failed}")
+    if total:
+        print(f"  Pass rate     : {100 * passed / total:.1f}%")
+    print(sep)
+
+    failed_results = [r for r in results if r["status"] == "failed"]
+    if failed_results:
+        print(f"\n  FAILED TESTS ({len(failed_results)}):")
+        print(f"  {'Test name':<50} {'Iter':>4}  {'Duration':>10}")
+        print("  " + "-" * 68)
+        for r in sorted(failed_results, key=lambda x: x["name"]):
+            print(f"  {'✗  ' + r['name']:<50} {r['iteration']:>4}  {r['duration_seconds']:>9.2f}s")
+    else:
+        print("\n  No failures recorded.")
+
+    if iterations > 1:
+        from collections import Counter
+        fail_counts: Counter = Counter()
+        run_counts: Counter = Counter()
+        for r in results:
+            run_counts[r["name"]] += 1
+            if r["status"] == "failed":
+                fail_counts[r["name"]] += 1
+        flaky = [(name, fail_counts[name], run_counts[name]) for name in fail_counts if fail_counts[name] > 0]
+        if flaky:
+            print(f"\n  FAILURE RATE BY TEST (across {iterations} iterations):")
+            print(f"  {'Test name':<50} {'Failures':>8}  {'Rate':>8}")
+            print("  " + "-" * 70)
+            for name, fails, runs in sorted(flaky, key=lambda x: -x[1]):
+                rate = 100 * fails / runs
+                print(f"  {name:<50} {fails:>5}/{runs:<2}  {rate:>7.1f}%")
+
+    slowest = sorted(
+        [r for r in results if r["status"] != "dry_run"],
+        key=lambda x: -x["duration_seconds"]
+    )[:top_slowest]
+
+    if slowest:
+        print(f"\n  SLOWEST {top_slowest} TEST RUNS:")
+        print(f"  {'Test name':<50} {'Status':<8} {'Iter':>4}  {'Duration':>10}")
+        print("  " + "-" * 76)
+        for r in slowest:
+            mark = "✓" if r["status"] == "passed" else "✗"
+            print(f"  {mark + '  ' + r['name']:<50} {r['status']:<8} {r['iteration']:>4}  {r['duration_seconds']:>9.2f}s")
+
+    print(sep)
 
 
 # On Linux, allow an execution shell to be prepared
