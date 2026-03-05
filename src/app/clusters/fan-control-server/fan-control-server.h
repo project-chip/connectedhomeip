@@ -17,20 +17,6 @@
 
 #pragma once
 
-#include "fan-control-delegate.h"
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/fan-control-server/CodegenIntegration.h>
-#include <app/util/af-types.h>
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace FanControl {
-
-void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate);
-Delegate * GetDelegate(EndpointId aEndpoint);
-
-} // namespace FanControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+// Note: This file exists for backwards compatibility only.
+// New code should directly use FanControlCluster.h instead.
+#include <app/clusters/fan-control-server/FanControlCluster.h>
