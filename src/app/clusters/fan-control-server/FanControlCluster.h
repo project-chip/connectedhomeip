@@ -155,11 +155,6 @@ private:
     BitMask<FanControl::WindBitmap> mWindSupport;
     OptionalAttributes mOptionalAttributes;
     FanControl::Delegate * mDelegate;
-
-    // Avoid circular callback when adjusting SpeedSetting and PercentSetting together
-    bool mSpeedWriteInProgress   = false;
-    bool mPercentWriteInProgress = false;
-    bool mFanModeWriteInProgress = false;
 };
 
 } // namespace chip::app::Clusters

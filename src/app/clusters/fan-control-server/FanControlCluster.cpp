@@ -108,13 +108,11 @@ void FanControlCluster::ApplyPercentSettingChanged()
 
     if (SupportsMultiSpeed())
     {
-        // Spec 4.4.6.3.1: speed = ceil(SpeedMax * (percent * 0.01))
-        uint8_t speedMax      = mSpeedMax;
-        uint16_t percent      = mPercentSetting.Value();
-        uint8_t speedSetting  = static_cast<uint8_t>((speedMax * percent + 99) / 100);
-        mSpeedWriteInProgress = true;
+        // speed = ceil(SpeedMax * (percent * 0.01))
+        uint8_t speedMax     = mSpeedMax;
+        uint16_t percent     = mPercentSetting.Value();
+        uint8_t speedSetting = static_cast<uint8_t>((speedMax * percent + 99) / 100);
         mSpeedSetting.SetNonNull(speedSetting);
-        mSpeedWriteInProgress = false;
         NotifyAttributeChanged(SpeedSetting::Id);
     }
 }
@@ -130,13 +128,11 @@ void FanControlCluster::ApplySpeedSettingChanged()
         return;
     }
 
-    // Spec 4.4.6.6.1: percent = floor(speed/SpeedMax * 100)
+    // percent = floor(speed/SpeedMax * 100)
     uint8_t speedMax             = mSpeedMax;
     float speed                  = static_cast<float>(mSpeedSetting.Value());
     chip::Percent percentSetting = static_cast<chip::Percent>(speed / speedMax * 100);
-    mPercentWriteInProgress      = true;
     mPercentSetting.SetNonNull(percentSetting);
-    mPercentWriteInProgress = false;
     NotifyAttributeChanged(PercentSetting::Id);
 }
 
@@ -203,9 +199,6 @@ DataModel::ActionReturnStatus FanControlCluster::WriteAttribute(const DataModel:
         FanModeEnum value;
         ReturnErrorOnFailure(decoder.Decode(value));
 
-        if (mFanModeWriteInProgress)
-            return Status::WriteIgnored;
-
         uint8_t seq = chip::to_underlying(mFanModeSequence);
         if (value == FanModeEnum::kLow && seq >= 4)
             return Status::ConstraintError;
@@ -246,9 +239,6 @@ DataModel::ActionReturnStatus FanControlCluster::WriteAttribute(const DataModel:
         DataModel::Nullable<chip::Percent> value;
         ReturnErrorOnFailure(decoder.Decode(value));
 
-        if (mPercentWriteInProgress)
-            return Status::WriteIgnored;
-
         if (value.IsNull())
             return Status::Success; // Spec: "If the client writes null, the attribute value SHALL NOT change"
 
@@ -259,8 +249,6 @@ DataModel::ActionReturnStatus FanControlCluster::WriteAttribute(const DataModel:
     case SpeedSetting::Id: {
         if (!SupportsMultiSpeed())
             return Status::UnsupportedAttribute;
-        if (mSpeedWriteInProgress)
-            return Status::WriteIgnored;
 
         DataModel::Nullable<uint8_t> value;
         ReturnErrorOnFailure(decoder.Decode(value));
