@@ -2947,7 +2947,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct AttestationResponse = 1 {
-    long_octet_string<0x384> attestationElements = 0;
+    long_octet_string<900> attestationElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
@@ -2965,7 +2965,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct CSRResponse = 5 {
-    long_octet_string<0x384> NOCSRElements = 0;
+    long_octet_string<900> NOCSRElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
@@ -3095,7 +3095,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct AttestationResponse = 1 {
-    long_octet_string<0x384> attestationElements = 0;
+    long_octet_string<900> attestationElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
@@ -3113,7 +3113,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct CSRResponse = 5 {
-    long_octet_string<0x384> NOCSRElements = 0;
+    long_octet_string<900> NOCSRElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
