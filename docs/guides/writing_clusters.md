@@ -418,11 +418,12 @@ implementation.
 5. **Update `config-data.yaml`:** To enable these callbacks, add your cluster to
    the `CodeDrivenClusters` array in
    `src/app/common/templates/config-data.yaml`.
-6. **Update ZAP Configuration:** In `src/app/zap-templates/zcl/zcl.json` and
-   `zcl-with-test-extensions.json`, add your cluster to the lists, and configure
-   specific attributes to move from `RAM` to `Callback` if they shouldn't be
-   backed by Ember's storage. Remember to keep attributes that define default
-   values in `.matter` files in RAM.
+6. **Update ZAP Configuration:** To prevent the Ember framework from allocating
+   memory for your cluster's attributes, you must:
+    - In `src/app/zap-templates/zcl/zcl.json` and
+      `zcl-with-test-extensions.json`, add all non-list attributes of your
+      cluster to `attributeAccessInterfaceAttributes`. This marks them as
+      externally handled.
 7. **Regenerate ZAP:** Once `config-data.yaml` and
    `zcl.json/zcl-with-test-extensions.json` are updated, run the ZAP
    regeneration command, like
