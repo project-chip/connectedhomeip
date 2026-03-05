@@ -64,6 +64,8 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
+
     Protocols::InteractionModel::Status GroupcastTesting(FabricIndex fabricIndex,
                                                          Groupcast::Commands::GroupcastTesting::DecodableType data);
 
