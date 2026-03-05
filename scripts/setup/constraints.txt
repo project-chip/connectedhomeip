@@ -146,10 +146,6 @@ portpicker==1.5.2
     #   mobly
 prompt-toolkit==3.0.43
     # via ipython
-protobuf==5.28.3
-    # via
-    #   -r requirements.all.txt
-    #   mypy-protobuf
 psutil==5.9.4
     # via portpicker
 ptyprocess==0.7.0
@@ -206,10 +202,6 @@ traitlets==5.9.0
     # via
     #   ipython
     #   matplotlib-inline
-types-protobuf==5.29.1.20250208
-    # via
-    #   -r requirements.all.txt
-    #   mypy-protobuf
 types-pyyaml==6.0.12.20250915
     # via -r ../tests/requirements.txt
 typing-extensions==4.8.0
