@@ -31,6 +31,7 @@ executable("chip-bridge-app") {
   deps = [
     "${chip_root}/examples/bridge-app/bridge-common",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/app/clusters/bridged-device-basic-information-server",
     "${chip_root}/src/lib",
   ]
 

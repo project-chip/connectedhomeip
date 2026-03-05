@@ -53,10 +53,6 @@ protected:
     uint8_t mIndex;
 };
 
-SupportedTemperatureLevelsIteratorDelegate * GetInstance();
-
-void SetInstance(SupportedTemperatureLevelsIteratorDelegate * instance);
-
 } // namespace TemperatureControl
 } // namespace Clusters
 } // namespace app
