@@ -425,9 +425,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         if current_progress is NullValue:
             current_progress = 0
 
-        # Log strings
-
-        log.info(f"Current OTA Image download progress is {current_progress}%")
         progress_seen = False
         current_max_progress = int(current_progress) + 1
 
