@@ -19,7 +19,6 @@
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/clusters/fan-control-server/fan-control-delegate.h>
-#include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/FanControl.h>
 #include <app/util/attribute-storage.h>
