@@ -101,7 +101,7 @@ class TC_ICDB_1_2(MatterBaseTest):
             TestStep(4, "Wait for ActiveModeDuration plus a 1-second buffer.",
                      "DUT transitions from Active Mode to Idle Mode."),
             TestStep(5, "Use UAT hint/instructions to transition DUT from Idle Mode to Active Mode.", """
-                     For each UAT hint, the DUT transitions from Idle to Active Mode and sends back a check-in message.
+                     For each UAT hint performed, after the DUT transitions from Idle Mode to Active Mode and sends a check-in message back:
                      Verify the ICDCounter value increased.
                      Verify the ActiveModeThreshold value is unchanged."""),
             TestStep(6, "TH reads from the DUT the RegisteredClients attribute.",
