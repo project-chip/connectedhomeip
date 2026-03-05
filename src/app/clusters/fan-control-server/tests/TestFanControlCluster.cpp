@@ -54,48 +54,48 @@ TestFanControlDelegate gTestDelegate(kTestEndpointId);
 
 FanControlCluster::Config MakeTestConfig()
 {
-    return FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh);
+    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh);
 }
 
 FanControlCluster::Config MakeTestConfigWithStep()
 {
-    return FanControlCluster::Config(kTestEndpointId, gTestDelegate)
+    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate)
         .WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh)
         .WithStep();
 }
 
 FanControlCluster::Config MakeTestConfigWithMultiSpeed()
 {
-    return FanControlCluster::Config(kTestEndpointId, gTestDelegate)
+    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate)
         .WithSpeedMax(10)
         .WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh);
 }
 
 FanControlCluster::Config MakeTestConfigWithAuto()
 {
-    return FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHighAuto);
+    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHighAuto);
 }
 
 FanControlCluster::Config MakeTestConfigWithMultiSpeedAndAuto()
 {
-    return FanControlCluster::Config(kTestEndpointId, gTestDelegate)
+    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate)
         .WithSpeedMax(10)
         .WithFanModeSequence(FanModeSequenceEnum::kOffLowHighAuto);
 }
 
 FanControlCluster::Config MakeTestConfigOffHigh()
 {
-    return FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffHigh);
+    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffHigh);
 }
 
 FanControlCluster::Config MakeTestConfigOffHighAuto()
 {
-    return FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffHighAuto);
+    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffHighAuto);
 }
 
 FanControlCluster::Config MakeTestConfigOffLowMedHigh()
 {
-    return FanControlCluster::Config(kTestEndpointId, gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowMedHigh);
+    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowMedHigh);
 }
 
 template <FanControlCluster::Config (*ConfigFn)()>

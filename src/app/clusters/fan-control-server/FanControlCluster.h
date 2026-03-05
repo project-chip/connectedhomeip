@@ -48,7 +48,7 @@ public:
 
     struct Config
     {
-        Config(EndpointId endpointId, FanControl::Delegate & delegate) : mEndpointId(endpointId), mDelegate(delegate) {}
+        Config(EndpointId endpointId, FanControl::Delegate * delegate) : mEndpointId(endpointId), mDelegate(delegate) {}
 
         Config & WithFanModeSequence(FanControl::FanModeSequenceEnum fanModeSequence)
         {
@@ -89,7 +89,7 @@ public:
         }
 
         EndpointId mEndpointId;
-        FanControl::Delegate & mDelegate;
+        FanControl::Delegate * mDelegate;
         bool mSupportsStep                               = false;
         FanControl::FanModeSequenceEnum mFanModeSequence = FanControl::FanModeSequenceEnum::kOffLowHigh;
         uint8_t mSpeedMax                                = 0;
