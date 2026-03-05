@@ -527,13 +527,12 @@ CHIP_ERROR GetSetupPasscodeFromOnboardingPayload(const char * onboardingPayload,
     if (isQRCode)
     {
         ReturnErrorOnFailure(QRCodeSetupPayloadParser(onboardingPayload).populatePayload(setupPayload));
-        setupPasscode = setupPayload.setUpPINCode;
     }
     else
     {
         ReturnErrorOnFailure(ManualSetupPayloadParser(onboardingPayload).populatePayload(setupPayload));
-        setupPasscode = setupPayload.setUpPINCode;
     }
+    setupPasscode = setupPayload.setUpPINCode;
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_SUPPORT_THREAD_MESHCOP
