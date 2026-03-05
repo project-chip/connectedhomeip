@@ -66,9 +66,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @end
 
-{{/if}}
 {{> command_params_internal_methods cluster=(asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) categoryName="PrivateMethods"}}
 
+{{/if}}
 {{/zcl_commands}}
 {{/if}}
 {{/zcl_clusters}}
@@ -125,9 +125,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 @end
 
-{{/if}}
 {{> command_params_internal_methods cluster=(asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) categoryName="PrivateMethods"}}
 
+{{/if}}
 {{/if}}
 {{/zcl_commands}}
 {{/if}}
