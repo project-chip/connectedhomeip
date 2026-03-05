@@ -101,6 +101,7 @@ def uat_set_hints(hint_bitmap):
 # ICDBaseTest - Main Base Class
 # ============================================================================
 
+
 class ICDBaseTest(MatterBaseTest):
     """Base test class for ICD tests with shared functionality."""
 
