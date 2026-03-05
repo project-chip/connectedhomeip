@@ -434,7 +434,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverThreadMeshcop()
     {
         mWaitingForDiscovery[kThreadMeshcopTransport] = true;
         Dnssd::DiscoveredNodeData discoveredNodeData;
-        
+
         CHIP_ERROR err = ThreadMeshcopCommissionProxy::GetInstance().Discover(
             pskc, mThreadMeshcopCommissionParams.Value().mBorderAgentAddress, code, connDiscriminator, discoveredNodeData, 30);
 
