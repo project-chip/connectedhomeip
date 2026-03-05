@@ -43,7 +43,7 @@ namespace chip::app::Clusters {
 FanControlCluster::FanControlCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, FanControl::Id }), mFanModeSequence(config.mFanModeSequence),
     mSupportsStep(config.mSupportsStep), mSpeedMax(config.mSpeedMax), mRockSupport(config.mRockSupport),
-    mWindSupport(config.mWindSupport), mOptionalAttributes(config.mOptionalAttributes), mDelegate(&config.mDelegate)
+    mWindSupport(config.mWindSupport), mOptionalAttributes(config.mOptionalAttributes), mDelegate(config.mDelegate)
 {}
 
 CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
@@ -342,6 +342,8 @@ std::optional<DataModel::ActionReturnStatus> FanControlCluster::InvokeCommand(co
         bool wrapValue      = commandData.wrap.ValueOr(false);
         bool lowestOffValue = commandData.lowestOff.ValueOr(false);
 
+        if (mDelegate == nullptr)
+            return Status::Failure;
         return mDelegate->HandleStep(commandData.direction, wrapValue, lowestOffValue);
     }
     default:
@@ -351,7 +353,6 @@ std::optional<DataModel::ActionReturnStatus> FanControlCluster::InvokeCommand(co
 
 void FanControlCluster::SetDelegate(FanControl::Delegate * delegate)
 {
-    VerifyOrDie(delegate != nullptr);
     mDelegate = delegate;
 }
 

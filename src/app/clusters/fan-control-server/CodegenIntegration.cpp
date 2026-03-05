@@ -18,7 +18,6 @@
 #include <app-common/zap-generated/callback.h>
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
 #include <app/clusters/fan-control-server/FanControlCluster.h>
-#include <app/clusters/fan-control-server/fan-control-delegate.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/FanControl.h>
 #include <app/util/attribute-storage.h>
@@ -45,7 +44,6 @@ static_assert(kFanControlDelegateTableSize <= kEmberInvalidEndpointIndex, "FanCo
 FanControl::Delegate * gDelegateTable[kFanControlDelegateTableSize] = { nullptr };
 
 LazyRegisteredServerCluster<FanControlCluster> gServers[kFanControlMaxClusterCount];
-FanControl::DefaultDelegate gDefaultDelegate(kRootEndpointId);
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -55,19 +53,18 @@ public:
     {
         BitFlags<FanControl::Feature> features(featureMap);
 
-        // Create cluster with default delegate. App can set custom delegate later via SetDefaultDelegate().
-        FanControlCluster::Config config(endpointId, gDefaultDelegate);
+        // Create cluster with no delegate. App must set delegate via SetDefaultDelegate().
+        FanControlCluster::Config config(endpointId, nullptr);
 
-        config.WithFanModeSequence(gDefaultDelegate.GetFanModeSequence().value_or(FanModeSequenceEnum::kOffLowHigh));
+        config.WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh);
 
         if (features.Has(FanControl::Feature::kMultiSpeed))
-            config.WithSpeedMax(gDefaultDelegate.GetSpeedMax().value_or(1));
+            config.WithSpeedMax(1);
         if (features.Has(FanControl::Feature::kRocking))
-            config.WithRockSupport(gDefaultDelegate.GetRockSupport().value_or(
-                BitMask<RockBitmap>(RockBitmap::kRockLeftRight, RockBitmap::kRockUpDown, RockBitmap::kRockRound)));
+            config.WithRockSupport(
+                BitMask<RockBitmap>(RockBitmap::kRockLeftRight, RockBitmap::kRockUpDown, RockBitmap::kRockRound));
         if (features.Has(FanControl::Feature::kWind))
-            config.WithWindSupport(
-                gDefaultDelegate.GetWindSupport().value_or(BitMask<WindBitmap>(WindBitmap::kSleepWind, WindBitmap::kNaturalWind)));
+            config.WithWindSupport(BitMask<WindBitmap>(WindBitmap::kSleepWind, WindBitmap::kNaturalWind));
         if (features.Has(FanControl::Feature::kAirflowDirection))
             config.WithAirflowDirection();
         if (features.Has(FanControl::Feature::kStep))
@@ -155,7 +152,7 @@ void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate)
     // Update the cluster instance if it already exists (e.g. app sets delegate in emberAfFanControlClusterInitCallback)
     if (FanControlCluster * cluster = FindClusterOnEndpoint(aEndpoint); cluster != nullptr)
     {
-        cluster->SetDelegate(aDelegate != nullptr ? aDelegate : &gDefaultDelegate);
+        cluster->SetDelegate(aDelegate);
     }
 }
 
