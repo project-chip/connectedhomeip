@@ -37,8 +37,8 @@ watchdog
 build==0.8.0
 mypy
 mypy-protobuf
-protobuf==5.28.3
-types-protobuf==5.29.1.20250208
+protobuf
+types-protobuf
 
 cffi==1.15.0; python_version < "3.13"
 cffi==1.17.1; python_version >= "3.13"
