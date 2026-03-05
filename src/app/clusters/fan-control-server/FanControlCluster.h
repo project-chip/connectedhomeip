@@ -119,6 +119,14 @@ public:
     DataModel::Nullable<chip::Percent> GetPercentSetting() const { return mPercentSetting; }
     DataModel::Nullable<uint8_t> GetSpeedSetting() const { return mSpeedSetting; }
 
+    // Setters
+    DataModel::ActionReturnStatus SetFanMode(FanControl::FanModeEnum value);
+    DataModel::ActionReturnStatus SetPercentSetting(DataModel::Nullable<chip::Percent> value);
+    DataModel::ActionReturnStatus SetSpeedSetting(DataModel::Nullable<uint8_t> value);
+    DataModel::ActionReturnStatus SetRockSetting(BitMask<FanControl::RockBitmap> value);
+    DataModel::ActionReturnStatus SetWindSetting(BitMask<FanControl::WindBitmap> value);
+    DataModel::ActionReturnStatus SetAirflowDirection(FanControl::AirflowDirectionEnum value);
+
     void SetDelegate(FanControl::Delegate * delegate);
 
 private:
