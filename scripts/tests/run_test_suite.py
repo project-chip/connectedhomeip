@@ -25,7 +25,7 @@ import time
 import warnings
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Optional, Protocol
 
 import chiptest
 import click
@@ -80,11 +80,11 @@ class TestResult:
 
 @dataclass
 class RunSummary:
-    run_timestamp: str
+    run_timestamp: datetime.datetime
     iterations: int
-    total_runs: int
-    passed: int
-    failed: int
+    total_runs: int = 0
+    passed: int = 0
+    failed: int = 0
     results: list[TestResult] = field(default_factory=list)
 
     def record(self, name: str, iteration: int, status: str, duration: float) -> None:
@@ -96,6 +96,7 @@ class RunSummary:
 
     def write_json(self, path: Path) -> None:
         data = asdict(self)
+        data["run_timestamp"] = self.run_timestamp.isoformat()
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(data, indent=2))
         log.info("Test run summary written to %s", path)
@@ -542,11 +543,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
     to_terminate: list[Terminable] = []
 
     run_summary = RunSummary(
-        run_timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        run_timestamp=datetime.datetime.now(datetime.timezone.utc),
         iterations=iterations,
-        total_runs=0,
-        passed=0,
-        failed=0,
     )
 
     def cleanup() -> None:
