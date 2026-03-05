@@ -42,6 +42,7 @@ static_assert((kTimeSynchronizationFixedClusterCount == 0) ||
 
 LazyRegisteredServerCluster<TimeSynchronizationCluster> gServer;
 
+static std::optional<TimeSourceEnum> gForcedTimeSource;
 TimeSynchronization::Delegate * gDelegate = nullptr;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
@@ -66,7 +67,11 @@ public:
 
         TimeSynchronizationCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         TimeSourceEnum timeSource = TimeSourceEnum::kNone;
-        if (optionalAttributeSet.IsSet(TimeSource::Id))
+        if (gForcedTimeSource.has_value())
+        {
+            timeSource = *gForcedTimeSource;
+        }
+        else if (optionalAttributeSet.IsSet(TimeSource::Id))
         {
             VerifyOrDie(TimeSource::Get(endpointId, &timeSource) == Status::Success);
         }
@@ -115,7 +120,7 @@ void MatterTimeSynchronizationClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId)
+void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
@@ -128,7 +133,7 @@ void MatterTimeSynchronizationClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kTimeSynchronizationFixedClusterCount,
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterTimeSynchronizationPluginServerInitCallback() {}
@@ -165,6 +170,12 @@ Delegate * GetDefaultDelegate()
         gDelegate = &delegate;
     }
     return gDelegate;
+}
+
+void ForceTimeSource(std::optional<TimeSourceEnum> value)
+{
+    VerifyOrDie(GetClusterInstance() == nullptr);
+    gForcedTimeSource = value;
 }
 
 } // namespace chip::app::Clusters::TimeSynchronization

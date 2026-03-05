@@ -27,6 +27,12 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Groupcast::I
             return Membership::kMetadataEntry;
         case MaxMembershipCount::Id:
             return MaxMembershipCount::kMetadataEntry;
+        case MaxMcastAddrCount::Id:
+            return MaxMcastAddrCount::kMetadataEntry;
+        case UsedMcastAddrCount::Id:
+            return UsedMcastAddrCount::kMetadataEntry;
+        case FabricUnderTest::Id:
+            return FabricUnderTest::kMetadataEntry;
         default:
             return std::nullopt;
         }
@@ -47,10 +53,10 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Groupc
             return LeaveGroup::kMetadataEntry;
         case UpdateGroupKey::Id:
             return UpdateGroupKey::kMetadataEntry;
-        case ExpireGracePeriod::Id:
-            return ExpireGracePeriod::kMetadataEntry;
         case ConfigureAuxiliaryACL::Id:
             return ConfigureAuxiliaryACL::kMetadataEntry;
+        case GroupcastTesting::Id:
+            return GroupcastTesting::kMetadataEntry;
 
         default:
             return std::nullopt;

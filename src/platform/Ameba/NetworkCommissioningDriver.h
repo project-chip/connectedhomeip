@@ -26,7 +26,7 @@ namespace NetworkCommissioning {
 namespace {
 inline constexpr uint8_t kMaxWiFiNetworks                  = 1;
 inline constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
-inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
+inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 35;
 } // namespace
 
 class AmebaScanResponseIterator : public Iterator<WiFiScanResponse>
@@ -43,10 +43,11 @@ public:
 
         // copy the available information into WiFiScanResponse struct, which will be copied to the result to be sent
         item.security.SetRaw(mpScanResults[mIternum].security);
-        item.ssidLen  = mpScanResults[mIternum].SSID.len;
-        item.channel  = mpScanResults[mIternum].channel;
-        item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        item.rssi     = mpScanResults[mIternum].signal_strength;
+        item.ssidLen         = mpScanResults[mIternum].SSID.len;
+        item.channel         = mpScanResults[mIternum].channel;
+        item.wiFiBand        = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
+        item.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
+        item.signal.strength = mpScanResults[mIternum].signal_strength;
         memcpy(item.ssid, mpScanResults[mIternum].SSID.val, item.ssidLen);
         memcpy(item.bssid, mpScanResults[mIternum].BSSID.octet, 6);
 
@@ -111,6 +112,7 @@ public:
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
     void OnConnectWiFiNetwork();
     void OnConnectWiFiNetworkFailed(uint16_t reason);
+    static void OnConnectWiFiNetworkFailedTimer(chip::System::Layer * aLayer, void * aAppState);
     void OnScanWiFiNetworkDone();
     void OnNetworkStatusChange();
 

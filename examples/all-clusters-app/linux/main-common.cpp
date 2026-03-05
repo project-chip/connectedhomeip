@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,6 @@
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
 #include "app-common/zap-generated/ids/Clusters.h"
-#include "camera-av-settings-user-level-management-instance.h"
 #include "dishwasher-mode.h"
 #include "include/diagnostic-logs-provider-delegate-impl.h"
 #include "include/tv-callbacks.h"
@@ -33,7 +32,6 @@
 #include "operational-state-delegate-impl.h"
 #include "oven-modes.h"
 #include "oven-operational-state-delegate.h"
-#include "push-av-stream-transport-delegate-impl.h"
 #include "resource-monitoring-delegates.h"
 #include "rvc-modes.h"
 #include "rvc-operational-state-delegate-impl.h"
@@ -45,16 +43,17 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
+#include <app/clusters/groupcast/GroupcastCluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
-#include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
-#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
+#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -119,7 +118,6 @@ Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupporte
 Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
 Clusters::TimeSynchronization::ExtendedTimeSyncDelegate sTimeSyncDelegate;
-Clusters::PushAvStreamTransport::PushAvStreamTransportManager gPushAvStreamTransportManager;
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
 constexpr const uint8_t kNamespaceCommon   = 7;
@@ -181,6 +179,8 @@ RegisteredServerCluster<Clusters::IdentifyCluster>
                           .WithIdentifyType(Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
                           .WithDelegate(&sIdentifyDelegate));
 
+LazyRegisteredServerCluster<Clusters::GroupcastCluster> gGroupcastCluster;
+
 } // namespace
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -199,7 +199,7 @@ void ApplicationInit()
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
     MatterDishwasherAlarmServerInit();
 #endif
-    Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
@@ -213,14 +213,21 @@ void ApplicationInit()
     VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationServer::Instance().SetTemperatureUnit(
                     Clusters::UnitLocalization::TempUnitEnum::kFahrenheit) == CHIP_NO_ERROR);
 
-    Clusters::PushAvStreamTransport::SetDelegate(chip::EndpointId(1), &gPushAvStreamTransportManager);
-    Clusters::PushAvStreamTransport::SetTLSClientManagementDelegate(chip::EndpointId(1),
-                                                                    &Clusters::TlsClientManagementCommandDelegate::GetInstance());
-
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster1.Registration()) == CHIP_NO_ERROR);
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster2.Registration()) == CHIP_NO_ERROR);
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster3.Registration()) == CHIP_NO_ERROR);
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster4.Registration()) == CHIP_NO_ERROR);
+
+    gGroupcastCluster.Create(
+        Clusters::GroupcastContext{
+            .fabricTable       = Server::GetInstance().GetFabricTable(),
+            .groupDataProvider = *Credentials::GetGroupDataProvider(),
+            .timerDelegate     = sTimerDelegate,
+        },
+        BitFlags<Clusters::Groupcast::Feature>(Clusters::Groupcast::Feature::kListener, Clusters::Groupcast::Feature::kSender,
+                                               Clusters::Groupcast::Feature::kPerGroup));
+
+    VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gGroupcastCluster.Registration()) == CHIP_NO_ERROR);
 
     TEMPORARY_RETURN_IGNORED SetTagList(/* endpoint= */ 0,
                                         Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));

@@ -268,12 +268,12 @@ void BluezConnection::SetupNotifyHandler(int aSocketFd, bool aAdditionalAdvertis
 CHIP_ERROR BluezConnection::SendIndicationImpl(ConnectionDataBundle * data)
 {
     GAutoPtr<GError> error;
-    size_t len, written;
+    gsize len, written;
 
     if (bluez_gatt_characteristic1_get_notify_acquired(data->mConn.mC2.get()) == TRUE)
     {
         auto * buf = static_cast<const char *>(g_variant_get_fixed_array(data->mData.get(), &len, sizeof(uint8_t)));
-        VerifyOrExit(len <= static_cast<size_t>(std::numeric_limits<gssize>::max()),
+        VerifyOrExit(len <= std::numeric_limits<gssize>::max(),
                      ChipLogError(DeviceLayer, "FAIL: buffer too large in %s", __func__));
         auto status = g_io_channel_write_chars(data->mConn.mC2Channel.mChannel.get(), buf, static_cast<gssize>(len), &written,
                                                &error.GetReceiver());
@@ -341,7 +341,7 @@ void BluezConnection::OnCharacteristicChanged(GDBusProxy * aInterface, GVariant 
     GAutoPtr<GVariant> dataValue(g_variant_lookup_value(aChangedProperties, "Value", G_VARIANT_TYPE_BYTESTRING));
     VerifyOrReturn(dataValue != nullptr);
 
-    size_t bufferLen;
+    gsize bufferLen;
     auto buffer = g_variant_get_fixed_array(dataValue.get(), &bufferLen, sizeof(uint8_t));
     VerifyOrReturn(buffer != nullptr, ChipLogError(DeviceLayer, "Characteristic value has unexpected type"));
 

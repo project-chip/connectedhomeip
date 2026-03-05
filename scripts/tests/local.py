@@ -29,27 +29,20 @@ import sys
 import textwrap
 import time
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Iterable, List, Optional
 
 import alive_progress
 import click
 import colorama
 import coloredlogs
+import python_path
 import tabulate
 import yaml
 
-try:
-    from matter.testing.metadata import extract_runs_args  # May fail if python environment not built yet
-except ImportError:
-    # Fallback to manual import from source tree
-    _MATTER_TESTING_PATH = os.path.join(os.path.dirname(
-        __file__), '..', '..', 'src', 'python_testing', 'matter_testing_infrastructure')
-    if _MATTER_TESTING_PATH not in sys.path:
-        sys.path.insert(0, _MATTER_TESTING_PATH)
-    try:
-        from matter.testing.metadata import extract_runs_args
-    except ImportError:
-        extract_runs_args = None  # filtering by app (--app-filter) will not work.
+with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
+    from matter.testing.metadata import extract_runs_args
+    from matter.testing.tasks import SubprocessKind
+
 
 log = logging.getLogger(__name__)
 
@@ -138,7 +131,9 @@ def _get_variants(coverage: Optional[bool]):
 
 @dataclass
 class ApplicationTarget:
-    key: str  # key for test_env running in python
+    kind: SubprocessKind
+    env_key: str  # key for test_env running in python
+    cli_key: str  # key for YAML test runner (for --app-path / --tool-path)
     target: str  # target name for build_examples (and directory in out)
     binary: str  # elf binary to run after it is built
 
@@ -151,105 +146,144 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
 
     targets.append(
         ApplicationTarget(
-            key="CHIP_TOOL",
+            kind=SubprocessKind.TOOL,
+            env_key="CHIP_TOOL",
+            cli_key="chip-tool",
             target=f"{target_prefix}-chip-tool-{suffix}",
             binary="chip-tool",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="ALL_CLUSTERS_APP",
+            kind=SubprocessKind.APP,
+            env_key="ALL_CLUSTERS_APP",
+            cli_key="all-clusters",
             target=f"{target_prefix}-all-clusters-{suffix}",
             binary="chip-all-clusters-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="CHIP_LOCK_APP",
+            kind=SubprocessKind.APP,
+            env_key="CHIP_LOCK_APP",
+            cli_key="lock",
             target=f"{target_prefix}-lock-{suffix}",
             binary="chip-lock-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="ENERGY_GATEWAY_APP",
+            kind=SubprocessKind.APP,
+            env_key="ENERGY_GATEWAY_APP",
+            cli_key="energy-gateway",
             target=f"{target_prefix}-energy-gateway-{suffix}",
             binary="chip-energy-gateway-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="ENERGY_MANAGEMENT_APP",
-            target=f"{target_prefix}-energy-management-{suffix}",
-            binary="chip-energy-management-app",
+            kind=SubprocessKind.APP,
+            env_key="WATER_HEATER_APP",
+            cli_key="water-heater",
+            target=f"{target_prefix}-water-heater-{suffix}",
+            binary="matter-water-heater-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="CLOSURE_APP",
+            kind=SubprocessKind.APP,
+            env_key="EVSE_APP",
+            cli_key="evse",
+            target=f"{target_prefix}-evse-{suffix}",
+            binary="chip-evse-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="CLOSURE_APP",
+            cli_key="closure",
             target=f"{target_prefix}-closure-{suffix}",
             binary="closure-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="LIT_ICD_APP",
+            kind=SubprocessKind.APP,
+            env_key="LIT_ICD_APP",
+            cli_key="lit-icd",
             target=f"{target_prefix}-lit-icd-{suffix}",
             binary="lit-icd-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="AIR_PURIFIER_APP",
+            kind=SubprocessKind.APP,
+            env_key="AIR_PURIFIER_APP",
+            cli_key="air-purifier",
             target=f"{target_prefix}-air-purifier-{suffix}",
             binary="chip-air-purifier-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="CHIP_MICROWAVE_OVEN_APP",
+            kind=SubprocessKind.APP,
+            env_key="CHIP_MICROWAVE_OVEN_APP",
+            cli_key="microwave-oven",
             target=f"{target_prefix}-microwave-oven-{suffix}",
             binary="chip-microwave-oven-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="CHIP_RVC_APP",
+            kind=SubprocessKind.APP,
+            env_key="CHIP_RVC_APP",
+            cli_key="rvc",
             target=f"{target_prefix}-rvc-{suffix}",
             binary="chip-rvc-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="NETWORK_MANAGEMENT_APP",
+            kind=SubprocessKind.APP,
+            env_key="NETWORK_MANAGEMENT_APP",
+            cli_key="network-manager",
             target=f"{target_prefix}-network-manager-ipv6only-{suffix}",
             binary="matter-network-manager-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="FABRIC_ADMIN_APP",
+            kind=SubprocessKind.APP,
+            env_key="FABRIC_ADMIN_APP",
+            cli_key="fabric-admin",
             target=f"{target_prefix}-fabric-admin-no-wifi-rpc-ipv6only-{suffix}",
             binary="fabric-admin",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="FABRIC_BRIDGE_APP",
+            kind=SubprocessKind.APP,
+            env_key="FABRIC_BRIDGE_APP",
+            cli_key="fabric-bridge",
             target=f"{target_prefix}-fabric-bridge-no-wifi-rpc-ipv6only-{suffix}",
             binary="fabric-bridge-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="FABRIC_SYNC_APP",
+            kind=SubprocessKind.APP,
+            env_key="FABRIC_SYNC_APP",
+            cli_key="fabric-sync",
             target=f"{target_prefix}-fabric-sync-no-wifi-ipv6only-{suffix}",
             binary="fabric-sync",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="LIGHTING_APP_NO_UNIQUE_ID",
+            kind=SubprocessKind.APP,
+            env_key="LIGHTING_APP_NO_UNIQUE_ID",
+            cli_key="lighting",
             target=f"{target_prefix}-light-data-model-no-unique-id-ipv6only-no-wifi-{suffix}",
             binary="chip-lighting-app",
         )
@@ -258,58 +292,104 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
     # These are needed for chip tool tests
     targets.append(
         ApplicationTarget(
-            key="OTA_PROVIDER_APP",
+            kind=SubprocessKind.APP,
+            env_key="OTA_PROVIDER_APP",
+            cli_key="ota-provider",
             target=f"{target_prefix}-ota-provider-{suffix}",
             binary="chip-ota-provider-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="OTA_REQUESTOR_APP",
+            kind=SubprocessKind.APP,
+            env_key="OTA_REQUESTOR_APP",
+            cli_key="ota-requestor",
             target=f"{target_prefix}-ota-requestor-{suffix}",
             binary="chip-ota-requestor-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="TV_APP",
+            kind=SubprocessKind.APP,
+            env_key="TV_APP",
+            cli_key="tv",
             target=f"{target_prefix}-tv-app-{suffix}",
             binary="chip-tv-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="BRIDGE_APP",
+            kind=SubprocessKind.APP,
+            env_key="BRIDGE_APP",
+            cli_key="bridge",
             target=f"{target_prefix}-bridge-{suffix}",
             binary="chip-bridge-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="TERMS_AND_CONDITIONS_APP",
+            kind=SubprocessKind.APP,
+            env_key="TERMS_AND_CONDITIONS_APP",
+            cli_key="terms-and-conditions",
             target=f"{target_prefix}-terms-and-conditions-{suffix}",
             binary="chip-terms-and-conditions-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="CAMERA_APP",
+            kind=SubprocessKind.APP,
+            env_key="CAMERA_APP",
+            cli_key="camera",
             target=f"{target_prefix}-camera-{suffix}",
             binary="chip-camera-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="JF_CONTROL_APP",
+            kind=SubprocessKind.APP,
+            env_key="JF_CONTROL_APP",
+            cli_key="jf-control",
             target=f"{target_prefix}-jf-control-app",
             binary="jfc-app",
         )
     )
     targets.append(
         ApplicationTarget(
-            key="JF_ADMIN_APP",
+            kind=SubprocessKind.APP,
+            env_key="JF_ADMIN_APP",
+            cli_key="jf-admin",
             target=f"{target_prefix}-jf-admin-app",
             binary="jfa-app",
+        )
+    )
+
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="ALL_DEVICES_APP",
+            cli_key="all-devices",
+            target=f"{target_prefix}-all-devices-{suffix}",
+            binary="all-devices-app"
+        )
+    )
+
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="CAMERA_CONTROLLER_APP",
+            cli_key="camera-controller",
+            target=f"{target_prefix}-camera-controller",
+            binary="chip-camera-controller"
+        )
+    )
+
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
+            env_key="WATER_LEAK_DETECTOR_APP",
+            cli_key="water-leak-detector",
+            target=f"{target_prefix}-water-leak-detector-{suffix}",
+            binary="water-leak-detector-app"
         )
     )
 
@@ -453,7 +533,7 @@ def _do_build_basic_apps(coverage: Optional[bool]):
     """
     log.info("Building example apps...")
 
-    all_targets = {t.key: t for t in _get_targets(coverage)}
+    all_targets = {t.env_key: t for t in _get_targets(coverage)}
     targets = [
         all_targets["CHIP_TOOL"].target,
         all_targets["ALL_CLUSTERS_APP"].target,
@@ -555,6 +635,22 @@ def _add_target_to_cmd(cmd, flag, path, runner):
     """
     cmd.append(flag)
     cmd.append(_maybe_with_runner(flag[2:].replace("-", "_"), path, runner))
+
+
+def _specify_target_path(target: ApplicationTarget, runner) -> Iterable[str]:
+    """
+    Generates `--{app,tool}-path` argument for run_test_suite.py
+
+    Specifically it figures out how to convert the target `path` into either
+    itself or execution via a `runner` script.
+
+    cmd will get "--<kind>-path <key>:<executable>" appended to it, where executable
+    is either the input path or a wrapper script to execute via the given
+    input runner.
+    """
+    path = f"./out/{target.target}/{target.binary}"
+    path = _maybe_with_runner(target.cli_key, path, runner)
+    return [f"--{target.kind.value}-path", f"{target.cli_key}:{path}"]
 
 
 @dataclass
@@ -856,11 +952,23 @@ def python_tests(
 
     with open("./out/test_env.yaml", "wt") as f:
         for target in _get_targets(coverage):
-            if target.key in override_binaries:
-                run_path = as_runner(override_binaries[target.key])
+            if target.env_key in override_binaries:
+                run_path = as_runner(override_binaries[target.env_key])
             else:
                 run_path = as_runner(f"out/{target.target}/{target.binary}")
-            f.write(f"{target.key}: {run_path}\n")
+            f.write(f"{target.env_key}: {run_path}\n")
+
+        # PushAV is special
+        f.write("PUSH_AV_SERVER: src/tools/push_av_server/server.py\n")
+
+        # Disable OTA requestor v2 for now
+        # This would be built by a shell script like this:
+        #
+        #    ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2"
+        #
+        # Which is not currently integrated in our build logic (we always use build_examples.py)
+        f.write("SU_OTA_REQUESTOR_V2: /usr/bin/false\n")
+
         f.write("TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}\n")
         f.write("TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}\n")
         f.write("TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}\n")
@@ -872,7 +980,8 @@ def python_tests(
     app_filter_list = None
     if app_filter:
         if not extract_runs_args:
-            raise Exception("`--app-filter` requires the python testing environment: ./scripts/tests/local.py build-python")
+            raise click.BadOptionUsage("--app-filter",
+                                       "The flag requires the python testing environment: ./scripts/tests/local.py build-python")
         app_filter_list = _parse_filters(app_filter)
 
     if skip:
@@ -908,9 +1017,7 @@ def python_tests(
     }
 
     if not os.path.isdir("src/python_testing"):
-        raise Exception(
-            "Script meant to be run from the CHIP checkout root (src/python_testing must exist)."
-        )
+        raise NotADirectoryError("Script meant to be run from the CHIP checkout root (src/python_testing must exist).")
 
     test_scripts = []
     for file in glob.glob(os.path.join("src/python_testing/", "*.py")):
@@ -1199,7 +1306,7 @@ def chip_tool_tests(
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:177
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:181
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage
@@ -1224,16 +1331,6 @@ def chip_tool_tests(
     cmd.extend(["--exclude-tags", "EXTRA_SLOW"])
     cmd.extend(["--exclude-tags", "PURPOSEFUL_FAILURE"])
 
-    paths = {
-        t.key: f"./out/{t.target}/{t.binary}" for t in _get_targets(coverage)
-    }
-
-    if runner == BinaryRunner.COVERAGE:
-        # when running with coveage, chip-tool also is covered
-        cmd.extend(["--chip-tool", _maybe_with_runner("chip-tool", paths["CHIP_TOOL"], runner)])
-    else:
-        cmd.extend(["--chip-tool", paths["CHIP_TOOL"]])
-
     if target is not None:
         cmd.extend(["--target", target])
 
@@ -1246,6 +1343,9 @@ def chip_tool_tests(
     cmd.append("run")
     cmd.extend(["--iterations", "1"])
 
+    for target in _get_targets(coverage):
+        cmd.extend(_specify_target_path(target, runner))
+
     # NOTE: we allow all runs here except extra slow
     #       This means our timeout is quite large
     cmd.extend(["--test-timeout-seconds", "300"])
@@ -1256,24 +1356,6 @@ def chip_tool_tests(
 
     if keep_going:
         cmd.append("--keep-going")
-
-    target_flags = [
-        ("--all-clusters-app", "ALL_CLUSTERS_APP"),
-        ("--lock-app", "CHIP_LOCK_APP"),
-        ("--ota-provider-app", "OTA_PROVIDER_APP"),
-        ("--ota-requestor-app", "OTA_REQUESTOR_APP"),
-        ("--tv-app", "TV_APP"),
-        ("--bridge-app", "BRIDGE_APP"),
-        ("--lit-icd-app", "LIT_ICD_APP"),
-        ("--microwave-oven-app", "CHIP_MICROWAVE_OVEN_APP"),
-        ("--rvc-app", "CHIP_RVC_APP"),
-        ("--energy-gateway-app", "ENERGY_GATEWAY_APP"),
-        ("--energy-management-app", "ENERGY_MANAGEMENT_APP"),
-        ("--closure-app", "CLOSURE_APP"),
-    ]
-
-    for flag, path_key in target_flags:
-        _add_target_to_cmd(cmd, flag, paths[path_key], runner)
 
     subprocess.run(_with_activate(cmd), check=True)
 

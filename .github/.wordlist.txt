@@ -376,6 +376,7 @@ DCMAKE
 DCONF
 DCONFIG
 deallocate
+deallocated
 deallocation
 debianutils
 debugText
@@ -402,6 +403,8 @@ deployable
 depottools
 deps
 der
+dereference
+dereferencing
 desc
 descheduled
 detokenization
@@ -549,6 +552,7 @@ EvalCode
 EvalCodeWithName
 EvalFrameDefault
 EVB
+EVKBMIMXRT
 EventLogging
 evk
 EVSE
@@ -607,6 +611,7 @@ fsl
 fstab
 fsync
 ftd
+ftr
 fullclean
 fuzzer
 fuzzers
@@ -710,6 +715,7 @@ ICD
 ICDs
 iCloud
 ICMP
+idempotency
 IDF
 IDL
 IDLs
@@ -955,6 +961,7 @@ MLD
 mmevk
 moal
 Mobly
+Mockito
 ModeSelect
 modprobe
 Modustoolbox
@@ -1036,6 +1043,7 @@ nwk
 NXP
 objcopy
 OccupancySensing
+OCMock
 OctetString
 OECORE
 OID
@@ -1114,6 +1122,7 @@ params
 PartNumber
 PASE
 Passcode
+passcodes
 passRetained
 passwd
 Pausable
@@ -1241,6 +1250,9 @@ Realtek
 rebase
 recommand
 recommanded
+Reconnection
+reconnection
+reconnections
 recurse
 refrigeratoralarm
 regen
@@ -1362,6 +1374,7 @@ Silabs's
 SiliconLabs
 SimpleFileExFlags
 SimpleLink
+simw
 SiWx
 sizedb
 sl

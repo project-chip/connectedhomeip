@@ -120,6 +120,15 @@ CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
     return CHIP_NO_ERROR;
 }
 
+void OccupancySensingCluster::Shutdown(ClusterShutdownType shutdownType)
+{
+    if (mHoldTimeDelegate)
+    {
+        mHoldTimeDelegate->CancelTimer(this);
+    }
+    DefaultServerCluster::Shutdown(shutdownType);
+}
+
 DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                      AttributeValueEncoder & encoder)
 {
@@ -334,7 +343,7 @@ const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & OccupancySensingCl
     return mHoldTimeLimits;
 }
 
-BitMask<OccupancySensing::Feature> OccupancySensingCluster::GetFeatureMap() const
+BitFlags<OccupancySensing::Feature> OccupancySensingCluster::GetFeatureMap() const
 {
     return mFeatureMap;
 }

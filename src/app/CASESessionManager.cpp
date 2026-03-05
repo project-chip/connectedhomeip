@@ -39,13 +39,14 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                 uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-                                                TransportPayloadCapability transportPayloadCapability)
+                                                TransportPayloadCapability transportPayloadCapability,
+                                                const Optional<AddressResolve::ResolveResult> & fallbackResolveResult)
 {
     FindOrEstablishSessionHelper(peerId, onConnection, onFailure, nullptr,
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                  attemptCount, onRetry,
 #endif
-                                 transportPayloadCapability);
+                                 transportPayloadCapability, fallbackResolveResult);
 }
 
 void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
@@ -94,7 +95,8 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                       uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
 #endif
-                                                      TransportPayloadCapability transportPayloadCapability)
+                                                      TransportPayloadCapability transportPayloadCapability,
+                                                      const Optional<AddressResolve::ResolveResult> & fallbackResolveResult)
 {
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
                   ChipLogValueX64(peerId.GetNodeId()));
@@ -130,6 +132,14 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
         session->AddRetryHandler(onRetry);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
+#if CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+    // Set fallback resolve result if provided
+    if (fallbackResolveResult.HasValue())
+    {
+        session->SetFallbackResolveResult(fallbackResolveResult.Value());
+    }
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
     if (onFailure != nullptr)
     {

@@ -13,11 +13,14 @@
 # limitations under the License.
 
 import logging
+import pathlib
 import re
 import shlex
 import subprocess
 import sys
 import threading
+from dataclasses import dataclass, replace
+from enum import StrEnum
 from typing import BinaryIO, Callable, Optional, Union
 
 LOGGER = logging.getLogger(__name__)
@@ -39,6 +42,32 @@ def forward_f(f_in: BinaryIO,
             line = cb(line, is_stderr)
         f_out.write(line)
         f_out.flush()
+
+
+class SubprocessKind(StrEnum):
+    APP = 'app'
+    TOOL = 'tool'
+    MGMT = 'mgmt'
+
+
+@dataclass
+class SubprocessInfo:
+    kind: SubprocessKind
+    path: pathlib.Path
+    wrapper: tuple[str, ...] = ()
+    args: tuple[str, ...] = ()
+
+    def __post_init__(self):
+        self.path = pathlib.Path(self.path)
+
+    def with_args(self, *args: str):
+        return replace(self, args=self.args + tuple(args))
+
+    def wrap_with(self, *args: str):
+        return replace(self, wrapper=tuple(args) + self.wrapper)
+
+    def to_cmd(self) -> list[str]:
+        return list(self.wrapper) + [str(self.path)] + list(self.args)
 
 
 class Subprocess(threading.Thread):
@@ -89,28 +118,47 @@ class Subprocess(threading.Thread):
         command = [self.program] + list(self.args)
 
         LOGGER.info("RUN: %s", shlex.join(command))
-        self.p = subprocess.Popen(command,
-                                  stdin=subprocess.PIPE,
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE,
-                                  bufsize=0)
-        self.event_started.set()
+        self.p = None
+        forwarding_stdout_thread = None
+        forwarding_stderr_thread = None
+        try:
+            self.p = subprocess.Popen(command,
+                                      stdin=subprocess.PIPE,
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE,
+                                      bufsize=0)
+            self.event_started.set()
 
-        # Forward stdout and stderr with a tag attached.
-        forwarding_stdout_thread = threading.Thread(
-            target=forward_f,
-            args=(self.p.stdout, self.f_stdout, self._check_output))
-        forwarding_stdout_thread.start()
-        forwarding_stderr_thread = threading.Thread(
-            target=forward_f,
-            args=(self.p.stderr, self.f_stderr, self._check_output, True))
-        forwarding_stderr_thread.start()
+            # Forward stdout and stderr with a tag attached.
+            forwarding_stdout_thread = threading.Thread(
+                target=forward_f,
+                args=(self.p.stdout, self.f_stdout, self._check_output))
+            forwarding_stdout_thread.start()
+            forwarding_stderr_thread = threading.Thread(
+                target=forward_f,
+                args=(self.p.stderr, self.f_stderr, self._check_output, True))
+            forwarding_stderr_thread.start()
 
-        # Wait for the process to finish.
-        self.returncode = self.p.wait()
+        except Exception:
+            # This is very likely an OSError, however generally we try to not
+            # fail the run at all here.
+            # Do not let the starter hang forever here if program fails
+            if not self.event_started.is_set():
+                self.event_started.set()
 
-        forwarding_stdout_thread.join()
-        forwarding_stderr_thread.join()
+            LOGGER.exception("Failed to execute subprocess `%s`", self.program)
+        finally:
+            # Wait for the process to finish.
+            if self.p is not None:
+                self.returncode = self.p.wait()
+            else:
+                self.returncode = -1
+
+            if forwarding_stdout_thread is not None:
+                forwarding_stdout_thread.join()
+
+            if forwarding_stderr_thread is not None:
+                forwarding_stderr_thread.join()
 
     def start(self,
               expected_output: Optional[Union[str, re.Pattern]] = None,

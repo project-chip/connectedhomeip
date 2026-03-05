@@ -26,20 +26,26 @@
 #ifndef GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_IPP
 #define GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_IPP
 
-#include <cassert>
-#include <limits>
+/* this file behaves like a config.h, comes first */
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <openthread/cli.h>
+#include <cassert>
+
 #include <openthread/dataset.h>
 #include <openthread/joiner.h>
 #include <openthread/link.h>
 #include <openthread/netdata.h>
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
+#include <openthread/udp.h>
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
 #include <openthread/dataset_ftd.h>
 #include <openthread/thread_ftd.h>
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+#include <openthread/seeker.h>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -50,14 +56,15 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FixedBufferAllocator.h>
+#include <lib/support/ThreadDiscoveryCode.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
@@ -218,6 +225,15 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
                 if (mIsAttached)
                 {
                     delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kConnected);
+
+                    // Remove kLinkDown fault if it was set, as the device is now connected.
+                    GeneralFaults<kMaxNetworkFaults> current = mNetworkFaults;
+                    if (current.remove(to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown)) ==
+                        CHIP_NO_ERROR)
+                    {
+                        delegate->OnNetworkFaultChanged(mNetworkFaults, current);
+                        mNetworkFaults = current;
+                    }
                 }
                 else
                 {
@@ -475,7 +491,11 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
         {
             TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
                 Impl()->LockThreadStack();
-                otIp6SetEnabled(mOTInst, false);
+                auto err = otIp6SetEnabled(mOTInst, false);
+                if (err != OT_ERROR_NONE)
+                {
+                    ChipLogProgress(DeviceLayer, "Failed to disable Thread IPv6: %s", otThreadErrorToString(err));
+                }
                 Impl()->UnlockThreadStack();
             });
         }
@@ -551,7 +571,7 @@ CHIP_ERROR
 GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
 {
     VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    otError error = OT_ERROR_NONE;
     otLinkModeConfig linkMode;
 
     switch (deviceType)
@@ -567,7 +587,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(Connec
 #endif
         break;
     default:
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+        ExitNow(error = OT_ERROR_INVALID_ARGS);
     }
 
 #if CHIP_PROGRESS_LOGGING
@@ -612,7 +632,9 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(Connec
     case ConnectivityManager::kThreadDeviceType_FullEndDevice:
         linkMode.mDeviceType   = true;
         linkMode.mRxOnWhenIdle = true;
-        otThreadSetRouterEligible(mOTInst, deviceType == ConnectivityManager::kThreadDeviceType_Router);
+
+        // This is expected to succeed for FTDs.
+        error = otThreadSetRouterEligible(mOTInst, deviceType == ConnectivityManager::kThreadDeviceType_Router);
         break;
 #endif
     case ConnectivityManager::kThreadDeviceType_MinimalEndDevice:
@@ -628,12 +650,17 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(Connec
         break;
     }
 
-    otThreadSetLinkMode(mOTInst, linkMode);
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+    if (error == OT_ERROR_NONE)
+#endif
+    {
+        error = otThreadSetLinkMode(mOTInst, linkMode);
+    }
 
     Impl()->UnlockThreadStack();
 
 exit:
-    return err;
+    return MapOpenThreadError(error);
 }
 
 template <class ImplClass>
@@ -816,9 +843,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo()
     VerifyOrReturn(mOTInst);
     ChipLogProgress(DeviceLayer, "Erasing Thread persistent info...");
     Impl()->LockThreadStack();
-    otThreadSetEnabled(mOTInst, false);
-    otIp6SetEnabled(mOTInst, false);
-    otInstanceErasePersistentInfo(mOTInst);
+    std::ignore = otThreadSetEnabled(mOTInst, false);
+    std::ignore = otIp6SetEnabled(mOTInst, false);
+    std::ignore = otInstanceErasePersistentInfo(mOTInst);
 
     if (mpCommissioningDriver)
     {
@@ -828,6 +855,158 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo()
     Impl()->UnlockThreadStack();
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RendezvousStop()
+{
+    otSeekerStop(mOTInst);
+    _CancelRendezvousAnnouncement();
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_CancelRendezvousAnnouncement()
+{
+    DeviceLayer::SystemLayer().CancelTimer(_HandleRendezvousRetransmissionTimer, this);
+    mRendezvousRetransmissionCount = 0;
+}
+
+template <class ImplClass>
+CHIP_ERROR
+GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RendezvousStart(RendezvousAnnouncementRequestCallback announcementRequest,
+                                                                      void * context)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    Impl()->LockThreadStack();
+    VerifyOrExit(otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED, error = MapOpenThreadError(OT_ERROR_INVALID_STATE));
+    VerifyOrExit(!otSeekerIsRunning(mOTInst), error = MapOpenThreadError(OT_ERROR_BUSY));
+
+    if (!otIp6IsEnabled(mOTInst))
+    {
+        SuccessOrExit(error = MapOpenThreadError(otIp6SetEnabled(mOTInst, true)));
+    }
+
+    _CancelRendezvousAnnouncement();
+
+    mRendezvousAnnouncementRequestCallback = announcementRequest;
+    mRendezvousAnnouncementRequestContext  = context;
+
+    SuccessOrExit(error = MapOpenThreadError(otSeekerSetUdpPort(mOTInst, CHIP_PORT)));
+    SuccessOrExit(error = MapOpenThreadError(otSeekerStart(mOTInst, _HandleSeekerScanEvaluator, this)));
+
+exit:
+    Impl()->UnlockThreadStack();
+
+    ChipLogProgress(DeviceLayer, "Rendezvous start: %s", chip::ErrorStr(error));
+
+    return error;
+}
+
+template <class ImplClass>
+otSeekerVerdict GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HandleSeekerScanEvaluator(void * aContext,
+                                                                                                const otSeekerScanResult * aResult)
+{
+    auto * self = static_cast<GenericThreadStackManagerImpl_OpenThread *>(aContext);
+
+    if (aResult == nullptr)
+    {
+        self->TryNextNetwork();
+        return OT_SEEKER_ACCEPT;
+    }
+
+    {
+        uint16_t discriminator;
+        if (DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator) != CHIP_NO_ERROR)
+        {
+            return OT_SEEKER_IGNORE;
+        }
+
+        Thread::DiscoveryCode code(discriminator);
+        otJoinerDiscerner discerner;
+        discerner.mValue  = code.AsUInt64();
+        discerner.mLength = 64;
+
+        if (otSteeringDataContainsDiscerner(&aResult->mSteeringData, &discerner))
+        {
+            return OT_SEEKER_ACCEPT_PREFERRED;
+        }
+
+        discerner.mValue  = code.AsUInt64Short();
+        discerner.mLength = 64;
+        if (otSteeringDataContainsDiscerner(&aResult->mSteeringData, &discerner))
+        {
+            return OT_SEEKER_ACCEPT;
+        }
+    }
+
+    return OT_SEEKER_IGNORE;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::TryNextNetwork()
+{
+    otSockAddr targetAddr;
+
+    if (otSeekerSetUpNextConnection(mOTInst, &targetAddr) == OT_ERROR_NONE)
+    {
+        mRendezvousPeerAddr =
+            chip::Transport::PeerAddress::UDP(ToIPAddress(targetAddr.mAddress), targetAddr.mPort, Inet::InterfaceId::Null());
+
+        DeviceLayer::SystemLayer().ScheduleLambda([this]() { SendRendezvousAnnouncement(); });
+    }
+    else if (otSeekerIsRunning(mOTInst))
+    {
+        otSeekerStop(mOTInst);
+
+        auto err = MapOpenThreadError(otSeekerStart(mOTInst, _HandleSeekerScanEvaluator, this));
+
+        ChipLogProgress(DeviceLayer, "Restart rendezvous: %s", chip::ErrorStr(err));
+    }
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::SendRendezvousAnnouncement()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (mRendezvousAnnouncementRequestCallback != nullptr)
+    {
+        err = mRendezvousAnnouncementRequestCallback(mRendezvousAnnouncementRequestContext, mRendezvousPeerAddr);
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        mRendezvousRetransmissionCount++;
+        if (mRendezvousRetransmissionCount < kMaxRendezvousRetransmissions)
+        {
+            const uint32_t kRendezvousRetransmissionIntervalMs = 1250;
+            ChipLogProgress(DeviceLayer, "Try the current Thread network #%u", mRendezvousRetransmissionCount);
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kRendezvousRetransmissionIntervalMs),
+                                                  _HandleRendezvousRetransmissionTimer, this);
+        }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "Give up the current Thread network!");
+            TryNextNetwork();
+        }
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to send rendezvous announcement: %" CHIP_ERROR_FORMAT, err.Format());
+        _CancelRendezvousAnnouncement();
+    }
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HandleRendezvousRetransmissionTimer(System::Layer * aLayer,
+                                                                                               void * aAppState)
+{
+    auto * self = static_cast<GenericThreadStackManagerImpl_OpenThread *>(aAppState);
+    self->SendRendezvousAnnouncement();
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_UpdateNetworkStatus()
 {
@@ -835,7 +1014,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_UpdateNetworkStatus()
     // Thread is not enabled, then we are not trying to connect to the network.
     VerifyOrReturn(ThreadStackMgrImpl().IsThreadEnabled() && mpStatusChangeCallback != nullptr);
 
-    ByteSpan datasetTLV;
     Thread::OperationalDataset dataset;
     ByteSpan extpanid;
 
@@ -1190,7 +1368,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSr
     {
         if (service.IsUsed() && service.mIsInvalid)
         {
-            ChipLogProgress(DeviceLayer, "removing srp service: %s.%s", service.mService.mInstanceName, service.mService.mName);
+            ChipLogProgress(DeviceLayer, "removing invalid srp service: %s.%s", service.mService.mInstanceName,
+                            service.mService.mName);
             error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &service.mService));
             SuccessOrExit(error);
         }

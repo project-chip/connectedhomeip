@@ -42,7 +42,9 @@ from test_plan_support import commission_if_required
 
 from matter.ChipDeviceCtrl import TransportPayloadCapability
 from matter.clusters import CameraAvStreamManagement, Objects, WebRTCTransportRequestor
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 log = logging.getLogger(__name__)
@@ -183,7 +185,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
                 cmd=CameraAvStreamManagement.Commands.VideoStreamAllocate(
                     streamUsage=aStreamUsagePriorities[0],
                     videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                    minFrameRate=30,
+                    minFrameRate=min(15, aVideoSensorParams.maxFPS),
                     maxFrameRate=aVideoSensorParams.maxFPS,
                     minResolution=aMinViewportRes,
                     maxResolution=CameraAvStreamManagement.Structs.VideoResolutionStruct(

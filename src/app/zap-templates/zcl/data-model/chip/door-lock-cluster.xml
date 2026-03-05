@@ -44,7 +44,7 @@ limitations under the License.
         <server tick="false" init="false">true</server>
 
         <!-- Current cluster version -->
-        <globalAttribute side="either" code="0xFFFD" value="7" />
+        <globalAttribute side="either" code="0xFFFD" value="10" />
         <!-- Cluster feature map -->
         <globalAttribute side="server" code="0xFFFC" value="0x0001">
             <featureBit tag="PIN" bit="0">true</featureBit>

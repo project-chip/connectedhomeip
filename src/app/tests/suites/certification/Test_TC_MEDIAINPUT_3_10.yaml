@@ -44,3 +44,9 @@ tests:
       PICS: MEDIAINPUT.S.A0000
       command: "readAttribute"
       attribute: "InputList"
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: tv
+      app: tv

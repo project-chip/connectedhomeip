@@ -273,7 +273,7 @@ else
                 shift
                 ;;
             --verbose)
-                optArgs+="sl_verbose_mode=true "
+                optArgs+="sl_verbose_mode=true chip_detail_logging=true "
                 VERBOSE_MODE=true
                 shift
                 ;;
@@ -324,6 +324,14 @@ else
         } &>/dev/null
     fi
 
+    # Run install-packages once (creates .install-packages-done when done)
+    INSTALL_MARKER="$CHIP_ROOT/scripts/setup/silabs/.install-packages-done"
+    if [ ! -f "$INSTALL_MARKER" ]; then
+        echo "Running install-packages (first-time setup)..."
+        pip install -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt"
+        python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
+    fi
+
     # Zap generation requires activation
     source "$CHIP_ROOT/scripts/activate.sh"
 
@@ -344,7 +352,11 @@ else
 
     if [ "$USE_DOCKER" == true ] && [ "$USE_WIFI" == false ]; then
         echo "Switching OpenThread ROOT"
-        optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
+        optArgs+="openthread_root=\"$GSDK_ROOT/openthread_stack/util/third_party/openthread\" "
+    fi
+
+    if [ "$VERBOSE_MODE" == false ]; then
+        optArgs+="chip_detail_logging=false "
     fi
 
     "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --add-export-compile-commands=* --root="$ROOT" --dotfile="$DOTFILE" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"

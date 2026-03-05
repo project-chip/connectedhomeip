@@ -388,11 +388,11 @@ CHIP_ERROR GeneralCommissioningCluster::Startup(ServerClusterContext & context)
     return mClusterContext.fabricTable.AddFabricDelegate(this);
 }
 
-void GeneralCommissioningCluster::Shutdown()
+void GeneralCommissioningCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     mClusterContext.platformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     mClusterContext.fabricTable.RemoveFabricDelegate(this);
-    DefaultServerCluster::Shutdown();
+    DefaultServerCluster::Shutdown(shutdownType);
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -400,7 +400,7 @@ GeneralCommissioningCluster::HandleArmFailSafe(const DataModel::InvokeRequest & 
                                                const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("ArmFailSafe", "GeneralCommissioning");
-    auto & failSafeContext = mClusterContext.failsafeContext;
+    auto & failSafeContext = mClusterContext.failSafeContext;
     Commands::ArmFailSafeResponse::Type response;
 
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
@@ -457,7 +457,7 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
 {
     MATTER_TRACE_SCOPE("CommissioningComplete", "GeneralCommissioning");
 
-    auto & failSafe = mClusterContext.failsafeContext;
+    auto & failSafe = mClusterContext.failSafeContext;
 
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
 
@@ -619,7 +619,7 @@ GeneralCommissioningCluster::HandleSetTCAcknowledgements(const DataModel::Invoke
 {
     MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
 
-    auto & failSafeContext                  = mClusterContext.failsafeContext;
+    auto & failSafeContext                  = mClusterContext.failSafeContext;
     TermsAndConditionsProvider & tcProvider = mClusterContext.termsAndConditionsProvider;
 
     Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;

@@ -41,8 +41,6 @@ namespace DeviceLayer {
 class FactoryDataProviderImpl : public FactoryDataProvider
 {
 public:
-    static FactoryDataProviderImpl sInstance;
-
     ~FactoryDataProviderImpl(){};
 
     CHIP_ERROR Init(void) override;

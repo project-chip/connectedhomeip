@@ -23,8 +23,10 @@ from mobly import asserts
 
 from matter.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                                evaluate_feature_choice_conformance)
-from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.conformance import ConformanceAssessmentData
+from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import ProblemNotice
+from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import XmlCluster, add_cluster_data_from_xml
 
 FEATURE_TEMPLATE = '''\
@@ -195,17 +197,21 @@ class TestConformanceSupport(MatterBaseTest):
             return feature_map
 
         for combo, expected_failures in self.all_id_combos:
-            problems = evaluate_feature_choice_conformance(0, 1, self.clusters, make_feature_map(combo), [], [])
+            info = ConformanceAssessmentData(feature_map=make_feature_map(
+                combo), attribute_list=[], all_command_list=[], cluster_revision=1)
+            problems = evaluate_feature_choice_conformance(0, 1, self.clusters, info)
             self._evaluate_problems(problems, expected_failures)
 
     def test_attributes(self):
         for combo, expected_failures in self.all_id_combos:
-            problems = evaluate_attribute_choice_conformance(0, 1, self.clusters, 0, list(combo), [])
+            info = ConformanceAssessmentData(feature_map=0, attribute_list=list(combo), all_command_list=[], cluster_revision=1)
+            problems = evaluate_attribute_choice_conformance(0, 1, self.clusters, info)
             self._evaluate_problems(problems, expected_failures)
 
     def test_commands(self):
         for combo, expected_failures in self.all_id_combos:
-            problems = evaluate_command_choice_conformance(0, 1, self.clusters, 0, [], list(combo))
+            info = ConformanceAssessmentData(feature_map=0, attribute_list=[], all_command_list=list(combo), cluster_revision=1)
+            problems = evaluate_command_choice_conformance(0, 1, self.clusters, info)
             self._evaluate_problems(problems, expected_failures)
 
 

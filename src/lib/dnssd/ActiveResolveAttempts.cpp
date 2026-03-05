@@ -17,6 +17,7 @@
 
 #include "ActiveResolveAttempts.h"
 
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;

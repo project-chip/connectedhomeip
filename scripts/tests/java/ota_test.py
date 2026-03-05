@@ -114,13 +114,13 @@ class OTATest:
             code = self.TestCmdOnnetworkLongOtaOverBdx(
                 self.nodeid, self.setup_pin_code, self.discriminator, self.timeout, self.uri, self.filename)
             if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long-ota-over-bdx failed with error {code}")
+                raise RuntimeError(f"Testing pairing onnetwork-long-ota-over-bdx failed with error {code}")
             # Validate the received OTA firmware
             filepath = "/tmp/test.bin"
             expected_content = b"Test\n"
             is_valid = self.validate_file_content(filepath, expected_content)
             if not is_valid:
-                raise Exception("OTA content is not matching as the original file")
+                raise RuntimeError("OTA content is not matching as the original file")
 
         else:
-            raise Exception(f"Unsupported command {self.command_name}")
+            raise ValueError(f"Unsupported command {self.command_name}")

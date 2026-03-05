@@ -54,7 +54,9 @@ public:
             ChipLogError(AppServer, "Failed to get active locale on endpoint %u: 0x%02x", endpointId, to_underlying(status));
         }
 
-        gServer.Create(*DeviceLayer::GetDeviceInfoProvider(), activeLocale);
+        DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+        VerifyOrDie(provider != nullptr);
+        gServer.Create(*provider, activeLocale);
         return gServer.Registration();
     }
 
@@ -80,7 +82,7 @@ void MatterLocalizationConfigurationClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterLocalizationConfigurationClusterShutdownCallback(EndpointId endpointId)
+void MatterLocalizationConfigurationClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
     CodegenClusterIntegration::UnregisterServer(
@@ -91,5 +93,5 @@ void MatterLocalizationConfigurationClusterShutdownCallback(EndpointId endpointI
                 static_cast<uint16_t>(LocalizationConfiguration::StaticApplicationConfig::kFixedClusterConfig.size()),
             .maxClusterInstanceCount = 1, // only root-node functionality supported by this implementation
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }

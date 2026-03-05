@@ -94,8 +94,8 @@ void OTAConfig::Init()
     // Periodic query timeout must be set prior to requestor being initialized
     gRequestorUser.SetPeriodicQueryTimeout(OTA_PERIODIC_TIMEOUT);
 
-#if SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
-    auto & imageProcessor = chip::OTAMultiImageProcessorImpl::GetDefaultInstance();
+#if defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+    auto & imageProcessor = chip::DeviceLayer::Silabs::MultiOTA::OTAMultiImageProcessorImpl::GetDefaultInstance();
 #else
     auto & imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
 #endif

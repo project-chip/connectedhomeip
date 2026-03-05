@@ -75,6 +75,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::
     case EnumType::kInvalidOptions:
     case EnumType::kInvalidStreamUsage:
     case EnumType::kInvalidTime:
+    case EnumType::kInvalidPreRollLength:
+    case EnumType::kDuplicateStreamValues:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -113,6 +115,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::
     case EnumType::kUserInitiated:
     case EnumType::kAutomation:
     case EnumType::kEmergency:
+    case EnumType::kDoorbellPressed:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

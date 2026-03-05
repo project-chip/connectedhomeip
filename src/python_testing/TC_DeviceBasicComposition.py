@@ -20,156 +20,7 @@
 #
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run2:
-#     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
-#     script-args: --storage-path admin_storage.json --manual-code 10054912339
-#     factory-reset: true
-#     quiet: true
-#   run3:
-#     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
-#     script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
-#     factory-reset: true
-#     quiet: true
-#   run4:
-#     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --discriminator 1234
-#       --passcode 20202021
-#     factory-reset: true
-#     quiet: true
-#   run5:
-#     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --commissioning-method on-network
-#     factory-reset: true
-#     quiet: true
-#   run6:
-#     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --qr-code MT:-24J0Q1212-10648G00
-#       --commissioning-method on-network
-#     factory-reset: true
-#     quiet: true
-#   run7:
-#     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --discriminator 1234
-#       --passcode 20202021
-#       --commissioning-method on-network
-#     factory-reset: true
-#     quiet: true
-#   run8:
-#     app: ${CHIP_LOCK_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
-#     script-args: --storage-path admin_storage.json
-#     factory-reset: false
-#     quiet: true
-#   run9:
-#     script-args:
-#       --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#     factory-reset: false
-#     quiet: true
-#   run10:
-#     app: ${ENERGY_MANAGEMENT_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run11:
-#     app: ${LIT_ICD_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run12:
-#     app: ${CHIP_MICROWAVE_OVEN_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run13:
-#     app: ${CHIP_RVC_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run14:
-#     app: ${NETWORK_MANAGEMENT_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run15:
-#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run16:
-#     app: ${ALL_DEVICES_APP}
-#     app-args: --discriminator 1234 --KVS kvs1
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run17:
+#   run1: # Runs through all tests with debug mode enabled (dumps attribute data on failure)
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -181,25 +32,161 @@
 #       --debug
 #     factory-reset: true
 #     quiet: true
+#   run2: # tests PASE connection using manual code (12.1 only)
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json --manual-code 10054912339
+#     factory-reset: true
+#     quiet: true
+#   run3: # tests PASE connection using QR code (12.1 only)
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
+#     factory-reset: true
+#     quiet: true
+#   run4: # tests PASE connection using discriminator and passcode (12.1 only)
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --discriminator 1234
+#       --passcode 20202021
+#     factory-reset: true
+#     quiet: true
+#   run5: # Tests CASE connection using manual code (12.1 only)
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run6: # Tests CASE connection using QR code (12.1 only)
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --qr-code MT:-24J0Q1212-10648G00
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run7: # Tests CASE connection using manual discriminator and passcode (12.1 only)
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --discriminator 1234
+#       --passcode 20202021
+#       --commissioning-method on-network
+#     factory-reset: true
+#     quiet: true
+#   run8: # Tests reusing storage from run7 (i.e. factory-reset=false)
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: --storage-path admin_storage.json
+#     factory-reset: false
+#     quiet: true
+#   run9: # Test using the generated attribute wildcard file from previous run
+#     script-args:
+#       --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#     factory-reset: false
+#     quiet: true
+#   run10: # Tests against energy-management-app
+#     app: ${EVSE_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run11: # Tests against lit-icd app
+#     app: ${LIT_ICD_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run12: # Tests against microwave-oven app
+#     app: ${CHIP_MICROWAVE_OVEN_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run13: # Tests against chip-rvc app
+#     app: ${CHIP_RVC_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run14: # Tests against network-management-app
+#     app: ${NETWORK_MANAGEMENT_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run15: # Tests against lighting-app-data-mode-no-unique-id
+#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run16: # Tests against all-devices-app - default (contactsensor)
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run17: # Tests against all-devices-app - on/off light
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --device on-off-light
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
-
-# Run 1: runs through all tests
-# Run 2: tests PASE connection using manual code (12.1 only)
-# Run 3: tests PASE connection using QR code (12.1 only)
-# Run 4: tests PASE connection using discriminator and passcode (12.1 only)
-# Run 5: Tests CASE connection using manual code (12.1 only)
-# Run 6: Tests CASE connection using QR code (12.1 only)
-# Run 7: Tests CASE connection using manual discriminator and passcode (12.1 only)
-# Run 8: Tests reusing storage from run7 (i.e. factory-reset=false)
-# Run 9: Test using the generated attribute wildcard file from previous run
-# Run 10: Tests against energy-management-app
-# Run 11: Tests against lit-icd app
-# Run 12: Tests against microwave-oven app
-# Run 13: Tests against chip-rvc app
-# Run 14: Tests against network-management-app
-# Run 15: Tests against lighting-app-data-mode-no-unique-id
-# Run 16: Tests against all-devices-app
-# Run 17: runs through all tests with debug mode enabled (dumps attribute data on failure)
 
 import logging
 import os
@@ -218,10 +205,11 @@ from matter.clusters.Types import Nullable
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.decorators import async_test_body
 from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds,
                                                  attribute_id_type, cluster_id_type, command_id_type)
-from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation, UnknownProblemLocation
+from matter.testing.runner import TestStep, default_matter_test_main
 from matter.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
                                                       find_tag_list_problems, find_tree_roots, flat_list_ok,
                                                       get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
@@ -1176,7 +1164,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 if len(taglist) not in range(TAG_LIST_EP_RANGE_MIN, TAG_LIST_EP_RANGE_MAX):
                     self.fail_current_test("Number of tagList is not in the range of 1 to 6")
 
-            no_duplicate_tag = []
+            no_duplicate_tag_keys = set()
             for tag_struct in taglist:
                 self.print_step(5.1, "verifying atleast 1 NamespaceID and tag property in the taglist struct for endpoint: {endpoint_id}".format(
                     endpoint_id=endpoint_id))
@@ -1187,12 +1175,13 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 if not isinstance(tag_struct.tag, int):
                     self.fail_current_test("Atleast 1 Tag is not present")
 
-                if tag_struct.tag in no_duplicate_tag:
+                mfg_code_key = None if isinstance(tag_struct.mfgCode, Nullable) else int(tag_struct.mfgCode)
+                tag_key = (mfg_code_key, int(tag_struct.namespaceID), int(tag_struct.tag))
+                if tag_key in no_duplicate_tag_keys:
                     self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
-                                      problem="duplicate Tags found in taglist struct", spec_location="TagList")
-                    self.fail_current_test("Duplicate tag found")
-                no_duplicate_tag.append(tag_struct.tag)
-
+                                      problem=f"duplicate Tag found in taglist struct: {tag_key}", spec_location="TagList")
+                    self.fail_current_test(f"Duplicate tag found: {tag_key}")
+                no_duplicate_tag_keys.add(tag_key)
                 self.print_step(5.2, "verifying namespaceID value falls under defined namespaces for endpoint: {endpoint_id}".format(
                     endpoint_id=endpoint_id))
 

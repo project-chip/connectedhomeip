@@ -17,6 +17,7 @@
 #include <app/clusters/bindings/BindingCluster.h>
 #include <app/static-cluster-config/Binding.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/generic-callbacks.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 
 #include <cstdint>
@@ -38,7 +39,13 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[clusterInstanceIndex].Create(endpointId);
+        gServers[clusterInstanceIndex].Create(
+            BindingCluster::Context{
+                .bindingTable    = Binding::Table::GetInstance(),
+                .bindingManager  = Binding::Manager::GetInstance(),
+                .platformManager = DeviceLayer::PlatformMgr(),
+            },
+            endpointId);
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -68,7 +75,7 @@ void MatterBindingClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterBindingClusterShutdownCallback(EndpointId endpointId)
+void MatterBindingClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -79,7 +86,7 @@ void MatterBindingClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kBindingFixedClusterCount,
             .maxClusterInstanceCount   = kBindingMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterBindingPluginServerInitCallback() {}

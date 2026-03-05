@@ -76,6 +76,7 @@ public:
 
 extern NetworkOptions gNetworkOptions;
 
+#if defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION
 /**
  * Handler for options that control fault injection testing behavior.
  */
@@ -93,3 +94,4 @@ public:
 };
 
 extern FaultInjectionOptions gFaultInjectionOptions;
+#endif // defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION

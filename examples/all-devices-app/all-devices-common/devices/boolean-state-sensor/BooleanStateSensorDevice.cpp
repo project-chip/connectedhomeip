@@ -34,17 +34,17 @@ CHIP_ERROR BooleanStateSensorDevice::Register(chip::EndpointId endpoint, CodeDri
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
-void BooleanStateSensorDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+void BooleanStateSensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
     if (mBooleanStateCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mBooleanStateCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mBooleanStateCluster.Cluster()));
         mBooleanStateCluster.Destroy();
     }
     if (mIdentifyCluster.IsConstructed())
     {
-        TEMPORARY_RETURN_IGNORED provider.RemoveCluster(&mIdentifyCluster.Cluster());
+        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
         mIdentifyCluster.Destroy();
     }
 }

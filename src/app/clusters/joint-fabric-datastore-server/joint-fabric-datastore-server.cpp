@@ -294,13 +294,10 @@ bool emberAfJointFabricDatastoreClusterAddKeySetCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const JointFabricDatastoreCluster::Commands::AddKeySet::DecodableType & commandData)
 {
-    CHIP_ERROR err                                                                              = CHIP_NO_ERROR;
-    JointFabricDatastoreCluster::Structs::DatastoreGroupKeySetStruct::DecodableType groupKeySet = commandData.groupKeySet;
+    CHIP_ERROR err                                   = CHIP_NO_ERROR;
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
-    VerifyOrExit(jointFabricDatastore.IsGroupKeySetEntryPresent(groupKeySet.groupKeySetID) == false,
-                 err = CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    SuccessOrExit(err = jointFabricDatastore.AddGroupKeySetEntry(groupKeySet));
+    SuccessOrExit(err = jointFabricDatastore.AddGroupKeySetEntry(commandData.groupKeySet));
 
 exit:
     if (err == CHIP_NO_ERROR)
@@ -324,7 +321,7 @@ bool emberAfJointFabricDatastoreClusterUpdateKeySetCallback(
     JointFabricDatastoreCluster::Structs::DatastoreGroupKeySetStruct::DecodableType groupKeySet = commandData.groupKeySet;
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
-    VerifyOrExit(jointFabricDatastore.IsGroupKeySetEntryPresent(groupKeySet.groupKeySetID), err = CHIP_ERROR_NOT_FOUND);
+    VerifyOrExit(jointFabricDatastore.IsGroupKeySetEntryPresent(groupKeySet.groupKeySetID), err = CHIP_IM_GLOBAL_STATUS(NotFound));
     SuccessOrExit(err = jointFabricDatastore.UpdateGroupKeySetEntry(groupKeySet));
 
 exit:
@@ -349,7 +346,7 @@ bool emberAfJointFabricDatastoreClusterRemoveKeySetCallback(
     uint16_t groupKeySetId                           = commandData.groupKeySetID;
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
-    VerifyOrExit(jointFabricDatastore.IsGroupKeySetEntryPresent(groupKeySetId), err = CHIP_ERROR_NOT_FOUND);
+    VerifyOrExit(jointFabricDatastore.IsGroupKeySetEntryPresent(groupKeySetId), err = CHIP_IM_GLOBAL_STATUS(NotFound));
     SuccessOrExit(err = jointFabricDatastore.RemoveGroupKeySetEntry(groupKeySetId));
 
 exit:
@@ -550,10 +547,7 @@ bool emberAfJointFabricDatastoreClusterRefreshNodeCallback(
 
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
-    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointsList;
-    // TODO: Get Endpoints List from connected device with <nodeId>
-
-    SuccessOrExit(err = jointFabricDatastore.RefreshNode(nodeId, endpointsList.TakeBuffer()));
+    SuccessOrExit(err = jointFabricDatastore.RefreshNode(nodeId));
 
 exit:
     if (err == CHIP_NO_ERROR)

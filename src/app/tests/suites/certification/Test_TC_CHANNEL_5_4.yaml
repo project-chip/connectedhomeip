@@ -73,3 +73,9 @@ tests:
           Enter the below command to read the current input.
            ./chip-tool channel read current-channel 1 1
       disabled: true
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: tv
+      app: tv

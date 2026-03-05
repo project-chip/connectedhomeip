@@ -80,7 +80,7 @@ void MatterWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -91,7 +91,7 @@ void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kWiFiNetworkDiagnosticsFixedClusterCount,
             .maxClusterInstanceCount   = kWiFiNetworkDiagnosticsMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback() {}

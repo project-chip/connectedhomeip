@@ -260,7 +260,8 @@ class GroupSettingFragment : Fragment() {
             hexStringToByteArray(epochKey1Ed.text.toString()),
             epochStartTime1Ed.text.toString().toULong().toLong(),
             hexStringToByteArray(epochKey2Ed.text.toString()),
-            epochStartTime2Ed.text.toString().toULong().toLong()
+            epochStartTime2Ed.text.toString().toULong().toLong(),
+            0
           )
         sendKeySetWrite(keySetWritestruct)
         requireActivity().runOnUiThread { dialog.dismiss() }

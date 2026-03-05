@@ -80,4 +80,45 @@ CHIP_ERROR AttributePersistence::StoreString(const ConcreteAttributePath & path,
     return mProvider.WriteValue(path, io.ContentWithPrefix());
 }
 
+CHIP_ERROR AttributePersistence::InternalStoreTLV(const ConcreteAttributePath & path, MutableByteSpan buffer, const void * context,
+                                                  TLVEncoderCallback encoder)
+{
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+
+    TLV::TLVType container;
+    // We wrap the value in an Anonymous Structure to ensure a single valid top-level element.
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
+    ReturnErrorOnFailure(encoder(context, writer));
+    ReturnErrorOnFailure(writer.EndContainer(container));
+    ReturnErrorOnFailure(writer.Finalize());
+
+    return mProvider.WriteValue(path, ByteSpan(buffer.data(), writer.GetLengthWritten()));
+}
+
+CHIP_ERROR AttributePersistence::InternalLoadTLV(const ConcreteAttributePath & path, MutableByteSpan buffer, void * context,
+                                                 TLVDecoderCallback decoder)
+{
+    ReturnErrorOnFailure(mProvider.ReadValue(path, buffer));
+
+    TLV::TLVReader reader;
+    reader.Init(buffer);
+
+    ReturnErrorOnFailure(reader.Next());
+    VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
+
+    {
+        TLV::TLVType container;
+        ReturnErrorOnFailure(reader.EnterContainer(container));
+        ReturnErrorOnFailure(reader.Next()); // Move to the element inside structure (Context Tag 1)
+        VerifyOrReturnError(reader.GetTag() == kTLVEncodingTag, CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(decoder(context, reader));
+        ReturnErrorOnFailure(reader.VerifyEndOfContainer());
+        ReturnErrorOnFailure(reader.ExitContainer(container));
+    }
+    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace chip::app

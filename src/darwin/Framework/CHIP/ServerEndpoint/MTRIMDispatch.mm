@@ -20,6 +20,7 @@
 #include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-table.h>
+#include <app/util/generic-callbacks.h>
 #include <app/util/privilege-storage.h>
 #include <lib/core/Global.h>
 #include <lib/core/Optional.h>
@@ -73,7 +74,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     // clusters dont use it.
 }
 void MatterDescriptorClusterInitCallback(EndpointId endpointId);
-void MatterDescriptorClusterShutdownCallback(EndpointId endpointId);
+void MatterDescriptorClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
 void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
@@ -88,7 +89,7 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     }
 }
 
-void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId)
+void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterId, MatterClusterShutdownType shutdownType)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -96,7 +97,7 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     // because we use the gOtaProviderServer and the functions defined here.
     switch (clusterId) {
     case app::Clusters::Descriptor::Id:
-        MatterDescriptorClusterShutdownCallback(endpoint);
+        MatterDescriptorClusterShutdownCallback(endpoint, shutdownType);
         break;
     }
 }

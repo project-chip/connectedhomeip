@@ -20,17 +20,20 @@
 
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/SafeAttributePersistenceProvider.h>
-#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
-#include <lib/support/ReadOnlyBuffer.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <vector>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::Testing;
+
+using chip::Testing::IsAcceptedCommandsListEqualTo;
+using chip::Testing::IsAttributesListEqualTo;
 
 namespace {
 
@@ -72,7 +75,7 @@ public:
         }
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    Protocols::InteractionModel::Status PlayChimeSound() override
+    Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override
     {
         playChimeSoundCalled = true;
         return playChimeSoundStatus;
@@ -87,46 +90,34 @@ struct TestChimeCluster : public ::testing::Test
     void SetUp() override
     {
         VerifyOrDie(mPersistenceProvider.Init(&mClusterTester.GetServerClusterContext().storage) == CHIP_NO_ERROR);
-        app::SetSafeAttributePersistenceProvider(&mPersistenceProvider);
         EXPECT_EQ(mCluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
-    void TearDown() override { app::SetSafeAttributePersistenceProvider(nullptr); }
+    void TearDown() override {}
 
     MockChimeDelegate mMockDelegate;
+    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 
-    ChimeCluster mCluster{ kTestEndpointId, mMockDelegate };
+    ChimeCluster mCluster{ kTestEndpointId,
+                           ChimeCluster::Context{ .delegate                         = mMockDelegate,
+                                                  .safeAttributePersistenceProvider = mPersistenceProvider } };
 
     ClusterTester mClusterTester{ mCluster };
-
-    app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 };
 
 TEST_F(TestChimeCluster, TestAttributesList)
 {
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> listBuilder;
-    EXPECT_EQ(mCluster.Attributes(ConcreteClusterPath(kTestEndpointId, Chime::Id), listBuilder), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedListBuilder;
-    AttributeListBuilder attributeListBuilder(expectedListBuilder);
-    EXPECT_EQ(attributeListBuilder.Append(Span(Chime::Attributes::kMandatoryMetadata), {}), CHIP_NO_ERROR);
-
-    EXPECT_TRUE(EqualAttributeSets(listBuilder.TakeBuffer(), expectedListBuilder.TakeBuffer()));
+    std::vector<DataModel::AttributeEntry> mandatoryAttributes(Chime::Attributes::kMandatoryMetadata.begin(),
+                                                               Chime::Attributes::kMandatoryMetadata.end());
+    EXPECT_TRUE(IsAttributesListEqualTo(mCluster, mandatoryAttributes));
 }
 
 TEST_F(TestChimeCluster, TestAcceptedCommands)
 {
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> listBuilder;
-    EXPECT_EQ(mCluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, Chime::Id), listBuilder), CHIP_NO_ERROR);
-
-    static constexpr DataModel::AcceptedCommandEntry kExpectedCommands[] = {
-        Chime::Commands::PlayChimeSound::kMetadataEntry,
-    };
-
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expectedListBuilder;
-    EXPECT_EQ(expectedListBuilder.ReferenceExisting(kExpectedCommands), CHIP_NO_ERROR);
-
-    EXPECT_TRUE(EqualAcceptedCommandSets(listBuilder.TakeBuffer(), expectedListBuilder.TakeBuffer()));
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(mCluster,
+                                              {
+                                                  Chime::Commands::PlayChimeSound::kMetadataEntry,
+                                              }));
 }
 
 TEST_F(TestChimeCluster, TestDelegateErrors)
@@ -266,12 +257,13 @@ TEST_F(TestChimeCluster, TestPersistence)
     TestServerClusterContext context;
     app::DefaultSafeAttributePersistenceProvider persistenceProvider;
     EXPECT_EQ(persistenceProvider.Init(&context.Get().storage), CHIP_NO_ERROR);
-    app::SetSafeAttributePersistenceProvider(&persistenceProvider);
     MockChimeDelegate mockDelegate;
 
     // 1. Initial startup, verify default values
     {
-        ChimeCluster cluster(kTestEndpointId, mockDelegate);
+        ChimeCluster cluster(
+            kTestEndpointId,
+            ChimeCluster::Context{ .delegate = mockDelegate, .safeAttributePersistenceProvider = persistenceProvider });
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
 
@@ -290,7 +282,9 @@ TEST_F(TestChimeCluster, TestPersistence)
 
     // 2. Restart (create new cluster instance), verify modified values are loaded
     {
-        ChimeCluster cluster(kTestEndpointId, mockDelegate);
+        ChimeCluster cluster(
+            kTestEndpointId,
+            ChimeCluster::Context{ .delegate = mockDelegate, .safeAttributePersistenceProvider = persistenceProvider });
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Testing::ClusterTester tester(cluster);
 

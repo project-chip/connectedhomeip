@@ -175,8 +175,8 @@ TEST_F(TestSingleEndpointServerClusterRegistry, BasicTest)
     EXPECT_EQ(registry.Get({ kEp2, kCluster1 }), nullptr);
 
     // remove registrations
-    EXPECT_EQ(registry.Unregister(&cluster2), CHIP_NO_ERROR);
-    EXPECT_EQ(registry.Unregister(&cluster2), CHIP_ERROR_NOT_FOUND);
+    EXPECT_EQ(registry.Unregister(&cluster2, ClusterShutdownType::kClusterShutdown), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Unregister(&cluster2, ClusterShutdownType::kClusterShutdown), CHIP_ERROR_NOT_FOUND);
 
     // Re-adding works
     EXPECT_EQ(registry.Get({ kEp2, kCluster2 }), nullptr);
@@ -265,11 +265,11 @@ TEST_F(TestSingleEndpointServerClusterRegistry, StressTest)
             {
                 // item MUST exist and be accessible
                 ASSERT_EQ(registry.Get(items[cluster].GetPath()), &items[cluster]);
-                ASSERT_EQ(registry.Unregister(&items[cluster]), CHIP_NO_ERROR);
+                ASSERT_EQ(registry.Unregister(&items[cluster], ClusterShutdownType::kClusterShutdown), CHIP_NO_ERROR);
 
                 // once unregistered, it is not there anymore
                 ASSERT_EQ(registry.Get(items[cluster].GetPath()), nullptr);
-                ASSERT_EQ(registry.Unregister(&items[cluster]), CHIP_ERROR_NOT_FOUND);
+                ASSERT_EQ(registry.Unregister(&items[cluster], ClusterShutdownType::kClusterShutdown), CHIP_ERROR_NOT_FOUND);
             }
 
             // all endpoints should be clear
@@ -398,7 +398,7 @@ TEST_F(TestSingleEndpointServerClusterRegistry, Context)
         EXPECT_TRUE(cluster3.HasContext());
 
         // removing clears the context/shuts clusters down
-        EXPECT_EQ(registry.Unregister(&cluster2), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.Unregister(&cluster2, ClusterShutdownType::kClusterShutdown), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());
@@ -486,7 +486,7 @@ TEST_F(TestSingleEndpointServerClusterRegistry, MultiPathRegistration)
     std::sort(expected_clusters.begin(), expected_clusters.end());
     ASSERT_EQ(returned_clusters, expected_clusters);
 
-    ASSERT_EQ(registry.Unregister(&cluster), CHIP_NO_ERROR);
+    ASSERT_EQ(registry.Unregister(&cluster, ClusterShutdownType::kClusterShutdown), CHIP_NO_ERROR);
     for (auto & p : kTestPaths)
     {
         ASSERT_EQ(registry.Get(p), nullptr);
@@ -579,7 +579,7 @@ TEST_F(TestSingleEndpointServerClusterRegistry, AllClustersIteration)
     EXPECT_NE(std::find(found_clusters.begin(), found_clusters.end(), &cluster2), found_clusters.end());
     EXPECT_NE(std::find(found_clusters.begin(), found_clusters.end(), &cluster3), found_clusters.end());
 
-    EXPECT_SUCCESS(registry.Unregister(&cluster2));
+    EXPECT_SUCCESS(registry.Unregister(&cluster2, ClusterShutdownType::kClusterShutdown));
 
     found_clusters.clear();
     for (auto * cluster : registry.AllServerClusterInstances())

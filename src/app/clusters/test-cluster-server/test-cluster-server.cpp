@@ -898,7 +898,7 @@ bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(
     const Commands::TestEmitTestEventRequest::DecodableType & commandData)
 {
     Commands::TestEmitTestEventResponse::Type responseData;
-    Structs::SimpleStruct::Type arg4;
+    Structs::SimpleStruct::Type arg4 = {};
     DataModel::List<const Structs::SimpleStruct::Type> arg5;
     DataModel::List<const SimpleEnum> arg6;
 

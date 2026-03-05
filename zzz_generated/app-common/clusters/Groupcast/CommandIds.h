@@ -30,13 +30,13 @@ namespace UpdateGroupKey {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace UpdateGroupKey
 
-namespace ExpireGracePeriod {
-inline constexpr CommandId Id = 0x00000004;
-} // namespace ExpireGracePeriod
-
 namespace ConfigureAuxiliaryACL {
-inline constexpr CommandId Id = 0x00000005;
+inline constexpr CommandId Id = 0x00000004;
 } // namespace ConfigureAuxiliaryACL
+
+namespace GroupcastTesting {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace GroupcastTesting
 
 namespace LeaveGroupResponse {
 inline constexpr CommandId Id = 0x00000002;

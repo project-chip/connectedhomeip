@@ -41,7 +41,7 @@ SDPType RtcTypeToSDPType(rtc::Description::Type type)
 WebrtcTransport::WebrtcTransport()
 {
     ChipLogProgress(Camera, "WebrtcTransport created");
-    mRequestArgs = { 0, 0, 0, 0, 0, 0 }; // Initialize request arguments to zero
+    mRequestArgs = {}; // Default initialize request arguments
 }
 
 WebrtcTransport::~WebrtcTransport()
@@ -62,6 +62,11 @@ void WebrtcTransport::SetRequestArgs(const RequestArgs & args)
     mRequestArgs = args;
 }
 
+void WebrtcTransport::SetICEServers(const std::vector<ICEServerInfo> & servers)
+{
+    mICEServers = servers;
+}
+
 WebrtcTransport::RequestArgs & WebrtcTransport::GetRequestArgs()
 {
     return mRequestArgs;
@@ -69,6 +74,7 @@ WebrtcTransport::RequestArgs & WebrtcTransport::GetRequestArgs()
 
 void WebrtcTransport::SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID)
 {
+    std::lock_guard<std::mutex> lock(mTrackStatusLock);
     if (mLocalVideoTrack)
     {
         // TODO: Implement SFrame encryption HERE (per-transport, during RTP packetization)
@@ -103,6 +109,7 @@ void WebrtcTransport::SendVideo(const chip::ByteSpan & data, int64_t timestamp, 
 // Implementation of SendAudio method
 void WebrtcTransport::SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID)
 {
+    std::lock_guard<std::mutex> lock(mTrackStatusLock);
     if (mLocalAudioTrack)
     {
         // TODO: Implement SFrame encryption HERE (per-transport, during RTP packetization)
@@ -143,13 +150,13 @@ void WebrtcTransport::SendAudioVideo(const chip::ByteSpan & data, uint16_t video
 // Implementation of CanSendVideo method
 bool WebrtcTransport::CanSendVideo()
 {
-    return mLocalVideoTrack != nullptr;
+    return mLocalVideoTrack != nullptr && mLocalVideoTrack->IsReady();
 }
 
 // Implementation of CanSendAudio method
 bool WebrtcTransport::CanSendAudio()
 {
-    return mLocalAudioTrack != nullptr;
+    return mLocalAudioTrack != nullptr && mLocalAudioTrack->IsReady();
 }
 
 const char * WebrtcTransport::GetStateStr() const
@@ -193,7 +200,7 @@ void WebrtcTransport::Start()
         return;
     }
 
-    mPeerConnection = CreateWebRTCPeerConnection();
+    mPeerConnection = CreateWebRTCPeerConnection(mICEServers);
 
     mPeerConnection->SetCallbacks([this](const std::string & sdp, SDPType type) { this->OnLocalDescription(sdp, type); },
                                   [this](const ICECandidateInfo & candidateInfo) { this->OnICECandidate(candidateInfo); },
@@ -203,6 +210,7 @@ void WebrtcTransport::Start()
 
 void WebrtcTransport::Stop()
 {
+    std::lock_guard<std::mutex> lock(mTrackStatusLock);
     if (mPeerConnection != nullptr)
     {
         mPeerConnection->Close();
@@ -248,6 +256,7 @@ void WebrtcTransport::OnLocalDescription(const std::string & sdp, SDPType type)
 
 bool WebrtcTransport::ClosePeerConnection()
 {
+    std::lock_guard<std::mutex> lock(mTrackStatusLock);
     if (mPeerConnection == nullptr)
     {
         return false;

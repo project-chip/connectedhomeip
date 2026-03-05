@@ -27,7 +27,6 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SafePointerCast.h>
@@ -791,7 +790,7 @@ int mbedtls_ct_memcmp_copy(const void * a, const void * b, size_t n)
          * This avoids IAR compiler warning:
          * 'the order of volatile accesses is undefined ..' */
         unsigned char x = A[i], y = B[i];
-        diff |= x ^ y;
+        diff = diff | (x ^ y);
     }
 
     return ((int) diff);
@@ -931,9 +930,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     return CHIP_NO_ERROR;
 }
 
-// We should compile this SPAKE2P implementation only if the PSA implementation is not in use.
-#if !CHIP_CRYPTO_PSA_SPAKE2P
-
+#if CHIP_CRYPTO_SPAKE2P_MBEDTLS
 typedef struct Spake2p_Context
 {
     mbedtls_ecp_group curve;
@@ -1239,7 +1236,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
     return CHIP_NO_ERROR;
 }
 
-#endif // !CHIP_CRYPTO_PSA_SPAKE2P
+#endif // !CHIP_CRYPTO_SPAKE2P_MBEDTLS
 
 } // namespace Crypto
 } // namespace chip

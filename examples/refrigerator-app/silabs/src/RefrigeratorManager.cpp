@@ -26,6 +26,7 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <static-supported-temperature-levels.h>
 
@@ -64,15 +65,17 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]   
 
 CHIP_ERROR RefrigeratorManager::Init()
 {
-    SetTreeCompositionForEndpoint(kRefEndpointId);
-    SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
-    SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
+    TEMPORARY_RETURN_IGNORED SetTreeCompositionForEndpoint(kRefEndpointId);
+    TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
+    TEMPORARY_RETURN_IGNORED SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
 
     // set TagList
-    SetTagList(kColdCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
-    SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
+    TEMPORARY_RETURN_IGNORED SetTagList(kColdCabinetEndpointId,
+                                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
+    TEMPORARY_RETURN_IGNORED SetTagList(kFreezeCabinetEndpointId,
+                                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
 
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
     return CHIP_NO_ERROR;
 }
 

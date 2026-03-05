@@ -73,14 +73,14 @@ static_library("telink") {
     ]
   }
 
-  if (chip_enable_openthread || chip_enable_wifi) {
+  if (chip_enable_thread || chip_enable_wifi) {
     sources += [
       "../Zephyr/InetUtils.cpp",
       "../Zephyr/InetUtils.h",
     ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
       "ThreadStackManagerImpl.cpp",
