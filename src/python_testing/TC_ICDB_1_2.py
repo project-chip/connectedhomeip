@@ -47,7 +47,8 @@ import logging
 import os
 
 from mobly import asserts
-from support_modules.icd_support import ICDTestEventTriggerOperations, uat_bit_name, uat_set_hints, ICDBaseTest, MAX_CI_IDLE_CYCLE_WAIT_S
+from support_modules.icd_support import (MAX_CI_IDLE_CYCLE_WAIT_S, ICDBaseTest, ICDTestEventTriggerOperations, uat_bit_name,
+                                         uat_set_hints)
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError

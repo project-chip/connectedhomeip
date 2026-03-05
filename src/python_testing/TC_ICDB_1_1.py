@@ -48,11 +48,11 @@ import logging
 import os
 
 from mobly import asserts
+from support_modules.icd_support import ICDBaseTest
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
-from support_modules.icd_support import ICDBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
