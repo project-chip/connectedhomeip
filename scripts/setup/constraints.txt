@@ -113,8 +113,6 @@ mypy==1.16.0
     #   -r ../tests/requirements.txt
     #   -r requirements.all.txt
 mypy-extensions==1.0.0
-    # via mypy
-mypy-protobuf==3.5.0
     # via -r requirements.all.txt
 numpy==1.26.4
     # via pandas
