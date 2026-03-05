@@ -102,12 +102,8 @@ if (CONFIG_DIAG_LOGS_DEMO)
     )
 endif()
 
-if(CONFIG_CHIP_SE05X)
-    list(FIND EXTRA_MCUX_MODULES "${CHIP_ROOT}/third_party/simw-top-mini/repo/matter" se_index)
-    if(se_index EQUAL -1)
-        message(FATAL_ERROR "MCUX_MODULES must include ${CHIP_ROOT}/third_party/simw-top-mini/repo/matter in the application when CONFIG_CHIP_SE05X is enabled")
-    endif()
-endif()
+# Include SE05X configuration
+include(${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_se05x.cmake)
 
 if (CONFIG_CHIP_APP_FACTORY_DATA)
     if (CONFIG_CHIP_APP_FACTORY_DATA_IMPL_PLATFORM)
@@ -120,17 +116,15 @@ if (CONFIG_CHIP_APP_FACTORY_DATA)
             )
         endif()
     elseif (CONFIG_CHIP_APP_FACTORY_DATA_IMPL_COMMON)
-        if (CONFIG_CHIP_SE05X)
-            target_sources(app PRIVATE
-                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../se05x/rw61x_factory_data/AppFactoryDataDefaultImpl.cpp
-            )
-            target_include_directories(app PRIVATE
-                ${CHIP_ROOT}/examples)
-        else ()
-            target_sources(app PRIVATE
-                ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataDefaultImpl.cpp
-            )
-        endif()
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/source/AppFactoryDataDefaultImpl.cpp
+        )
+    endif()
+
+    if (CONFIG_CHIP_SE05X_SPAKE_VERIFIER_USE_TP_VALUES OR CONFIG_CHIP_SE05X_DEVICE_ATTESTATION)
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/../se05x/mcu/common/factory_data_impl/Se05xDataProvider.cpp
+        )
     endif()
 endif()
 
