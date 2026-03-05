@@ -558,10 +558,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 log.warning("Encountered exception during cleanup: %r", e)
         to_terminate.clear()
         if summary_file is not None:
-            try:
-                run_summary.write_json(summary_file)
-            except Exception as e:
-                log.warning("Failed to write summary file: %r", e)
+            run_summary.total_runs = len(run_summary.results)
+            run_summary.write_json(summary_file)
 
     try:
         if sys.platform == 'linux':
@@ -640,8 +638,6 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                     observed_failures += 1
                     if not keep_going:
                         sys.exit(2)
-
-            run_summary.total_runs = len(run_summary.results)
 
             if observed_failures != expected_failures:
                 log.error("Iteration %d: expected failure count %d, but got %d",
