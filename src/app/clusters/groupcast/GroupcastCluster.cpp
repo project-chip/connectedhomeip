@@ -25,6 +25,11 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Groupcast::Commands::UpdateGroupKey::kMetadataEntry,   Groupcast::Commands::ConfigureAuxiliaryACL::kMetadataEntry,
     Groupcast::Commands::GroupcastTesting::kMetadataEntry,
 };
+
+constexpr CommandId kGeneratedCommands[] = {
+    Groupcast::Commands::LeaveGroupResponse::Id,
+};
+
 } // namespace
 
 GroupcastCluster::GroupcastCluster(GroupcastContext && context) : GroupcastCluster(std::move(context), {}) {}
@@ -150,6 +155,13 @@ CHIP_ERROR GroupcastCluster::AcceptedCommands(const ConcreteClusterPath & path,
 {
     return builder.ReferenceExisting(kAcceptedCommands);
 }
+
+CHIP_ERROR GroupcastCluster::GeneratedCommands(const ConcreteClusterPath & path,
+                                               ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    return builder.ReferenceExisting(kGeneratedCommands);
+}
+
 
 Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Commands::GroupcastTesting::DecodableType data)
 {
