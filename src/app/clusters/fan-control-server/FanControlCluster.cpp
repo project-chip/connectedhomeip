@@ -17,7 +17,6 @@
 
 /****************************************************************************
  * @file
- * @brief Implementation for the Fan Control Server Cluster (Code-Driven)
  ***************************************************************************/
 
 #include <app/clusters/fan-control-server/FanControlCluster.h>
