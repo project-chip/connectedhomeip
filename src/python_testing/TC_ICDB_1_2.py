@@ -69,13 +69,11 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/i
 Notes/Considerations
 In CI, the UAT is simulated via the kAddActiveModeReq test event trigger.
 On a real DUT, the UAT is performed physically per UserActiveModeTriggerHint/Instruction.
-For a real DUT, use --timeout <seconds> if ActiveModeDuration is large so the test doesn't time out.
+For a real DUT, use the --timeout <seconds> script argument if wait times are large to prevent the test from timing out.
 '''
 
-kRootEndpointId = 0
-# In CI, the simulated lit-icd-app cycles faster than its reported IdleModeDuration.
-# Cap the wait to avoid long test runs.
-kMaxCIWaitTimeSeconds = 10
+ROOT_ENDPOINT_ID = 0
+MAX_CI_IDLE_CYCLE_WAIT_S = 10
 
 cluster = Clusters.Objects.IcdManagement
 attributes = cluster.Attributes
@@ -110,10 +108,10 @@ class TC_ICDB_1_2(MatterBaseTest):
         ]
 
     async def _read_icdm_attribute_expect_success(self, attribute):
-        return await self.read_single_attribute_check_success(endpoint=kRootEndpointId, cluster=cluster, attribute=attribute)
+        return await self.read_single_attribute_check_success(endpoint=ROOT_ENDPOINT_ID, cluster=cluster, attribute=attribute)
 
     async def _send_single_icdm_command(self, command):
-        return await self.send_single_cmd(command, endpoint=kRootEndpointId)
+        return await self.send_single_cmd(command, endpoint=ROOT_ENDPOINT_ID)
 
     async def unregister_all_clients(self):
         """Unregisters all entries in the DUT's RegisteredClients attribute."""
@@ -185,13 +183,6 @@ class TC_ICDB_1_2(MatterBaseTest):
         # *** STEP 4 ***
         # Wait for ActiveModeDuration plus a 1-second buffer so DUT transitions from Active Mode to Idle Mode
         self.step(4)
-        is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if is_ci:
-            # In CI, framework exchanges may hold the DUT active. Clear any
-            # test-level active mode hold so the DUT can transition to idle.
-            await self.check_test_event_triggers_enabled()
-            await self.send_test_event_triggers(
-                eventTrigger=ICDTestEventTriggerOperations.kRemoveActiveModeReq)
         wait_time_for_idle_s = (active_mode_duration_ms / 1000.0) + 1.0
         log.info(f"Waiting {wait_time_for_idle_s}s for DUT to transition to Idle Mode...")
         await asyncio.sleep(wait_time_for_idle_s)
@@ -199,37 +190,39 @@ class TC_ICDB_1_2(MatterBaseTest):
         # *** STEP 5 ***
         # Use UAT hint/instructions to transition DUT from Idle Mode to Active Mode.
         self.step(5)
+        is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
-        # For CI, kAddActiveModeReq is a generic trigger regardless of hint
-        # bit, so iterating through each hint is unnecessary, limit to one
-        # For real DUTs, test all available UserActiveModeTriggerHints
+        # For CI, we use a generic trigger regardless of hint bit, so
+        # iterating through each hint is unnecessary, limit to one
+        # For real DUTs, test all available hints
         set_hints = uat_set_hints(user_active_mode_trigger_hint)
         hints_to_test = [set_hints[0]] if is_ci else set_hints
 
         previous_icd_counter = icd_counter_at_registration
 
-        # Iterate through UserActiveModeTriggerHints
+        # Iterate through UAT hints
         for i, bit in enumerate(hints_to_test, start=1):
+            # Get current hint name
             bit_name = uat_bit_name(bit)
             log.info(f"UAT hint {i}/{len(hints_to_test)}: {bit_name}...")
 
-            # For the first hint, we don’t need to wait for the DUT to transition back to idle
-            # because it’s already in idle mode from the previous step. For hints after the first,
-            # wait for the DUT to transition back to idle.
+            # For the first hint, we don’t need to wait for the DUT to transition back to Idle Mode
+            # because it’s already in Idle Mode from the previous step. For hints after the first,
+            # wait for the DUT to transition back to Idle Mode.
             if i > 1:
                 log.info(f"Waiting {wait_time_for_idle_s}s for DUT to transition to Idle Mode...")
                 await asyncio.sleep(wait_time_for_idle_s)
 
             # Transition DUT from Idle Mode to Active Mode
             if is_ci:
-                # In CI (TSAN-enabled app on small VM), we cannot rely on kAddActiveModeReq
-                # to trigger a check-in: the command's own exchange wakes the DUT before
-                # the trigger handler runs. Instead, wait for the DUT's natural idle cycle
-                # (it wakes and sends a check-in organically), then hold it active for reads.
-                log.info(f"Waiting {kMaxCIWaitTimeSeconds}s for DUT to complete natural idle cycle...")
-                await asyncio.sleep(kMaxCIWaitTimeSeconds)
+                # Extra settling time so the lit-icd-app is fully in Idle Mode before the kAddActiveModeReq exchange
+                # arrives and triggers a transition from Idle Mode to Active Mode (which sends the check-in)
+                # NOTE: This wait value was derived empirically; it was enough for GitHub CI to pass reliably
+                # given the CI environment and the hardware used for the app + controller.
+                log.info(f"Waiting {MAX_CI_IDLE_CYCLE_WAIT_S}s for lit-icd-app to fully settle into Idle Mode...")
+                await asyncio.sleep(MAX_CI_IDLE_CYCLE_WAIT_S)
 
-                # Hold DUT in active mode so we can reliably read attributes
+                # Send AddActiveModeReq event trigger to transition lit-icd-app from Idle Mode to Active Mode
                 await self.send_test_event_triggers(
                     eventTrigger=ICDTestEventTriggerOperations.kAddActiveModeReq)
             else:
