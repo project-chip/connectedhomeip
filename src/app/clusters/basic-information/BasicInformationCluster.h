@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2025-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,15 +16,21 @@
  */
 #pragma once
 
+#include <app/AttributeValueDecoder.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/persistence/String.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
-#include <clusters/BasicInformation/AttributeIds.h>
+#include <clusters/BasicInformation/Attributes.h>
 #include <clusters/BasicInformation/ClusterId.h>
+#include <clusters/BasicInformation/Enums.h>
+#include <clusters/BasicInformation/Events.h>
+#include <clusters/BasicInformation/Metadata.h>
+#include <clusters/BasicInformation/Structs.h>
 #include <lib/core/DataModelTypes.h>
-#include <platform/ConfigurationManager.h>
-#include <platform/DeviceInstanceInfoProvider.h>
-#include <platform/PlatformManager.h>
+
+// Include the default policy for backward compatibility
+#include <app/clusters/basic-information/DeviceLayerBasicInformationPolicy.h>
 
 namespace chip {
 namespace app {
@@ -32,20 +38,13 @@ namespace Clusters {
 
 /// This class provides a code-driven implementation for the Basic Information cluster,
 /// centralizing its logic and state.
-
-/// As a PlatformManagerDelegate, it automatically hooks into the node's lifecycle to
-/// emit the mandatory StartUp and optional ShutDown events, ensuring spec compliance.
-class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
+///
+/// It uses a Policy-based design to decouple from DeviceLayer and generic platform logic.
+template <typename Policy>
+class BasicInformationClusterImpl : public DefaultServerCluster, public Policy::DelegateBase
 {
 public:
-    // Define the Context struct with References
-    struct Context
-    {
-        DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
-        DeviceLayer::ConfigurationManager & configurationManager;
-        DeviceLayer::PlatformManager & platformManager;
-        uint16_t subscriptionsPerFabric;
-    };
+    using Context = typename Policy::Context;
 
     using OptionalAttributesSet = chip::app::OptionalAttributeSet< //
         BasicInformation::Attributes::ManufacturingDate::Id,       //
@@ -62,12 +61,12 @@ public:
         BasicInformation::Attributes::UniqueID::Id //
         >;
 
-    BasicInformationCluster(OptionalAttributesSet optionalAttributeSet, Context ctx) :
+    BasicInformationClusterImpl(OptionalAttributesSet optionalAttributeSet, Context ctx) :
         DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }), mEnabledOptionalAttributes(optionalAttributeSet),
-        mClusterContext(ctx)
+        mPolicy(ctx)
     {
         mEnabledOptionalAttributes
-            .Set<BasicInformation::Attributes::UniqueID::Id>(); // Unless told otherwise, unique id is mandatory
+            .template Set<BasicInformation::Attributes::UniqueID::Id>(); // Unless told otherwise, unique id is mandatory
     }
 
     OptionalAttributesSet & OptionalAttributes() { return mEnabledOptionalAttributes; }
@@ -81,7 +80,7 @@ public:
                                                  AttributeValueDecoder & decoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    // PlatformManagerDelegate
+    // Policy::DelegateBase implementation (PlatformManagerDelegate for DeviceLayer)
     /**
      * @brief Initialize the cluster
      *
@@ -106,11 +105,31 @@ private:
     // write without notification
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
 
+    // Reads a single device info string.
+    template <typename EncodeFunction>
+    CHIP_ERROR ReadConfigurationString(EncodeFunction && getter, bool unimplementedAllowed, AttributeValueEncoder & encoder);
+
     OptionalAttributesSet mEnabledOptionalAttributes;
 
     Storage::String<32> mNodeLabel;
-    Context mClusterContext;
+    Policy mPolicy;
 };
+
+// Externally available alias for backward compatibility
+using BasicInformationCluster = BasicInformationClusterImpl<DeviceLayerBasicInformationPolicy>;
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+// Include the implementation
+#include <app/clusters/basic-information/BasicInformationCluster.ipp>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+extern template class BasicInformationClusterImpl<DeviceLayerBasicInformationPolicy>;
 
 } // namespace Clusters
 } // namespace app
