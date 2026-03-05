@@ -635,8 +635,16 @@ JNI_METHOD(void, commissionDevice)
         VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    TEMPORARY_RETURN_IGNORED wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    if (icdRegistrationInfo != nullptr)
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+        err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kIgnore);
+    }
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
@@ -697,8 +705,20 @@ static void PairDevice(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, c
         commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
 
-    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    TEMPORARY_RETURN_IGNORED wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    if (icdRegistrationInfo != nullptr)
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+        err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "ApplyICDRegistrationInfo failed.");
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        }
+    }
+    else
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kIgnore);
+    }
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
@@ -767,8 +787,20 @@ JNI_METHOD(void, pairDeviceWithAddress)
         commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
 
-    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    TEMPORARY_RETURN_IGNORED wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    if (icdRegistrationInfo != nullptr)
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+        err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "ApplyICDRegistrationInfo failed.");
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        }
+    }
+    else
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kIgnore);
+    }
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
@@ -819,8 +851,20 @@ JNI_METHOD(void, pairDeviceWithCode)
         TEMPORARY_RETURN_IGNORED wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
     }
 
-    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    TEMPORARY_RETURN_IGNORED wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    if (icdRegistrationInfo != nullptr)
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+        err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "ApplyICDRegistrationInfo failed.");
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        }
+    }
+    else
+    {
+        commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kIgnore);
+    }
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
