@@ -204,7 +204,7 @@ class TC_ICDB_1_1(MatterBaseTest):
         log.info(
             f"ActiveModeThreshold after idle cycle: {current_active_mode_threshold_ms}ms (expected {active_mode_threshold_ms}ms)")
         asserts.assert_equal(current_active_mode_threshold_ms, active_mode_threshold_ms,
-                                f"ActiveModeThreshold value must be unchanged but changed after idle cycle. Expected: {active_mode_threshold_ms}ms, Current: {current_active_mode_threshold_ms}ms")
+                             f"ActiveModeThreshold value must be unchanged but changed after idle cycle. Expected: {active_mode_threshold_ms}ms, Current: {current_active_mode_threshold_ms}ms")
 
         # *** STEP 6 ***
         # TH reads from the DUT the RegisteredClients attribute
