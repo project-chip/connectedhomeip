@@ -180,6 +180,7 @@
             "AdminFabricIndex",
             "AdminVendorId"
         ],
+        "Actions": ["ActionList", "EndpointLists"],
         "Ambient Context Sensing": ["HoldTimeLimits", "ObjectCountConfig"],
         "Basic Information": [
             "FeatureMap",
