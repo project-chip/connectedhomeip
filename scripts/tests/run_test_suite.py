@@ -23,6 +23,7 @@ import random
 import sys
 import time
 import warnings
+from collections import Counter
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
@@ -70,11 +71,17 @@ class RunContext:
     deprecated_chip_tool_path: Path | None = None
 
 
+class TestStatus(enum.Enum):
+    PASSED = "passed"
+    FAILED = "failed"
+    DRY_RUN = "dry_run"
+
+
 @dataclass
 class TestResult:
     name: str
     iteration: int
-    status: str          # "passed" | "failed" | "dry_run"
+    status: TestStatus
     duration_seconds: float
 
 
@@ -87,16 +94,19 @@ class RunSummary:
     failed: int = 0
     results: list[TestResult] = field(default_factory=list)
 
-    def record(self, name: str, iteration: int, status: str, duration: float) -> None:
+    def record(self, name: str, iteration: int, status: TestStatus, duration: float) -> None:
         self.results.append(TestResult(name=name, iteration=iteration, status=status, duration_seconds=round(duration, 3)))
-        if status == "passed":
+        if status == TestStatus.PASSED:
             self.passed += 1
-        elif status == "failed":
+        elif status == TestStatus.FAILED:
             self.failed += 1
 
     def write_json(self, path: Path) -> None:
         data = asdict(self)
         data["run_timestamp"] = self.run_timestamp.isoformat()
+        # Convert Enum to string for JSON serialization
+        for result in data["results"]:
+            result["status"] = result["status"].value
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(data, indent=2))
         log.info("Test run summary written to %s", path)
@@ -623,16 +633,16 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                     )
                     test_end = time.monotonic()
                     if dry_run:
-                        run_summary.record(test.name, i + 1, "dry_run", test_end - test_start)
+                        run_summary.record(test.name, i + 1, TestStatus.DRY_RUN, test_end - test_start)
                     else:
                         log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
-                        run_summary.record(test.name, i + 1, "passed", test_end - test_start)
+                        run_summary.record(test.name, i + 1, TestStatus.PASSED, test_end - test_start)
                 except Exception:
                     if os.path.exists('thread.pcap'):
                         os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
                     test_end = time.monotonic()
                     log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
-                    run_summary.record(test.name, i + 1, "failed", test_end - test_start)
+                    run_summary.record(test.name, i + 1, TestStatus.FAILED, test_end - test_start)
                     observed_failures += 1
                     if not keep_going:
                         sys.exit(2)
@@ -689,7 +699,7 @@ def cmd_summarize(summary_file: Path, top_slowest: int) -> None:
         print(f"  Pass rate     : {100 * passed / total:.1f}%")
     print(sep)
 
-    failed_results = [r for r in results if r["status"] == "failed"]
+    failed_results = [r for r in results if r["status"] == TestStatus.FAILED.value]
     if failed_results:
         print(f"\n  FAILED TESTS ({len(failed_results)}):")
         print(f"  {'Test name':<50} {'Iter':>4}  {'Duration':>10}")
@@ -700,12 +710,11 @@ def cmd_summarize(summary_file: Path, top_slowest: int) -> None:
         print("\n  No failures recorded.")
 
     if iterations > 1:
-        from collections import Counter
         fail_counts: Counter = Counter()
         run_counts: Counter = Counter()
         for r in results:
             run_counts[r["name"]] += 1
-            if r["status"] == "failed":
+            if r["status"] == TestStatus.FAILED.value:
                 fail_counts[r["name"]] += 1
         flaky = [(name, fail_counts[name], run_counts[name]) for name in fail_counts if fail_counts[name] > 0]
         if flaky:
@@ -717,7 +726,7 @@ def cmd_summarize(summary_file: Path, top_slowest: int) -> None:
                 print(f"  {name:<50} {fails:>5}/{runs:<2}  {rate:>7.1f}%")
 
     slowest = sorted(
-        [r for r in results if r["status"] != "dry_run"],
+        [r for r in results if r["status"] != TestStatus.DRY_RUN.value],
         key=lambda x: -x["duration_seconds"]
     )[:top_slowest]
 
@@ -726,7 +735,7 @@ def cmd_summarize(summary_file: Path, top_slowest: int) -> None:
         print(f"  {'Test name':<50} {'Status':<8} {'Iter':>4}  {'Duration':>10}")
         print("  " + "-" * 76)
         for r in slowest:
-            mark = "✓" if r["status"] == "passed" else "✗"
+            mark = "✓" if r["status"] == TestStatus.PASSED.value else "✗"
             print(f"  {mark + '  ' + r['name']:<50} {r['status']:<8} {r['iteration']:>4}  {r['duration_seconds']:>9.2f}s")
 
     print(sep)
