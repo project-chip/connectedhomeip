@@ -70,7 +70,7 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/cluster/i
 Notes/Considerations
 In CI, the UAT is simulated via the kAddActiveModeReq test event trigger.
 On a real DUT, the UAT is performed physically per UserActiveModeTriggerHint/Instruction.
-For a real DUT, use the --timeout <seconds> script argument if wait times are large to prevent the test from timing out.
+On a real DUT, use the --timeout <seconds> script argument if wait times are large to prevent the test from timing out.
 '''
 
 ROOT_ENDPOINT_ID = 0
