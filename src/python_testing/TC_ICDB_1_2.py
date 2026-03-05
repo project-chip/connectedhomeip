@@ -28,6 +28,7 @@
 #       --KVS kvs1
 #       --trace-to json:${TRACE_TEST_JSON}-app.json
 #       --enable-key 000102030405060708090a0b0c0d0e0f
+#       --icdActiveModeDurationMs 10000
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -92,7 +93,7 @@ class TC_ICDB_1_2(MatterBaseTest):
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads from the DUT the RegisteredClients attribute.",
                      "If clients are registered, unregister them."),
-            TestStep(2, "TH reads from the DUT the IdleModeDuration, ActiveModeDuration, ActiveModeThreshold, UserActiveModeTriggerHint, and UserActiveModeTriggerInstruction attributes.",
+            TestStep(2, "TH reads from the DUT the ActiveModeDuration, ActiveModeThreshold, UserActiveModeTriggerHint, and UserActiveModeTriggerInstruction attributes.",
                      "Store all values for later use."),
             TestStep(3, "TH sends RegisterClient command with parameters: CheckInNodeID: <th_node_id>, MonitoredSubject: <th_node_id>, and Key: <any_16_byte_octstr>.", """
                      DUT ActiveModeDuration timer is reset.
@@ -149,15 +150,13 @@ class TC_ICDB_1_2(MatterBaseTest):
         await self.unregister_all_clients()
 
         # *** STEP 2 ***
-        # TH reads from the DUT the IdleModeDuration, ActiveModeDuration, ActiveModeThreshold,
+        # TH reads from the DUT the ActiveModeDuration, ActiveModeThreshold,
         # UserActiveModeTriggerHint, and UserActiveModeTriggerInstruction attributes
         self.step(2)
-        idle_mode_duration_s = await self._read_icdm_attribute_expect_success(attributes.IdleModeDuration)
         active_mode_duration_ms = await self._read_icdm_attribute_expect_success(attributes.ActiveModeDuration)
         active_mode_threshold_ms = await self._read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
         user_active_mode_trigger_hint = await self._read_icdm_attribute_expect_success(attributes.UserActiveModeTriggerHint)
         user_active_mode_trigger_instruction = await self._read_icdm_attribute_expect_success(attributes.UserActiveModeTriggerInstruction)
-        log.info(f"IdleModeDuration: {idle_mode_duration_s}s")
         log.info(f"ActiveModeDuration: {active_mode_duration_ms}ms")
         log.info(f"ActiveModeThreshold: {active_mode_threshold_ms}ms")
         log.info(f"UserActiveModeTriggerHint: 0x{user_active_mode_trigger_hint:08X}")
