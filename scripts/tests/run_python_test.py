@@ -163,14 +163,14 @@ class IpPacketCaptureManager():
         self.interface = 'any'
         self.keep_dumpfile = False
 
+    def start(self):
+        # Create directory for dump files
+        self.dump_filename.parent.mkdir(parents=True, exist_ok=True)
+
         cmd = ['tcpdump', '-qn', '-i', self.interface, '-w', str(self.dump_filename), '-Z', getpass.getuser()]
         if os.getuid() != 0:
             cmd = ['sudo', '-n'] + cmd
         self.tcpdump_process = Subprocess(cmd[0], *cmd[1:], output_cb=process_mon_output)
-
-    def start(self):
-        # Create directory for dump files
-        self.dump_filename.parent.mkdir(parents=True, exist_ok=True)
 
         self.tcpdump_process.start()
 
