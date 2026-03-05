@@ -93,27 +93,6 @@ jobs:
             - name: Build python env
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
 
-            - name: Build apps for REPL tests with unified build
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-light-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-thermostat-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-tv-app-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --pw-command-launcher=ccache \
-                        build \
-                        --copy-artifacts-to objdir-clone \
-                     "
-                  rm -rf out/unified-build
-
             - name: ccache stats
               run: ccache -s
 
@@ -133,7 +112,7 @@ jobs:
 
             - name: Build Software Update ota images with new version.
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 5
                   && mv out/su_ota_images_min-v*/*.ota objdir-clone
                   && rm -rf out/su_ota_images_min-v*"
 
@@ -176,7 +155,7 @@ jobs:
     su_repl_tests_linux_run:
         name: Software Update REPL Tests - Linux (RUN)
         needs: su_repl_tests_linux_build
-        timeout-minutes: 30
+        timeout-minutes: 45
 
         if: github.actor != 'restyled-io[bot]'
 
@@ -184,10 +163,9 @@ jobs:
             # These tests take a lot of time so we just run the batch related to TC_SU.
             fail-fast: false
             matrix:
-                # Regex filter by TC SU we think 30 minutes is a good time for each one
+                # Regex filter by TC SU we think 45 minutes is more than engough for this task
                 # Each on one run to avoid all the jobs fail if one fails
-                # Pending to add "TC_SU_2_5","TC_SU_2_7"
-                filter: ["", "TC_SU_2_2" ]
+                filter: ["", "TC_SU_2_2", "TC_SU_2_5", "TC_SU_2_7" ]
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
@@ -238,6 +216,9 @@ jobs:
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   # SU OTA Images
                   echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
+                  echo "SU_OTA_REQUESTOR_V3: objdir-clone/chip-ota-requestor-app_v3.min.ota" >> /tmp/test_env.yaml
+                  echo "SU_OTA_REQUESTOR_V4: objdir-clone/chip-ota-requestor-app_v4.min.ota" >> /tmp/test_env.yaml
+                  echo "SU_OTA_REQUESTOR_V5: objdir-clone/chip-ota-requestor-app_v5.min.ota" >> /tmp/test_env.yaml
 
                   # Generic trace setups after applications
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
@@ -247,6 +228,9 @@ jobs:
               if: ${{matrix.filter == ''}}
               run: |
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v2.min.ota -v 2'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v3.min.ota -v 3'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v4.min.ota -v 4'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v5.min.ota -v 5'
             
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
