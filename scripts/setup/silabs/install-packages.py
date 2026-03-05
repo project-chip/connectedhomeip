@@ -83,7 +83,11 @@ def parse_version_from_slt(file_path):
     if match:
         version_str = match.group(1)
         if "." in version_str:
-            return version_str.split("@")[0].strip()
+            version = version_str.split("@")[0].strip()
+            # TODO: Remove this override once a GA SiSDK release is available.
+            if version == "2025.12.1-alpha":
+                version = "2025.12.0"
+            return version
     return None
 
 
