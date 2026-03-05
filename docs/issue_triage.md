@@ -108,7 +108,7 @@ types or functionality) as well as individual examples.
 | `examples/darwin-framework-tool`               | Boris Zbarsky                |              |
 | `examples/dishwasher-app`                      |                              | UNMAINTAINED |
 | `examples/energy-gateway-app`                  | James Harrow                 |              |
-| `examples/energy-management`                   | James Harrow                 |              |
+| `examples/energy-management`                   | Louis-Philip Beliveau        |              |
 | `examples/evse-app`                            | James Harrow                 |              |
 | `examples/fabric-admin`                        |                              | UNMAINTAINED |
 | `examples/fabric-bridge-app`                   |                              | UNMAINTAINED |
