@@ -396,7 +396,6 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             log.info("Stopping app restart monitor thread")
             restart_monitor_thread.join(2.0)
 
-
         tcpdump.stop()
 
         # Clean up any leftover flag files if they exist - ensure this always executes
