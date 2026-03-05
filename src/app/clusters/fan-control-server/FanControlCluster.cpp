@@ -198,102 +198,32 @@ DataModel::ActionReturnStatus FanControlCluster::WriteAttribute(const DataModel:
     case FanMode::Id: {
         FanModeEnum value;
         ReturnErrorOnFailure(decoder.Decode(value));
-
-        uint8_t seq = chip::to_underlying(mFanModeSequence);
-        if (value == FanModeEnum::kLow && seq >= 4)
-            return Status::ConstraintError;
-        if (value == FanModeEnum::kMedium && seq != 0 && seq != 2)
-            return Status::ConstraintError;
-        if (value == FanModeEnum::kAuto && !SupportsAuto())
-            return Status::ConstraintError;
-
-        if (value == FanModeEnum::kOn)
-        {
-            mFanMode = FanModeEnum::kHigh;
-            return NotifyAttributeChangedIfSuccess(FanMode::Id, Status::Success);
-        }
-        if (value == FanModeEnum::kSmart)
-        {
-            if (SupportsAuto() &&
-                (mFanModeSequence == FanModeSequenceEnum::kOffLowHighAuto ||
-                 mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto))
-            {
-                mFanMode = FanModeEnum::kAuto;
-            }
-            else
-            {
-                mFanMode = FanModeEnum::kHigh;
-            }
-            return NotifyAttributeChangedIfSuccess(FanMode::Id, Status::Success);
-        }
-
-        mFanMode = value;
-        if (value == FanModeEnum::kOff)
-            ApplyFanModeOffSideEffects();
-        else if (value == FanModeEnum::kAuto)
-            ApplyFanModeAutoSideEffects();
-
-        return NotifyAttributeChangedIfSuccess(FanMode::Id, Status::Success);
+        return SetFanMode(value);
     }
     case PercentSetting::Id: {
         DataModel::Nullable<chip::Percent> value;
         ReturnErrorOnFailure(decoder.Decode(value));
-
-        if (value.IsNull())
-            return Status::Success; // Spec: "If the client writes null, the attribute value SHALL NOT change"
-
-        mPercentSetting = value;
-        ApplyPercentSettingChanged();
-        return NotifyAttributeChangedIfSuccess(PercentSetting::Id, Status::Success);
+        return SetPercentSetting(value);
     }
     case SpeedSetting::Id: {
-        if (!SupportsMultiSpeed())
-            return Status::UnsupportedAttribute;
-
         DataModel::Nullable<uint8_t> value;
         ReturnErrorOnFailure(decoder.Decode(value));
-
-        if (value.IsNull())
-            return Status::Success; // Spec: "If the client writes null, the attribute value SHALL NOT change"
-
-        if (value.Value() > mSpeedMax)
-            return Status::ConstraintError;
-
-        mSpeedSetting = value;
-        ApplySpeedSettingChanged();
-        return NotifyAttributeChangedIfSuccess(SpeedSetting::Id, Status::Success);
+        return SetSpeedSetting(value);
     }
     case RockSetting::Id: {
-        if (!SupportsRocking())
-            return Status::UnsupportedAttribute;
         BitMask<RockBitmap> value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        uint8_t rawValue   = value.Raw();
-        uint8_t rawSupport = mRockSupport.Raw();
-        if ((rawValue & rawSupport) != rawValue)
-            return Status::ConstraintError;
-        mRockSetting = value;
-        return NotifyAttributeChangedIfSuccess(RockSetting::Id, Status::Success);
+        return SetRockSetting(value);
     }
     case WindSetting::Id: {
-        if (!SupportsWind())
-            return Status::UnsupportedAttribute;
         BitMask<WindBitmap> value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        uint8_t rawValue   = value.Raw();
-        uint8_t rawSupport = mWindSupport.Raw();
-        if ((rawValue & rawSupport) != rawValue)
-            return Status::ConstraintError;
-        mWindSetting = value;
-        return NotifyAttributeChangedIfSuccess(WindSetting::Id, Status::Success);
+        return SetWindSetting(value);
     }
     case AirflowDirection::Id: {
-        if (!SupportsAirflowDirection())
-            return Status::UnsupportedAttribute;
         AirflowDirectionEnum value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        mAirflowDirection = value;
-        return NotifyAttributeChangedIfSuccess(AirflowDirection::Id, Status::Success);
+        return SetAirflowDirection(value);
     }
     default:
         return Status::UnsupportedAttribute;
@@ -349,6 +279,108 @@ std::optional<DataModel::ActionReturnStatus> FanControlCluster::InvokeCommand(co
     default:
         return Status::UnsupportedCommand;
     }
+}
+
+DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
+{
+    uint8_t seq = chip::to_underlying(mFanModeSequence);
+    if (value == FanModeEnum::kLow && seq >= 4)
+        return Status::ConstraintError;
+    if (value == FanModeEnum::kMedium && seq != 0 && seq != 2)
+        return Status::ConstraintError;
+    if (value == FanModeEnum::kAuto && !SupportsAuto())
+        return Status::ConstraintError;
+
+    if (value == FanModeEnum::kOn)
+    {
+        mFanMode = FanModeEnum::kHigh;
+        return NotifyAttributeChangedIfSuccess(FanMode::Id, Status::Success);
+    }
+    if (value == FanModeEnum::kSmart)
+    {
+        if (SupportsAuto() &&
+            (mFanModeSequence == FanModeSequenceEnum::kOffLowHighAuto ||
+             mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto))
+        {
+            mFanMode = FanModeEnum::kAuto;
+        }
+        else
+        {
+            mFanMode = FanModeEnum::kHigh;
+        }
+        return NotifyAttributeChangedIfSuccess(FanMode::Id, Status::Success);
+    }
+
+    mFanMode = value;
+    if (value == FanModeEnum::kOff)
+        ApplyFanModeOffSideEffects();
+    else if (value == FanModeEnum::kAuto)
+        ApplyFanModeAutoSideEffects();
+
+    return NotifyAttributeChangedIfSuccess(FanMode::Id, Status::Success);
+}
+
+DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nullable<chip::Percent> value)
+{
+    if (value.IsNull())
+        return Status::Success; // Spec: "If the client writes null, the attribute value SHALL NOT change"
+
+    mPercentSetting = value;
+    ApplyPercentSettingChanged();
+    return NotifyAttributeChangedIfSuccess(PercentSetting::Id, Status::Success);
+}
+
+DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Nullable<uint8_t> value)
+{
+    if (!SupportsMultiSpeed())
+        return Status::UnsupportedAttribute;
+
+    if (value.IsNull())
+        return Status::Success; // Spec: "If the client writes null, the attribute value SHALL NOT change"
+
+    if (value.Value() > mSpeedMax)
+        return Status::ConstraintError;
+
+    mSpeedSetting = value;
+    ApplySpeedSettingChanged();
+    return NotifyAttributeChangedIfSuccess(SpeedSetting::Id, Status::Success);
+}
+
+DataModel::ActionReturnStatus FanControlCluster::SetRockSetting(BitMask<RockBitmap> value)
+{
+    if (!SupportsRocking())
+        return Status::UnsupportedAttribute;
+
+    uint8_t rawValue   = value.Raw();
+    uint8_t rawSupport = mRockSupport.Raw();
+    if ((rawValue & rawSupport) != rawValue)
+        return Status::ConstraintError;
+
+    mRockSetting = value;
+    return NotifyAttributeChangedIfSuccess(RockSetting::Id, Status::Success);
+}
+
+DataModel::ActionReturnStatus FanControlCluster::SetWindSetting(BitMask<WindBitmap> value)
+{
+    if (!SupportsWind())
+        return Status::UnsupportedAttribute;
+
+    uint8_t rawValue   = value.Raw();
+    uint8_t rawSupport = mWindSupport.Raw();
+    if ((rawValue & rawSupport) != rawValue)
+        return Status::ConstraintError;
+
+    mWindSetting = value;
+    return NotifyAttributeChangedIfSuccess(WindSetting::Id, Status::Success);
+}
+
+DataModel::ActionReturnStatus FanControlCluster::SetAirflowDirection(AirflowDirectionEnum value)
+{
+    if (!SupportsAirflowDirection())
+        return Status::UnsupportedAttribute;
+
+    mAirflowDirection = value;
+    return NotifyAttributeChangedIfSuccess(AirflowDirection::Id, Status::Success);
 }
 
 void FanControlCluster::SetDelegate(FanControl::Delegate * delegate)
