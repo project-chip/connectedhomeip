@@ -221,6 +221,6 @@ extern "C" void app_main()
     error = GetAppTask().StartAppTask();
     if (error != CHIP_NO_ERROR)
     {
-        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed error:%" CHIP_ERROR_FORMAT, error.Format());
+        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed, error:%" CHIP_ERROR_FORMAT, error.Format());
     }
 }
