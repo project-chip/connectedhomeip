@@ -329,10 +329,10 @@ attribute's value changes.
     [Delegate/Driver Pattern for Validation](#delegate-driver-pattern-for-validation),
     each mutable attribute should have a corresponding
     `On<AttributeName>Changed` callback in the delegate interface. These are
-    _pre-write_ hooks—invoked after spec-level validation and the no-op guard,
+    _pre-write_ hooks invoked after spec-level validation and the no-op guard,
     but _before_ the value is committed. The callback must always receive the
     **proposed new value**, not the current (stale) value. Returning `true`
-    accepts the change; returning `false` vetoes it—the cluster must then fail
+    accepts the change; returning `false` vetoes it the cluster must then fail
     the operation with `Protocols::InteractionModel::Status::Failure` (for APIs
     returning `Status`) or `CHIP_ERROR_INCORRECT_STATE` (for APIs returning
     `CHIP_ERROR`). Default implementations should return `true` so applications
