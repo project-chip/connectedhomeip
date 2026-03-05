@@ -236,7 +236,8 @@ class WpaSupplicantMock(threading.Thread):
 
         @sdbus.dbus_method_async("a{sv}")
         async def Scan(self, args: DictVariantT) -> None:
-            pass
+            log.debug("Emitting ScanDone signal")
+            self.ScanDone.emit(True)
 
         @sdbus.dbus_method_async("a{sv}", "o")
         async def AddNetwork(self, args: DictVariantT) -> str:
@@ -250,7 +251,7 @@ class WpaSupplicantMock(threading.Thread):
                 await self.State.set_async("associating")
                 await self.State.set_async("associated")
                 self.mock.networking.app_link.up()
-                self.ScanDone.emit(True)
+                await self.Scan({})
                 await self.State.set_async("completed")
 
             await self.CurrentNetwork.set_async(path)
