@@ -56,7 +56,8 @@ struct VideoStream
                 videoStreamParams.minResolution.height <= inputParams.minResolution.height &&
                 videoStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
                 videoStreamParams.maxResolution.height >= inputParams.maxResolution.height &&
-                videoStreamParams.minBitRate <= inputParams.minBitRate && videoStreamParams.maxBitRate >= inputParams.maxBitRate);
+                videoStreamParams.minBitRate <= inputParams.minBitRate && videoStreamParams.maxBitRate >= inputParams.maxBitRate &&
+                inputParams.keyFrameInterval != 0);
     }
 };
 
