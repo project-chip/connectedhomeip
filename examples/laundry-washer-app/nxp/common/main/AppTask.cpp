@@ -23,6 +23,7 @@
 #include "ICDUtil.h"
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/operational-state-server/operational-state-cluster-objects.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/util/attribute-storage.h>
 
 #include "static-supported-temperature-levels.h"
@@ -44,7 +45,7 @@ using namespace chip::app::Clusters;
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
 {
-    TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    TemperatureControl::SetDelegate(&sAppSupportedTemperatureLevelsDelegate);
 }
 
 #ifdef ENABLE_CHIP_SHELL

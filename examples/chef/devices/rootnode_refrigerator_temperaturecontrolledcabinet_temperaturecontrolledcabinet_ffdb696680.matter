@@ -1836,7 +1836,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 5;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command SetTemperature;
   }
@@ -1878,7 +1878,7 @@ endpoint 3 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 5;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command SetTemperature;
   }
