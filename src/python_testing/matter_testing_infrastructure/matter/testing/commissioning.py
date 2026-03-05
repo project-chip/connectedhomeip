@@ -160,6 +160,18 @@ async def commission_device(
         except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
             LOGGER.exception("Commissioning failed")
             return PairingStatus(exception=e)
+    elif commissioning_info.commissioning_method == "nfc-on-network":
+        try:
+            # Type assertion to help mypy understand this is not None after the assert
+            await dev_ctrl.CommissionNfcOnNetwork(
+                info.filter_value,
+                info.passcode,
+                node_id,
+            )
+            return PairingStatus()
+        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
+            LOGGER.exception("Commissioning failed")
+            return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-wifi":
         try:
             asserts.assert_is_not_none(commissioning_info.wifi_ssid, "WiFi SSID must be provided for ble-wifi commissioning")
