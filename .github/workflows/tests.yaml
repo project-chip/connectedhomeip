@@ -1228,7 +1228,7 @@ jobs:
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading packet captures for debugging
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: ${{ failure() && !env.ACT }}
               with:
                   name: ip-packet-captures

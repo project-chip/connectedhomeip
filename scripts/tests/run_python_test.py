@@ -282,7 +282,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
 
     script_name = pathlib.Path(script).name.removesuffix('.py')
-    tcpdump_capture_filename = ip_packet_capture_dir / f"tcpdump_{script_name}-{os.getpid()}-{run_name}-.pcap"
+    tcpdump_capture_filename = ip_packet_capture_dir / f"tcpdump_{script_name}-{os.getpid()}-{run_name}.pcap"
 
     tcpdump = IpPacketCaptureManager(pathlib.Path(tcpdump_capture_filename))
 
