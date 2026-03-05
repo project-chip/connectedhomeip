@@ -238,8 +238,6 @@ void GroupcastCluster::GroupcastTestingTimer::TimerFired()
     mCluster.mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
 }
 
-// Methods moved from GroupcastLogic
-
 CHIP_ERROR GroupcastCluster::ReadMembership(const chip::Access::SubjectDescriptor * subject, EndpointId endpoint,
                                             AttributeValueEncoder & aEncoder)
 {
@@ -355,6 +353,11 @@ Status GroupcastCluster::JoinGroup(FabricIndex fabric_index, const Groupcast::Co
 
     // ReplaceEndpoints can only be present if kListener feature is supported
     VerifyOrReturnError(!data.replaceEndpoints.HasValue() || mFeatures.Has(Groupcast::Feature::kListener), Status::ConstraintError);
+
+    VerifyOrReturnError(!data.mcastAddrPolicy.HasValue() ||
+                            (Groupcast::MulticastAddrPolicyEnum::kIanaAddr == data.mcastAddrPolicy.Value()) ||
+                            mFeatures.Has(Groupcast::Feature::kPerGroup),
+                        Status::ConstraintError);
 
     // Check endpoints
     size_t endpoint_count = 0;

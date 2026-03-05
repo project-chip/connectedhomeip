@@ -159,7 +159,7 @@ struct TestGroupcastCluster : public ::testing::Test
     app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate },
                                              BitFlags<Feature>{ Feature::kSender } };
     app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate },
-                                               BitFlags<Feature>{ Feature::kListener } };
+                                               BitFlags<Feature>{ Feature::kListener, Feature::kPerGroup } };
 };
 
 TEST_F(TestGroupcastCluster, TestAttributes)
@@ -764,6 +764,24 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
         ASSERT_TRUE(result.status.has_value());
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
+
+        // Join group: McastAddrPolicy kPerGroup without kPerGroup feature set
+        data.groupID         = 2;
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+        result               = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+
+        // Join group: McastAddrPolicy kIanaAddr without kPerGroup feature
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        data.key.ClearValue();
+        result = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        // Join group: McastAddrPolicy absent without kPerGroup feature
+        data.groupID = 3;
+        data.mcastAddrPolicy.ClearValue();
+        result = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
 
         // Join group: Non-empty endpoints
         data.groupID   = 3;
