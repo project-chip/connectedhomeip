@@ -11,6 +11,7 @@ import argparse
 import logging
 import os
 import re
+import shutil
 import stat
 import subprocess
 import sys
@@ -306,23 +307,52 @@ def get_silabs_paths_as_submodules(repo_root):
     return found
 
 
+def _remove_silabs_submodules(repo_root, submodule_names):
+    """Remove submodule checkout dirs: git rm when path is in index; else remove from disk (e.g. after pull, index already has no entry)."""
+    paths = [os.path.join("third_party", "silabs", n) for n in submodule_names]
+    for path in paths:
+        logger.info("Running: git rm %s", path)
+        r = subprocess.run(["git", "rm", path], cwd=repo_root, capture_output=True, text=True)
+        if r.returncode == 0:
+            continue
+        full_path = os.path.join(repo_root, path)
+        if os.path.isdir(full_path):
+            logger.warning("Path not known to Git, removing directory from disk: %s", path)
+            try:
+                shutil.rmtree(full_path)
+            except OSError as e:
+                logger.error("Failed to remove %s: %s", path, e)
+                sys.exit(1)
+        else:
+            logger.error("Failed to remove %s: %s", path, r.stderr.strip() or r.stdout.strip())
+            sys.exit(1)
+    logger.info("Submodules removed successfully.")
+
+
 def check_silabs_not_submodules(repo_root):
-    """Exit with instructions if simplicity_sdk or wifi_sdk exist as submodule checkouts (e.g. from older installs)."""
+    """If simplicity_sdk or wifi_sdk are submodule checkouts, ask to remove them; else exit with instructions."""
     submodule_names = get_silabs_paths_as_submodules(repo_root)
     if not submodule_names:
         return
 
     paths = [os.path.join("third_party", "silabs", n) for n in submodule_names]
-    logger.error(
+    logger.warning(
         "The following paths are submodule checkouts (e.g. from older installs): %s. "
         "This script expects to create symlinks here, not use submodules.",
         ", ".join(paths),
     )
-    logger.error(
-        "Remove the submodules (e.g. git submodule deinit third_party/silabs/simplicity_sdk third_party/silabs/wifi_sdk; "
-        "git rm third_party/silabs/simplicity_sdk third_party/silabs/wifi_sdk), then re-run this script."
-    )
-    sys.exit(1)
+    try:
+        reply = input("Remove these submodules now? [y/N]: ").strip().lower()
+    except EOFError:
+        reply = "n"
+    if reply in ("y", "yes"):
+        _remove_silabs_submodules(repo_root, submodule_names)
+    else:
+        logger.error(
+            "Remove the directories manually (e.g. rm -rf %s), then re-run this script.",
+            " ".join(paths),
+        )
+        sys.exit(1)
 
 
 def create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path):
