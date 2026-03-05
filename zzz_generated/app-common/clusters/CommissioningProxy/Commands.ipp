@@ -39,6 +39,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kDiscriminator), discriminator);
     encoder.Encode(to_underlying(Fields::kVendorId), vendorId);
     encoder.Encode(to_underlying(Fields::kProductId), productId);
+    encoder.Encode(to_underlying(Fields::kTimeout), timeout);
     encoder.Encode(to_underlying(Fields::kWiFiBand), wiFiBand);
     return encoder.Finalize();
 }
@@ -72,6 +73,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kProductId))
         {
             err = DataModel::Decode(reader, productId);
+        }
+        else if (__context_tag == to_underlying(Fields::kTimeout))
+        {
+            err = DataModel::Decode(reader, timeout);
         }
         else if (__context_tag == to_underlying(Fields::kWiFiBand))
         {

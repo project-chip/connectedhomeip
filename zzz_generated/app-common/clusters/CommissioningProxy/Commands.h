@@ -103,7 +103,8 @@ enum class Fields : uint8_t
     kDiscriminator = 2,
     kVendorId      = 3,
     kProductId     = 4,
-    kWiFiBand      = 5,
+    kTimeout       = 5,
+    kWiFiBand      = 6,
 };
 
 struct Type
@@ -118,6 +119,7 @@ public:
     uint16_t discriminator                      = static_cast<uint16_t>(0);
     chip::VendorId vendorId                     = static_cast<chip::VendorId>(0);
     uint16_t productId                          = static_cast<uint16_t>(0);
+    uint16_t timeout                            = static_cast<uint16_t>(0);
     Optional<chip::BitMask<WiFiBandBitmap>> wiFiBand;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -139,6 +141,7 @@ public:
     uint16_t discriminator                      = static_cast<uint16_t>(0);
     chip::VendorId vendorId                     = static_cast<chip::VendorId>(0);
     uint16_t productId                          = static_cast<uint16_t>(0);
+    uint16_t timeout                            = static_cast<uint16_t>(0);
     Optional<chip::BitMask<WiFiBandBitmap>> wiFiBand;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

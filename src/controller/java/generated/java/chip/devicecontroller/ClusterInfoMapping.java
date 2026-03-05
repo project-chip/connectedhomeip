@@ -29428,6 +29428,9 @@ public class ClusterInfoMapping {
     CommandParameterInfo commissioningProxyproxyConnectRequestproductIdCommandParameterInfo = new CommandParameterInfo("productId", Integer.class, Integer.class);
     commissioningProxyproxyConnectRequestCommandParams.put("productId",commissioningProxyproxyConnectRequestproductIdCommandParameterInfo);
 
+    CommandParameterInfo commissioningProxyproxyConnectRequesttimeoutCommandParameterInfo = new CommandParameterInfo("timeout", Integer.class, Integer.class);
+    commissioningProxyproxyConnectRequestCommandParams.put("timeout",commissioningProxyproxyConnectRequesttimeoutCommandParameterInfo);
+
     CommandParameterInfo commissioningProxyproxyConnectRequestwiFiBandCommandParameterInfo = new CommandParameterInfo("wiFiBand", Optional.class, Integer.class);
     commissioningProxyproxyConnectRequestCommandParams.put("wiFiBand",commissioningProxyproxyConnectRequestwiFiBandCommandParameterInfo);
     InteractionInfo commissioningProxyproxyConnectRequestInteractionInfo = new InteractionInfo(
@@ -29448,6 +29451,9 @@ public class ClusterInfoMapping {
 
            , (Integer)
              commandArguments.get("productId")
+
+           , (Integer)
+             commandArguments.get("timeout")
 
            , (Optional<Integer>)
              commandArguments.get("wiFiBand")

@@ -43067,7 +43067,8 @@ class CommissioningProxy(Cluster):
                         ClusterObjectFieldDescriptor(Label="discriminator", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="vendorId", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="productId", Tag=4, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="wiFiBand", Tag=5, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="timeout", Tag=5, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="wiFiBand", Tag=6, Type=typing.Optional[uint]),
                     ])
 
             address: typing.Union[Nullable, bytes] = NullValue
@@ -43075,6 +43076,7 @@ class CommissioningProxy(Cluster):
             discriminator: uint = 0
             vendorId: uint = 0
             productId: uint = 0
+            timeout: uint = 0
             wiFiBand: typing.Optional[uint] = None
 
         @dataclass

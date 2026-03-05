@@ -15798,7 +15798,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum ProxyConnectRequestCommandField {Address(0),Transport(1),Discriminator(2),VendorId(3),ProductId(4),WiFiBand(5),;
+        }public enum ProxyConnectRequestCommandField {Address(0),Transport(1),Discriminator(2),VendorId(3),ProductId(4),Timeout(5),WiFiBand(6),;
                     private final int id;
                     ProxyConnectRequestCommandField(int id) {
                         this.id = id;

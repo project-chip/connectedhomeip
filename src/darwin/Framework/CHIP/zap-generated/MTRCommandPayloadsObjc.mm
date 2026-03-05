@@ -27935,6 +27935,8 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _productId = @(0);
 
+        _timeout = @(0);
+
         _wiFiBand = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
@@ -27951,6 +27953,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     other.discriminator = self.discriminator;
     other.vendorId = self.vendorId;
     other.productId = self.productId;
+    other.timeout = self.timeout;
     other.wiFiBand = self.wiFiBand;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
@@ -27960,7 +27963,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: address:%@; transport:%@; discriminator:%@; vendorId:%@; productId:%@; wiFiBand:%@; >", NSStringFromClass([self class]), [_address base64EncodedStringWithOptions:0], _transport, _discriminator, _vendorId, _productId, _wiFiBand];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: address:%@; transport:%@; discriminator:%@; vendorId:%@; productId:%@; timeout:%@; wiFiBand:%@; >", NSStringFromClass([self class]), [_address base64EncodedStringWithOptions:0], _transport, _discriminator, _vendorId, _productId, _timeout, _wiFiBand];
     return descriptionString;
 }
 
@@ -27991,6 +27994,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     }
     {
         encodableStruct.productId = self.productId.unsignedShortValue;
+    }
+    {
+        encodableStruct.timeout = self.timeout.unsignedShortValue;
     }
     {
         if (self.wiFiBand != nil) {

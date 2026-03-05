@@ -8916,7 +8916,8 @@ provisional cluster CommissioningProxy = 1109 {
     int16u discriminator = 2;
     vendor_id vendorId = 3;
     int16u productId = 4;
-    optional WiFiBandBitmap wiFiBand = 5;
+    int16u timeout = 5;
+    optional WiFiBandBitmap wiFiBand = 6;
   }
 
   response struct ProxyConnectResponse = 1 {

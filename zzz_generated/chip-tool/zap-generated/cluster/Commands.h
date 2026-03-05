@@ -12014,6 +12014,7 @@ public:
         AddArgument("Discriminator", 0, UINT16_MAX, &mRequest.discriminator);
         AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
         AddArgument("ProductId", 0, UINT16_MAX, &mRequest.productId);
+        AddArgument("Timeout", 0, UINT16_MAX, &mRequest.timeout);
         AddArgument("WiFiBand", 0, UINT16_MAX, &mRequest.wiFiBand);
         ClusterCommand::AddArguments();
     }

@@ -11793,6 +11793,7 @@ class ChipClusters:
                     "discriminator": "int",
                     "vendorId": "int",
                     "productId": "int",
+                    "timeout": "int",
                     "wiFiBand": "int",
                 },
             },

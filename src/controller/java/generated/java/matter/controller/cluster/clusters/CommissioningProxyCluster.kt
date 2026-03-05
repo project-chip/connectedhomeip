@@ -103,6 +103,7 @@ class CommissioningProxyCluster(
     discriminator: UShort,
     vendorId: UShort,
     productId: UShort,
+    timeout: UShort,
     wiFiBand: UShort?,
     timedInvokeTimeout: Duration? = null,
   ): ProxyConnectResponse {
@@ -126,7 +127,10 @@ class CommissioningProxyCluster(
     val TAG_PRODUCT_ID_REQ: Int = 4
     tlvWriter.put(ContextSpecificTag(TAG_PRODUCT_ID_REQ), productId)
 
-    val TAG_WI_FI_BAND_REQ: Int = 5
+    val TAG_TIMEOUT_REQ: Int = 5
+    tlvWriter.put(ContextSpecificTag(TAG_TIMEOUT_REQ), timeout)
+
+    val TAG_WI_FI_BAND_REQ: Int = 6
     wiFiBand?.let { tlvWriter.put(ContextSpecificTag(TAG_WI_FI_BAND_REQ), wiFiBand) }
     tlvWriter.endStructure()
 

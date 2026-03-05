@@ -53475,11 +53475,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void proxyConnectRequest(ProxyConnectResponseCallback callback, @Nullable byte[] address, Integer transport, Integer discriminator, Integer vendorId, Integer productId, Optional<Integer> wiFiBand) {
-      proxyConnectRequest(callback, address, transport, discriminator, vendorId, productId, wiFiBand, 0);
+    public void proxyConnectRequest(ProxyConnectResponseCallback callback, @Nullable byte[] address, Integer transport, Integer discriminator, Integer vendorId, Integer productId, Integer timeout, Optional<Integer> wiFiBand) {
+      proxyConnectRequest(callback, address, transport, discriminator, vendorId, productId, timeout, wiFiBand, 0);
     }
 
-    public void proxyConnectRequest(ProxyConnectResponseCallback callback, @Nullable byte[] address, Integer transport, Integer discriminator, Integer vendorId, Integer productId, Optional<Integer> wiFiBand, int timedInvokeTimeoutMs) {
+    public void proxyConnectRequest(ProxyConnectResponseCallback callback, @Nullable byte[] address, Integer transport, Integer discriminator, Integer vendorId, Integer productId, Integer timeout, Optional<Integer> wiFiBand, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -53503,7 +53503,11 @@ public class ChipClusters {
       BaseTLVType productIdtlvValue = new UIntType(productId);
       elements.add(new StructElement(productIdFieldID, productIdtlvValue));
 
-      final long wiFiBandFieldID = 5L;
+      final long timeoutFieldID = 5L;
+      BaseTLVType timeouttlvValue = new UIntType(timeout);
+      elements.add(new StructElement(timeoutFieldID, timeouttlvValue));
+
+      final long wiFiBandFieldID = 6L;
       BaseTLVType wiFiBandtlvValue = wiFiBand.<BaseTLVType>map((nonOptionalwiFiBand) -> new UIntType(nonOptionalwiFiBand)).orElse(new EmptyType());
       elements.add(new StructElement(wiFiBandFieldID, wiFiBandtlvValue));
 
