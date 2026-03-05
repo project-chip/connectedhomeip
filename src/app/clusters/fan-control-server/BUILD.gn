@@ -19,6 +19,7 @@ source_set("fan-control-server") {
   sources = [
     "FanControlCluster.cpp",
     "FanControlCluster.h",
+    "fan-control-delegate.h",
   ]
 
   public_deps = [
