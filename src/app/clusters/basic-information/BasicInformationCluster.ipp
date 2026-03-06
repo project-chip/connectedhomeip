@@ -69,7 +69,7 @@ constexpr size_t kMaxStringLength = std::max({
     BasicInformation::Attributes::SerialNumber::TypeInfo::MaxLength(),
 });
 
-    inline CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & encoder, const char * buf, size_t maxBufSize)
+inline CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & encoder, const char * buf, size_t maxBufSize)
 {
     ReturnErrorOnFailure(status);
     return encoder.Encode(chip::CharSpan(buf, strnlen(buf, maxBufSize)));
