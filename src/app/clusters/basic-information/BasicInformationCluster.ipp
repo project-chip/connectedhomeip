@@ -150,6 +150,11 @@ template <typename EncodeFunction>
 CHIP_ERROR BasicInformationClusterImpl<Policy>::ReadConfigurationString(EncodeFunction && getter, AttributeValueEncoder & encoder)
 {
     char buffer[BasicInformationClusterImplDetails::kMaxStringLength + 1];
+
+    // In case buggy getter returns success but does not change the string
+    // NOTE: we do this instead of `= {0}` to try to use less flash than a memset.
+    buffer[0] = 0;
+
     CHIP_ERROR status = getter(buffer, sizeof(buffer));
     return BasicInformationClusterImplDetails::EncodeStringOnSuccess(status, encoder, buffer,
                                                                      BasicInformationClusterImplDetails::kMaxStringLength);
@@ -221,14 +226,15 @@ DataModel::ActionReturnStatus BasicInformationClusterImpl<Policy>::ReadAttribute
         return ReadConfigurationString([this](char * buf, size_t size) { return mPolicy.GetSoftwareVersionString(buf, size); },
                                        encoder);
     case ManufacturingDate::Id: {
-        constexpr size_t kMaxDateLength  = 8;     // YYYYMMDD
-        char manufacturingDateString[17] = { 0 }; // kMaxManufacturingDateLength around 16
+        constexpr size_t kMaxLength      = BasicInformation::Attributes::ManufacturingDate::TypeInfo::MaxLength();
+        constexpr size_t kMaxDateLength  = 8;              // YYYYMMDD
+        char manufacturingDateString[kMaxLength + 1] = { 0 }; 
+
         uint16_t manufacturingYear;
         uint8_t manufacturingMonth;
         uint8_t manufacturingDayOfMonth;
         size_t totalManufacturingDateLen = 0;
-        MutableCharSpan vendorSuffixSpan(manufacturingDateString + kMaxDateLength,
-                                         sizeof(manufacturingDateString) - kMaxDateLength);
+        MutableCharSpan vendorSuffixSpan(manufacturingDateString + kMaxDateLength, kMaxLength - kMaxDateLength);
         CHIP_ERROR status = mPolicy.GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
 
         if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
