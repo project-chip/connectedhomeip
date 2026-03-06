@@ -102,10 +102,14 @@ public:
     CHIP_ERROR IncreaseConfigurationVersion();
 
 private:
-    // write without notification
+    // Implementation of just the write, without doing a attribute change notification.
+    //
+    // Will return ActionReturnStatus::FixedStatus::kWriteSuccessNoop if the attribute write
+    // is not changing the underlying data.
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
 
-    // Reads a single device info string.
+    // Reads a single device info string and handles error sanitization (clearing the buffer)
+    // if the attribute is optional and not implemented.
     template <typename EncodeFunction>
     CHIP_ERROR ReadConfigurationString(EncodeFunction && getter, bool unimplementedAllowed, AttributeValueEncoder & encoder);
 

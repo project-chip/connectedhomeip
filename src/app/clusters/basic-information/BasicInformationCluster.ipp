@@ -16,18 +16,31 @@
  */
 
 #include <algorithm>
-#include <app/SpecificationDefinedRevisions.h>
+
+#include <app/AttributeValueDecoder.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/persistence/AttributePersistence.h>
+#include <app/persistence/String.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <app/server-cluster/ServerClusterContext.h>
+#include <app/SpecificationDefinedRevisions.h>
+#include <clusters/BasicInformation/Attributes.h>
+#include <clusters/BasicInformation/ClusterId.h>
+#include <clusters/BasicInformation/Enums.h>
+#include <clusters/BasicInformation/Events.h>
+#include <clusters/BasicInformation/Metadata.h>
+#include <clusters/BasicInformation/Structs.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <platform/CHIPDeviceError.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <tracing/macros.h>
 
-#include <clusters/BasicInformation/Attributes.h>
-#include <clusters/BasicInformation/Enums.h>
-#include <clusters/BasicInformation/Metadata.h>
-#include <clusters/BasicInformation/Structs.h>
+// not really required, however helps IDEs
+#include <app/clusters/basic-information/BasicInformationCluster.h>
 
 namespace chip {
 namespace app {
@@ -80,7 +93,6 @@ CHIP_ERROR BasicInformationClusterImpl<Policy>::Startup(ServerClusterContext & c
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    // Register this cluster as the PlatformManager delegate to receive shutdown events.
     mPolicy.RegisterPlatformDelegate(this);
 
     AttributePersistence persistence(context.attributeStorage);
@@ -93,7 +105,6 @@ CHIP_ERROR BasicInformationClusterImpl<Policy>::Startup(ServerClusterContext & c
         { kRootEndpointId, BasicInformation::Id, BasicInformation::Attributes::LocalConfigDisabled::Id }, localConfigDisabled,
         false);
 
-    // Propagate the restored 'LocalConfigDisabled' state to the policy
     ReturnErrorOnFailure(mPolicy.SetLocalConfigDisabled(localConfigDisabled));
 
     return CHIP_NO_ERROR;
@@ -227,7 +238,7 @@ DataModel::ActionReturnStatus BasicInformationClusterImpl<Policy>::ReadAttribute
     }
     case SoftwareVersionString::Id:
         return ReadConfigurationString([this](char * buf, size_t size) { return mPolicy.GetSoftwareVersionString(buf, size); },
-                                       false /* unimplementedAllowed */, encoder); // Wait, original was false for SW Version String
+                                       false /* unimplementedAllowed */, encoder);
     case ManufacturingDate::Id: {
         constexpr size_t kMaxDateLength  = 8;     // YYYYMMDD
         char manufacturingDateString[17] = { 0 }; // kMaxManufacturingDateLength around 16
@@ -341,7 +352,6 @@ template <typename Policy>
 DataModel::ActionReturnStatus BasicInformationClusterImpl<Policy>::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                                   AttributeValueDecoder & decoder)
 {
-    // WriteImpl is private, so we can access it
     return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
 }
 
