@@ -23,7 +23,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import threading
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 import sdbus
 
@@ -212,8 +212,8 @@ class WpaSupplicantMock(threading.Thread):
         _subscribe_id_counter = 0
 
         # Attributes initialised to None in __init__ but later set to concrete types.
-        interface_name_in_sim: Optional[str]
-        nan_simulator: Optional["NANSimulator"]
+        interface_name_in_sim: str | None
+        nan_simulator: NANSimulator | None
         # Instance-level mapping of session id -> session info
         nan_sessions: dict[int, dict]
 
@@ -248,6 +248,7 @@ class WpaSupplicantMock(threading.Thread):
             log.debug("SelectNetwork called with path=%s", path)
 
             async def associate():
+                # Mock AP association process.
                 await self.State.set_async("associating")
                 await self.State.set_async("associated")
                 self.mock.networking.app_link.up()
@@ -322,8 +323,7 @@ class WpaSupplicantMock(threading.Thread):
             """Cancel a NAN publish session."""
             log.debug("NANCancelPublish: publish_id=%d", publish_id)
 
-            if publish_id in self.nan_sessions:
-                del self.nan_sessions[publish_id]
+            self.nan_sessions.pop(publish_id, None)
 
             if self.nan_simulator:
                 self.nan_simulator.on_publish_cancelled(publish_id)
