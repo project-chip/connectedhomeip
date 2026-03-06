@@ -19,13 +19,13 @@
 
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/String.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/server-cluster/ServerClusterContext.h>
-#include <app/SpecificationDefinedRevisions.h>
 #include <clusters/BasicInformation/Attributes.h>
 #include <clusters/BasicInformation/ClusterId.h>
 #include <clusters/BasicInformation/Enums.h>
