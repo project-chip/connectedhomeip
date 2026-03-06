@@ -399,7 +399,7 @@ CHIP_ERROR BasicInformationClusterImpl<Policy>::Attributes(const ConcreteCluster
     // TODO: MetadataEntry for these are static constants in the generated code.
     // They are available as BasicInformation::Attributes::X::kMetadataEntry
 
-    DataModel::AttributeEntry optionalAttributes[] = {
+    static constexpr DataModel::AttributeEntry optionalAttributes[] = {
         ManufacturingDate::kMetadataEntry,   //
         PartNumber::kMetadataEntry,          //
         ProductURL::kMetadataEntry,          //
@@ -415,7 +415,7 @@ CHIP_ERROR BasicInformationClusterImpl<Policy>::Attributes(const ConcreteCluster
     };
 
     // kMandatoryAttributes equivalent
-    DataModel::AttributeEntry mandatoryAttributes[] = {
+    static constexpr DataModel::AttributeEntry mandatoryAttributes[] = {
         DataModelRevision::kMetadataEntry,
         VendorName::kMetadataEntry,
         VendorID::kMetadataEntry,
