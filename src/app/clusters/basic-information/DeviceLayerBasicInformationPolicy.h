@@ -24,7 +24,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-
 class DeviceLayerBasicInformationPolicy
 {
 public:
@@ -42,35 +41,20 @@ public:
     DeviceLayerBasicInformationPolicy(Context ctx) : mContext(ctx) {}
 
     // Delegated methods
-    CHIP_ERROR GetVendorName(char * buf, size_t bufSize)
-    {
-        return mContext.deviceInstanceInfoProvider.GetVendorName(buf, bufSize);
-    }
+    CHIP_ERROR GetVendorName(char * buf, size_t bufSize) { return mContext.deviceInstanceInfoProvider.GetVendorName(buf, bufSize); }
 
-    CHIP_ERROR GetVendorId(uint16_t & vendorId) const
-    {
-        return mContext.deviceInstanceInfoProvider.GetVendorId(vendorId);
-    }
+    CHIP_ERROR GetVendorId(uint16_t & vendorId) const { return mContext.deviceInstanceInfoProvider.GetVendorId(vendorId); }
 
     CHIP_ERROR GetProductName(char * buf, size_t bufSize)
     {
         return mContext.deviceInstanceInfoProvider.GetProductName(buf, bufSize);
     }
 
-    CHIP_ERROR GetProductId(uint16_t & productId) const
-    {
-        return mContext.deviceInstanceInfoProvider.GetProductId(productId);
-    }
+    CHIP_ERROR GetProductId(uint16_t & productId) const { return mContext.deviceInstanceInfoProvider.GetProductId(productId); }
 
-    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize)
-    {
-        return mContext.deviceInstanceInfoProvider.GetPartNumber(buf, bufSize);
-    }
+    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) { return mContext.deviceInstanceInfoProvider.GetPartNumber(buf, bufSize); }
 
-    CHIP_ERROR GetProductURL(char * buf, size_t bufSize)
-    {
-        return mContext.deviceInstanceInfoProvider.GetProductURL(buf, bufSize);
-    }
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) { return mContext.deviceInstanceInfoProvider.GetProductURL(buf, bufSize); }
 
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize)
     {
@@ -138,16 +122,13 @@ public:
         return mContext.configurationManager.GetSoftwareVersionString(buf, bufSize);
     }
 
-    CHIP_ERROR GetUniqueId(char * buf, size_t bufSize)
-    {
-        return mContext.configurationManager.GetUniqueId(buf, bufSize);
-    }
+    CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) { return mContext.configurationManager.GetUniqueId(buf, bufSize); }
 
     CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVersion)
     {
         return mContext.configurationManager.GetConfigurationVersion(configurationVersion);
     }
-    
+
     CHIP_ERROR StoreConfigurationVersion(uint32_t configurationVersion)
     {
         return mContext.configurationManager.StoreConfigurationVersion(configurationVersion);
@@ -183,7 +164,7 @@ public:
     uint16_t GetSubscriptionsPerFabric() const { return mContext.subscriptionsPerFabric; }
 
 private:
-   Context mContext;
+    Context mContext;
 };
 
 } // namespace Clusters

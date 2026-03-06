@@ -35,7 +35,8 @@ namespace BasicInformationClusterImplDetails {
 // Unique ID became mandatory in 4. If we have no unique id, claim revision 3
 inline constexpr uint32_t kRevisionWithoutUniqueId = 3;
 
-constexpr size_t kExpectedFixedLocationLength = 2; // DeviceLayer definition used to suffice, but we define it here for generic usage
+constexpr size_t kExpectedFixedLocationLength =
+    2; // DeviceLayer definition used to suffice, but we define it here for generic usage
 // static_assert(kExpectedFixedLocationLength == DeviceLayer::ConfigurationManager::kMaxLocationLength,
 //              "Fixed location storage must be of size 2"); // TODO: How to static assert against policy?
 
@@ -71,11 +72,13 @@ CHIP_ERROR BasicInformationClusterImpl<Policy>::Startup(ServerClusterContext & c
 
     AttributePersistence persistence(context.attributeStorage);
 
-    (void) persistence.LoadString({ kRootEndpointId, BasicInformation::Id, BasicInformation::Attributes::NodeLabel::Id }, mNodeLabel);
-    
+    (void) persistence.LoadString({ kRootEndpointId, BasicInformation::Id, BasicInformation::Attributes::NodeLabel::Id },
+                                  mNodeLabel);
+
     bool localConfigDisabled = false;
-    (void) persistence.LoadNativeEndianValue<bool>({ kRootEndpointId, BasicInformation::Id, BasicInformation::Attributes::LocalConfigDisabled::Id },
-                                                   localConfigDisabled, false);
+    (void) persistence.LoadNativeEndianValue<bool>(
+        { kRootEndpointId, BasicInformation::Id, BasicInformation::Attributes::LocalConfigDisabled::Id }, localConfigDisabled,
+        false);
 
     // Propagate the restored 'LocalConfigDisabled' state to the policy
     ReturnErrorOnFailure(mPolicy.SetLocalConfigDisabled(localConfigDisabled));
@@ -136,12 +139,13 @@ CHIP_ERROR BasicInformationClusterImpl<Policy>::ReadConfigurationString(EncodeFu
 {
     char buffer[BasicInformationClusterImplDetails::kMaxStringLength + 1];
     CHIP_ERROR status = getter(buffer, sizeof(buffer));
-    
+
     if (unimplementedAllowed)
     {
         status = BasicInformationClusterImplDetails::ClearNullTerminatedStringWhenUnimplemented(status, buffer);
     }
-    return BasicInformationClusterImplDetails::EncodeStringOnSuccess(status, encoder, buffer, BasicInformationClusterImplDetails::kMaxStringLength);
+    return BasicInformationClusterImplDetails::EncodeStringOnSuccess(status, encoder, buffer,
+                                                                     BasicInformationClusterImplDetails::kMaxStringLength);
 }
 
 template <typename Policy>
@@ -171,7 +175,7 @@ DataModel::ActionReturnStatus BasicInformationClusterImpl<Policy>::ReadAttribute
         return encoder.Encode(Revision::kDataModelRevision);
     case Location::Id: {
         char location[BasicInformationClusterImplDetails::kExpectedFixedLocationLength + 1] = { 0 };
-        size_t codeLen = 0;
+        size_t codeLen                                                                      = 0;
         CHIP_ERROR err = mPolicy.GetCountryCode(location, sizeof(location), codeLen);
         if ((err != CHIP_NO_ERROR) || (codeLen != BasicInformationClusterImplDetails::kExpectedFixedLocationLength))
         {
@@ -180,16 +184,16 @@ DataModel::ActionReturnStatus BasicInformationClusterImpl<Policy>::ReadAttribute
         return encoder.Encode(CharSpan{ location, codeLen });
     }
     case VendorName::Id:
-        return ReadConfigurationString([this](char* buf, size_t size) { return mPolicy.GetVendorName(buf, size); },
-                                       false, encoder);
+        return ReadConfigurationString([this](char * buf, size_t size) { return mPolicy.GetVendorName(buf, size); }, false,
+                                       encoder);
     case VendorID::Id: {
         uint16_t vendorId = 0;
         ReturnErrorOnFailure(mPolicy.GetVendorId(vendorId));
         return encoder.Encode(vendorId);
     }
     case ProductName::Id:
-        return ReadConfigurationString([this](char* buf, size_t size) { return mPolicy.GetProductName(buf, size); },
-                                       false, encoder);
+        return ReadConfigurationString([this](char * buf, size_t size) { return mPolicy.GetProductName(buf, size); }, false,
+                                       encoder);
     case ProductID::Id: {
         uint16_t productId = 0;
         ReturnErrorOnFailure(mPolicy.GetProductId(productId));
@@ -201,7 +205,7 @@ DataModel::ActionReturnStatus BasicInformationClusterImpl<Policy>::ReadAttribute
         return encoder.Encode(hardwareVersion);
     }
     case HardwareVersionString::Id:
-        return ReadConfigurationString([this](char* buf, size_t size) { return mPolicy.GetHardwareVersionString(buf, size); },
+        return ReadConfigurationString([this](char * buf, size_t size) { return mPolicy.GetHardwareVersionString(buf, size); },
                                        false, encoder);
     case SoftwareVersion::Id: {
         uint32_t softwareVersion = 0;
@@ -209,16 +213,17 @@ DataModel::ActionReturnStatus BasicInformationClusterImpl<Policy>::ReadAttribute
         return encoder.Encode(softwareVersion);
     }
     case SoftwareVersionString::Id:
-        return ReadConfigurationString([this](char* buf, size_t size) { return mPolicy.GetSoftwareVersionString(buf, size); },
+        return ReadConfigurationString([this](char * buf, size_t size) { return mPolicy.GetSoftwareVersionString(buf, size); },
                                        false /* unimplementedAllowed */, encoder); // Wait, original was false for SW Version String
     case ManufacturingDate::Id: {
-        constexpr size_t kMaxDateLength = 8; // YYYYMMDD
+        constexpr size_t kMaxDateLength  = 8;     // YYYYMMDD
         char manufacturingDateString[17] = { 0 }; // kMaxManufacturingDateLength around 16
         uint16_t manufacturingYear;
         uint8_t manufacturingMonth;
         uint8_t manufacturingDayOfMonth;
         size_t totalManufacturingDateLen = 0;
-        MutableCharSpan vendorSuffixSpan(manufacturingDateString + kMaxDateLength, sizeof(manufacturingDateString) - kMaxDateLength);
+        MutableCharSpan vendorSuffixSpan(manufacturingDateString + kMaxDateLength,
+                                         sizeof(manufacturingDateString) - kMaxDateLength);
         CHIP_ERROR status = mPolicy.GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
 
         if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
@@ -235,7 +240,7 @@ DataModel::ActionReturnStatus BasicInformationClusterImpl<Policy>::ReadAttribute
                  manufacturingDayOfMonth);
 
         totalManufacturingDateLen = kMaxDateLength;
-        status = mPolicy.GetManufacturingDateSuffix(vendorSuffixSpan);
+        status                    = mPolicy.GetManufacturingDateSuffix(vendorSuffixSpan);
         if (status == CHIP_NO_ERROR)
         {
             totalManufacturingDateLen += vendorSuffixSpan.size();
@@ -244,21 +249,19 @@ DataModel::ActionReturnStatus BasicInformationClusterImpl<Policy>::ReadAttribute
         return encoder.Encode(CharSpan(manufacturingDateString, totalManufacturingDateLen));
     }
     case PartNumber::Id:
-        return ReadConfigurationString([this](char* buf, size_t size) { return mPolicy.GetPartNumber(buf, size); },
-                                       true, encoder);
+        return ReadConfigurationString([this](char * buf, size_t size) { return mPolicy.GetPartNumber(buf, size); }, true, encoder);
     case ProductURL::Id:
-        return ReadConfigurationString([this](char* buf, size_t size) { return mPolicy.GetProductURL(buf, size); },
-                                       true, encoder);
+        return ReadConfigurationString([this](char * buf, size_t size) { return mPolicy.GetProductURL(buf, size); }, true, encoder);
     case ProductLabel::Id:
-        return ReadConfigurationString([this](char* buf, size_t size) { return mPolicy.GetProductLabel(buf, size); },
-                                       true, encoder);
+        return ReadConfigurationString([this](char * buf, size_t size) { return mPolicy.GetProductLabel(buf, size); }, true,
+                                       encoder);
     case SerialNumber::Id:
-        return ReadConfigurationString([this](char* buf, size_t size) { return mPolicy.GetSerialNumber(buf, size); },
-                                       true, encoder);
+        return ReadConfigurationString([this](char * buf, size_t size) { return mPolicy.GetSerialNumber(buf, size); }, true,
+                                       encoder);
     case UniqueID::Id: {
         char uniqueId[33] = { 0 };
         CHIP_ERROR status = mPolicy.GetUniqueId(uniqueId, sizeof(uniqueId));
-        status = BasicInformationClusterImplDetails::ClearNullTerminatedStringWhenUnimplemented(status, uniqueId);
+        status            = BasicInformationClusterImplDetails::ClearNullTerminatedStringWhenUnimplemented(status, uniqueId);
         return BasicInformationClusterImplDetails::EncodeStringOnSuccess(status, encoder, uniqueId, 32);
     }
     case CapabilityMinima::Id: {
@@ -342,7 +345,8 @@ DataModel::ActionReturnStatus BasicInformationClusterImpl<Policy>::WriteImpl(con
     case Location::Id: {
         CharSpan location;
         ReturnErrorOnFailure(decoder.Decode(location));
-        VerifyOrReturnError(location.size() == BasicInformationClusterImplDetails::kExpectedFixedLocationLength, Protocols::InteractionModel::Status::ConstraintError);
+        VerifyOrReturnError(location.size() == BasicInformationClusterImplDetails::kExpectedFixedLocationLength,
+                            Protocols::InteractionModel::Status::ConstraintError);
         return mPolicy.StoreCountryCode(location.data(), location.size());
     }
     case NodeLabel::Id: {
