@@ -407,7 +407,7 @@ class WpaSupplicantMock(threading.Thread):
 
         def _extract_variant_dict(self, variant_dict: dict) -> dict:
             """Extract values from GVariant a{sv} format to plain dict."""
-            return {k:v[1] for k,v in variant_dict.items()}
+            return {k: v[1] for k, v in variant_dict.items()}
         # =====================================================================
         # NAN D-Bus Signals
         # =====================================================================
