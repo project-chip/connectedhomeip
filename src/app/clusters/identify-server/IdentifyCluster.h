@@ -54,6 +54,8 @@ public:
      * @return True if the TriggerEffect command is enabled, false otherwise.
      */
     virtual bool IsTriggerEffectEnabled() const = 0;
+
+    virtual void OnIdentifyTimeChanged(uint16_t identifyTime) {}
 };
 
 class IdentifyCluster : public DefaultServerCluster, public TimerContext, public IdentifyIntegrationDelegate

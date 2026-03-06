@@ -128,6 +128,7 @@ DataModel::ActionReturnStatus IdentifyCluster::SetIdentifyTime(IdentifyTimeChang
         {
             mIdentifyDelegate->OnIdentifyStop(*this);
         }
+        mIdentifyDelegate->OnIdentifyTimeChanged(mIdentifyTime);
     }
 
     if (mIdentifyTime > 0)
