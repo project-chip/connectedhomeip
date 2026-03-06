@@ -115,7 +115,7 @@ class TC_WebRTCP_2_28(MatterBaseTest, WEBRTCPTestBase):
         self.step(2)
         # Send SolicitOffer with no VideoStreams and no AudioStreams
         cmd = cluster.Commands.SolicitOffer(
-            streamUsage=3, originatingEndpointID=endpoint)
+            streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView, originatingEndpointID=endpoint)
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("Unexpected success on SolicitOffer with no VideoStreams or AudioStreams")
