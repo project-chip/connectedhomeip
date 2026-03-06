@@ -134,7 +134,7 @@ template <typename EncodeFunction>
 CHIP_ERROR BasicInformationClusterImpl<Policy>::ReadConfigurationString(EncodeFunction && getter, bool unimplementedAllowed,
                                                                         AttributeValueEncoder & encoder)
 {
-    char buffer[BasicInformationClusterImplDetails::kMaxStringLength + 1] = { 0 };
+    char buffer[BasicInformationClusterImplDetails::kMaxStringLength + 1];
     CHIP_ERROR status = getter(buffer, sizeof(buffer));
     
     if (unimplementedAllowed)
