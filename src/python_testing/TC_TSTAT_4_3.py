@@ -179,7 +179,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             # If has_valid_time is False, TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle,
             # the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes.
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
-            log.info(f"Active Preset Handlers: {activePresetHandle}")
+            log.info(f"Active Preset Handle: {activePresetHandle}")
             possiblePresetHandles = [
                 preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
             if len(possiblePresetHandles) > 0:
