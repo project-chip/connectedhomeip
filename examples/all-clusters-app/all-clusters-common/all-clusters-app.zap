@@ -13164,6 +13164,14 @@
               "isEnabled": 1
             },
             {
+              "name": "AddThermostatSuggestionResponse",
+              "code": 2,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
               "name": "SetActiveScheduleRequest",
               "code": 5,
               "mfgCode": null,
@@ -13174,6 +13182,22 @@
             {
               "name": "SetActivePresetRequest",
               "code": 6,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "AddThermostatSuggestion",
+              "code": 7,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveThermostatSuggestion",
+              "code": 8,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -13630,6 +13654,70 @@
               "reportableChange": 0
             },
             {
+              "name": "MaxThermostatSuggestions",
+              "code": 83,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ThermostatSuggestions",
+              "code": 84,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentThermostatSuggestion",
+              "code": 85,
+              "mfgCode": null,
+              "side": "server",
+              "type": "ThermostatSuggestionStruct",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ThermostatSuggestionNotFollowingReason",
+              "code": 86,
+              "mfgCode": null,
+              "side": "server",
+              "type": "ThermostatSuggestionNotFollowingReasonBitmap",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -13687,7 +13775,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0123",
+              "defaultValue": "0x0523",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
