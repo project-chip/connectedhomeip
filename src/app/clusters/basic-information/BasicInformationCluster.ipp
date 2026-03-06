@@ -283,10 +283,11 @@ DataModel::ActionReturnStatus BasicInformationClusterImpl<Policy>::ReadAttribute
         return ReadConfigurationString([this](char * buf, size_t size) { return mPolicy.GetSerialNumber(buf, size); }, true,
                                        encoder);
     case UniqueID::Id: {
-        char uniqueId[33] = { 0 };
-        CHIP_ERROR status = mPolicy.GetUniqueId(uniqueId, sizeof(uniqueId));
-        status            = BasicInformationClusterImplDetails::ClearNullTerminatedStringWhenUnimplemented(status, uniqueId);
-        return BasicInformationClusterImplDetails::EncodeStringOnSuccess(status, encoder, uniqueId, 32);
+        constexpr size_t kMaxLength   = BasicInformation::Attributes::UniqueID::TypeInfo::MaxLength();
+        char uniqueId[kMaxLength + 1] = { 0 };
+        CHIP_ERROR status             = mPolicy.GetUniqueId(uniqueId, sizeof(uniqueId));
+        status = BasicInformationClusterImplDetails::ClearNullTerminatedStringWhenUnimplemented(status, uniqueId);
+        return BasicInformationClusterImplDetails::EncodeStringOnSuccess(status, encoder, uniqueId, kMaxLength);
     }
     case CapabilityMinima::Id: {
         BasicInformation::Structs::CapabilityMinimaStruct::Type capabilityMinima;
