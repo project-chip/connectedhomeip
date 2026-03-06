@@ -97,7 +97,7 @@ ElectricalEnergyMeasurementCluster::ElectricalEnergyMeasurementCluster(const Con
         attrs.Set<Attributes::PeriodicEnergyExported::Id>(
             config.featureFlags.HasAll(Feature::kPeriodicEnergy, Feature::kExportedEnergy));
         attrs.Set<Attributes::CumulativeEnergyReset::Id>(config.optionalAttributes.IsSet(Attributes::CumulativeEnergyReset::Id) &&
-                                                          config.featureFlags.Has(Feature::kCumulativeEnergy));
+                                                         config.featureFlags.Has(Feature::kCumulativeEnergy));
         return attrs;
     }()),
     mDelegate(config.delegate), mTimerDelegate(config.timerDelegate), mReportInterval(config.reportInterval)
