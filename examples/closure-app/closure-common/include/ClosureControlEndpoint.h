@@ -63,7 +63,7 @@ public:
 
     void SetClusterInstance(ClosureControlCluster * clusterInstance) { mClusterInstance = clusterInstance; }
 
-    ClosureControlCluster * GetClusterInstance() const { return mClusterInstance; }
+    ClosureControlCluster & GetClusterInstance() { return *mClusterInstance; }
 
 private:
     ClosureControlCluster * mClusterInstance;

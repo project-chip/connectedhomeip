@@ -102,27 +102,26 @@ CHIP_ERROR ClosureControlDelegate::HandleEventTrigger(uint64_t eventTrigger)
 {
     eventTrigger                           = clearEndpointInEventTrigger(eventTrigger);
     ClosureControlTestEventTrigger trigger = static_cast<ClosureControlTestEventTrigger>(eventTrigger);
-    ClosureControlCluster * cluster        = GetClusterInstance();
-    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ClosureControlCluster & cluster        = GetClusterInstance();
 
     switch (trigger)
     {
     case ClosureControlTestEventTrigger::kMainStateIsSetupRequired:
-        ReturnErrorOnFailure(cluster->SetMainState(MainStateEnum::kSetupRequired));
+        ReturnErrorOnFailure(cluster.SetMainState(MainStateEnum::kSetupRequired));
         break;
     case ClosureControlTestEventTrigger::kMainStateIsProtected:
-        ReturnErrorOnFailure(cluster->SetMainState(MainStateEnum::kProtected));
+        ReturnErrorOnFailure(cluster.SetMainState(MainStateEnum::kProtected));
         break;
     case ClosureControlTestEventTrigger::kMainStateIsError:
-        ReturnErrorOnFailure(cluster->SetMainState(MainStateEnum::kError));
-        ReturnErrorOnFailure(cluster->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor));
+        ReturnErrorOnFailure(cluster.SetMainState(MainStateEnum::kError));
+        ReturnErrorOnFailure(cluster.AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor));
         break;
     case ClosureControlTestEventTrigger::kMainStateIsDisengaged:
-        ReturnErrorOnFailure(cluster->SetMainState(MainStateEnum::kDisengaged));
+        ReturnErrorOnFailure(cluster.SetMainState(MainStateEnum::kDisengaged));
         break;
     case ClosureControlTestEventTrigger::kClearEvent:
-        ReturnErrorOnFailure(cluster->SetMainState(MainStateEnum::kStopped));
-        cluster->ClearCurrentErrorList();
+        ReturnErrorOnFailure(cluster.SetMainState(MainStateEnum::kStopped));
+        cluster.ClearCurrentErrorList();
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;

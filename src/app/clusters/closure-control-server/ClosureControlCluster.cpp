@@ -40,7 +40,7 @@ ClosureControlCluster::ClosureControlCluster(EndpointId endpointId, const Contex
     DefaultServerCluster({ endpointId, ClosureControl::Id }), mDelegate(context.delegate), mTimerDelegate(context.timerDelegate),
     mConformance(context.conformance)
 {
-    VerifyOrDieWithMsg(context.conformance.Valid(), AppServer, "Invalid conformance");
+    VerifyOrDieWithMsg(context.conformance.IsValid(), AppServer, "Invalid conformance");
     VerifyOrDieWithMsg(SetMainState(context.initParams.mMainState) == CHIP_NO_ERROR, AppServer, "Failed to set main state");
     VerifyOrDieWithMsg(SetOverallCurrentState(context.initParams.mOverallCurrentState) == CHIP_NO_ERROR, AppServer,
                        "Failed to set overall current state");
@@ -565,9 +565,9 @@ Protocols::InteractionModel::Status ClosureControlCluster::HandleMoveTo(Optional
     VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState = GetOverallCurrentState();
-    DataModel::Nullable<GenericOverallTargetState> overallTargetState   = GetOverallTargetState();
     VerifyOrReturnError(!overallCurrentState.IsNull(), Status::InvalidInState,
                         ChipLogError(AppServer, "OverallCurrentState is null on endpoint : %d", GetEndpointId()));
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState = GetOverallTargetState();
 
     if (overallTargetState.IsNull())
     {

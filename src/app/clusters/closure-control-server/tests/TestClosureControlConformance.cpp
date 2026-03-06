@@ -32,7 +32,7 @@ TEST(TestClosureControlConformance, ValidWhenPositioningEnabled)
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kPositioning);
 
-    EXPECT_TRUE(conformance.Valid());
+    EXPECT_TRUE(conformance.IsValid());
 }
 
 TEST(TestClosureControlConformance, ValidWhenMotionLatchingEnabled)
@@ -40,14 +40,14 @@ TEST(TestClosureControlConformance, ValidWhenMotionLatchingEnabled)
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kMotionLatching);
 
-    EXPECT_TRUE(conformance.Valid());
+    EXPECT_TRUE(conformance.IsValid());
 }
 
 TEST(TestClosureControlConformance, InvalidWhenNeitherPositioningNorMotionLatchingEnabled)
 {
     ClusterConformance conformance;
 
-    EXPECT_FALSE(conformance.Valid());
+    EXPECT_FALSE(conformance.IsValid());
 }
 
 TEST(TestClosureControlConformance, ValidWhenSpeedAndPositioningEnabledAndInstantaneousDisabled)
@@ -55,7 +55,7 @@ TEST(TestClosureControlConformance, ValidWhenSpeedAndPositioningEnabledAndInstan
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kSpeed).Set(Feature::kPositioning);
 
-    EXPECT_TRUE(conformance.Valid());
+    EXPECT_TRUE(conformance.IsValid());
 }
 
 TEST(TestClosureControlConformance, InvalidWhenSpeedEnabledButPositioningDisabled)
@@ -63,7 +63,7 @@ TEST(TestClosureControlConformance, InvalidWhenSpeedEnabledButPositioningDisable
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kSpeed);
 
-    EXPECT_FALSE(conformance.Valid());
+    EXPECT_FALSE(conformance.IsValid());
 }
 
 TEST(TestClosureControlConformance, InvalidWhenSpeedAndInstantaneousBothEnabled)
@@ -71,7 +71,7 @@ TEST(TestClosureControlConformance, InvalidWhenSpeedAndInstantaneousBothEnabled)
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kSpeed).Set(Feature::kPositioning).Set(Feature::kInstantaneous);
 
-    EXPECT_FALSE(conformance.Valid());
+    EXPECT_FALSE(conformance.IsValid());
 }
 
 TEST(TestClosureControlConformance, ValidWhenVentilationAndPositioningEnabled)
@@ -79,7 +79,7 @@ TEST(TestClosureControlConformance, ValidWhenVentilationAndPositioningEnabled)
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kVentilation).Set(Feature::kPositioning);
 
-    EXPECT_TRUE(conformance.Valid());
+    EXPECT_TRUE(conformance.IsValid());
 }
 
 TEST(TestClosureControlConformance, InvalidWhenVentilationEnabledButPositioningDisabled)
@@ -87,7 +87,7 @@ TEST(TestClosureControlConformance, InvalidWhenVentilationEnabledButPositioningD
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kVentilation);
 
-    EXPECT_FALSE(conformance.Valid());
+    EXPECT_FALSE(conformance.IsValid());
 }
 
 TEST(TestClosureControlConformance, ValidWhenPedestrianAndPositioningEnabled)
@@ -95,7 +95,7 @@ TEST(TestClosureControlConformance, ValidWhenPedestrianAndPositioningEnabled)
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kPedestrian).Set(Feature::kPositioning);
 
-    EXPECT_TRUE(conformance.Valid());
+    EXPECT_TRUE(conformance.IsValid());
 }
 
 TEST(TestClosureControlConformance, InvalidWhenPedestrianEnabledButPositioningDisabled)
@@ -103,7 +103,7 @@ TEST(TestClosureControlConformance, InvalidWhenPedestrianEnabledButPositioningDi
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kPedestrian);
 
-    EXPECT_FALSE(conformance.Valid());
+    EXPECT_FALSE(conformance.IsValid());
 }
 
 TEST(TestClosureControlConformance, ValidWhenCalibrationAndPositioningEnabled)
@@ -111,7 +111,7 @@ TEST(TestClosureControlConformance, ValidWhenCalibrationAndPositioningEnabled)
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kCalibration).Set(Feature::kPositioning);
 
-    EXPECT_TRUE(conformance.Valid());
+    EXPECT_TRUE(conformance.IsValid());
 }
 
 TEST(TestClosureControlConformance, InvalidWhenCalibrationEnabledButPositioningDisabled)
@@ -119,7 +119,7 @@ TEST(TestClosureControlConformance, InvalidWhenCalibrationEnabledButPositioningD
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kCalibration);
 
-    EXPECT_FALSE(conformance.Valid());
+    EXPECT_FALSE(conformance.IsValid());
 }
 
 TEST(TestClosureControlConformance, ValidWhenVentilationPedestrianCalibrationAndPositioningEnabled)
@@ -132,7 +132,7 @@ TEST(TestClosureControlConformance, ValidWhenVentilationPedestrianCalibrationAnd
         .Set(Feature::kCalibration)
         .Set(Feature::kPositioning);
 
-    EXPECT_TRUE(conformance.Valid());
+    EXPECT_TRUE(conformance.IsValid());
 }
 
 TEST(TestClosureControlConformance, InvalidWhenVentilationPedestrianCalibrationEnabledButPositioningDisabled)
@@ -140,5 +140,5 @@ TEST(TestClosureControlConformance, InvalidWhenVentilationPedestrianCalibrationE
     ClusterConformance conformance;
     conformance.FeatureMap().Set(Feature::kVentilation).Set(Feature::kPedestrian).Set(Feature::kCalibration);
 
-    EXPECT_FALSE(conformance.Valid());
+    EXPECT_FALSE(conformance.IsValid());
 }

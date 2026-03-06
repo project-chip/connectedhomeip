@@ -68,7 +68,7 @@ public:
      * @return true, the cluster confirmance is valid
      *         false, otherwise
      */
-    bool Valid() const
+    bool IsValid() const
     {
         // Positioning or Matching must be enabled
         VerifyOrReturnValue(HasFeature(Feature::kPositioning) || HasFeature(Feature::kMotionLatching), false,

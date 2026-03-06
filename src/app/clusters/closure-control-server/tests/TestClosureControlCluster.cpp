@@ -406,17 +406,17 @@ TEST_F(TestClosureControlCluster, TestSetCountdownTimeFromDelegateAndRead)
 
     EXPECT_EQ(cluster.SetCountdownTimeFromDelegate(DataModel::MakeNullable<ElapsedS>(1)), CHIP_NO_ERROR);
     EXPECT_EQ(mockDelegate.GetCountdownTimeChangedCalled(), true);
-    EXPECT_EQ(mockDelegate.GetCountdownTimeValue(), 1u);
     DataModel::Nullable<ElapsedS> countdownTime = cluster.GetCountdownTime();
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_EQ(countdownTime.Value(), 1u);
+    EXPECT_EQ(mockDelegate.GetCountdownTimeValue(), countdownTime);
 
     EXPECT_EQ(cluster.SetCountdownTimeFromDelegate(DataModel::MakeNullable<ElapsedS>(2)), CHIP_NO_ERROR);
     EXPECT_EQ(mockDelegate.GetCountdownTimeChangedCalled(), true);
-    EXPECT_EQ(mockDelegate.GetCountdownTimeValue(), 2u);
     countdownTime = cluster.GetCountdownTime();
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_EQ(countdownTime.Value(), 2u);
+    EXPECT_EQ(mockDelegate.GetCountdownTimeValue(), countdownTime);
 }
 
 TEST_F(TestClosureControlCluster, TestSetOverallCurrentStateFeatureValidation)
@@ -586,6 +586,7 @@ TEST_F(TestClosureControlCluster, TestHandleMoveToAllFeatures)
     EXPECT_EQ(targetState.Value().position.Value().Value(), TargetPositionEnum::kMoveToFullyOpen);
     EXPECT_EQ(targetState.Value().latch.Value().Value(), false);
     EXPECT_EQ(targetState.Value().speed.Value(), Globals::ThreeLevelAutoEnum::kHigh);
+    EXPECT_EQ(mockDelegate.GetOverallTargetStateValue(), targetState);
 
     MainStateEnum state = cluster.GetMainState();
     EXPECT_EQ(state, MainStateEnum::kMoving);
