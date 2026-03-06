@@ -177,16 +177,16 @@ class TC_WebRTCP_2_2(MatterBaseTest, WEBRTCPTestBase):
 
         # Verify response contains the allocated VideoStreamID
         asserts.assert_not_equal(
-            resp.videoStreamID,
+            session.videoStreamID,
             NullValue,
-            "videoStreamID in SolicitOfferResponse should be valid."
+            "videoStreamID in CurrentSessions should be valid."
         )
 
         # Verify response contains the allocated AudioStreamID
         asserts.assert_not_equal(
-            resp.audioStreamID,
+            session.audioStreamID,
             NullValue,
-            "audioStreamID in SolicitOfferResponse should be valid."
+            "audioStreamID in CurrentSessions should be valid."
         )
 
         self.step(5)
