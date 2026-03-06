@@ -22,8 +22,7 @@
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ZoneManagement/Metadata.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
-
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <algorithm>
 #include <cmath>
 
@@ -50,50 +49,36 @@ namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
-ZoneManagementCluster::ZoneManagementCluster(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
-                                             uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
-                                             const TwoDCartesianVertexStruct & aTwoDCartesianMax) :
-    DefaultServerCluster({ aEndpointId, ZoneManagement::Id }),
-    mDelegate(aDelegate), mEndpointId(aEndpointId), mRegistration(*this), mFeatures(aFeatures),
-    mMaxUserDefinedZones(aMaxUserDefinedZones), mMaxZones(aMaxZones), mSensitivityMax(aSensitivityMax),
-    mTwoDCartesianMax(aTwoDCartesianMax)
-{
-    mDelegate.SetZoneMgmtServer(this);
-}
+ZoneManagementCluster::ZoneManagementCluster(const Context & context) :
+    DefaultServerCluster({ context.endpointId, ZoneManagement::Id }),
+    mClusterContext(context),
+    mDelegate(context.delegate),
+    mFeatures(context.features),
+    mMaxUserDefinedZones(context.config.maxUserDefinedZones),
+    mMaxZones(context.config.maxZones),
+    mSensitivityMax(context.config.sensitivityMax),
+    mTwoDCartesianMax(context.config.twoDCartesianMax)
+{}
 
-ZoneManagementCluster::~ZoneManagementCluster()
-{
-    if (mIsRegistered)
-    {
-        CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(this);
-        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_NOT_FOUND)
-        {
-            ChipLogError(Zcl, "ZoneManagement[ep=%d]: failed to unregister cluster: %" CHIP_ERROR_FORMAT, mEndpointId,
-                         err.Format());
-        }
-        mIsRegistered = false;
-    }
+ZoneManagementCluster::~ZoneManagementCluster() = default;
 
-    mDelegate.SetZoneMgmtServer(nullptr);
-}
-
-CHIP_ERROR ZoneManagementCluster::Init()
-{
-    ReturnErrorOnFailure(ValidateConfiguration());
-    VerifyOrReturnError(!mIsRegistered, CHIP_ERROR_ALREADY_INITIALIZED);
-
-    ReturnErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(mRegistration));
-    mIsRegistered = true;
-
-    return CHIP_NO_ERROR;
-}
 
 CHIP_ERROR ZoneManagementCluster::Startup(ServerClusterContext & context)
 {
+    return Startup(context, std::nullopt);
+}
+
+CHIP_ERROR ZoneManagementCluster::Startup(ServerClusterContext & context, std::optional<uint8_t> initialSensitivity)
+{
     ReturnErrorOnFailure(ValidateConfiguration());
+    if (initialSensitivity.has_value())
+    {
+        VerifyOrReturnError(*initialSensitivity >= 1 && *initialSensitivity <= mSensitivityMax,
+                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    LoadPersistentAttributes();
+    LoadPersistentAttributes(initialSensitivity);
     return CHIP_NO_ERROR;
 }
 
@@ -111,18 +96,18 @@ CHIP_ERROR ZoneManagementCluster::ValidateConfiguration() const
     if (HasFeature(Feature::kUserDefined))
     {
         VerifyOrReturnError(mMaxUserDefinedZones >= 5, CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxUserDefinedZones configuration error", mEndpointId));
+                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxUserDefinedZones configuration error", mPath.mEndpointId));
         VerifyOrReturnError(mMaxZones >= mMaxUserDefinedZones, CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxZones configuration error", mEndpointId));
+                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxZones configuration error", mPath.mEndpointId));
     }
     else
     {
         VerifyOrReturnError(mMaxZones >= 1, CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxZones configuration error", mEndpointId));
+                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxZones configuration error", mPath.mEndpointId));
     }
 
     VerifyOrReturnError(mSensitivityMax >= 2 && mSensitivityMax <= 10, CHIP_ERROR_INVALID_ARGUMENT,
-                        ChipLogError(Zcl, "ZoneManagement[ep=%d]: SensitivityMax configuration error", mEndpointId));
+                        ChipLogError(Zcl, "ZoneManagement[ep=%d]: SensitivityMax configuration error", mPath.mEndpointId));
 
     return CHIP_NO_ERROR;
 }
@@ -132,7 +117,7 @@ bool ZoneManagementCluster::HasFeature(Feature feature) const
     return mFeatures.Has(feature);
 }
 
-void ZoneManagementCluster::LoadPersistentAttributes()
+void ZoneManagementCluster::LoadPersistentAttributes(std::optional<uint8_t> initialSensitivity)
 {
     VerifyOrReturn(mContext != nullptr);
 
@@ -144,14 +129,14 @@ void ZoneManagementCluster::LoadPersistentAttributes()
     CHIP_ERROR err = mDelegate.LoadZones(mZones);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load zones from storage.", mEndpointId);
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load zones from storage.", mPath.mEndpointId);
     }
 
     // Load Triggers
     err = mDelegate.LoadTriggers(mTriggers);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load triggers from storage.", mEndpointId);
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load triggers from storage.", mPath.mEndpointId);
     }
 
     const size_t userZonesCount = CountUserDefinedZones(mZones);
@@ -161,13 +146,14 @@ void ZoneManagementCluster::LoadPersistentAttributes()
     const ConcreteAttributePath sensitivityPath(mPath.mEndpointId, mPath.mClusterId, Sensitivity::Id);
     AttributePersistence persistence(mContext->attributeStorage);
 
-    if (mSensitivityConfiguredByApp)
+    if (initialSensitivity.has_value())
     {
+        mSensitivity = *initialSensitivity;
         const ByteSpan value(reinterpret_cast<const uint8_t *>(&mSensitivity), sizeof(mSensitivity));
         err = mContext->attributeStorage.WriteValue(sensitivityPath, value);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to persist configured Sensitivity", mEndpointId);
+            ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to persist configured Sensitivity", mPath.mEndpointId);
         }
     }
     else
@@ -178,17 +164,17 @@ void ZoneManagementCluster::LoadPersistentAttributes()
             if (loadedSensitivity >= 1 && loadedSensitivity <= mSensitivityMax)
             {
                 mSensitivity = loadedSensitivity;
-                ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Loaded Sensitivity as %u", mEndpointId, mSensitivity);
+                ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Loaded Sensitivity as %u", mPath.mEndpointId, mSensitivity);
             }
             else
             {
-                ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Loaded invalid Sensitivity=%u. Keeping current value=%u", mEndpointId,
+                ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Loaded invalid Sensitivity=%u. Keeping current value=%u", mPath.mEndpointId,
                               loadedSensitivity, mSensitivity);
             }
         }
         else
         {
-            ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Sensitivity not found in storage. Using %u", mEndpointId, mSensitivity);
+            ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Sensitivity not found in storage. Using %u", mPath.mEndpointId, mSensitivity);
         }
     }
 
@@ -238,8 +224,7 @@ CHIP_ERROR ZoneManagementCluster::SetSensitivity(uint8_t aSensitivity)
 
     VerifyOrReturnValue(aSensitivity != mSensitivity, CHIP_NO_ERROR);
 
-    mSensitivity                = aSensitivity;
-    mSensitivityConfiguredByApp = true;
+    mSensitivity = aSensitivity;
 
     if (mContext != nullptr)
     {
@@ -248,7 +233,7 @@ CHIP_ERROR ZoneManagementCluster::SetSensitivity(uint8_t aSensitivity)
         ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(path, value));
     }
 
-    NotifyAttributeChangedIfSuccess(Sensitivity::Id);
+    DefaultServerCluster::NotifyAttributeChanged(Sensitivity::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -297,16 +282,16 @@ DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataMo
             path, ByteSpan(reinterpret_cast<const uint8_t *>(&sensitivity), sizeof(sensitivity)));
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DataManagement, "ZoneManagement[ep=%d]: Failed to persist sensitivity: %" CHIP_ERROR_FORMAT, mEndpointId,
+            ChipLogError(DataManagement, "ZoneManagement[ep=%d]: Failed to persist sensitivity: %" CHIP_ERROR_FORMAT, mPath.mEndpointId,
                          err.Format());
             return err;
         }
 
-        mSensitivity                = sensitivity;
-        mSensitivityConfiguredByApp = true;
+        mSensitivity = sensitivity;
         mDelegate.OnAttributeChanged(request.path.mAttributeId);
 
-        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, Status::Success);
+        NotifyAttributeChanged(request.path.mAttributeId);
+        return Status::Success;
     }
     }
 
@@ -331,17 +316,17 @@ CHIP_ERROR ZoneManagementCluster::AcceptedCommands(const ConcreteClusterPath & p
 {
     if (HasFeature(Feature::kTwoDimensionalCartesianZone) && HasFeature(Feature::kUserDefined))
     {
-        ReturnErrorOnFailure(builder.Append(Commands::CreateTwoDCartesianZone::kMetadataEntry));
-        ReturnErrorOnFailure(builder.Append(Commands::UpdateTwoDCartesianZone::kMetadataEntry));
+        ReturnErrorOnFailure(
+            builder.AppendElements({ Commands::CreateTwoDCartesianZone::kMetadataEntry, Commands::UpdateTwoDCartesianZone::kMetadataEntry }));
     }
 
     if (HasFeature(Feature::kUserDefined))
     {
-        ReturnErrorOnFailure(builder.Append(Commands::RemoveZone::kMetadataEntry));
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::RemoveZone::kMetadataEntry }));
     }
 
-    ReturnErrorOnFailure(builder.Append(Commands::CreateOrUpdateTrigger::kMetadataEntry));
-    ReturnErrorOnFailure(builder.Append(Commands::RemoveTrigger::kMetadataEntry));
+    ReturnErrorOnFailure(
+        builder.AppendElements({ Commands::CreateOrUpdateTrigger::kMetadataEntry, Commands::RemoveTrigger::kMetadataEntry }));
 
     return CHIP_NO_ERROR;
 }
@@ -350,7 +335,7 @@ CHIP_ERROR ZoneManagementCluster::GeneratedCommands(const ConcreteClusterPath & 
 {
     if (HasFeature(Feature::kTwoDimensionalCartesianZone) && HasFeature(Feature::kUserDefined))
     {
-        ReturnErrorOnFailure(builder.Append(Commands::CreateTwoDCartesianZoneResponse::Id));
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::CreateTwoDCartesianZoneResponse::Id }));
     }
 
     return CHIP_NO_ERROR;
@@ -397,7 +382,7 @@ std::optional<DataModel::ActionReturnStatus> ZoneManagementCluster::InvokeComman
 CHIP_ERROR ZoneManagementCluster::AddZone(const ZoneInformationStorage & zone)
 {
     mZones.push_back(zone);
-    NotifyAttributeChangedIfSuccess(Attributes::Zones::Id);
+    NotifyAttributeChanged(Attributes::Zones::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -412,7 +397,7 @@ CHIP_ERROR ZoneManagementCluster::UpdateZone(uint16_t zoneId, const ZoneInformat
     }
 
     *it = zoneInfo;
-    NotifyAttributeChangedIfSuccess(Attributes::Zones::Id);
+    NotifyAttributeChanged(Attributes::Zones::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -427,7 +412,7 @@ CHIP_ERROR ZoneManagementCluster::RemoveZone(uint16_t zoneId)
     }
 
     mZones.erase(it, mZones.end());
-    NotifyAttributeChangedIfSuccess(Attributes::Zones::Id);
+    NotifyAttributeChanged(Attributes::Zones::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -455,10 +440,7 @@ Status ZoneManagementCluster::AddOrUpdateTrigger(const ZoneTriggerControlStruct 
         }
     }
 
-    if (status == Status::Success)
-    {
-        NotifyAttributeChangedIfSuccess(Attributes::Triggers::Id);
-    }
+    NotifyAttributeChangedIfSuccess(Attributes::Triggers::Id, status);
 
     return status;
 }
@@ -471,7 +453,7 @@ Status ZoneManagementCluster::RemoveTrigger(uint16_t zoneId)
         mTriggers.erase(std::remove_if(mTriggers.begin(), mTriggers.end(),
                                        [&](const ZoneTriggerControlStruct & trigger) { return trigger.zoneID == zoneId; }),
                         mTriggers.end());
-        NotifyAttributeChangedIfSuccess(Attributes::Triggers::Id);
+        NotifyAttributeChanged(Attributes::Triggers::Id);
     }
 
     return status;
@@ -566,7 +548,7 @@ ZoneManagementCluster::HandleUpdateTwoDCartesianZone(const Commands::UpdateTwoDC
     auto foundZone =
         std::find_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStruct & z) { return z.zoneID == zoneID; });
     VerifyOrReturnValue(foundZone != mZones.end(), Status::NotFound,
-                        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mEndpointId, zoneID));
+                        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mPath.mEndpointId, zoneID));
 
     VerifyOrReturnValue(foundZone->zoneSource != ZoneSourceEnum::kMfg, Status::ConstraintError);
     VerifyOrReturnValue(foundZone->zoneType == ZoneTypeEnum::kTwoDCARTZone, Status::DynamicConstraintError);
@@ -622,14 +604,14 @@ DataModel::ActionReturnStatus ZoneManagementCluster::HandleRemoveZone(const Comm
     auto foundZone =
         std::find_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStruct & z) { return z.zoneID == zoneID; });
     VerifyOrReturnValue(foundZone != mZones.end(), Status::NotFound,
-                        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mEndpointId, zoneID));
+                        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mPath.mEndpointId, zoneID));
 
     VerifyOrReturnValue(foundZone->zoneSource == ZoneSourceEnum::kUser, Status::ConstraintError);
 
     auto foundTrigger =
         std::find_if(mTriggers.begin(), mTriggers.end(), [&](const ZoneTriggerControlStruct & t) { return t.zoneID == zoneID; });
     VerifyOrReturnValue(foundTrigger == mTriggers.end(), Status::InvalidInState,
-                        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: Zone id %d is referenced in zone triggers", mEndpointId, zoneID));
+                        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: Zone id %d is referenced in zone triggers", mPath.mEndpointId, zoneID));
 
     Status status = mDelegate.RemoveZone(zoneID);
     VerifyOrReturnValue(status == Status::Success, status);
@@ -669,7 +651,7 @@ ZoneManagementCluster::HandleCreateOrUpdateTrigger(const Commands::CreateOrUpdat
     auto foundZone =
         std::find_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStorage & z) { return z.zoneID == trigger.zoneID; });
     VerifyOrReturnValue(foundZone != mZones.end(), Status::NotFound,
-                        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mEndpointId, trigger.zoneID));
+                        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mPath.mEndpointId, trigger.zoneID));
 
     VerifyOrReturnValue(!foundZone->twoDCartZoneStorage.HasValue() ||
                             foundZone->twoDCartZoneStorage.Value().use == ZoneUseEnum::kMotion,
@@ -685,7 +667,7 @@ DataModel::ActionReturnStatus ZoneManagementCluster::HandleRemoveTrigger(const C
     auto foundTrigger =
         std::find_if(mTriggers.begin(), mTriggers.end(), [&](const ZoneTriggerControlStruct & t) { return t.zoneID == zoneID; });
     VerifyOrReturnValue(foundTrigger != mTriggers.end(), Status::NotFound,
-                        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: Trigger for zone id %d does not exist", mEndpointId, zoneID));
+                        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: Trigger for zone id %d does not exist", mPath.mEndpointId, zoneID));
 
     return RemoveTrigger(zoneID);
 }
@@ -740,7 +722,7 @@ Status ZoneManagementCluster::GenerateZoneTriggeredEvent(uint16_t zoneID, ZoneEv
 
     if (!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value())
     {
-        ChipLogError(AppServer, "Endpoint %d - Unable to generate ZoneTriggered event", mEndpointId);
+        ChipLogError(AppServer, "Endpoint %d - Unable to generate ZoneTriggered event", mPath.mEndpointId);
         return Status::Failure;
     }
 
@@ -757,7 +739,7 @@ Status ZoneManagementCluster::GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEven
 
     if (!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value())
     {
-        ChipLogError(AppServer, "Endpoint %d - Unable to generate ZoneStopped event", mEndpointId);
+        ChipLogError(AppServer, "Endpoint %d - Unable to generate ZoneStopped event", mPath.mEndpointId);
         return Status::Failure;
     }
 

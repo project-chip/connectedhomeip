@@ -18,224 +18,103 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
-#include <protocols/interaction_model/StatusCode.h>
+#include <app/server-cluster/ServerClusterContext.h>
+
+#include <optional>
+
+// The compatibility wrapper depends on the code-driven cluster, but the shared
+// delegate and storage types are split into ZoneManagementCommon.h so the cluster
+// header does not need to include this legacy wrapper header.
+#include "ZoneManagementCluster.h"
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
-using TwoDCartesianZoneDecodableStruct = Structs::TwoDCartesianZoneStruct::DecodableType;
-using TwoDCartesianZoneStruct          = Structs::TwoDCartesianZoneStruct::Type;
-using TwoDCartesianVertexStruct        = Structs::TwoDCartesianVertexStruct::Type;
-using ZoneInformationStruct            = Structs::ZoneInformationStruct::Type;
-using ZoneTriggerControlStruct         = Structs::ZoneTriggerControlStruct::Type;
-using ActionReturnStatus               = DataModel::ActionReturnStatus;
-using AttributeEntry                   = DataModel::AttributeEntry;
-using AcceptedCommandEntry             = DataModel::AcceptedCommandEntry;
-
-class ZoneManagementCluster;
-
-struct TwoDCartesianZoneStorage : TwoDCartesianZoneStruct
-{
-    TwoDCartesianZoneStorage() = default;
-
-    TwoDCartesianZoneStorage(const CharSpan & aName, ZoneUseEnum aUse, const std::vector<TwoDCartesianVertexStruct> & aVertices,
-                             Optional<CharSpan> aColor)
-    {
-        Set(aName, aUse, aVertices, aColor);
-    }
-
-    TwoDCartesianZoneStorage(const TwoDCartesianZoneStorage & aTwoDCartZone) { *this = aTwoDCartZone; }
-
-    TwoDCartesianZoneStorage & operator=(const TwoDCartesianZoneStorage & aTwoDCartZone)
-    {
-        Set(aTwoDCartZone.name, aTwoDCartZone.use, aTwoDCartZone.verticesVector, aTwoDCartZone.color);
-        return *this;
-    }
-
-    void Set(const CharSpan & aName, ZoneUseEnum aUse, const std::vector<TwoDCartesianVertexStruct> & aVertices,
-             Optional<CharSpan> aColor)
-    {
-        nameString     = std::string(aName.begin(), aName.end());
-        name           = CharSpan(nameString.c_str(), nameString.size());
-        use            = aUse;
-        verticesVector = aVertices;
-        vertices       = DataModel::List<TwoDCartesianVertexStruct>(verticesVector.data(), verticesVector.size());
-        if (aColor.HasValue())
-        {
-            colorString = std::string(aColor.Value().begin(), aColor.Value().end());
-            color       = MakeOptional(CharSpan(colorString.c_str(), colorString.size()));
-        }
-        else
-        {
-            colorString.clear();
-            color = NullOptional;
-        }
-    }
-
-    std::string nameString;
-    std::string colorString;
-    std::vector<TwoDCartesianVertexStruct> verticesVector;
-};
-
-struct ZoneInformationStorage : ZoneInformationStruct
-{
-    ZoneInformationStorage() = default;
-
-    ZoneInformationStorage(const uint16_t & aZoneID, ZoneTypeEnum aZoneType, ZoneSourceEnum aZoneSource,
-                           const Optional<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage)
-    {
-        Set(aZoneID, aZoneType, aZoneSource, aTwoDCartZoneStorage);
-    }
-
-    ZoneInformationStorage(const ZoneInformationStorage & aZoneInfoStorage) { *this = aZoneInfoStorage; }
-
-    ZoneInformationStorage & operator=(const ZoneInformationStorage & aZoneInfoStorage)
-    {
-        Set(aZoneInfoStorage.zoneID, aZoneInfoStorage.zoneType, aZoneInfoStorage.zoneSource, aZoneInfoStorage.twoDCartZoneStorage);
-        return *this;
-    }
-
-    void Set(const uint16_t & aZoneID, ZoneTypeEnum aZoneType, ZoneSourceEnum aZoneSource,
-             const Optional<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage)
-    {
-        zoneID              = aZoneID;
-        zoneType            = aZoneType;
-        zoneSource          = aZoneSource;
-        twoDCartZoneStorage = aTwoDCartZoneStorage;
-        twoDCartesianZone   = twoDCartZoneStorage;
-    }
-
-    Optional<TwoDCartesianZoneStorage> twoDCartZoneStorage;
-};
-
-/** @brief
- *  Defines interfaces for implementing application-specific logic for various aspects of the ZoneManagement Cluster.
- *  Specifically, it defines interfaces for the command handling and loading of the allocated streams.
- */
-class Delegate
+class ZoneMgmtServer
 {
 public:
-    Delegate() = default;
+    ZoneMgmtServer(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures, uint8_t aMaxUserDefinedZones,
+                   uint8_t aMaxZones, uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax) :
+        mDelegate(aDelegate),
+        mCluster(ZoneManagementCluster::Context{
+            aDelegate, aEndpointId, aFeatures, { aMaxUserDefinedZones, aMaxZones, aSensitivityMax, aTwoDCartesianMax } })
+    {
+        aDelegate.SetZoneMgmtServer(this);
+    }
 
-    virtual ~Delegate() = default;
+    ~ZoneMgmtServer() { mDelegate.SetZoneMgmtServer(nullptr); }
 
-    /**
-     *    @brief Command Delegate for creation of TwoDCartesianZone with the provided parameters.
-     *
-     *   @param[in]  zone       Structure with parameters for defining a TwoDCartesian zone.
-     *
-     *   @param[out] outZoneID  Indicates the ID of the created zone.
-     *
-     *   @return Success if the creation is successful and a zoneID was
-     *   produced; otherwise, the command SHALL be rejected with an appropriate
-     *   error.
-     */
-    virtual Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
-                                                                        uint16_t & outZoneID) = 0;
+    CHIP_ERROR Init()
+    {
+        VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        CHIP_ERROR err = mCluster.Startup(*mContext, mPendingAppSensitivity);
+        if (err == CHIP_NO_ERROR)
+        {
+            mInitialized = true;
+            mSensitivity = mCluster.GetSensitivity();
+            mPendingAppSensitivity.reset();
+        }
+        return err;
+    }
 
-    /**
-     *    @brief Command Delegate for updating of a TwoDCartesianZone with the provided parameters.
-     *
-     *   @param[in] zoneID  Indicates the ID of the zone to update.
-     *   @param[in]  zone    Structure with parameters for a TwoDCartesian zone.
-     *
-     *
-     *   @return Success if the update is successful; otherwise, the command SHALL be
-     *   rejected with an appropriate error.
-     */
-    virtual Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone) = 0;
+    void Deinit()
+    {
+        if (!mInitialized)
+        {
+            return;
+        }
 
-    /**
-     *    @brief Command Delegate for the removal of a TwoDCartesianZone for a given zoneID.
-     *
-     *   @param[in] zoneID  Indicates the ID of the zone to remove.
-     *
-     *   @return Success if the removal is successful; otherwise, the command SHALL be
-     *   rejected with an appropriate error.
-     */
-    virtual Protocols::InteractionModel::Status RemoveZone(uint16_t zoneID) = 0;
+        mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+        mInitialized = false;
+    }
 
-    /**
-     *    @brief Command Delegate for creation of a ZoneTrigger.
-     *
-     *   @param[in]  zoneTrigger    Structure with parameters for defining a ZoneTriggerControl.
-     *
-     *   @return Success if the creation is successful; otherwise, the command SHALL be
-     *   rejected with an appropriate error.
-     */
-    virtual Protocols::InteractionModel::Status CreateTrigger(const ZoneTriggerControlStruct & zoneTrigger) = 0;
+    const std::vector<ZoneInformationStorage> & GetZones() const { return mCluster.GetZones(); }
+    uint8_t GetMaxZones() const { return mCluster.GetMaxZones(); }
+    uint8_t GetSensitivity() const { return mSensitivity; }
+    Optional<ZoneTriggerControlStruct> GetTriggerForZone(uint16_t zoneId) const { return mCluster.GetTriggerForZone(zoneId); }
 
-    /**
-     *    @brief Command Delegate for update of a ZoneTrigger.
-     *
-     *   @param[in]  zoneTrigger    Structure with parameters for defining a ZoneTriggerControl.
-     *
-     *   @return Success if the update is successful; otherwise, the command SHALL be
-     *   rejected with an appropriate error.
-     */
-    virtual Protocols::InteractionModel::Status UpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger) = 0;
+    Protocols::InteractionModel::Status GenerateZoneTriggeredEvent(uint16_t zoneID, ZoneEventTriggeredReasonEnum triggerReason);
+    Protocols::InteractionModel::Status GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEventStoppedReasonEnum stopReason);
 
-    /**
-     *    @brief Command Delegate for the removal of a ZoneTrigger for a given zoneID.
-     *
-     *   @param[in] zoneID  Indicates the ID of the zone to remove the ZoneTrigger for.
-     *
-     *   @return Success if the removal is successful; otherwise, the command SHALL be
-     *   rejected with an appropriate error.
-     */
-    virtual Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) = 0;
+    bool HasFeature(Feature feature) const;
 
-    /**
-     *   @brief Delegate callback for notifying change in an attribute.
-     *
-     */
-    virtual void OnAttributeChanged(AttributeId attributeId) = 0;
+    CHIP_ERROR SetSensitivity(uint8_t aSensitivity)
+    {
+        VerifyOrReturnError(aSensitivity >= 1 && aSensitivity <= mCluster.GetSensitivityMax(),
+                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnValue(aSensitivity != mSensitivity, CHIP_NO_ERROR);
 
-    /**
-     *  @brief Callback into the delegate once persistent attributes managed by
-     *  the Cluster have been loaded from Storage.
-     */
-    virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
+        if (!mInitialized)
+        {
+            mSensitivity           = aSensitivity;
+            mPendingAppSensitivity = aSensitivity;
+            return CHIP_NO_ERROR;
+        }
 
-    /**
-     * Delegate function to load the created zones and triggers.
-     * The application is responsible for persisting them. The Load APIs
-     * would be used to load the persisted zones and triggers into the cluster
-     * server list members at initialization.
-     * Once loaded, the cluster server can serve Reads on these
-     * attributes.
-     */
-    virtual CHIP_ERROR LoadZones(std::vector<ZoneInformationStorage> & aZones) = 0;
+        ReturnErrorOnFailure(mCluster.SetSensitivity(aSensitivity));
+        mSensitivity = mCluster.GetSensitivity();
+        return CHIP_NO_ERROR;
+    }
 
-    virtual CHIP_ERROR LoadTriggers(std::vector<ZoneTriggerControlStruct> & aTriggers) = 0;
-
-    ZoneManagementCluster * GetZoneMgmtServer() const { return mZoneManagementCluster; }
+    const std::vector<ZoneTriggerControlStruct> & GetTriggers() const { return mCluster.GetTriggers(); }
+    uint8_t GetMaxUserDefinedZones() const { return mCluster.GetMaxUserDefinedZones(); }
+    uint8_t GetSensitivityMax() const { return mCluster.GetSensitivityMax(); }
+    const TwoDCartesianVertexStruct & GetTwoDCartesianMax() const { return mCluster.GetTwoDCartesianMax(); }
+    CHIP_ERROR RemoveZone(uint16_t zoneId) { return mCluster.RemoveZone(zoneId); }
+    Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneId) { return mCluster.RemoveTrigger(zoneId); }
 
 private:
-    friend class ZoneManagementCluster;
-
-    ZoneManagementCluster * mZoneManagementCluster = nullptr;
-
-    /**
-     * This method is used by the SDK to ensure the delegate points to the server instance it's associated with.
-     * When a server instance is created or destroyed, this method will be called to set and clear, respectively,
-     * the pointer to the server instance.
-     *
-     * @param aZoneManagementCluster  A pointer to the ZoneMgmtServer object related to this delegate object.
-     */
-    void SetZoneMgmtServer(ZoneManagementCluster * aZoneManagementCluster) { mZoneManagementCluster = aZoneManagementCluster; }
+    Delegate & mDelegate;
+    ZoneManagementCluster mCluster;
+    ServerClusterContext * mContext = nullptr;
+    bool mInitialized               = false;
+    uint8_t mSensitivity            = 1;
+    std::optional<uint8_t> mPendingAppSensitivity;
 };
-
-using ZoneMgmtServer = ZoneManagementCluster;
 
 } // namespace ZoneManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-#include "ZoneManagementCluster.h"

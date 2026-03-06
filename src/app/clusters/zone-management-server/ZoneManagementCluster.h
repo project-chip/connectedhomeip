@@ -18,72 +18,68 @@
 
 #pragma once
 
-#include "zone-management-server.h"
+#include <app/server-cluster/DefaultServerCluster.h>
+
+#include <optional>
+
+// Shared storage and delegate definitions are kept in ZoneManagementCommon.h so
+// the code-driven cluster can use them without depending on the legacy
+// ZoneMgmtServer compatibility wrapper.
+#include "ZoneManagementCommon.h"
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
-using TwoDCartesianVertexStruct        = Structs::TwoDCartesianVertexStruct::Type;
-using ZoneInformationStruct            = Structs::ZoneInformationStruct::Type;
-using ZoneTriggerControlStruct         = Structs::ZoneTriggerControlStruct::Type;
-
 class ZoneManagementCluster : public DefaultServerCluster
 {
-public:
     /**
-     * @brief Creates a Zone Management cluster instance. The Init() function needs to be called for this instance
-     * to be registered and called by the interaction model at the appropriate times.
+     * @brief Creates a Zone Management cluster instance from the supplied context.
      *
-     * @param aDelegate                         A reference to the delegate to be used by this server.
-     *                                          Note: the caller must ensure that the delegate lives throughout the instance's
-     *                                          lifetime.
-     *
-     * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aFeatures                         The bitflags value that identifies which features are supported by this instance.
-     * @param aMaxUserDefinedZones              The maximum number of user-defined zones supported by the device.
-     *                                          This value is specified by the device manufacturer.
-     * @param aMaxZones                         The maximum number of zones that are allowed to exist on the device. This is the
-     *                                          sum of the predefined built-in zones and the user-defined zones.
-     * @param aSensitivityMax                   The hardware-specific value for the number of supported sensitivity levels.
-     *                                          This value is specified by the device manufacturer.
-     * @param aTwoDCartesianMax                 The maximum X and Y points that are allowed for TwoD Cartesian Zones.
-     *
+     * The caller must ensure that the referenced delegate remains valid for the lifetime of the cluster.
+     * The provided endpoint, feature set, and configuration must match the device's supported Zone Management
+     * cluster configuration.
      */
-    ZoneManagementCluster(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
-                          uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
-                          const TwoDCartesianVertexStruct & aTwoDCartesianMax);
+public:
+    struct Context {
+        Delegate & delegate;
+        EndpointId endpointId;
+        BitFlags<Feature> features;
+
+        struct Config {
+            uint8_t maxUserDefinedZones;
+            uint8_t maxZones;
+            uint8_t sensitivityMax;
+            TwoDCartesianVertexStruct twoDCartesianMax;
+        } config;
+    };
+
+    ZoneManagementCluster(const Context & context);
 
     ~ZoneManagementCluster() override;
 
-    /**
-     * @brief Initialise the Zone Management server instance.
-     * This function must be called after defining a ZoneMgmtServer class object.
-     * @return Returns an error if some of the constraint/feature validation checks fail or
-     * the CommandHandler or AttributeHandler registration fails, else returns CHIP_NO_ERROR.
-     */
-    CHIP_ERROR Init();
-
     CHIP_ERROR Startup(ServerClusterContext & context) override;
+    CHIP_ERROR Startup(ServerClusterContext & context, std::optional<uint8_t> initialSensitivity);
     void Shutdown(ClusterShutdownType shutdownType) override;
 
-    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder) override;
-    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder) override;
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                               AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                AttributeValueDecoder & decoder) override;
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                                    CommandHandler * handler) override;
+                                                               CommandHandler * handler) override;
 
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<AttributeEntry> & builder) override;
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<AcceptedCommandEntry> & builder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
     bool HasFeature(Feature feature) const;
 
-    // Attribute Setters
     CHIP_ERROR SetSensitivity(uint8_t aSensitivity);
 
-    // Attribute Getters
     const std::vector<ZoneInformationStorage> & GetZones() const { return mZones; }
     const std::vector<ZoneTriggerControlStruct> & GetTriggers() const { return mTriggers; }
     Optional<ZoneTriggerControlStruct> GetTriggerForZone(uint16_t zoneID) const;
@@ -101,34 +97,26 @@ public:
     Protocols::InteractionModel::Status AddOrUpdateTrigger(const ZoneTriggerControlStruct & trigger);
     Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneId);
 
-    // Generate Zone events
     Protocols::InteractionModel::Status GenerateZoneTriggeredEvent(uint16_t zoneID, ZoneEventTriggeredReasonEnum triggerReason);
     Protocols::InteractionModel::Status GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEventStoppedReasonEnum stopReason);
 
 private:
+    Context mClusterContext;
     Delegate & mDelegate;
-    ServerClusterRegistration mRegistration;
 
     const BitFlags<Feature> mFeatures;
-
-    // Attributes
     const uint8_t mMaxUserDefinedZones;
     const uint8_t mMaxZones;
     const uint8_t mSensitivityMax;
     const TwoDCartesianVertexStruct mTwoDCartesianMax;
     uint8_t mUserDefinedZonesCount = 0;
 
-    bool mSensitivityConfiguredByApp = false;
-    bool mIsRegistered               = false;
     std::vector<ZoneInformationStorage> mZones;
     std::vector<ZoneTriggerControlStruct> mTriggers;
     uint8_t mSensitivity = 1;
 
     CHIP_ERROR ValidateConfiguration() const;
-    /**
-     * Helper function that loads all the persistent attributes from the KVS.
-     */
-    void LoadPersistentAttributes();
+    void LoadPersistentAttributes(std::optional<uint8_t> initialSensitivity);
 
     CHIP_ERROR ReadAndEncodeZones(const AttributeValueEncoder::ListEncodeHelper & encoder);
     CHIP_ERROR ReadAndEncodeTriggers(const AttributeValueEncoder::ListEncodeHelper & encoder);
@@ -136,19 +124,14 @@ private:
     Protocols::InteractionModel::Status ValidateTwoDCartesianZone(const TwoDCartesianZoneDecodableStruct & zone);
     Protocols::InteractionModel::Status ValidateTrigger(const ZoneTriggerControlStruct & trigger);
 
-    // Utility that matches a given zone's ZoneUse and verices with the given
-    // parameters to check if they match. Used by ZoneAlreadyExists().
     bool DoZoneUseAndVerticesMatch(ZoneUseEnum use, const std::vector<TwoDCartesianVertexStruct> & vertices,
                                    const TwoDCartesianZoneStorage & zone);
-
-    // Utility function to check if a given ZoneUse and a TwoDVertex already
-    // exists in mZones.
     bool ZoneAlreadyExists(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices,
                            const DataModel::Nullable<uint16_t> & excludeZoneId);
 
-    std::optional<DataModel::ActionReturnStatus> HandleCreateTwoDCartesianZone(const ConcreteCommandPath & requestPath,
-                                                                    CommandHandler * handler,
-                                                                    const Commands::CreateTwoDCartesianZone::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus> HandleCreateTwoDCartesianZone(
+        const ConcreteCommandPath & requestPath, CommandHandler * handler,
+        const Commands::CreateTwoDCartesianZone::DecodableType & req);
 
     DataModel::ActionReturnStatus HandleUpdateTwoDCartesianZone(const Commands::UpdateTwoDCartesianZone::DecodableType & req);
     DataModel::ActionReturnStatus HandleRemoveZone(const Commands::RemoveZone::DecodableType & req);
