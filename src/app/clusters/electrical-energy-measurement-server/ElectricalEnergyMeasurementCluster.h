@@ -156,7 +156,7 @@ private:
     const OptionalAttributesSet mEnabledOptionalAttributes;
     MeasurementData mMeasurementData;
 
-    /** @brief Owns the accuracyRanges backing store; either references long-lived data (ReferenceExisting) when passing in 
+    /** @brief Owns the accuracyRanges backing store; either references long-lived data (ReferenceExisting) when passing in
      * Config::accuracyStruct or an allocated copy when using the SetMeasurementAccuracy() method */
     ReadOnlyBuffer<Structs::MeasurementAccuracyRangeStruct::Type> mAccuracyRangesStorage;
 
