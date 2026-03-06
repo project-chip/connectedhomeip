@@ -477,7 +477,6 @@ CHIP_ERROR LevelControlReadCurrentLevel(int argc, char ** argv)
     data->attributeId         = Clusters::LevelControl::Attributes::CurrentLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
@@ -488,7 +487,6 @@ CHIP_ERROR LevelControlReadRemainingTime(int argc, char ** argv)
     data->attributeId         = Clusters::LevelControl::Attributes::RemainingTime::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
@@ -499,7 +497,6 @@ CHIP_ERROR LevelControlReadMinLevel(int argc, char ** argv)
     data->attributeId         = Clusters::LevelControl::Attributes::MinLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
@@ -510,7 +507,6 @@ CHIP_ERROR LevelControlReadMaxLevel(int argc, char ** argv)
     data->attributeId         = Clusters::LevelControl::Attributes::MaxLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
@@ -521,7 +517,6 @@ CHIP_ERROR LevelControlReadCurrentFrequency(int argc, char ** argv)
     data->attributeId         = Clusters::LevelControl::Attributes::CurrentFrequency::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
@@ -532,7 +527,6 @@ CHIP_ERROR LevelControlReadMinFrequency(int argc, char ** argv)
     data->attributeId         = Clusters::LevelControl::Attributes::MinFrequency::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
@@ -543,7 +537,6 @@ CHIP_ERROR LevelControlReadMaxFrequency(int argc, char ** argv)
     data->attributeId         = Clusters::LevelControl::Attributes::MaxFrequency::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
@@ -554,7 +547,6 @@ CHIP_ERROR LevelControlReadOptions(int argc, char ** argv)
     data->attributeId         = Clusters::LevelControl::Attributes::Options::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
@@ -565,7 +557,6 @@ CHIP_ERROR LevelControlReadOnOffTransitionTime(int argc, char ** argv)
     data->attributeId         = Clusters::LevelControl::Attributes::OnOffTransitionTime::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
@@ -576,7 +567,6 @@ CHIP_ERROR LevelControlReadOnLevel(int argc, char ** argv)
     data->attributeId         = Clusters::LevelControl::Attributes::OnLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
@@ -587,7 +577,6 @@ CHIP_ERROR LevelControlReadOnTransitionTime(int argc, char ** argv)
     data->attributeId         = Clusters::LevelControl::Attributes::OnTransitionTime::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
@@ -598,7 +587,6 @@ CHIP_ERROR LevelControlReadOffTransitionTime(int argc, char ** argv)
     data->attributeId         = Clusters::LevelControl::Attributes::OffTransitionTime::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
@@ -609,7 +597,6 @@ CHIP_ERROR LevelControlReadDefaultMoveRate(int argc, char ** argv)
     data->attributeId         = Clusters::LevelControl::Attributes::DefaultMoveRate::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
@@ -620,7 +607,6 @@ CHIP_ERROR LevelControlReadStartUpCurrentLevel(int argc, char ** argv)
     data->attributeId         = Clusters::LevelControl::Attributes::StartUpCurrentLevel::Id;
     data->clusterId           = Clusters::LevelControl::Id;
     data->isReadAttribute     = true;
-    ChipLogProgress(NotSpecified, "Read cluster=0x%x, attribute=0x%08x", data->clusterId, data->attributeId);
     DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }

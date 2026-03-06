@@ -266,7 +266,7 @@ CHIP_ERROR BaseApplication::Init()
     CHIP_ERROR err = BaseInit();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("BaseInit() failed");
+        ChipLogError(DeviceLayer, "BaseInit() failed");
         appError(err);
         return err;
     }
@@ -274,7 +274,7 @@ CHIP_ERROR BaseApplication::Init()
     err = AppInit();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("AppInit() failed");
+        ChipLogError(DeviceLayer, "AppInit() failed");
         appError(err);
         return err;
     }
@@ -295,12 +295,12 @@ CHIP_ERROR BaseApplication::BaseInit()
     /*
      * Wait for the WiFi to be initialized
      */
-    ChipLogProgress(AppServer, "APP: Wait WiFi Init");
+    ChipLogDetail(AppServer, "APP: Wait WiFi Init");
     while (!WifiInterface::GetInstance().IsStationReady())
     {
         osDelay(pdMS_TO_TICKS(10));
     }
-    ChipLogProgress(AppServer, "APP: Done WiFi Init");
+    ChipLogDetail(AppServer, "APP: Done WiFi Init");
 #endif
 
     // Create cmsis os sw timer for Function Selection.
@@ -330,7 +330,9 @@ CHIP_ERROR BaseApplication::BaseInit()
     ChipLogProgress(AppServer, "Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     ChipLogProgress(AppServer, "Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
 
-    ConfigurationMgr().LogDeviceConfig();
+    // TODO FIXME: ConfigurationMgr().LogDeviceConfig() fills the UART log queue.
+    // Write an optimized version to reduce the number of calls to ChipLogProgress.
+    // ConfigurationMgr().LogDeviceConfig();
 
     OutputQrCode(true /*refreshLCD at init*/);
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)))
@@ -857,13 +859,13 @@ void BaseApplication::PostEvent(const AppEvent * aEvent)
 
 void BaseApplication::DispatchEvent(AppEvent * aEvent)
 {
-    if (aEvent->Handler)
+    if (aEvent != nullptr && aEvent->Handler)
     {
         aEvent->Handler(aEvent);
     }
     else
     {
-        ChipLogProgress(AppServer, "Event received with no handler. Dropping event.");
+        ChipLogError(AppServer, "Nullptr event received or no handler. Dropping it.");
     }
 }
 
@@ -902,7 +904,6 @@ void BaseApplication::DoProvisioningReset()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-        ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
         chip::DeviceLayer::ConnectivityMgr().ClearWiFiStationProvision();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
