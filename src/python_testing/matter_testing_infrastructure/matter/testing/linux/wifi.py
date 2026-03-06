@@ -222,6 +222,7 @@ class WpaSupplicantMock(threading.Thread):
             self.network = WpaSupplicantMock.WpaNetwork(self, mock.ssid)
             self.mock_mac = f"00:11:22:33:44:{index:02x}"  # Unique MAC per interface
             self.state = "disconnected"
+            self.scanning = False
             self.current_network = "/"
             self.nan_sessions: dict[int, dict] = {}
             self.interface_name_in_sim: str = None
@@ -233,7 +234,13 @@ class WpaSupplicantMock(threading.Thread):
         @sdbus.dbus_method_async("a{sv}")
         async def Scan(self, args: DictVariantT) -> None:
             log.debug("Emitting ScanDone signal")
-            self.ScanDone.emit(True)
+
+            async def scan():
+                await self.Scanning.set_async(False)
+                self.ScanDone.emit(True)
+
+            await self.Scanning.set_async(True)
+            asyncio.create_task(scan())
 
         @sdbus.dbus_method_async("a{sv}", "o")
         async def AddNetwork(self, args: DictVariantT) -> str:
@@ -459,6 +466,14 @@ class WpaSupplicantMock(threading.Thread):
         @State.setter_private
         def State_setter(self, value: str) -> None:
             self.state = value
+
+        @sdbus.dbus_property_async("b")
+        def Scanning(self) -> bool:
+            return self.scanning
+
+        @Scanning.setter_private
+        def Scanning_setter(self, value: bool) -> None:
+            self.scanning = value
 
         @sdbus.dbus_property_async("o")
         def CurrentNetwork(self) -> str:
