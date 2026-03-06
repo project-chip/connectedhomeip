@@ -328,6 +328,7 @@ else
     INSTALL_MARKER="$CHIP_ROOT/scripts/setup/silabs/.install-packages-done"
     if [ ! -f "$INSTALL_MARKER" ]; then
         echo "Running install-packages (first-time setup)..."
+        pip install -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt"
         python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
     fi
 

@@ -102,12 +102,8 @@ if (CONFIG_DIAG_LOGS_DEMO)
     )
 endif()
 
-if(CONFIG_CHIP_SE05X)
-    list(FIND EXTRA_MCUX_MODULES "${CHIP_ROOT}/third_party/simw-top-mini/repo/matter" se_index)
-    if(se_index EQUAL -1)
-        message(FATAL_ERROR "MCUX_MODULES must include ${CHIP_ROOT}/third_party/simw-top-mini/repo/matter in the application when CONFIG_CHIP_SE05X is enabled")
-    endif()
-endif()
+# Include SE05X configuration
+include(${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_se05x.cmake)
 
 if (CONFIG_CHIP_APP_FACTORY_DATA)
     if (CONFIG_CHIP_APP_FACTORY_DATA_IMPL_PLATFORM)

@@ -32,6 +32,31 @@ static BOOL AttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=true}
 {{/if}}
 {{/zcl_clusters}}
 
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
+{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+static BOOL PrivateAttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=true}}Cluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::{{asUpperCamelCase name}};
+    switch (aAttributeId) {
+        {{#zcl_attributes_server}}
+        {{#if manufacturerCode}}
+        {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
+        case Attributes::{{asUpperCamelCase name}}::Id: {
+            return YES;
+        }
+        {{/if}}
+        {{/if}}
+        {{/zcl_attributes_server}}
+        default: {
+            return NO;
+        }
+    }
+}
+{{/if}}
+{{/if}}
+{{/zcl_clusters}}
+
 BOOL MTRPrivateAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
 {
     switch (aClusterId)
@@ -41,6 +66,15 @@ BOOL MTRPrivateAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttribute
         {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
         case Clusters::{{asUpperCamelCase name}}::Id: {
             return AttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aAttributeId);
+        }
+        {{/if}}
+        {{/if}}
+        {{/zcl_clusters}}
+        {{#zcl_clusters}}
+        {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
+        {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+        case Clusters::{{asUpperCamelCase name}}::Id: {
+            return PrivateAttributeIsSpecifiedIn{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aAttributeId);
         }
         {{/if}}
         {{/if}}

@@ -14,8 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/core/CHIPError.h"
+#include "lib/support/CodeUtils.h"
 #include <app/clusters/bridged-device-basic-information-server/BridgedDeviceBasicInformationCluster.h>
 
+#include <app/data-model/Encode.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/String.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -23,17 +26,33 @@
 #include <clusters/BridgedDeviceBasicInformation/Commands.h>
 #include <clusters/BridgedDeviceBasicInformation/Events.h>
 #include <clusters/BridgedDeviceBasicInformation/Metadata.h>
+#include <lib/core/TLV.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/Span.h>
 
 #include <algorithm>
+#include <optional>
 
 using namespace chip::app::Clusters::BridgedDeviceBasicInformation;
 using chip::Protocols::InteractionModel::Status;
 
+using LocationDescriptorStructType = chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type;
+
 namespace chip::app::Clusters {
 
 namespace {
+
+// DeviceLocation is a structure containing:
+//    - locationName: string (up to 128 bytes)
+//    - floorNumber: int16 (2 bytes)
+//    - areaType: enum (1 byte)
+//
+// The TLV encoding size for this structure depends on tag and length
+// encoding details, which can vary. The constant below is a conservative
+// upper bound chosen to comfortably hold a LocationDescriptorStruct with a
+// locationName of up to 128 bytes plus associated metadata and TLV
+// overhead, with additional headroom for future changes.
+constexpr size_t kMaxLocationDescriptorTLVEncodingSize = 160;
 
 static constexpr uint32_t kMinKeepActiveTimeoutMs = 30 * 1000;
 static constexpr uint32_t kMaxKeepActiveTimeoutMs = 3600 * 1000;
@@ -53,7 +72,62 @@ CharSpan ToSpan(const std::optional<std::string> & s)
     return ToSpan(*s);
 }
 
+bool IsLocationEqual(const LocationDescriptorStructType & a, const LocationDescriptorStructType & b)
+{
+    return a.locationName.data_equal(b.locationName) && (a.floorNumber == b.floorNumber) && (a.areaType == b.areaType);
+}
+
 } // namespace
+
+Globals::Structs::LocationDescriptorStruct::Type BridgedDeviceBasicInformationCluster::OwnedDeviceLocation::ToView() const
+{
+    return {
+        .locationName = { locationName.data(), locationName.size() },
+        .floorNumber  = floorNumber.has_value() ? DataModel::MakeNullable(*floorNumber) : DataModel::Nullable<int16_t>(),
+        .areaType     = areaType.has_value() ? DataModel::MakeNullable(*areaType) : DataModel::Nullable<Globals::AreaTypeTag>(),
+    };
+}
+
+bool BridgedDeviceBasicInformationCluster::OwnedDeviceLocation::operator==(
+    const Globals::Structs::LocationDescriptorStruct::Type & other) const
+{
+    return IsLocationEqual(ToView(), other);
+}
+
+BridgedDeviceBasicInformationCluster::OwnedDeviceLocation &
+BridgedDeviceBasicInformationCluster::OwnedDeviceLocation::operator=(const Globals::Structs::LocationDescriptorStruct::Type & value)
+{
+    // Special handling since empty char-span will return nullptr for data() and
+    // std::string does not like that
+    if (value.locationName.empty())
+    {
+        locationName.clear();
+    }
+    else
+    {
+        locationName = std::string{ value.locationName.data(), value.locationName.size() };
+    }
+
+    if (value.floorNumber.IsNull())
+    {
+        floorNumber.reset();
+    }
+    else
+    {
+        floorNumber = value.floorNumber.Value();
+    }
+
+    if (value.areaType.IsNull())
+    {
+        areaType.reset();
+    }
+    else
+    {
+        areaType = value.areaType.Value();
+    }
+
+    return *this;
+}
 
 DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel(CharSpan nodeLabel)
 {
@@ -67,7 +141,7 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel
     // std::string may not like a nullptr .data() when the charspan is empty.
     const std::string newValue = nodeLabel.empty() ? std::string() : std::string{ nodeLabel.data(), nodeLabel.size() };
 
-    if (mRequiredData.nodeLabel == newValue)
+    if (mMutableData.nodeLabel == newValue)
     {
         return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
     }
@@ -92,10 +166,94 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetNodeLabel
         }
     }
 
-    mRequiredData.nodeLabel = newValue;
+    mMutableData.nodeLabel = newValue;
     NotifyAttributeChanged(Attributes::NodeLabel::Id);
 
     return Status::Success;
+}
+
+CHIP_ERROR BridgedDeviceBasicInformationCluster::PersistDeviceLocation()
+{
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    AttributePersistence persistence(mContext->attributeStorage);
+
+    // When persisting, we persist the Nullable<LocationDescriptorStructType> directly.
+    // We reconstruct it from our internal state.
+    auto locationToStore = GetDeviceLocation();
+
+    // Only persist if attribute exists on the cluster.
+    VerifyOrReturnError(locationToStore.has_value(), CHIP_NO_ERROR);
+
+    return persistence.StoreTLV<kMaxLocationDescriptorTLVEncodingSize>(
+        { mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::DeviceLocation::Id }, *locationToStore);
+}
+
+DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetDeviceLocationInternal(
+    const DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> & location, PersistenceMode mode)
+{
+    // Cluster must support this attribute
+    VerifyOrReturnError(mMutableData.deviceLocation.has_value(), Status::UnsupportedAttribute);
+
+    if (!location.IsNull())
+    {
+        // Validation: At least one field must be non-null/empty
+        VerifyOrReturnError(!location.Value().locationName.empty() || !location.Value().floorNumber.IsNull() ||
+                                !location.Value().areaType.IsNull(),
+                            Status::ConstraintError);
+
+        // constraint on location name
+        VerifyOrReturnError(location.Value().locationName.size() <= 128, Status::ConstraintError);
+    }
+
+    // Check for equality
+    if (mMutableData.deviceLocation->IsNull())
+    {
+        if (location.IsNull())
+        {
+            return Status::Success; // No change
+        }
+    }
+    else
+    {
+        if (!location.IsNull())
+        {
+            if (IsLocationEqual(mMutableData.deviceLocation->Value().ToView(), location.Value()))
+            {
+                return Status::Success; // No change
+            }
+        }
+    }
+
+    auto oldValue = mMutableData.deviceLocation;
+
+    if (location.IsNull())
+    {
+        mMutableData.deviceLocation->SetNull();
+    }
+    else
+    {
+        mMutableData.deviceLocation->SetNonNull(location.Value());
+    }
+
+    if (mode == PersistenceMode::kPersist)
+    {
+        if (auto err = PersistDeviceLocation(); err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to persist DeviceLocation: %" CHIP_ERROR_FORMAT, err.Format());
+            // Revert the change
+            mMutableData.deviceLocation = oldValue;
+            return Status::Failure;
+        }
+    }
+
+    NotifyAttributeChanged(Attributes::DeviceLocation::Id);
+    return Status::Success;
+}
+
+DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::SetDeviceLocation(
+    const DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> & location)
+{
+    return SetDeviceLocationInternal(location, PersistenceMode::kPersist);
 }
 
 CHIP_ERROR BridgedDeviceBasicInformationCluster::Startup(ServerClusterContext & context)
@@ -105,24 +263,58 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Startup(ServerClusterContext & 
     AttributePersistence persistence(context.attributeStorage);
     Storage::String<Attributes::NodeLabel::TypeInfo::MaxLength()> storedLabel;
 
+    // LoadString already handles logging in case of load errors
+    // We do not want to re-persist what we just loaded from NVM, hence kDoNotPersist
+    // Failure here is unlikely and most applications cannot recover from it, so we ignore the status
     if (persistence.LoadString({ mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::NodeLabel::Id }, storedLabel))
     {
-        // LoadString already handles logging in case of load errors.
-        // We do not want to re-persist what we just loaded from NVM, hence kDoNotPersist.
-        // Failure here is unlikely and most applications cannot recover from it, so we ignore the status.
+        // Safe to ignore result: SetNodeLabelInternal is called with kDoNotPersist, so it will not fail due to persistence errors.
+        // Other failures (like constraint errors) are not expected here as the value comes from storage.
         RETURN_SAFELY_IGNORED SetNodeLabelInternal(storedLabel.Content(), PersistenceMode::kDoNotPersist);
     }
     else
     {
-        // missing label, we keep whatever is already in the cluster (e.g. set at startup)
+        // missing label, we keep whatever is already in the cluster (e.g. set at start up);
         Storage::String<Attributes::NodeLabel::TypeInfo::MaxLength()> initialLabel;
-        initialLabel.SetContent(ToSpan(mRequiredData.nodeLabel));
+        initialLabel.SetContent(ToSpan(mMutableData.nodeLabel));
 
         // Ignore errors on purpose: not stored, but already an initial value from the app, so
         // same value is likely to be provided again. Failure to store here should not cause the cluster
-        // to stop initializing.
+        // to stop initializing
         RETURN_SAFELY_IGNORED persistence.StoreString(
             { mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::NodeLabel::Id }, initialLabel);
+    }
+
+    // Load DeviceLocation
+    // Note: We reuse the buffer logic here.
+    // The loaded value (DataModel::Nullable<LocationDescriptorStructType>) will contain Spans pointing into `buffer`.
+    // However, `SetDeviceLocationInternal` (via `OwnedDeviceLocation`) makes a deep copy of the data (std::string),
+    // so it is safe for the buffer to go out of scope after this block.
+    //
+    // We use a buffer size determined by kMaxLocationDescriptorTLVEncodingSize.
+    uint8_t buffer[kMaxLocationDescriptorTLVEncodingSize];
+    MutableByteSpan span(buffer);
+    DataModel::Nullable<LocationDescriptorStructType> loaded;
+
+    if (mMutableData.deviceLocation.has_value())
+    {
+        CHIP_ERROR err = persistence.LoadTLV(
+            { mPath.mEndpointId, BridgedDeviceBasicInformation::Id, Attributes::DeviceLocation::Id }, loaded, span);
+        if (err == CHIP_NO_ERROR)
+        {
+            // Best effort: SetDeviceLocationInternal is called with kDoNotPersist, so it will not fail due to persistence errors.
+            // Other failures (like constraint errors) are not expected here as the value comes from storage.
+            LogErrorOnFailure(SetDeviceLocationInternal(loaded, PersistenceMode::kDoNotPersist).GetUnderlyingError());
+        }
+        else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            // Nothing in storage, keep the initial value (from mMutableData).
+            // This is a best-effort attempt to keep persisted data in sync with startup value
+            // and what is read through `ReadAttribute`.
+            //
+            // Failure to store here should not cause the cluster to stop initializing.
+            LogErrorOnFailure(PersistDeviceLocation());
+        }
     }
 
     return CHIP_NO_ERROR;
@@ -130,9 +322,10 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Startup(ServerClusterContext & 
 
 CHIP_ERROR BridgedDeviceBasicInformationCluster::IncreaseConfigurationVersion()
 {
-    ReturnErrorOnFailure(mClusterContext.parentVersionConfiguration.IncreaseConfigurationVersion());
+    VerifyOrReturnError(mMutableData.configurationVersion.has_value(), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
-    mRequiredData.configurationVersion++;
+    ReturnErrorOnFailure(mMutableData.configurationVersion->delegate.IncreaseConfigurationVersion());
+    mMutableData.configurationVersion->version++;
     NotifyAttributeChanged(Attributes::ConfigurationVersion::Id);
 
     return CHIP_NO_ERROR;
@@ -161,7 +354,7 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::ReadAttribut
     case ProductID::Id:
         return encoder.Encode(mFixedData.productId.value_or(0));
     case NodeLabel::Id:
-        return encoder.Encode(ToSpan(mRequiredData.nodeLabel));
+        return encoder.Encode(ToSpan(mMutableData.nodeLabel));
     case HardwareVersion::Id:
         return encoder.Encode(mFixedData.hardwareVersion.value_or(0));
     case HardwareVersionString::Id:
@@ -181,14 +374,20 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::ReadAttribut
     case SerialNumber::Id:
         return encoder.Encode(ToSpan(mFixedData.serialNumber));
     case Reachable::Id:
-        return encoder.Encode(mRequiredData.reachable);
+        return encoder.Encode(mMutableData.reachable);
     case UniqueID::Id:
-        return encoder.Encode(ToSpan(mRequiredData.uniqueId));
+        return encoder.Encode(ToSpan(mFixedData.uniqueId));
     case ProductAppearance::Id:
         return encoder.Encode(
             mFixedData.productAppearance.value_or(BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::Type{}));
     case ConfigurationVersion::Id:
-        return encoder.Encode(mRequiredData.configurationVersion);
+        return encoder.Encode(mMutableData.configurationVersion.has_value() ? mMutableData.configurationVersion->version : 1);
+    case DeviceLocation::Id:
+        if (auto location = GetDeviceLocation(); location.has_value())
+        {
+            return encoder.Encode(*location);
+        }
+        return Status::UnsupportedAttribute;
     default:
         return Status::UnsupportedAttribute;
     }
@@ -203,6 +402,11 @@ DataModel::ActionReturnStatus BridgedDeviceBasicInformationCluster::WriteAttribu
         CharSpan newNodeLabel;
         ReturnErrorOnFailure(aDecoder.Decode(newNodeLabel));
         return SetNodeLabel(newNodeLabel);
+    }
+    case Attributes::DeviceLocation::Id: {
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> newLocation;
+        ReturnErrorOnFailure(aDecoder.Decode(newLocation));
+        return SetDeviceLocation(newLocation);
     }
     case Attributes::ConfigurationVersion::Id:
         return Status::UnsupportedWrite; // Not writable via Matter
@@ -234,7 +438,9 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::Attributes(const ConcreteCluste
         { mFixedData.serialNumber.has_value(), SerialNumber::kMetadataEntry },
         { true, UniqueID::kMetadataEntry }, // mandatory for new revisions
         { mFixedData.productAppearance.has_value(), ProductAppearance::kMetadataEntry },
-        { true, ConfigurationVersion::kMetadataEntry }, // Always present
+        { mMutableData.configurationVersion.has_value(), ConfigurationVersion::kMetadataEntry },
+        { mMutableData.deviceLocation.has_value(),
+          DeviceLocation::kMetadataEntry }, // Present when supported (Provisionally Mandatory)
     };
 
     AttributeListBuilder listBuilder(builder);
@@ -318,9 +524,9 @@ void BridgedDeviceBasicInformationCluster::GenerateLeaveEvent()
 
 void BridgedDeviceBasicInformationCluster::SetReachable(bool reachable)
 {
-    VerifyOrReturn(mRequiredData.reachable != reachable);
+    VerifyOrReturn(mMutableData.reachable != reachable);
 
-    mRequiredData.reachable = reachable;
+    mMutableData.reachable = reachable;
     NotifyAttributeChanged(Attributes::Reachable::Id);
 
     VerifyOrReturn(mContext != nullptr);

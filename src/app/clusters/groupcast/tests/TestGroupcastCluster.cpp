@@ -18,7 +18,6 @@
 
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/groupcast/GroupcastCluster.h>
-#include <app/clusters/groupcast/GroupcastLogic.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -59,7 +58,7 @@ using chip::Testing::IsAttributesListEqualTo;
 
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
-static constexpr size_t kMaxMembershipEndpoints = app::Clusters::GroupcastLogic::kMaxMembershipEndpoints;
+static constexpr size_t kMaxMembershipEndpoints = app::Clusters::GroupcastCluster::kMaxMembershipEndpoints;
 
 template <typename DecodableListType>
 CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
@@ -252,7 +251,7 @@ TEST_F(TestGroupcastCluster, TestAcceptedCommands)
 
 TEST_F(TestGroupcastCluster, TestReadMembership)
 {
-    static constexpr uint16_t kMaxEndpoints   = app::Clusters::GroupcastLogic::kMaxCommandEndpoints;
+    static constexpr uint16_t kMaxEndpoints   = app::Clusters::GroupcastCluster::kMaxCommandEndpoints;
     static constexpr uint16_t kIntervals      = 15;
     static constexpr uint16_t kTotalEndpoints = kMaxEndpoints * kIntervals;
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
@@ -776,7 +775,7 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 
 TEST_F(TestGroupcastCluster, TestLeaveGroup)
 {
-    static constexpr uint16_t kMaxEndpoints   = app::Clusters::GroupcastLogic::kMaxCommandEndpoints;
+    static constexpr uint16_t kMaxEndpoints   = app::Clusters::GroupcastCluster::kMaxCommandEndpoints;
     static constexpr uint16_t kIntervals      = 5;
     static constexpr uint16_t kTotalEndpoints = kMaxEndpoints * kIntervals;
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
