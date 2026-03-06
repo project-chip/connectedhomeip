@@ -324,10 +324,8 @@ else
         } &>/dev/null
     fi
 
-    # Run install-packages once (creates .install-packages-done when done)
-    INSTALL_MARKER="$CHIP_ROOT/scripts/setup/silabs/.install-packages-done"
-    if [ ! -f "$INSTALL_MARKER" ]; then
-        echo "Running install-packages (first-time setup)..."
+    # Run install-packages once (creates .install-packages-done when done); skip when using Docker (SDK is in image)
+    if [ "$USE_DOCKER" != true ]; then
         pip install -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt"
         python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
     fi
