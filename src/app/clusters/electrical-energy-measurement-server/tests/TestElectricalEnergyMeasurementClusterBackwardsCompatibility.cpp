@@ -89,7 +89,7 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestAttrAcc
                               Feature::kPeriodicEnergy);
     BitMask<OptionalAttributes> optionalAttrs(OptionalAttributes::kOptionalAttributeCumulativeEnergyReset);
 
-    ElectricalEnergyMeasurementAttrAccess attrAccess(features, optionalAttrs, kTestEndpointId, mDelegate, mTimerDelegate);
+    ElectricalEnergyMeasurementAttrAccess attrAccess(features, optionalAttrs, kTestEndpointId);
 
     // Test initialization
     EXPECT_EQ(attrAccess.Init(), CHIP_NO_ERROR);
@@ -107,8 +107,7 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestAttrAcc
     // Test with a feature that's not enabled
     BitMask<Feature> minimalFeatures(Feature::kImportedEnergy);
     BitMask<OptionalAttributes> noOptionalAttrs;
-    ElectricalEnergyMeasurementAttrAccess minimalAttrAccess(minimalFeatures, noOptionalAttrs, kTestEndpointId + 1, mDelegate,
-                                                            mTimerDelegate);
+    ElectricalEnergyMeasurementAttrAccess minimalAttrAccess(minimalFeatures, noOptionalAttrs, kTestEndpointId + 1);
     EXPECT_EQ(minimalAttrAccess.Init(), CHIP_NO_ERROR);
     EXPECT_TRUE(minimalAttrAccess.HasFeature(Feature::kImportedEnergy));
     EXPECT_FALSE(minimalAttrAccess.HasFeature(Feature::kExportedEnergy));
@@ -120,8 +119,7 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestAttrAcc
     EXPECT_TRUE(attrAccess.SupportsOptAttr(OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
 
     // Test with no optional attributes
-    ElectricalEnergyMeasurementAttrAccess noOptAttrAccess(features, noOptionalAttrs, kTestEndpointId + 2, mDelegate,
-                                                          mTimerDelegate);
+    ElectricalEnergyMeasurementAttrAccess noOptAttrAccess(features, noOptionalAttrs, kTestEndpointId + 2);
     EXPECT_EQ(noOptAttrAccess.Init(), CHIP_NO_ERROR);
     EXPECT_FALSE(noOptAttrAccess.SupportsOptAttr(OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
     noOptAttrAccess.Shutdown();

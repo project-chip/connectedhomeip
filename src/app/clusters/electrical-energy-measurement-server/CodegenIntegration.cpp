@@ -99,6 +99,12 @@ namespace ElectricalEnergyMeasurement {
 
 ElectricalEnergyMeasurementAttrAccess::ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature,
                                                                              BitMask<OptionalAttributes> aOptionalAttrs,
+                                                                             EndpointId endpointId) :
+    ElectricalEnergyMeasurementAttrAccess(aFeature, aOptionalAttrs, endpointId, gNoOpDelegate, gDefaultTimerDelegate)
+{}
+
+ElectricalEnergyMeasurementAttrAccess::ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature,
+                                                                             BitMask<OptionalAttributes> aOptionalAttrs,
                                                                              EndpointId endpointId, Delegate & delegate,
                                                                              TimerDelegate & timerDelegate) :
     mCluster(ElectricalEnergyMeasurementCluster::Config{

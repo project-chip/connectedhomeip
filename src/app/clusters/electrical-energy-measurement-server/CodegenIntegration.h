@@ -42,6 +42,9 @@ class ElectricalEnergyMeasurementAttrAccess
 {
 public:
     ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature, BitMask<OptionalAttributes> aOptionalAttrs,
+                                          EndpointId endpointId = kDefaultEndpointId);
+
+    ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature, BitMask<OptionalAttributes> aOptionalAttrs,
                                           EndpointId endpointId, Delegate & delegate, TimerDelegate & timerDelegate);
 
     ~ElectricalEnergyMeasurementAttrAccess() {}

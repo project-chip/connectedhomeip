@@ -91,6 +91,14 @@ ElectricalEnergyMeasurementCluster * ElectricalSensorManager::GetEEMCluster()
     return nullptr;
 }
 
+void ElectricalSensorManager::GenerateEEMReport()
+{
+    if (mEEMCluster)
+    {
+        mEEMCluster->Cluster().GenerateReport();
+    }
+}
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip
