@@ -393,15 +393,15 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
-    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u cp=%u jf=%u",
-                    advertiseParameters.GetVendorId().value_or(0), advertiseParameters.GetProductId().value_or(0),
-                    advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator(),
-                    to_underlying(advertiseParameters.GetCommissioningMode()),
-                    advertiseParameters.GetCommissionerPasscodeSupported().value_or(false) ? 1 : 0,
+    ChipLogDetail(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u cp=%u jf=%u",
+                  advertiseParameters.GetVendorId().value_or(0), advertiseParameters.GetProductId().value_or(0),
+                  advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator(),
+                  to_underlying(advertiseParameters.GetCommissioningMode()),
+                  advertiseParameters.GetCommissionerPasscodeSupported().value_or(false) ? 1 : 0,
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-                    advertiseParameters.GetJointFabricMode().Raw()
+                  advertiseParameters.GetJointFabricMode().Raw()
 #else
-                    0 // Dummy value when Joint Fabric is disabled
+                  0 // Dummy value when Joint Fabric is disabled
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     );
 
@@ -492,11 +492,15 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
     SuccessOrLog(Dnssd::ServiceAdvertiser::Instance().Init(chip::DeviceLayer::UDPEndPointManager()), Discovery,
                  "Failed to initialize advertiser");
 
-    SuccessOrLog(Dnssd::ServiceAdvertiser::Instance().RemoveServices(), Discovery, "Failed to remove advertised services");
+    // No need to remove anything if it's not initialized
+    if (Dnssd::ServiceAdvertiser::Instance().IsInitialized())
+    {
+        SuccessOrLog(Dnssd::ServiceAdvertiser::Instance().RemoveServices(), Discovery, "Failed to remove advertised services");
+    }
 
     SuccessOrLog(AdvertiseOperational(), Discovery, "Failed to advertise operational node");
 
-    if (mode != Dnssd::CommissioningMode::kDisabled)
+    if (mode != Dnssd::CommissioningMode::kDisabled && Dnssd::ServiceAdvertiser::Instance().IsInitialized())
     {
         SuccessOrLog(AdvertiseCommissionableNode(mode), Discovery, "Failed to advertise commissionable node");
     }
@@ -526,8 +530,10 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     SuccessOrLog(AdvertiseCommissioner(), Discovery, "Failed to advertise commissioner");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
-
-    SuccessOrLog(Dnssd::ServiceAdvertiser::Instance().FinalizeServiceUpdate(), Discovery, "Failed to finalize service update");
+    if (Dnssd::ServiceAdvertiser::Instance().IsInitialized())
+    {
+        SuccessOrLog(Dnssd::ServiceAdvertiser::Instance().FinalizeServiceUpdate(), Discovery, "Failed to finalize service update");
+    }
 }
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
