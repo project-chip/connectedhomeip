@@ -16,7 +16,11 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/actions-server.h"
     "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/actions-server.h"
+    "${CLUSTER_DIR}/ActionsCluster.h"
+    "${CLUSTER_DIR}/ActionsCluster.cpp"
+    "${CLUSTER_DIR}/ActionsDelegate.h"
+    "${CLUSTER_DIR}/ActionStructs.h"
 )
