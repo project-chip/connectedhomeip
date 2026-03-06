@@ -30,7 +30,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ZoneManagement;
 
 constexpr size_t kZoneManagementFixedClusterCount = MATTER_DM_ZONE_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT;
-constexpr size_t kZoneManagementMaxClusterCount = kZoneManagementFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kZoneManagementMaxClusterCount   = kZoneManagementFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 struct EndpointConfiguration
 {
@@ -66,7 +66,7 @@ void SetContext(EndpointId endpointId, Delegate & delegate, BitFlags<Feature> fe
         {
             if (candidate.endpointId == kInvalidEndpointId)
             {
-                configuration = &candidate;
+                configuration             = &candidate;
                 configuration->endpointId = endpointId;
                 break;
             }
@@ -75,13 +75,13 @@ void SetContext(EndpointId endpointId, Delegate & delegate, BitFlags<Feature> fe
 
     VerifyOrReturn(configuration != nullptr);
 
-    configuration->delegate  = &delegate;
-    configuration->features  = features;
-    configuration->config    = {
-        .maxUserDefinedZones = maxUserDefinedZones,
-        .maxZones            = maxZones,
-        .sensitivityMax      = sensitivityMax,
-        .twoDCartesianMax    = twoDCartesianMax,
+    configuration->delegate = &delegate;
+    configuration->features = features;
+    configuration->config   = {
+          .maxUserDefinedZones = maxUserDefinedZones,
+          .maxZones            = maxZones,
+          .sensitivityMax      = sensitivityMax,
+          .twoDCartesianMax    = twoDCartesianMax,
     };
 }
 
@@ -124,8 +124,7 @@ void MatterZoneManagementClusterInitCallback(chip::EndpointId endpointId)
     auto * configuration = FindConfigurationByEndpoint(endpointId);
     if ((configuration == nullptr) || (configuration->delegate == nullptr))
     {
-        ChipLogError(Zcl,
-                     "Zone Management cluster on endpoint %u requires SetContext() before cluster initialization. Skipping.",
+        ChipLogError(Zcl, "Zone Management cluster on endpoint %u requires SetContext() before cluster initialization. Skipping.",
                      endpointId);
         return;
     }
