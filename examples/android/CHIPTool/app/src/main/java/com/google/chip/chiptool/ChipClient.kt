@@ -26,6 +26,7 @@ import chip.devicecontroller.ICDCheckInDelegate
 import chip.devicecontroller.ICDClientInfo
 import chip.platform.AndroidBleManager
 import chip.platform.AndroidChipPlatform
+import chip.platform.AndroidChipPlatform.ServiceResolveListener
 import chip.platform.AndroidNfcCommissioningManager
 import chip.platform.ChipMdnsCallbackImpl
 import chip.platform.DiagnosticDataProviderImpl
@@ -114,6 +115,12 @@ object ChipClient {
     return androidPlatform
   }
 
+  fun setServiceResolveListener(listener: ServiceResolveListener) {
+    if (this::androidPlatform.isInitialized) {
+      androidPlatform.setServiceResolveListener(listener)
+    }
+  }
+
   fun setICDCheckInCallback(callback: ICDCheckInCallback) {
     icdCheckInCallback = callback
   }
@@ -131,6 +138,10 @@ object ChipClient {
       getDeviceController(context)
     }
     chipDeviceController.stopDnssd()
+  }
+
+  fun getAndroidNfcCommissioningManager() : AndroidNfcCommissioningManager {
+    return androidNfcCommissioningManager
   }
 
   /**

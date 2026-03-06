@@ -305,4 +305,16 @@
 
     <string name="icd_btn_text">Intermittently Connected Device</string>
     <string name="icd_registration_completed">ICD device registration completed, How to trigger to switch to Active Mode : %1$s</string>
+
+    <string name="matter_commissioning_in_progress">Matter Commissioning in progress:</string>
+    <string name="pase">PASE</string>
+    <string name="check_device_attestion">Check Device Attestation</string>
+    <string name="set_node_operational_certificate">Set Node Operational Certificate</string>
+    <string name="set_operational_network">Set Operational Network</string>
+    <string name="please_power_on_the_device">Please power ON the device</string>
+    <string name="perform_service_discovery">Perform service discovery</string>
+    <string name="case_step">CASE</string>
+    <string name="device_commissioned_successfully">Device commissioned successfully!</string>
+    <string name="click_here_when_done">Click here when done</string>
+
 </resources>
