@@ -37,6 +37,7 @@ chip_test_suite("tests") {
       "TestEventNumberCaching.cpp",
       "TestReadChunking.cpp",
       "TestServerCommandDispatch.cpp",
+      "TestWriteChunking.cpp",
     ]
 
     # Not supported on efr32.

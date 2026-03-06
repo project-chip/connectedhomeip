@@ -27,6 +27,7 @@ chip_test_suite("tests") {
     "TestSystemErrorStr.cpp",
     "TestSystemPacketBuffer.cpp",
     "TestSystemScheduleLambda.cpp",
+    "TestSystemScheduleWork.cpp",
     "TestSystemTimer.cpp",
     "TestTimeSource.cpp",
   ]
