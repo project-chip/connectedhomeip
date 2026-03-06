@@ -19,8 +19,8 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-       
-        Delegate & appDelegate = GetDelegateForEndpoint(endpointId); 
+
+        Delegate & appDelegate = GetDelegateForEndpoint(endpointId);
 
         gServer.Create(ZoneManagementCluster::Context{
             .delegate   = appDelegate,
@@ -33,7 +33,7 @@ public:
                 .twoDCartesianMax    = aTwoDCartesianMax
             }
         });
-                
+
         return gServer.Registration();
     }
 
@@ -48,7 +48,7 @@ void Deinit()
 {
     Shutdown(kClusterShutdownType_Immediate);
 
-    mIsRegistered = false; 
+    mIsRegistered = false;
 }
 
 void MatterZoneManagementPluginServerShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
@@ -59,7 +59,7 @@ void MatterZoneManagementPluginServerShutdownCallback(EndpointId endpointId, Mat
     {
         // 2. Call the explicit Deinit() to break references before destruction
         gServer.Cluster().Deinit();
-        
+
         // 3. Destroy the cluster instance via the framework
         gServer.Destroy();
     }
@@ -71,7 +71,7 @@ void MatterZoneManagementPluginServerShutdownCallback(EndpointId endpointId, Mat
         {
             .endpointId                = endpointId,
             .clusterId                 = ZoneManagement::Id,
-            .fixedClusterInstanceCount = 0, 
+            .fixedClusterInstanceCount = 0,
             .maxClusterInstanceCount   = 1,
         },
         integrationDelegate, shutdownType);
