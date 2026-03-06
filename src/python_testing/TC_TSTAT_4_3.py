@@ -193,7 +193,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
                                                                   expiration_in_minutes=30,
                                                                   expected_status=Status.InvalidInState)
             else:
-                log.info("Couldn't run test step 3 since all preset handles are also the ActivePresetHandle on this Thermostat")
+                log.info("Couldn't run test step 4a since all preset handles are also the ActivePresetHandle on this Thermostat")
 
             self.step("4b")
             if self.pics_guard(self.check_pics("TIMESYNC.S.C00.Rsp")):
