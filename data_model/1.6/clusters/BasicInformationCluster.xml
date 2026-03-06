@@ -64,7 +64,7 @@ Davis, CA 95616, USA
     <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
     <revision revision="4" summary="Updated conformance for UniqueID to mandatory"/>
     <revision revision="5" summary="Added ConfigurationVersion attribute"/>
-    <revision revision="6"/>
+    <revision revision="6" summary="Added extended information fields to CapabilityMinimaStruct"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0028" name="Basic Information"/>
