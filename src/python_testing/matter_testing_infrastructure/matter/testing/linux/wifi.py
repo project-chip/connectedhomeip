@@ -233,7 +233,7 @@ class WpaSupplicantMock(threading.Thread):
 
         @sdbus.dbus_method_async("a{sv}")
         async def Scan(self, args: DictVariantT) -> None:
-            log.debug("Emitting ScanDone signal")
+            log.debug("Scanning started")
 
             async def scan():
                 await self.Scanning.set_async(False)
