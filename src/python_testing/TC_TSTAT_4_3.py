@@ -459,8 +459,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
         self.step("8b")
         # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to a value not matching the UniqueID field of the CurrentThermostatSuggestion attribute.
-        random_uniqueID = addThermostatSuggestionResponse_uniqueID
-        while random_uniqueID == addThermostatSuggestionResponse_uniqueID:
+        random_uniqueID = currentThermostatSuggestion.uniqueID
+        while random_uniqueID == currentThermostatSuggestion.uniqueID:
             random_uniqueID = random.randint(0, 255)
         currentUTC = get_epoch_utc_time()
         # Verify that the RemoveThermostatSuggestion command returns NOT_FOUND.
