@@ -226,9 +226,9 @@ DataModel::ActionReturnStatus BasicInformationClusterImpl<Policy>::ReadAttribute
         return ReadConfigurationString([this](char * buf, size_t size) { return mPolicy.GetSoftwareVersionString(buf, size); },
                                        encoder);
     case ManufacturingDate::Id: {
-        constexpr size_t kMaxLength      = BasicInformation::Attributes::ManufacturingDate::TypeInfo::MaxLength();
-        constexpr size_t kMaxDateLength  = 8;              // YYYYMMDD
-        char manufacturingDateString[kMaxLength + 1] = { 0 }; 
+        constexpr size_t kMaxLength                  = BasicInformation::Attributes::ManufacturingDate::TypeInfo::MaxLength();
+        constexpr size_t kMaxDateLength              = 8; // YYYYMMDD
+        char manufacturingDateString[kMaxLength + 1] = { 0 };
 
         uint16_t manufacturingYear;
         uint8_t manufacturingMonth;
