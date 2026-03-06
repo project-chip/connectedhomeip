@@ -127,6 +127,9 @@ declare_args() {
   chip_enable_mrp_analytics =
       current_os == "linux" || current_os == "android" || current_os == "mac" ||
       current_os == "ios"
+
+  # enable UniqueID support in the descriptor cluster.
+  chip_enable_endpoint_unique_id = false
 }
 
 if (chip_target_style == "") {
