@@ -53,7 +53,7 @@ inline constexpr uint32_t kRevisionWithoutUniqueId = 3;
 // This is generally DeviceLayer::ConfigurationManager::kMaxLocationLength
 // However we try to not tie these constants to device layer.
 //
-// Technically we should static_assert(kExpectedFixedLocationLength == DeviceLayer::ConfigurationManager::kLocationLength);
+// Technically we should static_assert(kExpectedFixedLocationLength == DeviceLayer::ConfigurationManager::kMaxLocationLength);
 constexpr size_t kExpectedFixedLocationLength = 2;
 
 // The largest buffer size needed to read string attributes. This allows re-use of a common
