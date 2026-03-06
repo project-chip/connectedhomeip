@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,6 +34,9 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/internal/BLEManager.h>
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#include <platform/DeviceControlServer.h>
+#endif
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
@@ -41,10 +44,14 @@
 #include <zephyr/bluetooth/addr.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/bluetooth/hci.h>
-#include <zephyr/random/random.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
+#if defined(CONFIG_ZEPHYR_VERSION_3_3)
+#include <version.h>
+#else
+#include <zephyr/random/random.h>
 #include <zephyr/version.h>
+#endif
 
 #ifdef CONFIG_BT_BONDABLE
 #include <zephyr/settings/settings.h>
@@ -52,6 +59,16 @@
 
 #if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 #include <ncs_version.h>
+#elif CHIP_DEVICE_LAYER_TARGET_TELINK
+extern "C" {
+#if defined(CONFIG_BT_B9X)
+extern __attribute__((noinline)) int b9x_bt_blc_mac_init(uint8_t * bt_mac);
+#elif defined(CONFIG_BT_TLX)
+extern __attribute__((noinline)) int tlx_bt_blc_mac_init(uint8_t * bt_mac);
+#elif defined(CONFIG_BT_W91)
+extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac);
+#endif
+}
 #endif
 
 #include <array>
@@ -140,8 +157,16 @@ int InitRandomStaticAddress(bool idPresent, int & id)
     bt_addr_le_t addr;
 
     // generating the address
-    addr.type = BT_ADDR_LE_RANDOM;
-    error     = sys_csrand_get(addr.a.val, sizeof(addr.a.val));
+#if CHIP_DEVICE_LAYER_TARGET_TELINK
+#if defined(CONFIG_BT_B9X)
+    b9x_bt_blc_mac_init(addr.a.val);
+#elif defined(CONFIG_BT_TLX)
+    tlx_bt_blc_mac_init(addr.a.val);
+#elif defined(CONFIG_BT_W91)
+    telink_bt_blc_mac_init(addr.a.val);
+#endif
+#else
+    error = sys_csrand_get(addr.a.val, sizeof(addr.a.val));
 
     if (error)
     {
@@ -150,22 +175,28 @@ int InitRandomStaticAddress(bool idPresent, int & id)
     }
 
     BT_ADDR_SET_STATIC(&addr.a);
+#endif
 
-    if (!idPresent)
+    if (BT_ADDR_IS_STATIC(&addr.a)) // in case of Random static address, create a new id
     {
-        id = bt_id_create(&addr, nullptr);
-    }
+        addr.type = BT_ADDR_LE_RANDOM;
+
+        if (!idPresent)
+        {
+            id = bt_id_create(&addr, nullptr);
+        }
 #if CONFIG_BT_ID_MAX == 2
-    else
-    {
-        id = bt_id_reset(1, &addr, nullptr);
-    }
+        else
+        {
+            id = bt_id_reset(1, &addr, nullptr);
+        }
 #endif // CONFIG_BT_BONDABLE
 
-    if (id < 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", error);
-        return id;
+        if (id < 0)
+        {
+            ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", id);
+            return id;
+        }
     }
 
     ChipLogProgress(DeviceLayer, "BLE address: %02X:%02X:%02X:%02X:%02X:%02X", addr.a.val[5], addr.a.val[4], addr.a.val[3],
@@ -209,8 +240,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #else
     err = InitRandomStaticAddress(false, id);
     VerifyOrReturnError(err == 0 && id == kMatterBleIdentity, MapErrorZephyr(err));
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     err = bt_enable(nullptr);
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
+#endif
 #endif // CONFIG_BT_BONDABLE
 
     TEMPORARY_RETURN_IGNORED BLEAdvertisingArbiter::Init(static_cast<uint8_t>(id));
@@ -227,6 +260,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
     TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return CHIP_NO_ERROR;
+}
+
+void BLEManagerImpl::_Shutdown()
+{
+    bt_disable();
 }
 
 void BLEManagerImpl::DriveBLEState(intptr_t arg)
@@ -332,9 +370,9 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
     }
 #endif
 
-    advertisingData[0]                   = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
-    advertisingData[1]                   = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
-    scanResponseData[0]                  = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
+    advertisingData[0]  = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
+    advertisingData[1]  = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
+    scanResponseData[0] = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
 #endif // CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
 
     mAdvertisingRequest.priority = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
@@ -415,6 +453,19 @@ CHIP_ERROR BLEManagerImpl::UnregisterGattService()
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising()
 {
+    // Re-initializing the BLE layer after shutdown
+    if (!BleLayer::IsInitialized())
+    {
+        ReturnErrorOnFailure(BleLayer::Init(this, this, &DeviceLayer::SystemLayer()));
+    }
+
+    // Initialize the BLE radio if not initialized
+    if (!bt_is_ready())
+    {
+        int err = bt_enable(nullptr);
+        VerifyOrReturnError(err == 0, MapErrorZephyr(err));
+    }
+
     // Prepare advertising request
     ReturnErrorOnFailure(PrepareAdvertisingRequest());
     // We need to register GATT service before issuing the advertising to start
@@ -835,6 +886,17 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     TEMPORARY_RETURN_IGNORED CloseConnection(conId);
+}
+
+void BLEManagerImpl::CheckNonConcurrentBleClosing()
+{
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    if (IsBleClosing())
+    {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::DeviceControlServer::DeviceControlSvr()
+            .PostCloseAllBLEConnectionsToOperationalNetworkEvent();
+    }
+#endif
 }
 
 bool BLEManagerImpl::IsSubscribed(bt_conn * conn)
