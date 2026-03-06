@@ -420,14 +420,14 @@ DataModel::Nullable<Percent> AirPurifierManager::GetPercentSetting()
     return percentSetting;
 }
 
-std::optional<uint8_t> AirPurifierManager::GetSpeedMax()
+uint8_t AirPurifierManager::GetSpeedMax()
 {
     uint8_t speedMax = 1;
     Status status    = FanControl::Attributes::SpeedMax::Get(mEndpointId, &speedMax);
     if (status != Status::Success)
     {
-        ChipLogError(NotSpecified, "AirPurifierManager::GetSpeedMax: failed to get SpeedMax attribute: %d", to_underlying(status));
-        return std::nullopt;
+        ChipLogError(NotSpecified, "AirPurifierManager::GetPercentSetting: failed to get SpeedMax attribute: %d",
+                     to_underlying(status));
     }
     return speedMax;
 }
