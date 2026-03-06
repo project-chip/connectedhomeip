@@ -22,5 +22,5 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/ActionsCluster.h"
     "${CLUSTER_DIR}/ActionsCluster.cpp"
     "${CLUSTER_DIR}/ActionsDelegate.h"
-    "${CLUSTER_DIR}/ActionStructs.h"
+    "${CLUSTER_DIR}/ActionsStructs.h"
 )
