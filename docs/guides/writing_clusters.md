@@ -325,7 +325,7 @@ attribute's value changes.
         VerifyOrReturnValue(mValue != newValue, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
         ```
 
-*   **Per-Attribute Change Callbacks:** As a concrete realization of the
+-   **Per-Attribute Change Callbacks:** As a concrete realization of the
     [Delegate/Driver Pattern for Validation](#delegate-driver-pattern-for-validation),
     each mutable attribute should have a corresponding
     `On<AttributeName>Changed` callback in the delegate interface. These are
