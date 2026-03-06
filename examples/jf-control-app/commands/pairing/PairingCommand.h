@@ -350,4 +350,6 @@ private:
     void PersistIcdInfo();
     CHIP_ERROR SetAnchorNodeId(NodeId value);
     NodeId GetAnchorNodeId();
+    static bool GetDatastoreCATVersions(std::optional<uint16_t> & administratorCATVersion,
+                                        std::optional<uint16_t> & anchorCATVersion);
 };
