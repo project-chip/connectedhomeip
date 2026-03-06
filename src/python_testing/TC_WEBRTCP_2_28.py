@@ -125,7 +125,7 @@ class TC_WebRTCP_2_28(MatterBaseTest, WEBRTCPTestBase):
         self.step(3)
         # Send valid SolicitOffer command using multi-stream list API
         cmd = cluster.Commands.SolicitOffer(
-            streamUsage=3, originatingEndpointID=endpoint,
+            streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView, originatingEndpointID=endpoint,
             videoStreams=[videoStreamID], audioStreams=[audioStreamID])
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
