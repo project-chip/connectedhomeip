@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <algorithm>
 #include <app/SpecificationDefinedRevisions.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -23,6 +24,7 @@
 #include <protocols/interaction_model/StatusCode.h>
 #include <tracing/macros.h>
 
+#include <clusters/BasicInformation/Attributes.h>
 #include <clusters/BasicInformation/Enums.h>
 #include <clusters/BasicInformation/Metadata.h>
 #include <clusters/BasicInformation/Structs.h>
@@ -35,13 +37,24 @@ namespace BasicInformationClusterImplDetails {
 // Unique ID became mandatory in 4. If we have no unique id, claim revision 3
 inline constexpr uint32_t kRevisionWithoutUniqueId = 3;
 
-constexpr size_t kExpectedFixedLocationLength =
-    2; // DeviceLayer definition used to suffice, but we define it here for generic usage
-// static_assert(kExpectedFixedLocationLength == DeviceLayer::ConfigurationManager::kMaxLocationLength,
-//              "Fixed location storage must be of size 2"); // TODO: How to static assert against policy?
+// This is generally DeviceLayer::ConfigurationManager::kMaxLocationLength
+// However we try to not tie these constants to device layer.
+//
+// Technically we should static_assert(kExpectedFixedLocationLength == DeviceLayer::ConfigurationManager::kLocationLength);
+constexpr size_t kExpectedFixedLocationLength = 2;
 
-// Use a private helper namespace or static members for these constants
-constexpr size_t kMaxStringLength = 256; // Max of all string lengths
+// The largest buffer size needed to read string attributes. This allows re-use of a common
+// buffer when reading any string attribute (saves code size).
+constexpr size_t kMaxStringLength = std::max({
+    BasicInformation::Attributes::VendorName::TypeInfo::MaxLength(),
+    BasicInformation::Attributes::ProductName::TypeInfo::MaxLength(),
+    BasicInformation::Attributes::HardwareVersionString::TypeInfo::MaxLength(),
+    BasicInformation::Attributes::SoftwareVersionString::TypeInfo::MaxLength(),
+    BasicInformation::Attributes::PartNumber::TypeInfo::MaxLength(),
+    BasicInformation::Attributes::ProductURL::TypeInfo::MaxLength(),
+    BasicInformation::Attributes::ProductLabel::TypeInfo::MaxLength(),
+    BasicInformation::Attributes::SerialNumber::TypeInfo::MaxLength(),
+});
 
 inline CHIP_ERROR ClearNullTerminatedStringWhenUnimplemented(CHIP_ERROR status, char * strBuf)
 {
