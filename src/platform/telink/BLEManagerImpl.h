@@ -76,7 +76,7 @@ private:
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
-    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
+    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId);
     void CheckNonConcurrentBleClosing() override;
 
     // ===== Private members reserved for use by this class only.
@@ -96,20 +96,24 @@ private:
     struct ServiceData;
 
     BitFlags<Flags> mFlags;
-    uint16_t mGAPConns;
+    uint16_t mMatterConnNum;
     CHIPoBLEServiceMode mServiceMode;
     bool mSubscribedConns[CONFIG_BT_MAX_CONN];
     bt_gatt_indicate_params mIndicateParams[CONFIG_BT_MAX_CONN];
     bt_conn_cb mConnCallbacks;
-    bt_conn * mconId;
     BLEAdvertisingArbiter::Request mAdvertisingRequest = {};
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     PacketBufferHandle c3CharDataBufferHandle;
 #endif
-    bool mBLERadioInitialized;
+    // The summarized number of Bluetooth LE connections related to the device (including these not related to Matter service).
+    uint16_t mTotalConnNum;
+#ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
+    Span<bt_data> mCustomAdvertising  = {};
+    Span<bt_data> mCustomScanResponse = {};
+#endif
 
     void DriveBLEState(void);
-    CHIP_ERROR PrepareAdvertisingRequest(void);
+    CHIP_ERROR PrepareAdvertisingRequest();
     CHIP_ERROR StartAdvertising(void);
     CHIP_ERROR StopAdvertising(void);
     CHIP_ERROR HandleGAPConnect(const ChipDeviceEvent * event);
@@ -117,15 +121,15 @@ private:
     CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent * event);
     CHIP_ERROR HandleTXCharCCCDWrite(const ChipDeviceEvent * event);
     CHIP_ERROR HandleTXCharComplete(const ChipDeviceEvent * event);
-    CHIP_ERROR HandleBleConnectionClosed(const ChipDeviceEvent * event);
-
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    CHIP_ERROR PrepareC3CharData(void);
+    CHIP_ERROR PrepareC3CharData();
 #endif
     bool IsSubscribed(bt_conn * conn);
     bool SetSubscribed(bt_conn * conn);
     bool UnsetSubscribed(bt_conn * conn);
     uint32_t GetAdvertisingInterval();
+    CHIP_ERROR RegisterGattService();
+    CHIP_ERROR UnregisterGattService();
 
     static void DriveBLEState(intptr_t arg);
 
@@ -151,6 +155,10 @@ public:
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static ssize_t HandleC3Read(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len, uint16_t offset);
+#endif
+#ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
+    void SetCustomAdvertising(Span<bt_data> CustomAdvertising);
+    void SetCustomScanResponse(Span<bt_data> CustomScanResponse);
 #endif
 };
 
