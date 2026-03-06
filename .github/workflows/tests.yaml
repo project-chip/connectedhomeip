@@ -1163,7 +1163,20 @@ jobs:
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
               run: |
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}"'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file test-summaries/python-tests.json'
+            - name: Print python test summary
+              if: ${{ matrix.filter != '' && always() }}
+              run: |
+                  [ -f test-summaries/python-tests.json ] && \
+                    scripts/run_in_python_env.sh out/venv \
+                      'src/python_testing/execute_python_tests.py summarize --summary-file test-summaries/python-tests.json' || true
+            - name: Upload python test summary
+              uses: actions/upload-artifact@v7
+              if: ${{ matrix.filter != '' && always() }}
+              with:
+                  name: test-summaries-python-${{ matrix.filter }}
+                  path: test-summaries/python-tests.json
+                  retention-days: 30
 
             - name: Execute Jupyter Notebooks
               if: ${{matrix.filter == ''}}
