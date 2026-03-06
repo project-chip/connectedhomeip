@@ -52,18 +52,24 @@ public:
 
     CHIP_ERROR GetProductId(uint16_t & productId) const { return mContext.deviceInstanceInfoProvider.GetProductId(productId); }
 
-    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) { return mContext.deviceInstanceInfoProvider.GetPartNumber(buf, bufSize); }
+    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize)
+    {
+        return IgnoreUnimplemented(mContext.deviceInstanceInfoProvider.GetPartNumber(buf, bufSize), buf, bufSize);
+    }
 
-    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) { return mContext.deviceInstanceInfoProvider.GetProductURL(buf, bufSize); }
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSize)
+    {
+        return IgnoreUnimplemented(mContext.deviceInstanceInfoProvider.GetProductURL(buf, bufSize), buf, bufSize);
+    }
 
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize)
     {
-        return mContext.deviceInstanceInfoProvider.GetProductLabel(buf, bufSize);
+        return IgnoreUnimplemented(mContext.deviceInstanceInfoProvider.GetProductLabel(buf, bufSize), buf, bufSize);
     }
 
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize)
     {
-        return mContext.deviceInstanceInfoProvider.GetSerialNumber(buf, bufSize);
+        return IgnoreUnimplemented(mContext.deviceInstanceInfoProvider.GetSerialNumber(buf, bufSize), buf, bufSize);
     }
 
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
@@ -122,7 +128,10 @@ public:
         return mContext.configurationManager.GetSoftwareVersionString(buf, bufSize);
     }
 
-    CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) { return mContext.configurationManager.GetUniqueId(buf, bufSize); }
+    CHIP_ERROR GetUniqueId(char * buf, size_t bufSize)
+    {
+        return IgnoreUnimplemented(mContext.configurationManager.GetUniqueId(buf, bufSize), buf, bufSize);
+    }
 
     CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVersion)
     {
@@ -164,6 +173,19 @@ public:
     uint16_t GetSubscriptionsPerFabric() const { return mContext.subscriptionsPerFabric; }
 
 private:
+    CHIP_ERROR IgnoreUnimplemented(CHIP_ERROR status, char * buf, size_t bufSize)
+    {
+        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            if (bufSize > 0)
+            {
+                buf[0] = 0;
+            }
+            return CHIP_NO_ERROR;
+        }
+        return status;
+    }
+
     Context mContext;
 };
 

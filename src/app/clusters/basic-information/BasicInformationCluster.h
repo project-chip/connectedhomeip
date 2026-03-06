@@ -111,7 +111,7 @@ private:
     // Reads a single device info string and handles error sanitization (clearing the buffer)
     // if the attribute is optional and not implemented.
     template <typename EncodeFunction>
-    CHIP_ERROR ReadConfigurationString(EncodeFunction && getter, bool unimplementedAllowed, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadConfigurationString(EncodeFunction && getter, AttributeValueEncoder & encoder);
 
     OptionalAttributesSet mEnabledOptionalAttributes;
 
