@@ -17,7 +17,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-enums.h>
+#include <app/clusters/closure-control-server/ClosureControlClusterObjects.h>
+#include <app/data-model/List.h>
+#include <app/data-model/Nullable.h>
+#include <clusters/ClosureControl/Enums.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -91,6 +94,15 @@ public:
      * @return Time required for Motion action.
      */
     virtual ElapsedS GetWaitingForMotionCountdownTime() = 0;
+
+    // These methods are called when the corresponding attributes are updated by the server, whether
+    // via InvokeCommand, or direct server APIs. Default implementations return true;
+    // override only the callbacks you need.
+    virtual bool OnCountdownTimeChanged(DataModel::Nullable<ElapsedS> newCountdownTime) { return true; }
+    virtual bool OnMainStateChanged(MainStateEnum newState) { return true; }
+    virtual bool OnCurrentErrorListChanged(DataModel::List<const ClosureErrorEnum> newCurrentErrorList) { return true; }
+    virtual bool OnOverallCurrentStateChanged(DataModel::Nullable<GenericOverallCurrentState> newState) { return true; }
+    virtual bool OnOverallTargetStateChanged(DataModel::Nullable<GenericOverallTargetState> newState) { return true; }
 };
 
 } // namespace ClosureControl

@@ -219,6 +219,7 @@ CHIP_ERROR ClosureControlCluster::SetCountdownTime(const DataModel::Nullable<Ela
         // Force reporting when the tracked operation changes due to MainState change
         return !fromDelegate;
     };
+    VerifyOrReturnError(mDelegate.OnCountdownTimeChanged(countdownTime), CHIP_ERROR_INCORRECT_STATE);
     markDirty = (mState.mCountdownTime.SetValue(countdownTime, now, predicate) == AttributeDirtyState::kMustReport);
 
     if (markDirty)
@@ -247,6 +248,7 @@ CHIP_ERROR ClosureControlCluster::SetMainState(MainStateEnum mainState)
         ReturnErrorOnFailure(GenerateEngageStateChangedEvent(false));
     }
 
+    VerifyOrReturnError(mDelegate.OnMainStateChanged(mainState), CHIP_ERROR_INCORRECT_STATE);
     mState.mMainState = mainState;
     NotifyAttributeChanged(Attributes::MainState::Id);
 
@@ -363,6 +365,7 @@ ClosureControlCluster::SetOverallCurrentState(const DataModel::Nullable<GenericO
         }
     }
 
+    VerifyOrReturnError(mDelegate.OnOverallCurrentStateChanged(overallCurrentState), CHIP_ERROR_INCORRECT_STATE);
     SetAttributeValue(mState.mOverallCurrentState, overallCurrentState, Attributes::OverallCurrentState::Id);
     return CHIP_NO_ERROR;
 }
@@ -415,6 +418,7 @@ CHIP_ERROR ClosureControlCluster::SetOverallTargetState(const DataModel::Nullabl
         }
     }
 
+    VerifyOrReturnError(mDelegate.OnOverallTargetStateChanged(overallTarget), CHIP_ERROR_INCORRECT_STATE);
     SetAttributeValue(mState.mOverallTargetState, overallTarget, Attributes::OverallTargetState::Id);
 
     return CHIP_NO_ERROR;
@@ -444,6 +448,9 @@ CHIP_ERROR ClosureControlCluster::AddErrorToCurrentErrorList(ClosureErrorEnum er
         VerifyOrReturnError(mState.mCurrentErrorList[i] != error, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED,
                             ChipLogError(AppServer, "Error already exists in the list"));
     }
+    VerifyOrReturnError(mDelegate.OnCurrentErrorListChanged(
+                            DataModel::List<const ClosureErrorEnum>(mState.mCurrentErrorList, mState.mCurrentErrorCount)),
+                        CHIP_ERROR_INCORRECT_STATE);
     mState.mCurrentErrorList[mState.mCurrentErrorCount++] = error;
     DataModel::List<const ClosureErrorEnum> currentErrorList(mState.mCurrentErrorList, mState.mCurrentErrorCount);
     NotifyAttributeChanged(Attributes::CurrentErrorList::Id);
@@ -453,6 +460,8 @@ CHIP_ERROR ClosureControlCluster::AddErrorToCurrentErrorList(ClosureErrorEnum er
 void ClosureControlCluster::ClearCurrentErrorList()
 {
     assertChipStackLockedByCurrentThread();
+    VerifyOrReturn(mDelegate.OnCurrentErrorListChanged(
+        DataModel::List<const ClosureErrorEnum>(mState.mCurrentErrorList, mState.mCurrentErrorCount)));
     // Clearing the error list array by setting all elements to kUnknownEnumValue
     for (size_t i = 0; i < mState.mCurrentErrorCount; ++i)
     {

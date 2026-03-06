@@ -28,6 +28,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/TimerDelegateMock.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -91,6 +92,83 @@ public:
     int moveToCommandCalls    = 0;
     int calibrateCommandCalls = 0;
 
+    bool OnCountdownTimeChanged(DataModel::Nullable<ElapsedS> newCountdownTime) override
+    {
+        mCountdownTimeValue         = newCountdownTime;
+        mCountdownTimeChangedCalled = true;
+        return true;
+    }
+    bool OnMainStateChanged(MainStateEnum newState) override
+    {
+        mMainStateValue         = newState;
+        mMainStateChangedCalled = true;
+        return true;
+    }
+    bool OnOverallCurrentStateChanged(DataModel::Nullable<GenericOverallCurrentState> newState) override
+    {
+        mOverallCurrentStateValue         = newState;
+        mOverallCurrentStateChangedCalled = true;
+        return true;
+    }
+    bool OnOverallTargetStateChanged(DataModel::Nullable<GenericOverallTargetState> newState) override
+    {
+        mOverallTargetStateValue         = newState;
+        mOverallTargetStateChangedCalled = true;
+        return true;
+    }
+    bool OnCurrentErrorListChanged(DataModel::List<const ClosureErrorEnum> newCurrentErrorList) override
+    {
+        mCurrentErrorListCopy.clear();
+        for (auto it = newCurrentErrorList.begin(); it != newCurrentErrorList.end(); ++it)
+        {
+            mCurrentErrorListCopy.push_back(*it);
+        }
+        mCurrentErrorListCount         = mCurrentErrorListCopy.size();
+        mCurrentErrorListChangedCalled = true;
+        return true;
+    }
+
+    bool GetCountdownTimeChangedCalled() const { return mCountdownTimeChangedCalled; }
+    bool GetMainStateChangedCalled() const { return mMainStateChangedCalled; }
+    bool GetOverallCurrentStateChangedCalled() const { return mOverallCurrentStateChangedCalled; }
+    bool GetOverallTargetStateChangedCalled() const { return mOverallTargetStateChangedCalled; }
+    bool GetCurrentErrorListChangedCalled() const { return mCurrentErrorListChangedCalled; }
+    DataModel::Nullable<ElapsedS> GetCountdownTimeValue() const { return mCountdownTimeValue; }
+    MainStateEnum GetMainStateValue() const { return mMainStateValue; }
+    DataModel::Nullable<GenericOverallCurrentState> GetOverallCurrentStateValue() const { return mOverallCurrentStateValue; }
+    DataModel::Nullable<GenericOverallTargetState> GetOverallTargetStateValue() const { return mOverallTargetStateValue; }
+    size_t GetCurrentErrorListCount() const { return mCurrentErrorListCount; }
+    const std::vector<ClosureErrorEnum> & GetCurrentErrorListCopy() const { return mCurrentErrorListCopy; }
+
+    void Reset()
+    {
+        mCountdownTimeChangedCalled       = false;
+        mCountdownTimeValue               = DataModel::NullNullable;
+        mMainStateChangedCalled           = false;
+        mMainStateValue                   = MainStateEnum::kUnknownEnumValue;
+        mOverallCurrentStateChangedCalled = false;
+        mOverallCurrentStateValue         = DataModel::NullNullable;
+        mOverallTargetStateChangedCalled  = false;
+        mOverallTargetStateValue          = DataModel::NullNullable;
+        mCurrentErrorListChangedCalled    = false;
+        mCurrentErrorListCopy.clear();
+        mCurrentErrorListCount = 0;
+    }
+
+private:
+    bool mCountdownTimeChangedCalled = false;
+    DataModel::Nullable<ElapsedS> mCountdownTimeValue;
+    bool mMainStateChangedCalled = false;
+    MainStateEnum mMainStateValue;
+    bool mOverallCurrentStateChangedCalled = false;
+    DataModel::Nullable<GenericOverallCurrentState> mOverallCurrentStateValue;
+    bool mOverallTargetStateChangedCalled = false;
+    DataModel::Nullable<GenericOverallTargetState> mOverallTargetStateValue;
+    bool mCurrentErrorListChangedCalled = false;
+    std::vector<ClosureErrorEnum> mCurrentErrorListCopy;
+    size_t mCurrentErrorListCount = 0;
+
+    // Move to command parameters
     Optional<TargetPositionEnum> lastMoveToPosition       = NullOptional;
     Optional<bool> lastMoveToLatch                        = NullOptional;
     Optional<Globals::ThreeLevelAutoEnum> lastMoveToSpeed = NullOptional;
@@ -127,7 +205,11 @@ public:
         initParams.mOverallCurrentState = DataModel::NullNullable;
     }
 
-    void TearDown() override { mCluster.Shutdown(ClusterShutdownType::kClusterShutdown); }
+    void TearDown() override
+    {
+        mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+        mockDelegate.Reset();
+    }
 
     static DataModel::Nullable<GenericOverallCurrentState> PositioningState(CurrentPositionEnum position)
     {
@@ -248,10 +330,16 @@ TEST_F(TestClosureControlCluster, TestMainState)
     ASSERT_EQ(featureCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     EXPECT_EQ(featureCluster.SetMainState(MainStateEnum::kCalibrating), CHIP_NO_ERROR);
     EXPECT_EQ(featureCluster.GetMainState(), MainStateEnum::kCalibrating);
+    EXPECT_EQ(mockDelegate.GetMainStateChangedCalled(), true);
+    EXPECT_EQ(mockDelegate.GetMainStateValue(), featureCluster.GetMainState());
     EXPECT_EQ(featureCluster.SetMainState(MainStateEnum::kProtected), CHIP_NO_ERROR);
     EXPECT_EQ(featureCluster.GetMainState(), MainStateEnum::kProtected);
+    EXPECT_EQ(mockDelegate.GetMainStateChangedCalled(), true);
+    EXPECT_EQ(mockDelegate.GetMainStateValue(), featureCluster.GetMainState());
     EXPECT_EQ(featureCluster.SetMainState(MainStateEnum::kDisengaged), CHIP_NO_ERROR);
     EXPECT_EQ(featureCluster.GetMainState(), MainStateEnum::kDisengaged);
+    EXPECT_EQ(mockDelegate.GetMainStateChangedCalled(), true);
+    EXPECT_EQ(mockDelegate.GetMainStateValue(), featureCluster.GetMainState());
 }
 
 TEST_F(TestClosureControlCluster, TestSetMainStateUpdatesCountdownTime)
@@ -268,21 +356,29 @@ TEST_F(TestClosureControlCluster, TestSetMainStateUpdatesCountdownTime)
     DataModel::Nullable<ElapsedS> countdownTime = cluster.GetCountdownTime();
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_EQ(countdownTime.Value(), 22u);
+    EXPECT_EQ(mockDelegate.GetCountdownTimeValue(), countdownTime);
+    EXPECT_EQ(mockDelegate.GetCountdownTimeChangedCalled(), true);
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kWaitingForMotion), CHIP_NO_ERROR);
     countdownTime = cluster.GetCountdownTime();
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_EQ(countdownTime.Value(), 11u);
+    EXPECT_EQ(mockDelegate.GetCountdownTimeValue(), countdownTime);
+    EXPECT_EQ(mockDelegate.GetCountdownTimeChangedCalled(), true);
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kCalibrating), CHIP_NO_ERROR);
     countdownTime = cluster.GetCountdownTime();
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_EQ(countdownTime.Value(), 33u);
+    EXPECT_EQ(mockDelegate.GetCountdownTimeValue(), countdownTime);
+    EXPECT_EQ(mockDelegate.GetCountdownTimeChangedCalled(), true);
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kStopped), CHIP_NO_ERROR);
     countdownTime = cluster.GetCountdownTime();
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_EQ(countdownTime.Value(), 0u);
+    EXPECT_EQ(mockDelegate.GetCountdownTimeValue(), countdownTime);
+    EXPECT_EQ(mockDelegate.GetCountdownTimeChangedCalled(), true);
 }
 
 TEST_F(TestClosureControlCluster, TestSetCountdownTimeFromDelegateUnsupportedFeatures)
@@ -309,11 +405,15 @@ TEST_F(TestClosureControlCluster, TestSetCountdownTimeFromDelegateAndRead)
         kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, positioningConformance, initParams });
 
     EXPECT_EQ(cluster.SetCountdownTimeFromDelegate(DataModel::MakeNullable<ElapsedS>(1)), CHIP_NO_ERROR);
+    EXPECT_EQ(mockDelegate.GetCountdownTimeChangedCalled(), true);
+    EXPECT_EQ(mockDelegate.GetCountdownTimeValue(), 1u);
     DataModel::Nullable<ElapsedS> countdownTime = cluster.GetCountdownTime();
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_EQ(countdownTime.Value(), 1u);
 
     EXPECT_EQ(cluster.SetCountdownTimeFromDelegate(DataModel::MakeNullable<ElapsedS>(2)), CHIP_NO_ERROR);
+    EXPECT_EQ(mockDelegate.GetCountdownTimeChangedCalled(), true);
+    EXPECT_EQ(mockDelegate.GetCountdownTimeValue(), 2u);
     countdownTime = cluster.GetCountdownTime();
     EXPECT_FALSE(countdownTime.IsNull());
     EXPECT_EQ(countdownTime.Value(), 2u);
@@ -328,16 +428,22 @@ TEST_F(TestClosureControlCluster, TestSetOverallCurrentStateFeatureValidation)
     DataModel::Nullable<GenericOverallCurrentState> validState(GenericOverallCurrentState(
         Optional(DataModel::MakeNullable(CurrentPositionEnum::kFullyOpened)), NullOptional, NullOptional));
     EXPECT_EQ(cluster.SetOverallCurrentState(validState), CHIP_NO_ERROR);
+    EXPECT_EQ(mockDelegate.GetOverallCurrentStateChangedCalled(), true);
+    EXPECT_EQ(mockDelegate.GetOverallCurrentStateValue(), cluster.GetOverallCurrentState());
 
+    mockDelegate.Reset();
     DataModel::Nullable<GenericOverallCurrentState> invalidSpeed(
         GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kFullyOpened)), NullOptional,
                                    Optional(Globals::ThreeLevelAutoEnum::kLow)));
     EXPECT_EQ(cluster.SetOverallCurrentState(invalidSpeed), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    EXPECT_EQ(mockDelegate.GetOverallCurrentStateChangedCalled(), false);
 
+    mockDelegate.Reset();
     DataModel::Nullable<GenericOverallCurrentState> invalidLatch(
         GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kFullyOpened)),
                                    Optional(DataModel::MakeNullable(true)), NullOptional));
     EXPECT_EQ(cluster.SetOverallCurrentState(invalidLatch), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    EXPECT_EQ(mockDelegate.GetOverallCurrentStateChangedCalled(), false);
 }
 
 TEST_F(TestClosureControlCluster, TestSetOverallCurrentStateSecureStateValidation)
@@ -371,9 +477,18 @@ TEST_F(TestClosureControlCluster, TestHandleCalibrate)
     ClosureControlCluster cluster(
         kTestEndpointId, ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, calibratingConformance, initParams });
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kMoving), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.HandleCalibrate(), Status::InvalidInState);
+    EXPECT_EQ(mockDelegate.GetMainStateChangedCalled(), true);
+    EXPECT_EQ(mockDelegate.GetMainStateValue(), cluster.GetMainState());
 
+    mockDelegate.Reset();
+    EXPECT_EQ(cluster.HandleCalibrate(), Status::InvalidInState);
+    EXPECT_EQ(cluster.GetMainState(), MainStateEnum::kMoving);
+    EXPECT_EQ(mockDelegate.GetMainStateChangedCalled(), false);
+
+    mockDelegate.Reset();
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kStopped), CHIP_NO_ERROR);
+    EXPECT_EQ(mockDelegate.GetMainStateChangedCalled(), true);
+    EXPECT_EQ(mockDelegate.GetMainStateValue(), cluster.GetMainState());
     EXPECT_EQ(cluster.HandleCalibrate(), Status::Success);
     EXPECT_EQ(mockDelegate.calibrateCommandCalls, 1);
 
@@ -402,6 +517,8 @@ TEST_F(TestClosureControlCluster, TestHandleStop)
                                   ClosureControlCluster::Context{ mockDelegate, mockTimerDelegate, testConformance, initParams });
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kMoving), CHIP_NO_ERROR);
+    EXPECT_EQ(mockDelegate.GetMainStateChangedCalled(), true);
+    EXPECT_EQ(mockDelegate.GetMainStateValue(), cluster.GetMainState());
     EXPECT_EQ(cluster.HandleStop(), Status::Success);
     EXPECT_EQ(mockDelegate.stopCommandCalls, 1);
 
@@ -410,6 +527,8 @@ TEST_F(TestClosureControlCluster, TestHandleStop)
 
     EXPECT_EQ(cluster.SetMainState(MainStateEnum::kError), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.HandleStop(), Status::Success);
+    EXPECT_EQ(mockDelegate.GetMainStateChangedCalled(), true);
+    EXPECT_EQ(mockDelegate.GetMainStateValue(), cluster.GetMainState());
     EXPECT_EQ(mockDelegate.stopCommandCalls, 1);
 }
 
@@ -588,6 +707,12 @@ TEST_F(TestClosureControlCluster, TestErrorListLifecycle)
     EXPECT_EQ(errorSpan[0], ClosureErrorEnum::kPhysicallyBlocked);
     EXPECT_EQ(errorSpan[1], ClosureErrorEnum::kTemperatureLimited);
     EXPECT_EQ(errorSpan[2], ClosureErrorEnum::kBlockedBySensor);
+    EXPECT_EQ(mockDelegate.GetCurrentErrorListChangedCalled(), true);
+    // Cluster calls OnCurrentErrorListChanged with the list before each add; the last call (before 3rd add) had 2 elements.
+    const std::vector<ClosureErrorEnum> & delegateList = mockDelegate.GetCurrentErrorListCopy();
+    EXPECT_EQ(delegateList.size(), 2u);
+    EXPECT_EQ(delegateList[0], ClosureErrorEnum::kPhysicallyBlocked);
+    EXPECT_EQ(delegateList[1], ClosureErrorEnum::kTemperatureLimited);
 }
 
 TEST_F(TestClosureControlCluster, TestErrorListBufferSizeValidation)
