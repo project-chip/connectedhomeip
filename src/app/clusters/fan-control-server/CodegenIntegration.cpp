@@ -133,6 +133,66 @@ FanControlCluster * FindClusterOnEndpoint(EndpointId endpointId)
     return static_cast<FanControlCluster *>(cluster);
 }
 
+Status SetSpeedSetting(EndpointId endpointId, DataModel::Nullable<uint8_t> value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetSpeedSetting(value).GetStatusCode().GetStatus();
+}
+
+Status SetFanMode(EndpointId endpointId, FanModeEnum value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetFanMode(value).GetStatusCode().GetStatus();
+}
+
+Status SetPercentSetting(EndpointId endpointId, DataModel::Nullable<chip::Percent> value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetPercentSetting(value).GetStatusCode().GetStatus();
+}
+
+Status SetRockSetting(EndpointId endpointId, BitMask<RockBitmap> value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetRockSetting(value).GetStatusCode().GetStatus();
+}
+
+Status SetWindSetting(EndpointId endpointId, BitMask<WindBitmap> value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetWindSetting(value).GetStatusCode().GetStatus();
+}
+
+Status SetAirflowDirection(EndpointId endpointId, AirflowDirectionEnum value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return cluster->SetAirflowDirection(value).GetStatusCode().GetStatus();
+}
+
 Delegate * GetDelegate(EndpointId aEndpoint)
 {
     uint16_t ep =

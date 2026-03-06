@@ -18,11 +18,21 @@
 #pragma once
 
 #include <app/clusters/fan-control-server/FanControlCluster.h>
+#include <app/data-model/Nullable.h>
 #include <app/util/basic-types.h>
+#include <lib/support/BitMask.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip::app::Clusters::FanControl {
 
 FanControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
+
+Protocols::InteractionModel::Status SetFanMode(EndpointId endpointId, FanModeEnum value);
+Protocols::InteractionModel::Status SetPercentSetting(EndpointId endpointId, DataModel::Nullable<chip::Percent> value);
+Protocols::InteractionModel::Status SetSpeedSetting(EndpointId endpointId, DataModel::Nullable<uint8_t> value);
+Protocols::InteractionModel::Status SetRockSetting(EndpointId endpointId, BitMask<RockBitmap> value);
+Protocols::InteractionModel::Status SetWindSetting(EndpointId endpointId, BitMask<WindBitmap> value);
+Protocols::InteractionModel::Status SetAirflowDirection(EndpointId endpointId, AirflowDirectionEnum value);
 
 void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate);
 Delegate * GetDelegate(EndpointId aEndpoint);

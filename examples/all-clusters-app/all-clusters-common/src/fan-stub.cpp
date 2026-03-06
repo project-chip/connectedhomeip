@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -150,7 +149,7 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
         }
     }
 
-    return emberAfWriteAttribute(mEndpoint, FanControl::Id, SpeedSetting::Id, &newSpeedSetting, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return FanControl::SetSpeedSetting(mEndpoint, DataModel::Nullable<uint8_t>(newSpeedSetting));
 }
 
 CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)

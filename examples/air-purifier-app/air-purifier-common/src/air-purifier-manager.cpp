@@ -17,7 +17,6 @@
  */
 
 #include <air-purifier-manager.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
 #include <app/util/attribute-table.h>
 
@@ -152,9 +151,7 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
         }
     }
 
-    // Fan Control is a CodeDriven cluster, so SpeedSetting::Set is not generated in Accessors.
-    return emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::SpeedSetting::Id, &newSpeedSetting,
-                                 ZCL_INT8U_ATTRIBUTE_TYPE);
+    return FanControl::SetSpeedSetting(mEndpointId, DataModel::Nullable<uint8_t>(newSpeedSetting));
 }
 
 void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
@@ -259,10 +256,8 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         new_percent = 0;
         new_speed   = 0;
     }
-    emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::SpeedCurrent::Id, &new_speed,
-                          ZCL_INT8U_ATTRIBUTE_TYPE);
-    emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::PercentCurrent::Id, &new_percent,
-                          ZCL_INT8U_ATTRIBUTE_TYPE);
+    FanControl::SetSpeedSetting(mEndpointId, DataModel::Nullable<uint8_t>(new_speed));
+    FanControl::SetPercentSetting(mEndpointId, DataModel::Nullable<Percent>(new_percent));
     mOnOffClusterOn = on;
 }
 
@@ -271,8 +266,7 @@ void AirPurifierManager::PercentSettingWriteCallback(uint8_t aNewPercentSetting)
     ChipLogDetail(NotSpecified, "AirPurifierManager::PercentSettingWriteCallback: %d", static_cast<int>(aNewPercentSetting));
     if (mOnOffClusterOn)
     {
-        Status status = emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::PercentCurrent::Id,
-                                              &aNewPercentSetting, ZCL_INT8U_ATTRIBUTE_TYPE);
+        Status status = FanControl::SetPercentSetting(mEndpointId, DataModel::Nullable<Percent>(aNewPercentSetting));
         if (status != Status::Success)
         {
             ChipLogError(NotSpecified,
@@ -287,8 +281,7 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
     ChipLogDetail(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: %d", static_cast<int>(aNewSpeedSetting));
     if (mOnOffClusterOn)
     {
-        Status status = emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::SpeedCurrent::Id,
-                                              &aNewSpeedSetting, ZCL_INT8U_ATTRIBUTE_TYPE);
+        Status status = FanControl::SetSpeedSetting(mEndpointId, DataModel::Nullable<uint8_t>(aNewSpeedSetting));
         if (status != Status::Success)
         {
             ChipLogError(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: failed to set SpeedCurrent attribute: %d",
@@ -318,8 +311,7 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
     {
         return;
     }
-    uint8_t fanModeRaw = to_underlying(fanMode);
-    emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::FanMode::Id, &fanModeRaw, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    FanControl::SetFanMode(mEndpointId, fanMode);
 }
 
 void AirPurifierManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode)
@@ -382,9 +374,7 @@ void AirPurifierManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedS
         return;
     }
 
-    uint8_t value = aNewSpeedSetting.Value();
-    Status status = emberAfWriteAttribute(mEndpointId, FanControl::Id, FanControl::Attributes::SpeedSetting::Id, &value,
-                                          ZCL_INT8U_ATTRIBUTE_TYPE);
+    Status status = FanControl::SetSpeedSetting(mEndpointId, aNewSpeedSetting);
     if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "AirPurifierManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d",
