@@ -218,7 +218,7 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         // than practical.
         DataModel::Nullable<Percent> percent = GetPercentSetting();
         DataModel::Nullable<uint8_t> speed   = GetSpeedSetting();
-        uint8_t speedMax                     = GetSpeedMax().value_or(1);
+        uint8_t speedMax                     = GetSpeedMax();
         if (speedMax == 0)
         {
             ChipLogError(NotSpecified, "Out of bounds value for SpeedMax, setting to default (1)");
