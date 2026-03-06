@@ -103,6 +103,7 @@ CHIP_ERROR ClosureControlDelegate::HandleEventTrigger(uint64_t eventTrigger)
     eventTrigger                           = clearEndpointInEventTrigger(eventTrigger);
     ClosureControlTestEventTrigger trigger = static_cast<ClosureControlTestEventTrigger>(eventTrigger);
     ClosureControlCluster * cluster        = GetClusterInstance();
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     switch (trigger)
     {
