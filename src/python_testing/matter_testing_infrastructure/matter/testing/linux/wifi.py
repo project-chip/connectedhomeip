@@ -95,7 +95,7 @@ class NANSimulator:
         if not sub_iface:
             return
 
-        sub_srv_name = sub_args.get('srv_name', '')
+        sub_srv_name = sub_args.get("srv_name", "")
 
         for pub_id, (pub_iface_name, pub_args) in publishers_copy.items():
             # Don't match same interface
@@ -107,7 +107,7 @@ class NANSimulator:
                 continue
 
             # Check service name match
-            pub_srv_name = pub_args.get('srv_name', '')
+            pub_srv_name = pub_args.get("srv_name", "")
             if sub_srv_name and pub_srv_name and sub_srv_name != pub_srv_name:
                 continue
 
@@ -116,26 +116,26 @@ class NANSimulator:
 
             # Emit NANDiscoveryResult to subscriber
             discovery_args = {
-                'subscribe_id': ('u', sub_id),
-                'publish_id': ('u', pub_id),
-                'peer_addr': ('s', pub_iface.mock_mac),
-                'srv_proto_type': ('u', pub_args.get('srv_proto_type', 3)),
-                'ssi': ('ay', pub_args.get('ssi', b'')),
+                "subscribe_id": ("u", sub_id),
+                "publish_id": ("u", pub_id),
+                "peer_addr": ("s", pub_iface.mock_mac),
+                "srv_proto_type": ("u", pub_args.get("srv_proto_type", 3)),
+                "ssi": ("ay", pub_args.get("ssi", b"")),
             }
             sub_iface.NANDiscoveryResult.emit(discovery_args)
 
             # Emit NANReplied to publisher
             replied_args = {
-                'publish_id': ('u', pub_id),
-                'subscribe_id': ('u', sub_id),
-                'peer_addr': ('s', sub_iface.mock_mac),
-                'srv_proto_type': ('u', sub_args.get('srv_proto_type', 3)),
-                'ssi': ('ay', sub_args.get('ssi', b'')),
+                "publish_id": ("u", pub_id),
+                "subscribe_id": ("u", sub_id),
+                "peer_addr": ("s", sub_iface.mock_mac),
+                "srv_proto_type": ("u", sub_args.get("srv_proto_type", 3)),
+                "ssi": ("ay", sub_args.get("ssi", b"")),
             }
             log.debug("Interface[%d] Emitting NANReplied: %s", pub_iface.index, replied_args)
             pub_iface.NANReplied.emit(replied_args)
 
-    async def on_transmit(self, sender_iface: 'WpaSupplicantMock.WpaInterface', handle: int,
+    async def on_transmit(self, sender_iface: WpaSupplicantMock.WpaInterface, handle: int,
                           req_instance_id: int, peer_addr: str, ssi: bytes):
         """Route NAN transmit to the appropriate receiver."""
         with self._lock:
@@ -154,10 +154,10 @@ class NANSimulator:
 
         # Emit NANReceive on receiver
         receive_args = {
-            'id': ('u', req_instance_id),
-            'peer_id': ('u', handle),
-            'peer_addr': ('s', sender_iface.mock_mac),
-            'ssi': ('ay', ssi),
+            "id": ("u", req_instance_id),
+            "peer_id": ("u", handle),
+            "peer_addr": ("s", sender_iface.mock_mac),
+            "ssi": ("ay", ssi),
         }
         log.debug("Interface[%d] Emitting NANReceive: %s", receiver.index, receive_args)
         receiver.NANReceive.emit(receive_args)
@@ -185,15 +185,15 @@ class WpaSupplicantMock(threading.Thread):
               interface_name="fi.w1.wpa_supplicant1"):
         path = "/fi/w1/wpa_supplicant1"
 
-        def __init__(self, mock: 'WpaSupplicantMock'):
+        def __init__(self, mock: WpaSupplicantMock):
             super().__init__()
             self.mock = mock
 
         @sdbus.dbus_method_async("a{sv}", "o")
         async def CreateInterface(self, args: DictVariantT) -> str:
-            ifname = ''
-            if 'Ifname' in args:
-                raw = args['Ifname'][1]
+            ifname = ""
+            if "Ifname" in args:
+                raw = args["Ifname"][1]
                 # Ensure we provide a str to GetInterface
                 ifname = raw if isinstance(raw, str) else str(raw)
             return await self.GetInterface(ifname)
@@ -211,13 +211,10 @@ class WpaSupplicantMock(threading.Thread):
         _publish_id_counter = 0
         _subscribe_id_counter = 0
 
-        # Attributes initialised to None in __init__ but later set to concrete types.
-        interface_name_in_sim: str | None
-        nan_simulator: NANSimulator | None
         # Instance-level mapping of session id -> session info
         nan_sessions: dict[int, dict]
 
-        def __init__(self, mock: 'WpaSupplicantMock', index: int):
+        def __init__(self, mock: WpaSupplicantMock, index: int):
             super().__init__()
             self.mock = mock
             self.index = index
@@ -227,8 +224,7 @@ class WpaSupplicantMock(threading.Thread):
             self.state = "disconnected"
             self.current_network = "/"
             self.nan_sessions: dict[int, dict] = {}
-            self.interface_name_in_sim = None
-            self.nan_simulator = None
+            self.interface_name_in_sim: str = None
 
         @sdbus.dbus_method_async("s")
         async def AutoScan(self, arg: str) -> None:
@@ -302,18 +298,18 @@ class WpaSupplicantMock(threading.Thread):
             args_dict = self._extract_variant_dict(nan_args)
 
             session_info = {
-                'type': 'publish',
-                'id': publish_id,
-                'args': args_dict,
-                'active': True
+                "type": "publish",
+                "id": publish_id,
+                "args": args_dict,
+                "active": True
             }
             self.nan_sessions[publish_id] = session_info
 
             log.debug("NANPublish: publish_id=%d, args=%s", publish_id, args_dict)
 
             # Notify NANSimulator if connected
-            if self.nan_simulator and self.interface_name_in_sim:
-                self.nan_simulator.on_publish_started(
+            if self.mock.nan_simulator and self.interface_name_in_sim:
+                self.mock.nan_simulator.on_publish_started(
                     self.interface_name_in_sim, publish_id, args_dict)
 
             return publish_id
@@ -325,18 +321,18 @@ class WpaSupplicantMock(threading.Thread):
 
             self.nan_sessions.pop(publish_id, None)
 
-            if self.nan_simulator:
-                self.nan_simulator.on_publish_cancelled(publish_id)
+            if self.mock.nan_simulator:
+                self.mock.nan_simulator.on_publish_cancelled(publish_id)
 
         @sdbus.dbus_method_async("a{sv}")
         async def NANUpdatePublish(self, nan_args: dict):
             """Update an existing publish session."""
             args_dict = self._extract_variant_dict(nan_args)
-            publish_id = args_dict.get('publish_id')
+            publish_id = args_dict.get("publish_id")
             log.debug("NANUpdatePublish: publish_id=%s, args=%s", publish_id, args_dict)
 
             if publish_id and publish_id in self.nan_sessions:
-                self.nan_sessions[publish_id]['args'].update(args_dict)
+                self.nan_sessions[publish_id]["args"].update(args_dict)
 
         @sdbus.dbus_method_async("a{sv}", "u")
         async def NANSubscribe(self, nan_args: dict) -> int:
@@ -352,19 +348,19 @@ class WpaSupplicantMock(threading.Thread):
             args_dict = self._extract_variant_dict(nan_args)
 
             session_info = {
-                'type': 'subscribe',
-                'id': subscribe_id,
-                'args': args_dict,
-                'active': True
+                "type": "subscribe",
+                "id": subscribe_id,
+                "args": args_dict,
+                "active": True
             }
             self.nan_sessions[subscribe_id] = session_info
 
             log.debug("NANSubscribe: subscribe_id=%d, args=%s", subscribe_id, args_dict)
 
             # Notify NANSimulator to trigger discovery
-            if self.nan_simulator and self.interface_name_in_sim:
+            if self.mock.nan_simulator and self.interface_name_in_sim:
                 asyncio.create_task(
-                    self.nan_simulator.on_subscribe_started(
+                    self.mock.nan_simulator.on_subscribe_started(
                         self.interface_name_in_sim, subscribe_id, args_dict))
 
             return subscribe_id
@@ -376,8 +372,8 @@ class WpaSupplicantMock(threading.Thread):
 
             self.nan_sessions.pop(subscribe_id, None)
 
-            if self.nan_simulator:
-                self.nan_simulator.on_subscribe_cancelled(subscribe_id)
+            if self.mock.nan_simulator:
+                self.mock.nan_simulator.on_subscribe_cancelled(subscribe_id)
 
         @sdbus.dbus_method_async("a{sv}")
         async def NANTransmit(self, nan_args: dict):
@@ -393,22 +389,18 @@ class WpaSupplicantMock(threading.Thread):
             args_dict = self._extract_variant_dict(nan_args)
             log.debug("NANTransmit: args=%s", args_dict)
 
-            if self.nan_simulator:
-                await self.nan_simulator.on_transmit(
+            if self.mock.nan_simulator:
+                await self.mock.nan_simulator.on_transmit(
                     sender_iface=self,
-                    handle=args_dict.get('handle', 0),
-                    req_instance_id=args_dict.get('req_instance_id', 0),
-                    peer_addr=args_dict.get('peer_addr', ''),
-                    ssi=args_dict.get('ssi', b'')
+                    handle=args_dict.get("handle", 0),
+                    req_instance_id=args_dict.get("req_instance_id", 0),
+                    peer_addr=args_dict.get("peer_addr", ""),
+                    ssi=args_dict.get("ssi", b"")
                 )
 
         def _extract_variant_dict(self, variant_dict: dict) -> dict:
             """Extract values from GVariant a{sv} format to plain dict."""
-            result = {}
-            for key, value in variant_dict.items():
-                result[key] = value[1]
-            return result
-
+            return {k:v[1] for k,v in variant_dict.items()}
         # =====================================================================
         # NAN D-Bus Signals
         # =====================================================================
