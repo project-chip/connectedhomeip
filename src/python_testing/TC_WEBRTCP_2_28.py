@@ -179,8 +179,8 @@ class TC_WebRTCP_2_28(MatterBaseTest, WEBRTCPTestBase):
                             f"AudioStreams should contain allocated AudioStreamID {audioStreamID}")
 
         self.step(5)
-        # Send EndSession with invalid WebRTCSessionID (current + 1)
-        invalid_session_id = current_session_id + 1
+        # Send EndSession with invalid WebRTCSessionID (current + 1), wrapped to stay in valid range
+        invalid_session_id = (current_session_id + 1) % 65535
         cmd = cluster.Commands.EndSession(webRTCSessionID=invalid_session_id)
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
