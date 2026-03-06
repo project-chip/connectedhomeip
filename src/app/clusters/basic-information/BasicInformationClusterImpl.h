@@ -16,15 +16,16 @@
  */
 #pragma once
 
+#include <algorithm>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/String.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/server-cluster/ServerClusterContext.h>
-#include <app/SpecificationDefinedRevisions.h>
 #include <clusters/BasicInformation/Attributes.h>
 #include <clusters/BasicInformation/ClusterId.h>
 #include <clusters/BasicInformation/Enums.h>
@@ -37,7 +38,6 @@
 #include <platform/CHIPDeviceError.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <tracing/macros.h>
-#include <algorithm>
 
 namespace chip {
 namespace app {
@@ -149,7 +149,7 @@ constexpr size_t kMaxStringLength = std::max({
     BasicInformation::Attributes::SerialNumber::TypeInfo::MaxLength(),
 });
 
-    inline CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & encoder, const char * buf, size_t maxBufSize)
+inline CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & encoder, const char * buf, size_t maxBufSize)
 {
     ReturnErrorOnFailure(status);
     return encoder.Encode(chip::CharSpan(buf, strnlen(buf, maxBufSize)));
