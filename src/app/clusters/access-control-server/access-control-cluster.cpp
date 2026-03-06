@@ -497,6 +497,11 @@ DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataMode
     case AccessControl::Attributes::FeatureMap::Id: {
         value = 0;
 
+        if (mFeatureFlags.Has(Feature::kAuxiliary))
+        {
+            value |= to_underlying(Clusters::AccessControl::Feature::kAuxiliary);
+        }
+
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
         value |= to_underlying(Clusters::AccessControl::Feature::kManagedDevice);
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
