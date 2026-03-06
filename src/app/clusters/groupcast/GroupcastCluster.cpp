@@ -354,10 +354,10 @@ Status GroupcastCluster::JoinGroup(FabricIndex fabric_index, const Groupcast::Co
     // ReplaceEndpoints can only be present if kListener feature is supported
     VerifyOrReturnError(!data.replaceEndpoints.HasValue() || mFeatures.Has(Groupcast::Feature::kListener), Status::ConstraintError);
 
-    VerifyOrReturnError(!data.mcastAddrPolicy.HasValue() ||
-                            (Groupcast::MulticastAddrPolicyEnum::kIanaAddr == data.mcastAddrPolicy.Value()) ||
-                            mFeatures.Has(Groupcast::Feature::kPerGroup),
-                        Status::ConstraintError);
+    if (data.mcastAddrPolicy.HasValue() && data.mcastAddrPolicy.Value() == Groupcast::MulticastAddrPolicyEnum::kPerGroup)
+    {
+        VerifyOrReturnError(mFeatures.Has(Groupcast::Feature::kPerGroup), Status::ConstraintError);
+    }
 
     // Check endpoints
     size_t endpoint_count = 0;
