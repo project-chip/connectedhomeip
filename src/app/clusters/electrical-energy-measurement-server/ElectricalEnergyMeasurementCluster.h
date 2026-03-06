@@ -131,7 +131,8 @@ private:
     CHIP_ERROR SetPeriodicEnergyImported(const Optional<EnergyMeasurementStruct> & value);
     CHIP_ERROR SetPeriodicEnergyExported(const Optional<EnergyMeasurementStruct> & value);
 
-    /** @brief Builds an EnergyMeasurementStruct with timestamps, carrying forward the previous endTimestamp as the new startTimestamp. */
+    /** @brief Builds an EnergyMeasurementStruct with timestamps, carrying forward the previous endTimestamp as the new
+     * startTimestamp. */
     Optional<EnergyMeasurementStruct> BuildMeasurement(DataModel::Nullable<int64_t> energy,
                                                        const Optional<EnergyMeasurementStruct> & previous);
 
