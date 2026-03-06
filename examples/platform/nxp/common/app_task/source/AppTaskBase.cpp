@@ -114,6 +114,10 @@
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
 #endif
 
+#if CONFIG_CHIP_SE05X
+#include "AppSe05x.h"
+#endif
+
 #if CONFIG_NXP_USE_POWER_DOWN
 #include "ICDUtil.h"
 #endif // CONFIG_NXP_USE_POWER_DOWN
@@ -324,6 +328,11 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     }
 #endif
 
+#if CONFIG_CHIP_SE05X
+    err = chip::NXP::App::Se05x::Init();
+    SuccessOrExit(err);
+#endif
+
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
     TEMPORARY_RETURN_IGNORED sNetworkCommissioningInstance.Init();
 #ifdef ENABLE_CHIP_SHELL
@@ -361,6 +370,14 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Error during ThreadStackMgrImpl().StartThreadTask()");
+    }
+#endif
+
+#if CONFIG_CHIP_SE05X
+    err = chip::NXP::App::Se05x::PostInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Error during chip::NXP::App::Se05x::PostInit(): %s", ErrorStr(err));
     }
 #endif
 

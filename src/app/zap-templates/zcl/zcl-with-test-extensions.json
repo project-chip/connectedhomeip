@@ -539,7 +539,10 @@
             "DSTOffsetListMaxSize",
             "ClusterRevision"
         ],
-        "Temperature Control": ["SupportedTemperatureLevels"],
+        "Temperature Control": [
+            "SupportedTemperatureLevels",
+            "ClusterRevision"
+        ],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [

@@ -91,7 +91,7 @@ class WebRTCTestHelper:
                 cmd=CameraAvStreamManagement.Commands.VideoStreamAllocate(
                     streamUsage=aStreamUsagePriorities[0],
                     videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                    minFrameRate=30,
+                    minFrameRate=min(15, aVideoSensorParams.maxFPS),
                     maxFrameRate=aVideoSensorParams.maxFPS,
                     minResolution=aMinViewportRes,
                     maxResolution=CameraAvStreamManagement.Structs.VideoResolutionStruct(

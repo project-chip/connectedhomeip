@@ -97,6 +97,8 @@ source_set("power-cluster-test-srcs") {
 source_set("actions-cluster-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/actions-server/ActionsCluster.cpp",
+    "${chip_root}/src/app/clusters/actions-server/ActionsDelegate.h",
+    "${chip_root}/src/app/clusters/actions-server/ActionsStructs.h",
     "${chip_root}/src/app/clusters/actions-server/actions-server.h",
   ]
 
@@ -270,6 +272,7 @@ chip_test_suite("tests") {
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
+    "TestFailSafeContext.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
@@ -284,6 +287,7 @@ chip_test_suite("tests") {
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",
+    "TestThreadBorderRouterManagementCluster.cpp",
     "TestTimeSyncDataProvider.cpp",
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
@@ -298,6 +302,7 @@ chip_test_suite("tests") {
     ":ecosystem-information-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
+    ":thread-border-router-management-test-srcs",
     ":thread-network-directory-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
@@ -345,14 +350,6 @@ chip_test_suite("tests") {
       "${chip_root}/src/messaging/tests/echo:common",
     ]
   }
-  if (!chip_fake_platform) {
-    test_sources += [ "TestThreadBorderRouterManagementCluster.cpp" ]
-    public_deps += [ ":thread-border-router-management-test-srcs" ]
-  }
-
-  if (!chip_fake_platform) {
-    test_sources += [ "TestFailSafeContext.cpp" ]
-  }
 
   # DefaultICDClientStorage assumes that raw AES key is used by the application
   if (chip_crypto != "psa") {
@@ -371,10 +368,10 @@ chip_test_suite("tests") {
     test_sources += [ "TestClusterStateCache.cpp" ]
   }
 
-  # On NRF, Open IoT SDK and fake platforms we do not have a realtime clock available,
+  # On NRF platform we do not have a realtime clock available,
   # so TestEventLogging.cpp would be testing the same thing as TestEventLoggingNoUTCTime,
   # but it's not set up to deal with the timestamps being that low.
-  if (chip_device_platform != "nrfconnect" && chip_device_platform != "fake") {
+  if (chip_device_platform != "nrfconnect") {
     test_sources += [ "TestEventLogging.cpp" ]
   }
 }

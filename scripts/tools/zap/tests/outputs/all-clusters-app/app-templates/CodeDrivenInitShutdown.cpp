@@ -100,6 +100,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterInitCallback(endpoint);
         break;
+    case app::Clusters::TemperatureControl::Id:
+        MatterTemperatureControlClusterInitCallback(endpoint);
+        break;
     case app::Clusters::ScenesManagement::Id:
         MatterScenesManagementClusterInitCallback(endpoint);
         break;
@@ -223,6 +226,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::TemperatureControl::Id:
+        MatterTemperatureControlClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::ScenesManagement::Id:
         MatterScenesManagementClusterShutdownCallback(endpoint, shutdownType);
