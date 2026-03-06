@@ -42,12 +42,14 @@ class ZoneManagementCluster : public DefaultServerCluster
      * cluster configuration.
      */
 public:
-    struct Context {
+    struct Context
+    {
         Delegate & delegate;
         EndpointId endpointId;
         BitFlags<Feature> features;
 
-        struct Config {
+        struct Config
+        {
             uint8_t maxUserDefinedZones;
             uint8_t maxZones;
             uint8_t sensitivityMax;
@@ -64,12 +66,12 @@ public:
     void Shutdown(ClusterShutdownType shutdownType) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                               AttributeValueEncoder & encoder) override;
+                                                AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                AttributeValueDecoder & decoder) override;
+                                                 AttributeValueDecoder & decoder) override;
 
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
@@ -129,9 +131,9 @@ private:
     bool ZoneAlreadyExists(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices,
                            const DataModel::Nullable<uint16_t> & excludeZoneId);
 
-    std::optional<DataModel::ActionReturnStatus> HandleCreateTwoDCartesianZone(
-        const ConcreteCommandPath & requestPath, CommandHandler * handler,
-        const Commands::CreateTwoDCartesianZone::DecodableType & req);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleCreateTwoDCartesianZone(const ConcreteCommandPath & requestPath, CommandHandler * handler,
+                                  const Commands::CreateTwoDCartesianZone::DecodableType & req);
 
     DataModel::ActionReturnStatus HandleUpdateTwoDCartesianZone(const Commands::UpdateTwoDCartesianZone::DecodableType & req);
     DataModel::ActionReturnStatus HandleRemoveZone(const Commands::RemoveZone::DecodableType & req);

@@ -16,14 +16,14 @@
  *
  */
 
-#include "zone-geometry.h"
 #include "ZoneManagementCluster.h"
+#include "zone-geometry.h"
 
+#include <algorithm>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <clusters/ZoneManagement/Metadata.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <algorithm>
+#include <clusters/ZoneManagement/Metadata.h>
 #include <cmath>
 
 using namespace chip;
@@ -50,18 +50,12 @@ namespace Clusters {
 namespace ZoneManagement {
 
 ZoneManagementCluster::ZoneManagementCluster(const Context & context) :
-    DefaultServerCluster({ context.endpointId, ZoneManagement::Id }),
-    mClusterContext(context),
-    mDelegate(context.delegate),
-    mFeatures(context.features),
-    mMaxUserDefinedZones(context.config.maxUserDefinedZones),
-    mMaxZones(context.config.maxZones),
-    mSensitivityMax(context.config.sensitivityMax),
-    mTwoDCartesianMax(context.config.twoDCartesianMax)
+    DefaultServerCluster({ context.endpointId, ZoneManagement::Id }), mClusterContext(context), mDelegate(context.delegate),
+    mFeatures(context.features), mMaxUserDefinedZones(context.config.maxUserDefinedZones), mMaxZones(context.config.maxZones),
+    mSensitivityMax(context.config.sensitivityMax), mTwoDCartesianMax(context.config.twoDCartesianMax)
 {}
 
 ZoneManagementCluster::~ZoneManagementCluster() = default;
-
 
 CHIP_ERROR ZoneManagementCluster::Startup(ServerClusterContext & context)
 {
@@ -168,13 +162,14 @@ void ZoneManagementCluster::LoadPersistentAttributes(std::optional<uint8_t> init
             }
             else
             {
-                ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Loaded invalid Sensitivity=%u. Keeping current value=%u", mPath.mEndpointId,
-                              loadedSensitivity, mSensitivity);
+                ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Loaded invalid Sensitivity=%u. Keeping current value=%u",
+                              mPath.mEndpointId, loadedSensitivity, mSensitivity);
             }
         }
         else
         {
-            ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Sensitivity not found in storage. Using %u", mPath.mEndpointId, mSensitivity);
+            ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Sensitivity not found in storage. Using %u", mPath.mEndpointId,
+                          mSensitivity);
         }
     }
 
@@ -282,8 +277,8 @@ DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataMo
             path, ByteSpan(reinterpret_cast<const uint8_t *>(&sensitivity), sizeof(sensitivity)));
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DataManagement, "ZoneManagement[ep=%d]: Failed to persist sensitivity: %" CHIP_ERROR_FORMAT, mPath.mEndpointId,
-                         err.Format());
+            ChipLogError(DataManagement, "ZoneManagement[ep=%d]: Failed to persist sensitivity: %" CHIP_ERROR_FORMAT,
+                         mPath.mEndpointId, err.Format());
             return err;
         }
 
@@ -316,8 +311,8 @@ CHIP_ERROR ZoneManagementCluster::AcceptedCommands(const ConcreteClusterPath & p
 {
     if (HasFeature(Feature::kTwoDimensionalCartesianZone) && HasFeature(Feature::kUserDefined))
     {
-        ReturnErrorOnFailure(
-            builder.AppendElements({ Commands::CreateTwoDCartesianZone::kMetadataEntry, Commands::UpdateTwoDCartesianZone::kMetadataEntry }));
+        ReturnErrorOnFailure(builder.AppendElements(
+            { Commands::CreateTwoDCartesianZone::kMetadataEntry, Commands::UpdateTwoDCartesianZone::kMetadataEntry }));
     }
 
     if (HasFeature(Feature::kUserDefined))

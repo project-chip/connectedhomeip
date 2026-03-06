@@ -22,17 +22,13 @@ public:
 
         Delegate & appDelegate = GetDelegateForEndpoint(endpointId);
 
-        gServer.Create(ZoneManagementCluster::Context{
-            .delegate   = appDelegate,
-            .endpointId = endpointId,
-            .features   = aFeatures,
-            .config = {
-                .maxUserDefinedZones = aMaxUserDefinedZones,
-                .maxZones            = aMaxZones,
-                .sensitivityMax      = aSensitivityMax,
-                .twoDCartesianMax    = aTwoDCartesianMax
-            }
-        });
+        gServer.Create(ZoneManagementCluster::Context{ .delegate   = appDelegate,
+                                                       .endpointId = endpointId,
+                                                       .features   = aFeatures,
+                                                       .config     = { .maxUserDefinedZones = aMaxUserDefinedZones,
+                                                                       .maxZones            = aMaxZones,
+                                                                       .sensitivityMax      = aSensitivityMax,
+                                                                       .twoDCartesianMax    = aTwoDCartesianMax } });
 
         return gServer.Registration();
     }
@@ -44,38 +40,38 @@ public:
 
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 
-void Deinit()
-{
-    Shutdown(kClusterShutdownType_Immediate);
-
-    mIsRegistered = false;
-}
-
-void MatterZoneManagementPluginServerShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
-{
-    // 1. Identify the instance being shut down
-    // Since we use LazyRegisteredServerCluster, we can access the cluster instance directly.
-    if (gServer.IsConstructed())
+    void Deinit()
     {
-        // 2. Call the explicit Deinit() to break references before destruction
-        gServer.Cluster().Deinit();
+        Shutdown(kClusterShutdownType_Immediate);
 
-        // 3. Destroy the cluster instance via the framework
-        gServer.Destroy();
+        mIsRegistered = false;
     }
 
-    // 4. Perform final unregistration from the Codegen integration layer
-    // (We reuse the IntegrationDelegate to identify the cluster type)
-    static IntegrationDelegate integrationDelegate;
-    CodegenClusterIntegration::UnregisterServer(
+    void MatterZoneManagementPluginServerShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
+    {
+        // 1. Identify the instance being shut down
+        // Since we use LazyRegisteredServerCluster, we can access the cluster instance directly.
+        if (gServer.IsConstructed())
         {
-            .endpointId                = endpointId,
-            .clusterId                 = ZoneManagement::Id,
-            .fixedClusterInstanceCount = 0,
-            .maxClusterInstanceCount   = 1,
-        },
-        integrationDelegate, shutdownType);
-}
+            // 2. Call the explicit Deinit() to break references before destruction
+            gServer.Cluster().Deinit();
+
+            // 3. Destroy the cluster instance via the framework
+            gServer.Destroy();
+        }
+
+        // 4. Perform final unregistration from the Codegen integration layer
+        // (We reuse the IntegrationDelegate to identify the cluster type)
+        static IntegrationDelegate integrationDelegate;
+        CodegenClusterIntegration::UnregisterServer(
+            {
+                .endpointId                = endpointId,
+                .clusterId                 = ZoneManagement::Id,
+                .fixedClusterInstanceCount = 0,
+                .maxClusterInstanceCount   = 1,
+            },
+            integrationDelegate, shutdownType);
+    }
 };
 
 } // namespace

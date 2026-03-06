@@ -121,20 +121,20 @@ struct ZoneInformationStorage : ZoneInformationStruct
 class Delegate
 {
 public:
-    Delegate() = default;
+    Delegate()          = default;
     virtual ~Delegate() = default;
 
     virtual Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
-                                                                        uint16_t & outZoneID) = 0;
+                                                                        uint16_t & outZoneID)                                   = 0;
     virtual Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone) = 0;
-    virtual Protocols::InteractionModel::Status RemoveZone(uint16_t zoneID) = 0;
-    virtual Protocols::InteractionModel::Status CreateTrigger(const ZoneTriggerControlStruct & zoneTrigger) = 0;
-    virtual Protocols::InteractionModel::Status UpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger) = 0;
-    virtual Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) = 0;
-    virtual void OnAttributeChanged(AttributeId attributeId)                    = 0;
-    virtual CHIP_ERROR PersistentAttributesLoadedCallback()                     = 0;
-    virtual CHIP_ERROR LoadZones(std::vector<ZoneInformationStorage> & aZones) = 0;
-    virtual CHIP_ERROR LoadTriggers(std::vector<ZoneTriggerControlStruct> & aTriggers) = 0;
+    virtual Protocols::InteractionModel::Status RemoveZone(uint16_t zoneID)                                                     = 0;
+    virtual Protocols::InteractionModel::Status CreateTrigger(const ZoneTriggerControlStruct & zoneTrigger)                     = 0;
+    virtual Protocols::InteractionModel::Status UpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger)                     = 0;
+    virtual Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID)                                                  = 0;
+    virtual void OnAttributeChanged(AttributeId attributeId)                                                                    = 0;
+    virtual CHIP_ERROR PersistentAttributesLoadedCallback()                                                                     = 0;
+    virtual CHIP_ERROR LoadZones(std::vector<ZoneInformationStorage> & aZones)                                                  = 0;
+    virtual CHIP_ERROR LoadTriggers(std::vector<ZoneTriggerControlStruct> & aTriggers)                                          = 0;
 
     // Legacy applications may still discover the compatibility wrapper via the
     // delegate. The wrapper owns this pointer so the code-driven cluster API

@@ -34,10 +34,10 @@ using chip::Testing::IsGeneratedCommandsListEqualTo;
 
 namespace {
 
-constexpr EndpointId kTestEndpointId               = 1;
-constexpr uint8_t kMaxUserDefinedZones             = 5;
-constexpr uint8_t kMaxZones                        = 8;
-constexpr uint8_t kSensitivityMax                  = 4;
+constexpr EndpointId kTestEndpointId   = 1;
+constexpr uint8_t kMaxUserDefinedZones = 5;
+constexpr uint8_t kMaxZones            = 8;
+constexpr uint8_t kSensitivityMax      = 4;
 const TwoDCartesianVertexStruct kTwoDMaxPoint{ 640, 480 };
 
 class MockDelegate : public Delegate
@@ -53,10 +53,7 @@ public:
         return Protocols::InteractionModel::Status::Success;
     }
 
-    Protocols::InteractionModel::Status RemoveZone(uint16_t) override
-    {
-        return Protocols::InteractionModel::Status::Success;
-    }
+    Protocols::InteractionModel::Status RemoveZone(uint16_t) override { return Protocols::InteractionModel::Status::Success; }
 
     Protocols::InteractionModel::Status CreateTrigger(const ZoneTriggerControlStruct &) override
     {
@@ -68,10 +65,7 @@ public:
         return Protocols::InteractionModel::Status::Success;
     }
 
-    Protocols::InteractionModel::Status RemoveTrigger(uint16_t) override
-    {
-        return Protocols::InteractionModel::Status::Success;
-    }
+    Protocols::InteractionModel::Status RemoveTrigger(uint16_t) override { return Protocols::InteractionModel::Status::Success; }
 
     void OnAttributeChanged(AttributeId) override {}
 
