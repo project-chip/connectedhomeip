@@ -34,6 +34,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
 #       --app-pipe /tmp/pavst_2_13_fifo
+#       --timeout 300
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -281,14 +282,14 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         initDuration = 5
         augDuration = 2
         maxDuration = 15
-        blindDuration = 3
+        blindDuration = 10
         maxPreRollLen = 4
         try:
             zoneList = [{"zone": zoneID1, "sensitivity": 4}]
             triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                               "maxPreRollLen": 4000,
                               "motionZones": zoneList,
-                              "motionTimeControl": {"initialDuration": 5, "augmentationDuration": 2, "maxDuration": 15, "blindDuration": 3}}
+                              "motionTimeControl": {"initialDuration": initDuration, "augmentationDuration": augDuration, "maxDuration": maxDuration, "blindDuration": blindDuration}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
                                                               tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
             asserts.assert_equal(status, Status.Success,
@@ -323,7 +324,8 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                                    self.dut_node_id,
                                    self.get_endpoint())
 
-        timeControl = {"initialDuration": 5, "augmentationDuration": 2, "maxDuration": 15, "blindDuration": 3}
+        timeControl = {"initialDuration": initDuration, "augmentationDuration": augDuration,
+                       "maxDuration": maxDuration, "blindDuration": blindDuration}
         cmd = pvcluster.Commands.ManuallyTriggerTransport(
             connectionID=aConnectionID,
             activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency,
@@ -450,7 +452,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                               "maxPreRollLen": 4000,
                               "motionZones": zoneList,
-                              "motionTimeControl": {"initialDuration": 5, "augmentationDuration": 15, "maxDuration": 10, "blindDuration": 3}}
+                              "motionTimeControl": {"initialDuration": initDuration, "augmentationDuration": augDuration+13, "maxDuration": maxDuration, "blindDuration": blindDuration}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
                                                               tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
             asserts.assert_equal(status, Status.Success,
