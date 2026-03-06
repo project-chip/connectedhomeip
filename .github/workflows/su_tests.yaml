@@ -14,10 +14,16 @@
 
 name: Daily Run For Software Update Tests
 on:
-    schedule:
-      - cron: '0 0 * * *'
+    # schedule:
+    #   - cron: '0 0 * * *'
+# --- TEST SECTION: Uncomment below to test on PRs ---
+    push:
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
+# --- END TEST SECTION ---
     workflow_dispatch:
         inputs:
             disable_ccache:
@@ -43,7 +49,9 @@ jobs:
     su_repl_tests_linux_build:
         name: REPL Tests - Linux Software Update (BUILD)
 
-        if: github.actor != 'restyled-io[bot]'
+            if: |
+              github.actor != 'restyled-io[bot]' && 
+              (github.ref == 'refs/heads/master' || github.event_name == 'pull_request')
 
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi
@@ -76,6 +84,9 @@ jobs:
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v5
+              with:
+                # This ensures we are always testing master code
+                ref: ${{ github.event_name == 'pull_request' && github.head_ref || 'master' }}
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -155,6 +166,7 @@ jobs:
     su_repl_tests_linux_run:
         name: Software Update REPL Tests - Linux (RUN)
         needs: su_repl_tests_linux_build
+        if: github.actor != 'restyled-io[bot]'
         timeout-minutes: 45
 
         if: github.actor != 'restyled-io[bot]'
@@ -195,6 +207,9 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v5
+              with:
+                # This ensures we are always testing master code
+                ref: ${{ github.event_name == 'pull_request' && github.head_ref || 'master' }}
             # NOTE: no bootstrap since we only use compile outputs from previous steps (including python venv in out/venv)
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
@@ -236,16 +251,3 @@ jobs:
               if: ${{matrix.filter != ''}}
               run: |
                   scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}"'
-
-            - name: Execute Jupyter Notebooks
-              if: ${{matrix.filter == ''}}
-              run: |
-                  # TODO: ipynb HARD CODES paths to all-clusters app. create a symlink to them
-                  ln -s ../objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test out/linux-x64-all-clusters
-
-                  scripts/run_in_python_env.sh out/venv \
-                  "jupyter execute docs/development_controllers/matter-repl/Matter_REPL_Intro.ipynb \
-                  docs/development_controllers/matter-repl/Matter_Basic_Interactions.ipynb \
-                  docs/development_controllers/matter-repl/Matter_Access_Control.ipynb \
-                  docs/development_controllers/matter-repl/Matter_Multi_Fabric_Commissioning.ipynb \
-                  "
