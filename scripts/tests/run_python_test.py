@@ -161,7 +161,7 @@ class IpPacketCaptureManager():
         self.tcpdump_process = None
         self.dump_filename = dump_filename
         self.interface = 'any'
-        self.keep_dumpfile = False
+        self.keep_dumpfile = True
 
     def start(self):
         # Create directory for dump files
@@ -375,8 +375,9 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         # We expect both app and test script should exit with 0
         exit_code = test_script_exit_code or app_exit_code
 
-        if tcpdump and exit_code != 0:
-            tcpdump.keep_dumpfile = True
+        if tcpdump and exit_code == 0:
+            # Delete packet captures from successful runs
+            tcpdump.keep_dumpfile = False
 
         if quiet:
             if exit_code:
