@@ -203,7 +203,7 @@ class WpaSupplicantMock(threading.Thread):
             for interface in self.mock.interfaces:
                 if interface.interface_name_in_sim in name.lower():  # Case-insensitive match
                     return interface.path
-            return next(reversed(self.mock.interfaces)).path
+            return self.mock.interfaces[-1].path
 
     class WpaInterface(sdbus.DbusInterfaceCommonAsync,
                        interface_name="fi.w1.wpa_supplicant1.Interface"):
@@ -217,12 +217,12 @@ class WpaSupplicantMock(threading.Thread):
         # Instance-level mapping of session id -> session info
         nan_sessions: dict[int, dict]
 
-        def __init__(self, mock: 'WpaSupplicantMock', index: int, network: WpaSupplicantMock.WpaNetwork):
+        def __init__(self, mock: 'WpaSupplicantMock', index: int):
             super().__init__()
             self.mock = mock
             self.index = index
             self.path = f"/fi/w1/wpa_supplicant1/Interfaces/{index}"
-            self.network = network
+            self.network = WpaSupplicantMock.WpaNetwork(self, mock.ssid)
             self.mock_mac = f"00:11:22:33:44:{index:02x}"  # Unique MAC per interface
             self.state = "disconnected"
             self.current_network = "/"
@@ -251,8 +251,9 @@ class WpaSupplicantMock(threading.Thread):
                 await self.State.set_async("associating")
                 await self.State.set_async("associated")
                 self.mock.networking.app_link.up()
-                await self.Scan({})
                 await self.State.set_async("completed")
+
+            await self.Scan({})
 
             await self.CurrentNetwork.set_async(path)
             asyncio.create_task(associate())
@@ -485,11 +486,10 @@ class WpaSupplicantMock(threading.Thread):
 
     class WpaNetwork(sdbus.DbusInterfaceCommonAsync,
                      interface_name="fi.w1.wpa_supplicant1.Network"):
-        def __init__(self, ssid: str, interface_index: int):
+        def __init__(self, interface: WpaSupplicantMock.WpaInterface, ssid: str):
             super().__init__()
             self.ssid = ssid
-            self.interface_index = interface_index
-            self.path = f"/fi/w1/wpa_supplicant1/Interfaces/{interface_index}/Networks/1"
+            self.path = interface.path + "/Networks/1"
             self.enabled = False
 
         @sdbus.dbus_property_async("a{sv}")
@@ -532,8 +532,7 @@ class WpaSupplicantMock(threading.Thread):
 
         for interface_idx, name in enumerate(interfaces_names):
             self.interfaces.append(
-                interface := WpaSupplicantMock.WpaInterface(self,
-                                                            interface_idx, WpaSupplicantMock.WpaNetwork(self.ssid, interface_idx)))
+                interface := WpaSupplicantMock.WpaInterface(self, interface_idx))
             # Assign interfaces to given names
             self.nan_simulator.register_interface(name, interface)
 
