@@ -166,6 +166,7 @@ void FakeReadings::FakeReadingsUpdate()
         esManager->SetPeriodicEnergyExported(mPeriodicEnergyExported);
         esManager->SetCumulativeEnergyImported(mTotalEnergyImported);
         esManager->SetCumulativeEnergyExported(mTotalEnergyExported);
+        esManager->GenerateEEMReport();
     }
 
     // start/restart the timer

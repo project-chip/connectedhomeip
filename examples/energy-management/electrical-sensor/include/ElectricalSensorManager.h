@@ -69,6 +69,7 @@ public:
     void SetCumulativeEnergyExported(int64_t value) { mEEMDelegate.SetCumulativeEnergyExported(value); }
     void SetPeriodicEnergyImported(int64_t value) { mEEMDelegate.SetPeriodicEnergyImported(value); }
     void SetPeriodicEnergyExported(int64_t value) { mEEMDelegate.SetPeriodicEnergyExported(value); }
+    void GenerateEEMReport();
 
     // --- Power reading API (updates EPM delegate) ---
     CHIP_ERROR SendPowerReading(int64_t aActivePower_mW, int64_t aVoltage_mV, int64_t aActiveCurrent_mA);
