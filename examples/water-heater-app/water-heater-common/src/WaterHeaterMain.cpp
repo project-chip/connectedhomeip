@@ -233,7 +233,8 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
             .features = BitMask<ElectricalEnergyMeasurement::Feature, uint32_t>(
                 ElectricalEnergyMeasurement::Feature::kImportedEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy,
                 ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kPeriodicEnergy),
-            .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet().Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyReset::Id>(),
+            .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet()
+                                      .Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyReset::Id>(),
             .accuracyStruct = kMeasurementAccuracy,
         };
 
