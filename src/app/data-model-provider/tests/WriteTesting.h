@@ -86,6 +86,12 @@ public:
         return *this;
     }
 
+    WriteOperation & SetListOperation(app::ConcreteDataAttributePath::ListOperation listOp)
+    {
+        mRequest.path.mListOp = listOp;
+        return *this;
+    }
+
     const app::DataModel::WriteAttributeRequest & GetRequest() const { return mRequest; }
 
     // Helper to encode a value, using EncodeForWrite for fabric-scoped types
