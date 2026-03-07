@@ -252,6 +252,7 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside HandleOpenCommand");
     Commands::Open::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
+    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside HandleOpenCommand: commandData.Decode finished");
 
     // Check the "min 1" constraint in the command fields.
     // This mirrors the previous implementation for this cluster, however we need to validate properly the scenarios
@@ -259,7 +260,9 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     // https://github.com/project-chip/connectedhomeip/issues/42777
     VerifyOrReturnValue((!commandData.openDuration.HasValue() ? true : commandData.openDuration.Value().ValueOr(1) > 0),
                         Status::ConstraintError);
+    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside HandleOpenCommand: commandData.openDuration.Value().ValueOr(1) > 0 finished");
     VerifyOrReturnValue(commandData.targetLevel.ValueOr(1) > 0, Status::ConstraintError);
+    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside HandleOpenCommand: commandData.targetLevel.ValueOr(1) > 0 finished");
 
     // If there is a fault that prevents the cluster to perform the action, return FailureDueToFault.
     // This logic keeps the previous implementation of this cluster, however it may be too strict since
