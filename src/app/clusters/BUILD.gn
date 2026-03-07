@@ -26,6 +26,7 @@ source_set("clusters") {
     "camera-av-settings-user-level-management-server",
     "chime-server",
     "descriptor",
+    "fan-control-server",
     "general-commissioning-server",
     "general-diagnostics-server",
     "group-key-mgmt-server",
