@@ -818,6 +818,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.fail_on_skipped_tests = args.fail_on_skipped
 
     config.legacy = args.use_legacy_test_event_triggers
+    config.no_wildcard_subscription = args.no_wildcard_subscription
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
@@ -992,6 +993,11 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
 
     basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
                              help="Send test event triggers with endpoint 0 for older devices")
+    basic_group.add_argument("--no-wildcard-subscription", action="store_true", default=False,
+                             dest="no_wildcard_subscription",
+                             help="Skip the background wildcard attribute subscription that is normally started "
+                                  "before each test.  Use for tests that directly manipulate the ACL and would "
+                                  "be disrupted by the framework adding a secondary-controller admin entry.")
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 

@@ -538,3 +538,267 @@ class AttributeSubscriptionHandler:
         """Flush entire queue, returning nothing."""
         _ = self.get_last_report()
         return
+
+
+class WildcardAttributeSubscriptionHandler:
+    """
+    Callback class to handle wildcard attribute subscription reports.
+
+    Unlike AttributeSubscriptionHandler which tracks a specific attribute, this class manages
+    subscriptions to multiple attributes using wildcard paths (e.g., all attributes in a cluster,
+    all attributes on an endpoint, or all attributes across all endpoints/clusters).
+
+    It provides queue-based tracking of all attribute updates, allowing tests to verify that
+    specific attributes received reports after being modified.
+
+    Attributes with the Changes Omitted (C) or Quieter Reporting (Q) spec quality flags can be
+    excluded by passing their (cluster_id, attribute_id) pairs as `excluded_attribute_ids`.
+    Excluded attributes are silently dropped from the queue and cache so that subscription
+    verification logic does not falsely flag them as missing.
+
+    Attributes:
+        _subscription: The active subscription transaction object.
+        _excluded_attribute_ids: Frozen set of (cluster_id, attr_id) pairs to ignore.
+        _q: Queue storing dicts of {endpoint, cluster, attribute, value} for received updates.
+        _attribute_reports: Dictionary tracking all reports by (endpoint, cluster, attribute) tuple.
+        _latest_values: Dictionary mapping (endpoint_id, cluster_id, attr_id) -> latest value,
+            seeded from the priming read and updated on every non-excluded report.
+        _lock: Threading lock for thread-safe access to internal data structures.
+    """
+
+    def __init__(self, excluded_attribute_ids: Optional[frozenset[tuple[int, int]]] = None):
+        """Initialize the wildcard subscription handler.
+
+        Parameters:
+            excluded_attribute_ids: Optional frozenset of (cluster_id, attribute_id) integer
+                pairs whose reports should be silently dropped.  Build this set from
+                XmlAttribute.changes_omitted / XmlAttribute.quieter_reporting flags in
+                spec_parsing to exclude C- and Q-quality attributes from subscription checks.
+        """
+        self._subscription = None
+        self._excluded_attribute_ids: frozenset[tuple[int, int]] = excluded_attribute_ids or frozenset()
+        self._q: queue.Queue = queue.Queue()
+        self._attribute_reports: dict[tuple, list[Any]] = {}
+        # (endpoint_id: int, cluster_id: int, attr_id: int) -> latest reported value.
+        # Seeded from the priming read in start() and kept up-to-date by __call__.
+        self._latest_values: dict[tuple[int, int, int], Any] = {}
+        self._lock = threading.Lock()
+
+    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
+        """
+        Callback invoked when an attribute report is received via subscription.
+
+        Drops reports for attributes in `excluded_attribute_ids` (C/Q quality flags).
+        For all other attributes, stores the report in a queue, tracks it in the
+        internal history, and updates the latest-value cache.
+
+        Parameters:
+            path (TypedAttributePath): Contains endpoint, cluster and attribute metadata for the report.
+            transaction (SubscriptionTransaction): Provides access to the actual reported value.
+        """
+        # Drop C/Q-quality attributes: they are not required to report on every change,
+        # so including them in subscription verification would produce false failures.
+        if (path.ClusterId, path.AttributeId) in self._excluded_attribute_ids:
+            return
+
+        data = transaction.GetAttribute(path)
+
+        endpoint_id: int = path.Path.EndpointId
+        report_key = (endpoint_id, path.ClusterType, path.AttributeType)
+        cache_key = (endpoint_id, path.ClusterId, path.AttributeId)
+
+        # Queue the report for sequential processing
+        self._q.put({
+            'endpoint': endpoint_id,
+            'cluster': path.ClusterType,
+            'attribute': path.AttributeType,
+            'value': data
+        })
+
+        # Track in history and latest-value cache with thread safety
+        with self._lock:
+            if report_key not in self._attribute_reports:
+                self._attribute_reports[report_key] = []
+            self._attribute_reports[report_key].append({
+                'value': data,
+                'timestamp': datetime.now(timezone.utc)
+            })
+            self._latest_values[cache_key] = data
+
+    async def start(self, dev_ctrl, node_id: int, attributes: list,
+                    fabric_filtered: bool = False,
+                    min_interval_sec: int = 0,
+                    max_interval_sec: int = 5,
+                    keepSubscriptions: bool = False,
+                    autoResubscribe: bool = False) -> Any:
+        """
+        Start a wildcard subscription for the specified attribute paths.
+
+        After the subscription is established the priming read values (all attribute values
+        returned as part of the initial SubscribeResponse) are used to seed `_latest_values`
+        so callers can query the current state of any non-excluded attribute immediately.
+
+        Parameters:
+            dev_ctrl: Device controller to use for the subscription.
+            node_id: Node ID of the device to subscribe to.
+            attributes: List of attribute paths (can include wildcards).
+            fabric_filtered: Whether to filter by fabric.
+            min_interval_sec: Minimum reporting interval in seconds.
+            max_interval_sec: Maximum reporting interval in seconds.
+            keepSubscriptions: Whether to keep existing subscriptions.
+            autoResubscribe: Whether to automatically resubscribe on subscription loss.
+
+        Returns:
+            The subscription transaction object.
+        """
+        self._subscription = await dev_ctrl.ReadAttribute(
+            nodeId=node_id,
+            attributes=attributes,
+            reportInterval=(int(min_interval_sec), int(max_interval_sec)),
+            fabricFiltered=fabric_filtered,
+            keepSubscriptions=keepSubscriptions,
+            autoResubscribe=autoResubscribe
+        )
+        self._subscription.SetAttributeUpdateCallback(self.__call__)
+
+        # Seed _latest_values from the priming read.  GetAttributes() returns the
+        # full attribute cache as {endpoint_id: {ClusterType: {AttributeType: value}}}.
+        # The callback is only invoked for *subsequent* updates, so we must populate
+        # the initial snapshot here.
+        self._seed_latest_values_from_priming_read()
+
+        return self._subscription
+
+    def _seed_latest_values_from_priming_read(self) -> None:
+        """Populate _latest_values from the subscription's priming read cache.
+
+        Called once from start() after ReadAttribute returns.  Skips excluded (C/Q)
+        attributes and any value that is an error/decode failure.
+        """
+        if self._subscription is None:
+            return
+
+        from matter.clusters.Attribute import ValueDecodeFailure  # local import avoids top-level cost
+        try:
+            priming_data = self._subscription.GetAttributes()
+        except Exception:
+            LOGGER.warning("[WildcardAttributeSubscriptionHandler] Could not read priming attribute cache")
+            return
+
+        with self._lock:
+            for endpoint_id, clusters in priming_data.items():
+                if not isinstance(endpoint_id, int):
+                    continue
+                for cluster_type, attrs in clusters.items():
+                    if not isinstance(attrs, dict):
+                        continue
+                    try:
+                        cluster_id: int = cluster_type.id
+                    except AttributeError:
+                        continue
+                    for attr_type, value in attrs.items():
+                        try:
+                            attr_id: int = attr_type.attribute_id
+                        except AttributeError:
+                            continue
+                        if (cluster_id, attr_id) in self._excluded_attribute_ids:
+                            continue
+                        if isinstance(value, ValueDecodeFailure):
+                            continue
+                        self._latest_values[(endpoint_id, cluster_id, attr_id)] = value
+
+    def was_attribute_reported(self, endpoint_id: int, cluster_type, attribute_type) -> bool:
+        """
+        Check if a specific attribute has received at least one report.
+
+        Parameters:
+            endpoint_id: The endpoint ID to check.
+            cluster_type: The cluster class type.
+            attribute_type: The attribute class type.
+
+        Returns:
+            True if the attribute has been reported, False otherwise.
+        """
+        report_key = (endpoint_id, cluster_type, attribute_type)
+        with self._lock:
+            return report_key in self._attribute_reports and len(self._attribute_reports[report_key]) > 0
+
+    def get_attribute_report_count(self, endpoint_id: int, cluster_type, attribute_type) -> int:
+        """
+        Get the number of reports received for a specific attribute.
+
+        Parameters:
+            endpoint_id: The endpoint ID to check.
+            cluster_type: The cluster class type.
+            attribute_type: The attribute class type.
+
+        Returns:
+            Number of reports received for this attribute.
+        """
+        report_key = (endpoint_id, cluster_type, attribute_type)
+        with self._lock:
+            return len(self._attribute_reports.get(report_key, []))
+
+    def get_all_reported_attributes(self) -> list[tuple]:
+        """
+        Get a list of all (endpoint, cluster, attribute) tuples that have received reports.
+
+        Returns:
+            List of tuples (endpoint_id, cluster_type, attribute_type).
+        """
+        with self._lock:
+            return list(self._attribute_reports.keys())
+
+    def get_latest_value(self, endpoint_id: int, cluster_id: int, attr_id: int) -> Optional[Any]:
+        """Return the most recently reported value for the given attribute, or None if not yet seen.
+
+        Parameters:
+            endpoint_id: Endpoint the attribute lives on.
+            cluster_id: Integer cluster ID (e.g. 0x0006 for On/Off).
+            attr_id: Integer attribute ID within that cluster.
+
+        Returns:
+            The latest cached value, or None if no report has been received yet.
+        """
+        with self._lock:
+            return self._latest_values.get((endpoint_id, cluster_id, attr_id))
+
+    @property
+    def latest_values(self) -> dict[tuple[int, int, int], Any]:
+        """Return a snapshot of the entire latest-value cache.
+
+        Keys are (endpoint_id, cluster_id, attr_id) integer tuples.
+        Values are the last reported attribute value (never a ValueDecodeFailure).
+        """
+        with self._lock:
+            return dict(self._latest_values)
+
+    def reset(self) -> None:
+        """Reset all tracking data, clearing the queue, report history, and latest-value cache."""
+        with self._lock:
+            self._attribute_reports.clear()
+            self._latest_values.clear()
+        self.flush_reports()
+
+    def flush_reports(self) -> None:
+        """Flush the entire queue, discarding all pending reports."""
+        while True:
+            try:
+                self._q.get(block=False)
+            except queue.Empty:
+                return
+
+    @property
+    def attribute_queue(self) -> queue.Queue:
+        """Get the internal queue of attribute reports."""
+        return self._q
+
+    @property
+    def subscription(self):
+        """Get the underlying subscription transaction object."""
+        return self._subscription
+
+    def shutdown(self) -> None:
+        """Shutdown the subscription."""
+        if self._subscription:
+            self._subscription.Shutdown()

@@ -133,6 +133,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
     @async_test_body
     async def setup_class(self):
+        super().setup_class()
 
         self.print_step("precondition", "Commissioning - already done")
 

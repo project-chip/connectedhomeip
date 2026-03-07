@@ -50,6 +50,7 @@ import matter.logging
 import matter.native
 import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute, ClusterObjects
+from matter.clusters.Types import NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
@@ -61,6 +62,7 @@ from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from matter.testing.runner import TestRunnerHooks, TestStep
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, SpecParsingException, build_xml_clusters
 from matter.tlv import uint
 
 # TODO: Add utility to commission a device if needed
@@ -216,6 +218,22 @@ class MatterBaseTest(base_test.BaseTestClass):
         # where the read is deferred until the first guard function call that requires global attributes.
         self.stored_global_wildcard = None
 
+        # Pre-build the set of (cluster_id, attr_id) pairs whose attributes carry the
+        # Changes Omitted (C) or Quieter Reporting (Q) spec quality flags.  These attributes
+        # are excluded from the background wildcard subscription started in setup_test so that
+        # subscription-verification logic does not flag them as missing or stale.
+        # The XML parsing is done once per class here (not per test) because it is expensive.
+        self.wildcard_subscription_handler = None
+        # Secondary controller for the background wildcard subscription.  A separate node_id
+        # is used so that keepSubscriptions=False on default_controller does not cancel this
+        # background subscription (they use different CASE sessions).
+        # Created lazily in _start_wildcard_subscription; shut down in teardown_class.
+        self.subscription_controller = None
+        # ACL snapshot taken immediately before the subscription controller's admin entry is
+        # added.  Restored in teardown_test so every test sees a clean, unmodified ACL.
+        self._pre_subscription_acl = None
+        self._cq_excluded_attr_ids: frozenset[tuple[int, int]] = self._build_cq_excluded_ids()
+
     def teardown_class(self):
         """Final teardown after all tests: log all problems and dump device attributes if available.
             Test authors may overwrite this method in the derived class to perform teardown that is common for all tests
@@ -237,7 +255,141 @@ class MatterBaseTest(base_test.BaseTestClass):
             for problem in self.problems:
                 LOGGER.info(str(problem))
             LOGGER.info("###########################################################")
+
+        if self.subscription_controller is not None:
+            try:
+                self.subscription_controller.Shutdown()
+            except Exception as e:
+                LOGGER.warning("[MatterBaseTest] Error shutting down subscription controller: %s", e)
+            self.subscription_controller = None
+
         super().teardown_class()
+
+    @staticmethod
+    def _build_cq_excluded_ids(
+            dm_dir: PrebuiltDataModelDirectory = PrebuiltDataModelDirectory.k1_6
+    ) -> frozenset[tuple[int, int]]:
+        """Return a frozenset of (cluster_id, attr_id) pairs for C/Q-quality attributes.
+
+        Parses the Matter spec data-model XML for `dm_dir` and collects every attribute
+        that carries the Changes Omitted (changeOmitted="true") or Quieter Reporting
+        (quieterReporting="true") quality flag.
+
+        These attributes are excluded from the background wildcard subscription so that
+        subscription-verification logic does not flag them as unexpectedly silent.
+
+        Args:
+            dm_dir: Which pre-built DM version to use.  Override in subclasses if the
+                    device's spec version is known (e.g. via BasicInformation.SpecificationVersion).
+        """
+        try:
+            xml_clusters, _ = build_xml_clusters(dm_dir)
+        except SpecParsingException as e:
+            LOGGER.warning("Could not build XML clusters for C/Q exclusion set: %s", e)
+            return frozenset()
+
+        return frozenset(
+            (int(cluster_id), int(attr_id))
+            for cluster_id, cluster in xml_clusters.items()
+            for attr_id, attr in cluster.attributes.items()
+            if attr.changes_omitted or attr.quieter_reporting
+        )
+
+    def _start_wildcard_subscription(self) -> None:
+        """Start a background wildcard subscription, omitting C/Q-quality attributes.
+
+        Creates a WildcardAttributeSubscriptionHandler pre-loaded with the C/Q exclusion
+        set built in setup_class, subscribes to all attributes on all endpoints of the DUT,
+        and caches the priming-read values so tests can query the current device state
+        without an extra round-trip read.
+
+        A secondary controller (node_id = controller_node_id + 123456) is used so that
+        keepSubscriptions=False from default_controller (issued by tests that manage their
+        own subscriptions) does not cancel this background subscription.
+
+        Before the subscription starts the current ACL is snapshotted into
+        _pre_subscription_acl and a single Administer entry for the secondary controller is
+        appended.  teardown_test restores the ACL from the snapshot so every test sees an
+        unmodified ACL regardless of what the test did to it.
+
+        autoResubscribe=False is intentional: if a test removes the subscription
+        controller's ACL entry (e.g. via a full ACL overwrite), the subscription stops
+        receiving reports rather than repeatedly retrying with failing re-subscriptions.
+
+        The subscription handler is stored as `self.wildcard_subscription_handler` and is
+        shut down automatically in teardown_test.
+
+        This is a synchronous wrapper around an async operation; it uses self.event_loop
+        (set by the test runner before setup_class is called).
+        """
+        # Lazy import to break the circular dependency:
+        from matter.testing.event_attribute_reporting import WildcardAttributeSubscriptionHandler
+
+        LOGGER.info("[MatterBaseTest] Building wildcard subscription handler")
+        handler = WildcardAttributeSubscriptionHandler(
+            excluded_attribute_ids=self._cq_excluded_attr_ids
+        )
+
+        subscription_node_id = self.matter_test_config.controller_node_id + 123456
+
+        async def _start():
+            # Create the secondary controller once per class; reused across all tests.
+            if self.subscription_controller is None:
+                fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
+                self.subscription_controller = fabric_admin.NewController(
+                    nodeId=subscription_node_id,
+                    paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
+                )
+                LOGGER.info("[MatterBaseTest] Subscription controller created "
+                            "(node_id=0x%016X)", subscription_node_id)
+
+            # Snapshot the current ACL, then append an Administer entry for the subscription
+            # controller.  teardown_test will restore from this snapshot after every test.
+            acl_result = await self.default_controller.ReadAttribute(
+                nodeId=self.dut_node_id,
+                attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+            )
+            self._pre_subscription_acl = (
+                acl_result[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
+            )
+            sub_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                subjects=[subscription_node_id],
+                targets=NullValue,
+            )
+            await self.default_controller.WriteAttribute(
+                nodeId=self.dut_node_id,
+                attributes=[(0, Clusters.AccessControl.Attributes.Acl(
+                    list(self._pre_subscription_acl) + [sub_entry]
+                ))],
+            )
+
+            # Start the wildcard subscription using the secondary controller.
+            await handler.start(
+                dev_ctrl=self.subscription_controller,
+                node_id=self.dut_node_id,
+                attributes=[Attribute.AttributePath(None, None, None)],
+                min_interval_sec=0,
+                max_interval_sec=30,
+                keepSubscriptions=False,
+                autoResubscribe=False,
+            )
+
+        try:
+            LOGGER.info("[MatterBaseTest] Starting wildcard subscription")
+            self.event_loop.run_until_complete(_start())
+            self.wildcard_subscription_handler = handler
+            LOGGER.info(
+                "[MatterBaseTest] Wildcard subscription started (%d C/Q attrs excluded, "
+                "%d attrs cached from priming read)",
+                len(self._cq_excluded_attr_ids),
+                len(handler.latest_values),
+            )
+        except Exception as e:
+            LOGGER.warning("[MatterBaseTest] Could not start wildcard subscription: %s", e)
+            self._pre_subscription_acl = None
+            self.wildcard_subscription_handler = None
 
     def _dump_device_attributes_on_failure(self):
         """
@@ -277,7 +429,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     def setup_test(self):
         """Set up for each individual test execution.
 
-        Resets test state, starts timers, and notifies runner hooks.
+        Resets test state, starts timers, notifies runner hooks, and establishes a background
+        wildcard attribute subscription (excluding C/Q-quality attributes) so that tests have
+        an up-to-date attribute cache available without extra round-trip reads.
+
         Called before each test method by the Mobly framework.
 
         Test authors may overwrite this method in the derived class to perform setup that is common for all tests.
@@ -291,6 +446,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
         self.failed = False
         if self.runner_hook and not self.is_commissioning:
+            # Start the background wildcard subscription unless the test has opted out
+            # via --no-wildcard-subscription (e.g. tests that directly manipulate the ACL).
+            if not self.matter_test_config.no_wildcard_subscription:
+                self._start_wildcard_subscription()
             test_name = self.current_test_info.name
             steps = self.get_defined_test_steps(test_name)
             num_steps = 1 if steps is None else len(steps)
@@ -303,6 +462,48 @@ class MatterBaseTest(base_test.BaseTestClass):
             # to indicates how it is proceeding
             if steps is None:
                 self.step(1)
+
+    def teardown_test(self):
+        """Tear down after each individual test execution.
+
+        Shuts down the background wildcard subscription and restores the DUT ACL to the
+        state captured before the subscription controller's entry was added.  This ensures
+        every test starts with a clean, unmodified ACL regardless of what the test did.
+
+        Test authors that implement this method should ensure super().teardown_test() is called
+        after any custom teardown code.
+        """
+        if not self.matter_test_config.no_wildcard_subscription:
+            if self.wildcard_subscription_handler is not None:
+                try:
+                    self.wildcard_subscription_handler.shutdown()
+                except Exception as e:
+                    LOGGER.warning("[MatterBaseTest] Error shutting down wildcard subscription: %s", e)
+                self.wildcard_subscription_handler = None
+            LOGGER.info("Wildcard subscription shut down")
+
+            # Restore ACL to the snapshot taken before the subscription controller entry was
+            # added.  Runs unconditionally so the DUT is always left in the original state
+            # regardless of what the test did to the ACL.
+            if self._pre_subscription_acl is not None:
+                async def _restore_acl():
+                    try:
+                        await self.default_controller.WriteAttribute(
+                            nodeId=self.dut_node_id,
+                            attributes=[(0, Clusters.AccessControl.Attributes.Acl(
+                                self._pre_subscription_acl
+                            ))],
+                        )
+                        LOGGER.info("[MatterBaseTest] ACL restored to pre-subscription state")
+                    except Exception as e:
+                        LOGGER.warning("[MatterBaseTest] Error restoring ACL: %s", e)
+                try:
+                    self.event_loop.run_until_complete(_restore_acl())
+                except Exception as e:
+                    LOGGER.warning("[MatterBaseTest] Error running ACL restore: %s", e)
+                self._pre_subscription_acl = None
+
+        super().teardown_test()
 
     def on_fail(self, record):
         """Handle test failure callback from Mobly framework.
@@ -981,7 +1182,97 @@ class MatterBaseTest(base_test.BaseTestClass):
             if not type_ok:
                 self.record_error(test_name=test_name, location=location, problem=type_err_msg)
                 return None
+
+        # Compare the read value against the background wildcard subscription cache.
+        # Always uses assert_on_error=False so a subscription mismatch records a problem
+        # without disrupting existing test logic or return values.
+        # Skipped automatically for C/Q-quality attributes, missing subscriptions, or
+        # when a non-specified controller/node is used.
+        if read_ok:
+            self.verify_attribute_subscription_value(
+                attribute=attribute,
+                read_value=attr_ret,
+                endpoint_id=endpoint,
+                test_name=test_name,
+                assert_on_error=False,
+            )
+
         return attr_ret
+
+    def verify_attribute_subscription_value(
+            self,
+            attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+            read_value: Any,
+            endpoint_id: Optional[int] = None,
+            test_name: str = "",
+            assert_on_error: bool = True) -> bool:
+        """Compare a freshly-read attribute value against the background wildcard subscription cache.
+
+        Call this immediately after read_single_attribute_check_success() to confirm that
+        the device is reporting the same value through its subscription as it returns on a
+        direct read.  A mismatch means the subscription is either stale or not firing.
+
+        Attributes with Changes Omitted (C) or Quieter Reporting (Q) spec quality flags are
+        skipped automatically — they are not required to reflect every change in subscription
+        reports, so no comparison is meaningful for them.
+
+        Args:
+            attribute:      Attribute descriptor class (e.g. Clusters.OnOff.Attributes.OnOff).
+            read_value:     Value returned by read_single_attribute_check_success().
+            endpoint_id:    Endpoint to check; defaults to self.get_endpoint().
+            test_name:      Included in recorded problems when assert_on_error is False.
+            assert_on_error: If True, calls asserts.fail() on mismatch.
+                             If False, records a problem via record_error() and returns False.
+
+        Returns:
+            True if the values match or the check was skipped; False on mismatch.
+        """
+        LOGGER.info("verify_attribute_subscription_value called")
+        if endpoint_id is None:
+            endpoint_id = self.get_endpoint()
+
+        cluster_id: int = attribute.cluster_id
+        attr_id: int = attribute.attribute_id
+        location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attr_id)
+
+        # C/Q-quality attributes are never stored in the subscription cache because they
+        # are not required to report on every change.  Skip without error.
+        if (cluster_id, attr_id) in self._cq_excluded_attr_ids:
+            return True
+
+        if self.wildcard_subscription_handler is None:
+            return True
+
+        cached_value = self.wildcard_subscription_handler.get_latest_value(endpoint_id, cluster_id, attr_id)
+
+        if cached_value is None:
+            problem = (
+                f"Attribute {attribute.__name__} (cluster 0x{cluster_id:04X}, "
+                f"attr 0x{attr_id:04X}) on endpoint {endpoint_id} "
+                f"has no value in subscription cache — never reported via subscription"
+            )
+            if assert_on_error:
+                asserts.fail(problem)
+            else:
+                self.record_error(test_name=test_name, location=location, problem=problem)
+            return False
+
+        if cached_value != read_value:
+            problem = (
+                f"Subscription cache mismatch for {attribute.__name__} "
+                f"(cluster 0x{cluster_id:04X}, attr 0x{attr_id:04X}) "
+                f"on endpoint {endpoint_id}: "
+                f"read returned {read_value!r}, subscription cache has {cached_value!r}"
+            )
+            if assert_on_error:
+                asserts.fail(problem)
+            else:
+                self.record_error(test_name=test_name, location=location, problem=problem)
+            return False
+
+        LOGGER.info(
+            f"[verify_subscription] {attribute.__name__} on endpoint {endpoint_id} matches read value: {read_value}")
+        return True
 
     async def read_single_attribute_expect_error(
             self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
