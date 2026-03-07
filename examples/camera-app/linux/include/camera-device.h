@@ -313,7 +313,7 @@ public:
 
     void SetVideoDevicePath(const std::string & path) { mVideoDevicePath = path; }
 
-    void HandleSimulatedZoneTriggeredEvent(uint16_t zoneId);
+    void HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds);
 
     void HandleSimulatedZoneStoppedEvent(uint16_t zoneId);
 
