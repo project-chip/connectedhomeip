@@ -130,17 +130,16 @@ class TC_WebRTCP_2_2(MatterBaseTest, WEBRTCPTestBase):
                              "Incorrect response type")
         asserts.assert_false(resp.deferredOffer, "Expected 'deferredOffer' to be False.")
 
-        # TODO: Enable this check after integrating with Camera AvStreamManager
-        # asserts.assert_not_equal(
-        #     resp.videoStreamID,
-        #     NullValue,
-        #     "videoStreamID in SolicitOfferResponse should be valid."
-        # )
-        # asserts.assert_not_equal(
-        #     resp.audioStreamID,
-        #     NullValue,
-        #     "audioStreamID in SolicitOfferResponse should be valid."
-        # )
+        asserts.assert_not_equal(
+            resp.videoStreamID,
+            NullValue,
+            "videoStreamID in SolicitOfferResponse should be valid."
+        )
+        asserts.assert_not_equal(
+            resp.audioStreamID,
+            NullValue,
+            "audioStreamID in SolicitOfferResponse should be valid."
+        )
 
         # Save the session ID for later steps
         current_session_id = resp.webRTCSessionID
@@ -153,8 +152,42 @@ class TC_WebRTCP_2_2(MatterBaseTest, WEBRTCPTestBase):
         )
         asserts.assert_equal(len(current_sessions), 1, "Expected CurrentSessions to be 1")
 
-        # Verify the session contains the correct WebRTCSessionID
-        asserts.assert_equal(current_sessions[0].id, current_session_id, "Session ID should match")
+        session = current_sessions[0]
+
+        # ID is uint16 type and contains a valid value (0–65534)
+        asserts.assert_true(isinstance(session.id, int), "Session ID should be an integer (uint16)")
+        asserts.assert_true(0 <= session.id <= 65534, "Session ID should be in valid uint16 range (0–65534)")
+
+        # PeerNodeID is node-id type and contains a valid non-zero node-id value
+        asserts.assert_true(isinstance(session.peerNodeID, int), "PeerNodeID should be an integer (node-id)")
+        asserts.assert_greater(session.peerNodeID, 0, "PeerNodeID should be a valid non-zero node-id")
+
+        # PeerEndpointID is endpoint-no type and contains a valid endpoint value (0–65534)
+        asserts.assert_true(isinstance(session.peerEndpointID, int), "PeerEndpointID should be an integer (endpoint-no)")
+        asserts.assert_true(0 <= session.peerEndpointID <= 65534, "PeerEndpointID should be in valid endpoint range (0–65534)")
+
+        # StreamUsage is StreamUsageEnum type and contains a valid StreamUsageEnum value
+        asserts.assert_true(isinstance(session.streamUsage, Clusters.Globals.Enums.StreamUsageEnum),
+                            "StreamUsage should be a StreamUsageEnum type")
+        asserts.assert_not_equal(session.streamUsage, Clusters.Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
+                                 "StreamUsage should be a valid known StreamUsageEnum value")
+
+        # Verify the stored session ID matches the one returned in the SolicitOfferResponse
+        asserts.assert_equal(session.id, current_session_id, "Session ID in CurrentSessions should match SolicitOfferResponse")
+
+        # Verify response contains the allocated VideoStreamID
+        asserts.assert_not_equal(
+            session.videoStreamID,
+            NullValue,
+            "videoStreamID in CurrentSessions should be valid."
+        )
+
+        # Verify response contains the allocated AudioStreamID
+        asserts.assert_not_equal(
+            session.audioStreamID,
+            NullValue,
+            "audioStreamID in CurrentSessions should be valid."
+        )
 
         self.step(5)
         # Send EndSession with invalid WebRTCSessionID (current + 1)
