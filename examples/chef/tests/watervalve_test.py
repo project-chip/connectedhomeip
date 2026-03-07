@@ -16,7 +16,6 @@
 #
 
 import logging
-import time
 
 from attributes_service import attributes_service_pb2
 from mobly import asserts
