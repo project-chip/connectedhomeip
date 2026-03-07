@@ -16,11 +16,6 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/closure-control-cluster-delegate.h"
-    "${CLUSTER_DIR}/ClosureControlClusterLogic.cpp"
-    "${CLUSTER_DIR}/closure-control-cluster-logic.h"
-    "${CLUSTER_DIR}/closure-control-cluster-matter-context.h"
-    "${CLUSTER_DIR}/closure-control-cluster-objects.h"
-    "${CLUSTER_DIR}/ClosureControlCluster.cpp"
-    "${CLUSTER_DIR}/closure-control-server.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
 )

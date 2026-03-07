@@ -2576,11 +2576,11 @@ endpoint 1 {
     emits event EngageStateChanged;
     emits event SecureStateChanged;
     callback attribute countdownTime;
-    ram      attribute mainState;
+    callback attribute mainState;
     callback attribute currentErrorList;
     callback attribute overallCurrentState;
     callback attribute overallTargetState;
-    ram      attribute latchControlModes;
+    callback attribute latchControlModes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

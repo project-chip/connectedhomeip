@@ -178,14 +178,17 @@ public:
     bool IsClosureControlMotionInProgress() const;
 
     /**
-     * @brief Gets the ClosureControlEndpoint logic for direct access.
+     * @brief Gets the ClosureControlEndpoint cluster for direct access.
      *
-     * This allows direct access to the cluster logic methods (e.g., HandleMoveTo)
+     * This allows direct access to the cluster cluster methods (e.g., HandleMoveTo)
      * when called from chip task context (e.g., via ScheduleWork).
      *
-     * @return Reference to the ClosureControlEndpoint logic.
+     * @return Reference to the ClosureControlEndpoint cluster.
      */
-    chip::app::Clusters::ClosureControl::ClusterLogic & GetClosureControlLogic() { return mClosureEndpoint1.GetLogic(); }
+    chip::app::Clusters::ClosureControl::ClosureControlCluster & GetClosureControlCluster()
+    {
+        return mClosureEndpoint1.GetClusterInstance();
+    }
 
     /**
      * @brief Sets the initial state for the ClosureControlEndpoint.
