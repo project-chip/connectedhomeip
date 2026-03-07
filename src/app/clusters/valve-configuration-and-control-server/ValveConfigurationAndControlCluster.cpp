@@ -249,10 +249,8 @@ std::optional<DataModel::ActionReturnStatus>
 ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
                                                        CommandHandler * handler)
 {
-    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside HandleOpenCommand");
     Commands::Open::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
-    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside HandleOpenCommand: commandData.Decode finished");
 
     // Check the "min 1" constraint in the command fields.
     // This mirrors the previous implementation for this cluster, however we need to validate properly the scenarios
@@ -260,19 +258,15 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     // https://github.com/project-chip/connectedhomeip/issues/42777
     VerifyOrReturnValue((!commandData.openDuration.HasValue() ? true : commandData.openDuration.Value().ValueOr(1) > 0),
                         Status::ConstraintError);
-    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside HandleOpenCommand: commandData.openDuration.Value().ValueOr(1) > 0 finished");
     VerifyOrReturnValue(commandData.targetLevel.ValueOr(1) > 0, Status::ConstraintError);
-    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside HandleOpenCommand: commandData.targetLevel.ValueOr(1) > 0 finished");
 
     // If there is a fault that prevents the cluster to perform the action, return FailureDueToFault.
     // This logic keeps the previous implementation of this cluster, however it may be too strict since
     // any fault will cause the command to fail.
     if (mValveFault.HasAny())
     {
-        ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside HandleOpenCommand: mValveFault !!!!");
         return Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kFailureDueToFault);
     }
-    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside HandleOpenCommand: mValveFault finished");
     // In the spec, the setting of the TargetState and CurrentState goes before the handling of the
     // fields of the command (checking and setting default values), however this was deferred to the OpenValve function to keep
     // backwards compatibility. Also this avoids setting the attributes if the targetLevel field doesn't have a valid value (in LVL
@@ -334,13 +328,11 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
 CHIP_ERROR ValveConfigurationAndControlCluster::OpenValve(DataModel::Nullable<Percent> targetLevel,
                                                           DataModel::Nullable<uint32_t> openDuration)
 {
-    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside OpenValve");
     // Check for the AutoCloseTime feature and set it to the UTC time plus OpenDuration.
     if (mFeatures.Has(Feature::kTimeSync))
     {
         ReturnErrorOnFailure(SetAutoCloseTime(openDuration));
     }
-    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside OpenValve: SetAutoCloseTime success.");
     // Set TargetState to Open and CurrentState to Transitioning
     SetAttributeValue(mTargetState, DataModel::MakeNullable(ValveStateEnum::kOpen), Attributes::TargetState::Id);
     SetCurrentState(ValveStateEnum::kTransitioning);
@@ -378,9 +370,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::OpenValve(DataModel::Nullable<Pe
 // Internal functions.
 CHIP_ERROR ValveConfigurationAndControlCluster::SetAutoCloseTime(DataModel::Nullable<uint32_t> openDuration)
 {
-    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside SetAutoCloseTime");
     VerifyOrReturnValue(mTsTracker != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside SetAutoCloseTime: mTsTracker is not NULL");
     if (!openDuration.IsNull() && mTsTracker->IsValidUTCTime())
     {
         // We have a synchronized UTC time in the TimeSync cluster, we can proceed to set the AutoCloseTime attribute
