@@ -886,6 +886,8 @@ void BaseApplication::ScheduleFactoryReset()
                                                   // relevant when there are no fabrics left
         ConfigurationMgr().InitiateFactoryReset();
     });
+    // This is needed to avoid the factory reset to be triggered again after the factory reset is completed
+    sIsFactoryResetTriggered = false;
 }
 
 void BaseApplication::DoProvisioningReset()
