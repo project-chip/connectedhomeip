@@ -59,6 +59,7 @@ from matter.testing.decorators import _has_attribute, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
+from matter.testing.pixit import _PIXIT_NO_DEFAULT, format_pixit_error, get_pixit_definitions, validate_pixits
 from matter.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from matter.testing.runner import TestRunnerHooks, TestStep
 from matter.tlv import uint
@@ -133,6 +134,7 @@ class AttributeMatcher:
     @staticmethod
     def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> "AttributeMatcher":
         """Take a single callable and wrap it into an AttributeMatcher object. Useful to wrap closures."""
+
         class AttributeMatcherFromCallable(AttributeMatcher):
             def __init__(self, description, matcher: Callable[[AttributeValue], bool]):
                 super().__init__(description)
@@ -156,13 +158,15 @@ class SetupParameters:
 
     @property
     def qr_code(self):
-        return SetupPayload().GenerateQrCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
-                                             self.custom_flow, self.capabilities, self.version)
+        return SetupPayload().GenerateQrCode(
+            self.passcode, self.vendor_id, self.product_id, self.discriminator, self.custom_flow, self.capabilities, self.version
+        )
 
     @property
     def manual_code(self):
-        return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
-                                                        self.custom_flow, self.capabilities, self.version)
+        return SetupPayload().GenerateManualPairingCode(
+            self.passcode, self.vendor_id, self.product_id, self.discriminator, self.custom_flow, self.capabilities, self.version
+        )
 
 
 class MatterBaseTest(base_test.BaseTestClass):
@@ -218,12 +222,12 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def teardown_class(self):
         """Final teardown after all tests: log all problems and dump device attributes if available.
-            Test authors may overwrite this method in the derived class to perform teardown that is common for all tests
-             This function is called only once per class. To perform teardown after each test, use teardown_test.
-             Test authors that implement steps in this function need to be careful of step handling if there is
-             more than one test in the class.
-             Test authors that implement this method should ensure super().teardown_class() is called after any
-             custom teardown code.
+        Test authors may overwrite this method in the derived class to perform teardown that is common for all tests
+         This function is called only once per class. To perform teardown after each test, use teardown_test.
+         Test authors that implement steps in this function need to be careful of step handling if there is
+         more than one test in the class.
+         Test authors that implement this method should ensure super().teardown_class() is called after any
+         custom teardown code.
 
         """
         if len(self.problems) > 0:
@@ -248,12 +252,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         try:
             # Check if we have endpoints_tlv data (from BasicCompositionTests or similar)
-            if hasattr(self, 'endpoints_tlv') and self.endpoints_tlv:
+            if hasattr(self, "endpoints_tlv") and self.endpoints_tlv:
                 # Check if we have the dump_wildcard method (from BasicCompositionTests)
-                if hasattr(self, 'dump_wildcard'):
+                if hasattr(self, "dump_wildcard"):
                     _, txt_str = self.dump_wildcard(None)
                     # Only dump the text format - it's more readable for debugging
-                    self.log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
+                    self.log_structured_data("==== FAILURE_DUMP_txt: ", txt_str)
         except (AttributeError, KeyError, ValueError, TypeError):
             # Don't let data access or serialization errors interfere with the original test failure
             pass
@@ -269,10 +273,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             dump_string: The data to be logged
         """
         lines = dump_string.splitlines()
-        LOGGER.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
+        LOGGER.info(f"{start_tag}BEGIN ({len(lines)} lines)====")
         for line in lines:
-            LOGGER.info(f'{start_tag}{line}')
-        LOGGER.info(f'{start_tag}END ====')
+            LOGGER.info(f"{start_tag}{line}")
+        LOGGER.info(f"{start_tag}END ====")
 
     def setup_test(self):
         """Set up for each individual test execution.
@@ -303,6 +307,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             # to indicates how it is proceeding
             if steps is None:
                 self.step(1)
+        self._validate_pixits()
 
     def on_fail(self, record):
         """Handle test failure callback from Mobly framework.
@@ -379,9 +384,13 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             probable_error, probable_file = extract_error_text()
             test_steps = self.get_defined_test_steps(self.current_test_info.name)
-            test_step = str(test_steps[self.current_step_index-1]
-                            ) if test_steps is not None else 'UNKNOWN - no test steps provided in test script'
-            LOGGER.error(textwrap.dedent(f"""
+            test_step = (
+                str(test_steps[self.current_step_index - 1])
+                if test_steps is not None
+                else "UNKNOWN - no test steps provided in test script"
+            )
+            LOGGER.error(
+                textwrap.dedent(f"""
 
                                           ******************************************************************
                                           *
@@ -397,7 +406,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                                           * Endpoint: {self.matter_test_config.endpoint}
                                           *
                                           *******************************************************************
-                                          """))
+                                          """)
+            )
 
     def on_pass(self, record):
         """Handle test success callback from Mobly framework.
@@ -496,7 +506,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     @property
     def is_pics_sdk_ci_only(self) -> bool:
         """Checks if the 'PICS_SDK_CI_ONLY' PICS flag is enabled."""
-        return self.check_pics('PICS_SDK_CI_ONLY')
+        return self.check_pics("PICS_SDK_CI_ONLY")
 
     @property
     def default_endpoint(self) -> int:
@@ -506,6 +516,56 @@ class MatterBaseTest(base_test.BaseTestClass):
     # Matter Test API - Parameter Getters
     #
 
+    def pixit(self, name: str, default: Any = None) -> Any:
+        """Get a declared PIXIT value by name.
+
+        Retrieves the value from user_params. If not found, falls back to the
+        default specified in the @pixit decorator, or the default
+        argument provided to this method.
+
+        Args:
+            name: The PIXIT parameter name (as declared in @pixit).
+            default: Fallback default if no value is found and no decorator default exists.
+
+        Returns:
+            The PIXIT value, or the default.
+        """
+        value = self.user_params.get(name)
+        if value is not None:
+            return value
+
+        # Look up decorator default from the current test method
+        test_name = self.current_test_info.name
+        test_method = getattr(self, test_name, None)
+        if test_method:
+            for pixit_def in get_pixit_definitions(test_method):
+                if pixit_def.name == name:
+                    if pixit_def.default is not _PIXIT_NO_DEFAULT:
+                        return pixit_def.default
+                    return default
+        return default
+
+    def _validate_pixits(self):
+        """Validate that all required PIXITs declared via @pixit are present.
+
+        Called automatically by setup_test() before each test method.
+        If required PIXITs are missing, the test fails immediately with a clear
+        error message listing all missing parameters and available optional ones.
+        """
+        test_name = self.current_test_info.name
+        test_method = getattr(self, test_name, None)
+        if test_method is None:
+            return
+
+        pixit_defs = get_pixit_definitions(test_method)
+        if not pixit_defs:
+            return
+
+        missing_required, available_optional = validate_pixits(pixit_defs, self.user_params)
+        if missing_required:
+            error_msg = format_pixit_error(test_name, missing_required, available_optional)
+            asserts.fail(error_msg)
+
     def get_endpoint(self) -> int:
         """Gets the target endpoint ID from config, with a fallback default."""
         endpoint = self.matter_test_config.endpoint
@@ -514,19 +574,19 @@ class MatterBaseTest(base_test.BaseTestClass):
         return self.default_endpoint
 
     def get_wifi_ssid(self, default: str = "") -> str:
-        ''' Get WiFi SSID
+        """Get WiFi SSID
 
-            Get the WiFi networks name provided with flags
+        Get the WiFi networks name provided with flags
 
-        '''
+        """
         return self.matter_test_config.wifi_ssid if self.matter_test_config.wifi_ssid is not None else default
 
     def get_credentials(self, default: str = "") -> str:
-        ''' Get WiFi passphrase
+        """Get WiFi passphrase
 
-            Get the WiFi credentials provided with flags
+        Get the WiFi credentials provided with flags
 
-        '''
+        """
         return self.matter_test_config.wifi_passphrase if self.matter_test_config.wifi_passphrase is not None else default
 
     def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
@@ -543,22 +603,22 @@ class MatterBaseTest(base_test.BaseTestClass):
     #  These helper methods are used by the test harness and should not be called tests.
 
     def get_test_steps(self, test: str) -> list[TestStep]:
-        ''' Retrieves the test step list for the given test
+        """Retrieves the test step list for the given test
 
-            Test steps are defined in the function called steps_<functionname>.
-            ex for test test_TC_TEST_1_1, the steps are in a function called
-            steps_TC_TEST_1_1.
+        Test steps are defined in the function called steps_<functionname>.
+        ex for test test_TC_TEST_1_1, the steps are in a function called
+        steps_TC_TEST_1_1.
 
-            Test that implement a steps_ function should call each step
-            in order using self.step(number), where number is the test_plan_number
-            from each TestStep.
-        '''
+        Test that implement a steps_ function should call each step
+        in order using self.step(number), where number is the test_plan_number
+        from each TestStep.
+        """
         steps = self.get_defined_test_steps(test)
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
     def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
         """Retrieves test steps from a 'steps_*' function, using a cache."""
-        steps_name = f'steps_{test.removeprefix("test_")}'
+        steps_name = f"steps_{test.removeprefix('test_')}"
         if test in self.cached_steps:
             return self.cached_steps[test]
 
@@ -576,14 +636,14 @@ class MatterBaseTest(base_test.BaseTestClass):
         return str(self.matter_test_config.restart_flag_file)
 
     def get_test_pics(self, test: str) -> list[str]:
-        ''' Retrieves a list of top-level PICS that should be checked before running this test
+        """Retrieves a list of top-level PICS that should be checked before running this test
 
-            An empty list means the test will always be run.
+        An empty list means the test will always be run.
 
-            PICS are defined in a function called pics_<functionname>.
-            ex. for test test_TC_TEST_1_1, the pics are in a function called
-            pics_TC_TEST_1_1.
-        '''
+        PICS are defined in a function called pics_<functionname>.
+        ex. for test test_TC_TEST_1_1, the pics are in a function called
+        pics_TC_TEST_1_1.
+        """
         pics = self._get_defined_pics(test)
         return [] if pics is None else pics
 
@@ -596,7 +656,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         Returns:
             List of PICS strings if pics function exists, None otherwise.
         """
-        steps_name = f'pics_{test.removeprefix("test_")}'
+        steps_name = f"pics_{test.removeprefix('test_')}"
         try:
             fn = getattr(self, steps_name)
             return fn()
@@ -604,19 +664,19 @@ class MatterBaseTest(base_test.BaseTestClass):
             return None
 
     def get_test_desc(self, test: str) -> str:
-        ''' Returns a description of this test
+        """Returns a description of this test
 
-            Test description is defined in the function called desc_<functionname>.
-            ex for test test_TC_TEST_1_1, the steps are in a function called
-            desc_TC_TEST_1_1.
+        Test description is defined in the function called desc_<functionname>.
+        ex for test test_TC_TEST_1_1, the steps are in a function called
+        desc_TC_TEST_1_1.
 
-            Format:
-            <Test plan reference> [<test plan number>] <test plan name>
+        Format:
+        <Test plan reference> [<test plan number>] <test plan name>
 
-            ex:
-            133.1.1. [TC-ACL-1.1] Global attributes
-        '''
-        desc_name = f'desc_{test.removeprefix("test_")}'
+        ex:
+        133.1.1. [TC-ACL-1.1] Global attributes
+        """
+        desc_name = f"desc_{test.removeprefix('test_')}"
         try:
             fn = getattr(self, desc_name)
             return fn()
@@ -645,7 +705,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         # TODO: this might be annoying during dev. Remove? Flag?
         if len(steps) <= self.current_step_index or steps[self.current_step_index].test_plan_number != step:
-            asserts.fail(f'Unexpected test step: {step} - steps not called in order, or step does not exist')
+            asserts.fail(f"Unexpected test step: {step} - steps not called in order, or step does not exist")
 
         current_step = steps[self.current_step_index]
         self.print_step(step, current_step.description)
@@ -658,7 +718,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
             # TODO: it seems like the step start should take a number and a name
-            name = f'{step} : {current_step.description}'
+            name = f"{step} : {current_step.description}"
             self.runner_hook.step_start(name=name)
 
         self.step_start_time = datetime.now(tz=timezone.utc)
@@ -672,7 +732,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             stepnum: The step number or identifier.
             title: The descriptive title of the step.
         """
-        LOGGER.info(f'***** Test Step {stepnum} : {title}')
+        LOGGER.info(f"***** Test Step {stepnum} : {title}")
 
     def skip_step(self, step):
         """Execute and immediately mark a step as skipped.
@@ -698,7 +758,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
             #       as a string? Does it get used by the TH?
             self.runner_hook.step_skipped(name=str(num), expression="")
-        LOGGER.info(f'**** Skipping: {num}')
+        LOGGER.info(f"**** Skipping: {num}")
         self.step_skipped = True
 
     def mark_all_remaining_steps_skipped(self, starting_step_number: typing.Union[int, str]) -> None:
@@ -714,7 +774,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         self.mark_step_range_skipped(starting_step_number, None)
 
-    def mark_step_range_skipped(self, starting_step_number: typing.Union[int, str], ending_step_number: typing.Union[int, str, None]) -> None:
+    def mark_step_range_skipped(
+        self, starting_step_number: typing.Union[int, str], ending_step_number: typing.Union[int, str, None]
+    ) -> None:
         """Mark a range of remaining test steps starting with provided starting step
             starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
             starting_step_number must be provided, and is not derived intentionally.
@@ -750,9 +812,12 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             asserts.assert_is_not_none(ending_step_idx, "mark_step_ranges_skipped was provided with invalid ending_step_num")
             ending_index: int = typing.cast(int, ending_step_idx)
-            asserts.assert_greater(ending_index, starting_index,
-                                   "mark_step_ranges_skipped was provided with ending_step_num that is before starting_step_num")
-            skipping_steps = steps[starting_index:ending_index+1]
+            asserts.assert_greater(
+                ending_index,
+                starting_index,
+                "mark_step_ranges_skipped was provided with ending_step_num that is before starting_step_num",
+            )
+            skipping_steps = steps[starting_index: ending_index + 1]
         else:
             skipping_steps = steps[starting_index:]
 
@@ -776,41 +841,51 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def pics_guard(self, pics_condition: bool):
         """Checks a condition and if False marks the test step as skipped and
-           returns False, otherwise returns True.
-           For example can be used to check if a test step should be run:
+        returns False, otherwise returns True.
+        For example can be used to check if a test step should be run:
 
-              self.step("4")
-              if self.pics_guard(condition_needs_to_be_true_to_execute):
-                  # do the test for step 4
+           self.step("4")
+           if self.pics_guard(condition_needs_to_be_true_to_execute):
+               # do the test for step 4
 
-              self.step("5")
-              if self.pics_guard(condition2_needs_to_be_true_to_execute):
-                  # do the test for step 5
-           """
+           self.step("5")
+           if self.pics_guard(condition2_needs_to_be_true_to_execute):
+               # do the test for step 5
+        """
         if not pics_condition:
             self.mark_current_step_skipped()
         return pics_condition
 
     async def _populate_wildcard(self):
-        """ Populates self.stored_global_wildcard if not already filled. """
+        """Populates self.stored_global_wildcard if not already filled."""
         if self.stored_global_wildcard is None:
-            global_wildcard = asyncio.wait_for(self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(
-                None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
+            global_wildcard = asyncio.wait_for(
+                self.default_controller.Read(
+                    self.dut_node_id,
+                    [
+                        (Clusters.Descriptor),
+                        Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+                        Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+                        Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+                    ],
+                ),
+                timeout=60,
+            )
             self.stored_global_wildcard = await global_wildcard
 
     async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
         """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
-           returns False using attributes against attributes_list, otherwise returns True.
-           For example can be used to check if a test step should be run:
+        returns False using attributes against attributes_list, otherwise returns True.
+        For example can be used to check if a test step should be run:
 
-              self.step("1")
-              if self.attribute_guard(condition1_needs_to_be_true_to_execute):
-                  # do the test for step 1
+           self.step("1")
+           if self.attribute_guard(condition1_needs_to_be_true_to_execute):
+               # do the test for step 1
 
-              self.step("2")
-              if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
-                  # skip step 2 if condition not met
-           """
+           self.step("2")
+           if self.attribute_guard(condition2_needs_to_be_false_to_skip_step):
+               # skip step 2 if condition not met
+        """
         await self._populate_wildcard()
         attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
         if not attr_condition:
@@ -819,17 +894,17 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def command_guard(self, endpoint: int, command: ClusterObjects.ClusterCommand):
         """Similar to attribute_guard above, except checks a condition and if False marks the test step as skipped and
-           returns False using command id against AcceptedCmdsList, otherwise returns True.
-           For example can be used to check if a test step should be run:
+        returns False using command id against AcceptedCmdsList, otherwise returns True.
+        For example can be used to check if a test step should be run:
 
-              self.step("1")
-              if self.command_guard(condition1_needs_to_be_true_to_execute):
-                  # do the test for step 1
+           self.step("1")
+           if self.command_guard(condition1_needs_to_be_true_to_execute):
+               # do the test for step 1
 
-              self.step("2")
-              if self.command_guard(condition2_needs_to_be_false_to_skip_step):
-                  # skip step 2 if condition not met
-           """
+           self.step("2")
+           if self.command_guard(condition2_needs_to_be_false_to_skip_step):
+               # skip step 2 if condition not met
+        """
         await self._populate_wildcard()
         cmd_condition = _has_command(wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
         if not cmd_condition:
@@ -838,17 +913,17 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def feature_guard(self, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor, feature_int: IntFlag):
         """Similar to command_guard and attribute_guard above, except checks a condition and if False marks the test step as skipped and
-           returns False using feature id against feature_map, otherwise returns True.
-           For example can be used to check if a test step should be run:
+        returns False using feature id against feature_map, otherwise returns True.
+        For example can be used to check if a test step should be run:
 
-              self.step("1")
-              if self.feature_guard(condition1_needs_to_be_true_to_execute):
-                  # do the test for step 1
+           self.step("1")
+           if self.feature_guard(condition1_needs_to_be_true_to_execute):
+               # do the test for step 1
 
-              self.step("2")
-              if self.feature_guard(condition2_needs_to_be_false_to_skip_step):
-                  # skip step 2 if condition not met
-           """
+           self.step("2")
+           if self.feature_guard(condition2_needs_to_be_false_to_skip_step):
+               # skip step 2 if condition not met
+        """
         await self._populate_wildcard()
         feat_condition = _has_feature(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster, feature=feature_int)
         if not feat_condition:
@@ -885,7 +960,9 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
 
-    async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
+    async def open_commissioning_window(
+        self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900
+    ) -> CustomCommissioningParameters:
         """Open a commissioning window on the target device.
 
         Args:
@@ -905,16 +982,27 @@ class MatterBaseTest(base_test.BaseTestClass):
         if node_id is None:
             node_id = self.dut_node_id
         try:
-            commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeId=node_id, timeout=timeout, iteration=1000,
-                                                                          discriminator=rnd_discriminator, option=dev_ctrl.CommissioningWindowPasscode.kTokenWithRandomPin)
+            commissioning_params = await dev_ctrl.OpenCommissioningWindow(
+                nodeId=node_id,
+                timeout=timeout,
+                iteration=1000,
+                discriminator=rnd_discriminator,
+                option=dev_ctrl.CommissioningWindowPasscode.kTokenWithRandomPin,
+            )
             return CustomCommissioningParameters(commissioning_params, rnd_discriminator)
 
         except InteractionModelError as e:
-            asserts.fail(e.status, 'Failed to open commissioning window')
+            asserts.fail(e.status, "Failed to open commissioning window")
             raise  # Help mypy understand this never returns
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: Type[ClusterObjects.ClusterAttributeDescriptor], fabricFiltered: bool = True) -> object:
+        self,
+        dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
+        node_id: int,
+        endpoint: int,
+        attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+        fabricFiltered: bool = True,
+    ) -> object:
         """Read a single attribute value from a device.
 
         Args:
@@ -932,8 +1020,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         return list(data.values())[0][attribute]
 
     async def read_single_attribute_all_endpoints(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None):
+        self,
+        cluster: ClusterObjects.Cluster,
+        attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+        dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None,
+        node_id: Optional[int] = None,
+    ):
         """Reads a single attribute of a specified cluster across all endpoints.
 
         Returns:
@@ -954,27 +1046,37 @@ class MatterBaseTest(base_test.BaseTestClass):
         return attrs
 
     async def read_single_attribute_check_success(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
+        self,
+        cluster: ClusterObjects.Cluster,
+        attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+        dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None,
+        node_id: Optional[int] = None,
+        endpoint: Optional[int] = None,
+        fabric_filtered: bool = True,
+        assert_on_error: bool = True,
+        test_name: str = "",
+        payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD,
+    ) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
             endpoint = self.get_endpoint()
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered, payloadCapability=payloadCapability)
+        result = await dev_ctrl.ReadAttribute(
+            node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered, payloadCapability=payloadCapability
+        )
         attr_ret = result[endpoint][cluster][attribute]
         read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
         desired_type = attribute.attribute_type.Type
-        type_err_msg = f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
+        type_err_msg = f"Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}"
         read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
         type_ok = matchers.is_type(attr_ret, desired_type)
         if assert_on_error:
             asserts.assert_true(read_ok, read_err_msg)
             asserts.assert_true(type_ok, type_err_msg)
         else:
-            location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
-                                             attribute_id=attribute.attribute_id)
+            location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id, attribute_id=attribute.attribute_id)
             if not read_ok:
                 self.record_error(test_name=test_name, location=location, problem=read_err_msg)
                 return None
@@ -984,9 +1086,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         return attr_ret
 
     async def read_single_attribute_expect_error(
-            self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
-            error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
-            fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
+        self,
+        cluster: ClusterObjects.Cluster,
+        attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
+        error: Status,
+        dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None,
+        node_id: Optional[int] = None,
+        endpoint: Optional[int] = None,
+        fabric_filtered: bool = True,
+        assert_on_error: bool = True,
+        test_name: str = "",
+    ) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -996,20 +1106,27 @@ class MatterBaseTest(base_test.BaseTestClass):
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
         err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
-        error_type_ok = attr_ret is not None and isinstance(
-            attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
+        error_type_ok = (
+            attr_ret is not None
+            and isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
+            and isinstance(attr_ret.Reason, InteractionModelError)
+        )
         if assert_on_error:
             asserts.assert_true(error_type_ok, err_msg)
             asserts.assert_equal(attr_ret.Reason.status, error, err_msg)
         elif not error_type_ok or attr_ret.Reason.status != error:
-            location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
-                                             attribute_id=attribute.attribute_id)
+            location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id, attribute_id=attribute.attribute_id)
             self.record_error(test_name=test_name, location=location, problem=err_msg)
             return None
 
         return attr_ret
 
-    async def write_single_attribute(self, attribute_value: ClusterObjects.ClusterAttributeDescriptor, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
+    async def write_single_attribute(
+        self,
+        attribute_value: ClusterObjects.ClusterAttributeDescriptor,
+        endpoint_id: Optional[int] = None,
+        expect_success: bool = True,
+    ) -> Status:
         """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
 
         If `endpoint_id` is None, the default DUT endpoint for the test is selected.
@@ -1025,8 +1142,11 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         write_result = await dev_ctrl.WriteAttribute(node_id, [(endpoint_id, attribute_value)])
         if expect_success:
-            asserts.assert_equal(write_result[0].Status, Status.Success,
-                                 f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
+            asserts.assert_equal(
+                write_result[0].Status,
+                Status.Success,
+                f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}",
+            )
         return write_result[0].Status
 
     def read_from_app_pipe(
@@ -1176,18 +1296,22 @@ class MatterBaseTest(base_test.BaseTestClass):
         else:
             LOGGER.info(f"Using DUT IP address: {dut_ip}")
 
-            dut_uname = os.getenv('LINUX_DUT_USER')
+            dut_uname = os.getenv("LINUX_DUT_USER")
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
             LOGGER.info(f"Using DUT user name: {dut_uname}")
             command_fixed = shlex.quote(json.dumps(command_dict))
-            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
+            cmd = "echo \"%s\" | ssh %s@%s 'cat > %s'" % (command_fixed, dut_uname, dut_ip, app_pipe)
             os.system(cmd)
 
     async def send_single_cmd(
-            self, cmd: Clusters.ClusterObjects.ClusterCommand,
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
-            timedRequestTimeoutMs: OptionalTimeout = None,
-            payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
+        self,
+        cmd: Clusters.ClusterObjects.ClusterCommand,
+        dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None,
+        node_id: Optional[int] = None,
+        endpoint: Optional[int] = None,
+        timedRequestTimeoutMs: OptionalTimeout = None,
+        payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD,
+    ) -> object:
         """Send a single command to a Matter device.
 
         Args:
@@ -1208,38 +1332,46 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.get_endpoint()
 
-        return await dev_ctrl.SendCommand(nodeId=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
-                                          payloadCapability=payloadCapability)
+        return await dev_ctrl.SendCommand(
+            nodeId=node_id,
+            endpoint=endpoint,
+            payload=cmd,
+            timedRequestTimeoutMs=timedRequestTimeoutMs,
+            payloadCapability=payloadCapability,
+        )
 
     async def send_test_event_triggers(self, eventTrigger: int, enableKey: Optional[bytes] = None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
 
-           The enableKey can be passed into the function, or omitted which will then
-           use the one provided to the script via --hex-arg enableKey:<HEX VALUE>
-           if not it defaults to 0x000102030405060708090a0b0c0d0e0f
+        The enableKey can be passed into the function, or omitted which will then
+        use the one provided to the script via --hex-arg enableKey:<HEX VALUE>
+        if not it defaults to 0x000102030405060708090a0b0c0d0e0f
         """
         # get the test event enable key or assume the default
         # This can be passed in on command line using
         #    --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
         if enableKey is None:
-            if 'enableKey' not in self.matter_test_config.global_test_params:
+            if "enableKey" not in self.matter_test_config.global_test_params:
                 enableKey = bytes(list(range(16)))
             else:
-                enableKey = self.matter_test_config.global_test_params['enableKey']
+                enableKey = self.matter_test_config.global_test_params["enableKey"]
 
         eventTrigger = self._update_legacy_test_event_triggers(eventTrigger)
 
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
-            await self.send_single_cmd(endpoint=0, cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey, uint(eventTrigger)))
+            await self.send_single_cmd(
+                endpoint=0, cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey, uint(eventTrigger))
+            )
 
         except InteractionModelError as e:
             asserts.fail(
-                f"Sending TestEventTrigger resulted in Unexpected error. Are they enabled in DUT? Command returned - {e.status}")
+                f"Sending TestEventTrigger resulted in Unexpected error. Are they enabled in DUT? Command returned - {e.status}"
+            )
 
     async def check_test_event_triggers_enabled(self):
         """This cluster checks that the General Diagnostics cluster TestEventTriggersEnabled attribute is True.
-           It will assert and fail the test if not True."""
+        It will assert and fail the test if not True."""
         full_attr = Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
         cluster = Clusters.Objects.GeneralDiagnostics
         # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
@@ -1270,7 +1402,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise ValueError("Target endpoint should be between 0 and 0xFFFF")
 
         # Clean endpoint target
-        eventTrigger = eventTrigger & ~ (0xFFFF << 32)
+        eventTrigger = eventTrigger & ~(0xFFFF << 32)
 
         # Sets endpoint in eventTrigger
         eventTrigger |= (target_endpoint & 0xFFFF) << 32
@@ -1314,10 +1446,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.NOTE, problem, spec_location))
 
-    def wait_for_user_input(self,
-                            prompt_msg: str,
-                            prompt_msg_placeholder: str = "Submit anything to continue",
-                            default_value: str = "y") -> Optional[str]:
+    def wait_for_user_input(
+        self, prompt_msg: str, prompt_msg_placeholder: str = "Submit anything to continue", default_value: str = "y"
+    ) -> Optional[str]:
         """Ask for user input and wait for it.
 
         Args:
@@ -1338,9 +1469,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         if self.runner_hook:
             # TODO(#31928): Add endpoint support to hooks.
-            self.runner_hook.show_prompt(msg=prompt_msg,
-                                         placeholder=prompt_msg_placeholder,
-                                         default_value=default_value)
+            self.runner_hook.show_prompt(msg=prompt_msg, placeholder=prompt_msg_placeholder, default_value=default_value)
 
         LOGGER.info(f"========= USER PROMPT for Endpoint {endpoint_id} =========")
         LOGGER.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
@@ -1350,9 +1479,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             LOGGER.info("========= EOF on STDIN =========")
             return None
 
-    def user_verify_snap_shot(self,
-                              prompt_msg: str,
-                              image: bytes) -> None:
+    def user_verify_snap_shot(self, prompt_msg: str, image: bytes) -> None:
         """Show Image Verification Prompt and wait for user validation.
            This method will be executed only when TC is running in TH.
 
@@ -1368,19 +1495,16 @@ class MatterBaseTest(base_test.BaseTestClass):
             TestError: Indicating image validation step failed.
         """
         # Only run when TC is being executed in TH
-        if self.runner_hook and hasattr(self.runner_hook, 'show_image_prompt'):
+        if self.runner_hook and hasattr(self.runner_hook, "show_image_prompt"):
             # Convert bytes to comma separated hex string
-            hex_string = ', '.join(f'{byte:02x}' for byte in image)
-            self.runner_hook.show_image_prompt(
-                msg=prompt_msg,
-                img_hex_str=hex_string
-            )
+            hex_string = ", ".join(f"{byte:02x}" for byte in image)
+            self.runner_hook.show_image_prompt(msg=prompt_msg, img_hex_str=hex_string)
 
             LOGGER.info("========= USER PROMPT for Image Validation =========")
 
             try:
                 result = input()
-                if result != '1':  # User did not select 'PASS'
+                if result != "1":  # User did not select 'PASS'
                     raise TestError("Image validation failed")
             except EOFError:
                 LOGGER.info("========= EOF on STDIN =========")
@@ -1397,15 +1521,14 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             try:
                 result = input()
-                if result != '1':  # User did not select 'PASS'
+                if result != "1":  # User did not select 'PASS'
                     raise TestError(error_message)
             except EOFError:
                 LOGGER.info("========= EOF on STDIN =========")
             return False
         return True  # Indicating skipped
 
-    def user_verify_video_stream(self,
-                                 prompt_msg: str) -> None:
+    def user_verify_video_stream(self, prompt_msg: str) -> None:
         """Show Video Verification Prompt and wait for user validation.
            This method will be executed only when TC is running in TH.
 
@@ -1421,13 +1544,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         self._user_verify_prompt(
             prompt_msg=prompt_msg,
-            hook_method_name='show_video_prompt',
-            validation_name='Video Stream Validation',
-            error_message='Video stream validation failed'
+            hook_method_name="show_video_prompt",
+            validation_name="Video Stream Validation",
+            error_message="Video stream validation failed",
         )
 
-    def user_verify_two_way_talk(self,
-                                 prompt_msg: str) -> None:
+    def user_verify_two_way_talk(self, prompt_msg: str) -> None:
         """Show Two Way Talk Verification Prompt and wait for user validation.
            This method will be executed only when TC is running in TH.
 
@@ -1443,9 +1565,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         self._user_verify_prompt(
             prompt_msg=prompt_msg,
-            hook_method_name='show_two_way_talk_prompt',
-            validation_name='Two Way Talk Validation',
-            error_message='Two way talk validation failed'
+            hook_method_name="show_two_way_talk_prompt",
+            validation_name="Two Way Talk Validation",
+            error_message="Two way talk validation failed",
         )
 
     def user_verify_push_av_stream(self, prompt_msg: str) -> bool:
@@ -1464,9 +1586,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         return self._user_verify_prompt(
             prompt_msg=prompt_msg,
-            hook_method_name='show_push_av_stream_prompt',
-            validation_name='Push AV Stream Validation',
-            error_message='Push AV Stream validation failed'
+            hook_method_name="show_push_av_stream_prompt",
+            validation_name="Push AV Stream Validation",
+            error_message="Push AV Stream validation failed",
         )
 
     def _expire_sessions_on_all_controllers(self):
@@ -1620,12 +1742,14 @@ def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterO
 
 
 async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
-    """ Returns a list of endpoints matching the accept condition. """
-    wildcard = await self.default_controller.Read(self.dut_node_id, [
-        (Clusters.Descriptor,),  # single-element tuple needs trailing comma
-        Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
-        Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
-        Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)
-    ])
-    return [e for e in wildcard.attributes
-            if accept_function(wildcard, e)]
+    """Returns a list of endpoints matching the accept condition."""
+    wildcard = await self.default_controller.Read(
+        self.dut_node_id,
+        [
+            (Clusters.Descriptor,),  # single-element tuple needs trailing comma
+            Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+            Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+            Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+        ],
+    )
+    return [e for e in wildcard.attributes if accept_function(wildcard, e)]
