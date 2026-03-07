@@ -105,6 +105,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CameraAvStre
             return StatusLightEnabled::kMetadataEntry;
         case StatusLightBrightness::Id:
             return StatusLightBrightness::kMetadataEntry;
+        case ImageRotationDiscreteAngles::Id:
+            return ImageRotationDiscreteAngles::kMetadataEntry;
         default:
             return std::nullopt;
         }

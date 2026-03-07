@@ -3379,6 +3379,28 @@ public class ClusterWriteMapping {
       writeCameraAvStreamManagementStatusLightBrightnessCommandParams
     );
     writeCameraAvStreamManagementInteractionInfo.put("writeStatusLightBrightnessAttribute", writeCameraAvStreamManagementStatusLightBrightnessAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeCameraAvStreamManagementImageRotationDiscreteAnglesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo cameraAvStreamManagementimageRotationDiscreteAnglesCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeCameraAvStreamManagementImageRotationDiscreteAnglesCommandParams.put(
+        "value",
+        cameraAvStreamManagementimageRotationDiscreteAnglesCommandParameterInfo
+    );
+    InteractionInfo writeCameraAvStreamManagementImageRotationDiscreteAnglesAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.CameraAvStreamManagementCluster) cluster).writeImageRotationDiscreteAnglesAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeCameraAvStreamManagementImageRotationDiscreteAnglesCommandParams
+    );
+    writeCameraAvStreamManagementInteractionInfo.put("writeImageRotationDiscreteAnglesAttribute", writeCameraAvStreamManagementImageRotationDiscreteAnglesAttributeInteractionInfo);
     writeAttributeMap.put("cameraAvStreamManagement", writeCameraAvStreamManagementInteractionInfo);
     Map<String, InteractionInfo> writeCameraAvSettingsUserLevelManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("cameraAvSettingsUserLevelManagement", writeCameraAvSettingsUserLevelManagementInteractionInfo);

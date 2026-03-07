@@ -10190,7 +10190,7 @@ cluster ZoneManagement = 1360 {
 
 /** The Camera AV Stream Management cluster is used to allow clients to manage, control, and configure various audio, video, and snapshot streams on a camera. */
 cluster CameraAvStreamManagement = 1361 {
-  revision 1;
+  revision 2;
 
   enum AudioCodecEnum : enum8 {
     kOPUS = 0 [spec_name = "OPUS"];
@@ -10350,6 +10350,7 @@ cluster CameraAvStreamManagement = 1361 {
   attribute access(read: manage, write: manage) optional boolean localSnapshotRecordingEnabled = 38;
   attribute access(read: manage, write: manage) optional boolean statusLightEnabled = 39;
   attribute access(read: manage, write: manage) optional ThreeLevelAutoEnum statusLightBrightness = 40;
+  attribute access(read: manage, write: manage) optional int16u imageRotationDiscreteAngles = 41;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;

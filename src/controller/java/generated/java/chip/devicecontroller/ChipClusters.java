@@ -59295,6 +59295,7 @@ public class ChipClusters {
     private static final long LOCAL_SNAPSHOT_RECORDING_ENABLED_ATTRIBUTE_ID = 38L;
     private static final long STATUS_LIGHT_ENABLED_ATTRIBUTE_ID = 39L;
     private static final long STATUS_LIGHT_BRIGHTNESS_ATTRIBUTE_ID = 40L;
+    private static final long IMAGE_ROTATION_DISCRETE_ANGLES_ATTRIBUTE_ID = 41L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -60971,6 +60972,41 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, STATUS_LIGHT_BRIGHTNESS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readImageRotationDiscreteAnglesAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, IMAGE_ROTATION_DISCRETE_ANGLES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, IMAGE_ROTATION_DISCRETE_ANGLES_ATTRIBUTE_ID, true);
+    }
+
+    public void writeImageRotationDiscreteAnglesAttribute(DefaultClusterCallback callback, Integer value) {
+      writeImageRotationDiscreteAnglesAttribute(callback, value, 0);
+    }
+
+    public void writeImageRotationDiscreteAnglesAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), IMAGE_ROTATION_DISCRETE_ANGLES_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeImageRotationDiscreteAnglesAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, IMAGE_ROTATION_DISCRETE_ANGLES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, IMAGE_ROTATION_DISCRETE_ANGLES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

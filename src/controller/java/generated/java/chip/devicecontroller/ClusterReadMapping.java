@@ -18280,6 +18280,17 @@ public class ClusterReadMapping {
           readCameraAvStreamManagementStatusLightBrightnessCommandParams
         );
         result.put("readStatusLightBrightnessAttribute", readCameraAvStreamManagementStatusLightBrightnessAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCameraAvStreamManagementImageRotationDiscreteAnglesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCameraAvStreamManagementImageRotationDiscreteAnglesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CameraAvStreamManagementCluster) cluster).readImageRotationDiscreteAnglesAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readCameraAvStreamManagementImageRotationDiscreteAnglesCommandParams
+        );
+        result.put("readImageRotationDiscreteAnglesAttribute", readCameraAvStreamManagementImageRotationDiscreteAnglesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCameraAvStreamManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCameraAvStreamManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
