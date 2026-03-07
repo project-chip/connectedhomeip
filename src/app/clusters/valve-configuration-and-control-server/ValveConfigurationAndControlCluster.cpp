@@ -378,7 +378,9 @@ CHIP_ERROR ValveConfigurationAndControlCluster::OpenValve(DataModel::Nullable<Pe
 // Internal functions.
 CHIP_ERROR ValveConfigurationAndControlCluster::SetAutoCloseTime(DataModel::Nullable<uint32_t> openDuration)
 {
+    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside SetAutoCloseTime");
     VerifyOrReturnValue(mTsTracker != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside SetAutoCloseTime: mTsTracker is not NULL");
     if (!openDuration.IsNull() && mTsTracker->IsValidUTCTime())
     {
         // We have a synchronized UTC time in the TimeSync cluster, we can proceed to set the AutoCloseTime attribute
