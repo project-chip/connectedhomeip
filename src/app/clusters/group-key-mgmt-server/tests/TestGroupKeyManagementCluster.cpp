@@ -109,12 +109,13 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
     // Writes a list of group keys to the GroupKeyMap attribute for a given fabric.
     // Used to set up test scenarios with pre-existing keys.
     void PrepopulateGroupKeyMap(const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & keys,
-                                FabricIndex fabricIndex)
+                                FabricIndex fabricIndex, ListWritingPattern listWritingPattern)
     {
         auto listToWrite =
             app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
-        CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite).GetUnderlyingError();
+        CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, listWritingPattern)
+                             .GetUnderlyingError();
         ASSERT_EQ(err, CHIP_NO_ERROR);
     }
 
@@ -180,38 +181,49 @@ TEST_F(TestGroupKeyManagementCluster, AttributesTest)
 // Cluster should accept writing multiple group keys with the same KeySetID but different Group IDs
 TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeSameKeySetDifferentGroup)
 {
-    auto keys = TestHelpers::CreateGroupKeyMapList(2, kTestFabricIndex, kTestGroupId, kTestKeySetId, 1, 0);
-    PrepopulateGroupKeyMap(keys, kTestFabricIndex);
-    VerifyGroupKeysMatch(kTestFabricIndex, keys);
+    for (ListWritingPattern listWritingPattern : { ListWritingPattern::ReplaceAll, ListWritingPattern::ClearAllThenAppendItems })
+    {
+        auto keys = TestHelpers::CreateGroupKeyMapList(2, kTestFabricIndex, kTestGroupId, kTestKeySetId, 1, 0);
+        PrepopulateGroupKeyMap(keys, kTestFabricIndex, listWritingPattern);
+        VerifyGroupKeysMatch(kTestFabricIndex, keys);
+    }
 }
 
 // Cluster should reject a write containing duplicate keys for the same group/keyset combination.
 TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeDuplicateKey)
 {
-    //  Intentionally creates two identical entries (duplicate group/keyset combination).
-    // by setting increments  to 0 (groupIdIncrement = 0, keySetIdIncrement = 0)
-    auto keys = TestHelpers::CreateGroupKeyMapList(2, kTestFabricIndex, kTestGroupId, kTestKeySetId, 0, 0);
+    for (ListWritingPattern listWritingPattern : { ListWritingPattern::ReplaceAll, ListWritingPattern::ClearAllThenAppendItems })
+    {
+        //  Intentionally creates two identical entries (duplicate group/keyset combination).
+        // by setting increments  to 0 (groupIdIncrement = 0, keySetIdIncrement = 0)
+        auto keys = TestHelpers::CreateGroupKeyMapList(2, kTestFabricIndex, kTestGroupId, kTestKeySetId, 0, 0);
 
-    auto listToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
+        auto listToWrite =
+            app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
-    CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite).GetUnderlyingError();
+        CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, listWritingPattern)
+                             .GetUnderlyingError();
 
-    ASSERT_EQ(err, CHIP_ERROR_DUPLICATE_KEY_ID);
+        ASSERT_EQ(err, CHIP_ERROR_DUPLICATE_KEY_ID);
 
-    // Explicitly check that the write stops at the first duplicate entry,
-    // but the valid entries processed *before* the error (i.e., keys[0]) are persisted.
-    std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> expectedKeys;
-    expectedKeys.push_back(keys[0]);
+        // Explicitly check that the write stops at the first duplicate entry,
+        // but the valid entries processed *before* the error (i.e., keys[0]) are persisted.
+        std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> expectedKeys;
+        expectedKeys.push_back(keys[0]);
 
-    VerifyGroupKeysMatch(kTestFabricIndex, expectedKeys);
+        VerifyGroupKeysMatch(kTestFabricIndex, expectedKeys);
+    }
 }
 
 TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttribute)
 {
-    auto keys = TestHelpers::CreateGroupKeyMapList(2, kTestFabricIndex);
+    for (ListWritingPattern listWritingPattern : { ListWritingPattern::ReplaceAll, ListWritingPattern::ClearAllThenAppendItems })
+    {
+        auto keys = TestHelpers::CreateGroupKeyMapList(2, kTestFabricIndex);
 
-    PrepopulateGroupKeyMap(keys, kTestFabricIndex);
-    VerifyGroupKeysMatch(kTestFabricIndex, keys);
+        PrepopulateGroupKeyMap(keys, kTestFabricIndex, listWritingPattern);
+        VerifyGroupKeysMatch(kTestFabricIndex, keys);
+    }
 }
 
 const chip::EndpointId kTestEndpoint1 = 10;
