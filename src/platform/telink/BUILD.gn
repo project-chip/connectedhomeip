@@ -24,6 +24,7 @@ static_library("telink") {
     "../SingletonConfigurationManager.cpp",
     "../Zephyr/BLEAdvertisingArbiter.cpp",
     "../Zephyr/BLEAdvertisingArbiter.h",
+    "../Zephyr/BLEManagerImpl.cpp",
     "../Zephyr/ConfigurationManagerImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.h",
@@ -34,7 +35,6 @@ static_library("telink") {
     "../Zephyr/SystemTimeSupport.cpp",
     "../Zephyr/ZephyrConfig.cpp",
     "../Zephyr/ZephyrConfig.h",
-    "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
@@ -83,7 +83,7 @@ static_library("telink") {
   if (chip_enable_thread) {
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
-      "ThreadStackManagerImpl.cpp",
+      "../Zephyr/ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
     deps += [ "${chip_root}/src/app:app_config" ]

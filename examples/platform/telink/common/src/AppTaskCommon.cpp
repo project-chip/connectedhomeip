@@ -56,6 +56,19 @@
 #include <zephyr/settings/settings.h>
 #include <zephyr/sys/reboot.h>
 
+extern "C" {
+#if defined(CONFIG_PM) &&                                                                                                          \
+    (defined(CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION) || defined(CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
+#include <zephyr/sys/reboot.h>
+
+extern bool pm_has_deep_sleep_retention_occurred(void);
+#endif
+}
+
+#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
+#include <zephyr/pm/policy.h>
+#endif
+
 using namespace chip::app;
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -186,7 +199,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
     {
         if (ThreadStackManagerImpl().IsThreadEnabled())
         {
-            ThreadStackManagerImpl().Finalize();
+            otInstanceFinalize(openthread_get_default_instance());
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -586,6 +599,15 @@ void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
         return;
     }
 
+#if defined(CONFIG_PM) &&                                                                                                          \
+    (defined(CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION) || defined(CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
+    if (pm_has_deep_sleep_retention_occurred())
+    {
+        ChipLogError(DeviceLayer, "BLE state in non-retention RAM corrupted after deep sleep retention. Rebooting...");
+        sys_reboot(SYS_REBOOT_WARM);
+    }
+#endif
+
     if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
         LOG_ERR("OpenBasicCommissioningWindow fail");
@@ -681,14 +703,7 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
     LOG_INF("StartThreadHandler");
     if (!sIsNetworkProvisioned)
     {
-        // Switch context from BLE to Thread
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-        Internal::BLEManagerImpl sInstance;
-        sInstance.SwitchToIeee802154();
-#else
-        ThreadStackMgrImpl().SetRadioBlocked(false);
-        ThreadStackMgrImpl().SetThreadEnabled(true);
-#endif
+        TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(true);
         StartDefaultThreadNetwork();
     }
     else
@@ -772,18 +787,27 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
         UpdateStatusLED();
-#ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
         {
-            if (NFCOnboardingPayloadMgr().IsTagEmulationStarted())
+#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
+            pm_policy_state_lock_get(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+#endif
+
+#ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
+            if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
             {
-                LOG_INF("NFC Tag emulation is already started");
+                if (NFCOnboardingPayloadMgr().IsTagEmulationStarted())
+                {
+                    LOG_INF("NFC Tag emulation is already started");
+                }
+                else
+                {
+                    ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+                }
             }
-            else
-            {
-                ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-            }
+#endif
         }
+#ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
             NFCOnboardingPayloadMgr().StopTagEmulation();
@@ -791,11 +815,27 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 #endif
         break;
     case DeviceEventType::kCHIPoBLEConnectionClosed:
-        if (Internal::BLEMgrImpl().NeedToResetFailSafeTimer())
+        if (ConnectivityMgr().GetBleLayer()->IsInitialized()) // Unexpected BLE disconnect during commissioning
         {
-            LOG_INF("BLE disconnected during commissioning");
-            Internal::BLEMgrImpl().ClearResetFailSafeTimerFlag();
-            Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+            ChipLogDetail(DeviceLayer, "BLE disconnected during commissioning");
+            chip::Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+        }
+        else // Expected BLE disconnect: switching to Thread
+        {
+            bt_disable();
+#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
+            pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+            ChipLogProgress(DeviceLayer, "Switch to Thread");
+            TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(true);
+
+            ChipDeviceEvent opEvent;
+            opEvent.Type     = DeviceEventType::kOperationalNetworkStarted;
+            CHIP_ERROR error = PlatformMgr().PostEvent(&opEvent);
+            ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format());
+#endif
         }
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD

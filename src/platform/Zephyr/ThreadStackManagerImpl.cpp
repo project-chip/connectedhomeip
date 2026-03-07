@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,7 +30,11 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/ThreadStackManager.h>
 
+#if defined(CONFIG_ZEPHYR_VERSION_3_3)
+#include <version.h>
+#else
 #include <zephyr/version.h>
+#endif
 
 #if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 #include <ncs_version.h>
@@ -110,6 +114,32 @@ void ThreadStackManagerImpl::_NotifySrpClearAllComplete()
     k_sem_give(&mSrpClearAllSemaphore);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
+{
+    /* In non-concurrent mode, BLE and Thread cannot run simultaneously.
+     *
+     * This request corresponds to a Thread prescan. If BLE is currently active,
+     * a new scan cannot be started, so the cached prescan results are returned
+     * instead. Once the device switches to Thread mode, scanning is available again.
+     */
+    if (bt_is_ready())
+    {
+        ChipLogProgress(DeviceLayer, "Thread prescan: BLE active, using cached results");
+
+        if (callback != nullptr)
+        {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, callback]() {
+                callback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
+            });
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    return Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::_StartThreadScan(callback);
+}
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip
