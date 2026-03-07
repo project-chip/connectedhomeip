@@ -20,9 +20,8 @@
 
 #include <DEMManufacturerDelegate.h>
 #include <DeviceEnergyManagementManager.h>
-#include <ElectricalPowerMeasurementDelegateImpl.h>
+#include <ElectricalSensorManager.h>
 #include <EnergyEvseManager.h>
-#include <PowerTopologyDelegateImpl.h>
 
 using chip::Protocols::InteractionModel::Status;
 namespace chip {
@@ -37,13 +36,11 @@ namespace EnergyEvse {
 class EVSEManufacturer : public DEMManufacturerDelegate
 {
 public:
-    EVSEManufacturer(EnergyEvseManager * aEvseInstance,
-                     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * aEPMInstance,
-                     PowerTopology::PowerTopologyInstance * aPTInstance, DeviceEnergyManagementManager * aDEMInstance)
+    EVSEManufacturer(EnergyEvseManager * aEvseInstance, ElectricalSensorManager * aESManager,
+                     DeviceEnergyManagementManager * aDEMInstance)
     {
         mEvseInstance = aEvseInstance;
-        mEPMInstance  = aEPMInstance;
-        mPTInstance   = aPTInstance;
+        mESManager    = aESManager;
         mDEMInstance  = aDEMInstance;
     }
 
@@ -51,7 +48,7 @@ public:
 
     EnergyEvseManager * GetEvseInstance() { return mEvseInstance; }
 
-    ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * GetEPMInstance() { return mEPMInstance; }
+    ElectricalSensorManager * GetESManager() { return mESManager; }
 
     EnergyEvseDelegate * GetEvseDelegate()
     {
@@ -64,18 +61,18 @@ public:
 
     ElectricalPowerMeasurement::ElectricalPowerMeasurementDelegate * GetEPMDelegate()
     {
-        if (mEPMInstance)
+        if (mESManager)
         {
-            return mEPMInstance->GetDelegate();
+            return mESManager->GetEPMDelegate();
         }
         return nullptr;
     }
 
     PowerTopology::PowerTopologyDelegate * GetPTDelegate()
     {
-        if (mPTInstance)
+        if (mESManager)
         {
-            return mPTInstance->GetDelegate();
+            return mESManager->GetPTDelegate();
         }
         return nullptr;
     }
@@ -154,38 +151,6 @@ public:
      */
     CHIP_ERROR InitializePowerSourceCluster(chip::EndpointId endpointId);
 
-    /**
-     * @brief   Allows a client application to send in power readings into the system
-     *
-     * @param[in]  aEndpointId       - Endpoint to send to EPM Cluster
-     * @param[in]  aActivePower_mW   - ActivePower measured in milli-watts
-     * @param[in]  aVoltage_mV       - Voltage measured in milli-volts
-     * @param[in]  aActiveCurrent_mA - ActiveCurrent measured in milli-amps
-     */
-    CHIP_ERROR SendPowerReading(EndpointId aEndpointId, int64_t aActivePower_mW, int64_t aVoltage_mV, int64_t aCurrent_mA) override;
-
-    /**
-     * @brief   Allows a client application to send cumulative energy readings into the system
-     *
-     *          This is a helper function to add timestamps to the readings
-     *
-     * @param[in]  aCumulativeEnergyImported -total energy imported in milli-watthours
-     * @param[in]  aCumulativeEnergyExported -total energy exported in milli-watthours
-     */
-    CHIP_ERROR SendCumulativeEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
-                                           int64_t aCumulativeEnergyExported) override;
-
-    /**
-     * @brief   Allows a client application to send periodic energy readings into the system
-     *
-     *          This is a helper function to add timestamps to the readings
-     *
-     * @param[in]  aPeriodicEnergyImported - energy imported in milli-watthours in last period
-     * @param[in]  aPeriodicEnergyExported - energy exported in milli-watthours in last period
-     */
-    CHIP_ERROR SendPeriodicEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
-                                         int64_t aCumulativeEnergyExported) override;
-
     /**  Fake Meter data generation - used for testing EPM/EEM clusters */
     /**
      * @brief   Starts a fake load/generator to periodically callback the power and energy
@@ -231,8 +196,7 @@ public:
 
 private:
     EnergyEvseManager * mEvseInstance;
-    ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * mEPMInstance;
-    PowerTopology::PowerTopologyInstance * mPTInstance;
+    ElectricalSensorManager * mESManager;
     DeviceEnergyManagementManager * mDEMInstance;
 
     int64_t mLastChargingEnergyMeter    = 0;

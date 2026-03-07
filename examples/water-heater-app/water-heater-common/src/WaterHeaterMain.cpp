@@ -23,13 +23,11 @@
 
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <DeviceEnergyManagementManager.h>
-#include <ElectricalPowerMeasurementDelegateImpl.h>
+#include <ElectricalSensorManager.h>
 #include <EnergyManagementAppCmdLineOptions.h>
-#include <PowerTopologyDelegateImpl.h>
 #include <WaterHeaterInstance.h>
 #include <WaterHeaterMain.h>
 #include <WaterHeaterManufacturer.h>
-#include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <device-energy-management-modes.h>
 #include <water-heater-mode.h>
 
@@ -46,7 +44,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
-using namespace chip::app::Clusters::PowerTopology;
 using namespace chip::app::Clusters::WaterHeaterManagement;
 
 namespace {
@@ -70,11 +67,7 @@ const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type kMea
 // Common cluster instances
 std::unique_ptr<DeviceEnergyManagementDelegate> gDEMDelegate;
 std::unique_ptr<DeviceEnergyManagementManager> gDEMInstance;
-std::unique_ptr<ElectricalPowerMeasurementDelegate> gEPMDelegate;
-std::unique_ptr<ElectricalPowerMeasurementInstance> gEPMInstance;
-std::unique_ptr<PowerTopologyDelegate> gPTDelegate;
-std::unique_ptr<PowerTopologyInstance> gPTInstance;
-std::unique_ptr<ElectricalEnergyMeasurementAttrAccess> gEEMAttrAccess;
+std::unique_ptr<ElectricalSensorManager> gESManager;
 bool gCommonClustersInitialized = false;
 
 // Water Heater specific instances
@@ -210,15 +203,17 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
     if (!gCommonClustersInitialized)
     {
         TEMPORARY_RETURN_IGNORED DeviceEnergyManagementInit(endpointId, gDEMDelegate, gDEMInstance, GetFeatureMapFromCmdLine());
-        // These features and optional attributes are used to make the app pass certification
-        // We recommend implementers of the app to modify these to fit their needs
-        TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementInit(
-            endpointId, gEPMDelegate, gEPMInstance,
-            BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
+
+        // Initialize ElectricalSensorManager (owns both EPM and EEM)
+        gESManager = std::make_unique<ElectricalSensorManager>();
+        VerifyOrReturnError(gESManager != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        ElectricalSensorManager::EpmConfig epmConfig{
+            .features = BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
                 ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kAlternatingCurrent,
                 ElectricalPowerMeasurement::Feature::kPolyphasePower, ElectricalPowerMeasurement::Feature::kHarmonics,
                 ElectricalPowerMeasurement::Feature::kPowerQuality),
-            BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
+            .optionalAttributes = BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRanges,
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent,
@@ -231,13 +226,38 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSPower,
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeFrequency,
                 ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributePowerFactor,
-                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeNeutralCurrent));
-        TEMPORARY_RETURN_IGNORED PowerTopologyInit(endpointId, gPTDelegate, gPTInstance);
+                ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeNeutralCurrent),
+        };
+
+        ElectricalSensorManager::EemConfig eemConfig{
+            .features = BitMask<ElectricalEnergyMeasurement::Feature, uint32_t>(
+                ElectricalEnergyMeasurement::Feature::kImportedEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy,
+                ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kPeriodicEnergy),
+            .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet()
+                                      .Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyReset::Id>(),
+            .accuracyStruct = kMeasurementAccuracy,
+        };
+
+        ElectricalSensorManager::PtConfig ptConfig{
+            .features = BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology),
+        };
+
+        TEMPORARY_RETURN_IGNORED gESManager->Init(endpointId, epmConfig, eemConfig, ptConfig);
+
+        // Set CumulativeEnergyReset struct on the EEM cluster
+        ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type resetStruct = {
+            .importedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
+            .exportedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
+            .importedResetSystime   = MakeOptional(MakeNullable(static_cast<uint64_t>(0))),
+            .exportedResetSystime   = MakeOptional(MakeNullable(static_cast<uint64_t>(0))),
+        };
+        if (auto * eemCluster = gESManager->GetEEMCluster())
+        {
+            TEMPORARY_RETURN_IGNORED eemCluster->SetCumulativeEnergyReset(MakeOptional(resetStruct));
+        }
     }
     VerifyOrReturnError(gDEMDelegate && gDEMInstance, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(gEPMDelegate && gEPMInstance, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(gPTDelegate && gPTInstance, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(gEEMAttrAccess, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gESManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
     gCommonClustersInitialized = true;
     return CHIP_NO_ERROR;
 }
@@ -250,35 +270,14 @@ DeviceEnergyManagement::DeviceEnergyManagementDelegate * GetDEMDelegate()
     return gDEMDelegate.get();
 }
 
+ElectricalSensorManager * GetESManager()
+{
+    return gESManager.get();
+}
+
 WaterHeaterManufacturer * WaterHeaterManagement::GetWaterHeaterManufacturer()
 {
     return gWaterHeaterManufacturer.get();
-}
-
-void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endpointId)
-{
-    VerifyOrDie(!gEEMAttrAccess);
-
-    gEEMAttrAccess = std::make_unique<ElectricalEnergyMeasurementAttrAccess>(
-        BitMask<ElectricalEnergyMeasurement::Feature, uint32_t>(
-            ElectricalEnergyMeasurement::Feature::kImportedEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy,
-            ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kPeriodicEnergy),
-        BitMask<ElectricalEnergyMeasurement::OptionalAttributes, uint32_t>(
-            ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
-
-    ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type resetStruct = {
-        .importedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
-        .exportedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
-        .importedResetSystime   = MakeOptional(MakeNullable(static_cast<uint64_t>(0))),
-        .exportedResetSystime   = MakeOptional(MakeNullable(static_cast<uint64_t>(0))),
-    };
-
-    if (gEEMAttrAccess)
-    {
-        TEMPORARY_RETURN_IGNORED gEEMAttrAccess->Init();
-        TEMPORARY_RETURN_IGNORED SetMeasurementAccuracy(endpointId, kMeasurementAccuracy);
-        TEMPORARY_RETURN_IGNORED SetCumulativeReset(endpointId, MakeOptional(resetStruct));
-    }
 }
 
 void WaterHeaterApplicationInit()
@@ -306,9 +305,12 @@ void WaterHeaterApplicationShutdown()
     ChipLogDetail(AppServer, "Water Heater App: WaterHeaterShutdown()");
 
     /* Shutdown in reverse order that they were created */
-    TEMPORARY_RETURN_IGNORED PowerTopologyShutdown(gPTInstance, gPTDelegate);                /* Free the PowerTopology */
-    TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementShutdown(gEPMInstance, gEPMDelegate); /* Free the Energy Meter */
-    DeviceEnergyManagementShutdown(gDEMInstance, gDEMDelegate);                              /* Free the DEM */
+    if (gESManager)
+    {
+        gESManager->Shutdown();
+        gESManager.reset();
+    }
+    DeviceEnergyManagementShutdown(gDEMInstance, gDEMDelegate);
 
     // Shutdown Water Heater specific clusters
     TEMPORARY_RETURN_IGNORED WaterHeaterManufacturerShutdown();
