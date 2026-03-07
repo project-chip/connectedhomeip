@@ -97,13 +97,13 @@ public:
                     ChipLogError(Zcl, "[Pw] Failed to decode currentLevel: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
-                err = ValveConfigurationAndControl::UpdateCurrentLevel(level);
+                err = ValveConfigurationAndControl::UpdateCurrentLevel(path.mEndpointId, level);
                 if (err != CHIP_NO_ERROR)
                 {
                     ChipLogError(Zcl, "[Pw] Failed to update currentLevel: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
-                ChipLogProgress(Zcl, "[Pw] Successfully set current level to " ChipLogFormatMEI ".", ChipLogFormatMEI(level));
+                ChipLogProgress(Zcl, "[Pw] Successfully set current level to " ChipLogValueMEI ".", ChipLogFormatMEI(level));
             }
 #endif
         }
