@@ -249,6 +249,7 @@ std::optional<DataModel::ActionReturnStatus>
 ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
                                                        CommandHandler * handler)
 {
+    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside HandleOpenCommand");
     Commands::Open::DecodableType commandData;
     ReturnErrorOnFailure(commandData.Decode(input_arguments));
 
