@@ -24,6 +24,7 @@
 #include "AccessRestrictionProvider.h"
 #endif
 
+#include "AuxiliaryType.h"
 #include "Privilege.h"
 #include "RequestPath.h"
 #include "SubjectDescriptor.h"
@@ -88,11 +89,13 @@ public:
             virtual CHIP_ERROR GetAuthMode(AuthMode & authMode) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
             virtual CHIP_ERROR GetFabricIndex(FabricIndex & fabricIndex) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
             virtual CHIP_ERROR GetPrivilege(Privilege & privilege) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR GetAuxiliaryType(AuxiliaryType & auxiliaryType) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
             // Simple setters
             virtual CHIP_ERROR SetAuthMode(AuthMode authMode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
             virtual CHIP_ERROR SetFabricIndex(FabricIndex fabricIndex) { return CHIP_ERROR_NOT_IMPLEMENTED; }
             virtual CHIP_ERROR SetPrivilege(Privilege privilege) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR SetAuxiliaryType(AuxiliaryType auxiliaryType) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
             // Subjects
             virtual CHIP_ERROR GetSubjectCount(size_t & count) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -133,11 +136,13 @@ public:
         CHIP_ERROR GetAuthMode(AuthMode & authMode) const { return mDelegate->GetAuthMode(authMode); }
         CHIP_ERROR GetFabricIndex(FabricIndex & fabricIndex) const { return mDelegate->GetFabricIndex(fabricIndex); }
         CHIP_ERROR GetPrivilege(Privilege & privilege) const { return mDelegate->GetPrivilege(privilege); }
+        CHIP_ERROR GetAuxiliaryType(AuxiliaryType & auxiliaryType) const { return mDelegate->GetAuxiliaryType(auxiliaryType); }
 
         // Simple setters
         CHIP_ERROR SetAuthMode(AuthMode authMode) { return mDelegate->SetAuthMode(authMode); }
         CHIP_ERROR SetFabricIndex(FabricIndex fabricIndex) { return mDelegate->SetFabricIndex(fabricIndex); }
         CHIP_ERROR SetPrivilege(Privilege privilege) { return mDelegate->SetPrivilege(privilege); }
+        CHIP_ERROR SetAuxiliaryType(AuxiliaryType auxiliaryType) { return mDelegate->SetAuxiliaryType(auxiliaryType); }
 
         /**
          * Gets the number of subjects.
@@ -400,6 +405,11 @@ public:
         // Iteration
         virtual CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex) const { return CHIP_NO_ERROR; }
 
+        virtual CHIP_ERROR AuxiliaryEntries(EntryIterator & iterator, const FabricIndex * fabricIndex) const
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
         // Check
         // Return CHIP_NO_ERROR if allowed, CHIP_ERROR_ACCESS_DENIED if denied,
         // CHIP_ERROR_NOT_IMPLEMENTED to use the default check algorithm (against entries),
@@ -422,6 +432,11 @@ public:
         if (IsInitialized())
         {
             mDelegate->Release();
+        }
+
+        if (IsGroupAuxiliaryDelegateRegistered())
+        {
+            mGroupAuxDelegate->Release();
         }
     }
 
@@ -634,11 +649,59 @@ public:
         return mDelegate->Entries(iterator, fabricIndex);
     }
 
+    /**
+     * Iterates over auxiliary entries for the given fabric.
+     *
+     * @param [in]  fabric   Fabric for which to iterate auxiliary entries.
+     * @param [out] iterator Iterator controlling the iteration.
+     */
+    CHIP_ERROR AuxiliaryEntries(FabricIndex fabric, EntryIterator & iterator) const
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsGroupAuxiliaryDelegateRegistered(), CHIP_ERROR_INCORRECT_STATE);
+        return mGroupAuxDelegate->AuxiliaryEntries(iterator, &fabric);
+    }
+
+    /**
+     * Iterates over auxiliary entries for the given fabric.
+     *
+     * @param [out] iterator    Iterator controlling the iteration.
+     * @param [in]  fabricIndex Iteration is confined to fabric, if not null.
+     */
+    CHIP_ERROR AuxiliaryEntries(EntryIterator & iterator, const FabricIndex * fabricIndex = nullptr) const
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsGroupAuxiliaryDelegateRegistered(), CHIP_ERROR_INCORRECT_STATE);
+        return mGroupAuxDelegate->AuxiliaryEntries(iterator, fabricIndex);
+    }
+
     // Adds a listener to the end of the listener list, if not already in the list.
     void AddEntryListener(EntryListener & listener);
 
     // Removes a listener from the listener list, if in the list.
     void RemoveEntryListener(EntryListener & listener);
+
+    /**
+     * @brief Registers a delegate to handle auxiliary access control entries.
+     *
+     * @param[in] delegate The delegate to register.
+     *
+     * @retval #CHIP_ERROR_INVALID_ARGUMENT if the delegate is null.
+     * @retval #CHIP_ERROR_INCORRECT_STATE if a delegate is already registered.
+     * @retval #CHIP_NO_ERROR on success.
+     */
+    CHIP_ERROR RegisterGroupAuxiliaryDelegate(Delegate * delegate)
+    {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mGroupAuxDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        mGroupAuxDelegate = delegate;
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * @brief Unregisters the delegate handling auxiliary access control entries.
+     */
+    void UnregisterGroupAuxiliaryDelegate() { mGroupAuxDelegate = nullptr; }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     // Set an optional AcceessRestriction object for MNGD feature.
@@ -676,6 +739,8 @@ public:
 private:
     bool IsInitialized() const { return (mDelegate != nullptr); }
 
+    bool IsGroupAuxiliaryDelegateRegistered() const { return (mGroupAuxDelegate != nullptr); }
+
     void NotifyEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry * entry,
                             EntryListener::ChangeType changeType);
 
@@ -694,6 +759,8 @@ private:
 
 private:
     Delegate * mDelegate = nullptr;
+
+    Delegate * mGroupAuxDelegate = nullptr;
 
     DeviceTypeResolver * mDeviceTypeResolver = nullptr;
 

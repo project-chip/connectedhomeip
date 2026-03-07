@@ -37,6 +37,7 @@ using chip::kUndefinedNodeId;
 
 using chip::Access::AccessControl;
 using chip::Access::AuthMode;
+using chip::Access::AuxiliaryType;
 using chip::Access::Privilege;
 using chip::Access::RequestPath;
 using chip::Access::SubjectDescriptor;
