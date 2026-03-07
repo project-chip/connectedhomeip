@@ -26,6 +26,9 @@ import("system.gni")
 assert(chip_enable_thread || !chip_system_config_use_openthread_inet_endpoints,
        "OpenThread Endpoint is only available when Thread is enabled")
 
+assert(!chip_enable_otns || chip_system_config_use_openthread_inet_endpoints,
+       "OTNS requires chip_system_config_use_openthread_inet_endpoints to be true")
+
 if (chip_system_config_use_lwip) {
   import("//build_overrides/lwip.gni")
 }

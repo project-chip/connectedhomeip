@@ -208,3 +208,10 @@ class Subprocess(threading.Thread):
         """Wait for the subprocess to finish."""
         self.join(timeout)
         return self.returncode
+
+class ProcessConfigurator:
+    def apply_args(self, process: SubprocessInfo) -> SubprocessInfo:
+        return process
+
+    def apply_pairing_args(self, process: SubprocessInfo) -> SubprocessInfo:
+        return process
