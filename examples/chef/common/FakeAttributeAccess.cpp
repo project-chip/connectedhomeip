@@ -104,6 +104,7 @@ public:
                     return ::pw::Status::Internal();
                 }
                 ChipLogProgress(Zcl, "[Pw] Successfully set current level to " ChipLogFormatMEI ".", ChipLogValueMEI(level));
+                return ::pw::OkStatus();
             }
 #endif
         }
