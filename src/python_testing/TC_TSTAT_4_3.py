@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -96,7 +96,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
     def pics_TC_TSTAT_4_3(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        return ["TSTAT.S", "TSTAT.S.F0a"]
+        return ["TSTAT.S", "TSTAT.S.F08", "TSTAT.S.F0a"]
 
     def steps_TC_TSTAT_4_3(self) -> list[TestStep]:
         return [
@@ -148,27 +148,25 @@ class TC_TSTAT_4_3(MatterBaseTest):
         # Commission DUT - already done
 
         self.step("2a")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            # TH reads the FeatureMap attribute.
-            feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.FeatureMap)
-            log.info(f"FeatureMap: {feature_map}")
+        # TH reads the FeatureMap attribute.
+        feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.FeatureMap)
+        log.info(f"FeatureMap: {feature_map}")
 
-            # Verify that the TSUGGEST bit is set in the FeatureMap value.
-            asserts.assert_true(feature_map & cluster.Bitmaps.Feature.kThermostatSuggestions,
-                                "TSUGGEST bit is not set in the FeatureMap")
+        # Verify that the TSUGGEST bit is set in the FeatureMap value.
+        asserts.assert_true(feature_map & cluster.Bitmaps.Feature.kThermostatSuggestions,
+                            "TSUGGEST bit is not set in the FeatureMap")
 
         self.step("2b")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            # TH reads the Presets attribute and saves it in a SupportedPresets variable.
-            supported_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
-            log.info(f"Supported Presets: {supported_presets}")
+        # TH reads the Presets attribute and saves it in a SupportedPresets variable.
+        supported_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
+        log.info(f"Supported Presets: {supported_presets}")
 
-            # Verify that the read returned a list of presets with count >=2.
-            asserts.assert_greater_equal(len(supported_presets), 2)
+        # Verify that the read returned a list of presets with count >=2.
+        asserts.assert_greater_equal(len(supported_presets), 2)
 
         has_valid_time = True
         self.step("3")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
+        if self.pics_guard(self.check_pics("TIMESYNC.S.A0000")):
             # TH checks if the Thermostat does not have a valid UTC time.
             currentUTC = await self.read_single_attribute_check_success(endpoint=0, cluster=time_cluster, attribute=time_cluster.Attributes.UTCTime)
 
@@ -177,29 +175,28 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
         if not has_valid_time:
             self.step("4a")
-            if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
 
-                # If has_valid_time is False, TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle,
-                # the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes.
-                activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
-                log.info(f"Active Preset Handlers: {activePresetHandle}")
-                possiblePresetHandles = [
-                    preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
-                if len(possiblePresetHandles) > 0:
-                    preset_handle = possiblePresetHandles[0]
-                    # Calculate the current UTC timestamp for use as the EffectiveTime.
-                    effective_time = get_epoch_utc_time()
-                    # Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE.
-                    await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                      preset_handle=preset_handle,
-                                                                      effective_time=effective_time,
-                                                                      expiration_in_minutes=30,
-                                                                      expected_status=Status.InvalidInState)
-                else:
-                    log.info("Couldn't run test step 3 since all preset handles are also the ActivePresetHandle on this Thermostat")
+            # If has_valid_time is False, TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle,
+            # the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes.
+            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+            log.info(f"Active Preset Handle: {activePresetHandle}")
+            possiblePresetHandles = [
+                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
+            if len(possiblePresetHandles) > 0:
+                preset_handle = possiblePresetHandles[0]
+                # Calculate the current UTC timestamp for use as the EffectiveTime.
+                effective_time = get_epoch_utc_time()
+                # Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE.
+                await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                                                                  preset_handle=preset_handle,
+                                                                  effective_time=effective_time,
+                                                                  expiration_in_minutes=30,
+                                                                  expected_status=Status.InvalidInState)
+            else:
+                log.info("Couldn't run test step 4a since all preset handles are also the ActivePresetHandle on this Thermostat")
 
             self.step("4b")
-            if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
+            if self.pics_guard(self.check_pics("TIMESYNC.S.C00.Rsp")):
                 # If has_valid_time is False, TH sends Time Synchronization command to DUT using a time source.
                 try:
                     code = 0
@@ -217,58 +214,57 @@ class TC_TSTAT_4_3(MatterBaseTest):
             self.skip_step("4b")
 
         self.step("5")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            # TH picks a random preset handle that does not match any entry in the Presets attribute and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes set to 30 minutes.
-            existing_handles = {p.presetHandle for p in supported_presets}
-            # Use the maximum length of existing handles as an upper bound, with a conservative default if none exist.
-            max_handle_length = max((len(h) for h in existing_handles), default=32)
-            counter = 0
-            while True:
-                unique_preset_handle_str = f"{counter}"
-                unique_preset_handle = unique_preset_handle_str.encode("ascii")
-                if len(unique_preset_handle) > max_handle_length:
-                    asserts.fail(
-                        f"Generated preset handle '{unique_preset_handle_str}' exceeds maximum allowed length ({max_handle_length} bytes)"
-                    )
-                if unique_preset_handle not in existing_handles:
-                    break
-                counter += 1
-            currentUTC = get_epoch_utc_time()
-            # Verify that the AddThermostatSuggestion command returns NOT_FOUND.
-            await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                              preset_handle=unique_preset_handle,
-                                                              effective_time=currentUTC,
-                                                              expiration_in_minutes=30,
-                                                              expected_status=Status.NotFound)
+
+        # TH picks a random preset handle that does not match any entry in the Presets attribute and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes set to 30 minutes.
+        existing_handles = {p.presetHandle for p in supported_presets}
+        # Use the maximum length of existing handles as an upper bound, with a conservative default if none exist.
+        max_handle_length = max((len(h) for h in existing_handles), default=32)
+        counter = 0
+        while True:
+            unique_preset_handle_str = f"{counter}"
+            unique_preset_handle = unique_preset_handle_str.encode("ascii")
+            if len(unique_preset_handle) > max_handle_length:
+                asserts.fail(
+                    f"Generated preset handle '{unique_preset_handle_str}' exceeds maximum allowed length ({max_handle_length} bytes)"
+                )
+            if unique_preset_handle not in existing_handles:
+                break
+            counter += 1
+        currentUTC = get_epoch_utc_time()
+        # Verify that the AddThermostatSuggestion command returns NOT_FOUND.
+        await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                                                          preset_handle=unique_preset_handle,
+                                                          effective_time=currentUTC,
+                                                          expiration_in_minutes=30,
+                                                          expected_status=Status.NotFound)
 
         self.step("6a")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            # TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp
-            # and ExpirationInMinutes is set to 30 minutes. TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.
-            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
-            log.info(f"Active Preset Handlers: {activePresetHandle}")
-            possiblePresetHandles = [
-                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
-            asserts.assert_greater_equal(
-                len(possiblePresetHandles), 1, "Couldn't run test step 6a since all preset handles are also the ActivePresetHandle on this Thermostat")
-            presetHandle = possiblePresetHandles[0]
-            currentUTC = get_epoch_utc_time()
-            expirationInMinutes = 30
-            addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                                                preset_handle=presetHandle,
-                                                                                                effective_time=currentUTC,
-                                                                                                expiration_in_minutes=expirationInMinutes,
-                                                                                                expected_status=Status.Success)
+        # TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp
+        # and ExpirationInMinutes is set to 30 minutes. TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.
+        activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+        log.info(f"Active Preset Handlers: {activePresetHandle}")
+        possiblePresetHandles = [
+            preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
+        asserts.assert_greater_equal(
+            len(possiblePresetHandles), 1, "Couldn't run test step 6a since all preset handles are also the ActivePresetHandle on this Thermostat")
+        presetHandle = possiblePresetHandles[0]
+        currentUTC = get_epoch_utc_time()
+        expirationInMinutes = 30
+        addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                                                                                            preset_handle=presetHandle,
+                                                                                            effective_time=currentUTC,
+                                                                                            expiration_in_minutes=expirationInMinutes,
+                                                                                            expected_status=Status.Success)
 
-            # TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.
-            currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
-            thermostatSuggestionNotFollowingReason = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestionNotFollowingReason)
-            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+        # TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.
+        currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
+        thermostatSuggestionNotFollowingReason = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestionNotFollowingReason)
+        activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
 
-            # Verify that the AddThermostatSuggestion command returns an AddThermostatSuggestionResponse with a distinct value in the UniqueID field.
-            if addThermostatSuggestionResponse:
-                addThermostatSuggestionResponse_uniqueID = addThermostatSuggestionResponse.uniqueID
-                log.info(f"UniqueID from AddThermostatSuggestionResponse: {addThermostatSuggestionResponse_uniqueID}")
+        # Verify that the AddThermostatSuggestion command returns an AddThermostatSuggestionResponse with a distinct value in the UniqueID field.
+        if addThermostatSuggestionResponse:
+            addThermostatSuggestionResponse_uniqueID = addThermostatSuggestionResponse.uniqueID
+            log.info(f"UniqueID from AddThermostatSuggestionResponse: {addThermostatSuggestionResponse_uniqueID}")
 
             # Verify that the ThermostatSuggestions has one entry with the UniqueID field matching the UniqueID sent in the AddThermostatSuggestionResponse.
             thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
@@ -287,26 +283,26 @@ class TC_TSTAT_4_3(MatterBaseTest):
             asserts.assert_equal(currentThermostatSuggestion.expirationTime, expirationTime,
                                  "ExpirationTime in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
 
-            # If the ThermostatSuggestionNotFollowingReason is set to null, verify that the ActivePresetHandle attribute is set to the PresetHandle field of the CurrentThermostatSuggestion attribute.
-            if thermostatSuggestionNotFollowingReason is None:
-                asserts.assert_equal(activePresetHandle, presetHandle,
-                                     "ActivePresetHandle attribute should be equal to the PresetHandle in the CurrentThermostatSuggestion attribute when ThermostatSuggestionNotFollowingReason is set to null.")
+            # Verify that the ThermostatSuggestionNotFollowingReason is set to null and the ActivePresetHandle attribute is set to the PresetHandle field of the CurrentThermostatSuggestion attribute.
+            asserts.assert_equal(thermostatSuggestionNotFollowingReason, NullValue,
+                                 "ThermostatSuggestionNotFollowingReason should be set to null")
+            asserts.assert_equal(activePresetHandle, currentThermostatSuggestion.presetHandle,
+                                 "ActivePresetHandle attribute should be equal to the PresetHandle in the CurrentThermostatSuggestion attribute")
 
         self.step("6b")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID field of the CurrentThermostatSuggestion attribute to clean up the test.
-            currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
-            await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
-                                                                 uniqueID=currentThermostatSuggestion.uniqueID,
-                                                                 expected_status=Status.Success)
+        # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID field of the CurrentThermostatSuggestion attribute to clean up the test.
+        currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
+        await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
+                                                             uniqueID=currentThermostatSuggestion.uniqueID,
+                                                             expected_status=Status.Success)
 
-            # Verify that the entry with the UniqueID matching the UniqueID field in the CurrentThermostatSuggestion attribute is removed from the ThermostatSuggestions attribute.
-            thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
-            asserts.assert_equal(len(thermostatSuggestions), 0,
-                                 "ThermostatSuggestions should not have any entries after the matching entry was removed using the RemoveThermostatSuggestion command.")
+        # Verify that the entry with the UniqueID matching the UniqueID field in the CurrentThermostatSuggestion attribute is removed from the ThermostatSuggestions attribute.
+        thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
+        asserts.assert_equal(len(thermostatSuggestions), 0,
+                             "ThermostatSuggestions should not have any entries after the matching entry was removed using the RemoveThermostatSuggestion command.")
 
         self.step("7a")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a") and self.check_pics("TSTAT.S.A0023") and self.check_pics("TSTAT.S.A0024")):
+        if self.pics_guard(self.check_pics("TSTAT.S.A0023") and self.check_pics("TSTAT.S.A0024")):
             # TH sets TemperatureSetpointHold to SetpointHoldOn and TemperatureSetpointHoldDuration to null.
             await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHold(cluster.Enums.TemperatureSetpointHoldEnum.kSetpointHoldOn), endpoint_id=endpoint, expect_success=True)
             await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHoldDuration(NullValue), endpoint_id=endpoint, expect_success=True)
@@ -374,7 +370,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             # "ActivePresetHandle attribute should not be equal to the PresetHandle in the CurrentThermostatSuggestion attribute.")
 
         self.step("7b")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a") and self.check_pics("TSTAT.S.A0023") and self.check_pics("TSTAT.S.A0024")):
+        if self.pics_guard(self.check_pics("TSTAT.S.A0023") and self.check_pics("TSTAT.S.A0024")):
             # TH sets TemperatureSetpointHold to SetpointHoldOff after 2 seconds.
             await asyncio.sleep(2)
             await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHold(cluster.Enums.TemperatureSetpointHoldEnum.kSetpointHoldOff), endpoint_id=endpoint, expect_success=True)
@@ -389,13 +385,14 @@ class TC_TSTAT_4_3(MatterBaseTest):
             asserts.assert_equal(temperatureSetpointHold, cluster.Enums.TemperatureSetpointHoldEnum.kSetpointHoldOff,
                                  "TemperatureSetpointHold is not equal to SetpointHoldOff")
 
-            # If the ThermostatSuggestionNotFollowingReason is set to null, verify that the ActivePresetHandle attribute is updated to the PresetHandle field of the CurrentThermostatSuggestion attribute.
-            if thermostatSuggestionNotFollowingReason is None:
-                asserts.assert_equal(activePresetHandle, presetHandle,
-                                     "ActivePresetHandle attribute should be equal to the PresetHandle in the CurrentThermostatSuggestion attribute when ThermostatSuggestionNotFollowingReason is set to null.")
+            # Verify that the ThermostatSuggestionNotFollowingReason is set to null and the ActivePresetHandle attribute is set to the PresetHandle field of the CurrentThermostatSuggestion attribute.
+            asserts.assert_equal(thermostatSuggestionNotFollowingReason, NullValue,
+                                 "ThermostatSuggestionNotFollowingReason should be set to null")
+            asserts.assert_equal(activePresetHandle, currentThermostatSuggestion.presetHandle,
+                                 "ActivePresetHandle attribute should be equal to the PresetHandle in the CurrentThermostatSuggestion attribute")
 
         self.step("7c")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
+        if self.pics_guard(self.check_pics("TSTAT.S.A0023") and self.check_pics("TSTAT.S.A0024")):
             # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID field of the CurrentThermostatSuggestion attribute to clean up the test.
             currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
             await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
@@ -408,228 +405,223 @@ class TC_TSTAT_4_3(MatterBaseTest):
                                  "ThermostatSuggestions should not have any entries after the RemoveThermostatSuggestion command removed the matching entry.")
 
         self.step("8a")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            # TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp
-            # and ExpirationInMinutes is set to 30 minutes. TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.
-            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
-            log.info(f"Active Preset Handlers: {activePresetHandle}")
+        # TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp
+        # and ExpirationInMinutes is set to 30 minutes. TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.
+        activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+        log.info(f"Active Preset Handlers: {activePresetHandle}")
 
-            # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes.
-            possiblePresetHandles = [
-                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
-            asserts.assert_greater_equal(
-                len(possiblePresetHandles), 1, "Couldn't run test step 8a since all preset handles are also the ActivePresetHandle on this Thermostat")
-            presetHandle = possiblePresetHandles[0]
-            currentUTC = get_epoch_utc_time()
-            expirationInMinutes = 30
-            addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                                                preset_handle=presetHandle,
-                                                                                                effective_time=currentUTC,
-                                                                                                expiration_in_minutes=expirationInMinutes,
-                                                                                                expected_status=Status.Success)
+        # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes.
+        possiblePresetHandles = [
+            preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
+        asserts.assert_greater_equal(
+            len(possiblePresetHandles), 1, "Couldn't run test step 8a since all preset handles are also the ActivePresetHandle on this Thermostat")
+        presetHandle = possiblePresetHandles[0]
+        currentUTC = get_epoch_utc_time()
+        expirationInMinutes = 30
+        addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                                                                                            preset_handle=presetHandle,
+                                                                                            effective_time=currentUTC,
+                                                                                            expiration_in_minutes=expirationInMinutes,
+                                                                                            expected_status=Status.Success)
 
-            # TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.
-            currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
-            thermostatSuggestionNotFollowingReason = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestionNotFollowingReason)
-            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+        # TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.
+        currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
+        thermostatSuggestionNotFollowingReason = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestionNotFollowingReason)
+        activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
 
-            # Verify that the AddThermostatSuggestion command returns an AddThermostatSuggestionResponse with a value in the UniqueID field.
-            if addThermostatSuggestionResponse:
-                addThermostatSuggestionResponse_uniqueID = addThermostatSuggestionResponse.uniqueID
-                log.info(f"UniqueID from AddThermostatSuggestionResponse: {addThermostatSuggestionResponse_uniqueID}")
+        # Verify that the AddThermostatSuggestion command returns an AddThermostatSuggestionResponse with a value in the UniqueID field.
+        if addThermostatSuggestionResponse:
+            addThermostatSuggestionResponse_uniqueID = addThermostatSuggestionResponse.uniqueID
+            log.info(f"UniqueID from AddThermostatSuggestionResponse: {addThermostatSuggestionResponse_uniqueID}")
 
-            # Verify that the ThermostatSuggestions has one entry with the UniqueID field matching the UniqueID sent in the AddThermostatSuggestionResponse.
-            thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
-            if len(thermostatSuggestions) > 0:
-                asserts.assert_equal(thermostatSuggestions[0].uniqueID, addThermostatSuggestionResponse_uniqueID,
-                                     "UniqueID in the entry for ThermostatSuggestions does not match the UniqueID entry from AddThermostatSuggestionResponse.")
+        # Verify that the ThermostatSuggestions has one entry with the UniqueID field matching the UniqueID sent in the AddThermostatSuggestionResponse.
+        thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
+        if len(thermostatSuggestions) > 0:
+            asserts.assert_equal(thermostatSuggestions[0].uniqueID, addThermostatSuggestionResponse_uniqueID,
+                                 "UniqueID in the entry for ThermostatSuggestions does not match the UniqueID entry from AddThermostatSuggestionResponse.")
 
-            # Verify that the CurrentThermostatSuggestion attribute is set to the uniqueID, preset handle, the EffectiveTime, and the EffectiveTime plus ExpirationInMinutes (converted to seconds) passed in the AddThermostatSuggestion command.
-            asserts.assert_equal(currentThermostatSuggestion.uniqueID, addThermostatSuggestionResponse_uniqueID,
-                                 "UniqueID in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
-            asserts.assert_equal(currentThermostatSuggestion.presetHandle, presetHandle,
-                                 "PresetHandle in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
-            asserts.assert_equal(currentThermostatSuggestion.effectiveTime, currentUTC,
-                                 "EffectiveTime in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
-            expirationTime = currentUTC + int(timedelta(minutes=expirationInMinutes).total_seconds())
-            asserts.assert_equal(currentThermostatSuggestion.expirationTime, expirationTime,
-                                 "ExpirationTime in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
+        # Verify that the CurrentThermostatSuggestion attribute is set to the uniqueID, preset handle, the EffectiveTime, and the EffectiveTime plus ExpirationInMinutes (converted to seconds) passed in the AddThermostatSuggestion command.
+        asserts.assert_equal(currentThermostatSuggestion.uniqueID, addThermostatSuggestionResponse_uniqueID,
+                             "UniqueID in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
+        asserts.assert_equal(currentThermostatSuggestion.presetHandle, presetHandle,
+                             "PresetHandle in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
+        asserts.assert_equal(currentThermostatSuggestion.effectiveTime, currentUTC,
+                             "EffectiveTime in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
+        expirationTime = currentUTC + int(timedelta(minutes=expirationInMinutes).total_seconds())
+        asserts.assert_equal(currentThermostatSuggestion.expirationTime, expirationTime,
+                             "ExpirationTime in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
 
-            # If the ThermostatSuggestionNotFollowingReason is set to null, verify that the ActivePresetHandle attribute is set to the PresetHandle field of the CurrentThermostatSuggestion attribute.
-            if thermostatSuggestionNotFollowingReason is None:
-                asserts.assert_equal(activePresetHandle, presetHandle,
-                                     "ActivePresetHandle attribute should be equal to the PresetHandle in the CurrentThermostatSuggestion attribute when ThermostatSuggestionNotFollowingReason is set to null.")
+        # Verify that the ThermostatSuggestionNotFollowingReason is set to null and the ActivePresetHandle attribute is set to the PresetHandle field of the CurrentThermostatSuggestion attribute.
+        asserts.assert_equal(thermostatSuggestionNotFollowingReason, NullValue,
+                             "ThermostatSuggestionNotFollowingReason should be set to null")
+        asserts.assert_equal(activePresetHandle, currentThermostatSuggestion.presetHandle,
+                             "ActivePresetHandle attribute should be equal to the PresetHandle in the CurrentThermostatSuggestion attribute")
 
         self.step("8b")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to a value not matching the UniqueID field of the CurrentThermostatSuggestion attribute.
-            random_uniqueID = addThermostatSuggestionResponse_uniqueID
-            while random_uniqueID == addThermostatSuggestionResponse_uniqueID:
-                random_uniqueID = random.randint(0, 255)
-            currentUTC = get_epoch_utc_time()
-            # Verify that the RemoveThermostatSuggestion command returns NOT_FOUND.
-            await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
-                                                                 uniqueID=random_uniqueID,
-                                                                 expected_status=Status.NotFound)
+        # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to a value not matching the UniqueID field of the CurrentThermostatSuggestion attribute.
+        random_uniqueID = currentThermostatSuggestion.uniqueID
+        while random_uniqueID == currentThermostatSuggestion.uniqueID:
+            random_uniqueID = random.randint(0, 255)
+        currentUTC = get_epoch_utc_time()
+        # Verify that the RemoveThermostatSuggestion command returns NOT_FOUND.
+        await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
+                                                             uniqueID=random_uniqueID,
+                                                             expected_status=Status.NotFound)
 
         self.step("8c")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID field of the CurrentThermostatSuggestion attribute.
-            currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
-            await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
-                                                                 uniqueID=currentThermostatSuggestion.uniqueID,
-                                                                 expected_status=Status.Success)
-            # Verify that the RemoveThermostatSuggestion command returns SUCCESS and that the entry with the UniqueID matching the UniqueID field in the CurrentThermostatSuggestion attribute is removed from the ThermostatSuggestions attribute.
-            thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
-            asserts.assert_equal(len(thermostatSuggestions), 0,
-                                 "ThermostatSuggestions should not have any entries after the relevant entry was removed by UniqueID.")
+        # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID field of the CurrentThermostatSuggestion attribute.
+        currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
+        await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
+                                                             uniqueID=currentThermostatSuggestion.uniqueID,
+                                                             expected_status=Status.Success)
+        # Verify that the RemoveThermostatSuggestion command returns SUCCESS and that the entry with the UniqueID matching the UniqueID field in the CurrentThermostatSuggestion attribute is removed from the ThermostatSuggestions attribute.
+        thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
+        asserts.assert_equal(len(thermostatSuggestions), 0,
+                             "ThermostatSuggestions should not have any entries after the relevant entry was removed by UniqueID.")
 
         self.step("9a")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            # TH reads the ActivePresetHandle attribute and saves it.
-            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
-            log.info(f"Active Preset Handlers: {activePresetHandle}")
-            # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 35 minutes.
-            possiblePresetHandles = [
-                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
-            asserts.assert_greater_equal(
-                len(possiblePresetHandles), 1, "Couldn't run test step 9a since all preset handles are also the ActivePresetHandle on this Thermostat")
-            firstPresetHandle = possiblePresetHandles[0]
-            firstCurrentUTC = get_epoch_utc_time()
-            firstExpirationInMinutes = 35
-            firstAddThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                                                     preset_handle=firstPresetHandle,
-                                                                                                     effective_time=firstCurrentUTC,
-                                                                                                     expiration_in_minutes=firstExpirationInMinutes,
-                                                                                                     expected_status=Status.Success)
+        # TH reads the ActivePresetHandle attribute and saves it.
+        activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+        log.info(f"Active Preset Handlers: {activePresetHandle}")
+        # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 35 minutes.
+        possiblePresetHandles = [
+            preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
+        asserts.assert_greater_equal(
+            len(possiblePresetHandles), 1, "Couldn't run test step 9a since all preset handles are also the ActivePresetHandle on this Thermostat")
+        firstPresetHandle = possiblePresetHandles[0]
+        firstCurrentUTC = get_epoch_utc_time()
+        firstExpirationInMinutes = 35
+        firstAddThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                                                                                                 preset_handle=firstPresetHandle,
+                                                                                                 effective_time=firstCurrentUTC,
+                                                                                                 expiration_in_minutes=firstExpirationInMinutes,
+                                                                                                 expected_status=Status.Success)
 
-            # TH calls the AddThermostatSuggestion command again with the saved ActivePresetHandle attribute value, the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes.
-            secondPresetHandle = activePresetHandle
-            secondCurrentUTC = get_epoch_utc_time()
-            secondExpirationInMinutes = 30
-            secondAddThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                                                      preset_handle=secondPresetHandle,
-                                                                                                      effective_time=secondCurrentUTC,
-                                                                                                      expiration_in_minutes=secondExpirationInMinutes,
-                                                                                                      expected_status=Status.Success)
+        # TH calls the AddThermostatSuggestion command again with the saved ActivePresetHandle attribute value, the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes.
+        secondPresetHandle = activePresetHandle
+        secondCurrentUTC = get_epoch_utc_time()
+        secondExpirationInMinutes = 30
+        secondAddThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                                                                                                  preset_handle=secondPresetHandle,
+                                                                                                  effective_time=secondCurrentUTC,
+                                                                                                  expiration_in_minutes=secondExpirationInMinutes,
+                                                                                                  expected_status=Status.Success)
 
-            # Verify that both the AddThermostatSuggestion command return a AddThermostatSuggestionResponse with distinct values in the UniqueID field.
-            # TH saves both the UniqueID values.
-            firstAddThermostatSuggestionResponse_uniqueID = firstAddThermostatSuggestionResponse.uniqueID
-            log.info(f"UniqueID from First AddThermostatSuggestionResponse: {firstAddThermostatSuggestionResponse_uniqueID}")
+        # Verify that both the AddThermostatSuggestion command return a AddThermostatSuggestionResponse with distinct values in the UniqueID field.
+        # TH saves both the UniqueID values.
+        firstAddThermostatSuggestionResponse_uniqueID = firstAddThermostatSuggestionResponse.uniqueID
+        log.info(f"UniqueID from First AddThermostatSuggestionResponse: {firstAddThermostatSuggestionResponse_uniqueID}")
 
-            secondAddThermostatSuggestionResponse_uniqueID = secondAddThermostatSuggestionResponse.uniqueID
-            log.info(f"UniqueID from Second AddThermostatSuggestionResponse: {secondAddThermostatSuggestionResponse_uniqueID}")
+        secondAddThermostatSuggestionResponse_uniqueID = secondAddThermostatSuggestionResponse.uniqueID
+        log.info(f"UniqueID from Second AddThermostatSuggestionResponse: {secondAddThermostatSuggestionResponse_uniqueID}")
 
-            # Verify that the ThermostatSuggestions has two entries with the UniqueID field matching one of the UniqueID fields sent in the two AddThermostatSuggestionResponse(s).
-            thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
-            asserts.assert_equal(len(thermostatSuggestions), 2, "Expected two thermostat suggestions")
-            thermostatSuggestionUniqueIDs = {s.uniqueID for s in thermostatSuggestions}
-            asserts.assert_in(firstAddThermostatSuggestionResponse_uniqueID,
-                              thermostatSuggestionUniqueIDs, "First suggestion's UniqueID not found")
-            asserts.assert_in(secondAddThermostatSuggestionResponse_uniqueID,
-                              thermostatSuggestionUniqueIDs, "Second suggestion's UniqueID not found")
+        # Verify that the ThermostatSuggestions has two entries with the UniqueID field matching one of the UniqueID fields sent in the two AddThermostatSuggestionResponse(s).
+        thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
+        asserts.assert_equal(len(thermostatSuggestions), 2, "Expected two thermostat suggestions")
+        thermostatSuggestionUniqueIDs = {s.uniqueID for s in thermostatSuggestions}
+        asserts.assert_in(firstAddThermostatSuggestionResponse_uniqueID,
+                          thermostatSuggestionUniqueIDs, "First suggestion's UniqueID not found")
+        asserts.assert_in(secondAddThermostatSuggestionResponse_uniqueID,
+                          thermostatSuggestionUniqueIDs, "Second suggestion's UniqueID not found")
 
-            # Verify that the CurrentThermostatSuggestion attribute is set to the uniqueID, preset handle, the EffectiveTime, and the EffectiveTime plus ExpirationInMinutes (converted to seconds) of one of the entries in ThermostatSuggestions.
-            currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
-            thermostatSuggestionNotFollowingReason = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestionNotFollowingReason)
-            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+        # Verify that the CurrentThermostatSuggestion attribute is set to the uniqueID, preset handle, the EffectiveTime, and the EffectiveTime plus ExpirationInMinutes (converted to seconds) of one of the entries in ThermostatSuggestions.
+        currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
+        thermostatSuggestionNotFollowingReason = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestionNotFollowingReason)
+        activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
 
-            try:
-                asserts.assert_equal(currentThermostatSuggestion.uniqueID,
-                                     thermostatSuggestions[0].uniqueID, "UniqueID in the entry for CurrentThermostatSuggestion does not match the UniqueID entry from First AddThermostatSuggestionResponse.")
-                thermSuggestionIndex = 0
-            except AssertionError:
-                asserts.assert_equal(currentThermostatSuggestion.uniqueID,
-                                     thermostatSuggestions[1].uniqueID, "UniqueID in the entry for CurrentThermostatSuggestion does not match the UniqueID entry from First or Second AddThermostatSuggestionResponse.")
-                thermSuggestionIndex = 1
+        try:
+            asserts.assert_equal(currentThermostatSuggestion.uniqueID,
+                                 thermostatSuggestions[0].uniqueID, "UniqueID in the entry for CurrentThermostatSuggestion does not match the UniqueID entry from First AddThermostatSuggestionResponse.")
+            thermSuggestionIndex = 0
+        except AssertionError:
+            asserts.assert_equal(currentThermostatSuggestion.uniqueID,
+                                 thermostatSuggestions[1].uniqueID, "UniqueID in the entry for CurrentThermostatSuggestion does not match the UniqueID entry from First or Second AddThermostatSuggestionResponse.")
+            thermSuggestionIndex = 1
 
-            asserts.assert_equal(currentThermostatSuggestion.presetHandle, thermostatSuggestions[thermSuggestionIndex].presetHandle,
-                                 "PresetHandle in the entry for CurrentThermostatSuggestion does not match the PresetHandle entry from either AddThermostatSuggestionResponse.")
-            asserts.assert_equal(currentThermostatSuggestion.effectiveTime, thermostatSuggestions[thermSuggestionIndex].effectiveTime,
-                                 "EffectiveTime in the entry for CurrentThermostatSuggestion does not match the EffectiveTime entry from either AddThermostatSuggestionResponse.")
-            asserts.assert_equal(currentThermostatSuggestion.expirationTime, thermostatSuggestions[thermSuggestionIndex].expirationTime,
-                                 "ExpirationTime in the entry for CurrentThermostatSuggestion does not match the ExpirationTime entry from either AddThermostatSuggestionResponse.")
+        asserts.assert_equal(currentThermostatSuggestion.presetHandle, thermostatSuggestions[thermSuggestionIndex].presetHandle,
+                             "PresetHandle in the entry for CurrentThermostatSuggestion does not match the PresetHandle entry from either AddThermostatSuggestionResponse.")
+        asserts.assert_equal(currentThermostatSuggestion.effectiveTime, thermostatSuggestions[thermSuggestionIndex].effectiveTime,
+                             "EffectiveTime in the entry for CurrentThermostatSuggestion does not match the EffectiveTime entry from either AddThermostatSuggestionResponse.")
+        asserts.assert_equal(currentThermostatSuggestion.expirationTime, thermostatSuggestions[thermSuggestionIndex].expirationTime,
+                             "ExpirationTime in the entry for CurrentThermostatSuggestion does not match the ExpirationTime entry from either AddThermostatSuggestionResponse.")
 
-            # If the ThermostatSuggestionNotFollowingReason is set to null, verify that the ActivePresetHandle attribute is set to the PresetHandle field of the CurrentThermostatSuggestion attribute.
-            if thermostatSuggestionNotFollowingReason is None:
-                asserts.assert_equal(activePresetHandle, currentThermostatSuggestion.presetHandle,
-                                     "ActivePresetHandle attribute should be equal to the PresetHandle in the CurrentThermostatSuggestion attribute when ThermostatSuggestionNotFollowingReason is set to null.")
+        # Verify that the ThermostatSuggestionNotFollowingReason is set to null and the ActivePresetHandle attribute is set to the PresetHandle field of the CurrentThermostatSuggestion attribute.
+        asserts.assert_equal(thermostatSuggestionNotFollowingReason, NullValue,
+                             "ThermostatSuggestionNotFollowingReason should be set to null")
+        asserts.assert_equal(activePresetHandle, currentThermostatSuggestion.presetHandle,
+                             "ActivePresetHandle attribute should be equal to the PresetHandle in the CurrentThermostatSuggestion attribute")
 
         self.step("9b")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID fields of the added Thermostat Suggestions to clean up the test.
-            await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
-                                                                 uniqueID=firstAddThermostatSuggestionResponse_uniqueID,
-                                                                 expected_status=Status.Success)
+        # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID fields of the added Thermostat Suggestions to clean up the test.
+        await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
+                                                             uniqueID=firstAddThermostatSuggestionResponse_uniqueID,
+                                                             expected_status=Status.Success)
 
-            # Verify that the ThermostatSuggestions attribute has one entry in it.
-            thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
-            asserts.assert_equal(len(thermostatSuggestions), 1,
-                                 "ThermostatSuggestions should have 1 entry after one suggestion has been removed.")
+        # Verify that the ThermostatSuggestions attribute has one entry in it.
+        thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
+        asserts.assert_equal(len(thermostatSuggestions), 1,
+                             "ThermostatSuggestions should have 1 entry after one suggestion has been removed.")
 
-            await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
-                                                                 uniqueID=secondAddThermostatSuggestionResponse_uniqueID,
-                                                                 expected_status=Status.Success)
+        await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
+                                                             uniqueID=secondAddThermostatSuggestionResponse_uniqueID,
+                                                             expected_status=Status.Success)
 
-            # Verify that the ThermostatSuggestions attribute has no entry in it.
-            thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
-            asserts.assert_equal(len(thermostatSuggestions), 0,
-                                 "ThermostatSuggestions should have 0 entries after the second suggestion has been removed.")
+        # Verify that the ThermostatSuggestions attribute has no entry in it.
+        thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
+        asserts.assert_equal(len(thermostatSuggestions), 0,
+                             "ThermostatSuggestions should have 0 entries after the second suggestion has been removed.")
 
         self.step("10")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            # TH reads the ActivePresetHandle attribute.
-            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
-            log.info(f"Active Preset Handlers: {activePresetHandle}")
-            # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp plus 25 hours and the ExpirationInMinutes is set to 30 minutes.
-            possiblePresetHandles = [
-                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
-            asserts.assert_greater_equal(
-                len(possiblePresetHandles), 1, "Couldn't run test step 10 since all preset handles are also the ActivePresetHandle on this Thermostat")
-            presetHandle = possiblePresetHandles[0]
-            currentUTC = int((datetime.now(timezone.utc) - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
-                              ).total_seconds()) + int(timedelta(hours=25).total_seconds())
-            expirationInMinutes = 30
-            # Verify that the AddThermostatSuggestion command returns INVALID_COMMAND.
-            addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                                                preset_handle=presetHandle,
-                                                                                                effective_time=currentUTC,
-                                                                                                expiration_in_minutes=expirationInMinutes,
-                                                                                                expected_status=Status.InvalidCommand)
+        # TH reads the ActivePresetHandle attribute.
+        activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+        log.info(f"Active Preset Handlers: {activePresetHandle}")
+        # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp plus 25 hours and the ExpirationInMinutes is set to 30 minutes.
+        possiblePresetHandles = [
+            preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
+        asserts.assert_greater_equal(
+            len(possiblePresetHandles), 1, "Couldn't run test step 10 since all preset handles are also the ActivePresetHandle on this Thermostat")
+        presetHandle = possiblePresetHandles[0]
+        currentUTC = int((datetime.now(timezone.utc) - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
+                          ).total_seconds()) + int(timedelta(hours=25).total_seconds())
+        expirationInMinutes = 30
+        # Verify that the AddThermostatSuggestion command returns INVALID_COMMAND.
+        addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                                                                                            preset_handle=presetHandle,
+                                                                                            effective_time=currentUTC,
+                                                                                            expiration_in_minutes=expirationInMinutes,
+                                                                                            expected_status=Status.InvalidCommand)
 
         self.step("11")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            # TH reads the MaxThermostatSuggestions attribute.
-            maxThermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxThermostatSuggestions)
-            log.info(f"MaxThermostatSuggestions: {maxThermostatSuggestions}")
-            # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes for the number of times specified in the value of MaxThermostatSuggestions + 1.
-            possiblePresetHandles = [
-                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
-            asserts.assert_greater_equal(
-                len(possiblePresetHandles), 1, "Couldn't run test step 11 since all preset handles are also the ActivePresetHandle on this Thermostat")
-            presetHandle = possiblePresetHandles[0]
-            currentUTC = get_epoch_utc_time()
-            expirationInMinutes = 30
+        # TH reads the MaxThermostatSuggestions attribute.
+        maxThermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxThermostatSuggestions)
+        log.info(f"MaxThermostatSuggestions: {maxThermostatSuggestions}")
+        # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and ExpirationInMinutes is set to 30 minutes for the number of times specified in the value of MaxThermostatSuggestions + 1.
+        possiblePresetHandles = [
+            preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
+        asserts.assert_greater_equal(
+            len(possiblePresetHandles), 1, "Couldn't run test step 11 since all preset handles are also the ActivePresetHandle on this Thermostat")
+        presetHandle = possiblePresetHandles[0]
+        currentUTC = get_epoch_utc_time()
+        expirationInMinutes = 30
 
-            # Verify that the AddThermostatSuggestion command returns SUCCESS and the ThermostatSuggestions attribute has one entry added to it for the first {MaxThermostatSuggestions} times.
-            for i in range(0, maxThermostatSuggestions + 1):
-                if i < maxThermostatSuggestions:
-                    addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                                                        preset_handle=presetHandle,
-                                                                                                        effective_time=currentUTC,
-                                                                                                        expiration_in_minutes=expirationInMinutes,
-                                                                                                        expected_status=Status.Success)
-                    thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
-                    asserts.assert_equal(len(thermostatSuggestions), i+1,
-                                         f"ThermostatSuggestions should have {i+1} number of entries.")
-                else:
-                    # Verify that when the AddThermostatSuggestion command is called for the {MaxThermostatSuggestions + 1} time, the AddThermostatSuggestion command returns RESOURCE_EXHAUSTED.
-                    addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                                                        preset_handle=presetHandle,
-                                                                                                        effective_time=currentUTC,
-                                                                                                        expiration_in_minutes=expirationInMinutes,
-                                                                                                        expected_status=Status.ResourceExhausted)
+        # Verify that the AddThermostatSuggestion command returns SUCCESS and the ThermostatSuggestions attribute has one entry added to it for the first {MaxThermostatSuggestions} times.
+        for i in range(0, maxThermostatSuggestions + 1):
+            if i < maxThermostatSuggestions:
+                addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                                                                                                    preset_handle=presetHandle,
+                                                                                                    effective_time=currentUTC,
+                                                                                                    expiration_in_minutes=expirationInMinutes,
+                                                                                                    expected_status=Status.Success)
+                thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
+                asserts.assert_equal(len(thermostatSuggestions), i+1,
+                                     f"ThermostatSuggestions should have {i+1} number of entries.")
+            else:
+                # Verify that when the AddThermostatSuggestion command is called for the {MaxThermostatSuggestions + 1} time, the AddThermostatSuggestion command returns RESOURCE_EXHAUSTED.
+                addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                                                                                                    preset_handle=presetHandle,
+                                                                                                    effective_time=currentUTC,
+                                                                                                    expiration_in_minutes=expirationInMinutes,
+                                                                                                    expected_status=Status.ResourceExhausted)
 
 
 if __name__ == "__main__":
