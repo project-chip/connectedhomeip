@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "ActionsCluster.cpp",
-  "ActionsDelegate.h",
-  "ActionsStructs.h",
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
   "actions-server.h",
 ]
