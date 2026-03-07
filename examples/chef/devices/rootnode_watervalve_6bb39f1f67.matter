@@ -1752,6 +1752,21 @@ cluster ValveConfigurationAndControl = 129 {
   command Close(): DefaultSuccess = 1;
 }
 
+/** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
+cluster FlowMeasurement = 1028 {
+  revision 3;
+
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
+  readonly attribute optional int16u tolerance = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 endpoint 0 {
   device type ma_rootdevice = 22, version 5;
 
@@ -1965,19 +1980,38 @@ endpoint 1 {
   }
 
   server cluster ValveConfigurationAndControl {
+    emits event ValveStateChanged;
+    emits event ValveFault;
     callback attribute openDuration;
     ram      attribute defaultOpenDuration;
     callback attribute remainingDuration;
     callback attribute currentState;
     callback attribute targetState;
+    callback attribute currentLevel;
+    callback attribute targetLevel;
+    ram      attribute defaultOpenLevel default = 100;
+    callback attribute valveFault;
+    ram      attribute levelStep default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 2;
     callback attribute clusterRevision;
 
     handle command Open;
     handle command Close;
+  }
+
+  server cluster FlowMeasurement {
+    ram      attribute measuredValue;
+    ram      attribute minMeasuredValue default = 0;
+    ram      attribute maxMeasuredValue default = 100;
+    ram      attribute tolerance default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 3;
   }
 }
 
