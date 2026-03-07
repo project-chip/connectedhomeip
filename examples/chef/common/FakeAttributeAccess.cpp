@@ -31,6 +31,10 @@
 #include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 #endif
 
+#if MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/valve-configuration-and-control-server/CodegenIntegration.h>
+#endif
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -58,29 +62,50 @@ public:
                 CHIP_ERROR err = decoder.Decode(measuredValue);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Failed to decode measuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    ChipLogError(Zcl, "[Pw] Failed to decode measuredValue: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
 
                 err = TemperatureMeasurement::SetMeasuredValue(path.mEndpointId, measuredValue);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Failed to set measuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    ChipLogError(Zcl, "[Pw] Failed to set measuredValue: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
 
                 if (measuredValue.IsNull())
                 {
-                    ChipLogProgress(Zcl, "Successfully set measuredValue to null");
+                    ChipLogProgress(Zcl, "[Pw] Successfully set measuredValue to null.");
                 }
                 else
                 {
-                    ChipLogProgress(Zcl, "Successfully set measuredValue to %d", measuredValue.Value());
+                    ChipLogProgress(Zcl, "[Pw] Successfully set measuredValue to %d.", measuredValue.Value());
                 }
                 return ::pw::OkStatus();
             }
             }
 #endif // MATTER_DM_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+        case ValveConfigurationAndControl::Id:
+            switch (path.mAttributeId)
+            {
+            case ValveConfigurationAndControl::Attributes::CurrentLevel::Id:
+                Percent level;
+                CHIP_ERROR err = decoder.Decode(level);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode currentLevel: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                err = ValveConfigurationAndControl::UpdateCurrentLevel(level);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to update currentLevel: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                ChipLogProgress(Zcl, "[Pw] Successfully set current level to " ChipLogFormatMEI ".", ChipLogFormatMEI(level));
+            }
+#endif
         }
         return std::nullopt;
     }
