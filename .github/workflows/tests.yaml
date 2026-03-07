@@ -61,7 +61,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:184
+            image: ghcr.io/project-chip/chip-build:190
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -796,7 +796,7 @@ jobs:
         runs-on: namespace-profile-16x32
 
         container:
-            image: ghcr.io/project-chip/chip-build:181
+            image: ghcr.io/project-chip/chip-build:190
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -1054,12 +1054,13 @@ jobs:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
+            CHIP_IP_PACKET_CAPTURE: 1
 
         # Tests are I/O bound, so run on a smaller machine
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:182
+            image: ghcr.io/project-chip/chip-build:190
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -1190,6 +1191,21 @@ jobs:
                   docs/development_controllers/matter-repl/Matter_Access_Control.ipynb \
                   docs/development_controllers/matter-repl/Matter_Multi_Fabric_Commissioning.ipynb \
                   "
+
+            - name: Uploading core files
+              uses: actions/upload-artifact@v7
+              if: ${{ failure() && !env.ACT }}
+              with:
+                  name: crash-core-linux-repl-${{ matrix.filter }}
+                  path: /tmp/cores/
+                  # Cores are big; don't hold on to them too long.
+                  retention-days: 5
+            - name: Uploading packet captures for debugging
+              uses: actions/upload-artifact@v7
+              if: ${{ failure() && !env.ACT }}
+              with:
+                  name: pcaps-linux-repl-${{ matrix.filter }}
+                  path: out/ip_packet_captures
 
             # Example debug breakpoint:
             #
