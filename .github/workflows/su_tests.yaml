@@ -1,0 +1,251 @@
+# Copyright (c) 2020-2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Daily Run For Software Update Tests
+on:
+    schedule:
+      - cron: '0 0 * * *'
+    pull_request:
+    merge_group:
+    workflow_dispatch:
+        inputs:
+            disable_ccache:
+                description: 'Disable ccache restore and builds (sets CCACHE_DISABLE=1)'
+                required: false
+                default: 'false'
+                type: choice
+                options: ['false', 'true']
+            cache_suffix:
+                description: 'Optional suffix appended to ccache key to rotate (e.g. short hash)'
+                required: false
+                default: ''
+                type: string
+
+concurrency:
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
+jobs:
+    su_repl_tests_linux_build:
+        name: REPL Tests - Linux Software Update (BUILD)
+
+        if: github.actor != 'restyled-io[bot]'
+
+        env:
+            BUILD_VARIANT: ipv6only-no-ble-no-wifi
+            DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
+            CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
+
+        # Run on namespace.so instead of `ubuntu-latest`: since compilations are generally CPU
+        # bound, we run these on larger/faster machines.
+        runs-on: namespace-profile-16x32
+
+        container:
+            image: ghcr.io/project-chip/chip-build:184
+            volumes:
+                - /var/run/nsc/:/var/run/nsc/
+            env:
+                NSC_TOKEN_FILE: ${{ env.NSC_TOKEN_FILE }}
+                NAMESPACE_ACTIONS_RESULTS_URL: ${{ env.NAMESPACE_ACTIONS_RESULTS_URL }}
+                NAMESPACE_ACTIONS_RESULTS_SERVICE: ${{ env.NAMESPACE_ACTIONS_RESULTS_SERVICE }}
+                NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD: ${{ env.NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD }}
+            options: >-
+                --privileged
+                --sysctl net.ipv6.conf.all.disable_ipv6=0
+                --sysctl net.ipv4.conf.all.forwarding=0
+                --sysctl net.ipv6.conf.all.forwarding=0
+
+        steps:
+            - name: Set up additional environment
+              run: |
+                echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
+                echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
+            - name: Checkout
+              uses: actions/checkout@v5
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+
+            - name: Setup and Restore Cache
+              id: ccache
+              uses: ./.github/actions/setup-ccache
+              with:
+                build-variant: ${{ matrix.build_variant }}
+                disable: ${{ env.DISABLE_CCACHE }}
+                cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
+
+            - name: Build python env
+              run: scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
+
+            - name: ccache stats
+              run: ccache -s
+
+            - name: Build linux-x64-requestor-app
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-provider-app
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build Software Update ota images with new version.
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 5
+                  && mv out/su_ota_images_min-v*/*.ota objdir-clone
+                  && rm -rf out/su_ota_images_min-v*"
+
+            - name: ccache stats
+              run: ccache -s
+
+            # We archive ourselves since upload-artifact seems to lose permission bits
+            # We also remove some debug info to make artifacts smaller (otherwise they are 2GB for binaries)
+            - name: Archive artifacts
+              env:
+                XZ_OPT: -T 0 -1
+              run: |
+                find objdir-clone -executable -type f | xargs -n 1 strip
+                tar cfJ repl-build-data.tar.xz out/venv objdir-clone
+
+            - name: Upload artifacts for running
+              uses: namespace-actions/upload-artifact@v1
+              with:
+                name: repl-build-data
+                path: repl-build-data.tar.xz
+                retention-days: 2
+                if-no-files-found: error
+                overwrite: true
+            - name: Ensure only useful ccache is kept
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              run: ccache --evict-older-than 1d || true
+            - name: Delete existing ccache before save
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: ./.github/actions/delete-cache
+              with:
+                  cache-key: ${{ env.CCACHE_KEY }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+            - name: Save ccache
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: actions/cache/save@v4
+              with:
+                  path: .ccache
+                  key: ${{ env.CCACHE_KEY }}
+
+    su_repl_tests_linux_run:
+        name: Software Update REPL Tests - Linux (RUN)
+        needs: su_repl_tests_linux_build
+        timeout-minutes: 45
+
+        if: github.actor != 'restyled-io[bot]'
+
+        strategy:
+            # These tests take a lot of time so we just run the batch related to TC_SU.
+            fail-fast: false
+            matrix:
+                # Regex filter by TC SU we think 45 minutes is more than engough for this task
+                # Each on one run to avoid all the jobs fail if one fails
+                filter: ["", "TC_SU_2_2", "TC_SU_2_5", "TC_SU_2_7" ]
+        env:
+            BUILD_VARIANT: ipv6only-no-ble-no-wifi
+            DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
+            CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
+
+        # Tests are I/O bound, so run on a smaller machine
+        runs-on: namespace-profile-1x2
+
+        container:
+            image: ghcr.io/project-chip/chip-build:177
+            volumes:
+                - /var/run/nsc/:/var/run/nsc/
+            env:
+                NSC_TOKEN_FILE: ${{ env.NSC_TOKEN_FILE }}
+                NAMESPACE_ACTIONS_RESULTS_URL: ${{ env.NAMESPACE_ACTIONS_RESULTS_URL }}
+                NAMESPACE_ACTIONS_RESULTS_SERVICE: ${{ env.NAMESPACE_ACTIONS_RESULTS_SERVICE }}
+                NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD: ${{ env.NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD }}
+            options: >-
+                --privileged
+                --sysctl net.ipv6.conf.all.disable_ipv6=0
+                --sysctl net.ipv4.conf.all.forwarding=0
+                --sysctl net.ipv6.conf.all.forwarding=0
+
+        steps:
+            - name: Set up additional environment
+              run: |
+                echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
+            - name: Checkout
+              uses: actions/checkout@v5
+            # NOTE: no bootstrap since we only use compile outputs from previous steps (including python venv in out/venv)
+            - name: Set up a IPV6 known envionment
+              uses: ./.github/actions/add-ipv6
+
+            - name: Download artifacts for running
+              uses: namespace-actions/download-artifact@v2
+              with:
+                name: repl-build-data
+
+            - name: Unpack artifacts
+              run: |
+                tar xfJ repl-build-data.tar.xz
+
+            - name: Generate an argument environment file
+              run: |
+                  echo -n "" >/tmp/test_env.yaml
+                  echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test/chip-ota-provider-app" >> /tmp/test_env.yaml
+                  echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
+                  echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+                  # SU OTA Images
+                  echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
+                  echo "SU_OTA_REQUESTOR_V3: objdir-clone/chip-ota-requestor-app_v3.min.ota" >> /tmp/test_env.yaml
+                  echo "SU_OTA_REQUESTOR_V4: objdir-clone/chip-ota-requestor-app_v4.min.ota" >> /tmp/test_env.yaml
+                  echo "SU_OTA_REQUESTOR_V5: objdir-clone/chip-ota-requestor-app_v5.min.ota" >> /tmp/test_env.yaml
+
+                  # Generic trace setups after applications
+                  echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+                  echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+
+            - name: Verify Testing Support for Software Update
+              if: ${{matrix.filter == ''}}
+              run: |
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v2.min.ota -v 2'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v3.min.ota -v 3'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v4.min.ota -v 4'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v5.min.ota -v 5'
+            
+            - name: Run Tests ${{matrix.filter}}
+              if: ${{matrix.filter != ''}}
+              run: |
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}"'
+
+            - name: Execute Jupyter Notebooks
+              if: ${{matrix.filter == ''}}
+              run: |
+                  # TODO: ipynb HARD CODES paths to all-clusters app. create a symlink to them
+                  ln -s ../objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test out/linux-x64-all-clusters
+
+                  scripts/run_in_python_env.sh out/venv \
+                  "jupyter execute docs/development_controllers/matter-repl/Matter_REPL_Intro.ipynb \
+                  docs/development_controllers/matter-repl/Matter_Basic_Interactions.ipynb \
+                  docs/development_controllers/matter-repl/Matter_Access_Control.ipynb \
+                  docs/development_controllers/matter-repl/Matter_Multi_Fabric_Commissioning.ipynb \
+                  "
