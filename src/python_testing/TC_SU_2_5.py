@@ -39,7 +39,6 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
-#       --int-arg ota_image_expected_version:2
 #       --int-arg ota_provider_port:5541
 #       --int-arg ota_image_download_timeout:300
 #       --timeout 2100
@@ -90,7 +89,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
     async def setup_test(self):
         # Set up Provider configuration and values for step1
         self.ota_image = self.user_params.get('ota_image')
-        self.expected_software_version = self.user_params.get('ota_image_expected_version')
+
         self.provider_app_path = self.user_params.get('provider_app_path')
         self.ota_provider_port = self.user_params.get('ota_provider_port', 5541)
         self.provider_kvs_path = self.user_params.get('provider_kvs_path', '/tmp/chip_kvs_provider')
@@ -104,9 +103,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         if self.ota_image_download_timeout <= 0:
             asserts.fail("Invalid value for --int-arg ota_image_download_timeout:<seconds> value provided, must be equal or greater than 1.")
-
-        if not self.expected_software_version:
-            asserts.fail("Missing OTA image software version. Specify using --int-arg ota_image_expected_version:<ota_image_expected_version>")
 
         if not self.provider_app_path:
             asserts.fail("Missing provider app path. Specify using --string-arg provider_app_path:<provider_app_path>")
@@ -123,6 +119,10 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.controller = self.default_controller
         # Extra Arguments required for the step 1
         extra_arguments = ['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', '0']
+
+        # Check ota image and running software version, this will fail if is not suited to update the device else return the version to update
+        self.expected_software_version = await self.check_ota_image_version(
+            controller=self.controller, requestor_node_id=self.requestor_node_id, ota_image_path=self.ota_image)
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
