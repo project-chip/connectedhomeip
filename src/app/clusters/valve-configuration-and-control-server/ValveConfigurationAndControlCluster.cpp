@@ -269,9 +269,10 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     // any fault will cause the command to fail.
     if (mValveFault.HasAny())
     {
+        ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside HandleOpenCommand: mValveFault !!!!");
         return Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kFailureDueToFault);
     }
-
+    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside HandleOpenCommand: mValveFault finished");
     // In the spec, the setting of the TargetState and CurrentState goes before the handling of the
     // fields of the command (checking and setting default values), however this was deferred to the OpenValve function to keep
     // backwards compatibility. Also this avoids setting the attributes if the targetLevel field doesn't have a valid value (in LVL
@@ -333,12 +334,13 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
 CHIP_ERROR ValveConfigurationAndControlCluster::OpenValve(DataModel::Nullable<Percent> targetLevel,
                                                           DataModel::Nullable<uint32_t> openDuration)
 {
+    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside OpenValve");
     // Check for the AutoCloseTime feature and set it to the UTC time plus OpenDuration.
     if (mFeatures.Has(Feature::kTimeSync))
     {
         ReturnErrorOnFailure(SetAutoCloseTime(openDuration));
     }
-
+    ChipLogProgress(Zcl, "[DEBUG_DEBUG] Inside OpenValve: SetAutoCloseTime success.");
     // Set TargetState to Open and CurrentState to Transitioning
     SetAttributeValue(mTargetState, DataModel::MakeNullable(ValveStateEnum::kOpen), Attributes::TargetState::Id);
     SetCurrentState(ValveStateEnum::kTransitioning);
