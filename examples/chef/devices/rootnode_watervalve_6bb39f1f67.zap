@@ -2637,22 +2637,6 @@
               "reportableChange": 0
             },
             {
-              "name": "AutoCloseTime",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "type": "epoch_us",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": null,
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "RemainingDuration",
               "code": 3,
               "mfgCode": null,
@@ -2838,7 +2822,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

@@ -1984,7 +1984,6 @@ endpoint 1 {
     emits event ValveFault;
     callback attribute openDuration;
     ram      attribute defaultOpenDuration;
-    callback attribute autoCloseTime;
     callback attribute remainingDuration;
     callback attribute currentState;
     callback attribute targetState;
@@ -1996,7 +1995,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 3;
+    ram      attribute featureMap default = 2;
     callback attribute clusterRevision;
 
     handle command Open;
