@@ -30,6 +30,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
@@ -99,13 +100,19 @@ class DLL_EXPORT SetUpCodePairer : public DevicePairingDelegate
 #endif
 {
 public:
+    struct ThreadMeshcopCommissionParameters
+    {
+        Transport::PeerAddress mBorderAgentAddress;
+        uint8_t mPSKcBuffer[Thread::kSizePSKc];
+    };
     SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
     virtual ~SetUpCodePairer() {}
 
     CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode,
                           SetupCodePairerBehaviour connectionType              = SetupCodePairerBehaviour::kCommission,
                           DiscoveryType discoveryType                          = DiscoveryType::kAll,
-                          Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional);
+                          Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional,
+                          Optional<ThreadMeshcopCommissionParameters> meshcopCommissionParams = NullOptional);
 
     // Called by the DeviceCommissioner to notify that we have discovered a new device.
     void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData);
@@ -143,6 +150,8 @@ private:
     CHIP_ERROR StopDiscoveryOverWiFiPAF();
     CHIP_ERROR StartDiscoveryOverNFC();
     CHIP_ERROR StopDiscoveryOverNFC();
+    CHIP_ERROR StartDiscoveryOverThreadMeshcop();
+    CHIP_ERROR StopDiscoveryOverThreadMeshcop();
 
     // Returns whether we have kicked off a new connection attempt.
     bool ConnectToDiscoveredDevice();
@@ -189,6 +198,7 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
         kNFCTransport,
 #endif
+        kThreadMeshcopTransport,
         kTransportTypeCount,
     };
 
@@ -259,6 +269,8 @@ private:
 
     // mLastPASEError is the error from the last OnPairingComplete call we got.
     CHIP_ERROR mLastPASEError = CHIP_NO_ERROR;
+
+    Optional<ThreadMeshcopCommissionParameters> mThreadMeshcopCommissionParams;
 };
 
 } // namespace Controller

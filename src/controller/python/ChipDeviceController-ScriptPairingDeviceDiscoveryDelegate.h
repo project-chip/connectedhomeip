@@ -32,13 +32,14 @@ class ScriptPairingDeviceDiscoveryDelegate : public DeviceDiscoveryDelegate
 public:
     CHIP_ERROR Init(NodeId nodeId, uint32_t setupPasscode, CommissioningParameters commissioningParams,
                     ScriptDevicePairingDelegate * pairingDelegate, DeviceCommissioner * activeDeviceCommissioner,
-                    uint32_t discoveryTimeoutMsec)
+                    uint32_t discoveryTimeoutMsec, bool establishPaseOnly = false)
     {
         mNodeId                   = nodeId;
         mSetupPasscode            = setupPasscode;
         mParams                   = commissioningParams;
         mPairingDelegate          = pairingDelegate;
         mActiveDeviceCommissioner = activeDeviceCommissioner;
+        mEstablishPaseOnly        = establishPaseOnly;
         VerifyOrReturnError(mActiveDeviceCommissioner != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         mActiveDeviceCommissioner->RegisterDeviceDiscoveryDelegate(this);
         return chip::DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(discoveryTimeoutMsec), OnDiscoveredTimeout,
@@ -65,6 +66,7 @@ private:
     CommissioningParameters mParams;
     NodeId mNodeId;
     uint32_t mSetupPasscode;
+    bool mEstablishPaseOnly;
 };
 
 } // namespace Controller

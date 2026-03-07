@@ -76,10 +76,6 @@
 #endif
 #include <controller/DeviceDiscoveryDelegate.h>
 
-#if CHIP_SUPPORT_THREAD_MESHCOP
-#include <controller/ThreadMeshcopCommissionProxy.h>
-#endif
-
 namespace chip {
 
 namespace Controller {
@@ -527,7 +523,8 @@ public:
                           Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional);
     CHIP_ERROR PairDevice(NodeId remoteDeviceId, const char * setUpCode, const CommissioningParameters & CommissioningParameters,
                           DiscoveryType discoveryType                          = DiscoveryType::kAll,
-                          Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional);
+                          Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional,
+                          Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams = NullOptional);
 
     /**
      * @brief
@@ -592,9 +589,10 @@ public:
      * @param[in] discoveryType         The network discovery type, defaults to DiscoveryType::kAll.
      * @param[in] resolutionData        Optional resolution data previously discovered on the network for the target device.
      */
-    CHIP_ERROR EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode,
-                                       DiscoveryType discoveryType                          = DiscoveryType::kAll,
-                                       Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional);
+    CHIP_ERROR
+    EstablishPASEConnection(NodeId remoteDeviceId, const char * setUpCode, DiscoveryType discoveryType = DiscoveryType::kAll,
+                            Optional<Dnssd::CommonResolutionData> resolutionData                                 = NullOptional,
+                            Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams = NullOptional);
 
     /**
      * @brief
@@ -1169,10 +1167,6 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     Optional<Crypto::P256PublicKey> mTrustedIcacPublicKeyB;
     EndpointId mPeerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
-#endif
-
-#if CHIP_SUPPORT_THREAD_MESHCOP
-    ThreadMeshcopCommissionProxy mThreadMeshcopCommissionProxy;
 #endif
 };
 

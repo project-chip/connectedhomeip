@@ -1005,6 +1005,27 @@ class ChipDeviceControllerBase():
                 self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeId, port)
         )
 
+    async def EstablishPASESessionThreadMeshcop(self, baAddr: str, setupCode: str, nodeId: int, baPort: int) -> None:
+        '''
+        Establish a PASE session over Thread MeshCoP.
+
+        Warning: This method attempts to establish a new PASE session, even if an open session already exists.
+        For safer session management that reuses existing sessions, see `FindOrEstablishPASESession`.
+
+        Args:
+            baAddr (str): IP address of BorderAgent.
+            baPort (int): IP port of BorderAgent.
+            setupCode (str): The setup code of the device.
+            nodeId (int): The node ID of the device.
+
+        Returns:
+            None
+        '''
+        await self._establishPASESession(
+            lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop(
+                self.devCtrl, baAddr.encode("utf-8"), baPort, setupCode.encode("utf-8"), nodeId)
+        )
+
     async def EstablishPASESession(self, setUpCode: str, nodeId: int) -> None:
         '''
         Establish a PASE session using setUpCode.
@@ -2563,6 +2584,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_EstablishPASESessionIP.argtypes = [
                 c_void_p, c_char_p, c_uint32, c_uint64, c_uint16]
             self._dmLib.pychip_DeviceController_EstablishPASESessionIP.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.argtypes = [
+                c_void_p, c_char_p, c_uint16, c_char_p, c_uint64]
+            self._dmLib.pychip_DeviceController_EstablishPASESessionThreadMeshcop.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_EstablishPASESessionBLE.argtypes = [
                 c_void_p, c_uint32, c_uint16, c_uint64]

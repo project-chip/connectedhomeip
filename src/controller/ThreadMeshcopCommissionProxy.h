@@ -62,8 +62,15 @@ public:
     ThreadMeshcopCommissionProxy();
     ~ThreadMeshcopCommissionProxy() override;
 
+    static ThreadMeshcopCommissionProxy & GetInstance()
+    {
+        static ThreadMeshcopCommissionProxy instance;
+        return instance;
+    }
+
     /**
      * Entry point to start the Thread commissioning and discover the device.
+     * TODO: this function is synchronous, we need to make it asynchronous
      */
     CHIP_ERROR Discover(ByteSpan & pskc, const Transport::PeerAddress & peerAddr, const Thread::DiscoveryCode code,
                         chip::SetupDiscriminator expectedDiscriminator, Dnssd::DiscoveredNodeData & nodeData, uint16_t timeout);
