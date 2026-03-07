@@ -437,6 +437,19 @@ Davis, CA 95616, USA
         <min value="1"/>
       </constraint>
     </attribute>
+    <attribute id="0x0017" name="DeviceLocation" type="LocationDescriptorStruct" isNullable="true">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
+      <quality persistence="nonVolatile"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="6"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>    
     <attribute id="0x0018" name="ConfigurationVersion" type="uint32" default="1">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>

@@ -208,6 +208,7 @@
             "ProductAppearance",
             "SpecificationVersion",
             "MaxPathsPerInvoke",
+            "DeviceLocation",
             "ConfigurationVersion"
         ],
         "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
