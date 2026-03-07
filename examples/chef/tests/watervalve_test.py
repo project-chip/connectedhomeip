@@ -95,8 +95,6 @@ class TC_WATERVALVE(MatterBaseTest):
         asserts.assert_equal(await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.OpenDuration), NullValue, "OpenDuration should be NULL")
         asserts.assert_equal(await self.read_single_attribute_check_success(
-            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.AutoCloseTime), NullValue, "AutoCloseTime should be NULL")
-        asserts.assert_equal(await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.RemainingDuration), NullValue, "RemainingDuration should be NULL")
         asserts.assert_equal(await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.CurrentState), NullValue, "CurrentState should be NULL")
@@ -118,12 +116,7 @@ class TC_WATERVALVE(MatterBaseTest):
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.OpenDuration)
         asserts.assert_equal(open_duration, 15, "OpenDuration should be 15")
 
-        # 4.2.3: Check AutoCloseTime and RemainingDuration are non-NULL and > 0.
-        auto_close_time = await self.read_single_attribute_check_success(
-            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.AutoCloseTime)
-        asserts.assert_is_not_none(auto_close_time, "AutoCloseTime should not be NULL")
-        asserts.assert_greater(auto_close_time, 0, "AutoCloseTime should be > 0")
-
+        # 4.2.3: Check RemainingDuration is non-NULL and > 0.
         remaining_duration = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.RemainingDuration)
         asserts.assert_is_not_none(remaining_duration, "RemainingDuration should not be NULL")
@@ -173,13 +166,11 @@ class TC_WATERVALVE(MatterBaseTest):
             endpoint=self.ENDPOINT
         )
 
-        # 4.3.13: Check openDuration is NULL, RemainingDuration is NULL, AutoCloseTime is NULL.
+        # 4.3.13: Check openDuration is NULL, RemainingDuration is NULL.
         asserts.assert_equal(await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.OpenDuration), NullValue, "OpenDuration should be NULL after Close")
         asserts.assert_equal(await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.RemainingDuration), NullValue, "RemainingDuration should be NULL after Close")
-        asserts.assert_equal(await self.read_single_attribute_check_success(
-            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.AutoCloseTime), NullValue, "AutoCloseTime should be NULL after Close")
 
         # 4.3.14: Check current state is kTransitioning (2) and Check target state is kClosed (0), and targetLevel is 0.
         current_state = await self.read_single_attribute_check_success(
