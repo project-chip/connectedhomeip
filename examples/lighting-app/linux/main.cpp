@@ -16,13 +16,16 @@
  *    limitations under the License.
  */
 
+#include "AppOptions.h"
 #include "LightingAppCommandDelegate.h"
 #include "LightingManager.h"
+#include "diagnostic-logs-provider-delegate-impl.h"
 #include <AppMain.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 #include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -39,6 +42,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using chip::app::Clusters::DiagnosticLogs::DiagnosticLogsServer;
 
 namespace {
 
@@ -75,6 +79,17 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     // TODO: implement any additional Cluster Server init actions
 }
 
+void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
+{
+    auto & logProvider = chip::app::Clusters::DiagnosticLogs::LogProvider::GetInstance();
+
+    logProvider.SetEndUserSupportLogFilePath(AppOptions::GetEndUserSupportLogFilePath());
+    logProvider.SetNetworkDiagnosticsLogFilePath(AppOptions::GetNetworkDiagnosticsLogFilePath());
+    logProvider.SetCrashLogFilePath(AppOptions::GetCrashLogFilePath());
+
+    DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
+}
+
 void ApplicationInit()
 {
     std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
@@ -103,7 +118,7 @@ extern "C" {
 
 int main(int argc, char * argv[])
 {
-    if (ChipLinuxAppInit(argc, argv) != 0)
+    if (ChipLinuxAppInit(argc, argv, AppOptions::GetOptions()) != 0)
     {
         return -1;
     }
