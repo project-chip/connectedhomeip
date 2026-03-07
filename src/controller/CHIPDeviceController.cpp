@@ -2827,6 +2827,22 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
         info.icd.checkInProtocolSupport = featureMap.Has(IcdManagement::Feature::kCheckInProtocolSupport);
         hasUserActiveModeTrigger        = featureMap.Has(IcdManagement::Feature::kUserActiveModeTrigger);
         isICD                           = true;
+
+        // LIT support was introduced but broken in ICD Management cluster revision 2 (Matter 1.3).
+        // Only treat a device as LIT for cluster revisions after 1.3 (i.e., revision > 2).
+        if (info.icd.isLIT)
+        {
+            uint16_t clusterRevision = 0;
+            CHIP_ERROR revErr = mAttributeCache->Get<ClusterRevision::TypeInfo>(kRootEndpointId, clusterRevision);
+            if (revErr == CHIP_NO_ERROR && clusterRevision <= 2)
+            {
+                ChipLogProgress(Controller,
+                                "IcdManagement: Device claims LIT support but cluster revision is %" PRIu16
+                                " (Matter 1.3). Disabling LIT due to known Matter 1.3 LIT issues.",
+                                clusterRevision);
+                info.icd.isLIT = false;
+            }
+        }
     }
     else if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
