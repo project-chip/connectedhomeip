@@ -60,15 +60,18 @@ class TC_WATERVALVE(MatterBaseTest):
 
         measured_value = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.MeasuredValue)
-        asserts.assert_equal(measured_value, NullValue, "MeasuredValue should be NULL")
+        asserts.assert_equal(measured_value, NullValue,
+                             "MeasuredValue should be NULL")
 
         min_measured_value = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.MinMeasuredValue)
-        asserts.assert_equal(min_measured_value, 0, "MinMeasuredValue should be 0")
+        asserts.assert_equal(min_measured_value, 0,
+                             "MinMeasuredValue should be 0")
 
         max_measured_value = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.MaxMeasuredValue)
-        asserts.assert_equal(max_measured_value, 100, "MaxMeasuredValue should be 100")
+        asserts.assert_equal(max_measured_value, 100,
+                             "MaxMeasuredValue should be 100")
 
         tolerance = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.Tolerance)
@@ -118,18 +121,22 @@ class TC_WATERVALVE(MatterBaseTest):
         # 4.2.3: Check RemainingDuration is non-NULL and > 0.
         remaining_duration = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.RemainingDuration)
-        asserts.assert_is_not_none(remaining_duration, "RemainingDuration should not be NULL")
-        asserts.assert_greater(remaining_duration, 0, "RemainingDuration should be > 0")
+        asserts.assert_is_not_none(
+            remaining_duration, "RemainingDuration should not be NULL")
+        asserts.assert_greater(remaining_duration, 0,
+                               "RemainingDuration should be > 0")
 
         # 4.2.4: Check current state is kTransitioning (2)
         current_state = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.CurrentState)
-        asserts.assert_equal(current_state, cluster.Enums.ValveStateEnum.kTransitioning, "CurrentState should be kTransitioning")
+        asserts.assert_equal(current_state, cluster.Enums.ValveStateEnum.kTransitioning,
+                             "CurrentState should be kTransitioning")
 
         # 4.2.5: Check target state is kOpen (1)
         target_state = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.TargetState)
-        asserts.assert_equal(target_state, cluster.Enums.ValveStateEnum.kOpen, "TargetState should be kOpen")
+        asserts.assert_equal(
+            target_state, cluster.Enums.ValveStateEnum.kOpen, "TargetState should be kOpen")
 
         # 4.3.6: Check target level is 50.
         target_level = await self.read_single_attribute_check_success(
@@ -147,17 +154,20 @@ class TC_WATERVALVE(MatterBaseTest):
         # 4.3.9: Read target level and check it is NULL.
         target_level = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.TargetLevel)
-        asserts.assert_equal(target_level, NullValue, "TargetLevel should be NULL after reaching target")
+        asserts.assert_equal(target_level, NullValue,
+                             "TargetLevel should be NULL after reaching target")
 
         # 4.3.10: Read current state and check it is kOpen (1).
         current_state = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.CurrentState)
-        asserts.assert_equal(current_state, cluster.Enums.ValveStateEnum.kOpen, "CurrentState should be kOpen")
+        asserts.assert_equal(
+            current_state, cluster.Enums.ValveStateEnum.kOpen, "CurrentState should be kOpen")
 
         # 4.3.11: Read target state and check it is NULL.
         target_state = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.TargetState)
-        asserts.assert_equal(target_state, NullValue, "TargetState should be NULL after reaching target")
+        asserts.assert_equal(target_state, NullValue,
+                             "TargetState should be NULL after reaching target")
 
         # 4.3.12: Now send Close command.
         await self.send_single_cmd(
@@ -174,15 +184,18 @@ class TC_WATERVALVE(MatterBaseTest):
         # 4.3.14: Check current state is kTransitioning (2) and Check target state is kClosed (0), and targetLevel is 0.
         current_state = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.CurrentState)
-        asserts.assert_equal(current_state, cluster.Enums.ValveStateEnum.kTransitioning, "CurrentState should be kTransitioning")
+        asserts.assert_equal(current_state, cluster.Enums.ValveStateEnum.kTransitioning,
+                             "CurrentState should be kTransitioning")
 
         target_state = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.TargetState)
-        asserts.assert_equal(target_state, cluster.Enums.ValveStateEnum.kClosed, "TargetState should be kClosed")
+        asserts.assert_equal(
+            target_state, cluster.Enums.ValveStateEnum.kClosed, "TargetState should be kClosed")
 
         target_level = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.TargetLevel)
-        asserts.assert_equal(target_level, 0, "TargetLevel should be 0 for Close")
+        asserts.assert_equal(
+            target_level, 0, "TargetLevel should be 0 for Close")
 
         # 4.3.15: Send Pw command to update currentLevel to 0.
         self._write_current_level_pwrpc(device, 0)
@@ -195,12 +208,14 @@ class TC_WATERVALVE(MatterBaseTest):
         # 4.3.17: Read target level and check it is NULL.
         target_level = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.TargetLevel)
-        asserts.assert_equal(target_level, NullValue, "TargetLevel should be NULL after reaching 0")
+        asserts.assert_equal(target_level, NullValue,
+                             "TargetLevel should be NULL after reaching 0")
 
         # 4.3.18: Read current state and check it is kClosed (0).
         current_state = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.CurrentState)
-        asserts.assert_equal(current_state, cluster.Enums.ValveStateEnum.kClosed, "CurrentState should be kClosed")
+        asserts.assert_equal(
+            current_state, cluster.Enums.ValveStateEnum.kClosed, "CurrentState should be kClosed")
 
     @async_test_body
     async def test_TC_WATERVALVE(self):
