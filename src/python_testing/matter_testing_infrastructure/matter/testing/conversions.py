@@ -84,7 +84,10 @@ def format_decimal_and_hex(number):
         >>> format_decimal_and_hex(255)
         '255 (0xff)'
     """
-    return f'{number} (0x{number:02x})'
+    try:
+        return f'{number} (0x{number:02x})'
+    except (TypeError, ValueError):
+        return f'{number}'
 
 
 def cluster_id_with_name(id):
