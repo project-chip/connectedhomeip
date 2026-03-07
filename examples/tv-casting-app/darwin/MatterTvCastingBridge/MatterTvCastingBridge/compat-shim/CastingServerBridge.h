@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
-#import "../MatterError.h"
 #import "AppParameters.h"
 #import "CommissioningCallbackHandlers.h"
 #import "ContentApp.h"
 #import "ContentLauncherTypes.h"
 #import "DiscoveredNodeData.h"
+#import "MatterError.h"
 #import "MediaPlaybackTypes.h"
 #import "OnboardingPayload.h"
 #import "TargetNavigatorTypes.h"

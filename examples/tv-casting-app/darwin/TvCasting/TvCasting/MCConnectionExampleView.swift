@@ -18,6 +18,7 @@
 
 import SwiftUI
 import os.log
+import MatterTvCastingBridge
 
 struct MCConnectionExampleView: View {
     let Log = Logger(subsystem: "com.matter.casting",

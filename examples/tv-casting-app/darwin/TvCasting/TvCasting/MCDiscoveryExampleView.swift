@@ -16,6 +16,7 @@
  */
 
 import SwiftUI
+import MatterTvCastingBridge
 
 extension MCCastingPlayer : Identifiable {
     public var id: String {

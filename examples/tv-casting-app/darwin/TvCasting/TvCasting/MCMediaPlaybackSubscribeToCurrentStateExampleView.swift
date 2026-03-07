@@ -16,6 +16,7 @@
  */
 
 import SwiftUI
+import MatterTvCastingBridge
 
 struct MCMediaPlaybackSubscribeToCurrentStateExampleView: View {
     @StateObject var viewModel = MCMediaPlaybackSubscribeToCurrentStateExampleViewModel()

@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "../MCCastingPlayer.h"
+#import "MCCastingPlayer.h"
 #import "VideoPlayer.h"
 
 #ifndef DiscoveredNodeData_h

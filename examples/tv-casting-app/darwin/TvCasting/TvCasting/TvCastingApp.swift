@@ -17,6 +17,7 @@
 
 import SwiftUI
 import os.log
+import MatterTvCastingBridge
 
 @main
 struct TvCastingApp: App {

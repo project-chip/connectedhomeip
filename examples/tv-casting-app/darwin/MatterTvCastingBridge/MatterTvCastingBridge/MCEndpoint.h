@@ -17,7 +17,7 @@
 
 #import "MCCastingPlayer.h"
 #import "MCCluster.h"
-#import "zap-generated/MCEndpointClusterType.h"
+#import "MCEndpointClusterType.h"
 
 #import <Foundation/Foundation.h>
 

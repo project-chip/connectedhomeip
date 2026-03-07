@@ -360,7 +360,7 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     return [NSString stringWithCString:_cppCastingPlayer->GetInstanceName() encoding:NSUTF8StringEncoding];
 }
 
-- (NSArray * _Nonnull)ipAddresses
+- (NSArray<NSString *> * _Nonnull)ipAddresses
 {
     NSMutableArray * ipAddresses = [NSMutableArray new];
     for (size_t i = 0; i < _cppCastingPlayer->GetNumIPs(); i++) {

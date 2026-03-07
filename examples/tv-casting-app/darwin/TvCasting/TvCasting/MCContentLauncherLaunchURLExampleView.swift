@@ -16,6 +16,7 @@
  */
 
 import SwiftUI
+import MatterTvCastingBridge
 
 struct MCContentLauncherLaunchURLExampleView : View {
     @StateObject var viewModel = MCContentLauncherLaunchURLExampleViewModel()

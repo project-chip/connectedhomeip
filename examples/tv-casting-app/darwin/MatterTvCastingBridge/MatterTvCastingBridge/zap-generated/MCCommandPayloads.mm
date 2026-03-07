@@ -19,11 +19,11 @@
 
 #import "MCCommandPayloads_Internal.h"
 
-#import "../MCAttribute_Internal.h"
-#import "../MCCastingApp.h"
-#import "../MCErrorUtils.h"
-#import "../NSDataSpanConversion.h"
-#import "../NSStringSpanConversion.h"
+#import "MCAttribute_Internal.h"
+#import "MCCastingApp.h"
+#import "MCErrorUtils.h"
+#import "NSDataSpanConversion.h"
+#import "NSStringSpanConversion.h"
 
 #include <app/data-model/Decode.h>
 #include <app/data-model/ListLargeSystemExtensions.h>
