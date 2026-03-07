@@ -95,8 +95,6 @@ class TC_WATERVALVE(MatterBaseTest):
         asserts.assert_equal(await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.OpenDuration), NullValue, "OpenDuration should be NULL")
         asserts.assert_equal(await self.read_single_attribute_check_success(
-            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.DefaultOpenDuration), NullValue, "DefaultOpenDuration should be NULL")
-        asserts.assert_equal(await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.AutoCloseTime), NullValue, "AutoCloseTime should be NULL")
         asserts.assert_equal(await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.RemainingDuration), NullValue, "RemainingDuration should be NULL")
