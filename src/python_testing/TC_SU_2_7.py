@@ -41,7 +41,6 @@
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --int-arg ota_image_expected_version:2
-#       --int-arg ota_image_download_timeout:360
 #       --timeout 1800
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
@@ -49,7 +48,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 from time import time
 
@@ -80,7 +78,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
     provider_discriminator = 321
     provider_setup_pincode = 2321
     requestor_node_id = None
-    ota_image_download_timeout = 0
 
     @async_test_body
     async def setup_test(self):
@@ -96,15 +93,9 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.provider_port = self.user_params.get('ota_provider_port', 5541)
         self.provider_kvs_path = self.user_params.get('provider_kvs_path', '/tmp/chip_kvs_provider')
         self.provider_log = self.user_params.get('provider_log_path', '/tmp/provider_2_7.log')
-        # On average the ota image build for the CI is 1.8 MB which takes 4-6 min to download. Adjust time if needed.
-        self.ota_image_download_timeout = self.user_params.get('ota_image_download_timeout', 60*6)
-        logger.info(f"Image download timeout is set to {self.ota_image_download_timeout} seconds")
 
         if not self.provider_kvs_path.startswith('/tmp'):
             asserts.fail("Provider KVS path must be placed in the /tmp directory.")
-
-        if self.ota_image_download_timeout <= 0:
-            asserts.fail("Invalid value for --int-arg ota_image_download_timeout:<seconds> value provided, must be equal or greater than 1.")
 
         if not self.expected_software_version:
             asserts.fail("Missing OTA image software version. Speficy using --int-arg ota_image_expected_version:<ota_image_expected_version>")
@@ -209,9 +200,12 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDownloading, expected_target_version=self.expected_software_version)
 
+        # Once the device get into the Downloading state Track the download until 99% then wait for the ApplyingEvent
+        await self.track_download_progress(controller=controller, requestor_node_id=self.requestor_node_id, max_progress=99)
+
         # Event for Applying
         event_report = state_transition_event_handler.wait_for_event_report(
-            self.ota_req.Events.StateTransition, timeout_sec=self.ota_image_download_timeout)
+            self.ota_req.Events.StateTransition, timeout_sec=120)
         logger.info(f"Event report for Applying {event_report}")
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kDownloading,
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kApplying, expected_target_version=self.expected_software_version)
@@ -387,8 +381,9 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.DownloadError.event_id)
         await error_download_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
         # Force an DownloadError by Killing the app during the image download.
-        logger.info("Wait 3 seconds to allow download some data before killing the Provider Process")
-        await asyncio.sleep(3)
+        # Let the device download part of the image 2% then kill the process
+        await self.track_download_progress(controller=controller, requestor_node_id=self.requestor_node_id, max_progress=2)
+
         self.current_provider_app_proc.kill()
         start_time = time()
         logger.info("Waiting for the StateTransitionEvent with value KIdle.")
@@ -437,13 +432,18 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         attribute_idle = AttributeValue(
             endpoint_id=self.get_endpoint(), attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, value=Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
         update_state_attr_handler.await_all_final_values_reported(expected_final_values=[attribute_idle], timeout_sec=600)
+
+        # Once the device get into the Downloading state Track the download until 99% then wait for the ApplyingEvent
+        await self.track_download_progress(controller=controller, requestor_node_id=self.requestor_node_id, max_progress=99)
+
         # EventSubscriptionHandler
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
         await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=20, autoResubscribe=True)
-        # Download complete then Applying
+
+        # Wait for Applying Event
         event_report = state_transition_event_handler.wait_for_event_report(
-            self.ota_req.Events.StateTransition, timeout_sec=self.ota_image_download_timeout)
+            self.ota_req.Events.StateTransition, timeout_sec=120)
         logger.info(f"Event report: {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kApplying)
 
