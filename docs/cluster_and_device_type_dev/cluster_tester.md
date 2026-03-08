@@ -129,12 +129,13 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteViewport)
 
 ### Writing List Attributes
 
--   There are (Mainly) two patterns used to write list attributes, and cluster
-    servers are expected to support both of them.
--   Therefore an overload of WriteAttribute specifically for lists was created,
-    which includes a parameter `ListWritingPattern`.
--   It is recommended to always use both patterns when testing list attributes,
-    an example would be through a range-for loop as in the example below
+- There are (Mainly) two patterns used to write list attributes, and cluster
+  servers usually support both of them.
+- For that reason, ClusterTester provides a `WriteAttribute` overload for lists
+  that takes a `ListWritingPattern`
+- Tests for list attributes should exercise both patterns to ensure future
+  proofing. One way of doing that could be be through a range-for loop as in the
+  example below.
 
 ```cpp
 TEST_F(TestUserLabelCluster, WriteValidLabelListTest)
@@ -149,7 +150,7 @@ TEST_F(TestUserLabelCluster, WriteValidLabelListTest)
         };
 
         // Wrap in DataModel::List
-        auto listToWrite = DataModel::List(labels)
+        auto listToWrite = DataModel::List(labels);
 
         // Write the attribute
         // The tester automatically handles EncodeForWrite for fabric-scoped attributes
@@ -198,33 +199,33 @@ behaviors that simplify testing.
 When using `ReadAttribute`, `ClusterTester` automatically manages the underlying
 TLV data for you.
 
--   **Views & Lists**: If you read a type that contains views (like `CharSpan`,
-    `ByteSpan`, or `DecodableList`), the tester buffers the TLV data internally.
--   **Lifetime Safety**: This data remains valid for the lifetime of the
-    `ClusterTester` instance, allowing you to safely iterate over lists or
-    inspect spans without worrying about the buffer being freed immediately
-    after the read call.
+- **Views & Lists**: If you read a type that contains views (like `CharSpan`,
+  `ByteSpan`, or `DecodableList`), the tester buffers the TLV data internally.
+- **Lifetime Safety**: This data remains valid for the lifetime of the
+  `ClusterTester` instance, allowing you to safely iterate over lists or inspect
+  spans without worrying about the buffer being freed immediately after the read
+  call.
 
 ### Fabric Scoping (Writes)
 
 `WriteAttribute` abstracts away the complexity of fabric-sensitive writes.
 
--   **Auto-Encoding**: It uses C++ introspection to detect if a struct is
-    fabric-scoped. If so, it automatically uses `EncodeForWrite`; otherwise, it
-    uses standard `Encode`.
--   **Subject Descriptor**: It automatically applies the Access Control subject
-    descriptor corresponding to the fabric index set via `SetFabricIndex()`.
+- **Auto-Encoding**: It uses C++ introspection to detect if a struct is
+  fabric-scoped. If so, it automatically uses `EncodeForWrite`; otherwise, it
+  uses standard `Encode`.
+- **Subject Descriptor**: It automatically applies the Access Control subject
+  descriptor corresponding to the fabric index set via `SetFabricIndex()`.
 
 ### Command Results (Invoke)
 
 The `Invoke` wrapper simplifies the distinction between Status responses and
 Data responses.
 
--   **Unified Result**: It returns an `InvokeResult` that acts as a single
-    container for both success/failure status and the decoded response payload
-    (if the command returns data).
--   **Synchronous execution**: The helper is designed for unit tests where
-    command execution is expected to be synchronous.
+- **Unified Result**: It returns an `InvokeResult` that acts as a single
+  container for both success/failure status and the decoded response payload (if
+  the command returns data).
+- **Synchronous execution**: The helper is designed for unit tests where command
+  execution is expected to be synchronous.
 
 ### Testing Side Effects (Events & Reporting)
 

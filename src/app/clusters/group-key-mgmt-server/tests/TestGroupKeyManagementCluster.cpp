@@ -109,7 +109,7 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
     // Writes a list of group keys to the GroupKeyMap attribute for a given fabric.
     // Used to set up test scenarios with pre-existing keys.
     void PrepopulateGroupKeyMap(const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & keys,
-                                FabricIndex fabricIndex, ListWritingPattern listWritingPattern)
+                                ListWritingPattern listWritingPattern)
     {
         auto listToWrite =
             app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
@@ -184,7 +184,7 @@ TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeSameKeySetDif
     for (ListWritingPattern listWritingPattern : { ListWritingPattern::ReplaceAll, ListWritingPattern::ClearAllThenAppendItems })
     {
         auto keys = TestHelpers::CreateGroupKeyMapList(2, kTestFabricIndex, kTestGroupId, kTestKeySetId, 1, 0);
-        PrepopulateGroupKeyMap(keys, kTestFabricIndex, listWritingPattern);
+        PrepopulateGroupKeyMap(keys, listWritingPattern);
         VerifyGroupKeysMatch(kTestFabricIndex, keys);
     }
 }
@@ -221,7 +221,7 @@ TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttribute)
     {
         auto keys = TestHelpers::CreateGroupKeyMapList(2, kTestFabricIndex);
 
-        PrepopulateGroupKeyMap(keys, kTestFabricIndex, listWritingPattern);
+        PrepopulateGroupKeyMap(keys, listWritingPattern);
         VerifyGroupKeysMatch(kTestFabricIndex, keys);
     }
 }

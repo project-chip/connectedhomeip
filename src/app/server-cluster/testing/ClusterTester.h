@@ -184,13 +184,13 @@ public:
 
         auto decoder = writeOp.DecoderFor(value);
 
-        return mCluster.WriteAttribute(writeOp.GetRequest(), decoder).GetUnderlyingError();
+        return mCluster.WriteAttribute(writeOp.GetRequest(), decoder);
     }
 
     // This WriteAttribute overload is for writing list attributes, and allows specifying the pattern used for mutating/writing the
     // list on the cluster side (i.e. Replacing the list in its entirety vs Clearing the list in its entirety then appending/writing
     // list items individually).
-    // Cluster servers support both patterns of writing lists, Therefore we should always test list attributes using both
+    // Cluster servers usually support both patterns of writing lists, Therefore we should always test list attributes using both
     // patterns.
     template <typename T>
     app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr, const app::DataModel::List<T> & listValue,
@@ -218,7 +218,7 @@ public:
             // For ReplaceAll, we need to write the entire list in one go
             writeOp.SetListOperation(app::ConcreteDataAttributePath::ListOperation::ReplaceAll);
             auto decoder = writeOp.DecoderFor(listValue);
-            return mCluster.WriteAttribute(writeOp.GetRequest(), decoder).GetUnderlyingError();
+            return mCluster.WriteAttribute(writeOp.GetRequest(), decoder);
         }
 
         case ListWritingPattern::ClearAllThenAppendItems: {
@@ -237,6 +237,9 @@ public:
             }
             return Protocols::InteractionModel::Status::Success;
         }
+        default:
+            ChipLogError(Test, "Unhandled ListWritingPattern");
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
 
