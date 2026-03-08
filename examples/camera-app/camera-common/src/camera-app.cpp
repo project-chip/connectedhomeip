@@ -341,6 +341,13 @@ void CameraApp::ShutdownCameraDeviceClusters()
         ChipLogError(Camera, "CameraAVStreamMgmt Server unregister error: %" CHIP_ERROR_FORMAT, err.Format());
     }
     mAVStreamMgmtServer.Destroy();
+
+    err = CodegenDataModelProvider::Instance().Registry().Unregister(&mAVSettingsUserLevelMgmtServer.Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Camera, "CameraAVSettingsUserLevelMgmt Server unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    mAVSettingsUserLevelMgmtServer.Destroy();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

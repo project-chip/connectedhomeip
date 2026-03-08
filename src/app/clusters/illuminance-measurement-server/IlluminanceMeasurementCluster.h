@@ -49,10 +49,18 @@ public:
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<uint16_t> measuredValue);
     DataModel::Nullable<uint16_t> GetMeasuredValue() const { return mMeasuredValue; }
 
+    CHIP_ERROR SetMeasuredValueRange(DataModel::Nullable<uint16_t> minMeasuredValue,
+                                     DataModel::Nullable<uint16_t> maxMeasuredValue);
+    DataModel::Nullable<uint16_t> GetMinMeasuredValue() const { return mMinMeasuredValue; }
+    DataModel::Nullable<uint16_t> GetMaxMeasuredValue() const { return mMaxMeasuredValue; }
+
 protected:
-    DataModel::Nullable<uint16_t> mMeasuredValue{};
     const OptionalAttributeSet mOptionalAttributeSet;
-    const StartupConfiguration mConfig;
+    DataModel::Nullable<uint16_t> mMeasuredValue{};
+    DataModel::Nullable<uint16_t> mMinMeasuredValue{};
+    DataModel::Nullable<uint16_t> mMaxMeasuredValue{};
+    uint16_t mTolerance{};
+    DataModel::Nullable<IlluminanceMeasurement::LightSensorTypeEnum> mLightSensorType{};
 };
 
 } // namespace chip::app::Clusters

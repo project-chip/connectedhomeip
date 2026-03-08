@@ -13,8 +13,17 @@ The application interacts with the cluster via a
 `BooleanStateConfiguration::Delegate` instance:
 
 -   allows additional handling when commands are received
--   provides a post-attribute update callback, which can be used for example to
-    react to updates to the `CurrentSensitivityLevel` attribute.
+-   provides type-safe per-attribute change callbacks:
+    -   `OnCurrentSensitivityLevelChanged(uint8_t)` - called when
+        CurrentSensitivityLevel changes
+    -   `OnAlarmsActiveChanged(BitMask<AlarmModeBitmap>)` - called when
+        AlarmsActive changes
+    -   `OnAlarmsSuppressedChanged(BitMask<AlarmModeBitmap>)` - called when
+        AlarmsSuppressed changes
+    -   `OnAlarmsEnabledChanged(BitMask<AlarmModeBitmap>)` - called when
+        AlarmsEnabled changes
+    -   `OnSensorFaultChanged(BitMask<SensorFaultBitmap>)` - called when
+        SensorFault changes
 
 ## CodegenIntegration / updates from ember `PostAttributeChangeCallback`
 
@@ -28,7 +37,9 @@ Usage Notes:
 -   existing API was preserved in `CodegenIntegration.h` with the added
     requirement that the API calls _MUST_ be called only after server
     initialization (i.e. after the clusters have been created.)
--   The `Delegate` provides a `OnAttributeChanged` hook that is to be used to
-    react/detect when attributes change (e.g. when `CurrentSensitivityLevel::Id`
-    was updated). Use this instead of implementing functionality in
+-   The `Delegate` provides type-safe per-attribute change callbacks (e.g.
+    `OnCurrentSensitivityLevelChanged(uint8_t)`) that are called whenever the
+    corresponding attributes change, whether via attribute writes, command
+    handlers, or server APIs such as `SetAlarmsActive()` or
+    `GenerateSensorFault()`. Use these instead of implementing functionality in
     `PostAttributeChangeCallback`.

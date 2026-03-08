@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include <devices/speaker/impl/LoggingSpeakerDevice.h>
+#include <inttypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
@@ -33,7 +34,7 @@ void LoggingSpeakerDevice::OnLevelChanged(uint8_t value)
     uint8_t min  = LevelControlCluster().GetMinLevel();
     uint8_t max  = LevelControlCluster().GetMaxLevel();
     uint32_t pct = (max > min) ? (static_cast<uint32_t>(value - min) * 100) / (max - min) : 0;
-    ChipLogProgress(AppServer, "LoggingSpeakerDevice: Volume set to %u (%u%%)", value, pct);
+    ChipLogProgress(AppServer, "LoggingSpeakerDevice: Volume set to %u (%" PRIu32 "%%)", value, pct);
 }
 
 void LoggingSpeakerDevice::OnOptionsChanged(BitMask<Clusters::LevelControl::OptionsBitmap> value)

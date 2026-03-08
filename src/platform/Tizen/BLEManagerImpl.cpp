@@ -379,7 +379,7 @@ void BLEManagerImpl::NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId)
 
 void BLEManagerImpl::NotifyHandleConnectFailed(CHIP_ERROR error)
 {
-    ChipLogProgress(DeviceLayer, "Connection failed: %" CHIP_ERROR_FORMAT, error.Format());
+    ChipLogError(DeviceLayer, "Connection failed: %" CHIP_ERROR_FORMAT, error.Format());
     if (mIsCentral)
     {
         ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformTizenBLECentralConnectFailed,
@@ -420,26 +420,16 @@ void BLEManagerImpl::HandleConnectionTimeout(System::Layer *, void * appState)
 
 CHIP_ERROR BLEManagerImpl::ConnectChipThing(const char * address)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int ret;
-
     ChipLogProgress(DeviceLayer, "ConnectRequest: Addr [%s]", StringOrNullMarker(address));
 
-    ret = bt_gatt_client_create(address, &mGattClient);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Failed to create GATT client: %s", get_error_message(ret));
-                 err = MATTER_PLATFORM_ERROR(ret));
+    int ret = bt_gatt_client_create(address, &mGattClient);
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret), NotifyHandleConnectFailed(MATTER_PLATFORM_ERROR(ret)));
 
     ret = bt_gatt_connect(address, false);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "Failed to issue GATT connect request: %s", get_error_message(ret));
-                 err = MATTER_PLATFORM_ERROR(ret));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret), NotifyHandleConnectFailed(MATTER_PLATFORM_ERROR(ret)));
 
     ChipLogProgress(DeviceLayer, "GATT Connect Issued");
-
-exit:
-    if (err != CHIP_NO_ERROR)
-        NotifyHandleConnectFailed(err);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::OnDeviceScanned(const bt_adapter_le_device_scan_result_info_s & scanInfo,
@@ -509,8 +499,8 @@ void BLEManagerImpl::OnScanComplete()
 
 void BLEManagerImpl::OnScanError(CHIP_ERROR err)
 {
+    ChipLogError(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
     BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
-    ChipLogDetail(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
@@ -707,16 +697,11 @@ CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
     ChipLogProgress(DeviceLayer, "Stop Advertising");
 
     int ret = bt_adapter_le_stop_advertising(mAdvertiser);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_adapter_le_stop_advertising() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        NotifyBLEPeripheralAdvStopComplete(MATTER_PLATFORM_ERROR(ret)));
 
     mAdvReqInProgress = true;
     return CHIP_NO_ERROR;
-
-exit:
-    auto err = MATTER_PLATFORM_ERROR(ret);
-    NotifyBLEPeripheralAdvStopComplete(err);
-    return err;
 }
 
 static bool __GattClientForeachCharCb(int total, int index, bt_gatt_h charHandle, void * data)
@@ -948,26 +933,18 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
-    CHIP_ERROR err;
-
-    err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer()));
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
     ChipLogProgress(DeviceLayer, "Initialize Tizen BLE Layer");
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BLEManagerImpl * self) { return self->_InitImpl(); }, this);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BLEManagerImpl * self) { return self->_InitImpl(); }, this));
 
     mFlags.Set(Flags::kTizenBLELayerInitialized);
-
-    err = DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
-
-exit:
-    return err;
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 }
 
 void BLEManagerImpl::_Shutdown()

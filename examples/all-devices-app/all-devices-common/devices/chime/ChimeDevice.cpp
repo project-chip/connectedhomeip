@@ -46,7 +46,7 @@ CHIP_ERROR ChimeDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelP
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
-void ChimeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+void ChimeDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
     if (mChimeCluster.IsConstructed())

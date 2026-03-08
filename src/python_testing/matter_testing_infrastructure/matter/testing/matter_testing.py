@@ -1511,15 +1511,18 @@ class MatterBaseTest(base_test.BaseTestClass):
         else:
             try:
                 # Create the restart flag file to signal the test runner
+                # Allow for multiple reboots like SW update tests do using the "restart" mode
+                restart_text = "restart"
                 with open(restart_flag_file, "w") as f:
-                    f.write("restart")
+                    f.write(restart_text)
                 LOGGER.info("Created restart flag file to signal app reboot")
 
-                # The test runner will automatically wait for the app-ready-pattern before continuing
-
-                # Expire sessions and re-establish connections
+                # Expire sessions before the monitor picks up the flag
                 self._expire_sessions_on_all_controllers()
-                LOGGER.info("App restart completed successfully")
+
+                await self.wait_for_restart_flag_file_removal(restart_flag_file, restart_text)
+
+                LOGGER.info("App reboot completed successfully")
 
             except Exception as e:
                 LOGGER.error(f"Failed to reboot app: {e}")
@@ -1559,16 +1562,26 @@ class MatterBaseTest(base_test.BaseTestClass):
                     f.write(restart_flag_text)
                     LOGGER.info("Created restart flag file to signal %s request", restart_flag_text)
 
-                # The test runner will automatically wait for the app-ready-pattern before continuing
-
                 # Expire sessions and re-establish connections
                 self._expire_sessions_on_all_controllers()
                 LOGGER.info("%s request sent successfully", restart_flag_text.capitalize())
+
+                await self.wait_for_restart_flag_file_removal(restart_flag_file, restart_flag_text)
 
             except Exception as e:
                 err = f"Failed to {restart_flag_text}: {e}"
                 LOGGER.error(err)
                 asserts.fail(err)
+
+    async def wait_for_restart_flag_file_removal(self, restart_flag_file, restart_flag_text, timeout_sec=30.0):
+        # Wait for the monitor thread to remove the flag file
+        # The monitor deletes the flag file AFTER the restart completes, so this ensures
+        # the app has fully rebooted and is ready before we continue
+        start_time = time.time()
+        while os.path.exists(restart_flag_file):
+            if time.time() - start_time > timeout_sec:
+                asserts.fail(f"App {restart_flag_text} did not complete within timeout (flag file still exists)")
+            await asyncio.sleep(0.1)
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
