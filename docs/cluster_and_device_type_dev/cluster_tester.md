@@ -134,8 +134,8 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteViewport)
 -   For that reason, ClusterTester provides a `WriteAttribute` overload for
     lists that takes a `ListWritingPattern`
 -   Tests for list attributes should exercise both patterns to ensure future
-    proofing. One way of doing that could be be through a range-for loop as in
-    the example below.
+    proofing. One way of doing that could be through a range-for loop as in the
+    example below.
 
 ```cpp
 TEST_F(TestUserLabelCluster, WriteValidLabelListTest)

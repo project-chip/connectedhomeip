@@ -225,15 +225,17 @@ public:
 
             // We first write an empty list to clear the existing list using ReplaceAll List Operation
             writeOp.SetListOperation(app::ConcreteDataAttributePath::ListOperation::ReplaceAll);
-            auto decoderEmptyReplaceAll = writeOp.DecoderFor(app::DataModel::List<uint8_t>());
-            ReturnErrorOnFailure(mCluster.WriteAttribute(writeOp.GetRequest(), decoderEmptyReplaceAll).GetUnderlyingError());
+            auto decoder = writeOp.DecoderFor(app::DataModel::List<uint8_t>());
+            auto status  = mCluster.WriteAttribute(writeOp.GetRequest(), decoder);
+            VerifyOrReturnValue(status.IsSuccess(), status);
 
             // We now write each list item individually with AppendItem list operation.
             writeOp.SetListOperation(app::ConcreteDataAttributePath::ListOperation::AppendItem);
-            for (ListIndex i = 0; i < listValue.size(); i++)
+            for (const auto & listItem : listValue)
             {
-                auto decoder = writeOp.DecoderFor(listValue[i]);
-                ReturnErrorOnFailure(mCluster.WriteAttribute(writeOp.GetRequest(), decoder).GetUnderlyingError());
+                auto decoderAppend = writeOp.DecoderFor(listItem);
+                auto statusAppend  = mCluster.WriteAttribute(writeOp.GetRequest(), decoderAppend);
+                VerifyOrReturnValue(statusAppend.IsSuccess(), statusAppend);
             }
             return Protocols::InteractionModel::Status::Success;
         }
