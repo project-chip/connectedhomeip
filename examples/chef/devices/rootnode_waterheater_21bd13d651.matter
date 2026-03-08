@@ -2203,7 +2203,7 @@ endpoint 1 {
     ram      attribute localTemperature default = 2000;
     ram      attribute absMinHeatSetpointLimit default = 700;
     ram      attribute absMaxHeatSetpointLimit default = 8000;
-    ram      attribute occupiedHeatingSetpoint default = 2000;
+    ram      attribute occupiedHeatingSetpoint default = 5500;
     ram      attribute minHeatSetpointLimit default = 700;
     ram      attribute maxHeatSetpointLimit default = 8000;
     ram      attribute controlSequenceOfOperation default = 2;
