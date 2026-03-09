@@ -32,8 +32,6 @@ class LogProvider : public DiagnosticLogsProviderDelegate
 public:
     static LogProvider & GetInstance() { return sInstance; }
 
-    ~LogProvider();
-
     /////////// DiagnosticLogsProviderDelegate Interface /////////
     CHIP_ERROR StartLogCollection(IntentEnum intent, LogSessionHandle & outHandle, Optional<uint64_t> & outTimeStamp,
                                   Optional<uint64_t> & outTimeSinceBoot) override;
@@ -54,6 +52,7 @@ public:
 
 private:
     LogProvider()                                = default;
+    ~LogProvider();
     LogProvider(const LogProvider &)             = delete;
     LogProvider & operator=(const LogProvider &) = delete;
 

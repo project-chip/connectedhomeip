@@ -18,6 +18,7 @@
 
 #include "AppOptions.h"
 
+#include <cstring>
 #include <string>
 
 using namespace chip::ArgParser;

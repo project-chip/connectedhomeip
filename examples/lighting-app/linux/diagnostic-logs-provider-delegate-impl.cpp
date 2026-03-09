@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "include/diagnostic-logs-provider-delegate-impl.h"
+#include "diagnostic-logs-provider-delegate-impl.h"
 
 #include <lib/support/SafeInt.h>
 
@@ -141,6 +141,7 @@ CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSp
 
     auto currentPos = ftell(fp);
     VerifyOrReturnError(currentPos != -1, CHIP_ERROR_POSIX(errno), outBuffer.reduce_size(0));
+    VerifyOrReturnError(CanCastTo<size_t>(currentPos), CHIP_ERROR_INVALID_INTEGER_VALUE, outBuffer.reduce_size(0));
     outIsEndOfLog = fileSize == static_cast<size_t>(currentPos);
     return CHIP_NO_ERROR;
 }
