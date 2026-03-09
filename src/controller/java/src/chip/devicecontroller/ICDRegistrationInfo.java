@@ -63,6 +63,15 @@ public class ICDRegistrationInfo {
     return new Builder();
   }
 
+  /**
+   * Creates an ICDRegistrationInfo instance with an empty symmetric key.
+   * This configuration enables the kBeforeComplete feature but intentionally omits the key
+   * to defer the configuration and trigger the OnICDRegistrationInfoRequired callback during commissioning.
+   */
+  public static ICDRegistrationInfo createForDeferredConfiguration() {
+    return newBuilder().setSymmetricKey(new byte[0]).build();
+  }
+
   /** Builder for {@link ICDRegistrationInfo}. */
   public static class Builder {
     @Nullable private Long checkInNodeId = null;

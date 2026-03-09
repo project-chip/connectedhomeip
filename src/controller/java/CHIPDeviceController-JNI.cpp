@@ -713,6 +713,7 @@ static void PairDevice(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, c
         {
             ChipLogError(Controller, "ApplyICDRegistrationInfo failed.");
             JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+            return;
         }
     }
     else
@@ -795,6 +796,7 @@ JNI_METHOD(void, pairDeviceWithAddress)
         {
             ChipLogError(Controller, "ApplyICDRegistrationInfo failed.");
             JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+            return;
         }
     }
     else
@@ -859,6 +861,7 @@ JNI_METHOD(void, pairDeviceWithCode)
         {
             ChipLogError(Controller, "ApplyICDRegistrationInfo failed.");
             JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+            return;
         }
     }
     else

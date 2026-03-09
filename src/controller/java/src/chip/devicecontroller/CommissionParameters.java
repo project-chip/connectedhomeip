@@ -39,7 +39,16 @@ public final class CommissionParameters {
   public NetworkCredentials getNetworkCredentials() {
     return networkCredentials;
   }
-  /* the informations for ICD registration. For detailed information {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link CompletionListener.onICDRegistrationInfoRequired} is called to request the ICDRegistrationInfo value. */
+
+  /**
+   * The informations for ICD registration. For detailed information {@link ICDRegistrationInfo}.
+   * If this value is null when commissioning an ICD device, {@link CompletionListener.onICDRegistrationInfoRequired}
+   * is called to request the ICDRegistrationInfo value.
+   *
+   * - If LIT mode for Commissioning and {@link CompletionListener.onICDRegistrationInfoRequired} are not needed, all values must be set.
+   * - If LIT mode for Commissioning and {@link CompletionListener.onICDRegistrationInfoRequired} need to be called, set the value using {@link ICDRegistrationInfo.createForDeferredConfiguration}.
+   * - For SIT mode for Commissioning, set the value to null.
+   */
   public ICDRegistrationInfo getICDRegistrationInfo() {
     return icdRegistrationInfo;
   }
