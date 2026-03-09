@@ -51,9 +51,8 @@ public class ICDRegistrationInfo {
   }
 
   /**
-   * Gets the ICD symmetric key.
-   * Typically returns a 16-byte key. However, if deferred ICD configuration is supported,
-   * this may return an empty array as a sentinel value.
+   * Gets the ICD symmetric key. Typically returns a 16-byte key. However, if deferred ICD
+   * configuration is supported, this may return an empty array as a sentinel value.
    */
   public byte[] getSymmetricKey() {
     return symmetricKey;
@@ -102,9 +101,9 @@ public class ICDRegistrationInfo {
     }
 
     /**
-     * Sets the ICD symmetric key.
-     * Typically, this is a 16-byte key. If not set, a 16-byte key will be randomly generated.
-     * Note that an empty array is a valid sentinel value for deferred ICD configuration.
+     * Sets the ICD symmetric key. Typically, this is a 16-byte key. If not set, a 16-byte key will
+     * be randomly generated. Note that an empty array is a valid sentinel value for deferred ICD
+     * configuration.
      */
     public Builder setSymmetricKey(byte[] symmetricKey) {
       this.symmetricKey = symmetricKey;
