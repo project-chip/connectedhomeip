@@ -111,12 +111,12 @@ class TC_WebRTCP_2_29(MatterBaseTest, WEBRTCPTestBase):
         )
 
         # Check if privacy feature is supported before testing privacy mode
-        aFeatureMap = await self.read_single_attribute_check_success(
+        feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=Clusters.CameraAvStreamManagement,
             attribute=Clusters.CameraAvStreamManagement.Attributes.FeatureMap
         )
-        privacySupported = aFeatureMap & Clusters.CameraAvStreamManagement.Bitmaps.Feature.kPrivacy
+        privacy_supported = feature_map & Clusters.CameraAvStreamManagement.Bitmaps.Feature.kPrivacy
 
         self.step(1)
         current_sessions = await self.read_single_attribute_check_success(
@@ -129,7 +129,7 @@ class TC_WebRTCP_2_29(MatterBaseTest, WEBRTCPTestBase):
         self.step(2)
         # Send ProvideOffer with no VideoStreams and no AudioStreams
         cmd = cluster.Commands.ProvideOffer(
-            webRTCSessionID=NullValue, sdp=test_sdp, streamUsage=3, originatingEndpointID=endpoint)
+            webRTCSessionID=NullValue, sdp=test_sdp, streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView, originatingEndpointID=endpoint)
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("Unexpected success on ProvideOffer with no VideoStreams or AudioStreams")
@@ -203,7 +203,7 @@ class TC_WebRTCP_2_29(MatterBaseTest, WEBRTCPTestBase):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.AlreadyExists, "Expected ALREADY_EXISTS")
 
-        if privacySupported:
+        if privacy_supported:
             self.step(6)
             # Write SoftLivestreamPrivacyModeEnabled=true and verify INVALID_IN_STATE
             await self.write_single_attribute(
@@ -227,7 +227,7 @@ class TC_WebRTCP_2_29(MatterBaseTest, WEBRTCPTestBase):
             self.skip_step(6)
 
         self.step(7)
-        if privacySupported:
+        if privacy_supported:
             # Write SoftLivestreamPrivacyModeEnabled=false before sending valid ProvideOffer
             await self.write_single_attribute(
                 attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled(False),
@@ -238,7 +238,7 @@ class TC_WebRTCP_2_29(MatterBaseTest, WEBRTCPTestBase):
         cmd = cluster.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
             sdp=test_sdp,
-            streamUsage=3,  # kLiveView
+            streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView,
             originatingEndpointID=endpoint,
             videoStreams=[videoStreamID],
             audioStreams=[audioStreamID]
