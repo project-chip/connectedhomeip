@@ -17,44 +17,59 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
-#include <app/util/af-types.h>
-#include <app/util/basic-types.h>
-#include <lib/support/Span.h>
-#include <platform/CHIPDeviceConfig.h>
+#include "PowerSourceCluster.h"
+
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+namespace PowerSource {
 
-class PowerSourceServer
+/// Makes integration of a PowerSourceCluster with CodegenDataModelProvider easier.
+///
+/// This class provides a very thin wrapper around the PowerSourceCluster and its
+/// registration within the CodegenDataModelProvider.
+///
+
+template <typename DelegateT, typename = std::enable_if_t<
+    std::is_same_v<DelegateT, PowerSourceCluster::Wired> ||
+    std::is_same_v<DelegateT, PowerSourceCluster::Battery>>>
+class Instance
 {
 public:
-    static PowerSourceServer & Instance();
+    using OptionalAttributeSet = PowerSourceCluster::OptionalAttributeSet;
 
-    // Caller does not need to retain the span past the call point as these are copied into an internal storage
-    CHIP_ERROR SetEndpointList(EndpointId powerSourceClusterEndpoint, Span<EndpointId> endpointList);
-    CHIP_ERROR ClearEndpointList(EndpointId powerSourceClusterEndpoint)
+    PowerSourceCluster & Cluster() { return mCluster.Cluster(); }
+
+    /// Registers the cluster within the CodegenDataModelProvider Registry
+    CHIP_ERROR Register()
     {
-        return SetEndpointList(powerSourceClusterEndpoint, Span<EndpointId>());
+        return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
     }
-    // returns nullptr if there's not endpoint list set for this power source cluster endpoint id.
-    const Span<EndpointId> * GetEndpointList(EndpointId powerSourceClusterEndpoint) const;
-    void Shutdown();
-    size_t GetNumSupportedEndpointLists() const;
+
+    /// Unregisters the cluster from the CodegenDataModelProvider Registry
+    void Unregister()
+    {
+        CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
+    }
+
+    Instance(EndpointId endpointId, Span<AttributeId> supportedOptionalAttributes, const DelegateT & delegate) : mCluster(endpointId, GetOptionalAttributeSet(supportedOptionalAttributes), mDelegate) {}
+
+private:
+    static OptionalAttributeSet GetOptionalAttributeSet(Span<AttributeId> supportedOptionalAttributes)
+    {
+        uint32_t optionalAttributeBits = 0;
+        for (AttributeId attributeId : supportedOptionalAttributes)
+        {
+            optionalAttributeBits |= (1 << attributeId);
+        }
+        return OptionalAttributeSet(optionalAttributeBits);
+    }
+    RegisteredServerCluster<PowerSourceCluster> mCluster;
 };
 
-class PowerSourceAttrAccess : public AttributeAccessInterface
-{
-public:
-    // Register on all endpoints.
-    PowerSourceAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), PowerSource::Id) {}
-
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-};
-
-PowerSourceAttrAccess & TestOnlyGetPowerSourceAttrAccess();
-
+} // namespace PowerSource
 } // namespace Clusters
 } // namespace app
 } // namespace chip
