@@ -520,6 +520,7 @@ void SetUpCodePairer::OnBLEDiscoveryError(CHIP_ERROR err)
     ChipLogError(Controller, "Commissionable node discovery over BLE failed: %" CHIP_ERROR_FORMAT, err.Format());
     mWaitingForDiscovery[kBLETransport] = false;
     LogErrorOnFailure(err);
+    StopPairingIfTransportsExhausted(err);
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
@@ -543,6 +544,7 @@ void SetUpCodePairer::OnWifiPAFDiscoveryError(CHIP_ERROR err)
 {
     ChipLogError(Controller, "Commissionable node discovery over Wi-Fi PAF failed: %" CHIP_ERROR_FORMAT, err.Format());
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
+    StopPairingIfTransportsExhausted(err);
 }
 
 void SetUpCodePairer::OnWiFiPAFSubscribeComplete(void * appState)
@@ -578,6 +580,7 @@ void SetUpCodePairer::OnTagDiscoveryFailed(CHIP_ERROR error)
 {
     ChipLogError(Controller, "Commissionable node discovery over NFC failed: %" CHIP_ERROR_FORMAT, error.Format());
     mWaitingForDiscovery[kNFCTransport] = false;
+    StopPairingIfTransportsExhausted(error);
 }
 #endif
 
@@ -712,6 +715,20 @@ bool SetUpCodePairer::DiscoveryInProgress() const
     return false;
 }
 
+void SetUpCodePairer::StopPairingIfTransportsExhausted(CHIP_ERROR err)
+{
+    if (mWaitingForPASE || !mDiscoveredParameters.empty() || DiscoveryInProgress() || mRemoteId == kUndefinedNodeId)
+    {
+        return;
+    }
+    // Clear mRemoteId first to guard against re-entrant calls (e.g. from an async
+    // cancel callback fired after StopAllDiscoveryAttempts already cleared the flags).
+    mRemoteId              = kUndefinedNodeId;
+    CHIP_ERROR failErr     = mLastPASEError != CHIP_NO_ERROR ? mLastPASEError : err;
+    MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, failErr);
+    mCommissioner->OnSessionEstablishmentError(failErr);
+}
+
 void SetUpCodePairer::StopAllDiscoveryAttempts()
 {
     LogErrorOnFailure(StopDiscoveryOverBLE());
@@ -834,6 +851,16 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error, const std::optional<Re
             ChipLogError(Controller, "Error when verifying the validity of an address: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
+    // If this was a DNS-SD-triggered (IP/UDP) PASE attempt, stop DNS-SD now.
+    // All addresses for this device were already queued when DNS-SD found the
+    // record, so continued DNS-SD scanning cannot help.  More importantly,
+    // leaving DNS-SD running would keep DiscoveryInProgress() true indefinitely,
+    // which would prevent StopPairingIfTransportsExhausted from ever firing once
+    // the physical-proximity transports (BLE, Wi-Fi PAF, NFC) also complete.
+    if (mCurrentPASEParameters.HasValue())
+    {
+        LogErrorOnFailure(StopDiscoveryOverDNSSD());
+    }
     mCurrentPASEParameters.ClearValue();
 
     // We failed to establish PASE.  Try the next thing we have discovered, if
@@ -873,20 +900,19 @@ void SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, v
 {
     ChipLogError(Controller, "Discovery timed out");
     auto * pairer = static_cast<SetUpCodePairer *>(context);
-    pairer->StopAllDiscoveryAttempts();
-    if (!pairer->mWaitingForPASE && pairer->mDiscoveredParameters.empty())
+
+    // If a PASE attempt is in progress, do not stop any discovery — give every
+    // transport that has started (DNS-SD, BLE, Wi-Fi PAF, NFC) a chance to
+    // complete, fail, or time out naturally.  DNS-SD will be stopped in
+    // OnPairingComplete once the PASE attempt it triggered completes.
+    if (pairer->mWaitingForPASE)
     {
-        // We're not waiting on any more PASE attempts, and we're not going to
-        // discover anything at this point, so we should just notify our
-        // listener.
-        CHIP_ERROR err = pairer->mLastPASEError;
-        if (err == CHIP_NO_ERROR)
-        {
-            err = CHIP_ERROR_TIMEOUT;
-        }
-        MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, err);
-        pairer->mCommissioner->OnSessionEstablishmentError(err);
+        return;
     }
+
+    // No PASE in progress — stop all remaining discovery and fail if nothing is left to try.
+    pairer->StopAllDiscoveryAttempts();
+    pairer->StopPairingIfTransportsExhausted(CHIP_ERROR_TIMEOUT);
 }
 
 bool SetUpCodePairer::ShouldDiscoverUsing(RendezvousInformationFlag commissioningChannel) const

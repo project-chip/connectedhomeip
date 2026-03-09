@@ -180,6 +180,12 @@ private:
     // RendezvousParameters in the future.
     bool DiscoveryInProgress() const;
 
+    // If there is nothing left to try (no PASE in progress, no queued discovered
+    // parameters, no discovery in progress), notify the commissioner that pairing
+    // has failed.  err is used as the failure error only if no PASE attempt has
+    // produced an error yet.
+    void StopPairingIfTransportsExhausted(CHIP_ERROR err);
+
     // Not an enum class because we use this for indexing into arrays.
     enum TransportTypes
     {
