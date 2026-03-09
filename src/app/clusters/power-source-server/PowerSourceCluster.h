@@ -691,7 +691,7 @@ private:
 
     // Setters for `Fixed` attributes
 
-    CHIP_ERROR SetDescription(CharSpan val, bool notify = true)
+    CHIP_ERROR SetDescription(CharSpan val)
     {
         VERIFY_STRING_ATTRIBUTE_SIZE_OR_RETURN_ERROR(val, PowerSource::Attributes::Description::TypeInfo::MaxLength());
 
@@ -700,46 +700,45 @@ private:
             mAttributes.GetDescription(),
             mAttributes.mDescriptionBuffer,
             PowerSource::Attributes::Description::TypeInfo::MaxLength(),
-            PowerSource::Attributes::Description::Id,
-            notify
+            PowerSource::Attributes::Description::Id
         );
     }
 
-    CHIP_ERROR SetWiredCurrentType(WiredCurrentTypeEnum val, bool notify = true)
+    CHIP_ERROR SetWiredCurrentType(WiredCurrentTypeEnum val)
     {
         VERIFY_FEATURE_OR_RETURN_ERROR(kWired);
 
-        SetAndNotify(mAttributes.wired.currentType, val, PowerSource::Attributes::WiredCurrentType::Id, notify);
+        SetAndNotify(mAttributes.wired.currentType, val, PowerSource::Attributes::WiredCurrentType::Id);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SetWiredNominalVoltage(uint32_t val, bool notify = true)
+    CHIP_ERROR SetWiredNominalVoltage(uint32_t val)
     {
         VERIFY_FEATURE_OR_RETURN_ERROR(kWired);
         VERIFY_OPTIONAL_ATTRIBUTE_OR_RETURN_ERROR(WiredNominalVoltage);
 
-        SetAndNotify(mAttributes.wired.nominalVoltage, val, PowerSource::Attributes::WiredNominalVoltage::Id, notify);
+        SetAndNotify(mAttributes.wired.nominalVoltage, val, PowerSource::Attributes::WiredNominalVoltage::Id);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SetWiredMaximumCurrent(uint32_t val, bool notify = true)
+    CHIP_ERROR SetWiredMaximumCurrent(uint32_t val)
     {
         VERIFY_FEATURE_OR_RETURN_ERROR(kWired);
         VERIFY_OPTIONAL_ATTRIBUTE_OR_RETURN_ERROR(WiredMaximumCurrent);
 
-        SetAndNotify(mAttributes.wired.maximumCurrent, val, PowerSource::Attributes::WiredMaximumCurrent::Id, notify);
+        SetAndNotify(mAttributes.wired.maximumCurrent, val, PowerSource::Attributes::WiredMaximumCurrent::Id);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SetBatReplaceability(BatReplaceabilityEnum val, bool notify = true)
+    CHIP_ERROR SetBatReplaceability(BatReplaceabilityEnum val)
     {
         VERIFY_FEATURE_OR_RETURN_ERROR(kBattery);
 
-        SetAndNotify(mAttributes.battery.replaceability, val, PowerSource::Attributes::BatReplaceability::Id, notify);
+        SetAndNotify(mAttributes.battery.replaceability, val, PowerSource::Attributes::BatReplaceability::Id);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SetBatReplacementDescription(CharSpan val, bool notify = true)
+    CHIP_ERROR SetBatReplacementDescription(CharSpan val)
     {
         VERIFY_FEATURE_OR_RETURN_ERROR(kBattery);
         VERIFY_FEATURE_OR_RETURN_ERROR(kReplaceable);
@@ -751,22 +750,21 @@ private:
             mAttributes.battery.replaceable.GetReplacementDescription(),
             mAttributes.battery.replaceable.mReplacementDescriptionBuffer,
             PowerSource::Attributes::BatReplacementDescription::TypeInfo::MaxLength(),
-            PowerSource::Attributes::BatReplacementDescription::Id,
-            notify
+            PowerSource::Attributes::BatReplacementDescription::Id
         );
     }
 
-    CHIP_ERROR SetBatCommonDesignation(BatCommonDesignationEnum val, bool notify = true)
+    CHIP_ERROR SetBatCommonDesignation(BatCommonDesignationEnum val)
     {
         VERIFY_FEATURE_OR_RETURN_ERROR(kBattery);
         VERIFY_FEATURE_OR_RETURN_ERROR(kReplaceable);
         VERIFY_OPTIONAL_ATTRIBUTE_OR_RETURN_ERROR(BatCommonDesignation);
 
-        SetAndNotify(mAttributes.battery.replaceable.commonDesignation, PowerSource::Attributes::BatCommonDesignation::Id, notify);
+        SetAndNotify(mAttributes.battery.replaceable.commonDesignation, PowerSource::Attributes::BatCommonDesignation::Id);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SetBatANSIDesignation(CharSpan val, bool notify = true)
+    CHIP_ERROR SetBatANSIDesignation(CharSpan val)
     {
         VERIFY_FEATURE_OR_RETURN_ERROR(kBattery);
         VERIFY_FEATURE_OR_RETURN_ERROR(kReplaceable);
@@ -778,12 +776,11 @@ private:
             mAttributes.battery.replaceable.GetANSIDesignation(),
             mAttributes.battery.replaceable.mANSIDesignationBuffer,
             PowerSource::Attributes::BatANSIDesignation::TypeInfo::MaxLength(),
-            PowerSource::Attributes::BatANSIDesignation::Id,
-            notify
+            PowerSource::Attributes::BatANSIDesignation::Id
         );
     }
 
-    CHIP_ERROR SetBatIECDesignation(CharSpan val, bool notify = true)
+    CHIP_ERROR SetBatIECDesignation(CharSpan val)
     {
         VERIFY_FEATURE_OR_RETURN_ERROR(kBattery);
         VERIFY_FEATURE_OR_RETURN_ERROR(kReplaceable);
@@ -795,37 +792,36 @@ private:
             mAttributes.battery.replaceable.GetIECDesignation(),
             mAttributes.battery.replaceable.mIECDesignationBuffer,
             PowerSource::Attributes::BatIECDesignation::TypeInfo::MaxLength(),
-            PowerSource::Attributes::BatIECDesignation::Id,
-            notify
+            PowerSource::Attributes::BatIECDesignation::Id
         );
     }
 
-    CHIP_ERROR SetBatApprovedChemistry(BatApprovedChemistryEnum val, bool notify = true)
+    CHIP_ERROR SetBatApprovedChemistry(BatApprovedChemistryEnum val)
     {
         VERIFY_FEATURE_OR_RETURN_ERROR(kBattery);
         VERIFY_FEATURE_OR_RETURN_ERROR(kReplaceable);
         VERIFY_OPTIONAL_ATTRIBUTE_OR_RETURN_ERROR(BatApprovedChemistry);
 
-        SetAndNotify(mAttributes.battery.replaceable.approvedChemistry, PowerSource::Attributes::BatApprovedChemistry::Id, notify);
+        SetAndNotify(mAttributes.battery.replaceable.approvedChemistry, PowerSource::Attributes::BatApprovedChemistry::Id);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SetBatCapacity(uint32_t val, bool notify = true)
+    CHIP_ERROR SetBatCapacity(uint32_t val)
     {
         VERIFY_FEATURE_OR_RETURN_ERROR(kBattery);
         VerifyOrReturnError(Features().Has(Feature::kReplaceable) || Features().Has(Feature::kRechargeable), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         VERIFY_OPTIONAL_ATTRIBUTE_OR_RETURN_ERROR(BatCapacity);
 
-        SetAndNotify(mAttributes.batttery.capacity, val, PowerSource::Attributes::BatCapacity::Id, notify);
+        SetAndNotify(mAttributes.batttery.capacity, val, PowerSource::Attributes::BatCapacity::Id);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SetBatQuantity(uint8_t val, bool notify = true)
+    CHIP_ERROR SetBatQuantity(uint8_t val)
     {
         VERIFY_FEATURE_OR_RETURN_ERROR(kBattery);
         VERIFY_FEATURE_OR_RETURN_ERROR(kReplaceable);
 
-        SetAndNotify(mAttributes.battery.replaceable.quantity, val, PowerSource::Attributes::BatQuantity::Id, notify);
+        SetAndNotify(mAttributes.battery.replaceable.quantity, val, PowerSource::Attributes::BatQuantity::Id);
         return CHIP_NO_ERROR;
     }
 
@@ -932,16 +928,16 @@ public:
     void forceOptionalAttributesValidity();
 
     template <class T>
-    void SetAndNotify(T & current_val, const T & new_val, AttributeId id, bool notify = true)
+    void SetAndNotify(T & current_val, const T & new_val, AttributeId id)
     {
-        VerifyOrReturn(current_val != new_val && notify); // no-op if equal
+        VerifyOrReturn(current_val != new_val); // no-op if equal
 
         current_val = new_val;
         NotifyAttributeChanged(id);
     }
 
     // maxSize without null byte
-    CHIP_ERROR SetStringAndNotify(CharSpan val, CharSpan current, char* buffer, size_t maxSize, AttributeId id, bool notify = true)
+    CHIP_ERROR SetStringAndNotify(CharSpan val, CharSpan current, char* buffer, size_t maxSize, AttributeId id)
     {
         if (current.data_equal(val))
         {
@@ -952,10 +948,7 @@ public:
         VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
         buffer[val.size()] = 0; // null byte
-        if (notify)
-        {
-            NotifyAttributeChanged(id);
-        }
+        NotifyAttributeChanged(id);
         return CHIP_NO_ERROR;
     }
 
