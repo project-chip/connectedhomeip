@@ -199,7 +199,7 @@ class BarcodeFragment : Fragment() {
 
   private fun handleScannedQrCode(barcode: Barcode) {
     if (_binding == null) {
-      Log.d(TAG, "Already onDestory is called in Barcode Fragment.")
+      Log.d(TAG, "onDestroyView has already been called in BarcodeFragment.")
       return
     }
     val isLIT = binding.enableLITCommissioningSwitchInBarcode.isChecked
