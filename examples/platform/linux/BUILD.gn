@@ -19,6 +19,7 @@ import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/system/system.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
 if (current_os != "nuttx") {
@@ -251,6 +252,9 @@ source_set("app-main") {
     "CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER=${chip_enable_commodity_metering_trigger}",
   ]
 
+  if (chip_system_config_use_openthread_inet_endpoints) {
+    deps += [ "${chip_root}/third_party/openthread/platforms/simulation" ]
+  }
   public_configs = [ ":app-main-config" ]
 }
 

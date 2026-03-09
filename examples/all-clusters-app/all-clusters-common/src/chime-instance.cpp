@@ -58,7 +58,7 @@ CHIP_ERROR ChimeCommandDelegate::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t &
     return CHIP_NO_ERROR;
 }
 
-Status ChimeCommandDelegate::PlayChimeSound()
+Status ChimeCommandDelegate::PlayChimeSound(uint8_t chimeID)
 {
     return Status::Success;
 }

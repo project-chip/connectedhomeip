@@ -29,7 +29,7 @@ log = logging.getLogger(__name__)
 
 
 class PAVSTTestBase:
-    DEFAULT_AV_TRANSPORT_EXPIRY_TIME_SEC = 30  # 30 seconds
+    DEFAULT_AV_TRANSPORT_EXPIRY_TIME_SEC = 100  # 100 seconds
 
     async def read_pavst_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.PushAvStreamTransport
@@ -137,7 +137,7 @@ class PAVSTTestBase:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=30,  # An acceptable value for min frame rate
+                minFrameRate=min(15, aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewport,
                 maxResolution=cluster.Structs.VideoResolutionStruct(

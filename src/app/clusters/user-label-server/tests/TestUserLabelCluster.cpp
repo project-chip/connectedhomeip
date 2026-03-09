@@ -22,6 +22,7 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <app/server/Server.h>
 #include <clusters/UserLabel/Attributes.h>
 #include <clusters/UserLabel/Enums.h>
 #include <clusters/UserLabel/Metadata.h>
@@ -62,30 +63,25 @@ protected:
     CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override { return CHIP_NO_ERROR; }
     CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override { return CHIP_NO_ERROR; }
 };
-
 struct TestUserLabelCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
 
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    void SetUp() override
-    {
-        DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider);
-        ASSERT_EQ(userLabel.Startup(testContext.Get()), CHIP_NO_ERROR);
-    }
+    void SetUp() override { ASSERT_EQ(userLabel.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
-    void TearDown() override
-    {
-        userLabel.Shutdown(ClusterShutdownType::kClusterShutdown);
-        DeviceLayer::SetDeviceInfoProvider(nullptr);
-    }
+    void TearDown() override { userLabel.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
-    TestUserLabelCluster() : userLabel(kRootEndpointId) {}
+    TestUserLabelCluster() :
+        userLabel(kRootEndpointId,
+                  UserLabelCluster::Context{ .deviceInfoProvider = mDeviceInfoProvider,
+                                             .fabricTable        = chip::Server::GetInstance().GetFabricTable() })
+    {}
 
     TestServerClusterContext testContext;
+    MockDeviceInfoProvider mDeviceInfoProvider; // Must be declared before userLabel so it's initialized first
     UserLabelCluster userLabel;
-    MockDeviceInfoProvider mDeviceInfoProvider;
 };
 
 } // namespace

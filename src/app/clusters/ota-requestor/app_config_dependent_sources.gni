@@ -23,10 +23,10 @@ app_config_dependent_sources = [
   "DefaultOTARequestorUserConsent.h",
   "ExtendedOTARequestorDriver.cpp",
   "ExtendedOTARequestorDriver.h",
+  "OTARequestorCluster.cpp",
   "OTARequestorDriver.h",
   "OTARequestorStorage.h",
   "OTATestEventTriggerHandler.cpp",
   "OTATestEventTriggerHandler.h",
-  "ota-requestor-server.cpp",
   "ota-requestor-server.h",
 ]

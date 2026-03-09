@@ -58,6 +58,8 @@ namespace chip {
 namespace app {
 namespace {
 
+inline constexpr uint16_t kMaxNumSubscriptionsPerFabric = 10000;
+
 /**
  * Helper to handle wildcard events in the event path.
  *
@@ -1204,7 +1206,7 @@ bool InteractionModelEngine::TrimFabricForSubscriptions(FabricIndex aFabricIndex
             candidateEventPathsUsed     = eventPathsUsed;
         }
         // This handler is older than the one we picked before.
-        else if (handler->GetTransactionStartGeneration() < candidate->GetTransactionStartGeneration() &&
+        else if (handler->GetTransactionStartGeneration().Before(candidate->GetTransactionStartGeneration()) &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
                  ((attributePathsUsed > perFabricPathCapacity || eventPathsUsed > perFabricPathCapacity) ==
                   (candidateAttributePathsUsed > perFabricPathCapacity || candidateEventPathsUsed > perFabricPathCapacity)))
@@ -1382,7 +1384,7 @@ bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
             candidate = handler;
         }
         // Read Handlers are "first come first served", so we give eariler read transactions a higher priority.
-        else if (handler->GetTransactionStartGeneration() > candidate->GetTransactionStartGeneration() &&
+        else if (handler->GetTransactionStartGeneration().After(candidate->GetTransactionStartGeneration()) &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
                  ((attributePathsUsed > kMinSupportedPathsPerReadRequest || eventPathsUsed > kMinSupportedPathsPerReadRequest) ==
                   (candidateAttributePathsUsed > kMinSupportedPathsPerReadRequest ||
@@ -2021,10 +2023,10 @@ bool InteractionModelEngine::HasActiveRead()
 uint16_t InteractionModelEngine::GetMinGuaranteedSubscriptionsPerFabric() const
 {
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    return UINT16_MAX;
+    return kMaxNumSubscriptionsPerFabric;
 #else
-    return static_cast<uint16_t>(
-        std::min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(), static_cast<size_t>(UINT16_MAX)));
+    return static_cast<uint16_t>(std::min(GetReadHandlerPoolCapacityForSubscriptions() / GetConfigMaxFabrics(),
+                                          static_cast<size_t>(kMaxNumSubscriptionsPerFabric)));
 #endif
 }
 

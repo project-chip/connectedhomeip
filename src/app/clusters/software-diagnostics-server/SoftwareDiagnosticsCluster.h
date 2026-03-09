@@ -16,19 +16,23 @@
  */
 #pragma once
 
-#include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsLogic.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/SoftwareDiagnostics/Attributes.h>
 #include <clusters/SoftwareDiagnostics/ClusterId.h>
 #include <clusters/SoftwareDiagnostics/Commands.h>
+#include <clusters/SoftwareDiagnostics/Enums.h>
 #include <clusters/SoftwareDiagnostics/Events.h>
 #include <clusters/SoftwareDiagnostics/Metadata.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
-
-#include <sys/types.h>
 
 namespace chip {
 namespace app {
@@ -42,112 +46,58 @@ namespace Clusters {
 class SoftwareDiagnosticsServerCluster : public DefaultServerCluster, public SoftwareDiagnostics::SoftwareFaultListener
 {
 public:
-    SoftwareDiagnosticsServerCluster(const SoftwareDiagnosticsLogic::OptionalAttributeSet & optionalAttributeSet) :
-        DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }), mLogic(optionalAttributeSet)
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<
+        SoftwareDiagnostics::Attributes::ThreadMetrics::Id, SoftwareDiagnostics::Attributes::CurrentHeapFree::Id,
+        SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id, SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id>;
+
+    SoftwareDiagnosticsServerCluster(const OptionalAttributeSet & optionalAttributeSet,
+                                     DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider) :
+        DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }),
+        mOptionalAttributeSet(optionalAttributeSet), mDiagnosticDataProvider(diagnosticDataProvider)
     {}
 
     // software fault listener
-    void OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault) override
-    {
-        VerifyOrReturn(mContext != nullptr);
-        (void) mContext->interactionContext.eventsGenerator.GenerateEvent(softwareFault, kRootEndpointId);
-    }
+    void OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault) override;
 
-    CHIP_ERROR Startup(ServerClusterContext & context) override
-    {
-        ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
 
-        if (SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener() == nullptr)
-        {
-            SoftwareDiagnostics::SoftwareFaultListener::SetGlobalListener(this);
-        }
-
-        return CHIP_NO_ERROR;
-    }
-
-    void Shutdown(ClusterShutdownType shutdownType) override
-    {
-        if (SoftwareDiagnostics::SoftwareFaultListener::GetGlobalListener() == this)
-        {
-            SoftwareDiagnostics::SoftwareFaultListener::SetGlobalListener(nullptr);
-        }
-        DefaultServerCluster::Shutdown(shutdownType);
-    }
+    void Shutdown(ClusterShutdownType shutdownType) override;
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override
-    {
-        switch (request.path.mAttributeId)
-        {
-        case SoftwareDiagnostics::Attributes::CurrentHeapFree::Id: {
-            uint64_t value;
-            CHIP_ERROR err = mLogic.GetCurrentHeapFree(value);
-            return EncodeValue(value, err, encoder);
-        }
-        case SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id: {
-            uint64_t value;
-            CHIP_ERROR err = mLogic.GetCurrentHeapUsed(value);
-            return EncodeValue(value, err, encoder);
-        }
-        case SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id: {
-            uint64_t value;
-            CHIP_ERROR err = mLogic.GetCurrentHighWatermark(value);
-            return EncodeValue(value, err, encoder);
-        }
-        case SoftwareDiagnostics::Attributes::ThreadMetrics::Id:
-            return mLogic.ReadThreadMetrics(encoder);
-        case Globals::Attributes::FeatureMap::Id:
-            return encoder.Encode(mLogic.GetFeatureMap());
-        case Globals::Attributes::ClusterRevision::Id:
-            return encoder.Encode(SoftwareDiagnostics::kRevision);
-        default:
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
-        }
-    }
+                                                AttributeValueEncoder & encoder) override;
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override
-    {
-        switch (request.path.mCommandId)
-        {
-        case SoftwareDiagnostics::Commands::ResetWatermarks::Id:
-            return mLogic.ResetWatermarks();
-        default:
-            return Protocols::InteractionModel::Status::UnsupportedCommand;
-        }
-    }
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    // Encodes the thread metrics list, using the provided encoder.
+    CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & encoder);
+
+    /// Determines the feature map based on the DiagnosticsProvider support.
+    BitFlags<SoftwareDiagnostics::Feature> GetFeatureMap() const
     {
-        return mLogic.AcceptedCommands(builder);
+        return BitFlags<SoftwareDiagnostics::Feature>().Set(
+            SoftwareDiagnostics::Feature::kWatermarks,
+            mOptionalAttributeSet.IsSet(SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id) &&
+                mDiagnosticDataProvider.SupportsWatermarks());
     }
 
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
-    {
-        return mLogic.Attributes(builder);
-    }
+    CHIP_ERROR ResetWatermarks() { return mDiagnosticDataProvider.ResetWatermarks(); }
 
 private:
     // Encodes the `value` in `encoder`, while handling a potential `readError` that occurred
     // when the input `value` was read:
     //   - CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE results in a 0 being encoded
     //   - any other read error is just forwarded
-    CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
-    {
-        if (readError == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            value = 0;
-        }
-        else if (readError != CHIP_NO_ERROR)
-        {
-            return readError;
-        }
-        return encoder.Encode(value);
-    }
+    CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder);
 
-    SoftwareDiagnosticsLogic mLogic;
+    const OptionalAttributeSet mOptionalAttributeSet;
+    DeviceLayer::DiagnosticDataProvider & mDiagnosticDataProvider;
 };
 
 } // namespace Clusters

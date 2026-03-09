@@ -706,17 +706,17 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
             print("error: Duplicate values in node id list")
             return False
 
-    wifi_args = ['ble-wifi']
-    thread_args = ['ble-thread', 'nfc-thread']
+    wifi_args = ['ble-wifi', 'nfc-wifi']
+    thread_args = ['ble-thread', 'nfc-thread', 'thread-meshcop']
     if commissioning_method in wifi_args:
         if args.wifi_ssid is None:
             print("error: missing --wifi-ssid <SSID> for --commissioning-method "
-                  "or --in-test-commissioning-method ble-wifi!")
+                  "or --in-test-commissioning-method ble-wifi or nfc-wifi!")
             return False
 
         if args.wifi_passphrase is None:
             print("error: missing --wifi-passphrase <passphrase> for --commissioning-method or "
-                  "--in-test-commissioning-method ble-wifi!")
+                  "--in-test-commissioning-method ble-wifi or nfc-wifi!")
             return False
 
         config.wifi_ssid = args.wifi_ssid
@@ -724,9 +724,15 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     elif commissioning_method in thread_args:
         if args.thread_dataset_hex is None:
             print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method or "
-                  "--in-test-commissioning-method ble-thread or nfc-thread!")
+                  "--in-test-commissioning-method ble-thread, nfc-thread or thread-meshcop!")
             return False
         config.thread_operational_dataset = args.thread_dataset_hex
+        if commissioning_method == 'thread-meshcop':
+            if args.thread_ba_host is None or args.thread_ba_port is None:
+                print("error: missing --thread-ba-host or --thread-ba-port for --commissioning-method thread-meshcop!")
+                return False
+            config.thread_ba_host = args.thread_ba_host
+            config.thread_ba_port = args.thread_ba_port
     elif config.commissioning_method == "on-network-ip":
         if args.ip_addr is None:
             print("error: missing --ip-addr <IP_ADDRESS> for --commissioning-method on-network-ip")
@@ -769,11 +775,13 @@ def convert_args_to_matter_config(args: argparse.Namespace):
 
         if any([args.passcodes, args.discriminators, args.manual_code, args.qr_code]):
             LOGGER.error("Error: Do not provide discriminator, passcode, manual code or qr-code for NFC commissioning. "
-                         "The payload is read directly from the NFC tag.")
+                         "The onboarding data is read directly from the NFC tag.")
             sys.exit(1)
 
-        from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
-        nfc_tag_data = connect_read_nfc_tag_data(config.global_test_params.get("NFC_Reader_index", 0))
+        from matter.testing.nfc import NFCReader
+        nfc_reader_index = config.global_test_params.get("NFC_Reader_index", 0)
+        reader = NFCReader(nfc_reader_index)
+        nfc_tag_data = reader.read_nfc_tag_data()
         args.qr_code.append(nfc_tag_data)
 
     # Populate commissioning config if present, exiting on error
@@ -822,138 +830,6 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.global_test_params["meta_config"] = {k: v for k, v in dataclass_asdict(config).items() if k != "global_test_params"}
 
     return config
-
-
-def parse_matter_test_args(argv: Optional[List[str]] = None):
-    parser = argparse.ArgumentParser(description='Matter standalone Python test')
-
-    basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
-
-    basic_group.add_argument('--tests', '--test-case', action='append', nargs='+', type=str, metavar='test_NAME',
-                             help='A list of tests in the test class to execute.')
-    basic_group.add_argument('--fail-on-skipped', action="store_true", default=False,
-                             help="Fail the test if any test cases are skipped")
-    basic_group.add_argument('--trace-to', nargs="*", default=[],
-                             help="Where to trace (e.g perfetto, perfetto:path, json:log, json:path)")
-    basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
-                             metavar="PATH", help="Location for persisted storage of instance")
-    basic_group.add_argument('--logs-path', action="store", type=pathlib.Path, metavar="PATH", help="Location for test logs")
-    paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
-    basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
-                             help="PAA trust store path (default: %s)" % str(paa_path_default))
-    basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
-                             help="Path to JSON file containing the device attestation revocation set.")
-    basic_group.add_argument('--ble-controller', action="store", type=int,
-                             metavar="CONTROLLER_ID", help="BLE controller selector, see example or platform docs for details")
-    basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
-                             metavar='NODE_ID',
-                             default=TestingDefaults.CONTROLLER_NODE_ID,
-                             help='NodeID to use for initial/default controller (default: %d)' % TestingDefaults.CONTROLLER_NODE_ID)
-    basic_group.add_argument('-n', '--dut-node-id', '--nodeId', type=int_decimal_or_hex,
-                             metavar='NODE_ID', dest='dut_node_ids', default=[],
-                             help='Node ID for primary DUT communication, '
-                             'and NodeID to assign if commissioning (default: %d)' % TestingDefaults.DUT_NODE_ID, nargs="+")
-    basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
-    basic_group.add_argument('--app-pipe', type=str, default=None,
-                             help="The full path of the app to send an out-of-band command from test to app")
-    basic_group.add_argument('--app-pipe-out', type=str, default=None,
-                             help="The full path of the app to read an out-of-band command from app to test")
-    basic_group.add_argument('--restart-flag-file', type=str, default=None,
-                             help="The full path of the file to use to signal a restart to the app")
-    basic_group.add_argument('--debug', action="store_true", default=False,
-                             help="Run the script in debug mode. This is needed to capture attribute dump at end of test modules if there are problems found during testing.")
-    basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
-    basic_group.add_argument("--PICS", help="PICS file path", type=str)
-
-    basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
-                             help="Send test event triggers with endpoint 0 for older devices")
-
-    commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
-
-    commission_group.add_argument('-m', '--commissioning-method', type=str,
-                                  metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread"],
-                                  help='Name of commissioning method to use')
-    commission_group.add_argument('--in-test-commissioning-method', type=str,
-                                  metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread"],
-                                  help='Name of commissioning method to use, for commissioning tests')
-    commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
-                                  metavar='LONG_DISCRIMINATOR',
-                                  dest='discriminators',
-                                  default=[],
-                                  help='Discriminator to use for commissioning', nargs="+")
-    commission_group.add_argument('-p', '--passcode', type=int_decimal_or_hex,
-                                  metavar='PASSCODE',
-                                  dest='passcodes',
-                                  default=[],
-                                  help='PAKE passcode to use', nargs="+")
-
-    commission_group.add_argument('--wifi-ssid', type=str,
-                                  metavar='SSID',
-                                  help='Wi-Fi SSID for ble-wifi commissioning')
-    commission_group.add_argument('--wifi-passphrase', type=str,
-                                  metavar='PASSPHRASE',
-                                  help='Wi-Fi passphrase for ble-wifi commissioning')
-
-    commission_group.add_argument('--thread-dataset-hex', type=byte_string_from_hex,
-                                  metavar='OPERATIONAL_DATASET_HEX',
-                                  help='Thread operational dataset as a hex string for ble-thread commissioning')
-
-    commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=TestingDefaults.ADMIN_VENDOR_ID,
-                                  metavar="VENDOR_ID",
-                                  help="VendorID to use during commissioning (default 0x%04X)" % TestingDefaults.ADMIN_VENDOR_ID)
-    commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
-                                  metavar="CASE_ADMIN_SUBJECT",
-                                  help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
-
-    commission_group.add_argument('--commission-only', action="store_true", default=False,
-                                  help="If true, test exits after commissioning without running subsequent tests")
-
-    commission_group.add_argument('--tc-version-to-simulate', type=int, help="Terms and conditions version")
-
-    commission_group.add_argument('--tc-user-response-to-simulate', type=int, help="Terms and conditions acknowledgements")
-
-    code_group = parser.add_argument_group(title="Setup codes")
-
-    code_group.add_argument('-q', '--qr-code', type=str,
-                            metavar="QR_CODE", default=[], help="QR setup code content (overrides passcode and discriminator)", nargs="+")
-    code_group.add_argument('--manual-code', type=str_from_manual_code,
-                            metavar="MANUAL_CODE", default=[], help="Manual setup code content (overrides passcode and discriminator)", nargs="+")
-
-    fabric_group = parser.add_argument_group(
-        title="Fabric selection", description="Fabric selection for single-fabric basic usage, and commissioning")
-    fabric_group.add_argument('-f', '--fabric-id', type=int_decimal_or_hex,
-                              metavar='FABRIC_ID',
-                              help='Fabric ID on which to operate under the root of trust')
-
-    fabric_group.add_argument('-r', '--root-index', type=root_index,
-                              metavar='ROOT_INDEX_OR_NAME', default=TestingDefaults.TRUST_ROOT_INDEX,
-                              help='Root of trust under which to operate/commission for single-fabric basic usage. '
-                              'alpha/beta/gamma are aliases for 1/2/3. Default (%d)' % TestingDefaults.TRUST_ROOT_INDEX)
-
-    fabric_group.add_argument('-c', '--chip-tool-credentials-path', type=pathlib.Path,
-                              metavar='PATH',
-                              help='Path to chip-tool credentials file root')
-
-    args_group = parser.add_argument_group(title="Config arguments", description="Test configuration global arguments set")
-    args_group.add_argument('--int-arg', nargs='+', action='append', type=int_named_arg, metavar="NAME:VALUE",
-                            help="Add a named test argument for an integer as hex or decimal (e.g. -2 or 0xFFFF_1234)")
-    args_group.add_argument('--bool-arg', nargs='+', action='append', type=bool_named_arg, metavar="NAME:VALUE",
-                            help="Add a named test argument for an boolean value (e.g. true/false or 0/1)")
-    args_group.add_argument('--float-arg', nargs='+', action='append', type=float_named_arg, metavar="NAME:VALUE",
-                            help="Add a named test argument for a floating point value (e.g. -2.1 or 6.022e23)")
-    args_group.add_argument('--string-arg', nargs='+', action='append', type=str_named_arg, metavar="NAME:VALUE",
-                            help="Add a named test argument for a string value")
-    args_group.add_argument('--json-arg', nargs='+', action='append', type=json_named_arg, metavar="NAME:VALUE",
-                            help="Add a named test argument for JSON stored as a list or dict")
-    args_group.add_argument('--hex-arg', nargs='+', action='append', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
-                            help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
-
-    if not argv:
-        argv = sys.argv[1:]
-
-    return convert_args_to_matter_config(parser.parse_args(argv))
 
 
 def int_decimal_or_hex(s: str) -> int:
@@ -1071,3 +947,139 @@ def root_index(s: str) -> int:
         if root_index == 0:
             raise ValueError("Only support root index >= 1")
         return root_index
+
+
+def parse_matter_test_args(argv: Optional[List[str]] = None):
+    parser = argparse.ArgumentParser(description='Matter standalone Python test')
+
+    basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
+
+    basic_group.add_argument('--tests', '--test-case', action='append', nargs='+', type=str, metavar='test_NAME',
+                             help='A list of tests in the test class to execute.')
+    basic_group.add_argument('--fail-on-skipped', action="store_true", default=False,
+                             help="Fail the test if any test cases are skipped")
+    basic_group.add_argument('--trace-to', nargs="*", default=[],
+                             help="Where to trace (e.g perfetto, perfetto:path, json:log, json:path)")
+    basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
+                             metavar="PATH", help="Location for persisted storage of instance")
+    basic_group.add_argument('--logs-path', action="store", type=pathlib.Path, metavar="PATH", help="Location for test logs")
+    paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
+    basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
+                             help="PAA trust store path (default: %s)" % str(paa_path_default))
+    basic_group.add_argument('--dac-revocation-set-path', action="store", type=pathlib.Path, metavar="PATH",
+                             help="Path to JSON file containing the device attestation revocation set.")
+    basic_group.add_argument('--ble-controller', action="store", type=int,
+                             metavar="CONTROLLER_ID", help="BLE controller selector, see example or platform docs for details")
+    basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
+                             metavar='NODE_ID',
+                             default=TestingDefaults.CONTROLLER_NODE_ID,
+                             help='NodeID to use for initial/default controller (default: %d)' % TestingDefaults.CONTROLLER_NODE_ID)
+    basic_group.add_argument('-n', '--dut-node-id', '--nodeId', type=int_decimal_or_hex,
+                             metavar='NODE_ID', dest='dut_node_ids', default=[],
+                             help='Node ID for primary DUT communication, '
+                             'and NodeID to assign if commissioning (default: %d)' % TestingDefaults.DUT_NODE_ID, nargs="+")
+    basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
+    basic_group.add_argument('--app-pipe', type=str, default=None,
+                             help="The full path of the app to send an out-of-band command from test to app")
+    basic_group.add_argument('--app-pipe-out', type=str, default=None,
+                             help="The full path of the app to read an out-of-band command from app to test")
+    basic_group.add_argument('--restart-flag-file', type=str, default=None,
+                             help="The full path of the file to use to signal a restart to the app")
+    basic_group.add_argument('--debug', action="store_true", default=False,
+                             help="Run the script in debug mode. This is needed to capture attribute dump at end of test modules if there are problems found during testing.")
+    basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
+    basic_group.add_argument("--PICS", help="PICS file path", type=str)
+
+    basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
+                             help="Send test event triggers with endpoint 0 for older devices")
+
+    commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
+
+    commission_group.add_argument('-m', '--commissioning-method', type=str,
+                                  metavar='METHOD_NAME',
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread", "nfc-wifi", "thread-meshcop"],
+                                  help='Name of commissioning method to use')
+    commission_group.add_argument('--in-test-commissioning-method', type=str,
+                                  metavar='METHOD_NAME',
+                                  choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread", "nfc-wifi", "thread-meshcop"],
+                                  help='Name of commissioning method to use, for commissioning tests')
+    commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
+                                  metavar='LONG_DISCRIMINATOR',
+                                  dest='discriminators',
+                                  default=[],
+                                  help='Discriminator to use for commissioning', nargs="+")
+    commission_group.add_argument('-p', '--passcode', type=int_decimal_or_hex,
+                                  metavar='PASSCODE',
+                                  dest='passcodes',
+                                  default=[],
+                                  help='PAKE passcode to use', nargs="+")
+
+    commission_group.add_argument('--wifi-ssid', type=str,
+                                  metavar='SSID',
+                                  help='Wi-Fi SSID for ble-wifi commissioning')
+    commission_group.add_argument('--wifi-passphrase', type=str,
+                                  metavar='PASSPHRASE',
+                                  help='Wi-Fi passphrase for ble-wifi commissioning')
+
+    commission_group.add_argument('--thread-dataset-hex', type=byte_string_from_hex,
+                                  metavar='OPERATIONAL_DATASET_HEX',
+                                  help='Thread operational dataset as a hex string for ble-thread commissioning')
+
+    commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=TestingDefaults.ADMIN_VENDOR_ID,
+                                  metavar="VENDOR_ID",
+                                  help="VendorID to use during commissioning (default 0x%04X)" % TestingDefaults.ADMIN_VENDOR_ID)
+    commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
+                                  metavar="CASE_ADMIN_SUBJECT",
+                                  help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
+    commission_group.add_argument('--thread-ba-host', action="store", type=str,
+                                  help="Border Agent IP address")
+    commission_group.add_argument('--thread-ba-port', action="store", type=int,
+                                  help="Border Agent port")
+
+    commission_group.add_argument('--commission-only', action="store_true", default=False,
+                                  help="If true, test exits after commissioning without running subsequent tests")
+
+    commission_group.add_argument('--tc-version-to-simulate', type=int, help="Terms and conditions version")
+
+    commission_group.add_argument('--tc-user-response-to-simulate', type=int, help="Terms and conditions acknowledgements")
+
+    code_group = parser.add_argument_group(title="Setup codes")
+
+    code_group.add_argument('-q', '--qr-code', type=str,
+                            metavar="QR_CODE", default=[], help="QR setup code content (overrides passcode and discriminator)", nargs="+")
+    code_group.add_argument('--manual-code', type=str_from_manual_code,
+                            metavar="MANUAL_CODE", default=[], help="Manual setup code content (overrides passcode and discriminator)", nargs="+")
+
+    fabric_group = parser.add_argument_group(
+        title="Fabric selection", description="Fabric selection for single-fabric basic usage, and commissioning")
+    fabric_group.add_argument('-f', '--fabric-id', type=int_decimal_or_hex,
+                              metavar='FABRIC_ID',
+                              help='Fabric ID on which to operate under the root of trust')
+
+    fabric_group.add_argument('-r', '--root-index', type=root_index,
+                              metavar='ROOT_INDEX_OR_NAME', default=TestingDefaults.TRUST_ROOT_INDEX,
+                              help='Root of trust under which to operate/commission for single-fabric basic usage. '
+                              'alpha/beta/gamma are aliases for 1/2/3. Default (%d)' % TestingDefaults.TRUST_ROOT_INDEX)
+
+    fabric_group.add_argument('-c', '--chip-tool-credentials-path', type=pathlib.Path,
+                              metavar='PATH',
+                              help='Path to chip-tool credentials file root')
+
+    args_group = parser.add_argument_group(title="Config arguments", description="Test configuration global arguments set")
+    args_group.add_argument('--int-arg', nargs='+', action='append', type=int_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for an integer as hex or decimal (e.g. -2 or 0xFFFF_1234)")
+    args_group.add_argument('--bool-arg', nargs='+', action='append', type=bool_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for an boolean value (e.g. true/false or 0/1)")
+    args_group.add_argument('--float-arg', nargs='+', action='append', type=float_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for a floating point value (e.g. -2.1 or 6.022e23)")
+    args_group.add_argument('--string-arg', nargs='+', action='append', type=str_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for a string value")
+    args_group.add_argument('--json-arg', nargs='+', action='append', type=json_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for JSON stored as a list or dict")
+    args_group.add_argument('--hex-arg', nargs='+', action='append', type=bytes_as_hex_named_arg, metavar="NAME:VALUE",
+                            help="Add a named test argument for an octet string in hex (e.g. 0011cafe or 00:11:CA:FE)")
+
+    if not argv:
+        argv = sys.argv[1:]
+
+    return convert_args_to_matter_config(parser.parse_args(argv))

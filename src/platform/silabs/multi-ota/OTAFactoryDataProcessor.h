@@ -26,6 +26,9 @@
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
 
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 /**
  * OTA custom payload that uses Matter TLVs.
@@ -51,7 +54,7 @@ struct OTAFactoryPayload
     }
 };
 
-enum class FactoryTags
+enum class FactoryTags : uint8_t
 {
     kDacKey  = 1,
     kDacCert = 2,
@@ -77,4 +80,8 @@ private:
 protected:
     uint32_t GetAccumulatorLength() const override { return mLength; }
 };
+
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

@@ -73,7 +73,7 @@ struct ManagerInitParams
  * or watched cluster is changed).
  *
  */
-class Manager
+class Manager : public chip::FabricTable::Delegate
 {
 public:
     Manager() {}
@@ -122,6 +122,19 @@ public:
      */
     CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
 
+    /**
+     * @brief appends a binding to the list of bindings
+     *        This function is to be used when a device wants to add a binding to its own table
+     *        If entry is a unicast binding, BindingManager will be notified and will establish a case session with the peer device
+     *        Entry will be added to the binding table and persisted into storage
+     *        BindingManager will be notified and the binding added callback will be called if it has been set
+     *
+     * @param entry binding to add
+     */
+    CHIP_ERROR AddBindingEntry(const Binding::TableEntry & entry);
+
+    Table & GetBindingTable() { return mBindingTable; }
+
     static Manager & GetInstance() { return sBindingManager; }
 
 private:
@@ -166,11 +179,30 @@ private:
         Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
     };
 
+    void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+    {
+        auto & bindingTable = GetBindingTable();
+        auto iter           = bindingTable.begin();
+        while (iter != bindingTable.end())
+        {
+            if (iter->fabricIndex == fabricIndex)
+            {
+                TEMPORARY_RETURN_IGNORED bindingTable.RemoveAt(iter);
+            }
+            else
+            {
+                ++iter;
+            }
+        }
+        FabricRemoved(fabricIndex);
+    }
+
     static Manager sBindingManager;
 
     CHIP_ERROR EstablishConnection(const ScopedNodeId & nodeId);
 
-    PendingNotificationMap mPendingNotificationMap;
+    Table mBindingTable;
+    PendingNotificationMap mPendingNotificationMap{ mBindingTable };
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
     ManagerInitParams mInitParams;
 

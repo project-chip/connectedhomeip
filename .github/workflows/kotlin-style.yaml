@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: "checkout"
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: "detekt"
         uses: natiginfo/action-detekt-all@1.23.7
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-java@v5
         with:

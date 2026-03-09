@@ -19,6 +19,7 @@
  * @file Basic implementation of a binding table.
  */
 
+#include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
 
 namespace chip {
@@ -26,7 +27,10 @@ namespace app {
 namespace Clusters {
 namespace Binding {
 
-Table Table::sInstance;
+Table & Table::GetInstance()
+{
+    return Manager::GetInstance().GetBindingTable();
+}
 
 Table::Table()
 {

@@ -205,9 +205,9 @@ void ElectricalSensorManager::UpdateEPMAttributes(OperationalStateEnum state)
         ChipLogDetail(AppServer, "UpdateAllAttributes to Operational State : %d", updateState);
 
         // Added to support testing using a static array for now
-        gEPMDelegate->SetPowerMode(kAttributes[updateState].PowerMode);
-        gEPMDelegate->SetVoltage(MakeNullable(kAttributes[updateState].Voltage));
-        gEPMDelegate->SetActiveCurrent(MakeNullable(kAttributes[updateState].ActiveCurrent));
-        gEPMDelegate->SetActivePower(MakeNullable(kAttributes[updateState].ActivePower));
+        TEMPORARY_RETURN_IGNORED gEPMDelegate->SetPowerMode(kAttributes[updateState].PowerMode);
+        TEMPORARY_RETURN_IGNORED gEPMDelegate->SetVoltage(MakeNullable(kAttributes[updateState].Voltage));
+        TEMPORARY_RETURN_IGNORED gEPMDelegate->SetActiveCurrent(MakeNullable(kAttributes[updateState].ActiveCurrent));
+        TEMPORARY_RETURN_IGNORED gEPMDelegate->SetActivePower(MakeNullable(kAttributes[updateState].ActivePower));
     }
 }

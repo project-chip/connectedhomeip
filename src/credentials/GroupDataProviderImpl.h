@@ -27,9 +27,16 @@ namespace Credentials {
 class GroupDataProviderImpl : public GroupDataProvider
 {
 public:
-    static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
+    static constexpr size_t kIteratorsMax         = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
+    static constexpr uint16_t kMaxMembershipCount = CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT;
+    // Per spec, a single fabric cannot use more than half of the total memberships
+    static constexpr uint16_t kMaxMembershipPerFabric = kMaxMembershipCount / 2;
+    static constexpr uint16_t kMaxGroupKeysPerFabric  = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC;
 
-    GroupDataProviderImpl() = default;
+    // TODO Make this configurable. Note: if PGA feature is enabled it SHALL be >= 4. else it SHALL = 1.
+    static constexpr uint16_t kMaxMcastAddrCount = 4;
+
+    GroupDataProviderImpl() : GroupDataProvider(kMaxMembershipPerFabric, kMaxGroupKeysPerFabric) {}
     GroupDataProviderImpl(uint16_t maxGroupsPerFabric, uint16_t maxGroupKeysPerFabric) :
         GroupDataProvider(maxGroupsPerFabric, maxGroupKeysPerFabric)
     {}
@@ -48,6 +55,7 @@ public:
 
     CHIP_ERROR Init() override;
     void Finish() override;
+    bool IsInitialized() { return (mStorage != nullptr); }
 
     //
     // Group Info
@@ -64,8 +72,12 @@ public:
     // Endpoints
     bool HasEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) override;
     CHIP_ERROR AddEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) override;
+    CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id,
+                              GroupCleanupPolicy cleanupPolicy) override;
+    CHIP_ERROR RemoveEndpointAllGroups(FabricIndex fabric_index, EndpointId endpoint_id, GroupCleanupPolicy cleanupPolicy) override;
     CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) override;
     CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, EndpointId endpoint_id) override;
+    CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id) override;
     // Iterators
     GroupInfoIterator * IterateGroupInfo(FabricIndex fabric_index) override;
     EndpointIterator * IterateEndpoints(FabricIndex fabric_index, std::optional<GroupId> group_id = std::nullopt) override;
@@ -74,6 +86,7 @@ public:
     // Group-Key map
     //
 
+    CHIP_ERROR SetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id) override;
     CHIP_ERROR SetGroupKeyAt(FabricIndex fabric_index, size_t index, const GroupKey & info) override;
     CHIP_ERROR GetGroupKeyAt(FabricIndex fabric_index, size_t index, GroupKey & info) override;
     CHIP_ERROR RemoveGroupKeyAt(FabricIndex fabric_index, size_t index) override;
@@ -87,6 +100,7 @@ public:
     CHIP_ERROR SetKeySet(FabricIndex fabric_index, const ByteSpan & compressed_fabric_id, const KeySet & keys) override;
     CHIP_ERROR GetKeySet(FabricIndex fabric_index, chip::KeysetId keyset_id, KeySet & keys) override;
     CHIP_ERROR RemoveKeySet(FabricIndex fabric_index, chip::KeysetId keyset_id) override;
+    CHIP_ERROR GetGroupKey(FabricIndex fabric_index, GroupId group_id, KeysetId & keyset_id) override;
     CHIP_ERROR GetIpkKeySet(FabricIndex fabric_index, KeySet & out_keyset) override;
     KeySetIterator * IterateKeySets(FabricIndex fabric_index) override;
 
@@ -96,6 +110,10 @@ public:
     // Decryption
     Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex fabric_index, GroupId group_id) override;
     GroupSessionIterator * IterateGroupSessions(uint16_t session_id) override;
+
+    // Groupcast configurations
+    uint16_t getMaxMembershipCount() override { return kMaxMembershipCount; }
+    uint16_t getMaxMcastAddrCount() override { return kMaxMcastAddrCount; }
 
 protected:
     class GroupInfoIteratorImpl : public GroupInfoIterator
@@ -243,8 +261,6 @@ protected:
         bool mFirstMap           = true;
         GroupKeyContext mGroupKeyContext;
     };
-    bool IsInitialized() { return (mStorage != nullptr); }
-    CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id);
 
     PersistentStorageDelegate * mStorage       = nullptr;
     Crypto::SessionKeystore * mSessionKeystore = nullptr;

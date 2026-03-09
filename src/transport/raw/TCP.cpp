@@ -65,11 +65,7 @@ CHIP_ERROR GetPeerAddress(Inet::TCPEndPoint & endPoint, PeerAddress & outAddr)
 
 } // namespace
 
-TCPBase::~TCPBase()
-{
-    // Call Close to free the listening socket and close all active connections.
-    Close();
-}
+TCPBase::~TCPBase() = default;
 
 void TCPBase::CloseActiveConnections()
 {
@@ -160,6 +156,8 @@ ActiveTCPConnectionState * TCPBase::AllocateConnection(const Inet::TCPEndPointHa
                 char addrStr[Transport::PeerAddress::kMaxToStringSize];
                 activeConnection->mPeerAddr.ToString(addrStr);
                 ChipLogError(Inet, "Leaked TCP connection %p to %s.", activeConnection, addrStr);
+                // Try to notify callbacks in the hope that they release; the connection is no good
+                CloseConnectionInternal(*activeConnection, CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY, SuppressCallback::No);
             }
             ActiveTCPConnectionHandle releaseUnclaimed(activeConnection);
         }

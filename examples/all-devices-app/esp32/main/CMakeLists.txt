@@ -15,7 +15,7 @@
 #    limitations under the License.
 #
 
-get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+get_filename_component(CHIP_ROOT "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip" REALPATH)
 get_filename_component(ALL_DEVICES_COMMON_DIR ${CHIP_ROOT}/examples/all-devices-app/all-devices-common REALPATH)
 
 set(PRIV_INCLUDE_DIRS_LIST
@@ -24,98 +24,39 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${CHIP_ROOT}/examples/providers"
 )
 
-# Application sources
-set(APP_SRCS
-    "${CMAKE_CURRENT_LIST_DIR}/main.cpp"
-    "${CMAKE_CURRENT_LIST_DIR}/DeviceShellCommands.cpp"
-    # All-devices common sources
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface/DeviceInterface.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/interface/SingleEndpointDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor/BooleanStateSensorDevice.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/devices/root-node/RootNodeDevice.cpp"
-    # Providers
-    "${CHIP_ROOT}/examples/providers/DeviceInfoProviderImpl.cpp"
-    # Shell extension
-    "${CHIP_ROOT}/examples/platform/esp32/shell_extension/launch.cpp"
-)
-
-# Code-driven data model provider sources
-set(CODE_DRIVEN_SRCS
-    "${CHIP_ROOT}/src/data-model-providers/codedriven/CodeDrivenDataModelProvider.cpp"
-    "${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.cpp"
-    "${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/SpanEndpoint.cpp"
-)
-
-# Server and core app sources
-set(SERVER_SRCS
+# Keep top-level src/app files explicit to avoid pulling unrelated src/app/*.cpp.
+set(APP_TOPLEVEL_EXTRA_SRCS
     "${CHIP_ROOT}/src/app/SafeAttributePersistenceProvider.cpp"
     "${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp"
-    "${CHIP_ROOT}/src/app/server/AclStorage.cpp"
-    "${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp"
-    "${CHIP_ROOT}/src/app/server/DefaultAclStorage.cpp"
-    "${CHIP_ROOT}/src/app/server/DefaultTermsAndConditionsProvider.cpp"
-    "${CHIP_ROOT}/src/app/server/Dnssd.cpp"
-    "${CHIP_ROOT}/src/app/server/EchoHandler.cpp"
-    "${CHIP_ROOT}/src/app/server/Server.cpp"
-    "${CHIP_ROOT}/src/app/server/TermsAndConditionsManager.cpp"
-    "${CHIP_ROOT}/src/app/server/JointFabricAdministrator.cpp"
-    "${CHIP_ROOT}/src/app/server/JointFabricDatastore.cpp"
 )
 
-# Persistence sources
-set(PERSISTENCE_SRCS
-    "${CHIP_ROOT}/src/app/persistence/AttributePersistence.cpp"
-    "${CHIP_ROOT}/src/app/persistence/AttributePersistenceProviderInstance.cpp"
-    "${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp"
-    "${CHIP_ROOT}/src/app/persistence/DeferredAttributePersistenceProvider.cpp"
-    "${CHIP_ROOT}/src/app/persistence/String.cpp"
-)
+set(SRC_DIRS_LIST
+    "${CMAKE_CURRENT_LIST_DIR}"
+    "${CHIP_ROOT}/examples/providers"
+    "${CHIP_ROOT}/examples/platform/esp32/shell_extension"
+    "${CHIP_ROOT}/src/data-model-providers/codedriven"
+    "${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint"
+    "${CHIP_ROOT}/src/app/server"
+    "${CHIP_ROOT}/src/app/persistence"
+    "${CHIP_ROOT}/src/app/server-cluster"
 
-# Server cluster infrastructure
-set(SERVER_CLUSTER_SRCS
-    "${CHIP_ROOT}/src/app/server-cluster/AttributeListBuilder.cpp"
-    "${CHIP_ROOT}/src/app/server-cluster/DefaultServerCluster.cpp"
-    "${CHIP_ROOT}/src/app/server-cluster/ServerClusterInterface.cpp"
-    "${CHIP_ROOT}/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp"
-    "${CHIP_ROOT}/src/app/server-cluster/SingleEndpointServerClusterRegistry.cpp"
-)
-
-# Cluster implementations (new-style, excluding CodegenIntegration.cpp files)
-set(CLUSTER_SRCS
-    # Access Control
-    "${CHIP_ROOT}/src/app/clusters/access-control-server/access-control-cluster.cpp"
-    "${CHIP_ROOT}/src/app/clusters/access-control-server/ArlEncoder.cpp"
-    # Administrator Commissioning
-    "${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.cpp"
-    "${CHIP_ROOT}/src/app/clusters/administrator-commissioning-server/AdministratorCommissioningLogic.cpp"
-    # Basic Information
-    "${CHIP_ROOT}/src/app/clusters/basic-information/BasicInformationCluster.cpp"
-    # Boolean State
-    "${CHIP_ROOT}/src/app/clusters/boolean-state-server/BooleanStateCluster.cpp"
-    # Descriptor
-    "${CHIP_ROOT}/src/app/clusters/descriptor/DescriptorCluster.cpp"
-    # General Commissioning
-    "${CHIP_ROOT}/src/app/clusters/general-commissioning-server/GeneralCommissioningCluster.cpp"
-    # General Diagnostics
-    "${CHIP_ROOT}/src/app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.cpp"
-    # Group Key Management
-    "${CHIP_ROOT}/src/app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.cpp"
-    # Identify
-    "${CHIP_ROOT}/src/app/clusters/identify-server/IdentifyCluster.cpp"
-    # Network Commissioning
-    "${CHIP_ROOT}/src/app/clusters/network-commissioning/NetworkCommissioningCluster.cpp"
-    "${CHIP_ROOT}/src/app/clusters/network-commissioning/WifiScanResponse.cpp"
-    # Operational Credentials
-    "${CHIP_ROOT}/src/app/clusters/operational-credentials-server/OperationalCredentialsCluster.cpp"
-    # Software Diagnostics (header-only cluster, uses SoftwareDiagnosticsLogic)
-    "${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/SoftwareDiagnosticsLogic.cpp"
-    "${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/software-fault-listener.cpp"
-    # WiFi Network Diagnostics
-    "${CHIP_ROOT}/src/app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.cpp"
+    # all-devices-common device modules
+    "${ALL_DEVICES_COMMON_DIR}/devices/boolean-state-sensor"
+    "${ALL_DEVICES_COMMON_DIR}/devices/chime"
+    "${ALL_DEVICES_COMMON_DIR}/devices/chime/impl"
+    "${ALL_DEVICES_COMMON_DIR}/devices/interface"
+    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor"
+    "${ALL_DEVICES_COMMON_DIR}/devices/occupancy-sensor/impl"
+    "${ALL_DEVICES_COMMON_DIR}/devices/on-off-light"
+    "${ALL_DEVICES_COMMON_DIR}/devices/root-node"
+    "${ALL_DEVICES_COMMON_DIR}/devices/speaker"
+    "${ALL_DEVICES_COMMON_DIR}/devices/speaker/impl"
 )
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
-                       SRCS ${APP_SRCS} ${CODE_DRIVEN_SRCS} ${SERVER_SRCS} ${PERSISTENCE_SRCS} ${SERVER_CLUSTER_SRCS} ${CLUSTER_SRCS})
+                       SRC_DIRS ${SRC_DIRS_LIST})
+
+target_sources(${COMPONENT_LIB} PRIVATE ${APP_TOPLEVEL_EXTRA_SRCS})
 
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
