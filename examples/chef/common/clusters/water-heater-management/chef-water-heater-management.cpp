@@ -1,0 +1,149 @@
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "chef-water-heater-management.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::WaterHeaterManagement;
+
+#if MATTER_DM_PLUGIN_WATER_HEATER_MANAGEMENT_SERVER_ENDPOINT_COUNT > 0
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace WaterHeaterManagement {
+namespace Chef {
+
+namespace {
+static void OnTimerTick(System::Layer * systemLayer, void * data)
+{
+    ChefDelegate * delegate = reinterpret_cast<ChefDelegate *>(data);
+    delegate->TimerTick();
+}
+} // namespace
+
+Protocols::InteractionModel::Status ChefDelegate::HandleBoost(uint32_t duration, Optional<bool> oneShot,
+                                                              Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint,
+                                                              Optional<Percent> targetPercentage, Optional<Percent> targetReheat)
+{
+    ChipLogProgress(DeviceLayer, "Inside ChefDelegate::HandleBoost");
+
+    if (duration < 60)
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+
+    DeviceLayer::SystemLayer().CancelTimer(OnTimerTick, this);
+    mBoostInfo.ClearValue();
+
+    mBoostState = BoostStateEnum::kActive;
+    MatterReportingAttributeChangeCallback(mEndpointId, WaterHeaterManagement::Id, Attributes::BoostState::Id);
+
+    Structs::WaterHeaterBoostInfoStruct::Type boostInfo;
+    boostInfo.duration          = duration;
+    boostInfo.oneShot           = oneShot;
+    boostInfo.emergencyBoost    = emergencyBoost;
+    boostInfo.temporarySetpoint = temporarySetpoint;
+    boostInfo.targetPercentage  = targetPercentage;
+    boostInfo.targetReheat      = targetReheat;
+
+    mBoostInfo.SetValue(boostInfo);
+    mBoostInfo.Value().duration--;
+
+    GenerateBoostStartedEvent(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat);
+
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), OnTimerTick, this);
+
+    return Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status ChefDelegate::HandleCancelBoost()
+{
+    DeviceLayer::SystemLayer().CancelTimer(OnTimerTick, this);
+    mBoostInfo.ClearValue();
+
+    mBoostState = BoostStateEnum::kInactive;
+    MatterReportingAttributeChangeCallback(mEndpointId, WaterHeaterManagement::Id, Attributes::BoostState::Id);
+
+    GenerateBoostEndedEvent();
+
+    return Protocols::InteractionModel::Status::Success;
+}
+
+void ChefDelegate::TimerTick()
+{
+    if (mBoostState != BoostStateEnum::kActive)
+    {
+        return;
+    }
+
+    if (!mBoostInfo.HasValue() || mBoostInfo.Value().duration == 0)
+    {
+        HandleCancelBoost();
+        return;
+    }
+
+    mBoostInfo.Value().duration--;
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), OnTimerTick, this);
+}
+
+Energy_mWh ChefDelegate::GetEstimatedHeatRequired()
+{
+    int16_t occupiedHeatingSetpoint;
+    int16_t localTemperature;
+
+    if (Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Get(mEndpointId, &occupiedHeatingSetpoint) !=
+        Protocols::InteractionModel::Status::Success)
+    {
+        occupiedHeatingSetpoint = 2000; // Default 20C
+    }
+
+    if (Clusters::Thermostat::Attributes::LocalTemperature::Get(mEndpointId, &localTemperature) !=
+        Protocols::InteractionModel::Status::Success)
+    {
+        localTemperature = 2000; // Default 20C
+    }
+
+    if (localTemperature >= occupiedHeatingSetpoint)
+    {
+        return 0;
+    }
+
+    // Formula: Energy (mWh) = (4182 * (OccupiedHeatingSetpoint - LocalTemperature) * Volume) / 3600 * (1 - TankPercentage / 100)
+    // Note: Use milliwatt-hours as per the energy_mwh type.
+    double tempDiff = static_cast<double>(occupiedHeatingSetpoint) - static_cast<double>(localTemperature);
+    double energy   = (4182.0 * tempDiff * static_cast<double>(mTankVolume)) / 3600.0;
+    energy          = energy * (1.0 - (static_cast<double>(mTankPercentage) / 100.0));
+
+    return static_cast<Energy_mWh>(energy);
+}
+
+} // namespace Chef
+} // namespace WaterHeaterManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+#endif // MATTER_DM_PLUGIN_WATER_HEATER_MANAGEMENT_SERVER

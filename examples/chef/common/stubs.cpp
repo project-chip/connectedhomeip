@@ -9,6 +9,7 @@
 #include <devices/Types.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPMem.h> // For chip::Platform
+#include <lib/support/TypeTraits.h>
 
 using chip::app::DataModel::Nullable;
 
@@ -96,6 +97,10 @@ void InitIdentifyCluster()
 #if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #include "application-launch/chef-application-launch-delegate.h"
 #endif // MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
+
+#if MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/water-heater-management/chef-water-heater-management.h"
+#endif
 
 namespace {
 
@@ -393,6 +398,16 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         HandleFanControlAttributeChange(attributeId, type, size, value);
     }
 #endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+#if (MATTER_DM_PLUGIN_WATER_HEATER_MANAGEMENT_SERVER_ENDPOINT_COUNT > 0) && (MATTER_DM_PLUGIN_THERMOSTAT_SERVER_ENDPOINT_COUNT > 0)
+    if (clusterId == Thermostat::Id &&
+        (attributeId == Thermostat::Attributes::OccupiedHeatingSetpoint::Id ||
+         attributeId == Thermostat::Attributes::LocalTemperature::Id) &&
+        DeviceTypes::EndpointHasDeviceType(1, Device::kWaterHeaterDeviceTypeId))
+    {
+        MatterReportingAttributeChangeCallback(attributePath.mEndpointId, WaterHeaterManagement::Id,
+                                               WaterHeaterManagement::Attributes::EstimatedHeatRequired::Id);
+    }
+#endif
 }
 
 /** @brief OnOff Cluster Init
@@ -672,6 +687,31 @@ void CastingvideoplayerContentappInit()
 #endif
 }
 
+/*
+ * This initializer is for the casting video player application rootnode_waterheater_21bd13d651. To not have this initialiser
+ * affect new apps video player device types, use different endpoints.
+ */
+void WaterHeaterInit()
+{
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: WaterHeaterInit called more than once");
+    called = true;
+
+#if (MATTER_DM_PLUGIN_WATER_HEATER_MANAGEMENT_SERVER_ENDPOINT_COUNT > 0) && (MATTER_DM_PLUGIN_THERMOSTAT_SERVER_ENDPOINT_COUNT > 0)
+    if (!DeviceTypes::EndpointHasDeviceType(1, Device::kWaterHeaterDeviceTypeId))
+    {
+        return;
+    }
+    static WaterHeaterManagement::Chef::ChefDelegate delegate;
+    delegate.SetEndpointId(1);
+    static WaterHeaterManagement::Instance instance(
+        1, delegate,
+        WaterHeaterManagement::Feature(to_underlying(WaterHeaterManagement::Feature::kTankPercent) |
+                                       to_underlying(WaterHeaterManagement::Feature::kEnergyManagement)));
+    instance.Init();
+#endif
+}
+
 void ApplicationInit()
 {
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
@@ -681,6 +721,7 @@ void ApplicationInit()
     GenericSwitchInit();
     LaundryDryerInit();
     CastingvideoplayerContentappInit();
+    WaterHeaterInit();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
