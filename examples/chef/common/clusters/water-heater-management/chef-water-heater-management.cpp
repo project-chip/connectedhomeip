@@ -72,7 +72,13 @@ Protocols::InteractionModel::Status ChefDelegate::HandleBoost(uint32_t duration,
     mBoostInfo.SetValue(boostInfo);
     mBoostInfo.Value().duration--;
 
-    GenerateBoostStartedEvent(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat);
+    CHIP_ERROR err =
+        GenerateBoostStartedEvent(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "HandleBoost: Failed to generate BoostStarted event: %" CHIP_ERROR_FORMAT, err.Format());
+        return Protocols::InteractionModel::Status::Failure;
+    }
 
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), OnTimerTick, this);
 
@@ -87,7 +93,12 @@ Protocols::InteractionModel::Status ChefDelegate::HandleCancelBoost()
     mBoostState = BoostStateEnum::kInactive;
     MatterReportingAttributeChangeCallback(mEndpointId, WaterHeaterManagement::Id, Attributes::BoostState::Id);
 
-    GenerateBoostEndedEvent();
+    CHIP_ERROR err = GenerateBoostEndedEvent();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "HandleCancelBoost: Failed to generate BoostEnded event: %" CHIP_ERROR_FORMAT, err.Format());
+        return Protocols::InteractionModel::Status::Failure;
+    }
 
     return Protocols::InteractionModel::Status::Success;
 }

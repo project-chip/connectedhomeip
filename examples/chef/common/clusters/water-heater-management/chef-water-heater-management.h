@@ -42,9 +42,9 @@ public:
     Energy_mWh GetEstimatedHeatRequired() override;
     Percent GetTankPercentage() override { return mTankPercentage; }
     BoostStateEnum GetBoostState() override { return mBoostState; }
+    void TimerTick();
 
 private:
-    void TimerTick();
     BitMask<WaterHeaterHeatSourceBitmap> mHeaterTypes =
         to_underlying(WaterHeaterHeatSourceBitmap::kImmersionElement1) | to_underlying(WaterHeaterHeatSourceBitmap::kHeatPump);
     BitMask<WaterHeaterHeatSourceBitmap> mHeatDemand = 0;
