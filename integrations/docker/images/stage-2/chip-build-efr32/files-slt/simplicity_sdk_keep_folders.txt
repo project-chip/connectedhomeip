@@ -1,0 +1,166 @@
+# Top-level Simplicity SDK folders to keep when trimming (referenced by SiWx917_sdk.gni and efr32_sdk.gni).
+# One folder per line (no path). Library paths (lines ending .a) are used only to keep those .a files; other .a are removed.
+# Parse folders: grep -v '^#' simplicity_sdk_keep_folders.txt | grep -v '^$' | grep -v '\.a$'
+# Parse kept libraries: grep -v '^#' simplicity_sdk_keep_folders.txt | grep -v '^$' | grep '\.a$'
+# Sections: SiWx917_sdk.gni, efr32_sdk.gni, then "all" (combined unique).
+
+# SiWx917_sdk.gni
+board_drivers
+cmsis
+cmsis_common
+freertos
+glib
+openthread_stack
+platform_common
+platform_core
+segger
+security_mbedtls
+security_mbedtls_source
+security_se_manager
+
+# efr32_sdk.gni
+app
+bgapi_protocol
+bluetooth_apploader
+bluetooth_common
+bluetooth_le_controller
+bluetooth_le_host
+bluetooth_le_middleware
+bluetooth_mesh
+board_drivers
+boards
+bootloader
+bootloader_interface
+cmsis
+cmsis_common
+common_15_4
+devices
+freertos
+glib
+lwip
+openthread
+openthread_stack
+platform
+platform_common
+platform_core
+rail_library
+security_mbedtls
+security_mbedtls_source
+security_se_manager
+segger
+util
+
+# efr32_sdk.gni libraries (.a)
+openthread/build/gcc/cortex-m33/cmake/sl-openthread-library/Release/libsl_openthread.a
+# openthread/libs (all .a from connectedhomeip_silabs)
+openthread/libs/libsl_ot_stack_ftd_coap_efr32mg21_gcc.a
+openthread/libs/libsl_ot_stack_ftd_coap_efr32mg24_gcc.a
+openthread/libs/libsl_ot_stack_ftd_coap_efr32mg26_gcc.a
+openthread/libs/libsl_ot_stack_ftd_coap_simg301_gcc.a
+openthread/libs/libsl_ot_stack_ftd_efr32mg21_gcc.a
+openthread/libs/libsl_ot_stack_ftd_efr32mg24_gcc.a
+openthread/libs/libsl_ot_stack_ftd_efr32mg26_gcc.a
+openthread/libs/libsl_ot_stack_ftd_mi_coap_efr32mg21_gcc.a
+openthread/libs/libsl_ot_stack_ftd_mi_coap_efr32mg24_gcc.a
+openthread/libs/libsl_ot_stack_ftd_mi_coap_efr32mg26_gcc.a
+openthread/libs/libsl_ot_stack_ftd_mi_coap_simg301_gcc.a
+openthread/libs/libsl_ot_stack_ftd_simg301_gcc.a
+openthread/libs/libsl_ot_stack_mtd_coap_efr32mg21_gcc.a
+openthread/libs/libsl_ot_stack_mtd_coap_efr32mg24_gcc.a
+openthread/libs/libsl_ot_stack_mtd_coap_efr32mg26_gcc.a
+openthread/libs/libsl_ot_stack_mtd_coap_simg301_gcc.a
+openthread/libs/libsl_ot_stack_mtd_efr32mg21_gcc.a
+openthread/libs/libsl_ot_stack_mtd_efr32mg24_gcc.a
+openthread/libs/libsl_ot_stack_mtd_efr32mg26_gcc.a
+openthread/libs/libsl_ot_stack_mtd_mi_coap_efr32mg21_gcc.a
+openthread/libs/libsl_ot_stack_mtd_mi_coap_efr32mg24_gcc.a
+openthread/libs/libsl_ot_stack_mtd_mi_coap_efr32mg26_gcc.a
+openthread/libs/libsl_ot_stack_mtd_mi_coap_simg301_gcc.a
+openthread/libs/libsl_ot_stack_mtd_simg301_gcc.a
+openthread/libs/libsl_ot_stack_tcp_efr32mg21_gcc.a
+openthread/libs/libsl_ot_stack_tcp_efr32mg24_gcc.a
+openthread/libs/libsl_ot_stack_tcp_efr32mg26_gcc.a
+openthread/libs/libsl_ot_stack_tcp_simg301_gcc.a
+# bluetooth_apploader/build/gcc/cortex-m33/release
+bluetooth_apploader/build/gcc/cortex-m33/release/libapploader.a
+# bluetooth_common/lib/build/gcc/cortex-m33/bgcommon/release
+bluetooth_common/lib/build/gcc/cortex-m33/bgcommon/release/libbgcommon.a
+# bluetooth_le_controller/build/gcc (all variants)
+bluetooth_le_controller/build/gcc/x301/release/liblinklayer.a
+bluetooth_le_controller/build/gcc/xg21/release/liblinklayer.a
+bluetooth_le_controller/build/gcc/xg22/release/liblinklayer.a
+bluetooth_le_controller/build/gcc/xg24/release/liblinklayer.a
+bluetooth_le_controller/build/gcc/xg26/release/liblinklayer.a
+bluetooth_le_controller/build/gcc/xg27/release/liblinklayer.a
+bluetooth_le_controller/build/gcc/xg28/release/liblinklayer.a
+bluetooth_le_controller/build/gcc/xg29/release/liblinklayer.a
+# bluetooth_le_host/build/gcc/cortex-m33
+bluetooth_le_host/build/gcc/cortex-m33/accept_list/release/libble_host_accept_list.a
+bluetooth_le_host/build/gcc/cortex-m33/accept_list/release/libble_host_accept_list_stub.a
+bluetooth_le_host/build/gcc/cortex-m33/bgstack/release/libble_host.a
+bluetooth_le_host/build/gcc/cortex-m33/bgstack/release/libbondingdb.a
+bluetooth_le_host/build/gcc/cortex-m33/bgstack/release/libbondingdb_stub.a
+bluetooth_le_host/build/gcc/cortex-m33/ble_bgapi/release/libble_bgapi.a
+bluetooth_le_host/build/gcc/cortex-m33/ble_bgapi/release/libble_bgapi_gatt_client.a
+bluetooth_le_host/build/gcc/cortex-m33/ble_bgapi/release/libble_bgapi_gatt_server.a
+bluetooth_le_host/build/gcc/cortex-m33/ble_bgapi/release/libble_bgapi_stub_gatt_client.a
+bluetooth_le_host/build/gcc/cortex-m33/ble_bgapi/release/libble_bgapi_stub_gatt_server.a
+bluetooth_le_host/build/gcc/cortex-m33/ble_system/release/libble_system.a
+bluetooth_le_host/build/gcc/cortex-m33/channel_classification/release/libble_host_channel_classification.a
+bluetooth_le_host/build/gcc/cortex-m33/connection_subrating/release/libble_host_connection_subrating.a
+bluetooth_le_host/build/gcc/cortex-m33/connection_subrating/release/libble_host_connection_subrating_stub.a
+bluetooth_le_host/build/gcc/cortex-m33/core/release/libble_host_core.a
+bluetooth_le_host/build/gcc/cortex-m33/cte_transmitter/release/libble_host_cte_transmitter.a
+bluetooth_le_host/build/gcc/cortex-m33/hal/release/libble_host_hal_series2.a
+bluetooth_le_host/build/gcc/cortex-m33/hal/release/libble_host_hal_series3.a
+bluetooth_le_host/build/gcc/cortex-m33/hci/release/libble_host_hci.a
+bluetooth_le_host/build/gcc/cortex-m33/linklayer_interface/release/libble_host_linklayer_interface.a
+bluetooth_le_host/build/gcc/cortex-m33/system/release/libble_host_system.a
+# bgapi_protocol/build/gcc/cortex-m33 (all .a from connectedhomeip_silabs)
+bgapi_protocol/build/gcc/cortex-m33/bgapi_service/release/libbgapi_service.a
+bgapi_protocol/build/gcc/cortex-m33/bgapi_service/system/release/libbgapi_service_system.a
+bgapi_protocol/build/gcc/cortex-m33/bgapi_trace/release/libbgapi_trace_stub.a
+bgapi_protocol/build/gcc/cortex-m33/protocol/command/release/libbgapi_command.a
+bgapi_protocol/build/gcc/cortex-m33/protocol/core/release/libbgapi_core.a
+bgapi_protocol/build/gcc/cortex-m33/protocol/device/release/libbgapi_device.a
+bgapi_protocol/build/gcc/cortex-m33/protocol/event/release/libbgapi_event.a
+bgapi_protocol/build/gcc/cortex-m33/protocol/release/libbgapi_protocol.a
+bgapi_protocol/build/gcc/cortex-m33/rtos_adaptation/release/libbgapi_protocol_rtos_adaptation_stub.a
+rail_library/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a
+rail_library/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a
+rail_library/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a
+rail_library/autogen/librail_release/librail_config_mgm240pb32vna_gcc.a
+rail_library/autogen/librail_release/librail_config_mgm240pb22vna_gcc.a
+rail_library/autogen/librail_release/librail_config_mgm240l022rnf_gcc.a
+rail_library/autogen/librail_release/librail_config_mgm240sd22vna_gcc.a
+
+# all (combined unique, alphabetical)
+bgapi_protocol
+bluetooth_apploader
+bluetooth_common
+bluetooth_le_controller
+bluetooth_le_host
+bluetooth_le_middleware
+bluetooth_mesh
+board_drivers
+boards
+bootloader
+bootloader_interface
+cmsis
+cmsis_common
+common_15_4
+devices
+freertos
+glib
+lwip
+openthread
+openthread_stack
+platform
+platform_common
+platform_core
+rail_library
+segger
+security_mbedtls
+security_mbedtls_source
+security_se_manager
+util

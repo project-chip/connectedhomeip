@@ -41,12 +41,8 @@
 #include <algorithm>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
-#include <app/server/ThreadRendezvousAnnouncement.h>
-#include <inttypes.h>
-#include <stdarg.h>
-#include <stdio.h>
-
 #include <app/server/Server.h>
+#include <app/server/ThreadRendezvousAnnouncement.h> // nogncheck
 #endif
 
 using namespace chip;

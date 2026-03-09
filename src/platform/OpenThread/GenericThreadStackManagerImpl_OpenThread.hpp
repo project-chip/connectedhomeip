@@ -225,6 +225,15 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
                 if (mIsAttached)
                 {
                     delegate->OnConnectionStatusChanged(app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kConnected);
+
+                    // Remove kLinkDown fault if it was set, as the device is now connected.
+                    GeneralFaults<kMaxNetworkFaults> current = mNetworkFaults;
+                    if (current.remove(to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown)) ==
+                        CHIP_NO_ERROR)
+                    {
+                        delegate->OnNetworkFaultChanged(mNetworkFaults, current);
+                        mNetworkFaults = current;
+                    }
                 }
                 else
                 {
@@ -970,8 +979,10 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::SendRendezvousAnnounce
         mRendezvousRetransmissionCount++;
         if (mRendezvousRetransmissionCount < kMaxRendezvousRetransmissions)
         {
+            const uint32_t kRendezvousRetransmissionIntervalMs = 1250;
             ChipLogProgress(DeviceLayer, "Try the current Thread network #%u", mRendezvousRetransmissionCount);
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(1250), _HandleRendezvousRetransmissionTimer, this);
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kRendezvousRetransmissionIntervalMs),
+                                                  _HandleRendezvousRetransmissionTimer, this);
         }
         else
         {
@@ -1357,7 +1368,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSr
     {
         if (service.IsUsed() && service.mIsInvalid)
         {
-            ChipLogProgress(DeviceLayer, "removing srp service: %s.%s", service.mService.mInstanceName, service.mService.mName);
+            ChipLogProgress(DeviceLayer, "removing invalid srp service: %s.%s", service.mService.mInstanceName,
+                            service.mService.mName);
             error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &service.mService));
             SuccessOrExit(error);
         }

@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import enum
+import json
 import logging
 import multiprocessing
 import os
@@ -22,7 +24,8 @@ import random
 import sys
 import time
 import warnings
-from dataclasses import dataclass
+from collections import Counter
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -33,14 +36,18 @@ from chiptest.concurrent.worker import WorkerError
 from chiptest.concurrent.pool import TestPool
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_utils import LogConfig
-from chiptest.runner import SubprocessKind
 from chiptest.test_definition import SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 from chiptest.log_utils import LOG_LEVELS
 
+import python_path
+
+with python_path.PythonPath('../../../src/python_testing/matter_testing_infrastructure', relative_to=__file__):
+    # Import all symbols used downstream not only those we use ourselves
+    from matter.testing.tasks import SubprocessKind  # noqa: F401
+
 log = logging.getLogger(__name__)
 
-# If running on Linux platform load the Linux specific code.
 if sys.platform == "linux":
     import chiptest.linux
 
@@ -67,6 +74,47 @@ class RunContext:
 
     # Deprecated options passed to `cmd_run`
     deprecated_chip_tool_path: Path | None = None
+
+
+class TestStatus(enum.Enum):
+    PASSED = "passed"
+    FAILED = "failed"
+    DRY_RUN = "dry_run"
+
+
+@dataclass
+class TestResult:
+    name: str
+    iteration: int
+    status: TestStatus
+    duration_seconds: float
+
+
+@dataclass
+class RunSummary:
+    run_timestamp: datetime.datetime
+    iterations: int
+    total_runs: int = 0
+    passed: int = 0
+    failed: int = 0
+    results: list[TestResult] = field(default_factory=list)
+
+    def record(self, name: str, iteration: int, status: TestStatus, duration: float) -> None:
+        self.results.append(TestResult(name=name, iteration=iteration, status=status, duration_seconds=round(duration, 3)))
+        if status == TestStatus.PASSED:
+            self.passed += 1
+        elif status == TestStatus.FAILED:
+            self.failed += 1
+
+    def write_json(self, path: Path) -> None:
+        data = asdict(self)
+        data["run_timestamp"] = self.run_timestamp.isoformat()
+        # Convert Enum to string for JSON serialization
+        for result in data["results"]:
+            result["status"] = result["status"].value
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(data, indent=2))
+        log.info("Test run summary written to %s", path)
 
 
 # TODO: When we update click to >= 8.2.0 we will be able to use the builtin `deprecated` argument for Option
@@ -172,7 +220,6 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     default='chip_tool_python',
     help='Run YAML tests using the specified runner.')
 @click.option(
-
     '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
@@ -363,7 +410,7 @@ class Terminable(Protocol):
 )
 @click.option(
     '--tool-path', multiple=True, metavar="<key>:<path>",
-    help='Set path for a tool (run in tool network namespace), use `--help-paths` to list known keys'
+    help='Set path for a controller (run in controller network namespace), use `--help-paths` to list known keys'
 )
 @click.option(
     '--discover-paths',
@@ -375,7 +422,7 @@ class Terminable(Protocol):
     '--help-paths',
     is_flag=True,
     default=False,
-    help="Print keys for known application and tool paths"
+    help="Print keys for known application and controller paths"
 )
 @click.option(
     '--pics-file',
@@ -406,6 +453,11 @@ class Terminable(Protocol):
     default='on-network',
     help='Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth and Thread mock servers. "thread-meshcop" performs Thread commissioning using Thread mock server. This option is Linux-only.')
 @click.option(
+    '--summary-file',
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help='If provided, write a JSON test-run summary to this file at the end of the run.')
+@click.option(
     '--concurrency',
     default=1,
     show_default=True,
@@ -435,7 +487,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
             microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None, energy_gateway_app: Path | None,
             water_heater_app: Path | None, evse_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
-            chip_tool_with_python: Path | None) -> None:
+            chip_tool_with_python: Path | None, summary_file: Path | None) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
@@ -477,9 +529,9 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     handle_deprecated_pathopt('evse', evse_app, SubprocessKind.APP)
     handle_deprecated_pathopt('closure', closure_app, SubprocessKind.APP)
 
-    handle_deprecated_pathopt('matter-repl-yaml-tester', matter_repl_yaml_tester, SubprocessKind.CTRL)
-    handle_deprecated_pathopt('chip-tool-with-python', chip_tool_with_python, SubprocessKind.CTRL)
-    handle_deprecated_pathopt('chip-tool', context.obj.deprecated_chip_tool_path, SubprocessKind.CTRL)
+    handle_deprecated_pathopt('matter-repl-yaml-tester', matter_repl_yaml_tester, SubprocessKind.TOOL)
+    handle_deprecated_pathopt('chip-tool-with-python', chip_tool_with_python, SubprocessKind.TOOL)
+    handle_deprecated_pathopt('chip-tool', context.obj.deprecated_chip_tool_path, SubprocessKind.TOOL)
 
     # New-style options override the deprecated ones
     for p in app_path:
@@ -489,7 +541,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
             raise click.BadOptionUsage("app-path", f"Invalid app path specifier '{p}': {e}")
     for p in tool_path:
         try:
-            subproc_info_repo.addSpec(p, kind=SubprocessKind.CTRL)
+            subproc_info_repo.addSpec(p, kind=SubprocessKind.TOOL)
         except ValueError as e:
             raise click.BadOptionUsage("tool-path", f"Invalid tool path specifier '{p}': {e}")
 
@@ -524,12 +576,92 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
     config = TestJobConfig(wifi_required, thread_required, commissioning_method, concurrency, concurrency_status, concurrency_mode,
                            dry_run, subproc_info_repo, pics_file, context.obj.runtime, test_timeout_seconds, iterations, keep_going,
-                           expected_failures)
+                           expected_failures, summary_file)
     try:
         TestPool.run_tests(context.obj.log_config, config, context.obj.tests)
     except WorkerError as e:
         log.exception("%s", e, exc_info=e)
         sys.exit(1)
+
+
+@main.command(
+    'summarize',
+    help='Pretty-print a JSON summary file produced by the "run" command.')
+@click.option(
+    '--summary-file',
+    required=True,
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    help='Path to the JSON summary file to display.')
+@click.option(
+    '--top-slowest',
+    default=20,
+    show_default=True,
+    type=click.IntRange(min=1),
+    help='Number of slowest tests to include in the timing table.')
+def cmd_summarize(summary_file: Path, top_slowest: int) -> None:
+    raw = json.loads(summary_file.read_text())
+    results: list[dict] = raw.get("results", [])
+
+    passed = raw.get("passed", 0)
+    failed = raw.get("failed", 0)
+    total = raw.get("total_runs", len(results))
+    iterations = raw.get("iterations", 1)
+    ts = raw.get("run_timestamp", "unknown")
+
+    sep = "=" * 72
+
+    print(sep)
+    print("  TEST RUN SUMMARY")
+    print(sep)
+    print(f"  Run timestamp : {ts}")
+    print(f"  Iterations    : {iterations}")
+    print(f"  Total runs    : {total}")
+    print(f"  Passed        : {passed}")
+    print(f"  Failed        : {failed}")
+    if total:
+        print(f"  Pass rate     : {100 * passed / total:.1f}%")
+    print(sep)
+
+    failed_results = [r for r in results if r["status"] == TestStatus.FAILED.value]
+    if failed_results:
+        print(f"\n  FAILED TESTS ({len(failed_results)}):")
+        print(f"  {'Test name':<50} {'Iter':>4}  {'Duration':>10}")
+        print("  " + "-" * 68)
+        for r in sorted(failed_results, key=lambda x: x["name"]):
+            print(f"  {'✗  ' + r['name']:<50} {r['iteration']:>4}  {r['duration_seconds']:>9.2f}s")
+    else:
+        print("\n  No failures recorded.")
+
+    if iterations > 1:
+        fail_counts: Counter = Counter()
+        run_counts: Counter = Counter()
+        for r in results:
+            run_counts[r["name"]] += 1
+            if r["status"] == TestStatus.FAILED.value:
+                fail_counts[r["name"]] += 1
+        flaky = [(name, fail_counts[name], run_counts[name]) for name in fail_counts if fail_counts[name] > 0]
+        if flaky:
+            print(f"\n  FAILURE RATE BY TEST (across {iterations} iterations):")
+            print(f"  {'Test name':<50} {'Failures':>8}  {'Rate':>8}")
+            print("  " + "-" * 70)
+            for name, fails, runs in sorted(flaky, key=lambda x: -x[1]):
+                rate = 100 * fails / runs
+                print(f"  {name:<50} {fails:>5}/{runs:<2}  {rate:>7.1f}%")
+
+    slowest = sorted(
+        [r for r in results if r["status"] != TestStatus.DRY_RUN.value],
+        key=lambda x: -x["duration_seconds"]
+    )[:top_slowest]
+
+    if slowest:
+        print(f"\n  SLOWEST {top_slowest} TEST RUNS:")
+        print(f"  {'Test name':<50} {'Status':<8} {'Iter':>4}  {'Duration':>10}")
+        print("  " + "-" * 76)
+        for r in slowest:
+            mark = "✓" if r["status"] == TestStatus.PASSED.value else "✗"
+            print(f"  {mark + '  ' + r['name']:<50} {r['status']:<8} {r['iteration']:>4}  {r['duration_seconds']:>9.2f}s")
+
+    print(sep)
 
 
 # On Linux, allow an execution shell to be prepared

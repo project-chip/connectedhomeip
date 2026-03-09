@@ -27,7 +27,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, StrEnum, auto
 from pathlib import Path
-from types import MappingProxyType
 
 from .accessories import AppsRegister
 from .runner import LogPipe, Runner, SubprocessInfo, SubprocessKind
@@ -277,12 +276,12 @@ BUILTIN_SUBPROC_DATA = {
     'water-leak-detector': KnownSubprocessEntry(kind=SubprocessKind.APP, target_name='water-leak-detector-app'),
 
     # Tools
-    'chip-tool': KnownSubprocessEntry(kind=SubprocessKind.CTRL, target_name='chip-tool'),
-    'darwin-framework-tool': KnownSubprocessEntry(kind=SubprocessKind.CTRL, target_name='darwin-framework-tool'),
-    'matter-repl-yaml-tester': KnownSubprocessEntry(kind=SubprocessKind.CTRL, target_name='yamltest_with_matter_repl_tester.py'),
+    'chip-tool': KnownSubprocessEntry(kind=SubprocessKind.TOOL, target_name='chip-tool'),
+    'darwin-framework-tool': KnownSubprocessEntry(kind=SubprocessKind.TOOL, target_name='darwin-framework-tool'),
+    'matter-repl-yaml-tester': KnownSubprocessEntry(kind=SubprocessKind.TOOL, target_name='yamltest_with_matter_repl_tester.py'),
 
     # No target_name as this is either chiptool.py or darwinframework.py depending on the selected TestRunTime
-    'chip-tool-with-python': KnownSubprocessEntry(kind=SubprocessKind.CTRL)
+    'chip-tool-with-python': KnownSubprocessEntry(kind=SubprocessKind.TOOL)
 }
 
 
@@ -498,7 +497,7 @@ class TestDefinition:
             if not dry_run:
                 for key, subproc in subproc_info_repo.items():
                     # Do not add controller tools to the register
-                    if subproc.kind == SubprocessKind.CTRL:
+                    if subproc.kind == SubprocessKind.TOOL:
                         continue
 
                     # For the app indicated by target, give it the 'default' key to add to the register
@@ -510,7 +509,8 @@ class TestDefinition:
                     if op_network == 'Thread':
                         # The node id must not conflict with ThreadBorderRouter.NODE_ID
                         subproc = subproc.with_args("--thread-node-id=2")
-                    elif ble_controller_app is not None:
+
+                    if ble_controller_app is not None:
                         subproc = subproc.with_args("--ble-controller", str(ble_controller_app))
                         if op_network == 'WiFi':
                             subproc = subproc.with_args("--wifi")
@@ -576,7 +576,7 @@ class TestDefinition:
                         pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
                 elif op_network == 'Thread' and thread_ba_host is not None and thread_ba_port is not None:
                     pairing_cmd = pairing_cmd.with_args(
-                        "pairing", "code-thread", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", setupCode,
+                        "pairing", "thread-meshcop", TEST_NODE_ID, f"hex:{TEST_THREAD_DATASET}", setupCode,
                         "--thread-ba-host", thread_ba_host, "--thread-ba-port", str(thread_ba_port))
                 else:
                     pairing_cmd = pairing_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)

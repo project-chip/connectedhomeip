@@ -224,7 +224,11 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             return CHIP_ERROR_INTERNAL;
         }
 
-        destination_address = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
+        Credentials::GroupDataProvider::GroupInfo info;
+        ReturnErrorOnFailure(groups->GetGroupInfo(groupSession->GetFabricIndex(), groupSession->GetGroupId(), info));
+        destination_address = (info.UsePerGroupAddress())
+            ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId())
+            : Transport::PeerAddress::Groupcast();
 
         Crypto::SymmetricKeyContext * keyContext =
             groups->GetKeyContext(groupSession->GetFabricIndex(), groupSession->GetGroupId());
@@ -420,8 +424,14 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         const FabricInfo * fabric = mFabricTable->FindFabricWithIndex(groupSession->GetFabricIndex());
         VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        auto * groups = Credentials::GetGroupDataProvider();
+        VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
 
-        multicastAddress = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
+        Credentials::GroupDataProvider::GroupInfo info;
+        ReturnErrorOnFailure(groups->GetGroupInfo(groupSession->GetFabricIndex(), groupSession->GetGroupId(), info));
+        multicastAddress = (info.UsePerGroupAddress())
+            ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId())
+            : Transport::PeerAddress::Groupcast();
         destination      = &multicastAddress;
     }
     break;

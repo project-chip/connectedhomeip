@@ -164,7 +164,7 @@ static_library("ESP32") {
     }
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
       "../OpenThread/GenericNetworkCommissioningThreadDriver.h",

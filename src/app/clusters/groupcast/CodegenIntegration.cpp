@@ -21,6 +21,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <platform/DefaultTimerDelegate.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -32,6 +33,7 @@ using chip::Protocols::InteractionModel::Status;
 namespace {
 
 LazyRegisteredServerCluster<GroupcastCluster> gServer;
+DefaultTimerDelegate sTimerDelegate;
 
 // Groupcast implementation is specifically implemented
 // only for the root endpoint (endpoint 0)
@@ -52,10 +54,13 @@ public:
         Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
         VerifyOrDie(groupDataProvider != nullptr); // we require app main to set this before cluster startup
 
-        gServer.Create(GroupcastContext{
-            .fabrics  = Server::GetInstance().GetFabricTable(),
-            .provider = *groupDataProvider,
-        });
+        gServer.Create(
+            GroupcastContext{
+                .fabricTable       = Server::GetInstance().GetFabricTable(),
+                .groupDataProvider = *groupDataProvider,
+                .timerDelegate     = sTimerDelegate,
+            },
+            BitFlags<Groupcast::Feature>(featureMap));
         return gServer.Registration();
     }
 
@@ -84,7 +89,7 @@ void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
             .clusterId                 = Groupcast::Id,
             .fixedClusterInstanceCount = Groupcast::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
-            .fetchFeatureMap           = false,
+            .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);

@@ -21,23 +21,20 @@
 #include <DeviceEnergyManagementDelegateImpl.h>
 #include <DeviceEnergyManagementManager.h>
 #include <EVSEManufacturerImpl.h>
-#include <ElectricalPowerMeasurementDelegate.h>
+#include <ElectricalPowerMeasurementDelegateImpl.h>
 #include <EnergyEvseManager.h>
 #include <EnergyManagementAppCmdLineOptions.h>
-#include <PowerTopologyDelegate.h>
+#include <PowerTopologyDelegateImpl.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <device-energy-management-modes.h>
 #include <energy-evse-modes.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/data-model/Nullable.h>
 #include <app/server/Server.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/Linux/NetworkCommissioningDriver.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -50,6 +47,22 @@ using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::PowerTopology;
 
 namespace {
+
+const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type kMeasurementAccuracyRanges[] = {
+    { .rangeMin   = 0,
+      .rangeMax   = 1'000'000'000'000'000, // 1 million Mwh
+      .percentMax = MakeOptional(static_cast<chip::Percent100ths>(500)),
+      .percentMin = MakeOptional(static_cast<chip::Percent100ths>(50)) }
+};
+
+const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type kMeasurementAccuracy = {
+    .measurementType  = MeasurementTypeEnum::kElectricalEnergy,
+    .measured         = true,
+    .minMeasuredValue = 0,
+    .maxMeasuredValue = 1'000'000'000'000'000, // 1 million Mwh
+    .accuracyRanges   = DataModel::List<const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type>(
+        kMeasurementAccuracyRanges)
+};
 
 // Common cluster instances
 std::unique_ptr<DeviceEnergyManagementDelegate> gDEMDelegate;
@@ -256,22 +269,6 @@ void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endp
         BitMask<ElectricalEnergyMeasurement::OptionalAttributes, uint32_t>(
             ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
 
-    ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type energyAccuracyRanges[] = {
-        { .rangeMin   = 0,
-          .rangeMax   = 1'000'000'000'000'000, // 1 million Mwh
-          .percentMax = MakeOptional(static_cast<chip::Percent100ths>(500)),
-          .percentMin = MakeOptional(static_cast<chip::Percent100ths>(50)) }
-    };
-
-    ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type accuracy = {
-        .measurementType  = MeasurementTypeEnum::kElectricalEnergy,
-        .measured         = true,
-        .minMeasuredValue = 0,
-        .maxMeasuredValue = 1'000'000'000'000'000,
-        .accuracyRanges =
-            DataModel::List<const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type>(energyAccuracyRanges)
-    };
-
     ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type resetStruct = {
         .importedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
         .exportedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
@@ -282,7 +279,7 @@ void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endp
     if (gEEMAttrAccess)
     {
         TEMPORARY_RETURN_IGNORED gEEMAttrAccess->Init();
-        TEMPORARY_RETURN_IGNORED SetMeasurementAccuracy(endpointId, accuracy);
+        TEMPORARY_RETURN_IGNORED SetMeasurementAccuracy(endpointId, kMeasurementAccuracy);
         TEMPORARY_RETURN_IGNORED SetCumulativeReset(endpointId, MakeOptional(resetStruct));
     }
 }

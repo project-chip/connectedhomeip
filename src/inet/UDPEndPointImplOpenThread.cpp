@@ -262,18 +262,8 @@ CHIP_ERROR UDPEndPointImplOT::SendMsgImpl(const IPPacketInfo * aPktInfo, System:
 
     LockOpenThread();
 
-    switch (otThreadGetDeviceRole(mOTInstance))
-    {
-    case OT_DEVICE_ROLE_DISABLED:
-    case OT_DEVICE_ROLE_DETACHED:
-        settings.mLinkSecurityEnabled = false;
-        break;
-    default:
-        settings.mLinkSecurityEnabled = true;
-        break;
-    }
-
-    settings.mPriority = OT_MESSAGE_PRIORITY_NORMAL;
+    settings.mPriority            = OT_MESSAGE_PRIORITY_NORMAL;
+    settings.mLinkSecurityEnabled = otThreadGetDeviceRole(mOTInstance) != OT_DEVICE_ROLE_DISABLED;
 
     message = otUdpNewMessage(mOTInstance, &settings);
     VerifyOrExit(message != NULL, error = OT_ERROR_NO_BUFS);

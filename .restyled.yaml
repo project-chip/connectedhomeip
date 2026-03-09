@@ -37,6 +37,12 @@ comments: false
 # Request review on the Restyle PR
 request_review: none
 
+copy_files:
+    - .prettierrc.json
+    - .clang-format
+    - .editorconfig
+    - pyproject.toml
+
 # Patterns to exclude from all Restylers
 exclude:
     - ".github/workflows/**/*" # https://github.com/restyled-io/restyler/issues/73

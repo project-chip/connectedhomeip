@@ -58,6 +58,18 @@ source_set("joint_fabric") {
   ]
 }
 
+static_library("thread_rendezvous_announcement") {
+  sources = [
+    "ThreadRendezvousAnnouncement.cpp",
+    "ThreadRendezvousAnnouncement.h",
+  ]
+  deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/dnssd",
+    "${chip_root}/src/lib/dnssd/minimal_mdns",
+  ]
+}
+
 static_library("server") {
   output_name = "libCHIPAppServer"
 
@@ -76,8 +88,6 @@ static_library("server") {
     "EchoHandler.h",
     "Server.cpp",
     "Server.h",
-    "ThreadRendezvousAnnouncement.cpp",
-    "ThreadRendezvousAnnouncement.h",
   ]
 
   public_configs = [ ":server_config" ]
@@ -102,10 +112,7 @@ static_library("server") {
   ]
 
   if (chip_device_config_enable_thread_meshcop) {
-    public_deps += [
-      "${chip_root}/src/lib/dnssd/minimal_mdns",
-      "${chip_root}/src/lib/dnssd/minimal_mdns/records",
-    ]
+    deps = [ ":thread_rendezvous_announcement" ]
   }
 
   if (chip_terms_and_conditions_required) {

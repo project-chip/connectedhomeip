@@ -58,8 +58,6 @@ private:
     const char * mTxtStrings[Dnssd::CommissionAdvertisingParameters::kTxtMaxNumber];
 };
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
-
 /**
  * @brief Builds the Thread Rendezvous Announcement packet buffer.
  *
@@ -69,8 +67,6 @@ private:
  */
 CHIP_ERROR BuildThreadRendezvousAnnouncement(const Dnssd::CommissionAdvertisingParameters & params,
                                              System::PacketBufferHandle & outBuffer);
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
 
 } // namespace app
 } // namespace chip

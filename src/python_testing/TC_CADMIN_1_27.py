@@ -124,6 +124,9 @@ class TC_CADMIN_1_27(MatterBaseTest):
                      "TH_AJF2 is successfuly commissioned into Fabric 1 by DUT_AAF using Joint Commissioning Method")
         ]
 
+    def pics_TC_CADMIN_1_27(self):
+        return ['CADMIN.S']
+
     @async_test_body
     async def test_TC_CADMIN_1_27(self):
         _devCtrlEcoA = None
@@ -419,14 +422,16 @@ class TC_CADMIN_1_27(MatterBaseTest):
             asserts.fail(f'Exception {e} occured during OJCW')
 
         self.step("4")
+        log.info("Setup event on fabric_a_admin for JCM completion message")
+        self.fabric_a_admin.set_output_match("[JF] Joint Commissioning Method (nodeId=15) success")
+        self.fabric_a_admin.event.clear()
+
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork-long 15 {response.setupPinCode} {discriminator} --jcm true",
             expected_output="[CTL] Commissioning complete for node ID 0x000000000000000F: success",
             timeout=60)
 
         log.info("Waiting for transfer of ownership from the commissioner(controller) to the administrator and completion of commissioning")
-        self.fabric_a_admin.set_output_match("[JF] Joint Commissioning Method (nodeId=15) success")
-        self.fabric_a_admin.event.clear()
         if self.fabric_a_admin.event.wait(30) is False:
             raise TimeoutError("Timed out waiting for commissioning to complete")
         log.info("JCM commissioning complete")

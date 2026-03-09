@@ -66,13 +66,13 @@ CHIP_ERROR ChipAndroidAppInit(AppDelegate * appDelegate)
     initParams.portRetryCount = 9;
 #endif
 
-    err = chip::Server::GetInstance().Init(initParams);
-    SuccessOrExit(err);
-
     if (!IsDeviceAttestationCredentialsProviderSet())
     {
         SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     }
+
+    err = chip::Server::GetInstance().Init(initParams);
+    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)

@@ -703,10 +703,56 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     return errorCode;
 }
 
+#if CHIP_SUPPORT_THREAD_MESHCOP
+CHIP_ERROR DeviceCommissioner::PairThreadMeshcop(RendezvousParameters & rendezvousParams,
+                                                 CommissioningParameters & commissioningParams)
+{
+    VerifyOrReturnError(rendezvousParams.GetSetupDiscriminator().has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(commissioningParams.GetThreadOperationalDataset().HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    auto discriminator = rendezvousParams.GetSetupDiscriminator().value();
+    Thread::DiscoveryCode code;
+    if (rendezvousParams.GetSetupDiscriminator().value().IsShortDiscriminator())
+    {
+        code = Thread::DiscoveryCode(discriminator.GetShortValue());
+        ChipLogProgress(Controller, "Discovery code from short discriminator: 0x%" PRIx64, code.AsUInt64());
+    }
+    else
+    {
+        code = Thread::DiscoveryCode(discriminator.GetLongValue());
+        ChipLogProgress(Controller, "Discovery code from long discriminator: 0x%" PRIx64, code.AsUInt64());
+    }
+
+    uint8_t pskcBuffer[Thread::kSizePSKc];
+    ByteSpan pskc(pskcBuffer);
+    {
+        Thread::OperationalDatasetView dataset;
+        ReturnErrorOnFailure(dataset.Init(commissioningParams.GetThreadOperationalDataset().Value()));
+
+        ReturnErrorOnFailure(dataset.GetPSKc(pskcBuffer));
+    }
+
+    {
+        Dnssd::DiscoveredNodeData discoveredNodeData;
+        ReturnErrorOnFailure(mThreadMeshcopCommissionProxy.Discover(pskc, rendezvousParams.GetPeerAddress(), code, discriminator,
+                                                                    discoveredNodeData, 30));
+
+        ChipLogProgress(Controller, "Joiner discovered");
+        OnNodeDiscovered(discoveredNodeData);
+    }
+    return CHIP_NO_ERROR;
+}
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
+
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams,
                                           CommissioningParameters & commissioningParams)
 {
     MATTER_TRACE_SCOPE("PairDevice", "DeviceCommissioner");
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    if (rendezvousParams.GetPeerAddress().GetTransportType() == Transport::Type::kThreadMeshcop)
+    {
+        return PairThreadMeshcop(rendezvousParams, commissioningParams);
+    }
+#endif
     ReturnErrorOnFailureWithMetric(kMetricDeviceCommissionerCommission, EstablishPASEConnection(remoteDeviceId, rendezvousParams));
     auto errorCode = Commission(remoteDeviceId, commissioningParams);
     VerifyOrDoWithMetric(kMetricDeviceCommissionerCommission, CHIP_NO_ERROR == errorCode, errorCode);
@@ -826,7 +872,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
             // for later.
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
-
+            VerifyOrExit(params.GetSetupDiscriminator().has_value(), err = CHIP_ERROR_INVALID_ARGUMENT);
             ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(params.GetSetupDiscriminator().value(), this,
                                                                                     OnDiscoveredDeviceOverBleSuccess,
                                                                                     OnDiscoveredDeviceOverBleError));
@@ -1228,7 +1274,7 @@ void DeviceCommissioner::OnSessionEstablished(const SessionHandle & session)
     CHIP_ERROR err = device->SetConnected(session);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogFailure(err, Controller, "Failed in setting up secure channel");
+        ChipLogError(Controller, "Failed in setting up secure channel: %" CHIP_ERROR_FORMAT, err.Format());
         OnSessionEstablishmentError(err);
         return;
     }
@@ -2400,17 +2446,17 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
         {
             VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
                                                     Clusters::IcdManagement::Attributes::FeatureMap::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::IdleModeDuration::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::ActiveModeDuration::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::ActiveModeThreshold::Id));
         }
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::Id));
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id));
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::IdleModeDuration::Id));
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::ActiveModeDuration::Id));
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::ActiveModeThreshold::Id));
 
         // Extra paths requested via CommissioningParameters
         for (auto const & path : params.GetExtraReadPaths())

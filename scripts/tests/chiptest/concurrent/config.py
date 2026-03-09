@@ -33,6 +33,7 @@ class TestJobConfig:
     iterations: int
     keep_going: bool
     expected_failures: int
+    summary_file: Path | None
 
 
 @dataclasses.dataclass
