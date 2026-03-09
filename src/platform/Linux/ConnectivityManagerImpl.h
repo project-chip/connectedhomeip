@@ -323,13 +323,5 @@ private:
     NetworkStatusChangeCallback * mpStatusChangeCallback;
 };
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout()
-{
-    return mWiFiAPIdleTimeout;
-}
-
-#endif
-
 } // namespace DeviceLayer
 } // namespace chip

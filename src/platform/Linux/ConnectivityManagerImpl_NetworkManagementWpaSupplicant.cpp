@@ -182,6 +182,11 @@ bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled()
     return mWiFiAPMode == kWiFiAPMode_ApplicationControlled;
 }
 
+System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout()
+{
+    return mWiFiAPIdleTimeout;
+}
+
 ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
 {
     return mWiFiAPMode;
