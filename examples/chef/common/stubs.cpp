@@ -402,7 +402,9 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     (MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
     if (clusterId == Thermostat::Id &&
         (attributeId == Thermostat::Attributes::OccupiedHeatingSetpoint::Id ||
-         attributeId == Thermostat::Attributes::LocalTemperature::Id) &&
+         attributeId == Thermostat::Attributes::LocalTemperature::Id ||
+         attributeId == WaterHeaterManagement::Attributes::TankVolume::Id ||
+         attributeId == WaterHeaterManagement::Attributes::TankPercentage::Id) &&
         DeviceTypes::EndpointHasDeviceType(1, Device::kWaterHeaterDeviceTypeId))
     {
         MatterReportingAttributeChangeCallback(attributePath.mEndpointId, WaterHeaterManagement::Id,

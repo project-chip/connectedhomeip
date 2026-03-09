@@ -23,6 +23,7 @@ from pw_hdlc import rpc
 from pw_system.device_connection import create_device_serial_or_socket_connection
 
 import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
@@ -116,6 +117,90 @@ class TC_WATERHEATER(MatterBaseTest):
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.ThermostatRunningState)
         asserts.assert_equal(val, 1, "ThermostatRunningState should be 1")
 
+    async def water_heater_management_test(self, device):
+        cluster = Clusters.Objects.WaterHeaterManagement
+        attributes = cluster.Attributes
+
+        # 1. HeaterTypes (read-only attribute) - verify its default value.
+        # mHeaterTypes = kImmersionElement1 | kHeatPump = (1 << 0) | (1 << 3) = 9
+        val = await self.read_single_attribute_check_success(
+            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.HeaterTypes)
+        asserts.assert_equal(val, 9, "HeaterTypes initial value should be 9")
+
+        # 2. TankVolume (read-only attribute) - verify its default value.
+        # mTankVolume = 150
+        val = await self.read_single_attribute_check_success(
+            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.TankVolume)
+        asserts.assert_equal(val, 150, "TankVolume initial value should be 150")
+
+        # 3. TankPercentage (read-only attribute) - verify its default value.
+        # mTankPercentage = 50
+        val = await self.read_single_attribute_check_success(
+            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.TankPercentage)
+        asserts.assert_equal(val, 50, "TankPercentage initial value should be 50")
+
+        # 4. BoostState (read-only attribute) - verify it starts as kInactive (0).
+        val = await self.read_single_attribute_check_success(
+            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.BoostState)
+        asserts.assert_equal(val, cluster.Enums.BoostStateEnum.kInactive, "BoostState initial value should be kInactive")
+
+        # 5. Boost command:
+        # - Call Boost with duration < 60, should fail with ConstraintError.
+        try:
+            await self.send_single_cmd(
+                cmd=cluster.Commands.Boost(duration=30),
+                endpoint=self.ENDPOINT
+            )
+            asserts.fail("Boost with duration < 60 should have failed")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError, "Should be ConstraintError")
+
+        # - Call Boost with duration >= 60, should succeed.
+        await self.send_single_cmd(
+            cmd=cluster.Commands.Boost(duration=100),
+            endpoint=self.ENDPOINT
+        )
+
+        # - Verify BoostState is now kActive (1).
+        val = await self.read_single_attribute_check_success(
+            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.BoostState)
+        asserts.assert_equal(val, cluster.Enums.BoostStateEnum.kActive, "BoostState should be kActive after Boost command")
+
+        # 6. CancelBoost command:
+        # - Call CancelBoost, should succeed.
+        await self.send_single_cmd(
+            cmd=cluster.Commands.CancelBoost(),
+            endpoint=self.ENDPOINT
+        )
+
+        # - Verify BoostState is now kInactive (0).
+        val = await self.read_single_attribute_check_success(
+            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.BoostState)
+        asserts.assert_equal(val, cluster.Enums.BoostStateEnum.kInactive, "BoostState should be kInactive after CancelBoost command")
+
+        # 7. EstimatedHeatRequired calculation:
+        # Use Pigweed to set Thermostat local temperature
+        self._write_thermostat_local_temperature_pwrpc(device, 2000) # 20C
+
+        # Set OccupiedHeatingSetpoint to 2500 (25C)
+        await self.write_single_attribute(
+            attribute_value=Clusters.Objects.Thermostat.Attributes.OccupiedHeatingSetpoint(2500),
+            endpoint_id=self.ENDPOINT
+        )
+
+        # Now read EstimatedHeatRequired.
+        # Expected: 43562
+        val = await self.read_single_attribute_check_success(
+            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.EstimatedHeatRequired)
+        asserts.assert_equal(val, 43562, f"EstimatedHeatRequired should be 43562, got {val}")
+
+        # 8. EstimatedHeatRequired calculation (Zero case):
+        self._write_thermostat_local_temperature_pwrpc(device, 3000) # 30C
+        # OccupiedHeatingSetpoint is 2500.
+        val = await self.read_single_attribute_check_success(
+            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.EstimatedHeatRequired)
+        asserts.assert_equal(val, 0, "EstimatedHeatRequired should be 0 when temperature is above setpoint")
+
     @async_test_body
     async def test_TC_WATERHEATER(self):
         # Step 1: Commissioning already done.
@@ -154,6 +239,7 @@ class TC_WATERHEATER(MatterBaseTest):
         self.step(4)
         with device_connection as device:
             await self.thermostat_test(device)
+            await self.water_heater_management_test(device)
 
 
 if __name__ == "__main__":
