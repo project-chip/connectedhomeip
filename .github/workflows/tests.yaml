@@ -94,9 +94,6 @@ jobs:
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
 
-            - name: Set up a IPV6 known environment
-              uses: ./.github/actions/add-ipv6
-
             - name: Setup and Restore Cache
               id: ccache
               uses: ./.github/actions/setup-ccache
@@ -1037,8 +1034,6 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v6
             # NOTE: no bootstrap since we only use compile outputs from previous steps (including python venv in out/venv)
-            - name: Set up a IPV6 known envionment
-              uses: ./.github/actions/add-ipv6
 
             - name: Download artifacts for running
               uses: namespace-actions/download-artifact@v2

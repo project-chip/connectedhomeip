@@ -81,9 +81,6 @@ jobs:
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
 
-            - name: Set up a IPV6 known envionment
-              uses: ./.github/actions/add-ipv6
-
             - name: Build python env
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/python_env -pw true'
 
