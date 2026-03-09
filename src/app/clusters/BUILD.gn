@@ -41,6 +41,7 @@ source_set("clusters") {
     "push-av-stream-transport-server",
     "scenes-server",
     "software-diagnostics-server",
+    "temperature-control-server",
     "temperature-measurement-server",
     "tls-certificate-management-server",
     "tls-client-management-server",
