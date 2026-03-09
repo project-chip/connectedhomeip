@@ -41,16 +41,22 @@ public final class CommissionParameters {
   }
 
   /**
-   * The informations for ICD registration. For detailed information {@link ICDRegistrationInfo}. If
-   * this value is null when commissioning an ICD device, {@link
-   * CompletionListener.onICDRegistrationInfoRequired} is called to request the ICDRegistrationInfo
-   * value.
+   * The information for ICD registration. For detailed information see {@link ICDRegistrationInfo}.
    *
-   * <p>- If LIT mode for Commissioning and {@link CompletionListener.onICDRegistrationInfoRequired}
-   * are not needed, all values must be set. - If LIT mode for Commissioning and {@link
-   * CompletionListener.onICDRegistrationInfoRequired} need to be called, set the value using {@link
-   * ICDRegistrationInfo.createForDeferredConfiguration}. - For SIT mode for Commissioning, set the
-   * value to null.
+   * <p>Behavior depends on the commissioning mode and how this value is set:
+   *
+   * <ul>
+   *   <li><b>LIT mode, immediate configuration</b>: If LIT mode for commissioning is used and
+   *       {@link CompletionListener.onICDRegistrationInfoRequired} is not needed, all required
+   *       values in {@link ICDRegistrationInfo} must be provided directly.
+   *   <li><b>LIT mode, deferred configuration</b>: If LIT mode for commissioning is used and
+   *       {@link CompletionListener.onICDRegistrationInfoRequired} should be invoked to obtain
+   *       registration information later, set the value using
+   *       {@link ICDRegistrationInfo#createForDeferredConfiguration()}.
+   *   <li><b>SIT mode</b>: For SIT mode for commissioning, set this value to {@code null}. A null
+   *       value results in {@code ICDRegistrationStrategy::kIgnore} and will <b>not</b> cause
+   *       {@link CompletionListener.onICDRegistrationInfoRequired} to be called.
+   * </ul>
    */
   public ICDRegistrationInfo getICDRegistrationInfo() {
     return icdRegistrationInfo;
