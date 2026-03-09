@@ -51,7 +51,7 @@ public:
     void SetCrashLogFilePath(Optional<std::string> filePath) { mCrashLogFilePath = filePath; }
 
 private:
-    LogProvider()                                = default;
+    LogProvider() = default;
     ~LogProvider();
     LogProvider(const LogProvider &)             = delete;
     LogProvider & operator=(const LogProvider &) = delete;
