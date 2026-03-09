@@ -28,7 +28,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WaterHeaterManagement;
 
-#if MATTER_DM_PLUGIN_WATER_HEATER_MANAGEMENT_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 namespace chip {
 namespace app {
@@ -146,4 +146,4 @@ Energy_mWh ChefDelegate::GetEstimatedHeatRequired()
 } // namespace app
 } // namespace chip
 
-#endif // MATTER_DM_PLUGIN_WATER_HEATER_MANAGEMENT_SERVER
+#endif // MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT

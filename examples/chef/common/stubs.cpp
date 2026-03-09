@@ -398,7 +398,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         HandleFanControlAttributeChange(attributeId, type, size, value);
     }
 #endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
-#if (MATTER_DM_PLUGIN_WATER_HEATER_MANAGEMENT_SERVER_ENDPOINT_COUNT > 0) && (MATTER_DM_PLUGIN_THERMOSTAT_SERVER_ENDPOINT_COUNT > 0)
+#if (MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                       \
+    (MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
     if (clusterId == Thermostat::Id &&
         (attributeId == Thermostat::Attributes::OccupiedHeatingSetpoint::Id ||
          attributeId == Thermostat::Attributes::LocalTemperature::Id) &&
@@ -697,7 +698,8 @@ void WaterHeaterInit()
     VerifyOrDieWithMsg(!called, Zcl, "Error: WaterHeaterInit called more than once");
     called = true;
 
-#if (MATTER_DM_PLUGIN_WATER_HEATER_MANAGEMENT_SERVER_ENDPOINT_COUNT > 0) && (MATTER_DM_PLUGIN_THERMOSTAT_SERVER_ENDPOINT_COUNT > 0)
+#if (MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                       \
+    (MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
     if (!DeviceTypes::EndpointHasDeviceType(1, Device::kWaterHeaterDeviceTypeId))
     {
         return;
