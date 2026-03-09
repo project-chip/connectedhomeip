@@ -37,15 +37,23 @@ class TestResultSummary:
             self.worker_ids.append(result.worker_id)
 
     def table_row(self) -> tuple[str, str, str, str]:
+        match self.first_exception:
+            case KeyboardInterrupt():
+                status = "❔ Cancelled"
+            case BaseException() as e:
+                status = f"❌ {e!r}"
+            case None:
+                status = "✅"
+
         return (f"{self.passed}/{self.total}",
                 f"{mean_runtime:.2f}" if (mean_runtime := self.mean_runtime) is not None else "—",
                 ", ".join(str(worker_id) for worker_id in self.worker_ids) if self.worker_ids else "—",
-                f"❌ {self.first_exception!r}" if self.first_exception is not None else "✅")
+                status)
 
 
 class ResultProcessingThread(threading.Thread):
     def __init__(self, config: WorkerConfig, work_queue: WorkQueue[WorkerJob, WorkerResult], tests_per_iteration: int) -> None:
-        super().__init__(name=self.__class__.__name__)
+        super().__init__(name="Results")
         self.config = config
         self.work_queue = work_queue
         self.test_per_iteration = tests_per_iteration
@@ -58,15 +66,10 @@ class ResultProcessingThread(threading.Thread):
         self._summaries: dict[str, TestResultSummary] = {}
 
     def run(self) -> None:
+        log.debug("Launching result processing thread")
         try:
             while True:
-                # Double check the result type. Mismatch can happen if the mp_manager is already shut down for some reason, which can
-                # happen in some unclean cancellation cases.
-                if not isinstance(result := self.work_queue.get_rsp_or_cancel(), WorkerResult):
-                    log.warning("Wrong work result: %r", result)
-                    continue
-
-                self._process_result(result)
+                self._process_result(self.work_queue.rsp_get_or_cancel())
         except WorkQueueCancelled:
             log.debug("No more results to process, finishing result processing thread")
         except Exception as e:

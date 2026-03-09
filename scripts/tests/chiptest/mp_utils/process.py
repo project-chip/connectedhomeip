@@ -27,7 +27,7 @@ def with_annotated_exception(fn: Callable[Concatenate[S, P], R]) -> Callable[Con
         try:
             return fn(self, *args, **kwargs)
         except BaseException as e:
-            e.add_note(f"Exception in process {self._config.name_long}")
+            e.add_note(f"Exception in process {self._config.name}")
             raise
 
     return wrapper
@@ -37,29 +37,36 @@ ConfigT = TypeVar("ConfigT", bound=ProcessConfigTemplate)
 WorkRequestT = TypeVar("WorkRequestT")
 WorkResponseT = TypeVar("WorkResponseT")
 
-
 class WrappedProcess(ABC, Generic[ConfigT, WorkRequestT, WorkResponseT]):
-    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, config: ConfigT,
-                 work_queue: WorkQueue[WorkRequestT, WorkResponseT] | None = None,
+    # Methods run in the parent process.
+
+    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, config: ConfigT, work_queue: WorkQueue[WorkRequestT, WorkResponseT] | None = None,
                  group_state: ProcessGroupState | None = None) -> None:
         # Neither mp_context or mp_manager should be saved in the instance, as they are not picklable between processes but they can
         # be used to initialize some shared resources.
 
         # Create state and work queue.
         self._config = config
-        self.work_queue: WorkQueue[WorkRequestT, WorkResponseT] = work_queue if work_queue is not None else WorkQueue(mp_manager)
         self.state = ProcessState(mp_manager, config, group_state)
 
+        self.work_queue: WorkQueue[WorkRequestT, WorkResponseT]
+        if work_queue is None:
+            self._external_work_queue = False
+            self.work_queue = WorkQueue(mp_manager)
+        else:
+            self._external_work_queue = True
+            self.work_queue = work_queue
+
         # Create multiprocessing.Process in the given context.
-        self._proc = mp_context.Process(target=self.run, name=self._config.name_short)
+        self._proc = mp_context.Process(target=self.run, name=self._config.name)
 
     @property
     def name(self) -> str:
-        return self._config.name_long
+        return self._config.name
 
     @with_annotated_exception
     def start(self) -> None:
-        log.debug("Starting process")
+        log.debug("Starting process %s", self.name)
         self._proc.start()
 
         # No start timeout means that the caller doesn't want to wait for initialization to finish.
@@ -80,14 +87,14 @@ class WrappedProcess(ABC, Generic[ConfigT, WorkRequestT, WorkResponseT]):
 
                 match self.state.phase:
                     case ProcessState.Phase.READY:
-                        log.debug("Process started successfully")
+                        log.debug("Process %s started successfully", self.name)
                     case ProcessState.Phase.CLOSED:
                         raise RuntimeError("Process closed immediately after initialization")
                     case _:
                         raise RuntimeError("Process is in unexpected state")
         except BaseException as e:
             if not isinstance(e, KeyboardInterrupt):
-                log.info("Stopping the process on failure during inititialization")
+                log.exception("Stopping process %s on failure during inititialization", self.name)
             self.stop()
             raise
 
@@ -96,21 +103,29 @@ class WrappedProcess(ABC, Generic[ConfigT, WorkRequestT, WorkResponseT]):
         def has_stopped(timeout: float) -> bool:
             self._proc.join(timeout)
             if not self._proc.is_alive():
-                log.debug("Process got stopped")
+                log.debug("Process %s got stopped", self.name)
                 return True
             return False
 
         if not self._proc.is_alive():
-            log.debug("Process hasn't started yet or is already stopped")
+            log.debug("Process %s hasn't started yet or is already stopped", self.name)
             return
 
-        log.debug("Cancelling work in process")
-        self.work_queue.cancel()
-        if has_stopped(self._config.stop_timeout):
-            return
+        if self._external_work_queue:
+            # Wait for the external work queue to be cancelled by its owner, which should signal the process to stop.
+            if has_stopped(self._config.stop_timeout):
+                return
+            log.debug("Sending interrupt signal")
+        else:
+            log.debug("Cancelling work in process %s", self.name)
+            self.work_queue.req_cancel()
+            self.work_queue.rsp_cancel()
+
+            if has_stopped(self._config.stop_timeout):
+                return
+            log.info("Process is not responding to the cancel event. Sending interrupt signal")
 
         if self._proc.pid is not None:
-            log.info("Process is not responding to the cancel event. Sending interrupt signal")
             os.kill(self._proc.pid, signal.SIGINT)  # TODO Python 3.14: self.process.interrupt()
         if has_stopped(self._config.stop_timeout):
             return
@@ -125,7 +140,7 @@ class WrappedProcess(ABC, Generic[ConfigT, WorkRequestT, WorkResponseT]):
         if has_stopped(self._config.termination_timeout):
             return
 
-        raise TimeoutError(f"Failed to terminate the process {self._config.name_long}. May become a zombie")
+        raise TimeoutError(f"Failed to terminate the process {self._config.name}. May become a zombie")
 
     # Methods run in the subprocess.
 
@@ -133,7 +148,7 @@ class WrappedProcess(ABC, Generic[ConfigT, WorkRequestT, WorkResponseT]):
         try:
             self.state.phase = ProcessState.Phase.UNINITIALIZED
 
-            # Logger needs to be initialized per-process.
+            # Initialize global logger in the subprocess.
             self._config.log_config.set_log_fmt()
 
             # Initialize.
@@ -170,7 +185,7 @@ class WrappedProcess(ABC, Generic[ConfigT, WorkRequestT, WorkResponseT]):
 
         Should wait for cancellation (default) or consume the work_queue while actively setting `Phase.READY` and `Phase.WORKING`.
         """
-        self.work_queue.wait_for_cancel()
+        self.work_queue.req_wait_for_cancel()
 
     @abstractmethod
     def _proc_cleanup(self):

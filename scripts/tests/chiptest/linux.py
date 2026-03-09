@@ -234,7 +234,7 @@ class NetworkLink(NetworkCmdHandler):
     def wait_for_duplicate_address_detection(self) -> bool:
         # IPv6 does Duplicate Address Detection even though we know ULAs provided are isolated.
         # Wait for 'tentative' address to be gone.
-        log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
+        log.debug("Waiting for IPv6 DaD to complete (no tentative addresses)")
 
         cmd = "ip addr"
         if self._ns_wrapper:
@@ -245,7 +245,7 @@ class NetworkLink(NetworkCmdHandler):
         start_time = time.time()
         while time.time() - start_time < 10:
             if 'tentative' not in subprocess.check_output(cmd_list, text=True):
-                log.info("No more tentative addresses")
+                log.debug("No more tentative addresses")
                 return True
             time.sleep(0.1)
 
@@ -315,7 +315,10 @@ class IsolatedNetworkNamespace:
             if app_link_up:
                 self.app_link.activate()
         except BaseException as e:
-            log.error("Encountered error while setting up network namespaces: %r", e)
+            if isinstance(e, KeyboardInterrupt):
+                log.info("Interrupted during network namespace setup")
+            else:
+                log.exception("Encountered error while setting up network namespaces: %r", e)
             # Ensure that we leave a clean state on any exception.
             self.terminate()
             raise

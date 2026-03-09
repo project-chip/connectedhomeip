@@ -1,20 +1,23 @@
 from __future__ import annotations
 
 import enum
+import logging
 import threading
 from collections.abc import Callable, Iterable
 from multiprocessing.managers import SyncManager, ValueProxy
 from types import TracebackType
+from typing import Literal
 
 from chiptest.mp_utils.config import ProcessConfigTemplate
 from chiptest.mp_utils.queue import RequestQueue
 
+log = logging.getLogger(__name__)
 
 class ProcessGroupState:
-    def __init__(self, mp_manager: SyncManager, *, process_ready_queue: bool) -> None:
+    def __init__(self, mp_manager: SyncManager) -> None:
         self._state_changed = mp_manager.Condition()
-        self.process_ready_queue = RequestQueue[int](mp_manager, mp_manager.Event()) if process_ready_queue else None
         self._states: list[ProcessState] = []
+        self.process_ready_queue = RequestQueue[int](mp_manager)
 
     def register_process(self, state: ProcessState) -> threading.Condition:
         with self._state_changed:
@@ -41,7 +44,7 @@ class ProcessGroupState:
         with self._state_changed:
             return self._state_changed.wait_for(lambda: predicate(self._states), timeout)
 
-    def collect_exceptions(self) -> bool:
+    def collect_exceptions(self) -> Literal[True]:
         """Collect exceptions from all processes.
 
         Raise them as an ExceptionGroup if there are any, or return True if there are no exceptions, which allows to use this method
@@ -77,11 +80,14 @@ class ProcessState:
     def __init__(self, mp_manager: SyncManager, config: ProcessConfigTemplate, group_state: ProcessGroupState | None = None,
                  initial_state: Phase = Phase.NOT_STARTED) -> None:
         self._config = config
-        self._group_state = group_state if group_state is not None else ProcessGroupState(mp_manager, process_ready_queue=False)
         self._phase: ValueProxy[ProcessState.Phase] = mp_manager.Value(object, initial_state)
         self._exception: ValueProxy[BaseException | None] = mp_manager.Value(object, None)
 
-        self._state_changed = self._group_state.register_process(self)
+        self._group_state = group_state
+        if self._group_state is None:
+            self._state_changed = mp_manager.Condition()
+        else:
+            self._state_changed = self._group_state.register_process(self)
 
     @property
     def phase(self) -> Phase:
@@ -92,7 +98,7 @@ class ProcessState:
     def phase(self, value: Phase) -> None:
         with self._state_changed:
             self._phase.set(value)
-            if self._group_state.process_ready_queue is not None and value == ProcessState.Phase.READY:
+            if self._group_state is not None and value == ProcessState.Phase.READY:
                 self._group_state.process_ready_queue.put(self._config.id)
             self._state_changed.notify_all()
 
@@ -103,8 +109,8 @@ class ProcessState:
     @exception.setter
     def exception(self, value: BaseException | None) -> None:
         with self._state_changed:
-            if value is not None and isinstance(value, BaseException):
-                value.add_note(f"Exception in process {self._config.name_long} in phase {self.phase.name}")
+            if isinstance(value, BaseException):
+                value.add_note(f"Exception in process {self._config.name}")
             self._exception.set(value)
             self._state_changed.notify_all()
 

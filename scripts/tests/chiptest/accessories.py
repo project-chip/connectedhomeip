@@ -54,17 +54,17 @@ XmlRpcFuncRetT: TypeAlias = bool | Exception
 class XmlRpcServerProcess(WrappedProcess, StartStopContextMixin):
     def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, work_queue: WorkQueue[XmlRpcFuncCallT, XmlRpcFuncRetT],
                  log_config: LogConfig) -> None:
-        super().__init__(mp_context, mp_manager,
-                         ProcessConfigTemplate(name_short="XMLRPC", name_long="XML RPC Server", log_config=log_config), work_queue)
+        config = ProcessConfigTemplate(name="XmlRpc", log_config=log_config).with_formatted_name()
+        super().__init__(mp_context, mp_manager, config, work_queue)
 
         self._server: SimpleXMLRPCServer | None = None
         self._server_thread: threading.Thread | None = None
 
     def _call(self, name: str, *args: Any) -> bool:
-        self.work_queue.put_req((name, args))
+        self.work_queue.req_put((name, args))
 
         # Propagate any exception to the RPC server process, so that it can be handled by it.
-        if isinstance(rsp := self.work_queue.get_rsp_or_cancel(), Exception):
+        if isinstance(rsp := self.work_queue.rsp_get_or_cancel(), Exception):
             raise rsp
         return rsp
 
@@ -81,20 +81,24 @@ class XmlRpcServerProcess(WrappedProcess, StartStopContextMixin):
         for func in APPS_RPC_FUNCS:
             self._server.register_function(self._create_func(func), self.to_camel_case(func))
 
-        self._server_thread = threading.Thread(target=self._server.serve_forever, name=f"{self._config.name_short}/Server")
+        self._server_thread = threading.Thread(target=self._server.serve_forever)
         self._server_thread.start()
 
     def _proc_cleanup(self):
         if self._server is not None:
-            log.debug("Stopping XMLRPC Server")
+            log.debug("Stopping XMLRPC Server thread")
             self._server.shutdown()
         if self._server_thread is not None:
-            self._server_thread.join()
+            log.debug("Waiting for XMLRPC Server thread to stop")
+            self._server_thread.join(timeout=ProcessConfigTemplate.DEFAULT_STOP_TIMEOUT)
+            if self._server_thread.is_alive():
+                log.error("XMLRPC Server thread failed to stop")
+            log.debug("XMLRPC Server thread stopped")
 
 
 class XmlRpcServerProcessManager(threading.Thread):
     def __init__(self, apps: AppsRegister) -> None:
-        super().__init__(name=self.__class__.__name__)
+        super().__init__(name="XmlRpcProcManager")
         self._apps = apps
         self._mp_manager = multiprocessing.Manager()
         self._work_queue = WorkQueue[XmlRpcFuncCallT, XmlRpcFuncRetT](self._mp_manager)
@@ -113,7 +117,9 @@ class XmlRpcServerProcessManager(threading.Thread):
             raise RuntimeError(f"XMLRPC Manager initialization failed with {self._exception!r}")
 
     def cancel(self) -> None:
-        self._work_queue.cancel()
+        # We can cancel both request and response queues.
+        self._work_queue.req_cancel()
+        self._work_queue.rsp_cancel()
 
         self.join(timeout=ProcessConfigTemplate.DEFAULT_STOP_TIMEOUT)
         if self.is_alive():
@@ -140,27 +146,28 @@ class XmlRpcServerProcessManager(threading.Thread):
             log.debug("Caught a cancel event in XMLRPC Manager")
             raise
         except Exception as e:
-            # On error, pass the exception to the XMLRPC server process and continue.
-            log.error("Error in XMLRPC Manager: %s", e, exc_info=True)
+            # On excepion, pass the exception to the XMLRPC server process and continue. The server process will handle it and
+            # return it to the caller, so that the caller can also handle it.
             return e
 
     def run(self) -> None:
         log.debug("Starting server process")
-        with (mp_wrapped_spawn_context(wrapper_linux=self._apps.net_ns_wrapper) as ctx,
-                XmlRpcServerProcess(ctx, self._mp_manager, self._work_queue, self._apps.log_config) as server):
-            log.debug("XMLRPC Server process started")
-            self._init_done.set()
-
-            try:
-                while True:
-                    server.work_queue.put_rsp(self._execute_func(server.work_queue.get_req_or_cancel()))
-            except WorkQueueCancelled:
-                pass
-            except Exception as e:
-                log.exception("Error in XMLRPC Manager: %r", e, exc_info=True)
-                self._exception = e
+        try:
+            with (mp_wrapped_spawn_context(wrapper_linux=self._apps.net_ns_wrapper) as ctx,
+                  XmlRpcServerProcess(ctx, self._mp_manager, self._work_queue, self._apps.log_config) as server):
+                log.debug("XMLRPC Server process started")
                 self._init_done.set()
-                raise
+
+                try:
+                    while True:
+                        server.work_queue.rsp_put(self._execute_func(server.work_queue.req_put_or_cancel()))
+                except WorkQueueCancelled:
+                    log.debug("Received a cancel event")
+        except Exception as e:
+            log.exception("Error in XMLRPC Manager: %r", e)
+            self._exception = e
+            self._init_done.set()
+            raise
 
 
 S = TypeVar("S", bound="AppsRegister")
@@ -210,7 +217,6 @@ class AppsRegister:
         log.debug("Stopping XMLRPC Manager")
         self._server.cancel()
         log.debug("XMLRPC Manager stopped")
-        # TODO: Check XMLRPC logs (don't seem to be visible with the process name in the logs).
 
     def terminate(self):
         self.uninit()

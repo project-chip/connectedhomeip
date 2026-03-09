@@ -2,6 +2,7 @@ import dataclasses
 import logging
 import os
 import queue
+import signal
 import subprocess
 import sys
 import time
@@ -81,9 +82,11 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, WorkerResult], ABC):
 
     def _proc_work(self) -> None:
         while True:
-            work = self.work_queue.get_req_or_cancel(req_queue_id=self._config.id)
+            work = self.work_queue.req_put_or_cancel(req_queue_id=self._config.id)
             self.state.phase = ProcessState.Phase.WORKING
-            self.work_queue.put_rsp(self._run_test(work))
+            self.work_queue.rsp_put(result:=self._run_test(work))
+            if isinstance(result.exception, KeyboardInterrupt):
+                raise result.exception
             self.state.phase = ProcessState.Phase.READY
 
     def _run_test(self, job: WorkerJob) -> WorkerResult:
@@ -117,21 +120,20 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, WorkerResult], ABC):
             result.runtime = time.monotonic() - test_start
             result.exception = e
 
-            if isinstance(e, KeyboardInterrupt):
-                log.info("❔ Cancelled after %0.2f seconds", result.runtime)
-                raise
-
             # TODO: Use proper path construction.
             if Path('/tmp/thread.pcap').exists():
                 os.system("echo 'base64 -d - >/tmp/thread.pcap <<EOF' && base64 /tmp/thread.pcap && echo EOF")
 
-            log.exception("❌ Failed in %0.2f seconds", result.runtime, exc_info=True)
+            if isinstance(e, KeyboardInterrupt):
+                log.info("❔ Cancelled after %0.2f seconds", result.runtime)
+            else:
+                log.exception("❌ Failed in %0.2f seconds", result.runtime)
         finally:
             self._config.log_config.set_log_fmt(task=None)
             return result
 
     def _proc_cleanup(self):
-        while not self._to_clean.empty():
+        while True:
             # During termination treat exceptions as warnings to ensure that all items get a chance to terminate.
             try:
                 item = self._to_clean.get_nowait()
@@ -145,15 +147,18 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, WorkerResult], ABC):
 
                 # Terminate the item.
                 item.terminate()
-            except BaseException as e:
-                log.warning("Exception during cleanup: %s", e)
+            except queue.Empty:
+                # No more items to clean.
+                break
+            except Exception as e:
+                log.warning("Exception during cleanup: %r", e)
 
 
 if sys.platform == "linux":
 
     class LinuxWorkerProcess(WorkerProcess):
         def _platform_init(self) -> Executor:
-            log.debug("Initializing Linux test executor.")
+            log.debug("Initializing Linux test executor")
 
             # Create a virtual /tmp.
             tmp_dir_default = self._config.tmp_dir_default

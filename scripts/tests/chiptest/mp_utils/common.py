@@ -35,9 +35,9 @@ class StartStopContextMixin(ABC):
         elif issubclass(exc_type, KeyboardInterrupt):
             log.warning("Interrupting %s per user request", self.name)
         elif exc is not None and tb is not None:
-            log.exception("Stopping %s due to exception", self.name, exc_info=(exc_type, exc, tb))
+            log.error("Stopping %s due to exception", self.name, exc_info=(exc_type, exc, tb))
         else:
-            log.exception("Stopping %s due to exception: %r", self.name, exc)
+            log.error("Stopping %s due to exception: %r", self.name, exc)
 
         self.stop()
         return False

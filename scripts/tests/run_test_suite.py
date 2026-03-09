@@ -266,8 +266,7 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
         random.seed(test_order_seed)
         random.shuffle(tests_filtered)
 
-    context.obj = RunContext(root=root, tests=tests_filtered,
-                             runtime=runtime, find_path=find_path, log_config=log_config)
+    context.obj = RunContext(root=root, tests=tests_filtered, runtime=runtime, find_path=find_path, log_config=log_config)
     if chip_tool:
         context.obj.deprecated_chip_tool_path = Path(chip_tool)
 
@@ -415,6 +414,7 @@ class Terminable(Protocol):
 @click.option(
     '--concurrency-status',
     default=-1,
+    show_default=True,
     type=float,
     help='Periodically show the status of test execution. <0: automatic period, 0: turn off, other values: periodicity of report in seconds.'
 )

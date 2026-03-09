@@ -16,7 +16,7 @@ class TestSchedulerType(enum.StrEnum):
     FAST = enum.auto()
     REPRODUCIBLE = enum.auto()
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class TestJobConfig:
     """Worker configuration which is a subset of command line options."""
     wifi_required: bool
@@ -35,7 +35,7 @@ class TestJobConfig:
     expected_failures: int
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass
 class WorkerConfig(ProcessConfigTemplate, TestJobConfig):
     WORKER_START_TIMEOUT: ClassVar[float] = 15
     WORKER_STOP_TIMEOUT: ClassVar[float] = 10
@@ -47,8 +47,7 @@ class WorkerConfig(ProcessConfigTemplate, TestJobConfig):
     def from_test_job_config(cls, log_config: LogConfig, config: TestJobConfig):
         # Needs to be a shallow copy, so that we don't accidentally create unpicklable generators in the config.
         return cls(**{field.name: getattr(config, field.name) for field in dataclasses.fields(config)},
-                   name_short=f"W{{id:0{len(str(config.concurrency))}}}",
-                   name_long="Worker {id}",
+                   name=f"W{{id:0{len(str(config.concurrency))}}}",
                    log_config=log_config,
                    start_timeout=WorkerConfig.WORKER_START_TIMEOUT,
                    stop_timeout=WorkerConfig.WORKER_STOP_TIMEOUT)

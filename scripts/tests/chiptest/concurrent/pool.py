@@ -4,6 +4,7 @@ import sys
 from collections.abc import Callable, Iterable
 from multiprocessing.context import SpawnContext
 from multiprocessing.managers import SyncManager
+from typing import Literal
 
 from chiptest.concurrent.config import TestJobConfig, TestSchedulerType, WorkerConfig
 from chiptest.concurrent.results import ResultProcessingThread
@@ -12,7 +13,7 @@ from chiptest.concurrent.worker import WorkerError, WorkerJob, WorkerProcessCls,
 from chiptest.log_utils import LogConfig
 from chiptest.mp_utils.common import StartStopContextMixin, mp_wrapped_spawn_context
 from chiptest.mp_utils.pool import WrappedProcessPool
-from chiptest.mp_utils.process import ProcessState
+from chiptest.mp_utils.process import EndOfWork, ProcessState, WorkQueueCancelled
 from chiptest.test_definition import TestDefinition
 
 log = logging.getLogger(__name__)
@@ -26,13 +27,17 @@ else:
     # Other platforms will fall back to their default.
     SYNC_MANAGER_PATH = None
 
-SchedulerFunc = Callable[[int, Iterable[TestDefinition]], None]
+SchedulerFunc = Callable[[Iterable[TestDefinition]], Iterable[tuple[int, TestDefinition]]]
+"""Function type for scheduling tests to workers.
+
+It takes an iterable of tests and returns an iterable of worker id and test pairs.
+"""
 
 
 class TestPool(WrappedProcessPool[WorkerProcessCls, WorkerConfig, WorkerJob, WorkerResult], StartStopContextMixin):
-    def __init__(self, process_cls: type[WorkerProcessCls], mp_context: SpawnContext, mp_manager: SyncManager,
-                 log_config: LogConfig, config: TestJobConfig, tests_per_iteration: int) -> None:
-        super().__init__(process_cls, mp_context, mp_manager, config.concurrency, "Test Pool",
+    def __init__(self, mp_context: SpawnContext, mp_manager: SyncManager, log_config: LogConfig, config: TestJobConfig,
+                 tests_per_iteration: int) -> None:
+        super().__init__(WorkerProcessCls, mp_context, mp_manager, config.concurrency, "Test Pool",
                          WorkerConfig.from_test_job_config(log_config, config))
 
         self._results_thread = ResultProcessingThread(self.config_template, self.work_queue, tests_per_iteration)
@@ -47,7 +52,7 @@ class TestPool(WrappedProcessPool[WorkerProcessCls, WorkerConfig, WorkerJob, Wor
             case _:
                 raise ValueError(f"Unknown scheduler type: {self.config.concurrenct_scheduler}")
 
-    def collect_exceptions(self) -> bool:
+    def collect_exceptions(self) -> Literal[True]:
         super().collect_exceptions()
 
         if self._results_thread.exception is not None:
@@ -79,20 +84,15 @@ class TestPool(WrappedProcessPool[WorkerProcessCls, WorkerConfig, WorkerJob, Wor
         log.debug("Finalized worker pool")
         self._results_thread.print_summary()
 
-    def _scheduler_fast(self, iteration: int, tests: Iterable[TestDefinition]) -> None:
-        if self.state.process_ready_queue is None:
-            raise RuntimeError("Ready queue is not initialized in the pool state")
-
+    def _scheduler_fast(self, tests: Iterable[TestDefinition]) -> Iterable[tuple[int, TestDefinition]]:
         for test in tests:
             worker_id = self.state.process_ready_queue.get_or_cancel()
             self.collect_exceptions()
-            log.debug("Enqueuing test %s to worker %i", test.name, worker_id)
-            self.work_queue.put_req(WorkerJob(iteration, test), worker_id)
+            yield worker_id, test
 
-    def _scheduler_reproducible(self, iteration: int, tests: Iterable[TestDefinition]) -> None:
-        for test, worker_id in zip(tests, itertools.cycle(range(len(self._pool)))):
-            log.debug("Enqueuing test %s to worker %i", test.name, worker_id)
-            self.work_queue.put_req(WorkerJob(iteration, test), worker_id)
+    def _scheduler_reproducible(self, tests: Iterable[TestDefinition]) -> Iterable[tuple[int, TestDefinition]]:
+        for worker_id, test in zip(itertools.cycle(range(len(self._pool))), tests):
+            yield worker_id, test
 
         self.collect_exceptions()
 
@@ -100,18 +100,22 @@ class TestPool(WrappedProcessPool[WorkerProcessCls, WorkerConfig, WorkerJob, Wor
     def run_tests(cls, log_config: LogConfig, config: TestJobConfig, tests: list[TestDefinition]) -> None:
         with (SyncManager(address=SYNC_MANAGER_PATH) as mp_manager,
               mp_wrapped_spawn_context(wrapper_linux="unshare --map-root-user -n -m") as mp_ctx,
-              TestPool(WorkerProcessCls, mp_ctx, mp_manager, log_config, config, len(tests)) as pool):
-            for i in range(config.iterations):
-                log.info("Scheduling iteration %d", i+1)
-                pool.scheduler(i, tests)
-
-                # If this is the last iteration schedule finalization event.
-                if i+1 == config.iterations:
-                    pool.work_queue.finalize_req()
-
-            log.info("All jobs scheduled")
+              cls(mp_ctx, mp_manager, log_config, config, len(tests)) as pool):
             try:
+                for i in range(1, config.iterations+1):
+                    log.info("Scheduling iteration %d", i)
+                    for worker_id, test in pool.scheduler(tests):
+                        log.debug("Enqueuing test %s to worker %i", test.name, worker_id)
+                        pool.work_queue.req_put(WorkerJob(i, test), worker_id)
+
+                    # If this is the last iteration schedule finalization event.
+                    if i == config.iterations:
+                        pool.work_queue.req_put(EndOfWork(), req_queue_id=None)
+
+                log.info("All jobs scheduled")
                 pool.state.wait_for(
                     lambda states: pool.collect_exceptions() and all(state.phase == ProcessState.Phase.CLOSED for state in states))
+            except WorkQueueCancelled:
+                log.debug("Received a cancel event on a work queue")
             except WorkerError as e:
                 log.error("%s", e)
