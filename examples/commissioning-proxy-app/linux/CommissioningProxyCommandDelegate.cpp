@@ -23,6 +23,7 @@
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 #include <app/clusters/commissioning-proxy-server/CommissioningProxyDelegate.h>
+#include <clusters/CommissioningProxy/Commands.h>
 #include "commissioning-proxy-delegate-impl.h"
 
 using namespace chip;
@@ -109,22 +110,23 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
                         uint16_t discriminator,
                         chip::VendorId vendorid,
                         uint16_t productid,
+                        uint16_t timeout,
                         WiFiBandBitmap wiFiBand,
                         app::CommandHandler * commandObj,
                         const DataModel::InvokeRequest & request)
 {
-    ChipLogProgress(AppServer, "===SHM %s(), transport:%d wiFiBand:%d", __func__, (int)transport, (int)wiFiBand);
-    // Cluster state is owned by the cluster; access it via the bound server pointer.
-    ChipLogProgress(NotSpecified, "=== %s() State:%u", __func__, (uint8_t)Server().GetCPState());
+    ChipLogProgress(AppServer, "===SHM %s(), transport:%d wiFiBand:%d timeout:%u",
+                    __func__, (int)transport, (int)wiFiBand, timeout);
 
-    // Successfully Connected, change CP state
-    CHIP_ERROR err = Server().SetCPState(CommissioningProxyCluster::kState_CPConnected);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Commissioning Proxy SetCPState() Failed");
-        return chip::Protocols::InteractionModel::Status::Failure;
-    }
-    ChipLogProgress(NotSpecified, "=== %s() State:%u", __func__, (uint8_t)Server().GetCPState());
+    // TODO: initiate the actual transport connection here using the transport-specific
+    //       layer (BLE/WiFiPAF/NTL), honouring the Timeout field per spec [10.124].
+
+    // Send ProxyConnectResponse with a sessionId per spec [10.125-10.127].
+    // TODO: allocate a real per-session ID when multiple sessions are supported.
+    Commands::ProxyConnectResponse::Type response;
+    response.sessionId = 1;
+    commandObj->AddResponse(request.path, response);
+
     return chip::Protocols::InteractionModel::Status::Success;
 }
 

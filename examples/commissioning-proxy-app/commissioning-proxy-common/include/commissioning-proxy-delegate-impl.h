@@ -61,6 +61,7 @@ protected:
                     uint16_t discriminator,
                     chip::VendorId vendorid,
                     uint16_t productid,
+                    uint16_t timeout,
                     WiFiBandBitmap wiFiBand,
                     app::CommandHandler * commandObj,
                     const DataModel::InvokeRequest & request) override;

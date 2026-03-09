@@ -136,36 +136,47 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
     Commands::ProxyConnectRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
-    // Only a single valid transport allowed
+    // Only a single transport SHALL be selected per spec
     VerifyOrReturnError(HasExactlyOneBitSet(commandData.transport.Raw()), Status::InvalidCommand);
 
-    // Default to zero if optional field is missing
+    // WiFiPAF transport requires WI feature, otherwise INVALID_TRANSPORT_TYPE per spec [10.122]
+    if (commandData.transport.Has(CapabilitiesBitmap::kWiFiPAF) && !mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
+    {
+        ChipLogError(Zcl, "Commissioning Proxy: kWiFiPAF transport selected but kWiFiNetworkInterface feature is disabled");
+        return Status::InvalidTransportType;
+    }
+
+    // WiFiBand is only valid when the WI feature is enabled per spec
     chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBand =
         static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(0);
 
     if (commandData.wiFiBand.HasValue())
     {
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), Status::InvalidCommand);
         wiFiBand = static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(
             commandData.wiFiBand.Value().Raw());
     }
 
-    // Cluster state is owned by the cluster; access it via the bound server pointer.
-    ChipLogProgress(NotSpecified, "=== %s() State:%u WiFiBand:%u", __func__, (uint8_t)GetCPState(), (uint8_t)wiFiBand);
+    ChipLogProgress(NotSpecified, "=== %s() Transport:%u WiFiBand:%u Timeout:%u",
+                    __func__, commandData.transport.Raw(), (uint8_t)wiFiBand, commandData.timeout);
+
+    // Delegate SHALL establish the transport connection and call commandObj->AddResponse()
+    // with a ProxyConnectResponse containing the sessionId per spec
+    auto delegateStatus = mDelegate.ProxyConnectRequest(
+        commandData.address, commandData.transport, commandData.discriminator,
+        commandData.vendorId, commandData.productId, commandData.timeout, wiFiBand, handler, request);
+
+    ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
+
+    // Update cluster state now that connection has been established
     CHIP_ERROR err = SetCPState(CommissioningProxyCluster::kState_CPConnected);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Commissioning Proxy SetCPState() Failed");
         return chip::Protocols::InteractionModel::Status::Failure;
     }
-    ChipLogProgress(NotSpecified, "=== %s() State:%u", __func__, (uint8_t)GetCPState());
 
-    ReturnErrorOnFailure(
-        DataModel::ActionReturnStatus(mDelegate.ProxyConnectRequest(
-            commandData.address, commandData.transport, commandData.discriminator,
-            commandData.vendorId, commandData.productId, wiFiBand, handler, request))
-            .GetUnderlyingError());
-
-    return Status::UnsupportedCommand;
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyDisconnectRequest(const DataModel::InvokeRequest & request,

@@ -49,15 +49,22 @@ public:
     virtual CommissioningProxyCluster * GetServer() const { return nullptr; }
 
     /**
-     * @brief Handles starting a Scan Request of required Transport and Bands
+     * @brief Handles connecting to a commissionable device discovered by the proxy
      *
-     * @param transport  Which transports to use
-     * @param wiFiBands  The frequency of the transports (if applicable)
-     * @param commandObj The command handler object from the command
-     * @param request    Invokde path
-     * @return Success if successful
+     * @param address       Transport address of the device (null if not available)
+     * @param transport     Which transport to use (exactly one bit set)
+     * @param discriminator Discriminator of the device to connect to
+     * @param vendorid      Vendor ID of the device (0 if not used)
+     * @param productid     Product ID of the device (0 if not used)
+     * @param timeout       Maximum time in seconds to wait for connection
+     * @param wiFiBand      Wi-Fi band to use (only valid when WI feature enabled)
+     * @param commandObj    The command handler object; delegate SHALL call AddResponse with ProxyConnectResponse
+     * @param request       Invoke path
+     * @return Success if connection was established and ProxyConnectResponse has been sent
      *
-     * The delegate handles all the transport specific options.
+     * The delegate handles all transport-specific connection logic. On success, the delegate
+     * SHALL call commandObj->AddResponse() with a ProxyConnectResponse containing the sessionId.
+     * If the connection cannot be established, an appropriate error Status is returned.
      */
     virtual Protocols::InteractionModel::Status
     ProxyConnectRequest(DataModel::Nullable<chip::ByteSpan> address,
@@ -65,6 +72,7 @@ public:
                         uint16_t discriminator,
                         chip::VendorId vendorid,
                         uint16_t productid,
+                        uint16_t timeout,
                         chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBand,
                         app::CommandHandler * commandObj,
                         const DataModel::InvokeRequest & request) = 0;

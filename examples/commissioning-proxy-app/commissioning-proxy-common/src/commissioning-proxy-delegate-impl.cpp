@@ -56,7 +56,7 @@ void MyCPDelegate::SetScanMaxTime(uint8_t seconds)
 {
     auto & st             = GetState(this);
     st.scanMaxTime = seconds;
-    ChipLogProgress(AppServer, "===SHM %s() delegate scanMaxTimeSeconds=%u", 
+    ChipLogProgress(AppServer, "===SHM %s() delegate scanMaxTimeSeconds=%u",
         __func__, static_cast<unsigned>(seconds));
 }
 
