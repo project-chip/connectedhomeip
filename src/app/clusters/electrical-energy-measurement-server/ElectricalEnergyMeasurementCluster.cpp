@@ -185,17 +185,8 @@ ElectricalEnergyMeasurementCluster::BuildMeasurement(DataModel::Nullable<int64_t
         measurement.startSystime   = previous.Value().endSystime;
     }
 
-    uint32_t epochTimestamp;
-    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(epochTimestamp);
-    if (err == CHIP_NO_ERROR)
-    {
-        measurement.endTimestamp.SetValue(epochTimestamp);
-    }
-    else
-    {
-        System::Clock::Milliseconds64 sysTimeMs = System::SystemClock().GetMonotonicMilliseconds64();
-        measurement.endSystime.SetValue(static_cast<uint64_t>(sysTimeMs.count()));
-    }
+    System::Clock::Milliseconds64 sysTimeMs = mTimerDelegate.GetCurrentMonotonicTimestamp();
+    measurement.endSystime.SetValue(static_cast<uint64_t>(sysTimeMs.count()));
 
     return MakeOptional(measurement);
 }
@@ -367,13 +358,6 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::SetMeasurementAccuracy(const Meas
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::SetCumulativeEnergyImported(const Optional<EnergyMeasurementStruct> & value)
 {
-    if (!mFeatureFlags.HasAll(Feature::kCumulativeEnergy, Feature::kImportedEnergy))
-    {
-        ChipLogError(
-            Zcl, "Electrical Energy Measurement: CumulativeEnergyImported requires kCumulativeEnergy and kImportedEnergy features");
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
-
     if (ValueChanged(mMeasurementData.cumulativeImported, value))
     {
         mMeasurementData.cumulativeImported = value;
@@ -384,14 +368,6 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::SetCumulativeEnergyImported(const
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::SetCumulativeEnergyExported(const Optional<EnergyMeasurementStruct> & value)
 {
-    if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy,
-                              ElectricalEnergyMeasurement::Feature::kExportedEnergy))
-    {
-        ChipLogError(
-            Zcl, "Electrical Energy Measurement: CumulativeEnergyExported requires kCumulativeEnergy and kExportedEnergy features");
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
-
     if (ValueChanged(mMeasurementData.cumulativeExported, value))
     {
         mMeasurementData.cumulativeExported = value;

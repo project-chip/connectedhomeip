@@ -58,15 +58,15 @@ const Structs::MeasurementAccuracyStruct::Type kTestAccuracy = {
 class MockEEMDelegate : public ElectricalEnergyMeasurement::Delegate
 {
 public:
-    DataModel::Nullable<int64_t> GetCumulativeEnergyImported() override { return DataModel::MakeNullable(mCumulativeImported); }
-    DataModel::Nullable<int64_t> GetCumulativeEnergyExported() override { return DataModel::MakeNullable(mCumulativeExported); }
-    DataModel::Nullable<int64_t> GetPeriodicEnergyImported() override { return DataModel::MakeNullable(mPeriodicImported); }
-    DataModel::Nullable<int64_t> GetPeriodicEnergyExported() override { return DataModel::MakeNullable(mPeriodicExported); }
+    DataModel::Nullable<int64_t> GetCumulativeEnergyImported() override { return mCumulativeImported; }
+    DataModel::Nullable<int64_t> GetCumulativeEnergyExported() override { return mCumulativeExported; }
+    DataModel::Nullable<int64_t> GetPeriodicEnergyImported() override { return mPeriodicImported; }
+    DataModel::Nullable<int64_t> GetPeriodicEnergyExported() override { return mPeriodicExported; }
 
-    int64_t mCumulativeImported = 0;
-    int64_t mCumulativeExported = 0;
-    int64_t mPeriodicImported   = 0;
-    int64_t mPeriodicExported   = 0;
+    DataModel::Nullable<int64_t> mCumulativeImported;
+    DataModel::Nullable<int64_t> mCumulativeExported;
+    DataModel::Nullable<int64_t> mPeriodicImported;
+    DataModel::Nullable<int64_t> mPeriodicExported;
 };
 
 struct TestElectricalEnergyMeasurementCluster : public ::testing::Test
@@ -488,10 +488,10 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GenerateReportPullsDelegateAndGen
     auto & logOnlyEvents = testContext.EventsGenerator();
 
     // Set delegate values
-    mDelegate.mCumulativeImported = 42000;
-    mDelegate.mCumulativeExported = 10000;
-    mDelegate.mPeriodicImported   = 500;
-    mDelegate.mPeriodicExported   = 200;
+    mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(42000));
+    mDelegate.mCumulativeExported = DataModel::MakeNullable(static_cast<int64_t>(10000));
+    mDelegate.mPeriodicImported   = DataModel::MakeNullable(static_cast<int64_t>(500));
+    mDelegate.mPeriodicExported   = DataModel::MakeNullable(static_cast<int64_t>(200));
 
     // Advance clock past min report interval so GenerateReport works
     mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMinReportInterval);
@@ -552,7 +552,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GenerateReportRespectsMinInterval
 
     auto & logOnlyEvents = testContext.EventsGenerator();
 
-    mDelegate.mCumulativeImported = 100;
+    mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(100));
 
     // Advance the clock to avoid having the last report = 0, impossible in practice but would happen in tests without this.
     mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(100));
@@ -566,7 +566,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GenerateReportRespectsMinInterval
 
     // Second call 1 ms after first report -- should be silently dropped (min 1s)
     mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(1));
-    mDelegate.mCumulativeImported = 200;
+    mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(200));
     cluster.GenerateReport();
     {
         auto event = logOnlyEvents.GetNextEvent();
@@ -607,7 +607,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TimerFiresAndGeneratesReport)
 
     auto & logOnlyEvents = testContext.EventsGenerator();
 
-    mDelegate.mCumulativeImported = 99999;
+    mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(99999));
 
     // Advance clock by the report interval (default 60s) -- should trigger TimerFired
     mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMaxReportInterval);
@@ -619,6 +619,88 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TimerFiresAndGeneratesReport)
     ASSERT_EQ((*event).GetEventData(decoded), CHIP_NO_ERROR);
     ASSERT_TRUE(decoded.energyImported.HasValue());
     EXPECT_EQ(decoded.energyImported.Value().energy, 99999);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalEnergyMeasurementCluster, TestGenerateReport)
+{
+    TestServerClusterContext testContext;
+
+    BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kCumulativeEnergy);
+
+    ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
+        .endpointId         = kTestEndpointId,
+        .featureFlags       = allFeatures,
+        .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet(),
+        .accuracyStruct     = kTestAccuracy,
+        .delegate           = mDelegate,
+        .timerDelegate      = mTimerDelegate,
+    });
+
+    EXPECT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    auto & logOnlyEvents = testContext.EventsGenerator();
+
+    
+    {
+        // Test when the delegate has no data, all values are null
+        mDelegate.mCumulativeImported.SetNull();
+        mDelegate.mCumulativeExported.SetNull();
+        mDelegate.mPeriodicImported.SetNull();
+        mDelegate.mPeriodicExported.SetNull();
+
+        DataModel::Nullable<int64_t>  testImported = mDelegate.GetCumulativeEnergyImported();
+        DataModel::Nullable<int64_t>  testExported = mDelegate.GetCumulativeEnergyExported();
+        EXPECT_TRUE(testImported.IsNull());
+        EXPECT_TRUE(testExported.IsNull());
+
+        testImported = mDelegate.GetPeriodicEnergyImported();
+        testExported = mDelegate.GetPeriodicEnergyExported();
+        EXPECT_TRUE(testImported.IsNull());
+        EXPECT_TRUE(testExported.IsNull());
+
+        cluster.GenerateReport();
+        {
+            auto event = logOnlyEvents.GetNextEvent();
+            EXPECT_FALSE(event.has_value());
+        }
+
+        mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(100));
+        mDelegate.mCumulativeExported = DataModel::MakeNullable(static_cast<int64_t>(50));
+        mDelegate.mPeriodicImported   = DataModel::MakeNullable(static_cast<int64_t>(10));
+        mDelegate.mPeriodicExported   = DataModel::MakeNullable(static_cast<int64_t>(5));
+
+        cluster.GenerateReport();
+        uint64_t firstEndSystime = 0;
+        {
+            auto event = logOnlyEvents.GetNextEvent();
+            ASSERT_TRUE(event.has_value());
+            Events::CumulativeEnergyMeasured::DecodableType decoded;
+            ASSERT_EQ((*event).GetEventData(decoded), CHIP_NO_ERROR);
+            ASSERT_TRUE(decoded.energyImported.HasValue());
+            EXPECT_EQ(decoded.energyImported.Value().energy, 100);
+            EXPECT_FALSE(decoded.energyImported.Value().startTimestamp.HasValue());
+            EXPECT_FALSE(decoded.energyImported.Value().startSystime.HasValue());
+            EXPECT_FALSE(decoded.energyImported.Value().endTimestamp.HasValue());
+            ASSERT_TRUE(decoded.energyImported.Value().endSystime.HasValue());
+            firstEndSystime = decoded.energyImported.Value().endSystime.Value();
+        }
+
+        // Test path where previous.HasValue() is true
+        mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(200));
+        mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMinReportInterval);
+        cluster.GenerateReport();
+        {
+            auto event = logOnlyEvents.GetNextEvent();
+            ASSERT_TRUE(event.has_value());
+            Events::CumulativeEnergyMeasured::DecodableType decoded;
+            ASSERT_EQ((*event).GetEventData(decoded), CHIP_NO_ERROR);
+            ASSERT_TRUE(decoded.energyImported.HasValue());
+            EXPECT_EQ(decoded.energyImported.Value().energy, 200);
+            ASSERT_TRUE(decoded.energyImported.Value().startSystime.HasValue());
+            EXPECT_EQ(decoded.energyImported.Value().startSystime.Value(), firstEndSystime);
+        }
+    }
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
