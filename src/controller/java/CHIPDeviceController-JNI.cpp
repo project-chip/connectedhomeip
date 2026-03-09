@@ -794,7 +794,7 @@ JNI_METHOD(void, pairDeviceWithAddress)
         err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "ApplyICDRegistrationInfo failed.");
+            ChipLogError(Controller, "ApplyICDRegistrationInfo failed: %s", err.Format());
             JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
             return;
         }
