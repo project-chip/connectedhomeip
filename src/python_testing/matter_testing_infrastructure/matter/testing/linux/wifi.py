@@ -205,7 +205,7 @@ class WpaSupplicantMock(threading.Thread):
             return self.mock.interfaces[-1].path
 
     class WpaInterface(sdbus.DbusInterfaceCommonAsync):
-        interface_name ="fi.w1.wpa_supplicant1.Interface"
+        interface_name = "fi.w1.wpa_supplicant1.Interface"
 
         # NAN session tracking (class-level counters shared across all interfaces)
         _publish_id_counter = 0
@@ -493,6 +493,7 @@ class WpaSupplicantMock(threading.Thread):
 
     class WpaNetwork(sdbus.DbusInterfaceCommonAsync):
         interface_name = "fi.w1.wpa_supplicant1.Network"
+
         def __init__(self, interface: WpaSupplicantMock.WpaInterface, ssid: str):
             super().__init__()
             self.ssid = ssid
