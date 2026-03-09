@@ -80,8 +80,7 @@ void LoggingDimmableLightDevice::OnDefaultMoveRateChanged(DataModel::Nullable<ui
 
 // OnOffEffectDelegate
 
-DataModel::ActionReturnStatus
-LoggingDimmableLightDevice::TriggerDelayedAllOff(OnOff::DelayedAllOffEffectVariantEnum e)
+DataModel::ActionReturnStatus LoggingDimmableLightDevice::TriggerDelayedAllOff(OnOff::DelayedAllOffEffectVariantEnum e)
 {
     switch (e)
     {
