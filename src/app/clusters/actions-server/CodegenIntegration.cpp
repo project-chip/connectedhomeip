@@ -40,7 +40,13 @@ CHIP_ERROR ActionsServer::Init()
 void ActionsServer::Shutdown()
 {
     // Unregisters the code-driven cluster
-    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
+                     mCluster.Cluster().GetPaths()[0].mEndpointId, ChipLogValueMEI(DeviceEnergyManagement::Id), err.Format());
+    }
 }
 
 void ActionsServer::ActionListModified(EndpointId aEndpoint)

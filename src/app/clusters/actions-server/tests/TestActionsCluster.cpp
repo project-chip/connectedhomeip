@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -281,14 +281,14 @@ TEST_F(TestActionsCluster, TestInvokeInstantActionSuccess)
 
     // Verify the command was successful
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_TRUE(result.status.value().IsSuccess());
+    EXPECT_TRUE(result.status.value().IsSuccess()); // NOLINT(bugprone-unchecked-optional-access)
 
     // Verify the delegate was called
     EXPECT_TRUE(mDelegate.mHandleInstantActionCalled);
     EXPECT_EQ(mDelegate.mLastActionId, 1);
     // ASSERT_TRUE forces the test to stop evaluating immediately if it fails, preventing the crash
     ASSERT_TRUE(mDelegate.mLastInvokeId.HasValue());
-    EXPECT_EQ(mDelegate.mLastInvokeId.Value(), 12345u);
+    EXPECT_EQ(mDelegate.mLastInvokeId.Value(), 12345u); // NOLINT(bugprone-unchecked-optional-access)
 }
 
 // Test invoking InstantAction command with invalid action ID
@@ -308,7 +308,7 @@ TEST_F(TestActionsCluster, TestInvokeInstantActionNotFound)
 
     // Verify the command returned NotFound status
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_FALSE(result.status.value().IsSuccess());
+    EXPECT_FALSE(result.status.value().IsSuccess()); // NOLINT(bugprone-unchecked-optional-access)
 }
 
 // Test invoking InstantAction command when delegate returns failure
@@ -340,7 +340,7 @@ TEST_F(TestActionsCluster, TestInvokeInstantActionDelegateFailure)
 
     // Verify the command returned the failure status from delegate
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_FALSE(result.status.value().IsSuccess());
+    EXPECT_FALSE(result.status.value().IsSuccess()); // NOLINT(bugprone-unchecked-optional-access)
 
     // Verify the delegate was still called
     EXPECT_TRUE(mDelegate.mHandleInstantActionCalled);
@@ -372,7 +372,7 @@ TEST_F(TestActionsCluster, TestInvokeInstantActionUnsupportedCommand)
 
     // Verify the command returned InvalidCommand status
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_FALSE(result.status.value().IsSuccess());
+    EXPECT_FALSE(result.status.value().IsSuccess()); // NOLINT(bugprone-unchecked-optional-access)
 
     // Verify the delegate was NOT called (command was rejected before delegate)
     EXPECT_FALSE(mDelegate.mHandleInstantActionCalled);

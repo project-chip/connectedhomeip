@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 
 #include "ActionsCluster.h"
+#include "ActionsStructs.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/reporting/reporting.h>

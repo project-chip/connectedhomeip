@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@
 #include <lib/core/DataModelTypes.h>
 
 #include "ActionsDelegate.h"
-#include "ActionsStructs.h"
 
 namespace chip {
 namespace app {
