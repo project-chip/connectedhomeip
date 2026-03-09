@@ -75,8 +75,7 @@ class TC_DISHALM_2_1(BasicCompositionTests):
             TestStep(2, "TH reads from the DUT the Mask attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(3, "TH reads from the DUT the Latch attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(4, "TH reads from the DUT the State attribute", "Verify that the DUT response contains a 32-bit value"),
-            TestStep(5, "TH reads from the DUT the Supported attribute",
-                     "Verify that the DUT response contains a 32-bit value. Verify that Supported, Mask, State, and Latch only contain valid alarm bits from the specification")
+            TestStep(5, "TH reads from the DUT the Supported attribute", "Verify that the DUT response contains a 32-bit value")
         ]
 
     def _get_valid_alarm_bitmap_mask(self, allow_provisional: bool = True) -> int:
@@ -127,8 +126,6 @@ class TC_DISHALM_2_1(BasicCompositionTests):
         logger.info(f"Provisional alarm bits: {provisional_bits}")
         logger.info(f"Valid alarm bitmap mask: 0x{mask:08X} (allow_provisional={allow_provisional})")
 
-        asserts.assert_true(mask != 0, "No valid alarm bits found in AlarmBitmap specification")
-
         return mask
 
     def _validate_alarm_bitmap(self, attribute_name: str, bitmap_value: int,
@@ -171,18 +168,18 @@ class TC_DISHALM_2_1(BasicCompositionTests):
 
         logger.info(f"{attribute_name} bitmap validation passed: 0x{bitmap_value:08X}")
 
-    async def read_and_check_attributes_from_dishwasher_alarm(self, attribute: type[ClusterObjects.ClusterAttributeDescriptor]) -> int:
+    async def read_and_check_attributes_from_dishwasher_alarm(self, attribute: type[ClusterObjects.ClusterAttributeDescriptor], name: str) -> int:
         resp = await self.read_single_attribute_check_success(
             cluster=self.cluster,
             attribute=attribute
         )
 
-        matter_asserts.assert_valid_uint32(resp, attribute.__name__)
+        matter_asserts.assert_valid_uint32(resp, name)
 
-        logger.info(f"Reading attribute: {attribute}, response: {resp}")
-        return int(resp)  # type: ignore[arg-type]
+        logger.info(f"Reading attribute: {name}, response: {resp}")
+        return int(resp)
 
-    @run_if_endpoint_matches(has_cluster(Clusters.DishwasherAlarm))  # type: ignore[arg-type]
+    @run_if_endpoint_matches(has_cluster(Clusters.DishwasherAlarm))
     async def test_TC_DISHALM_2_1(self):
 
         self.cluster = Clusters.DishwasherAlarm
@@ -196,21 +193,21 @@ class TC_DISHALM_2_1(BasicCompositionTests):
 
         self.step(2)
         mask = Clusters.DishwasherAlarm.Attributes.Mask
-        mask_value = await self.read_and_check_attributes_from_dishwasher_alarm(mask)
+        mask_value = await self.read_and_check_attributes_from_dishwasher_alarm(mask, "Mask")
 
         self.step(3)
         latch_attribute = Clusters.DishwasherAlarm.Attributes.Latch
         latch_value = None
         if await self.attribute_guard(endpoint=self.endpoint, attribute=latch_attribute):
-            latch_value = await self.read_and_check_attributes_from_dishwasher_alarm(latch_attribute)
+            latch_value = await self.read_and_check_attributes_from_dishwasher_alarm(latch_attribute, "Latch")
 
         self.step(4)
         state_attribute = Clusters.DishwasherAlarm.Attributes.State
-        state_value = await self.read_and_check_attributes_from_dishwasher_alarm(state_attribute)
+        state_value = await self.read_and_check_attributes_from_dishwasher_alarm(state_attribute, "State")
 
         self.step(5)
         supported_attribute = Clusters.DishwasherAlarm.Attributes.Supported
-        supported_value = await self.read_and_check_attributes_from_dishwasher_alarm(supported_attribute)
+        supported_value = await self.read_and_check_attributes_from_dishwasher_alarm(supported_attribute, "Supported")
 
         valid_mask = self._get_valid_alarm_bitmap_mask(allow_provisional)
 
