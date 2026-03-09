@@ -64,5 +64,5 @@ class WrappedProcessPool(ABC, Generic[WrappedProcessT, ConfigT, WorkRequestT, Wo
             if self.state.phase_min != ProcessState.Phase.CLOSED:
                 self._execute_for_all_workers(lambda process: process.stop(), f"Exception when stopping {self.name}", "WorkerStop")
         finally:
-            # Now, once all processes are stopped, is the time to cancel the response queue to stop the results processing thread.
-            self.work_queue.rsp_cancel()
+            # Now, once all processes are stopped, is the time to close the response queue to stop the results processing thread.
+            self.work_queue.rsp_close()

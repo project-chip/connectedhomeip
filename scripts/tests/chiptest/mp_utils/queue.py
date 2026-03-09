@@ -1,7 +1,6 @@
 import contextlib
 import queue
 import threading
-from abc import ABC, abstractmethod
 from multiprocessing.managers import SyncManager
 from types import TracebackType
 from typing import Generic, Protocol, TypeVar
@@ -16,6 +15,7 @@ class Waitable(Protocol):
     def wait(self, timeout: float | None = None) -> bool: ...
 
 
+# TODO: Make it into proper wait_for with a predicate.
 def wait_for_mp_managed(waitable: Waitable, timeout: float | None = None) -> bool:
     """Wait for a resource managed by multiprocessing.Manager.
 
@@ -54,7 +54,7 @@ QueueElementT = TypeVar("QueueElementT")
 """Queue element, which can be anything but None."""
 
 
-class CancellableQueue(ABC, Generic[QueueElementT]):
+class CancellableQueue(Generic[QueueElementT]):
     def __init__(self, mp_manager: SyncManager, cancel_event: threading.Event | None = None):
         self._queue: queue.Queue[QueueElementT] = mp_manager.Queue()
         self._cond = mp_manager.Condition()
@@ -83,20 +83,18 @@ class CancellableQueue(ABC, Generic[QueueElementT]):
         If timeout is not None, also raise TimeoutError on timeout.
         """
         with self._cond:
-            # First check without waiting, to avoid unnecessary waiting and possible race conditions.
-            with contextlib.suppress(queue.Empty):
-                return self._get_or_cancel_logic()
+            if timeout != 0:
+                # First check without waiting, to avoid unnecessary waiting and possible race conditions.
+                with contextlib.suppress(queue.Empty):
+                    return self.get_or_cancel(timeout=0)
 
-            if not wait_for_mp_managed(self._cond, timeout):
-                raise TimeoutError("Timeout when waiting for queue item")
-            return self._get_or_cancel_logic()
+                # Now, we wait for the condition within the timeout.
+                if not wait_for_mp_managed(self._cond, timeout):
+                    raise TimeoutError("Timeout when waiting for queue item")
 
-    @abstractmethod
-    def _get_or_cancel_logic(self) -> QueueElementT:
-        """Implement the logic to get an item from the queue, and raise WorkQueueCancelled if cancellation is observed.
-
-        This method will be called by get_or_cancel() after waiting for the condition, and should not do any waiting itself.
-        """
+            if self._cancel_event.is_set():
+                raise WorkQueueCancelled
+            return self._queue.get_nowait()
 
     def cancel(self) -> None:
         """Set cancel event and notify all consumers.
@@ -121,33 +119,6 @@ class CancellableQueue(ABC, Generic[QueueElementT]):
         return self._cond.__exit__(exc_type, exc_val, exc_tb)
 
 
-class RequestQueue(CancellableQueue[QueueElementT]):
-    def _get_or_cancel_logic(self) -> QueueElementT:
-        """Get a request item from the queue.
-
-        Raise WorkQueueCancelled as soon as the cancellation event is set.
-        """
-        with self._cond:
-            if self._cancel_event.is_set():
-                raise WorkQueueCancelled
-            return self._queue.get_nowait()
-
-
-class ResponseQueue(CancellableQueue[QueueElementT]):
-    def _get_or_cancel_logic(self) -> QueueElementT:
-        """Get a response item from the queue.
-
-        In case of cancellation, first get all response items until the queue is empty, then raise WorkQueueCancelled. This allows
-        to process all responses for already processed requests.
-        """
-        with self._cond:
-            try:
-                return self._queue.get_nowait()
-            except queue.Empty:
-                if self._cancel_event.is_set():
-                    raise WorkQueueCancelled
-                raise
-
 
 WorkRequestT = TypeVar("WorkRequestT")
 WorkResponseT = TypeVar("WorkResponseT")
@@ -165,29 +136,25 @@ class WorkQueue(Generic[WorkRequestT, WorkResponseT]):
 
     def __init__(self, mp_manager: SyncManager, req_count: int = 1) -> None:
         self._req_cancel_event = mp_manager.Event()
-        self._req = tuple(RequestQueue[WorkRequestT | EndOfWork](mp_manager, self._req_cancel_event) for _ in range(req_count))
+        self._req = tuple(CancellableQueue[WorkRequestT | EndOfWork](mp_manager, self._req_cancel_event) for _ in range(req_count))
 
-        self._rsp = ResponseQueue[WorkResponseT](mp_manager)
+        self._rsp: queue.Queue[WorkResponseT | EndOfWork] = mp_manager.Queue()
 
-    def req_put(self, req: WorkRequestT | EndOfWork, req_queue_id: int | None = 0) -> None:
-        """Put a request to the queue.
+    def req_put(self, req: WorkRequestT, req_queue_id: int = 0) -> None:
+        """Put a request to one of the request queues."""
+        if req_queue_id > len(self._req):
+            raise ValueError(f"No request queue with ID {req_queue_id}")
+        self._req[req_queue_id].put(req)
 
-        If req_queue_id is not None, put to the corresponding request queue, otherwise put to all request queues (broadcast).
-        """
-        if req_queue_id is not None:
-            # Single queue (more likely).
-            if req_queue_id > len(self._req):
-                raise ValueError(f"No request queue with ID {req_queue_id}")
-            self._req[req_queue_id].put(req)
-        else:
-            # Broadcast to all request queues.
-            for req_queue in self._req:
-                req_queue.put(req)
-
-    def req_put_or_cancel(self, req_queue_id: int = 0, timeout: float | None = None) -> WorkRequestT:
+    def req_get_or_cancel(self, req_queue_id: int = 0, timeout: float | None = None) -> WorkRequestT:
         if isinstance(req := self._req[req_queue_id].get_or_cancel(timeout), EndOfWork):
-            raise EndOfWork
+            raise req
         return req
+
+    def req_close(self) -> None:
+        """Indicate that no more requests will be put on the queues by broadcasting EndOfWork sentinel to all request queues."""
+        for req_queue in self._req:
+            req_queue.put(EndOfWork())
 
     def req_cancel(self) -> None:
         """Trigger cancel event for the request queues."""
@@ -208,9 +175,11 @@ class WorkQueue(Generic[WorkRequestT, WorkResponseT]):
     def rsp_put(self, rsp: WorkResponseT) -> None:
         self._rsp.put(rsp)
 
-    def rsp_get_or_cancel(self, timeout: float | None = None) -> WorkResponseT:
-        return self._rsp.get_or_cancel(timeout)
+    def rsp_get(self, timeout: float | None = None) -> WorkResponseT:
+        if isinstance(rsp := self._rsp.get(timeout=timeout), EndOfWork):
+            raise rsp
+        return rsp
 
-    def rsp_cancel(self) -> None:
-        """Trigger cancel event for the response queue."""
-        self._rsp.cancel()
+    def rsp_close(self) -> None:
+        """Indicate that no more responses will be put on the queue."""
+        self._rsp.put(EndOfWork())

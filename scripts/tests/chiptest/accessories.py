@@ -64,7 +64,7 @@ class XmlRpcServerProcess(WrappedProcess, StartStopContextMixin):
         self.work_queue.req_put((name, args))
 
         # Propagate any exception to the RPC server process, so that it can be handled by it.
-        if isinstance(rsp := self.work_queue.rsp_get_or_cancel(), Exception):
+        if isinstance(rsp := self.work_queue.rsp_get(), Exception):
             raise rsp
         return rsp
 
@@ -119,7 +119,7 @@ class XmlRpcServerProcessManager(threading.Thread):
     def cancel(self) -> None:
         # We can cancel both request and response queues.
         self._work_queue.req_cancel()
-        self._work_queue.rsp_cancel()
+        self._work_queue.rsp_close()
 
         self.join(timeout=ProcessConfigTemplate.DEFAULT_STOP_TIMEOUT)
         if self.is_alive():
@@ -160,7 +160,7 @@ class XmlRpcServerProcessManager(threading.Thread):
 
                 try:
                     while True:
-                        server.work_queue.rsp_put(self._execute_func(server.work_queue.req_put_or_cancel()))
+                        server.work_queue.rsp_put(self._execute_func(server.work_queue.req_get_or_cancel()))
                 except WorkQueueCancelled:
                     log.debug("Received a cancel event")
         except Exception as e:

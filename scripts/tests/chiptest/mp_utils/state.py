@@ -9,7 +9,7 @@ from types import TracebackType
 from typing import Literal
 
 from chiptest.mp_utils.config import ProcessConfigTemplate
-from chiptest.mp_utils.queue import RequestQueue
+from chiptest.mp_utils.queue import CancellableQueue
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ class ProcessGroupState:
     def __init__(self, mp_manager: SyncManager) -> None:
         self._state_changed = mp_manager.Condition()
         self._states: list[ProcessState] = []
-        self.process_ready_queue = RequestQueue[int](mp_manager)
+        self.process_ready_queue: CancellableQueue[int] = CancellableQueue(mp_manager)
 
     def register_process(self, state: ProcessState) -> threading.Condition:
         with self._state_changed:

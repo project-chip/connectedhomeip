@@ -119,7 +119,7 @@ class WrappedProcess(ABC, Generic[ConfigT, WorkRequestT, WorkResponseT]):
         else:
             log.debug("Cancelling work in process %s", self.name)
             self.work_queue.req_cancel()
-            self.work_queue.rsp_cancel()
+            self.work_queue.rsp_close()
 
             if has_stopped(self._config.stop_timeout):
                 return

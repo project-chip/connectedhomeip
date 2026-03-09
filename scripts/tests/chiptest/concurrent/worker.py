@@ -2,7 +2,6 @@ import dataclasses
 import logging
 import os
 import queue
-import signal
 import subprocess
 import sys
 import time
@@ -82,7 +81,7 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, WorkerResult], ABC):
 
     def _proc_work(self) -> None:
         while True:
-            work = self.work_queue.req_put_or_cancel(req_queue_id=self._config.id)
+            work = self.work_queue.req_get_or_cancel(req_queue_id=self._config.id)
             self.state.phase = ProcessState.Phase.WORKING
             self.work_queue.rsp_put(result:=self._run_test(work))
             if isinstance(result.exception, KeyboardInterrupt):

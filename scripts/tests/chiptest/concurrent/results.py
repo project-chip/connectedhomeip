@@ -4,8 +4,7 @@ import threading
 
 from chiptest.concurrent.config import WorkerConfig
 from chiptest.concurrent.worker import WorkerError, WorkerJob, WorkerResult
-from chiptest.mp_utils.process import WorkQueueCancelled
-from chiptest.mp_utils.queue import WorkQueue
+from chiptest.mp_utils.queue import WorkQueue, EndOfWork
 
 log = logging.getLogger(__name__)
 
@@ -69,8 +68,8 @@ class ResultProcessingThread(threading.Thread):
         log.debug("Launching result processing thread")
         try:
             while True:
-                self._process_result(self.work_queue.rsp_get_or_cancel())
-        except WorkQueueCancelled:
+                self._process_result(self.work_queue.rsp_get())
+        except EndOfWork:
             log.debug("No more results to process, finishing result processing thread")
         except Exception as e:
             self.exception = e

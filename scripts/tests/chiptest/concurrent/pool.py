@@ -110,7 +110,7 @@ class TestPool(WrappedProcessPool[WorkerProcessCls, WorkerConfig, WorkerJob, Wor
 
                     # If this is the last iteration schedule finalization event.
                     if i == config.iterations:
-                        pool.work_queue.req_put(EndOfWork(), req_queue_id=None)
+                        pool.work_queue.req_close()
 
                 log.info("All jobs scheduled")
                 pool.state.wait_for(
