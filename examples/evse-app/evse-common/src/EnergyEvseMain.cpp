@@ -271,7 +271,7 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
             RETURN_SAFELY_IGNORED eemCluster->SetCumulativeEnergyReset(MakeOptional(resetStruct));
         }
     }
-    
+
     VerifyOrReturnError(gDEMDelegate && gDEMInstance, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(gESManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
     gCommonClustersInitialized = true;
