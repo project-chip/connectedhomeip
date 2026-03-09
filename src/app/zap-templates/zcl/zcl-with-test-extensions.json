@@ -90,6 +90,7 @@
         "mode-base-cluster.xml",
         "mode-select-cluster.xml",
         "mode-select-extensions.xml",
+        "proximity-ranging-cluster.xml",
         "push-av-stream-transport-cluster.xml",
         "semantic-tag-namespace-enums.xml",
         "network-commissioning-cluster.xml",
