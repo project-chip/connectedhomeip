@@ -60,7 +60,7 @@ jobs:
 
         # Run on namespace.so instead of `ubuntu-latest`: since compilations are generally CPU
         # bound, we run these on larger/faster machines.
-        runs-on: namespace-profile-16x32
+        runs-on: namespace-profile-4x16
 
         container:
             image: ghcr.io/project-chip/chip-build:184
