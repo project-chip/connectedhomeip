@@ -120,10 +120,16 @@ Energy_mWh ChefDelegate::GetEstimatedHeatRequired()
         occupiedHeatingSetpoint = 2000; // Default 20C
     }
 
-    if (Clusters::Thermostat::Attributes::LocalTemperature::Get(mEndpointId, &localTemperature) !=
-        Protocols::InteractionModel::Status::Success)
+    DataModel::Nullable<int16_t> temp;
+    if (Clusters::Thermostat::Attributes::LocalTemperature::Get(mEndpointId, temp) !=
+            Protocols::InteractionModel::Status::Success ||
+        temp.IsNull())
     {
         localTemperature = 2000; // Default 20C
+    }
+    else
+    {
+        localTemperature = temp.Value();
     }
 
     if (localTemperature >= occupiedHeatingSetpoint)
