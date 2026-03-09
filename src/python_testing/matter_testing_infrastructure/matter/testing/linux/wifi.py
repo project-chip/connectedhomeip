@@ -45,8 +45,8 @@ class NANSimulator:
 
     def __init__(self):
         self.interfaces: dict[str, WpaSupplicantMock.WpaInterface] = {}
-        self.publishers: dict[str, tuple[str, Any]] = {}
-        self.subscribers: dict[str, tuple[str, Any]] = {}
+        self.publishers: dict[int, tuple[str, Any]] = {}
+        self.subscribers: dict[int, tuple[str, Any]] = {}
         self._lock = threading.Lock()
 
     def register_interface(self, name: str, interface: WpaSupplicantMock.WpaInterface):
@@ -54,7 +54,6 @@ class NANSimulator:
         with self._lock:
             self.interfaces[name] = interface
             interface.interface_name_in_sim = name
-            interface.nan_simulator = self
             log.debug("NANSimulator: Registered interface '%s' with MAC %s",
                       name, interface.mock_mac)
 
@@ -225,7 +224,7 @@ class WpaSupplicantMock(threading.Thread):
             self.scanning = False
             self.current_network = "/"
             self.nan_sessions: dict[int, dict] = {}
-            self.interface_name_in_sim: str = None
+            self.interface_name_in_sim: str = ""
 
         @sdbus.dbus_method_async("s")
         async def AutoScan(self, arg: str) -> None:
