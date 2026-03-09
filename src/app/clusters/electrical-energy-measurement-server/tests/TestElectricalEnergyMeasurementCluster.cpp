@@ -641,7 +641,6 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TestGenerateReport)
     EXPECT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     auto & logOnlyEvents = testContext.EventsGenerator();
 
-
     {
         // Test when the delegate has no data, all values are null
         mDelegate.mCumulativeImported.SetNull();
@@ -649,8 +648,8 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TestGenerateReport)
         mDelegate.mPeriodicImported.SetNull();
         mDelegate.mPeriodicExported.SetNull();
 
-        DataModel::Nullable<int64_t>  testImported = mDelegate.GetCumulativeEnergyImported();
-        DataModel::Nullable<int64_t>  testExported = mDelegate.GetCumulativeEnergyExported();
+        DataModel::Nullable<int64_t> testImported = mDelegate.GetCumulativeEnergyImported();
+        DataModel::Nullable<int64_t> testExported = mDelegate.GetCumulativeEnergyExported();
         EXPECT_TRUE(testImported.IsNull());
         EXPECT_TRUE(testExported.IsNull());
 

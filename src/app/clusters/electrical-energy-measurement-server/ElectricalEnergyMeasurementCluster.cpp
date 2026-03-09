@@ -112,7 +112,6 @@ ElectricalEnergyMeasurementCluster::ElectricalEnergyMeasurementCluster(const Con
         mReportInterval = kMaxReportInterval;
     }
 
-
     mMeasurementData.measurementAccuracy.measurementType  = config.accuracyStruct.measurementType;
     mMeasurementData.measurementAccuracy.measured         = config.accuracyStruct.measured;
     mMeasurementData.measurementAccuracy.minMeasuredValue = config.accuracyStruct.minMeasuredValue;
@@ -219,7 +218,7 @@ void ElectricalEnergyMeasurementCluster::DoGenerateReport()
             auto measurement = BuildMeasurement(mDelegate.GetCumulativeEnergyImported(), mMeasurementData.cumulativeImported);
             TEMPORARY_RETURN_IGNORED SetCumulativeEnergyImported(measurement);
             event.energyImported = measurement;
-            hasData = hasData || measurement.HasValue();
+            hasData              = hasData || measurement.HasValue();
         }
 
         if (mFeatureFlags.Has(Feature::kExportedEnergy))
@@ -227,7 +226,7 @@ void ElectricalEnergyMeasurementCluster::DoGenerateReport()
             auto measurement = BuildMeasurement(mDelegate.GetCumulativeEnergyExported(), mMeasurementData.cumulativeExported);
             TEMPORARY_RETURN_IGNORED SetCumulativeEnergyExported(measurement);
             event.energyExported = measurement;
-            hasData = hasData || measurement.HasValue();
+            hasData              = hasData || measurement.HasValue();
         }
 
         if (hasData && mContext != nullptr)
@@ -247,7 +246,7 @@ void ElectricalEnergyMeasurementCluster::DoGenerateReport()
             auto measurement = BuildMeasurement(mDelegate.GetPeriodicEnergyImported(), mMeasurementData.periodicImported);
             TEMPORARY_RETURN_IGNORED SetPeriodicEnergyImported(measurement);
             event.energyImported = measurement;
-            hasData = hasData || measurement.HasValue();
+            hasData              = hasData || measurement.HasValue();
         }
 
         if (mFeatureFlags.Has(Feature::kExportedEnergy))
