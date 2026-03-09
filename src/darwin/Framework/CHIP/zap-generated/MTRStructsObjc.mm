@@ -8793,6 +8793,291 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRProximityRangingClusterRDRStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _azimuth = @(0);
+
+        _elevation = @(0);
+
+        _azimuthAccuracy = @(0);
+
+        _elevationAccuracy = @(0);
+
+        _reference = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRProximityRangingClusterRDRStruct alloc] init];
+
+    other.azimuth = self.azimuth;
+    other.elevation = self.elevation;
+    other.azimuthAccuracy = self.azimuthAccuracy;
+    other.elevationAccuracy = self.elevationAccuracy;
+    other.reference = self.reference;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: azimuth:%@; elevation:%@; azimuthAccuracy:%@; elevationAccuracy:%@; reference:%@; >", NSStringFromClass([self class]), _azimuth, _elevation, _azimuthAccuracy, _elevationAccuracy, _reference];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRProximityRangingClusterRangingMeasurementDataStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _wiFiDevIK = nil;
+
+        _bleDeviceId = nil;
+
+        _bltDevIK = nil;
+
+        _timeOfMeasurement = nil;
+
+        _distance = nil;
+
+        _accuracy = nil;
+
+        _rdr = nil;
+
+        _rssi = nil;
+
+        _txPower = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRProximityRangingClusterRangingMeasurementDataStruct alloc] init];
+
+    other.wiFiDevIK = self.wiFiDevIK;
+    other.bleDeviceId = self.bleDeviceId;
+    other.bltDevIK = self.bltDevIK;
+    other.timeOfMeasurement = self.timeOfMeasurement;
+    other.distance = self.distance;
+    other.accuracy = self.accuracy;
+    other.rdr = self.rdr;
+    other.rssi = self.rssi;
+    other.txPower = self.txPower;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: wiFiDevIK:%@; bleDeviceId:%@; bltDevIK:%@; timeOfMeasurement:%@; distance:%@; accuracy:%@; rdr:%@; rssi:%@; txPower:%@; >", NSStringFromClass([self class]), [_wiFiDevIK base64EncodedStringWithOptions:0], _bleDeviceId, [_bltDevIK base64EncodedStringWithOptions:0], _timeOfMeasurement, _distance, _accuracy, _rdr, _rssi, _txPower];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRProximityRangingClusterBLERangingDeviceRoleConfigStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _role = @(0);
+
+        _peerBLEDeviceID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRProximityRangingClusterBLERangingDeviceRoleConfigStruct alloc] init];
+
+    other.role = self.role;
+    other.peerBLEDeviceID = self.peerBLEDeviceID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: role:%@; peerBLEDeviceID:%@; >", NSStringFromClass([self class]), _role, _peerBLEDeviceID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _role = @(0);
+
+        _peerBLTDevIK = [NSData data];
+
+        _ltk = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct alloc] init];
+
+    other.role = self.role;
+    other.peerBLTDevIK = self.peerBLTDevIK;
+    other.ltk = self.ltk;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: role:%@; peerBLTDevIK:%@; ltk:%@; >", NSStringFromClass([self class]), _role, [_peerBLTDevIK base64EncodedStringWithOptions:0], [_ltk base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRProximityRangingClusterRangingCapabilitiesStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _technology = @(0);
+
+        _frequencyBand = @(0);
+
+        _periodicRangingSupport = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRProximityRangingClusterRangingCapabilitiesStruct alloc] init];
+
+    other.technology = self.technology;
+    other.frequencyBand = self.frequencyBand;
+    other.periodicRangingSupport = self.periodicRangingSupport;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: technology:%@; frequencyBand:%@; periodicRangingSupport:%@; >", NSStringFromClass([self class]), _technology, _frequencyBand, _periodicRangingSupport];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRProximityRangingClusterRangingTriggerConditionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _startTime = @(0);
+
+        _endTime = nil;
+
+        _rangingInstanceInterval = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRProximityRangingClusterRangingTriggerConditionStruct alloc] init];
+
+    other.startTime = self.startTime;
+    other.endTime = self.endTime;
+    other.rangingInstanceInterval = self.rangingInstanceInterval;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTime:%@; endTime:%@; rangingInstanceInterval:%@; >", NSStringFromClass([self class]), _startTime, _endTime, _rangingInstanceInterval];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRProximityRangingClusterReportingConditionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _minDistanceCondition = nil;
+
+        _maxDistanceCondition = nil;
+
+        _accuracyCondition = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRProximityRangingClusterReportingConditionStruct alloc] init];
+
+    other.minDistanceCondition = self.minDistanceCondition;
+    other.maxDistanceCondition = self.maxDistanceCondition;
+    other.accuracyCondition = self.accuracyCondition;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: minDistanceCondition:%@; maxDistanceCondition:%@; accuracyCondition:%@; >", NSStringFromClass([self class]), _minDistanceCondition, _maxDistanceCondition, _accuracyCondition];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRProximityRangingClusterWiFiRangingDeviceRoleConfigStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _role = @(0);
+
+        _peerWiFiDevIK = [NSData data];
+
+        _pmk = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRProximityRangingClusterWiFiRangingDeviceRoleConfigStruct alloc] init];
+
+    other.role = self.role;
+    other.peerWiFiDevIK = self.peerWiFiDevIK;
+    other.pmk = self.pmk;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: role:%@; peerWiFiDevIK:%@; pmk:%@; >", NSStringFromClass([self class]), _role, [_peerWiFiDevIK base64EncodedStringWithOptions:0], [_pmk base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRThreadNetworkDirectoryClusterThreadNetworkStruct
 - (instancetype)init
 {

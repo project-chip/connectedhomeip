@@ -8907,6 +8907,167 @@ provisional cluster AmbientContextSensing = 1073 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster enables the configuration of proximity ranging sessions and reporting of proximity ranging data. */
+provisional cluster ProximityRanging = 1075 {
+  revision 1;
+
+  enum RangingRoleEnum : enum8 {
+    kWiFiSubscriberRole = 0;
+    kWiFiPublisherRole = 1;
+    kBLEScanningRole = 2;
+    kBLEBeaconRole = 3;
+    kBLTInitiatorRole = 4;
+    kBLTReflectorRole = 5;
+  }
+
+  enum RangingSecurityEnum : enum8 {
+    kSecureRanging = 0;
+    kOpenRanging = 1;
+  }
+
+  enum RangingTechEnum : enum8 {
+    kBluetoothChannelSounding = 0;
+    kWiFiRoundTripTimeRanging = 1;
+    kWiFiNextGenerationRanging = 2;
+    kBLEBeaconRSSIRanging = 3;
+  }
+
+  enum ResultCodeEnum : enum8 {
+    kAccepted = 0;
+    kRejectedInfeasibleRanging = 1;
+    kRejectedInfeasibleRangingTriggers = 2;
+    kBusySessionCapacityReached = 3;
+    kBusyTryAgainLater = 4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kWiFiUSDProximityDetection = 0x1 [spec_name = "Wi-Fi USD Proximity Detection"];
+    kBluetoothChannelSounding = 0x2;
+    kBLEBeaconRSSI = 0x4 [spec_name = "BLE Beacon RSSI"];
+    kUWBRanging = 0x8 [spec_name = "UWB Ranging"];
+  }
+
+  bitmap RadioBandBitmap : bitmap16 {
+    k2G4 = 0x1 [spec_name = "2G4"];
+    k3G65 = 0x2 [spec_name = "3G65"];
+    k5G = 0x4 [spec_name = "5G"];
+    k6G = 0x8 [spec_name = "6G"];
+    k60G = 0x10 [spec_name = "60G"];
+    k1G = 0x20 [spec_name = "1G"];
+    k45G = 0x40 [spec_name = "45G"];
+  }
+
+  bitmap RangingBandwidthBitmap : bitmap32 {
+    k1MHz = 0x1;
+    k2MHz = 0x2;
+    k4MHz = 0x4;
+    k8MHz = 0x8;
+    k16MHz = 0x10;
+    k20MHz = 0x20;
+    k40MHz = 0x40;
+    k80MHz = 0x80;
+    k160MHz = 0x100;
+    k320MHz = 0x200;
+  }
+
+  struct RDRStruct {
+    int16u azimuth = 0;
+    int16s elevation = 1;
+    int8u azimuthAccuracy = 2;
+    int8u elevationAccuracy = 3;
+    int8u reference = 4;
+  }
+
+  struct RangingMeasurementDataStruct {
+    optional octet_string<16> wiFiDevIK = 0;
+    optional int64u BLEDeviceId = 1;
+    optional octet_string BLTDevIK = 2;
+    optional epoch_s timeOfMeasurement = 3;
+    nullable int16u distance = 4;
+    optional int16s accuracy = 5;
+    optional RDRStruct rdr = 6;
+    optional nullable int8s rssi = 7;
+    optional nullable int8s txPower = 8;
+  }
+
+  struct BLERangingDeviceRoleConfigStruct {
+    RangingRoleEnum role = 0;
+    int64u peerBLEDeviceID = 1;
+  }
+
+  struct BLTChannelSoundingDeviceRoleConfigStruct {
+    RangingRoleEnum role = 0;
+    octet_string<16> peerBLTDevIK = 1;
+    optional octet_string<16> ltk = 2;
+  }
+
+  struct RangingCapabilitiesStruct {
+    RangingTechEnum technology = 0;
+    RadioBandBitmap frequencyBand = 1;
+    boolean periodicRangingSupport = 2;
+  }
+
+  struct RangingTriggerConditionStruct {
+    elapsed_s startTime = 0;
+    optional elapsed_s endTime = 1;
+    optional elapsed_s rangingInstanceInterval = 2;
+  }
+
+  struct ReportingConditionStruct {
+    optional int16u minDistanceCondition = 0;
+    optional int16u maxDistanceCondition = 1;
+    optional int16u accuracyCondition = 2;
+  }
+
+  struct WiFiRangingDeviceRoleConfigStruct {
+    RangingRoleEnum role = 0;
+    octet_string<16> peerWiFiDevIK = 1;
+    optional octet_string<32> pmk = 2;
+  }
+
+  readonly attribute RangingCapabilitiesStruct rangingCapabilities[] = 0;
+  readonly attribute optional octet_string<16> wiFiDevIK = 1;
+  readonly attribute optional int64u BLEDeviceId = 2;
+  readonly attribute optional octet_string<16> BLTDevIK = 3;
+  readonly attribute nullable int8u sessionIDs[] = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct StartRangingRequestRequest {
+    RangingTechEnum technology = 0;
+    optional WiFiRangingDeviceRoleConfigStruct wiFiRangingDeviceRoleConfig = 1;
+    optional BLERangingDeviceRoleConfigStruct BLERangingDeviceRoleConfig = 2;
+    optional BLTChannelSoundingDeviceRoleConfigStruct BLTChannelSoundingDeviceRoleConfig = 3;
+    optional RadioBandBitmap frequencyBand = 4;
+    optional RangingBandwidthBitmap bandwidth = 5;
+    RangingSecurityEnum securityMode = 6;
+    RangingTriggerConditionStruct trigger = 7;
+    optional ReportingConditionStruct reportingCondition = 8;
+  }
+
+  response struct StartRangingResponse = 1 {
+    ResultCodeEnum resultCode = 0;
+    nullable int8u sessionID = 1;
+  }
+
+  request struct StopRangingRequestRequest {
+    int8u sessionID = 0;
+  }
+
+  response struct RangingResult = 3 {
+    int8u sessionID = 0;
+    RangingMeasurementDataStruct rangingResultData = 1;
+  }
+
+  /** This command allows the client to request the start of a ranging session. */
+  command StartRangingRequest(StartRangingRequestRequest): StartRangingResponse = 0;
+  /** Upon receipt of a StopRangingRequest command that contains a SessionID that matches an active ranging session, the server SHALL terminate the corresponding ranging session. */
+  command StopRangingRequest(StopRangingRequestRequest): DefaultSuccess = 2;
+}
+
 /** Functionality to retrieve operational information about a managed Wi-Fi network. */
 cluster WiFiNetworkManagement = 1105 {
   revision 1;

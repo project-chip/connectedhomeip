@@ -202,6 +202,8 @@
 #include <clusters/PowerTopology/MetadataProvider.h>
 #include <clusters/PressureMeasurement/Ids.h>
 #include <clusters/PressureMeasurement/MetadataProvider.h>
+#include <clusters/ProximityRanging/Ids.h>
+#include <clusters/ProximityRanging/MetadataProvider.h>
 #include <clusters/ProxyConfiguration/Ids.h>
 #include <clusters/ProxyConfiguration/MetadataProvider.h>
 #include <clusters/ProxyDiscovery/Ids.h>
@@ -797,6 +799,11 @@ std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId
     {
         if (id == PressureMeasurement::Id)
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, PressureMeasurement::Id>::EntryFor(command);
+    }
+    if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ProximityRanging::Id) || ...))
+    {
+        if (id == ProximityRanging::Id)
+            return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ProximityRanging::Id>::EntryFor(command);
     }
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == ProxyConfiguration::Id) || ...))
     {

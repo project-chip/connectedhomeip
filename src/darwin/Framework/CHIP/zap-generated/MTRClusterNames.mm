@@ -342,6 +342,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeAmbientContextSensingID:
         result = @"AmbientContextSensing";
         break;
+    case MTRClusterIDTypeProximityRangingID:
+        result = @"ProximityRanging";
+        break;
     case MTRClusterIDTypeWiFiNetworkManagementID:
         result = @"WiFiNetworkManagement";
         break;
@@ -7600,6 +7603,58 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeProximityRangingID:
+
+        switch (attributeID) {
+
+            // Cluster ProximityRanging attributes
+        case MTRAttributeIDTypeClusterProximityRangingAttributeRangingCapabilitiesID:
+            result = @"RangingCapabilities";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeWiFiDevIKID:
+            result = @"WiFiDevIK";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeBLEDeviceIdID:
+            result = @"BLEDeviceId";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeBLTDevIKID:
+            result = @"BLTDevIK";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeSessionIDsID:
+            result = @"SessionIDs";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known ProximityRanging attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWiFiNetworkManagementID:
 
         switch (attributeID) {
@@ -11722,6 +11777,24 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeProximityRangingID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterProximityRangingCommandStartRangingRequestID:
+            result = @"StartRangingRequest";
+            break;
+
+        case MTRCommandIDTypeClusterProximityRangingCommandStopRangingRequestID:
+            result = @"StopRangingRequest";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWiFiNetworkManagementID:
 
         switch (commandID) {
@@ -14072,6 +14145,24 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeProximityRangingID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterProximityRangingCommandStartRangingResponseID:
+            result = @"StartRangingResponse";
+            break;
+
+        case MTRCommandIDTypeClusterProximityRangingCommandRangingResultID:
+            result = @"RangingResult";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWiFiNetworkManagementID:
 
         switch (commandID) {
@@ -16229,6 +16320,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         case MTREventIDTypeClusterAmbientContextSensingEventAmbientContextDetectEndedID:
             result = @"AmbientContextDetectEnded";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeProximityRangingID:
+
+        switch (eventID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

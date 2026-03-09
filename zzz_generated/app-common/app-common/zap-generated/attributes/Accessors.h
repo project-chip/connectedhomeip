@@ -4477,6 +4477,42 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Attributes
 } // namespace AmbientContextSensing
 
+namespace ProximityRanging {
+namespace Attributes {
+
+namespace WiFiDevIK {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty);
+} // namespace WiFiDevIK
+
+namespace BLEDeviceId {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint64_t * value); // int64u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value, MarkAttributeDirty markDirty);
+} // namespace BLEDeviceId
+
+namespace BLTDevIK {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value, MarkAttributeDirty markDirty);
+} // namespace BLTDevIK
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ProximityRanging
+
 namespace WiFiNetworkManagement {
 namespace Attributes {
 

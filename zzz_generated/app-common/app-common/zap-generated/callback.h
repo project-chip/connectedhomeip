@@ -1117,6 +1117,16 @@ void emberAfAmbientContextSensingClusterShutdownCallback(chip::EndpointId endpoi
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfProximityRangingClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfProximityRangingClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfWiFiNetworkManagementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -5650,6 +5660,45 @@ chip::Protocols::InteractionModel::Status MatterAmbientContextSensingClusterServ
 void emberAfAmbientContextSensingClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Proximity Ranging Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfProximityRangingClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterProximityRangingClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfProximityRangingClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterProximityRangingClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterProximityRangingClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfProximityRangingClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Wi-Fi Network Management Cluster
 //
 
@@ -7551,6 +7600,18 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(
 bool emberAfColorControlClusterStepColorTemperatureCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::DecodableType & commandData);
+/**
+ * @brief Proximity Ranging Cluster StartRangingRequest Command callback (from client)
+ */
+bool emberAfProximityRangingClusterStartRangingRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ProximityRanging::Commands::StartRangingRequest::DecodableType & commandData);
+/**
+ * @brief Proximity Ranging Cluster StopRangingRequest Command callback (from client)
+ */
+bool emberAfProximityRangingClusterStopRangingRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ProximityRanging::Commands::StopRangingRequest::DecodableType & commandData);
 /**
  * @brief Channel Cluster ChangeChannel Command callback (from client)
  */
