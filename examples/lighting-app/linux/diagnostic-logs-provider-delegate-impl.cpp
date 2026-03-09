@@ -20,6 +20,8 @@
 
 #include <lib/support/SafeInt.h>
 
+#include <algorithm>
+#include <cerrno>
 #include <string>
 
 using namespace chip;
