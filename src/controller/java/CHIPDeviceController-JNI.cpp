@@ -638,8 +638,7 @@ JNI_METHOD(void, commissionDevice)
     if (icdRegistrationInfo != nullptr)
     {
         commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-        err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
-        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorOnFailure(wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo));
     }
     else
     {
@@ -711,7 +710,7 @@ static void PairDevice(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, c
         err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "ApplyICDRegistrationInfo failed.");
+            ChipLogError(Controller, "ApplyICDRegistrationInfo failed. %" CHIP_ERROR_FORMAT, err.Format());
             JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
             return;
         }
