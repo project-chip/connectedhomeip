@@ -39,6 +39,8 @@ namespace Chef {
 namespace {
 static void OnTimerTick(System::Layer * systemLayer, void * data)
 {
+    ChipLogProgress(Zcl,
+                    "Inside examples/chef/common/clusters/water-heater-management/chef-water-heater-management.cpp::OnTimerTick");
     ChefDelegate * delegate = reinterpret_cast<ChefDelegate *>(data);
     delegate->TimerTick();
 }
@@ -48,7 +50,7 @@ Protocols::InteractionModel::Status ChefDelegate::HandleBoost(uint32_t duration,
                                                               Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint,
                                                               Optional<Percent> targetPercentage, Optional<Percent> targetReheat)
 {
-    ChipLogProgress(DeviceLayer, "Inside ChefDelegate::HandleBoost");
+    ChipLogProgress(Zcl, "Inside ChefDelegate::HandleBoost");
 
     if (duration < 60)
     {

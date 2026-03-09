@@ -148,7 +148,7 @@ class TC_WATERHEATER(MatterBaseTest):
         # - Call Boost with duration < 60, should fail with ConstraintError.
         try:
             await self.send_single_cmd(
-                cmd=cluster.Commands.Boost(duration=30),
+                cmd=cluster.Commands.Boost(boostInfo=cluster.Structs.WaterHeaterBoostInfoStruct(duration=30)),
                 endpoint=self.ENDPOINT
             )
             asserts.fail("Boost with duration < 60 should have failed")
@@ -157,7 +157,7 @@ class TC_WATERHEATER(MatterBaseTest):
 
         # - Call Boost with duration >= 60, should succeed.
         await self.send_single_cmd(
-            cmd=cluster.Commands.Boost(duration=100),
+            cmd=cluster.Commands.Boost(boostInfo=cluster.Structs.WaterHeaterBoostInfoStruct(duration=100)),
             endpoint=self.ENDPOINT
         )
 
