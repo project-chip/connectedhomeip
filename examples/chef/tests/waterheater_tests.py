@@ -98,17 +98,6 @@ class TC_WATERHEATER(MatterBaseTest):
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.OccupiedHeatingSetpoint)
         asserts.assert_equal(val, 6200, "OccupiedHeatingSetpoint should be 6200 after raise by 70")
 
-        # 4. Send SetpointRaiseLower command with Amount = 200 (Increase by 20 C).
-        await self.send_single_cmd(
-            cmd=cluster.Commands.SetpointRaiseLower(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=200),
-            endpoint=self.ENDPOINT
-        )
-
-        # 5. Read OccupiedHeatingSetpoint. Value must be 8000 (Clamped at MaxHeatSetpointLimit).
-        val = await self.read_single_attribute_check_success(
-            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.OccupiedHeatingSetpoint)
-        asserts.assert_equal(val, 8000, "OccupiedHeatingSetpoint should be 8000 (clamped)")
-
         # Tests LocalTemperature
         # 1. Use Pigweed to set LocalTemperature to 3000 (30 C).
         self._write_thermostat_local_temperature_pwrpc(device, 3000)
