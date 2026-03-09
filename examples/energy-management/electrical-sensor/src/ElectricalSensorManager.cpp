@@ -27,11 +27,22 @@ namespace Clusters {
 using namespace ElectricalPowerMeasurement;
 using namespace ElectricalEnergyMeasurement;
 
+namespace {
+/// Common pattern of:
+///   - if error (i.e. NOT CHIP_NO_ERROR), then call shutdown and return error
+#define SuccessOrShutdown(err_expr)                                                                       \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (CHIP_ERROR __err = err_expr; __err != CHIP_NO_ERROR) { Shutdown(); return __err; } \
+    } while (0)
+
+} // namespace
+
 CHIP_ERROR ElectricalSensorManager::Init(EndpointId endpointId, const EpmConfig & epmConfig, const EemConfig & eemConfig,
                                          const PtConfig & ptConfig)
 {
     // --- Initialize EPM ---
-    ReturnErrorOnFailure(
+    SuccessOrShutdown(
         ElectricalPowerMeasurementInit(endpointId, mEPMDelegate, mEPMInstance, epmConfig.features, epmConfig.optionalAttributes));
 
     // --- Initialize EEM ---
@@ -47,10 +58,10 @@ CHIP_ERROR ElectricalSensorManager::Init(EndpointId endpointId, const EpmConfig 
     mEEMCluster = std::make_unique<RegisteredServerCluster<ElectricalEnergyMeasurementCluster>>(clusterConfig);
     VerifyOrReturnError(mEEMCluster != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(mEEMCluster->Registration()));
+    SuccessOrShutdown(CodegenDataModelProvider::Instance().Registry().Register(mEEMCluster->Registration()));
 
     // --- Initialize Power Topology ---
-    ReturnErrorOnFailure(PowerTopology::PowerTopologyInit(endpointId, mPTDelegate, mPTInstance, ptConfig.features));
+    SuccessOrShutdown(PowerTopology::PowerTopologyInit(endpointId, mPTDelegate, mPTInstance, ptConfig.features));
 
     return CHIP_NO_ERROR;
 }

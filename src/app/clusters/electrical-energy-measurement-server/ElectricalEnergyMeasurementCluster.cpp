@@ -216,17 +216,23 @@ void ElectricalEnergyMeasurementCluster::DoGenerateReport()
         if (mFeatureFlags.Has(Feature::kImportedEnergy))
         {
             auto measurement = BuildMeasurement(mDelegate.GetCumulativeEnergyImported(), mMeasurementData.cumulativeImported);
-            TEMPORARY_RETURN_IGNORED SetCumulativeEnergyImported(measurement);
-            event.energyImported = measurement;
-            hasData              = hasData || measurement.HasValue();
+            if (measurement.HasValue())
+            {
+                TEMPORARY_RETURN_IGNORED SetCumulativeEnergyImported(measurement);
+                event.energyImported = measurement;
+                hasData              = true;
+            }
         }
 
         if (mFeatureFlags.Has(Feature::kExportedEnergy))
         {
             auto measurement = BuildMeasurement(mDelegate.GetCumulativeEnergyExported(), mMeasurementData.cumulativeExported);
-            TEMPORARY_RETURN_IGNORED SetCumulativeEnergyExported(measurement);
-            event.energyExported = measurement;
-            hasData              = hasData || measurement.HasValue();
+            if (measurement.HasValue())
+            {
+                TEMPORARY_RETURN_IGNORED SetCumulativeEnergyExported(measurement);
+                event.energyExported = measurement;
+                hasData              = true;
+            }
         }
 
         if (hasData && mContext != nullptr)
@@ -244,17 +250,23 @@ void ElectricalEnergyMeasurementCluster::DoGenerateReport()
         if (mFeatureFlags.Has(Feature::kImportedEnergy))
         {
             auto measurement = BuildMeasurement(mDelegate.GetPeriodicEnergyImported(), mMeasurementData.periodicImported);
-            TEMPORARY_RETURN_IGNORED SetPeriodicEnergyImported(measurement);
-            event.energyImported = measurement;
-            hasData              = hasData || measurement.HasValue();
+            if (measurement.HasValue())
+            {
+                TEMPORARY_RETURN_IGNORED SetPeriodicEnergyImported(measurement);
+                event.energyImported = measurement;
+                hasData              = true;
+            }
         }
 
         if (mFeatureFlags.Has(Feature::kExportedEnergy))
         {
             auto measurement = BuildMeasurement(mDelegate.GetPeriodicEnergyExported(), mMeasurementData.periodicExported);
-            TEMPORARY_RETURN_IGNORED SetPeriodicEnergyExported(measurement);
-            event.energyExported = measurement;
-            hasData              = hasData || measurement.HasValue();
+            if (measurement.HasValue())
+            {
+                TEMPORARY_RETURN_IGNORED SetPeriodicEnergyExported(measurement);
+                event.energyExported = measurement;
+                hasData              = true;
+            }
         }
 
         if (hasData && mContext != nullptr)

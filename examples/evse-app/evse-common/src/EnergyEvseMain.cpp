@@ -215,11 +215,11 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
     if (!gCommonClustersInitialized)
     {
         chip::BitMask<DeviceEnergyManagement::Feature> featureMap = GetFeatureMapFromCmdLine();
-        TEMPORARY_RETURN_IGNORED DeviceEnergyManagementInit(endpointId, gDEMDelegate, gDEMInstance, featureMap);
+        ReturnErrorOnFailure(DeviceEnergyManagementInit(endpointId, gDEMDelegate, gDEMInstance, featureMap));
 
         // Initialize ElectricalSensorManager (owns both EPM and EEM)
         gESManager = std::make_unique<ElectricalSensorManager>();
-        VerifyOrReturnError(gESManager != nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(gESManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         ElectricalSensorManager::EpmConfig epmConfig{
             .features = BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
@@ -255,7 +255,7 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
             .features = BitMask<PowerTopology::Feature, uint32_t>(PowerTopology::Feature::kNodeTopology),
         };
 
-        TEMPORARY_RETURN_IGNORED gESManager->Init(endpointId, epmConfig, eemConfig, ptConfig);
+        ReturnErrorOnFailure(gESManager->Init(endpointId, epmConfig, eemConfig, ptConfig));
 
         // Set CumulativeEnergyReset struct on the EEM cluster
         ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type resetStruct = {
@@ -266,9 +266,12 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
         };
         if (auto * eemCluster = gESManager->GetEEMCluster())
         {
-            TEMPORARY_RETURN_IGNORED eemCluster->SetCumulativeEnergyReset(MakeOptional(resetStruct));
+            // We can ignore the error here as the only reason for error is if the feature is not supported
+            // and the feature is enabled
+            RETURN_SAFELY_IGNORED eemCluster->SetCumulativeEnergyReset(MakeOptional(resetStruct));
         }
     }
+    
     VerifyOrReturnError(gDEMDelegate && gDEMInstance, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(gESManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
     gCommonClustersInitialized = true;
