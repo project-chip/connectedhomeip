@@ -173,14 +173,14 @@ class TC_WebRTCP_2_2(MatterBaseTest, WEBRTCPTestBase):
         # Verify the stored session ID matches the one returned in the SolicitOfferResponse
         asserts.assert_equal(session.id, current_session_id, "Session ID in CurrentSessions should match SolicitOfferResponse")
 
-        # Verify response contains the allocated VideoStreamID
+        # Verify current session contains the allocated VideoStreamID
         asserts.assert_not_equal(
             session.videoStreamID,
             NullValue,
             "videoStreamID in CurrentSessions should be valid."
         )
 
-        # Verify response contains the allocated AudioStreamID
+        # Verify current session contains the allocated AudioStreamID
         asserts.assert_not_equal(
             session.audioStreamID,
             NullValue,
