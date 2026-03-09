@@ -198,8 +198,7 @@ class BarcodeFragment : Fragment() {
   }
 
   private fun handleScannedQrCode(barcode: Barcode) {
-    if (_binding == null)
-    {
+    if (_binding == null) {
       Log.d(TAG, "Already onDestory is called in Barcode Fragment.")
       return
     }

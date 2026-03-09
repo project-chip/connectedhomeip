@@ -168,14 +168,12 @@ class DeviceProvisioningFragment : Fragment() {
 
     setAttestationDelegate()
 
-    val icdRegistrationInfo = if (deviceInfo.isLIT) {
-      Log.d(TAG, "icdRegistrationInfo : true")
-      ICDRegistrationInfo.createForDeferredConfiguration()
-    }
-    else {
-      Log.d(TAG, "icdRegistrationInfo : false")
-      null
-    }
+    val icdRegistrationInfo =
+      if (deviceInfo.isLIT) {
+        ICDRegistrationInfo.createForDeferredConfiguration()
+      } else {
+        null
+      }
 
     val params =
       CommissionParameters.Builder()
@@ -242,14 +240,12 @@ class DeviceProvisioningFragment : Fragment() {
 
       setAttestationDelegate()
 
-      val icdRegistrationInfo = if (deviceInfo.isLIT) {
-        Log.d(TAG, "icdRegistrationInfo : true")
-        ICDRegistrationInfo.createForDeferredConfiguration()
-      }
-      else {
-        Log.d(TAG, "icdRegistrationInfo : false")
-        null
-      }
+      val icdRegistrationInfo =
+        if (deviceInfo.isLIT) {
+          ICDRegistrationInfo.createForDeferredConfiguration()
+        } else {
+          null
+        }
 
       val params =
         CommissionParameters.Builder()
