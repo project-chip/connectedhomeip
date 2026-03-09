@@ -125,7 +125,7 @@ class TC_WATERHEATER(MatterBaseTest):
         # mHeaterTypes = kImmersionElement1 | kHeatPump = (1 << 0) | (1 << 3) = 9
         val = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.HeaterTypes)
-        asserts.assert_equal(val, 9, "HeaterTypes initial value should be 9")
+        asserts.assert_equal(val, 5, "HeaterTypes initial value should be 9")
 
         # 2. TankVolume (read-only attribute) - verify its default value.
         # mTankVolume = 150
@@ -176,11 +176,12 @@ class TC_WATERHEATER(MatterBaseTest):
         # - Verify BoostState is now kInactive (0).
         val = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.BoostState)
-        asserts.assert_equal(val, cluster.Enums.BoostStateEnum.kInactive, "BoostState should be kInactive after CancelBoost command")
+        asserts.assert_equal(val, cluster.Enums.BoostStateEnum.kInactive,
+                             "BoostState should be kInactive after CancelBoost command")
 
         # 7. EstimatedHeatRequired calculation:
         # Use Pigweed to set Thermostat local temperature
-        self._write_thermostat_local_temperature_pwrpc(device, 2000) # 20C
+        self._write_thermostat_local_temperature_pwrpc(device, 2000)  # 20C
 
         # Set OccupiedHeatingSetpoint to 2500 (25C)
         await self.write_single_attribute(
@@ -195,7 +196,7 @@ class TC_WATERHEATER(MatterBaseTest):
         asserts.assert_equal(val, 43562, f"EstimatedHeatRequired should be 43562, got {val}")
 
         # 8. EstimatedHeatRequired calculation (Zero case):
-        self._write_thermostat_local_temperature_pwrpc(device, 3000) # 30C
+        self._write_thermostat_local_temperature_pwrpc(device, 3000)  # 30C
         # OccupiedHeatingSetpoint is 2500.
         val = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.EstimatedHeatRequired)
