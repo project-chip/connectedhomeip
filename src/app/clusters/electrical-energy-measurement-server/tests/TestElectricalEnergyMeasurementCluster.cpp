@@ -641,7 +641,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TestGenerateReport)
     EXPECT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     auto & logOnlyEvents = testContext.EventsGenerator();
 
-    
+
     {
         // Test when the delegate has no data, all values are null
         mDelegate.mCumulativeImported.SetNull();
