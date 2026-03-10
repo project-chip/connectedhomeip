@@ -17,7 +17,6 @@
 #pragma once
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/CommissionerControl/Attributes.h>
