@@ -241,6 +241,8 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
             all_tests = list(chiptest.AllDarwinFrameworkToolYamlTests())
         case TestRunTime.CHIP_TOOL_PYTHON:
             all_tests = list(chiptest.AllChipToolYamlTests())
+        case _:
+            raise ValueError(f"Unsupported test runtime: {runner}")
 
     tests: list[TestDefinition] = all_tests
 
