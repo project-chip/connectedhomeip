@@ -237,6 +237,21 @@ class TC_CNET_4_24(MatterBaseTest):
         logger.info(" --- Expiring CASE sessions after potential network transition")
         self.default_controller.ExpireSessions(self.dut_node_id)
 
+    async def _reestablish_case_after_network_transition(self, do_test_over_pase: bool):
+        if do_test_over_pase:
+            return
+
+        try:
+            await asyncio.wait_for(
+                self.default_controller.GetConnectedDevice(
+                    nodeId=self.dut_node_id,
+                    allowPASE=False
+                ),
+                timeout=60
+            )
+        except Exception:
+            logger.info("Unable to re-establish CASE session")
+
     # Overrides default_timeout
     @property
     def default_timeout(self) -> int:
@@ -513,6 +528,8 @@ class TC_CNET_4_24(MatterBaseTest):
         await asyncio.sleep(40)
         await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
+        await self._reestablish_case_after_network_transition(do_test_over_pase)
+
         # Step 4: TH reads LastNetworkingStatus after Extended PAN ID connection failure
         self.step(4)
 
@@ -585,6 +602,8 @@ class TC_CNET_4_24(MatterBaseTest):
         # Wait for Thread to attempt connection and DUT to update status
         await asyncio.sleep(40)
 
+        await self._reestablish_case_after_network_transition(do_test_over_pase)
+
         # Step 10: TH reads LastNetworkingStatus after Network Key connection failure
         self.step(10)
 
@@ -631,6 +650,11 @@ class TC_CNET_4_24(MatterBaseTest):
         # joining the target Thread network. Expire existing CASE sessions so follow-up reads
         # establish a fresh operational session if needed.
         await self._expire_case_sessions_if_needed(do_test_over_pase)
+
+        # Wait for Thread to attempt connection and DUT to update status
+        await asyncio.sleep(40)
+
+        await self._reestablish_case_after_network_transition(do_test_over_pase)
 
         # Step 13: TH reads LastNetworkingStatus (should be kSuccess)
         self.step(13)
