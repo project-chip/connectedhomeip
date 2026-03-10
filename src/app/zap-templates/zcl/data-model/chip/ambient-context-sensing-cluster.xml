@@ -192,9 +192,9 @@ Alchemy: v1.6.10
       </otherwiseConform>
     </attribute>
     <event code="0x0000" name="AmbientContextDetectStarted" priority="info" side="server" optional="true">
-      <field fieldId="0" name="AmbientContextDetected" type="AmbientContextTypeStruct" optional="true"/>
-      <field fieldId="1" name="ObjectCountReached" type="boolean" optional="true"/>
-      <field fieldId="2" name="ObjectCount" type="int16u" optional="true" min="1"/>
+      <field id="0" name="AmbientContextDetected" type="AmbientContextTypeStruct" optional="true"/>
+      <field id="1" name="ObjectCountReached" type="boolean" optional="true"/>
+      <field id="2" name="ObjectCount" type="int16u" optional="true" min="1"/>
       <description>This event SHALL be generated when there is at least one of HumanActivityDetected or ObjectIdentified or AudioContextDetected or ObjectCountReached attribute changes from False To True, and a new different detection is added to AmbientContextType.</description>
       <otherwiseConform>
         <provisionalConform/>
@@ -214,7 +214,7 @@ Alchemy: v1.6.10
     </event>
 
     <event code="0x0001" name="AmbientContextDetectEnded" priority="info" side="server" optional="true">
-      <field fieldId="0" name="EventStartTime" type="int64u"/>
+      <field id="0" name="EventStartTime" type="int64u"/>
       <description>This event SHALL be generated when the Boolean state of HumanActivityDetected or ObjectIdentified or AudioContextDetected or ObjectCountReached attribute is changed from True to False, and its corresponding detection is removed from AmbientContextType.</description>
       <otherwiseConform>
         <provisionalConform/>
