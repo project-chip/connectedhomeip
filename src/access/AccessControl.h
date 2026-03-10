@@ -652,7 +652,7 @@ public:
     /**
      * Iterates over auxiliary entries for the given fabric.
      *
-     * @param [in]  fabricIndex   Fabric index for which to iterate auxiliary entries. 
+     * @param [in]  fabricIndex   Fabric index for which to iterate auxiliary entries.
      * @param [out] iterator      Iterator controlling the iteration.
      */
     // TODO: fabricIndex should be a pointer, and if it's nullptr then entries across all fabrics should be returned.
