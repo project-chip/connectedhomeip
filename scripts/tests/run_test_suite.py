@@ -368,6 +368,59 @@ class CommissioningMethod(enum.StrEnum):
     '--iterations',
     default=1,
     help='Number of iterations to run')
+@click.option(
+    '--app-path', multiple=True, metavar="<key>:<path>",
+    help='Set path for an application (run in app network namespace), use `--help-paths` to list known keys')
+@click.option(
+    '--tool-path', multiple=True, metavar="<key>:<path>",
+    help='Set path for a controller (run in controller network namespace), use `--help-paths` to list known keys')
+@click.option(
+    '--discover-paths',
+    is_flag=True,
+    default=False,
+    help='Discover missing paths for application and tool binaries')
+@click.option(
+    '--help-paths',
+    is_flag=True,
+    default=False,
+    help="Print keys for known application and controller paths")
+@click.option(
+    '--pics-file',
+    type=ExistingFilePath,
+    default="src/app/tests/suites/certification/ci-pics-values",
+    show_default=True,
+    help='PICS file to use for test runs.')
+@click.option(
+    '--keep-going',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Keep running the rest of the tests even if a test fails.')
+@click.option(
+    '--test-timeout-seconds',
+    default=None,
+    type=int,
+    help='If provided, fail if a test runs for longer than this time')
+@click.option(
+    '--expected-failures',
+    type=click.IntRange(min=0),
+    default=0,
+    show_default=True,
+    help=('Number of tests that are expected to fail in each iteration. Overall test will pass if the number of failures matches '
+          'this. Nonzero values require --keep-going'))
+@click.option(
+    '--commissioning-method',
+    type=click.Choice(CommissioningMethod, case_sensitive=False),  # type: ignore[arg-type]
+    default=CommissioningMethod.ON_NETWORK,
+    help=('Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi '
+          'commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth '
+          'and Thread mock servers. "thread-meshcop" performs Thread commissioning using Thread mock server. This option is '
+          'Linux-only.'))
+@click.option(
+    '--summary-file',
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help='If provided, write a JSON test-run summary to this file at the end of the run.')
 # Deprecated flags:
 @click.option(
     '--all-clusters-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path all-clusters:<path>',
@@ -420,69 +473,16 @@ class CommissioningMethod(enum.StrEnum):
 @click.option(
     '--chip-tool-with-python', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool-with-python:<path>',
     help='what python script to use for running yaml tests using chip-tool as controller')
-@click.option(
-    '--app-path', multiple=True, metavar="<key>:<path>",
-    help='Set path for an application (run in app network namespace), use `--help-paths` to list known keys'
-)
-@click.option(
-    '--tool-path', multiple=True, metavar="<key>:<path>",
-    help='Set path for a controller (run in controller network namespace), use `--help-paths` to list known keys'
-)
-@click.option(
-    '--discover-paths',
-    is_flag=True,
-    default=False,
-    help='Discover missing paths for application and tool binaries'
-)
-@click.option(
-    '--help-paths',
-    is_flag=True,
-    default=False,
-    help="Print keys for known application and controller paths"
-)
-@click.option(
-    '--pics-file',
-    type=ExistingFilePath,
-    default="src/app/tests/suites/certification/ci-pics-values",
-    show_default=True,
-    help='PICS file to use for test runs.')
-@click.option(
-    '--keep-going',
-    is_flag=True,
-    default=False,
-    show_default=True,
-    help='Keep running the rest of the tests even if a test fails.')
-@click.option(
-    '--test-timeout-seconds',
-    default=None,
-    type=int,
-    help='If provided, fail if a test runs for longer than this time')
-@click.option(
-    '--expected-failures',
-    type=click.IntRange(min=0),
-    default=0,
-    show_default=True,
-    help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
-@click.option(
-    '--commissioning-method',
-    type=click.Choice(CommissioningMethod, case_sensitive=False),  # type: ignore[arg-type]
-    default=CommissioningMethod.ON_NETWORK,
-    help='Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth and Thread mock servers. "thread-meshcop" performs Thread commissioning using Thread mock server. This option is Linux-only.')
-@click.option(
-    '--summary-file',
-    type=click.Path(dir_okay=False, path_type=Path),
-    default=None,
-    help='If provided, write a JSON test-run summary to this file at the end of the run.')
 @click.pass_context
-def cmd_run(context: click.Context, dry_run: bool, iterations: int,
-            app_path: list[str], tool_path: list[str], discover_paths: bool, help_paths: bool,
+def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: list[str], tool_path: list[str], discover_paths: bool,
+            help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None, expected_failures: int,
+            commissioning_method: CommissioningMethod, summary_file: Path | None,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
-            microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None, energy_gateway_app: Path | None,
-            water_heater_app: Path | None, evse_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
-            chip_tool_with_python: Path | None, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
-            expected_failures: int, commissioning_method: CommissioningMethod, summary_file: Path | None) -> None:
+            microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None,
+            energy_gateway_app: Path | None, water_heater_app: Path | None, evse_app: Path | None, closure_app: Path | None,
+            matter_repl_yaml_tester: Path | None, chip_tool_with_python: Path | None) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
