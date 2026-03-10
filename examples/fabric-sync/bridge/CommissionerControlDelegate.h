@@ -29,6 +29,8 @@ namespace CommissionerControl {
 
 inline constexpr EndpointId kAggregatorEndpointId = 1;
 
+using CommissionerControlServer = CommissionerControlCluster;
+
 class CommissionerControlDelegate : public Delegate
 {
 public:
