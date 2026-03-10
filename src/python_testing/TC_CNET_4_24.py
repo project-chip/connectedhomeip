@@ -431,7 +431,10 @@ class TC_CNET_4_24(MatterBaseTest):
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=300, breadcrumb=0)
         )
 
-        logger.info(" --- Fail-safe armed successfully (300 seconds)")
+        asserts.assert_equal(arm_failsafe_response.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
+                             f"Fail-safe armed was not successful, it was {arm_failsafe_response.errorCode}")
+
+        logger.info(f" --- Fail-safe armed successfully (300 seconds): {arm_failsafe_response}")
 
         # Step 1: TH reads Networks attribute and removes all configured networks
         self.step(1)
@@ -580,7 +583,7 @@ class TC_CNET_4_24(MatterBaseTest):
                 cmd=cnet.Commands.ConnectNetwork(networkID=network_id_2, breadcrumb=9),
                 timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS,
             )
-            await self._validate_connect_network_response(response, expect_success=False)
+            await self._validate_connect_network_response(response, expect_success=True)
             logger.info(" --- ConnectNetwork completed")
         except Exception as e:
             logger.info(f" --- ConnectNetwork timed out: {type(e).__name__}")
