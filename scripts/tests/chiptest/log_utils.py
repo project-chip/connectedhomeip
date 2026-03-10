@@ -24,6 +24,13 @@ import coloredlogs
 LOG_LEVELS = tuple(coloredlogs.find_defined_levels().keys())
 """Possible log levels for coloredlogs."""
 
+_FIELD_STYLES = coloredlogs.DEFAULT_FIELD_STYLES | {
+    "process_thread": {"bold": True},
+    # We need to explicitly disable bold for subsequent fields in case process_thread is empty, as coloredlogs don't seem to close
+    # the formatting in that case.
+    "task": {"bold": False},
+    "message": {"bold": False},
+}
 
 class ProcessThreadTaskFilter(logging.Filter):
     """Logging filter to add process/thread and task information to log records."""
@@ -41,7 +48,7 @@ class ProcessThreadTaskFilter(logging.Filter):
         proc_thread = '/'.join(name for name, default in ((record.processName, "MainProcess"), (record.threadName, "MainThread"))
                                if name is not None and name != default)
 
-        record.process_thread = f"\033[1m[{proc_thread}]\033[0m " if proc_thread else ""
+        record.process_thread = f"[{proc_thread}] " if proc_thread else ""
         record.task = f"{self.task_name}: " if self.task_name else ""
         return True
 
@@ -72,7 +79,7 @@ class LogConfig:
         fmt = ("%(asctime)s.%(msecs)03d " if self.timestamps else "") + "%(levelname)-7s %(process_thread)s%(task)s%(message)s"
 
         logger = logging.getLogger()
-        coloredlogs.install(level=level, fmt=fmt, logger=logger)
+        coloredlogs.install(level=level, fmt=fmt, logger=logger, field_styles=_FIELD_STYLES)
 
         self._filter.task_name = task
         for handler in logger.handlers:
