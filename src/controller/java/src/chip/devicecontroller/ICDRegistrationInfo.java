@@ -56,8 +56,8 @@ public class ICDRegistrationInfo {
    * <p>Typically returns a 16-byte key. However:
    *
    * <ul>
-   *   <li>If deferred ICD configuration is supported, this may return an empty array as a
-   *       sentinel value.
+   *   <li>If deferred ICD configuration is supported, this may return an empty array as a sentinel
+   *       value.
    *   <li>If no symmetric key was explicitly set in the builder, this may return {@code null},
    *       indicating that a 16-byte key will be randomly generated in native code.
    * </ul>
