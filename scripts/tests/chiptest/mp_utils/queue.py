@@ -1,11 +1,10 @@
 import contextlib
 import queue
 import threading
+import time
 from multiprocessing.managers import SyncManager
 from types import TracebackType
 from typing import Generic, Protocol, TypeVar
-import time
-
 
 MP_MANAGED_WAIT_POLLING_S = 0.1
 """Polling interval for waiting on resources managed by multiprocessing.Manager."""

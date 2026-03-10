@@ -4,7 +4,7 @@ import threading
 
 from chiptest.concurrent.config import WorkerConfig
 from chiptest.concurrent.worker import WorkerError, WorkerJob, WorkerResult
-from chiptest.mp_utils.queue import WorkQueue, EndOfWork
+from chiptest.mp_utils.queue import EndOfWork, WorkQueue
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ class TestResultSummary:
     def table_row(self) -> tuple[str, str, str, str]:
         match self.first_exception:
             case KeyboardInterrupt():
-                status = "❔ Cancelled"
+                status = "⚠️ Cancelled"
             case BaseException() as e:
                 status = f"❌ {e!r}"
             case None:

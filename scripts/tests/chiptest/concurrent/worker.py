@@ -1,4 +1,6 @@
 import dataclasses
+import datetime
+import enum
 import json
 import logging
 import os
@@ -10,8 +12,6 @@ import time
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Protocol, TypeVar
-import datetime
-import enum
 
 import chiptest
 
@@ -182,7 +182,7 @@ class WorkerProcess(WrappedProcess[WorkerConfig, WorkerJob, WorkerResult], ABC):
                 os.system("echo 'base64 -d - >/tmp/thread.pcap <<EOF' && base64 /tmp/thread.pcap && echo EOF")
 
             if isinstance(e, KeyboardInterrupt):
-                log.info("❔ Cancelled after %0.2f seconds", result.runtime)
+                log.info("⚠️ Cancelled after %0.2f seconds", result.runtime)
                 # TODO: Add run_summary.record for cancelled tests.
             else:
                 log.exception("❌ Failed in %0.2f seconds", result.runtime)

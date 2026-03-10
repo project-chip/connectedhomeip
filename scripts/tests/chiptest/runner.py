@@ -204,10 +204,10 @@ class Runner:
 
         outpipe = LogPipe(
             logging.DEBUG, capture_delegate=self.capture_delegate,
-            name=name + ' OUT')
+            name=name + ' STDOUT')
         errpipe = LogPipe(
             logging.INFO, capture_delegate=self.capture_delegate,
-            name=name + ' ERR')
+            name=name + ' STDERR')
 
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)

@@ -31,16 +31,14 @@ from typing import Any, Protocol
 
 import chiptest
 import click
+import python_path
 from chiptest.concurrent.config import TestJobConfig, TestSchedulerType
-from chiptest.concurrent.worker import WorkerError
 from chiptest.concurrent.pool import TestPool
+from chiptest.concurrent.worker import WorkerError
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.log_utils import LogConfig
+from chiptest.log_utils import LOG_LEVELS, LogConfig
 from chiptest.test_definition import SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
-from chiptest.log_utils import LOG_LEVELS
-
-import python_path
 
 with python_path.PythonPath('../../../src/python_testing/matter_testing_infrastructure', relative_to=__file__):
     # Import all symbols used downstream not only those we use ourselves
@@ -75,7 +73,7 @@ class RunContext:
     # Deprecated options passed to `cmd_run`
     deprecated_chip_tool_path: Path | None = None
 
-
+# TODO: Move to the proper place
 class TestStatus(enum.Enum):
     PASSED = "passed"
     FAILED = "failed"
@@ -233,7 +231,7 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
     if sys.platform == "linux":
         if not internal_inside_unshare:
             # If not running in an unshared network namespace yet, try to rerun the script with the 'unshare' command.
-            chiptest.linux.ensure_network_namespace_availability()
+            chiptest.linux.ensure_namespace_availability()
         else:
             chiptest.linux.ensure_private_state()
 
@@ -580,7 +578,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     try:
         TestPool.run_tests(context.obj.log_config, config, context.obj.tests)
     except WorkerError as e:
-        log.exception("%s", e, exc_info=e)
+        log.error("%s", e)
         sys.exit(1)
 
 

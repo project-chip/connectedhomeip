@@ -205,6 +205,9 @@
     "python-envs.workspaceSearchPaths": [
         ".environment-vscode/pigweed-venv/"
     ],
+    "python.analysis.extraPaths": [
+        "src/python_testing/matter_testing_infrastructure"
+    ],
     "autopep8.args": ["--max-line-length", "132"],
     "search.exclude": {
         "**/examples/**/third_party/connectedhomeip/**": true
@@ -212,5 +215,6 @@
     "files.exclude": {
         "**/examples/**/third_party/connectedhomeip/**": true
     },
-    "git.autoRepositoryDetection": "openEditors"
+    "git.autoRepositoryDetection": "openEditors",
+    "python-envs.defaultEnvManager": "ms-python.python:venv"
 }
