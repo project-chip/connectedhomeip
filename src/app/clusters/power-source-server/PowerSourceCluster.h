@@ -78,10 +78,10 @@ public:
 
     struct WiredConfiguration
     {
-        CharSpan description;
-        WiredCurrentTypeEnum currentType;
-        uint32_t nominalVoltage;
-        uint32_t maximumCurrent;
+        CharSpan description{};
+        WiredCurrentTypeEnum currentType{};
+        uint32_t nominalVoltage{};
+        uint32_t maximumCurrent{};
 
         // To force the user to specify these mandatory attributes (taking the corresponding feature into account).
         WiredConfiguration(CharSpan description, WiredCurrentTypeEnum currentType):
@@ -91,15 +91,15 @@ public:
 
     struct BatteryConfiguration
     {
-        CharSpan description;
-        BatReplaceabilityEnum replaceability;
-        CharSpan replacementDescription;
-        BatCommonDesignationEnum commonDesignation;
-        CharSpan ansiDesignation;
-        CharSpan iecDesignation;
-        BatApprovedChemistryEnum approvedChemistry;
-        uint32_t capacity;
-        uint8_t quantity;
+        CharSpan description{};
+        BatReplaceabilityEnum replaceability{};
+        CharSpan replacementDescription{};
+        BatCommonDesignationEnum commonDesignation{};
+        CharSpan ansiDesignation{};
+        CharSpan iecDesignation{};
+        BatApprovedChemistryEnum approvedChemistry{};
+        uint32_t capacity{};
+        uint8_t quantity{};
 
         // To force the user to specify mandatory attributes (taking the corresponding features into account).
 
@@ -107,7 +107,7 @@ public:
             replaceable(false), rechargeable(false), description(description), replaceability(replaceability)
         {}
 
-        void MakeReplaceable(BatReplacementDescriptionEnum replacementDescription, uint8_t quantity)
+        void MakeReplaceable(CharSpan replacementDescription, uint8_t quantity)
         {
             replaceable = true;
             this->replacementDescription = replacementDescription;
@@ -124,8 +124,8 @@ public:
         bool rechargeable;
     };
 
-    PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet, System::Layer & systemLayer, WiredConfiguration config);
-    PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet, System::Layer & systemLayer, BatteryConfiguration config);
+    PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet, System::Layer & systemLayer, const WiredConfiguration& config);
+    PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet, System::Layer & systemLayer, const BatteryConfiguration& config);
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                         AttributeValueEncoder & encoder) override;
@@ -133,12 +133,6 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     const BitFlags<PowerSource::Feature> & Features() const { return mFeatures; }
-
-#define VALIDATE_FEATURE(feature_name, attr_name) \
-    VerifyOrDieWithMsg(Features().Has(Feature::##feature_name), NotSpecified, "Attempting to read attribute `" #attr_name "` when feature `" #feature_name "` is not set.");
-
-#define VALIDATE_OPTIONAL_ATTRIBUTE(attr_name) \
-    VerifyOrDieWithMsg(mOptionalAttributeSet.IsSet(PowerSource::Attributes::##attr_name::Id), NotSpecified, "Attempting to read attribute `" #attr_name "` when it is not specified as supported optional attribute");
 
     // Getters
 

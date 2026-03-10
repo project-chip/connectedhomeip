@@ -19,55 +19,12 @@
 
 #include "PowerSourceCluster.h"
 
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
-
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace PowerSource {
 
-/// Makes integration of a PowerSourceCluster with CodegenDataModelProvider easier.
-///
-/// This class provides a very thin wrapper around the PowerSourceCluster and its
-/// registration within the CodegenDataModelProvider.
-///
-
-template <typename DelegateT, typename = std::enable_if_t<
-    std::is_same_v<DelegateT, PowerSourceCluster::Wired> ||
-    std::is_same_v<DelegateT, PowerSourceCluster::Battery>>>
-class Instance
-{
-public:
-    using OptionalAttributeSet = PowerSourceCluster::OptionalAttributeSet;
-
-    PowerSourceCluster & Cluster() { return mCluster.Cluster(); }
-
-    /// Registers the cluster within the CodegenDataModelProvider Registry
-    CHIP_ERROR Register()
-    {
-        return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
-    }
-
-    /// Unregisters the cluster from the CodegenDataModelProvider Registry
-    void Unregister()
-    {
-        CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
-    }
-
-    Instance(EndpointId endpointId, Span<AttributeId> supportedOptionalAttributes, const DelegateT & delegate) : mCluster(endpointId, GetOptionalAttributeSet(supportedOptionalAttributes), mDelegate) {}
-
-private:
-    static OptionalAttributeSet GetOptionalAttributeSet(Span<AttributeId> supportedOptionalAttributes)
-    {
-        uint32_t optionalAttributeBits = 0;
-        for (AttributeId attributeId : supportedOptionalAttributes)
-        {
-            optionalAttributeBits |= (1 << attributeId);
-        }
-        return OptionalAttributeSet(optionalAttributeBits);
-    }
-    RegisteredServerCluster<PowerSourceCluster> mCluster;
-};
+PowerSourceCluster * FindClusterOnEndpoint(EndpointId id);
 
 } // namespace PowerSource
 } // namespace Clusters
