@@ -638,7 +638,8 @@ JNI_METHOD(void, commissionDevice)
     if (icdRegistrationInfo != nullptr)
     {
         commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-        ReturnErrorOnFailure(wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo));
+        err = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
     }
     else
     {
