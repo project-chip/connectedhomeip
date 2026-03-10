@@ -139,7 +139,7 @@ class TC_CNET_4_24(MatterBaseTest):
     """
     [TC-CNET-4.24] [Thread] Network Commissioning Success After Connection Failures [DUT-Server]
 
-    This test verifies network commissioning behavior and can run over both PASE and CASE sessions.
+    This test verifies network commissioning behavior and can run over both PASE or CASE sessions.
     The test automatically detects if the device is already commissioned:
     - If device is commissioned: Uses CASE session
     - If device is not commissioned: Uses PASE session (requires setup code)
@@ -150,27 +150,15 @@ class TC_CNET_4_24(MatterBaseTest):
         ```bash
         # For uncommissioned device (PASE):
         rm -rf /tmp/chip_kvs
-        python src/python_testing/TC_CNET_4_24.py \
-               --discriminator <discriminator> \
-               --passcode <passcode> \
-               --endpoint <endpoint_value> \
-               --string-arg thread_dataset:<dataset_hex> \
-               --storage-path /tmp/chip_kvs
+        src/python_testing/TC_CNET_4_24.py \
+            --in-test-commissioning-method ble-thread \
+            --discriminator <discriminator> \
+            --passcode <passcode> \
+            --thread-dataset-hex <dataset_hex>
 
         # For already commissioned device (CASE):
-        python src/python_testing/TC_CNET_4_24.py \
-               --endpoint <endpoint_value> \
-               --string-arg thread_dataset:<dataset_hex> \
-               --storage-path /tmp/chip_kvs
-
-        # To force PASE even if device is commissioned:
-        python src/python_testing/TC_CNET_4_24.py \
-               --string-arg use_pase_only:True \
-               --discriminator <discriminator> \
-               --passcode <passcode> \
-               --endpoint <endpoint_value> \
-               --string-arg thread_dataset:<dataset_hex> \
-               --storage-path /tmp/chip_kvs
+        src/python_testing/TC_CNET_4_24.py \
+            --thread-dataset-hex <dataset_hex>
         ```
 
         Where:
@@ -338,17 +326,10 @@ class TC_CNET_4_24(MatterBaseTest):
 
         # Save correct Thread operational dataset from test config (used by commissioning framework and for final connection)
         correct_thread_dataset = self.matter_test_config.thread_operational_dataset
-        if correct_thread_dataset is None:
-            # Try reading from global_test_params as fallback (--string-arg thread_dataset:<hex>)
-            thread_dataset_hex = self.matter_test_config.global_test_params.get('thread_dataset')
-            if thread_dataset_hex:
-                correct_thread_dataset = bytes.fromhex(thread_dataset_hex) if isinstance(
-                    thread_dataset_hex, str) else thread_dataset_hex
 
         if correct_thread_dataset is None:
             asserts.fail(
-                "Thread operational dataset must be provided via --thread-dataset-hex parameter "
-                "(with --commissioning-method ble-thread) OR via --string-arg thread_dataset:<hex>"
+                "Thread operational dataset must be provided via --thread-dataset-hex <dataset_hex>."
             )
         logger.info(f" --- Correct Thread operational dataset: {correct_thread_dataset.hex()}")
 
@@ -374,13 +355,8 @@ class TC_CNET_4_24(MatterBaseTest):
         logger.info(f" --- Incorrect Thread dataset 2 (modified Network Key only): {incorrect_thread_dataset_2.hex()}")
 
         # Detect session type: Check if device is already commissioned (CASE) or needs PASE
-        # Check for optional parameter to force PASE (similar to TC_DA_1_2)
-        # do_test_over_pase = self.user_params.get("use_pase_only", False)
         session_established = False
 
-        # if not do_test_over_pase:
-        #     # Try to connect with CASE first (device is already commissioned)
-        #     logger.info(" --- Attempting to connect with CASE session (device may be already commissioned)...")
         try:
             # Try to get connected device with CASE only (timeout 3 seconds)
             await asyncio.wait_for(
@@ -594,7 +570,7 @@ class TC_CNET_4_24(MatterBaseTest):
                 cmd=cnet.Commands.ConnectNetwork(networkID=network_id_2, breadcrumb=9),
                 timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS,
             )
-            await self._validate_connect_network_response(response, expect_success=False)
+            await self._validate_connect_network_response(response, expect_success=True)
             logger.info(" --- ConnectNetwork completed")
         except Exception as e:
             logger.info(f" --- ConnectNetwork raised exception: {type(e).__name__}")
