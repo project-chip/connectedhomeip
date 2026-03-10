@@ -87,17 +87,17 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 6,
-                "If Snapshot feature is supported, TH sends the SnapshotStreamAllocate command.",
+                "TH sends an allocation command (Snapshot, Video, or Audio) based on supported features.",
                 "DUT responds with a SUCCESS status code. Store StreamID as aStreamID.",
             ),
             TestStep(
                 7,
-                "If Snapshot feature is supported, TH sends the SetStreamPriorities command with StreamPriorities set as a subset of aSupportedStreamUsages.",
-                "DUT responds with a INVALID_IN_STATE status code.",
+                "TH sends the SetStreamPriorities command with StreamPriorities set as a subset of aSupportedStreamUsages.",
+                "DUT responds with a INVALID_IN_STATE status code because a stream is allocated.",
             ),
             TestStep(
                 8,
-                "If Snapshot feature is supported, TH sends the SnapshotStreamDeallocate command with SnapshotStreamID set to aStreamID.",
+                "TH sends the appropriate deallocation command for the stream allocated in Step 6 with StreamID set to aStreamID.",
                 "DUT responds with a SUCCESS status code.",
             ),
         ]
@@ -109,6 +109,9 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
 
+        self.step("precondition")
+        # Commission DUT - already done
+
         feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap
         )
@@ -119,9 +122,6 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
 
         asserts.assert_true(has_snapshot or has_video or has_audio,
                             "DUT must support at least one of Snapshot, Video, or Audio features")
-
-        self.step("precondition")
-        # Commission DUT - already done
 
         # Check that there are no allocated streams
         if has_snapshot:
