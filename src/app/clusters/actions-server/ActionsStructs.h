@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/Actions/Structs.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
@@ -31,7 +31,7 @@ static constexpr size_t kEndpointListMaxSize     = 256u;
 
 struct ActionStructStorage : public Structs::ActionStruct::Type
 {
-    ActionStructStorage(){};
+    ActionStructStorage() {};
 
     ActionStructStorage(uint16_t aAction, const CharSpan & aActionName, ActionTypeEnum aActionType, uint16_t aEpListID,
                         BitMask<CommandBits> aCommands, ActionStateEnum aActionState)
@@ -66,7 +66,7 @@ private:
 
 struct EndpointListStorage : public Structs::EndpointListStruct::Type
 {
-    EndpointListStorage(){};
+    EndpointListStorage() {};
 
     EndpointListStorage(uint16_t aEpListId, const CharSpan & aEpListName, EndpointListTypeEnum aEpListType,
                         const DataModel::List<const EndpointId> & aEndpointList)

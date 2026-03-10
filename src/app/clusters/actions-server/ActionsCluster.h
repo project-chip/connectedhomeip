@@ -17,12 +17,11 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/data-model/Encode.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <lib/core/DataModelTypes.h>
+#include <clusters/Actions/Attributes.h>
+#include <clusters/Actions/Events.h>
 
 #include "ActionsDelegate.h"
 
@@ -42,10 +41,6 @@ public:
     {}
 
     ~ActionsCluster() override = default;
-
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
-
-    void Shutdown(ClusterShutdownType type) override;
 
     void ActionListModified();
 
@@ -69,8 +64,6 @@ public:
 
 private:
     Delegate & mDelegate;
-    ServerClusterContext * mContext = nullptr;
-
     CHIP_ERROR ReadActionListAttribute(const DataModel::ReadAttributeRequest & request,
                                        const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 

@@ -15,14 +15,12 @@
  *    limitations under the License.
  */
 
-#include "ActionsCluster.h"
-#include "ActionsStructs.h"
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app/reporting/reporting.h>
+#include <app/clusters/actions-server/ActionsCluster.h>
 #include <clusters/Actions/Metadata.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+
+#include "ActionsStructs.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -30,17 +28,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Actions;
 using namespace chip::app::Clusters::Actions::Attributes;
 using namespace chip::Protocols::InteractionModel;
-
-CHIP_ERROR ActionsCluster::Startup(ServerClusterContext & context)
-{
-    mContext = &context;
-    return DefaultServerCluster::Startup(context);
-}
-
-void ActionsCluster::Shutdown(ClusterShutdownType type)
-{
-    // No cleanup needed
-}
 
 void ActionsCluster::OnStateChanged(uint16_t aActionId, uint32_t aInvokeId, ActionStateEnum aActionState)
 {

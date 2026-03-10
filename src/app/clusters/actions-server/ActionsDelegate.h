@@ -16,8 +16,7 @@
  */
 
 #pragma once
-
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/Actions/Commands.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
