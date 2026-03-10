@@ -114,7 +114,7 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
         mLabel.ClearValue();
     }
 
-    CHIP_ERROR err = CommissionerControlServer::GenerateCommissioningRequestResultEvent(kAggregatorEndpointId, result);
+    CHIP_ERROR err = GenerateCommissioningRequestResultEvent(kAggregatorEndpointId, result);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -232,12 +232,12 @@ CHIP_ERROR CommissionerControlInit(bridge::FabricAdminDelegate * fabricAdmin)
     BitMask<Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories;
     supportedDeviceCategories.SetField(Clusters::CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization, 1);
 
-    Protocols::InteractionModel::Status status = CommissionerControl::SetSupportedDeviceCategories(
-        Clusters::CommissionerControl::kAggregatorEndpointId, supportedDeviceCategories);
+    err = CommissionerControl::SetSupportedDeviceCategories(Clusters::CommissionerControl::kAggregatorEndpointId,
+                                                            supportedDeviceCategories);
 
-    if (status != Protocols::InteractionModel::Status::Success)
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to set SupportedDeviceCategories: %d", static_cast<int>(status));
+        ChipLogError(NotSpecified, "Failed to set SupportedDeviceCategories: %d", err);
         sCommissionerControlDelegate.reset();
         return CHIP_ERROR_INTERNAL;
     }
