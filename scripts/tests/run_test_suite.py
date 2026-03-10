@@ -168,10 +168,9 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='What targets to skip (glob)'
 )
 @click.option(
-    '--no-log-timestamps',
-    default=False,
-    is_flag=True,
-    help='Skip timestaps in log output')
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestamps in log output')
 @click.option(
     '--root',
     default=DEFAULT_CHIP_ROOT,
@@ -219,15 +218,12 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
-def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str,
-         no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
-         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: TestRunTime,
-         chip_tool: Path | None) -> None:
+def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str, log_timestamps: bool,
+         root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...], exclude_tags: tuple[TestTag, ...],
+         test_order_seed: str | None, find_path: list[str], runner: TestRunTime, chip_tool: Path | None) -> None:
 
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
-    if no_log_timestamps:
-        log_fmt = '%(levelname)-7s %(message)s'
+    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     if sys.platform == "linux":
