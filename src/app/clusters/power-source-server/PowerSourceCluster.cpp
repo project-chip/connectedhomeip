@@ -127,7 +127,7 @@ PowerSourceCluster::PowerSourceCluster(EndpointId endpointId, const OptionalAttr
         VerifyOrDieWithMsg(err = SetBatQuantity(config.quantity), NotSpecified, "Can't set the attribute `BatQuantity`, error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    // no mandatory attributes marked `Fixed` when `kRehcargeable` feature is set
+    // no mandatory attributes marked `Fixed` when `kRechargeable` feature is set
 
     // optional attributes marked `Fixed` (deliberately ignoring errors because these will check if the optional attribute is enabled)
     DieIfInvalidValue(SetBatCommonDesignation(config.commonDesignation));
