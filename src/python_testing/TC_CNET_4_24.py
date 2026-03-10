@@ -242,6 +242,13 @@ class TC_CNET_4_24(MatterBaseTest):
             asserts.assert_in(status, valid_statuses, f"Expected one of {valid_statuses}, got {status}")
         return status
 
+    async def _expire_case_sessions_if_needed(self, do_test_over_pase: bool) -> None:
+        if do_test_over_pase:
+            return
+
+        logger.info(" --- Expiring CASE sessions after potential network transition")
+        self.default_controller.ExpireSessions(self.dut_node_id)
+
     # Overrides default_timeout
     @property
     def default_timeout(self) -> int:
@@ -507,8 +514,7 @@ class TC_CNET_4_24(MatterBaseTest):
         network_id_1 = get_thread_tlv(incorrect_thread_dataset_1, tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
         logger.info(f" --- Step 3: Sending ConnectNetwork with incorrect Extended PAN ID: {network_id_1.hex()}")
 
-        # ConnectNetwork with incorrect Extended PAN ID - expect kSuccess response
-        # Thread connection attempt may take time (~28 seconds based on logs)
+        # ConnectNetwork with incorrect Extended PAN ID
         try:
             response = await self.send_single_cmd(
                 endpoint=endpoint,
@@ -516,10 +522,16 @@ class TC_CNET_4_24(MatterBaseTest):
                 timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS,
             )
             await self._validate_connect_network_response(response, expect_success=True)
-            logger.info(" --- ConnectNetwork returned kSuccess")
+            logger.info(" --- ConnectNetwork returned response")
         except Exception as e:
-            logger.info(f" --- ConnectNetwork timed out: {type(e).__name__}")
-            logger.info(" --- Waiting for DUT to complete Thread connection attempt...")
+            logger.info(f" --- ConnectNetwork raised exception: {type(e).__name__}")
+            logger.info(" --- Continuing to observe post-connect network state")
+
+        # IMPORTANT:
+        # If the test is running over CASE, the DUT may have left its original operational
+        # network while attempting to connect to the updated Thread network. Expire existing
+        # CASE sessions so subsequent operations do not try to reuse a stale session.
+        await self._expire_case_sessions_if_needed(do_test_over_pase)
 
         # Wait for Thread to attempt connection and DUT to update status
         await asyncio.sleep(40)
@@ -575,19 +587,24 @@ class TC_CNET_4_24(MatterBaseTest):
         network_id_2 = get_thread_tlv(incorrect_thread_dataset_2, tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
         logger.info(f" --- Step 9: Sending ConnectNetwork with incorrect Network Key: {network_id_2.hex()}")
 
-        # ConnectNetwork with incorrect Network Key - expect error response
-        # Connection attempt may complete quickly (~2 seconds based on logs)
+        # ConnectNetwork with incorrect Network Key
         try:
             response = await self.send_single_cmd(
                 endpoint=endpoint,
                 cmd=cnet.Commands.ConnectNetwork(networkID=network_id_2, breadcrumb=9),
                 timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS,
             )
-            await self._validate_connect_network_response(response, expect_success=True)
+            await self._validate_connect_network_response(response, expect_success=False)
             logger.info(" --- ConnectNetwork completed")
         except Exception as e:
-            logger.info(f" --- ConnectNetwork timed out: {type(e).__name__}")
-            logger.info(" --- Waiting for DUT to complete Thread connection attempt...")
+            logger.info(f" --- ConnectNetwork raised exception: {type(e).__name__}")
+            logger.info(" --- Continuing to observe post-connect network state")
+
+        # IMPORTANT:
+        # If the test is running over CASE, the DUT may have left its original operational
+        # network while attempting to connect to the updated Thread network. Expire existing
+        # CASE sessions so subsequent operations do not try to reuse a stale session.
+        await self._expire_case_sessions_if_needed(do_test_over_pase)
 
         # Wait for Thread to attempt connection and DUT to update status
         await asyncio.sleep(40)
@@ -632,6 +649,12 @@ class TC_CNET_4_24(MatterBaseTest):
         )
         await self._validate_connect_network_response(response, expect_success=True)
         logger.info(" --- ConnectNetwork succeeded with correct credentials")
+
+        # IMPORTANT:
+        # Over CASE, the DUT may transition away from the original operational network while
+        # joining the target Thread network. Expire existing CASE sessions so follow-up reads
+        # establish a fresh operational session if needed.
+        await self._expire_case_sessions_if_needed(do_test_over_pase)
 
         # Step 13: TH reads LastNetworkingStatus (should be kSuccess)
         self.step(13)
