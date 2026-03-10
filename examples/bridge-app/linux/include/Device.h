@@ -66,8 +66,8 @@ public:
 
     chip::app::ServerClusterRegistration &
     CreateBridgedDeviceInfo(chip::EndpointId endpointId,
-                            chip::app::Clusters::BridgedDeviceBasicInformationCluster::RequiredData && required,
-                            chip::app::Clusters::BridgedDeviceBasicInformationCluster::FixedData && fixed
+                            chip::app::Clusters::BridgedDeviceBasicInformationCluster::MutableData && mutableData,
+                            chip::app::Clusters::BridgedDeviceBasicInformationCluster::FixedData && fixedData
 
     );
 

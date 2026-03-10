@@ -106,8 +106,6 @@ public:
 protected:
     const ConcreteClusterPath mPath;
     ServerClusterContext * mContext = nullptr;
-    // Tracks if shutdown has been called to make it idempotent
-    bool mIsShutdown = false;
 
     bool IsStarted() const { return mContext != nullptr; }
 

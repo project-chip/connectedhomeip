@@ -872,10 +872,10 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
             // for later.
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
-
-            ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(params.GetSetupDiscriminator().value(), this,
-                                                                                    OnDiscoveredDeviceOverBleSuccess,
-                                                                                    OnDiscoveredDeviceOverBleError));
+            auto setupDiscriminator                         = params.GetSetupDiscriminator();
+            VerifyOrExit(setupDiscriminator.has_value(), err = CHIP_ERROR_INVALID_ARGUMENT);
+            ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(
+                        setupDiscriminator.value(), this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
         }
         else
         {
@@ -2446,17 +2446,17 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
         {
             VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
                                                     Clusters::IcdManagement::Attributes::FeatureMap::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::IdleModeDuration::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::ActiveModeDuration::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::ActiveModeThreshold::Id));
         }
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::Id));
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id));
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::IdleModeDuration::Id));
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::ActiveModeDuration::Id));
-        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
-                                                Clusters::IcdManagement::Attributes::ActiveModeThreshold::Id));
 
         // Extra paths requested via CommissioningParameters
         for (auto const & path : params.GetExtraReadPaths())

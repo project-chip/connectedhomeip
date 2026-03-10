@@ -84,6 +84,7 @@ config CHIP_CRYPTO_PSA
 	imply PSA_WANT_ALG_ECDH
 	imply PSA_WANT_ALG_HKDF
 	imply PSA_WANT_ALG_HMAC
+	imply PSA_WANT_ALG_ECDSA
 
 config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	bool "Erase NVS flash pages on factory reset"

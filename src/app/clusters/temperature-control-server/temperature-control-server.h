@@ -1,6 +1,6 @@
-/**
- *
- *    Copyright (c) 2026 Project CHIP Authors
+/*
+ *    Copyright (c) 2023-2026 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
+#include <app/clusters/temperature-control-server/CodegenIntegration.h>

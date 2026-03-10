@@ -18,4 +18,16 @@
 
 #pragma once
 
-#include <app/clusters/closure-control-server/ClosureControlClusterObjects.h>
+#include <app/clusters/temperature-control-server/TemperatureControlCluster.h>
+
+namespace chip::app::Clusters::TemperatureControl {
+
+TemperatureControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
+
+CHIP_ERROR SetTemperatureSetpoint(EndpointId endpointId, int16_t temperatureSetpoint);
+CHIP_ERROR SetSelectedTemperatureLevel(EndpointId endpointId, uint8_t selectedTemperatureLevel);
+
+SupportedTemperatureLevelsIteratorDelegate * GetDelegate();
+void SetDelegate(SupportedTemperatureLevelsIteratorDelegate * delegate);
+
+} // namespace chip::app::Clusters::TemperatureControl

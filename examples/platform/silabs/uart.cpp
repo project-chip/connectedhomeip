@@ -152,7 +152,7 @@ typedef struct
 #if CHIP_DETAIL_LOGGING
 #define UART_MAX_QUEUE_SIZE 60
 #else
-#define UART_MAX_QUEUE_SIZE 20
+#define UART_MAX_QUEUE_SIZE 25
 #endif
 #endif
 
