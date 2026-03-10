@@ -543,7 +543,8 @@ CHIP_ERROR AccessControlCluster::Attributes(const ConcreteClusterPath & path,
     AttributeListBuilder::OptionalAttributeEntry kOptionalAttributes[] = {
         // The AuxiliaryACL attribute can only be set if the group auxiliary access control delegate
         // is defined. Without it, none of the reporting functionality of auxiliary ACLs will function.
-        { .enabled = mClusterContext.accessControl.IsGroupAuxiliaryDelegateRegistered(), .metadata = Attributes::AuxiliaryACL::kMetadataEntry },
+        { .enabled  = mClusterContext.accessControl.IsGroupAuxiliaryDelegateRegistered(),
+          .metadata = Attributes::AuxiliaryACL::kMetadataEntry },
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
         { .enabled = true, .metadata = Attributes::Extension::kMetadataEntry },
 #endif

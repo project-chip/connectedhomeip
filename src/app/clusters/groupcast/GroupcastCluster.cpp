@@ -96,7 +96,8 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     FabricIndex fabric_index = handler->GetAccessingFabricIndex();
 
     const chip::Access::SubjectDescriptor * subjectDescriptor = request.subjectDescriptor;
-    if(subjectDescriptor == nullptr) {
+    if (subjectDescriptor == nullptr)
+    {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::UnsupportedCommand;

@@ -693,7 +693,8 @@ public:
     /**
      * @brief Unregisters the delegate handling auxiliary access control entries.
      */
-    void UnregisterGroupAuxiliaryDelegate() {
+    void UnregisterGroupAuxiliaryDelegate()
+    {
         mGroupAuxDelegate->Release();
         mGroupAuxDelegate = nullptr;
     }
@@ -733,7 +734,6 @@ public:
 
 private:
     bool IsInitialized() const { return (mDelegate != nullptr); }
-
 
     void NotifyEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry * entry,
                             EntryListener::ChangeType changeType);
