@@ -307,8 +307,6 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
         mTransportMap[connectionID]->ConfigureRecorderTimeSetting(timeControl.Value());
     }
 
-    // Pass zoneIDs with at least 1 invalidZoneId to match the earlier implementation
-    // Using the default parameter value { kInvalidZoneId } from the TriggerTransport function
     mTransportMap[connectionID]->TriggerTransport(activationReason);
 
     return Status::Success;
