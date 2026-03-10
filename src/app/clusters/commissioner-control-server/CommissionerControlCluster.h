@@ -20,6 +20,9 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/CommissionerControl/Attributes.h>
+#include <clusters/CommissionerControl/Commands.h>
+#include <clusters/CommissionerControl/Enums.h>
+#include <clusters/CommissionerControl/Events.h>
 #include <clusters/CommissionerControl/Metadata.h>
 
 namespace chip::app::Clusters {
