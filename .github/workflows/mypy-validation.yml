@@ -52,6 +52,7 @@ jobs:
       - name: Build Python environment
         run: |
           scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+          out/venv/bin/pip install mypy
 
       - name: Run mypy validation (ChipDeviceCtrl.py)
         shell: bash

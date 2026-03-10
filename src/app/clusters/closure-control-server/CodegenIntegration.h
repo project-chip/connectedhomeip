@@ -19,3 +19,22 @@
 #pragma once
 
 #include <app/clusters/closure-control-server/ClosureControlCluster.h>
+#include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ClosureControl {
+
+ClosureControlCluster * GetInstance(EndpointId endpointId);
+
+void MatterClosureControlSetDelegate(EndpointId endpointId, ClosureControlClusterDelegate & delegate);
+
+void MatterClosureControlSetConformance(EndpointId endpointId, const ClusterConformance & conformance);
+
+void MatterClosureControlSetInitParams(EndpointId endpointId, const ClusterInitParameters & initParams);
+
+} // namespace ClosureControl
+} // namespace Clusters
+} // namespace app
+} // namespace chip
