@@ -670,7 +670,7 @@ public:
 
     /**
      * @brief Registers a delegate to handle auxiliary access control entries. There
-     * can only be 1 group auxiliary access control delegate registered at a time. To 
+     * can only be 1 group auxiliary access control delegate registered at a time. To
      * replace the delegate after one has been set previously, one MUST unregister the
      * currently set delegate before calling this registration function.
      *
@@ -693,9 +693,9 @@ public:
     /**
      * @brief Unregisters the delegate handling auxiliary access control entries.
      */
-    void UnregisterGroupAuxiliaryDelegate() { 
+    void UnregisterGroupAuxiliaryDelegate() {
         mGroupAuxDelegate->Release();
-        mGroupAuxDelegate = nullptr; 
+        mGroupAuxDelegate = nullptr;
     }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -754,12 +754,12 @@ private:
 private:
     Delegate * mDelegate = nullptr;
 
-    // This is an access control delegate that is specifically set to handle auxiliary ACL entries 
+    // This is an access control delegate that is specifically set to handle auxiliary ACL entries
     // based on group information. It is part of server init params, and can also be set at runtime using
-    // RegisterGroupAuxiliaryDelegate(). It is needed for functionality in the groupcast cluster protected by 
-    // the LN feature, and the access control cluster protected by the AUX feature. It is expected that 
-    // this delegate will have an implementation of the AuxiliaryEntries() funciton for reporting these 
-    // entries. It is also expected to implement a Check() function to actually use these entries 
+    // RegisterGroupAuxiliaryDelegate(). It is needed for functionality in the groupcast cluster protected by
+    // the LN feature, and the access control cluster protected by the AUX feature. It is expected that
+    // this delegate will have an implementation of the AuxiliaryEntries() funciton for reporting these
+    // entries. It is also expected to implement a Check() function to actually use these entries
     // to approve/deny access control.
     Delegate * mGroupAuxDelegate = nullptr;
 
