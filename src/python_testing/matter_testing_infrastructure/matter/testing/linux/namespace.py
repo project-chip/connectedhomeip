@@ -126,11 +126,11 @@ class NetworkResource:
         else:
             cmd = shlex.split(netcmd.cmd)
 
-        log.debug("Executing: '%s' check=%s", cmd, check)
+        log.debug("Executing: '%s' check=%s", shlex.join(cmd), check)
         try:
-            subprocess.run(cmd, check=check)
+            subprocess.run(cmd, check=check, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Failed to execute '{cmd}'. Are you using --privileged if running in docker?") from e
+            raise RuntimeError(f"Failed to execute '{shlex.join(cmd)}'. Are you using --privileged if running in docker?") from e
 
     def setup(self):
         """Run commands to setup a resource."""
@@ -200,11 +200,12 @@ class NetworkLink(NetworkResource):
     def wait_for_duplicate_address_detection(self) -> bool:
         # IPv6 does Duplicate Address Detection even though we know ULAs provided are isolated.
         # Wait for 'tentative' address to be gone.
-        log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
-
         cmd = ['ip', 'addr']
         if self.ns:
+            log.info("Waiting for IPv6 DaD for namespace %s to complete (no tentative addresses)", self.ns.name)
             cmd = self.ns.wrap_cmd(cmd)
+        else:
+            log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
 
         # Wait at most 10 seconds.
         start_time = time.time()
