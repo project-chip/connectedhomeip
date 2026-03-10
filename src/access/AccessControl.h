@@ -652,14 +652,15 @@ public:
     /**
      * Iterates over auxiliary entries for the given fabric.
      *
-     * @param [in]  fabric   Fabric for which to iterate auxiliary entries.
-     * @param [out] iterator Iterator controlling the iteration.
+     * @param [in]  fabricIndex   Fabric index for which to iterate auxiliary entries. 
+     * @param [out] iterator      Iterator controlling the iteration.
      */
-    CHIP_ERROR AuxiliaryEntries(FabricIndex fabric, EntryIterator & iterator) const
+    // TODO: fabricIndex should be a pointer, and if it's nullptr then entries across all fabrics should be returned.
+    CHIP_ERROR AuxiliaryEntries(FabricIndex fabricIndex, EntryIterator & iterator) const
     {
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(IsGroupAuxiliaryDelegateRegistered(), CHIP_ERROR_INCORRECT_STATE);
-        return mGroupAuxDelegate->AuxiliaryEntries(iterator, &fabric);
+        return mGroupAuxDelegate->AuxiliaryEntries(iterator, &fabricIndex);
     }
 
     // Adds a listener to the end of the listener list, if not already in the list.

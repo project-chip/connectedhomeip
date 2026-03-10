@@ -23,6 +23,7 @@
 namespace chip {
 namespace Access {
 
+// AuxiliaryType should have only one value expressed.
 enum class AuxiliaryType : uint8_t
 {
     kSystem    = 1 << 0,

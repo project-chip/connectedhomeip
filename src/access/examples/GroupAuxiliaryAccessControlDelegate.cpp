@@ -122,10 +122,10 @@ public:
     void Init(EntryIterator & iterator, Credentials::GroupDataProvider * groupDataProvider, FabricIndex fabric)
     {
         mGroupDataProvider = groupDataProvider;
-        mFabric            = fabric;
+        mFabricIndex            = fabric;
         if (mGroupDataProvider)
         {
-            mGroupInfoIterator = mGroupDataProvider->IterateGroupInfo(mFabric);
+            mGroupInfoIterator = mGroupDataProvider->IterateGroupInfo(mFabricIndex);
         }
         iterator.SetDelegate(*this);
     }
@@ -163,7 +163,7 @@ public:
                     {
                         return CHIP_ERROR_NO_MEMORY;
                     }
-                    delegate->Init(entry, mFabric, mGroupId, endpoint.endpoint_id);
+                    delegate->Init(entry, mFabricIndex, mGroupId, endpoint.endpoint_id);
                     return CHIP_NO_ERROR;
                 }
                 mEndpointIterator->Release();
@@ -178,7 +178,7 @@ public:
                     if (info.flags & to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL))
                     {
                         mGroupId          = info.group_id;
-                        mEndpointIterator = mGroupDataProvider->IterateEndpoints(mFabric, mGroupId);
+                        mEndpointIterator = mGroupDataProvider->IterateEndpoints(mFabricIndex, mGroupId);
                     }
                 }
                 else
@@ -194,7 +194,7 @@ public:
 
 private:
     Credentials::GroupDataProvider * mGroupDataProvider;
-    FabricIndex mFabric;
+    FabricIndex mFabricIndex;
     Credentials::GroupDataProvider::GroupInfoIterator * mGroupInfoIterator = nullptr;
     Credentials::GroupDataProvider::EndpointIterator * mEndpointIterator   = nullptr;
     GroupId mGroupId                                                       = kUndefinedGroupId;
