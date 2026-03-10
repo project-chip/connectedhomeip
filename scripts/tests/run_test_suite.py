@@ -342,6 +342,21 @@ class Terminable(Protocol):
     def terminate(self) -> None: ...
 
 
+class CommissioningMethod(enum.StrEnum):
+    ON_NETWORK = "on-network"
+    BLE_WIFI = "ble-wifi"
+    BLE_THREAD = "ble-thread"
+    THREAD_MESHCOP = "thread-meshcop"
+
+    @property
+    def wifi_required(self) -> bool:
+        return self in {CommissioningMethod.BLE_WIFI}
+
+    @property
+    def thread_required(self) -> bool:
+        return self in {CommissioningMethod.BLE_THREAD, CommissioningMethod.THREAD_MESHCOP}
+
+
 @main.command(
     'run', help='Execute the tests')
 @click.option(
@@ -450,8 +465,8 @@ class Terminable(Protocol):
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.option(
     '--commissioning-method',
-    type=click.Choice(['on-network', 'ble-wifi', 'ble-thread', 'thread-meshcop'], case_sensitive=False),
-    default='on-network',
+    type=click.Choice(CommissioningMethod, case_sensitive=False),  # type: ignore[arg-type]
+    default=CommissioningMethod.ON_NETWORK,
     help='Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth and Thread mock servers. "thread-meshcop" performs Thread commissioning using Thread mock server. This option is Linux-only.')
 @click.option(
     '--summary-file',
@@ -467,7 +482,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None, energy_gateway_app: Path | None,
             water_heater_app: Path | None, evse_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
             chip_tool_with_python: Path | None, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
-            expected_failures: int, commissioning_method: str | None, summary_file: Path | None) -> None:
+            expected_failures: int, commissioning_method: CommissioningMethod, summary_file: Path | None) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
@@ -539,8 +554,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         raise click.BadOptionUsage("{app,tool}-path", f"Missing required path: {e}")
 
     # Derive boolean flags from commissioning_method parameter
-    wifi_required = commissioning_method in ['ble-wifi']
-    thread_required = commissioning_method in ['ble-thread', 'thread-meshcop']
+    wifi_required = commissioning_method.wifi_required
+    thread_required = commissioning_method.thread_required
 
     if (wifi_required or thread_required) and sys.platform != "linux":
         raise click.BadOptionUsage("commissioning-method",
@@ -580,22 +595,23 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 # depending on the commissioning method used.
                 app_link_name='wlx-app' if wifi_required else 'eth-app'))
 
-            if commissioning_method == 'ble-wifi':
-                to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                to_terminate.append(chiptest.linux.BluetoothMock())
-                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
-                ble_controller_app = 0   # Bind app to the first BLE controller
-                ble_controller_tool = 1  # Bind tool to the second BLE controller
-            elif commissioning_method == 'ble-thread':
-                to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                to_terminate.append(chiptest.linux.BluetoothMock())
-                to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
-                ble_controller_app = 0   # Bind app to the first BLE controller
-                ble_controller_tool = 1  # Bind tool to the second BLE controller
-            elif commissioning_method == 'thread-meshcop':
-                to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
-                thread_ba_host = tbr.get_border_agent_host()
-                thread_ba_port = tbr.get_border_agent_port()
+            match commissioning_method:
+                case CommissioningMethod.BLE_WIFI:
+                    to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                    to_terminate.append(chiptest.linux.BluetoothMock())
+                    to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
+                    ble_controller_app = 0   # Bind app to the first BLE controller
+                    ble_controller_tool = 1  # Bind tool to the second BLE controller
+                case CommissioningMethod.BLE_THREAD:
+                    to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                    to_terminate.append(chiptest.linux.BluetoothMock())
+                    to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                    ble_controller_app = 0   # Bind app to the first BLE controller
+                    ble_controller_tool = 1  # Bind tool to the second BLE controller
+                case CommissioningMethod.THREAD_MESHCOP:
+                    to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                    thread_ba_host = tbr.get_border_agent_host()
+                    thread_ba_port = tbr.get_border_agent_port()
 
             to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
