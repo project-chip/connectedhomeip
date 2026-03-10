@@ -32,6 +32,7 @@ _FIELD_STYLES = coloredlogs.DEFAULT_FIELD_STYLES | {
     "message": {"bold": False},
 }
 
+
 class ProcessThreadTaskFilter(logging.Filter):
     """Logging filter to add process/thread and task information to log records."""
 
