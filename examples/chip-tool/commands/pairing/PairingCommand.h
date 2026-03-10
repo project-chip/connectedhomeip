@@ -26,6 +26,11 @@
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
+#include <app/CommandSender.h>
+#include <controller/CHIPDeviceControllerSystemState.h>
+#include <transport/Session.h>
+#include <transport/raw/ProxyTransport.h>
+
 #include <optional>
 #include <thread>
 
@@ -44,6 +49,7 @@ enum class PairingMode
     AlreadyDiscoveredByIndexWithCode,
     OnNetwork,
     Nfc,
+    Proxy, ///< Commission via a Commissioning Proxy (ProxyMessageRequest/Response tunnel)
 };
 
 enum class PairingNetworkType
@@ -57,7 +63,9 @@ enum class PairingNetworkType
 class PairingCommand : public CHIPCommand,
                        public chip::Controller::DevicePairingDelegate,
                        public chip::Controller::DeviceDiscoveryDelegate,
-                       public chip::Credentials::DeviceAttestationDelegate
+                       public chip::Credentials::DeviceAttestationDelegate,
+                       public chip::Transport::ProxyTransportDelegate,
+                       public chip::app::CommandSender::Callback
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
@@ -66,7 +74,9 @@ public:
         CHIPCommand(commandName, credIssuerCmds),
         mPairingMode(mode), mNetworkType(networkType), mFilterType(filterType),
         mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }, mComplex_TimeZones(&mTimeZoneList),
-        mComplex_DSTOffsets(&mDSTOffsetList), mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
+        mComplex_DSTOffsets(&mDSTOffsetList), mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this),
+        mOnProxyConnectedCallback(OnProxyDeviceConnected, this),
+        mOnProxyConnectionFailureCallback(OnProxyDeviceConnectionFailed, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("bypass-attestation-verifier", 0, 1, &mBypassAttestationVerifier,
@@ -129,6 +139,13 @@ public:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            break;
+        case PairingMode::Proxy:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            AddArgument("proxy-node-id", 0, UINT64_MAX, &mProxyNodeId,
+                        "Node ID of the commissioning-proxy-app to tunnel packets through");
             break;
         case PairingMode::OnNetwork:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
@@ -336,4 +353,44 @@ private:
     std::string mPromptedSSID;
     std::string mPromptedPassword;
     std::string mPromptedOperationalDataset;
+
+    // ------------------------------------------------------------------
+    // Proxy commissioning support
+    // ------------------------------------------------------------------
+
+    /** Kick off the proxy pairing flow. */
+    CHIP_ERROR PairViaProxy(NodeId remoteId);
+
+    /** Called when CASE session to the proxy is established. */
+    static void OnProxyDeviceConnected(void * context,
+                                       chip::Messaging::ExchangeManager & exchangeMgr,
+                                       const chip::SessionHandle & sessionHandle);
+    static void OnProxyDeviceConnectionFailed(void * context, const chip::ScopedNodeId & nodeId, CHIP_ERROR error);
+
+    /** Called after ProxyConnectResponse arrives to kick off PairDevice. */
+    void OnProxyConnected(uint16_t sessionId);
+
+    // ProxyTransportDelegate — sends ProxyMessageRequest when ProxyTransport needs to forward a packet
+    CHIP_ERROR SendProxyMessage(uint16_t sessionId, chip::ByteSpan message) override;
+
+    // CommandSender::Callback — receives ProxyMessageResponse
+    void OnResponse(chip::app::CommandSender * client,
+                    const chip::app::ConcreteCommandPath & path,
+                    const chip::app::StatusIB & status,
+                    chip::TLV::TLVReader * data) override;
+    void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override;
+    void OnDone(chip::app::CommandSender * client) override;
+
+    NodeId  mProxyNodeId      = chip::kUndefinedNodeId;
+    uint16_t mProxySessionId  = 0;
+
+    // Exchange context to the proxy, kept alive for ProxyMessageRequest invokes.
+    chip::Messaging::ExchangeManager * mProxyExchangeMgr = nullptr;
+    chip::SessionHolder mProxySession;
+
+    // Outstanding ProxyMessageRequest CommandSender (null when idle).
+    chip::Platform::UniquePtr<chip::app::CommandSender> mProxyCmdSender;
+
+    chip::Callback::Callback<chip::OnDeviceConnected>   mOnProxyConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnProxyConnectionFailureCallback;
 };

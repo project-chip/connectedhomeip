@@ -236,7 +236,22 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyMessageReque
                                                                                                TLV::TLVReader & input_arguments,
                                                                                                CommandHandler * handler)
 {
-    return Status::UnsupportedCommand;
+    ChipLogProgress(Zcl, "===SHM %s()", __func__);
+
+    Commands::ProxyMessageRequest::DecodableType commandData;
+    ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
+
+    chip::Optional<chip::ByteSpan> message;
+    if (!commandData.message.IsNull())
+    {
+        message.SetValue(commandData.message.Value());
+    }
+
+    auto delegateStatus = mDelegate.ProxyMessageRequest(
+        commandData.sessionId, message, commandData.responseTimeout, handler, request);
+
+    ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
+    return Status::Success;
 }
 
 CHIP_ERROR CommissioningProxyCluster::Attributes(const ConcreteClusterPath & path,

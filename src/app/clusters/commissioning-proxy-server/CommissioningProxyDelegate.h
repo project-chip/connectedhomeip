@@ -94,6 +94,24 @@ public:
                      chip::app::CommandHandler * commandObj,
                      const DataModel::InvokeRequest & request) = 0;
 
+    /**
+     * @brief Forward a raw Matter packet to the commissionee via the proxy's
+     *        transport (e.g. WiFi-PAF) and return the response in ProxyMessageResponse.
+     *
+     * @param sessionId      The proxy session ID from ProxyConnectResponse.
+     * @param message        The raw Matter packet bytes to forward (nullable).
+     * @param responseTimeout Maximum time in seconds to wait for the commissionee response.
+     * @param commandObj     The command handler; delegate SHALL call AddResponse with
+     *                       ProxyMessageResponse once the commissionee replies.
+     * @param request        The invoke path.
+     */
+    virtual Protocols::InteractionModel::Status
+    ProxyMessageRequest(uint16_t sessionId,
+                        chip::Optional<chip::ByteSpan> message,
+                        uint8_t responseTimeout,
+                        app::CommandHandler * commandObj,
+                        const DataModel::InvokeRequest & request) = 0;
+
     // ------------------------------------------------------------------
     // Get attribute methods
     virtual uint8_t GetScanMaxTime()         = 0;

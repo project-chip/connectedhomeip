@@ -59,6 +59,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 #include <transport/raw/NFC.h>
 #endif
+#include <transport/raw/ProxyTransport.h>
 
 namespace chip {
 
@@ -99,7 +100,41 @@ using DeviceTransportMgr = TransportMgr<
     ,
     Transport::NFC /* NFC */
 #endif
+    ,
+    Transport::Proxy<> /* Proxy: tunnels commissioning packets via ProxyMessageRequest */
     >;
+
+/**
+ * Compute the zero-based index of Transport::Proxy<> inside DeviceTransportMgr.
+ * Must stay in sync with the DeviceTransportMgr type alias above.
+ */
+constexpr size_t kDeviceProxyTransportIndex =
+    1 /* IPv6 UDP */
+#if INET_CONFIG_ENABLE_IPV4
+    + 1 /* IPv4 UDP */
+#endif
+#if CONFIG_NETWORK_LAYER_BLE
+    + 1 /* BLE */
+#endif
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    + 1 /* IPv6 TCP */
+#if INET_CONFIG_ENABLE_IPV4
+    + 1 /* IPv4 TCP */
+#endif
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    + 1 /* WiFiPAF */
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    + 1 /* NFC */
+#endif
+    ; /* Proxy<> is last */
+
+/** Return the ProxyTransportBase embedded in the DeviceTransportMgr. */
+inline Transport::ProxyTransportBase * GetDeviceProxyTransport(DeviceTransportMgr * mgr)
+{
+    return &mgr->GetTransport().GetImplAtIndex<kDeviceProxyTransportIndex>();
+}
 
 namespace Controller {
 

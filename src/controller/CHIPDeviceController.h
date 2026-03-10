@@ -224,6 +224,11 @@ public:
         return nullptr;
     }
 
+    DeviceTransportMgr * GetTransportMgr()
+    {
+        return mSystemState ? mSystemState->TransportMgr() : nullptr;
+    }
+
     CHIP_ERROR GetPeerAddressAndPort(NodeId peerId, Inet::IPAddress & addr, uint16_t & port);
 
     /**

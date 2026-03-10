@@ -65,6 +65,13 @@ static_library("raw") {
     ]
   }
 
+  # ProxyTransport is always compiled in; it is a no-op unless activated
+  # via ProxyTransportBase::Activate().
+  sources += [
+    "ProxyTransport.cpp",
+    "ProxyTransport.h",
+  ]
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [

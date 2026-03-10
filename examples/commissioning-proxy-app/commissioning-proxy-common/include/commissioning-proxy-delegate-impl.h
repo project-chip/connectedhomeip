@@ -66,6 +66,13 @@ protected:
                     app::CommandHandler * commandObj,
                     const DataModel::InvokeRequest & request) override;
 
+    Protocols::InteractionModel::Status ProxyMessageRequest(
+                    uint16_t sessionId,
+                    chip::Optional<chip::ByteSpan> message,
+                    uint8_t responseTimeout,
+                    app::CommandHandler * commandObj,
+                    const DataModel::InvokeRequest & request) override;
+
     uint8_t GetScanMaxTime() override;
     void SetScanMaxTime(uint8_t seconds) override;
 
