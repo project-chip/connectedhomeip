@@ -30,9 +30,9 @@ from typing import Any, Protocol
 
 import chiptest
 import click
-import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
+from chiptest.log_utils import LOG_LEVELS, LogConfig
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
@@ -55,17 +55,13 @@ class ManualHandling(enum.Enum):
     ONLY = enum.auto()
 
 
-# Supported log levels, mapping string values required for argument
-# parsing into logging constants
-__LOG_LEVELS__ = logging.getLevelNamesMapping()
-
-
 @dataclass
 class RunContext:
     root: str
     tests: list[chiptest.TestDefinition]
     runtime: TestRunTime
     find_path: list[str]
+    log_config: LogConfig
 
     # Deprecated options passed to `cmd_run`
     deprecated_chip_tool_path: Path | None = None
@@ -149,8 +145,12 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
 @click.option(
     '--log-level',
     default='info',
-    type=click.Choice(tuple(__LOG_LEVELS__.keys()), case_sensitive=False),
-    help='Determines the verbosity of script output.')
+    type=click.Choice(LOG_LEVELS, case_sensitive=False),
+    help='Set the verbosity of logger')
+@click.option(
+    '--log-level-tests',
+    type=click.Choice(LOG_LEVELS, case_sensitive=False),
+    help='Set the verbosity of logger during test execution. Use --log-level if not defined')
 @click.option(
     '--target',
     default=['all'],
@@ -219,16 +219,14 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
-def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str,
+def main(context: click.Context, log_level: str, log_level_tests: str | None, target: str, target_glob: str, target_skip_glob: str,
          no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
          exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: str,
          chip_tool: Path | None) -> None:
 
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
-    if no_log_timestamps:
-        log_fmt = '%(levelname)-7s %(message)s'
-    coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
+    log_config = LogConfig(log_level, log_level_tests if log_level_tests is not None else log_level, not no_log_timestamps)
+    log_config.set_fmt()
 
     if sys.platform == "linux":
         if not internal_inside_unshare:
@@ -313,8 +311,7 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
         random.seed(test_order_seed)
         random.shuffle(tests_filtered)
 
-    context.obj = RunContext(root=root, tests=tests_filtered,
-                             runtime=runtime, find_path=find_path)
+    context.obj = RunContext(root=root, tests=tests_filtered, runtime=runtime, find_path=find_path, log_config=log_config)
     if chip_tool:
         context.obj.deprecated_chip_tool_path = Path(chip_tool)
 
@@ -611,41 +608,41 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         to_terminate.append(apps_register := AppsRegister())
         apps_register.init()
 
+        log_config = context.obj.log_config
         for i in range(iterations):
             log.info("Starting iteration %d", i+1)
             observed_failures = 0
             for test in context.obj.tests:
                 test_start = time.monotonic()
-                try:
-                    if dry_run:
-                        log.info("Would run test: '%s'", test.name)
-                    else:
-                        log.info("%-20s - Starting test", test.name)
-                    test.Run(
-                        runner, apps_register, subproc_info_repo, pics_file,
-                        test_timeout_seconds, dry_run,
-                        test_runtime=context.obj.runtime,
-                        ble_controller_app=ble_controller_app,
-                        ble_controller_tool=ble_controller_tool,
-                        op_network='Thread' if thread_required else 'WiFi',
-                        thread_ba_host=thread_ba_host,
-                        thread_ba_port=thread_ba_port,
-                    )
-                    test_end = time.monotonic()
-                    if dry_run:
-                        run_summary.record(test.name, i + 1, TestStatus.DRY_RUN, test_end - test_start)
-                    else:
-                        log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
-                        run_summary.record(test.name, i + 1, TestStatus.PASSED, test_end - test_start)
-                except Exception:
-                    if os.path.exists('thread.pcap'):
-                        os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
-                    test_end = time.monotonic()
-                    log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
-                    run_summary.record(test.name, i + 1, TestStatus.FAILED, test_end - test_start)
-                    observed_failures += 1
-                    if not keep_going:
-                        sys.exit(2)
+                with log_config.fmt_context(task=test.name):
+                    try:
+                        log.info("%s", "Would run test" if dry_run else "Starting test")
+                        with log_config.fmt_context(level=log_config.level_tests):
+                            test.Run(
+                                runner, apps_register, subproc_info_repo, pics_file,
+                                test_timeout_seconds, dry_run,
+                                test_runtime=context.obj.runtime,
+                                ble_controller_app=ble_controller_app,
+                                ble_controller_tool=ble_controller_tool,
+                                op_network='Thread' if thread_required else 'WiFi',
+                                thread_ba_host=thread_ba_host,
+                                thread_ba_port=thread_ba_port,
+                            )
+                        test_end = time.monotonic()
+                        if dry_run:
+                            run_summary.record(test.name, i + 1, TestStatus.DRY_RUN, test_end - test_start)
+                        else:
+                            log.info("Completed in %0.2f seconds", test_end - test_start)
+                            run_summary.record(test.name, i + 1, TestStatus.PASSED, test_end - test_start)
+                    except Exception:
+                        if os.path.exists('thread.pcap'):
+                            os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
+                        test_end = time.monotonic()
+                        log.exception("FAILED in %0.2f seconds", test_end - test_start)
+                        run_summary.record(test.name, i + 1, TestStatus.FAILED, test_end - test_start)
+                        observed_failures += 1
+                        if not keep_going:
+                            sys.exit(2)
 
             if observed_failures != expected_failures:
                 log.error("Iteration %d: expected failure count %d, but got %d",
