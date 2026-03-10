@@ -122,7 +122,7 @@ public:
     void Init(EntryIterator & iterator, Credentials::GroupDataProvider * groupDataProvider, FabricIndex fabric)
     {
         mGroupDataProvider = groupDataProvider;
-        mFabricIndex            = fabric;
+        mFabricIndex       = fabric;
         if (mGroupDataProvider)
         {
             mGroupInfoIterator = mGroupDataProvider->IterateGroupInfo(mFabricIndex);
