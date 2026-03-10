@@ -279,9 +279,11 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             zoneID1 = cmdResponse.zoneID
 
         self.step(6)
+        # Initialze the time control fields
         initDuration = 5
         augDuration = 2
         maxDuration = 15
+        # blindDuration time set as 10 sec to ensure it is sufficient enough to receive the motion event at DUT post the clip recording is completed
         blindDuration = 10
         maxPreRollLen = 4
         try:
@@ -446,13 +448,15 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
 
         self.step(17)
+        # update maxDuration and  augDuration fields to ensure initDuration + augDuration > maxDuration
         maxDuration = 10
+        augDuration = 15
         try:
             zoneList = [{"zone": zoneID1, "sensitivity": 4}]
             triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                               "maxPreRollLen": 4000,
                               "motionZones": zoneList,
-                              "motionTimeControl": {"initialDuration": initDuration, "augmentationDuration": augDuration+13, "maxDuration": maxDuration, "blindDuration": blindDuration}}
+                              "motionTimeControl": {"initialDuration": initDuration, "augmentationDuration": augDuration, "maxDuration": maxDuration, "blindDuration": blindDuration}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
                                                               tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
             asserts.assert_equal(status, Status.Success,
