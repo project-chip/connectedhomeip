@@ -93,9 +93,7 @@ data class CHIPDeviceInfo(
         setupPayload.discoveryCapabilities,
         setupPayload.hasShortDiscriminator,
         serialNumber,
-        null,
-        5540,
-        isLIT
+        isLIT = isLIT
       )
     }
   }
