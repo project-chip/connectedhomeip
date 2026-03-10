@@ -31,7 +31,7 @@ CHIP_ERROR
 GenerateCommissioningRequestResultEvent(EndpointId endpointId,
                                         const CommissionerControl::Events::CommissioningRequestResult::Type & result);
 
-Delegate * GetDelegate(EndpointId endpoint);
-void SetDelegate(EndpointId endpoint, Delegate * delegate);
+Delegate * GetDelegate(EndpointId endpointId);
+void SetDelegate(EndpointId endpointId, Delegate * delegate);
 
 } // namespace chip::app::Clusters::CommissionerControl

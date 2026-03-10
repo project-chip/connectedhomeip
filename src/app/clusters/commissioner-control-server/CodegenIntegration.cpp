@@ -128,7 +128,7 @@ GenerateCommissioningRequestResultEvent(EndpointId endpointId,
     return commissionerControl->GenerateCommissioningRequestResultEvent(result);
 }
 
-Delegate * GetDelegate(EndpointId endpoint)
+Delegate * GetDelegate(EndpointId endpointId)
 {
     auto commissionerControl = FindClusterOnEndpoint(endpointId);
     if (commissionerControl != nullptr)
@@ -138,7 +138,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     return gDelegate;
 }
 
-void SetDelegate(EndpointId endpoint, Delegate * delegate)
+void SetDelegate(EndpointId endpointId, Delegate * delegate)
 {
     VerifyOrReturn(delegate != nullptr);
     gDelegate                = delegate;

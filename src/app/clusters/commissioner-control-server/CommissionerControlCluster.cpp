@@ -250,7 +250,7 @@ exit:
         return StatusIB(err).mStatus;
     }
 
-    return Status::Success;
+    return std::nullopt;
 }
 
 } // namespace chip::app::Clusters
