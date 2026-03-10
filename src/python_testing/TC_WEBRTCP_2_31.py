@@ -69,7 +69,7 @@ class TC_WebRTCP_2_31(MatterBaseTest, WEBRTCPTestBase):
             TestStep(6, "Send SolicitOffer with a supported-but-non-matching stream usage and the allocated stream IDs => expect SolicitOfferResponse"),
             TestStep(7, "Send SolicitOffer with an unsupported stream usage and the allocated stream IDs => expect DYNAMIC_CONSTRAINT_ERROR"),
             TestStep(8, "Send SolicitOffer with matching stream usage and allocated stream IDs => expect SolicitOfferResponse, save WebRTCSessionID"),
-            TestStep(9, "Read CurrentSessions attribute => expect >= 2 sessions"),
+            TestStep(9, "Read CurrentSessions attribute => expect >= 1 session (>= 2 if step 6 was not skipped)"),
             TestStep(10, "Send EndSession with invalid WebRTCSessionID => expect NOT_FOUND"),
             TestStep(11, "Send EndSession with saved WebRTCSessionID from step 8 => expect success"),
         ]
@@ -167,11 +167,11 @@ class TC_WebRTCP_2_31(MatterBaseTest, WEBRTCPTestBase):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
 
-        self.step(6)
         if non_matching_supported_usage is None:
             # Device only supports kLiveView; no other supported usage to test with
             self.skip_step(6)
         else:
+            self.step(6)
             log.info(f"Using non-matching supported usage: {non_matching_supported_usage} for step 6")
             cmd = cluster.Commands.SolicitOffer(
                 streamUsage=non_matching_supported_usage,
@@ -183,11 +183,11 @@ class TC_WebRTCP_2_31(MatterBaseTest, WEBRTCPTestBase):
             asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
                                  "Incorrect response type for step 6")
 
-        self.step(7)
         if unsupported_usage is None:
             # All known usages are supported; cannot test unsupported usage
             self.skip_step(7)
         else:
+            self.step(7)
             log.info(f"Using unsupported usage: {unsupported_usage} for step 7")
             cmd = cluster.Commands.SolicitOffer(
                 streamUsage=unsupported_usage,
