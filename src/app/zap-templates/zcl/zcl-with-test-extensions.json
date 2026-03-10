@@ -2,7 +2,7 @@
     "description": "Matter SDK ZCL data with some extensions",
     "category": "matter",
     "version": 1,
-    "requiredFeatureLevel": 102,
+    "requiredFeatureLevel": 109,
     "xmlRoot": [".", "./data-model/chip", "./data-model/test"],
     "_comment": "Ensure access-control-definitions.xml is first in xmlFile array",
     "xmlFile": [
