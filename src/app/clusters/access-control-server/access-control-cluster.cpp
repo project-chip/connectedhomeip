@@ -497,7 +497,9 @@ DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataMode
     case AccessControl::Attributes::FeatureMap::Id: {
         value = 0;
 
-        if (mFeatureFlags.Has(Feature::kAuxiliary))
+        // The kAuxiliary feature can only be set if the group auxiliary access control delegate
+        // is defined. Without it, none of the functionality protected by this feature will function.
+        if (mClusterContext.accessControl.IsGroupAuxiliaryDelegateRegistered())
         {
             value |= to_underlying(Clusters::AccessControl::Feature::kAuxiliary);
         }
@@ -539,7 +541,9 @@ CHIP_ERROR AccessControlCluster::Attributes(const ConcreteClusterPath & path,
     AttributeListBuilder listBuilder(builder);
 
     AttributeListBuilder::OptionalAttributeEntry kOptionalAttributes[] = {
-        { .enabled = mFeatureFlags.Has(Feature::kAuxiliary), .metadata = Attributes::AuxiliaryACL::kMetadataEntry },
+        // The AuxiliaryACL attribute can only be set if the group auxiliary access control delegate
+        // is defined. Without it, none of the reporting functionality of auxiliary ACLs will function.
+        { .enabled = mClusterContext.accessControl.IsGroupAuxiliaryDelegateRegistered(), .metadata = Attributes::AuxiliaryACL::kMetadataEntry },
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
         { .enabled = true, .metadata = Attributes::Extension::kMetadataEntry },
 #endif

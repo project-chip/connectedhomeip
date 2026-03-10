@@ -25,8 +25,8 @@ namespace Access {
 
 enum class AuxiliaryType : uint8_t
 {
-    kSystem    = 0,
-    kGroupcast = 1
+    kSystem    = 1 << 0,
+    kGroupcast = 1 << 1,
 };
 
 } // namespace Access

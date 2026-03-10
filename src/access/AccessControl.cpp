@@ -184,8 +184,9 @@ char GetAuxiliaryTypeStringForLogging(AuxiliaryType auxiliaryType)
         return 's';
     case AuxiliaryType::kGroupcast:
         return 'g';
+    default:
+        return 'u';
     }
-    return 'u';
 }
 
 char GetRequestTypeStringForLogging(RequestType requestType)

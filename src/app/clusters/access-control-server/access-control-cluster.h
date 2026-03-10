@@ -46,8 +46,8 @@ public:
         Access::AccessControl & accessControl;
     };
 
-    constexpr AccessControlCluster(BitFlags<AccessControl::Feature> featureFlags, const Context & context) :
-        DefaultServerCluster(ConcreteClusterPath::ConstExpr(kRootEndpointId, AccessControl::Id)), mFeatureFlags(featureFlags),
+    constexpr AccessControlCluster(const Context & context) :
+        DefaultServerCluster(ConcreteClusterPath::ConstExpr(kRootEndpointId, AccessControl::Id)),
         mClusterContext(context)
     {}
 
@@ -94,7 +94,6 @@ private:
                                          Optional<CharSpan> arlRequestFlowUrl) override;
 #endif
 
-    BitFlags<AccessControl::Feature> mFeatureFlags;
     Context mClusterContext;
 };
 

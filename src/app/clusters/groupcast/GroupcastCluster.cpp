@@ -35,10 +35,7 @@ GroupcastCluster::GroupcastCluster(GroupcastContext && context) : GroupcastClust
 GroupcastCluster::GroupcastCluster(GroupcastContext && context, BitFlags<Groupcast::Feature> features) :
     DefaultServerCluster({ kRootEndpointId, Groupcast::Id }), mGroupcastContext(std::move(context)), mFeatures(features),
     mMembershipChangedTimer(*this), mGroupcastTestingTimer(*this)
-{
-    mGroupcastContext.groupDataProvider.SetListener(this);
-    UpdateUsedMcastAddrCount();
-}
+{}
 
 GroupcastCluster::~GroupcastCluster() {}
 
@@ -47,6 +44,7 @@ CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     mGroupcastContext.groupDataProvider.SetListener(this);
     SetDataModelProvider(context.provider);
+    UpdateUsedMcastAddrCount();
 
     return CHIP_NO_ERROR;
 }
@@ -97,15 +95,18 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     VerifyOrReturnValue(nullptr != handler, Protocols::InteractionModel::Status::InvalidAction);
     FabricIndex fabric_index = handler->GetAccessingFabricIndex();
 
+    const chip::Access::SubjectDescriptor * subjectDescriptor = request.subjectDescriptor;
+    if(subjectDescriptor == nullptr) {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::UnsupportedCommand;
 
-    const chip::Access::SubjectDescriptor subjectDescriptor = handler->GetSubjectDescriptor();
     switch (request.path.mCommandId)
     {
     case Groupcast::Commands::JoinGroup::Id: {
         Groupcast::Commands::JoinGroup::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        status = JoinGroup(fabric_index, data, subjectDescriptor);
+        status = JoinGroup(fabric_index, data, *subjectDescriptor);
     }
     break;
     case Groupcast::Commands::LeaveGroup::Id: {
@@ -113,7 +114,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         Groupcast::Commands::LeaveGroupResponse::Type response;
         EndpointList endpoints;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        status = LeaveGroup(fabric_index, data, endpoints, subjectDescriptor);
+        status = LeaveGroup(fabric_index, data, endpoints, *subjectDescriptor);
         if (Protocols::InteractionModel::Status::Success == status)
         {
             NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
@@ -133,7 +134,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     case Groupcast::Commands::ConfigureAuxiliaryACL::Id: {
         Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        status = ConfigureAuxiliaryACL(fabric_index, data, subjectDescriptor);
+        status = ConfigureAuxiliaryACL(fabric_index, data, *subjectDescriptor);
     }
     break;
     case Groupcast::Commands::GroupcastTesting::Id: {
@@ -447,7 +448,7 @@ Status GroupcastCluster::JoinGroup(FabricIndex fabric_index, const Groupcast::Co
         }
     }
 
-    if (data.useAuxiliaryACL.HasValue() && data.useAuxiliaryACL.Value())
+    if (data.useAuxiliaryACL.ValueOr(false))
     {
         EmitAuxiliaryAccessUpdated(subjectDescriptor);
     }
@@ -512,11 +513,11 @@ Status GroupcastCluster::ConfigureAuxiliaryACL(FabricIndex fabric_index,
     err = groups.GetGroupInfo(fabric_index, data.groupID, info);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::NotFound);
 
-    bool hadAuxiliaryACL = (info.flags & chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL)) != 0;
-    bool hasAuxiliaryACL = data.useAuxiliaryACL;
+    bool oldHasAuxiliaryACL = (info.flags & chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL)) != 0;
+    bool newHasAuxiliaryACL = data.useAuxiliaryACL;
 
     // Update group info
-    if (hasAuxiliaryACL)
+    if (newHasAuxiliaryACL)
     {
         info.flags |= chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL);
     }
@@ -527,7 +528,7 @@ Status GroupcastCluster::ConfigureAuxiliaryACL(FabricIndex fabric_index,
     err = groups.SetGroupInfo(fabric_index, info);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
 
-    if (hadAuxiliaryACL != hasAuxiliaryACL)
+    if (oldHasAuxiliaryACL != newHasAuxiliaryACL)
     {
         EmitAuxiliaryAccessUpdated(subjectDescriptor);
     }
@@ -596,7 +597,7 @@ Status GroupcastCluster::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
     CHIP_ERROR err = groups.GetGroupInfo(fabric_index, group_id, info);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::NotFound);
 
-    bool hadAuxiliaryACL = (info.flags & chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL)) != 0;
+    bool oldHasAuxiliaryACL = (info.flags & chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL)) != 0;
 
     if (data.endpoints.HasValue())
     {
@@ -635,7 +636,7 @@ Status GroupcastCluster::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
         VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
         VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
 
-        if (hadAuxiliaryACL)
+        if (oldHasAuxiliaryACL)
         {
             EmitAuxiliaryAccessUpdated(subjectDescriptor);
         }

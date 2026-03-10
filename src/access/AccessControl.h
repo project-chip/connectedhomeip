@@ -428,15 +428,15 @@ public:
 
     ~AccessControl()
     {
+        if (IsGroupAuxiliaryDelegateRegistered())
+        {
+            mGroupAuxDelegate->Release();
+        }
+
         // Never-initialized AccessControl instances will not have the delegate set.
         if (IsInitialized())
         {
             mDelegate->Release();
-        }
-
-        if (IsGroupAuxiliaryDelegateRegistered())
-        {
-            mGroupAuxDelegate->Release();
         }
     }
 
@@ -628,13 +628,13 @@ public:
     /**
      * Iterates over entries in the access control list.
      *
-     * @param [in]  fabric   Fabric over which to iterate entries.
+     * @param [in]  fabricIndex   Fabric over which to iterate entries.
      * @param [out] iterator Iterator controlling the iteration.
      */
-    CHIP_ERROR Entries(FabricIndex fabric, EntryIterator & iterator) const
+    CHIP_ERROR Entries(FabricIndex fabricIndex, EntryIterator & iterator) const
     {
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-        return mDelegate->Entries(iterator, &fabric);
+        return mDelegate->Entries(iterator, &fabricIndex);
     }
 
     /**
@@ -662,19 +662,6 @@ public:
         return mGroupAuxDelegate->AuxiliaryEntries(iterator, &fabric);
     }
 
-    /**
-     * Iterates over auxiliary entries for the given fabric.
-     *
-     * @param [out] iterator    Iterator controlling the iteration.
-     * @param [in]  fabricIndex Iteration is confined to fabric, if not null.
-     */
-    CHIP_ERROR AuxiliaryEntries(EntryIterator & iterator, const FabricIndex * fabricIndex = nullptr) const
-    {
-        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(IsGroupAuxiliaryDelegateRegistered(), CHIP_ERROR_INCORRECT_STATE);
-        return mGroupAuxDelegate->AuxiliaryEntries(iterator, fabricIndex);
-    }
-
     // Adds a listener to the end of the listener list, if not already in the list.
     void AddEntryListener(EntryListener & listener);
 
@@ -682,7 +669,10 @@ public:
     void RemoveEntryListener(EntryListener & listener);
 
     /**
-     * @brief Registers a delegate to handle auxiliary access control entries.
+     * @brief Registers a delegate to handle auxiliary access control entries. There
+     * can only be 1 group auxiliary access control delegate registered at a time. To 
+     * replace the delegate after one has been set previously, one MUST unregister the
+     * currently set delegate before calling this registration function.
      *
      * @param[in] delegate The delegate to register.
      *
@@ -698,10 +688,15 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    bool IsGroupAuxiliaryDelegateRegistered() const { return (mGroupAuxDelegate != nullptr); }
+
     /**
      * @brief Unregisters the delegate handling auxiliary access control entries.
      */
-    void UnregisterGroupAuxiliaryDelegate() { mGroupAuxDelegate = nullptr; }
+    void UnregisterGroupAuxiliaryDelegate() { 
+        mGroupAuxDelegate->Release();
+        mGroupAuxDelegate = nullptr; 
+    }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     // Set an optional AcceessRestriction object for MNGD feature.
@@ -739,7 +734,6 @@ public:
 private:
     bool IsInitialized() const { return (mDelegate != nullptr); }
 
-    bool IsGroupAuxiliaryDelegateRegistered() const { return (mGroupAuxDelegate != nullptr); }
 
     void NotifyEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry * entry,
                             EntryListener::ChangeType changeType);
@@ -760,6 +754,13 @@ private:
 private:
     Delegate * mDelegate = nullptr;
 
+    // This is an access control delegate that is specifically set to handle auxiliary ACL entries 
+    // based on group information. It is part of server init params, and can also be set at runtime using
+    // RegisterGroupAuxiliaryDelegate(). It is needed for functionality in the groupcast cluster protected by 
+    // the LN feature, and the access control cluster protected by the AUX feature. It is expected that 
+    // this delegate will have an implementation of the AuxiliaryEntries() funciton for reporting these 
+    // entries. It is also expected to implement a Check() function to actually use these entries 
+    // to approve/deny access control.
     Delegate * mGroupAuxDelegate = nullptr;
 
     DeviceTypeResolver * mDeviceTypeResolver = nullptr;
