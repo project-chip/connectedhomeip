@@ -212,8 +212,8 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='Default directory path for finding compiled targets.')
 @click.option(
     '--runner',
-    type=click.Choice(['matter_repl_python', 'chip_tool_python', 'darwin_framework_tool_python'], case_sensitive=False),
-    default='chip_tool_python',
+    type=click.Choice(TestRunTime, case_sensitive=False),  # type: ignore[arg-type]
+    default=TestRunTime.CHIP_TOOL_PYTHON,
     help='Run YAML tests using the specified runner.')
 @click.option(
     '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
@@ -221,7 +221,7 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
 @click.pass_context
 def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str,
          no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
-         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: str,
+         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: TestRunTime,
          chip_tool: Path | None) -> None:
 
     # Ensures somewhat pretty logging of what is going on
@@ -237,19 +237,14 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
         else:
             chiptest.linux.ensure_private_state()
 
-    runtime = TestRunTime.CHIP_TOOL_PYTHON
-    if runner == 'matter_repl_python':
-        runtime = TestRunTime.MATTER_REPL_PYTHON
-    elif runner == 'darwin_framework_tool_python':
-        runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON
-
     # Figures out selected test that match the given name(s)
-    if runtime == TestRunTime.MATTER_REPL_PYTHON:
-        all_tests = list(chiptest.AllReplYamlTests())
-    elif runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-        all_tests = list(chiptest.AllDarwinFrameworkToolYamlTests())
-    else:
-        all_tests = list(chiptest.AllChipToolYamlTests())
+    match runner:
+        case TestRunTime.MATTER_REPL_PYTHON:
+            all_tests = list(chiptest.AllReplYamlTests())
+        case TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
+            all_tests = list(chiptest.AllDarwinFrameworkToolYamlTests())
+        case TestRunTime.CHIP_TOOL_PYTHON:
+            all_tests = list(chiptest.AllChipToolYamlTests())
 
     tests: list[TestDefinition] = all_tests
 
@@ -266,7 +261,7 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
             TestTag.PURPOSEFUL_FAILURE,
         }
 
-        if runtime == TestRunTime.MATTER_REPL_PYTHON:
+        if runner == TestRunTime.MATTER_REPL_PYTHON:
             exclude_tags_set.add(TestTag.CHIP_TOOL_PYTHON_ONLY)
 
     if 'all' not in target:
@@ -313,8 +308,7 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
         random.seed(test_order_seed)
         random.shuffle(tests_filtered)
 
-    context.obj = RunContext(root=root, tests=tests_filtered,
-                             runtime=runtime, find_path=find_path)
+    context.obj = RunContext(root=root, tests=tests_filtered, runtime=runner, find_path=find_path)
     if chip_tool:
         context.obj.deprecated_chip_tool_path = Path(chip_tool)
 
