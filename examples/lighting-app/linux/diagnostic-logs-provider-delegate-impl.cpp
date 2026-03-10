@@ -112,8 +112,9 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
         VerifyOrDo(mLogSessionHandle != kInvalidLogSessionHandle, mLogSessionHandle = 0);
     } while (mFiles.count(mLogSessionHandle) != 0);
 
-    outHandle                 = mLogSessionHandle;
-    mFiles[mLogSessionHandle] = fp;
+    outHandle                    = mLogSessionHandle;
+    mFiles[mLogSessionHandle]    = fp;
+    mFileSizes[mLogSessionHandle] = GetFileSize(fp);
     return CHIP_NO_ERROR;
 }
 
@@ -124,6 +125,7 @@ CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle)
 
     auto fp = mFiles[sessionHandle];
     mFiles.erase(sessionHandle);
+    mFileSizes.erase(sessionHandle);
 
     auto rv = fclose(fp);
     VerifyOrReturnError(rv == 0, CHIP_ERROR_POSIX(errno));
@@ -136,14 +138,19 @@ CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSp
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(mFiles.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto fp = mFiles[sessionHandle];
+    auto fp       = mFiles[sessionHandle];
+    auto fileSize = mFileSizes[sessionHandle];
 
     clearerr(fp);
     size_t bytesRead = fread(outBuffer.data(), 1, outBuffer.size(), fp);
     VerifyOrReturnError(ferror(fp) == 0, CHIP_ERROR_POSIX(errno), outBuffer.reduce_size(0));
 
     outBuffer.reduce_size(bytesRead);
-    outIsEndOfLog = (feof(fp) != 0);
+
+    auto currentPos = ftell(fp);
+    VerifyOrReturnError(currentPos != -1, CHIP_ERROR_POSIX(errno), outBuffer.reduce_size(0));
+    VerifyOrReturnError(CanCastTo<size_t>(currentPos), CHIP_ERROR_INVALID_INTEGER_VALUE, outBuffer.reduce_size(0));
+    outIsEndOfLog = fileSize == static_cast<size_t>(currentPos);
 
     return CHIP_NO_ERROR;
 }
