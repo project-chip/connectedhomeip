@@ -10,6 +10,8 @@ Silicon Labs development tools required for Matter development.
 import argparse
 import logging
 import os
+import re
+import shutil
 import stat
 import subprocess
 import sys
@@ -56,6 +58,121 @@ def get_install_done_marker_path():
     """Return path to marker file indicating install-packages has completed successfully."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(script_dir, ".install-packages-done")
+
+
+def get_files_slt_dir():
+    """Return path to chip-build-efr32 files-slt directory."""
+    repo_root = get_repo_root()
+    return os.path.join(
+        repo_root, "integrations", "docker", "images", "stage-2", "chip-build-efr32", "files-slt"
+    )
+
+
+def parse_version_from_slt(file_path):
+    """Extract dependency version from a .slt file (version = \"X\" in [dependency] block). Returns None if missing."""
+    if not file_path or not os.path.isfile(file_path):
+        return None
+    # This regex finds the [dependency] section and captures the first version string in it.
+    pattern = re.compile(r"\[dependency\][^\[]*version\s*=\s*\"([^\"]+)\"")
+    try:
+        with open(file_path, "r") as f:
+            content = f.read()
+    except OSError:
+        return None
+    match = pattern.search(content)
+    if match:
+        version_str = match.group(1)
+        if "." in version_str:
+            version = version_str.split("@")[0].strip()
+            # TODO: Remove this override once a GA SiSDK release is available.
+            if version == "2025.12.1-alpha":
+                version = "2025.12.0"
+            return version
+    return None
+
+
+def version_tuple(version_str):
+    """Convert version string to tuple of integers for comparison (e.g. 2025.12.1-alpha -> (2025, 12, 1))."""
+    if not version_str:
+        return ()
+    main = version_str.split("-")[0].split("+")[0]
+    parts = []
+    for p in main.split("."):
+        try:
+            parts.append(int(p))
+        except ValueError:
+            parts.append(0)
+    return tuple(parts)
+
+
+def version_greater(a, b):
+    """Return True if version string a is greater than b."""
+    ta = version_tuple(a)
+    tb = version_tuple(b)
+    return ta > tb
+
+
+def read_install_done_versions():
+    """Read simplicity_sdk_version and wiseconnect_version from .install-packages-done. Returns None if missing."""
+    path = get_install_done_marker_path()
+    if not os.path.isfile(path):
+        return None
+    versions = {}
+    try:
+        with open(path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if "=" in line:
+                    key, _, value = line.partition("=")
+                    versions[key.strip()] = value.strip()
+    except OSError:
+        return None
+    simplicity = versions.get("simplicity_sdk_version")
+    wiseconnect = versions.get("wiseconnect_version")
+    if simplicity is None or wiseconnect is None:
+        return None
+    return {"simplicity_sdk_version": simplicity, "wiseconnect_version": wiseconnect}
+
+
+def check_skip_if_up_to_date():
+    """
+    If .install-packages-done exists, compare its versions to sisdk-pkg.slt and wiseconnect-pkg.slt.
+    If both .slt requested versions are not greater than installed, exit 0 (skip execution).
+    """
+    marker_path = get_install_done_marker_path()
+    if not os.path.isfile(marker_path):
+        return
+
+    done = read_install_done_versions()
+    if done is None:
+        return
+
+    files_slt_dir = get_files_slt_dir()
+    sisdk_slt = os.path.join(files_slt_dir, "sisdk-pkg.slt")
+    wiseconnect_slt = os.path.join(files_slt_dir, "wiseconnect-pkg.slt")
+
+    slt_simplicity = parse_version_from_slt(sisdk_slt)
+    slt_wiseconnect = parse_version_from_slt(wiseconnect_slt)
+
+    if slt_simplicity is None:
+        logger.error("Could not parse version from %s", sisdk_slt)
+        sys.exit(1)
+    if slt_wiseconnect is None:
+        logger.error("Could not parse version from %s", wiseconnect_slt)
+        sys.exit(1)
+
+    need_simplicity = version_greater(slt_simplicity, done["simplicity_sdk_version"])
+    need_wiseconnect = version_greater(slt_wiseconnect, done["wiseconnect_version"])
+
+    if not need_simplicity and not need_wiseconnect:
+        logger.info(
+            "Installed SDK versions (%s, %s) are already >= requested in .slt (%s, %s). Skipping.",
+            done["simplicity_sdk_version"],
+            done["wiseconnect_version"],
+            slt_simplicity,
+            slt_wiseconnect,
+        )
+        sys.exit(0)
 
 
 def make_executable(path):
@@ -167,6 +284,81 @@ def get_repo_root():
     return os.path.normpath(os.path.join(script_dir, "..", "..", ".."))
 
 
+SILABS_SDK_LINK_NAMES = ("simplicity_sdk", "wifi_sdk")
+
+
+def is_git_submodule_checkout(dir_path):
+    """Return True if dir_path is a directory that is a git submodule checkout (e.g. from older installs)."""
+    if not dir_path or not os.path.isdir(dir_path) or os.path.islink(dir_path):
+        return False
+    git_file = os.path.join(dir_path, ".git")
+    if not os.path.isfile(git_file):
+        return False
+    try:
+        with open(git_file, "r") as f:
+            return f.read().strip().startswith("gitdir:")
+    except OSError:
+        return False
+
+
+def get_silabs_paths_as_submodules(repo_root):
+    """Return which of third_party/silabs/simplicity_sdk and wifi_sdk exist as submodule checkouts on disk."""
+    found = []
+    for name in SILABS_SDK_LINK_NAMES:
+        path = os.path.join(repo_root, "third_party", "silabs", name)
+        if is_git_submodule_checkout(path):
+            found.append(name)
+    return found
+
+
+def _remove_silabs_submodules(repo_root, submodule_names):
+    """Remove submodule checkout dirs: git rm when path is in index; else remove from disk (e.g. after pull, index already has no entry)."""
+    paths = [os.path.join("third_party", "silabs", n) for n in submodule_names]
+    for path in paths:
+        logger.info("Running: git rm %s", path)
+        r = subprocess.run(["git", "rm", path], cwd=repo_root, capture_output=True, text=True)
+        if r.returncode == 0:
+            continue
+        full_path = os.path.join(repo_root, path)
+        if os.path.isdir(full_path):
+            logger.warning("Path not known to Git, removing directory from disk: %s", path)
+            try:
+                shutil.rmtree(full_path)
+            except OSError as e:
+                logger.error("Failed to remove %s: %s", path, e)
+                sys.exit(1)
+        else:
+            logger.error("Failed to remove %s: %s", path, r.stderr.strip() or r.stdout.strip())
+            sys.exit(1)
+    logger.info("Submodules removed successfully.")
+
+
+def check_silabs_not_submodules(repo_root):
+    """If simplicity_sdk or wifi_sdk are submodule checkouts, ask to remove them; else exit with instructions."""
+    submodule_names = get_silabs_paths_as_submodules(repo_root)
+    if not submodule_names:
+        return
+
+    paths = [os.path.join("third_party", "silabs", n) for n in submodule_names]
+    logger.warning(
+        "The following paths are submodule checkouts (e.g. from older installs): %s. "
+        "This script expects to create symlinks here, not use submodules.",
+        ", ".join(paths),
+    )
+    try:
+        reply = input("Remove these submodules now? [y/N]: ").strip().lower()
+    except EOFError:
+        reply = "n"
+    if reply in ("y", "yes"):
+        _remove_silabs_submodules(repo_root, submodule_names)
+    else:
+        logger.error(
+            "Remove the directories manually (e.g. rm -rf %s), then re-run this script.",
+            " ".join(paths),
+        )
+        sys.exit(1)
+
+
 def create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path):
     """Create symlinks: third_party/silabs/simplicity_sdk and wifi_sdk to SLT SDK locations."""
     repo_root = get_repo_root()
@@ -198,23 +390,80 @@ def create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path):
     create_symlink(wiseconnect_path, "wifi_sdk")
 
 
+def parse_key_from_file(file_path, key):
+    """Return the value for the first line 'key: value' in file_path, or None if missing."""
+    if not file_path or not os.path.isfile(file_path):
+        return None
+    prefix = key + ": "
+    try:
+        with open(file_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith(prefix):
+                    return line[len(prefix):].strip()
+    except OSError as e:
+        logger.warning("Could not read file %s: %s", file_path, e)
+    return None
+
+
+def get_installed_sdk_versions(repo_root):
+    """Read sdk_version from simplicity_sdk.slcs and version from wiseconnect.slce under third_party/silabs.
+    Exits with an error if either file or key is missing.
+    """
+    silabs = os.path.join(repo_root, "third_party", "silabs")
+    simplicity_slcs = os.path.join(silabs, "simplicity_sdk", "simplicity_sdk.slcs")
+    wiseconnect_slce = os.path.join(silabs, "wifi_sdk", "wiseconnect.slce")
+
+    simplicity_sdk_version = parse_key_from_file(simplicity_slcs, "sdk_version")
+    wiseconnect_version = parse_key_from_file(wiseconnect_slce, "version")
+
+    missing = []
+    if simplicity_sdk_version is None:
+        missing.append("sdk_version from %s" % simplicity_slcs)
+    if wiseconnect_version is None:
+        missing.append("version from %s" % wiseconnect_slce)
+    if missing:
+        logger.error("Could not read required version fields: %s", "; ".join(missing))
+        sys.exit(1)
+
+    return {
+        "simplicity_sdk_version": simplicity_sdk_version,
+        "wiseconnect_version": wiseconnect_version,
+    }
+
+
+def write_install_done_marker(versions):
+    """Write .install-packages-done with installed SDK versions."""
+    marker_path = get_install_done_marker_path()
+    lines = [f"{key}={value}" for key, value in versions.items()]
+    try:
+        with open(marker_path, "w") as f:
+            f.write("\n".join(lines))
+            f.write("\n")
+    except OSError as e:
+        logger.error("Could not write install-done marker: %s", e)
+        sys.exit(1)
+
+
 def setup_slt_environment(verbose=False):
     """Main function to setup SLT CLI and install required packages."""
     setup_logging(verbose)
+
+    check_skip_if_up_to_date()
 
     slt_cli_path = download_slt_cli()
     update_slt_cli(slt_cli_path)
     install_sdk_packages(slt_cli_path)
 
+    repo_root = get_repo_root()
+    check_silabs_not_submodules(repo_root)
+
     simplicity_sdk_path = slt_where(slt_cli_path, "simplicity-sdk/2025.12.1-alpha")
     wiseconnect_path = slt_where(slt_cli_path, "wiseconnect")
     create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path)
 
-    try:
-        with open(get_install_done_marker_path(), "w"):
-            pass
-    except OSError as e:
-        logger.warning("Could not write install-done marker: %s", e)
+    versions = get_installed_sdk_versions(repo_root)
+    write_install_done_marker(versions)
 
     return slt_cli_path
 

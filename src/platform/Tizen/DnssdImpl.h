@@ -56,6 +56,8 @@ struct RegisterContext
     RegisterContext(DnssdTizen & instance, const char * type, const DnssdService & service, DnssdPublishCallback callback,
                     void * context);
     ~RegisterContext();
+
+    void RemoveFromOwner();
 };
 
 struct BrowseContext
@@ -78,6 +80,8 @@ struct BrowseContext
     BrowseContext(DnssdTizen & instance, const char * type, Dnssd::DnssdServiceProtocol protocol, uint32_t interfaceId,
                   DnssdBrowseCallback callback, void * context);
     ~BrowseContext();
+
+    void RemoveFromOwner();
 };
 
 struct ResolveContext
@@ -103,6 +107,7 @@ struct ResolveContext
     ~ResolveContext() = default;
 
     void Finalize(CHIP_ERROR error);
+    void RemoveFromOwner();
 };
 
 class DnssdTizen
@@ -123,14 +128,13 @@ public:
     CHIP_ERROR Resolve(const DnssdService & browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                        void * context);
 
-    // TODO (a.bokowy): Make these methods private
-    void RemoveContext(RegisterContext * context);
-    void RemoveContext(BrowseContext * context);
-    void RemoveContext(ResolveContext * context);
-
     static DnssdTizen & GetInstance() { return sInstance; }
 
 private:
+    friend struct RegisterContext;
+    friend struct BrowseContext;
+    friend struct ResolveContext;
+
     DnssdTizen() = default;
     static DnssdTizen sInstance;
 
@@ -140,6 +144,10 @@ private:
                                         DnssdBrowseCallback callback, void * context);
     ResolveContext * CreateResolveContext(const char * name, const char * type, uint32_t interfaceId, DnssdResolveCallback callback,
                                           void * context);
+
+    void RemoveRegisterContext(RegisterContext * context);
+    void RemoveBrowseContext(BrowseContext * context);
+    void RemoveResolveContext(ResolveContext * context);
 
     std::mutex mMutex;
     std::set<std::unique_ptr<RegisterContext>> mRegisterContexts;

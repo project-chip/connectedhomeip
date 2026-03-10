@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,20 +15,14 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/build/chip/chip_test_suite.gni")
-
-chip_test_suite("tests") {
-  output_name = "libTestAdministratorCommissioningCluster"
-
-  test_sources = [ "TestAdministratorCommissioningCluster.cpp" ]
-
-  cflags = [ "-Wconversion" ]
+source_set("logging") {
+  sources = [
+    "LoggingDimmableLightDevice.cpp",
+    "LoggingDimmableLightDevice.h",
+  ]
 
   public_deps = [
-    "${chip_root}/src/app/clusters/administrator-commissioning-server",
-    "${chip_root}/src/app/server-cluster/testing",
-    "${chip_root}/src/app/tests:helpers",
-    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/dimmable-light",
     "${chip_root}/src/lib/support",
   ]
 }
