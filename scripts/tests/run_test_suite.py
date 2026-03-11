@@ -14,17 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
 import enum
-import json
 import logging
 import os
 import random
 import sys
 import time
 import warnings
-from collections import Counter
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -33,6 +30,7 @@ import click
 import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
+from chiptest.results import RunSummary, TestResult
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
@@ -69,47 +67,6 @@ class RunContext:
 
     # Deprecated options passed to `cmd_run`
     deprecated_chip_tool_path: Path | None = None
-
-
-class TestStatus(enum.Enum):
-    PASSED = "passed"
-    FAILED = "failed"
-    DRY_RUN = "dry_run"
-
-
-@dataclass
-class TestResult:
-    name: str
-    iteration: int
-    status: TestStatus
-    duration_seconds: float
-
-
-@dataclass
-class RunSummary:
-    run_timestamp: datetime.datetime
-    iterations: int
-    total_runs: int = 0
-    passed: int = 0
-    failed: int = 0
-    results: list[TestResult] = field(default_factory=list)
-
-    def record(self, name: str, iteration: int, status: TestStatus, duration: float) -> None:
-        self.results.append(TestResult(name=name, iteration=iteration, status=status, duration_seconds=round(duration, 3)))
-        if status == TestStatus.PASSED:
-            self.passed += 1
-        elif status == TestStatus.FAILED:
-            self.failed += 1
-
-    def write_json(self, path: Path) -> None:
-        data = asdict(self)
-        data["run_timestamp"] = self.run_timestamp.isoformat()
-        # Convert Enum to string for JSON serialization
-        for result in data["results"]:
-            result["status"] = result["status"].value
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(data, indent=2))
-        log.info("Test run summary written to %s", path)
 
 
 # TODO: When we update click to >= 8.2.0 we will be able to use the builtin `deprecated` argument for Option
@@ -546,28 +503,12 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         raise click.BadOptionUsage("commissioning-method",
                                    f"Option --commissioning-method={commissioning_method} is available on Linux platform only")
 
+    run_summary = RunSummary(iterations)
     ble_controller_app = None
     ble_controller_tool = None
     thread_ba_host = None
     thread_ba_port = None
     to_terminate: list[Terminable] = []
-
-    run_summary = RunSummary(
-        run_timestamp=datetime.datetime.now(datetime.timezone.utc),
-        iterations=iterations,
-    )
-
-    def cleanup() -> None:
-        for item in reversed(to_terminate):
-            try:
-                log.info("Cleaning up %s", item.__class__.__name__)
-                item.terminate()
-            except Exception as e:
-                log.warning("Encountered exception during cleanup: %r", e)
-        to_terminate.clear()
-        if summary_file is not None:
-            run_summary.total_runs = len(run_summary.results)
-            run_summary.write_json(summary_file)
 
     try:
         if sys.platform == 'linux':
@@ -611,38 +552,25 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         to_terminate.append(apps_register := AppsRegister())
         apps_register.init()
 
-        for i in range(iterations):
-            log.info("Starting iteration %d", i+1)
+        for i in range(1, iterations + 1):
+            log.info("Starting iteration %d", i)
             observed_failures = 0
             for test in context.obj.tests:
-                test_start = time.monotonic()
                 try:
-                    if dry_run:
-                        log.info("Would run test: '%s'", test.name)
-                    else:
-                        log.info("%-20s - Starting test", test.name)
-                    test.Run(
-                        runner, apps_register, subproc_info_repo, pics_file,
-                        test_timeout_seconds, dry_run,
-                        test_runtime=context.obj.runtime,
-                        ble_controller_app=ble_controller_app,
-                        ble_controller_tool=ble_controller_tool,
-                        op_network='Thread' if thread_required else 'WiFi',
-                        thread_ba_host=thread_ba_host,
-                        thread_ba_port=thread_ba_port,
-                    )
-                    test_end = time.monotonic()
-                    if dry_run:
-                        run_summary.record(test.name, i + 1, TestStatus.DRY_RUN, test_end - test_start)
-                    else:
-                        log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
-                        run_summary.record(test.name, i + 1, TestStatus.PASSED, test_end - test_start)
+                    run_summary.record(result := TestResult.run_test(
+                        test.name, i, dry_run, lambda: test.Run(
+                            runner, apps_register, subproc_info_repo, pics_file,
+                            test_timeout_seconds, dry_run,
+                            test_runtime=context.obj.runtime,
+                            ble_controller_app=ble_controller_app,
+                            ble_controller_tool=ble_controller_tool,
+                            op_network='Thread' if thread_required else 'WiFi',
+                            thread_ba_host=thread_ba_host,
+                            thread_ba_port=thread_ba_port,
+                        )))
+                    if result.exception is not None:
+                        raise result.exception
                 except Exception:
-                    if os.path.exists('thread.pcap'):
-                        os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
-                    test_end = time.monotonic()
-                    log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
-                    run_summary.record(test.name, i + 1, TestStatus.FAILED, test_end - test_start)
                     observed_failures += 1
                     if not keep_going:
                         sys.exit(2)
@@ -658,7 +586,16 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         log.error("Caught exception during test execution: %s", e, exc_info=True)
         raise
     finally:
-        cleanup()
+        for item in reversed(to_terminate):
+            try:
+                log.info("Cleaning up %s", item.__class__.__name__)
+                item.terminate()
+            except Exception as e:
+                log.warning("Encountered exception during cleanup: %r", e)
+
+        run_summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
+        if summary_file is not None:
+            run_summary.write_json(summary_file)
 
 
 @main.command(
@@ -667,78 +604,20 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 @click.option(
     '--summary-file',
     required=True,
-    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    type=ExistingFilePath,
     help='Path to the JSON summary file to display.')
 @click.option(
     '--top-slowest',
     default=20,
     show_default=True,
-    type=click.IntRange(min=1),
-    help='Number of slowest tests to include in the timing table.')
-def cmd_summarize(summary_file: Path, top_slowest: int) -> None:
-    raw = json.loads(summary_file.read_text())
-    results: list[dict] = raw.get("results", [])
-
-    passed = raw.get("passed", 0)
-    failed = raw.get("failed", 0)
-    total = raw.get("total_runs", len(results))
-    iterations = raw.get("iterations", 1)
-    ts = raw.get("run_timestamp", "unknown")
-
-    sep = "=" * 72
-
-    print(sep)
-    print("  TEST RUN SUMMARY")
-    print(sep)
-    print(f"  Run timestamp : {ts}")
-    print(f"  Iterations    : {iterations}")
-    print(f"  Total runs    : {total}")
-    print(f"  Passed        : {passed}")
-    print(f"  Failed        : {failed}")
-    if total:
-        print(f"  Pass rate     : {100 * passed / total:.1f}%")
-    print(sep)
-
-    failed_results = [r for r in results if r["status"] == TestStatus.FAILED.value]
-    if failed_results:
-        print(f"\n  FAILED TESTS ({len(failed_results)}):")
-        print(f"  {'Test name':<50} {'Iter':>4}  {'Duration':>10}")
-        print("  " + "-" * 68)
-        for r in sorted(failed_results, key=lambda x: x["name"]):
-            print(f"  {'✗  ' + r['name']:<50} {r['iteration']:>4}  {r['duration_seconds']:>9.2f}s")
-    else:
-        print("\n  No failures recorded.")
-
-    if iterations > 1:
-        fail_counts: Counter = Counter()
-        run_counts: Counter = Counter()
-        for r in results:
-            run_counts[r["name"]] += 1
-            if r["status"] == TestStatus.FAILED.value:
-                fail_counts[r["name"]] += 1
-        flaky = [(name, fail_counts[name], run_counts[name]) for name in fail_counts if fail_counts[name] > 0]
-        if flaky:
-            print(f"\n  FAILURE RATE BY TEST (across {iterations} iterations):")
-            print(f"  {'Test name':<50} {'Failures':>8}  {'Rate':>8}")
-            print("  " + "-" * 70)
-            for name, fails, runs in sorted(flaky, key=lambda x: -x[1]):
-                rate = 100 * fails / runs
-                print(f"  {name:<50} {fails:>5}/{runs:<2}  {rate:>7.1f}%")
-
-    slowest = sorted(
-        [r for r in results if r["status"] != TestStatus.DRY_RUN.value],
-        key=lambda x: -x["duration_seconds"]
-    )[:top_slowest]
-
-    if slowest:
-        print(f"\n  SLOWEST {top_slowest} TEST RUNS:")
-        print(f"  {'Test name':<50} {'Status':<8} {'Iter':>4}  {'Duration':>10}")
-        print("  " + "-" * 76)
-        for r in slowest:
-            mark = "✓" if r["status"] == TestStatus.PASSED.value else "✗"
-            print(f"  {mark + '  ' + r['name']:<50} {r['status']:<8} {r['iteration']:>4}  {r['duration_seconds']:>9.2f}s")
-
-    print(sep)
+    type=click.IntRange(min=-1),
+    help='Number of slowest tests to include in the timing table. Disable with 0 and show all with -1.')
+@click.option(
+    '--show-all',
+    is_flag=True,
+    help='Show statistics of all tests for all iterations.')
+def cmd_summarize(summary_file: Path, top_slowest: int, show_all: bool) -> None:
+    RunSummary.from_json(summary_file).print_summary(top_slowest=top_slowest, show_all=show_all)
 
 
 # On Linux, allow an execution shell to be prepared
