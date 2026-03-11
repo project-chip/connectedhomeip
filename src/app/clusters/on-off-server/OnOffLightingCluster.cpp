@@ -196,13 +196,8 @@ DataModel::ActionReturnStatus OnOffLightingCluster::WriteAttribute(const DataMod
         AttributePersistence persistence(mContext->attributeStorage);
         app::DataModel::ActionReturnStatus result =
             persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mStartUpOnOff);
-        if (!result.IsSuccess())
-        {
-            return result;
-        }
-
-        NotifyAttributeChanged(request.path.mAttributeId);
-        return Status::Success;
+        NotifyAttributeChangedIfSuccess(request.path.mAttributeId, result);
+        return result;
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
