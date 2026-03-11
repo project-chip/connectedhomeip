@@ -182,7 +182,10 @@ class TC_WebRTCP_2_28(MatterBaseTest, WEBRTCPTestBase):
         self.step(6)
         # Send EndSession with valid WebRTCSessionID
         cmd = cluster.Commands.EndSession(webRTCSessionID=current_session_id)
-        await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        try:
+            await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        except InteractionModelError as e:
+            asserts.fail(f"Unexpected failure on EndSession with valid WebRTCSessionID: {e.status}")        
 
 
 if __name__ == "__main__":
