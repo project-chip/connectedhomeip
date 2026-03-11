@@ -100,11 +100,8 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     VerifyOrReturnValue(nullptr != handler, Protocols::InteractionModel::Status::InvalidAction);
     FabricIndex fabric_index = handler->GetAccessingFabricIndex();
 
-    const chip::Access::SubjectDescriptor * subjectDescriptor = request.subjectDescriptor;
-    if (subjectDescriptor == nullptr)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    const chip::Access::SubjectDescriptor subjectDescriptor = request.subjectDescriptor;
+
     Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::UnsupportedCommand;
 
     switch (request.path.mCommandId)
@@ -112,7 +109,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     case Groupcast::Commands::JoinGroup::Id: {
         Groupcast::Commands::JoinGroup::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        status = JoinGroup(fabric_index, data, *subjectDescriptor);
+        status = JoinGroup(fabric_index, data, subjectDescriptor);
     }
     break;
     case Groupcast::Commands::LeaveGroup::Id: {
@@ -120,7 +117,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         Groupcast::Commands::LeaveGroupResponse::Type response;
         EndpointList endpoints;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        status = LeaveGroup(fabric_index, data, endpoints, *subjectDescriptor);
+        status = LeaveGroup(fabric_index, data, endpoints, subjectDescriptor);
         if (Protocols::InteractionModel::Status::Success == status)
         {
             NotifyAttributeChanged(Groupcast::Attributes::Membership::Id);
@@ -140,7 +137,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
     case Groupcast::Commands::ConfigureAuxiliaryACL::Id: {
         Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType data;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        status = ConfigureAuxiliaryACL(fabric_index, data, *subjectDescriptor);
+        status = ConfigureAuxiliaryACL(fabric_index, data, subjectDescriptor);
     }
     break;
     case Groupcast::Commands::GroupcastTesting::Id: {
