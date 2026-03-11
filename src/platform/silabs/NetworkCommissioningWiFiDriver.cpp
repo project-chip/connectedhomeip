@@ -77,7 +77,6 @@ CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
 
 CHIP_ERROR SlWiFiDriver::CommitConfiguration()
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     constexpr uint8_t kDefaultSecurityBitmap =
         static_cast<uint8_t>(chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpa2Personal);
 
@@ -94,7 +93,6 @@ CHIP_ERROR SlWiFiDriver::CommitConfiguration()
 
 CHIP_ERROR SlWiFiDriver::RevertConfiguration()
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     mStagingNetwork = mSavedNetwork;
     return CHIP_NO_ERROR;
 }
@@ -107,7 +105,6 @@ bool SlWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
 Status SlWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                                         uint8_t & outNetworkIndex)
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
     VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
@@ -127,7 +124,6 @@ Status SlWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, Mut
 
 Status SlWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
@@ -139,7 +135,6 @@ Status SlWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebu
 
 Status SlWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     outDebugText.reduce_size(0);
     // Only one network is supported for now
     VerifyOrReturnError(index == 0, Status::kOutOfRange);
@@ -149,7 +144,6 @@ Status SlWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCh
 
 CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
         ChipLogProgress(DeviceLayer, "Disconnecting for current wifi");
@@ -183,7 +177,6 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
 // TODO: Re-write implementation with proper driver based callback
 void SlWiFiDriver::UpdateNetworkingStatus()
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     if (mpStatusChangeCallback == nullptr)
     {
         ChipLogError(NetworkProvisioning, "networkStatusChangeCallback is nil");
@@ -209,7 +202,6 @@ void SlWiFiDriver::UpdateNetworkingStatus()
 
 void SlWiFiDriver::OnConnectWiFiNetwork()
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     if (mpConnectCallback)
     {
         TEMPORARY_RETURN_IGNORED CommitConfiguration();
@@ -220,7 +212,6 @@ void SlWiFiDriver::OnConnectWiFiNetwork()
 
 void SlWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kUnknownError;
 
@@ -246,7 +237,6 @@ exit:
 
 uint32_t SlWiFiDriver::GetSupportedWiFiBandsMask() const
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     return WifiInterface::GetInstance().GetSupportedWiFiBandsMask();
 }
 
@@ -266,7 +256,6 @@ bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 
 void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     SlWiFiDriver * nwDriver = NetworkCommissioning::SlWiFiDriver::GetInstance();
     // Cannot use the driver if the instance is not initialized.
     VerifyOrDie(nwDriver != nullptr); // should never be null
@@ -311,7 +300,6 @@ void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
 
 void SlWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     if (callback != nullptr)
     {
         mpScanCallback = callback;
@@ -326,7 +314,6 @@ void SlWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callba
 
 CHIP_ERROR GetConnectedNetwork(Network & network)
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     WifiInterface::WifiCredentials wifiConfig;
     network.networkIDLen = 0;
     network.connected    = false;
@@ -349,13 +336,11 @@ CHIP_ERROR GetConnectedNetwork(Network & network)
 
 size_t SlWiFiDriver::WiFiNetworkIterator::Count()
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     return mDriver->mStagingNetwork.ssidLen == 0 ? 0 : 1;
 }
 
 bool SlWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 {
-    ChipLogProgress(DeviceLayer, "[SL] %s: start", __func__);
     if (mExhausted || mDriver->mStagingNetwork.ssidLen == 0)
     {
         return false;
