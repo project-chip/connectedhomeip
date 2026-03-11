@@ -35,8 +35,8 @@ public:
 
     ActionsCluster(EndpointId endpointId, Actions::Delegate & delegate, OptionalAttributesSet optionalAttributes = {},
                    std::optional<CharSpan> setupURL = std::nullopt) :
-        DefaultServerCluster({ endpointId, Actions::Id }), mDelegate(delegate), mOptionalAttributes(optionalAttributes),
-        mSetupURL(setupURL)
+        DefaultServerCluster({ endpointId, Actions::Id }),
+        mDelegate(delegate), mOptionalAttributes(optionalAttributes), mSetupURL(setupURL)
     {}
 
     ~ActionsCluster() override = default;
