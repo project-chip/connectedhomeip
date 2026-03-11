@@ -1,3 +1,0 @@
-macOS 26.1 (25B77)
-Apple clang version 17.0.0 (clang-1700.4.4.1)
-SDK: macOS 26.1
