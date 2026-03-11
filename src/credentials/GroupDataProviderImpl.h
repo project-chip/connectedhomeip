@@ -116,7 +116,7 @@ public:
     uint16_t getMaxMcastAddrCount() override { return kMaxMcastAddrCount; }
     bool ConsumeAuxAclNotificationNeeded() override
     {
-        bool needed = mAuxAclNotificationNeeded;
+        bool needed               = mAuxAclNotificationNeeded;
         mAuxAclNotificationNeeded = false;
         return needed;
     }

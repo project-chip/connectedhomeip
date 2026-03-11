@@ -1861,7 +1861,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
 
     // Remove fabric, and ensure no auxiliary acl changed
     // event will be emitted from this action
-    err = fabric.Delete(mStorage);
+    err                       = fabric.Delete(mStorage);
     mAuxAclNotificationNeeded = false;
     return err;
 }
