@@ -196,7 +196,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
 
-    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(&gGroupDataProvider, &Server::GetInstance().GetFabricTable());
+    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(&gGroupDataProvider,
+                                                                                        &Server::GetInstance().GetFabricTable());
     initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);

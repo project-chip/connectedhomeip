@@ -21,10 +21,10 @@
 #include "access/examples/GroupAuxiliaryAccessControlDelegate.h"
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
-#include <credentials/GroupDataProviderImpl.h>
 #include <set>
 
 #include <pw_unit_test/framework.h>
@@ -2124,7 +2124,7 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntriesAllFabrics)
     {
         Credentials::GroupDataProvider::GroupInfo info;
         info.group_id = 0x1111;
-        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        info.flags    = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
         EXPECT_EQ(provider->SetGroupInfo(fabric1, info), CHIP_NO_ERROR);
         EXPECT_EQ(provider->AddEndpoint(fabric1, info.group_id, 10), CHIP_NO_ERROR);
     }
@@ -2133,7 +2133,7 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntriesAllFabrics)
     {
         Credentials::GroupDataProvider::GroupInfo info;
         info.group_id = 0x2222;
-        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        info.flags    = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
         EXPECT_EQ(provider->SetGroupInfo(fabric2, info), CHIP_NO_ERROR);
         EXPECT_EQ(provider->AddEndpoint(fabric2, info.group_id, 20), CHIP_NO_ERROR);
     }
@@ -2151,7 +2151,6 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntriesAllFabrics)
         EXPECT_EQ(GetAccessControl().RegisterGroupAuxiliaryDelegate(&manualDelegate), CHIP_NO_ERROR);
 
         ValidateAuxiliaryEntries(accessControl, kUndefinedFabricIndex, expectedAll);
-
     }
 
     // Path 2: FabricTable iteration
@@ -2159,7 +2158,7 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntriesAllFabrics)
         // Unregister existing delegate
         GetAccessControl().UnregisterGroupAuxiliaryDelegate();
 
-        //Setup a test Fabric Table
+        // Setup a test Fabric Table
         PersistentStorageOperationalKeystore opKeyStore;
         Credentials::PersistentStorageOpCertStore opCertStore;
         FabricTable fabricTable;
@@ -2174,15 +2173,13 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntriesAllFabrics)
         EXPECT_EQ(fabricTable.Init(initParams), CHIP_NO_ERROR);
 
         FabricIndex f1, f2;
-        EXPECT_EQ(fabricTable.AddNewFabricForTestIgnoringCollisions(TestCerts::GetRootACertAsset().mCert,
-                                                                    TestCerts::GetIAA1CertAsset().mCert,
-                                                                    TestCerts::GetNodeA1CertAsset().mCert,
-                                                                    TestCerts::GetNodeA1CertAsset().mKey, &f1),
+        EXPECT_EQ(fabricTable.AddNewFabricForTestIgnoringCollisions(
+                      TestCerts::GetRootACertAsset().mCert, TestCerts::GetIAA1CertAsset().mCert,
+                      TestCerts::GetNodeA1CertAsset().mCert, TestCerts::GetNodeA1CertAsset().mKey, &f1),
                   CHIP_NO_ERROR);
-        EXPECT_EQ(fabricTable.AddNewFabricForTestIgnoringCollisions(TestCerts::GetRootACertAsset().mCert,
-                                                                    TestCerts::GetIAA1CertAsset().mCert,
-                                                                    TestCerts::GetNodeA2CertAsset().mCert,
-                                                                    TestCerts::GetNodeA2CertAsset().mKey, &f2),
+        EXPECT_EQ(fabricTable.AddNewFabricForTestIgnoringCollisions(
+                      TestCerts::GetRootACertAsset().mCert, TestCerts::GetIAA1CertAsset().mCert,
+                      TestCerts::GetNodeA2CertAsset().mCert, TestCerts::GetNodeA2CertAsset().mKey, &f2),
                   CHIP_NO_ERROR);
 
         // Create GroupAuxiliaryAccessControlDelegate with fabric table
