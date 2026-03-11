@@ -77,13 +77,6 @@ class TC_WebRTCP_2_31(MatterBaseTest, WEBRTCPTestBase):
     def pics_TC_WebRTCP_2_31(self) -> list[str]:
         return [
             "WEBRTCP.S",           # WebRTC Transport Provider Server
-            "WEBRTCP.S.A0000",     # CurrentSessions attribute
-            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
-            "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
-            "WEBRTCP.S.C06.Rsp",   # EndSession command
-            "AVSM.S",              # CameraAVStreamManagement Server
-            "AVSM.S.F00",          # Audio Data Output feature
-            "AVSM.S.F01",          # Video Data Output feature
         ]
 
     @property
@@ -246,7 +239,10 @@ class TC_WebRTCP_2_31(MatterBaseTest, WEBRTCPTestBase):
 
         self.step(11)
         cmd = cluster.Commands.EndSession(webRTCSessionID=saved_session_id)
-        await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        try:
+            await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        except InteractionModelError as e:
+            asserts.fail(f"Unexpected failure on EndSession with valid WebRTCSessionID: {e.status}")
 
 
 if __name__ == "__main__":
