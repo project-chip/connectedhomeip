@@ -45,6 +45,7 @@ chip_test_suite("tests") {
       test_sources += [
         "TestCommissioningWindowOpener.cpp",
         "TestExampleOperationalCredentialsIssuer.cpp",
+        "TestSetUpCodePairer.cpp",
       ]
     }
   }
@@ -57,7 +58,10 @@ chip_test_suite("tests") {
 
   cflags = [ "-Wconversion" ]
 
-  sources = [ "AutoCommissionerTestAccess.h" ]
+  sources = [
+    "AutoCommissionerTestAccess.h",
+    "SetUpCodePairerTestAccess.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",

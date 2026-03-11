@@ -50,6 +50,13 @@
 #include <vector>
 
 namespace chip {
+
+namespace Testing {
+
+class SetUpCodePairerTestAccess;
+
+} // namespace Testing
+
 namespace Controller {
 
 class DeviceCommissioner;
@@ -98,6 +105,8 @@ class DLL_EXPORT SetUpCodePairer : public DevicePairingDelegate
                                    public Nfc::NFCReaderTransportDelegate
 #endif
 {
+    friend class chip::Testing::SetUpCodePairerTestAccess;
+
 public:
     SetUpCodePairer(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
     virtual ~SetUpCodePairer() {}

@@ -901,12 +901,13 @@ void SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, v
     ChipLogError(Controller, "Discovery timed out");
     auto * pairer = static_cast<SetUpCodePairer *>(context);
 
-    // If a PASE attempt is in progress, do not stop any discovery — give every
-    // transport that has started (DNS-SD, BLE, Wi-Fi PAF, NFC) a chance to
-    // complete, fail, or time out naturally.  DNS-SD will be stopped in
-    // OnPairingComplete once the PASE attempt it triggered completes.
+    // If a PASE attempt is in progress, do not stop physical-proximity
+    // transports (BLE, Wi-Fi PAF, NFC) — they have their own completion/timeout
+    // mechanisms.  DNS-SD, however, runs indefinitely, so stop it now to
+    // prevent DiscoveryInProgress() from being true forever.
     if (pairer->mWaitingForPASE)
     {
+        LogErrorOnFailure(pairer->StopDiscoveryOverDNSSD());
         return;
     }
 
