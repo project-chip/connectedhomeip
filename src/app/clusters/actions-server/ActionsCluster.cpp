@@ -28,7 +28,10 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Actions;
 using namespace chip::app::Clusters::Actions::Attributes;
 using namespace chip::Protocols::InteractionModel;
-
+namespace {
+static constexpr size_t kMaxEndpointListLength = 256u;
+static constexpr size_t kMaxActionListLength   = 256u;
+} // namespace
 void ActionsCluster::OnStateChanged(uint16_t aActionId, uint32_t aInvokeId, ActionStateEnum aActionState)
 {
     ChipLogProgress(Zcl, "ActionsCluster: OnStateChanged");
@@ -37,10 +40,7 @@ void ActionsCluster::OnStateChanged(uint16_t aActionId, uint32_t aInvokeId, Acti
     // Generate StateChanged event
     Events::StateChanged::Type event{ aActionId, aInvokeId, aActionState };
 
-    if (!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId))
-    {
-        ChipLogError(Zcl, "ActionsCluster: Failed to generate OnStateChanged event");
-    }
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
 void ActionsCluster::OnActionFailed(uint16_t aActionId, uint32_t aInvokeId, ActionStateEnum aActionState,
@@ -52,47 +52,39 @@ void ActionsCluster::OnActionFailed(uint16_t aActionId, uint32_t aInvokeId, Acti
     // Generate ActionFailed event
     Events::ActionFailed::Type event{ aActionId, aInvokeId, aActionState, aActionError };
 
-    if (!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId))
-    {
-        ChipLogError(Zcl, "ActionsCluster: Failed to generate OnActionFailed event");
-    }
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
 DataModel::ActionReturnStatus ActionsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                             AttributeValueEncoder & encoder)
 {
-    VerifyOrDie(request.path.mClusterId == Actions::Id);
-
     switch (request.path.mAttributeId)
     {
     case ClusterRevision::Id:
-        // Encode the generated revision constant for the Actions cluster
         return encoder.Encode(Actions::kRevision);
-
     case FeatureMap::Id:
         // The Actions cluster currently doesn't use feature maps, so we encode 0
         return encoder.Encode(static_cast<uint32_t>(0));
-
-    case ActionList::Id: {
-        CHIP_ERROR err = encoder.EncodeList([this, &request](const auto & listEncoder) -> CHIP_ERROR {
+    case SetupURL::Id: {
+        if (!mOptionalAttributes.IsSet(SetupURL::Id))
+        {
+            return Protocols::InteractionModel::Status::UnsupportedAttribute;
+        }
+        // If it's supported but we don't have a value, that's an internal error
+        if (!mSetupURL.has_value())
+        {
+            return Protocols::InteractionModel::Status::Failure;
+        }
+        return encoder.Encode(mSetupURL.value());
+    }
+    case ActionList::Id:
+        return encoder.EncodeList([this, &request](const auto & listEncoder) -> CHIP_ERROR {
             return this->ReadActionListAttribute(request, listEncoder);
         });
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-        return Protocols::InteractionModel::Status::Success;
-    }
-    case EndpointLists::Id: {
-        CHIP_ERROR err = encoder.EncodeList([this, &request](const auto & listEncoder) -> CHIP_ERROR {
+    case EndpointLists::Id:
+        return encoder.EncodeList([this, &request](const auto & listEncoder) -> CHIP_ERROR {
             return this->ReadEndpointListAttribute(request, listEncoder);
         });
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-        return Protocols::InteractionModel::Status::Success;
-    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -132,9 +124,22 @@ CHIP_ERROR ActionsCluster::ReadEndpointListAttribute(const DataModel::ReadAttrib
     return CHIP_NO_ERROR;
 }
 
-bool ActionsCluster::HaveActionWithId(uint16_t aActionId, uint16_t & aActionIndex)
+Status ActionsCluster::ValidateActionCommand(uint16_t actionID, CommandId commandId)
 {
-    return mDelegate.HaveActionWithId(aActionId, aActionIndex);
+    uint16_t actionIndex = kMaxActionListLength;
+
+    // Validation 1: Does the action exist?
+    VerifyOrReturnValue(mDelegate.HaveActionWithId(actionID, actionIndex), Status::NotFound);
+
+    // Validation 2: Is the command supported by this action?
+    if (actionIndex != kMaxActionListLength)
+    {
+        ActionStructStorage action;
+        TEMPORARY_RETURN_IGNORED mDelegate.ReadActionAtIndex(actionIndex, action);
+        VerifyOrReturnValue((action.supportedCommands.Raw() & (1 << commandId)), Status::InvalidCommand);
+    }
+
+    return Status::Success;
 }
 
 std::optional<DataModel::ActionReturnStatus> ActionsCluster::InvokeCommand(const DataModel::InvokeRequest & request,
@@ -145,111 +150,111 @@ std::optional<DataModel::ActionReturnStatus> ActionsCluster::InvokeCommand(const
     {
     case Actions::Commands::InstantAction::Id: {
         Commands::InstantAction::DecodableType commandData;
-        if (DataModel::Decode(input_arguments, commandData) != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::InvalidCommand;
-        }
-        HandleInstantAction(request, handler, commandData);
-        return std::nullopt;
+        VerifyOrReturnValue(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
+
+        Status status = ValidateActionCommand(commandData.actionID, request.path.mCommandId);
+        VerifyOrReturnValue(status == Status::Success, status);
+
+        return mDelegate.HandleInstantAction(commandData.actionID, commandData.invokeID);
     }
     case Actions::Commands::InstantActionWithTransition::Id: {
         Commands::InstantActionWithTransition::DecodableType commandData;
-        if (DataModel::Decode(input_arguments, commandData) != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::InvalidCommand;
-        }
-        HandleInstantActionWithTransition(request, handler, commandData);
-        return std::nullopt;
+        VerifyOrReturnValue(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
+
+        Status status = ValidateActionCommand(commandData.actionID, request.path.mCommandId);
+        VerifyOrReturnValue(status == Status::Success, status);
+
+        return mDelegate.HandleInstantActionWithTransition(commandData.actionID, commandData.transitionTime, commandData.invokeID);
     }
     case Actions::Commands::StartAction::Id: {
         Commands::StartAction::DecodableType commandData;
-        if (DataModel::Decode(input_arguments, commandData) != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::InvalidCommand;
-        }
-        HandleStartAction(request, handler, commandData);
-        return std::nullopt;
+        VerifyOrReturnValue(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
+
+        Status status = ValidateActionCommand(commandData.actionID, request.path.mCommandId);
+        VerifyOrReturnValue(status == Status::Success, status);
+
+        return mDelegate.HandleStartAction(commandData.actionID, commandData.invokeID);
     }
     case Actions::Commands::StartActionWithDuration::Id: {
         Commands::StartActionWithDuration::DecodableType commandData;
-        if (DataModel::Decode(input_arguments, commandData) != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::InvalidCommand;
-        }
-        HandleStartActionWithDuration(request, handler, commandData);
-        return std::nullopt;
+        VerifyOrReturnValue(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
+
+        Status status = ValidateActionCommand(commandData.actionID, request.path.mCommandId);
+        VerifyOrReturnValue(status == Status::Success, status);
+
+        return mDelegate.HandleStartActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
     }
     case Actions::Commands::StopAction::Id: {
         Commands::StopAction::DecodableType commandData;
-        if (DataModel::Decode(input_arguments, commandData) != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::InvalidCommand;
-        }
-        HandleStopAction(request, handler, commandData);
-        return std::nullopt;
+        VerifyOrReturnValue(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
+
+        Status status = ValidateActionCommand(commandData.actionID, request.path.mCommandId);
+        VerifyOrReturnValue(status == Status::Success, status);
+
+        return mDelegate.HandleStopAction(commandData.actionID, commandData.invokeID);
     }
     case Actions::Commands::PauseAction::Id: {
         Commands::PauseAction::DecodableType commandData;
-        if (DataModel::Decode(input_arguments, commandData) != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::InvalidCommand;
-        }
-        HandlePauseAction(request, handler, commandData);
-        return std::nullopt;
+        VerifyOrReturnValue(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
+
+        Status status = ValidateActionCommand(commandData.actionID, request.path.mCommandId);
+        VerifyOrReturnValue(status == Status::Success, status);
+
+        return mDelegate.HandlePauseAction(commandData.actionID, commandData.invokeID);
     }
     case Actions::Commands::PauseActionWithDuration::Id: {
         Commands::PauseActionWithDuration::DecodableType commandData;
-        if (DataModel::Decode(input_arguments, commandData) != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::InvalidCommand;
-        }
-        HandlePauseActionWithDuration(request, handler, commandData);
-        return std::nullopt;
+        VerifyOrReturnValue(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
+
+        Status status = ValidateActionCommand(commandData.actionID, request.path.mCommandId);
+        VerifyOrReturnValue(status == Status::Success, status);
+
+        return mDelegate.HandlePauseActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
     }
     case Actions::Commands::ResumeAction::Id: {
         Commands::ResumeAction::DecodableType commandData;
-        if (DataModel::Decode(input_arguments, commandData) != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::InvalidCommand;
-        }
-        HandleResumeAction(request, handler, commandData);
-        return std::nullopt;
+        VerifyOrReturnValue(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
+
+        Status status = ValidateActionCommand(commandData.actionID, request.path.mCommandId);
+        VerifyOrReturnValue(status == Status::Success, status);
+
+        return mDelegate.HandleResumeAction(commandData.actionID, commandData.invokeID);
     }
     case Actions::Commands::EnableAction::Id: {
         Commands::EnableAction::DecodableType commandData;
-        if (DataModel::Decode(input_arguments, commandData) != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::InvalidCommand;
-        }
-        HandleEnableAction(request, handler, commandData);
-        return std::nullopt;
+        VerifyOrReturnValue(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
+
+        Status status = ValidateActionCommand(commandData.actionID, request.path.mCommandId);
+        VerifyOrReturnValue(status == Status::Success, status);
+
+        return mDelegate.HandleEnableAction(commandData.actionID, commandData.invokeID);
     }
     case Actions::Commands::EnableActionWithDuration::Id: {
         Commands::EnableActionWithDuration::DecodableType commandData;
-        if (DataModel::Decode(input_arguments, commandData) != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::InvalidCommand;
-        }
-        HandleEnableActionWithDuration(request, handler, commandData);
-        return std::nullopt;
+        VerifyOrReturnValue(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
+
+        Status status = ValidateActionCommand(commandData.actionID, request.path.mCommandId);
+        VerifyOrReturnValue(status == Status::Success, status);
+
+        return mDelegate.HandleEnableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
     }
     case Actions::Commands::DisableAction::Id: {
         Commands::DisableAction::DecodableType commandData;
-        if (DataModel::Decode(input_arguments, commandData) != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::InvalidCommand;
-        }
-        HandleDisableAction(request, handler, commandData);
-        return std::nullopt;
+        VerifyOrReturnValue(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
+
+        Status status = ValidateActionCommand(commandData.actionID, request.path.mCommandId);
+        VerifyOrReturnValue(status == Status::Success, status);
+
+        return mDelegate.HandleDisableAction(commandData.actionID, commandData.invokeID);
     }
     case Actions::Commands::DisableActionWithDuration::Id: {
         Commands::DisableActionWithDuration::DecodableType commandData;
-        if (DataModel::Decode(input_arguments, commandData) != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::InvalidCommand;
-        }
-        HandleDisableActionWithDuration(request, handler, commandData);
-        return std::nullopt;
+        VerifyOrReturnValue(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
+
+        Status status = ValidateActionCommand(commandData.actionID, request.path.mCommandId);
+        VerifyOrReturnValue(status == Status::Success, status);
+
+        return mDelegate.HandleDisableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
     }
     }
 
@@ -262,19 +267,12 @@ std::optional<DataModel::ActionReturnStatus> ActionsCluster::InvokeCommand(const
 CHIP_ERROR ActionsCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     using namespace chip::app::Clusters::Actions::Attributes;
-
-    // If Actions has any optional attributes, you evaluate them here.
-    // If SetupURL is optional and you conditionally support it, you'd do: { true, SetupURL::kMetadataEntry }
-    // AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-    //     // Add optional attributes here if your ActionsDelegate supports them.
-    //     // Leave empty if everything is mandatory.
-    // };
+    constexpr DataModel::AttributeEntry optionalAttributesMeta[] = {
+        SetupURL::kMetadataEntry,
+    };
 
     AttributeListBuilder listBuilder(builder);
-
-    // This automatically pulls in ActionList, EndpointLists, ClusterRevision, FeatureMap
-    // assuming they are marked as mandatory in the ZCL specification!
-    return listBuilder.Append(Span(chip::app::Clusters::Actions::Attributes::kMandatoryMetadata), {});
+    return listBuilder.Append(Span(kMandatoryMetadata), Span{ optionalAttributesMeta }, mOptionalAttributes);
 }
 
 CHIP_ERROR ActionsCluster::AcceptedCommands(const ConcreteClusterPath & path,
@@ -282,7 +280,6 @@ CHIP_ERROR ActionsCluster::AcceptedCommands(const ConcreteClusterPath & path,
 {
     using namespace chip::app::Clusters::Actions::Commands;
 
-    // Explicitly list out the commands supported by the Actions cluster
     static const DataModel::AcceptedCommandEntry kCommands[] = {
         InstantAction::kMetadataEntry,
         InstantActionWithTransition::kMetadataEntry,
@@ -301,188 +298,12 @@ CHIP_ERROR ActionsCluster::AcceptedCommands(const ConcreteClusterPath & path,
     return builder.ReferenceExisting(kCommands);
 }
 
-void ActionsCluster::HandleInstantAction(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                         const Commands::InstantAction::DecodableType & commandData)
-{
-    if (!ValidateActionCommand(request, commandHandler, commandData.actionID))
-    {
-        return;
-    }
-
-    Status status = mDelegate.HandleInstantAction(commandData.actionID, commandData.invokeID);
-    commandHandler->AddStatus(request.path, status);
-}
-
-void ActionsCluster::HandleInstantActionWithTransition(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                                       const Commands::InstantActionWithTransition::DecodableType & commandData)
-{
-    if (!ValidateActionCommand(request, commandHandler, commandData.actionID))
-    {
-        return;
-    }
-
-    Status status =
-        mDelegate.HandleInstantActionWithTransition(commandData.actionID, commandData.transitionTime, commandData.invokeID);
-    commandHandler->AddStatus(request.path, status);
-}
-
-void ActionsCluster::HandleStartAction(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                       const Commands::StartAction::DecodableType & commandData)
-{
-    if (!ValidateActionCommand(request, commandHandler, commandData.actionID))
-    {
-        return;
-    }
-
-    Status status = mDelegate.HandleStartAction(commandData.actionID, commandData.invokeID);
-    commandHandler->AddStatus(request.path, status);
-}
-
-void ActionsCluster::HandleStartActionWithDuration(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                                   const Commands::StartActionWithDuration::DecodableType & commandData)
-{
-    if (!ValidateActionCommand(request, commandHandler, commandData.actionID))
-    {
-        return;
-    }
-
-    Status status = mDelegate.HandleStartActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
-    commandHandler->AddStatus(request.path, status);
-}
-
-void ActionsCluster::HandleStopAction(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                      const Commands::StopAction::DecodableType & commandData)
-{
-    if (!ValidateActionCommand(request, commandHandler, commandData.actionID))
-    {
-        return;
-    }
-
-    Status status = mDelegate.HandleStopAction(commandData.actionID, commandData.invokeID);
-    commandHandler->AddStatus(request.path, status);
-}
-
-void ActionsCluster::HandlePauseAction(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                       const Commands::PauseAction::DecodableType & commandData)
-{
-    if (!ValidateActionCommand(request, commandHandler, commandData.actionID))
-    {
-        return;
-    }
-
-    Status status = mDelegate.HandlePauseAction(commandData.actionID, commandData.invokeID);
-    commandHandler->AddStatus(request.path, status);
-}
-
-void ActionsCluster::HandlePauseActionWithDuration(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                                   const Commands::PauseActionWithDuration::DecodableType & commandData)
-{
-    if (!ValidateActionCommand(request, commandHandler, commandData.actionID))
-    {
-        return;
-    }
-
-    Status status = mDelegate.HandlePauseActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
-    commandHandler->AddStatus(request.path, status);
-}
-
-void ActionsCluster::HandleResumeAction(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                        const Commands::ResumeAction::DecodableType & commandData)
-{
-    if (!ValidateActionCommand(request, commandHandler, commandData.actionID))
-    {
-        return;
-    }
-
-    Status status = mDelegate.HandleResumeAction(commandData.actionID, commandData.invokeID);
-    commandHandler->AddStatus(request.path, status);
-}
-
-void ActionsCluster::HandleEnableAction(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                        const Commands::EnableAction::DecodableType & commandData)
-{
-    if (!ValidateActionCommand(request, commandHandler, commandData.actionID))
-    {
-        return;
-    }
-
-    Status status = mDelegate.HandleEnableAction(commandData.actionID, commandData.invokeID);
-    commandHandler->AddStatus(request.path, status);
-}
-
-void ActionsCluster::HandleEnableActionWithDuration(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                                    const Commands::EnableActionWithDuration::DecodableType & commandData)
-{
-    if (!ValidateActionCommand(request, commandHandler, commandData.actionID))
-    {
-        return;
-    }
-
-    Status status = mDelegate.HandleEnableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
-    commandHandler->AddStatus(request.path, status);
-}
-
-void ActionsCluster::HandleDisableAction(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                         const Commands::DisableAction::DecodableType & commandData)
-{
-    if (!ValidateActionCommand(request, commandHandler, commandData.actionID))
-    {
-        return;
-    }
-
-    Status status = mDelegate.HandleDisableAction(commandData.actionID, commandData.invokeID);
-    commandHandler->AddStatus(request.path, status);
-}
-
-void ActionsCluster::HandleDisableActionWithDuration(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                                     const Commands::DisableActionWithDuration::DecodableType & commandData)
-{
-    if (!ValidateActionCommand(request, commandHandler, commandData.actionID))
-    {
-        return;
-    }
-
-    Status status = mDelegate.HandleDisableActionWithDuration(commandData.actionID, commandData.duration, commandData.invokeID);
-    commandHandler->AddStatus(request.path, status);
-}
-
-bool ActionsCluster::ValidateActionCommand(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                           uint16_t actionID)
-{
-    uint16_t actionIndex = kMaxActionListLength;
-    if (!HaveActionWithId(actionID, actionIndex))
-    {
-        commandHandler->AddStatus(request.path, Protocols::InteractionModel::Status::NotFound);
-        return false;
-    }
-    if (actionIndex != kMaxActionListLength)
-    {
-        ActionStructStorage action;
-        TEMPORARY_RETURN_IGNORED mDelegate.ReadActionAtIndex(actionIndex, action);
-        // Check if the command bit is set in the SupportedCommands of an action.
-        if (!(action.supportedCommands.Raw() & (1 << request.path.mCommandId)))
-        {
-            commandHandler->AddStatus(request.path, Protocols::InteractionModel::Status::InvalidCommand);
-            return false;
-        }
-    }
-    return true;
-}
-
 void ActionsCluster::ActionListModified()
 {
-    OnClusterAttributeChanged(Attributes::ActionList::Id);
+    NotifyAttributeChanged(Attributes::ActionList::Id);
 }
 
 void ActionsCluster::EndpointListsModified()
 {
-    OnClusterAttributeChanged(Attributes::EndpointLists::Id);
-}
-
-void ActionsCluster::OnClusterAttributeChanged(AttributeId attributeId)
-{
-    // Use DefaultServerCluster's NotifyAttributeChanged which:
-    // 1. Increases the data version
-    // 2. Notifies subscribers of the change
-    NotifyAttributeChanged(attributeId);
+    NotifyAttributeChanged(Attributes::EndpointLists::Id);
 }

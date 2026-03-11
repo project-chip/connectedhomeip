@@ -18,11 +18,7 @@
 
 #include <app/clusters/actions-server/ActionsCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Actions {
+namespace chip::app::Clusters::Actions {
 
 // Legacy wrapper for backwards compatibility with existing applications.
 class ActionsServer
@@ -51,16 +47,12 @@ public:
     void ActionListModified(EndpointId aEndpoint);
     void EndpointListModified(EndpointId aEndpoint);
 
-    /**
-     * @return The endpoint ID.
-     */
     EndpointId GetEndpointId() { return mCluster.Cluster().GetPaths()[0].mEndpointId; }
 
-    // The Code Driven ActionsCluster instance
-    chip::app::RegisteredServerCluster<Actions::ActionsCluster> mCluster;
+private:
+    char mSetupURLBuffer[254] = { 0 };
+    std::optional<chip::CharSpan> mSetupURL;
+    RegisteredServerCluster<ActionsCluster> mCluster;
 };
 
-} // namespace Actions
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::Actions

@@ -20,24 +20,24 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/Actions/Attributes.h>
 #include <clusters/Actions/Events.h>
 
 #include "ActionsDelegate.h"
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Actions {
-
-static constexpr size_t kMaxEndpointListLength = 256u;
-static constexpr size_t kMaxActionListLength   = 256u;
+namespace chip::app::Clusters {
 
 class ActionsCluster : public DefaultServerCluster
 {
 public:
-    ActionsCluster(EndpointId endpointId, Delegate & delegate) :
-        DefaultServerCluster({ endpointId, Actions::Id }), mDelegate(delegate)
+    using OptionalAttributesSet = OptionalAttributeSet<Actions::Attributes::SetupURL::Id>;
+
+    ActionsCluster(EndpointId endpointId, Actions::Delegate & delegate,
+                   OptionalAttributesSet optionalAttributes = OptionalAttributesSet(),
+                   std::optional<CharSpan> setupURL         = std::nullopt) :
+        DefaultServerCluster({ endpointId, Actions::Id }), mDelegate(delegate), mOptionalAttributes(optionalAttributes),
+        mSetupURL(setupURL)
     {}
 
     ~ActionsCluster() override = default;
@@ -46,9 +46,9 @@ public:
 
     void EndpointListsModified();
 
-    void OnStateChanged(uint16_t aActionId, uint32_t aInvokeId, ActionStateEnum aActionState);
-
-    void OnActionFailed(uint16_t aActionId, uint32_t aInvokeId, ActionStateEnum aActionState, ActionErrorEnum aActionError);
+    void OnStateChanged(uint16_t aActionId, uint32_t aInvokeId, Actions::ActionStateEnum aActionState);
+    void OnActionFailed(uint16_t aActionId, uint32_t aInvokeId, Actions::ActionStateEnum aActionState,
+                        Actions::ActionErrorEnum aActionError);
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -63,64 +63,17 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
 private:
-    Delegate & mDelegate;
+    Actions::Delegate & mDelegate;
+    const OptionalAttributesSet mOptionalAttributes;
+
+    std::optional<CharSpan> mSetupURL;
     CHIP_ERROR ReadActionListAttribute(const DataModel::ReadAttributeRequest & request,
                                        const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 
     CHIP_ERROR ReadEndpointListAttribute(const DataModel::ReadAttributeRequest & request,
                                          const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 
-    bool HaveActionWithId(uint16_t aActionId, uint16_t & aActionIndex);
-
-    void HandleInstantAction(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                             const Commands::InstantAction::DecodableType & commandData);
-
-    void HandleInstantActionWithTransition(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                           const Commands::InstantActionWithTransition::DecodableType & commandData);
-
-    void HandleStartAction(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                           const Commands::StartAction::DecodableType & commandData);
-
-    void HandleStartActionWithDuration(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                       const Commands::StartActionWithDuration::DecodableType & commandData);
-
-    void HandleStopAction(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                          const Commands::StopAction::DecodableType & commandData);
-
-    void HandlePauseAction(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                           const Commands::PauseAction::DecodableType & commandData);
-
-    void HandlePauseActionWithDuration(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                       const Commands::PauseActionWithDuration::DecodableType & commandData);
-
-    void HandleResumeAction(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                            const Commands::ResumeAction::DecodableType & commandData);
-
-    void HandleEnableAction(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                            const Commands::EnableAction::DecodableType & commandData);
-
-    void HandleEnableActionWithDuration(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                        const Commands::EnableActionWithDuration::DecodableType & commandData);
-
-    void HandleDisableAction(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                             const Commands::DisableAction::DecodableType & commandData);
-
-    void HandleDisableActionWithDuration(const DataModel::InvokeRequest & request, CommandHandler * commandHandler,
-                                         const Commands::DisableActionWithDuration::DecodableType & commandData);
-
-    bool ValidateActionCommand(const DataModel::InvokeRequest & request, CommandHandler * commandHandler, uint16_t actionID);
-
-    /**
-     * @brief Unified helper for attribute change notifications.
-     * @param attributeId The ID of the attribute that changed.
-     *
-     * This method replaces direct calls to MatterReportingAttributeChangeCallback
-     * and uses the DefaultServerCluster's NotifyAttributeChanged mechanism.
-     */
-    void OnClusterAttributeChanged(AttributeId attributeId);
+    Protocols::InteractionModel::Status ValidateActionCommand(uint16_t actionID, CommandId commandId);
 };
 
-} // namespace Actions
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters
