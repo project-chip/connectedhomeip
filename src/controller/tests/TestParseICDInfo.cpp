@@ -71,9 +71,7 @@ private:
     class MockCallback : public ClusterStateCache::Callback
     {
         void OnDone(ReadClient *) override {}
-        void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
-                             const StatusIB & aStatus) override
-        {}
+        void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override {}
     };
 
     MockCallback mCallback;
@@ -97,14 +95,12 @@ TEST_F(TestParseICDInfo, LITDisabledForClusterRevisionLessThanOrEqual2)
     // Set FeatureMap with LIT bit set
     BitFlags<IcdManagement::Feature> featureMap;
     featureMap.Set(IcdManagement::Feature::kLongIdleTimeSupport);
-    ConcreteAttributePath featureMapPath(kRootEndpointId, IcdManagement::Id,
-                                        IcdManagement::Attributes::FeatureMap::Id);
+    ConcreteAttributePath featureMapPath(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id);
     ASSERT_EQ(cache->SetAttribute(featureMapPath, *featureMap.RawStorage()), CHIP_NO_ERROR);
 
     // Set ClusterRevision to 2 (Matter 1.3 — LIT broken)
     uint16_t clusterRevision = 2;
-    ConcreteAttributePath clusterRevisionPath(kRootEndpointId, IcdManagement::Id,
-                                              IcdManagement::Attributes::ClusterRevision::Id);
+    ConcreteAttributePath clusterRevisionPath(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::ClusterRevision::Id);
     ASSERT_EQ(cache->SetAttribute(clusterRevisionPath, clusterRevision), CHIP_NO_ERROR);
 
     // Populate required ICD attributes that ParseICDInfo reads when isICD is true
@@ -137,14 +133,12 @@ TEST_F(TestParseICDInfo, LITEnabledForClusterRevisionGreaterThan2)
     // Set FeatureMap with LIT bit set
     BitFlags<IcdManagement::Feature> featureMap;
     featureMap.Set(IcdManagement::Feature::kLongIdleTimeSupport);
-    ConcreteAttributePath featureMapPath(kRootEndpointId, IcdManagement::Id,
-                                        IcdManagement::Attributes::FeatureMap::Id);
+    ConcreteAttributePath featureMapPath(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id);
     ASSERT_EQ(cache->SetAttribute(featureMapPath, *featureMap.RawStorage()), CHIP_NO_ERROR);
 
     // Set ClusterRevision to 3 (post-1.3 — LIT fixed)
     uint16_t clusterRevision = 3;
-    ConcreteAttributePath clusterRevisionPath(kRootEndpointId, IcdManagement::Id,
-                                              IcdManagement::Attributes::ClusterRevision::Id);
+    ConcreteAttributePath clusterRevisionPath(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::ClusterRevision::Id);
     ASSERT_EQ(cache->SetAttribute(clusterRevisionPath, clusterRevision), CHIP_NO_ERROR);
 
     // Populate required ICD attributes that ParseICDInfo reads when isICD is true
