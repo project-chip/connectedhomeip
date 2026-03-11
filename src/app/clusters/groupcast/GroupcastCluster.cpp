@@ -631,7 +631,6 @@ Status GroupcastCluster::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
         err = groups.RemoveGroupInfo(fabric_index, group_id);
         VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
         VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
-
     }
     if (groups.ConsumeAuxAclNotificationNeeded())
     {
