@@ -74,13 +74,6 @@ class TC_WebRTCP_2_28(MatterBaseTest, WEBRTCPTestBase):
         """
         return [
             "WEBRTCP.S",           # WebRTC Transport Provider Server
-            "WEBRTCP.S.A0000",     # CurrentSessions attribute
-            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
-            "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
-            "WEBRTCP.S.C06.Rsp",   # EndSession command
-            "AVSM.S",              # CameraAVStreamManagement Server
-            "AVSM.S.F00",          # Audio Data Output feature
-            "AVSM.S.F01",          # Video Data Output feature
         ]
 
     @property
@@ -190,7 +183,6 @@ class TC_WebRTCP_2_28(MatterBaseTest, WEBRTCPTestBase):
         # Send EndSession with valid WebRTCSessionID
         cmd = cluster.Commands.EndSession(webRTCSessionID=current_session_id)
         await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
-        # EndSession command should succeed (no exception thrown)
 
 
 if __name__ == "__main__":
