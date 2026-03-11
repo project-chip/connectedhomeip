@@ -38,6 +38,10 @@ public:
                                   Optional<uint64_t> & outTimeSinceBoot) override;
 
     CHIP_ERROR EndLogCollection(LogSessionHandle sessionHandle) override;
+    CHIP_ERROR EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error) override
+    {
+        return EndLogCollection(sessionHandle);
+    }
 
     CHIP_ERROR CollectLog(LogSessionHandle sessionHandle, MutableByteSpan & outBuffer, bool & outIsEndOfLog) override;
 

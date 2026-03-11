@@ -125,8 +125,17 @@ CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle)
     auto fp = mFiles[sessionHandle];
     mFiles.erase(sessionHandle);
 
+    errno   = 0;
     auto rv = fclose(fp);
-    VerifyOrReturnError(rv == 0, CHIP_ERROR_POSIX(errno));
+    if (rv != 0)
+    {
+        int savedErrno = errno;
+        if (savedErrno == 0)
+        {
+            savedErrno = EIO;
+        }
+        return CHIP_ERROR_POSIX(savedErrno);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -140,8 +149,18 @@ CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSp
     const size_t bytesRequested = outBuffer.size();
 
     clearerr(fp);
+    errno            = 0;
     size_t bytesRead = fread(outBuffer.data(), 1, bytesRequested, fp);
-    VerifyOrReturnError(ferror(fp) == 0, CHIP_ERROR_POSIX(errno), outBuffer.reduce_size(0));
+    if (ferror(fp) != 0)
+    {
+        int savedErrno = errno;
+        if (savedErrno == 0)
+        {
+            savedErrno = EIO;
+        }
+        outBuffer.reduce_size(0);
+        return CHIP_ERROR_POSIX(savedErrno);
+    }
 
     outBuffer.reduce_size(bytesRead);
     // Treat short reads (including 0 bytes) as end-of-log, and also respect EOF.
