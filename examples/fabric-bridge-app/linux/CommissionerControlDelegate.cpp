@@ -238,7 +238,7 @@ CHIP_ERROR CommissionerControlInit()
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to set SupportedDeviceCategories: %d", err);
+        ChipLogError(NotSpecified, "Failed to set SupportedDeviceCategories: %" CHIP_ERROR_FORMAT, error.Format());
         sCommissionerControlDelegate.reset();
         return CHIP_ERROR_INTERNAL;
     }
