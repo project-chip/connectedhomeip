@@ -893,8 +893,12 @@ void BLEManagerImpl::CheckNonConcurrentBleClosing()
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (IsBleClosing())
     {
-        TEMPORARY_RETURN_IGNORED DeviceLayer::DeviceControlServer::DeviceControlSvr()
-            .PostCloseAllBLEConnectionsToOperationalNetworkEvent();
+        CHIP_ERROR error =
+            DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "PostCloseAllBLEConnections failed: %" CHIP_ERROR_FORMAT, error.Format());
+        }
     }
 #endif
 }

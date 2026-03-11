@@ -834,7 +834,10 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
             ChipDeviceEvent opEvent;
             opEvent.Type     = DeviceEventType::kOperationalNetworkStarted;
             CHIP_ERROR error = PlatformMgr().PostEvent(&opEvent);
+            if (error != CHIP_NO_ERROR)
+            {
             ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format());
+            }
 #endif
         }
         break;
