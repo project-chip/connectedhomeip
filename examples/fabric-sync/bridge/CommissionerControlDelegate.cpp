@@ -237,7 +237,7 @@ CHIP_ERROR CommissionerControlInit(bridge::FabricAdminDelegate * fabricAdmin)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to set SupportedDeviceCategories: %" CHIP_ERROR_FORMAT, error.Format());
+        ChipLogError(NotSpecified, "Failed to set SupportedDeviceCategories: %" CHIP_ERROR_FORMAT, err.Format());
         sCommissionerControlDelegate.reset();
         return CHIP_ERROR_INTERNAL;
     }
