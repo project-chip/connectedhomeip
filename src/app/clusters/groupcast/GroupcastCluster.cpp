@@ -449,7 +449,7 @@ Status GroupcastCluster::JoinGroup(FabricIndex fabric_index, const Groupcast::Co
         }
     }
 
-    if (data.useAuxiliaryACL.ValueOr(false))
+    if (groups.ConsumeAuxAclNotificationNeeded())
     {
         EmitAuxiliaryAccessUpdated(subjectDescriptor);
     }
@@ -529,7 +529,7 @@ Status GroupcastCluster::ConfigureAuxiliaryACL(FabricIndex fabric_index,
     err = groups.SetGroupInfo(fabric_index, info);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
 
-    if (oldHasAuxiliaryACL != newHasAuxiliaryACL)
+    if (groups.ConsumeAuxAclNotificationNeeded())
     {
         EmitAuxiliaryAccessUpdated(subjectDescriptor);
     }
@@ -637,7 +637,7 @@ Status GroupcastCluster::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
         VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
         VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
 
-        if (oldHasAuxiliaryACL)
+        if (groups.ConsumeAuxAclNotificationNeeded())
         {
             EmitAuxiliaryAccessUpdated(subjectDescriptor);
         }
