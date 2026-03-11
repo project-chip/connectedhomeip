@@ -65,12 +65,6 @@ class TC_WebRTCP_2_32(MatterBaseTest, WEBRTCPTestBase):
     def pics_TC_WebRTCP_2_32(self) -> list[str]:
         return [
             "WEBRTCP.S",           # WebRTC Transport Provider Server
-            "WEBRTCP.S.A0000",     # CurrentSessions attribute
-            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
-            "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
-            "AVSM.S",              # CameraAVStreamManagement Server
-            "AVSM.S.F00",          # Audio Data Output feature
-            "AVSM.S.F01",          # Video Data Output feature
         ]
 
     @property
