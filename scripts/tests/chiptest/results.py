@@ -93,7 +93,7 @@ class TestResult:
             if os.path.exists('thread.pcap'):
                 os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
         finally:
-            result.duration_seconds = test_end - test_start
+            result.duration_seconds = round(test_end - test_start, 3)
 
             symbol = result.status.symbol
             match result.status:
@@ -149,7 +149,7 @@ class RunStats:
                 self.cancelled += 1
 
         # Calculate cumulative average.
-        self.mean_duration += (result.duration_seconds - self.mean_duration) / self.total_runs
+        self.mean_duration += round((result.duration_seconds - self.mean_duration) / self.total_runs, 3)
 
         # Save the exception if it's the first one.
         if result.exception is not None and self.exception_first is None:
