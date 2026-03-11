@@ -13,12 +13,14 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/openthread.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/system/system.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
@@ -253,7 +255,15 @@ source_set("app-main") {
   ]
 
   if (chip_system_config_use_openthread_inet_endpoints) {
-    deps += [ "${chip_root}/third_party/openthread/platforms/simulation" ]
+    if (chip_enable_otns) {
+      deps += [
+        "${chip_root}/third_party/openthread:openthread_cli",
+        "${chip_root}/third_party/openthread/platforms/otns",
+        "${openthread_root}/examples/apps/cli:cli_uart",
+      ]
+    } else {
+      deps += [ "${chip_root}/third_party/openthread/platforms/simulation" ]
+    }
   }
   public_configs = [ ":app-main-config" ]
 }

@@ -182,6 +182,7 @@ void ThreadMeshcopCommissionProxy::OnResource(mdns::Minimal::ResourceType sectio
 
 CHIP_ERROR ThreadMeshcopCommissionProxy::CreateProxySocket(chip::Dnssd::CommissionNodeData & commissionData)
 {
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     mProxyFd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
     VerifyOrReturnError(mProxyFd >= 0, CHIP_ERROR_POSIX(errno));
 
@@ -212,6 +213,9 @@ CHIP_ERROR ThreadMeshcopCommissionProxy::CreateProxySocket(chip::Dnssd::Commissi
 
     ChipLogProgress(Controller, "Proxy socket created on port %u", commissionData.port);
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 void ThreadMeshcopCommissionProxy::OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value)

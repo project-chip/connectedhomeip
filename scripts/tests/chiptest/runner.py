@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 
 with python_path.PythonPath('../../../src/python_testing/matter_testing_infrastructure', relative_to=__file__):
     # Import all symbols used downstream not only those we use ourselves
-    from matter.testing.tasks import SubprocessInfo, SubprocessKind  # noqa: F401
+    from matter.testing.tasks import SubprocessInfo, SubprocessKind, ProcessConfigurator  # noqa: F401
 
 
 class LogPipe(threading.Thread):
@@ -200,7 +200,7 @@ class Runner:
                       timeout_seconds: int | None = None,
                       stdin: IO[Any] | None = None) -> tuple[subprocess.Popen[bytes], LogPipe, LogPipe]:
         cmd = subproc.to_cmd()
-        log.info('RunSubprocess starting application %s', " ".join(cmd))
+        log.error('RunSubprocess starting application %s', " ".join(cmd))
 
         outpipe = LogPipe(
             logging.DEBUG, capture_delegate=self.capture_delegate,

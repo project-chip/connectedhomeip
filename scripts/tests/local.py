@@ -165,6 +165,15 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
     targets.append(
         ApplicationTarget(
             kind=SubprocessKind.APP,
+            env_key="ALL_CLUSTERS_THREAD_APP",
+            cli_key="all-clusters",
+            target=f"{target_prefix}-all-clusters-no-wifi-openthread-endpoint-{suffix}",
+            binary="chip-all-clusters-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            kind=SubprocessKind.APP,
             env_key="CHIP_LOCK_APP",
             cli_key="lock",
             target=f"{target_prefix}-lock-{suffix}",

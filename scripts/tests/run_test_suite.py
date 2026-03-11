@@ -20,6 +20,7 @@ import json
 import logging
 import os
 import random
+import shlex
 import sys
 import time
 import warnings
@@ -450,7 +451,7 @@ class Terminable(Protocol):
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.option(
     '--commissioning-method',
-    type=click.Choice(['on-network', 'ble-wifi', 'ble-thread', 'thread-meshcop'], case_sensitive=False),
+    type=click.Choice(['on-network', 'ble-wifi', 'ble-thread', 'otns-meshcop', 'thread-meshcop'], case_sensitive=False),
     default='on-network',
     help='Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth and Thread mock servers. "thread-meshcop" performs Thread commissioning using Thread mock server. This option is Linux-only.')
 @click.option(
@@ -540,7 +541,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 
     # Derive boolean flags from commissioning_method parameter
     wifi_required = commissioning_method in ['ble-wifi']
-    thread_required = commissioning_method in ['ble-thread', 'thread-meshcop']
+    thread_required = commissioning_method in ['ble-thread', 'thread-meshcop', 'otns-meshcop']
 
     if (wifi_required or thread_required) and sys.platform != "linux":
         raise click.BadOptionUsage("commissioning-method",
@@ -589,13 +590,17 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
             elif commissioning_method == 'ble-thread':
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
                 to_terminate.append(chiptest.linux.BluetoothMock())
-                to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                thread_config = chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns)
+                to_terminate.append(thread_config)
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
             elif commissioning_method == 'thread-meshcop':
-                to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
-                thread_ba_host = tbr.get_border_agent_host()
-                thread_ba_port = tbr.get_border_agent_port()
+                thread_config = chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns, True)
+                to_terminate.append(thread_config)
+            elif commissioning_method == 'otns-meshcop':
+                subproc_info_repo.require('otns')
+                thread_config = chiptest.linux.ThreadOtns(shlex.join(subproc_info_repo['otns'].to_cmd()))
+                to_terminate.append(thread_config)
 
             to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
@@ -628,8 +633,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                         ble_controller_app=ble_controller_app,
                         ble_controller_tool=ble_controller_tool,
                         op_network='Thread' if thread_required else 'WiFi',
-                        thread_ba_host=thread_ba_host,
-                        thread_ba_port=thread_ba_port,
+                        thread_config=thread_config
                     )
                     test_end = time.monotonic()
                     if dry_run:

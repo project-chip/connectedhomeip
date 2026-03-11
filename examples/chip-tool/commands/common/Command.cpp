@@ -181,6 +181,7 @@ static bool ParseAddressWithInterface(const char * addressString, Command::Addre
         return false;
     }
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     if (result->ai_family == AF_INET6)
     {
         struct sockaddr_in6 * addr = reinterpret_cast<struct sockaddr_in6 *>(result->ai_addr);
@@ -201,6 +202,14 @@ static bool ParseAddressWithInterface(const char * addressString, Command::Addre
     }
 
     return true;
+#else
+    if (!::chip::Inet::IPAddress::FromString(addressString, address->address))
+    {
+      return false;
+    }
+    address->interfaceId = chip::Inet::InterfaceId::Null();
+    return true;
+#endif
 }
 
 // The callback should return whether the argument is valid, for the non-null

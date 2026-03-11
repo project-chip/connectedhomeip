@@ -24,6 +24,10 @@
 #include <app/server/Server.h>
 #include <system/SystemClock.h>
 
+#if CHIP_ENABLE_OTNS
+#include <openthread/platform/time.h>
+#endif
+
 #include <string>
 
 using namespace chip::ArgParser;
@@ -44,6 +48,34 @@ constexpr uint16_t kOptionCrashFilePath              = 0xFF05;
 constexpr uint16_t kOptionUseMockClock               = 0xFF06;
 
 namespace {
+#if CHIP_ENABLE_OTNS
+struct MockClock : public ClockBase
+{
+public:
+    MockClock() : mRealClock(SystemClock()) { Clock::Internal::SetSystemClockForTesting(this); }
+    ~MockClock() { Clock::Internal::SetSystemClockForTesting(&mRealClock); }
+
+    void SetUTCTime(Microseconds64 aOverride) { }
+
+    Microseconds64 GetMonotonicMicroseconds64() override { return Microseconds64(otPlatTimeGet()); }
+    Milliseconds64 GetMonotonicMilliseconds64() override { return std::chrono::duration_cast<Milliseconds64>(Microseconds64(otPlatTimeGet())); }
+
+    CHIP_ERROR GetClock_RealTime(Microseconds64 & aCurTime) override
+    {
+        aCurTime = Microseconds64(otPlatTimeGet());
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetClock_RealTimeMS(Milliseconds64 & aCurTime) override
+    {
+        aCurTime = std::chrono::duration_cast<Milliseconds64>(Microseconds64(otPlatTimeGet()));
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR SetClock_RealTime(Microseconds64 aNewCurTime) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+private:
+    ClockBase & mRealClock;
+};
+#else
 struct MockClock : public ClockBase
 {
 private:
@@ -95,6 +127,7 @@ private:
     ClockBase & mRealClock;
     Offset mOffset;
 };
+#endif
 
 } // namespace
 
