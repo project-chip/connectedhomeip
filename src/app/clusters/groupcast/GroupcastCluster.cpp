@@ -514,11 +514,8 @@ Status GroupcastCluster::ConfigureAuxiliaryACL(FabricIndex fabric_index,
     err = groups.GetGroupInfo(fabric_index, data.groupID, info);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::NotFound);
 
-    bool oldHasAuxiliaryACL = (info.flags & chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL)) != 0;
-    bool newHasAuxiliaryACL = data.useAuxiliaryACL;
-
     // Update group info
-    if (newHasAuxiliaryACL)
+    if (data.useAuxiliaryACL)
     {
         info.flags |= chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL);
     }
@@ -598,8 +595,6 @@ Status GroupcastCluster::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
     CHIP_ERROR err = groups.GetGroupInfo(fabric_index, group_id, info);
     VerifyOrReturnError(CHIP_NO_ERROR == err, Status::NotFound);
 
-    bool oldHasAuxiliaryACL = (info.flags & chip::to_underlying(GroupInfo::Flags::kHasAuxiliaryACL)) != 0;
-
     if (data.endpoints.HasValue())
     {
         // Remove endpoints
@@ -637,10 +632,10 @@ Status GroupcastCluster::RemoveGroup(FabricIndex fabric_index, GroupId group_id,
         VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, Status::NotFound);
         VerifyOrReturnError(CHIP_NO_ERROR == err, Status::Failure);
 
-        if (groups.ConsumeAuxAclNotificationNeeded())
-        {
-            EmitAuxiliaryAccessUpdated(subjectDescriptor);
-        }
+    }
+    if (groups.ConsumeAuxAclNotificationNeeded())
+    {
+        EmitAuxiliaryAccessUpdated(subjectDescriptor);
     }
 
     return Status::Success;
