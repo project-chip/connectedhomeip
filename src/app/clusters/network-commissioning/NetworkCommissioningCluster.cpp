@@ -27,9 +27,9 @@
 #include <app/clusters/network-commissioning/WifiScanResponse.h>
 #include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
-#include <app/server/Server.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server/Server.h>
 #include <clusters/NetworkCommissioning/AttributeIds.h>
 #include <clusters/NetworkCommissioning/CommandIds.h>
 #include <clusters/NetworkCommissioning/Commands.h>
@@ -50,8 +50,8 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <transport/SecureSession.h>
 #include <tracing/macros.h>
+#include <transport/SecureSession.h>
 
 namespace chip {
 namespace app {
@@ -64,12 +64,16 @@ using namespace chip::app::Clusters::NetworkCommissioning;
 
 namespace {
 
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+
 bool IsConnectNetworkRequestOverPASE(CommandHandler & handler)
 {
     Messaging::ExchangeContext * exchangeCtx = handler.GetExchangeContext();
     return exchangeCtx && exchangeCtx->HasSessionHandle() && exchangeCtx->GetSessionHandle()->IsSecureSession() &&
         exchangeCtx->GetSessionHandle()->AsSecureSession()->GetSecureSessionType() == Transport::SecureSession::Type::kPASE;
 }
+
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
 // Note: CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE can be 0, this disables debug text
 using DebugTextStorage = std::array<char, CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE>;
@@ -833,7 +837,6 @@ void NetworkCommissioningCluster::OnResult(Status commissioningError, CharSpan d
     // has already been sent and the BLE will have been stopped, however the other functionality
     // is still required
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    auto commandHandle = commandHandleRef.Get();
     if (commandHandle == nullptr)
     {
         // When the platform shut down, interaction model engine will invalidate all commandHandle to avoid dangling references.
@@ -874,7 +877,7 @@ void NetworkCommissioningCluster::OnResult(Status commissioningError, CharSpan d
 
     if (shouldSendConnectNetworkResponse && commandHandle != nullptr)
     {
-    commandHandle->AddResponse(mAsyncCommandPath, response);
+        commandHandle->AddResponse(mAsyncCommandPath, response);
     }
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION

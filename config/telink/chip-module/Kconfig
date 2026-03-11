@@ -280,7 +280,7 @@ config TFLM_FEATURE
 	bool "Enable the TFLM micro speech feature"
 	default n
 
-config CHIP_TELINK_OPENTHREAD_NETWORK_SWITCH_PATH
+config CHIP_OPENTHREAD_NETWORK_SWITCH_PATH
 	bool "Keep Thread enabled when switching between commissioned datasets"
 	help
 		Keep Thread enabled while switching between commissioned
