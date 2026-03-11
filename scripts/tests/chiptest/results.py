@@ -61,7 +61,7 @@ class TestResult:
     iteration: int
     status: TestStatus
     duration_seconds: float
-    exception: BaseException | str | None
+    exception: BaseException | str | None = None
 
     @property
     def name_decorated(self) -> str:
