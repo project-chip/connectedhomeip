@@ -522,7 +522,7 @@
         { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 }, /* SelectedDrynessLevel */                                             \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Laundry Washer Controls (server) */                                                               \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1F }, /* SpinSpeedCurrent */                                                \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xF }, /* SpinSpeedCurrent */                                                 \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Smoke CO Alarm (server) */                                                                        \
         { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x2 }, /* SmokeSensitivityLevel */                                            \

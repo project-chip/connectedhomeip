@@ -25,6 +25,7 @@ source_set("clusters") {
     "bridged-device-basic-information-server",
     "camera-av-settings-user-level-management-server",
     "chime-server",
+    "closure-control-server",
     "descriptor",
     "general-commissioning-server",
     "general-diagnostics-server",
