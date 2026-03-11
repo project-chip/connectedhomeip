@@ -21,15 +21,20 @@
 #include "access/AccessControl.h"
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
+
+class FabricTable;
+
 namespace Access {
 namespace Examples {
 
 class GroupAuxiliaryAccessControlDelegate : public AccessControl::Delegate
 {
 public:
-    GroupAuxiliaryAccessControlDelegate(Credentials::GroupDataProvider * groupDataProvider) : mGroupDataProvider(groupDataProvider)
+    GroupAuxiliaryAccessControlDelegate(Credentials::GroupDataProvider * groupDataProvider, FabricTable * fabricTable = nullptr) :
+        mGroupDataProvider(groupDataProvider), mFabricTable(fabricTable)
     {}
     ~GroupAuxiliaryAccessControlDelegate() override = default;
 
@@ -41,6 +46,7 @@ public:
 
 private:
     Credentials::GroupDataProvider * mGroupDataProvider;
+    FabricTable * mFabricTable;
 };
 
 } // namespace Examples

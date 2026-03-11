@@ -18,9 +18,11 @@
 
 #include "GroupAuxiliaryAccessControlDelegate.h"
 
+#include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/NodeId.h>
+#include <lib/core/Optional.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
@@ -119,10 +121,33 @@ private:
 class AuxiliaryEntryIteratorDelegate : public EntryIterator::Delegate
 {
 public:
-    void Init(EntryIterator & iterator, Credentials::GroupDataProvider * groupDataProvider, FabricIndex fabric)
+    void Init(EntryIterator & iterator, Credentials::GroupDataProvider * groupDataProvider, FabricTable * fabricTable,
+              FabricIndex fabricIndex)
     {
         mGroupDataProvider = groupDataProvider;
-        mFabricIndex       = fabric;
+        mFabricTable       = fabricTable;
+        mFabricIndex       = fabricIndex;
+
+        if (mFabricIndex == kUndefinedFabricIndex)
+        {
+            mAllFabrics = true;
+            // If the fabric table is defined, it can be used to find and iterate over all
+            // valid existing fabric indices. Otherwise, iteration can be done starting from
+            // the minimum fabric index and going up
+            if (mFabricTable)
+            {
+                mFabricTableIter.SetValue(mFabricTable->begin());
+                if (mFabricTableIter.Value() != mFabricTable->end())
+                {
+                    mFabricIndex = mFabricTableIter.Value()->GetFabricIndex();
+                }
+            }
+            else
+            {
+                mFabricIndex = kMinValidFabricIndex;
+            }
+        }
+
         if (mGroupDataProvider)
         {
             mGroupInfoIterator = mGroupDataProvider->IterateGroupInfo(mFabricIndex);
@@ -151,7 +176,7 @@ public:
             return CHIP_ERROR_SENTINEL;
         }
 
-        while (mGroupInfoIterator != nullptr || mEndpointIterator != nullptr)
+        while (mGroupInfoIterator != nullptr || mEndpointIterator != nullptr || mAllFabrics)
         {
             if (mEndpointIterator != nullptr)
             {
@@ -180,11 +205,29 @@ public:
                         mGroupId          = info.group_id;
                         mEndpointIterator = mGroupDataProvider->IterateEndpoints(mFabricIndex, mGroupId);
                     }
+                    continue;
                 }
-                else
+                mGroupInfoIterator->Release();
+                mGroupInfoIterator = nullptr;
+            }
+
+            if (mAllFabrics)
+            {
+                mAllFabrics = false;
+                if (mFabricTable && mFabricTableIter.HasValue())
                 {
-                    mGroupInfoIterator->Release();
-                    mGroupInfoIterator = nullptr;
+                    if (mFabricTableIter.Value() != mFabricTable->end() && ++mFabricTableIter.Value() != mFabricTable->end())
+                    {
+                        mFabricIndex       = mFabricTableIter.Value()->GetFabricIndex();
+                        mGroupInfoIterator = mGroupDataProvider->IterateGroupInfo(mFabricIndex);
+                        mAllFabrics        = true;
+                    }
+                }
+                else if (mFabricIndex < kMaxValidFabricIndex)
+                {
+                    mFabricIndex++;
+                    mGroupInfoIterator = mGroupDataProvider->IterateGroupInfo(mFabricIndex);
+                    mAllFabrics        = true;
                 }
             }
         }
@@ -194,7 +237,10 @@ public:
 
 private:
     Credentials::GroupDataProvider * mGroupDataProvider;
+    FabricTable * mFabricTable;
     FabricIndex mFabricIndex;
+    bool mAllFabrics = false;
+    chip::Optional<chip::ConstFabricIterator> mFabricTableIter;
     Credentials::GroupDataProvider::GroupInfoIterator * mGroupInfoIterator = nullptr;
     Credentials::GroupDataProvider::EndpointIterator * mEndpointIterator   = nullptr;
     GroupId mGroupId                                                       = kUndefinedGroupId;
@@ -209,12 +255,10 @@ namespace Examples {
 CHIP_ERROR GroupAuxiliaryAccessControlDelegate::AuxiliaryEntries(AccessControl::EntryIterator & iterator,
                                                                  const FabricIndex * fabricIndex) const
 {
-    VerifyOrReturnError(fabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
     auto * delegate = Platform::New<AuxiliaryEntryIteratorDelegate>();
     if (delegate)
     {
-        delegate->Init(iterator, mGroupDataProvider, *fabricIndex);
+        delegate->Init(iterator, mGroupDataProvider, mFabricTable, fabricIndex ? *fabricIndex : kUndefinedFabricIndex);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_NO_MEMORY;

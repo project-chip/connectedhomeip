@@ -19,7 +19,11 @@
 #include "access/AccessControl.h"
 #include "access/examples/ExampleAccessControlDelegate.h"
 #include "access/examples/GroupAuxiliaryAccessControlDelegate.h"
+#include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <credentials/tests/CHIPCert_unit_test_vectors.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <set>
 
@@ -2101,6 +2105,102 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntries)
     // Execute Validation
     ValidateAuxiliaryEntries(accessControl, fabric1, expectedFabric1);
     ValidateAuxiliaryEntries(accessControl, fabric2, expectedFabric2);
+
+    // Cleanup
+    EXPECT_EQ(provider->RemoveFabric(fabric1), CHIP_NO_ERROR);
+    EXPECT_EQ(provider->RemoveFabric(fabric2), CHIP_NO_ERROR);
+}
+
+TEST_F(TestAccessControl, TestGroupAuxiliaryEntriesAllFabrics)
+{
+    // Ensure GroupDataProvider is available
+    Credentials::GroupDataProvider * provider = Credentials::GetGroupDataProvider();
+    ASSERT_NE(provider, nullptr);
+
+    FabricIndex fabric1 = 1;
+    FabricIndex fabric2 = 2;
+
+    // Set up group data for fabric 1
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x1111;
+        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        EXPECT_EQ(provider->SetGroupInfo(fabric1, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric1, info.group_id, 10), CHIP_NO_ERROR);
+    }
+
+    // Set up group data for fabric 2
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x2222;
+        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        EXPECT_EQ(provider->SetGroupInfo(fabric2, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric2, info.group_id, 20), CHIP_NO_ERROR);
+    }
+
+    // Define expected set across all fabrics
+    std::set<AuxiliaryEquivalenceEntry> expectedAll = { { .fabricIndex = fabric1, .groupId = 0x1111, .endpointId = 10 },
+                                                        { .fabricIndex = fabric2, .groupId = 0x2222, .endpointId = 20 } };
+
+    // Path 1: Manual iteration (no FabricTable)
+    {
+        // Unregister global delegate first
+        GetAccessControl().UnregisterGroupAuxiliaryDelegate();
+
+        Examples::GroupAuxiliaryAccessControlDelegate manualDelegate(provider, nullptr);
+        EXPECT_EQ(GetAccessControl().RegisterGroupAuxiliaryDelegate(&manualDelegate), CHIP_NO_ERROR);
+
+        ValidateAuxiliaryEntries(accessControl, kUndefinedFabricIndex, expectedAll);
+
+    }
+
+    // Path 2: FabricTable iteration
+    {
+        // Unregister existing delegate
+        GetAccessControl().UnregisterGroupAuxiliaryDelegate();
+
+        //Setup a test Fabric Table
+        PersistentStorageOperationalKeystore opKeyStore;
+        Credentials::PersistentStorageOpCertStore opCertStore;
+        FabricTable fabricTable;
+
+        EXPECT_EQ(opKeyStore.Init(&gTestStorage), CHIP_NO_ERROR);
+        EXPECT_EQ(opCertStore.Init(&gTestStorage), CHIP_NO_ERROR);
+
+        FabricTable::InitParams initParams;
+        initParams.storage             = &gTestStorage;
+        initParams.operationalKeystore = &opKeyStore;
+        initParams.opCertStore         = &opCertStore;
+        EXPECT_EQ(fabricTable.Init(initParams), CHIP_NO_ERROR);
+
+        FabricIndex f1, f2;
+        EXPECT_EQ(fabricTable.AddNewFabricForTestIgnoringCollisions(TestCerts::GetRootACertAsset().mCert,
+                                                                    TestCerts::GetIAA1CertAsset().mCert,
+                                                                    TestCerts::GetNodeA1CertAsset().mCert,
+                                                                    TestCerts::GetNodeA1CertAsset().mKey, &f1),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(fabricTable.AddNewFabricForTestIgnoringCollisions(TestCerts::GetRootACertAsset().mCert,
+                                                                    TestCerts::GetIAA1CertAsset().mCert,
+                                                                    TestCerts::GetNodeA2CertAsset().mCert,
+                                                                    TestCerts::GetNodeA2CertAsset().mKey, &f2),
+                  CHIP_NO_ERROR);
+
+        // Create GroupAuxiliaryAccessControlDelegate with fabric table
+        Examples::GroupAuxiliaryAccessControlDelegate tableDelegate(provider, &fabricTable);
+        EXPECT_EQ(GetAccessControl().RegisterGroupAuxiliaryDelegate(&tableDelegate), CHIP_NO_ERROR);
+
+        // Validate entries
+        ValidateAuxiliaryEntries(accessControl, kUndefinedFabricIndex, expectedAll);
+
+        // Cleanup
+        fabricTable.Shutdown();
+        opCertStore.Finish();
+        opKeyStore.Finish();
+    }
+
+    // Restore global delegate for other tests
+    GetAccessControl().UnregisterGroupAuxiliaryDelegate();
+    EXPECT_EQ(GetAccessControl().RegisterGroupAuxiliaryDelegate(&gGroupAuxiliaryAccessControlDelegate), CHIP_NO_ERROR);
 
     // Cleanup
     EXPECT_EQ(provider->RemoveFabric(fabric1), CHIP_NO_ERROR);
