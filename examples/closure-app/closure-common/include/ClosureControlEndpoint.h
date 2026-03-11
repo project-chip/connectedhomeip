@@ -18,11 +18,8 @@
 
 #pragma once
 
-#include <app/clusters/closure-control-server/closure-control-cluster-delegate.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-matter-context.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
-#include <app/clusters/closure-control-server/closure-control-server.h>
+#include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
+#include <app/clusters/closure-control-server/CodegenIntegration.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/TestEventTriggerDelegate.h>
@@ -43,7 +40,7 @@ namespace ClosureControl {
  * for closure control operations such as Stop, MoveTo, Calibration, and
  * error retrieval, and Test event triggering.
  */
-class ClosureControlDelegate : public DelegateBase, public TestEventTriggerHandler
+class ClosureControlDelegate : public ClosureControlClusterDelegate, public TestEventTriggerHandler
 {
 public:
     ClosureControlDelegate() {}
@@ -64,12 +61,12 @@ public:
 
     // Delegate specific functions and variables
 
-    void SetLogic(ClusterLogic * logic) { mLogic = logic; }
+    void SetClusterInstance(ClosureControlCluster * clusterInstance) { mClusterInstance = clusterInstance; }
 
-    ClusterLogic * GetLogic() const { return mLogic; }
+    ClosureControlCluster & GetClusterInstance() { return *mClusterInstance; }
 
 private:
-    ClusterLogic * mLogic;
+    ClosureControlCluster * mClusterInstance;
 };
 
 /**
@@ -77,27 +74,46 @@ private:
  * @brief Represents a Closure Control cluster endpoint.
  *
  * This class encapsulates the logic and interfaces required to manage a Closure Control cluster endpoint.
- * It integrates the delegate, context, logic, and interface components for the endpoint.
+ * It integrates the conformance, init params, delegate and cluster instance for the endpoint.
+ *
+ * NOTE: Set the Conformance, Init Params and Delegate before initializing the Endpoint.
+ *       The Cluster Instance is initialized in the Init() function.
  *
  * @param mEndpoint The endpoint ID associated with this Closure Control endpoint.
- * @param mContext The Matter context for the endpoint.
  * @param mDelegate The delegate instance for handling commands.
- * @param mLogic The cluster logic associated with the endpoint.
- * @param mInterface The interface for interacting with the cluster.
+ * @param mClusterInstance The cluster instance for interacting with the cluster.
  */
 class ClosureControlEndpoint
 {
 public:
-    ClosureControlEndpoint(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
+    ClosureControlEndpoint(EndpointId endpoint) : mEndpoint(endpoint), mDelegate(), mClusterInstance(nullptr)
     {
-        mDelegate.SetLogic(&mLogic);
+        ClusterConformance conformance;
+        conformance.FeatureMap()
+            .Set(Feature::kPositioning)
+            .Set(Feature::kMotionLatching)
+            .Set(Feature::kSpeed)
+            .Set(Feature::kVentilation)
+            .Set(Feature::kPedestrian)
+            .Set(Feature::kCalibration)
+            .Set(Feature::kProtection)
+            .Set(Feature::kManuallyOperable);
+        conformance.OptionalAttributes().Set<Attributes::CountdownTime::Id>();
+
+        ClusterInitParameters initParams;
+
+        MatterClosureControlSetConformance(mEndpoint, conformance);
+        MatterClosureControlSetInitParams(mEndpoint, initParams);
+        MatterClosureControlSetDelegate(mEndpoint, mDelegate);
     }
 
     /**
      * @brief Initializes the ClosureControlEndpoint instance.
      *
-     * @return CHIP_ERROR indicating the result of the initialization.
+     * It initializes the Cluster Instance for the Closure Control Endpoint and sets the same instance to the delegate.
+     *
+     * @return CHIP_ERROR_INTERNAL if the Closure Control Cluster is not Initialized
+     *         CHIP_NO_ERROR in case of success
      */
     CHIP_ERROR Init();
 
@@ -109,11 +125,11 @@ public:
     ClosureControlDelegate & GetDelegate() { return mDelegate; }
 
     /**
-     * @brief Returns a reference to the ClusterLogic instance associated with this object.
+     * @brief Returns a reference to the ClosureControlCluster instance associated with this object.
      *
-     * @return ClusterLogic& Reference to the internal ClusterLogic object.
+     * @return ClosureControlCluster& Reference to the internal ClosureControlCluster object.
      */
-    ClusterLogic & GetLogic() { return mLogic; }
+    ClosureControlCluster & GetClusterInstance() { return *mClusterInstance; }
 
     /**
      * @brief Handles the completion of a stop motion action.
@@ -171,10 +187,8 @@ public:
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
-    MatterContext mContext;
     ClosureControlDelegate mDelegate;
-    ClusterLogic mLogic;
-    Interface mInterface;
+    ClosureControlCluster * mClusterInstance;
 
     /**
      * @brief Updates the current state of the closure control endpoint from the target state.

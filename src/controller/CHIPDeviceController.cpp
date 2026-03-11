@@ -51,7 +51,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -872,10 +872,10 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
             // for later.
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
-            VerifyOrExit(params.GetSetupDiscriminator().has_value(), err = CHIP_ERROR_INVALID_ARGUMENT);
-            ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(params.GetSetupDiscriminator().value(), this,
-                                                                                    OnDiscoveredDeviceOverBleSuccess,
-                                                                                    OnDiscoveredDeviceOverBleError));
+            auto setupDiscriminator                         = params.GetSetupDiscriminator();
+            VerifyOrExit(setupDiscriminator.has_value(), err = CHIP_ERROR_INVALID_ARGUMENT);
+            ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(
+                        setupDiscriminator.value(), this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
         }
         else
         {

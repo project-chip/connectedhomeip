@@ -127,7 +127,7 @@ std::optional<DataModel::ActionReturnStatus> WiFiNetworkManagementCluster::Invok
     switch (request.path.mCommandId)
     {
     case NetworkPassphraseRequest::Id: {
-        VerifyOrReturnValue(request.subjectDescriptor->authMode == Access::AuthMode::kCase,
+        VerifyOrReturnValue(request.subjectDescriptor.authMode == Access::AuthMode::kCase,
                             Protocols::InteractionModel::Status::UnsupportedAccess);
         VerifyOrReturnValue(HasNetworkCredentials(), Protocols::InteractionModel::Status::InvalidInState);
 
