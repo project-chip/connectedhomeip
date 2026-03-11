@@ -79,7 +79,7 @@ class TestResult:
         """
         log.info("Would run test: '%s'" if dry_run else "%s - Starting test", name)
 
-        result = TestResult(name, iteration, TestStatus.FAILED, duration_seconds=0, exception=None)
+        result = cls(name, iteration, TestStatus.FAILED, duration_seconds=0, exception=None)
         test_start = test_end = time.monotonic()
         try:
             test_func()
