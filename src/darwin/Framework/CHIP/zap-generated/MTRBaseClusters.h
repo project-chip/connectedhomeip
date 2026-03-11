@@ -10465,115 +10465,115 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command MoveToHue
  *
- * Move to specified hue.
+ * This command will move the device to the requested hue using a transition.
  */
 - (void)moveToHueWithParams:(MTRColorControlClusterMoveToHueParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command MoveHue
  *
- * Move hue up or down at specified rate.
+ * This command will change the hue of the device with a requested rate.
  */
 - (void)moveHueWithParams:(MTRColorControlClusterMoveHueParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command StepHue
  *
- * Step hue up or down by specified size at specified rate.
+ * This command will change the hue of the device using a step and transition.
  */
 - (void)stepHueWithParams:(MTRColorControlClusterStepHueParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command MoveToSaturation
  *
- * Move to specified saturation.
+ * This command will move the device to the requested saturation using a transition.
  */
 - (void)moveToSaturationWithParams:(MTRColorControlClusterMoveToSaturationParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command MoveSaturation
  *
- * Move saturation up or down at specified rate.
+ * This command will change the saturation of the device with a requested rate.
  */
 - (void)moveSaturationWithParams:(MTRColorControlClusterMoveSaturationParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command StepSaturation
  *
- * Step saturation up or down by specified size at specified rate.
+ * This command will change the saturation of the device using a step and transition.
  */
 - (void)stepSaturationWithParams:(MTRColorControlClusterStepSaturationParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command MoveToHueAndSaturation
  *
- * Move to hue and saturation.
+ * This command will move the device to the requested hue and saturation using a transition.
  */
 - (void)moveToHueAndSaturationWithParams:(MTRColorControlClusterMoveToHueAndSaturationParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command MoveToColor
  *
- * Move to specified color.
+ * This command will move the device to the requested color using a transition.
  */
 - (void)moveToColorWithParams:(MTRColorControlClusterMoveToColorParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command MoveColor
  *
- * Moves the color.
+ * This command will change the color of the device with a requested rate.
  */
 - (void)moveColorWithParams:(MTRColorControlClusterMoveColorParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command StepColor
  *
- * Steps the lighting to a specific color.
+ * This command will change the color of the device using a step and transition.
  */
 - (void)stepColorWithParams:(MTRColorControlClusterStepColorParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command MoveToColorTemperature
  *
- * Move to a specific color temperature.
+ * This command will move the device to the requested color temperate using a transition.
  */
 - (void)moveToColorTemperatureWithParams:(MTRColorControlClusterMoveToColorTemperatureParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command EnhancedMoveToHue
  *
- * Command description for EnhancedMoveToHue
+ * This command allows the light to be moved in a smooth continuous transition from their current hue to a target hue.
  */
 - (void)enhancedMoveToHueWithParams:(MTRColorControlClusterEnhancedMoveToHueParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command EnhancedMoveHue
  *
- * Command description for EnhancedMoveHue
+ * This command allows the light to start a continuous transition starting from their current hue.
  */
 - (void)enhancedMoveHueWithParams:(MTRColorControlClusterEnhancedMoveHueParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command EnhancedStepHue
  *
- * Command description for EnhancedStepHue
+ * This command allows the device to be moved in a stepped transition from their current hue.
  */
 - (void)enhancedStepHueWithParams:(MTRColorControlClusterEnhancedStepHueParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command EnhancedMoveToHueAndSaturation
  *
- * Command description for EnhancedMoveToHueAndSaturation
+ * This command allows the light to be moved in a smooth continuous transition from their current hue to a target hue and from their current saturation to a target saturation.
  */
 - (void)enhancedMoveToHueAndSaturationWithParams:(MTRColorControlClusterEnhancedMoveToHueAndSaturationParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command ColorLoopSet
  *
- * Command description for ColorLoopSet
+ * This command allows a color loop to be activated such that the color light cycles through its range of hues.
  */
 - (void)colorLoopSetWithParams:(MTRColorControlClusterColorLoopSetParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command StopMoveStep
  *
- * Command description for StopMoveStep
+ * This command is provided to allow MoveTo and Step commands to be stopped.
  */
 - (void)stopMoveStepWithParams:(MTRColorControlClusterStopMoveStepParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command MoveColorTemperature
  *
- * Command description for MoveColorTemperature
+ * This command allows the color temperature of the light to be moved at a specified rate.
  */
 - (void)moveColorTemperatureWithParams:(MTRColorControlClusterMoveColorTemperatureParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command StepColorTemperature
  *
- * Command description for StepColorTemperature
+ * This command allows the color temperature of the light to be stepped with a specified step size.
  */
 - (void)stepColorTemperatureWithParams:(MTRColorControlClusterStepColorTemperatureParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
