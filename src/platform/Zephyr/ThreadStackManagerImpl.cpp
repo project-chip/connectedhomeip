@@ -130,7 +130,7 @@ CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::Thread
 
         if (callback != nullptr)
         {
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, callback]() {
+            return DeviceLayer::SystemLayer().ScheduleLambda([this, callback]() {
                 callback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
             });
         }
