@@ -27,7 +27,6 @@
 #include <controller/tests/DeviceCommissionerTestAccess.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLV.h>
-#include <lib/support/ScopedBuffer.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <clusters/IcdManagement/Attributes.h>
