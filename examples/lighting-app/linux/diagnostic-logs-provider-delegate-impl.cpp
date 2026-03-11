@@ -112,8 +112,8 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
         VerifyOrDo(mLogSessionHandle != kInvalidLogSessionHandle, mLogSessionHandle = 0);
     } while (mFiles.count(mLogSessionHandle) != 0);
 
-    outHandle                    = mLogSessionHandle;
-    mFiles[mLogSessionHandle]    = fp;
+    outHandle                 = mLogSessionHandle;
+    mFiles[mLogSessionHandle] = fp;
     return CHIP_NO_ERROR;
 }
 
@@ -136,7 +136,7 @@ CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSp
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(mFiles.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto fp       = mFiles[sessionHandle];
+    auto fp                     = mFiles[sessionHandle];
     const size_t bytesRequested = outBuffer.size();
 
     clearerr(fp);
