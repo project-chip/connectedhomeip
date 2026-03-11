@@ -301,7 +301,7 @@ class RunSummary(RunStats):
             flaky = tuple((name, stats) for name, stats in self.test_stats.items() if stats.failed > 0)
             self._print_table(title=f"FAILURE RATE BY TEST (across {self.iterations} iterations)",
                               no_content_msg="No flaky results",
-                              headers_fmt=(("Test name", "<"), ("Failuers", ">"), ("Rate", ">")),
+                              headers_fmt=(("Test name", "<"), ("Failures", ">"), ("Rate", ">")),
                               rows=((name, f"{stats.failed}/{stats.total_runs:<2}", f"{100 * stats.fail_rate:.1f}%")
                               for name, stats in sorted(flaky, key=lambda item: -item[1].failed)))
 
