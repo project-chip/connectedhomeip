@@ -106,6 +106,11 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::RemoveOpKeypairForFabric(FabricInde
         keyId);
     Se05x_API_DeleteSecureObject(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyId);
 
+    if (se05x_close_session() != CHIP_NO_ERROR)
+    {
+        ChipLogError(Crypto, "se05x::Error in se05x_close_session.");
+    }
+
     // remove key from secure element
     if ((mPendingKeypair != nullptr) && (fabricIndex == mPendingFabricIndex))
     {

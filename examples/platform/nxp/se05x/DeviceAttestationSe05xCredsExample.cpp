@@ -25,8 +25,8 @@
 #include <platform/nxp/crypto/se05x/CHIPCryptoPAL_se05x.h>
 
 /* Device attestation key ids */
-#define DEV_ATTESTATION_KEY_SE05X_ID 0x7D300000
-#define DEV_ATTESTATION_CERT_SE05X_ID 0x7D300001
+#define DEV_ATTESTATION_KEY_SE05X_ID 0x7FFF3007
+#define DEV_ATTESTATION_CERT_SE05X_ID 0x7FFF3003
 
 extern CHIP_ERROR se05x_get_certificate(uint32_t keyId, uint8_t * buf, size_t * buflen);
 
@@ -55,6 +55,10 @@ CHIP_ERROR ExampleSe05xDACProvider::GetDeviceAttestationCert(MutableByteSpan & o
     ChipLogDetail(Crypto, "Get DA certificate from se05x");
     ReturnErrorOnFailure(se05x_get_certificate(DEV_ATTESTATION_CERT_SE05X_ID, out_dac_buffer.data(), &buflen));
     out_dac_buffer.reduce_size(buflen);
+    if (buflen > 4 && out_dac_buffer.data()[0] == 0x31)
+    {
+        out_dac_buffer = out_dac_buffer.SubSpan(4); // ignoring TLV of DA certificate
+    }
     return CHIP_NO_ERROR;
 #endif
 }
@@ -129,7 +133,7 @@ CHIP_ERROR ExampleSe05xDACProvider::SignWithDeviceAttestationKey(const ByteSpan 
                                                                  MutableByteSpan & out_signature_buffer)
 {
     Crypto::P256ECDSASignature signature;
-    Crypto::P256Keypair keypair;
+    Crypto::P256KeypairSE05x keypair;
     Crypto::P256SerializedKeypair serialized_keypair;
     uint8_t magic_bytes[] = NXP_CRYPTO_KEY_MAGIC;
 

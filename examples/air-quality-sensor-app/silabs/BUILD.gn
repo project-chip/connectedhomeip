@@ -102,7 +102,7 @@ if (wifi_soc) {
     #TODO: This is a placeholder for the actual implementation
     if (use_air_quality_sensor) {
       include_dirs +=
-          [ "${efr32_sdk_root}/examples/platform/silabs/sensors/AirQuality" ]
+          [ "${chip_root}/examples/platform/silabs/sensors/AirQuality" ]
 
       defines += [ "USE_AIR_QUALITY_SENSOR" ]
     }
@@ -129,7 +129,7 @@ silabs_executable("air_quality_sensor_app") {
 
   #TODO: This is a placeholder for the actual implementation
   if (use_air_quality_sensor) {
-    sources += [ "${efr32_sdk_root}/examples/platform/silabs/sensors/AirQuality/AirQualitySensor.cpp" ]
+    sources += [ "${chip_root}/examples/platform/silabs/sensors/AirQuality/AirQualitySensor.cpp" ]
   }
 
   #ENDTODO

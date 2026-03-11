@@ -364,6 +364,55 @@ fabric_scoped struct WebRTCSessionStruct {
   fabric_idx fabricIndex = 254;
 }
 
+/** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
+cluster Identify = 3 {
+  revision 6;
+
+  enum EffectIdentifierEnum : enum8 {
+    kBlink = 0;
+    kBreathe = 1;
+    kOkay = 2;
+    kChannelChange = 11;
+    kFinishEffect = 254;
+    kStopEffect = 255;
+  }
+
+  enum EffectVariantEnum : enum8 {
+    kDefault = 0;
+  }
+
+  enum IdentifyTypeEnum : enum8 {
+    kNone = 0;
+    kLightOutput = 1;
+    kVisibleIndicator = 2;
+    kAudibleBeep = 3;
+    kDisplay = 4;
+    kActuator = 5;
+  }
+
+  attribute int16u identifyTime = 0;
+  readonly attribute IdentifyTypeEnum identifyType = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct IdentifyRequest {
+    int16u identifyTime = 0;
+  }
+
+  request struct TriggerEffectRequest {
+    EffectIdentifierEnum effectIdentifier = 0;
+    EffectVariantEnum effectVariant = 1;
+  }
+
+  /** This command starts or stops the receiving device identifying itself. */
+  command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
+  /** This command allows the support of feedback to the user, such as a certain light effect. */
+  command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
+}
+
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
   revision 3;
@@ -1231,9 +1280,9 @@ cluster OperationalCredentials = 62 {
   }
 
   fabric_scoped struct NOCStruct {
-    octet_string<400> noc = 1;
-    nullable octet_string<400> icac = 2;
-    optional octet_string<400> vvsc = 3;
+    long_octet_string<400> noc = 1;
+    nullable long_octet_string<400> icac = 2;
+    optional long_octet_string<400> vvsc = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1254,7 +1303,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct AttestationResponse = 1 {
-    octet_string attestationElements = 0;
+    long_octet_string<900> attestationElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
@@ -1263,7 +1312,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct CertificateChainResponse = 3 {
-    octet_string<600> certificate = 0;
+    long_octet_string<600> certificate = 0;
   }
 
   request struct CSRRequestRequest {
@@ -1272,21 +1321,21 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct CSRResponse = 5 {
-    octet_string NOCSRElements = 0;
+    long_octet_string<900> NOCSRElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
   request struct AddNOCRequest {
-    octet_string<400> NOCValue = 0;
-    optional octet_string<400> ICACValue = 1;
+    long_octet_string<400> NOCValue = 0;
+    optional long_octet_string<400> ICACValue = 1;
     octet_string<16> IPKValue = 2;
     int64u caseAdminSubject = 3;
     vendor_id adminVendorId = 4;
   }
 
   request struct UpdateNOCRequest {
-    octet_string<400> NOCValue = 0;
-    optional octet_string<400> ICACValue = 1;
+    long_octet_string<400> NOCValue = 0;
+    optional long_octet_string<400> ICACValue = 1;
   }
 
   response struct NOCResponse = 8 {
@@ -1304,13 +1353,13 @@ cluster OperationalCredentials = 62 {
   }
 
   request struct AddTrustedRootCertificateRequest {
-    octet_string<400> rootCACertificate = 0;
+    long_octet_string<400> rootCACertificate = 0;
   }
 
   request struct SetVIDVerificationStatementRequest {
     optional vendor_id vendorID = 0;
     optional octet_string<85> VIDVerificationStatement = 1;
-    optional octet_string<400> vvsc = 2;
+    optional long_octet_string<400> vvsc = 2;
   }
 
   request struct SignVIDVerificationRequestRequest {
@@ -1324,25 +1373,25 @@ cluster OperationalCredentials = 62 {
     octet_string signature = 2;
   }
 
-  /** Sender is requesting attestation information from the receiver. */
+  /** This command is used to perform an attestation request. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
-  /** Sender is requesting a device attestation certificate from the receiver. */
+  /** This command is used to request a certificate from the device attestation certificate chain. */
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  /** Sender is requesting a certificate signing request (CSR) from the receiver. */
+  /** This command is used to perform a CSR request. */
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
-  /** Sender is requesting to add the new node operational certificates. */
+  /** This command is used to add a new NOC to the device. */
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  /** This command SHALL replace the NOC and optional associated ICAC (if present) scoped under the accessing fabric upon successful validation of all arguments and preconditions. */
+  /** This command is used to update an existing NOC on the device. */
   fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  /** This command SHALL be used by an Administrative Node to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute. */
+  /** This command is used to set the user-visible fabric label for a given Fabric. */
   fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
-  /** This command is used by Administrative Nodes to remove a given fabric index and delete all associated fabric-scoped data. */
+  /** This command is used to remove a Fabric from the device. */
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
-  /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
+  /** This command is used to add a trusted root certificate to the device. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  /** This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate). */
+  /** This command is used to manage the VendorID and VIDVerificationStatement fields of the Fabrics attribute, and the VVSC field of an entry in the NOCs attribute. */
   fabric command access(invoke: administer) SetVIDVerificationStatement(SetVIDVerificationStatementRequest): DefaultSuccess = 12;
-  /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
+  /** This command is used to authenticate the fabric associated with the FabricIndex. */
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 
@@ -1541,6 +1590,87 @@ cluster RefrigeratorAlarm = 87 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** An interface for controlling a fan in a heating/cooling system. */
+cluster FanControl = 514 {
+  revision 5;
+
+  enum AirflowDirectionEnum : enum8 {
+    kForward = 0;
+    kReverse = 1;
+  }
+
+  enum FanModeEnum : enum8 {
+    kOff = 0;
+    kLow = 1;
+    kMedium = 2;
+    kHigh = 3;
+    kOn = 4;
+    kAuto = 5;
+    kSmart = 6;
+  }
+
+  enum FanModeSequenceEnum : enum8 {
+    kOffLowMedHigh = 0;
+    kOffLowHigh = 1;
+    kOffLowMedHighAuto = 2;
+    kOffLowHighAuto = 3;
+    kOffHighAuto = 4;
+    kOffHigh = 5;
+  }
+
+  enum StepDirectionEnum : enum8 {
+    kIncrease = 0;
+    kDecrease = 1;
+  }
+
+  bitmap Feature : bitmap32 {
+    kMultiSpeed = 0x1;
+    kAuto = 0x2;
+    kRocking = 0x4;
+    kWind = 0x8;
+    kStep = 0x10;
+    kAirflowDirection = 0x20;
+  }
+
+  bitmap RockBitmap : bitmap8 {
+    kRockLeftRight = 0x1;
+    kRockUpDown = 0x2;
+    kRockRound = 0x4;
+  }
+
+  bitmap WindBitmap : bitmap8 {
+    kSleepWind = 0x1;
+    kNaturalWind = 0x2;
+  }
+
+  attribute FanModeEnum fanMode = 0;
+  readonly attribute FanModeSequenceEnum fanModeSequence = 1;
+  attribute nullable percent percentSetting = 2;
+  readonly attribute percent percentCurrent = 3;
+  readonly attribute optional int8u speedMax = 4;
+  attribute optional nullable int8u speedSetting = 5;
+  readonly attribute optional int8u speedCurrent = 6;
+  readonly attribute optional RockBitmap rockSupport = 7;
+  attribute optional RockBitmap rockSetting = 8;
+  readonly attribute optional WindBitmap windSupport = 9;
+  attribute optional WindBitmap windSetting = 10;
+  attribute optional AirflowDirectionEnum airflowDirection = 11;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct StepRequest {
+    StepDirectionEnum direction = 0;
+    optional boolean wrap = 1;
+    optional boolean lowestOff = 2;
+  }
+
+  /** This command speeds up or slows down the fan, in steps, without a client having to know the fan speed. */
+  command Step(StepRequest): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
@@ -1836,7 +1966,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 5;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command SetTemperature;
   }
@@ -1878,7 +2008,7 @@ endpoint 3 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 5;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command SetTemperature;
   }
@@ -1892,6 +2022,57 @@ endpoint 3 {
     callback attribute attributeList;
     callback attribute featureMap;
     callback attribute clusterRevision;
+  }
+}
+endpoint 4 {
+  device type ma_fan = 43, version 1;
+
+
+  server cluster Identify {
+    callback attribute identifyTime;
+    callback attribute identifyType;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+
+    handle command Identify;
+    handle command TriggerEffect;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
+  }
+
+  server cluster FanControl {
+    ram      attribute fanMode default = 0;
+    ram      attribute fanModeSequence default = 2;
+    ram      attribute percentSetting default = 0;
+    ram      attribute percentCurrent default = 0;
+    ram      attribute speedMax default = 10;
+    ram      attribute speedSetting default = 0;
+    ram      attribute speedCurrent default = 0;
+    ram      attribute rockSupport default = 0x03;
+    ram      attribute rockSetting default = 0x00;
+    ram      attribute windSupport default = 0x03;
+    ram      attribute windSetting default = 0x00;
+    ram      attribute airflowDirection default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 63;
+    ram      attribute clusterRevision default = 5;
+
+    handle command Step;
   }
 }
 

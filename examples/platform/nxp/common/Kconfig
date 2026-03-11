@@ -48,7 +48,7 @@ config CHIP_APP_BLE_MANAGER
 if CHIP_APP_BLE_MANAGER
     choice CHIP_APP_BLE_MANAGER_SELECTION
         prompt "Select Application BLE Manager"
-        
+
         config CHIP_APP_BLE_MANAGER_CUSTOM_BLE_ZEPHYR
             bool "App Custom BLE Manager Zephyr"
             depends on CHIP_CUSTOM_BLE_ADV_DATA && CHIP_DEVICE_USE_ZEPHYR_BLE
@@ -386,7 +386,7 @@ config CHIP_APP_QUEUE_TICKS_TO_WAIT
 
 config CHIP_APP_TASK_STACK_SIZE
     int "App Task Stack Size"
-    default 9000 if CHIP_SE05X  # Increase is do to the additional middle-ware APDU buffers
+    default 12500 if CHIP_SE05X  # Increase is due to the additional middle-ware APDU buffers
     default 6144
     help
         Set the stack size for the application task in bytes.
