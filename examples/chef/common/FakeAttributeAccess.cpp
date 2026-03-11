@@ -35,6 +35,14 @@
 #include <app/clusters/valve-configuration-and-control-server/CodegenIntegration.h>
 #endif
 
+#if MATTER_DM_ILLUMINANCE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/illuminance-measurement-server/CodegenIntegration.h>
+#endif
+
+#if MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
+#endif
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -83,6 +91,54 @@ public:
                 }
                 return ::pw::OkStatus();
             }
+            case TemperatureMeasurement::Attributes::MinMeasuredValue::Id: {
+                DataModel::Nullable<int16_t> minMeasuredValue;
+                CHIP_ERROR err = decoder.Decode(minMeasuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode minMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                auto temperatureMeasurement = TemperatureMeasurement::FindClusterOnEndpoint(path.mEndpointId);
+                if (temperatureMeasurement == nullptr)
+                {
+                    return ::pw::Status::Internal();
+                }
+
+                err = TemperatureMeasurement::SetMeasuredValueRange(path.mEndpointId, minMeasuredValue,
+                                                                    temperatureMeasurement->GetMaxMeasuredValue());
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set minMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            case TemperatureMeasurement::Attributes::MaxMeasuredValue::Id: {
+                DataModel::Nullable<int16_t> maxMeasuredValue;
+                CHIP_ERROR err = decoder.Decode(maxMeasuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode maxMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                auto temperatureMeasurement = TemperatureMeasurement::FindClusterOnEndpoint(path.mEndpointId);
+                if (temperatureMeasurement == nullptr)
+                {
+                    return ::pw::Status::Internal();
+                }
+
+                err = TemperatureMeasurement::SetMeasuredValueRange(path.mEndpointId, temperatureMeasurement->GetMinMeasuredValue(),
+                                                                    maxMeasuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set maxMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
             }
 #endif // MATTER_DM_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #if MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0
@@ -106,7 +162,113 @@ public:
                 ChipLogProgress(Zcl, "[Pw] Successfully set current level to " ChipLogFormatMEI ".", ChipLogValueMEI(level));
                 return ::pw::OkStatus();
             }
-#endif
+#endif // MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_ILLUMINANCE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+        case IlluminanceMeasurement::Id:
+            switch (path.mAttributeId)
+            {
+            case IlluminanceMeasurement::Attributes::MeasuredValue::Id: {
+                DataModel::Nullable<uint16_t> measuredValue;
+                CHIP_ERROR err = decoder.Decode(measuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode measuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                err = IlluminanceMeasurement::SetMeasuredValue(path.mEndpointId, measuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set measuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                if (measuredValue.IsNull())
+                {
+                    ChipLogProgress(Zcl, "[Pw] Successfully set measuredValue to null.");
+                }
+                else
+                {
+                    ChipLogProgress(Zcl, "[Pw] Successfully set measuredValue to %u.", measuredValue.Value());
+                }
+                return ::pw::OkStatus();
+            }
+            case IlluminanceMeasurement::Attributes::MinMeasuredValue::Id: {
+                DataModel::Nullable<uint16_t> minMeasuredValue;
+                CHIP_ERROR err = decoder.Decode(minMeasuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode minMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                auto illuminanceMeasurement = IlluminanceMeasurement::FindClusterOnEndpoint(path.mEndpointId);
+                if (illuminanceMeasurement == nullptr)
+                {
+                    return ::pw::Status::Internal();
+                }
+
+                err = IlluminanceMeasurement::SetMeasuredValueRange(path.mEndpointId, minMeasuredValue,
+                                                                    illuminanceMeasurement->GetMaxMeasuredValue());
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set minMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            case IlluminanceMeasurement::Attributes::MaxMeasuredValue::Id: {
+                DataModel::Nullable<uint16_t> maxMeasuredValue;
+                CHIP_ERROR err = decoder.Decode(maxMeasuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode maxMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                auto illuminanceMeasurement = IlluminanceMeasurement::FindClusterOnEndpoint(path.mEndpointId);
+                if (illuminanceMeasurement == nullptr)
+                {
+                    return ::pw::Status::Internal();
+                }
+
+                err = IlluminanceMeasurement::SetMeasuredValueRange(path.mEndpointId, illuminanceMeasurement->GetMinMeasuredValue(),
+                                                                    maxMeasuredValue);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set maxMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+                return ::pw::OkStatus();
+            }
+            }
+#endif // MATTER_DM_ILLUMINANCE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#if MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+        case OccupancySensing::Id:
+            switch (path.mAttributeId)
+            {
+            case OccupancySensing::Attributes::Occupancy::Id: {
+                BitMask<OccupancySensing::OccupancyBitmap> occupancy;
+                CHIP_ERROR err = decoder.Decode(occupancy);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to decode occupancy: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                auto occupancySensing = OccupancySensing::FindClusterOnEndpoint(path.mEndpointId);
+                if (occupancySensing == nullptr)
+                {
+                    return ::pw::Status::Internal();
+                }
+
+                occupancySensing->SetOccupancy(occupancy.Has(OccupancySensing::OccupancyBitmap::kOccupied));
+                ChipLogProgress(Zcl, "[Pw] Successfully set occupancy to %d.",
+                                occupancy.Has(OccupancySensing::OccupancyBitmap::kOccupied));
+                return ::pw::OkStatus();
+            }
+            }
+#endif // MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         }
         return std::nullopt;
     }
