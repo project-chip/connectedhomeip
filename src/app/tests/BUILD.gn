@@ -218,26 +218,6 @@ source_set("app-test-stubs") {
   ]
 }
 
-source_set("closure-control-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/clusters/closure-control-server/ClosureControlClusterLogic.cpp",
-    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-delegate.h",
-    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.h",
-    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-matter-context.h",
-    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-objects.h",
-  ]
-
-  deps = [
-    "${chip_root}/src/app",
-    "${chip_root}/src/app:interaction-model",
-    "${chip_root}/src/app/cluster-building-blocks:cluster-building-blocks",
-    "${chip_root}/src/app/common:enums",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/zzz_generated/app-common/clusters/ClosureControl:metadata",
-  ]
-}
-
 chip_test_suite("tests") {
   output_name = "libAppTests"
 
@@ -253,9 +233,6 @@ chip_test_suite("tests") {
     "TestBasicCommandPathRegistry.cpp",
     "TestBuilderParser.cpp",
     "TestCheckInHandler.cpp",
-    "TestClosureControlClusterLogic.cpp",
-    "TestClosureControlClusterObjects.cpp",
-    "TestClosureControlConformance.cpp",
     "TestClosureDimensionCluster.cpp",
     "TestClosureDimensionClusterObjects.cpp",
     "TestCommandHandlerInterfaceRegistry.cpp",
@@ -297,7 +274,6 @@ chip_test_suite("tests") {
 
   public_deps = [
     ":app-test-stubs",
-    ":closure-control-test-srcs",
     ":closure-dimension-test-srcs",
     ":ecosystem-information-test-srcs",
     ":operational-state-test-srcs",
