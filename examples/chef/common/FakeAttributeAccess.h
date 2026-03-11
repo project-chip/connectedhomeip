@@ -18,4 +18,12 @@
 
 #pragma once
 
-#include <app/clusters/closure-control-server/ClosureControlCluster.h>
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Chef {
+void RegisterAttributeAccessor();
+} // namespace Chef
+} // namespace Clusters
+} // namespace app
+} // namespace chip

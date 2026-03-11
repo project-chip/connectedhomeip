@@ -2627,7 +2627,7 @@ TEST_F(TestCodegenModelViaMocks, EmberInvokeTest)
 
     {
         const ConcreteCommandPath kCommandPath(kMockEndpoint1, MockClusterId(1), kMockCommandId1);
-        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        InvokeRequest kInvokeRequest(kCommandPath, chip::Testing::kAdminSubjectDescriptor);
         chip::TLV::TLVReader tlvReader;
 
         const uint32_t kDispatchCountPre = chip::Testing::DispatchCount();
@@ -2641,7 +2641,7 @@ TEST_F(TestCodegenModelViaMocks, EmberInvokeTest)
 
     {
         const ConcreteCommandPath kCommandPath(kMockEndpoint1, MockClusterId(1), kMockCommandId2);
-        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        InvokeRequest kInvokeRequest(kCommandPath, chip::Testing::kAdminSubjectDescriptor);
         chip::TLV::TLVReader tlvReader;
 
         const uint32_t kDispatchCountPre = chip::Testing::DispatchCount();
@@ -2878,7 +2878,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
     // so we can see the right method is called.
     {
         const ConcreteCommandPath kCommandPath(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kMockCommandId1);
-        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        InvokeRequest kInvokeRequest(kCommandPath, chip::Testing::kAdminSubjectDescriptor);
         chip::TLV::TLVReader tlvReader;
 
         // Using a handler set to nullptr as it is not used by the impl

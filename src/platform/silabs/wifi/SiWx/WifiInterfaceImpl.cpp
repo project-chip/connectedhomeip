@@ -512,9 +512,9 @@ sl_status_t SetWifiConfigurations()
         join_feature_bitmap |= SL_SI91X_JOIN_FEAT_QUICK_JOIN;
     }
 
-    status = sl_si91x_set_join_configuration(SL_WIFI_CLIENT_INTERFACE, join_feature_bitmap);
+    status = sl_wifi_set_join_configuration(SL_WIFI_CLIENT_INTERFACE, join_feature_bitmap);
     VerifyOrReturnError(status == SL_STATUS_OK, status,
-                        ChipLogError(DeviceLayer, "sl_si91x_set_join_configuration failed: 0x%lx", status));
+                        ChipLogError(DeviceLayer, "sl_wifi_set_join_configuration failed: 0x%lx", status));
 
     status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
     VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogError(DeviceLayer, "sl_net_set_profile failed: 0x%lx", status));
@@ -528,14 +528,14 @@ sl_status_t SetWifiConfigurations()
  *
  * @param configuration Matter Power Save Configuration
  *
- * @return sl_si91x_performance_profile_t SiWx Power Save Configuration; Default value is High Performance
+ * @return sl_wifi_system_performance_profile_t SiWx Power Save Configuration; Default value is High Performance
  *                                        kHighPerformance: HIGH_PERFORMANCE
  *                                        kConnectedSleep: ASSOCIATED_POWER_SAVE
  *                                        kDeepSleep: DEEP_SLEEP_WITH_RAM_RETENTION
  */
-sl_si91x_performance_profile_t ConvertPowerSaveConfiguration(PowerSaveInterface::PowerSaveConfiguration configuration)
+sl_wifi_system_performance_profile_t ConvertPowerSaveConfiguration(PowerSaveInterface::PowerSaveConfiguration configuration)
 {
-    sl_si91x_performance_profile_t profile = HIGH_PERFORMANCE;
+    sl_wifi_system_performance_profile_t profile = HIGH_PERFORMANCE;
 
     switch (configuration)
     {

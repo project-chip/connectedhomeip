@@ -28,6 +28,11 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Groupcast::Commands::UpdateGroupKey::kMetadataEntry,   Groupcast::Commands::ConfigureAuxiliaryACL::kMetadataEntry,
     Groupcast::Commands::GroupcastTesting::kMetadataEntry,
 };
+
+constexpr CommandId kGeneratedCommands[] = {
+    Groupcast::Commands::LeaveGroupResponse::Id,
+};
+
 } // namespace
 
 GroupcastCluster::GroupcastCluster(GroupcastContext && context) : GroupcastCluster(std::move(context), {}) {}
@@ -157,6 +162,11 @@ CHIP_ERROR GroupcastCluster::AcceptedCommands(const ConcreteClusterPath & path,
     return builder.ReferenceExisting(kAcceptedCommands);
 }
 
+CHIP_ERROR GroupcastCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    return builder.ReferenceExisting(kGeneratedCommands);
+}
+
 Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Commands::GroupcastTesting::DecodableType data)
 {
     VerifyOrReturnError(mFabricUnderTest == kUndefinedFabricIndex || mFabricUnderTest == fabricIndex, Status::ConstraintError);
@@ -234,13 +244,10 @@ void GroupcastCluster::GroupcastTestingTimer::TimerFired()
     mCluster.mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
 }
 
-// Methods moved from GroupcastLogic
-
-CHIP_ERROR GroupcastCluster::ReadMembership(const chip::Access::SubjectDescriptor * subject, EndpointId endpoint,
+CHIP_ERROR GroupcastCluster::ReadMembership(const chip::Access::SubjectDescriptor & subject, EndpointId endpoint,
                                             AttributeValueEncoder & aEncoder)
 {
-    VerifyOrReturnError(nullptr != subject, CHIP_ERROR_INVALID_ARGUMENT);
-    FabricIndex fabric_index = subject->fabricIndex;
+    FabricIndex fabric_index = subject.fabricIndex;
 
     GroupDataProvider * groups = &Provider();
 
@@ -352,6 +359,11 @@ Status GroupcastCluster::JoinGroup(FabricIndex fabric_index, const Groupcast::Co
 
     // ReplaceEndpoints can only be present if kListener feature is supported
     VerifyOrReturnError(!data.replaceEndpoints.HasValue() || mFeatures.Has(Groupcast::Feature::kListener), Status::ConstraintError);
+
+    if (data.mcastAddrPolicy.HasValue() && data.mcastAddrPolicy.Value() == Groupcast::MulticastAddrPolicyEnum::kPerGroup)
+    {
+        VerifyOrReturnError(mFeatures.Has(Groupcast::Feature::kPerGroup), Status::ConstraintError);
+    }
 
     // Check endpoints
     size_t endpoint_count = 0;
