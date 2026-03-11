@@ -33,11 +33,9 @@ class ActionsCluster : public DefaultServerCluster
 public:
     using OptionalAttributesSet = OptionalAttributeSet<Actions::Attributes::SetupURL::Id>;
 
-    ActionsCluster(EndpointId endpointId, Actions::Delegate & delegate, OptionalAttributesSet optionalAttributes,
-                   std::optional<CharSpan> setupURL) :
-        DefaultServerCluster({ endpointId, Actions::Id }),
-        mDelegate(delegate),
-        mOptionalAttributes(optionalAttributes),
+    ActionsCluster(EndpointId endpointId, Actions::Delegate & delegate, OptionalAttributesSet optionalAttributes = {},
+                   std::optional<CharSpan> setupURL = std::nullopt) :
+        DefaultServerCluster({ endpointId, Actions::Id }), mDelegate(delegate), mOptionalAttributes(optionalAttributes),
         mSetupURL(setupURL)
     {}
 
@@ -47,7 +45,27 @@ public:
 
     void EndpointListsModified();
 
+    /**
+     * Public helper API for the Application/Delegate to call asynchronously when a previously invoked action
+     * changes state. This method exists to allow the application to notify the C++ cluster when an action's
+     * state has changed, enabling the cluster to emit the corresponding Matter StateChanged event to the fabric.
+     *
+     * @param aActionId The ID of the action whose state has changed
+     * @param aInvokeId The invoke ID associated with the action invocation
+     * @param aActionState The new state of the action
+     */
     void OnStateChanged(uint16_t aActionId, uint32_t aInvokeId, Actions::ActionStateEnum aActionState);
+
+    /**
+     * Public helper API for the Application/Delegate to call asynchronously when a previously invoked action
+     * fails. This method exists to allow the application to notify the C++ cluster when an action has failed,
+     * enabling the cluster to emit the corresponding Matter ActionFailed event to the fabric.
+     *
+     * @param aActionId The ID of the action that failed
+     * @param aInvokeId The invoke ID associated with the action invocation
+     * @param aActionState The state of the action at the time of failure
+     * @param aActionError The error that caused the action to fail
+     */
     void OnActionFailed(uint16_t aActionId, uint32_t aInvokeId, Actions::ActionStateEnum aActionState,
                         Actions::ActionErrorEnum aActionError);
 

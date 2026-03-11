@@ -127,15 +127,16 @@ CHIP_ERROR ActionsCluster::ReadEndpointListAttribute(const DataModel::ReadAttrib
 Status ActionsCluster::ValidateActionCommand(uint16_t actionID, CommandId commandId)
 {
     uint16_t actionIndex = kMaxActionListLength;
-
-    // Validation 1: Does the action exist?
     VerifyOrReturnValue(mDelegate.HaveActionWithId(actionID, actionIndex), Status::NotFound);
-
-    // Validation 2: Is the command supported by this action?
     if (actionIndex != kMaxActionListLength)
     {
         ActionStructStorage action;
-        TEMPORARY_RETURN_IGNORED mDelegate.ReadActionAtIndex(actionIndex, action);
+        CHIP_ERROR err = mDelegate.ReadActionAtIndex(actionIndex, action);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to read action at index %u: %" CHIP_ERROR_FORMAT, actionIndex, err.Format());
+            return Status::Failure;
+        }
         VerifyOrReturnValue((action.supportedCommands.Raw() & (1 << commandId)), Status::InvalidCommand);
     }
 
