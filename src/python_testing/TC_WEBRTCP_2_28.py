@@ -185,7 +185,7 @@ class TC_WebRTCP_2_28(MatterBaseTest, WEBRTCPTestBase):
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
         except InteractionModelError as e:
-            asserts.fail(f"Unexpected failure on EndSession with valid WebRTCSessionID: {e.status}")        
+            asserts.fail(f"Unexpected failure on EndSession with valid WebRTCSessionID: {e.status}")
 
 
 if __name__ == "__main__":
