@@ -140,7 +140,7 @@ class RunStats:
         # Increment counters depending on the result status.
         self.total_runs += 1
         match result.status:
-            case TestStatus.PASSED:
+            case TestStatus.PASSED | TestStatus.DRY_RUN:
                 self.passed += 1
             case TestStatus.FAILED:
                 self.failed += 1
