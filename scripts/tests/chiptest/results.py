@@ -307,8 +307,13 @@ class RunSummary(RunStats):
 
         if top_slowest:
             slowest = sorted((r for r in self.results if r.status not in (TestStatus.DRY_RUN, TestStatus.CANCELLED)),
-                             key=lambda x: -x.duration_seconds)[:top_slowest]
-            self._print_table(title=f"SLOWEST {top_slowest if top_slowest > 0 else 'ALL'} TEST RUNS:",
+                             key=lambda x: -x.duration_seconds)
+
+            # Slice only the top slowest tests if the limit is set to a positive value. If it's negative, show all tests.
+            if top_slowest > 0:
+                slowest = slowest[:top_slowest]
+
+            self._print_table(title=f"SLOWEST {len(slowest)} TEST RUNS:",
                               headers_fmt=(("Test name", "<"), ("Status", "<"), ("Iter", ">"), ("Duration", ">")),
                               rows=((r.name_decorated, r.status, str(r.iteration), f"{r.duration_seconds:.2f}s")
                               for r in slowest))
