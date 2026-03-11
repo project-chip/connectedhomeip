@@ -2835,7 +2835,7 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
         if (info.icd.isLIT)
         {
             uint16_t clusterRevision = 0;
-            CHIP_ERROR revErr = mAttributeCache->Get<ClusterRevision::TypeInfo>(kRootEndpointId, clusterRevision);
+            CHIP_ERROR revErr        = mAttributeCache->Get<ClusterRevision::TypeInfo>(kRootEndpointId, clusterRevision);
             if (revErr != CHIP_NO_ERROR || clusterRevision <= 2)
             {
                 if (revErr == CHIP_NO_ERROR)
