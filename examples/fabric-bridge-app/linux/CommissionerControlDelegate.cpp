@@ -233,8 +233,8 @@ CHIP_ERROR CommissionerControlInit()
     BitMask<Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories;
     supportedDeviceCategories.SetField(Clusters::CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization, 1);
 
-    err = CommissionerControl::SetSupportedDeviceCategories(Clusters::CommissionerControl::kAggregatorEndpointId,
-                                                            supportedDeviceCategories);
+    err = Clusters::CommissionerControl::SetSupportedDeviceCategories(Clusters::CommissionerControl::kAggregatorEndpointId,
+                                                                      supportedDeviceCategories);
 
     if (err != CHIP_NO_ERROR)
     {
