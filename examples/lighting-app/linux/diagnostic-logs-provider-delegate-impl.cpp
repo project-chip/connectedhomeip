@@ -21,7 +21,6 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <algorithm>
 #include <cerrno>
 #include <cstdio>
 #include <string>
@@ -49,6 +48,7 @@ size_t GetFileSize(FILE * fp)
 
     auto fileSize = ftell(fp);
     VerifyOrReturnValue(fileSize != -1, 0);
+    VerifyOrReturnValue(CanCastTo<size_t>(fileSize), 0);
 
     rv = fseek(fp, offset, SEEK_SET);
     VerifyOrReturnValue(rv == 0, 0);
@@ -97,12 +97,12 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     auto filePath = GetFilePathForIntent(intent);
     VerifyOrReturnValue(filePath.HasValue(), CHIP_ERROR_NOT_FOUND);
 
+    // Guard against infinite loop if all handles are exhausted
+    VerifyOrReturnError(mFiles.size() < UINT16_MAX, CHIP_ERROR_NO_MEMORY);
+
     auto fp = fopen(filePath.Value().c_str(), "rb");
     VerifyOrReturnValue(!(nullptr == fp && errno == ENOENT), CHIP_ERROR_NOT_FOUND);
     VerifyOrReturnValue(nullptr != fp, CHIP_ERROR_INTERNAL);
-
-    // Guard against infinite loop if all handles are exhausted
-    VerifyOrReturnError(mFiles.size() < UINT16_MAX, CHIP_ERROR_NO_MEMORY);
 
     // Select the next unused session handle, skipping the invalid handle.
     do
@@ -114,7 +114,6 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
 
     outHandle                    = mLogSessionHandle;
     mFiles[mLogSessionHandle]    = fp;
-    mFileSizes[mLogSessionHandle] = GetFileSize(fp);
     return CHIP_NO_ERROR;
 }
 
@@ -125,7 +124,6 @@ CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle)
 
     auto fp = mFiles[sessionHandle];
     mFiles.erase(sessionHandle);
-    mFileSizes.erase(sessionHandle);
 
     auto rv = fclose(fp);
     VerifyOrReturnError(rv == 0, CHIP_ERROR_POSIX(errno));
@@ -139,18 +137,15 @@ CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSp
     VerifyOrReturnValue(mFiles.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
 
     auto fp       = mFiles[sessionHandle];
-    auto fileSize = mFileSizes[sessionHandle];
+    const size_t bytesRequested = outBuffer.size();
 
     clearerr(fp);
-    size_t bytesRead = fread(outBuffer.data(), 1, outBuffer.size(), fp);
+    size_t bytesRead = fread(outBuffer.data(), 1, bytesRequested, fp);
     VerifyOrReturnError(ferror(fp) == 0, CHIP_ERROR_POSIX(errno), outBuffer.reduce_size(0));
 
     outBuffer.reduce_size(bytesRead);
-
-    auto currentPos = ftell(fp);
-    VerifyOrReturnError(currentPos != -1, CHIP_ERROR_POSIX(errno), outBuffer.reduce_size(0));
-    VerifyOrReturnError(CanCastTo<size_t>(currentPos), CHIP_ERROR_INVALID_INTEGER_VALUE, outBuffer.reduce_size(0));
-    outIsEndOfLog = fileSize == static_cast<size_t>(currentPos);
+    // Treat short reads (including 0 bytes) as end-of-log, and also respect EOF.
+    outIsEndOfLog = (bytesRead < bytesRequested) || (feof(fp) != 0);
 
     return CHIP_NO_ERROR;
 }

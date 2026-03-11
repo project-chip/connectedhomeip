@@ -67,8 +67,6 @@ private:
 
     LogSessionHandle mLogSessionHandle = kInvalidLogSessionHandle;
     std::map<LogSessionHandle, FILE *> mFiles;
-    std::map<LogSessionHandle, size_t> mFileSizes;
-
 };
 
 } // namespace DiagnosticLogs
