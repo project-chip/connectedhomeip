@@ -1,0 +1,377 @@
+Metadata-Version: 2.4
+Name: pycountry
+Version: 26.2.16
+Summary: ISO country, subdivision, language, currency and script definitions and their translations
+License-Expression: LGPL-2.1-only
+License-File: LICENSE.txt
+Keywords: country,subdivision,language,currency,iso,3166,639,4217,15924,3166-1,3166-2,3166-3
+Author: Christian Theune
+Author-email: ct@flyingcircus.io
+Maintainer: Nate Schimmoller
+Maintainer-email: nschimmo@gmail.com
+Requires-Python: >=3.10
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Topic :: Software Development :: Internationalization
+Classifier: Topic :: Software Development :: Localization
+Project-URL: changelog, https://github.com/pycountry/pycountry/blob/main/HISTORY.txt
+Project-URL: issues, https://github.com/pycountry/pycountry/issues
+Project-URL: source, https://github.com/pycountry/pycountry
+Description-Content-Type: text/x-rst
+
+###########
+ pycountry
+###########
+
+pycountry provides the ISO databases for the standards:
+
+-  `639-3 <https://en.wikipedia.org/wiki/ISO_639-3>`_ Languages
+-  `3166 <https://en.wikipedia.org/wiki/ISO_3166>`_ Codes for
+   representation of names of countries and their subdivisions
+-  `3166-1 <https://en.wikipedia.org/wiki/ISO_3166-1>`_ Countries
+-  `3166-3 <https://en.wikipedia.org/wiki/ISO_3166-3>`_ Deleted
+   countries
+-  `3166-2 <https://en.wikipedia.org/wiki/ISO_3166-2>`_ Subdivisions of
+   countries
+-  `4217 <https://en.wikipedia.org/wiki/ISO_4217>`_ Currencies
+-  `15924 <https://en.wikipedia.org/wiki/ISO_15924>`_ Scripts
+
+The package includes a copy from Debian's `pkg-isocodes
+<https://salsa.debian.org/iso-codes-team/iso-codes>`_ and makes the data
+accessible through a Python API.
+
+Translation files for the various strings are included as well.
+
+********************
+ Data update policy
+********************
+
+No changes to the data will be accepted into pycountry. This is a pure
+wrapper around the ISO standard using the ``pkg-isocodes`` database from
+Debian *as is*. If you need changes to the political situation in the
+world, please talk to the ISO or Debian people, not me.
+
+***************
+ Contributions
+***************
+
+The code lives in a `git repository on GitHub
+<https://github.com/pycountry/pycountry>`_, and issues must be reported
+in there as well.
+
+************************
+ Countries (ISO 3166-1)
+************************
+
+Countries are accessible through a database object that is already
+configured upon import of pycountry and works as an iterable:
+
+.. code:: pycon
+
+   >>> import pycountry
+   >>> len(pycountry.countries)
+   249
+   >>> list(pycountry.countries)[0]
+   Country(alpha_2='AW', alpha_3='ABW', flag='🇦🇼', name='Aruba', numeric='533')
+
+Specific countries can be looked up by their various codes and provide
+the information included in the standard as attributes:
+
+.. code:: pycon
+
+   >>> germany = pycountry.countries.get(alpha_2='DE')
+   >>> germany
+   Country(alpha_2='DE', alpha_3='DEU', flag='🇩🇪', name='Germany', numeric='276', official_name='Federal Republic of Germany')
+   >>> germany.alpha_2
+   'DE'
+   >>> germany.alpha_3
+   'DEU'
+   >>> germany.numeric
+   '276'
+   >>> germany.name
+   'Germany'
+   >>> germany.official_name
+   'Federal Republic of Germany'
+
+There's also a "fuzzy" search to help people discover "proper" countries
+for names that might only actually be subdivisions. The fuzziness also
+includes normalizing unicode accents. There's also a bit of
+prioritization included to prefer matches on country names before
+subdivision names and have countries with more matches be listed before
+ones with fewer matches:
+
+.. code:: pycon
+
+   >>> pycountry.countries.search_fuzzy('England')
+   [Country(alpha_2='GB', alpha_3='GBR', flag='🇬🇧', name='United Kingdom', numeric='826', official_name='United Kingdom of Great Britain and Northern Ireland')]
+
+   >>> pycountry.countries.search_fuzzy('Cote')
+   [Country(alpha_2='CI', alpha_3='CIV', flag='🇨🇮', name="Côte d'Ivoire", numeric='384', official_name="Republic of Côte d'Ivoire"),
+    Country(alpha_2='FR', alpha_3='FRA', flag='🇫🇷', name='France', numeric='250', official_name='French Republic'),
+    Country(alpha_2='HN', alpha_3='HND', flag='🇭🇳', name='Honduras', numeric='340', official_name='Republic of Honduras')]
+
+Attributes for the country class can be accessed using the
+``__getattr__`` method. If the requested attribute is a key for the
+country class, it will return the corresponding value. Here are some
+examples:
+
+.. code:: pycon
+
+   >>> aland = pycountry.countries.get(alpha_2='AX')
+   >>> print(aland)
+   Country(alpha_2='AX', alpha_3='ALA', flag='🇦🇽', name='Åland Islands', numeric='248')
+   >>> aland.common_name
+   Traceback (most recent call last):
+   AttributeError: common_name
+   >>> aland.flag
+   '🇦🇽'
+   >>> aland.foo
+   Traceback (most recent call last):
+   AttributeError: foo
+
+*********************************
+ Historic Countries (ISO 3166-3)
+*********************************
+
+The ``historic_countries`` database contains former countries that have
+been removed from the standard and are now included in ISO 3166-3,
+excluding existing ones:
+
+.. code:: pycon
+
+   >>> ussr = pycountry.historic_countries.get(alpha_3='SUN')
+   >>> ussr
+   Country(alpha_2='SU', alpha_3='SUN', alpha_4='SUHH', name='USSR, Union of Soviet Socialist Republics', numeric='810', withdrawal_date='1992-08-30')
+   >>> ussr.alpha_4
+   'SUHH'
+   >>> ussr.alpha_3
+   'SUN'
+   >>> ussr.name
+   'USSR, Union of Soviet Socialist Republics'
+   >>> ussr.withdrawal_date
+   '1992-08-30'
+
+***********************************
+ Country subdivisions (ISO 3166-2)
+***********************************
+
+The country subdivisions are a little more complex than the countries
+itself because they provide a nested and typed structure.
+
+All subdivisons can be accessed directly:
+
+.. code:: pycon
+
+   >>> len(pycountry.subdivisions)
+   5046
+   >>> list(pycountry.subdivisions)[0]
+   SubdivisionHierarchy(code='AD-02', country_code='AD', name='Canillo', parent_code=None, type='Parish')
+
+Subdivisions can be accessed using their unique code. The resulting
+object will provide at least their code, name and type:
+
+.. code:: pycon
+
+   >>> de_st = pycountry.subdivisions.get(code='DE-ST')
+   >>> de_st.code
+   'DE-ST'
+   >>> de_st.name
+   'Sachsen-Anhalt'
+   >>> de_st.type
+   'Land'
+   >>> de_st.country
+   Country(alpha_2='DE', alpha_3='DEU', flag='🇩🇪', name='Germany', numeric='276', official_name='Federal Republic of Germany')
+
+Some subdivisions specify another subdivision as a parent:
+
+.. code:: pycon
+
+   >>> fr_01 = pycountry.subdivisions.get(code='FR-01')
+   >>> fr_01.code
+   'FR-01'
+   >>> fr_01.name
+   'Ain'
+   >>> fr_01.type
+   'Metropolitan department'
+   >>> fr_01.parent_code
+   'FR-ARA'
+   >>> fr_01.parent
+   SubdivisionHierarchy(code='FR-ARA', country_code='FR', name='Auvergne-Rhône-Alpes', parent_code=None, type='Metropolitan region')
+   >>> fr_01.parent.name
+   'Auvergne-Rhône-Alpes'
+
+The divisions of a single country can be queried using the country_code
+index:
+
+.. code:: pycon
+
+   >>> len(pycountry.subdivisions.get(country_code='DE'))
+   16
+
+   >>> len(pycountry.subdivisions.get(country_code='US'))
+   57
+
+Similar to countries, the ``search_fuzzy`` method has been implemented
+for subdivisions to facilitate finding relevant subdivision entries.
+This method includes unicode normalization for accents and prioritizes
+matches on subdivision names. The search algorithm is designed to return
+more relevant matches first:
+
+This method is especially useful for cases where the exact name or code
+of the subdivision is not known.
+
+.. code:: pycon
+
+   >>> pycountry.subdivisions.search_fuzzy('York')
+   [SubdivisionHierarchy(code='GB-YOR', country_code='GB', name='York', parent='GB-ENG', parent_code='GB-ENG', type='Unitary authority'),
+    SubdivisionHierarchy(code='GB-ERY', country_code='GB', name='East Riding of Yorkshire', parent='GB-ENG', parent_code='GB-ENG', type='Unitary authority'),
+    SubdivisionHierarchy(code='GB-NYK', country_code='GB', name='North Yorkshire', parent='GB-ENG', parent_code='GB-ENG', type='Two-tier county'),
+    SubdivisionHierarchy(code='US-NY', country_code='US', name='New York', parent_code=None, type='State')]
+
+*********************
+ Scripts (ISO 15924)
+*********************
+
+Scripts are available from a database similar to the countries:
+
+.. code:: pycon
+
+   >>> len(pycountry.scripts)
+   226
+   >>> list(pycountry.scripts)[0]
+   Script(alpha_4='Adlm', name='Adlam', numeric='166')
+   >>> latin = pycountry.scripts.get(name='Latin')
+   >>> latin
+   Script(alpha_4='Latn', name='Latin', numeric='215')
+   >>> latin.alpha_4
+   'Latn'
+   >>> latin.name
+   'Latin'
+   >>> latin.numeric
+   '215'
+
+***********************
+ Currencies (ISO 4217)
+***********************
+
+The currencies database is, again, similar to the ones before:
+
+.. code:: pycon
+
+   >>> len(pycountry.currencies)
+   178
+   >>> list(pycountry.currencies)[0]
+   Currency(alpha_3='AED', name='UAE Dirham', numeric='784')
+   >>> argentine_peso = pycountry.currencies.get(alpha_3='ARS')
+   >>> argentine_peso
+   Currency(alpha_3='ARS', name='Argentine Peso', numeric='032')
+   >>> argentine_peso.alpha_3
+   'ARS'
+   >>> argentine_peso.name
+   'Argentine Peso'
+   >>> argentine_peso.numeric
+   '032'
+
+***********************
+ Languages (ISO 639-3)
+***********************
+
+The languages database is similar too:
+
+.. code:: pycon
+
+   >>> len(pycountry.languages)
+   7923
+   >>> list(pycountry.languages)[0]
+   Language(alpha_3='aaa', name='Ghotuo', scope='I', type='L')
+
+   >>> aragonese = pycountry.languages.get(alpha_2='an')
+   >>> aragonese.alpha_2
+   'an'
+   >>> aragonese.alpha_3
+   'arg'
+   >>> aragonese.name
+   'Aragonese'
+
+   >>> bengali = pycountry.languages.get(alpha_2='bn')
+   >>> bengali.name
+   'Bengali'
+   >>> bengali.common_name
+   'Bangla'
+
+*********
+ Locales
+*********
+
+Locales are available in the ``pycountry.LOCALES_DIR`` subdirectory of
+this package. The translation domains are called ``isoXXX`` according to
+the standard they provide translations for. The directory is structured
+in a way compatible to Python's gettext module.
+
+Here is an example translating language names:
+
+.. code:: pycon
+
+   >>> import gettext
+   >>> german = gettext.translation('iso3166-1', pycountry.LOCALES_DIR,
+   ...                              languages=['de'])
+   >>> german.install()
+   >>> _('Germany')
+   'Deutschland'
+
+*********
+ Lookups
+*********
+
+For each database (countries, languages, scripts, etc.), you can also
+look up entities case insensitively without knowing which key the value
+may match. For example:
+
+.. code:: pycon
+
+   >>> pycountry.countries.lookup('de')
+   Country(alpha_2='DE', alpha_3='DEU', flag='🇩🇪', name='Germany', numeric='276', official_name='Federal Republic of Germany')
+
+The search ends with the first match, which is returned.
+
+********************
+ Dict Compatibility
+********************
+
+You can cast each object type into a ``dict``:
+
+.. code:: pycon
+
+   >>> country = pycountry.countries.lookup('de')
+   >>> dict(country)
+   {'alpha_2': 'DE', 'alpha_3': 'DEU', 'flag': '🇩🇪', 'name': 'Germany', 'numeric': '276', 'official_name': 'Federal Republic of Germany'}
+
+******************
+ Custom Countries
+******************
+
+While pycountry will not be adding non-ISO values to its standard
+library, you can add or remove entries at runtime to fit your needs.
+
+Add a non-ISO country:
+
+.. code:: pycon
+
+   >>> pycountry.countries.add_entry(alpha_2="XK", alpha_3="XXK", name="Kosovo", numeric="926")
+
+Remove a country from a database:
+
+.. code:: pycon
+
+   >>> pycountry.countries.remove_entry(alpha_2="XK")
+

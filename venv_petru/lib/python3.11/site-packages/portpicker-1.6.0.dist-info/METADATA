@@ -1,0 +1,35 @@
+Metadata-Version: 2.1
+Name: portpicker
+Version: 1.6.0
+Summary: A library to choose unique available network ports.
+Home-page: https://github.com/google/python_portpicker
+Maintainer: Google LLC
+Maintainer-email: greg@krypto.org
+License: Apache 2.0
+Platform: POSIX
+Platform: Windows
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Requires-Python: >=3.6
+License-File: LICENSE
+Requires-Dist: psutil
+
+Portpicker provides an API to find and return an available
+network port for an application to bind to.  Ideally suited for use from
+unittests or for test harnesses that launch local servers.
+
+It also contains an optional portserver that can be used to coordinate
+allocation of network ports on a single build/test farm host across all
+processes willing to use a port server aware port picker library such as
+this one.

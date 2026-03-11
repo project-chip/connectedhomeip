@@ -1,0 +1,16 @@
+service_identity-24.2.0.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+service_identity-24.2.0.dist-info/METADATA,sha256=MPG_UpWR8E1H5kuQlNvUPRSOOk2GoegkrQlaLi89f3Y,5144
+service_identity-24.2.0.dist-info/RECORD,,
+service_identity-24.2.0.dist-info/WHEEL,sha256=1yFddiXMmvYK7QYTqtRNtX66WJ0Mz8PYEiEUoOUUxRY,87
+service_identity-24.2.0.dist-info/licenses/LICENSE,sha256=JL0Km6fQ6uCKOm4yobCfjmhx-gMlUgovywDhU56qYCo,1120
+service_identity/__init__.py,sha256=uN4CtYdWSaugMABLSIJnHM5wO336zcSO-WDjuRlGk5c,708
+service_identity/__pycache__/__init__.cpython-311.pyc,,
+service_identity/__pycache__/cryptography.cpython-311.pyc,,
+service_identity/__pycache__/exceptions.cpython-311.pyc,,
+service_identity/__pycache__/hazmat.cpython-311.pyc,,
+service_identity/__pycache__/pyopenssl.cpython-311.pyc,,
+service_identity/cryptography.py,sha256=-hXyUpb9ngyW5LxrhzYQezVPKO9L-H-MCPmr2rGO2Ow,5277
+service_identity/exceptions.py,sha256=iK2XrwViAlP6rye8QAR4IkAmqPUBOPvKk2wziINnj-I,1515
+service_identity/hazmat.py,sha256=3vSxpagqpTnXPLfgSlHdaDpZQASZAyZqWHop0mKRNuI,12739
+service_identity/py.typed,sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU,0
+service_identity/pyopenssl.py,sha256=-5Cz0ilMaaUlHGiR6_v1k5LzwXGxdLzQHDRGvKYihlI,3683

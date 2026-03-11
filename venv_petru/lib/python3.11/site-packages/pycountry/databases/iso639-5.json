@@ -1,0 +1,464 @@
+{
+  "639-5": [
+    {
+      "alpha_3": "aav",
+      "name": "Austro-Asiatic languages"
+    },
+    {
+      "alpha_3": "afa",
+      "name": "Afro-Asiatic languages"
+    },
+    {
+      "alpha_3": "alg",
+      "name": "Algonquian languages"
+    },
+    {
+      "alpha_3": "alv",
+      "name": "Atlantic-Congo languages"
+    },
+    {
+      "alpha_3": "apa",
+      "name": "Apache languages"
+    },
+    {
+      "alpha_3": "aqa",
+      "name": "Alacalufan languages"
+    },
+    {
+      "alpha_3": "aql",
+      "name": "Algic languages"
+    },
+    {
+      "alpha_3": "art",
+      "name": "Artificial languages"
+    },
+    {
+      "alpha_3": "ath",
+      "name": "Athapascan languages"
+    },
+    {
+      "alpha_3": "auf",
+      "name": "Arauan languages"
+    },
+    {
+      "alpha_3": "aus",
+      "name": "Australian languages"
+    },
+    {
+      "alpha_3": "awd",
+      "name": "Arawakan languages"
+    },
+    {
+      "alpha_3": "azc",
+      "name": "Uto-Aztecan languages"
+    },
+    {
+      "alpha_3": "bad",
+      "name": "Banda languages"
+    },
+    {
+      "alpha_3": "bai",
+      "name": "Bamileke languages"
+    },
+    {
+      "alpha_3": "bat",
+      "name": "Baltic languages"
+    },
+    {
+      "alpha_3": "ber",
+      "name": "Berber languages"
+    },
+    {
+      "alpha_3": "bih",
+      "name": "Bihari languages"
+    },
+    {
+      "alpha_3": "bnt",
+      "name": "Bantu languages"
+    },
+    {
+      "alpha_3": "btk",
+      "name": "Batak languages"
+    },
+    {
+      "alpha_3": "cai",
+      "name": "Central American Indian languages"
+    },
+    {
+      "alpha_3": "cau",
+      "name": "Caucasian languages"
+    },
+    {
+      "alpha_3": "cba",
+      "name": "Chibchan languages"
+    },
+    {
+      "alpha_3": "ccn",
+      "name": "North Caucasian languages"
+    },
+    {
+      "alpha_3": "ccs",
+      "name": "South Caucasian languages"
+    },
+    {
+      "alpha_3": "cdc",
+      "name": "Chadic languages"
+    },
+    {
+      "alpha_3": "cdd",
+      "name": "Caddoan languages"
+    },
+    {
+      "alpha_3": "cel",
+      "name": "Celtic languages"
+    },
+    {
+      "alpha_3": "cmc",
+      "name": "Chamic languages"
+    },
+    {
+      "alpha_3": "cpe",
+      "name": "Creoles and pidgins, English‑based"
+    },
+    {
+      "alpha_3": "cpf",
+      "name": "Creoles and pidgins, French‑based"
+    },
+    {
+      "alpha_3": "cpp",
+      "name": "Creoles and pidgins, Portuguese-based"
+    },
+    {
+      "alpha_3": "crp",
+      "name": "Creoles and pidgins"
+    },
+    {
+      "alpha_3": "csu",
+      "name": "Central Sudanic languages"
+    },
+    {
+      "alpha_3": "cus",
+      "name": "Cushitic languages"
+    },
+    {
+      "alpha_3": "day",
+      "name": "Land Dayak languages"
+    },
+    {
+      "alpha_3": "dmn",
+      "name": "Mande languages"
+    },
+    {
+      "alpha_3": "dra",
+      "name": "Dravidian languages"
+    },
+    {
+      "alpha_3": "egx",
+      "name": "Egyptian languages"
+    },
+    {
+      "alpha_3": "esx",
+      "name": "Eskimo-Aleut languages"
+    },
+    {
+      "alpha_3": "euq",
+      "name": "Basque (family)"
+    },
+    {
+      "alpha_3": "fiu",
+      "name": "Finno-Ugrian languages"
+    },
+    {
+      "alpha_3": "fox",
+      "name": "Formosan languages"
+    },
+    {
+      "alpha_3": "gem",
+      "name": "Germanic languages"
+    },
+    {
+      "alpha_3": "gme",
+      "name": "East Germanic languages"
+    },
+    {
+      "alpha_3": "gmq",
+      "name": "North Germanic languages"
+    },
+    {
+      "alpha_3": "gmw",
+      "name": "West Germanic languages"
+    },
+    {
+      "alpha_3": "grk",
+      "name": "Greek languages"
+    },
+    {
+      "alpha_3": "hmx",
+      "name": "Hmong-Mien languages"
+    },
+    {
+      "alpha_3": "hok",
+      "name": "Hokan languages"
+    },
+    {
+      "alpha_3": "hyx",
+      "name": "Armenian (family)"
+    },
+    {
+      "alpha_3": "iir",
+      "name": "Indo-Iranian languages"
+    },
+    {
+      "alpha_3": "ijo",
+      "name": "Ijo languages"
+    },
+    {
+      "alpha_3": "inc",
+      "name": "Indic languages"
+    },
+    {
+      "alpha_3": "ine",
+      "name": "Indo-European languages"
+    },
+    {
+      "alpha_3": "ira",
+      "name": "Iranian languages"
+    },
+    {
+      "alpha_3": "iro",
+      "name": "Iroquoian languages"
+    },
+    {
+      "alpha_3": "itc",
+      "name": "Italic languages"
+    },
+    {
+      "alpha_3": "jpx",
+      "name": "Japanese (family)"
+    },
+    {
+      "alpha_3": "kar",
+      "name": "Karen languages"
+    },
+    {
+      "alpha_3": "kdo",
+      "name": "Kordofanian languages"
+    },
+    {
+      "alpha_3": "khi",
+      "name": "Khoisan languages"
+    },
+    {
+      "alpha_3": "kro",
+      "name": "Kru languages"
+    },
+    {
+      "alpha_3": "map",
+      "name": "Austronesian languages"
+    },
+    {
+      "alpha_3": "mkh",
+      "name": "Mon-Khmer languages"
+    },
+    {
+      "alpha_3": "mno",
+      "name": "Manobo languages"
+    },
+    {
+      "alpha_3": "mun",
+      "name": "Munda languages"
+    },
+    {
+      "alpha_3": "myn",
+      "name": "Mayan languages"
+    },
+    {
+      "alpha_3": "nah",
+      "name": "Nahuatl languages"
+    },
+    {
+      "alpha_3": "nai",
+      "name": "North American Indian languages"
+    },
+    {
+      "alpha_3": "ngf",
+      "name": "Trans-New Guinea languages"
+    },
+    {
+      "alpha_3": "nic",
+      "name": "Niger-Kordofanian languages"
+    },
+    {
+      "alpha_3": "nub",
+      "name": "Nubian languages"
+    },
+    {
+      "alpha_3": "omq",
+      "name": "Oto-Manguean languages"
+    },
+    {
+      "alpha_3": "omv",
+      "name": "Omotic languages"
+    },
+    {
+      "alpha_3": "oto",
+      "name": "Otomian languages"
+    },
+    {
+      "alpha_3": "paa",
+      "name": "Papuan languages"
+    },
+    {
+      "alpha_3": "phi",
+      "name": "Philippine languages"
+    },
+    {
+      "alpha_3": "plf",
+      "name": "Central Malayo-Polynesian languages"
+    },
+    {
+      "alpha_3": "poz",
+      "name": "Malayo-Polynesian languages"
+    },
+    {
+      "alpha_3": "pqe",
+      "name": "Eastern Malayo-Polynesian languages"
+    },
+    {
+      "alpha_3": "pqw",
+      "name": "Western Malayo-Polynesian languages"
+    },
+    {
+      "alpha_3": "pra",
+      "name": "Prakrit languages"
+    },
+    {
+      "alpha_3": "qwe",
+      "name": "Quechuan (family)"
+    },
+    {
+      "alpha_3": "roa",
+      "name": "Romance languages"
+    },
+    {
+      "alpha_3": "sai",
+      "name": "South American Indian languages"
+    },
+    {
+      "alpha_3": "sal",
+      "name": "Salishan languages"
+    },
+    {
+      "alpha_3": "sdv",
+      "name": "Eastern Sudanic languages"
+    },
+    {
+      "alpha_3": "sem",
+      "name": "Semitic languages"
+    },
+    {
+      "alpha_3": "sgn",
+      "name": "sign languages"
+    },
+    {
+      "alpha_3": "sio",
+      "name": "Siouan languages"
+    },
+    {
+      "alpha_3": "sit",
+      "name": "Sino-Tibetan languages"
+    },
+    {
+      "alpha_3": "sla",
+      "name": "Slavic languages"
+    },
+    {
+      "alpha_3": "smi",
+      "name": "Sami languages"
+    },
+    {
+      "alpha_3": "son",
+      "name": "Songhai languages"
+    },
+    {
+      "alpha_3": "sqj",
+      "name": "Albanian languages"
+    },
+    {
+      "alpha_3": "ssa",
+      "name": "Nilo-Saharan languages"
+    },
+    {
+      "alpha_3": "syd",
+      "name": "Samoyedic languages"
+    },
+    {
+      "alpha_3": "tai",
+      "name": "Tai languages"
+    },
+    {
+      "alpha_3": "tbq",
+      "name": "Tibeto-Burman languages"
+    },
+    {
+      "alpha_3": "trk",
+      "name": "Turkic languages"
+    },
+    {
+      "alpha_3": "tup",
+      "name": "Tupi languages"
+    },
+    {
+      "alpha_3": "tut",
+      "name": "Altaic languages"
+    },
+    {
+      "alpha_3": "tuw",
+      "name": "Tungus languages"
+    },
+    {
+      "alpha_3": "urj",
+      "name": "Uralic languages"
+    },
+    {
+      "alpha_3": "wak",
+      "name": "Wakashan languages"
+    },
+    {
+      "alpha_3": "wen",
+      "name": "Sorbian languages"
+    },
+    {
+      "alpha_3": "xgn",
+      "name": "Mongolian languages"
+    },
+    {
+      "alpha_3": "xnd",
+      "name": "Na-Dene languages"
+    },
+    {
+      "alpha_3": "ypk",
+      "name": "Yupik languages"
+    },
+    {
+      "alpha_3": "zhx",
+      "name": "Chinese (family)"
+    },
+    {
+      "alpha_3": "zle",
+      "name": "East Slavic languages"
+    },
+    {
+      "alpha_3": "zls",
+      "name": "South Slavic languages"
+    },
+    {
+      "alpha_3": "zlw",
+      "name": "West Slavic languages"
+    },
+    {
+      "alpha_3": "znd",
+      "name": "Zande languages"
+    }
+  ]
+}

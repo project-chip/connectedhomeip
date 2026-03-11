@@ -1,0 +1,1134 @@
+{
+  "15924": [
+    {
+      "alpha_4": "Adlm",
+      "name": "Adlam",
+      "numeric": "166"
+    },
+    {
+      "alpha_4": "Afak",
+      "name": "Afaka",
+      "numeric": "439"
+    },
+    {
+      "alpha_4": "Aghb",
+      "name": "Caucasian Albanian",
+      "numeric": "239"
+    },
+    {
+      "alpha_4": "Ahom",
+      "name": "Ahom, Tai Ahom",
+      "numeric": "338"
+    },
+    {
+      "alpha_4": "Arab",
+      "name": "Arabic",
+      "numeric": "160"
+    },
+    {
+      "alpha_4": "Aran",
+      "name": "Arabic (Nastaliq variant)",
+      "numeric": "161"
+    },
+    {
+      "alpha_4": "Armi",
+      "name": "Imperial Aramaic",
+      "numeric": "124"
+    },
+    {
+      "alpha_4": "Armn",
+      "name": "Armenian",
+      "numeric": "230"
+    },
+    {
+      "alpha_4": "Avst",
+      "name": "Avestan",
+      "numeric": "134"
+    },
+    {
+      "alpha_4": "Bali",
+      "name": "Balinese",
+      "numeric": "360"
+    },
+    {
+      "alpha_4": "Bamu",
+      "name": "Bamum",
+      "numeric": "435"
+    },
+    {
+      "alpha_4": "Bass",
+      "name": "Bassa Vah",
+      "numeric": "259"
+    },
+    {
+      "alpha_4": "Batk",
+      "name": "Batak",
+      "numeric": "365"
+    },
+    {
+      "alpha_4": "Beng",
+      "name": "Bengali (Bangla)",
+      "numeric": "325"
+    },
+    {
+      "alpha_4": "Berf",
+      "name": "Beria Erfe",
+      "numeric": "258"
+    },
+    {
+      "alpha_4": "Bhks",
+      "name": "Bhaiksuki",
+      "numeric": "334"
+    },
+    {
+      "alpha_4": "Blis",
+      "name": "Blissymbols",
+      "numeric": "550"
+    },
+    {
+      "alpha_4": "Bopo",
+      "name": "Bopomofo",
+      "numeric": "285"
+    },
+    {
+      "alpha_4": "Brah",
+      "name": "Brahmi",
+      "numeric": "300"
+    },
+    {
+      "alpha_4": "Brai",
+      "name": "Braille",
+      "numeric": "570"
+    },
+    {
+      "alpha_4": "Bugi",
+      "name": "Buginese",
+      "numeric": "367"
+    },
+    {
+      "alpha_4": "Buhd",
+      "name": "Buhid",
+      "numeric": "372"
+    },
+    {
+      "alpha_4": "Cakm",
+      "name": "Chakma",
+      "numeric": "349"
+    },
+    {
+      "alpha_4": "Cans",
+      "name": "Unified Canadian Aboriginal Syllabics",
+      "numeric": "440"
+    },
+    {
+      "alpha_4": "Cari",
+      "name": "Carian",
+      "numeric": "201"
+    },
+    {
+      "alpha_4": "Cham",
+      "name": "Cham",
+      "numeric": "358"
+    },
+    {
+      "alpha_4": "Cher",
+      "name": "Cherokee",
+      "numeric": "445"
+    },
+    {
+      "alpha_4": "Chis",
+      "name": "Chisoi",
+      "numeric": "298"
+    },
+    {
+      "alpha_4": "Chrs",
+      "name": "Chorasmian",
+      "numeric": "109"
+    },
+    {
+      "alpha_4": "Cirt",
+      "name": "Cirth",
+      "numeric": "291"
+    },
+    {
+      "alpha_4": "Copt",
+      "name": "Coptic",
+      "numeric": "204"
+    },
+    {
+      "alpha_4": "Cpmn",
+      "name": "Cypro-Minoan",
+      "numeric": "402"
+    },
+    {
+      "alpha_4": "Cprt",
+      "name": "Cypriot syllabary",
+      "numeric": "403"
+    },
+    {
+      "alpha_4": "Cyrl",
+      "name": "Cyrillic",
+      "numeric": "220"
+    },
+    {
+      "alpha_4": "Cyrs",
+      "name": "Cyrillic (Old Church Slavonic variant)",
+      "numeric": "221"
+    },
+    {
+      "alpha_4": "Deva",
+      "name": "Devanagari (Nagari)",
+      "numeric": "315"
+    },
+    {
+      "alpha_4": "Diak",
+      "name": "Dives Akuru",
+      "numeric": "342"
+    },
+    {
+      "alpha_4": "Dogr",
+      "name": "Dogra",
+      "numeric": "328"
+    },
+    {
+      "alpha_4": "Dsrt",
+      "name": "Deseret (Mormon)",
+      "numeric": "250"
+    },
+    {
+      "alpha_4": "Dupl",
+      "name": "Duployan shorthand, Duployan stenography",
+      "numeric": "755"
+    },
+    {
+      "alpha_4": "Egyd",
+      "name": "Egyptian demotic",
+      "numeric": "070"
+    },
+    {
+      "alpha_4": "Egyh",
+      "name": "Egyptian hieratic",
+      "numeric": "060"
+    },
+    {
+      "alpha_4": "Egyp",
+      "name": "Egyptian hieroglyphs",
+      "numeric": "050"
+    },
+    {
+      "alpha_4": "Elba",
+      "name": "Elbasan",
+      "numeric": "226"
+    },
+    {
+      "alpha_4": "Elym",
+      "name": "Elymaic",
+      "numeric": "128"
+    },
+    {
+      "alpha_4": "Ethi",
+      "name": "Ethiopic (Geʻez)",
+      "numeric": "430"
+    },
+    {
+      "alpha_4": "Gara",
+      "name": "Garay",
+      "numeric": "164"
+    },
+    {
+      "alpha_4": "Geok",
+      "name": "Khutsuri (Asomtavruli and Nuskhuri)",
+      "numeric": "241"
+    },
+    {
+      "alpha_4": "Geor",
+      "name": "Georgian (Mkhedruli and Mtavruli)",
+      "numeric": "240"
+    },
+    {
+      "alpha_4": "Glag",
+      "name": "Glagolitic",
+      "numeric": "225"
+    },
+    {
+      "alpha_4": "Gong",
+      "name": "Gunjala Gondi",
+      "numeric": "312"
+    },
+    {
+      "alpha_4": "Gonm",
+      "name": "Masaram Gondi",
+      "numeric": "313"
+    },
+    {
+      "alpha_4": "Goth",
+      "name": "Gothic",
+      "numeric": "206"
+    },
+    {
+      "alpha_4": "Gran",
+      "name": "Grantha",
+      "numeric": "343"
+    },
+    {
+      "alpha_4": "Grek",
+      "name": "Greek",
+      "numeric": "200"
+    },
+    {
+      "alpha_4": "Gujr",
+      "name": "Gujarati",
+      "numeric": "320"
+    },
+    {
+      "alpha_4": "Gukh",
+      "name": "Gurung Khema",
+      "numeric": "397"
+    },
+    {
+      "alpha_4": "Guru",
+      "name": "Gurmukhi",
+      "numeric": "310"
+    },
+    {
+      "alpha_4": "Hanb",
+      "name": "Han with Bopomofo (alias for Han + Bopomofo)",
+      "numeric": "503"
+    },
+    {
+      "alpha_4": "Hang",
+      "name": "Hangul (Hangŭl, Hangeul)",
+      "numeric": "286"
+    },
+    {
+      "alpha_4": "Hani",
+      "name": "Han (Hanzi, Kanji, Hanja)",
+      "numeric": "500"
+    },
+    {
+      "alpha_4": "Hano",
+      "name": "Hanunoo (Hanunóo)",
+      "numeric": "371"
+    },
+    {
+      "alpha_4": "Hans",
+      "name": "Han (Simplified variant)",
+      "numeric": "501"
+    },
+    {
+      "alpha_4": "Hant",
+      "name": "Han (Traditional variant)",
+      "numeric": "502"
+    },
+    {
+      "alpha_4": "Hatr",
+      "name": "Hatran",
+      "numeric": "127"
+    },
+    {
+      "alpha_4": "Hebr",
+      "name": "Hebrew",
+      "numeric": "125"
+    },
+    {
+      "alpha_4": "Hira",
+      "name": "Hiragana",
+      "numeric": "410"
+    },
+    {
+      "alpha_4": "Hluw",
+      "name": "Anatolian Hieroglyphs (Luwian Hieroglyphs, Hittite Hieroglyphs)",
+      "numeric": "080"
+    },
+    {
+      "alpha_4": "Hmng",
+      "name": "Pahawh Hmong",
+      "numeric": "450"
+    },
+    {
+      "alpha_4": "Hmnp",
+      "name": "Nyiakeng Puachue Hmong",
+      "numeric": "451"
+    },
+    {
+      "alpha_4": "Hntl",
+      "name": "Han (Traditional variant) with Latin (alias for Hant + Latn)",
+      "numeric": "504"
+    },
+    {
+      "alpha_4": "Hrkt",
+      "name": "Japanese syllabaries (alias for Hiragana + Katakana)",
+      "numeric": "412"
+    },
+    {
+      "alpha_4": "Hung",
+      "name": "Old Hungarian (Hungarian Runic)",
+      "numeric": "176"
+    },
+    {
+      "alpha_4": "Inds",
+      "name": "Indus (Harappan)",
+      "numeric": "610"
+    },
+    {
+      "alpha_4": "Ital",
+      "name": "Old Italic (Etruscan, Oscan, etc.)",
+      "numeric": "210"
+    },
+    {
+      "alpha_4": "Jamo",
+      "name": "Jamo (alias for Jamo subset of Hangul)",
+      "numeric": "284"
+    },
+    {
+      "alpha_4": "Java",
+      "name": "Javanese",
+      "numeric": "361"
+    },
+    {
+      "alpha_4": "Jpan",
+      "name": "Japanese (alias for Han + Hiragana + Katakana)",
+      "numeric": "413"
+    },
+    {
+      "alpha_4": "Jurc",
+      "name": "Jurchen",
+      "numeric": "510"
+    },
+    {
+      "alpha_4": "Kali",
+      "name": "Kayah Li",
+      "numeric": "357"
+    },
+    {
+      "alpha_4": "Kana",
+      "name": "Katakana",
+      "numeric": "411"
+    },
+    {
+      "alpha_4": "Kawi",
+      "name": "Kawi",
+      "numeric": "368"
+    },
+    {
+      "alpha_4": "Khar",
+      "name": "Kharoshthi",
+      "numeric": "305"
+    },
+    {
+      "alpha_4": "Khmr",
+      "name": "Khmer",
+      "numeric": "355"
+    },
+    {
+      "alpha_4": "Khoj",
+      "name": "Khojki",
+      "numeric": "322"
+    },
+    {
+      "alpha_4": "Kitl",
+      "name": "Khitan large script",
+      "numeric": "505"
+    },
+    {
+      "alpha_4": "Kits",
+      "name": "Khitan small script",
+      "numeric": "288"
+    },
+    {
+      "alpha_4": "Knda",
+      "name": "Kannada",
+      "numeric": "345"
+    },
+    {
+      "alpha_4": "Kore",
+      "name": "Korean (alias for Hangul + Han)",
+      "numeric": "287"
+    },
+    {
+      "alpha_4": "Kpel",
+      "name": "Kpelle",
+      "numeric": "436"
+    },
+    {
+      "alpha_4": "Krai",
+      "name": "Kirat Rai",
+      "numeric": "396"
+    },
+    {
+      "alpha_4": "Kthi",
+      "name": "Kaithi",
+      "numeric": "317"
+    },
+    {
+      "alpha_4": "Lana",
+      "name": "Tai Tham (Lanna)",
+      "numeric": "351"
+    },
+    {
+      "alpha_4": "Laoo",
+      "name": "Lao",
+      "numeric": "356"
+    },
+    {
+      "alpha_4": "Latf",
+      "name": "Latin (Fraktur variant)",
+      "numeric": "217"
+    },
+    {
+      "alpha_4": "Latg",
+      "name": "Latin (Gaelic variant)",
+      "numeric": "216"
+    },
+    {
+      "alpha_4": "Latn",
+      "name": "Latin",
+      "numeric": "215"
+    },
+    {
+      "alpha_4": "Leke",
+      "name": "Leke",
+      "numeric": "364"
+    },
+    {
+      "alpha_4": "Lepc",
+      "name": "Lepcha (Róng)",
+      "numeric": "335"
+    },
+    {
+      "alpha_4": "Limb",
+      "name": "Limbu",
+      "numeric": "336"
+    },
+    {
+      "alpha_4": "Lina",
+      "name": "Linear A",
+      "numeric": "400"
+    },
+    {
+      "alpha_4": "Linb",
+      "name": "Linear B",
+      "numeric": "401"
+    },
+    {
+      "alpha_4": "Lisu",
+      "name": "Lisu (Fraser)",
+      "numeric": "399"
+    },
+    {
+      "alpha_4": "Loma",
+      "name": "Loma",
+      "numeric": "437"
+    },
+    {
+      "alpha_4": "Lyci",
+      "name": "Lycian",
+      "numeric": "202"
+    },
+    {
+      "alpha_4": "Lydi",
+      "name": "Lydian",
+      "numeric": "116"
+    },
+    {
+      "alpha_4": "Mahj",
+      "name": "Mahajani",
+      "numeric": "314"
+    },
+    {
+      "alpha_4": "Maka",
+      "name": "Makasar",
+      "numeric": "366"
+    },
+    {
+      "alpha_4": "Mand",
+      "name": "Mandaic, Mandaean",
+      "numeric": "140"
+    },
+    {
+      "alpha_4": "Mani",
+      "name": "Manichaean",
+      "numeric": "139"
+    },
+    {
+      "alpha_4": "Marc",
+      "name": "Marchen",
+      "numeric": "332"
+    },
+    {
+      "alpha_4": "Maya",
+      "name": "Mayan hieroglyphs",
+      "numeric": "090"
+    },
+    {
+      "alpha_4": "Medf",
+      "name": "Medefaidrin (Oberi Okaime, Oberi Ɔkaimɛ)",
+      "numeric": "265"
+    },
+    {
+      "alpha_4": "Mend",
+      "name": "Mende Kikakui",
+      "numeric": "438"
+    },
+    {
+      "alpha_4": "Merc",
+      "name": "Meroitic Cursive",
+      "numeric": "101"
+    },
+    {
+      "alpha_4": "Mero",
+      "name": "Meroitic Hieroglyphs",
+      "numeric": "100"
+    },
+    {
+      "alpha_4": "Mlym",
+      "name": "Malayalam",
+      "numeric": "347"
+    },
+    {
+      "alpha_4": "Modi",
+      "name": "Modi, Moḍī",
+      "numeric": "324"
+    },
+    {
+      "alpha_4": "Mong",
+      "name": "Mongolian",
+      "numeric": "145"
+    },
+    {
+      "alpha_4": "Moon",
+      "name": "Moon (Moon code, Moon script, Moon type)",
+      "numeric": "218"
+    },
+    {
+      "alpha_4": "Mroo",
+      "name": "Mro, Mru",
+      "numeric": "264"
+    },
+    {
+      "alpha_4": "Mtei",
+      "name": "Meitei Mayek (Meithei, Meetei)",
+      "numeric": "337"
+    },
+    {
+      "alpha_4": "Mult",
+      "name": "Multani",
+      "numeric": "323"
+    },
+    {
+      "alpha_4": "Mymr",
+      "name": "Myanmar (Burmese)",
+      "numeric": "350"
+    },
+    {
+      "alpha_4": "Nagm",
+      "name": "Nag Mundari",
+      "numeric": "295"
+    },
+    {
+      "alpha_4": "Nand",
+      "name": "Nandinagari",
+      "numeric": "311"
+    },
+    {
+      "alpha_4": "Narb",
+      "name": "Old North Arabian (Ancient North Arabian)",
+      "numeric": "106"
+    },
+    {
+      "alpha_4": "Nbat",
+      "name": "Nabataean",
+      "numeric": "159"
+    },
+    {
+      "alpha_4": "Newa",
+      "name": "Newa, Newar, Newari, Nepāla lipi",
+      "numeric": "333"
+    },
+    {
+      "alpha_4": "Nkdb",
+      "name": "Naxi Dongba (na²¹ɕi³³ to³³ba²¹, Nakhi Tomba)",
+      "numeric": "085"
+    },
+    {
+      "alpha_4": "Nkgb",
+      "name": "Naxi Geba (na²¹ɕi³³ gʌ²¹ba²¹, 'Na-'Khi ²Ggŏ-¹baw, Nakhi Geba)",
+      "numeric": "420"
+    },
+    {
+      "alpha_4": "Nkoo",
+      "name": "N’Ko",
+      "numeric": "165"
+    },
+    {
+      "alpha_4": "Nshu",
+      "name": "Nüshu",
+      "numeric": "499"
+    },
+    {
+      "alpha_4": "Ogam",
+      "name": "Ogham",
+      "numeric": "212"
+    },
+    {
+      "alpha_4": "Olck",
+      "name": "Ol Chiki (Ol Cemet’, Ol, Santali)",
+      "numeric": "261"
+    },
+    {
+      "alpha_4": "Onao",
+      "name": "Ol Onal",
+      "numeric": "296"
+    },
+    {
+      "alpha_4": "Orkh",
+      "name": "Old Turkic, Orkhon Runic",
+      "numeric": "175"
+    },
+    {
+      "alpha_4": "Orya",
+      "name": "Oriya (Odia)",
+      "numeric": "327"
+    },
+    {
+      "alpha_4": "Osge",
+      "name": "Osage",
+      "numeric": "219"
+    },
+    {
+      "alpha_4": "Osma",
+      "name": "Osmanya",
+      "numeric": "260"
+    },
+    {
+      "alpha_4": "Ougr",
+      "name": "Old Uyghur",
+      "numeric": "143"
+    },
+    {
+      "alpha_4": "Palm",
+      "name": "Palmyrene",
+      "numeric": "126"
+    },
+    {
+      "alpha_4": "Pauc",
+      "name": "Pau Cin Hau",
+      "numeric": "263"
+    },
+    {
+      "alpha_4": "Pcun",
+      "name": "Proto-Cuneiform",
+      "numeric": "015"
+    },
+    {
+      "alpha_4": "Pelm",
+      "name": "Proto-Elamite",
+      "numeric": "016"
+    },
+    {
+      "alpha_4": "Perm",
+      "name": "Old Permic",
+      "numeric": "227"
+    },
+    {
+      "alpha_4": "Phag",
+      "name": "Phags-pa",
+      "numeric": "331"
+    },
+    {
+      "alpha_4": "Phli",
+      "name": "Inscriptional Pahlavi",
+      "numeric": "131"
+    },
+    {
+      "alpha_4": "Phlp",
+      "name": "Psalter Pahlavi",
+      "numeric": "132"
+    },
+    {
+      "alpha_4": "Phlv",
+      "name": "Book Pahlavi",
+      "numeric": "133"
+    },
+    {
+      "alpha_4": "Phnx",
+      "name": "Phoenician",
+      "numeric": "115"
+    },
+    {
+      "alpha_4": "Piqd",
+      "name": "Klingon (KLI pIqaD)",
+      "numeric": "293"
+    },
+    {
+      "alpha_4": "Plrd",
+      "name": "Miao (Pollard)",
+      "numeric": "282"
+    },
+    {
+      "alpha_4": "Prti",
+      "name": "Inscriptional Parthian",
+      "numeric": "130"
+    },
+    {
+      "alpha_4": "Psin",
+      "name": "Proto-Sinaitic",
+      "numeric": "103"
+    },
+    {
+      "alpha_4": "Qaaa",
+      "name": "Reserved for private use (start)",
+      "numeric": "900"
+    },
+    {
+      "alpha_4": "Qabx",
+      "name": "Reserved for private use (end)",
+      "numeric": "949"
+    },
+    {
+      "alpha_4": "Ranj",
+      "name": "Ranjana",
+      "numeric": "303"
+    },
+    {
+      "alpha_4": "Rjng",
+      "name": "Rejang (Redjang, Kaganga)",
+      "numeric": "363"
+    },
+    {
+      "alpha_4": "Rohg",
+      "name": "Hanifi Rohingya",
+      "numeric": "167"
+    },
+    {
+      "alpha_4": "Roro",
+      "name": "Rongorongo",
+      "numeric": "620"
+    },
+    {
+      "alpha_4": "Runr",
+      "name": "Runic",
+      "numeric": "211"
+    },
+    {
+      "alpha_4": "Samr",
+      "name": "Samaritan",
+      "numeric": "123"
+    },
+    {
+      "alpha_4": "Sara",
+      "name": "Sarati",
+      "numeric": "292"
+    },
+    {
+      "alpha_4": "Sarb",
+      "name": "Old South Arabian",
+      "numeric": "105"
+    },
+    {
+      "alpha_4": "Saur",
+      "name": "Saurashtra",
+      "numeric": "344"
+    },
+    {
+      "alpha_4": "Seal",
+      "name": "(Small) Seal",
+      "numeric": "590"
+    },
+    {
+      "alpha_4": "Sgnw",
+      "name": "SignWriting",
+      "numeric": "095"
+    },
+    {
+      "alpha_4": "Shaw",
+      "name": "Shavian (Shaw)",
+      "numeric": "281"
+    },
+    {
+      "alpha_4": "Shrd",
+      "name": "Sharada, Śāradā",
+      "numeric": "319"
+    },
+    {
+      "alpha_4": "Shui",
+      "name": "Shuishu",
+      "numeric": "530"
+    },
+    {
+      "alpha_4": "Sidd",
+      "name": "Siddham, Siddhaṃ, Siddhamātṛkā",
+      "numeric": "302"
+    },
+    {
+      "alpha_4": "Sidt",
+      "name": "Sidetic",
+      "numeric": "180"
+    },
+    {
+      "alpha_4": "Sind",
+      "name": "Khudawadi, Sindhi",
+      "numeric": "318"
+    },
+    {
+      "alpha_4": "Sinh",
+      "name": "Sinhala",
+      "numeric": "348"
+    },
+    {
+      "alpha_4": "Sogd",
+      "name": "Sogdian",
+      "numeric": "141"
+    },
+    {
+      "alpha_4": "Sogo",
+      "name": "Old Sogdian",
+      "numeric": "142"
+    },
+    {
+      "alpha_4": "Sora",
+      "name": "Sora Sompeng",
+      "numeric": "398"
+    },
+    {
+      "alpha_4": "Soyo",
+      "name": "Soyombo",
+      "numeric": "329"
+    },
+    {
+      "alpha_4": "Sund",
+      "name": "Sundanese",
+      "numeric": "362"
+    },
+    {
+      "alpha_4": "Sunu",
+      "name": "Sunuwar",
+      "numeric": "274"
+    },
+    {
+      "alpha_4": "Sylo",
+      "name": "Syloti Nagri",
+      "numeric": "316"
+    },
+    {
+      "alpha_4": "Syrc",
+      "name": "Syriac",
+      "numeric": "135"
+    },
+    {
+      "alpha_4": "Syre",
+      "name": "Syriac (Estrangelo variant)",
+      "numeric": "138"
+    },
+    {
+      "alpha_4": "Syrj",
+      "name": "Syriac (Western variant)",
+      "numeric": "137"
+    },
+    {
+      "alpha_4": "Syrn",
+      "name": "Syriac (Eastern variant)",
+      "numeric": "136"
+    },
+    {
+      "alpha_4": "Tagb",
+      "name": "Tagbanwa",
+      "numeric": "373"
+    },
+    {
+      "alpha_4": "Takr",
+      "name": "Takri, Ṭākrī, Ṭāṅkrī",
+      "numeric": "321"
+    },
+    {
+      "alpha_4": "Tale",
+      "name": "Tai Le",
+      "numeric": "353"
+    },
+    {
+      "alpha_4": "Talu",
+      "name": "New Tai Lue",
+      "numeric": "354"
+    },
+    {
+      "alpha_4": "Taml",
+      "name": "Tamil",
+      "numeric": "346"
+    },
+    {
+      "alpha_4": "Tang",
+      "name": "Tangut",
+      "numeric": "520"
+    },
+    {
+      "alpha_4": "Tavt",
+      "name": "Tai Viet",
+      "numeric": "359"
+    },
+    {
+      "alpha_4": "Tayo",
+      "name": "Tai Yo",
+      "numeric": "380"
+    },
+    {
+      "alpha_4": "Telu",
+      "name": "Telugu",
+      "numeric": "340"
+    },
+    {
+      "alpha_4": "Teng",
+      "name": "Tengwar",
+      "numeric": "290"
+    },
+    {
+      "alpha_4": "Tfng",
+      "name": "Tifinagh (Berber)",
+      "numeric": "120"
+    },
+    {
+      "alpha_4": "Tglg",
+      "name": "Tagalog (Baybayin, Alibata)",
+      "numeric": "370"
+    },
+    {
+      "alpha_4": "Thaa",
+      "name": "Thaana",
+      "numeric": "170"
+    },
+    {
+      "alpha_4": "Thai",
+      "name": "Thai",
+      "numeric": "352"
+    },
+    {
+      "alpha_4": "Tibt",
+      "name": "Tibetan",
+      "numeric": "330"
+    },
+    {
+      "alpha_4": "Tirh",
+      "name": "Tirhuta",
+      "numeric": "326"
+    },
+    {
+      "alpha_4": "Tnsa",
+      "name": "Tangsa",
+      "numeric": "275"
+    },
+    {
+      "alpha_4": "Todr",
+      "name": "Todhri",
+      "numeric": "229"
+    },
+    {
+      "alpha_4": "Tols",
+      "name": "Tolong Siki",
+      "numeric": "299"
+    },
+    {
+      "alpha_4": "Toto",
+      "name": "Toto",
+      "numeric": "294"
+    },
+    {
+      "alpha_4": "Tutg",
+      "name": "Tulu-Tigalari",
+      "numeric": "341"
+    },
+    {
+      "alpha_4": "Ugar",
+      "name": "Ugaritic",
+      "numeric": "040"
+    },
+    {
+      "alpha_4": "Vaii",
+      "name": "Vai",
+      "numeric": "470"
+    },
+    {
+      "alpha_4": "Visp",
+      "name": "Visible Speech",
+      "numeric": "280"
+    },
+    {
+      "alpha_4": "Vith",
+      "name": "Vithkuqi",
+      "numeric": "228"
+    },
+    {
+      "alpha_4": "Wara",
+      "name": "Warang Citi (Varang Kshiti)",
+      "numeric": "262"
+    },
+    {
+      "alpha_4": "Wcho",
+      "name": "Wancho",
+      "numeric": "283"
+    },
+    {
+      "alpha_4": "Wole",
+      "name": "Woleai",
+      "numeric": "480"
+    },
+    {
+      "alpha_4": "Xpeo",
+      "name": "Old Persian",
+      "numeric": "030"
+    },
+    {
+      "alpha_4": "Xsux",
+      "name": "Cuneiform, Sumero-Akkadian",
+      "numeric": "020"
+    },
+    {
+      "alpha_4": "Yezi",
+      "name": "Yezidi",
+      "numeric": "192"
+    },
+    {
+      "alpha_4": "Yiii",
+      "name": "Yi",
+      "numeric": "460"
+    },
+    {
+      "alpha_4": "Zanb",
+      "name": "Zanabazar Square (Zanabazarin Dörböljin Useg, Xewtee Dörböljin Bicig, Horizontal Square Script)",
+      "numeric": "339"
+    },
+    {
+      "alpha_4": "Zinh",
+      "name": "Code for inherited script",
+      "numeric": "994"
+    },
+    {
+      "alpha_4": "Zmth",
+      "name": "Mathematical notation",
+      "numeric": "995"
+    },
+    {
+      "alpha_4": "Zsye",
+      "name": "Symbols (Emoji variant)",
+      "numeric": "993"
+    },
+    {
+      "alpha_4": "Zsym",
+      "name": "Symbols",
+      "numeric": "996"
+    },
+    {
+      "alpha_4": "Zxxx",
+      "name": "Code for unwritten documents",
+      "numeric": "997"
+    },
+    {
+      "alpha_4": "Zyyy",
+      "name": "Code for undetermined script",
+      "numeric": "998"
+    },
+    {
+      "alpha_4": "Zzzz",
+      "name": "Code for uncoded script",
+      "numeric": "999"
+    }
+  ]
+}

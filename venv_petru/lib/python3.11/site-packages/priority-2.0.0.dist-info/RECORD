@@ -1,0 +1,11 @@
+priority-2.0.0.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+priority-2.0.0.dist-info/LICENSE,sha256=8-nCnj2zbcMFpL5oqKIl-TlJhSzi0ZtbCjwJnu5lCcU,1056
+priority-2.0.0.dist-info/METADATA,sha256=AWLjIqaR_M8YjwACkkUeXZ_npK47hu_KHXSHvYp_gHs,6642
+priority-2.0.0.dist-info/RECORD,,
+priority-2.0.0.dist-info/WHEEL,sha256=OqRkF0eY5GHssMorFjlbTIq072vpHpF60fIQA6lS9xA,92
+priority-2.0.0.dist-info/top_level.txt,sha256=h3tSuUixZwbNNnmCDpCI-prFqZAqquWlneJge51DLkQ,9
+priority/__init__.py,sha256=LrhWbuqUtoxqJdlTMcaDW8AAsuxSY9kayhUJkMKAUkc,346
+priority/__pycache__/__init__.cpython-311.pyc,,
+priority/__pycache__/priority.cpython-311.pyc,,
+priority/priority.py,sha256=qhffE4QR9sYGZlNmDuFWOWmZsguKbC3g3SZkl5Wkj_k,16074
+priority/py.typed,sha256=47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU,0

@@ -1,0 +1,46 @@
+COPYRIGHT (c) 2008 - 2023, pycountry
+
+Pycountry is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or any later version.
+
+This project is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Lesser General Public License for more details.
+
+Contributors:
+- Christian Theune (2008-2020, 2022)
+- Nate Schimmoller (2022-2023)
+- Zachary Ware (2016, 2023)
+- Alan Orth (2023)
+- Ashok Argent-Katwala (2020)
+- Bastien Vallet (2020)
+- Chris R Bunney 2020
+- Christian Zagrodnick (2012-2013)
+- Christoph Zwerschke (2013)
+- Jakub Wilk (2020)
+- Janis Kirsteins (2019)
+- Justin Ryan Wagner 2014
+- Kevin Deldycke (2014, 2016)
+- Louis Sautier (2020)
+- Lucas Wiman (2015)
+- Mario Vilas (2014)
+- Michael Howitz (2020)
+- Michał Bielawski (2021, 2023)
+- Michał Górny (2020)
+- Mike Taves (2023)
+- Pedro Ferreira (2013)
+- Stuart Prescott (2021)
+- Victor Mireyev (2016)
+- simon klemenc (2016)
+
+Additional Acknowledgements and Licensing Information:
+- Data in the /src/databases/ and /src/locales/ folders is sourced from the Debian iso-codes project, available at: https://salsa.debian.org/iso-codes-team/iso-codes. This data is used under the terms of the GNU Lesser General Public License Version 2.1 (February 1999).
+
+The Debian iso-codes project is a collection of code lists for different standards, maintained and made available under the GNU Lesser General Public License Version 2.1. We gratefully acknowledge the Debian iso-codes team and contributors for their work and for making this resource freely available.
+
+The full text of the GNU Lesser General Public License Version 2.1 can be found at: https://salsa.debian.org/iso-codes-team/iso-codes/-/blob/main/COPYING.
+
+For the full text of the GNU Lesser General Public License,
+see https://github.com/pycountry/pycountry/blob/main/LICENSE.txt.

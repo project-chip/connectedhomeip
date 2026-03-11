@@ -1,0 +1,1 @@
+Most of the tests for langcodes are in doctests, intended to be run on Python 3. This directory contains additional tests that ensure langcodes can recognize language names as they are used on Wiktionary, the free multilingual dictionary.
