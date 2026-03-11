@@ -196,7 +196,7 @@ class RunSummary(RunStats):
 
         # Recover a timestamp.
         timestamp = raw.get("run_timestamp", "unknown")
-        with contextlib.suppress(KeyError, ValueError):
+        with contextlib.suppress(TypeError, ValueError):
             timestamp = datetime.datetime.fromisoformat(timestamp)
         ret.run_timestamp = timestamp
 
