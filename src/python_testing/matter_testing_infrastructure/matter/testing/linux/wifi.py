@@ -192,9 +192,7 @@ class WpaSupplicantMock(threading.Thread):
         async def CreateInterface(self, args: DictVariantT) -> str:
             ifname = ""
             if "Ifname" in args:
-                raw = args["Ifname"][1]
-                # Ensure we provide a str to GetInterface
-                ifname = raw if isinstance(raw, str) else str(raw)
+                ifname = str(args["Ifname"][1])
             return await self.GetInterface(ifname)
 
         @sdbus.dbus_method_async("s", "o")
