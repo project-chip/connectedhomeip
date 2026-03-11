@@ -103,7 +103,8 @@ class TestResult:
                     log.warning("%s %s - Cancelled after %0.2f seconds", symbol, name, result.duration_seconds)
                 case TestStatus.FAILED:
                     assert isinstance(result.exception, BaseException), "Exception should be set for failed test results"
-                    log.error("%s %s - Failed in %0.2f seconds", symbol, name, result.duration_seconds, exc_info=result.exception)
+                    log.error("%s %s - Failed in %0.2f seconds", symbol, name, result.duration_seconds,
+                              exc_info=(type(result.exception), result.exception, result.exception.__traceback__))
 
             return result
 
