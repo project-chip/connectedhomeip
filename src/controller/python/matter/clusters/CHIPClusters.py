@@ -3159,6 +3159,13 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000017: {
+                "attributeName": "DeviceLocation",
+                "attributeId": 0x00000017,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
             0x00000018: {
                 "attributeName": "ConfigurationVersion",
                 "attributeId": 0x00000018,

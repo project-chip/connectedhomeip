@@ -3537,6 +3537,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                                         reportHandler:(void (^)(MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 + (void)readAttributeProductAppearanceWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
+- (void)readAttributeDeviceLocationWithCompletion:(void (^)(MTRDataTypeLocationDescriptorStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeDeviceLocationWithValue:(MTRDataTypeLocationDescriptorStruct * _Nullable)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeDeviceLocationWithValue:(MTRDataTypeLocationDescriptorStruct * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeDeviceLocationWithParams:(MTRSubscribeParams *)params
+                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                     reportHandler:(void (^)(MTRDataTypeLocationDescriptorStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeDeviceLocationWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRDataTypeLocationDescriptorStruct * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
 - (void)readAttributeConfigurationVersionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeConfigurationVersionWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -3770,55 +3778,55 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command AttestationRequest
  *
- * Sender is requesting attestation information from the receiver.
+ * This command is used to perform an attestation request.
  */
 - (void)attestationRequestWithParams:(MTROperationalCredentialsClusterAttestationRequestParams *)params completion:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command CertificateChainRequest
  *
- * Sender is requesting a device attestation certificate from the receiver.
+ * This command is used to request a certificate from the device attestation certificate chain.
  */
 - (void)certificateChainRequestWithParams:(MTROperationalCredentialsClusterCertificateChainRequestParams *)params completion:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command CSRRequest
  *
- * Sender is requesting a certificate signing request (CSR) from the receiver.
+ * This command is used to perform a CSR request.
  */
 - (void)CSRRequestWithParams:(MTROperationalCredentialsClusterCSRRequestParams *)params completion:(void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command AddNOC
  *
- * Sender is requesting to add the new node operational certificates.
+ * This command is used to add a new NOC to the device.
  */
 - (void)addNOCWithParams:(MTROperationalCredentialsClusterAddNOCParams *)params completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command UpdateNOC
  *
- * This command SHALL replace the NOC and optional associated ICAC (if present) scoped under the accessing fabric upon successful validation of all arguments and preconditions.
+ * This command is used to update an existing NOC on the device.
  */
 - (void)updateNOCWithParams:(MTROperationalCredentialsClusterUpdateNOCParams *)params completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command UpdateFabricLabel
  *
- * This command SHALL be used by an Administrative Node to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute.
+ * This command is used to set the user-visible fabric label for a given Fabric.
  */
 - (void)updateFabricLabelWithParams:(MTROperationalCredentialsClusterUpdateFabricLabelParams *)params completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command RemoveFabric
  *
- * This command is used by Administrative Nodes to remove a given fabric index and delete all associated fabric-scoped data.
+ * This command is used to remove a Fabric from the device.
  */
 - (void)removeFabricWithParams:(MTROperationalCredentialsClusterRemoveFabricParams *)params completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command AddTrustedRootCertificate
  *
- * This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation.
+ * This command is used to add a trusted root certificate to the device.
  */
 - (void)addTrustedRootCertificateWithParams:(MTROperationalCredentialsClusterAddTrustedRootCertificateParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command SetVIDVerificationStatement
  *
- * This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate).
+ * This command is used to manage the VendorID and VIDVerificationStatement fields of the Fabrics attribute, and the VVSC field of an entry in the NOCs attribute.
  */
 - (void)setVIDVerificationStatementWithParams:(MTROperationalCredentialsClusterSetVIDVerificationStatementParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)setVIDVerificationStatementWithCompletion:(MTRStatusCompletion)completion
@@ -3826,7 +3834,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command SignVIDVerificationRequest
  *
- * This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given.
+ * This command is used to authenticate the fabric associated with the FabricIndex.
  */
 - (void)signVIDVerificationRequestWithParams:(MTROperationalCredentialsClusterSignVIDVerificationRequestParams *)params completion:(void (^)(MTROperationalCredentialsClusterSignVIDVerificationResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 

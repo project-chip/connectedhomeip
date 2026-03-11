@@ -4760,6 +4760,37 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
         }
         return value;
     }
+    case Attributes::DeviceLocation::Id: {
+        using TypeInfo = Attributes::DeviceLocation::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRDataTypeLocationDescriptorStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRDataTypeLocationDescriptorStruct new];
+            value.locationName = AsString(cppValue.Value().locationName);
+            if (value.locationName == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                *aError = err;
+                return nil;
+            }
+            if (cppValue.Value().floorNumber.IsNull()) {
+                value.floorNumber = nil;
+            } else {
+                value.floorNumber = [NSNumber numberWithShort:cppValue.Value().floorNumber.Value()];
+            }
+            if (cppValue.Value().areaType.IsNull()) {
+                value.areaType = nil;
+            } else {
+                value.areaType = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().areaType.Value())];
+            }
+        }
+        return value;
+    }
     case Attributes::ConfigurationVersion::Id: {
         using TypeInfo = Attributes::ConfigurationVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;

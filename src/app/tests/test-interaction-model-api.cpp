@@ -113,11 +113,7 @@ ActionReturnStatus TestImCustomDataModel::ReadAttribute(const ReadAttributeReque
 {
     AttributeEncodeState mutableState(&encoder.GetState()); // provide a state copy to start.
 
-    Access::SubjectDescriptor subjectDescriptor;
-    if (request.subjectDescriptor != nullptr)
-    {
-        subjectDescriptor = *request.subjectDescriptor;
-    }
+    Access::SubjectDescriptor subjectDescriptor = request.subjectDescriptor;
 
     CHIP_ERROR err = ReadSingleClusterData(subjectDescriptor, request.readFlags.Has(ReadFlags::kFabricFiltered), request.path,
                                            TestOnlyAttributeValueEncoderAccessor(encoder).Builder(), &mutableState);

@@ -22,6 +22,7 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/BridgedDeviceBasicInformation/ClusterId.h>
 #include <clusters/BridgedDeviceBasicInformation/Structs.h>
+#include <clusters/shared/Structs.h>
 #include <lib/support/TimerDelegate.h>
 
 #include <optional>
@@ -39,20 +40,44 @@ namespace chip::app::Clusters {
 ///   - Node-wide startup/shutdown events are provided by the Node's Basic Information cluster.
 ///   - Per-endpoint (bridged device) lifecycle is detectable via the Descriptor cluster.
 ///   - They are marked as Optional (O) in the Bridged Device Basic Information specification.
-///
-/// Note: DeviceLocation attribute (0x0017) is not supported as it is not in the standard Bridged Device Basic Information Cluster
-/// XML.
 class BridgedDeviceBasicInformationCluster : public DefaultServerCluster, public TimerContext
 {
 public:
+    // A device location, however without using Span (i.e. using actual strings and owning the storage)
+    struct OwnedDeviceLocation
+    {
+        std::string locationName;
+        std::optional<int16_t> floorNumber;
+        std::optional<Globals::AreaTypeTag> areaType;
+
+        OwnedDeviceLocation() = default;
+        OwnedDeviceLocation(const Globals::Structs::LocationDescriptorStruct::Type & other) { *this = other; }
+
+        // Return a view of this value as a LocationDescriptorStruct. The locationName
+        // will point into "this" so the lifetime of this MUST exceed the usage of the returned value.
+        Globals::Structs::LocationDescriptorStruct::Type ToView() const;
+
+        // compare with a non-owned version
+        bool operator==(const Globals::Structs::LocationDescriptorStruct::Type & other) const;
+        bool operator!=(const Globals::Structs::LocationDescriptorStruct::Type & other) const { return !(*this == other); }
+
+        // set the current value from a non-owned version
+        OwnedDeviceLocation & operator=(const Globals::Structs::LocationDescriptorStruct::Type & value);
+    };
+
     struct Context
     {
         // NOTE: These delegate references are used throughout the cluster's lifetime.
         // Their lifetimes MUST be greater than or equal to the lifetime of this cluster instance.
-        ConfigurationVersionDelegate & parentVersionConfiguration;
         BridgedDeviceBasicInformationDelegate & delegate;
         TimerDelegate & timerDelegate;
         BridgedDeviceIcdDelegate * icdDelegate = nullptr; // if nullptr, ICD support feature is disabled
+    };
+
+    struct Versioning
+    {
+        uint32_t version;
+        ConfigurationVersionDelegate & delegate;
     };
 
     /// Most attributes in the bridged device basic information cluster are fixed
@@ -62,6 +87,8 @@ public:
     /// Attribute will be exposed if the optional values have a value.
     struct FixedData
     {
+        std::string uniqueId; // Mandatory, fixed once set
+
         std::optional<std::string> vendorName;
         std::optional<VendorId> vendorId;
         std::optional<std::string> productName;
@@ -78,32 +105,49 @@ public:
         std::optional<BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::Type> productAppearance;
     };
 
-    /// Mandatory data for every bridged device
-    struct RequiredData
+    /// Mutable data for bridged device
+    struct MutableData
     {
-        std::string uniqueId;   // Fixed once set
         bool reachable = false; // initial value for reachable
         std::string nodeLabel;
-        uint32_t configurationVersion = 1;
+        std::optional<DataModel::Nullable<OwnedDeviceLocation>> deviceLocation;
+        std::optional<Versioning> configurationVersion;
     };
 
-    BridgedDeviceBasicInformationCluster(EndpointId endpointId, RequiredData && required, FixedData && fixedData,
+    BridgedDeviceBasicInformationCluster(EndpointId endpointId, MutableData && mutableData, FixedData && fixedData,
                                          Context && context) :
         DefaultServerCluster({ endpointId, BridgedDeviceBasicInformation::Id }),
-        mRequiredData(std::move(required)), mFixedData(std::move(fixedData)), mClusterContext(std::move(context))
-
+        mMutableData(std::move(mutableData)), mFixedData(std::move(fixedData)), mClusterContext(std::move(context))
     {}
 
-    bool GetReachable() const { return mRequiredData.reachable; }
+    bool GetReachable() const { return mMutableData.reachable; }
     void SetReachable(bool reachable);
 
-    const std::string & GetUniqueId() const { return mRequiredData.uniqueId; }
+    const std::string & GetUniqueId() const { return mFixedData.uniqueId; }
     const FixedData & GetFixedData() const { return mFixedData; }
 
-    const std::string & GetNodeLabel() const { return mRequiredData.nodeLabel; }
+    const std::string & GetNodeLabel() const { return mMutableData.nodeLabel; }
     DataModel::ActionReturnStatus SetNodeLabel(CharSpan nodeLabel);
 
-    uint32_t GetConfigurationVersion() const { return mRequiredData.configurationVersion; }
+    std::optional<uint32_t> GetConfigurationVersion() const
+    {
+        VerifyOrReturnValue(mMutableData.configurationVersion.has_value(), std::nullopt);
+        return mMutableData.configurationVersion->version;
+    }
+
+    std::optional<DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type>> GetDeviceLocation() const
+    {
+        VerifyOrReturnValue(mMutableData.deviceLocation.has_value(), std::nullopt);
+        VerifyOrReturnValue(!mMutableData.deviceLocation->IsNull(),
+                            DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type>(DataModel::NullNullable));
+
+        return DataModel::MakeNullable(mMutableData.deviceLocation->Value().ToView());
+    }
+
+    /// Device location can only be set if the cluster supports device location
+    /// (i.e. the MutableData has a location that is not std::nullopt)
+    DataModel::ActionReturnStatus
+    SetDeviceLocation(const DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> & location);
 
     /// Increases the configuration version and ALSO increases the device
     /// configuration version. Specifically handles the spec requirement of:
@@ -160,13 +204,28 @@ private:
     /// @return Status code indicating the result of the operation.
     DataModel::ActionReturnStatus SetNodeLabelInternal(CharSpan nodeLabel, PersistenceMode mode);
 
+    /// Updates the DeviceLocation attribute value with optional persistence.
+    ///
+    /// This internal helper validates the new value via the delegate, persists it to NVM if requested,
+    /// and then updates the in-memory state and notifies subscribers.
+    ///
+    /// @param location The new device location to set.
+    /// @param mode Whether to persist the new value to NVM.
+    /// @return Status code indicating the result of the operation.
+    DataModel::ActionReturnStatus
+    SetDeviceLocationInternal(const DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> & location,
+                              PersistenceMode mode);
+
+    /// Store the current DeviceLocation to persistent storage
+    CHIP_ERROR PersistDeviceLocation();
+
     // TimerContext
     void TimerFired() override;
 
     void StartPendingActiveTimer(System::Clock::Milliseconds32 timeoutMs);
     void CancelPendingActiveTimer();
 
-    RequiredData mRequiredData;
+    MutableData mMutableData;
     const FixedData mFixedData;
     const Context mClusterContext;
 

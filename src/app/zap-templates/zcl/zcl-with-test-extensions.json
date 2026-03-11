@@ -211,13 +211,19 @@
             "ConfigurationVersion"
         ],
         "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
-        "Bridged Device Basic Information": ["ProductAppearance"],
+        "Bridged Device Basic Information": [
+            "DeviceLocation",
+            "ProductAppearance"
+        ],
         "Binding": ["FeatureMap", "ClusterRevision"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": [
             "CountdownTime",
+            "MainState",
+            "CurrentErrorList",
             "OverallCurrentState",
             "OverallTargetState",
+            "LatchControlModes",
             "FeatureMap",
             "ClusterRevision"
         ],
@@ -536,7 +542,10 @@
             "DSTOffsetListMaxSize",
             "ClusterRevision"
         ],
-        "Temperature Control": ["SupportedTemperatureLevels"],
+        "Temperature Control": [
+            "SupportedTemperatureLevels",
+            "ClusterRevision"
+        ],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [
