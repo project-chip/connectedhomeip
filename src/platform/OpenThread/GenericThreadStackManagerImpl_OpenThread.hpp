@@ -391,6 +391,17 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
 
     // Reset the previously set callback since it will never be called in case incorrect dataset was supplied.
     mpConnectCallback = nullptr;
+
+#if CONFIG_CHIP_TELINK_OPENTHREAD_NETWORK_SWITCH_PATH
+if (callback == nullptr && dataset.IsCommissioned() && current_dataset.IsCommissioned() &&
+        !dataset.AsByteSpan().data_equal(current_dataset.AsByteSpan()) && Impl()->IsThreadEnabled())
+    {
+        ReturnErrorOnFailure(Impl()->SetThreadProvision(dataset.AsByteSpan()));
+        mpConnectCallback = callback;
+        return CHIP_NO_ERROR;
+    }
+#endif
+
     ReturnErrorOnFailure(Impl()->SetThreadEnabled(false));
     ReturnErrorOnFailure(Impl()->SetThreadProvision(dataset.AsByteSpan()));
 

@@ -240,6 +240,9 @@ private:
     uint8_t mLastNetworkIDLen = 0;
     Optional<uint64_t> mCurrentOperationBreadcrumb;
     bool mScanningWasDirected = false;
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    bool mConnectNetworkResponseSentEarly = false;
+#endif
     Context mClusterContext;
 
     void SetLastNetworkingStatusValue(NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo::Type networkingStatusValue);

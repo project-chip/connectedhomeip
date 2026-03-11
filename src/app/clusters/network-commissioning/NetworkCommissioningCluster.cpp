@@ -648,14 +648,15 @@ NetworkCommissioningCluster::HandleConnectNetwork(CommandHandler & handler, cons
 
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 #else
+    mConnectNetworkResponseSentEarly = false;
     // In Non-concurrent mode postpone the final execution of ConnectNetwork until the operational
     // network has been fully brought up and kOperationalNetworkStarted is delivered.
-    // mConnectingNetworkIDLen and mConnectingNetworkID contain the received SSID.
-    //
+
     // For PASE/BLE requests, reply before tearing down the commissioning transport.
     // For CASE requests, keep the command open and reply from OnResult after attach finishes.
     if (IsConnectNetworkRequestOverPASE(handler))
     {
+        mConnectNetworkResponseSentEarly = true;
         SendNonConcurrentConnectNetworkResponse();
     }
     else
@@ -827,7 +828,7 @@ void NetworkCommissioningCluster::DisconnectLingeringConnection()
 void NetworkCommissioningCluster::OnResult(Status commissioningError, CharSpan debugText, int32_t interfaceStatus)
 {
     auto commandHandleRef = std::move(mAsyncCommandHandle);
-
+    auto commandHandle    = commandHandleRef.Get();
     // In Non-concurrent mode the commandHandle will be null here, the ConnectNetworkResponse
     // has already been sent and the BLE will have been stopped, however the other functionality
     // is still required
@@ -862,14 +863,23 @@ void NetworkCommissioningCluster::OnResult(Status commissioningError, CharSpan d
     SetLastNetworkId(ByteSpan{ mConnectingNetworkID, mConnectingNetworkIDLen });
     SetLastNetworkingStatusValue(MakeNullable(commissioningError));
 
+    bool shouldSendConnectNetworkResponse = true;
 #if (CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP) && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, ConnectNetworkResponse will NOT be sent");
-    // Do not send the ConnectNetworkResponse if in non-concurrent mode
-    // TODO(#30576) raised to modify CommandHandler to notify it if no response required
-    // -----> Is this required here: commandHandle->FinishCommand();
-#else
+    if (mConnectNetworkResponseSentEarly)
+    {
+        ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, ConnectNetworkResponse was already sent");
+        shouldSendConnectNetworkResponse = false;
+    }
+#endif
+
+    if (shouldSendConnectNetworkResponse && commandHandle != nullptr)
+    {
     commandHandle->AddResponse(mAsyncCommandPath, response);
-#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    }
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    mConnectNetworkResponseSentEarly = false;
+#endif
 
     if (commissioningError == Status::kSuccess)
     {
@@ -968,6 +978,10 @@ void NetworkCommissioningCluster::OnCommissioningComplete()
 void NetworkCommissioningCluster::OnFailSafeTimerExpired()
 {
     VerifyOrReturn(mpWirelessDriver != nullptr);
+
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    mConnectNetworkResponseSentEarly = false;
+#endif
 
     ChipLogDetail(Zcl, "Failsafe timeout, tell platform driver to revert network credentials.");
     TEMPORARY_RETURN_IGNORED mpWirelessDriver->RevertConfiguration();
