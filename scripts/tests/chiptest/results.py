@@ -319,7 +319,7 @@ class RunSummary(RunStats):
             if top_slowest > 0:
                 slowest = slowest[:top_slowest]
 
-            self._print_table(title=f"SLOWEST {len(slowest)} TEST RUNS:",
+            self._print_table(title=f"SLOWEST {len(slowest)} TEST RUNS:", no_content_msg="No tests to show for slowest list",
                               headers_fmt=(("Test name", "<"), ("Status", "<"), ("Iter", ">"), ("Duration", ">")),
                               rows=((r.name_decorated, r.status, str(r.iteration), f"{r.duration_seconds:.2f}s")
                               for r in slowest))
