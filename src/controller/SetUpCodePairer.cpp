@@ -468,6 +468,7 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
         }
 
         // Failed to start establishing PASE.  Move on to the next item.
+        mCurrentPASEParameters.ClearValue();
         mCurrentPASEPayload.reset();
         PASEEstablishmentComplete();
     }
