@@ -33,10 +33,11 @@ class ActionsCluster : public DefaultServerCluster
 public:
     using OptionalAttributesSet = OptionalAttributeSet<Actions::Attributes::SetupURL::Id>;
 
-    ActionsCluster(EndpointId endpointId, Actions::Delegate & delegate,
-                   OptionalAttributesSet optionalAttributes = OptionalAttributesSet(),
-                   std::optional<CharSpan> setupURL         = std::nullopt) :
-        DefaultServerCluster({ endpointId, Actions::Id }), mDelegate(delegate), mOptionalAttributes(optionalAttributes),
+    ActionsCluster(EndpointId endpointId, Actions::Delegate & delegate, OptionalAttributesSet optionalAttributes,
+                   std::optional<CharSpan> setupURL) :
+        DefaultServerCluster({ endpointId, Actions::Id }),
+        mDelegate(delegate),
+        mOptionalAttributes(optionalAttributes),
         mSetupURL(setupURL)
     {}
 
@@ -65,8 +66,8 @@ public:
 private:
     Actions::Delegate & mDelegate;
     const OptionalAttributesSet mOptionalAttributes;
+    const std::optional<CharSpan> mSetupURL;
 
-    std::optional<CharSpan> mSetupURL;
     CHIP_ERROR ReadActionListAttribute(const DataModel::ReadAttributeRequest & request,
                                        const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 

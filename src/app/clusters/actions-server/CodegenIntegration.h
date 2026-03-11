@@ -50,8 +50,10 @@ public:
     EndpointId GetEndpointId() { return mCluster.Cluster().GetPaths()[0].mEndpointId; }
 
 private:
+    ActionsCluster::OptionalAttributesSet BuildOptionalAttributes(EndpointId endpointId);
+    std::optional<CharSpan> BuildSetupURL(EndpointId endpointId);
+
     char mSetupURLBuffer[254] = { 0 };
-    std::optional<chip::CharSpan> mSetupURL;
     RegisteredServerCluster<ActionsCluster> mCluster;
 };
 

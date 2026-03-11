@@ -18,6 +18,7 @@
 #include "CodegenIntegration.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CodeUtils.h>
 
@@ -27,23 +28,36 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Actions;
 
 ActionsServer::ActionsServer(EndpointId endpointId, Delegate & delegate) :
-    mCluster(endpointId, delegate, [this, endpointId]() {
-        ActionsCluster::ClusterConfig config;
-        // Make sure <app/util/attribute-storage.h> is included at the top of the file!
-        if (emberAfContainsServerAttribute(endpointId, Actions::Id, Attributes::SetupURL::Id))
-        {
-            // ADDED 'template' KEYWORD HERE:
-            config.optionalAttributes.template ForceSet<Attributes::SetupURL::Id>();
-
-            MutableCharSpan urlSpan(mSetupURLBuffer);
-            if (Attributes::SetupURL::Get(endpointId, urlSpan) == Protocols::InteractionModel::Status::Success)
-            {
-                config.setupURL = CharSpan(urlSpan.data(), urlSpan.size());
-            }
-        }
-        return config;
-    }())
+    mCluster(endpointId, delegate, BuildOptionalAttributes(endpointId), BuildSetupURL(endpointId))
 {}
+
+ActionsCluster::OptionalAttributesSet ActionsServer::BuildOptionalAttributes(EndpointId endpointId)
+{
+    ActionsCluster::OptionalAttributesSet optionalAttributes;
+    // Check if SetupURL attribute exists in Ember RAM
+    if (emberAfContainsAttribute(endpointId, Actions::Id, Attributes::SetupURL::Id))
+    {
+        // Mark SetupURL as supported
+        optionalAttributes.template ForceSet<Attributes::SetupURL::Id>();
+    }
+    return optionalAttributes;
+}
+
+std::optional<CharSpan> ActionsServer::BuildSetupURL(EndpointId endpointId)
+{
+    std::optional<CharSpan> setupURL;
+    // Check if SetupURL attribute exists in Ember RAM
+    if (emberAfContainsAttribute(endpointId, Actions::Id, Attributes::SetupURL::Id))
+    {
+        // Extract the SetupURL string from Ember storage into local buffer
+        MutableCharSpan urlSpan(mSetupURLBuffer);
+        if (Attributes::SetupURL::Get(endpointId, urlSpan) == Protocols::InteractionModel::Status::Success)
+        {
+            setupURL = CharSpan(urlSpan.data(), urlSpan.size());
+        }
+    }
+    return setupURL;
+}
 
 ActionsServer::~ActionsServer()
 {
