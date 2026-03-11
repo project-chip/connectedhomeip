@@ -61,11 +61,15 @@ class TestResult:
     iteration: int
     status: TestStatus
     duration_seconds: float
-    exception: BaseException | None
+    exception: BaseException | str | None
 
     @property
     def name_decorated(self) -> str:
         return TestStatus(self.status).decorate_name(self.name)
+
+    def __post_init__(self):
+        # Ensure that status is of type TestStatus, even if it's passed as a string (e.g. when loading from JSON).
+        self.status = TestStatus(self.status)
 
     @classmethod
     def run_test(cls, name: str, iteration: int, dry_run: bool, test_func: Callable[[], None]) -> TestResult:
@@ -98,6 +102,7 @@ class TestResult:
                 case TestStatus.CANCELLED:
                     log.warning("%s %s - Cancelled after %0.2f seconds", symbol, name, result.duration_seconds)
                 case TestStatus.FAILED:
+                    assert isinstance(result.exception, BaseException), "Exception should be set for failed test results"
                     log.error("%s %s - Failed in %0.2f seconds", symbol, name, result.duration_seconds, exc_info=result.exception)
 
             return result
