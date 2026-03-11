@@ -2456,6 +2456,8 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
                                                     Clusters::IcdManagement::Attributes::ActiveModeDuration::Id));
             VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
                                                     Clusters::IcdManagement::Attributes::ActiveModeThreshold::Id));
+            VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                                    Clusters::IcdManagement::Attributes::ClusterRevision::Id));
         }
 
         // Extra paths requested via CommissioningParameters
@@ -2834,12 +2836,23 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
         {
             uint16_t clusterRevision = 0;
             CHIP_ERROR revErr = mAttributeCache->Get<ClusterRevision::TypeInfo>(kRootEndpointId, clusterRevision);
-            if (revErr == CHIP_NO_ERROR && clusterRevision <= 2)
+            if (revErr != CHIP_NO_ERROR || clusterRevision <= 2)
             {
-                ChipLogProgress(Controller,
-                                "IcdManagement: Device claims LIT support but cluster revision is %" PRIu16
-                                " (Matter 1.3). Disabling LIT due to known Matter 1.3 LIT issues.",
-                                clusterRevision);
+                if (revErr == CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Controller,
+                                    "IcdManagement: Device claims LIT support but cluster revision is %" PRIu16
+                                    " (Matter 1.3). Disabling LIT due to known Matter 1.3 LIT issues.",
+                                    clusterRevision);
+                }
+                else
+                {
+                    ChipLogProgress(Controller,
+                                    "IcdManagement: Device claims LIT support but ClusterRevision attribute is "
+                                    "missing or unreadable (err=%" CHIP_ERROR_FORMAT
+                                    "). Treating as revision <= 2 and disabling LIT.",
+                                    revErr.Format());
+                }
                 info.icd.isLIT = false;
             }
         }
