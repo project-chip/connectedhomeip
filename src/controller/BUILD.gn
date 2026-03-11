@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/controller/flags.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 
@@ -121,6 +122,17 @@ static_library("controller") {
   cflags = [ "-Wconversion" ]
   if (chip_support_webrtc_python_bindings) {
     public_deps += [ "${chip_root}/src/controller/webrtc:chip_webrtc" ]
+  }
+
+  if (chip_device_platform == "linux" && chip_crypto != "mbedtls" &&
+      chip_support_thread_meshcop && current_cpu == host_cpu &&
+      current_os == host_os) {
+    sources += [
+      "ThreadMeshcopCommissionProxy.cpp",
+      "ThreadMeshcopCommissionProxy.h",
+    ]
+    deps += [ "${chip_root}/src/lib/dnssd/minimal_mdns:minimal_mdns" ]
+    public_deps += [ "${chip_root}/third_party/ot-commissioner" ]
   }
 
   public_configs = [ "${chip_root}/src:includes" ]

@@ -25,6 +25,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemClock.h>
 
 #include <optional>
 
@@ -80,6 +81,12 @@ public:
     /// that are being generated.
     virtual CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
                                      EventNumber & generatedEventNumber) = 0;
+
+    /// Returns the monotonic startup timestamp used by the event system.
+    ///
+    /// This timestamp represents the "time 0" for system-time event timestamps.
+    /// Returns zero if the event system has not been initialized yet.
+    virtual System::Clock::Milliseconds64 GetMonotonicStartupTime() const = 0;
 
     // Convenience methods for event logging using cluster-object structures
     //

@@ -1206,7 +1206,7 @@ bool InteractionModelEngine::TrimFabricForSubscriptions(FabricIndex aFabricIndex
             candidateEventPathsUsed     = eventPathsUsed;
         }
         // This handler is older than the one we picked before.
-        else if (handler->GetTransactionStartGeneration() < candidate->GetTransactionStartGeneration() &&
+        else if (handler->GetTransactionStartGeneration().Before(candidate->GetTransactionStartGeneration()) &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
                  ((attributePathsUsed > perFabricPathCapacity || eventPathsUsed > perFabricPathCapacity) ==
                   (candidateAttributePathsUsed > perFabricPathCapacity || candidateEventPathsUsed > perFabricPathCapacity)))
@@ -1384,7 +1384,7 @@ bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
             candidate = handler;
         }
         // Read Handlers are "first come first served", so we give eariler read transactions a higher priority.
-        else if (handler->GetTransactionStartGeneration() > candidate->GetTransactionStartGeneration() &&
+        else if (handler->GetTransactionStartGeneration().After(candidate->GetTransactionStartGeneration()) &&
                  // And the level of resource usage is the same (both exceed or neither exceed)
                  ((attributePathsUsed > kMinSupportedPathsPerReadRequest || eventPathsUsed > kMinSupportedPathsPerReadRequest) ==
                   (candidateAttributePathsUsed > kMinSupportedPathsPerReadRequest ||
@@ -1778,10 +1778,8 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 {
     Access::SubjectDescriptor subjectDescriptor = apCommandObj.GetSubjectDescriptor();
 
-    DataModel::InvokeRequest request;
-    request.path = aCommandPath;
+    DataModel::InvokeRequest request(aCommandPath, subjectDescriptor);
     request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, apCommandObj.IsTimedInvoke());
-    request.subjectDescriptor = &subjectDescriptor;
 
     std::optional<DataModel::ActionReturnStatus> status = GetDataModelProvider()->InvokeCommand(request, apPayload, &apCommandObj);
 
@@ -1834,17 +1832,12 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest,
                                                                                const Access::Privilege aRequiredPrivilege)
 {
-    if (aRequest.subjectDescriptor == nullptr)
-    {
-        return Status::UnsupportedAccess; // we require a subject for invoke
-    }
-
     Access::RequestPath requestPath{ .cluster     = aRequest.path.mClusterId,
                                      .endpoint    = aRequest.path.mEndpointId,
                                      .requestType = Access::RequestType::kCommandInvokeRequest,
                                      .entityId    = aRequest.path.mCommandId };
 
-    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, aRequiredPrivilege);
+    CHIP_ERROR err = Access::GetAccessControl().Check(aRequest.subjectDescriptor, requestPath, aRequiredPrivilege);
     if (err != CHIP_NO_ERROR)
     {
         if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))

@@ -41,7 +41,7 @@ import logging
 
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
-from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
+from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInterface
 
 import matter.clusters as Clusters
 from matter.clusters import Globals
@@ -204,6 +204,10 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
     def default_endpoint(self) -> int:
         return 1
 
+    @property
+    def default_timeout(self) -> int:
+        return 4 * 60  # 4 minutes
+
     @async_test_body
     async def test_TC_PAVSTI_1_1(self):
         PICS_PRIVACY = "AVSM.S.F03"
@@ -218,7 +222,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         await self.precondition_one_allocated_video_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
         await self.precondition_one_allocated_audio_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
         tlsEndpointId, _ = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=self.host_ip)
-        uploadStreamId = self.server.create_stream()
+        uploadStreamId = self.server.create_stream(SupportedIngestInterface.dash.value)
 
         self.step(1)
         currentConnections = await self.read_single_attribute_check_success(
@@ -298,7 +302,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             "containerFormat": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
             "containerOptions": {
                 "containerType": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
-                "CMAFContainerOptions": {"CMAFInterface": 0, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": trackName},
+                "CMAFContainerOptions": {"CMAFInterface": pushavCluster.Enums.CMAFInterfaceEnum.kInterface2DASH, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": trackName},
             },
         }
         allocatePushTransportResponse = await self.send_single_cmd(

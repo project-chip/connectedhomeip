@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <clusters/push-av-stream-transport/push-av-stream-manager.h>
 #include <ctime>
 #include <filesystem>
 #include <pushav-transport.h>
@@ -196,8 +197,8 @@ CHIP_ERROR PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStru
     {
         if (audioStreamParams.sampleRate == 0)
         {
-            ChipLogError(Camera, "Invalid sample rate: 0. Using fallback 48000 Hz.");
             audioStreamParams.sampleRate = 48000; // Fallback value for invalid sample rate
+            ChipLogError(Camera, "Invalid sample rate: 0. Using fallback 48000 Hz.");
         }
         mAudioInfo.mAudioCodecId  = AV_CODEC_ID_OPUS;
         mAudioInfo.mAudioTimeBase = { 1, static_cast<int>(audioStreamParams.sampleRate) };
@@ -297,7 +298,11 @@ PushAVTransport::~PushAVTransport()
 
     std::filesystem::path uniqueDirPath(mClipInfo.mOutputPath);
 
-    if (std::filesystem::exists(uniqueDirPath) && std::filesystem::is_directory(uniqueDirPath))
+    if (uniqueDirPath.empty())
+    {
+        ChipLogDetail(Camera, "Output path is empty, skipping directory removal");
+    }
+    else if (std::filesystem::exists(uniqueDirPath) && std::filesystem::is_directory(uniqueDirPath))
     {
         std::error_code ec;
         std::filesystem::remove_all(uniqueDirPath, ec);
@@ -398,6 +403,12 @@ bool PushAVTransport::HandleTriggerDetected()
 
 void PushAVTransport::StartRecordingAndStreaming()
 {
+    // Notify manager to reset transport sink state before starting recording
+    if (mManager != nullptr)
+    {
+        mManager->ResetTransportSinkStateForTransport(this);
+    }
+
     mRecorder->mClipInfo.mSessionNumber = mClipInfo.mSessionNumber;
     mRecorder->Start();
     mStreaming = true;
@@ -465,31 +476,67 @@ bool PushAVTransport::ValidateZoneAndSensitivity(
     return false;
 }
 
-void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationReason, int zoneId, int sensitivity)
+void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationReason, const std::vector<int> & zoneIds,
+                                       int sensitivity)
 {
-    ChipLogProgress(Camera, "PushAVTransport trigger transport, activation reason: [%u], ZoneId: [%d], Sensitivity: [%d]",
-                    (uint16_t) activationReason, zoneId, sensitivity);
+    ChipLogProgress(Camera, "PushAVTransport trigger transport, activation reason: [%u], ZoneIds count: [%zu], Sensitivity: [%d]",
+                    (uint16_t) activationReason, zoneIds.size(), sensitivity);
 
-    mCurrentActivationByManualTrigger = (zoneId == kInvalidZoneId) ? true : false;
+    // Handle edge case where zoneIds is empty
+    if (zoneIds.empty())
+    {
+        ChipLogProgress(Camera, "PushAVTransport trigger transport ignored - empty zoneIds list provided");
+        return;
+    }
+
+    // For a single motion event with multiple zones, we need to check if any zone should trigger
+    bool shouldProcessTrigger = false;
+    bool hasManualTrigger     = false;
+
+    // Check if this is a manual trigger (invalid zone ID)
+    for (int zoneId : zoneIds)
+    {
+        if (zoneId == kInvalidZoneId)
+        {
+            hasManualTrigger = true;
+            break;
+        }
+    }
+
+    mCurrentActivationByManualTrigger = hasManualTrigger;
     mActivationReason                 = chip::MakeOptional(activationReason);
 
     // Check if trigger should be processed based on transport type
-    bool shouldProcessTrigger = false;
-
     if (mTransportTriggerType == TransportTriggerTypeEnum::kCommand)
     {
         shouldProcessTrigger = true;
     }
     else if (mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
     {
-        shouldProcessTrigger =
-            mCurrentActivationByManualTrigger || ValidateZoneAndSensitivity(mZoneSensitivityList, zoneId, sensitivity);
+        // For motion triggers, check if any zone in the list should trigger
+        if (hasManualTrigger)
+        {
+            shouldProcessTrigger = true;
+        }
+        else
+        {
+            // Check if any zone in the list passes validation
+            for (int zoneId : zoneIds)
+            {
+                if (ValidateZoneAndSensitivity(mZoneSensitivityList, zoneId, sensitivity))
+                {
+                    shouldProcessTrigger = true;
+                    break;
+                }
+            }
+        }
     }
     else if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous)
     {
         ChipLogProgress(Camera, "PushAVTransport continuous transport trigger received. No action needed");
         return;
     }
+
     // Process the trigger if conditions are met
     if (shouldProcessTrigger)
     {

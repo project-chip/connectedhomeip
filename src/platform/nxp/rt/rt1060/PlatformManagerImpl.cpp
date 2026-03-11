@@ -59,6 +59,13 @@ extern "C" {
 #include "osa.h"
 }
 
+// Helper macro to identify boards that use PLATFORM_InitControllers for firmware initialization
+#if defined(WIFI_IW612_BOARD_MURATA_2EL_M2) || defined(WIFI_IW610_BOARD_MURATA_2LL_M2)
+#define NXP_USE_PLATFORM_INIT_CONTROLLERS 1
+#else
+#define NXP_USE_PLATFORM_INIT_CONTROLLERS 0
+#endif
+
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 #include "board.h"
@@ -118,7 +125,7 @@ extern "C" void initiateResetInIdle(void);
 Currently only IW612 and K32W0 support controller initialization in the connectivity framework
 * Include should be removed otherwise it will introduce double firmware definition
 */
-#ifndef WIFI_IW612_BOARD_MURATA_2EL_M2
+#if !NXP_USE_PLATFORM_INIT_CONTROLLERS
 #include "wlan_bt_fw.h"
 #endif
 
@@ -217,8 +224,7 @@ CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
 }
 
 /* For IW612 transceiver firmware initialization is done by PLATFORM_InitControllers */
-#ifndef WIFI_IW612_BOARD_MURATA_2EL_M2
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && !NXP_USE_PLATFORM_INIT_CONTROLLERS
 CHIP_ERROR PlatformManagerImpl::WiFiInterfaceInit(void)
 {
     CHIP_ERROR result = CHIP_NO_ERROR;
@@ -269,7 +275,6 @@ CHIP_ERROR PlatformManagerImpl::WiFiInterfaceInit(void)
 
     return result;
 }
-#endif
 #endif
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -346,7 +351,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #endif
 
 /* Currently only IW612 and K32W0 support controller initialization in the connectivity framework */
-#ifdef WIFI_IW612_BOARD_MURATA_2EL_M2
+#if NXP_USE_PLATFORM_INIT_CONTROLLERS
     /* Init the controller by giving as an arg the connectivity supported */
     PLATFORM_InitControllers(connBle_c
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -380,7 +385,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 /* For IW612 transceiver firmware initialization is done by PLATFORM_InitControllers */
-#ifndef WIFI_IW612_BOARD_MURATA_2EL_M2
+#if !NXP_USE_PLATFORM_INIT_CONTROLLERS
     err = WiFiInterfaceInit();
 #endif
 

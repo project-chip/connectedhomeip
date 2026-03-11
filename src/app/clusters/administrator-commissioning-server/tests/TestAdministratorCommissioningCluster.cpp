@@ -22,6 +22,7 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <app/server/Server.h>
 #include <clusters/AdministratorCommissioning/Enums.h>
 #include <clusters/AdministratorCommissioning/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -46,10 +47,20 @@ struct TestAdministratorCommissioningCluster : public chip::Testing::AppContext
 {
 };
 
+AdministratorCommissioningLogic::Context CreateContext()
+{
+    return AdministratorCommissioningLogic::Context{
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+        .fabricTable                = Server::GetInstance().GetFabricTable(),
+        .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
+    };
+}
+
 TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
 {
     {
-        AdministratorCommissioningCluster cluster(kRootEndpointId, {});
+        auto context = CreateContext();
+        AdministratorCommissioningCluster cluster(kRootEndpointId, {}, context);
 
         ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                             {
@@ -60,8 +71,9 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
     }
 
     {
-        AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId,
-                                                                              BitFlags<Feature>{ Feature::kBasic });
+        auto context = CreateContext();
+        AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId, BitFlags<Feature>{ Feature::kBasic },
+                                                                              context);
 
         ASSERT_TRUE(IsAttributesListEqualTo(cluster,
                                             {
@@ -75,7 +87,8 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
 TEST_F(TestAdministratorCommissioningCluster, TestCommands)
 {
     {
-        AdministratorCommissioningCluster cluster(kRootEndpointId, {});
+        auto context = CreateContext();
+        AdministratorCommissioningCluster cluster(kRootEndpointId, {}, context);
 
         EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
                                                   {
@@ -85,7 +98,8 @@ TEST_F(TestAdministratorCommissioningCluster, TestCommands)
     }
 
     {
-        AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId, BitFlags<Feature>{});
+        auto context = CreateContext();
+        AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId, BitFlags<Feature>{}, context);
 
         EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
                                                   {
@@ -95,8 +109,9 @@ TEST_F(TestAdministratorCommissioningCluster, TestCommands)
     }
 
     {
-        AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId,
-                                                                              BitFlags<Feature>{ Feature::kBasic });
+        auto context = CreateContext();
+        AdministratorCommissioningWithBasicCommissioningWindowCluster cluster(kRootEndpointId, BitFlags<Feature>{ Feature::kBasic },
+                                                                              context);
 
         EXPECT_TRUE(
             IsAcceptedCommandsListEqualTo(cluster,
@@ -128,7 +143,7 @@ TEST_F(TestAdministratorCommissioningCluster, TestRevokeCommissioningDoesNotExpi
     ASSERT_SUCCESS(failSafeContext.ArmFailSafe(kUndefinedFabricIndex, System::Clock::Seconds16(60)));
     ASSERT_TRUE(failSafeContext.IsFailSafeArmed());
 
-    AdministratorCommissioningLogic logic;
+    AdministratorCommissioningLogic logic(CreateContext());
     AdministratorCommissioning::Commands::RevokeCommissioning::DecodableType unused;
 
     // RevokeCommissioning attempts to expire the fail-safe (when it is held by a PASE session) regardless of the commissioning

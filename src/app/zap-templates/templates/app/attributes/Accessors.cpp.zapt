@@ -135,6 +135,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, {{accessorGetterTyp
     {{/if}}
     {{/if}}
 {{/inline}}
+{{#unless (isInConfigList parent.name "CodeDrivenClusters")}}
 
 Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value, MarkAttributeDirty markDirty)
 {
@@ -201,6 +202,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodabl
   return Set(endpoint, value.Value());
 }
 {{/if}}
+{{/unless}}
 
 } // namespace {{asUpperCamelCase label}}
 

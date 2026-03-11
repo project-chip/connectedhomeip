@@ -18,7 +18,9 @@
 
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningLogic.h>
 
+#include <app/FailSafeContext.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server/CommissioningWindowManager.h>
 #include <clusters/AdministratorCommissioning/ClusterId.h>
 
 namespace chip {
@@ -28,9 +30,12 @@ namespace Clusters {
 class AdministratorCommissioningCluster : public DefaultServerCluster
 {
 public:
+    using Context = AdministratorCommissioningLogic::Context;
+
     constexpr AdministratorCommissioningCluster(EndpointId endpointId,
-                                                BitFlags<AdministratorCommissioning::Feature> _unused_features) :
-        DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, AdministratorCommissioning::Id))
+                                                BitFlags<AdministratorCommissioning::Feature> _unused_features, Context context) :
+        DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpointId, AdministratorCommissioning::Id)),
+        mLogic(context)
     {}
 
     // Server cluster implementation
@@ -51,8 +56,9 @@ class AdministratorCommissioningWithBasicCommissioningWindowCluster : public Adm
 {
 public:
     AdministratorCommissioningWithBasicCommissioningWindowCluster(EndpointId endpointId,
-                                                                  BitFlags<AdministratorCommissioning::Feature> features) :
-        AdministratorCommissioningCluster(endpointId, features),
+                                                                  BitFlags<AdministratorCommissioning::Feature> features,
+                                                                  Context context) :
+        AdministratorCommissioningCluster(endpointId, features, context),
         mFeatures(features)
     {}
 

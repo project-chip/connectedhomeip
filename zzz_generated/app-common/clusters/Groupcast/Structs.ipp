@@ -53,6 +53,7 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
         encoder.Encode(to_underlying(Fields::kKeySetID), keySetID);
     }
     encoder.Encode(to_underlying(Fields::kHasAuxiliaryACL), hasAuxiliaryACL);
+    encoder.Encode(to_underlying(Fields::kMcastAddrPolicy), mcastAddrPolicy);
     if (aAccessingFabricIndex.HasValue())
     {
         encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
@@ -86,6 +87,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kHasAuxiliaryACL))
         {
             err = DataModel::Decode(reader, hasAuxiliaryACL);
+        }
+        else if (__context_tag == to_underlying(Fields::kMcastAddrPolicy))
+        {
+            err = DataModel::Decode(reader, mcastAddrPolicy);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
