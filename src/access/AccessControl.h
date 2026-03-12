@@ -695,7 +695,8 @@ public:
      */
     void UnregisterGroupAuxiliaryDelegate()
     {
-        if(IsGroupAuxiliaryDelegateRegistered()) {
+        if (IsGroupAuxiliaryDelegateRegistered())
+        {
             mGroupAuxDelegate->Release();
             mGroupAuxDelegate = nullptr;
         }
