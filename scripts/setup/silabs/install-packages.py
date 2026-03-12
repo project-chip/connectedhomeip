@@ -224,7 +224,7 @@ def update_slt_cli(slt_cli_path):
     update_cmd = [slt_cli_path, "update", "--self"]
     try:
         logger.info("Updating SLT CLI to latest version...")
-        subprocess.run(update_cmd, check=True)
+        subprocess.run(update_cmd, stdin=subprocess.DEVNULL, check=True)
         logger.info("SLT CLI updated successfully")
     except subprocess.CalledProcessError as e:
         logger.warning("Failed to update slt-cli: %s", e)
@@ -255,7 +255,7 @@ def install_sdk_packages(slt_cli_path):
         install_cmd = [slt_cli_path, "install", "-f", pkg_path]
         try:
             logger.info("Installing packages from %s...", os.path.basename(pkg_path))
-            subprocess.run(install_cmd, check=True)
+            subprocess.run(install_cmd, stdin=subprocess.DEVNULL, check=True)
             logger.info("Packages from %s installed successfully", os.path.basename(pkg_path))
         except subprocess.CalledProcessError as e:
             logger.error("Failed to install packages from %s: %s", pkg_path, e)
@@ -267,17 +267,23 @@ def slt_where(slt_cli_path, package):
     try:
         result = subprocess.run(
             [slt_cli_path, "where", package],
+            stdin=subprocess.DEVNULL,
             capture_output=True,
             text=True,
             check=False,
         )
         if result.returncode == 0 and result.stdout.strip():
             # SLT may print interactive prompts to stdout before the actual path.
-            # Extract the last absolute path from the output. The path may appear
-            # on its own line or appended after a prompt (e.g. "[y/n]?/home/...").
-            path_match = re.findall(r"(/[^\s.,;:\"']+)", result.stdout)
-            if path_match:
-                return path_match[-1]
+            # The path may be on its own line or appended after a prompt
+            # (e.g. "[y/n]?/home/..."). Scan from the bottom to find it.
+            for line in reversed(result.stdout.strip().splitlines()):
+                line = line.strip()
+                if line.startswith("/"):
+                    return line
+                # Handle path concatenated after interactive prompt
+                prompt_idx = line.rfind("?/")
+                if prompt_idx != -1:
+                    return line[prompt_idx + 1:]
             logger.error(
                 "Could not find an absolute path in 'slt where %s' output:\n%s",
                 package, result.stdout.strip(),
@@ -380,8 +386,11 @@ def create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path):
 
     def create_symlink(target_path, link_name):
         if not target_path or not os.path.isdir(target_path):
-            logger.warning("Target path does not exist or is not a directory: %s", target_path)
-            return
+            logger.error(
+                "Cannot create symlink: target path does not exist or is not a directory: %s",
+                target_path,
+            )
+            sys.exit(1)
         link_path = os.path.join(silabs_dir, link_name)
         try:
             os.makedirs(silabs_dir, exist_ok=True)
@@ -390,15 +399,20 @@ def create_sdk_symlinks(simplicity_sdk_path, wiseconnect_path):
                     current = os.path.realpath(link_path)
                     if os.path.realpath(target_path) == current:
                         logger.info("Symlink already up to date: %s", link_path)
-                        return
+                        return  # No error; skip create
                     os.remove(link_path)
                 else:
-                    logger.warning("Path exists and is not a symlink, skipping: %s", link_path)
-                    return
+                    logger.error(
+                        "Cannot create symlink: %s already exists and is not a symlink. "
+                        "Remove it manually and re-run.",
+                        link_path,
+                    )
+                    sys.exit(1)
             os.symlink(target_path, link_path)
             logger.info("Created symlink %s -> %s", link_path, target_path)
         except OSError as e:
-            logger.warning("Could not create symlink %s: %s", link_path, e)
+            logger.error("Could not create symlink %s -> %s: %s", link_path, target_path, e)
+            sys.exit(1)
 
     create_symlink(simplicity_sdk_path, "simplicity_sdk")
     create_symlink(wiseconnect_path, "wifi_sdk")
