@@ -45,5 +45,7 @@ CHIP_ERROR CommissionerControlServer::Init()
 
 } // namespace chip::app::Clusters
 
+void MatterCommissionerControlClusterInitCallback(EndpointId) {}
+void MatterCommissionerControlClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}
 void MatterCommissionerControlPluginServerInitCallback() {}
 void MatterCommissionerControlPluginServerShutdownCallback() {}
