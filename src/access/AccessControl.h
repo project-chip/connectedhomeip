@@ -695,8 +695,10 @@ public:
      */
     void UnregisterGroupAuxiliaryDelegate()
     {
-        mGroupAuxDelegate->Release();
-        mGroupAuxDelegate = nullptr;
+        if(IsGroupAuxiliaryDelegateRegistered()) {
+            mGroupAuxDelegate->Release();
+            mGroupAuxDelegate = nullptr;
+        }
     }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS

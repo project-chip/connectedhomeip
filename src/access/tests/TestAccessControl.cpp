@@ -2151,13 +2151,11 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntriesAllFabrics)
         EXPECT_EQ(GetAccessControl().RegisterGroupAuxiliaryDelegate(&manualDelegate), CHIP_NO_ERROR);
 
         ValidateAuxiliaryEntries(accessControl, kUndefinedFabricIndex, expectedAll);
+        GetAccessControl().UnregisterGroupAuxiliaryDelegate();
     }
 
     // Path 2: FabricTable iteration
     {
-        // Unregister existing delegate
-        GetAccessControl().UnregisterGroupAuxiliaryDelegate();
-
         // Setup a test Fabric Table
         PersistentStorageOperationalKeystore opKeyStore;
         Credentials::PersistentStorageOpCertStore opCertStore;
@@ -2190,13 +2188,13 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryEntriesAllFabrics)
         ValidateAuxiliaryEntries(accessControl, kUndefinedFabricIndex, expectedAll);
 
         // Cleanup
+        GetAccessControl().UnregisterGroupAuxiliaryDelegate();
         fabricTable.Shutdown();
         opCertStore.Finish();
         opKeyStore.Finish();
     }
 
     // Restore global delegate for other tests
-    GetAccessControl().UnregisterGroupAuxiliaryDelegate();
     EXPECT_EQ(GetAccessControl().RegisterGroupAuxiliaryDelegate(&gGroupAuxiliaryAccessControlDelegate), CHIP_NO_ERROR);
 
     // Cleanup
