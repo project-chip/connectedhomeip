@@ -116,7 +116,7 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
         mLabel.ClearValue();
     }
 
-    CHIP_ERROR err = CommissionerControl::GenerateCommissioningRequestResultEvent(kAggregatorEndpointId, result);
+    CHIP_ERROR err = mCommissionerControlServer.mCluster.Cluster().GenerateCommissioningRequestResultEvent(result);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -228,13 +228,21 @@ CHIP_ERROR CommissionerControlInit()
         return CHIP_ERROR_NO_MEMORY;
     }
 
+    err = sCommissionerControlDelegate->GetCommissionerControlServer().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Initialization failed on Commissioner Control Delegate.");
+        sCommissionerControlDelegate.reset();
+        return err;
+    }
+
     ChipLogProgress(Zcl, "Initializing SupportedDeviceCategories of Commissioner Control Cluster for this device.");
 
     BitMask<Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories;
     supportedDeviceCategories.SetField(Clusters::CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization, 1);
 
-    err = Clusters::CommissionerControl::SetSupportedDeviceCategories(Clusters::CommissionerControl::kAggregatorEndpointId,
-                                                                      supportedDeviceCategories);
+    err = sCommissionerControlDelegate->GetCommissionerControlServer().mCluster.Cluster().SetSupportedDeviceCategories(
+        supportedDeviceCategories);
 
     if (err != CHIP_NO_ERROR)
     {

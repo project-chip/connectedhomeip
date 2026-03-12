@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2026 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,19 +18,39 @@
 #pragma once
 
 #include <app/clusters/commissioner-control-server/CommissionerControlCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
-namespace chip::app::Clusters::CommissionerControl {
+namespace chip::app::Clusters {
 
-CommissionerControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
+class CommissionerControlServer
+{
+public:
+    /**
+     * Creates a chime server instance. This is just a backwards compatibility wrapper around the CommissionerControlCluster.
+     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aDelegate A reference to the delegate to be used by this server.
+     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     */
+    CommissionerControlServer(EndpointId endpointId, CommissionerControl::Delegate * delegate);
+    ~CommissionerControlServer();
 
-CHIP_ERROR SetSupportedDeviceCategories(EndpointId endpointId,
-                                        const BitMask<SupportedDeviceCategoryBitmap> supportedDeviceCategories);
+    /**
+     * Register the chime cluster instance with the codegen data model provider.
+     * @return Returns an error if registration fails.
+     */
+    CHIP_ERROR Init();
 
-CHIP_ERROR
-GenerateCommissioningRequestResultEvent(EndpointId endpointId,
-                                        const CommissionerControl::Events::CommissioningRequestResult::Type & result);
+    /**
+     * @return The endpoint ID.
+     */
+    EndpointId GetEndpointId() { return mEndpointId; }
 
-Delegate * GetDelegate(EndpointId endpointId);
-void SetDelegate(EndpointId endpointId, Delegate * delegate);
+    // The Code Driven CommissionerControlCluster instance (lazy-initialized)
+    chip::app::LazyRegisteredServerCluster<CommissionerControlCluster> mCluster;
 
-} // namespace chip::app::Clusters::CommissionerControl
+private:
+    EndpointId mEndpointId;
+    CommissionerControl::Delegate * mDelegate;
+};
+
+} // namespace chip::app::Clusters
