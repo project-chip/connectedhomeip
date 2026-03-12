@@ -14,7 +14,7 @@
 
 import shlex
 
-from .builder import Builder
+from .builder import Builder, BuildProfile
 
 
 class GnBuilder(Builder):
@@ -60,6 +60,16 @@ class GnBuilder(Builder):
         ]
 
         extra_args = []
+
+        match self.options.build_profile:
+            case BuildProfile.DEBUG:
+                extra_args.extend(["is_debug=true", "optimize_debug=false"])
+            case BuildProfile.DEBUG_OPTIMIZED:
+                extra_args.extend(["is_debug=true", "optimize_debug=true"])
+            case BuildProfile.RELEASE:
+                extra_args.extend(["is_debug=false", "optimize_for_size=false"])
+            case BuildProfile.RELEASE_SMALL:
+                extra_args.extend(["is_debug=false", "optimize_for_size=true"])
 
         if self.options.pw_command_launcher:
             extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)

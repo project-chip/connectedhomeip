@@ -17,7 +17,7 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput
+from .builder import Builder, BuilderOutput, BuildProfile
 
 
 class AndroidBoard(Enum):
@@ -424,6 +424,16 @@ class AndroidBuilder(Builder):
             gn_args["android_sdk_root"] = os.environ["ANDROID_HOME"]
             if exampleName == "chip-test":
                 gn_args["chip_build_test_static_libraries"] = False
+
+            match self.options.build_profile:
+                case BuildProfile.DEBUG:
+                    gn_args.update({"is_debug": True, "optimize_debug": False})
+                case BuildProfile.DEBUG_OPTIMIZED:
+                    gn_args.update({"is_debug": True, "optimize_debug": True})
+                case BuildProfile.RELEASE:
+                    gn_args.update({"is_debug": False, "optimize_for_size": False})
+                case BuildProfile.RELEASE_SMALL:
+                    gn_args.update({"is_debug": False, "optimize_for_size": True})
 
             if self.options.pw_command_launcher:
                 gn_args["pw_command_launcher"] = self.options.pw_command_launcher
