@@ -151,6 +151,9 @@ struct WiFiScanResponse
 static_assert(sizeof(WiFiScanResponse::ssid) <= std::numeric_limits<decltype(WiFiScanResponse::ssidLen)>::max(),
               "Max length of WiFi ssid exceeds the limit of ssidLen field");
 
+static_assert(sizeof(WiFiScanResponse::bssid) <= std::numeric_limits<decltype(WiFiScanResponse::bssidLen)>::max(),
+              "Max length of WiFi bssid exceeds the limit of bssidLen field");
+
 struct ThreadScanResponse
 {
     uint16_t panId;
