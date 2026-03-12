@@ -71,6 +71,7 @@ MTRClusterDescriptorAttributeDeviceTypeListID
 = {{asMEI manufacturerCode code}},
 {{/if}}
 {{/if}}
+{{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase ../clusterName preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
 {{#if (and (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping ../clusterName) attribute=(compatAttributeNameRemapping ../clusterName label) isForIds=true)
            (isSupported (compatClusterNameRemapping ../clusterName) attribute=(compatAttributeNameRemapping ../clusterName label) isForIds=true))}}
 MTRCluster{{compatClusterNameRemapping ../clusterName}}Attribute{{compatAttributeNameRemapping ../clusterName label}}ID
@@ -81,6 +82,7 @@ MTRCluster{{compatClusterNameRemapping ../clusterName}}Attribute{{compatAttribut
 MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID,
 {{/if}}
 {{/if}}
+{{/unless}}
 {{#last}}
 
 {{/last}}
@@ -93,6 +95,7 @@ MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID,
 // Cluster {{> cluster}} attributes
 {{/if}}
 {{/first}}
+{{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase ../clusterName preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
 {{#if (and (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)
            (or clusterRef
                (isSupported "" globalAttribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)))}}
@@ -103,14 +106,17 @@ MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID {{availability (a
 MTRAttributeIDTypeGlobalAttribute{{asUpperCamelCase label}}ID,
 {{/if}}
 {{/if}}
+{{/unless}}
 {{! Anything which has an old name, and the new name was introduced in the "27C5E231-9EB5-4932-B4C1-10D88419D9CB" release or later
     (or just after the "267F4B03-3256-4056-A62D-5237640FDCFE" release, but we don't have a good way to test for that),
     we need to generate the new-form id for the old name too, as long as it was not removed. }}
+{{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase ../clusterName preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
 {{#if (and (hasOldName (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true)
            (not (wasIntroducedBeforeRelease "27C5E231-9EB5-4932-B4C1-10D88419D9CB" (asUpperCamelCase ../clusterName preserveAcronyms=true) attribute=(asUpperCamelCase label preserveAcronyms=true) isForIds=true))
            (isSupported (compatClusterNameRemapping ../clusterName) attribute=(compatAttributeNameRemapping ../clusterName label) isForIds=true))}}
 MTRAttributeIDTypeCluster{{compatClusterNameRemapping ../clusterName}}Attribute{{compatAttributeNameRemapping ../clusterName label}}ID {{availability (compatClusterNameRemapping ../clusterName) attribute=(compatAttributeNameRemapping ../clusterName label) isForIds=true minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" deprecationMessage=(concat "Please use MTRAttributeIDType" (asUpperCamelCase ../clusterName preserveAcronyms=true) "Attribute" (asUpperCamelCase label preserveAcronyms=true) "ID")}} = MTRAttributeIDTypeCluster{{>cluster}}Attribute{{>attribute}}ID,
 {{/if}}
+{{/unless}}
 {{#last}}
 
 {{/last}}
@@ -140,12 +146,14 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 {{/first}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandIdDecl"}}
+{{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase ../clusterName preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
 {{#if (and (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" cluster command=command isForIds=true)
            (isSupported cluster command=command isForIds=true))}}
 MTRCluster{{cluster}}Command{{command}}ID
 {{availability cluster command=command deprecatedRelease="267F4B03-3256-4056-A62D-5237640FDCFE" deprecationMessage=(concat "Please use MTRCommandIDTypeCluster" (asUpperCamelCase ../clusterName preserveAcronyms=true) "Command" (asUpperCamelCase name preserveAcronyms=true) "ID") isForIds=true}}
 = {{asMEI manufacturerCode code}},
 {{/if}}
+{{/unless}}
 {{/inline}}
 {{> commandIdDecl cluster=(compatClusterNameRemapping ../clusterName)
                   command=(compatCommandNameRemapping ../clusterName name)}}
@@ -162,9 +170,11 @@ MTRCluster{{cluster}}Command{{command}}ID
 {{/first}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandIdDecl"}}
+{{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase ../clusterName preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
 {{#if (isSupported cluster command=command isForIds=true)}}
 MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID {{availability cluster command=command minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" isForIds=true deprecationMessage=(concat "The " command " command will be removed")}} = {{asMEI manufacturerCode code}},
 {{/if}}
+{{/unless}}
 {{/inline}}
 {{> commandIdDecl cluster=(asUpperCamelCase ../clusterName preserveAcronyms=true)
                   command=(asUpperCamelCase name preserveAcronyms=true)}}
@@ -204,12 +214,14 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
 {{/if}}
 {{/if}}
 {{/first}}
+{{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase ../clusterName preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
 {{#if (and (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping ../clusterName) event=(asUpperCamelCase name) isForIds=true)
            (isSupported (compatClusterNameRemapping ../clusterName) event=(asUpperCamelCase name) isForIds=true))}}
 MTRCluster{{compatClusterNameRemapping ../clusterName}}Event{{asUpperCamelCase name}}ID
 {{availability (compatClusterNameRemapping ../clusterName) event=(asUpperCamelCase name) deprecatedRelease="267F4B03-3256-4056-A62D-5237640FDCFE" deprecationMessage=(concat "Please use MTREventIDTypeCluster" (asUpperCamelCase ../clusterName preserveAcronyms=true) "Event" (asUpperCamelCase name preserveAcronyms=true) "ID") isForIds=true}}
 = {{asMEI manufacturerCode code}},
 {{/if}}
+{{/unless}}
 {{#last}}
 
 {{/last}}
@@ -222,9 +234,11 @@ MTRCluster{{compatClusterNameRemapping ../clusterName}}Event{{asUpperCamelCase n
 // Cluster {{>cluster}} events
 {{/if}}
 {{/first}}
+{{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase ../clusterName preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
 {{#if (isSupported (asUpperCamelCase ../clusterName preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true) isForIds=true)}}
 MTREventIDTypeCluster{{>cluster}}Event{{>event}}ID {{availability (asUpperCamelCase ../clusterName preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="267F4B03-3256-4056-A62D-5237640FDCFE" isForIds=true}} = {{asMEI manufacturerCode code}},
 {{/if}}
+{{/unless}}
 {{#last}}
 
 {{/last}}

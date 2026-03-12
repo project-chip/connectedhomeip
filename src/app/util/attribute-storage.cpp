@@ -195,12 +195,12 @@ void emberAfEndpointConfigure()
 {
     uint16_t ep;
 
-    static_assert(FIXED_ENDPOINT_COUNT <= std::numeric_limits<decltype(ep)>::max(),
-                  "FIXED_ENDPOINT_COUNT must not exceed the size of the endpoint data type");
-
     emberEndpointCount = FIXED_ENDPOINT_COUNT;
 
 #if FIXED_ENDPOINT_COUNT > 0
+
+    static_assert(FIXED_ENDPOINT_COUNT <= std::numeric_limits<decltype(ep)>::max(),
+                  "FIXED_ENDPOINT_COUNT must not exceed the size of the endpoint data type");
 
     constexpr uint16_t fixedEndpoints[]             = FIXED_ENDPOINT_ARRAY;
     constexpr uint16_t fixedDeviceTypeListLengths[] = FIXED_DEVICE_TYPE_LENGTHS;
@@ -936,6 +936,7 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
         return kEmberInvalidEndpointIndex;
     }
 
+#if FIXED_ENDPOINT_COUNT > 0
     if (epIndex < FIXED_ENDPOINT_COUNT)
     {
         // This endpoint is a fixed one.
@@ -957,6 +958,7 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
         epIndex = adjustedEndpointIndex;
     }
     else
+#endif // FIXED_ENDPOINT_COUNT > 0
     {
         // This is a dynamic endpoint.
         // Its index is just its index in the dynamic endpoint list, offset by fixedClusterServerEndpointCount.

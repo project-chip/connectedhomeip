@@ -32,24 +32,24 @@ void PreRollBuffer::SetMaxTotalBytes(size_t size)
 void PreRollBuffer::PushFrameToBuffer(const std::string & streamKey, const uint8_t * data, size_t size, int64_t timestampMs)
 {
     TrimBuffer();
-    std::lock_guard<std::mutex> lock(mBufferMutex);
-    auto frame       = std::make_shared<PreRollFrame>();
-    frame->streamKey = streamKey;
-    frame->data      = std::make_unique<uint8_t[]>(size);
-    memcpy(frame->data.get(), data, size);
-    frame->size  = size;
-    frame->ptsMs = timestampMs;
-    auto & queue = mBuffers[streamKey]; // Get or create the queue for this stream key
-    queue.push_back(frame);
-    mContentBufferSize += size; // Track total bytes in buffer for all streams
-    mBufferMutex.unlock();
-    PushBufferToTransport(); // Automatically flush after each frame push
+    {
+        std::lock_guard<std::mutex> lock(mBufferMutex);
+        auto frame       = std::make_shared<PreRollFrame>();
+        frame->streamKey = streamKey;
+        frame->data      = std::make_unique<uint8_t[]>(size);
+        memcpy(frame->data.get(), data, size);
+        frame->size  = size;
+        frame->ptsMs = timestampMs;
+        auto & queue = mBuffers[streamKey]; // Get or create the queue for this stream key
+        queue.push_back(frame);
+        mContentBufferSize += size; // Track total bytes in buffer for all streams
+    }                               // lock_guard released here
+    PushBufferToTransport();        // Automatically flush after each frame push
 }
 
 void PreRollBuffer::PushBufferToTransport()
 {
     std::lock_guard<std::mutex> lock(mBufferMutex);
-    int64_t currentTime = NowMs();
     std::vector<BufferSink *> sinksToRemove;
 
     for (auto & [sink, streamKeys] : mSinkSubscriptions)
@@ -61,11 +61,24 @@ void PreRollBuffer::PushBufferToTransport()
         }
 
         // Determine the cutoff time for frame delivery.
-        // If requestedPreBufferLengthMs is 0, it implies live mode. In this case, we use minKeyframeIntervalMs
-        // to ensure we have at least a keyframe's worth of data, if available.
-        // Otherwise, we use the configured pre-buffer length.
-        int64_t minTimeToDeliver = (sink->requestedPreBufferLengthMs == 0) ? currentTime - sink->minKeyframeIntervalMs
-                                                                           : currentTime - sink->requestedPreBufferLengthMs;
+        // This cutoff only matters for the INITIAL delivery when a sink is first registered,
+        // to decide which buffered frames to send. Once hasDeliveredFirstFrame is true,
+        // we deliver all new frames as they arrive (duplicate detection via deliveredTo handles the rest).
+        int64_t minTimeToDeliver;
+        if (!sink->hasDeliveredFirstFrame)
+        {
+            // For new sinks, deliver frames from registration time minus the pre-buffer length
+            // This ensures frames aren't filtered out if the track takes time to become ready
+            minTimeToDeliver = (sink->requestedPreBufferLengthMs == 0)
+                ? sink->registrationTimeMs - sink->minKeyframeIntervalMs
+                : sink->registrationTimeMs - sink->requestedPreBufferLengthMs;
+        }
+        else
+        {
+            // After first frame delivered, accept all frames (deliveredTo set prevents duplicates)
+            // Setting to 0 effectively disables the timestamp filter
+            minTimeToDeliver = 0;
+        }
 
         for (const std::string & streamKey : streamKeys)
         {
@@ -103,15 +116,17 @@ void PreRollBuffer::PushBufferToTransport()
                     }
                     // Mark as delivered to this sink to avoid duplicate delivery
                     frame->deliveredTo.insert(sink);
+                    // Mark that we've successfully delivered at least one frame to this sink
+                    sink->hasDeliveredFirstFrame = true;
                 }
             }
         }
     }
-    mBufferMutex.unlock();
-    // Remove sinks with no valid senders
+    // Remove sinks with no valid transport (already under lock)
     for (BufferSink * sink : sinksToRemove)
     {
-        DeregisterTransportFromBuffer(sink);
+        ChipLogProgress(Camera, "Removing transport from buffer %p (no valid transport)", sink);
+        mSinkSubscriptions.erase(sink);
     }
 }
 

@@ -53,6 +53,8 @@ enum class Feature : uint32_t
     kRadar           = 0x20,
     kRFSensing       = 0x40,
     kVision          = 0x80,
+    kPrediction      = 0x100,
+    kOccupancyEvent  = 0x200,
 };
 
 // Bitmap for OccupancyBitmap

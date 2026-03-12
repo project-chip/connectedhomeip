@@ -89,6 +89,7 @@ class HostApp(Enum):
     NETWORK_MANAGER = auto()
     ENERGY_GATEWAY = auto()
     EVSE = auto()
+    WATER_HEATER = auto()
     WATER_LEAK_DETECTOR = auto()
     TERMS_AND_CONDITIONS = auto()
     CAMERA = auto()
@@ -194,6 +195,8 @@ class HostApp(Enum):
             return 'energy-gateway-app/linux'
         if self == HostApp.EVSE:
             return 'evse-app/linux'
+        if self == HostApp.WATER_HEATER:
+            return 'water-heater-app/linux'
         if self == HostApp.WATER_LEAK_DETECTOR:
             return 'water-leak-detector-app/linux'
         if self == HostApp.TERMS_AND_CONDITIONS:
@@ -328,6 +331,9 @@ class HostApp(Enum):
         elif self == HostApp.EVSE:
             yield 'chip-evse-app'
             yield 'chip-evse-app.map'
+        elif self == HostApp.WATER_HEATER:
+            yield 'matter-water-heater-app'
+            yield 'matter-water-heater-app.map'
         elif self == HostApp.WATER_LEAK_DETECTOR:
             yield 'water-leak-detector-app'
             yield 'water-leak-detector-app.map'
@@ -406,7 +412,8 @@ class HostBuilder(GnBuilder):
                  enable_webrtc=False,
                  terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
                  openthread_endpoint=False,
-                 unified=False
+                 unified=False,
+                 chip_enable_endpoint_unique_id: Optional[bool] = None,
                  ):
         """
         Construct a host builder.
@@ -455,7 +462,7 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('chip_enable_wifi=false')
 
         if not enable_thread:
-            self.extra_gn_options.append('chip_enable_openthread=false')
+            self.extra_gn_options.append('chip_enable_thread=false')
 
         if disable_shell:
             self.extra_gn_options.append('chip_build_libshell=false')
@@ -569,6 +576,12 @@ class HostBuilder(GnBuilder):
                 self.extra_gn_options.append('chip_terms_and_conditions_required=true')
             else:
                 self.extra_gn_options.append('chip_terms_and_conditions_required=false')
+
+        if chip_enable_endpoint_unique_id is not None:
+            if chip_enable_endpoint_unique_id:
+                self.extra_gn_options.append('chip_enable_endpoint_unique_id=true')
+            else:
+                self.extra_gn_options.append('chip_enable_endpoint_unique_id=false')
 
         if openthread_endpoint:
             if enable_wifi:

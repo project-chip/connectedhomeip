@@ -78,6 +78,11 @@ void ScriptDevicePairingDelegate::SetCommissioningStatusUpdateCallback(
     mOnCommissioningStatusUpdateCallback = callback;
 }
 
+void ScriptDevicePairingDelegate::SetCommissioningStageStartCallback(DevicePairingDelegate_OnCommissioningStageStartFunct callback)
+{
+    mOnCommissioningStageStartCallback = callback;
+}
+
 void ScriptDevicePairingDelegate::OnStatusUpdate(DevicePairingDelegate::Status status)
 {
     switch (status)
@@ -138,6 +143,19 @@ void ScriptDevicePairingDelegate::OnCommissioningStatusUpdate(PeerId peerId, Com
     if (mOnCommissioningStatusUpdateCallback != nullptr)
     {
         mOnCommissioningStatusUpdateCallback(peerId, stageCompleted, error);
+    }
+}
+
+void ScriptDevicePairingDelegate::OnCommissioningStageStart(PeerId peerId, CommissioningStage stageStarting)
+{
+    ChipLogProgress(Zcl, "ScriptDevicePairingDelegate::OnCommissioningStageStart");
+
+    ChipLogProgress(Zcl, "nodeId=" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+    ChipLogProgress(Zcl, "stageStarting=%s (%d)", StageToString(stageStarting), stageStarting);
+
+    if (mOnCommissioningStageStartCallback != nullptr)
+    {
+        mOnCommissioningStageStartCallback(peerId.GetNodeId(), StageToString(stageStarting));
     }
 }
 

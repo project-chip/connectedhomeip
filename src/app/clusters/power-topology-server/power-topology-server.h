@@ -15,4 +15,4 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "CodegenIntegration.h"
+#include <app/clusters/power-topology-server/CodegenIntegration.h>

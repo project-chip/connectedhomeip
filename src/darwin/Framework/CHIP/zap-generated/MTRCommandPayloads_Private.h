@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#import "MTRCommandPayloadsObjc_Private.h"
 #import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRCommandPayloadsObjc_Private.h>
 #import <Matter/MTRDefines.h>
 
 #include <app-common/zap-generated/cluster-objects.h>

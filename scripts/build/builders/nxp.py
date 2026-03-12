@@ -310,11 +310,11 @@ class NxpBuilder(GnBuilder):
         if self.enable_thread:
             # thread is enabled by default on kw32
             if self.board == NxpBoard.RW61X:
-                args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
+                args.append('chip_enable_thread=true chip_inet_config_enable_ipv4=false')
             if self.board == NxpBoard.RT1060:
-                args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
+                args.append('chip_enable_thread=true chip_inet_config_enable_ipv4=false')
             if self.board == NxpBoard.RT1170:
-                args.append('chip_enable_openthread=true chip_inet_config_enable_ipv4=false')
+                args.append('chip_enable_thread=true chip_inet_config_enable_ipv4=false')
 
         if self.board_variant:
             board_variant_value = self.BoardVariantName(self.board, self.os_env, self.board_variant)
@@ -335,6 +335,9 @@ class NxpBuilder(GnBuilder):
 
         if self.enable_ethernet and self.os_env == NxpOsUsed.ZEPHYR:
             flags.append('-DEXTRA_CONF_FILE="prj_ethernet.conf"')
+
+        if self.enable_thread and self.os_env == NxpOsUsed.ZEPHYR:
+            flags.append('-DEXTRA_CONF_FILE="prj_thread_ftd.conf"')
 
         if self.has_sw_version_2:
             flags.append("-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2")
