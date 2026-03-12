@@ -416,7 +416,7 @@ sl_status_t InitiateScan()
 
     ssid.length = wfx_rsi.credentials.ssidLen;
 
-    chip::ByteSpan requestedSsidSpan(reinterpret_cast<const uint8_t *>(wfx_rsi.credentials.ssid), wfx_rsi.credentials.ssidLen);
+    chip::ByteSpan requestedSsidSpan(wfx_rsi.credentials.ssid, wfx_rsi.credentials.ssidLen);
     chip::MutableByteSpan ssidSpan(ssid.value, ssid.length);
     TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(requestedSsidSpan, ssidSpan);
 
