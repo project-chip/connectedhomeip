@@ -84,7 +84,12 @@ def load_env_from_yaml(file_path):
     multiple=True,
     help="Regex the tests to pick. Use `!` to negate the expression. Expressions FILTERS out non-matching (i.e. you can use it to restrict more and more, but not to add)",
 )
-def main(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str]):
+@click.option(
+    "--nightly",
+    is_flag=True,
+    help="If set run a only test under the nightly section.",
+)
+def main(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], nightly: bool):
     # Determine the root directory of the CHIP project
     chip_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -97,6 +102,7 @@ def main(search_directory, env_file, keep_going, dry_run: bool, glob: list[str],
     with open(os.path.join(chip_root, "src/python_testing/test_metadata.yaml")) as f:
         metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
+    nightly_tests = {item["name"] for item in metadata["nightly"]}
 
     # Get all .py files in the directory
     all_python_files = g.glob(os.path.join(search_directory, "*.py"))
@@ -117,8 +123,19 @@ def main(search_directory, env_file, keep_going, dry_run: bool, glob: list[str],
             def match(p): return r.search(p) is not None
         all_python_files = [path for path in all_python_files if match(path)]
 
-    # Filter out the files matching the excluded patterns
-    python_files = [file for file in all_python_files if os.path.basename(file) not in excluded_patterns]
+    # If nightly flag is set that mean only super slow tests are going to run, these test may be in the not_automated as
+    # tests are super slow and they should not run on REPL tests only on nightly tests.
+    if nightly and nightly_tests is not None:
+        python_files = [file for file in all_python_files if os.path.basename(file) in nightly_tests]
+
+    if not nightly:
+        # Filter out the files matching the excluded patterns
+        python_files = [file for file in all_python_files if os.path.basename(file) not in excluded_patterns]
+
+    if len(python_files) == 0:
+        # no files found
+        log.error("No tests to execute")
+        sys.exit(1)
 
     # Run each script with the base command
     failed_scripts = []

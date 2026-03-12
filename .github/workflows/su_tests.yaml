@@ -48,10 +48,7 @@ env:
 jobs:
     su_repl_tests_linux_build:
         name: REPL Tests - Linux Software Update (BUILD)
-
-            if: |
-              github.actor != 'restyled-io[bot]' && 
-              (github.ref == 'refs/heads/master' || github.event_name == 'pull_request')
+            if: github.actor != 'restyled-io[bot]' && (github.ref == 'refs/heads/master' || github.event_name == 'pull_request')
 
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi
@@ -123,7 +120,7 @@ jobs:
 
             - name: Build Software Update ota images with new version.
               run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 5
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2
                   && mv out/su_ota_images_min-v*/*.ota objdir-clone
                   && rm -rf out/su_ota_images_min-v*"
 
@@ -168,9 +165,6 @@ jobs:
         needs: su_repl_tests_linux_build
         if: github.actor != 'restyled-io[bot]'
         timeout-minutes: 45
-
-        if: github.actor != 'restyled-io[bot]'
-
         strategy:
             # These tests take a lot of time so we just run the batch related to TC_SU.
             fail-fast: false
@@ -187,7 +181,7 @@ jobs:
         runs-on: namespace-profile-1x2
 
         container:
-            image: ghcr.io/project-chip/chip-build:177
+            image: ghcr.io/project-chip/chip-build:184
             volumes:
                 - /var/run/nsc/:/var/run/nsc/
             env:
@@ -231,9 +225,6 @@ jobs:
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   # SU OTA Images
                   echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
-                  echo "SU_OTA_REQUESTOR_V3: objdir-clone/chip-ota-requestor-app_v3.min.ota" >> /tmp/test_env.yaml
-                  echo "SU_OTA_REQUESTOR_V4: objdir-clone/chip-ota-requestor-app_v4.min.ota" >> /tmp/test_env.yaml
-                  echo "SU_OTA_REQUESTOR_V5: objdir-clone/chip-ota-requestor-app_v5.min.ota" >> /tmp/test_env.yaml
 
                   # Generic trace setups after applications
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
@@ -243,11 +234,8 @@ jobs:
               if: ${{matrix.filter == ''}}
               run: |
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v2.min.ota -v 2'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v3.min.ota -v 3'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v4.min.ota -v 4'
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v5.min.ota -v 5'
             
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
               run: |
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}"'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --nightly --search-directory src/python_testing --regex "${{matrix.filter}}"'
