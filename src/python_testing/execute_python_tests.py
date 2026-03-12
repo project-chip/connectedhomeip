@@ -87,7 +87,7 @@ def load_env_from_yaml(file_path):
 @click.option(
     "--nightly",
     is_flag=True,
-    help="If set run a only test under the nightly section.",
+    help="If set only run tests under the nightly section.",
 )
 def main(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], nightly: bool):
     # Determine the root directory of the CHIP project
@@ -123,8 +123,8 @@ def main(search_directory, env_file, keep_going, dry_run: bool, glob: list[str],
             def match(p): return r.search(p) is not None
         all_python_files = [path for path in all_python_files if match(path)]
 
-    # If nightly flag is set that mean only super slow tests are going to run, these test may be in the not_automated as
-    # tests are super slow and they should not run on REPL tests only on nightly tests.
+    # If nightly flag is set that mean only super slow tests are going to run, some of these test may be in the not_automated
+    # section as tests are super slow and they should not run on each PR, only on nightly runs.
     if nightly and nightly_tests is not None:
         python_files = [file for file in all_python_files if os.path.basename(file) in nightly_tests]
 
@@ -133,7 +133,7 @@ def main(search_directory, env_file, keep_going, dry_run: bool, glob: list[str],
         python_files = [file for file in all_python_files if os.path.basename(file) not in excluded_patterns]
 
     if len(python_files) == 0:
-        # no files found
+        # No files match
         log.error("No tests to execute")
         sys.exit(1)
 
