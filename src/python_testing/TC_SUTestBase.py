@@ -275,7 +275,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             dev_ctrl: Device controller for sending commands
             provider_node_id: Node ID of the OTA provider
             requestor_node_id: Optional specific requestor node ID for targeted access
-            acl_entries: Optional[list[AccessControlEntryStruct]]. ACL list to write ino the requestor.
+            acl_entries: Optional[list[AccessControlEntryStruct]]. ACL list to write into the requestor.
 
         Returns:
             Result of the ACL write operation
