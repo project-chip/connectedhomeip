@@ -130,10 +130,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     bool hadBleStackInit = mFlags.Has(Flags::kSiLabsBLEStackInitialize);
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-    if (hadBleStackInit)
-    {
-        mFlags.Set(Flags::kSiLabsBLEStackInitialize);
-    }
+    mFlags.Set(Flags::kSiLabsBLEStackInitialize, hadBleStackInit);
 
     // Check that an address was not already configured at boot.
     // This covers the init-shutdown-init case to comply with the BLE address change at boot only requirement
