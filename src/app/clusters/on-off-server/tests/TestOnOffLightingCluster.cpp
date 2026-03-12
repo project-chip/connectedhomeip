@@ -533,14 +533,12 @@ TEST_F(TestOnOffLightingCluster, TestOffWaitTime)
 
 TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
 {
-    auto & changeListener = mClusterTester.GetServerClusterContext().ChangeListener();
-
     // Step 1: Invoke OnWithTimedOff with OnTime=5 and OffWaitTime=5
     Commands::OnWithTimedOff::Type command;
     command.onTime      = 5;
     command.offWaitTime = 5;
 
-    changeListener.DirtyList().clear();
+    mClusterTester.GetDirtyList().clear();
 
     EXPECT_TRUE(mClusterTester.Invoke(command).IsSuccess());
 
@@ -548,7 +546,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     bool onTimeReported      = false;
     bool offWaitTimeReported = false;
 
-    for (auto & id : changeListener.DirtyList())
+    for (auto & id : mClusterTester.GetDirtyList())
     {
         if (id.mAttributeId == Attributes::OnTime::Id)
             onTimeReported = true;
@@ -558,7 +556,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     EXPECT_FALSE(onTimeReported);
     EXPECT_FALSE(offWaitTimeReported);
 
-    changeListener.DirtyList().clear();
+    mClusterTester.GetDirtyList().clear();
 
     // Timer should remain active to count down OffWaitTime.
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
@@ -570,7 +568,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     }
 
     // Verify still no reporting
-    for (auto & id : changeListener.DirtyList())
+    for (auto & id : mClusterTester.GetDirtyList())
     {
         if (id.mAttributeId == Attributes::OnTime::Id)
             onTimeReported = true;
@@ -580,7 +578,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     EXPECT_FALSE(onTimeReported);
     EXPECT_FALSE(offWaitTimeReported);
 
-    changeListener.DirtyList().clear();
+    mClusterTester.GetDirtyList().clear();
 
     // Step 2: Advance clock to exhaust OnTime.
     for (int i = 0; i < 5; ++i)
@@ -591,7 +589,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&mCluster));
 
     // Verify reporting of 0
-    for (auto & id : changeListener.DirtyList())
+    for (auto & id : mClusterTester.GetDirtyList())
     {
         if (id.mAttributeId == Attributes::OnTime::Id)
             onTimeReported = true;
@@ -601,7 +599,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     EXPECT_TRUE(onTimeReported);
     EXPECT_TRUE(offWaitTimeReported);
 
-    changeListener.DirtyList().clear();
+    mClusterTester.GetDirtyList().clear();
 
     // Step 3: Invoke OnWithTimedOff with OnTime=15 and OffWaitTime=15
     command.onTime      = 15;
@@ -613,7 +611,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     onTimeReported      = false;
     offWaitTimeReported = false;
 
-    for (auto & id : changeListener.DirtyList())
+    for (auto & id : mClusterTester.GetDirtyList())
     {
         if (id.mAttributeId == Attributes::OnTime::Id)
             onTimeReported = true;
@@ -623,7 +621,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     EXPECT_TRUE(onTimeReported);
     EXPECT_TRUE(offWaitTimeReported);
 
-    changeListener.DirtyList().clear();
+    mClusterTester.GetDirtyList().clear();
 
     // Timer should remain active to count down OffWaitTime.
     EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&mCluster));
@@ -638,7 +636,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     onTimeReported      = false;
     offWaitTimeReported = false;
 
-    for (auto & id : changeListener.DirtyList())
+    for (auto & id : mClusterTester.GetDirtyList())
     {
         if (id.mAttributeId == Attributes::OnTime::Id)
             onTimeReported = true;
@@ -648,14 +646,14 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     EXPECT_FALSE(onTimeReported);
     EXPECT_FALSE(offWaitTimeReported);
 
-    changeListener.DirtyList().clear();
+    mClusterTester.GetDirtyList().clear();
 
     // Invoke off to initiate countdown of OffWaitTime
     Commands::Off::Type offCommand;
     EXPECT_TRUE(mClusterTester.Invoke(offCommand).IsSuccess());
 
     // Expect reporting of OnTime since it should change to 0
-    for (auto & id : changeListener.DirtyList())
+    for (auto & id : mClusterTester.GetDirtyList())
     {
         if (id.mAttributeId == Attributes::OnTime::Id)
             onTimeReported = true;
@@ -665,7 +663,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     EXPECT_TRUE(onTimeReported);
     EXPECT_FALSE(offWaitTimeReported);
 
-    changeListener.DirtyList().clear();
+    mClusterTester.GetDirtyList().clear();
 
     // Step 2: Advance clock.
     for (int i = 0; i < 10; ++i)
@@ -674,7 +672,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     }
 
     // Do not expect reporting
-    for (auto & id : changeListener.DirtyList())
+    for (auto & id : mClusterTester.GetDirtyList())
     {
         if (id.mAttributeId == Attributes::OnTime::Id)
             onTimeReported = true;
@@ -684,7 +682,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     EXPECT_FALSE(onTimeReported);
     EXPECT_FALSE(offWaitTimeReported);
 
-    changeListener.DirtyList().clear();
+    mClusterTester.GetDirtyList().clear();
 
     // Step 2: Advance clock to exhurst OffWaitTime.
     for (int i = 0; i < 10; ++i)
@@ -693,7 +691,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     }
 
     // Expect reporting of 0 value for OffWaitTime
-    for (auto & id : changeListener.DirtyList())
+    for (auto & id : mClusterTester.GetDirtyList())
     {
         if (id.mAttributeId == Attributes::OffWaitTime::Id)
             offWaitTimeReported = true;
