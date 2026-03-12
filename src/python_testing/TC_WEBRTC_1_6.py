@@ -226,11 +226,11 @@ class TC_WEBRTC_1_6(MatterBaseTest, WebRTCTestHelper):
                 payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
             )
         except InteractionModelError as e:
-            # Since on closing the browser popup, the PC state changes to Disonnected/Closed.
+            # Since on closing the browser popup, the PC state changes to Disconnected/Closed.
             # Some implementations can remove session from CurrentSessions on connection state
             # switching to Disconnected/Closed. Hence ignore NotFound status response.
-            if (e.status == Status.NotFound):
-                pass
+            if (e.status != Status.NotFound):
+                raise
 
         if dut_has_vdo_feature:
             self.step(10)
