@@ -581,9 +581,9 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
 
     mClusterTester.GetDirtyList().clear();
 
-    // Step 5: Invoke OnWithTimedOff with OnTime=5 and OffWaitTime=5
-    command.onTime      = 5;
-    command.offWaitTime = 5;
+    // Step 5: Invoke OnWithTimedOff with OnTime=4 and OffWaitTime=4
+    command.onTime      = 4;
+    command.offWaitTime = 4;
 
     mClusterTester.GetDirtyList().clear();
 
@@ -633,7 +633,7 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
 
     EXPECT_TRUE(mClusterTester.Invoke(command).IsSuccess());
 
-    // Step 10: Expect report since the change is higher than 10 (3 -> 15)
+    // Step 10: Expect report since the change is higher than 10 (OnTime: 2 -> 15 & OffWaitTime: 4 -> 15)
     for (auto & id : mClusterTester.GetDirtyList())
     {
         if (id.mAttributeId == Attributes::OnTime::Id)
