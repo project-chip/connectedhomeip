@@ -231,7 +231,7 @@ void OnOffLightingCluster::SetOnTime(uint16_t value)
 {
     VerifyOrReturn(mOnTime != value);
 
-    if (abs(mOnTime - value) > mValueDeltaReportTrigger)
+    if (abs(mOnTime - value) > mValueDeltaReportTrigger || value == 0)
     {
         NotifyAttributeChanged(Attributes::OnTime::Id);
     }
@@ -244,7 +244,7 @@ void OnOffLightingCluster::SetOffWaitTime(uint16_t value)
 {
     VerifyOrReturn(mOffWaitTime != value);
 
-    if (abs(mOffWaitTime - value) > mValueDeltaReportTrigger)
+    if (abs(mOffWaitTime - value) > mValueDeltaReportTrigger || value == 0)
     {
         NotifyAttributeChanged(Attributes::OffWaitTime::Id);
     }
