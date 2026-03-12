@@ -4,8 +4,8 @@ from typing import List
 
 from mobly import signals
 
-from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.commissioning import CommissioningInfo, SetupPayloadInfo, commission_devices
+from matter.testing.matter_testing import MatterBaseTest
 
 
 class CommissionDeviceTest(MatterBaseTest):

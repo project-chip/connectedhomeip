@@ -23,7 +23,7 @@ import logging
 from dataclasses import dataclass
 from typing import Any, List, Optional
 
-from mobly import asserts, signals
+from mobly import asserts
 
 from matter import ChipDeviceCtrl, discovery
 from matter.ChipDeviceCtrl import CommissioningParameters
