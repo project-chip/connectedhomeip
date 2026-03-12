@@ -46,3 +46,4 @@ CHIP_ERROR CommissionerControlServer::Init()
 } // namespace chip::app::Clusters
 
 void MatterCommissionerControlPluginServerInitCallback() {}
+void MatterCommissionerControlPluginServerShutdownCallback() {}
