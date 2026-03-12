@@ -582,7 +582,6 @@ TEST_F(TestOnOffLightingCluster, TestOnTimeAndOffWaitTimeReporting)
     mClusterTester.GetDirtyList().clear();
 
     // Step 5: Invoke OnWithTimedOff with OnTime=10 and OffWaitTime=10
-    Commands::OnWithTimedOff::Type command;
     command.onTime      = 10;
     command.offWaitTime = 10;
 
