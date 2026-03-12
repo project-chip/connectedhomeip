@@ -23,9 +23,6 @@ static_library("actions-server") {
   ]
 
   public_deps = [
-    "${chip_root}/src/app:constants",
-    "${chip_root}/src/app:interaction-model",
-    "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",

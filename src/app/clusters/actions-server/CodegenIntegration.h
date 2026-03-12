@@ -20,16 +20,31 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 namespace chip::app::Clusters::Actions {
 
-// Legacy wrapper for backwards compatibility with existing applications.
+/**
+ * Legacy wrapper around ActionsCluster for backwards compatibility with existing applications.
+ *
+ * LIMITATIONS:
+ *   - Assumes a single aggregator endpoint. The Matter spec classifies the Actions cluster as
+ *     "Scope: Node", so only one instance should exist on the node. Creating more than one
+ *     instance will log an error.
+ *   - The Delegate interface has no EndpointId parameters; it is designed for this single-instance
+ *     use case.
+ *
+ * NEW CODE should use ActionsCluster directly (see ActionsCluster.h), which integrates cleanly
+ * with the code-driven data model and does not carry the Ember/ZAP compatibility overhead.
+ */
 class ActionsServer
 {
 public:
     /**
-     * Creates an actions server instance. This is a backwards compatibility wrapper around ActionsCluster.
-     * @param endpointId The endpoint on which this cluster exists.
-     * @param delegate A reference to the delegate to be used by this server.
+     * Creates an ActionsServer for the given aggregator endpoint. Only one instance should
+     * exist per node. The constructor logs an error if this constraint is violated.
+     *
+     * @param endpointId The aggregator endpoint on which the Actions cluster resides.
+     * @param delegate   Application-supplied delegate providing action/endpoint-list data
+     *                   and command handling.
      */
-    ActionsServer(EndpointId endpointId, Actions::Delegate & delegate);
+    ActionsServer(EndpointId endpointId, Delegate & delegate);
     ~ActionsServer();
 
     /**
@@ -47,14 +62,24 @@ public:
     void ActionListModified(EndpointId aEndpoint);
     void EndpointListModified(EndpointId aEndpoint);
 
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
+
     EndpointId GetEndpointId() { return mCluster.Cluster().GetPaths()[0].mEndpointId; }
 
 private:
-    ActionsCluster::OptionalAttributesSet BuildOptionalAttributes(EndpointId endpointId);
-    std::optional<CharSpan> BuildSetupURL(EndpointId endpointId);
+    CHIP_ERROR ReadActionListAttribute(const ConcreteReadAttributePath & aPath,
+                                       const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 
-    char mSetupURLBuffer[254] = { 0 };
+    CHIP_ERROR ReadEndpointListAttribute(const ConcreteReadAttributePath & aPath,
+                                         const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+
+    bool mRegistered = false;
+    std::string mSetupURL;
     RegisteredServerCluster<ActionsCluster> mCluster;
+
+    // The Actions cluster has "Scope: Node" per the Matter spec, meaning only one
+    // instance should exist on the node (on a single aggregator endpoint).
+    static uint8_t sInstanceCount;
 };
 
 } // namespace chip::app::Clusters::Actions

@@ -19,12 +19,11 @@
 
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/actions-server/ActionsDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/Actions/Attributes.h>
 #include <clusters/Actions/Events.h>
-
-#include "ActionsDelegate.h"
 
 namespace chip::app::Clusters {
 
@@ -39,35 +38,18 @@ public:
         mDelegate(delegate), mOptionalAttributes(optionalAttributes), mSetupURL(setupURL)
     {}
 
-    ~ActionsCluster() override = default;
+    ~ActionsCluster() = default;
 
     void ActionListModified();
 
     void EndpointListsModified();
 
     /**
-     * Public helper API for the Application/Delegate to call asynchronously when a previously invoked action
-     * changes state. This method exists to allow the application to notify the C++ cluster when an action's
-     * state has changed, enabling the cluster to emit the corresponding Matter StateChanged event to the fabric.
-     *
-     * @param aActionId The ID of the action whose state has changed
-     * @param aInvokeId The invoke ID associated with the action invocation
-     * @param aActionState The new state of the action
+     * Public helper API for the Application/Delegate to call asynchronously to emit a Matter event to the fabric.
+     * Use these when an action's state changes or an action fails.
      */
-    void OnStateChanged(uint16_t aActionId, uint32_t aInvokeId, Actions::ActionStateEnum aActionState);
-
-    /**
-     * Public helper API for the Application/Delegate to call asynchronously when a previously invoked action
-     * fails. This method exists to allow the application to notify the C++ cluster when an action has failed,
-     * enabling the cluster to emit the corresponding Matter ActionFailed event to the fabric.
-     *
-     * @param aActionId The ID of the action that failed
-     * @param aInvokeId The invoke ID associated with the action invocation
-     * @param aActionState The state of the action at the time of failure
-     * @param aActionError The error that caused the action to fail
-     */
-    void OnActionFailed(uint16_t aActionId, uint32_t aInvokeId, Actions::ActionStateEnum aActionState,
-                        Actions::ActionErrorEnum aActionError);
+    void GenerateEvent(const Actions::Events::StateChanged::Type & event);
+    void GenerateEvent(const Actions::Events::ActionFailed::Type & event);
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -92,7 +74,9 @@ private:
     CHIP_ERROR ReadEndpointListAttribute(const DataModel::ReadAttributeRequest & request,
                                          const AttributeValueEncoder::ListEncodeHelper & aEncoder);
 
-    Protocols::InteractionModel::Status ValidateActionCommand(uint16_t actionID, CommandId commandId);
+    Protocols::InteractionModel::Status ValidateActionExists(uint16_t actionID, uint16_t & outActionIndex);
+
+    Protocols::InteractionModel::Status ValidateCommandSupported(uint16_t actionIndex, CommandId commandId);
 };
 
 } // namespace chip::app::Clusters

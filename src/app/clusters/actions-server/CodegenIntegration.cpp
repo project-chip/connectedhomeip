@@ -27,54 +27,75 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Actions;
 
-ActionsServer::ActionsServer(EndpointId endpointId, Delegate & delegate) :
-    mCluster(endpointId, delegate, BuildOptionalAttributes(endpointId), BuildSetupURL(endpointId))
-{}
+namespace {
 
-ActionsCluster::OptionalAttributesSet ActionsServer::BuildOptionalAttributes(EndpointId endpointId)
+// Maximum SetupURL length per the Matter spec (Actions cluster, SetupURL attribute).
+constexpr size_t kMaxSetupURLLength = 512u;
+
+ActionsCluster::OptionalAttributesSet BuildOptionalAttributes(EndpointId endpointId)
 {
     ActionsCluster::OptionalAttributesSet optionalAttributes;
-    // Check if SetupURL attribute exists in Ember RAM
     if (emberAfContainsAttribute(endpointId, Actions::Id, Attributes::SetupURL::Id))
     {
-        // Mark SetupURL as supported
         optionalAttributes.template ForceSet<Attributes::SetupURL::Id>();
     }
     return optionalAttributes;
 }
 
-std::optional<CharSpan> ActionsServer::BuildSetupURL(EndpointId endpointId)
+// Returns the SetupURL attribute value as a std::string, or an empty string on failure.
+// An empty return value means the attribute is absent or unreadable.
+std::string ReadSetupURL(EndpointId endpointId)
 {
-    std::optional<CharSpan> setupURL;
-    // Check if SetupURL attribute exists in Ember RAM
-    if (emberAfContainsAttribute(endpointId, Actions::Id, Attributes::SetupURL::Id))
+    VerifyOrReturnValue(emberAfContainsAttribute(endpointId, Actions::Id, Attributes::SetupURL::Id), std::string());
+    // Use a stack buffer for the Ember read; the result is then copied into a std::string.
+    char buf[kMaxSetupURLLength];
+    MutableCharSpan urlSpan(buf);
+    VerifyOrReturnValue(Attributes::SetupURL::Get(endpointId, urlSpan) == Protocols::InteractionModel::Status::Success,
+                        std::string());
+    return std::string(urlSpan.data(), urlSpan.size());
+}
+
+std::optional<CharSpan> SetupURLSpan(const std::string & url)
+{
+    VerifyOrReturnValue(!url.empty(), std::nullopt);
+    return CharSpan(url.data(), url.size());
+}
+
+} // namespace
+
+uint8_t ActionsServer::sInstanceCount = 0;
+
+ActionsServer::ActionsServer(EndpointId endpointId, Delegate & delegate) :
+    mSetupURL(ReadSetupURL(endpointId)),
+    mCluster(endpointId, delegate, BuildOptionalAttributes(endpointId), SetupURLSpan(mSetupURL))
+{
+    // The Actions cluster has "Scope: Node" per the Matter spec: it must live on a single
+    // aggregator endpoint. Log an error if an application creates more than one instance.
+    if (++sInstanceCount > 1)
     {
-        // Extract the SetupURL string from Ember storage into local buffer
-        MutableCharSpan urlSpan(mSetupURLBuffer);
-        if (Attributes::SetupURL::Get(endpointId, urlSpan) == Protocols::InteractionModel::Status::Success)
-        {
-            setupURL = CharSpan(urlSpan.data(), urlSpan.size());
-        }
+        ChipLogError(Zcl, "ActionsServer: multiple instances created. The Actions cluster must be a node-scoped singleton.");
     }
-    return setupURL;
 }
 
 ActionsServer::~ActionsServer()
 {
     Shutdown();
+    --sInstanceCount;
 }
 
 CHIP_ERROR ActionsServer::Init()
 {
-    // Registers the code-driven cluster with the new framework
-    return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
+    VerifyOrReturnError(!mRegistered, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration()));
+    mRegistered = true;
+    return CHIP_NO_ERROR;
 }
 
 void ActionsServer::Shutdown()
 {
-    // Unregisters the code-driven cluster
+    VerifyOrReturn(mRegistered);
+    mRegistered    = false;
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
-
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
@@ -84,18 +105,31 @@ void ActionsServer::Shutdown()
 
 void ActionsServer::ActionListModified(EndpointId aEndpoint)
 {
-    // Proxy the legacy call to the new cluster's centralized notification helper
+    VerifyOrReturn(aEndpoint == mCluster.Cluster().GetPaths()[0].mEndpointId);
     mCluster.Cluster().ActionListModified();
 }
 
 void ActionsServer::EndpointListModified(EndpointId aEndpoint)
 {
-    // Proxy the legacy call to the new cluster's centralized notification helper
+    VerifyOrReturn(aEndpoint == mCluster.Cluster().GetPaths()[0].mEndpointId);
     mCluster.Cluster().EndpointListsModified();
 }
 
-// Stub callbacks: Since we are using the RegisteredServerCluster instantiation pattern
-// in the applications themselves, these ZAP-generated callbacks can remain empty stubs.
+CHIP_ERROR ActionsServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    // 1. Construct the request using the path and a default SubjectDescriptor.
+    Access::SubjectDescriptor subjectDescriptor;
+    DataModel::ReadAttributeRequest request(aPath, subjectDescriptor);
+
+    // 2. Delegate the read operation to the new ActionsCluster implementation
+    DataModel::ActionReturnStatus status = mCluster.Cluster().ReadAttribute(request, aEncoder);
+
+    return status.GetUnderlyingError();
+}
+// ZAP-generated plugin callbacks are left as stubs. Applications instantiate ActionsServer
+// directly (not through these callbacks) and register it with the codegen data model
+// provider via Init(). This is consistent with the code-driven cluster pattern where the
+// application owns the cluster lifecycle rather than the ZAP-generated scaffolding.
 void MatterActionsClusterInitCallback(EndpointId endpointId) {}
 void MatterActionsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType type) {}
 void MatterActionsPluginServerInitCallback() {}
