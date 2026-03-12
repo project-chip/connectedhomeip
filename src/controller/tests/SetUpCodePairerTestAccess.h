@@ -53,10 +53,7 @@ public:
 
     void ExpectPASEEstablishment() { mPairer->ExpectPASEEstablishment(); }
 
-    void CallOnPairingComplete(CHIP_ERROR error)
-    {
-        mPairer->OnPairingComplete(error, std::nullopt, std::nullopt);
-    }
+    void CallOnPairingComplete(CHIP_ERROR error) { mPairer->OnPairingComplete(error, std::nullopt, std::nullopt); }
 
     void FireTimeoutCallback() { Controller::SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(nullptr, mPairer); }
 
