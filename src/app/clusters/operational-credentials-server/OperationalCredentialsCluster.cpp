@@ -45,6 +45,8 @@ constexpr auto kDACCertificate                = CertificateChainTypeEnum::kDACCe
 constexpr auto kPAICertificate                = CertificateChainTypeEnum::kPAICertificate;
 constexpr auto kNocResponseMaxDebugTextLength = 128;
 
+ByteSpan gVendorReserved[3];
+
 // Get the attestation challenge for the current session in progress. Only valid when called
 // synchronously from inside a CommandHandler. If not called in CASE/PASE session context,
 // return an empty span. This will for sure make the procedures that rely on the challenge
@@ -312,9 +314,12 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
     {
         constexpr size_t csrLength = Crypto::kMIN_CSR_Buffer_Size;
         size_t nocsrLengthEstimate = 0;
-        ByteSpan kNoVendorReserved;
         Platform::ScopedMemoryBuffer<uint8_t> csr;
         MutableByteSpan csrSpan;
+
+        ByteSpan vendorReserved1 = gVendorReserved[0];
+        ByteSpan vendorReserved2 = gVendorReserved[1];
+        ByteSpan vendorReserved3 = gVendorReserved[2];
 
         // Generate the actual CSR from the ephemeral key
         if (!csr.Alloc(csrLength))
@@ -346,9 +351,11 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
         ChipLogProgress(Zcl, "OpCreds: AllocatePendingOperationalKey succeeded");
 
         // Encode the NOCSR elements with the CSR and Nonce
-        nocsrLengthEstimate = TLV::EstimateStructOverhead(csrSpan.size(),  // CSR buffer
-                                                          CSRNonce.size(), // CSR Nonce
-                                                          0u               // no vendor reserved data
+        nocsrLengthEstimate = TLV::EstimateStructOverhead(csrSpan.size(),           // CSR buffer
+                                                          CSRNonce.size(),           // CSR Nonce
+                                                          vendorReserved1.size(),    // vendor_reserved1
+                                                          vendorReserved2.size(),    // vendor_reserved2
+                                                          vendorReserved3.size()     // vendor_reserved3
         );
 
         if (!nocsrElements.Alloc(nocsrLengthEstimate + attestationChallenge.size()))
@@ -361,8 +368,8 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
 
         VerifyOrExit(nocsrElementsSpan.size() >= nocsrLengthEstimate, errorStatus = Status::ConstraintError);
 
-        err = Credentials::ConstructNOCSRElements(ByteSpan{ csrSpan.data(), csrSpan.size() }, CSRNonce, kNoVendorReserved,
-                                                  kNoVendorReserved, kNoVendorReserved, nocsrElementsSpan);
+        err = Credentials::ConstructNOCSRElements(ByteSpan{ csrSpan.data(), csrSpan.size() }, CSRNonce, vendorReserved1,
+                                                  vendorReserved2, vendorReserved3, nocsrElementsSpan);
         VerifyOrExit(err == CHIP_NO_ERROR, errorStatus = Status::Failure);
 
         // Append attestation challenge in the back of the reserved space for the signature
@@ -1036,6 +1043,30 @@ void OnPlatformEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, in
     }
 }
 } // anonymous namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace OperationalCredentials {
+
+CHIP_ERROR SetCSRVendorReserved(CSRVendorReservedField field, ByteSpan data)
+{
+    uint8_t index = static_cast<uint8_t>(field);
+    if (index >= 3)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    gVendorReserved[index] = data;
+
+    ChipLogProgress(Zcl, "OpCreds: CSR vendor_reserved%u set (%u bytes)", index + 1, static_cast<unsigned>(data.size()));
+    return CHIP_NO_ERROR;
+}
+
+} // namespace OperationalCredentials
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 void OperationalCredentialsCluster::FailSafeCleanup(const DeviceLayer::ChipDeviceEvent * event,
                                                     OperationalCredentialsCluster * cluster)

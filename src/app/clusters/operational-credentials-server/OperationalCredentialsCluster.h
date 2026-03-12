@@ -30,6 +30,37 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+namespace OperationalCredentials {
+
+/**
+ * Identifies which vendor_reserved field to set in the CSRResponse NOCSRElements.
+ * Maps to context tags 3, 4, 5 in the NOCSRElements TLV structure per the Matter spec.
+ */
+enum class CSRVendorReservedField : uint8_t
+{
+    kVendorReserved1 = 0, // context tag 3
+    kVendorReserved2 = 1, // context tag 4
+    kVendorReserved3 = 2, // context tag 5
+};
+
+/**
+ * @brief Set vendor-specific data to be included in CSRResponse NOCSRElements.
+ *
+ * Must be called before the Matter stack is started, or from the Matter
+ * event loop thread via PlatformMgr().ScheduleWork().
+ *
+ * @param field      Which vendor_reserved field to set
+ * @param data       Vendor-specific data as a ByteSpan. The caller retains ownership of
+ *                   the underlying memory, which must remain valid for the lifetime of
+ *                   the device. Pass an empty ByteSpan to clear a previously set field.
+ *
+ * @return CHIP_NO_ERROR on success
+ *         CHIP_ERROR_INVALID_ARGUMENT if field is out of range
+ */
+CHIP_ERROR SetCSRVendorReserved(CSRVendorReservedField field, ByteSpan data);
+
+} // namespace OperationalCredentials
+
 class OperationalCredentialsCluster : public DefaultServerCluster, chip::FabricTable::Delegate
 {
 public:
