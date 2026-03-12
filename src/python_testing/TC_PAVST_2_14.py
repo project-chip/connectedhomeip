@@ -57,13 +57,13 @@ class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     @async_test_body
     async def setup_class(self):
+        super().setup_class()
         th_server_app = self.user_params.get("th_server_app_path", None)
         self.server = PushAvServerProcess(server_path=th_server_app)
         self.server.start(
             expected_output="Running on https://0.0.0.0:1234",
             timeout=30,
         )
-        super().setup_class()
 
     def teardown_class(self):
         if self.server is not None:
