@@ -280,10 +280,12 @@ def slt_where(slt_cli_path, package):
                 line = line.strip()
                 if line.startswith("/"):
                     return line
-                # Handle path concatenated after interactive prompt
-                prompt_idx = line.rfind("?/")
-                if prompt_idx != -1:
-                    return line[prompt_idx + 1:]
+                # Handle path concatenated after interactive prompt (e.g. "[y/n]?/path" or "[y/n]? /path")
+                q_idx = line.rfind("?")
+                if q_idx != -1:
+                    after = line[q_idx + 1:].lstrip()
+                    if after.startswith("/"):
+                        return after
             logger.error(
                 "Could not find an absolute path in 'slt where %s' output:\n%s",
                 package, result.stdout.strip(),
