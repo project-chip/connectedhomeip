@@ -26,24 +26,20 @@ class CommissionerControlServer
 {
 public:
     /**
-     * Creates a chime server instance. This is just a backwards compatibility wrapper around the CommissionerControlCluster.
-     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aDelegate A reference to the delegate to be used by this server.
+     * Creates a commissioner control server instance. This is just a backwards compatibility wrapper around the
+     * CommissionerControlCluster.
+     * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param delegate A reference to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     CommissionerControlServer(EndpointId endpointId, CommissionerControl::Delegate * delegate);
     ~CommissionerControlServer();
 
     /**
-     * Register the chime cluster instance with the codegen data model provider.
+     * Register the commissioner control cluster instance with the codegen data model provider.
      * @return Returns an error if registration fails.
      */
     CHIP_ERROR Init();
-
-    /**
-     * @return The endpoint ID.
-     */
-    EndpointId GetEndpointId() { return mEndpointId; }
 
     // The Code Driven CommissionerControlCluster instance (lazy-initialized)
     chip::app::LazyRegisteredServerCluster<CommissionerControlCluster> mCluster;
