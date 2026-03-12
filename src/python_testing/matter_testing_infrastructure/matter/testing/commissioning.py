@@ -364,15 +364,15 @@ class CommissionDeviceTest(MatterBaseTest):
         config = self.matter_test_config
         self.dut_node_ids: List[int] = config.dut_node_ids
         self.commissioning_info: CommissioningInfo = CommissioningInfo(
-            commissionee_ip_address_just_for_testing=meta_config['commissionee_ip_address_just_for_testing'],
-            commissioning_method=meta_config['commissioning_method'],
-            thread_operational_dataset=meta_config['thread_operational_dataset'],
-            wifi_passphrase=meta_config['wifi_passphrase'],
-            wifi_ssid=meta_config['wifi_ssid'],
-            tc_version_to_simulate=meta_config['tc_version_to_simulate'],
-            tc_user_response_to_simulate=meta_config['tc_user_response_to_simulate'],
-            thread_ba_host=meta_config['thread_ba_host'],
-            thread_ba_port=meta_config['thread_ba_port'],
+            commissionee_ip_address_just_for_testing=config.commissionee_ip_address_just_for_testing,
+            commissioning_method=config.commissioning_method,
+            thread_operational_dataset=config.thread_operational_dataset,
+            wifi_passphrase=config.wifi_passphrase,
+            wifi_ssid=config.wifi_ssid,
+            tc_version_to_simulate=config.tc_version_to_simulate,
+            tc_user_response_to_simulate=config.tc_user_response_to_simulate,
+            thread_ba_host=config.thread_ba_host,
+            thread_ba_port=config.thread_ba_port,
         )
         # Use inherited get_setup_payload_info method
         self.setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
