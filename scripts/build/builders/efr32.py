@@ -370,7 +370,7 @@ class Efr32Builder(GnBuilder):
                 extra_args.extend(["is_debug=true", "optimize_debug=true"])
             case BuildProfile.RELEASE:
                 extra_args.extend(["is_debug=false", "optimize_for_size=false"])
-            case BuildProfile.RELEASE_SMALL:
+            case BuildProfile.RELEASE_SIZE:
                 extra_args.extend(["is_debug=false", "optimize_for_size=true"])
 
         if self.options.pw_command_launcher:

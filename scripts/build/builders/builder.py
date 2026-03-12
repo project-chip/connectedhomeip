@@ -27,7 +27,7 @@ class BuildProfile(StrEnum):
     DEBUG = "debug"                      # Default debug profile.
     DEBUG_OPTIMIZED = "debug-optimized"  # Debug profile with optimizations enabled.
     RELEASE = "release"                  # Release profile optimized for performance.
-    RELEASE_SMALL = "release-small"      # Release profile optimized for size.
+    RELEASE_SIZE = "release-size"        # Release profile optimized for size.
 
 
 @dataclass

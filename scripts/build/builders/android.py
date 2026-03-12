@@ -432,7 +432,7 @@ class AndroidBuilder(Builder):
                     gn_args.update({"is_debug": True, "optimize_debug": True})
                 case BuildProfile.RELEASE:
                     gn_args.update({"is_debug": False, "optimize_for_size": False})
-                case BuildProfile.RELEASE_SMALL:
+                case BuildProfile.RELEASE_SIZE:
                     gn_args.update({"is_debug": False, "optimize_for_size": True})
 
             if self.options.pw_command_launcher:
