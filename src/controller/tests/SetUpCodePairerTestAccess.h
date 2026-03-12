@@ -43,6 +43,21 @@ public:
     NodeId GetRemoteId() const { return mPairer->mRemoteId; }
     void SetRemoteId(NodeId id) { mPairer->mRemoteId = id; }
 
+    CHIP_ERROR GetLastPASEError() const { return mPairer->mLastPASEError; }
+
+    bool HasCurrentPASEParameters() const { return mPairer->mCurrentPASEParameters.HasValue(); }
+    void SetCurrentPASEParameters(const Controller::SetUpCodePairerParameters & params)
+    {
+        mPairer->mCurrentPASEParameters.SetValue(params);
+    }
+
+    void ExpectPASEEstablishment() { mPairer->ExpectPASEEstablishment(); }
+
+    void CallOnPairingComplete(CHIP_ERROR error)
+    {
+        mPairer->OnPairingComplete(error, std::nullopt, std::nullopt);
+    }
+
     void FireTimeoutCallback() { Controller::SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(nullptr, mPairer); }
 
 private:
