@@ -724,8 +724,8 @@ void SetUpCodePairer::StopPairingIfTransportsExhausted(CHIP_ERROR err)
     }
     // Clear mRemoteId first to guard against re-entrant calls (e.g. from an async
     // cancel callback fired after StopAllDiscoveryAttempts already cleared the flags).
-    mRemoteId              = kUndefinedNodeId;
-    CHIP_ERROR failErr     = mLastPASEError != CHIP_NO_ERROR ? mLastPASEError : err;
+    mRemoteId          = kUndefinedNodeId;
+    CHIP_ERROR failErr = mLastPASEError != CHIP_NO_ERROR ? mLastPASEError : err;
     MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, failErr);
     mCommissioner->OnSessionEstablishmentError(failErr);
 }

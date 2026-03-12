@@ -63,8 +63,8 @@ chip_test_suite("tests") {
 
   sources = [
     "AutoCommissionerTestAccess.h",
-    "SetUpCodePairerTestAccess.h",
     "DeviceCommissionerTestAccess.h",
+    "SetUpCodePairerTestAccess.h",
   ]
 
   public_deps = [
