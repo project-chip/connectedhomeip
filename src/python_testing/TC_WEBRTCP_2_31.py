@@ -138,13 +138,21 @@ class TC_WebRTCP_2_31(MatterBaseTest, WEBRTCPTestBase):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand, "Expected INVALID_COMMAND")
 
-        self.step(3)
-        videoStreamID = await self.allocate_one_video_stream()
-        await self.validate_allocated_video_stream(videoStreamID)
+        videoStreamID = None
+        if video_supported:
+            self.step(3)
+            videoStreamID = await self.allocate_one_video_stream()
+            await self.validate_allocated_video_stream(videoStreamID)
+        else:
+            self.skip_step(3)
 
-        self.step(4)
-        audioStreamID = await self.allocate_one_audio_stream()
-        await self.validate_allocated_audio_stream(audioStreamID)
+        audioStreamID = None
+        if audio_supported:
+            self.step(4)
+            audioStreamID = await self.allocate_one_audio_stream()
+            await self.validate_allocated_audio_stream(audioStreamID)
+        else:
+            self.skip_step(4)
 
         self.step(5)
         # Valid AudioStreamID, but invalid (non-existent) VideoStreamID
