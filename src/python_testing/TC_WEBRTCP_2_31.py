@@ -118,6 +118,17 @@ class TC_WebRTCP_2_31(MatterBaseTest, WEBRTCPTestBase):
             None
         )
 
+        # Read AVSM feature map once to determine which stream types are supported
+        avsm_feature_map = await self.read_single_attribute_check_success(
+            endpoint=endpoint,
+            cluster=avsm_cluster,
+            attribute=avsm_cluster.Attributes.FeatureMap
+        )
+        log.info(f"Rx'd AVSM FeatureMap: {avsm_feature_map}")
+        video_supported = bool(avsm_feature_map & avsm_cluster.Bitmaps.Feature.kVideo)
+        audio_supported = bool(avsm_feature_map & avsm_cluster.Bitmaps.Feature.kAudio)
+        log.info(f"Video supported: {video_supported}, Audio supported: {audio_supported}")
+
         self.step(1)
         current_sessions = await self.read_single_attribute_check_success(
             endpoint=endpoint,
