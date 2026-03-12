@@ -272,9 +272,23 @@ def slt_where(slt_cli_path, package):
             check=False,
         )
         if result.returncode == 0 and result.stdout.strip():
-            return result.stdout.strip()
-    except (subprocess.SubprocessError, FileNotFoundError):
-        pass
+            # SLT may print interactive prompts to stdout before the actual path.
+            # Extract the last absolute path from the output. The path may appear
+            # on its own line or appended after a prompt (e.g. "[y/n]?/home/...").
+            path_match = re.findall(r"(/[^\s.,;:\"']+)", result.stdout)
+            if path_match:
+                return path_match[-1]
+            logger.error(
+                "Could not find an absolute path in 'slt where %s' output:\n%s",
+                package, result.stdout.strip(),
+            )
+        else:
+            logger.error(
+                "'slt where %s' failed (exit code %s): %s",
+                package, result.returncode, (result.stderr or result.stdout or "").strip(),
+            )
+    except (subprocess.SubprocessError, FileNotFoundError) as e:
+        logger.error("Failed to run 'slt where %s': %s", package, e)
     return None
 
 
