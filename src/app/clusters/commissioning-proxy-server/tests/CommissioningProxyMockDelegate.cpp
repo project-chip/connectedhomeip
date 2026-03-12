@@ -22,6 +22,14 @@ namespace app {
 namespace Clusters {
 namespace CommissioningProxy {
 
+using chip::ByteSpan;
+using chip::Span;
+using chip::BitMask;
+using chip::app::DataModel::List;
+using chip::app::DataModel::Nullable;
+namespace CP = chip::app::Clusters::CommissioningProxy;
+using ScanResult = CP::Structs::ScanResultStruct::Type;
+
 CommissioningProxyMockDelegate::CommissioningProxyMockDelegate() = default;
 CommissioningProxyMockDelegate::~CommissioningProxyMockDelegate() = default;
 
@@ -31,20 +39,28 @@ Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyConnect
                         uint16_t discriminator,
                         chip::VendorId vendorid,
                         uint16_t productid,
+                        uint16_t timeout,
                         chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBand,
                         app::CommandHandler * commandObj,
                         const DataModel::InvokeRequest & request)
 {
+    // Send the ProxyConnectResponse synchronously (mock simulates immediate success).
+    CP::Commands::ProxyConnectResponse::Type response;
+    response.sessionId = 1;
+    commandObj->AddResponse(request.path, response);
+
+    // Transition cluster state to connected, as OnPafConnectSuccess would do in production.
+    if (mServer != nullptr)
+    {
+        CHIP_ERROR err = mServer->SetCPState(CommissioningProxyCluster::kState_CPConnected);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Test, "MockDelegate: SetCPState(Connected) failed: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+
     return Protocols::InteractionModel::Status::Success;
 }
-
-using chip::ByteSpan;
-using chip::Span;
-using chip::BitMask;
-using chip::app::DataModel::List;
-using chip::app::DataModel::Nullable;
-namespace CP = chip::app::Clusters::CommissioningProxy;
-using ScanResult = CP::Structs::ScanResultStruct::Type;
 
 Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyScanRequest(
     CapabilitiesBitmap transport, WiFiBandBitmap wiFiBands, app::CommandHandler * commandObj,
@@ -81,6 +97,24 @@ Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyScanReq
     response.numberOfResults = static_cast<uint8_t>(results.size());
     commandObj->AddResponse(request.path, response);
 
+    return Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyMessageRequest(
+    uint16_t sessionId, chip::Optional<chip::ByteSpan> message, uint8_t responseTimeout,
+    app::CommandHandler * commandObj, const DataModel::InvokeRequest & request)
+{
+    // Mock: echo back with a null message response.
+    CP::Commands::ProxyMessageResponse::Type response;
+    response.sessionId = sessionId;
+    response.message.SetNull();
+    commandObj->AddResponse(request.path, response);
+
+    return Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyDisconnectRequest(uint16_t sessionId)
+{
     return Protocols::InteractionModel::Status::Success;
 }
 

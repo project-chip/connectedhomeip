@@ -60,6 +60,15 @@ public:
         CapabilitiesBitmap transport, WiFiBandBitmap wiFiBands, app::CommandHandler * commandObj,
         const DataModel::InvokeRequest & request) override;
 
+    Protocols::InteractionModel::Status ProxyMessageRequest(
+        uint16_t sessionId, chip::Optional<chip::ByteSpan> message, uint8_t responseTimeout,
+        app::CommandHandler * commandObj, const DataModel::InvokeRequest & request) override;
+
+    Protocols::InteractionModel::Status ProxyDisconnectRequest(uint16_t sessionId) override;
+
+    void SetServer(CommissioningProxyCluster * server) override { mServer = server; }
+    CommissioningProxyCluster * GetServer() const override { return mServer; }
+
     uint8_t GetScanMaxTime() override;
     void SetScanMaxTime(uint8_t seconds) override;
 #if 0
@@ -136,6 +145,7 @@ public:
 #endif
 
 private:
+    CommissioningProxyCluster * mServer = nullptr;
     uint8_t     mScanMaxTime        = 120;
     // uint8_t     mMaxSessions        = 1;
     // uint8_t     mMaxCachedResult    = 1;

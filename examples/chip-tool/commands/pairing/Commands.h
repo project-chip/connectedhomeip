@@ -203,7 +203,7 @@ class PairViaProxy : public PairingCommand
 {
 public:
     PairViaProxy(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("proxy", PairingMode::Proxy, PairingNetworkType::None, credsIssuerConfig)
+        PairingCommand("proxy", PairingMode::Proxy, PairingNetworkType::WiFi, credsIssuerConfig)
     {}
 };
 

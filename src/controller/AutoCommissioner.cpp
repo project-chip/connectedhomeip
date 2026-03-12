@@ -680,6 +680,15 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kWiFiPAF);
 #endif
+    // For proxy transport, the commissioner tunnels commissioning packets to the
+    // end device via the Commissioning Proxy cluster.  The end device still
+    // needs WiFi/Thread credentials, so run network-setup stages when any
+    // credentials were provided.
+    if (transportType == Transport::Type::kProxy)
+    {
+        mNeedsNetworkSetup =
+            mParams.GetWiFiCredentials().HasValue() || mParams.GetThreadOperationalDataset().HasValue();
+    }
     CHIP_ERROR err               = CHIP_NO_ERROR;
     CommissioningStage nextStage = GetNextCommissioningStage(commissioner->GetCommissioningStage(), err);
 

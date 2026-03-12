@@ -430,10 +430,14 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     else
     {
         ChipLogProgress(chipTool, "Pairing Failure: %s", ErrorStr(err));
-    }
 
-    if (err != CHIP_NO_ERROR)
-    {
+        // PASE failed — commissioning will not proceed, so clean up the proxy session now.
+        if (mPairingMode == PairingMode::Proxy)
+        {
+            SendProxyDisconnect(err);
+            return;
+        }
+
         SetCommandExitStatus(err);
     }
 }
@@ -471,6 +475,13 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             }
         }
         ChipLogProgress(chipTool, "Device commissioning Failure: %s", ErrorStr(err));
+    }
+
+    if (mPairingMode == PairingMode::Proxy)
+    {
+        // Clean up the proxy session before exiting, regardless of success or failure.
+        SendProxyDisconnect(err);
+        return;
     }
 
     SetCommandExitStatus(err);
@@ -913,6 +924,58 @@ void PairingCommand::OnDone(chip::app::CommandSender * client)
     {
         mProxyCmdSender.reset();
     }
+    else if (mProxyDisconnectCmdSender.get() == client)
+    {
+        mProxyDisconnectCmdSender.reset();
+    }
+}
+
+// Send ProxyDisconnectRequest to clean up the proxy session, then exit.
+// Fire-and-forget: SetCommandExitStatus is called immediately whether or not
+// the send succeeds, so teardown is best-effort.
+void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr)
+{
+    // Guard: only send if we have an active proxy session to disconnect.
+    if (mProxySessionId == 0 || mProxyExchangeMgr == nullptr || !static_cast<bool>(mProxySession))
+    {
+        SetCommandExitStatus(exitErr);
+        return;
+    }
+
+    using namespace chip::app::Clusters::CommissioningProxy;
+
+    auto cmdSender = chip::Platform::MakeUnique<chip::app::CommandSender>(this, mProxyExchangeMgr);
+    if (cmdSender == nullptr)
+    {
+        ChipLogError(chipTool, "PairViaProxy: failed to allocate CommandSender for ProxyDisconnectRequest");
+        SetCommandExitStatus(exitErr);
+        return;
+    }
+
+    Commands::ProxyDisconnectRequest::Type request;
+    request.sessionId = mProxySessionId;
+
+    chip::app::CommandPathParams pathParams(
+        /* endpoint */ 1,
+        chip::app::Clusters::CommissioningProxy::Id,
+        Commands::ProxyDisconnectRequest::Id,
+        chip::app::CommandPathFlags::kEndpointIdValid);
+
+    // Zero out the session ID now so a duplicate call is a no-op.
+    mProxySessionId = 0;
+
+    if (cmdSender->AddRequestData(pathParams, request) != CHIP_NO_ERROR ||
+        cmdSender->SendCommandRequest(mProxySession.Get().Value()) != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipTool, "PairViaProxy: failed to send ProxyDisconnectRequest");
+    }
+    else
+    {
+        ChipLogProgress(chipTool, "PairViaProxy: sent ProxyDisconnectRequest");
+        mProxyDisconnectCmdSender = std::move(cmdSender);
+    }
+
+    SetCommandExitStatus(exitErr);
 }
 
 // ProxyTransportDelegate — called by ProxyTransport when it needs to forward
@@ -931,8 +994,10 @@ CHIP_ERROR PairingCommand::SendProxyMessage(uint16_t sessionId, chip::ByteSpan m
     VerifyOrReturnError(cmdSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     Commands::ProxyMessageRequest::Type request;
-    request.sessionId       = sessionId;
-    request.responseTimeout = 5;
+    request.sessionId = sessionId;
+    // ConnectNetwork on Linux can take 20-30s (wpa_supplicant scan + join).
+    // The proxy exchange must stay open at least this long.
+    request.responseTimeout = 60;
     request.message.SetNonNull(message);
 
     chip::app::CommandPathParams pathParams(
@@ -943,7 +1008,10 @@ CHIP_ERROR PairingCommand::SendProxyMessage(uint16_t sessionId, chip::ByteSpan m
 
     ReturnErrorOnFailure(cmdSender->AddRequestData(pathParams, request));
 
-    ReturnErrorOnFailure(cmdSender->SendCommandRequest(mProxySession.Get().Value()));
+    // Give chip-tool's exchange a little extra headroom beyond responseTimeout
+    // so it does not expire before the proxy has a chance to forward the reply.
+    auto cmdTimeout = chip::System::Clock::Seconds16(request.responseTimeout + 10);
+    ReturnErrorOnFailure(cmdSender->SendCommandRequest(mProxySession.Get().Value(), chip::MakeOptional(cmdTimeout)));
 
     // Keep this sender alive until OnDone(). For simplicity only one
     // outstanding ProxyMessageRequest is supported at a time.

@@ -87,6 +87,18 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::ReadAttribute(const Dat
     case FeatureMap::Id:
         return encoder.Encode(mFeatureFlags);
 
+    case Transport::Id: {
+        // Report all transports supported by this proxy instance.
+        chip::BitMask<CapabilitiesBitmap> supported;
+        if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
+            supported.Set(CapabilitiesBitmap::kWiFiPAF);
+        return encoder.Encode(supported);
+    }
+
+    case MaxSessions::Id:
+        // Current implementation supports a single concurrent proxy session.
+        return encoder.Encode(static_cast<uint8_t>(1));
+
     case ScanMaxTime::Id:
         return encoder.Encode(mDelegate.GetScanMaxTime());
 
@@ -104,14 +116,26 @@ std::optional<DataModel::ActionReturnStatus> CommissioningProxyCluster::InvokeCo
 
     switch (request.path.mCommandId)
     {
-    case ProxyConnectRequest::Id:
-        return HandleProxyConnectRequest(request, input_arguments, handler);
+    case ProxyConnectRequest::Id: {
+        auto result = HandleProxyConnectRequest(request, input_arguments, handler);
+        // The delegate always sends the response (sync or async via Handle).
+        // Return nullopt so the framework does not add a duplicate status.
+        if (result.IsSuccess())
+            return std::nullopt;
+        return result;
+    }
 
     case ProxyDisconnectRequest::Id:
         return HandleProxyDisconnectRequest(request, input_arguments, handler);
 
-    case ProxyScanRequest::Id:
-        return HandleProxyScanRequest(request, input_arguments, handler);
+    case ProxyScanRequest::Id: {
+        auto result = HandleProxyScanRequest(request, input_arguments, handler);
+        // Delegate sends ProxyScanResponse asynchronously; return nullopt on
+        // success so the framework does not add a duplicate status.
+        if (result.IsSuccess())
+            return std::nullopt;
+        return result;
+    }
 
     case ProxyBackGroundScanStartRequest::Id:
         return HandleProxyBackGroundScanStartRequest(request, input_arguments, handler);
@@ -119,8 +143,14 @@ std::optional<DataModel::ActionReturnStatus> CommissioningProxyCluster::InvokeCo
     case ProxyBackGroundScanStopRequest::Id:
         return HandleProxyBackGroundScanStopRequest(request, input_arguments, handler);
 
-    case ProxyMessageRequest::Id:
-        return HandleProxyMessageRequest(request, input_arguments, handler);
+    case ProxyMessageRequest::Id: {
+        auto result = HandleProxyMessageRequest(request, input_arguments, handler);
+        // Delegate sends ProxyMessageResponse asynchronously; return nullopt on
+        // success so the framework does not add a duplicate status.
+        if (result.IsSuccess())
+            return std::nullopt;
+        return result;
+    }
 
     default:
         return Status::UnsupportedCommand;
@@ -161,20 +191,14 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
                     __func__, commandData.transport.Raw(), (uint8_t)wiFiBand, commandData.timeout);
 
     // Delegate SHALL establish the transport connection and call commandObj->AddResponse()
-    // with a ProxyConnectResponse containing the sessionId per spec
+    // with a ProxyConnectResponse containing the sessionId per spec.
+    // State transition to kState_CPConnected happens in the delegate's async
+    // success callback (OnPafConnectSuccess) once the transport is actually up.
     auto delegateStatus = mDelegate.ProxyConnectRequest(
         commandData.address, commandData.transport, commandData.discriminator,
         commandData.vendorId, commandData.productId, commandData.timeout, wiFiBand, handler, request);
 
     ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
-
-    // Update cluster state now that connection has been established
-    CHIP_ERROR err = SetCPState(CommissioningProxyCluster::kState_CPConnected);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Commissioning Proxy SetCPState() Failed");
-        return chip::Protocols::InteractionModel::Status::Failure;
-    }
 
     return Status::Success;
 }
@@ -183,7 +207,22 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyDisconnectRe
                                                                                       TLV::TLVReader & input_arguments,
                                                                                      CommandHandler * handler)
 {
-    return Status::UnsupportedCommand;
+    ChipLogProgress(Zcl, "===SHM %s()", __func__);
+
+    Commands::ProxyDisconnectRequest::DecodableType commandData;
+    ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
+
+    auto delegateStatus = mDelegate.ProxyDisconnectRequest(commandData.sessionId);
+    ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
+
+    // Transition cluster state back to disconnected now that the session is gone.
+    CHIP_ERROR stateErr = SetCPState(kState_CPDisconnected);
+    if (stateErr != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleProxyDisconnectRequest: SetCPState failed: %" CHIP_ERROR_FORMAT, stateErr.Format());
+    }
+
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyScanRequest(const DataModel::InvokeRequest & request,
@@ -199,7 +238,7 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyScanRequest(
         !mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
     {
         ChipLogError(Zcl, "Commissioning Proxy: kWiFiPAF selected however kWiFiNetworkInterface feature disabled");
-        return Status::Failure;
+        return Status::InvalidTransportType;
     }
 
     chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands =

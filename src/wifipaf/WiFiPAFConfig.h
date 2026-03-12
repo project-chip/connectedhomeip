@@ -118,9 +118,15 @@
  * @brief
  *   Maximum amount of time, in milliseconds, after sending a PAFTP packet to wait for
  *   an acknowledgement. When the ack is not received within this period the PAFTP session is closed.
+ *
+ *   Note: WiFi commissioning (ConnectNetwork) can take up to ~20s on Linux because the
+ *   wpa_supplicant scan monopolises the radio, preventing NAN ack transmission during that
+ *   window. The original 15s value causes a race where the ack arrives marginally late and
+ *   the PAFTP endpoint closes before the ConnectNetwork response can be delivered.
+ *   30s provides comfortable margin for the full WiFi join sequence.
  */
 #ifndef PAFTP_ACK_TIMEOUT_MS
-#define PAFTP_ACK_TIMEOUT_MS 15000
+#define PAFTP_ACK_TIMEOUT_MS 30000
 #endif // PAFTP_ACK_TIMEOUT_MS
 
 /**

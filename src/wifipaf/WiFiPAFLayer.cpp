@@ -486,7 +486,14 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
             {
                 ChipLogError(WiFiPAF, "===SHM %s() Removing session with id: %u", __func__, pPafSession->id);
                 ChipLogProgress(WiFiPAF, "Removing session with id: %u", pPafSession->id);
-                // Clear the slot
+                CleanPafInfo(*pPafSession);
+                return CHIP_NO_ERROR;
+            }
+            break;
+        case PafInfoAccess::kAccNodeInfo:
+            if (pPafSession->nodeId == SessionInfo.nodeId)
+            {
+                ChipLogProgress(WiFiPAF, "Removing session with nodeId: %" PRIu64, pPafSession->nodeId);
                 CleanPafInfo(*pPafSession);
                 return CHIP_NO_ERROR;
             }

@@ -112,6 +112,18 @@ public:
                         app::CommandHandler * commandObj,
                         const DataModel::InvokeRequest & request) = 0;
 
+    /**
+     * @brief Disconnect and clean up a proxy session established by ProxyConnectRequest.
+     *
+     * The delegate SHALL close the transport connection to the commissionee and
+     * release all resources associated with the session.
+     *
+     * @param sessionId  The proxy session ID from ProxyConnectResponse to disconnect.
+     * @return Success if the session was found and cleaned up; NotFound if unknown.
+     */
+    virtual Protocols::InteractionModel::Status
+    ProxyDisconnectRequest(uint16_t sessionId) { return Protocols::InteractionModel::Status::UnsupportedCommand; }
+
     // ------------------------------------------------------------------
     // Get attribute methods
     virtual uint8_t GetScanMaxTime()         = 0;
