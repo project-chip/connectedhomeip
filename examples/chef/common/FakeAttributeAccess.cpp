@@ -91,50 +91,40 @@ public:
                 }
                 return ::pw::OkStatus();
             }
-            case TemperatureMeasurement::Attributes::MinMeasuredValue::Id: {
-                DataModel::Nullable<int16_t> minMeasuredValue;
-                CHIP_ERROR err = decoder.Decode(minMeasuredValue);
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(Zcl, "[Pw] Failed to decode minMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
-                    return ::pw::Status::Internal();
-                }
-
-                auto temperatureMeasurement = TemperatureMeasurement::FindClusterOnEndpoint(path.mEndpointId);
-                if (temperatureMeasurement == nullptr)
-                {
-                    return ::pw::Status::Internal();
-                }
-
-                err = TemperatureMeasurement::SetMeasuredValueRange(path.mEndpointId, minMeasuredValue,
-                                                                    temperatureMeasurement->GetMaxMeasuredValue());
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(Zcl, "[Pw] Failed to set minMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
-                    return ::pw::Status::Internal();
-                }
-                return ::pw::OkStatus();
-            }
+            case TemperatureMeasurement::Attributes::MinMeasuredValue::Id:
             case TemperatureMeasurement::Attributes::MaxMeasuredValue::Id: {
-                DataModel::Nullable<int16_t> maxMeasuredValue;
-                CHIP_ERROR err = decoder.Decode(maxMeasuredValue);
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(Zcl, "[Pw] Failed to decode maxMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
-                    return ::pw::Status::Internal();
-                }
-
                 auto temperatureMeasurement = TemperatureMeasurement::FindClusterOnEndpoint(path.mEndpointId);
                 if (temperatureMeasurement == nullptr)
                 {
                     return ::pw::Status::Internal();
                 }
 
-                err = TemperatureMeasurement::SetMeasuredValueRange(path.mEndpointId, temperatureMeasurement->GetMinMeasuredValue(),
-                                                                    maxMeasuredValue);
+                DataModel::Nullable<int16_t> value;
+                CHIP_ERROR err = decoder.Decode(value);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "[Pw] Failed to set maxMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    ChipLogError(Zcl, "[Pw] Failed to decode measured value: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                DataModel::Nullable<int16_t> min;
+                DataModel::Nullable<int16_t> max;
+
+                if (path.mAttributeId == TemperatureMeasurement::Attributes::MinMeasuredValue::Id)
+                {
+                    min = value;
+                    max = temperatureMeasurement->GetMaxMeasuredValue();
+                }
+                else
+                {
+                    min = temperatureMeasurement->GetMinMeasuredValue();
+                    max = value;
+                }
+
+                err = TemperatureMeasurement::SetMeasuredValueRange(path.mEndpointId, min, max);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set measured value range: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
                 return ::pw::OkStatus();
@@ -193,50 +183,40 @@ public:
                 }
                 return ::pw::OkStatus();
             }
-            case IlluminanceMeasurement::Attributes::MinMeasuredValue::Id: {
-                DataModel::Nullable<uint16_t> minMeasuredValue;
-                CHIP_ERROR err = decoder.Decode(minMeasuredValue);
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(Zcl, "[Pw] Failed to decode minMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
-                    return ::pw::Status::Internal();
-                }
-
-                auto illuminanceMeasurement = IlluminanceMeasurement::FindClusterOnEndpoint(path.mEndpointId);
-                if (illuminanceMeasurement == nullptr)
-                {
-                    return ::pw::Status::Internal();
-                }
-
-                err = IlluminanceMeasurement::SetMeasuredValueRange(path.mEndpointId, minMeasuredValue,
-                                                                    illuminanceMeasurement->GetMaxMeasuredValue());
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(Zcl, "[Pw] Failed to set minMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
-                    return ::pw::Status::Internal();
-                }
-                return ::pw::OkStatus();
-            }
+            case IlluminanceMeasurement::Attributes::MinMeasuredValue::Id:
             case IlluminanceMeasurement::Attributes::MaxMeasuredValue::Id: {
-                DataModel::Nullable<uint16_t> maxMeasuredValue;
-                CHIP_ERROR err = decoder.Decode(maxMeasuredValue);
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(Zcl, "[Pw] Failed to decode maxMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
-                    return ::pw::Status::Internal();
-                }
-
                 auto illuminanceMeasurement = IlluminanceMeasurement::FindClusterOnEndpoint(path.mEndpointId);
                 if (illuminanceMeasurement == nullptr)
                 {
                     return ::pw::Status::Internal();
                 }
 
-                err = IlluminanceMeasurement::SetMeasuredValueRange(path.mEndpointId, illuminanceMeasurement->GetMinMeasuredValue(),
-                                                                    maxMeasuredValue);
+                DataModel::Nullable<uint16_t> value;
+                CHIP_ERROR err = decoder.Decode(value);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "[Pw] Failed to set maxMeasuredValue: %" CHIP_ERROR_FORMAT, err.Format());
+                    ChipLogError(Zcl, "[Pw] Failed to decode measured value: %" CHIP_ERROR_FORMAT, err.Format());
+                    return ::pw::Status::Internal();
+                }
+
+                DataModel::Nullable<uint16_t> min;
+                DataModel::Nullable<uint16_t> max;
+
+                if (path.mAttributeId == IlluminanceMeasurement::Attributes::MinMeasuredValue::Id)
+                {
+                    min = value;
+                    max = illuminanceMeasurement->GetMaxMeasuredValue();
+                }
+                else
+                {
+                    min = illuminanceMeasurement->GetMinMeasuredValue();
+                    max = value;
+                }
+
+                err = IlluminanceMeasurement::SetMeasuredValueRange(path.mEndpointId, min, max);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "[Pw] Failed to set measured value range: %" CHIP_ERROR_FORMAT, err.Format());
                     return ::pw::Status::Internal();
                 }
                 return ::pw::OkStatus();
