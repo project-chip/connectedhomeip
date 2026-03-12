@@ -23,7 +23,7 @@ silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 app_data_model = "${chip_root}/examples/water-heater-app/water-heater-common"
 chip_enable_pw_rpc = true
-chip_enable_openthread = true
+chip_enable_thread = true
 
 # Light app on EFR enables tracing server
 pw_trace_BACKEND = "$dir_pw_trace_tokenized"

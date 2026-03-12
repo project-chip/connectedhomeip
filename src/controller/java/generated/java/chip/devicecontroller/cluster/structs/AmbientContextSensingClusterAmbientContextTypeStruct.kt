@@ -27,15 +27,11 @@ import matter.tlv.TlvWriter
 class AmbientContextSensingClusterAmbientContextTypeStruct(
   val ambientContextSensed: List<AmbientContextSensingClusterSemanticTagStruct>,
   val detectionStartTime: Optional<ULong>,
-  val objectCountThreshold: Optional<UInt>,
-  val objectCount: Optional<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("AmbientContextSensingClusterAmbientContextTypeStruct {\n")
     append("\tambientContextSensed : $ambientContextSensed\n")
     append("\tdetectionStartTime : $detectionStartTime\n")
-    append("\tobjectCountThreshold : $objectCountThreshold\n")
-    append("\tobjectCount : $objectCount\n")
     append("}\n")
   }
 
@@ -51,14 +47,6 @@ class AmbientContextSensingClusterAmbientContextTypeStruct(
         val optdetectionStartTime = detectionStartTime.get()
         put(ContextSpecificTag(TAG_DETECTION_START_TIME), optdetectionStartTime)
       }
-      if (objectCountThreshold.isPresent) {
-        val optobjectCountThreshold = objectCountThreshold.get()
-        put(ContextSpecificTag(TAG_OBJECT_COUNT_THRESHOLD), optobjectCountThreshold)
-      }
-      if (objectCount.isPresent) {
-        val optobjectCount = objectCount.get()
-        put(ContextSpecificTag(TAG_OBJECT_COUNT), optobjectCount)
-      }
       endStructure()
     }
   }
@@ -66,8 +54,6 @@ class AmbientContextSensingClusterAmbientContextTypeStruct(
   companion object {
     private const val TAG_AMBIENT_CONTEXT_SENSED = 0
     private const val TAG_DETECTION_START_TIME = 1
-    private const val TAG_OBJECT_COUNT_THRESHOLD = 2
-    private const val TAG_OBJECT_COUNT = 3
 
     fun fromTlv(
       tlvTag: Tag,
@@ -88,26 +74,12 @@ class AmbientContextSensingClusterAmbientContextTypeStruct(
         } else {
           Optional.empty()
         }
-      val objectCountThreshold =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OBJECT_COUNT_THRESHOLD))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_OBJECT_COUNT_THRESHOLD)))
-        } else {
-          Optional.empty()
-        }
-      val objectCount =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_OBJECT_COUNT))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_OBJECT_COUNT)))
-        } else {
-          Optional.empty()
-        }
 
       tlvReader.exitContainer()
 
       return AmbientContextSensingClusterAmbientContextTypeStruct(
         ambientContextSensed,
         detectionStartTime,
-        objectCountThreshold,
-        objectCount,
       )
     }
   }

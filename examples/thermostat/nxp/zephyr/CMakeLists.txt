@@ -19,6 +19,7 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
 get_filename_component(THERMOSTAT_NXP_COMMON_DIR ${CHIP_ROOT}/examples/thermostat/nxp/common REALPATH)
+get_filename_component(THERMOSTAT_NXP_ZAP_DIR ${CHIP_ROOT}/examples/thermostat/nxp/zap REALPATH)
 get_filename_component(EXAMPLE_PLATFORM_NXP_COMMON_DIR ${CHIP_ROOT}/examples/platform/nxp/common REALPATH)
 get_filename_component(EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR ${CHIP_ROOT}/examples/platform/nxp/zephyr REALPATH)
 
@@ -97,9 +98,15 @@ if (CONFIG_CHIP_FACTORY_DATA)
     )
 endif()
 
-chip_configure_data_model(app
-    ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/../../thermostat/nxp/zap/thermostat_matter_wifi.zap
-)
+if(CONFIG_CHIP_WIFI)
+    chip_configure_data_model(app
+        ZAP_FILE ${THERMOSTAT_NXP_ZAP_DIR}/thermostat_matter_wifi.zap
+    )
+elseif(CONFIG_NET_L2_OPENTHREAD)
+    chip_configure_data_model(app
+        ZAP_FILE ${THERMOSTAT_NXP_ZAP_DIR}/thermostat_matter_thread.zap
+    )
+endif()
 
 if(CONFIG_CHIP_LIB_SHELL)
     target_compile_definitions(app PRIVATE ENABLE_CHIP_SHELL)

@@ -150,7 +150,6 @@ private:
         AttributePathParamsWithGeneration() = default;
         AttributePathParamsWithGeneration(const AttributePathParams aPath) : AttributePathParams(aPath) {}
 
-        // AttributePathParams is 32-bit aligned, so u32 seems reasonable since we do not use packed structs.
         AttributeGeneration mGeneration;
     };
 

@@ -39,7 +39,7 @@ chip_stack_lock_tracking = "fatal"
 chip_build_libshell = false
 
 # OPENTHREAD CONFIG
-chip_enable_openthread = true
+chip_enable_thread = true
 
 # NFC ONBOARDING PAYLOAD CONFIG
 chip_enable_nfc_onboarding_payload = false

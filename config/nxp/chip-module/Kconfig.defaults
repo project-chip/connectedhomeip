@@ -103,8 +103,22 @@ config LOG
 if LOG
 
 choice LOG_MODE
-	default LOG_MODE_MINIMAL
+	default LOG_MODE_MINIMAL if !NET_L2_OPENTHREAD
+	default LOG_MODE_DEFERRED
 endchoice
+
+if LOG_MODE_DEFERRED
+
+config LOG_BACKEND_UART
+	default y
+
+config SHELL_LOG_BACKEND
+	default n
+
+endif # LOG_MODE_DEFERRED
+
+config LOG_BUFFER_SIZE
+	default 6144 if NET_L2_OPENTHREAD
 
 choice MATTER_LOG_LEVEL_CHOICE
 	default MATTER_LOG_LEVEL_DBG
@@ -152,6 +166,7 @@ config POSIX_MAX_FDS
 
 # Application stack size
 config MAIN_STACK_SIZE
+	default 6144 if NET_L2_OPENTHREAD
 	default 3072
 
 config INIT_STACKS
@@ -219,6 +234,60 @@ config NET_BUF_TX_COUNT
 config NET_BUF_DATA_SIZE
 	default 256
 
+if NET_L2_OPENTHREAD
+
+config HDLC_RCP_IF
+	default y if SOC_FAMILY_NXP_RW
+
+config OPENTHREAD_THREAD_STACK_SIZE
+    default 6144
+
+# Use the platform-provided heap
+config OPENTHREAD_EXTERNAL_HEAP
+	default y
+
+# Enable ping sender feature
+config OPENTHREAD_PING_SENDER
+	default y
+
+# Enable SLAAC feature for IPv6 address auto-configuration
+config OPENTHREAD_SLAAC
+	default y
+
+# Increase number of message buffers in the buffer pool
+config OPENTHREAD_NUM_MESSAGE_BUFFERS
+	default 256
+
+# Enable IPv6 fragmentation support
+config OPENTHREAD_IP6_FRAGM
+	default y
+
+choice OPENTHREAD_LOG_LEVEL_CHOICE
+	default OPENTHREAD_LOG_LEVEL_DEBG
+endchoice
+
+choice OPENTHREAD_STACK_VERSION
+	default OPENTHREAD_THREAD_VERSION_1_4
+endchoice
+
+config OPENTHREAD_PARENT_SEARCH
+	default y
+
+if OPENTHREAD_PARENT_SEARCH
+
+config OPENTHREAD_PARENT_SEARCH_RSS_THRESHOLD
+	default -45
+
+endif # OPENTHREAD_PARENT_SEARCH
+
+config OPENTHREAD_MLE_INFORM_PREVIOUS_PARENT_ON_REATTACH
+	default y
+
+config CHIP_USE_OT_ENDPOINT
+	default y
+
+endif # NET_L2_OPENTHREAD
+
 # Bluetooth Low Energy configs
 
 config BT
@@ -271,6 +340,7 @@ config BT_BUF_ACL_TX_SIZE
 	default 251
 
 config BT_RX_STACK_SIZE
+	default 2560 if NET_L2_OPENTHREAD
 	default 2048 if NO_OPTIMIZATIONS && DEBUG
 	default 1700
 
@@ -371,9 +441,6 @@ config WIFI_NM_WPA_SUPPLICANT_WQ_STACK_SIZE
 config WIFI_NM_WPA_SUPPLICANT_INF_MON
 	default n
 
-config SYSTEM_WORKQUEUE_STACK_SIZE
-	default 2048
-
 config NET_TCP_WORKQ_STACK_SIZE
 	default 2048
 
@@ -413,7 +480,15 @@ config NET_MAX_ROUTERS
 config NET_MAX_CONN
 	default 10
 
+config ETH_DRIVER
+	default n
+
+endif
+
 config SHELL_STACK_SIZE
+	default 1536
+
+config LOG_PROCESS_THREAD_STACK_SIZE
 	default 1536
 
 config HEAP_MEM_POOL_SIZE
@@ -422,18 +497,13 @@ config HEAP_MEM_POOL_SIZE
 config CHIP_MALLOC_SYS_HEAP_SIZE
 	default 28672 # 28 kB
 
-config ETH_DRIVER
-	default n
-
-endif
-
-if CHIP_ETHERNET || CHIP_WIFI
+config SYSTEM_WORKQUEUE_STACK_SIZE
+	default 3072 if NET_L2_OPENTHREAD
+	default 2048 if CHIP_WIFI
 
 choice LIBC_IMPLEMENTATION
 	default NEWLIB_LIBC
 endchoice
-
-endif
 
 if CHIP_ETHERNET
 

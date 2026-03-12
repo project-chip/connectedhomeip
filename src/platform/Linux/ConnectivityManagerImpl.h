@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <lib/support/FixedBuffer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
@@ -247,7 +248,8 @@ private:
 
     CHIP_ERROR _StartWiFiManagement();
 
-    bool mAssociationStarted = false;
+    bool mAssociationStarted             = false;
+    unsigned int mAssociationRetriesLeft = 0;
     GDBusWpaSupplicant mWpaSupplicant CHIP_GUARDED_BY(mWpaSupplicantMutex);
     // Access to mWpaSupplicant has to be protected by a mutex because it is accessed from
     // the CHIP event loop thread and dedicated D-Bus thread started by platform manager.
@@ -283,8 +285,7 @@ private:
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    uint8_t sInterestedSSID[Internal::kMaxWiFiSSIDLength];
-    uint8_t sInterestedSSIDLen;
+    Internal::WiFiSSIDFixedBuffer mInterestedSSID;
 #endif
     NetworkCommissioning::WiFiDriver::ScanCallback * mpScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;

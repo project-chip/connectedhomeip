@@ -38,6 +38,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SortUtils.h>
@@ -107,25 +108,6 @@ BitFlags<Feature> WiFiFeatures(WiFiDriver * driver)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     return features;
 }
-
-/// Performs an auto-release of the given item, generally an `Iterator` type
-/// like Wifi or Thread scan results.
-template <typename T>
-class AutoRelease
-{
-public:
-    AutoRelease(T * iterator) : mValue(iterator) {}
-    ~AutoRelease()
-    {
-        if (mValue != nullptr)
-        {
-            mValue->Release();
-        }
-    }
-
-private:
-    T * mValue;
-};
 
 /// Convenience macro to auto-create a variable for you to release the given name at
 /// the exit of the current scope.
@@ -231,6 +213,8 @@ void NetworkCommissioningCluster::SendNonConcurrentConnectNetworkResponse()
 
 #if CONFIG_NETWORK_LAYER_BLE
     DeviceLayer::ConnectivityMgr().GetBleLayer()->IndicateBleClosing();
+#else
+    LogErrorOnFailure(DeviceLayer::DeviceControlServer::DeviceControlSvr().PostOperationalNetworkStartedEvent());
 #endif // CONFIG_NETWORK_LAYER_BLE
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode. Send ConnectNetworkResponse(Success)");
     Commands::ConnectNetworkResponse::Type response;
@@ -841,7 +825,7 @@ void NetworkCommissioningCluster::OnResult(Status commissioningError, CharSpan d
     SetLastNetworkId(ByteSpan{ mConnectingNetworkID, mConnectingNetworkIDLen });
     SetLastNetworkingStatusValue(MakeNullable(commissioningError));
 
-#if CONFIG_NETWORK_LAYER_BLE && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#if (CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP) && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, ConnectNetworkResponse will NOT be sent");
     // Do not send the ConnectNetworkResponse if in non-concurrent mode
     // TODO(#30576) raised to modify CommandHandler to notify it if no response required

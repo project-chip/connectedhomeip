@@ -23,7 +23,60 @@ ninja -C out/darwin-arm64-tests tests/TestCastingPlayerFabricCleanup
 ./out/darwin-arm64-tests/tests/TestCastingPlayerFabricCleanup
 ```
 
-### 2. SendUDC Tests (`CastingPlayerSendUDCTest.cpp`)
+### 2. Null Pointer Fix Tests (`TestCastingPlayerNullPointerFix.cpp`)
+
+Tests for the null pointer dereference fix in CastingPlayer connection
+callbacks.
+
+**Test Count:** 6 tests
+
+#### Background
+
+The CastingPlayer uses a weak_ptr (`mTargetCastingPlayer`) to track the
+currently targeted casting player. When connection attempts fail, callbacks are
+invoked that access this target. However, if multiple connection failures occur
+in quick succession, the first failure callback may delete the CastingPlayer
+(via `RemoveFabric()` and `Delete()`), causing subsequent callbacks to crash
+when they try to dereference the now-null pointer.
+
+#### Test Cases
+
+1. **TestGetTargetCastingPlayerReturnsNull** - Verifies that
+   `GetTargetCastingPlayer()` correctly returns nullptr when the weak_ptr has
+   expired
+2. **TestConnectionFailureCallbackWithNullTarget** - Simulates the crash
+   scenario where a failure callback executes after the target has been deleted
+3. **TestConnectionSuccessCallbackWithNullTarget** - Tests that success
+   callbacks also handle null targets gracefully
+4. **TestMultipleCallbacksWithNullTarget** - Simulates multiple queued callbacks
+   executing after target deletion
+5. **TestCallbackWithValidTarget** - Verifies that callbacks work correctly when
+   the target is valid
+6. **TestRaceConditionDocumentation** - Documents the theoretical race condition
+   and why it's not a concern in practice (CHIP uses a single-threaded event
+   loop model)
+
+#### The Fix
+
+The fix adds null pointer checks before dereferencing
+`GetTargetCastingPlayer()`:
+
+```cpp
+CastingPlayer * targetCastingPlayer = CastingPlayer::GetTargetCastingPlayer();
+if (targetCastingPlayer == nullptr)
+{
+    ChipLogError(AppServer, "Target CastingPlayer no longer exists, skipping cleanup");
+    return;
+}
+
+// Now safe to use targetCastingPlayer
+targetCastingPlayer->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+```
+
+This prevents the SIGSEGV crash that occurred when multiple connection failures
+tried to access a deleted CastingPlayer.
+
+### 3. SendUDC Tests (`CastingPlayerSendUDCTest.cpp`)
 
 Tests for the `SendUDC` functionality in the Matter TV Casting application.
 
@@ -115,7 +168,7 @@ The iOS tests use XCTest and OCMock to test:
 
 ## Running the Tests
 
-### C++ Tests (Fabric Cleanup)
+### C++ Tests (Fabric Cleanup & Null Pointer Fix)
 
 **Important:** Always activate the build environment first:
 
@@ -144,21 +197,25 @@ done
 ##### Linux
 
 ```bash
-# Build the test
+# Build the tests
 ninja -C out/linux-x64-tests tests/TestCastingPlayerFabricCleanup
+ninja -C out/linux-x64-tests tests/TestCastingPlayerNullPointerFix
 
-# Run the test
+# Run the tests
 ./out/linux-x64-tests/tests/TestCastingPlayerFabricCleanup
+./out/linux-x64-tests/tests/TestCastingPlayerNullPointerFix
 ```
 
 ##### macOS
 
 ```bash
-# Build the test
+# Build the tests
 ninja -C out/darwin-arm64-tests tests/TestCastingPlayerFabricCleanup
+ninja -C out/darwin-arm64-tests tests/TestCastingPlayerNullPointerFix
 
-# Run the test
+# Run the tests
 ./out/darwin-arm64-tests/tests/TestCastingPlayerFabricCleanup
+./out/darwin-arm64-tests/tests/TestCastingPlayerNullPointerFix
 ```
 
 #### Run ALL Example Tests
@@ -393,3 +450,7 @@ When adding new functionality to `SendUDC`, please:
     usage
 -   [Matter Specification](https://csa-iot.org/developer-resource/specifications-download-request/) -
     Section 5.3.7.4 on UDC with no Passcode prompt
+-   [FABRIC_CLEANUP_TESTS.md](FABRIC_CLEANUP_TESTS.md) - Detailed documentation
+    for fabric cleanup tests
+-   [CASE_SESSION_MANAGER_CRASH_FIX.md](/CASE_SESSION_MANAGER_CRASH_FIX.md) -
+    Documentation of the null pointer crash issue

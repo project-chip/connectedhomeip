@@ -21,7 +21,7 @@ if CHIP
 
 # See config/common/cmake/Kconfig for full definition
 config CHIP_WIFI
-	default y
+	default y if !NET_L2_OPENTHREAD
 	select WIFI
 	select WIFI_NXP
 	select WIFI_NM_WPA_SUPPLICANT

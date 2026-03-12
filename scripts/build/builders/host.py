@@ -412,7 +412,8 @@ class HostBuilder(GnBuilder):
                  enable_webrtc=False,
                  terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
                  openthread_endpoint=False,
-                 unified=False
+                 unified=False,
+                 chip_enable_endpoint_unique_id: Optional[bool] = None,
                  ):
         """
         Construct a host builder.
@@ -461,7 +462,7 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('chip_enable_wifi=false')
 
         if not enable_thread:
-            self.extra_gn_options.append('chip_enable_openthread=false')
+            self.extra_gn_options.append('chip_enable_thread=false')
 
         if disable_shell:
             self.extra_gn_options.append('chip_build_libshell=false')
@@ -575,6 +576,12 @@ class HostBuilder(GnBuilder):
                 self.extra_gn_options.append('chip_terms_and_conditions_required=true')
             else:
                 self.extra_gn_options.append('chip_terms_and_conditions_required=false')
+
+        if chip_enable_endpoint_unique_id is not None:
+            if chip_enable_endpoint_unique_id:
+                self.extra_gn_options.append('chip_enable_endpoint_unique_id=true')
+            else:
+                self.extra_gn_options.append('chip_enable_endpoint_unique_id=false')
 
         if openthread_endpoint:
             if enable_wifi:
