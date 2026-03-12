@@ -29,7 +29,6 @@
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server/Server.h>
 #include <clusters/NetworkCommissioning/AttributeIds.h>
 #include <clusters/NetworkCommissioning/CommandIds.h>
 #include <clusters/NetworkCommissioning/Commands.h>
@@ -653,13 +652,14 @@ NetworkCommissioningCluster::HandleConnectNetwork(CommandHandler & handler, cons
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 #else
     mConnectNetworkResponseSentEarly = false;
-    // In Non-concurrent mode postpone the final execution of ConnectNetwork until the operational
-    // network has been fully brought up and kOperationalNetworkStarted is delivered.
-
-    // For PASE/BLE requests, reply before tearing down the commissioning transport.
-    // For CASE requests, keep the command open and reply from OnResult after attach finishes.
+    // In non-concurrent mode there are two execution paths:
+    // 1) PASE/BLE: send ConnectNetworkResponse early before tearing down the commissioning
+    //    transport; actual connect is started later from OnPlatformEventHandler.
+    // 2) CASE: start connect immediately here and send ConnectNetworkResponse from OnResult
+    //    after attach finishes.
     if (IsConnectNetworkRequestOverPASE(handler))
     {
+        // PASE path must respond before commissioning transport is torn down.
         mConnectNetworkResponseSentEarly = true;
         SendNonConcurrentConnectNetworkResponse();
     }

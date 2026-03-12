@@ -397,7 +397,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
         !dataset.AsByteSpan().data_equal(current_dataset.AsByteSpan()) && Impl()->IsThreadEnabled())
     {
         ReturnErrorOnFailure(Impl()->SetThreadProvision(dataset.AsByteSpan()));
-        mpConnectCallback = callback;
         return CHIP_NO_ERROR;
     }
 #endif
