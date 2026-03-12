@@ -347,51 +347,6 @@ def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadI
     return infos
 
 
-# Import MatterBaseTest here - this works because matter_testing.py imports from
-# commissioning after MatterBaseTest class is fully defined (see end of matter_testing.py)
-from matter.testing.matter_testing import MatterBaseTest  # isort: skip  # noqa: E402
-
-
-class CommissionDeviceTest(MatterBaseTest):
-    """Test class auto-injected at the start of test list to commission a device when requested"""
-
-    def __init__(self, *args):
-        super().__init__(*args)
-        # This class is used to commission the device so is set to True
-        self.is_commissioning = True
-
-        # Use inherited matter_test_config property instead of manual extraction
-        config = self.matter_test_config
-        self.dut_node_ids: List[int] = config.dut_node_ids
-        self.commissioning_info: CommissioningInfo = CommissioningInfo(
-            commissionee_ip_address_just_for_testing=config.commissionee_ip_address_just_for_testing,
-            commissioning_method=config.commissioning_method,
-            thread_operational_dataset=config.thread_operational_dataset,
-            wifi_passphrase=config.wifi_passphrase,
-            wifi_ssid=config.wifi_ssid,
-            tc_version_to_simulate=config.tc_version_to_simulate,
-            tc_user_response_to_simulate=config.tc_user_response_to_simulate,
-            thread_ba_host=config.thread_ba_host,
-            thread_ba_port=config.thread_ba_port,
-        )
-        # Use inherited get_setup_payload_info method
-        self.setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
-
-    def test_run_commissioning(self):
-        """This method is the test called by mobly, which try to commission the device until is complete or raises an error.
-        Raises:
-            signals.TestAbortAll: Failed to commission node(s)
-        """
-        if not self.event_loop.run_until_complete(commission_devices(
-            dev_ctrl=self.default_controller,
-            dut_node_ids=self.dut_node_ids,
-            setup_payloads=self.setup_payloads,
-            commissioning_info=self.commissioning_info
-        )):
-            raise signals.TestAbortAll("Failed to commission node(s)")
-    # default_controller is now inherited from MatterBaseTest
-
-
 @dataclass
 class SetupParameters:
     """
