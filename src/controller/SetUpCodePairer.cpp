@@ -852,16 +852,6 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error, const std::optional<Re
             ChipLogError(Controller, "Error when verifying the validity of an address: %" CHIP_ERROR_FORMAT, err.Format());
         }
     }
-    // If this was a DNS-SD-triggered (IP/UDP) PASE attempt, stop DNS-SD now.
-    // All addresses for this device were already queued when DNS-SD found the
-    // record, so continued DNS-SD scanning cannot help.  More importantly,
-    // leaving DNS-SD running would keep DiscoveryInProgress() true indefinitely,
-    // which would prevent StopPairingIfTransportsExhausted from ever firing once
-    // the physical-proximity transports (BLE, Wi-Fi PAF, NFC) also complete.
-    if (mCurrentPASEParameters.HasValue())
-    {
-        LogErrorOnFailure(StopDiscoveryOverDNSSD());
-    }
     mCurrentPASEParameters.ClearValue();
 
     // We failed to establish PASE.  Try the next thing we have discovered, if
