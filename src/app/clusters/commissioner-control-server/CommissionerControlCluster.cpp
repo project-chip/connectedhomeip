@@ -33,6 +33,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters::CommissionerControl;
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -64,10 +65,7 @@ void AddReverseOpenCommissioningWindowResponse(CommandHandler & commandHandler, 
 
 } // namespace
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace CommissionerControl {
+namespace chip::app::Clusters {
 
 CommissionerControlServer::CommissionerControlServer(Delegate * delegate, EndpointId endpointId) :
     CommandHandlerInterface(MakeOptional(endpointId), Id)
@@ -265,10 +263,7 @@ exit:
     }
 }
 
-} // namespace CommissionerControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters
 
 void MatterCommissionerControlPluginServerInitCallback()
 {
