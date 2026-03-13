@@ -38,10 +38,6 @@ __LOG_LEVELS__ = {
 }
 
 
-def CommaSeparate(items) -> str:
-    return ', '.join([x for x in items])
-
-
 def ValidateRepoPath(context, parameter, value):
     """
     Validates that the given path looks like a valid chip repository checkout.
@@ -170,7 +166,7 @@ before running this script.
         ninja_jobs=ninja_jobs, runner=runner
     )
 
-    requested_targets = set([t.lower() for t in target])
+    requested_targets = {t.lower() for t in target}
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
         enable_link_map_file=enable_link_map_file,
         enable_flashbundle=enable_flashbundle,

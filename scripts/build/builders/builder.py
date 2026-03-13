@@ -61,12 +61,12 @@ class Builder(ABC):
     @abstractmethod
     def generate(self):
         """Generate the build files - generally the ninja/makefiles"""
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @abstractmethod
     def _build(self):
         """Perform an actual build"""
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def _bundle(self):
         """Perform an actual generating of flashbundle.
@@ -84,7 +84,7 @@ class Builder(ABC):
            May use build output data (e.g. manifests), so this should be
            invoked only after a build has succeeded.
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def bundle_outputs(self):
         """Return the BuilderOutput objects in flashbundle.

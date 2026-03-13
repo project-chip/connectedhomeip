@@ -140,6 +140,7 @@ def _HasVariantPrefix(value: str, prefix: str):
 
     if value.startswith(prefix + '-'):
         return value[len(prefix)+1:]
+    return None
 
 
 def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: List[List[TargetPart]], modifiers: List[TargetPart]):
@@ -224,10 +225,7 @@ class BuildTarget:
 
     def isUnifiedBuild(self, parts: List[TargetPart]):
         """Checks if the given parts combine into a unified build."""
-        for part in parts:
-            if part.build_arguments.get('unified', False):
-                return True
-        return False
+        return any(part.build_arguments.get('unified', False) for part in parts)
 
     def AppendFixedTargets(self, parts: List[TargetPart]):
         """Append a list of potential targets/variants.
@@ -283,7 +281,7 @@ class BuildTarget:
         result = self.name
         for fixed in self.fixed_targets:
             if len(fixed) > 1:
-                result += '-{' + ",".join(sorted(map(lambda x: x.name, fixed))) + '}'
+                result += '-{' + ",".join(sorted(x.name for x in fixed)) + '}'
             else:
                 result += '-' + fixed[0].name
 
@@ -411,9 +409,7 @@ class BuildTarget:
 
         while True:
 
-            prefix = "-".join(map(
-                lambda p: self.fixed_targets[p[0]][p[1]].name, enumerate(fixed_indices)
-            ))
+            prefix = "-".join(self.fixed_targets[i][n].name for i, n in enumerate(fixed_indices))
 
             for n in range(len(self.modifiers) + 1):
                 for c in itertools.combinations(self.modifiers, n):

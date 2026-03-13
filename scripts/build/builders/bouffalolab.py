@@ -128,7 +128,7 @@ class BouffalolabBuilder(GnBuilder):
         self.argsOpt.append(f'board="{self.board.GnArgName()}"')
         self.argsOpt.append(f'baudrate="{baudrate}"')
 
-        enable_thread = False if enable_thread_type == BouffalolabThreadType.NONE else True
+        enable_thread = enable_thread_type != BouffalolabThreadType.NONE
 
         if not (enable_wifi or enable_thread or enable_ethernet):
             # decide default connectivity for each chip
