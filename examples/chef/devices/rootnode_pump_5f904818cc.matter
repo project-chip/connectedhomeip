@@ -2066,3 +2066,5 @@ endpoint 1 {
     ram      attribute clusterRevision default = 0x0004;
   }
 }
+
+

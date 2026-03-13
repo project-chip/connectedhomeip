@@ -2070,8 +2070,10 @@ endpoint 4 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 63;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command Step;
   }
 }
+
+
