@@ -117,30 +117,18 @@ class AndroidApp(Enum):
         return None
 
 
-class AndroidProfile(Enum):
-    RELEASE = auto()
-    DEBUG = auto()
-
-    @property
-    def ProfileName(self):
-        if self == AndroidProfile.RELEASE:
-            return 'release'
-        if self == AndroidProfile.DEBUG:
-            return 'debug'
-        raise Exception('Unknown profile type: %r' % self)
-
-
 class AndroidBuilder(Builder):
     def __init__(self,
                  root,
                  runner,
                  board: AndroidBoard,
-                 app: AndroidApp,
-                 profile: AndroidProfile = AndroidProfile.DEBUG):
+                 app: AndroidApp):
         super(AndroidBuilder, self).__init__(root, runner)
+        if self.options.build_profile == BuildProfile.DEFAULT:
+            # Set default build profile to DEBUG if not specified explicitly by the user.
+            self.options.build_profile = BuildProfile.DEBUG
         self.board = board
         self.app = app
-        self.profile = profile
 
     def _get_sdk_manager_paths(self):
         """Get list of possible SDK manager paths for Android SDK compatibility."""
@@ -443,8 +431,6 @@ class AndroidBuilder(Builder):
 
             if exampleName == "chip-test":
                 gn_args["chip_build_tests"] = True
-            if self.profile != AndroidProfile.DEBUG:
-                gn_args["is_debug"] = False
             gn_args.update(self.app.AppGnArgs())
 
             args_str = ""
@@ -625,7 +611,7 @@ class AndroidBuilder(Builder):
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
 
-            if (self.profile != AndroidProfile.DEBUG):
+            if self.options.build_profile in [BuildProfile.RELEASE, BuildProfile.RELEASE_SIZE]:
                 self.stripSymbols()
 
     def build_outputs(self):
