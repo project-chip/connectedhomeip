@@ -19,7 +19,7 @@ import shlex
 import subprocess
 from enum import Enum, auto
 
-from .builder import BuilderOutput, BuildProfile
+from .builder import BuilderOutput
 from .gn import GnBuilder
 
 
