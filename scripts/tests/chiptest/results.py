@@ -14,12 +14,12 @@
 
 from __future__ import annotations
 
+import base64
 import contextlib
 import datetime
 import enum
 import json
 import logging
-import os
 import time
 from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass, field
@@ -93,8 +93,10 @@ class TestResult:
                 result.status = TestStatus.CANCELLED
             else:
                 result.status = TestStatus.FAILED
-                if os.path.exists('thread.pcap'):
-                    os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
+                if (pcap_path := Path("thread.pcap")).exists():
+                    print("base64 -d - >thread.pcap <<EOF")
+                    print(base64.b64encode(pcap_path.read_bytes()).decode("ascii"))
+                    print("EOF")
         finally:
             result.duration_seconds = round(test_end - test_start, 3)
 
