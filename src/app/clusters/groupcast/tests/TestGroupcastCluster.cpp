@@ -18,7 +18,6 @@
 
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/groupcast/GroupcastCluster.h>
-#include <app/clusters/groupcast/GroupcastLogic.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -59,7 +58,7 @@ using chip::Testing::IsAttributesListEqualTo;
 
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
-static constexpr size_t kMaxMembershipEndpoints = app::Clusters::GroupcastLogic::kMaxMembershipEndpoints;
+static constexpr size_t kMaxMembershipEndpoints = app::Clusters::GroupcastCluster::kMaxMembershipEndpoints;
 
 template <typename DecodableListType>
 CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
@@ -160,7 +159,7 @@ struct TestGroupcastCluster : public ::testing::Test
     app::Clusters::GroupcastCluster mSender{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate },
                                              BitFlags<Feature>{ Feature::kSender } };
     app::Clusters::GroupcastCluster mListener{ { mFabricHelper.GetFabricTable(), mProvider, mMockTimerDelegate },
-                                               BitFlags<Feature>{ Feature::kListener } };
+                                               BitFlags<Feature>{ Feature::kListener, Feature::kPerGroup } };
 };
 
 TEST_F(TestGroupcastCluster, TestAttributes)
@@ -252,7 +251,7 @@ TEST_F(TestGroupcastCluster, TestAcceptedCommands)
 
 TEST_F(TestGroupcastCluster, TestReadMembership)
 {
-    static constexpr uint16_t kMaxEndpoints   = app::Clusters::GroupcastLogic::kMaxCommandEndpoints;
+    static constexpr uint16_t kMaxEndpoints   = app::Clusters::GroupcastCluster::kMaxCommandEndpoints;
     static constexpr uint16_t kIntervals      = 15;
     static constexpr uint16_t kTotalEndpoints = kMaxEndpoints * kIntervals;
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
@@ -766,6 +765,24 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
         EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
                   Protocols::InteractionModel::Status::Success);
 
+        // Join group: McastAddrPolicy kPerGroup without kPerGroup feature set
+        data.groupID         = 2;
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+        result               = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+
+        // Join group: McastAddrPolicy kIanaAddr without kPerGroup feature
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        data.key.ClearValue();
+        result = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
+        // Join group: McastAddrPolicy absent without kPerGroup feature
+        data.groupID = 3;
+        data.mcastAddrPolicy.ClearValue();
+        result = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success));
+
         // Join group: Non-empty endpoints
         data.groupID   = 3;
         data.endpoints = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
@@ -776,7 +793,7 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 
 TEST_F(TestGroupcastCluster, TestLeaveGroup)
 {
-    static constexpr uint16_t kMaxEndpoints   = app::Clusters::GroupcastLogic::kMaxCommandEndpoints;
+    static constexpr uint16_t kMaxEndpoints   = app::Clusters::GroupcastCluster::kMaxCommandEndpoints;
     static constexpr uint16_t kIntervals      = 5;
     static constexpr uint16_t kTotalEndpoints = kMaxEndpoints * kIntervals;
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };

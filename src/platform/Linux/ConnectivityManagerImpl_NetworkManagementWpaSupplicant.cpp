@@ -1270,14 +1270,13 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiDriver::Sca
     VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
     // There is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(ssid.size() <= sizeof(sInterestedSSID), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(ssid.size() <= mInterestedSSID.capacity(), CHIP_ERROR_INVALID_ARGUMENT);
 
     GAutoPtr<GError> err;
     GVariant * args = nullptr;
     GVariantBuilder builder;
 
-    memcpy(sInterestedSSID, ssid.data(), ssid.size());
-    sInterestedSSIDLen = ssid.size();
+    mInterestedSSID = ssid;
 
     g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
     g_variant_builder_add(&builder, "{sv}", "Type", g_variant_new_string("active"));
@@ -1587,8 +1586,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
         WiFiScanResponse network;
         if (_GetBssInfo(bssPath, network))
         {
-            if (sInterestedSSIDLen == 0 ||
-                (network.ssidLen == sInterestedSSIDLen && memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0))
+            if (mInterestedSSID.empty() ||
+                (network.ssidLen == mInterestedSSID.size() &&
+                 memcmp(network.ssid, mInterestedSSID.data(), mInterestedSSID.size()) == 0))
             {
                 networkScanned->push_back(network);
             }

@@ -1368,7 +1368,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSr
     {
         if (service.IsUsed() && service.mIsInvalid)
         {
-            ChipLogProgress(DeviceLayer, "removing srp service: %s.%s", service.mService.mInstanceName, service.mService.mName);
+            ChipLogProgress(DeviceLayer, "removing invalid srp service: %s.%s", service.mService.mInstanceName,
+                            service.mService.mName);
             error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &service.mService));
             SuccessOrExit(error);
         }

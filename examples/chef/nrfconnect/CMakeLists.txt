@@ -81,6 +81,7 @@ endif()
 target_sources(app PRIVATE
     ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
     ${CHEF}/common/DeviceTypes.cpp
+    ${CHEF}/common/FakeAttributeAccess.cpp
     ${CHEF}/common/chef-air-quality.cpp
     ${CHEF}/common/chef-concentration-measurement.cpp
     ${CHEF}/common/chef-fan-control-manager.cpp
