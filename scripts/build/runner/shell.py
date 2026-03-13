@@ -67,7 +67,7 @@ class ShellRunner:
         if title:
             log.info(title)
 
-        if dedup & self.deduplicator.is_duplicate(cmd):
+        if dedup and self.deduplicator.is_duplicate(cmd):
             log.info("Skipping duplicate command...")
             return
 
