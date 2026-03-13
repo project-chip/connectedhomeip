@@ -80,7 +80,7 @@ class NuttXBuilder(Builder):
 
     def _build(self):
         log.info('Compiling NuttX %s at %s, ',
-                     self.board.board_config, self.output_dir)
+                 self.board.board_config, self.output_dir)
         self._Execute(['cmake', '--build', self.output_dir])
 
     def build_outputs(self):

@@ -117,7 +117,7 @@ class Builder(ABC):
         with tarfile.open(target_file, "w:gz") as tar:
             for output in self.outputs():
                 log.info('Adding %s into %s(%s)',
-                             output.source, target_file, output.target)
+                         output.source, target_file, output.target)
                 tar.add(output.source, output.target)
 
     def CopyArtifacts(self, target_dir: str):
@@ -129,7 +129,7 @@ class Builder(ABC):
 
             if not os.path.exists(target_dir_full_name):
                 log.info('Creating subdirectory %s first',
-                             target_dir_full_name)
+                         target_dir_full_name)
                 os.makedirs(target_dir_full_name)
 
             shutil.copyfile(output.source, target_full_name)
