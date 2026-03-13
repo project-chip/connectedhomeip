@@ -18,6 +18,7 @@
 #include "ThermostatClusterPresets.h"
 #include "ThermostatCluster.h"
 
+#include <app/reporting/reporting.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
@@ -315,6 +316,10 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
         ChipLogError(Zcl, "Failed to set ActivePresetHandle with error %" CHIP_ERROR_FORMAT, err.Format());
         return StatusIB(err).mStatus;
     }
+
+    // Notify subscribers that ActivePresetHandle has changed so that they
+    // receive a subscription report with the new value.
+    MatterReportingAttributeChangeCallback(endpoint, Thermostat::Id, ActivePresetHandle::Id);
 
     return Status::Success;
 }
