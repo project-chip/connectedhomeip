@@ -68,19 +68,24 @@ private:
     void InvokeCommand(HandlerContext & ctx) override;
 
     /**
-     * @brief Handle Command: SetCookingParameters.
-     * @param ctx Returns the Interaction Model status code which was user determined in the business logic.
-     * If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
-     * If the operational state is not in 'Stopped', returns the Interaction Model status code of INVALID_IN_STATE.
+     * @brief Handle Command: RequestCommissioningApproval.
+     * @param ctx The context for the command handling.
+     * @param req The command request.
+     * This command is sent by a client to request approval for a future CommissionNode call.
+     * The server SHALL always return SUCCESS to a correctly formatted RequestCommissioningApproval
+     * command, and then send a CommissioningRequestResult event once the result is ready.
      */
     void HandleRequestCommissioningApproval(HandlerContext & ctx,
                                             const Commands::RequestCommissioningApproval::DecodableType & req);
 
     /**
-     * @brief Handle Command: AddMoreTime.
-     * @param ctx Returns the Interaction Model status code which was user determined in the business logic.
-     * If the cook time value is out of range, returns the Interaction Model status code of CONSTRAINT_ERROR.
-     * If the operational state is in 'Error', returns the Interaction Model status code of INVALID_IN_STATE.
+     * @brief Handle Command: CommissionNode.
+     * @param ctx The context for the command handling.
+     * @param req The command request.
+     * This command is used to commission a node specified by a previously approved request.
+     * The server SHALL return FAILURE if this command is not sent from the same
+     * NodeId as the RequestCommissioningApproval or if the provided RequestId
+     * does not match the value provided to RequestCommissioningApproval.
      */
     void HandleCommissionNode(HandlerContext & ctx, const Commands::CommissionNode::DecodableType & req);
 
