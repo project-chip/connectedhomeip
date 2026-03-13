@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import build
 import json
 import logging
 import os
@@ -24,8 +25,6 @@ import coloredlogs
 from builders.builder import BuilderOptions
 from runner import PrintOnlyRunner, ShellRunner
 
-import build
-
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 
@@ -34,7 +33,7 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 
