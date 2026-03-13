@@ -87,11 +87,14 @@ class TestResult:
             result.status = TestStatus.DRY_RUN if dry_run else TestStatus.PASSED
         except BaseException as e:
             test_end = time.monotonic()
-            result.status = TestStatus.CANCELLED if isinstance(e, KeyboardInterrupt) else TestStatus.FAILED
             result.exception = e
 
-            if os.path.exists('thread.pcap'):
-                os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
+            if isinstance(e, KeyboardInterrupt):
+                result.status = TestStatus.CANCELLED
+            else:
+                result.status = TestStatus.FAILED
+                if os.path.exists('thread.pcap'):
+                    os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
         finally:
             result.duration_seconds = round(test_end - test_start, 3)
 
