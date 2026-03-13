@@ -15,7 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "commissioner-control-server.h"
+#include <app/clusters/commissioner-control-server/CommissionerControlCluster.h>
 
 #include <protocols/interaction_model/StatusCode.h>
 
