@@ -163,7 +163,6 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
             def match(p): return r.search(p) is not None
         all_python_files = [path for path in all_python_files if match(path)]
 
-
     # If nightly flag is set that mean only super slow tests are going to run, some of these test may be in the not_automated
     # section as tests are super slow and they should not run on each PR, only on nightly runs.
     if nightly and nightly_tests is not None:
