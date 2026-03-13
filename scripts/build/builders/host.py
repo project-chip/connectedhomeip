@@ -625,28 +625,24 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('chip_build_tests_googletest=true')
 
     def GnBuildArgs(self):
-        if self.board == HostBoard.NATIVE:
-            return self.extra_gn_options
-        if self.board == HostBoard.ARM64:
-            self.extra_gn_options.extend(
-                [
+        args = super().GnBuildArgs()
+        args.extend(self.extra_gn_options)
+        match self.board:
+            case HostBoard.NATIVE:
+                pass
+            case HostBoard.ARM64:
+                args.extend([
                     'target_cpu="arm64"',
                     'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
-                ]
-            )
-
-            return self.extra_gn_options
-        if self.board == HostBoard.FAKE:
-            self.extra_gn_options.extend(
-                [
+                ])
+            case HostBoard.FAKE:
+                args.extend([
                     'custom_toolchain="//build/toolchain/fake:fake_x64_gcc"',
                     'chip_link_tests=true',
                     'chip_device_platform="fake"',
                     'chip_fake_platform=true',
-                ]
-            )
-            return self.extra_gn_options
-        raise Exception('Unknown host board type: %r' % self)
+                ])
+        return args
 
     def createJavaExecutable(self, java_program):
         self._Execute(

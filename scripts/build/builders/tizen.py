@@ -213,12 +213,15 @@ class TizenBuilder(GnBuilder):
         else:
             raise Exception("CPU architecture is not supported")
 
-        return self.extra_gn_options + [
+        args = super().GnBuildArgs()
+        args.extend([
             'target_os="tizen"',
             'target_cpu="%s"' % self.board.value.target_cpu,
             'tizen_sdk_root="%s"' % os.environ['TIZEN_SDK_ROOT'],
             'tizen_sdk_sysroot="%s"' % sysroot,
-        ]
+        ])
+        args.extend(self.extra_gn_options)
+        return args
 
     def _bundle(self):
         if self.app.is_tpk:

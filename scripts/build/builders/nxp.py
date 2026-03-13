@@ -245,7 +245,7 @@ class NxpBuilder(GnBuilder):
                 raise Exception("Unknown NXP board")
 
     def GnBuildArgs(self):
-        args = []
+        args = super().GnBuildArgs()
 
         if self.low_power:
             args.append('nxp_use_low_power=true')
@@ -456,7 +456,7 @@ class NxpBuilder(GnBuilder):
             if self.options.pregen_dir:
                 extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
 
-            extra_args.extend(self.GnBuildArgs() or [])
+            extra_args.extend(self.GnBuildArgs())
             if extra_args:
                 cmd += ' --args="%s' % ' '.join(extra_args) + '" '
 

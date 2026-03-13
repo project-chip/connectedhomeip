@@ -290,7 +290,9 @@ class Efr32Builder(GnBuilder):
             self.extra_gn_options.append(f"wifi_sdk_root=\"{wifi_sdk_path}\"")
 
     def GnBuildArgs(self):
-        return self.extra_gn_options
+        args = super().GnBuildArgs()
+        args.extend(self.extra_gn_options)
+        return args
 
     def _bundle(self):
         # Only unit-test needs to generate the flashbundle here.  All other examples will generate a flashbundle via the silabs_executable template.
