@@ -561,28 +561,26 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         to_terminate.append(apps_register := AppsRegister())
         apps_register.init()
 
-        log_config = context.obj.log_config
         for i in range(1, iterations + 1):
             log.info("Starting iteration %d", i)
             observed_failures = 0
             for test in context.obj.tests:
                 try:
-                    with log_config.fmt_context(task=test.name, level=log_config.level_tests):
-                        run_summary.record(result := TestResult.run_test(
-                            test.name, i, dry_run, lambda: test.Run(
-                                runner, apps_register, subproc_info_repo, pics_file,
-                                test_timeout_seconds, dry_run,
-                                test_runtime=context.obj.runtime,
-                                ble_controller_app=ble_controller_app,
-                                ble_controller_tool=ble_controller_tool,
-                                op_network='Thread' if thread_required else 'WiFi',
-                                thread_ba_host=thread_ba_host,
-                                thread_ba_port=thread_ba_port,
-                            )))
-                        if result.exception is not None:
-                            if isinstance(result.exception, BaseException):
-                                raise result.exception
-                            raise RuntimeError(result.exception)
+                    run_summary.record(result := TestResult.run_test(
+                        test.name, i, dry_run, context.obj.log_config, lambda: test.Run(
+                            runner, apps_register, subproc_info_repo, pics_file,
+                            test_timeout_seconds, dry_run,
+                            test_runtime=context.obj.runtime,
+                            ble_controller_app=ble_controller_app,
+                            ble_controller_tool=ble_controller_tool,
+                            op_network='Thread' if thread_required else 'WiFi',
+                            thread_ba_host=thread_ba_host,
+                            thread_ba_port=thread_ba_port,
+                        )))
+                    if result.exception is not None:
+                        if isinstance(result.exception, BaseException):
+                            raise result.exception
+                        raise RuntimeError(result.exception)
                 except Exception:
                     observed_failures += 1
                     if not keep_going:
