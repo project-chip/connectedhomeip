@@ -84,6 +84,4 @@ private:
     CommissionerControl::Delegate * mDelegate = nullptr;
 };
 
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters
