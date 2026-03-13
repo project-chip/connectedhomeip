@@ -101,6 +101,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
         GroupcastContext{
             .fabricTable       = mContext.fabricTable,
             .groupDataProvider = mContext.groupDataProvider,
+            .timerDelegate     = mContext.timerDelegate,
         },
         BitFlags<Groupcast::Feature>{ Groupcast::Feature::kListener });
     ReturnErrorOnFailure(provider.AddCluster(mGroupcastCluster.Registration()));
@@ -135,7 +136,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     return provider.AddEndpoint(mEndpointRegistration);
 }
 
-void RootNodeDevice::UnRegister(CodeDrivenDataModelProvider & provider)
+void RootNodeDevice::Unregister(CodeDrivenDataModelProvider & provider)
 {
     SingleEndpointUnregistration(provider);
 

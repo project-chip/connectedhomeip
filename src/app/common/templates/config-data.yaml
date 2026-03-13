@@ -25,7 +25,6 @@ CommandHandlerInterfaceOnlyClusters:
     # keep-sorted start
     - Actions
     - Camera AV Settings User Level Management
-    - Closure Control
     - Closure Dimension
     - Commissioner Control
     - Commodity Price
@@ -57,7 +56,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Water Heater Mode
     - WebRTC Transport Provider
     - WebRTC Transport Requestor
-    - Wi-Fi Network Management
     - Zone Management
     # keep-sorted end
 
@@ -122,6 +120,7 @@ CodeDrivenClusters:
     - Boolean State Configuration
     - Camera AV Stream Management
     - Chime
+    - Closure Control
     - Descriptor
     - Device Energy Management
     - Diagnostic Logs
@@ -149,6 +148,8 @@ CodeDrivenClusters:
     - Switch
     - TLS Certificate Management
     - TLS Client Management
+    - Temperature Control
+    - Temperature Measurement
     - Thread Network Diagnostics
     - Time Format Localization
     - Time Synchronization
@@ -156,4 +157,5 @@ CodeDrivenClusters:
     - User Label
     - Valve Configuration and Control
     - Wi-Fi Network Diagnostics
+    - Wi-Fi Network Management
     # keep-sorted end

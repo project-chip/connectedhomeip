@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2025-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,11 +16,6 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/closure-control-cluster-delegate.h"
-    "${CLUSTER_DIR}/ClosureControlClusterLogic.cpp"
-    "${CLUSTER_DIR}/closure-control-cluster-logic.h"
-    "${CLUSTER_DIR}/closure-control-cluster-matter-context.h"
-    "${CLUSTER_DIR}/closure-control-cluster-objects.h"
-    "${CLUSTER_DIR}/ClosureControlCluster.cpp"
-    "${CLUSTER_DIR}/closure-control-server.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
 )

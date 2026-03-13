@@ -41,6 +41,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 import matter.discovery as Discovery
+from matter.clusters.Types import NullValue
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.apps import AppServerSubprocess
@@ -147,6 +148,18 @@ class TC_JFPKI_2_2(MatterBaseTest):
             setupPinCode=self.admin_passcode,
             filterType=Discovery.FilterType.LONG_DISCRIMINATOR,
             filter=self.admin_discriminator,
+        )
+        admin_fabric_idx = await self.read_single_attribute_check_success(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=self._JOINT_FABRIC_ADMINISTRATOR_ENDPOINT,
+            cluster=Clusters.JointFabricAdministrator,
+            attribute=Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex,
+        )
+        asserts.assert_true(
+            admin_fabric_idx in (None, NullValue, 0),
+            "Precondition failed: AdministratorFabricIndex must be null after commissioning"
+            f" (expected None/NullValue/0, got {admin_fabric_idx!r})",
         )
 
         self.step("2")

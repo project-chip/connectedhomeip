@@ -26,6 +26,7 @@
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/illuminance-measurement-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
 #include <string>
 #include <tuple>
@@ -161,7 +162,7 @@ public:
             if (name == "Temperature")
             {
                 // update the temp attribute here for hardcoded endpoint 1
-                chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(n * 100));
+                LogErrorOnFailure(chip::app::Clusters::TemperatureMeasurement::SetMeasuredValue(1, static_cast<int16_t>(n * 100)));
             }
             else if (name == "Color Current Level")
             {
@@ -184,18 +185,14 @@ public:
             else if (name == "Illuminance")
             {
                 // update the current illuminance here for hardcoded endpoint 1
-                auto illuminanceMeasurement = app::Clusters::IlluminanceMeasurement::FindClusterOnEndpoint(1);
-                if (illuminanceMeasurement != nullptr)
+                CHIP_ERROR err = app::Clusters::IlluminanceMeasurement::SetMeasuredValue(1, static_cast<uint16_t>(n));
+                if (err == CHIP_NO_ERROR)
                 {
-                    CHIP_ERROR err = illuminanceMeasurement->SetMeasuredValue(static_cast<int16_t>(n));
-                    if (err == CHIP_NO_ERROR)
-                    {
-                        ESP_LOGI(TAG, "Illuminance changed to : %d", n);
-                    }
-                    else
-                    {
-                        ESP_LOGE(TAG, "Failed to set illuminance: %" CHIP_ERROR_FORMAT, err.Format());
-                    }
+                    ESP_LOGI(TAG, "Illuminance changed to : %d", n);
+                }
+                else
+                {
+                    ESP_LOGE(TAG, "Failed to set illuminance: %" CHIP_ERROR_FORMAT, err.Format());
                 }
             }
             else if (name == "Humidity")
@@ -525,8 +522,8 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Thermometer");
     AddAttribute("Temperature", "21");
-    // write the temp attribute
-    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
+
+    LogErrorOnFailure(chip::app::Clusters::TemperatureMeasurement::SetMeasuredValue(1, static_cast<int16_t>(21 * 100)));
 
     AddDevice("Door Lock");
     AddEndpoint("Default");
@@ -578,7 +575,6 @@ void SetupPretendDevices()
     AddDevice("Thermostat");
     AddEndpoint("1");
     AddCluster("Thermostat");
-    app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, static_cast<int16_t>(21 * 100));
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
     AddAttribute("SystemMode", "4");
     app::Clusters::Thermostat::Attributes::SystemMode::Set(1, app::Clusters::Thermostat::SystemModeEnum::kHeat);
@@ -598,11 +594,7 @@ void SetupPretendDevices()
     AddCluster("Illuminance Measurement");
     AddAttribute("Illuminance", "1000");
 
-    auto illuminanceMeasurement = app::Clusters::IlluminanceMeasurement::FindClusterOnEndpoint(1);
-    if (illuminanceMeasurement != nullptr)
-    {
-        LogErrorOnFailure(illuminanceMeasurement->SetMeasuredValue(static_cast<int16_t>(1000)));
-    }
+    LogErrorOnFailure(app::Clusters::IlluminanceMeasurement::SetMeasuredValue(1, static_cast<uint16_t>(1000)));
 
     AddDevice("Color Light");
     AddEndpoint("1");
