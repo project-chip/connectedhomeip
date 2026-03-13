@@ -22,6 +22,7 @@
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model/Decode.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -387,10 +388,9 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAcceptedCommands)
 TEST_F(TestCameraAVStreamManagementCluster, TestReadClusterRevisionAttribute)
 {
     // Create a mock attribute request for ClusterRevision
-    chip::app::DataModel::ReadAttributeRequest request;
-    request.path.mEndpointId  = kTestEndpointId;
-    request.path.mClusterId   = CameraAvStreamManagement::Id;
-    request.path.mAttributeId = chip::app::Clusters::Globals::Attributes::ClusterRevision::Id;
+    chip::app::ConcreteAttributePath path(kTestEndpointId, CameraAvStreamManagement::Id,
+                                          chip::app::Clusters::Globals::Attributes::ClusterRevision::Id);
+    chip::app::DataModel::ReadAttributeRequest request(path, chip::Testing::kAdminSubjectDescriptor);
 
     // Create a buffer for encoding
     chip::Platform::ScopedMemoryBufferWithSize<uint8_t> buffer;
@@ -403,7 +403,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadClusterRevisionAttribute)
     CHIP_ERROR err = attributeReportIBsBuilder.Init(&reportWriter);
     ASSERT_EQ(err, CHIP_NO_ERROR);
 
-    chip::app::AttributeValueEncoder encoder(attributeReportIBsBuilder, chip::Access::SubjectDescriptor{}, request.path,
+    chip::app::AttributeValueEncoder encoder(attributeReportIBsBuilder, chip::Testing::kAdminSubjectDescriptor, request.path,
                                              0 /* dataVersion */);
 
     // Test reading cluster revision

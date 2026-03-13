@@ -36,7 +36,7 @@
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/Constants.h>

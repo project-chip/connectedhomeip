@@ -182,7 +182,33 @@ public:
         const Access::SubjectDescriptor subjectDescriptor = mHandler.GetSubjectDescriptor();
         writeOp.SetSubjectDescriptor(subjectDescriptor);
 
-        auto decoder = writeOp.DecoderFor(value);
+        uint8_t buffer[1024];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+
+        // - DataModel::Encode(integral, enum, etc.) for simple types.
+        // - DataModel::Encode(List<X>) for lists (which iterates and calls Encode on elements).
+        // - DataModel::Encode(Struct) for non-fabric-scoped structs.
+        // - Note: For attribute writes, DataModel::EncodeForWrite is usually preferred for fabric-scoped types,
+        //         but the generic DataModel::Encode often works as a top-level function.
+        //         If you use EncodeForWrite, you ensure fabric-scoped list items are handled correctly:
+
+        if constexpr (app::DataModel::IsFabricScoped<T>::value)
+        {
+            ReturnErrorOnFailure(chip::app::DataModel::EncodeForWrite(writer, TLV::AnonymousTag(), value));
+        }
+        else
+        {
+            ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, TLV::AnonymousTag(), value));
+        }
+
+        ReturnErrorOnFailure(writer.Finalize());
+
+        TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        ReturnErrorOnFailure(reader.Next());
+
+        app::AttributeValueDecoder decoder(reader, writeOp.GetRequest().subjectDescriptor);
 
         return mCluster.WriteAttribute(writeOp.GetRequest(), decoder);
     }
@@ -296,12 +322,8 @@ public:
         }
 
         const Access::SubjectDescriptor subjectDescriptor = mHandler.GetSubjectDescriptor();
-        const app::DataModel::InvokeRequest invokeRequest = [&]() {
-            app::DataModel::InvokeRequest req;
-            req.path              = { paths[0].mEndpointId, paths[0].mClusterId, commandId };
-            req.subjectDescriptor = &subjectDescriptor;
-            return req;
-        }();
+        const app::DataModel::InvokeRequest invokeRequest({ paths[0].mEndpointId, paths[0].mClusterId, commandId },
+                                                          subjectDescriptor);
 
         TLV::TLVWriter writer;
         writer.Init(mTlvBuffer);

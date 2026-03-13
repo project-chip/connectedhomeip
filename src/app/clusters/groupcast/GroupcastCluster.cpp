@@ -238,11 +238,10 @@ void GroupcastCluster::GroupcastTestingTimer::TimerFired()
     mCluster.mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
 }
 
-CHIP_ERROR GroupcastCluster::ReadMembership(const chip::Access::SubjectDescriptor * subject, EndpointId endpoint,
+CHIP_ERROR GroupcastCluster::ReadMembership(const chip::Access::SubjectDescriptor & subject, EndpointId endpoint,
                                             AttributeValueEncoder & aEncoder)
 {
-    VerifyOrReturnError(nullptr != subject, CHIP_ERROR_INVALID_ARGUMENT);
-    FabricIndex fabric_index = subject->fabricIndex;
+    FabricIndex fabric_index = subject.fabricIndex;
 
     GroupDataProvider * groups = &Provider();
 
