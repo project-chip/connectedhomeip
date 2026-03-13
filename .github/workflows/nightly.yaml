@@ -48,9 +48,9 @@ env:
 jobs:
     su_repl_tests_linux_build:
         name: REPL Tests - Linux Software Update (BUILD)
-            if: |
-              github.actor != 'restyled-io[bot]' && 
-              (github.ref == 'refs/heads/master' || github.event_name == 'pull_request')
+        if: |
+            github.actor != 'restyled-io[bot]' &&
+            (github.ref == 'refs/heads/master' || github.event_name == 'pull_request')
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
@@ -172,7 +172,7 @@ jobs:
             matrix:
                 # Regex filter by TC SU we think 45 minutes is more than engough for this task
                 # Each on one run to avoid all the jobs fail if one fails
-                filter: ["", "TC_SU_2_2", "TC_SU_2_5", "TC_SU_2_7" ]
+                filter: ["", "TC_SU_2_2", "TC_SU_2_5", "TC_SU_2_7"]
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
@@ -235,7 +235,6 @@ jobs:
               if: ${{matrix.filter == ''}}
               run: |
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v2.min.ota -v 2'
-            
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
               run: |
