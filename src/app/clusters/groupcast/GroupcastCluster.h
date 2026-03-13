@@ -73,7 +73,7 @@ public:
     const BitFlags<Groupcast::Feature> & Features() const { return mFeatures; }
 
     // Methods moved from GroupcastLogic
-    CHIP_ERROR ReadMembership(const chip::Access::SubjectDescriptor * subject, EndpointId endpoint,
+    CHIP_ERROR ReadMembership(const chip::Access::SubjectDescriptor & subject, EndpointId endpoint,
                               AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadMaxMembershipCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadMaxMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);

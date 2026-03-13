@@ -26,7 +26,7 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(SwitchActionEventHandler);
-    TEMPORARY_RETURN_IGNORED InitCommonParts();
+    ReturnErrorOnFailure(InitCommonParts());
 
     // Configure Bindings
     CHIP_ERROR err = InitBindingHandler();

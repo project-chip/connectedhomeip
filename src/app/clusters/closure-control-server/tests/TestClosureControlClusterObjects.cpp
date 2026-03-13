@@ -18,7 +18,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
+#include <app/clusters/closure-control-server/ClosureControlClusterObjects.h>
 #include <app/data-model/Nullable.h>
 
 using namespace chip;

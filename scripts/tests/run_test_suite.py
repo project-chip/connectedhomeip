@@ -14,17 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
 import enum
-import json
 import logging
 import os
 import random
 import sys
 import time
 import warnings
-from collections import Counter
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -33,6 +30,7 @@ import click
 import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
+from chiptest.results import RunSummary, TestResult
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
@@ -69,47 +67,6 @@ class RunContext:
 
     # Deprecated options passed to `cmd_run`
     deprecated_chip_tool_path: Path | None = None
-
-
-class TestStatus(enum.Enum):
-    PASSED = "passed"
-    FAILED = "failed"
-    DRY_RUN = "dry_run"
-
-
-@dataclass
-class TestResult:
-    name: str
-    iteration: int
-    status: TestStatus
-    duration_seconds: float
-
-
-@dataclass
-class RunSummary:
-    run_timestamp: datetime.datetime
-    iterations: int
-    total_runs: int = 0
-    passed: int = 0
-    failed: int = 0
-    results: list[TestResult] = field(default_factory=list)
-
-    def record(self, name: str, iteration: int, status: TestStatus, duration: float) -> None:
-        self.results.append(TestResult(name=name, iteration=iteration, status=status, duration_seconds=round(duration, 3)))
-        if status == TestStatus.PASSED:
-            self.passed += 1
-        elif status == TestStatus.FAILED:
-            self.failed += 1
-
-    def write_json(self, path: Path) -> None:
-        data = asdict(self)
-        data["run_timestamp"] = self.run_timestamp.isoformat()
-        # Convert Enum to string for JSON serialization
-        for result in data["results"]:
-            result["status"] = result["status"].value
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(data, indent=2))
-        log.info("Test run summary written to %s", path)
 
 
 # TODO: When we update click to >= 8.2.0 we will be able to use the builtin `deprecated` argument for Option
@@ -168,10 +125,9 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='What targets to skip (glob)'
 )
 @click.option(
-    '--no-log-timestamps',
-    default=False,
-    is_flag=True,
-    help='Skip timestaps in log output')
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestamps in log output')
 @click.option(
     '--root',
     default=DEFAULT_CHIP_ROOT,
@@ -212,22 +168,19 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     help='Default directory path for finding compiled targets.')
 @click.option(
     '--runner',
-    type=click.Choice(['matter_repl_python', 'chip_tool_python', 'darwin_framework_tool_python'], case_sensitive=False),
-    default='chip_tool_python',
+    type=click.Choice(TestRunTime, case_sensitive=False),  # type: ignore[arg-type]
+    default=TestRunTime.CHIP_TOOL_PYTHON,
     help='Run YAML tests using the specified runner.')
 @click.option(
     '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
-def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str,
-         no_log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
-         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: str,
-         chip_tool: Path | None) -> None:
+def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str, log_timestamps: bool,
+         root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...], exclude_tags: tuple[TestTag, ...],
+         test_order_seed: str | None, find_path: list[str], runner: TestRunTime, chip_tool: Path | None) -> None:
 
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
-    if no_log_timestamps:
-        log_fmt = '%(levelname)-7s %(message)s'
+    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     if sys.platform == "linux":
@@ -237,19 +190,16 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
         else:
             chiptest.linux.ensure_private_state()
 
-    runtime = TestRunTime.CHIP_TOOL_PYTHON
-    if runner == 'matter_repl_python':
-        runtime = TestRunTime.MATTER_REPL_PYTHON
-    elif runner == 'darwin_framework_tool_python':
-        runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON
-
     # Figures out selected test that match the given name(s)
-    if runtime == TestRunTime.MATTER_REPL_PYTHON:
-        all_tests = list(chiptest.AllReplYamlTests())
-    elif runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-        all_tests = list(chiptest.AllDarwinFrameworkToolYamlTests())
-    else:
-        all_tests = list(chiptest.AllChipToolYamlTests())
+    match runner:
+        case TestRunTime.MATTER_REPL_PYTHON:
+            all_tests = list(chiptest.AllReplYamlTests())
+        case TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
+            all_tests = list(chiptest.AllDarwinFrameworkToolYamlTests())
+        case TestRunTime.CHIP_TOOL_PYTHON:
+            all_tests = list(chiptest.AllChipToolYamlTests())
+        case _:
+            raise ValueError(f"Unsupported test runtime: {runner}")
 
     tests: list[TestDefinition] = all_tests
 
@@ -266,7 +216,7 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
             TestTag.PURPOSEFUL_FAILURE,
         }
 
-        if runtime == TestRunTime.MATTER_REPL_PYTHON:
+        if runner == TestRunTime.MATTER_REPL_PYTHON:
             exclude_tags_set.add(TestTag.CHIP_TOOL_PYTHON_ONLY)
 
     if 'all' not in target:
@@ -313,8 +263,7 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
         random.seed(test_order_seed)
         random.shuffle(tests_filtered)
 
-    context.obj = RunContext(root=root, tests=tests_filtered,
-                             runtime=runtime, find_path=find_path)
+    context.obj = RunContext(root=root, tests=tests_filtered, runtime=runner, find_path=find_path)
     if chip_tool:
         context.obj.deprecated_chip_tool_path = Path(chip_tool)
 
@@ -342,6 +291,21 @@ class Terminable(Protocol):
     def terminate(self) -> None: ...
 
 
+class CommissioningMethod(enum.StrEnum):
+    ON_NETWORK = "on-network"
+    BLE_WIFI = "ble-wifi"
+    BLE_THREAD = "ble-thread"
+    THREAD_MESHCOP = "thread-meshcop"
+
+    @property
+    def wifi_required(self) -> bool:
+        return self in {CommissioningMethod.BLE_WIFI}
+
+    @property
+    def thread_required(self) -> bool:
+        return self in {CommissioningMethod.BLE_THREAD, CommissioningMethod.THREAD_MESHCOP}
+
+
 @main.command(
     'run', help='Execute the tests')
 @click.option(
@@ -353,6 +317,59 @@ class Terminable(Protocol):
     '--iterations',
     default=1,
     help='Number of iterations to run')
+@click.option(
+    '--app-path', multiple=True, metavar="<key>:<path>",
+    help='Set path for an application (run in app network namespace), use `--help-paths` to list known keys')
+@click.option(
+    '--tool-path', multiple=True, metavar="<key>:<path>",
+    help='Set path for a controller (run in controller network namespace), use `--help-paths` to list known keys')
+@click.option(
+    '--discover-paths',
+    is_flag=True,
+    default=False,
+    help='Discover missing paths for application and tool binaries')
+@click.option(
+    '--help-paths',
+    is_flag=True,
+    default=False,
+    help="Print keys for known application and controller paths")
+@click.option(
+    '--pics-file',
+    type=ExistingFilePath,
+    default="src/app/tests/suites/certification/ci-pics-values",
+    show_default=True,
+    help='PICS file to use for test runs.')
+@click.option(
+    '--keep-going',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Keep running the rest of the tests even if a test fails.')
+@click.option(
+    '--test-timeout-seconds',
+    default=None,
+    type=int,
+    help='If provided, fail if a test runs for longer than this time')
+@click.option(
+    '--expected-failures',
+    type=click.IntRange(min=0),
+    default=0,
+    show_default=True,
+    help=('Number of tests that are expected to fail in each iteration. Overall test will pass if the number of failures matches '
+          'this. Nonzero values require --keep-going'))
+@click.option(
+    '--commissioning-method',
+    type=click.Choice(CommissioningMethod, case_sensitive=False),  # type: ignore[arg-type]
+    default=CommissioningMethod.ON_NETWORK,
+    help=('Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi '
+          'commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth '
+          'and Thread mock servers. "thread-meshcop" performs Thread commissioning using Thread mock server. This option is '
+          'Linux-only.'))
+@click.option(
+    '--summary-file',
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help='If provided, write a JSON test-run summary to this file at the end of the run.')
 # Deprecated flags:
 @click.option(
     '--all-clusters-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path all-clusters:<path>',
@@ -405,69 +422,16 @@ class Terminable(Protocol):
 @click.option(
     '--chip-tool-with-python', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool-with-python:<path>',
     help='what python script to use for running yaml tests using chip-tool as controller')
-@click.option(
-    '--app-path', multiple=True, metavar="<key>:<path>",
-    help='Set path for an application (run in app network namespace), use `--help-paths` to list known keys'
-)
-@click.option(
-    '--tool-path', multiple=True, metavar="<key>:<path>",
-    help='Set path for a controller (run in controller network namespace), use `--help-paths` to list known keys'
-)
-@click.option(
-    '--discover-paths',
-    is_flag=True,
-    default=False,
-    help='Discover missing paths for application and tool binaries'
-)
-@click.option(
-    '--help-paths',
-    is_flag=True,
-    default=False,
-    help="Print keys for known application and controller paths"
-)
-@click.option(
-    '--pics-file',
-    type=ExistingFilePath,
-    default="src/app/tests/suites/certification/ci-pics-values",
-    show_default=True,
-    help='PICS file to use for test runs.')
-@click.option(
-    '--keep-going',
-    is_flag=True,
-    default=False,
-    show_default=True,
-    help='Keep running the rest of the tests even if a test fails.')
-@click.option(
-    '--test-timeout-seconds',
-    default=None,
-    type=int,
-    help='If provided, fail if a test runs for longer than this time')
-@click.option(
-    '--expected-failures',
-    type=click.IntRange(min=0),
-    default=0,
-    show_default=True,
-    help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
-@click.option(
-    '--commissioning-method',
-    type=click.Choice(['on-network', 'ble-wifi', 'ble-thread', 'thread-meshcop'], case_sensitive=False),
-    default='on-network',
-    help='Commissioning method to use. "on-network" is the default one available on all platforms, "ble-wifi" performs BLE-WiFi commissioning using Bluetooth and WiFi mock servers. "ble-thread" performs BLE-Thread commissioning using Bluetooth and Thread mock servers. "thread-meshcop" performs Thread commissioning using Thread mock server. This option is Linux-only.')
-@click.option(
-    '--summary-file',
-    type=click.Path(dir_okay=False, path_type=Path),
-    default=None,
-    help='If provided, write a JSON test-run summary to this file at the end of the run.')
 @click.pass_context
-def cmd_run(context: click.Context, dry_run: bool, iterations: int,
-            app_path: list[str], tool_path: list[str], discover_paths: bool, help_paths: bool,
+def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: list[str], tool_path: list[str], discover_paths: bool,
+            help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None, expected_failures: int,
+            commissioning_method: CommissioningMethod, summary_file: Path | None,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
-            microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None, energy_gateway_app: Path | None,
-            water_heater_app: Path | None, evse_app: Path | None, closure_app: Path | None, matter_repl_yaml_tester: Path | None,
-            chip_tool_with_python: Path | None, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None,
-            expected_failures: int, commissioning_method: str | None, summary_file: Path | None) -> None:
+            microwave_oven_app: Path | None, rvc_app: Path | None, network_manager_app: Path | None,
+            energy_gateway_app: Path | None, water_heater_app: Path | None, evse_app: Path | None, closure_app: Path | None,
+            matter_repl_yaml_tester: Path | None, chip_tool_with_python: Path | None) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
@@ -539,35 +503,19 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         raise click.BadOptionUsage("{app,tool}-path", f"Missing required path: {e}")
 
     # Derive boolean flags from commissioning_method parameter
-    wifi_required = commissioning_method in ['ble-wifi']
-    thread_required = commissioning_method in ['ble-thread', 'thread-meshcop']
+    wifi_required = commissioning_method.wifi_required
+    thread_required = commissioning_method.thread_required
 
     if (wifi_required or thread_required) and sys.platform != "linux":
         raise click.BadOptionUsage("commissioning-method",
                                    f"Option --commissioning-method={commissioning_method} is available on Linux platform only")
 
+    run_summary = RunSummary(iterations)
     ble_controller_app = None
     ble_controller_tool = None
     thread_ba_host = None
     thread_ba_port = None
     to_terminate: list[Terminable] = []
-
-    run_summary = RunSummary(
-        run_timestamp=datetime.datetime.now(datetime.timezone.utc),
-        iterations=iterations,
-    )
-
-    def cleanup() -> None:
-        for item in reversed(to_terminate):
-            try:
-                log.info("Cleaning up %s", item.__class__.__name__)
-                item.terminate()
-            except Exception as e:
-                log.warning("Encountered exception during cleanup: %r", e)
-        to_terminate.clear()
-        if summary_file is not None:
-            run_summary.total_runs = len(run_summary.results)
-            run_summary.write_json(summary_file)
 
     try:
         if sys.platform == 'linux':
@@ -580,22 +528,23 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
                 # depending on the commissioning method used.
                 app_link_name='wlx-app' if wifi_required else 'eth-app'))
 
-            if commissioning_method == 'ble-wifi':
-                to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                to_terminate.append(chiptest.linux.BluetoothMock())
-                to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
-                ble_controller_app = 0   # Bind app to the first BLE controller
-                ble_controller_tool = 1  # Bind tool to the second BLE controller
-            elif commissioning_method == 'ble-thread':
-                to_terminate.append(chiptest.linux.DBusTestSystemBus())
-                to_terminate.append(chiptest.linux.BluetoothMock())
-                to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
-                ble_controller_app = 0   # Bind app to the first BLE controller
-                ble_controller_tool = 1  # Bind tool to the second BLE controller
-            elif commissioning_method == 'thread-meshcop':
-                to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
-                thread_ba_host = tbr.get_border_agent_host()
-                thread_ba_port = tbr.get_border_agent_port()
+            match commissioning_method:
+                case CommissioningMethod.BLE_WIFI:
+                    to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                    to_terminate.append(chiptest.linux.BluetoothMock())
+                    to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
+                    ble_controller_app = 0   # Bind app to the first BLE controller
+                    ble_controller_tool = 1  # Bind tool to the second BLE controller
+                case CommissioningMethod.BLE_THREAD:
+                    to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                    to_terminate.append(chiptest.linux.BluetoothMock())
+                    to_terminate.append(chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                    ble_controller_app = 0   # Bind app to the first BLE controller
+                    ble_controller_tool = 1  # Bind tool to the second BLE controller
+                case CommissioningMethod.THREAD_MESHCOP:
+                    to_terminate.append(tbr := chiptest.linux.ThreadBorderRouter(TEST_THREAD_DATASET, ns))
+                    thread_ba_host = tbr.get_border_agent_host()
+                    thread_ba_port = tbr.get_border_agent_port()
 
             to_terminate.append(executor := chiptest.linux.LinuxNamespacedExecutor(ns))
         elif sys.platform == 'darwin':
@@ -611,38 +560,25 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         to_terminate.append(apps_register := AppsRegister())
         apps_register.init()
 
-        for i in range(iterations):
-            log.info("Starting iteration %d", i+1)
+        for i in range(1, iterations + 1):
+            log.info("Starting iteration %d", i)
             observed_failures = 0
             for test in context.obj.tests:
-                test_start = time.monotonic()
                 try:
-                    if dry_run:
-                        log.info("Would run test: '%s'", test.name)
-                    else:
-                        log.info("%-20s - Starting test", test.name)
-                    test.Run(
-                        runner, apps_register, subproc_info_repo, pics_file,
-                        test_timeout_seconds, dry_run,
-                        test_runtime=context.obj.runtime,
-                        ble_controller_app=ble_controller_app,
-                        ble_controller_tool=ble_controller_tool,
-                        op_network='Thread' if thread_required else 'WiFi',
-                        thread_ba_host=thread_ba_host,
-                        thread_ba_port=thread_ba_port,
-                    )
-                    test_end = time.monotonic()
-                    if dry_run:
-                        run_summary.record(test.name, i + 1, TestStatus.DRY_RUN, test_end - test_start)
-                    else:
-                        log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
-                        run_summary.record(test.name, i + 1, TestStatus.PASSED, test_end - test_start)
+                    run_summary.record(result := TestResult.run_test(
+                        test.name, i, dry_run, lambda: test.Run(
+                            runner, apps_register, subproc_info_repo, pics_file,
+                            test_timeout_seconds, dry_run,
+                            test_runtime=context.obj.runtime,
+                            ble_controller_app=ble_controller_app,
+                            ble_controller_tool=ble_controller_tool,
+                            op_network='Thread' if thread_required else 'WiFi',
+                            thread_ba_host=thread_ba_host,
+                            thread_ba_port=thread_ba_port,
+                        )))
+                    if result.exception is not None:
+                        raise result.exception
                 except Exception:
-                    if os.path.exists('thread.pcap'):
-                        os.system("echo 'base64 -d - >thread.pcap <<EOF' && base64 thread.pcap && echo EOF")
-                    test_end = time.monotonic()
-                    log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
-                    run_summary.record(test.name, i + 1, TestStatus.FAILED, test_end - test_start)
                     observed_failures += 1
                     if not keep_going:
                         sys.exit(2)
@@ -658,7 +594,16 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
         log.error("Caught exception during test execution: %s", e, exc_info=True)
         raise
     finally:
-        cleanup()
+        for item in reversed(to_terminate):
+            try:
+                log.info("Cleaning up %s", item.__class__.__name__)
+                item.terminate()
+            except Exception as e:
+                log.warning("Encountered exception during cleanup: %r", e)
+
+        run_summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
+        if summary_file is not None:
+            run_summary.write_json(summary_file)
 
 
 @main.command(
@@ -667,78 +612,20 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int,
 @click.option(
     '--summary-file',
     required=True,
-    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    type=ExistingFilePath,
     help='Path to the JSON summary file to display.')
 @click.option(
     '--top-slowest',
     default=20,
     show_default=True,
-    type=click.IntRange(min=1),
-    help='Number of slowest tests to include in the timing table.')
-def cmd_summarize(summary_file: Path, top_slowest: int) -> None:
-    raw = json.loads(summary_file.read_text())
-    results: list[dict] = raw.get("results", [])
-
-    passed = raw.get("passed", 0)
-    failed = raw.get("failed", 0)
-    total = raw.get("total_runs", len(results))
-    iterations = raw.get("iterations", 1)
-    ts = raw.get("run_timestamp", "unknown")
-
-    sep = "=" * 72
-
-    print(sep)
-    print("  TEST RUN SUMMARY")
-    print(sep)
-    print(f"  Run timestamp : {ts}")
-    print(f"  Iterations    : {iterations}")
-    print(f"  Total runs    : {total}")
-    print(f"  Passed        : {passed}")
-    print(f"  Failed        : {failed}")
-    if total:
-        print(f"  Pass rate     : {100 * passed / total:.1f}%")
-    print(sep)
-
-    failed_results = [r for r in results if r["status"] == TestStatus.FAILED.value]
-    if failed_results:
-        print(f"\n  FAILED TESTS ({len(failed_results)}):")
-        print(f"  {'Test name':<50} {'Iter':>4}  {'Duration':>10}")
-        print("  " + "-" * 68)
-        for r in sorted(failed_results, key=lambda x: x["name"]):
-            print(f"  {'✗  ' + r['name']:<50} {r['iteration']:>4}  {r['duration_seconds']:>9.2f}s")
-    else:
-        print("\n  No failures recorded.")
-
-    if iterations > 1:
-        fail_counts: Counter = Counter()
-        run_counts: Counter = Counter()
-        for r in results:
-            run_counts[r["name"]] += 1
-            if r["status"] == TestStatus.FAILED.value:
-                fail_counts[r["name"]] += 1
-        flaky = [(name, fail_counts[name], run_counts[name]) for name in fail_counts if fail_counts[name] > 0]
-        if flaky:
-            print(f"\n  FAILURE RATE BY TEST (across {iterations} iterations):")
-            print(f"  {'Test name':<50} {'Failures':>8}  {'Rate':>8}")
-            print("  " + "-" * 70)
-            for name, fails, runs in sorted(flaky, key=lambda x: -x[1]):
-                rate = 100 * fails / runs
-                print(f"  {name:<50} {fails:>5}/{runs:<2}  {rate:>7.1f}%")
-
-    slowest = sorted(
-        [r for r in results if r["status"] != TestStatus.DRY_RUN.value],
-        key=lambda x: -x["duration_seconds"]
-    )[:top_slowest]
-
-    if slowest:
-        print(f"\n  SLOWEST {top_slowest} TEST RUNS:")
-        print(f"  {'Test name':<50} {'Status':<8} {'Iter':>4}  {'Duration':>10}")
-        print("  " + "-" * 76)
-        for r in slowest:
-            mark = "✓" if r["status"] == TestStatus.PASSED.value else "✗"
-            print(f"  {mark + '  ' + r['name']:<50} {r['status']:<8} {r['iteration']:>4}  {r['duration_seconds']:>9.2f}s")
-
-    print(sep)
+    type=click.IntRange(min=-1),
+    help='Number of slowest tests to include in the timing table. Disable with 0 and show all with -1.')
+@click.option(
+    '--show-all',
+    is_flag=True,
+    help='Show statistics of all tests for all iterations.')
+def cmd_summarize(summary_file: Path, top_slowest: int, show_all: bool) -> None:
+    RunSummary.from_json(summary_file).print_summary(top_slowest=top_slowest, show_all=show_all)
 
 
 # On Linux, allow an execution shell to be prepared

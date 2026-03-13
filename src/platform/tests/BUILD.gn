@@ -23,7 +23,7 @@ declare_args() {
   chip_enable_dnssd_tests = chip_device_platform == "darwin"
 }
 
-if (chip_device_platform != "none" && chip_device_platform != "fake") {
+if (chip_device_platform != "none") {
   import("${chip_root}/build/chip/chip_test_suite.gni")
 
   chip_test_suite("tests") {

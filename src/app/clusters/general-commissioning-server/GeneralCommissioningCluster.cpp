@@ -422,7 +422,7 @@ GeneralCommissioningCluster::HandleArmFailSafe(const DataModel::InvokeRequest & 
         // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
         // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
         if (!failSafeContext.IsFailSafeArmed() && mClusterContext.commissioningWindowManager.IsCommissioningWindowOpen() &&
-            request.subjectDescriptor->authMode == Access::AuthMode::kCase)
+            request.subjectDescriptor.authMode == Access::AuthMode::kCase)
         {
             response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
         }
