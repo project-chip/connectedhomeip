@@ -9262,7 +9262,7 @@ endpoint 0 {
     ram      attribute operationMode default = 0x00;
     ram      attribute controlMode default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0005;
   }
 
   server cluster Thermostat {
@@ -9345,7 +9345,7 @@ endpoint 0 {
     ram      attribute maxMeasuredValue default = 0x8000;
     ram      attribute tolerance;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
   }
 
   server cluster PressureMeasurement {
@@ -9359,7 +9359,7 @@ endpoint 0 {
     ram      attribute scaledTolerance;
     ram      attribute scale default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster FlowMeasurement {
@@ -9368,7 +9368,7 @@ endpoint 0 {
     ram      attribute maxMeasuredValue;
     ram      attribute tolerance default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster RelativeHumidityMeasurement {
@@ -9380,7 +9380,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster Channel {
@@ -9549,7 +9549,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;
@@ -9578,7 +9578,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command MoveToLevel;
     handle command Move;
@@ -9680,7 +9680,7 @@ endpoint 1 {
     ram      attribute coupleColorTempToLevelMinMireds;
     ram      attribute startUpColorTemperatureMireds default = 0x00FA;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 7;
+    ram      attribute clusterRevision default = 0x0009;
 
     handle command MoveToHue;
     handle command MoveHue;

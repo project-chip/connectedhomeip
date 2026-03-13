@@ -1993,7 +1993,7 @@ endpoint 1 {
     ram      attribute minMeasuredValue default = -8500;
     ram      attribute maxMeasuredValue default = 9900;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
   }
 }
 
