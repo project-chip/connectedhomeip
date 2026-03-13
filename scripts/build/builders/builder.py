@@ -19,6 +19,8 @@ import tarfile
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+log = logging.getLogger(__name__)
+
 
 @dataclass
 class BuilderOptions:
@@ -114,19 +116,19 @@ class Builder(ABC):
     def CompressArtifacts(self, target_file: str):
         with tarfile.open(target_file, "w:gz") as tar:
             for output in self.outputs():
-                logging.info('Adding %s into %s(%s)',
+                log.info('Adding %s into %s(%s)',
                              output.source, target_file, output.target)
                 tar.add(output.source, output.target)
 
     def CopyArtifacts(self, target_dir: str):
         for output in self.outputs():
-            logging.info(f'Copying {output.source} into {output.target}')
+            log.info(f'Copying {output.source} into {output.target}')
 
             target_full_name = os.path.join(target_dir, output.target)
             target_dir_full_name = os.path.dirname(target_full_name)
 
             if not os.path.exists(target_dir_full_name):
-                logging.info('Creating subdirectory %s first',
+                log.info('Creating subdirectory %s first',
                              target_dir_full_name)
                 os.makedirs(target_dir_full_name)
 
