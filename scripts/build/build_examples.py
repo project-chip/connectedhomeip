@@ -19,12 +19,11 @@ import logging
 import os
 import sys
 
+import build
 import click
 import coloredlogs
 from builders.builder import BuilderOptions, BuildProfile
 from runner import PrintOnlyRunner, ShellRunner
-
-import build
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
