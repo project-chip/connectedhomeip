@@ -30,6 +30,13 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 
+// Forward declaration to allow the test access helper to be a friend.
+namespace chip {
+namespace Testing {
+class ThermostatAttrAccessTestAccess;
+} // namespace Testing
+} // namespace chip
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -57,6 +64,9 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
 
 private:
+    // Allow test access helper to call private methods without #define private public.
+    friend class chip::Testing::ThermostatAttrAccessTestAccess;
+
     /**
      * @brief Set the Active Preset to a given preset handle, or null
      *

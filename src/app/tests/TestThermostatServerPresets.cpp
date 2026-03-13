@@ -14,9 +14,7 @@
  *    limitations under the License.
  */
 
-#define private public
-#include <app/clusters/thermostat-server/thermostat-server.h>
-#undef private
+#include "ThermostatAttrAccessTestAccess.h"
 #include <app/tests/test-ember-api.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
@@ -141,8 +139,8 @@ TEST(TestThermostatServerPresets, SetActivePresetSuccessCallsDelegate)
     SetDefaultDelegate(kEndpoint, &delegate);
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    auto status = chip::app::Clusters::Thermostat::gThermostatAttrAccess.SetActivePreset(
-        kEndpoint, chip::app::DataModel::NullNullable);
+    chip::Testing::ThermostatAttrAccessTestAccess accessor(&chip::app::Clusters::Thermostat::gThermostatAttrAccess);
+    auto status = accessor.SetActivePreset(kEndpoint, chip::app::DataModel::NullNullable);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     EXPECT_EQ(status, Status::Success);

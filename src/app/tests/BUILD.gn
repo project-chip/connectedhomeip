@@ -201,6 +201,7 @@ source_set("thermostat-server-test-srcs") {
     "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-atomic.cpp",
     "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-presets.cpp",
     "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-suggestions.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-test-stubs.cpp",
     "${chip_root}/src/app/clusters/thermostat-server/thermostat-server.cpp",
   ]
 
