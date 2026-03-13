@@ -48,8 +48,9 @@ env:
 jobs:
     su_repl_tests_linux_build:
         name: REPL Tests - Linux Software Update (BUILD)
-            if: github.actor != 'restyled-io[bot]' && (github.ref == 'refs/heads/master' || github.event_name == 'pull_request')
-
+            if: |
+              github.actor != 'restyled-io[bot]' && 
+              (github.ref == 'refs/heads/master' || github.event_name == 'pull_request')
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
