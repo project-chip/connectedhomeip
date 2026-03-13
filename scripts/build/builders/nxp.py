@@ -435,36 +435,12 @@ class NxpBuilder(GnBuilder):
             # add empty space at the end to avoid concatenation issue when there is no --args
             cmd += 'gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root=%s ' % self.root
 
-            extra_args = []
-
-            match self.options.build_profile:
-                case BuildProfile.DEBUG:
-                    extra_args.extend(["is_debug=true", "optimize_debug=false"])
-                case BuildProfile.DEBUG_OPTIMIZED:
-                    extra_args.extend(["is_debug=true", "optimize_debug=true"])
-                case BuildProfile.RELEASE:
-                    extra_args.extend(["is_debug=false", "optimize_for_size=false"])
-                case BuildProfile.RELEASE_SIZE:
-                    extra_args.extend(["is_debug=false", "optimize_for_size=true"])
-
-            if self.options.pw_command_launcher:
-                extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
-
-            if self.options.enable_link_map_file:
-                extra_args.append('chip_generate_link_map_file=true')
-
-            if self.options.pregen_dir:
-                extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
-
-            extra_args.extend(self.GnBuildArgs())
-            if extra_args:
-                cmd += ' --args="%s' % ' '.join(extra_args) + '" '
+            if args := self.GnBuildArgs():
+                cmd += ' --args="%s' % ' '.join(args) + '" '
 
             cmd += self.output_dir
 
-            title = 'Generating ' + self.identifier
-
-            self._Execute(['bash', '-c', cmd], title=title)
+            self._Execute(['bash', '-c', cmd], title=f"Generating {self.identifier}")
         else:
             cmd += '\nwest build -p --cmake-only -b {board_name} -d {out_folder} {example_folder} {build_flags}'.format(
                 board_name=self.BoardVariantName(self.board, self.os_env, self.board_variant),

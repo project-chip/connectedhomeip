@@ -354,7 +354,7 @@ class Efr32Builder(GnBuilder):
                     sourcepath,
                     os.path.join("flashbundle", name))
 
-    def generate(self):
+    def generate(self, dedup=False):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
             '--add-export-compile-commands=*',
@@ -363,43 +363,19 @@ class Efr32Builder(GnBuilder):
         if self.dotfile:
             cmd += ['--dotfile=%s' % self.dotfile]
 
-        extra_args = self.GnBuildArgs()
-
-        match self.options.build_profile:
-            case BuildProfile.DEBUG:
-                extra_args.extend(["is_debug=true", "optimize_debug=false"])
-            case BuildProfile.DEBUG_OPTIMIZED:
-                extra_args.extend(["is_debug=true", "optimize_debug=true"])
-            case BuildProfile.RELEASE:
-                extra_args.extend(["is_debug=false", "optimize_for_size=false"])
-            case BuildProfile.RELEASE_SIZE:
-                extra_args.extend(["is_debug=false", "optimize_for_size=true"])
-
-        if self.options.pw_command_launcher:
-            extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
-
-        if self.options.enable_link_map_file:
-            extra_args.append('chip_generate_link_map_file=true')
-
-        if self.options.pregen_dir:
-            extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
-
-        if extra_args:
-            cmd += ['--args=%s' % ' '.join(extra_args)]
+        if args := self.GnBuildArgs():
+            cmd += ['--args=%s' % ' '.join(args)]
 
         cmd += [self.output_dir]
 
-        title = 'Generating ' + self.identifier
-        extra_env = self.GnBuildEnv()
-
-        if extra_env:
+        if env := self.GnBuildEnv():
             # convert the command into a bash command that includes
             # setting environment variables
             cmd = [
                 'bash', '-c', '\n' + ' '.join(
-                    ['%s="%s" \\\n' % (key, value) for key, value in extra_env.items()] +
+                    ['%s="%s" \\\n' % (key, value) for key, value in env.items()] +
                     [shlex.join(cmd)]
                 )
             ]
 
-        self._Execute(cmd, title=title)
+        self._Execute(cmd, title=f"Generating {self.identifier}", dedup=dedup)
