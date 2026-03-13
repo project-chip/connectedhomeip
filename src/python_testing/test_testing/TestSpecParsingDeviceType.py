@@ -14,9 +14,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+import os
 import re
+import sys
 import xml.etree.ElementTree as ElementTree
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from DeviceConformanceTests import DeviceConformanceTests, get_supersets
 from fake_device_builder import create_minimal_dt
 from jinja2 import Template

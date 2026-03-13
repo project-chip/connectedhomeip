@@ -16,9 +16,12 @@
 #
 
 import logging
+import os
+import sys
 from enum import StrEnum
 from typing import Any
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from DeviceConformanceTests import DeviceConformanceTests
 from fake_device_builder import create_minimal_cluster, create_minimal_dt
 from mobly import asserts
