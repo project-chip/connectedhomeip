@@ -29,8 +29,8 @@ import chiptest
 import click
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.results import RunSummary, TestResult
 from chiptest.log_config import LOG_LEVELS, LogConfig
+from chiptest.results import RunSummary, TestResult
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
