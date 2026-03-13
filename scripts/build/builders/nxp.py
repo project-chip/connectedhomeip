@@ -15,6 +15,7 @@
 import importlib.util
 import logging
 import os
+import shlex
 from enum import Enum, auto
 
 from .builder import BuilderOutput
@@ -436,7 +437,7 @@ class NxpBuilder(GnBuilder):
             cmd += 'gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root=%s ' % self.root
 
             if args := self.GnBuildArgs():
-                cmd += ' --args="%s' % ' '.join(args) + '" '
+                cmd += " --args=%s " % shlex.quote(" ".join(args))
 
             cmd += self.output_dir
 
