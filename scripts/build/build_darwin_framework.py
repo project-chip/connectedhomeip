@@ -13,11 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import argparse
+import contextlib
 import glob
 import os
 import platform
 from subprocess import PIPE, Popen
-import contextlib
 
 
 def get_file_from_pigweed(name):
