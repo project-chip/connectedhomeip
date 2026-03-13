@@ -37,7 +37,7 @@
 #include <lib/support/JniTypeWrappers.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/KeyValueStoreManager.h>
@@ -578,14 +578,22 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
     if (jSymmetricKey != nullptr)
     {
         JniByteArray jniSymmetricKey(env, jSymmetricKey);
-        VerifyOrReturnError(jniSymmetricKey.size() == sizeof(mICDSymmetricKey), CHIP_ERROR_INVALID_ARGUMENT);
-        memcpy(mICDSymmetricKey, jniSymmetricKey.data(), sizeof(mICDSymmetricKey));
+        if (jniSymmetricKey.size() > 0)
+        {
+            VerifyOrReturnError(jniSymmetricKey.size() == sizeof(mICDSymmetricKey), CHIP_ERROR_INVALID_ARGUMENT);
+            memcpy(mICDSymmetricKey, jniSymmetricKey.data(), sizeof(mICDSymmetricKey));
+            params.SetICDSymmetricKey(chip::ByteSpan(mICDSymmetricKey));
+        }
+        else
+        {
+            ChipLogDetail(Controller, "Skip ICD Symmetric Key.");
+        }
     }
     else
     {
-        TEMPORARY_RETURN_IGNORED chip::Crypto::DRBG_get_bytes(mICDSymmetricKey, sizeof(mICDSymmetricKey));
+        ReturnErrorOnFailure(chip::Crypto::DRBG_get_bytes(mICDSymmetricKey, sizeof(mICDSymmetricKey)));
+        params.SetICDSymmetricKey(chip::ByteSpan(mICDSymmetricKey));
     }
-    params.SetICDSymmetricKey(chip::ByteSpan(mICDSymmetricKey));
 
     chip::app::Clusters::IcdManagement::ClientTypeEnum clientType = chip::app::Clusters::IcdManagement::ClientTypeEnum::kPermanent;
     if (jClientType != nullptr)

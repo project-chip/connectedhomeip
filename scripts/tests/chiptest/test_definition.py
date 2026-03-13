@@ -25,7 +25,7 @@ import typing
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum, StrEnum, auto
+from enum import StrEnum, auto
 from pathlib import Path
 from types import MappingProxyType
 
@@ -431,10 +431,10 @@ class TestTag(StrEnum):
         raise KeyError(f"Unknown tag: {self!r}")
 
 
-class TestRunTime(Enum):
-    CHIP_TOOL_PYTHON = auto()  # use the python yaml test parser with chip-tool
-    DARWIN_FRAMEWORK_TOOL_PYTHON = auto()  # use the python yaml test parser with chip-tool
-    MATTER_REPL_PYTHON = auto()       # use the python yaml test runner
+class TestRunTime(StrEnum):
+    CHIP_TOOL_PYTHON = 'chip_tool_python'                          # use the python yaml test parser with chip-tool
+    DARWIN_FRAMEWORK_TOOL_PYTHON = 'darwin_framework_tool_python'  # use the python yaml test parser with chip-tool
+    MATTER_REPL_PYTHON = 'matter_repl_python'                      # use the python yaml test runner
 
 
 @dataclass

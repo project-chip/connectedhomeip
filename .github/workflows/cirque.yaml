@@ -28,8 +28,8 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
-    
+    CHIP_LOG_TIMESTAMPS: false
+
 jobs:
     cirque:
         name: Cirque
@@ -127,7 +127,7 @@ jobs:
                        git config --global --add safe.directory '*' \
                        && scripts/tests/cirque_tests.sh run_all_tests \
                       "
-                   
+
 
             - name: Uploading Binaries
               uses: actions/upload-artifact@v7

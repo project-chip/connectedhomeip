@@ -33,7 +33,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     build_linux_gcc_debug:
@@ -522,7 +522,7 @@ jobs:
 
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
-            
+
         if: github.actor != 'restyled-io[bot]' && github.actor != 'dependabot[bot]' && inputs.run-codeql != true
         # Use namespace to get more disk space and slightly better performance (Compile and unit tests
         # are CPU bound)

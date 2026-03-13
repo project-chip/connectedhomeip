@@ -58,8 +58,8 @@ public:
     bool IsStationReady() override;
     CHIP_ERROR TriggerDisconnection() override;
     void ClearWifiCredentials() override;
-    void SetWifiCredentials(const WifiCredentials & credentials) override;
-    CHIP_ERROR GetWifiCredentials(WifiCredentials & credentials) override;
+    void SetWifiCredentials(const WiFiCredentials & credentials) override;
+    CHIP_ERROR GetWifiCredentials(WiFiCredentials & credentials) override;
     CHIP_ERROR ConnectToAccessPoint(void) override;
     bool HasAnIPv4Address() override;
     bool HasAnIPv6Address() override;
