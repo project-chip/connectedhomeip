@@ -98,7 +98,7 @@ class TestResult:
                     print(base64.b64encode(pcap_path.read_bytes()).decode("ascii"))
                     print("EOF")
         finally:
-            result.duration_seconds = round(test_end - test_start, 3)
+            result.duration_seconds = test_end - test_start
 
             symbol = result.status.symbol
             match result.status:
@@ -154,7 +154,7 @@ class RunStats:
                 self.cancelled += 1
 
         # Calculate cumulative average.
-        self.mean_duration += round((result.duration_seconds - self.mean_duration) / self.total_runs, 3)
+        self.mean_duration += (result.duration_seconds - self.mean_duration) / self.total_runs
 
         # Save the exception if it's the first one.
         if result.exception is not None and self.exception_first is None:
@@ -183,14 +183,23 @@ class RunSummary(RunStats):
 
     def write_json(self, path: Path) -> None:
         """Write the test run summary to a JSON file."""
-        def encoder(obj: Any):
-            """JSON encoder for non-serializable objects."""
+        def encode(obj: Any) -> Any:
+            """JSON encoder for non-serializable objects.
+
+            We cannot use json.dumps(default) for all cases, as it doesn't touch floats.
+            """
+            if isinstance(obj, dict):
+                return {key: encode(value) for key, value in obj.items()}
+            if isinstance(obj, Iterable) and not isinstance(obj, (str, bytes)):
+                return [encode(item) for item in obj]
             if isinstance(obj, datetime.datetime):
                 return obj.isoformat()
-            return repr(obj)
+            if isinstance(obj, float):
+                return round(obj, 3)  # Round floats to 3 decimal places for better readability.
+            return obj
 
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(asdict(self), indent=2, default=encoder))
+        path.write_text(json.dumps(encode(asdict(self)), indent=2, default=repr))
         log.info("Test run summary written to %s", path)
 
     @classmethod
