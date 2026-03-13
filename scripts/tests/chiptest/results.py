@@ -106,12 +106,12 @@ class TestResult:
                 symbol = result.status.symbol
                 match result.status:
                     case TestStatus.PASSED:
-                        log.info("%s Completed in %0.2f seconds", symbol, name, result.duration_seconds)
+                        log.info("%s Completed in %0.2f seconds", symbol, result.duration_seconds)
                     case TestStatus.CANCELLED:
-                        log.warning("%s Cancelled after %0.2f seconds", symbol, name, result.duration_seconds)
+                        log.warning("%s Cancelled after %0.2f seconds", symbol, result.duration_seconds)
                     case TestStatus.FAILED:
                         assert isinstance(result.exception, BaseException), "Exception should be set for failed test results"
-                        log.error("%s Failed in %0.2f seconds", symbol, name, result.duration_seconds,
+                        log.error("%s Failed in %0.2f seconds", symbol, result.duration_seconds,
                                   exc_info=(type(result.exception), result.exception, result.exception.__traceback__))
 
                 return result
