@@ -117,13 +117,16 @@ bool MatchingPendingPresetExists(Delegate * delegate, const PresetStructWithOwne
 
 /**
  * @brief Finds and returns an entry in the Presets attribute list that matches
- *        a preset, if such an entry exists. The presetToMatch must have a preset handle.
+ *        the given preset handle, if such an entry exists.
  *
  * @param[in] delegate The delegate to use.
- * @param[in] presetToMatch The preset to match with.
- * @param[out] matchingPreset The preset in the Presets attribute list that has the same PresetHandle as the presetToMatch.
+ * @param[in] presetHandle The preset handle to match against entries in the Presets attribute list.
+ * @param[out] matchingPreset The preset in the Presets attribute list that has the same PresetHandle as @p presetHandle.
+ *                            Only valid if @p found is set to true.
+ * @param[out] found Set to true if a matching preset was found; set to false if no matching preset exists.
  *
- * @return CHIP_NO_ERROR if the lookup completed; otherwise an error code.
+ * @return CHIP_NO_ERROR if the lookup completed (regardless of whether a matching preset was found);
+ *         otherwise an appropriate error code.
  */
 CHIP_ERROR GetMatchingPresetInPresets(Delegate * delegate, const ByteSpan & presetHandle,
                                       PresetStructWithOwnedMembers & matchingPreset, bool & found)
