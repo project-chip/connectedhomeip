@@ -26,7 +26,6 @@ using TwoDCartesianZoneDecodableStruct = Structs::TwoDCartesianZoneStruct::Decod
 using TwoDCartesianZoneStruct          = Structs::TwoDCartesianZoneStruct::Type;
 using TwoDCartesianVertexStruct        = Structs::TwoDCartesianVertexStruct::Type;
 
-
 struct TwoDCartesianZoneStorage : TwoDCartesianZoneStruct
 {
     TwoDCartesianZoneStorage(){};

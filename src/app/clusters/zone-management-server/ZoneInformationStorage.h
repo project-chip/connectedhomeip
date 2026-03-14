@@ -25,7 +25,7 @@ namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
-using ZoneInformationStruct            = Structs::ZoneInformationStruct::Type;
+using ZoneInformationStruct = Structs::ZoneInformationStruct::Type;
 
 struct ZoneInformationStorage : ZoneInformationStruct
 {

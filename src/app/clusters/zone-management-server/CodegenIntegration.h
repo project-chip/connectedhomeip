@@ -20,21 +20,20 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
-#include <app/StatusResponse.h>
-#include <app/clusters/zone-management-server/ZoneInformationStorage.h>
-#include <app/clusters/zone-management-server/TwoDCartesianZoneStorage.h>
-#include <app/clusters/zone-management-server/ZoneMgmtDelegate.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <app/StatusResponse.h>
+#include <app/clusters/zone-management-server/TwoDCartesianZoneStorage.h>
+#include <app/clusters/zone-management-server/ZoneInformationStorage.h>
+#include <app/clusters/zone-management-server/ZoneMgmtDelegate.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <optional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
-#include <optional>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ZoneManagement {
-
 
 class ZoneMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
 {
@@ -58,8 +57,9 @@ public:
      * @param aTwoDCartesianMax                 The maximum X and Y points that are allowed for TwoD Cartesian Zones.
      *
      */
-    ZoneMgmtServer(ZoneMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures, uint8_t aMaxUserDefinedZones,
-                   uint8_t aMaxZones, uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax);
+    ZoneMgmtServer(ZoneMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
+                   uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
+                   const TwoDCartesianVertexStruct & aTwoDCartesianMax);
 
     ~ZoneMgmtServer() override;
 
