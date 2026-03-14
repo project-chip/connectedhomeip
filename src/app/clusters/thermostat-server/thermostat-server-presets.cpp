@@ -18,7 +18,7 @@
 #include "thermostat-server-presets.h"
 #include "thermostat-server.h"
 
-#include <app/util/attribute-table-detail.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
@@ -327,9 +327,7 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
         if (coolingSetpointValue.HasValue())
         {
             int16_t constrainedCoolingSetpoint = EnforceCoolingSetpointLimits(coolingSetpointValue.Value(), endpoint);
-            Status status                      = emAfWriteAttributeExternal(
-                ConcreteAttributePath(endpoint, Thermostat::Id, OccupiedCoolingSetpoint::Id),
-                EmberAfWriteDataInput(reinterpret_cast<uint8_t *>(&constrainedCoolingSetpoint), ZCL_INT16S_ATTRIBUTE_TYPE));
+            Status status                      = OccupiedCoolingSetpoint::Set(endpoint, constrainedCoolingSetpoint);
             if (status != Status::Success)
             {
                 ChipLogError(Zcl, "Failed to set OccupiedCoolingSetpoint with status %u", to_underlying(status));
@@ -341,9 +339,7 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
         if (heatingSetpointValue.HasValue())
         {
             int16_t constrainedHeatingSetpoint = EnforceHeatingSetpointLimits(heatingSetpointValue.Value(), endpoint);
-            Status status                      = emAfWriteAttributeExternal(
-                ConcreteAttributePath(endpoint, Thermostat::Id, OccupiedHeatingSetpoint::Id),
-                EmberAfWriteDataInput(reinterpret_cast<uint8_t *>(&constrainedHeatingSetpoint), ZCL_INT16S_ATTRIBUTE_TYPE));
+            Status status                      = OccupiedHeatingSetpoint::Set(endpoint, constrainedHeatingSetpoint);
             if (status != Status::Success)
             {
                 ChipLogError(Zcl, "Failed to set OccupiedHeatingSetpoint with status %u", to_underlying(status));
