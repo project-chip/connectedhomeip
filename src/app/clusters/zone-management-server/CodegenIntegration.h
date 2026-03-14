@@ -22,9 +22,9 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/StatusResponse.h>
+#include <app/clusters/zone-management-server/Delegate.h>
 #include <app/clusters/zone-management-server/TwoDCartesianZoneStorage.h>
 #include <app/clusters/zone-management-server/ZoneInformationStorage.h>
-#include <app/clusters/zone-management-server/Delegate.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <optional>
 #include <protocols/interaction_model/StatusCode.h>
@@ -57,9 +57,8 @@ public:
      * @param aTwoDCartesianMax                 The maximum X and Y points that are allowed for TwoD Cartesian Zones.
      *
      */
-    ZoneMgmtServer(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
-                   uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
-                   const TwoDCartesianVertexStruct & aTwoDCartesianMax);
+    ZoneMgmtServer(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures, uint8_t aMaxUserDefinedZones,
+                   uint8_t aMaxZones, uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax);
 
     ~ZoneMgmtServer() override;
 
