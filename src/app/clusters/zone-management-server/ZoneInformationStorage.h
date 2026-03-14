@@ -20,12 +20,14 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/zone-management-server/TwoDCartesianZoneStorage.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
-using ZoneInformationStruct = Structs::ZoneInformationStruct::Type;
+using ZoneInformationStruct            = Structs::ZoneInformationStruct::Type;
+using ZoneTriggerControlStruct         = Structs::ZoneTriggerControlStruct::Type;
 
 struct ZoneInformationStorage : ZoneInformationStruct
 {

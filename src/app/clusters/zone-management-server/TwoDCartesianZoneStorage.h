@@ -1,4 +1,3 @@
-
 /**
  *
  *    Copyright (c) 2025-2026 Project CHIP Authors
@@ -16,6 +15,11 @@
  *    limitations under the License.
  *
  */
+
+#pragma once
+
+#include <string>
+#include <vector>
 
 namespace chip {
 namespace app {
