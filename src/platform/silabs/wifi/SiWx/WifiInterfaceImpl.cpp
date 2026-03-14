@@ -831,8 +831,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(NetworkCommissioning::WiFiScanR
 
     // TODO: add error processing
     sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &(rssi));
-    info.signal.strength = static_cast<int8_t>(
-        std::clamp(rssi, static_cast<int32_t>(INT8_MIN), static_cast<int32_t>(INT8_MAX)));
+    info.signal.strength = static_cast<int8_t>(std::clamp(rssi, static_cast<int32_t>(INT8_MIN), static_cast<int32_t>(INT8_MAX)));
     info.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
     return CHIP_NO_ERROR;
 }
