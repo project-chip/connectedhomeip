@@ -178,7 +178,9 @@ static OptionSet *       sToolOptionSets[] =
 {
     &sToolOptions,
     &gNetworkOptions,
+#if defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION
     &gFaultInjectionOptions,
+#endif  // defined(CHIP_WITH_NLFAULTINJECTION) && CHIP_WITH_NLFAULTINJECTION
     &sHelpOptions,
     nullptr
 };
@@ -526,12 +528,12 @@ void HandleTCPConnectionComplete(const TCPEndPointHandle & aEndPoint, CHIP_ERROR
         printf("TCP connection established to %s:%u\n", lPeerAddressBuffer, lPeerPort);
 
         if (sTCPIPEndPoint->PendingReceiveLength() == 0)
-            sTCPIPEndPoint->SetReceivedDataForTesting(nullptr);
+            TEMPORARY_RETURN_IGNORED sTCPIPEndPoint->SetReceivedDataForTesting(nullptr);
 
-        sTCPIPEndPoint->DisableReceive();
-        sTCPIPEndPoint->EnableKeepAlive(10, 100);
-        sTCPIPEndPoint->DisableKeepAlive();
-        sTCPIPEndPoint->EnableReceive();
+        TEMPORARY_RETURN_IGNORED sTCPIPEndPoint->DisableReceive();
+        TEMPORARY_RETURN_IGNORED sTCPIPEndPoint->EnableKeepAlive(10, 100);
+        TEMPORARY_RETURN_IGNORED sTCPIPEndPoint->DisableKeepAlive();
+        TEMPORARY_RETURN_IGNORED sTCPIPEndPoint->EnableReceive();
 
         DriveSend();
     }
@@ -541,7 +543,8 @@ void HandleTCPConnectionComplete(const TCPEndPointHandle & aEndPoint, CHIP_ERROR
 
         gSendIntervalExpired = false;
         gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, nullptr);
-        gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
+        TEMPORARY_RETURN_IGNORED gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs),
+                                                         Common::HandleSendTimerComplete, nullptr);
 
         SetStatusFailed(sTestState.mStatus);
     }
@@ -767,7 +770,8 @@ void DriveSend()
     else
     {
         gSendIntervalExpired = false;
-        gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
+        TEMPORARY_RETURN_IGNORED gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs),
+                                                         Common::HandleSendTimerComplete, nullptr);
 
         if (sTestState.mStats.mTransmit.mActual < sTestState.mStats.mTransmit.mExpected)
         {

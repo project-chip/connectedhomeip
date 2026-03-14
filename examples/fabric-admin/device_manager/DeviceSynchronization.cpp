@@ -276,7 +276,7 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
     ChipLogProgress(NotSpecified, "Synchronization complete and add device");
 
 #if defined(PW_RPC_ENABLED)
-    AddSynchronizedDevice(mCurrentDeviceData);
+    TEMPORARY_RETURN_IGNORED AddSynchronizedDevice(mCurrentDeviceData);
     // TODO(#35077) Figure out how we should reflect CADMIN values of ICD.
     if (!mCurrentDeviceData.is_icd)
     {
@@ -290,7 +290,7 @@ void DeviceSynchronizer::SynchronizationCompleteAddDevice()
             reachabilityChanged.has_id       = true;
             reachabilityChanged.id           = mCurrentDeviceData.id;
             reachabilityChanged.reachability = false;
-            DeviceReachableChanged(reachabilityChanged);
+            TEMPORARY_RETURN_IGNORED DeviceReachableChanged(reachabilityChanged);
         }
     }
 #endif

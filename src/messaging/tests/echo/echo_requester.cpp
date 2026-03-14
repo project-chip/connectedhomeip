@@ -123,12 +123,12 @@ void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState)
         if (err != CHIP_NO_ERROR)
         {
             printf("Send request failed: %s\n", chip::ErrorStr(err));
-            chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
         }
     }
     else
     {
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
     }
 }
 
@@ -230,7 +230,7 @@ void CloseConnection()
 
 void HandleConnectionAttemptComplete(chip::Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR err)
 {
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 
     if (err != CHIP_NO_ERROR || conn != gActiveTCPConnState)
     {

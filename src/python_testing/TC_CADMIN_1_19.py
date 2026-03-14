@@ -38,8 +38,10 @@ from support_modules.cadmin_support import CADMINBaseTest
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import AttributeValue
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_CADMIN_1_19(CADMINBaseTest):
@@ -162,7 +164,7 @@ class TC_CADMIN_1_19(CADMINBaseTest):
         self.step(9)
         for fab_idx in fabric_idxs:
             removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fab_idx)
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
         self.step(10)
         # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.

@@ -194,7 +194,7 @@ CHIP_ERROR AmebaUtils::WiFiConnectProvisionedNetwork(void)
 {
     rtw_wifi_config_t * config = (rtw_wifi_config_t *) pvPortMalloc(sizeof(rtw_wifi_config_t));
     memset(config, 0, sizeof(rtw_wifi_config_t));
-    GetWiFiConfig(config);
+    TEMPORARY_RETURN_IGNORED GetWiFiConfig(config);
     ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]", (char *) config->ssid);
     int32_t error  = matter_wifi_connect((char *) config->ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) config->password,
                                          strlen((const char *) config->ssid), strlen((const char *) config->password), 0, nullptr);
@@ -226,7 +226,7 @@ CHIP_ERROR AmebaUtils::SetCurrentProvisionedNetwork()
     else
     {
         rtw_wifi_config_t config = { 0 };
-        GetWiFiConfig(&config);
+        TEMPORARY_RETURN_IGNORED GetWiFiConfig(&config);
         if (!memcmp(config.ssid, pSetting.ssid, strlen((const char *) pSetting.ssid) + 1))
         {
             ChipLogProgress(DeviceLayer, "STA Wi-Fi Info exist, do nothing");

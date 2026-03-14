@@ -32,5 +32,4 @@ class ZapXmlHandler(BaseHandler):
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'configurator':
             return ConfiguratorHandler(self.context, self._idl)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)

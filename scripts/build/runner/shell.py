@@ -70,7 +70,7 @@ class ShellRunner:
             return
 
         outpipe = LogPipe(logging.INFO)
-        errpipe = LogPipe(logging.WARN)
+        errpipe = LogPipe(logging.WARNING)
 
         with subprocess.Popen(cmd, cwd=self.root_dir,
                               stdout=outpipe, stderr=errpipe) as s:
@@ -79,5 +79,4 @@ class ShellRunner:
             code = s.wait()
             if code != 0:
                 raise Exception('Command %r failed: %d' % (cmd, code))
-            else:
-                logging.info('Command %r completed', cmd)
+            logging.info('Command %r completed', cmd)

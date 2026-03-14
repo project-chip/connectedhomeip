@@ -20,13 +20,12 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ENERGY_MANAGEMENT_APP}
+#     app: ${EVSE_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
 #       --enable-key 000102030405060708090a0b0c0d0e0f
-#       --application evse
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -47,10 +46,12 @@ from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 cluster = Clusters.EnergyEvse
 
 
@@ -71,7 +72,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
         return ["EEVSE.S.F01"]
 
     def steps_TC_EEVSE_2_7(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the FeatureMap",
@@ -178,8 +179,6 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
 
         ]
 
-        return steps
-
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kSoCReporting))
     async def test_TC_EEVSE_2_7(self):
         endpoint = self.get_endpoint()
@@ -198,7 +197,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
         soc_reporting_supported = (feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kSoCReporting) > 0
         charging_preferences_supported = (feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kChargingPreferences) > 0
 
-        logger.info(
+        log.info(
             f"Received FeatureMap: {feature_map:#x} = SoCReporting ({soc_reporting_supported}), ChargingPreferences ({charging_preferences_supported})")
 
         self.step("3")
@@ -294,7 +293,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
             # TH reads from the DUT the NextChargeStartTime
             # Value has to be before the next TargetTime above.
             next_start_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeStartTime")
-            logger.info(
+            log.info(
                 f"Received NextChargeStartTime: {next_start_time_epoch_s} = {self.convert_epoch_s_to_time(next_start_time_epoch_s, tz=None)}")
 
             expected_next_target_time_epoch_s = self.compute_expected_target_time_as_epoch_s(
@@ -428,7 +427,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
             # TH reads from the DUT the NextChargeStartTime
             # Value has to be before the next TargetTime above
             next_start_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeStartTime")
-            logger.info(
+            log.info(
                 f"Received NextChargeStartTime: {next_start_time_epoch_s} = {self.convert_epoch_s_to_time(next_start_time_epoch_s, tz=None)}")
 
             expected_next_target_time_epoch_s = self.compute_expected_target_time_as_epoch_s(

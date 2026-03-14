@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster DishwasherMode (cluster code: 89/0x0459)
+// Identifier constant values for cluster DishwasherMode (cluster code: 89/0x0059)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

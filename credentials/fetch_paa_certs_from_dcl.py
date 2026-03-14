@@ -73,14 +73,13 @@ def parse_paa_root_certs(cmdpipe, paa_list):
         line = cmdpipe.stdout.readline()
         if not line:
             break
-        else:
-            if b': ' in line:
-                key, value = line.split(b': ')
-                result[key.strip(b' -').decode("utf-8")
-                       ] = value.strip().decode("utf-8")
-                parse_paa_root_certs.counter += 1
-                if parse_paa_root_certs.counter % 2 == 0:
-                    paa_list.append(copy.deepcopy(result))
+        if b': ' in line:
+            key, value = line.split(b': ')
+            result[key.strip(b' -').decode("utf-8")
+                   ] = value.strip().decode("utf-8")
+            parse_paa_root_certs.counter += 1
+            if parse_paa_root_certs.counter % 2 == 0:
+                paa_list.append(copy.deepcopy(result))
 
 
 def write_cert(certificate, subject):
@@ -109,16 +108,15 @@ def parse_paa_root_cert_from_dcld(cmdpipe):
         line = cmdpipe.stdout.readline()
         if not line:
             break
-        else:
-            if b'pemCert: |' in line:
-                while True:
-                    line = cmdpipe.stdout.readline()
-                    certificate += line.strip(b' \t').decode("utf-8")
-                    if b'-----END CERTIFICATE-----' in line:
-                        break
-            if b'subjectAsText:' in line:
-                subject = line.split(b': ')[1].strip().decode("utf-8")
-                break
+        if b'pemCert: |' in line:
+            while True:
+                line = cmdpipe.stdout.readline()
+                certificate += line.strip(b' \t').decode("utf-8")
+                if b'-----END CERTIFICATE-----' in line:
+                    break
+        if b'subjectAsText:' in line:
+            subject = line.split(b': ')[1].strip().decode("utf-8")
+            break
 
     return (certificate, subject)
 
@@ -136,9 +134,13 @@ def use_dcld(dcld, production, cmdlist):
 @optgroup.option('--use-test-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public TestNet observer.")
 @optgroup.group('Optional arguments')
 @optgroup.option('--paa-trust-store-path', default='paa-root-certs', type=str, metavar='PATH', help="PAA trust store path (default: paa-root-certs)")
-def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, paa_trust_store_path):
-    """DCL PAA mirroring tools"""
-    fetch_paa_certs(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, paa_trust_store_path)
+@optgroup.option('--cd-output-path')
+def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, paa_trust_store_path, cd_output_path):
+    """DCL mirroring tools"""
+    if cd_output_path is not None:
+        fetch_cd_signing_certs(cd_output_path)
+    else:
+        fetch_paa_certs(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, paa_trust_store_path)
 
 
 def get_cert_from_rest(rest_node_url, subject, subject_key_id):

@@ -42,7 +42,9 @@ from test_plan_support import commission_if_required, read_attribute, send_comma
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 def verify_noc() -> str:
@@ -313,7 +315,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
         resp = await self.open_commissioning_window()
 
         self.step(28)
-        await self.default_controller.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeid=self.dut_node_id)
+        await self.default_controller.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeId=self.dut_node_id)
 
         self.step(29)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(900)
@@ -331,7 +333,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
 
         self.step(31)
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
 
 
 if __name__ == "__main__":

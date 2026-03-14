@@ -78,7 +78,7 @@ CHIP_ERROR CustomCSRResponseOperationalKeyStore::ReuseOpKeypair(FabricIndex fabr
             err = CHIP_ERROR_INVALID_FABRIC_INDEX;
         }
         ReturnErrorOnFailure(err);
-        buf.SetLength(static_cast<size_t>(size));
+        TEMPORARY_RETURN_IGNORED buf.SetLength(static_cast<size_t>(size));
 
         // Read-out the operational key TLV entry.
         TLV::ContiguousBufferTLVReader reader;
@@ -106,7 +106,7 @@ CHIP_ERROR CustomCSRResponseOperationalKeyStore::ReuseOpKeypair(FabricIndex fabr
             ReturnErrorOnFailure(reader.VerifyEndOfContainer());
 
             memcpy(serializedOpKey.Bytes(), keyData.data(), keyData.size());
-            serializedOpKey.SetLength(keyData.size());
+            TEMPORARY_RETURN_IGNORED serializedOpKey.SetLength(keyData.size());
 
             // Load-up key material
             // WARNING: This makes use of the raw key bits

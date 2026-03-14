@@ -43,7 +43,9 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
@@ -56,7 +58,7 @@ class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
             TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send SolicitOffer with no Video or Audio StreamID => expect INVALID_COMMAND"),
@@ -66,13 +68,12 @@ class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
             TestStep(6, "Write SoftLivestreamPrivacyModeEnabled=false, send SolicitOffer with StreamUsage = LiveView => expect DeferredOffer=TRUE"),
             TestStep(7, "Read CurrentSessions attribute => expect 1 with valid session data"),
         ]
-        return steps
 
     def pics_TC_WebRTCP_2_1(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCP.S",           # WebRTC Transport Provider Server
             "WEBRTCP.S.A0000",     # CurrentSessions attribute
             "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
@@ -81,7 +82,10 @@ class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_WebRTCP_2_1(self):
@@ -97,7 +101,7 @@ class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
         await self.validate_allocated_audio_stream(audioStreamID)
         await self.validate_allocated_video_stream(videoStreamID)
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.WebRTCTransportProvider
 
         # Check if privacy feature is supported before testing privacy mode
@@ -188,6 +192,26 @@ class TC_WebRTCP_2_1(MatterBaseTest, WEBRTCPTestBase):
         )
 
         asserts.assert_equal(len(current_sessions), 1, "Expected CurrentSessions to be 1")
+
+        session = current_sessions[0]
+
+        # ID is uint16 type and contains a valid value (0–65534)
+        asserts.assert_true(isinstance(session.id, int), "Session ID should be an integer (uint16)")
+        asserts.assert_true(0 <= session.id <= 65534, "Session ID should be in valid uint16 range (0–65534)")
+
+        # PeerNodeID is node-id type and contains a valid non-zero node-id value
+        asserts.assert_true(isinstance(session.peerNodeID, int), "PeerNodeID should be an integer (node-id)")
+        asserts.assert_greater(session.peerNodeID, 0, "PeerNodeID should be a valid non-zero node-id")
+
+        # PeerEndpointID is endpoint-no type and contains a valid endpoint value (0–65534)
+        asserts.assert_true(isinstance(session.peerEndpointID, int), "PeerEndpointID should be an integer (endpoint-no)")
+        asserts.assert_true(0 <= session.peerEndpointID <= 65534, "PeerEndpointID should be in valid endpoint range (0–65534)")
+
+        # StreamUsage is StreamUsageEnum type and contains a valid StreamUsageEnum value
+        asserts.assert_true(isinstance(session.streamUsage, Clusters.Globals.Enums.StreamUsageEnum),
+                            "StreamUsage should be a StreamUsageEnum type")
+        asserts.assert_not_equal(session.streamUsage, Clusters.Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
+                                 "StreamUsage should be a valid known StreamUsageEnum value")
 
 
 if __name__ == "__main__":

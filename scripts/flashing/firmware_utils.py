@@ -331,7 +331,7 @@ class Flasher:
                         ↦ ρᵢ if opt[name]==σᵢ
                           ρ otherwise
         """
-        if isinstance(template, str) or isinstance(template, pathlib.Path):
+        if isinstance(template, (str, pathlib.Path)):
             result = [str(template).format_map(opt)]
         elif isinstance(template, list):
             result = []

@@ -54,6 +54,7 @@ public:
     ~GeneralFaults() { mSize = 0; }
 
     CHIP_ERROR add(const uint8_t value);
+    CHIP_ERROR remove(const uint8_t value);
 
     const uint8_t * data() const { return mData; }
     size_t size() const;
@@ -82,6 +83,22 @@ inline CHIP_ERROR GeneralFaults<N>::add(const uint8_t value)
     mData[mSize] = value;
     ++mSize;
     return CHIP_NO_ERROR;
+}
+
+template <size_t N>
+inline CHIP_ERROR GeneralFaults<N>::remove(const uint8_t value)
+{
+    int originalSize = mSize;
+    mSize            = 0;
+    for (int i = 0; i < originalSize; ++i)
+    {
+        if (mData[i] != value)
+        {
+            mData[mSize++] = mData[i];
+        }
+    }
+
+    return (mSize != originalSize) ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
 template <size_t N>

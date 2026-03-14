@@ -33,14 +33,14 @@ void ApplicationShutdown() {}
 void notifyIcdActive(System::Layer * layer, void *)
 {
     ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
-    DeviceLayer::SystemLayer().StartTimer(10000_ms32, notifyIcdActive, nullptr);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(10000_ms32, notifyIcdActive, nullptr);
 }
 
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
-    DeviceLayer::SystemLayer().StartTimer(10000_ms32, notifyIcdActive, nullptr);
-    IdentifyInit();
+    SuccessOrDie(DeviceLayer::SystemLayer().StartTimer(10000_ms32, notifyIcdActive, nullptr));
+    SuccessOrDie(IdentifyInit());
     ChipLinuxAppMainLoop();
     return 0;
 }

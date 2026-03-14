@@ -16,6 +16,7 @@
  */
 
 #include "identify-server.h"
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -26,10 +27,13 @@
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/util/generic-callbacks.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TimerDelegate.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <tracing/macros.h>
 
 namespace {
@@ -144,7 +148,7 @@ IdentifyCluster * FindIdentifyClusterOnEndpoint(EndpointId endpointId)
 
 Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
                    IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier, EffectIdentifierEnum effectIdentifier,
-                   EffectVariantEnum effectVariant, reporting::ReportScheduler::TimerDelegate * timerDelegate) :
+                   EffectVariantEnum effectVariant, chip::TimerDelegate * timerDelegate) :
 
     mOnIdentifyStart(onIdentifyStart),
     mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType), mOnEffectIdentifier(onEffectIdentifier),
@@ -165,7 +169,7 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
 
 Identify::~Identify()
 {
-    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+    RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
     UnregisterLegacyIdentify(this);
 }
 
@@ -181,7 +185,7 @@ void MatterIdentifyClusterInitCallback(EndpointId endpointId)
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
 }
 
-void MatterIdentifyClusterShutdownCallback(EndpointId endpointId) {}
+void MatterIdentifyClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}
 
 // Legacy PluginServer callback stubs
 void MatterIdentifyPluginServerInitCallback() {}

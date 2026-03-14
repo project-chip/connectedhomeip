@@ -353,11 +353,8 @@ CHIP_ERROR Dump(const TLVReader & aReader, DumpWriter aWriter)
 {
     void * context          = nullptr;
     DumpContext dumpContext = { aWriter, context };
-    CHIP_ERROR retval;
 
-    retval = Utilities::Iterate(aReader, DumpHandler, &dumpContext);
-
-    return retval;
+    return Utilities::Iterate(aReader, DumpHandler, &dumpContext).NoErrorIf(CHIP_END_OF_TLV);
 }
 
 } // namespace Debug

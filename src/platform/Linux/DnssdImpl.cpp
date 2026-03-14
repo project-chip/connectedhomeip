@@ -217,7 +217,7 @@ void Poller::WatchFree(AvahiWatch * watch)
 
 void Poller::WatchFree(AvahiWatch & watch)
 {
-    DeviceLayer::SystemLayerSockets().StopWatchingSocket(&watch.mSocketWatch);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayerSockets().StopWatchingSocket(&watch.mSocketWatch);
     mWatches.erase(std::remove_if(mWatches.begin(), mWatches.end(),
                                   [&watch](const std::unique_ptr<AvahiWatch> & aValue) { return aValue.get() == &watch; }),
                    mWatches.end());
@@ -320,7 +320,7 @@ void Poller::SystemTimerUpdate(AvahiTimeout * timer)
     {
         mEarliestTimeout = timer->mAbsTimeout;
         auto delay       = std::chrono::duration_cast<chip::System::Clock::Milliseconds32>(steady_clock::now() - mEarliestTimeout);
-        DeviceLayer::SystemLayer().StartTimer(delay, SystemTimerCallback, this);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(delay, SystemTimerCallback, this);
     }
 }
 
@@ -347,7 +347,7 @@ exit:
 
 void MdnsAvahi::Shutdown()
 {
-    StopPublish();
+    TEMPORARY_RETURN_IGNORED StopPublish();
     if (mClient)
     {
         avahi_client_free(mClient);
@@ -389,7 +389,7 @@ void MdnsAvahi::HandleClientState(AvahiClient * client, AvahiClientState state)
     case AVAHI_CLIENT_S_COLLISION:
     case AVAHI_CLIENT_S_REGISTERING:
         ChipLogProgress(DeviceLayer, "Avahi re-register required");
-        StopPublish();
+        TEMPORARY_RETURN_IGNORED StopPublish();
         mErrorCallback(mAsyncReturnContext, CHIP_ERROR_FORCED_RESET);
         break;
     case AVAHI_CLIENT_CONNECTING:
@@ -839,16 +839,25 @@ void MdnsAvahi::FreeResolveContext(size_t handle)
 
 void MdnsAvahi::StopResolve(const char * name)
 {
-    auto truncate_end = std::remove_if(mAllocatedResolves.begin(), mAllocatedResolves.end(),
-                                       [name](ResolveContext * ctx) { return strcmp(ctx->mName, name) == 0; });
+    // Cancel and delete any pending resolves for this instance name.
+    //
+    // Note: callbacks may re-enter into dnssd logic, so first detach matching contexts from
+    // `mAllocatedResolves`, then invoke callbacks and delete outside of the list iteration.
+    std::vector<ResolveContext *> contexts;
+    mAllocatedResolves.remove_if([&contexts, name](ResolveContext * ctx) {
+        if (strcmp(ctx->mName, name) == 0)
+        {
+            contexts.push_back(ctx);
+            return true;
+        }
+        return false;
+    });
 
-    for (auto it = truncate_end; it != mAllocatedResolves.end(); it++)
+    for (auto * context : contexts)
     {
-        (*it)->mCallback((*it)->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
-        chip::Platform::Delete(*it);
+        context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
+        chip::Platform::Delete(context);
     }
-
-    mAllocatedResolves.erase(truncate_end, mAllocatedResolves.end());
 }
 
 CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,

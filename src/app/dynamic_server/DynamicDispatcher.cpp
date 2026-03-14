@@ -31,7 +31,7 @@
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/WriteHandler.h>
-#include <app/clusters/ota-provider/ota-provider-cluster.h>
+#include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/data-model/Decode.h>
 #include <app/util/attribute-storage.h>
@@ -89,9 +89,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aPath, TLV::TLVRea
 {
     SubjectDescriptor subjectDescriptor = aCommandObj->GetSubjectDescriptor();
 
-    DataModel::InvokeRequest invokeRequest;
-    invokeRequest.path              = aPath;
-    invokeRequest.subjectDescriptor = &subjectDescriptor;
+    DataModel::InvokeRequest invokeRequest(aPath, subjectDescriptor);
 
     std::optional<DataModel::ActionReturnStatus> result = gOtaProviderServer.InvokeCommand(invokeRequest, aReader, aCommandObj);
 

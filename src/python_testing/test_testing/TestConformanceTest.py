@@ -25,10 +25,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.basic_composition import arls_populated
-from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, build_xml_namespaces
+
+log = logging.getLogger(__name__)
 
 
 def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]:
@@ -116,7 +117,7 @@ def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]
     return endpoint_tlv
 
 
-class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
+class TestConformanceTest(DeviceConformanceTests):
     def setup_class(self):
         # Latest fully qualified version
         # TODO: It might be good to find a way to run this against each directory.
@@ -246,7 +247,7 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
 
         success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
         for p in problems:
-            logging.info(p)
+            log.info(p)
         asserts.assert_true(success, "Unexpected failure on minimal on/off device")
         asserts.assert_equal(len(problems), 0, "Unexpected problems reported for on/off device type")
 
@@ -260,9 +261,9 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
         def run_check_with_expected_failure(msg_suffix: str, expected_location: ProblemLocation, problem_type: ProblemType):
             success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
             asserts.assert_false(success, f"Unexpected success on minimal on/off device {msg_suffix}")
-            logging.info("Problems reported (expect at least 1)")
+            log.info("Problems reported (expect at least 1)")
             for p in problems:
-                logging.info(p)
+                log.info(p)
             asserts.assert_greater_equal(
                 len(problems), 1, "Did not receive expected number of problem reports for on/off device type (expected at least 1)")
             locations = [p.location for p in problems]
@@ -308,7 +309,7 @@ class TestConformanceTest(MatterBaseTest, DeviceConformanceTests):
         self.endpoints_tlv[0][cluster_id][feature_map_id] = Clusters.NetworkCommissioning.Bitmaps.Feature.kEthernetNetworkInterface
         success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
         for p in problems:
-            logging.info(p)
+            log.info(p)
         asserts.assert_true(success, f"Unexpected failure on device {msg_suffix}")
         asserts.assert_equal(len(problems), 0, f"Unexpected problems reported on device {msg_suffix}")
 

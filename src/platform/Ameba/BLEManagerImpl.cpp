@@ -164,7 +164,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     InitSubscribed();
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:
     return err;
@@ -377,7 +377,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
         mFlags.Set(Flags::kAdvertisingEnabled, val);
         mFlags.Set(Flags::kFastAdvertisingEnabled, val);
         mFlags.Set(Flags::kRestartAdvertising, 1);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
 exit:
@@ -397,7 +397,7 @@ void BLEManagerImpl::HandleFastAdvertisementTimer()
     {
         mFlags.Set(Flags::kFastAdvertisingEnabled, 0);
         mFlags.Set(Flags::kRestartAdvertising, 1);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }
 
@@ -415,7 +415,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kRestartAdvertising);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -543,7 +543,7 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     mFlags.Set(Flags::kRestartAdvertising);
     mFlags.Clear(Flags::kAdvertisingConfigured);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return err;
 }
@@ -1078,7 +1078,7 @@ exit:
     }
 
     // Schedule DriveBLEState() to run.
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return err;
 }
@@ -1166,7 +1166,7 @@ CHIP_ERROR BLEManagerImpl::gatt_svr_chr_access(void * param, T_SERVER_ID service
             break;
         }
     }
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return err;
 }
@@ -1177,13 +1177,13 @@ int BLEManagerImpl::ble_callback_dispatcher(void * param, void * p_cb_data, int 
     switch (callback_type)
     {
     case CB_PROFILE_CALLBACK:
-        blemgr->gatt_svr_chr_access(param, type, (TBTCONFIG_CALLBACK_DATA *) p_cb_data);
+        TEMPORARY_RETURN_IGNORED blemgr->gatt_svr_chr_access(param, type, (TBTCONFIG_CALLBACK_DATA *) p_cb_data);
         break;
     case CB_GAP_CALLBACK:
-        blemgr->ble_svr_gap_event(param, type, p_cb_data);
+        TEMPORARY_RETURN_IGNORED blemgr->ble_svr_gap_event(param, type, p_cb_data);
         break;
     case CB_GAP_MSG_CALLBACK:
-        blemgr->ble_svr_gap_msg_event(param, (T_IO_MSG *) p_cb_data);
+        TEMPORARY_RETURN_IGNORED blemgr->ble_svr_gap_msg_event(param, (T_IO_MSG *) p_cb_data);
         break;
     default:
         break;

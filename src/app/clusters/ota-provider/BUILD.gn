@@ -29,8 +29,8 @@ source_set("user-consent") {
 
 source_set("ota-provider") {
   sources = [
-    "ota-provider-cluster.cpp",
-    "ota-provider-cluster.h",
+    "OTAProviderCluster.cpp",
+    "OTAProviderCluster.h",
     "ota-provider-delegate.h",
   ]
   public_deps = [

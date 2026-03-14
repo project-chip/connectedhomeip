@@ -62,9 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0551" name="Camera AV Stream Management">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0551" name="Camera AV Stream Management"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="AVSM" scope="Endpoint"/>
   <features>
@@ -631,14 +629,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0013" name="SoftRecordingPrivacyModeEnabled" type="bool">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality persistence="nonVolatile" sourceAttribution="true"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="PRIV"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0014" name="SoftLivestreamPrivacyModeEnabled" type="bool">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality persistence="nonVolatile" sourceAttribution="true"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="PRIV"/>
       </mandatoryConform>

@@ -96,7 +96,7 @@ class ZapTool:
             sys.exit(1)
 
         def parse_version_string(str):
-            return list(map(lambda component: int(component), str.split('.')))
+            return [int(component) for component in str.split('.')]
 
         if parse_version_string(version) < parse_version_string(MIN_ZAP_VERSION):
             print(f"Checking ZAP from {self.zap_start}:")

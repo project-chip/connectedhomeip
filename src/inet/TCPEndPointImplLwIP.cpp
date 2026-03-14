@@ -640,7 +640,7 @@ void TCPEndPointImplLwIP::HandleDataSent(uint16_t lenSent)
         // If unsent data exists, attempt to send it now...
         if (RemainingToSend() > 0)
         {
-            DriveSending();
+            TEMPORARY_RETURN_IGNORED DriveSending();
         }
         // If in the closing state and the send queue is now empty, attempt to transition to closed.
         if ((mState == State::kClosing) && (RemainingToSend() == 0))

@@ -16,8 +16,8 @@ import("//build_overrides/chip.gni")
 
 source_set("ethernet-network-diagnostics-server") {
   sources = [
-    "ethernet-diagnostics-cluster.cpp",
-    "ethernet-diagnostics-cluster.h",
+    "EthernetDiagnosticsCluster.cpp",
+    "EthernetDiagnosticsCluster.h",
   ]
 
   public_deps = [

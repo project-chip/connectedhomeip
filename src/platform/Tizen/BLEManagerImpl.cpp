@@ -58,6 +58,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/GLibTypeDeleter.h>
+#include <platform/PlatformError.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>
@@ -65,7 +66,6 @@
 
 #include "CHIPDevicePlatformEvent.h"
 #include "ChipDeviceScanner.h"
-#include "ErrorUtils.h"
 #include "SystemInfo.h"
 
 namespace chip {
@@ -103,7 +103,7 @@ void BLEManagerImpl::GattConnectionStateChangedCb(int result, bool connected, co
     default:
         ChipLogError(DeviceLayer, "GATT %s failed: %s", connected ? "connection" : "disconnection", get_error_message(result));
         if (connected)
-            NotifyHandleConnectFailed(TizenToChipError(result));
+            NotifyHandleConnectFailed(MATTER_PLATFORM_ERROR(result));
     }
 }
 
@@ -112,31 +112,30 @@ CHIP_ERROR BLEManagerImpl::_InitImpl()
     int ret;
 
     ret = bt_initialize();
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_initialize() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_initialize() failed: %s", get_error_message(ret)));
 
     ret = bt_adapter_set_state_changed_cb(
         +[](int result, bt_adapter_state_e adapterState, void * self) {
             return reinterpret_cast<BLEManagerImpl *>(self)->AdapterStateChangedCb(result, adapterState);
         },
         this);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed: %s", get_error_message(ret)));
 
     ret = bt_gatt_server_initialize();
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_server_initialize() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_gatt_server_initialize() failed: %s", get_error_message(ret)));
 
     ret = bt_gatt_set_connection_state_changed_cb(
         +[](int result, bool connected, const char * remoteAddress, void * self) {
             return reinterpret_cast<BLEManagerImpl *>(self)->GattConnectionStateChangedCb(result, connected, remoteAddress);
         },
         this);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed: %s", get_error_message(ret)));
 
     return CHIP_NO_ERROR;
-
-exit:
-    return TizenToChipError(ret);
 }
 
 static int __GetAttInfo(bt_gatt_h gattHandle, char ** uuid, bt_gatt_type_e * type)
@@ -167,7 +166,7 @@ void BLEManagerImpl::HandleAdvertisingTimeout(chip::System::Layer *, void * appS
     VerifyOrReturn(self->mFlags.Has(Flags::kFastAdvertisingEnabled));
 
     ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
-    self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+    TEMPORARY_RETURN_IGNORED self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
 }
 
 BLEManagerImpl::AdvertisingIntervals BLEManagerImpl::GetAdvertisingIntervals() const
@@ -300,23 +299,23 @@ void BLEManagerImpl::AdvertisingStateChangedCb(int result, bt_advertiser_h adver
     {
         mFlags.Set(Flags::kAdvertising);
         NotifyBLEPeripheralAdvStartComplete(CHIP_NO_ERROR);
-        DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
             // Start a timer to make sure that the fast advertising is stopped after specified timeout.
-            DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimeout, this);
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimeout, this);
         });
     }
     else
     {
         mFlags.Clear(Flags::kAdvertising);
         NotifyBLEPeripheralAdvStopComplete(CHIP_NO_ERROR);
-        DeviceLayer::SystemLayer().ScheduleLambda(
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
             [this] { DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimeout, this); });
     }
 
     if (mFlags.Has(Flags::kAdvertisingRefreshNeeded))
     {
         mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
-        DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
     }
 
     mAdvReqInProgress = false;
@@ -380,7 +379,7 @@ void BLEManagerImpl::NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId)
 
 void BLEManagerImpl::NotifyHandleConnectFailed(CHIP_ERROR error)
 {
-    ChipLogProgress(DeviceLayer, "Connection failed: %" CHIP_ERROR_FORMAT, error.Format());
+    ChipLogError(DeviceLayer, "Connection failed: %" CHIP_ERROR_FORMAT, error.Format());
     if (mIsCentral)
     {
         ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformTizenBLECentralConnectFailed,
@@ -421,26 +420,16 @@ void BLEManagerImpl::HandleConnectionTimeout(System::Layer *, void * appState)
 
 CHIP_ERROR BLEManagerImpl::ConnectChipThing(const char * address)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int ret;
-
     ChipLogProgress(DeviceLayer, "ConnectRequest: Addr [%s]", StringOrNullMarker(address));
 
-    ret = bt_gatt_client_create(address, &mGattClient);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Failed to create GATT client: %s", get_error_message(ret));
-                 err = TizenToChipError(ret));
+    int ret = bt_gatt_client_create(address, &mGattClient);
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret), NotifyHandleConnectFailed(MATTER_PLATFORM_ERROR(ret)));
 
     ret = bt_gatt_connect(address, false);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "Failed to issue GATT connect request: %s", get_error_message(ret));
-                 err = TizenToChipError(ret));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret), NotifyHandleConnectFailed(MATTER_PLATFORM_ERROR(ret)));
 
     ChipLogProgress(DeviceLayer, "GATT Connect Issued");
-
-exit:
-    if (err != CHIP_NO_ERROR)
-        NotifyHandleConnectFailed(err);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::OnDeviceScanned(const bt_adapter_le_device_scan_result_info_s & scanInfo,
@@ -480,14 +469,14 @@ void BLEManagerImpl::OnDeviceScanned(const bt_adapter_le_device_scan_result_info
     // StopScan should also be performed in the ChipStack thread.
     // At the same time, the scan timer also needs to be canceled in the ChipStack thread.
     DeviceLayer::SystemLayer().CancelTimer(HandleScanTimeout, this);
-    mDeviceScanner.StopScan();
+    TEMPORARY_RETURN_IGNORED mDeviceScanner.StopScan();
     // Stop scanning and then start connecting timer
-    DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectionTimeout, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectionTimeout, this);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     /* Initiate Connect */
     auto params = std::make_pair(this, scanInfo.remote_address);
-    PlatformMgrImpl().GLibMatterContextInvokeSync(
+    TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](decltype(params) * aParams) { return aParams->first->ConnectChipThing(aParams->second); }, &params);
 }
 
@@ -510,8 +499,8 @@ void BLEManagerImpl::OnScanComplete()
 
 void BLEManagerImpl::OnScanError(CHIP_ERROR err)
 {
+    ChipLogError(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
     BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
-    ChipLogDetail(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
@@ -613,8 +602,9 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
     return CHIP_NO_ERROR;
 
 exit:
-    NotifyBLEPeripheralGATTServerRegisterComplete(TizenToChipError(ret));
-    return TizenToChipError(ret);
+    auto err = MATTER_PLATFORM_ERROR(ret);
+    NotifyBLEPeripheralGATTServerRegisterComplete(err);
+    return err;
 }
 
 CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
@@ -697,7 +687,7 @@ CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
     return CHIP_NO_ERROR;
 
 exit:
-    err = ret != BT_ERROR_NONE ? TizenToChipError(ret) : err;
+    err = ret != BT_ERROR_NONE ? MATTER_PLATFORM_ERROR(ret) : err;
     NotifyBLEPeripheralAdvStartComplete(err);
     return err;
 }
@@ -707,15 +697,11 @@ CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
     ChipLogProgress(DeviceLayer, "Stop Advertising");
 
     int ret = bt_adapter_le_stop_advertising(mAdvertiser);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_adapter_le_stop_advertising() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        NotifyBLEPeripheralAdvStopComplete(MATTER_PLATFORM_ERROR(ret)));
 
     mAdvReqInProgress = true;
     return CHIP_NO_ERROR;
-
-exit:
-    NotifyBLEPeripheralAdvStopComplete(TizenToChipError(ret));
-    return TizenToChipError(ret);
 }
 
 static bool __GattClientForeachCharCb(int total, int index, bt_gatt_h charHandle, void * data)
@@ -843,7 +829,7 @@ void BLEManagerImpl::RemoveConnection(const char * remoteAddr)
     // immediately, because the BLE layer might still use it. Instead, we will also
     // schedule the deletion of the connection object, so it will happen after the
     // BLE layer has processed the disconnection event.
-    DeviceLayer::SystemLayer().ScheduleLambda([conn] {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([conn] {
         ChipLogDetail(DeviceLayer, "Freeing BLE connection");
         chip::Platform::Delete(conn);
     });
@@ -934,7 +920,7 @@ void BLEManagerImpl::DriveBLEState()
         int ret = bt_adapter_le_destroy_advertiser(mAdvertiser);
         VerifyOrExit(ret == BT_ERROR_NONE,
                      ChipLogError(DeviceLayer, "bt_adapter_le_destroy_advertiser() failed: %s", get_error_message(ret));
-                     err = TizenToChipError(ret));
+                     err = MATTER_PLATFORM_ERROR(ret));
         mAdvertiser = nullptr;
     }
 
@@ -947,26 +933,18 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
-    CHIP_ERROR err;
-
-    err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer()));
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
     ChipLogProgress(DeviceLayer, "Initialize Tizen BLE Layer");
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BLEManagerImpl * self) { return self->_InitImpl(); }, this);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BLEManagerImpl * self) { return self->_InitImpl(); }, this));
 
     mFlags.Set(Flags::kTizenBLELayerInitialized);
-
-    err = DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
-
-exit:
-    return err;
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 }
 
 void BLEManagerImpl::_Shutdown()
@@ -1009,7 +987,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 
     GAutoPtr<char> deviceName;
     int ret = bt_adapter_get_name(&deviceName.GetReceiver());
-    VerifyOrReturnError(ret == BT_ERROR_NONE, TizenToChipError(ret),
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
                         ChipLogError(DeviceLayer, "bt_adapter_get_name() failed: %s", get_error_message(ret)));
 
     VerifyOrReturnError(deviceName, CHIP_ERROR_INTERNAL);
@@ -1026,7 +1004,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     VerifyOrReturnError(deviceName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     int ret = bt_adapter_set_name(deviceName);
-    VerifyOrReturnError(ret == BT_ERROR_NONE, TizenToChipError(ret),
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
                         ChipLogError(DeviceLayer, "bt_adapter_set_name() failed: %s", get_error_message(ret)));
 
     return CHIP_NO_ERROR;
@@ -1152,14 +1130,12 @@ CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, 
 
     ChipLogProgress(DeviceLayer, "Sending Notification Enable Request to CHIP Peripheral: %s", conId->peerAddr.c_str());
     int ret = bt_gatt_client_set_characteristic_value_changed_cb(conId->gattCharC2Handle, CharacteristicIndicationCb, conId);
-    VerifyOrExit(
-        ret == BT_ERROR_NONE,
+    VerifyOrReturnError(
+        ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
         ChipLogError(DeviceLayer, "bt_gatt_client_set_characteristic_value_changed_cb() failed: %s", get_error_message(ret)));
 
     NotifySubscribeOpComplete(conId, true);
-
-exit:
-    return TizenToChipError(ret);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
@@ -1176,14 +1152,12 @@ CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId
 
     ChipLogProgress(DeviceLayer, "Disable Notification Request to CHIP Peripheral: %s", conId->peerAddr.c_str());
     int ret = bt_gatt_client_unset_characteristic_value_changed_cb(conId->gattCharC2Handle);
-    VerifyOrExit(
-        ret == BT_ERROR_NONE,
+    VerifyOrReturnError(
+        ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
         ChipLogError(DeviceLayer, "bt_gatt_client_unset_characteristic_value_changed_cb() failed: %s", get_error_message(ret)));
 
     NotifySubscribeOpComplete(conId, false);
-
-exit:
-    return TizenToChipError(ret);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
@@ -1194,7 +1168,7 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     ChipLogProgress(DeviceLayer, "Send GATT disconnect to [%s]", conId->peerAddr.c_str());
     int ret = bt_gatt_disconnect(conId->peerAddr.c_str());
-    VerifyOrReturnError(ret == BT_ERROR_NONE, TizenToChipError(ret),
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
                         ChipLogError(DeviceLayer, "bt_gatt_disconnect() failed: %s", get_error_message(ret)));
 
     return CHIP_NO_ERROR;
@@ -1208,7 +1182,8 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Ble
     VerifyOrReturnError(CanCastTo<int>(pBuf->DataLength()), CHIP_ERROR_INTERNAL);
 
     int ret = bt_gatt_set_value(mGattCharC2Handle, Uint8::to_const_char(pBuf->Start()), static_cast<int>(pBuf->DataLength()));
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_set_value() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_gatt_set_value() failed: %s", get_error_message(ret)));
 
     ChipLogProgress(DeviceLayer, "Sending indication for CHIPoBLE RX characteristic (con %s, len %u)", conId->peerAddr.c_str(),
                     static_cast<int>(pBuf->DataLength()));
@@ -1221,12 +1196,11 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Ble
                                                                                       completed);
         },
         conId->peerAddr.c_str(), this);
-    VerifyOrExit(
-        ret == BT_ERROR_NONE,
+    VerifyOrReturnError(
+        ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
         ChipLogError(DeviceLayer, "bt_gatt_server_notify_characteristic_changed_value() failed: %s", get_error_message(ret)));
 
-exit:
-    return TizenToChipError(ret);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
@@ -1242,17 +1216,17 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const B
     VerifyOrReturnError(CanCastTo<int>(pBuf->DataLength()), CHIP_ERROR_INTERNAL);
 
     int ret = bt_gatt_set_value(conId->gattCharC1Handle, Uint8::to_const_char(pBuf->Start()), static_cast<int>(pBuf->DataLength()));
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_set_value() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_gatt_set_value() failed: %s", get_error_message(ret)));
 
     ChipLogProgress(DeviceLayer, "Sending Write Request for CHIPoBLE TX characteristic (con %s, len %u)", conId->peerAddr.c_str(),
                     static_cast<int>(pBuf->DataLength()));
 
     ret = bt_gatt_client_write_value(conId->gattCharC1Handle, WriteCompletedCb, conId);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_gatt_client_write_value() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_gatt_client_write_value() failed: %s", get_error_message(ret)));
 
-exit:
-    return TizenToChipError(ret);
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) {}
@@ -1271,7 +1245,8 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
     }
 
     // Scan initiation performed async, to ensure that the BLE subsystem is initialized.
-    DeviceLayer::SystemLayer().ScheduleLambda([this] { InitiateScan(BleScanState::kScanForDiscriminator); });
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+        [this] { InitiateScan(BleScanState::kScanForDiscriminator); });
 }
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)
@@ -1288,11 +1263,11 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     /* Send StartScan Request to Scanner Class */
     strcpy(data.service_uuid, Ble::CHIP_BLE_SERVICE_SHORT_UUID_STR);
     err = mDeviceScanner.StartScan(ScanFilterType::kServiceData, data);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Ble, "Failed to start BLE scan: %" CHIP_ERROR_FORMAT, err.Format()));
+    SuccessOrExitAction(err, ChipLogError(Ble, "Failed to start BLE scan: %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = DeviceLayer::SystemLayer().StartTimer(kNewConnectionScanTimeout, HandleScanTimeout, this);
-    VerifyOrExit(err == CHIP_NO_ERROR, mDeviceScanner.StopScan();
-                 ChipLogError(Ble, "Failed to start BLE scan timeout: %" CHIP_ERROR_FORMAT, err.Format()));
+    SuccessOrExitAction(err, TEMPORARY_RETURN_IGNORED mDeviceScanner.StopScan();
+                        ChipLogError(Ble, "Failed to start BLE scan timeout: %" CHIP_ERROR_FORMAT, err.Format()));
 
     mBLEScanConfig.mBleScanState = scanType;
     return;
@@ -1306,7 +1281,7 @@ void BLEManagerImpl::HandleScanTimeout(chip::System::Layer *, void * appState)
 {
     auto * manager = static_cast<BLEManagerImpl *>(appState);
     manager->OnScanError(CHIP_ERROR_TIMEOUT);
-    manager->mDeviceScanner.StopScan();
+    TEMPORARY_RETURN_IGNORED manager->mDeviceScanner.StopScan();
 }
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()
@@ -1315,7 +1290,7 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
     if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
     {
         DeviceLayer::SystemLayer().CancelTimer(HandleScanTimeout, this);
-        mDeviceScanner.StopScan();
+        TEMPORARY_RETURN_IGNORED mDeviceScanner.StopScan();
     }
     return CHIP_NO_ERROR;
 }

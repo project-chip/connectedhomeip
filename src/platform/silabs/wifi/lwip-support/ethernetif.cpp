@@ -65,7 +65,7 @@ static void low_level_init(struct netif * netif)
 
     /* Set netif MAC hardware address */
     chip::MutableByteSpan byteSpan(netif->hwaddr, ETH_HWADDR_LEN);
-    chip::DeviceLayer::Silabs::WifiInterface::GetInstance().GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::WifiInterface::GetInstance().GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
 
     /* Set netif maximum transfer unit */
     netif->mtu = 1500;

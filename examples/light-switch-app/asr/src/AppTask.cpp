@@ -75,7 +75,7 @@ app::Clusters::NetworkCommissioning::Instance
 
 void NetWorkCommissioningInstInit()
 {
-    sWiFiNetworkCommissioningInstance.Init();
+    TEMPORARY_RETURN_IGNORED sWiFiNetworkCommissioningInstance.Init();
 
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);

@@ -53,7 +53,7 @@ StorageKeyName GetSMU2AllocatorKey()
 
 void ResetBLEController()
 {
-    VerifyOrDie(BLEMgrImpl().ResetController() == CHIP_NO_ERROR);
+    SuccessOrDie(BLEMgrImpl().ResetController());
 }
 
 void RegisterArea(void)

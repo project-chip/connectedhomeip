@@ -78,9 +78,6 @@ declare_args() {
   # Enable short error strings.
   chip_config_short_error_str = false
 
-  # Enable argument parser.
-  chip_config_enable_arg_parser = true
-
   # Memory management style: malloc, simple, platform.
   chip_config_memory_management = "malloc"
 
@@ -130,6 +127,9 @@ declare_args() {
   chip_enable_mrp_analytics =
       current_os == "linux" || current_os == "android" || current_os == "mac" ||
       current_os == "ios"
+
+  # enable UniqueID support in the descriptor cluster.
+  chip_enable_endpoint_unique_id = false
 }
 
 if (chip_target_style == "") {

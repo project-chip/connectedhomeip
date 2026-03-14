@@ -64,7 +64,7 @@ class LogPrinter:
 
         if raw.startswith(b'\x1b['):
             raw = raw[raw.find(b'm')+1:]
-        raw = raw.decode('utf8').strip()
+        raw = raw.decode('utf8', errors='replace').strip()
 
         self.ExtractSeverity(raw)
 

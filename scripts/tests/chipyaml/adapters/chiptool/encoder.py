@@ -336,10 +336,8 @@ class Encoder:
             arguments, request.busy_wait_ms, "busyWaitForMs")
         arguments = self.__maybe_add(
             arguments, request.identity, "commissioner-name")
-        arguments = self.__maybe_add(arguments, request.fabric_filtered,
-                                     "fabric-filtered")
-
-        return arguments
+        return self.__maybe_add(arguments, request.fabric_filtered,
+                                "fabric-filtered")
 
     def __maybe_add_destination(self, rv, request):
         if not self._supports_destination(request):
@@ -373,7 +371,9 @@ class Encoder:
         if endpoint_argument_value == '*':
             endpoint_argument_value = 0xFFFF
 
-        if (request.is_attribute and not request.command == "writeAttribute") or request.is_event or (request.command in _ANY_COMMANDS_LIST and not request.command == "WriteById"):
+        if ((request.is_attribute and request.command != "writeAttribute")
+                or (request.command in _ANY_COMMANDS_LIST and request.command != "WriteById")
+                or request.is_event):
             endpoint_argument_name = 'endpoint-ids'
 
         if self.__is_darwin_framework_tool:
@@ -528,9 +528,9 @@ class Encoder:
         if cluster_name == '*' and self.__is_darwin_framework_tool:
             if argument_name == 'AttributeId':
                 return 'attribute-id'
-            elif argument_name == 'ClusterId':
+            if argument_name == 'ClusterId':
                 return 'cluster-id'
-            elif argument_name == 'Value':
+            if argument_name == 'Value':
                 return 'attribute-value'
         return value
 

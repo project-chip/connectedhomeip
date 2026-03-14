@@ -62,9 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial version of the WebRTC Transport Requestor Cluster"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0554" name="WebRTC Transport Requestor">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0554" name="WebRTC Transport Requestor"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="WEBRTCR" scope="Endpoint"/>
   <attributes>

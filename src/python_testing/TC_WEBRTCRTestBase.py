@@ -21,6 +21,8 @@ import websockets
 
 from matter.testing.matter_testing import MatterBaseTest
 
+log = logging.getLogger(__name__)
+
 # WebSocket server URI for sending commands to the DUT
 SERVER_URI = "ws://localhost:9002"
 
@@ -52,29 +54,29 @@ class WEBRTCRTestBase(MatterBaseTest):
         """
         try:
             async with websockets.connect(SERVER_URI) as websocket:
-                logging.info(f"Connected to {SERVER_URI}")
+                log.info(f"Connected to {SERVER_URI}")
 
                 # Send command
-                logging.info(f"Sending command: {command}")
+                log.info(f"Sending command: {command}")
                 await websocket.send(command)
 
                 # Receive response
                 await websocket.recv()
-                logging.info("Received command response")
+                log.info("Received command response")
 
         except ConnectionRefusedError as e:
-            logging.error(f"Failed to connect to WebSocket server at {SERVER_URI}: Connection refused. "
-                          f"Is the DUT WebSocket server running? Error: {e}")
+            log.error(f"Failed to connect to WebSocket server at {SERVER_URI}: Connection refused. "
+                      f"Is the DUT WebSocket server running? Error: {e}")
             raise
 
         except websockets.exceptions.WebSocketException as e:
-            logging.error(f"WebSocket error while communicating with {SERVER_URI}: {e}")
+            log.error(f"WebSocket error while communicating with {SERVER_URI}: {e}")
             raise
 
         except OSError as e:
-            logging.error(f"Network error while connecting to {SERVER_URI}: {e}")
+            log.error(f"Network error while connecting to {SERVER_URI}: {e}")
             raise
 
         except Exception as e:
-            logging.error(f"Unexpected error while sending command '{command}' to {SERVER_URI}: {e}")
+            log.error(f"Unexpected error while sending command '{command}' to {SERVER_URI}: {e}")
             raise

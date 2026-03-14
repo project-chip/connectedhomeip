@@ -54,7 +54,18 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
                         "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(), calling CloseCommissioningWindow()");
         // Close the commissioning window.
         chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-        support::ChipDeviceEventHandler::SetUdcStatus(false);
+        TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
+    }
+
+    // During the workflow for Detecting App Presence on Casting Player, we send UDC with NoPasscode=True.
+    // The CD we get back will indicate NeedsPasscode=true and PasscodeDialogDisplayed=false.
+    // In this scenario, we want to clear the UDC status to allow other UDC messages to be sent.
+    if (cd.GetNeedsPasscode() && !cd.GetPasscodeDialogDisplayed())
+    {
+        ChipLogProgress(AppServer,
+                        "CommissionerDeclarationHandler::OnCommissionerDeclarationMessage() "
+                        "needs passcode - This is likely an App Check response");
+        TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
     }
 
     // Flag to indicate when the CastingPlayer/Commissioner user has decided to exit the commissioning process.
@@ -65,7 +76,7 @@ void CommissionerDeclarationHandler::OnCommissionerDeclarationMessage(
                         "CastingPlayer/Commissioner user has decided to exit the commissioning attempt. Connection aborted.");
         // Close the commissioning window.
         chip::Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-        support::ChipDeviceEventHandler::SetUdcStatus(false);
+        TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
         // Since the CastingPlayer/Commissioner user has decided to exit the commissioning process, we cancel the ongoing
         // connection attempt without notifying the CastingPlayer/Commissioner. Therefore the
         // shouldSendIdentificationDeclarationMessage flag in the internal StopConnecting() API call is set to false. The

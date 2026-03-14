@@ -26,14 +26,12 @@ import subprocess
 import sys
 import tempfile
 import time
-import traceback
-import urllib.request
 from dataclasses import dataclass
 from enum import Flag, auto
 from pathlib import Path
 from typing import List
 
-from zap.clang_format import getClangFormatBinary
+log = logging.getLogger(__name__)
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
@@ -149,10 +147,9 @@ class ZAPGenerateTarget:
     def MatterIdlTarget(zap_config: ZapInput, client_side=False, matter_file_name=None):
         if client_side:
             return ZAPGenerateTarget(zap_config, matter_file_name=matter_file_name, template="src/app/zap-templates/matter-idl-client.json", output_dir=None)
-        else:
-            # NOTE: this assumes `src/app/zap-templates/matter-idl-server.json` is the
-            #       DEFAULT generation target and it needs no output_dir
-            return ZAPGenerateTarget(zap_config, matter_file_name=matter_file_name, template=None, output_dir=None)
+        # NOTE: this assumes `src/app/zap-templates/matter-idl-server.json` is the
+        #       DEFAULT generation target and it needs no output_dir
+        return ZAPGenerateTarget(zap_config, matter_file_name=matter_file_name, template=None, output_dir=None)
 
     def __init__(self, zap_config: ZapInput, template, output_dir=None, matter_file_name=None):
         self.script = './scripts/tools/zap/generate.py'
@@ -179,13 +176,12 @@ class ZAPGenerateTarget:
             # directory (e.g. chef) so we claim the zap config is an output directory
             # for uniqueness
             return ZapDistinctOutput(input_template=None, output_directory=self.zap_config.value)
-        else:
-            return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
+        return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
 
     def log_command(self):
         """Log the command that will get run for this target
         """
-        logging.info("  %s" % " ".join(self.build_cmd()))
+        log.info("  %s", shlex.join(self.build_cmd()))
 
     def build_cmd(self):
         """Builds the command line we would run to generate this target.
@@ -212,7 +208,7 @@ class ZAPGenerateTarget:
         """Runs a ZAP generate command on the configured zap/template/outputs.
         """
         cmd = self.build_cmd()
-        logging.info("Generating target: %s" % shlex.join(cmd))
+        log.info("Generating target: %s", shlex.join(cmd))
 
         generate_start = time.time()
         subprocess.check_call(cmd)
@@ -268,7 +264,7 @@ class GoldenTestImageTarget():
         return ZapDistinctOutput(input_template='GOLDEN_IMAGES', output_directory='GOLDEN_IMAGES')
 
     def log_command(self):
-        logging.info("  %s" % " ".join(self.command))
+        log.info("  %s", shlex.join(self.command))
 
 
 class JinjaCodegenTarget():
@@ -281,64 +277,10 @@ class JinjaCodegenTarget():
         self.command = ["./scripts/codegen.py", "--output-dir", output_directory,
                         "--generator", generator, idl_path]
 
-    def formatKotlinFiles(self, paths):
-        try:
-            logging.info("Prettifying %d kotlin files:", len(paths))
-            for name in paths:
-                logging.info("    %s" % name)
-
-            VERSION = "0.58"
-            JAR_NAME = f"ktfmt-{VERSION}-with-dependencies.jar"
-            jar_url = f"https://repo1.maven.org/maven2/com/facebook/ktfmt/{VERSION}/{JAR_NAME}"
-
-            # ensure we have some headers otherwise maven seems to 403 us
-            opener = urllib.request.build_opener()
-            opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-            urllib.request.install_opener(opener)
-
-            with tempfile.TemporaryDirectory(prefix='ktfmt') as tmpdir:
-                path, _ = urllib.request.urlretrieve(jar_url, Path(tmpdir).joinpath(JAR_NAME).as_posix())
-                subprocess.check_call(['java', '-jar', path, '--google-style'] + paths)
-        except Exception:
-            traceback.print_exc()
-            raise
-
-    def formatWithClangFormat(self, paths):
-        try:
-            logging.info("Formatting %d cpp files:", len(paths))
-            for name in paths:
-                logging.info("    %s" % name)
-
-            subprocess.check_call([getClangFormatBinary(), "-i"] + paths)
-        except Exception:
-            traceback.print_exc()
-
-    def codeFormat(self):
-        outputs = subprocess.check_output(["./scripts/codegen.py", "--name-only", "--generator",
-                                           self.generator, "--log-level", "fatal", self.idl_path]).decode("utf8").split("\n")
-        outputs = [os.path.join(self.output_directory, name) for name in outputs if name]
-
-        # Split output files by extension,
-        name_dict = {}
-        for name in outputs:
-            _, extension = os.path.splitext(name)
-            name_dict[extension] = name_dict.get(extension, []) + [name]
-
-        if '.kt' in name_dict:
-            self.formatKotlinFiles(name_dict['.kt'])
-
-        cpp_files = []
-        for ext in ['.h', '.cpp', '.c', '.hpp']:
-            cpp_files.extend(name_dict.get(ext, []))
-        if cpp_files:
-            self.formatWithClangFormat(cpp_files)
-
     def generate(self) -> TargetRunStats:
         generate_start = time.time()
 
         subprocess.check_call(self.command)
-
-        self.codeFormat()
 
         generate_end = time.time()
 
@@ -353,7 +295,7 @@ class JinjaCodegenTarget():
         return ZapDistinctOutput(input_template=f'{self.generator}{self.idl_path}', output_directory=self.output_directory)
 
     def log_command(self):
-        logging.info("  %s" % " ".join(self.command))
+        log.info("  %s", shlex.join(self.command))
 
 
 def checkPythonVersion():
@@ -386,8 +328,7 @@ def setupArgumentsParser():
         args.type = TargetType.ALL  # default instead of a list
     else:
         # convert the list into a single flag value
-        types = [t for t in map(lambda x: __TARGET_TYPES__[
-                                x.lower()], args.type)]
+        types = [__TARGET_TYPES__[x.lower()] for x in args.type]
         args.type = types[0]
         for t in types:
             args.type = args.type | t
@@ -412,8 +353,7 @@ def getGlobalTemplatesTargets():
 
             example_name = "chef-"+os.path.basename(filepath)[:-len(".zap")]
 
-        logging.info("Found example %s (via %s)" %
-                     (example_name, str(filepath)))
+        log.info("Found example '%s' (via '%s')", example_name, filepath)
 
         targets.append(ZAPGenerateTarget.MatterIdlTarget(ZapInput.FromZap(filepath)))
 
@@ -469,7 +409,7 @@ def getSpecificTemplatesTargets():
 
     targets = []
     for template, output_dir in templates.items():
-        logging.info("Found specific template %s" % template)
+        log.info("Found specific template '%s'", template)
         targets.append(ZAPGenerateTarget(zap_input, template=template, output_dir=output_dir))
 
     return targets
@@ -490,7 +430,7 @@ def getTargets(type):
     if type & TargetType.GOLDEN_TEST_IMAGES:
         targets.extend(getGoldenTestImageTargets())
 
-    logging.info("Targets to be generated:")
+    log.info("Targets to be generated:")
     for target in targets:
         target.log_command()
 
@@ -501,10 +441,10 @@ def getTargets(type):
         o = target.distinct_output()
 
         if o in distinct_outputs:
-            logging.error("Same output %r:" % o)
+            log.error("Same output %r:", o)
             for t in targets:
                 if t.distinct_output() == o:
-                    logging.error("   %s" % t.zap_config)
+                    log.error("   %s", t.zap_config)
 
             raise Exception("Duplicate/overlapping output directory: %r" % o)
 
@@ -534,12 +474,12 @@ def main():
     #    - formatting is using bootstrapped clang-format
     # Figure out if bootstrapped. For now assume `PW_ROOT` is such a marker in the environment
     if "PW_ROOT" not in os.environ:
-        logging.error("Script MUST be run in a bootstrapped environment.")
+        log.error("Script MUST be run in a bootstrapped environment.")
 
         # using the `--no-rerun-in-env` to avoid recursive infinite calls
         if '--no-rerun-in-env' not in sys.argv:
             import shlex
-            logging.info("Will re-try running in a build environment....")
+            log.info("Will re-try running in a build environment....")
 
             what_to_run = sys.argv + ['--no-rerun-in-env']
             launcher = os.path.join(CHIP_ROOT_DIR, 'scripts', 'run_in_build_env.sh')

@@ -303,7 +303,7 @@ endpoint 2 {
                }
 
                struct ModeOptionStruct {
-                  char_string<64> label = 0;
+                  char_string label = 0;
                   int8u mode = 1;
                   ModeTagStruct modeTags[] = 2;
                }

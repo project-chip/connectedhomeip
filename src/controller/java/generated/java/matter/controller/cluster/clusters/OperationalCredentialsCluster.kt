@@ -161,9 +161,7 @@ class OperationalCredentialsCluster(
 
       if (tag == ContextSpecificTag(TAG_ATTESTATION_ELEMENTS)) {
         attestationElements_decoded = tlvReader.getByteArray(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_ATTESTATION_SIGNATURE)) {
+      } else if (tag == ContextSpecificTag(TAG_ATTESTATION_SIGNATURE)) {
         attestationSignature_decoded = tlvReader.getByteArray(tag)
       } else {
         tlvReader.skipElement()
@@ -272,9 +270,7 @@ class OperationalCredentialsCluster(
 
       if (tag == ContextSpecificTag(TAG_NOCSR_ELEMENTS)) {
         NOCSRElements_decoded = tlvReader.getByteArray(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_ATTESTATION_SIGNATURE)) {
+      } else if (tag == ContextSpecificTag(TAG_ATTESTATION_SIGNATURE)) {
         attestationSignature_decoded = tlvReader.getByteArray(tag)
       } else {
         tlvReader.skipElement()
@@ -349,9 +345,7 @@ class OperationalCredentialsCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS_CODE)) {
         statusCode_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
         fabricIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -363,9 +357,7 @@ class OperationalCredentialsCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -434,9 +426,7 @@ class OperationalCredentialsCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS_CODE)) {
         statusCode_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
         fabricIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -448,9 +438,7 @@ class OperationalCredentialsCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -512,9 +500,7 @@ class OperationalCredentialsCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS_CODE)) {
         statusCode_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
         fabricIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -526,9 +512,7 @@ class OperationalCredentialsCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -590,9 +574,7 @@ class OperationalCredentialsCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS_CODE)) {
         statusCode_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
+      } else if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
         fabricIndex_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -604,9 +586,7 @@ class OperationalCredentialsCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+      } else if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -736,13 +716,9 @@ class OperationalCredentialsCluster(
 
       if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
         fabricIndex_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_FABRIC_BINDING_VERSION)) {
+      } else if (tag == ContextSpecificTag(TAG_FABRIC_BINDING_VERSION)) {
         fabricBindingVersion_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SIGNATURE)) {
+      } else if (tag == ContextSpecificTag(TAG_SIGNATURE)) {
         signature_decoded = tlvReader.getByteArray(tag)
       } else {
         tlvReader.skipElement()

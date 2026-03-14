@@ -40,14 +40,16 @@ import logging
 
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
-from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
+from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess, SupportedIngestInterface
 
 import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
@@ -69,6 +71,10 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             timeout=30,
         )
         super().setup_class()
+
+    @property
+    def default_timeout(self) -> int:
+        return 4 * 60  # 4 minutes
 
     def teardown_class(self):
         if self.server is not None:
@@ -152,10 +158,14 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             ),
         ]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_PAVSTI_1_2(self):
         PICS_PRIVACY = "AVSM.S.F03"
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         pushavCluster = Clusters.PushAvStreamTransport
         avsmCluster = Clusters.CameraAvStreamManagement
         pushavAttr = Clusters.PushAvStreamTransport.Attributes
@@ -166,7 +176,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         await self.precondition_one_allocated_video_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
         await self.precondition_one_allocated_audio_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
         tlsEndpointId, _ = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=self.host_ip)
-        uploadStreamId = self.server.create_stream()
+        uploadStreamId = self.server.create_stream(SupportedIngestInterface.dash.value)
 
         self.step(1)
         currentConnections = await self.read_single_attribute_check_success(
@@ -174,7 +184,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=pushavCluster,
             attribute=pushavAttr.CurrentConnections
         )
-        logger.info(f"Rx'd CurrentConnections: {currentConnections}")
+        log.info(f"Rx'd CurrentConnections: {currentConnections}")
         if len(currentConnections) > 0:
             for connectionId in currentConnections:
                 await self.send_single_cmd(
@@ -190,7 +200,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=pushavCluster,
             attribute=pushavAttr.SupportedFormats,
         )
-        logger.info(f"Rx'd SupportedFormats: {supportedFormats}")
+        log.info(f"Rx'd SupportedFormats: {supportedFormats}")
         asserts.assert_greater_equal(
             len(supportedFormats), 1, "SupportedFormats must not be empty"
         )
@@ -212,7 +222,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=avsmCluster,
             attribute=avsmAttr.AllocatedVideoStreams,
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {allocatedVideoStreams}")
+        log.info(f"Rx'd AllocatedVideoStreams: {allocatedVideoStreams}")
         asserts.assert_true(
             len(allocatedVideoStreams) != 0, "AllocatedVideoStreams must not be empty"
         )
@@ -226,7 +236,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             cluster=avsmCluster,
             attribute=avsmAttr.AllocatedAudioStreams,
         )
-        logger.info(f"Rx'd AllocatedAudioStreams: {allocatedAudioStreams}")
+        log.info(f"Rx'd AllocatedAudioStreams: {allocatedAudioStreams}")
         asserts.assert_true(
             len(allocatedAudioStreams) != 0, "AllocatedAudioStreams must not be empty"
         )
@@ -249,13 +259,13 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                     "containerFormat": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
                     "containerOptions": {
                         "containerType": pushavCluster.Enums.ContainerFormatEnum.kCmaf,
-                        "CMAFContainerOptions": {"CMAFInterface": 0, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": trackName},
+                        "CMAFContainerOptions": {"CMAFInterface": pushavCluster.Enums.CMAFInterfaceEnum.kInterface2DASH, "segmentDuration": 4000, "chunkDuration": 2000, "sessionGroup": 1, "trackName": trackName},
                     },
                 }
             ),
             endpoint=endpoint,
         )
-        logger.info(
+        log.info(
             f"Rx'd allocatePushTransportResponse = {allocatePushTransportResponse}"
         )
         aConnectionID = (

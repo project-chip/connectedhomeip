@@ -27,6 +27,7 @@ struct AppEvent : public BaseAppEvent
     {
         kEventType_Closure = BaseAppEvent::kEventType_Max + 1,
         kEventType_Install,
+        kEventType_UpdateUI,
     };
 
     struct

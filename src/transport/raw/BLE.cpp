@@ -45,7 +45,7 @@ void BLEBase::ClearState()
 {
     if (mBleLayer)
     {
-        mBleLayer->CancelBleIncompleteConnection();
+        TEMPORARY_RETURN_IGNORED mBleLayer->CancelBleIncompleteConnection();
         mBleLayer->mBleTransport = nullptr;
         mBleLayer                = nullptr;
     }
@@ -57,6 +57,11 @@ void BLEBase::ClearState()
     }
 
     mState = State::kNotReady;
+}
+
+void BLEBase::Close()
+{
+    ClearState();
 }
 
 CHIP_ERROR BLEBase::Init(const BleListenParameters & param)

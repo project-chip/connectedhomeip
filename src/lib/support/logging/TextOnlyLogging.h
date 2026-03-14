@@ -98,6 +98,27 @@ using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, co
 #define ChipLogError(MOD, MSG, ...) ((void) 0)
 #endif // CHIP_ERROR_LOGGING
 
+/**
+ * @def ChipLogFailure(err, MOD, MSG, ...)
+ *
+ * @brief
+ *   Log a chip message with a formatted ChipError for the specified module in the 'Error'
+ *   category.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ChipLogFailure(errCode, Module, "Failure message: %s", param);
+ *  @endcode
+ *
+ *  @param[in]  ERROR_CODE  A CHIP_ERROR to log.
+ *  @param[in]  MOD         The log module to use.
+ *  @param[in]  MSG         The log message format string.
+ *  @param[in]  ...         Optional arguments for the log message.
+ */
+#define ChipLogFailure(ERROR_CODE, MOD, MSG, ...)                                                                                  \
+    ChipLogError(MOD, MSG ": %" CHIP_ERROR_FORMAT, ##__VA_ARGS__, ERROR_CODE.Format());
+
 #if CHIP_PROGRESS_LOGGING
 /**
  * @def ChipLogProgress(MOD, MSG, ...)

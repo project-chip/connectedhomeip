@@ -430,7 +430,7 @@ void UDPEndPointImplSockets::CloseImpl()
 {
     if (mSocket != kInvalidSocketFd)
     {
-        static_cast<System::LayerSockets *>(&GetSystemLayer())->StopWatchingSocket(&mWatch);
+        TEMPORARY_RETURN_IGNORED static_cast<System::LayerSockets *>(&GetSystemLayer())->StopWatchingSocket(&mWatch);
         close(mSocket);
         mSocket = kInvalidSocketFd;
     }
@@ -848,7 +848,7 @@ CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId a
             interfaceFound = true;
 
             char ifName[InterfaceId::kMaxIfNameLength];
-            interfaceIt.GetInterfaceName(ifName, sizeof(ifName));
+            TEMPORARY_RETURN_IGNORED interfaceIt.GetInterfaceName(ifName, sizeof(ifName));
 
             // Ignore errors here, except for logging, because we expect some of
             // these interfaces to not work, and some (e.g. loopback) to always

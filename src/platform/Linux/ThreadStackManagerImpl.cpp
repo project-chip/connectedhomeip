@@ -130,7 +130,7 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadBorderRouter * pr
             if (key == nullptr || value == nullptr)
                 continue;
             // ownership of key and value is still holding by the iter
-            DeviceLayer::SystemLayer().ScheduleLambda([me]() { me->_UpdateNetworkStatus(); });
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([me]() { me->_UpdateNetworkStatus(); });
 
             if (strcmp(key, kPropertyDeviceRole) == 0)
             {
@@ -301,9 +301,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDatase
         ReturnErrorOnFailure(mDataset.Init(ByteSpan(data, size)));
     }
 
-    dataset.Init(mDataset.AsByteSpan());
-
-    return CHIP_NO_ERROR;
+    return dataset.Init(mDataset.AsByteSpan());
 }
 
 bool ThreadStackManagerImpl::_IsThreadProvisioned()
@@ -410,7 +408,7 @@ void ThreadStackManagerImpl::_OnThreadBrAttachFinished(GObject * source_object, 
         {
             ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
                          err == nullptr ? "unknown error" : err->message);
-            DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
                 if (this_->mpConnectCallback != nullptr)
                 {
                     // TODO: Replace this with actual thread attach result.
@@ -421,7 +419,7 @@ void ThreadStackManagerImpl::_OnThreadBrAttachFinished(GObject * source_object, 
         }
         else
         {
-            DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
                 if (this_->mpConnectCallback != nullptr)
                 {
                     // TODO: Replace this with actual thread attach result.
@@ -602,7 +600,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
         {
             ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
                          err == nullptr ? "unknown error" : err->message);
-            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
                 if (mpScanCallback != nullptr)
                 {
                     LinuxScanResponseIterator<ThreadScanResponse> iter(nullptr);
@@ -678,7 +676,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
         }
     }
 
-    DeviceLayer::SystemLayer().ScheduleLambda([this, scanResult]() {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, scanResult]() {
         // Note: We cannot post a event in ScheduleLambda since std::vector is not trivial copiable. This results in the use of
         // const_cast but should be fine for almost all cases, since we actually handled the ownership of this element to this
         // lambda.

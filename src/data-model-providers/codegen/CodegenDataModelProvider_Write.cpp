@@ -28,16 +28,15 @@
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-detail.h>
-#include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table-detail.h>
 #include <app/util/attribute-table.h>
 #include <app/util/ember-io-storage.h>
 #include <app/util/ember-strings.h>
-#include <app/util/odd-sized-integers.h>
 #include <data-model-providers/codegen/EmberAttributeDataBuffer.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/odd-sized-integers.h>
 
 #include <zap-generated/endpoint_config.h>
 
@@ -136,7 +135,7 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
     dataInput.SetChangeListener(&mContext->dataModelChangeListener);
     // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmmited`
 
-    if (request.operationFlags.Has(DataModel::OperationFlags::kInternal))
+    if (request.subjectDescriptor.authMode == Access::AuthMode::kInternalDeviceAccess)
     {
         // Internal requests use the non-External interface that has less enforcement
         // than the external version (e.g. does not check/enforce writable settings, does not

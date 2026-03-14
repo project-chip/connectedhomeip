@@ -248,6 +248,16 @@ def Init():
         setter.Set('pychip_Bdx_InitCallbacks', None, [
                    _OnTransferObtainedCallbackFunct, _OnFailedToObtainTransferCallbackFunct, _OnDataReceivedCallbackFunct,
                    _OnTransferCompletedCallbackFunct])
+        setter.Set('pychip_Bdx_Shutdown',
+                   None, [])
 
     handle.pychip_Bdx_InitCallbacks(
         _OnTransferObtainedCallback, _OnFailedToObtainTransferCallback, _OnDataReceivedCallback, _OnTransferCompletedCallback)
+
+
+def Shutdown():
+    '''
+    Shut down the BDX server.
+    '''
+    handle = GetLibraryHandle()
+    handle.pychip_Bdx_Shutdown()

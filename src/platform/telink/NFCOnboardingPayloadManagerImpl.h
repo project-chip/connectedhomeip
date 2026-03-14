@@ -37,6 +37,7 @@ private:
     CHIP_ERROR _StartTagEmulation(const char * payload, size_t payloadLength);
     CHIP_ERROR _StopTagEmulation();
     bool _IsTagEmulationStarted() const { return mIsStarted; };
+    size_t _EncodeNDEFURI(const uint8_t * uri, size_t uri_len, uint8_t * out_buf);
 
     // ===== Members for internal use by this class.
     bool mIsStarted;

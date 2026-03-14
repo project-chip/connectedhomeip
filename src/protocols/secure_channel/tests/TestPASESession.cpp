@@ -86,13 +86,13 @@ constexpr Spake2pVerifierSerialized sTestSpake2p01_SerializedVerifier = {
 };
 
 class TestSecurePairingDelegate;
-class TestPASESession : public chip::Test::LoopbackMessagingContext
+class TestPASESession : public Testing::LoopbackMessagingContext
 {
 public:
     void SetUp() override
     {
         ConfigInitializeNodes(false);
-        chip::Test::LoopbackMessagingContext::SetUp();
+        Testing::LoopbackMessagingContext::SetUp();
     }
 
     void SecurePairingHandshakeTestCommon(SessionManager & sessionManager, PASESession & pairingCommissioner,
@@ -101,7 +101,7 @@ public:
                                           TestSecurePairingDelegate & delegateCommissioner);
 };
 
-class PASETestLoopbackTransportDelegate : public Test::LoopbackTransportDelegate
+class PASETestLoopbackTransportDelegate : public Testing::LoopbackTransportDelegate
 {
 public:
     void OnMessageDropped() override { mMessageDropped = true; }

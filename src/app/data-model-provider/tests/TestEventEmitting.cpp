@@ -23,6 +23,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 namespace {
@@ -33,7 +34,7 @@ using namespace chip::app::DataModel;
 
 using StartUpEventType              = chip::app::Clusters::BasicInformation::Events::StartUp::Type;
 using AccessControlEntryChangedType = chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::Type;
-using chip::Test::LogOnlyEvents;
+using chip::Testing::LogOnlyEvents;
 
 constexpr uint32_t kFakeSoftwareVersion = 0x1234abcd;
 
@@ -48,12 +49,14 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
 
     std::optional<EventNumber> n1 = events->GenerateEvent(event, 0 /* EndpointId */);
 
-    ASSERT_EQ(n1, logOnlyEvents.CurrentEventNumber());
-    ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
+    auto eventInfo = logOnlyEvents.GetNextEvent();
+    ASSERT_TRUE(eventInfo.has_value());
+    ASSERT_EQ(n1, eventInfo->eventNumber);
+    ASSERT_EQ(eventInfo->eventOptions.mPath,
               ConcreteEventPath(0 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
 
     chip::app::Clusters::BasicInformation::Events::StartUp::DecodableType decoded_event;
-    CHIP_ERROR err = logOnlyEvents.DecodeLastEvent(decoded_event);
+    CHIP_ERROR err = eventInfo->GetEventData(decoded_event);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -63,9 +66,11 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
     ASSERT_EQ(decoded_event.softwareVersion, kFakeSoftwareVersion);
 
     std::optional<EventNumber> n2 = events->GenerateEvent(event, /* endpointId = */ 1);
-    ASSERT_EQ(n2, logOnlyEvents.CurrentEventNumber());
+    eventInfo                     = logOnlyEvents.GetNextEvent();
+    ASSERT_TRUE(eventInfo.has_value());
+    ASSERT_EQ(n2, eventInfo->eventNumber);
 
-    ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
+    ASSERT_EQ(eventInfo->eventOptions.mPath,
               ConcreteEventPath(1 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
 }
 
@@ -90,13 +95,15 @@ TEST(TestInteractionModelEventEmitting, TestFabricScoped)
     event.fabricIndex = kTestFabricIndex;
     n1                = events->GenerateEvent(event, /* endpointId = */ 0);
 
-    ASSERT_EQ(n1, logOnlyEvents.CurrentEventNumber());
-    ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
+    auto eventInfo = logOnlyEvents.GetNextEvent();
+    ASSERT_TRUE(eventInfo.has_value());
+    ASSERT_EQ(n1, eventInfo->eventNumber);
+    ASSERT_EQ(eventInfo->eventOptions.mPath,
               ConcreteEventPath(0 /* endpointId */, AccessControlEntryChangedType::GetClusterId(),
                                 AccessControlEntryChangedType::GetEventId()));
 
     chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType decoded_event;
-    CHIP_ERROR err = logOnlyEvents.DecodeLastEvent(decoded_event);
+    CHIP_ERROR err = eventInfo->GetEventData(decoded_event);
 
     if (err != CHIP_NO_ERROR)
     {

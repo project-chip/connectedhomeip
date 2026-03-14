@@ -1069,13 +1069,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRGroupcastClusterExpireGracePeriodParams (InternalMethods)
+@interface MTRGroupcastClusterConfigureAuxiliaryACLParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRGroupcastClusterConfigureAuxiliaryACLParams (InternalMethods)
+@interface MTRGroupcastClusterGroupcastTestingParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -1088,6 +1088,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRActivatedCarbonFilterMonitoringClusterResetConditionParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRWaterTankLevelMonitoringClusterResetConditionParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

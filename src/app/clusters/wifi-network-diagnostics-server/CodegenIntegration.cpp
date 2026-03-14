@@ -16,7 +16,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
+#include <app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/WiFiNetworkDiagnostics.h>
 #include <app/util/attribute-storage.h>
@@ -80,7 +80,7 @@ void MatterWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -91,7 +91,7 @@ void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kWiFiNetworkDiagnosticsFixedClusterCount,
             .maxClusterInstanceCount   = kWiFiNetworkDiagnosticsMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback() {}

@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/ethernet-network-diagnostics-server/ethernet-diagnostics-cluster.h>
+#include <app/clusters/ethernet-network-diagnostics-server/EthernetDiagnosticsCluster.h>
 #include <app/static-cluster-config/EthernetNetworkDiagnostics.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
@@ -78,7 +78,7 @@ void MatterEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
         integrationDelegate);
 }
 
-void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -89,7 +89,7 @@ void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(EndpointId endpoint
             .fixedClusterInstanceCount = kEthernetNetworkDiagnosticsFixedClusterCount,
             .maxClusterInstanceCount   = kEthernetNetworkDiagnosticsMaxClusterCount,
         },
-        integrationDelegate);
+        integrationDelegate, shutdownType);
 }
 
 void MatterEthernetNetworkDiagnosticsPluginServerInitCallback() {}

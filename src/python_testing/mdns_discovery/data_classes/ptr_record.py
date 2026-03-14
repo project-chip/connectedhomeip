@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 
 from .json_serializable import JsonSerializable
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -42,5 +42,5 @@ class PtrRecord(JsonSerializable):
             else:
                 self.instance_name = self.service_name  # fallback
         except (AttributeError, IndexError, TypeError) as e:
-            logger.info("Failed to extract instance_name from PTR record: %s", e)
+            log.info("Failed to extract instance_name from PTR record: %s", e)
             self.instance_name = self.service_name  # final fallback

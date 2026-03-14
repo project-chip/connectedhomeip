@@ -106,10 +106,9 @@ def read_pics_from_file(path: str) -> dict[str, bool]:
                 pics_dict.update(parse_pics_xml(contents))
         return pics_dict
 
-    else:
-        with open(path, 'r') as f:
-            lines = f.readlines()
-            return parse_pics(lines)
+    with open(path, 'r') as f:
+        lines = f.readlines()
+        return parse_pics(lines)
 
 
 def generate_device_element_pics_from_device_wildcard(wildcard: AsyncReadTransaction.ReadResponse, xml_clusters: dict[uint, XmlCluster]) -> tuple[dict[int, list[str]], list[ProblemNotice]]:

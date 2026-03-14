@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("../system.gni")
 
 chip_test_suite("tests") {
   output_name = "libSystemLayerTests"
@@ -26,20 +27,23 @@ chip_test_suite("tests") {
     "TestSystemErrorStr.cpp",
     "TestSystemPacketBuffer.cpp",
     "TestSystemScheduleLambda.cpp",
+    "TestSystemScheduleWork.cpp",
     "TestSystemTimer.cpp",
-    "TestSystemWakeEvent.cpp",
     "TestTimeSource.cpp",
   ]
-
-  if (chip_device_platform != "fake") {
-    test_sources += [ "TestSystemScheduleWork.cpp" ]
-  }
 
   # SystemPacketBuffer on nrfconnect uses LwIP buffers, which ignore the
   #  requested allocation size and always allocate at max-size.  So our test,
   #  which tries to size-limit the buffers, does not work correctly there.
   if (chip_device_platform != "nrfconnect") {
     test_sources += [ "TestTLVPacketBufferBackingStore.cpp" ]
+  }
+
+  if (chip_system_config_event_loop == "Select") {
+    test_sources += [
+      "TestSystemEventSource.cpp",
+      "TestSystemWakeEvent.cpp",
+    ]
   }
 
   cflags = [ "-Wconversion" ]

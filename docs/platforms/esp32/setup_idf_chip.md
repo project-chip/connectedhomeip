@@ -54,7 +54,7 @@ care of downloading GN, ninja, and setting up a Python environment with
 libraries used to build and test.
 
 ```
-source scripts/bootstrap.sh
+source scripts/bootstrap.sh -p all,esp32
 ```
 
 Whenever Matter environment is out of date, it can be updated by running above

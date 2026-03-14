@@ -187,8 +187,7 @@ class SetupPayload:
     def parse(payload):
         if payload.startswith('MT:'):
             return SetupPayload.parse_qrcode(payload)
-        else:
-            return SetupPayload.parse_manualcode(payload)
+        return SetupPayload.parse_manualcode(payload)
 
 
 @click.group()

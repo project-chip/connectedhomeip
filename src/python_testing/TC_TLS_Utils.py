@@ -317,7 +317,7 @@ class TLSUtils:
     async def read_root_certs_attribute_as_map(self, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD):
         attribute_certs = await self.read_tls_cert_attribute(Clusters.TlsCertificateManagement.Attributes.ProvisionedRootCertificates, payloadCapability)
         matter_asserts.assert_list(attribute_certs, "Expected list")
-        found_certs = dict()
+        found_certs = {}
         for cert in attribute_certs:
             found_certs[cert.caid] = cert
         return found_certs
@@ -325,7 +325,7 @@ class TLSUtils:
     async def read_client_certs_attribute_as_map(self, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD):
         attribute_certs = await self.read_tls_cert_attribute(Clusters.TlsCertificateManagement.Attributes.ProvisionedClientCertificates, payloadCapability)
         matter_asserts.assert_list(attribute_certs, "Expected list")
-        found_certs = dict()
+        found_certs = {}
         for cert in attribute_certs:
             found_certs[cert.ccdid] = cert
         return found_certs
@@ -334,7 +334,7 @@ class TLSUtils:
             self,
             expected_status: Status = Status.Success):
         find_response = await self.send_find_client_command(expected_status=expected_status)
-        found_certs = dict()
+        found_certs = {}
         for cert in find_response.certificateDetails:
             found_certs[cert.ccdid] = cert
         return found_certs

@@ -36,7 +36,7 @@ class FakeBorderRouterDelegate final : public app::Clusters::ThreadBorderRouterM
 
     void GetBorderRouterName(MutableCharSpan & borderRouterName) override
     {
-        CopyCharSpanToMutableCharSpan("netman-br"_span, borderRouterName);
+        TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan("netman-br"_span, borderRouterName);
     }
 
     CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override
@@ -87,7 +87,8 @@ class FakeBorderRouterDelegate final : public app::Clusters::ThreadBorderRouterM
 
         mActivateDatasetCallback = callback;
         mActivateDatasetSequence = sequenceNum;
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(1000), ActivateActiveDataset, this);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(1000), ActivateActiveDataset,
+                                                                       this);
     }
 
     CHIP_ERROR CommitActiveDataset() override { return CHIP_NO_ERROR; }
@@ -98,8 +99,7 @@ class FakeBorderRouterDelegate final : public app::Clusters::ThreadBorderRouterM
         ReturnErrorOnFailure(mPendingDataset.Init(pendingDataset.AsByteSpan()));
         uint32_t delayTimerMillis;
         ReturnErrorOnFailure(mPendingDataset.GetDelayTimer(delayTimerMillis));
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(delayTimerMillis), ActivatePendingDataset, this);
-        return CHIP_NO_ERROR;
+        return DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(delayTimerMillis), ActivatePendingDataset, this);
     }
 
 private:
@@ -115,8 +115,8 @@ private:
     static void ActivatePendingDataset(System::Layer *, void * context)
     {
         auto * self = static_cast<FakeBorderRouterDelegate *>(context);
-        self->mActiveDataset.Init(self->mPendingDataset.AsByteSpan());
-        self->mPendingDataset.Clear();
+        TEMPORARY_RETURN_IGNORED self->mActiveDataset.Init(self->mPendingDataset.AsByteSpan());
+        TEMPORARY_RETURN_IGNORED self->mPendingDataset.Clear();
         // This could just call MatterReportingAttributeChangeCallback directly
         self->mAttributeChangeCallback->ReportAttributeChanged(
             app::Clusters::ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id);

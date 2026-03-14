@@ -22,6 +22,7 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
+#include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/ServerClusterContext.h>
@@ -35,11 +36,11 @@
 #include <cstdlib>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
-using namespace chip::app::Testing;
+using namespace chip::Testing;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {
@@ -166,9 +167,7 @@ TEST(TestDefaultServerCluster, InvokeDefault)
     FakeDefaultServerCluster cluster({ 1, 2 });
 
     TLV::TLVReader tlvReader;
-    InvokeRequest request;
-
-    request.path = { 0 /* endpoint */, 1 /* cluster */, 1234 /* command */ };
+    InvokeRequest request({ 0 /* endpoint */, 1 /* cluster */, 1234 /* command */ }, chip::Testing::kAdminSubjectDescriptor);
 
     ASSERT_EQ(cluster.InvokeCommand(request, tlvReader, nullptr /* command handler, assumed unused here */),
               Status::UnsupportedCommand);

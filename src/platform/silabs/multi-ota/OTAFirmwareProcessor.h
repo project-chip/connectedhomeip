@@ -22,6 +22,9 @@
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
 
 namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+namespace MultiOTA {
 
 class OTAFirmwareProcessor : public OTATlvProcessor
 {
@@ -43,4 +46,7 @@ private:
     static uint16_t writeBufOffset;
 };
 
+} // namespace MultiOTA
+} // namespace Silabs
+} // namespace DeviceLayer
 } // namespace chip

@@ -35,7 +35,6 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
@@ -308,7 +307,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
         bbuf.Put(mPublicKey, mPublicKey.Length());
         bbuf.Put(privkey, sizeof(privkey));
         VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
-        output.SetLength(bbuf.Needed());
+        TEMPORARY_RETURN_IGNORED output.SetLength(bbuf.Needed());
     }
 
 exit:

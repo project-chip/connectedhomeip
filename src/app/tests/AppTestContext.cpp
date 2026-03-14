@@ -36,7 +36,7 @@ chip::Access::AccessControl gPermissiveAccessControl;
 } // namespace
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 void AppContext::SetUpTestSuite()
 {
@@ -86,5 +86,5 @@ void AppContext::TearDown()
     LoopbackMessagingContext::TearDown();
 }
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

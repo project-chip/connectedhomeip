@@ -27,12 +27,22 @@
 
 #pragma once
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP && !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#define CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION 0
+#define CONFIG_RENDEZVOUS_MODE (1 << 5) // Thread MeshCoP
+#endif
+
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>
 
 // All clusters app has 3 group endpoints. This needs to defined here so that
 // CHIP_CONFIG_MAX_GROUPS_PER_FABRIC is properly configured.
 #define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 3
+
+// Temporary set MaxMembershipCount to 24 for all-cluster-app due to hardcoded TestGroupKeyManagementCluster.yaml
+// Where 12 group are created on a single fabric with the group clusters.
+// TODO cleanup this config #43166
+#define CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT 24
 
 // Allows app options (ports) to be configured on launch of app
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 1

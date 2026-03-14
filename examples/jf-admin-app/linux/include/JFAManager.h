@@ -75,10 +75,13 @@ private:
     SessionHolder mSessionHolder;
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+    NodeId mNodeId                               = kUndefinedNodeId;
     OnConnectedAction mOnConnectedAction         = kStandardCommissioningComplete;
     FabricId jfFabricIndex                       = kUndefinedFabricId;
     EndpointId peerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
     Crypto::P256PublicKey peerAdminICACPubKey;
+    uint8_t mICACBuffer[Credentials::kMaxDERCertLength];
+    size_t mICACBufferLen = 0;
 
     void ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onConnectedAction);
     CHIP_ERROR SendCommissioningComplete();

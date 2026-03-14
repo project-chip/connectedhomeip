@@ -257,7 +257,7 @@ CHIP_ERROR BLEManagerCommon::_SetAdvertisingEnabled(bool val)
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
         mFlags.Set(Flags::kAdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
 exit:
@@ -275,14 +275,14 @@ CHIP_ERROR BLEManagerCommon::_SetAdvertisingMode(BLEAdvertisingMode mode)
         // We are in FreeRTOS timer service context, which is a default daemon task and has
         // the highest priority. Stop advertising should be scheduled to run from Matter task.
         mFlags.Clear(Flags::kFastAdvertisingEnabled);
-        PlatformMgr().ScheduleWork(StopAdvertisingPriorToSwitchingMode, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(StopAdvertisingPriorToSwitchingMode, 0);
         break;
     }
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kRestartAdvertising);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -388,7 +388,7 @@ CHIP_ERROR BLEManagerCommon::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const
 
 void BLEManagerCommon::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    BLEMgrImpl().CloseConnection(conId);
+    TEMPORARY_RETURN_IGNORED BLEMgrImpl().CloseConnection(conId);
 }
 
 CHIP_ERROR BLEManagerCommon::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
@@ -961,12 +961,12 @@ void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
 
     if (mServiceMode == kMultipleBLE_Enabled)
     {
-        _SetAdvertisingEnabled(false);
+        TEMPORARY_RETURN_IGNORED _SetAdvertisingEnabled(false);
         CancelBleAdvTimeoutTimer();
         mServiceMode = kMultipleBLE_Disabled;
     }
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
@@ -986,7 +986,7 @@ void BLEManagerCommon::HandleConnectionCloseEvent(blekw_msg_t * msg)
     PlatformMgr().PostEventOrDie(&event);
     mFlags.Set(Flags::kRestartAdvertising);
     mFlags.Set(Flags::kFastAdvertisingEnabled);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerCommon::HandleWriteEvent(blekw_msg_t * msg)
@@ -1298,31 +1298,32 @@ void BLEManagerCommon::blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent
         uint16_t tempMtu = 0;
 
         (void) Gatt_GetMtu(deviceId, &tempMtu);
-        blekw_msg_add_u16(BLE_KW_MSG_MTU_CHANGED, tempMtu);
+        TEMPORARY_RETURN_IGNORED blekw_msg_add_u16(BLE_KW_MSG_MTU_CHANGED, tempMtu);
         break;
     }
 
     case gEvtAttributeWritten_c:
-        blekw_msg_add_att_written(BLE_KW_MSG_ATT_WRITTEN, deviceId, pServerEvent->eventData.attributeWrittenEvent.handle,
-                                  pServerEvent->eventData.attributeWrittenEvent.aValue,
-                                  pServerEvent->eventData.attributeWrittenEvent.cValueLength);
+        TEMPORARY_RETURN_IGNORED blekw_msg_add_att_written(
+            BLE_KW_MSG_ATT_WRITTEN, deviceId, pServerEvent->eventData.attributeWrittenEvent.handle,
+            pServerEvent->eventData.attributeWrittenEvent.aValue, pServerEvent->eventData.attributeWrittenEvent.cValueLength);
         break;
 
     case gEvtLongCharacteristicWritten_c:
-        blekw_msg_add_att_written(BLE_KW_MSG_ATT_LONG_WRITTEN, deviceId, pServerEvent->eventData.longCharWrittenEvent.handle,
-                                  pServerEvent->eventData.longCharWrittenEvent.aValue,
-                                  pServerEvent->eventData.longCharWrittenEvent.cValueLength);
+        TEMPORARY_RETURN_IGNORED blekw_msg_add_att_written(
+            BLE_KW_MSG_ATT_LONG_WRITTEN, deviceId, pServerEvent->eventData.longCharWrittenEvent.handle,
+            pServerEvent->eventData.longCharWrittenEvent.aValue, pServerEvent->eventData.longCharWrittenEvent.cValueLength);
         break;
 
     case gEvtAttributeRead_c:
-        blekw_msg_add_att_read(BLE_KW_MSG_ATT_READ, deviceId, pServerEvent->eventData.attributeReadEvent.handle);
+        TEMPORARY_RETURN_IGNORED blekw_msg_add_att_read(BLE_KW_MSG_ATT_READ, deviceId,
+                                                        pServerEvent->eventData.attributeReadEvent.handle);
         break;
 
     case gEvtCharacteristicCccdWritten_c: {
         uint16_t cccd_val = pServerEvent->eventData.charCccdWrittenEvent.newCccd;
 
-        blekw_msg_add_att_written(BLE_KW_MSG_ATT_CCCD_WRITTEN, deviceId, pServerEvent->eventData.charCccdWrittenEvent.handle,
-                                  (uint8_t *) &cccd_val, 2);
+        TEMPORARY_RETURN_IGNORED blekw_msg_add_att_written(
+            BLE_KW_MSG_ATT_CCCD_WRITTEN, deviceId, pServerEvent->eventData.charCccdWrittenEvent.handle, (uint8_t *) &cccd_val, 2);
         break;
     }
 
@@ -1512,7 +1513,7 @@ void BLEManagerCommon::BleAdvTimeoutHandler(TimerHandle_t xTimer)
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
         ChipLogDetail(DeviceLayer, "Start slow advertisement");
-        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+        TEMPORARY_RETURN_IGNORED BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
     }
 }
 

@@ -63,11 +63,11 @@ void InitChefMicrowaveOvenModeCluster()
             continue;
 
         gDelegateTable[epIndex] = std::make_unique<MicrowaveOvenMode::ChefDelegate>();
-        gDelegateTable[epIndex]->Init();
+        TEMPORARY_RETURN_IGNORED gDelegateTable[epIndex]->Init();
 
         gInstanceTable[epIndex] = std::make_unique<ModeBase::Instance>(gDelegateTable[epIndex].get(), endpointId,
                                                                        MicrowaveOvenMode::Id, kMicrowaveOvenFeatureMap);
-        gInstanceTable[epIndex]->Init();
+        TEMPORARY_RETURN_IGNORED gInstanceTable[epIndex]->Init();
 
         ChipLogProgress(DeviceLayer, "Endpoint %d MicrowaveOvenMode Initialized.", endpointId);
     }

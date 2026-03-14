@@ -203,7 +203,7 @@ void BluezAdvertisement::Shutdown()
 
     // Release resources on the glib thread to synchronize with potential signal handlers
     // attached to the advertising object that may run on the glib thread.
-    PlatformMgrImpl().GLibMatterContextInvokeSync(
+    TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezAdvertisement * self) {
             // The application object manager might not be released right away (it may be held
             // by other BLE layer objects). We need to unexport the advertisement object in the

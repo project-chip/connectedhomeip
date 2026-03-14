@@ -56,7 +56,7 @@ CHIP_ERROR EventPathIB::Parser::PrettyPrint() const
 #if CHIP_DETAIL_LOGGING
             {
                 NodeId node;
-                reader.Get(node);
+                TEMPORARY_RETURN_IGNORED reader.Get(node);
                 PRETTY_PRINT("\tNode = 0x" ChipLogFormatX64 ",", ChipLogValueX64(node));
             }
 #endif // CHIP_DETAIL_LOGGING
@@ -66,7 +66,7 @@ CHIP_ERROR EventPathIB::Parser::PrettyPrint() const
 #if CHIP_DETAIL_LOGGING
             {
                 EndpointId endpoint;
-                reader.Get(endpoint);
+                TEMPORARY_RETURN_IGNORED reader.Get(endpoint);
                 PRETTY_PRINT("\tEndpoint = 0x%x,", endpoint);
             }
 #endif // CHIP_DETAIL_LOGGING
@@ -77,7 +77,7 @@ CHIP_ERROR EventPathIB::Parser::PrettyPrint() const
 #if CHIP_DETAIL_LOGGING
             {
                 ClusterId cluster;
-                reader.Get(cluster);
+                TEMPORARY_RETURN_IGNORED reader.Get(cluster);
                 PRETTY_PRINT("\tCluster = 0x%" PRIx32 ",", cluster);
             }
 #endif // CHIP_DETAIL_LOGGING
@@ -88,7 +88,7 @@ CHIP_ERROR EventPathIB::Parser::PrettyPrint() const
 #if CHIP_DETAIL_LOGGING
             {
                 EventId event;
-                reader.Get(event);
+                TEMPORARY_RETURN_IGNORED reader.Get(event);
                 PRETTY_PRINT("\tEvent = 0x%" PRIx32 ",", event);
             }
 #endif // CHIP_DETAIL_LOGGING

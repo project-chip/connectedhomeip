@@ -27,7 +27,7 @@
 
 using namespace chip;
 using namespace chip::Controller;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 JNI_METHOD(void, GetConnectedDeviceCallbackForTestJni, onDeviceConnected)
 (JNIEnv * env, jobject self, jlong callbackHandle, jlong messagingContextHandle)

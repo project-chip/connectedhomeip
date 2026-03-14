@@ -281,10 +281,19 @@ private:
 class LibDataChannelPeerConnection : public WebRTCPeerConnection
 {
 public:
-    LibDataChannelPeerConnection()
+    LibDataChannelPeerConnection(const std::vector<ICEServerInfo> & servers = {})
     {
         rtc::Configuration config;
-        // config.iceServers.emplace_back("stun.l.google.com:19302");
+        for (const auto & server : servers)
+        {
+            for (const auto & url : server.urls)
+            {
+                rtc::IceServer iceServer(url);
+                iceServer.username = server.username;
+                iceServer.password = server.credential;
+                config.iceServers.push_back(iceServer);
+            }
+        }
         mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
     }
 
@@ -297,7 +306,7 @@ public:
 
             // Extract any candidates embedded in the SDP description
             std::vector<rtc::Candidate> candidates = desc.candidates();
-            ChipLogProgress(Camera, "Extracted %lu candidates from SDP description", candidates.size());
+            ChipLogProgress(Camera, "Extracted %zu candidates from SDP description", candidates.size());
 
             for (const auto & candidate : candidates)
             {
@@ -455,7 +464,7 @@ private:
 
 } // namespace
 
-std::shared_ptr<WebRTCPeerConnection> CreateWebRTCPeerConnection()
+std::shared_ptr<WebRTCPeerConnection> CreateWebRTCPeerConnection(const std::vector<ICEServerInfo> & iceServers)
 {
-    return std::make_shared<LibDataChannelPeerConnection>();
+    return std::make_shared<LibDataChannelPeerConnection>(iceServers);
 }

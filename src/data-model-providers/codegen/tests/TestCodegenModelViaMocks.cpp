@@ -51,12 +51,10 @@
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/util/attribute-metadata.h>
-#include <app/util/attribute-storage-null-handling.h>
 #include <app/util/ember-io-storage.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <app/util/mock/MockNodeConfig.h>
-#include <app/util/odd-sized-integers.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -70,15 +68,16 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/odd-sized-integers.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <optional>
 #include <vector>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app;
-using namespace chip::app::Testing;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::Globals::Attributes;
 
@@ -185,18 +184,22 @@ public:
     CodegenDataModelProviderWithContext()
     {
         SetPersistentStorageDelegate(&mStorageDelegate);
-        Startup({
+        EXPECT_SUCCESS(Startup({
             .eventsGenerator         = mEventGenerator,
             .dataModelChangeListener = mChangeListener,
             .actionContext           = mActionContext,
-        });
+        }));
     }
-    ~CodegenDataModelProviderWithContext() override { Shutdown(); }
+    ~CodegenDataModelProviderWithContext() override { EXPECT_SUCCESS(Shutdown()); }
 
     TestProviderChangeListener & ChangeListener() { return mChangeListener; }
     const TestProviderChangeListener & ChangeListener() const { return mChangeListener; }
 
 private:
+    // Test cases that explicitly manage the provider should not use this sub-class
+    using CodegenDataModelProvider::SetPersistentStorageDelegate;
+    using CodegenDataModelProvider::Startup;
+
     LogOnlyEvents mEventGenerator;
     TestProviderChangeListener mChangeListener;
     TestActionContext mActionContext;
@@ -268,9 +271,9 @@ class CustomListCommandHandler : public CommandHandlerInterface
 public:
     CustomListCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterface(endpointId, clusterId)
     {
-        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
+        EXPECT_SUCCESS(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     }
-    ~CustomListCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
+    ~CustomListCommandHandler() { EXPECT_SUCCESS(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this)); }
 
     void InvokeCommand(HandlerContext & handlerContext) override
     {
@@ -322,9 +325,9 @@ class ShimCommandHandler : public CommandHandlerInterfaceShim<Clusters::UnitTest
 public:
     ShimCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterfaceShim(endpointId, clusterId)
     {
-        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
+        EXPECT_SUCCESS(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     }
-    ~ShimCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
+    ~ShimCommandHandler() { EXPECT_SUCCESS(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this)); }
 
     void InvokeCommand(HandlerContext & handlerContext) override
     {
@@ -390,7 +393,10 @@ private:
 class ScopedMockAccessControl
 {
 public:
-    ScopedMockAccessControl() { Access::GetAccessControl().Init(&mMock, mMock); }
+    ScopedMockAccessControl()
+    { // We are sometimes initializing twice, resulting in a failure
+        TEMPORARY_RETURN_IGNORED Access::GetAccessControl().Init(&mMock, mMock);
+    }
     ~ScopedMockAccessControl() { Access::GetAccessControl().Finish(); }
 
 private:
@@ -430,36 +436,37 @@ const MockNodeConfig gTestNodeConfig({
         { MakeNullable(VendorId::TestVendor3), kNamespaceID3, kTag3, NullOptional},
     }),
     MockEndpointConfig(kMockEndpoint2, {
-        MockClusterConfig(MockClusterId(1), {
-            ClusterRevision::Id, FeatureMap::Id,
-        }),
-        MockClusterConfig(
-            MockClusterId(2),
-            {
-               ClusterRevision::Id,
-               FeatureMap::Id,
-               MockAttributeId(1),
-               MockAttributeConfig(MockAttributeId(2), ZCL_ARRAY_ATTRIBUTE_TYPE),
-            },          /* attributes */
-            {},         /* events */
-            {1, 2, 23}, /* acceptedCommands */
-            {2, 10}     /* generatedCommands */
-        ),
-        MockClusterConfig(
-            MockClusterId(3),
-            {
-                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
-            },    /* attributes */
-            {},   /* events */
-            {11}, /* acceptedCommands */
-            {4, 6},   /* generatedCommands */
-            BitMask<MockClusterSide>().Set(MockClusterSide::kClient).Set(MockClusterSide::kServer)
-        ),
-        MockClusterConfig(MockClusterId(4), {}, {}, {}, {}, MockClusterSide::kClient),
-    }, {
-        { kDeviceTypeId2, kDeviceTypeId2Version},
-    }, {},
-    EndpointComposition::kTree),
+           MockClusterConfig(MockClusterId(1), { ClusterRevision::Id, FeatureMap::Id }),
+           MockClusterConfig(
+               MockClusterId(2),
+               {
+                  ClusterRevision::Id,
+                  FeatureMap::Id,
+                  MockAttributeId(1),
+                  MockAttributeConfig(MockAttributeId(2), ZCL_ARRAY_ATTRIBUTE_TYPE),
+               },          /* attributes */
+               {},         /* events */
+               {1, 2, 23}, /* acceptedCommands */
+               {2, 10}     /* generatedCommands */
+           ),
+           MockClusterConfig(
+               MockClusterId(3),
+               {
+                   ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
+               },      /* attributes */
+               {},     /* events */
+               {11},   /* acceptedCommands */
+               {4, 6}, /* generatedCommands */
+               BitMask<MockClusterSide>().Set(MockClusterSide::kClient).Set(MockClusterSide::kServer)
+           ),
+           MockClusterConfig(MockClusterId(4), {}, {}, {}, {}, MockClusterSide::kClient),
+        }, {
+            { kDeviceTypeId2, kDeviceTypeId2Version},
+        },
+        {}, // empty semantic tags
+        EndpointComposition::kTree,
+        "shortUniqueId"_span
+    ),
     MockEndpointConfig(kMockEndpoint3, {
         MockClusterConfig(MockClusterId(1), {
             ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
@@ -629,12 +636,12 @@ const MockNodeConfig gTestNodeConfig({
             ClusterRevision::Id, FeatureMap::Id, MockAttributeId(4),
             MockAttributeConfig(Clusters::Descriptor::Attributes::EndpointUniqueID::Id, ZCL_CHAR_STRING_ATTRIBUTE_TYPE),
         }),
-    }, {
-        { kDeviceTypeId4, kDeviceTypeId4Version },
-    },
-    {}, // Empty semantic tags
-    EndpointComposition::kTree,
-    chip::CharSpan("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01", strlen("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01")) // Add endpointUniqueID
+        }, {
+            { kDeviceTypeId4, kDeviceTypeId4Version },
+        },
+        {}, // Empty semantic tags
+        EndpointComposition::kTree,
+        "AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"_span // endpoint unique id (if applicable)
     ),
 });
 // clang-format on
@@ -935,7 +942,7 @@ void TestEmberScalarTypeRead(typename NumericAttributeTraits<T>::WorkingType val
     // Ember encoding for integers is IDENTICAL to the in-memory representation for them
     typename NumericAttributeTraits<T>::StorageType storage;
     NumericAttributeTraits<T>::WorkingToStorage(value, storage);
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&storage), sizeof(storage)));
+    chip::Testing::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&storage), sizeof(storage)));
 
     // Data read via the encoder
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -969,7 +976,7 @@ void TestEmberScalarNullRead()
     // Ember encoding for integers is IDENTICAL to the in-memory representation for them
     typename NumericAttributeTraits<T>::StorageType nullValue;
     NumericAttributeTraits<T>::SetNull(nullValue);
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&nullValue), sizeof(nullValue)));
+    chip::Testing::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(&nullValue), sizeof(nullValue)));
 
     // Data read via the encoder
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1006,7 +1013,7 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
         ASSERT_TRUE(model.WriteAttribute(test.GetRequest(), decoder).IsSuccess());
 
         // Validate data after write
-        chip::ByteSpan writtenData = Test::GetEmberBuffer();
+        chip::ByteSpan writtenData = chip::Testing::GetEmberBuffer();
 
         typename NumericAttributeTraits<T>::StorageType storage;
         ASSERT_GE(writtenData.size(), sizeof(storage));
@@ -1053,7 +1060,7 @@ void TestEmberScalarTypeWrite(const typename NumericAttributeTraits<T>::WorkingT
         ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
 
         // Validate data after write
-        chip::ByteSpan writtenData = Test::GetEmberBuffer();
+        chip::ByteSpan writtenData = chip::Testing::GetEmberBuffer();
 
         typename NumericAttributeTraits<T>::StorageType storage;
         ASSERT_GE(writtenData.size(), sizeof(storage));
@@ -1087,7 +1094,7 @@ void TestEmberScalarNullWrite()
     ASSERT_TRUE(model.WriteAttribute(test.GetRequest(), decoder).IsSuccess());
 
     // Validate data after write
-    chip::ByteSpan writtenData = Test::GetEmberBuffer();
+    chip::ByteSpan writtenData = chip::Testing::GetEmberBuffer();
 
     using Traits = NumericAttributeTraits<T>;
 
@@ -1161,7 +1168,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    chip::Test::ResetVersion();
+    chip::Testing::ResetVersion();
 
     ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> builder;
 
@@ -1183,7 +1190,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverServerClusters)
     EXPECT_EQ(serverClusters[1].dataVersion, 0u);
     EXPECT_EQ(serverClusters[1].flags.Raw(), 0u);
 
-    chip::Test::BumpVersion();
+    chip::Testing::BumpVersion();
 
     EXPECT_EQ(model.ServerClusters(kMockEndpoint1, builder), CHIP_NO_ERROR);
     serverClusters = builder.TakeBuffer();
@@ -1294,25 +1301,25 @@ TEST_F(TestCodegenModelViaMocks, FindAttribute)
     // valid info
     std::optional<AttributeEntry> info1 = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), FeatureMap::Id));
     ASSERT_TRUE(info1.has_value());
-    EXPECT_FALSE(info1->HasFlags(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_FALSE(info1->HasFlags(AttributeQualityFlags::kListAttribute));
 
     // Mocks always set everything as R/W with administrative privileges
-    EXPECT_EQ(info1->GetReadPrivilege(), chip::Access::Privilege::kAdminister);  // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info1->GetWritePrivilege(), chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info1->GetReadPrivilege(), chip::Access::Privilege::kAdminister);
+    EXPECT_EQ(info1->GetWritePrivilege(), chip::Access::Privilege::kAdminister);
 
     std::optional<AttributeEntry> info2 = finder.Find(ConcreteAttributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(2)));
     ASSERT_TRUE(info2.has_value());
-    EXPECT_TRUE(info2->HasFlags(AttributeQualityFlags::kListAttribute));         // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info2->GetReadPrivilege(), chip::Access::Privilege::kAdminister);  // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info2->GetWritePrivilege(), chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_TRUE(info2->HasFlags(AttributeQualityFlags::kListAttribute));
+    EXPECT_EQ(info2->GetReadPrivilege(), chip::Access::Privilege::kAdminister);
+    EXPECT_EQ(info2->GetWritePrivilege(), chip::Access::Privilege::kAdminister);
 
     // test a read-only attribute, which will not have a write privilege
     std::optional<AttributeEntry> info3 =
         finder.Find(ConcreteAttributePath(kMockEndpoint3, MockClusterId(3), kReadOnlyAttributeId));
     ASSERT_TRUE(info3.has_value());
-    EXPECT_FALSE(info3->HasFlags(AttributeQualityFlags::kListAttribute));       // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info3->GetReadPrivilege(), chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_FALSE(info3->GetWritePrivilege().has_value());                       // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_FALSE(info3->HasFlags(AttributeQualityFlags::kListAttribute));
+    EXPECT_EQ(info3->GetReadPrivilege(), chip::Access::Privilege::kAdminister);
+    EXPECT_FALSE(info3->GetWritePrivilege().has_value());
 }
 
 // global attributes are EXPLICITLY supported
@@ -1699,7 +1706,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
                                   MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE));
         testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
-        chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Failure);
+        chip::Testing::SetEmberReadOutput(Protocols::InteractionModel::Status::Failure);
 
         // Actual read via an encoder
         std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1711,7 +1718,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
                                   MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE));
         testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
-        chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Busy);
+        chip::Testing::SetEmberReadOutput(Protocols::InteractionModel::Status::Busy);
 
         // Actual read via an encoder
         std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1719,7 +1726,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
     }
 
     // reset things to success to not affect other tests
-    chip::Test::SetEmberReadOutput(ByteSpan());
+    chip::Testing::SetEmberReadOutput(ByteSpan());
 }
 
 TEST_F(TestCodegenModelViaMocks, EmberAttributeReadNullOctetString)
@@ -1734,7 +1741,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadNullOctetString)
 
     // NOTE: This is a pascal string of size 0xFFFF which for null strings is a null marker
     char data[] = "\xFF\xFFInvalid length string is null";
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+    chip::Testing::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1771,7 +1778,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadOctetString)
     //       the longer encoding is to make it clear we do not encode the overflow
     char data[] = "\0\0testing here with overflow";
     WriteLe16(data, 4);
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+    chip::Testing::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1808,7 +1815,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadLongOctetString)
     // NOTE: This is a pascal string, so actual data is "test"
     //       the longer encoding is to make it clear we do not encode the overflow
     const char data[] = "\x04testing here with overflow";
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+    chip::Testing::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1846,7 +1853,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadShortString)
     //       the longer encoding is to make it clear we do not encode the overflow
     char data[] = "\0abcdef...this is the alphabet";
     *data       = 5;
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+    chip::Testing::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1882,7 +1889,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadLongString)
     //       the longer encoding is to make it clear we do not encode the overflow
     char data[] = "\0\0abcdef...this is the alphabet";
     WriteLe16(data, 5);
-    chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
+    chip::Testing::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
     // Actual read via an encoder
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -2175,7 +2182,7 @@ TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceTakesPrecedenceOverServ
     TestServerClusterContext testContext;
 
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
+    CodegenDataModelProvider model;
 
     model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
     ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
@@ -2219,7 +2226,7 @@ TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceTakesPrecedenceOverServ
         ASSERT_TRUE(model.WriteAttribute(test.GetRequest(), decoder).IsSuccess());
     }
 
-    model.Registry().Unregister(&fakeClusterServer);
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
 }
 
 TEST_F(TestCodegenModelViaMocks, AAISkippedIfNoEmberMetadata)
@@ -2229,7 +2236,7 @@ TEST_F(TestCodegenModelViaMocks, AAISkippedIfNoEmberMetadata)
     TestServerClusterContext testContext;
 
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
+    CodegenDataModelProvider model;
 
     model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
     ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
@@ -2261,7 +2268,7 @@ TEST_F(TestCodegenModelViaMocks, AAISkippedIfNoEmberMetadata)
         ASSERT_TRUE(model.WriteAttribute(test.GetRequest(), decoder).IsSuccess());
     }
 
-    model.Registry().Unregister(&fakeClusterServer);
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
 }
 
 TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
@@ -2555,16 +2562,16 @@ TEST_F(TestCodegenModelViaMocks, EmberWriteFailure)
 
     {
         AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-        chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Failure);
+        chip::Testing::SetEmberReadOutput(Protocols::InteractionModel::Status::Failure);
         ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::Failure);
     }
     {
         AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-        chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Busy);
+        chip::Testing::SetEmberReadOutput(Protocols::InteractionModel::Status::Busy);
         ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::Busy);
     }
     // reset things to success to not affect other tests
-    chip::Test::SetEmberReadOutput(ByteSpan());
+    chip::Testing::SetEmberReadOutput(ByteSpan());
 }
 
 TEST_F(TestCodegenModelViaMocks, EmberWriteAttributeAccessInterfaceTest)
@@ -2620,30 +2627,30 @@ TEST_F(TestCodegenModelViaMocks, EmberInvokeTest)
 
     {
         const ConcreteCommandPath kCommandPath(kMockEndpoint1, MockClusterId(1), kMockCommandId1);
-        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        InvokeRequest kInvokeRequest(kCommandPath, chip::Testing::kAdminSubjectDescriptor);
         chip::TLV::TLVReader tlvReader;
 
-        const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
+        const uint32_t kDispatchCountPre = chip::Testing::DispatchCount();
 
         // Using a handler set to nullptr as it is not used by the impl
         ASSERT_EQ(model.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
 
-        EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // single dispatch
-        EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
+        EXPECT_EQ(chip::Testing::DispatchCount(), kDispatchCountPre + 1); // single dispatch
+        EXPECT_EQ(chip::Testing::GetLastDispatchPath(), kCommandPath);    // for the right path
     }
 
     {
         const ConcreteCommandPath kCommandPath(kMockEndpoint1, MockClusterId(1), kMockCommandId2);
-        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        InvokeRequest kInvokeRequest(kCommandPath, chip::Testing::kAdminSubjectDescriptor);
         chip::TLV::TLVReader tlvReader;
 
-        const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
+        const uint32_t kDispatchCountPre = chip::Testing::DispatchCount();
 
         // Using a handler set to nullpotr as it is not used by the impl
         ASSERT_EQ(model.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
 
-        EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // single dispatch
-        EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
+        EXPECT_EQ(chip::Testing::DispatchCount(), kDispatchCountPre + 1); // single dispatch
+        EXPECT_EQ(chip::Testing::GetLastDispatchPath(), kCommandPath);    // for the right path
     }
 }
 
@@ -2742,7 +2749,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesWrite)
     TestServerClusterContext testContext;
 
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
+    CodegenDataModelProvider model;
 
     model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
     ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
@@ -2776,7 +2783,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesWrite)
         ASSERT_TRUE(result.has_value() && result->IsSuccess());
     }
 
-    model.Registry().Unregister(&fakeClusterServer);
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRead)
@@ -2784,7 +2791,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRead)
     TestServerClusterContext testContext;
 
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
+    CodegenDataModelProvider model;
 
     model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
     ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
@@ -2804,7 +2811,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRead)
                   CHIP_NO_ERROR);
     }
 
-    model.Registry().Unregister(&fakeClusterServer);
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
@@ -2812,7 +2819,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
     TestServerClusterContext testContext;
 
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
+    CodegenDataModelProvider model;
 
     model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
     ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
@@ -2871,7 +2878,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
     // so we can see the right method is called.
     {
         const ConcreteCommandPath kCommandPath(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kMockCommandId1);
-        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        InvokeRequest kInvokeRequest(kCommandPath, chip::Testing::kAdminSubjectDescriptor);
         chip::TLV::TLVReader tlvReader;
 
         // Using a handler set to nullptr as it is not used by the impl
@@ -2890,7 +2897,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
         ASSERT_TRUE(result.has_value() && result->GetUnderlyingError() == CHIP_ERROR_INCORRECT_STATE);
     }
 
-    model.Registry().Unregister(&fakeClusterServer);
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
 }
 
 TEST_F(TestCodegenModelViaMocks, EventInfo)
@@ -2924,7 +2931,7 @@ TEST_F(TestCodegenModelViaMocks, EventInfo)
     ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(1), kTestEventId }, entry), CHIP_NO_ERROR);
     ASSERT_EQ(entry.readPrivilege, Access::Privilege::kAdminister);
 
-    model.Registry().Unregister(&fakeClusterServer);
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
 
     // once unregistered, go back to the default
     ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), kTestEventId }, entry), CHIP_NO_ERROR);
@@ -2936,7 +2943,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
     TestServerClusterContext testContext;
 
     UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
+    CodegenDataModelProvider model;
 
     model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
     ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
@@ -3008,21 +3015,26 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
     }
     EXPECT_TRUE(updatedClusterFound);
 
-    model.Registry().Unregister(&fakeClusterServer);
-    model.Shutdown();
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
+    EXPECT_SUCCESS(model.Shutdown());
 }
+
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 TEST_F(TestCodegenModelViaMocks, EndpointUniqueID)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
 
-    // Mock endpoint 1 has a unique ID
     char buffer[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
     MutableCharSpan span(buffer);
-    // Mock endpoint 4 has a unique ID
-    // ASSERT_TRUE(builder.IsEmpty()); // ownership taken above, we start fresh
+
+    // Mock endpoint 4 has a unique ID that is long (actually max size)
     ASSERT_EQ(model.EndpointUniqueID(kMockEndpoint4, span), CHIP_NO_ERROR);
     EXPECT_TRUE(span.data_equal("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"_span));
+
+    // Mock endpoint 2 has a shorter span. This tests truncation
+    MutableCharSpan span2(buffer);
+    ASSERT_EQ(model.EndpointUniqueID(kMockEndpoint2, span2), CHIP_NO_ERROR);
+    EXPECT_TRUE(span2.data_equal("shortUniqueId"_span));
 }
 #endif

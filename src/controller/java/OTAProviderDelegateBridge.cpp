@@ -200,7 +200,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
 
     if (hardwareVersion.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
             "java/lang/Integer", "(I)V", static_cast<jint>(hardwareVersion.Value()), boxedHardwareVersion);
     }
 
@@ -211,7 +211,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
 
     if (requestorCanConsent.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
+        TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
             "java/lang/Boolean", "(Z)V", requestorCanConsent.Value() ? JNI_TRUE : JNI_FALSE, boxedRequestorCanConsent);
     }
 

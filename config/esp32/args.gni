@@ -26,7 +26,6 @@ lwip_platform = "external"
 
 #Enabling this causes some error
 #chip_inet_config_enable_tun_endpoint = false
-chip_inet_config_enable_tcp_endpoint = false
 chip_inet_config_enable_udp_endpoint = true
 
 chip_config_memory_management = "platform"

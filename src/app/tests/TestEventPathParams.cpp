@@ -21,7 +21,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
 
-using namespace chip::Test;
+using namespace chip::Testing;
 
 namespace chip {
 namespace app {

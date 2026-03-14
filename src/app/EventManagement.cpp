@@ -326,7 +326,8 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     // Revisit FabricRemovedCB function should the encoding of fabricIndex change in the future.
     if (apOptions->mFabricIndex != kUndefinedFabricIndex)
     {
-        apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag), apOptions->mFabricIndex);
+        TEMPORARY_RETURN_IGNORED apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag),
+                                                        apOptions->mFabricIndex);
     }
     ReturnErrorOnFailure(eventDataIBBuilder.EndOfEventDataIB());
     ReturnErrorOnFailure(eventReportBuilder.EndOfEventReportIB());
@@ -342,8 +343,9 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
                                             System::Clock::Milliseconds64 aMonotonicStartupTime)
 {
 
-    sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources, apEventNumberCounter,
-                   aMonotonicStartupTime, &InteractionModelEngine::GetInstance()->GetReportingEngine());
+    TEMPORARY_RETURN_IGNORED sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources,
+                                            apEventNumberCounter, aMonotonicStartupTime,
+                                            &InteractionModelEngine::GetInstance()->GetReportingEngine());
 }
 
 /**
@@ -873,6 +875,11 @@ void EventManagement::ScheduleUrgentEventDeliverySync(std::optional<FabricIndex>
     mpEventReporter->ScheduleUrgentEventDeliverySync(FromStdOptional(fabricIndex));
 }
 
+System::Clock::Milliseconds64 EventManagement::GetMonotonicStartupTime() const
+{
+    return mMonotonicStartupTime;
+}
+
 void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,
                                CircularEventBuffer * apNext, PriorityLevel aPriorityLevel)
 {
@@ -905,7 +912,7 @@ void CircularEventReader::Init(CircularEventBufferWrapper * apBufWrapper)
     if (apBufWrapper->mpCurrent == nullptr)
         return;
 
-    TLVReader::Init(*apBufWrapper, apBufWrapper->mpCurrent->DataLength());
+    TEMPORARY_RETURN_IGNORED TLVReader::Init(*apBufWrapper, apBufWrapper->mpCurrent->DataLength());
     mMaxLen = apBufWrapper->mpCurrent->DataLength();
     for (prev = apBufWrapper->mpCurrent->GetPreviousCircularEventBuffer(); prev != nullptr;
          prev = prev->GetPreviousCircularEventBuffer())
@@ -919,7 +926,7 @@ void CircularEventReader::Init(CircularEventBufferWrapper * apBufWrapper)
 CHIP_ERROR CircularEventBufferWrapper::GetNextBuffer(TLVReader & aReader, const uint8_t *& aBufStart, uint32_t & aBufLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    mpCurrent->GetNextBuffer(aReader, aBufStart, aBufLen);
+    TEMPORARY_RETURN_IGNORED mpCurrent->GetNextBuffer(aReader, aBufStart, aBufLen);
     SuccessOrExit(err);
 
     if ((aBufLen == 0) && (mpCurrent->GetPreviousCircularEventBuffer() != nullptr))

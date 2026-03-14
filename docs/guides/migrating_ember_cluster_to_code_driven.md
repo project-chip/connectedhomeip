@@ -19,16 +19,44 @@ smaller pull requests. This approach significantly simplifies the review
 process, allowing reviewers to approve preliminary changes quickly. We recommend
 the following sequence of PRs:
 
--   [ ] **PR 1: File Renames Only.**
+-   [ ] **PR 1: File Renames and Moves Only.**
 
     -   If your migration involves renaming files, submit a PR containing _only_
-        the renames. A typical rename is from `<name>-server.cpp` to
-        `<Name>Cluster.cpp`.
-    -   **Note:** For backward compatibility with code generation, it is often
-        best to **not** rename the header file.
+        the renames and file moves. This helps to isolate structural changes
+        from logic changes, making the review process easier.
+
+    -   **`.cpp` file rename:**
+
+        -   Rename `<name>-server.cpp` to `<Name>Cluster.cpp`. This is often a
+            good starting point as much of the implementation can be reused.
+            Renaming allows `git diff` to track changes more effectively than a
+            delete/add operation.
+
+    -   **`.h` file renames and refactoring:**
+
+        -   The legacy header (`<name>-server.h`) often contains a mix of legacy
+            API functions, delegate classes, and other definitions. To maintain
+            backward compatibility while moving to a code-driven model, we
+            recommend the following:
+        -   Create a new `CodegenIntegration.h` header and move the
+            implementation portions of `<name>-server.h` into it. This new file
+            will be responsible for maintaining the legacy API integration logic
+            that interacts with the generated code.
+        -   If `<name>-server.h` contains delegate classes or other distinct
+            components (e.g., `class FooDelegate`), move them into their own
+            header files (e.g., `FooDelegate.h`). A good rule of thumb is that
+            `class Bar` should live in `Bar.h`.
+        -   After moving the implementation out of `<name>-server.h`, update
+            `<name>-server.h` itself to be a wrapper that simply includes the
+            new headers (`CodegenIntegration.h`, `FooDelegate.h`, etc.). This
+            preserves the include paths for existing code while allowing the
+            implementation to evolve.
+
     -   **Why:** This prevents `git diff` from becoming confused and showing the
         entire file as deleted and recreated, making the actual code changes
-        impossible to review.
+        impossible to review. Separating file moves from logic changes is a
+        critical step for an efficient code review.
+
     -   _This type of PR can be reviewed and merged very quickly._
 
 -   [ ] **PR 2: Code Movement Only.**
@@ -147,6 +175,7 @@ project's Slack channel.
             commands.
 
 -   [ ] **2.4: Implement Event Logic:**
+
     -   [ ] Replace any calls to `LogEvent` with
             `mContext->interactionContext.eventsGenerator.GenerateEvent` to make
             events unit-testable.
@@ -174,7 +203,8 @@ project's Slack channel.
 
 -   [ ] **3.3: Update ZAP Configuration:**
     -   [ ] In `src/app/common/templates/config-data.yaml`, add the cluster to
-            the `CommandHandlerInterfaceOnlyClusters` array.
+            the `CodeDrivenClusters` array and remove it from
+            `CommandHandlerInterfaceOnlyClusters` if it exists there.
     -   [ ] In `src/app/zap-templates/zcl/zcl.json` and
             `zcl-with-test-extensions.json`, add all non-list attributes to the
             `attributeAccessInterfaceAttributes` list.
@@ -197,3 +227,20 @@ project's Slack channel.
             `all-clusters-app`).
     -   [ ] Manually validate the cluster's functionality using `chip-tool` or
             `matter-repl`.
+
+## Improvements to Consider
+
+Cluster migrations are often not a full re-write of the code but rather the
+minimum necessary to make the code testable and decoupled from Ember/ZAP.
+Therefore, the suggestions in this section are optional.
+
+### Remove Build Time Switches
+
+Some legacy cluster implementations contain build time switches (`#ifdef`)
+throughout the code. This is undesirable because it makes it difficult to change
+the behavior of an application in runtime.
+
+When possible, avoid copying this pattern and think of new ways the same thing
+could be achieved. For example, use configuration injected via constructor or
+implement separate sub classes if code size increase is a concern and the build
+time options cause a significant difference in the cluster behavior.

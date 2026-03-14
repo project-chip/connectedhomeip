@@ -87,14 +87,12 @@ class TLVList:
         def as_rich_repr_tuple(self):
             if self.tag is None:
                 return "Anonymous", repr(self.value)
-            else:
-                return str(self.tag), repr(self.value)
+            return str(self.tag), repr(self.value)
 
         def __repr__(self):
             if self.tag is None:
                 return "Anonymous: " + repr(self.value)
-            else:
-                return str(self.tag) + ": " + repr(self.value)
+            return str(self.tag) + ": " + repr(self.value)
 
         def __rich_repr__(self):
             yield self.as_rich_repr_tuple()
@@ -146,10 +144,10 @@ class TLVList:
             tag, index = access.start, access.stop
             if tag == TLVList.IndexMethod.Tag:
                 return self._get_item_by_tag(index)
-            elif tag == TLVList.IndexMethod.Index:
+            if tag == TLVList.IndexMethod.Index:
                 return self._data[index].as_tuple()
             raise ValueError("Method should be TLVList.IndexMethod.Tag or TLVList.IndexMethod.Index")
-        elif isinstance(access, int):
+        if isinstance(access, int):
             return self._get_item_by_tag(access)
         raise ValueError("Invalid access method")
 

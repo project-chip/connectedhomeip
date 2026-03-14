@@ -27,12 +27,16 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
   val connectionID: UInt,
   val triggerType: UInt,
   val activationReason: Optional<UInt>,
+  val containerType: UInt,
+  val CMAFSessionNumber: Optional<ULong>,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterPushTransportBeginEvent {\n")
     append("\tconnectionID : $connectionID\n")
     append("\ttriggerType : $triggerType\n")
     append("\tactivationReason : $activationReason\n")
+    append("\tcontainerType : $containerType\n")
+    append("\tCMAFSessionNumber : $CMAFSessionNumber\n")
     append("}\n")
   }
 
@@ -45,6 +49,11 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
         val optactivationReason = activationReason.get()
         put(ContextSpecificTag(TAG_ACTIVATION_REASON), optactivationReason)
       }
+      put(ContextSpecificTag(TAG_CONTAINER_TYPE), containerType)
+      if (CMAFSessionNumber.isPresent) {
+        val optCMAFSessionNumber = CMAFSessionNumber.get()
+        put(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER), optCMAFSessionNumber)
+      }
       endStructure()
     }
   }
@@ -53,6 +62,8 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
     private const val TAG_CONNECTION_ID = 0
     private const val TAG_TRIGGER_TYPE = 1
     private const val TAG_ACTIVATION_REASON = 2
+    private const val TAG_CONTAINER_TYPE = 3
+    private const val TAG_CMAF_SESSION_NUMBER = 4
 
     fun fromTlv(
       tlvTag: Tag,
@@ -67,6 +78,13 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
         } else {
           Optional.empty()
         }
+      val containerType = tlvReader.getUInt(ContextSpecificTag(TAG_CONTAINER_TYPE))
+      val CMAFSessionNumber =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CMAF_SESSION_NUMBER)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
@@ -74,6 +92,8 @@ class PushAvStreamTransportClusterPushTransportBeginEvent(
         connectionID,
         triggerType,
         activationReason,
+        containerType,
+        CMAFSessionNumber,
       )
     }
   }

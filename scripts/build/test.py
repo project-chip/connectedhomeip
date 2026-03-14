@@ -25,7 +25,7 @@ SCRIPT_ROOT = os.path.dirname(__file__)
 
 
 def build_expected_output(source: str, root: str, out: str) -> List[str]:
-    with open(os.path.join(SCRIPT_ROOT, source), 'rt') as f:
+    with open(os.path.join(SCRIPT_ROOT, source)) as f:
         for line in f.readlines():
             yield line.replace("{root}", root).replace("{out}", out)
 

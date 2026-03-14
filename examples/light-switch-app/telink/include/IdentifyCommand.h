@@ -56,17 +56,17 @@ void ProcessIdentifyUnicastBindingRead(BindingCommandData * data, const Binding:
     switch (data->attributeId)
     {
     case Clusters::Identify::Attributes::AttributeList::Id:
-        Controller::ReadAttribute<Clusters::Identify::Attributes::AttributeList::TypeInfo>(
+        TEMPORARY_RETURN_IGNORED Controller::ReadAttribute<Clusters::Identify::Attributes::AttributeList::TypeInfo>(
             peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Identify::Attributes::IdentifyTime::Id:
-        Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(
+        TEMPORARY_RETURN_IGNORED Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(
             peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
 
     case Clusters::Identify::Attributes::IdentifyType::Id:
-        Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyType::TypeInfo>(
+        TEMPORARY_RETURN_IGNORED Controller::ReadAttribute<Clusters::Identify::Attributes::IdentifyType::TypeInfo>(
             peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote, onSuccess, onFailure);
         break;
     }
@@ -92,15 +92,17 @@ void ProcessIdentifyUnicastBindingCommand(BindingCommandData * data, const Bindi
     {
     case Clusters::Identify::Commands::Identify::Id:
         identifyCommand.identifyTime = static_cast<uint16_t>(data->args[0]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         identifyCommand, onSuccess, onFailure);
+        TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                                  peer_device->GetSecureSession().Value(), binding.remote,
+                                                                  identifyCommand, onSuccess, onFailure);
         break;
 
     case Clusters::Identify::Commands::TriggerEffect::Id:
         triggerEffectCommand.effectIdentifier = static_cast<Clusters::Identify::EffectIdentifierEnum>(data->args[0]);
         triggerEffectCommand.effectVariant    = static_cast<Clusters::Identify::EffectVariantEnum>(data->args[1]);
-        Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
-                                         triggerEffectCommand, onSuccess, onFailure);
+        TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                                  peer_device->GetSecureSession().Value(), binding.remote,
+                                                                  triggerEffectCommand, onSuccess, onFailure);
         break;
     }
 }
@@ -116,13 +118,15 @@ void ProcessIdentifyGroupBindingCommand(BindingCommandData * data, const Binding
     {
     case Clusters::Identify::Commands::Identify::Id:
         identifyCommand.identifyTime = static_cast<uint16_t>(data->args[0]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, identifyCommand);
+        TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                       identifyCommand);
         break;
 
     case Clusters::Identify::Commands::TriggerEffect::Id:
         triggerEffectCommand.effectIdentifier = static_cast<Clusters::Identify::EffectIdentifierEnum>(data->args[0]);
         triggerEffectCommand.effectVariant    = static_cast<Clusters::Identify::EffectVariantEnum>(data->args[1]);
-        Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, triggerEffectCommand);
+        TEMPORARY_RETURN_IGNORED Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId,
+                                                                       triggerEffectCommand);
         break;
     }
 }
@@ -155,7 +159,7 @@ CHIP_ERROR IdentifyCommandHandler(int argc, char ** argv)
     data->clusterId           = Clusters::Identify::Id;
     data->args[0]             = atoi(argv[0]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
 
@@ -167,7 +171,7 @@ CHIP_ERROR TriggerEffectSwitchCommandHandler(int argc, char ** argv)
     data->args[0]             = atoi(argv[0]);
     data->args[1]             = atoi(argv[1]);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
 
@@ -198,7 +202,7 @@ CHIP_ERROR IdentifyReadAttributeList(int argc, char ** argv)
     data->clusterId           = Clusters::Identify::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
 
@@ -209,7 +213,7 @@ CHIP_ERROR IdentifyReadIdentifyTime(int argc, char ** argv)
     data->clusterId           = Clusters::Identify::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
 
@@ -220,7 +224,7 @@ CHIP_ERROR IdentifyReadIdentifyType(int argc, char ** argv)
     data->clusterId           = Clusters::Identify::Id;
     data->isReadAttribute     = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
 
@@ -252,7 +256,7 @@ CHIP_ERROR GroupIdentifyCommandHandler(int argc, char ** argv)
     data->args[0]             = atoi(argv[0]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
 
@@ -265,7 +269,7 @@ CHIP_ERROR GroupTriggerEffectSwitchCommandHandler(int argc, char ** argv)
     data->args[1]             = atoi(argv[1]);
     data->isGroup             = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     return CHIP_NO_ERROR;
 }
 #endif // CONFIG_CHIP_LIB_SHELL

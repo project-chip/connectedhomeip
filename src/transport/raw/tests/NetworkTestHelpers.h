@@ -31,7 +31,7 @@
 #include <queue>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 class IOContext
 {
@@ -200,5 +200,5 @@ public:
     LoopbackTransportDelegate * mDelegate      = nullptr;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

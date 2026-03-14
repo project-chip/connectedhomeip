@@ -78,10 +78,7 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 
 CHIP_ERROR BLEManagerImpl::_Init()
 {
-    CHIP_ERROR err;
-
-    err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer()));
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART && !mIsCentral);
@@ -89,10 +86,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     memset(mDeviceName, 0, sizeof(mDeviceName));
 
-    DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
-
-exit:
-    return err;
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 }
 
 void BLEManagerImpl::_Shutdown()
@@ -112,16 +106,12 @@ void BLEManagerImpl::_Shutdown()
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
         mFlags.Set(Flags::kAdvertisingEnabled, val);
     }
 
-    DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
-
-    return err;
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
@@ -138,8 +128,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
-    DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
-    return CHIP_NO_ERROR;
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 }
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
@@ -155,27 +144,24 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     if (deviceName != nullptr && deviceName[0] != 0)
     {
-        VerifyOrExit(strlen(deviceName) < kMaxDeviceNameLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(strlen(deviceName) < kMaxDeviceNameLength, CHIP_ERROR_INVALID_ARGUMENT);
         strcpy(mDeviceName, deviceName);
         mFlags.Set(Flags::kUseCustomDeviceName);
     }
     else
     {
         uint16_t discriminator;
-        SuccessOrExit(err = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
+        ReturnErrorOnFailure(GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator));
         snprintf(mDeviceName, sizeof(mDeviceName), "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
         mDeviceName[kMaxDeviceNameLength] = 0;
         mFlags.Clear(Flags::kUseCustomDeviceName);
     }
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 uint16_t BLEManagerImpl::_NumConnections()
@@ -668,7 +654,7 @@ void BLEManagerImpl::HandleAdvertisingTimer(chip::System::Layer *, void * appSta
     if (self->mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
-        self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+        TEMPORARY_RETURN_IGNORED self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
 #if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
         self->mFlags.Clear(Flags::kExtAdvertisingEnabled);
         DeviceLayer::SystemLayer().StartTimer(kSlowAdvertiseTimeout, HandleAdvertisingTimer, self);
@@ -711,7 +697,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     err = DeviceLayer::SystemLayer().StartTimer(kNewConnectionScanTimeout, HandleScanTimer, this);
     VerifyOrExit(err == CHIP_NO_ERROR, {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-        mDeviceScanner.StopScan();
+        TEMPORARY_RETURN_IGNORED mDeviceScanner.StopScan();
         ChipLogError(Ble, "Failed to start BLE scan timeout: %" CHIP_ERROR_FORMAT, err.Format());
     });
 
@@ -726,7 +712,7 @@ void BLEManagerImpl::HandleScanTimer(chip::System::Layer *, void * appState)
 {
     auto * manager = static_cast<BLEManagerImpl *>(appState);
     manager->OnScanError(CHIP_ERROR_TIMEOUT);
-    manager->mDeviceScanner.StopScan();
+    TEMPORARY_RETURN_IGNORED manager->mDeviceScanner.StopScan();
 }
 
 void BLEManagerImpl::CleanScanConfig()
@@ -751,7 +737,8 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
     mBLEScanConfig.mAppState      = appState;
 
     // Scan initiation performed async, to ensure that the BLE subsystem is initialized.
-    DeviceLayer::SystemLayer().ScheduleLambda([this] { InitiateScan(BleScanState::kScanForDiscriminator); });
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda(
+        [this] { InitiateScan(BleScanState::kScanForDiscriminator); });
 }
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()
@@ -762,7 +749,7 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
     else if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
     {
         DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
-        mDeviceScanner.StopScan();
+        return mDeviceScanner.StopScan();
     }
     return CHIP_NO_ERROR;
 }
@@ -865,13 +852,12 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
     // StopScan should also be performed in the ChipStack thread.
     // At the same time, the scan timer also needs to be canceled in the ChipStack thread.
     DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
-    mDeviceScanner.StopScan();
+    TEMPORARY_RETURN_IGNORED mDeviceScanner.StopScan();
     // Stop scanning and then start connecting timer
-    DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimer, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimer, this);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    CHIP_ERROR err = mEndpoint.ConnectDevice(device);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Ble, "Device connection failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    ReturnAndLogOnFailure(mEndpoint.ConnectDevice(device), Ble, "Device connection failed");
 
     ChipLogProgress(Ble, "New device connected: %s", address);
 }

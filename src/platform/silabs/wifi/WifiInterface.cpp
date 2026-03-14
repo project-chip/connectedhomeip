@@ -27,6 +27,7 @@
 
 using namespace chip;
 using namespace chip::DeviceLayer;
+using namespace chip::DeviceLayer::Internal;
 
 // TODO: We shouldn't need to have access to a global variable in the interface here
 extern WfxRsi_t wfx_rsi;
@@ -102,7 +103,7 @@ void WifiInterface::NotifyConnection(const MacAddress & ap)
     sl_wfx_connect_ind_t evt = {};
     evt.header.id            = to_underlying(WifiEvent::kConnect);
     evt.header.length        = sizeof evt;
-#ifdef RS911X_WIFI
+#ifdef SL_MATTER_SIWX_WIFI_ENABLE
     evt.body.channel = wfx_rsi.ap_chan;
 #endif
     std::copy(ap.begin(), ap.end(), evt.body.mac);
@@ -134,15 +135,15 @@ void WifiInterface::NotifyWifiTaskInitialized(void)
     evt.header.length = sizeof evt;
     evt.body.status   = 0;
 
-    // TODO : Remove workwound when sl_wfx_startup_ind_t is unified
+    // TODO : Remove workaround when sl_wfx_startup_ind_t is unified
     //        Issue is same structure name but different contents
 #if WF200_WIFI
-    MutableByteSpan macSpan(evt.body.mac_addr[SL_WFX_STA_INTERFACE], kWifiMacAddressLength);
+    MutableByteSpan macSpan(evt.body.mac_addr[SL_WFX_STA_INTERFACE], kWiFiMacAddressLength);
 #else
-    MutableByteSpan macSpan(evt.body.mac_addr, kWifiMacAddressLength);
+    MutableByteSpan macSpan(evt.body.mac_addr, kWiFiMacAddressLength);
 #endif // WF200_WIFI
 
-    GetMacAddress(SL_WFX_STA_INTERFACE, macSpan);
+    TEMPORARY_RETURN_IGNORED GetMacAddress(SL_WFX_STA_INTERFACE, macSpan);
 
     HandleWFXSystemEvent((sl_wfx_generic_message_t *) &evt);
 }
@@ -166,13 +167,13 @@ void WifiInterface::ScheduleConnectionAttempt()
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         //  Remove High performance request before giving up due to a timer start error to save battery life
-        Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+        TEMPORARY_RETURN_IGNORED Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
         return;
     }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+    TEMPORARY_RETURN_IGNORED Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     ChipLogProgress(DeviceLayer, "ScheduleConnectionAttempt : Next attempt after %d Seconds", retryInterval);

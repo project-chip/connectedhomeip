@@ -302,6 +302,7 @@ public class ChipDeviceController {
   }
 
   /* This method was deprecated. Please use {@link ChipDeviceController.pairDeviceWithAddress(long, String, int, int, long, CommissionParameters)}. */
+  @Deprecated
   public void pairDeviceWithAddress(
       long deviceId,
       String address,
@@ -634,6 +635,10 @@ public class ChipDeviceController {
 
   public void unpairDeviceCallback(long deviceId, UnpairDeviceCallback callback) {
     unpairDeviceCallback(deviceControllerPtr, deviceId, callback);
+  }
+
+  public void continueCommissioningAfterConnectNetworkRequest(long remoteDeviceId) {
+    continueCommissioningAfterConnectNetworkRequest(deviceControllerPtr, remoteDeviceId);
   }
 
   /**
@@ -1717,6 +1722,9 @@ public class ChipDeviceController {
 
   private native void unpairDeviceCallback(
       long deviceControllerPtr, long deviceId, UnpairDeviceCallback callback);
+
+  private native void continueCommissioningAfterConnectNetworkRequest(
+      long deviceControllerPtr, long remoteDeviceId);
 
   private native void stopDevicePairing(long deviceControllerPtr, long deviceId);
 

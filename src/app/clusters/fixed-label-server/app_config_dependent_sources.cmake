@@ -23,6 +23,6 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/fixed-label-cluster.cpp"
-    "${CLUSTER_DIR}/fixed-label-cluster.h"
+    "${CLUSTER_DIR}/FixedLabelCluster.cpp"
+    "${CLUSTER_DIR}/FixedLabelCluster.h"
 )

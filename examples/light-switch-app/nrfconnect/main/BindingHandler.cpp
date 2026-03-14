@@ -33,7 +33,7 @@ void BindingHandler::Init()
 #ifdef CONFIG_CHIP_LIB_SHELL
     SwitchCommands::RegisterSwitchCommands();
 #endif
-    DeviceLayer::PlatformMgr().ScheduleWork(InitInternal);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(InitInternal);
 }
 
 void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERROR aError)
@@ -311,5 +311,6 @@ void BindingHandler::SwitchWorkerHandler(intptr_t aContext)
 
     BindingData * data = reinterpret_cast<BindingData *>(aContext);
     LOG_INF("Notify Bounded Cluster | endpoint: %d cluster: %d", data->EndpointId, data->ClusterId);
-    Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId, static_cast<void *>(data));
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId,
+                                                                                       static_cast<void *>(data));
 }
