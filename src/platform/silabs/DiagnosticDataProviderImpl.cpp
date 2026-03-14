@@ -335,15 +335,15 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 #if defined(SL_WIFI) && SL_WIFI
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
-    constexpr size_t bssIdSize = 6;
-    wfx_wifi_scan_result_t ap  = { 0 };
+    using namespace ::chip::DeviceLayer::Internal;
+    wfx_wifi_scan_result_t ap = { 0 };
 
-    VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(BssId.size() >= kWiFiBSSIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     if (Silabs::WifiInterface::GetInstance().GetAccessPointInfo(ap) == CHIP_NO_ERROR)
     {
-        memcpy(BssId.data(), ap.bssid, bssIdSize);
-        BssId.reduce_size(bssIdSize);
+        memcpy(BssId.data(), ap.bssid, kWiFiBSSIDLength);
+        BssId.reduce_size(kWiFiBSSIDLength);
         return CHIP_NO_ERROR;
     }
 
