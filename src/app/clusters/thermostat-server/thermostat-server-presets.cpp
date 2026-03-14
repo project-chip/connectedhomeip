@@ -302,10 +302,38 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
         return Status::InvalidInState;
     }
 
-    // If the preset handle passed in the command is not present in the Presets attribute, return INVALID_COMMAND.
-    if (!presetHandle.IsNull() && !IsPresetHandlePresentInPresets(delegate, presetHandle.Value()))
+    if (!presetHandle.IsNull())
     {
-        return Status::InvalidCommand;
+        PresetStructWithOwnedMembers matchingPreset;
+        // Look up the preset once and reuse it to apply any setpoints it carries.
+        if (!GetMatchingPresetInPresets(delegate, presetHandle, matchingPreset))
+        {
+            return Status::InvalidCommand;
+        }
+
+        Optional<int16_t> coolingSetpointValue = matchingPreset.GetCoolingSetpoint();
+        if (coolingSetpointValue.HasValue())
+        {
+            Status status =
+                OccupiedCoolingSetpoint::Set(endpoint, EnforceCoolingSetpointLimits(coolingSetpointValue.Value(), endpoint));
+            if (status != Status::Success)
+            {
+                ChipLogError(Zcl, "Failed to set OccupiedCoolingSetpoint with status %u", to_underlying(status));
+                return status;
+            }
+        }
+
+        Optional<int16_t> heatingSetpointValue = matchingPreset.GetHeatingSetpoint();
+        if (heatingSetpointValue.HasValue())
+        {
+            Status status =
+                OccupiedHeatingSetpoint::Set(endpoint, EnforceHeatingSetpointLimits(heatingSetpointValue.Value(), endpoint));
+            if (status != Status::Success)
+            {
+                ChipLogError(Zcl, "Failed to set OccupiedHeatingSetpoint with status %u", to_underlying(status));
+                return status;
+            }
+        }
     }
 
     CHIP_ERROR err = delegate->SetActivePresetHandle(presetHandle);
