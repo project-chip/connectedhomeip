@@ -130,6 +130,7 @@ public:
                 return ::pw::OkStatus();
             }
             }
+            break;
 #endif // MATTER_DM_TEMPERATURE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #if MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         case ValveConfigurationAndControl::Id:
@@ -152,6 +153,7 @@ public:
                 ChipLogProgress(Zcl, "[Pw] Successfully set current level to " ChipLogFormatMEI ".", ChipLogValueMEI(level));
                 return ::pw::OkStatus();
             }
+            break;
 #endif // MATTER_DM_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #if MATTER_DM_ILLUMINANCE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         case IlluminanceMeasurement::Id:
@@ -222,6 +224,7 @@ public:
                 return ::pw::OkStatus();
             }
             }
+            break;
 #endif // MATTER_DM_ILLUMINANCE_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #if MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         case OccupancySensing::Id:
@@ -248,6 +251,7 @@ public:
                 return ::pw::OkStatus();
             }
             }
+            break;
 #endif // MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT > 0
         }
         return std::nullopt;
