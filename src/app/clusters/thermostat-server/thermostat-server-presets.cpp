@@ -309,7 +309,7 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
     {
         PresetStructWithOwnedMembers matchingPreset;
         // Look up the preset once and reuse it to apply any setpoints it carries.
-        bool found         = false;
+        bool found           = false;
         CHIP_ERROR lookupErr = GetMatchingPresetInPresets(delegate, presetHandle.Value(), matchingPreset, found);
         if (lookupErr != CHIP_NO_ERROR)
         {
@@ -324,9 +324,9 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
         if (coolingSetpointValue.HasValue())
         {
             int16_t constrainedCoolingSetpoint = EnforceCoolingSetpointLimits(coolingSetpointValue.Value(), endpoint);
-            Status status = emAfWriteAttributeExternal(ConcreteAttributePath(endpoint, Thermostat::Id, OccupiedCoolingSetpoint::Id),
-                                                       EmberAfWriteDataInput(reinterpret_cast<uint8_t *>(&constrainedCoolingSetpoint),
-                                                                             ZCL_INT16S_ATTRIBUTE_TYPE));
+            Status status                      = emAfWriteAttributeExternal(
+                ConcreteAttributePath(endpoint, Thermostat::Id, OccupiedCoolingSetpoint::Id),
+                EmberAfWriteDataInput(reinterpret_cast<uint8_t *>(&constrainedCoolingSetpoint), ZCL_INT16S_ATTRIBUTE_TYPE));
             if (status != Status::Success)
             {
                 ChipLogError(Zcl, "Failed to set OccupiedCoolingSetpoint with status %u", to_underlying(status));
@@ -338,9 +338,9 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
         if (heatingSetpointValue.HasValue())
         {
             int16_t constrainedHeatingSetpoint = EnforceHeatingSetpointLimits(heatingSetpointValue.Value(), endpoint);
-            Status status = emAfWriteAttributeExternal(ConcreteAttributePath(endpoint, Thermostat::Id, OccupiedHeatingSetpoint::Id),
-                                                       EmberAfWriteDataInput(reinterpret_cast<uint8_t *>(&constrainedHeatingSetpoint),
-                                                                             ZCL_INT16S_ATTRIBUTE_TYPE));
+            Status status                      = emAfWriteAttributeExternal(
+                ConcreteAttributePath(endpoint, Thermostat::Id, OccupiedHeatingSetpoint::Id),
+                EmberAfWriteDataInput(reinterpret_cast<uint8_t *>(&constrainedHeatingSetpoint), ZCL_INT16S_ATTRIBUTE_TYPE));
             if (status != Status::Success)
             {
                 ChipLogError(Zcl, "Failed to set OccupiedHeatingSetpoint with status %u", to_underlying(status));
@@ -382,7 +382,7 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
         // Per spec we need to check that:
         // (a) There is an existing non-pending preset with this handle.
         PresetStructWithOwnedMembers matchingPreset;
-        bool found         = false;
+        bool found           = false;
         CHIP_ERROR lookupErr = GetMatchingPresetInPresets(delegate, preset.GetPresetHandle().Value(), matchingPreset, found);
         if (lookupErr != CHIP_NO_ERROR)
         {
