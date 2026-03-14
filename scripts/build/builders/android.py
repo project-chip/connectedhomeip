@@ -124,10 +124,12 @@ class AndroidBuilder(Builder):
                  root,
                  runner,
                  board: AndroidBoard,
-                 app: AndroidApp):
+                 app: AndroidApp,
+                 optimize_size: bool = False):
         super(AndroidBuilder, self).__init__(root, runner)
         self.board = board
         self.app = app
+        self.optimize_size = optimize_size
 
     def _get_sdk_manager_paths(self):
         """Get list of possible SDK manager paths for Android SDK compatibility."""
@@ -354,6 +356,8 @@ class AndroidBuilder(Builder):
     def gradlewBuildExampleAndroid(self):
 
         # Example compilation
+        optimize_flag = "-PoptimizeApkSize=true" if self.optimize_size else "-PoptimizeApkSize=false"
+
         if self.app.Modules():
             for module in self.app.Modules():
                 self._Execute(
@@ -366,6 +370,7 @@ class AndroidBuilder(Builder):
                         "-PmatterBuildSrcDir=%s" % self.output_dir,
                         "-PmatterSdkSourceBuild=false",
                         "-PbuildDir=%s/%s" % (self.output_dir, module),
+                        optimize_flag,
                         ":%s:assembleDebug" % module,
                     ],
                     title="Building Example %s, module %s" % (
@@ -382,6 +387,7 @@ class AndroidBuilder(Builder):
                     "-PmatterBuildSrcDir=%s" % self.output_dir,
                     "-PmatterSdkSourceBuild=false",
                     "-PbuildDir=%s" % self.output_dir,
+                    optimize_flag,
                     "assembleDebug",
                 ],
                 title="Building Example " + self.identifier,
@@ -431,6 +437,11 @@ class AndroidBuilder(Builder):
 
             if exampleName == "chip-test":
                 gn_args["chip_build_tests"] = True
+            if self.optimize_size:
+                gn_args["optimize_apk_size"] = True
+                gn_args["is_debug"] = False
+                gn_args["matter_enable_tracing_support"] = False
+                gn_args["use_static_libcxx"] = True
             gn_args.update(self.app.AppGnArgs())
 
             args_str = ""
@@ -532,7 +543,12 @@ class AndroidBuilder(Builder):
                     self.root, "examples/", self.app.ExampleName(), "android/App/app/libs"
                 )
 
-                libs = ["libc++_shared.so", "libTvCastingApp.so"]
+                # When size-optimized with static libc++, libc++_shared.so is
+                # folded into libTvCastingApp.so and doesn't need to be shipped.
+                if self.optimize_size:
+                    libs = ["libTvCastingApp.so"]
+                else:
+                    libs = ["libc++_shared.so", "libTvCastingApp.so"]
 
                 jars = {
                     "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
@@ -611,7 +627,7 @@ class AndroidBuilder(Builder):
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
 
-            if self.options.build_profile in [BuildProfile.RELEASE, BuildProfile.RELEASE_SIZE]:
+            if self.options.build_profile in [BuildProfile.RELEASE, BuildProfile.RELEASE_SIZE] or self.optimize_size:
                 self.stripSymbols()
 
     def build_outputs(self):

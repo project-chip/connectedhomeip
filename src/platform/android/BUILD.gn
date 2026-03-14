@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
 
 import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
@@ -23,17 +24,20 @@ import("${chip_root}/build/chip/java/rules.gni")
 assert(chip_device_platform == "android")
 
 source_set("tracing") {
-  sources = [
-    "tracing.cpp",
-    "tracing.h",
-  ]
+  sources = [ "tracing.h" ]
 
-  deps = [
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/tracing",
-    "${chip_root}/src/tracing/perfetto:event_storage",
-    "${chip_root}/src/tracing/perfetto:simple_initialization",
-  ]
+  deps = [ "${chip_root}/src/lib/support" ]
+
+  if (matter_enable_tracing_support) {
+    sources += [ "tracing.cpp" ]
+    deps += [
+      "${chip_root}/src/tracing",
+      "${chip_root}/src/tracing/perfetto:event_storage",
+      "${chip_root}/src/tracing/perfetto:simple_initialization",
+    ]
+  } else {
+    sources += [ "tracing_noop.cpp" ]
+  }
 }
 
 static_library("logging") {
