@@ -123,12 +123,13 @@ bool MatchingPendingPresetExists(Delegate * delegate, const PresetStructWithOwne
  * @param[in] presetToMatch The preset to match with.
  * @param[out] matchingPreset The preset in the Presets attribute list that has the same PresetHandle as the presetToMatch.
  *
- * @return true if a matching entry was found in the  presets attribute list, false otherwise.
+ * @return CHIP_NO_ERROR if the lookup completed; otherwise an error code.
  */
-bool GetMatchingPresetInPresets(Delegate * delegate, const DataModel::Nullable<ByteSpan> & presetHandle,
-                                PresetStructWithOwnedMembers & matchingPreset)
+CHIP_ERROR GetMatchingPresetInPresets(Delegate * delegate, const ByteSpan & presetHandle,
+                                      PresetStructWithOwnedMembers & matchingPreset, bool & found)
 {
-    VerifyOrReturnValue(delegate != nullptr, false);
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    found = false;
 
     for (uint8_t i = 0; true; i++)
     {
@@ -141,16 +142,17 @@ bool GetMatchingPresetInPresets(Delegate * delegate, const DataModel::Nullable<B
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "GetMatchingPresetInPresets: GetPresetAtIndex failed with error %" CHIP_ERROR_FORMAT, err.Format());
-            return false;
+            return err;
         }
 
         // Note: presets coming from our delegate always have a handle.
-        if (presetHandle.Value().data_equal(matchingPreset.GetPresetHandle().Value()))
+        if (presetHandle.data_equal(matchingPreset.GetPresetHandle().Value()))
         {
-            return true;
+            found = true;
+            return CHIP_NO_ERROR;
         }
     }
-    return false;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -307,7 +309,13 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
     {
         PresetStructWithOwnedMembers matchingPreset;
         // Look up the preset once and reuse it to apply any setpoints it carries.
-        if (!GetMatchingPresetInPresets(delegate, presetHandle, matchingPreset))
+        bool found         = false;
+        CHIP_ERROR lookupErr = GetMatchingPresetInPresets(delegate, presetHandle.Value(), matchingPreset, found);
+        if (lookupErr != CHIP_NO_ERROR)
+        {
+            return Status::InvalidInState;
+        }
+        if (!found)
         {
             return Status::InvalidCommand;
         }
@@ -374,7 +382,13 @@ CHIP_ERROR ThermostatAttrAccess::AppendPendingPreset(Thermostat::Delegate * dele
         // Per spec we need to check that:
         // (a) There is an existing non-pending preset with this handle.
         PresetStructWithOwnedMembers matchingPreset;
-        if (!GetMatchingPresetInPresets(delegate, preset.GetPresetHandle().Value(), matchingPreset))
+        bool found         = false;
+        CHIP_ERROR lookupErr = GetMatchingPresetInPresets(delegate, preset.GetPresetHandle().Value(), matchingPreset, found);
+        if (lookupErr != CHIP_NO_ERROR)
+        {
+            return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+        }
+        if (!found)
         {
             return CHIP_IM_GLOBAL_STATUS(NotFound);
         }
