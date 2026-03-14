@@ -72,5 +72,5 @@ struct TwoDCartesianZoneStorage : TwoDCartesianZoneStruct
 
 } // namespace ZoneManagement
 } // namespace Clusters
-} // namespace app  
+} // namespace app
 } // namespace chip

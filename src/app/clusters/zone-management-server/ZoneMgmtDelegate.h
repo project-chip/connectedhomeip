@@ -36,7 +36,7 @@ class ZoneMgmtServer;
  *  Defines interfaces for implementing application-specific logic for various aspects of the ZoneManagement Cluster.
  *  Specifically, it defines interfaces for the command handling and loading of the allocated streams.
  */
-class ZoneMgmtDelegate 
+class ZoneMgmtDelegate
 {
 public:
     ZoneMgmtDelegate() = default;

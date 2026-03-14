@@ -59,6 +59,6 @@ struct ZoneInformationStorage : ZoneInformationStruct
 };
 
 } // namespace ZoneManagement
-} // namespace Clusters 
-} // namespace app  
+} // namespace Clusters
+} // namespace app
 } // namespace chip
