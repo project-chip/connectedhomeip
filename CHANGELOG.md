@@ -55,7 +55,7 @@ This represents the initial setup of the Matter SDK (formerly Project CHIP) repo
 - GitHub Actions for building examples, running tests, and code analysis
 
 ### Reference
-- Commit: 7cee904ce25de3cda41688c685b1c7e10f55ddd4
+- Commit: [7cee904ce25de3cda41688c685b1c7e10f55ddd4](https://github.com/Sum1cares/connectedhomeip/commit/7cee904ce25de3cda41688c685b1c7e10f55ddd4)
 - Date: November 2, 2025
 - Total files: 22,115
 - Matter Specification Version: 1.2.0
