@@ -26,8 +26,8 @@ namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
-using ZoneInformationStruct            = Structs::ZoneInformationStruct::Type;
-using ZoneTriggerControlStruct         = Structs::ZoneTriggerControlStruct::Type;
+using ZoneInformationStruct    = Structs::ZoneInformationStruct::Type;
+using ZoneTriggerControlStruct = Structs::ZoneTriggerControlStruct::Type;
 
 struct ZoneInformationStorage : ZoneInformationStruct
 {

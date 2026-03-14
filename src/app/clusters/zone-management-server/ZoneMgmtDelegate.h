@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app/clusters/zone-management-server/ZoneInformationStorage.h>
 #include <app/clusters/zone-management-server/TwoDCartesianZoneStorage.h>
+#include <app/clusters/zone-management-server/ZoneInformationStorage.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
 
