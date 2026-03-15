@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024-2026 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include <app/clusters/commissioner-control-server/CodegenIntegration.h>
+#include <cstdint>
+
+namespace chip {
+namespace Access {
+
+// AuxiliaryType should have only one value expressed.
+enum class AuxiliaryType : uint8_t
+{
+    kSystem    = 1 << 0,
+    kGroupcast = 1 << 1,
+};
+
+} // namespace Access
+} // namespace chip

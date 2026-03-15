@@ -15,7 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "commissioner-control-server.h"
+#include <app/clusters/commissioner-control-server/commissioner-control-server.h>
 
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -26,10 +26,9 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
+#include <memory>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
-
-#include <memory>
 
 using namespace chip;
 using namespace chip::app;

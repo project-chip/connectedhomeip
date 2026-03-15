@@ -80,13 +80,17 @@ public:
     CHIP_ERROR ReadUsedMcastAddrCount(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 
     Protocols::InteractionModel::Status JoinGroup(FabricIndex fabric_index,
-                                                  const Groupcast::Commands::JoinGroup::DecodableType & data);
-    Protocols::InteractionModel::Status
-    LeaveGroup(FabricIndex fabric_index, const Groupcast::Commands::LeaveGroup::DecodableType & data, EndpointList & endpoints);
+                                                  const Groupcast::Commands::JoinGroup::DecodableType & data,
+                                                  const chip::Access::SubjectDescriptor & subjectDescriptor);
+    Protocols::InteractionModel::Status LeaveGroup(FabricIndex fabric_index,
+                                                   const Groupcast::Commands::LeaveGroup::DecodableType & data,
+                                                   EndpointList & endpoints,
+                                                   const chip::Access::SubjectDescriptor & subjectDescriptor);
     Protocols::InteractionModel::Status UpdateGroupKey(FabricIndex fabric_index,
                                                        const Groupcast::Commands::UpdateGroupKey::DecodableType & data);
     Protocols::InteractionModel::Status
-    ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data);
+    ConfigureAuxiliaryACL(FabricIndex fabric_index, const Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & data,
+                          const chip::Access::SubjectDescriptor & subjectDescriptor);
 
     void SetDataModelProvider(DataModel::Provider & provider) { mDataModelProvider = &provider; }
     void ResetDataModelProvider() { mDataModelProvider = nullptr; }
@@ -94,28 +98,31 @@ public:
 private:
     void SetFabricUnderTest(FabricIndex fabricUnderTest);
     static void OnGroupcastTestingDone(System::Layer * aLayer, void * appState);
-    TimerDelegate & GetTimerDelegate() const { return mContext.timerDelegate; }
+    TimerDelegate & GetTimerDelegate() const { return mGroupcastContext.timerDelegate; }
 
     // GroupDataProvider::GroupListener implementation
     void OnGroupAdded(FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group) override;
     void OnGroupRemoved(FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override;
     void OnGroupModified(FabricIndex fabric_index, const GroupId & modified_group_id) override;
 
-    Credentials::GroupDataProvider & Provider() { return mContext.groupDataProvider; }
-    chip::FabricTable & Fabrics() { return mContext.fabricTable; }
+    Credentials::GroupDataProvider & Provider() { return mGroupcastContext.groupDataProvider; }
+    chip::FabricTable & Fabrics() { return mGroupcastContext.fabricTable; }
 
     Protocols::InteractionModel::Status SetKeySet(FabricIndex fabric_index, GroupId group_id, KeysetId keyset_id,
                                                   const chip::Optional<chip::ByteSpan> & key);
     Protocols::InteractionModel::Status RemoveGroup(FabricIndex fabric_index, GroupId group_id,
                                                     const Groupcast::Commands::LeaveGroup::DecodableType & data,
-                                                    EndpointList * endpoints);
+                                                    EndpointList * endpoints,
+                                                    const chip::Access::SubjectDescriptor & subjectDescriptor);
     Protocols::InteractionModel::Status RemoveGroupEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id,
                                                             EndpointList * endpoints);
     void UpdateUsedMcastAddrCount();
     void NotifyUsedMcastAddrCountOnChange();
     void NotifyMembershipChanged();
 
-    GroupcastContext mContext;
+    void EmitAuxiliaryAccessUpdated(const chip::Access::SubjectDescriptor & subjectDescriptor);
+
+    GroupcastContext mGroupcastContext;
     const BitFlags<Groupcast::Feature> mFeatures;
     DataModel::Provider * mDataModelProvider = nullptr;
     uint16_t mUsedMcastAddrCount             = 0;
