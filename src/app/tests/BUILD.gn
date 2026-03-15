@@ -197,18 +197,24 @@ source_set("closure-dimension-test-srcs") {
 
 source_set("thermostat-server-test-srcs") {
   sources = [
+    "${chip_root}/src/app/clusters/thermostat-server/PresetStructWithOwnedMembers.h",
+    "${chip_root}/src/app/clusters/thermostat-server/ThermostatSuggestionStructWithOwnedMembers.h",
     "${chip_root}/src/app/clusters/thermostat-server/PresetStructWithOwnedMembers.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/thermostat-server.h",
+    "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-presets.h",
     "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-atomic.cpp",
     "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-presets.cpp",
     "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-suggestions.cpp",
     "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-test-stubs.cpp",
     "${chip_root}/src/app/clusters/thermostat-server/thermostat-server.cpp",
+    "${chip_root}/src/app/tests/ThermostatAttrAccessTestAccess.h",
   ]
 
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/clusters/thermostat-server:thermostat-server",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/server:server",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
