@@ -38,20 +38,21 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
 } // namespace FeatureMap
 
 namespace RemoteSensing {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> * value)
 {
     *value = BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap>{};
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> value)
 {
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> value,
-                                        MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> value, MarkAttributeDirty markDirty)
 {
     return Protocols::InteractionModel::Status::Success;
 }

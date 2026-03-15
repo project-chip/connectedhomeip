@@ -87,7 +87,8 @@ public:
         currentThermostatSuggestion.SetNull();
     }
 
-    chip::app::DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> GetThermostatSuggestionNotFollowingReason() override
+    chip::app::DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap>
+    GetThermostatSuggestionNotFollowingReason() override
     {
         return chip::app::DataModel::NullNullable;
     }

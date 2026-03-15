@@ -33,8 +33,7 @@ public:
     ThermostatAttrAccessTestAccess() = delete;
     explicit ThermostatAttrAccessTestAccess(chip::app::Clusters::Thermostat::ThermostatAttrAccess * access) : mAccess(access) {}
 
-    Protocols::InteractionModel::Status SetActivePreset(EndpointId endpoint,
-                                                        chip::app::DataModel::Nullable<ByteSpan> presetHandle)
+    Protocols::InteractionModel::Status SetActivePreset(EndpointId endpoint, chip::app::DataModel::Nullable<ByteSpan> presetHandle)
     {
         return mAccess->SetActivePreset(endpoint, presetHandle);
     }
