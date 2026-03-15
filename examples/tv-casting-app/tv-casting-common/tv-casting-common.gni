@@ -14,6 +14,9 @@
 
 # Shared build args for the TV Casting App.
 # Import this file instead of redeclaring optimize_apk_size.
+
+import("//build_overrides/chip.gni")
+
 declare_args() {
   # When true, produce a smaller binary by excluding legacy chip-tool
   # sources, heavy tracing deps, and enabling aggressive dead-code
@@ -25,3 +28,8 @@ declare_args() {
   # (uncompressed) from the APK. Only used when optimize_apk_size is true.
   use_static_libcxx = false
 }
+
+# The slim cluster-objects override is set per-platform in each args.gni.
+# Linux and Darwin set chip_cluster_objects_source_override to the slim file;
+# Android leaves it empty because its Java controller compiles generated TLV
+# decoders that reference Decode() methods for every cluster.
