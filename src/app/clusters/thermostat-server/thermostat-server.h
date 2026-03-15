@@ -51,6 +51,11 @@ enum class AtomicWriteState
 static constexpr size_t kThermostatEndpointCount =
     MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
+// Some unit-test builds compile the Thermostat server sources without configuring
+// any Thermostat endpoints. Keep the actual endpoint count unchanged, but ensure
+// fixed-size backing storage remains valid in those configurations.
+static constexpr size_t kThermostatStorageEndpointCount = kThermostatEndpointCount > 0 ? kThermostatEndpointCount : 1;
+
 /**
  * @brief  Thermostat Attribute Access Interface.
  */
@@ -243,7 +248,7 @@ private:
         EndpointId endpointId = kInvalidEndpointId;
     };
 
-    AtomicWriteSession mAtomicWriteSessions[kThermostatEndpointCount];
+    AtomicWriteSession mAtomicWriteSessions[kThermostatStorageEndpointCount];
 };
 
 /**

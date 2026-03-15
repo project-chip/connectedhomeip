@@ -70,7 +70,7 @@ constexpr int8_t kDefaultDeadBand                 = 25; // 2.5C is the default
 
 static_assert(kThermostatEndpointCount <= kEmberInvalidEndpointIndex, "Thermostat Delegate table size error");
 
-Delegate * gDelegateTable[kThermostatEndpointCount] = { nullptr };
+Delegate * gDelegateTable[kThermostatStorageEndpointCount] = { nullptr };
 
 namespace chip {
 namespace app {
