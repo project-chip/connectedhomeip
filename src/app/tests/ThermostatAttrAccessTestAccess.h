@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <zap-generated/gen_config.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
 
 namespace chip {

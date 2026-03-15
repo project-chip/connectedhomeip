@@ -14,6 +14,8 @@
  *    limitations under the License.
  */
 
+#include <zap-generated/gen_config.h>
+
 #include "ThermostatAttrAccessTestAccess.h"
 #include <app/tests/test-ember-api.h>
 #include <platform/CHIPDeviceLayer.h>
