@@ -41,6 +41,7 @@ config("config") {
     cflags += [
       "-ffunction-sections",
       "-fdata-sections",
+      "-fvisibility=hidden",
       "-flto=thin",
     ]
   }

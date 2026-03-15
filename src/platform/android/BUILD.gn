@@ -35,8 +35,6 @@ source_set("tracing") {
       "${chip_root}/src/tracing/perfetto:event_storage",
       "${chip_root}/src/tracing/perfetto:simple_initialization",
     ]
-  } else {
-    sources += [ "tracing_noop.cpp" ]
   }
 }
 
