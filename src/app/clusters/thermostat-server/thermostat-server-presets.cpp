@@ -317,7 +317,8 @@ Status ThermostatAttrAccess::SetActivePreset(EndpointId endpoint, DataModel::Nul
         CHIP_ERROR lookupErr = GetMatchingPresetInPresets(delegate, presetHandle.Value(), matchingPreset, found);
         if (lookupErr != CHIP_NO_ERROR)
         {
-            return Status::InvalidInState;
+            ChipLogError(Zcl, "Failed to lookup preset with error %" CHIP_ERROR_FORMAT, lookupErr.Format());
+            return StatusIB(lookupErr).mStatus;
         }
         if (!found)
         {
