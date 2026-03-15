@@ -44,7 +44,7 @@ namespace ZoneManagement {
 using ZoneTriggerControlStruct = Structs::ZoneTriggerControlStruct::Type;
 using ZoneInformationStruct    = Structs::ZoneInformationStruct::Type;
 
-ZoneMgmtServer::ZoneMgmtServer(ZoneMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
+ZoneMgmtServer::ZoneMgmtServer(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
                                uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
                                const TwoDCartesianVertexStruct & aTwoDCartesianMax) :
     CommandHandlerInterface(MakeOptional(aEndpointId), ZoneManagement::Id),
