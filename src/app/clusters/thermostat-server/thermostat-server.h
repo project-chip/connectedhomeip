@@ -29,6 +29,15 @@
 #include <app-common/zap-generated/callback.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
+#include <app/util/config.h>
+#include <platform/CHIPDeviceConfig.h>
+
+// Provide a fallback when the generated endpoint count macro is not available
+// (e.g. unit-test or Android builds compiled with
+// CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1).
+#ifndef MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT
+#define MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT 0
+#endif
 
 // Forward declaration to allow the test access helper to be a friend.
 namespace chip {
