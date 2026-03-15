@@ -148,8 +148,9 @@ CHIP_ERROR GetMatchingPresetInPresets(Delegate * delegate, const ByteSpan & pres
             return err;
         }
 
-        // Note: presets coming from our delegate always have a handle.
-        if (presetHandle.data_equal(matchingPreset.GetPresetHandle().Value()))
+        // Treat presets with a null handle as non-matching.
+        auto presetHandleFromPreset = matchingPreset.GetPresetHandle();
+        if (!presetHandleFromPreset.IsNull() && presetHandle.data_equal(presetHandleFromPreset.Value()))
         {
             found = true;
             return CHIP_NO_ERROR;
