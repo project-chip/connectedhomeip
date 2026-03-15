@@ -131,8 +131,8 @@ bool MatchingPendingPresetExists(Delegate * delegate, const PresetStructWithOwne
 CHIP_ERROR GetMatchingPresetInPresets(Delegate * delegate, const ByteSpan & presetHandle,
                                       PresetStructWithOwnedMembers & matchingPreset, bool & found)
 {
-    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     found = false;
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     for (uint8_t i = 0; true; i++)
     {
