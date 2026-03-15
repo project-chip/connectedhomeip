@@ -197,16 +197,17 @@ source_set("closure-dimension-test-srcs") {
 
 source_set("thermostat-server-test-srcs") {
   sources = [
-    "${chip_root}/src/app/clusters/thermostat-server/PresetStructWithOwnedMembers.cpp",
     "${chip_root}/src/app/clusters/thermostat-server/PresetStructWithOwnedMembers.h",
     "${chip_root}/src/app/clusters/thermostat-server/ThermostatSuggestionStructWithOwnedMembers.h",
+    "${chip_root}/src/app/clusters/thermostat-server/PresetStructWithOwnedMembers.cpp",
+    "${chip_root}/src/app/clusters/thermostat-server/thermostat-delegate.h",
+    "${chip_root}/src/app/clusters/thermostat-server/thermostat-server.h",
+    "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-presets.h",
     "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-atomic.cpp",
     "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-presets.cpp",
-    "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-presets.h",
     "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-suggestions.cpp",
     "${chip_root}/src/app/clusters/thermostat-server/thermostat-server-test-stubs.cpp",
     "${chip_root}/src/app/clusters/thermostat-server/thermostat-server.cpp",
-    "${chip_root}/src/app/clusters/thermostat-server/thermostat-server.h",
     "${chip_root}/src/app/tests/ThermostatAttrAccessTestAccess.h",
   ]
 
@@ -292,8 +293,8 @@ chip_test_suite("tests") {
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",
-    "TestThermostatServerPresets.cpp",
     "TestThreadBorderRouterManagementCluster.cpp",
+    "TestThermostatServerPresets.cpp",
     "TestTimeSyncDataProvider.cpp",
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
@@ -307,9 +308,9 @@ chip_test_suite("tests") {
     ":ecosystem-information-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
-    ":thermostat-server-test-srcs",
     ":thread-border-router-management-test-srcs",
     ":thread-network-directory-test-srcs",
+    ":thermostat-server-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app:attribute-persistence",
