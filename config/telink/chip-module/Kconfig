@@ -284,13 +284,6 @@ choice CHIP_LAST_FABRIC_REMOVED_ACTION
 	prompt "An action to perform after removing the last fabric"
 	default CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
 
-	config CHIP_LAST_FABRIC_REMOVED_NONE
-	bool "After removing the last fabric do not perform any action"
-	help
-	  After removing the last fabric the device will not perform factory reset
-	  or reboot. The current state will be left as it is and the BLE advertising
-	  will not start automatically.
-
 	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
 	bool "After removing the last fabric erase NVS and reboot"
 	help
@@ -300,6 +293,7 @@ choice CHIP_LAST_FABRIC_REMOVED_ACTION
 
 	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
 	bool "After removing the last fabric erase NVS and start Bluetooth LE advertising"
+	depends on !PM
 	help
 	  After removing the last fabric the device will perform the factory reset without 
 	  rebooting and start the Bluetooth LE advertisement automatically.
@@ -314,6 +308,13 @@ choice CHIP_LAST_FABRIC_REMOVED_ACTION
 	  After removing the last fabric the device will perform the factory reset only without
 	  rebooting. The current RAM state will be saved and the new commissioning to the next 
 	  fabric will use the next possible fabric index.
+
+	config CHIP_LAST_FABRIC_REMOVED_NONE
+	bool "After removing the last fabric do not perform any action"
+	help
+	  After removing the last fabric the device will not perform factory reset
+	  or reboot. The current state will be left as it is and the BLE advertising
+	  will not start automatically.
 
 endchoice
 
