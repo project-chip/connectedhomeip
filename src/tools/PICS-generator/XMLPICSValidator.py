@@ -22,6 +22,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from pics_generator_support import map_cluster_name_to_pics_xml, pics_xml_file_list_loader
+
 from matter.testing.pics import (accepted_cmd_pics_str, attribute_pics_str, client_pics_str, event_pics_str, feature_pics_str,
                                  generated_cmd_pics_str, server_pics_str)
 
