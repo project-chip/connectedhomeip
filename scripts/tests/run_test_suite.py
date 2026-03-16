@@ -321,6 +321,7 @@ class CommissioningMethod(enum.StrEnum):
 @click.option(
     '--iterations',
     default=1,
+    type=click.IntRange(min=1),
     help='Number of iterations to run')
 @click.option(
     '--app-path', multiple=True, metavar="<key>:<path>",
