@@ -43,7 +43,7 @@ GroupcastCluster::GroupcastCluster(GroupcastContext && context, BitFlags<Groupca
 {}
 
 GroupcastCluster::~GroupcastCluster() {
-    // Context will be non null when the cluster is initialized. Calling 
+    // Context will be non null when the cluster is initialized. Calling
     // Shutdown() to ensure proper cleanup if the cluster was started.
     if (mContext != nullptr) {
         Shutdown(ClusterShutdownType::kPermanentRemove);

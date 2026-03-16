@@ -184,7 +184,7 @@ public:
                 if (mEndpointIterator->Next(endpoint))
                 {
                     // Groups cannot be created with endpoint 0, this state should never be reached
-                    // because of restrictions with creating/joining groups. Something has gone wrong 
+                    // because of restrictions with creating/joining groups. Something has gone wrong
                     // there if this condition is reached.
                     if (endpoint.endpoint_id == kRootEndpointId) {
                         return CHIP_ERROR_INCORRECT_STATE;
@@ -220,14 +220,14 @@ public:
 
             if (mIterateOverFabricIndices)
             {
-                // This indicates that there are no more fabric indices to iterate over (unless it is 
-                // determined in the conditions below that at least 1 more is remaining, in which 
+                // This indicates that there are no more fabric indices to iterate over (unless it is
+                // determined in the conditions below that at least 1 more is remaining, in which
                 // case this will be set to true again).
                 mIterateOverFabricIndices = false;
 
                 if (mFabricTable && mFabricTableIter.HasValue())
                 {
-                    if ((mFabricTableIter.Value() != mFabricTable->end()) 
+                    if ((mFabricTableIter.Value() != mFabricTable->end())
                         && (++mFabricTableIter.Value() != mFabricTable->end()))
                     {
                         mFabricIndex       = mFabricTableIter.Value()->GetFabricIndex();
@@ -257,7 +257,7 @@ private:
     GroupId mGroupId                                                       = kUndefinedGroupId;
 
     // When true, this indicates the entries are not fabric scoped. AuxiliaryEntries() through
-    // the Next() funciton will iterate over all fabrics to fetch auxiliary ACL entries. This 
+    // the Next() funciton will iterate over all fabrics to fetch auxiliary ACL entries. This
     // will be set to true when a fabric index is not specified (kUndefinedFabricIndex).
     bool mIterateOverFabricIndices = false;
 };
