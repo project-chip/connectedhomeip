@@ -37,7 +37,7 @@
 # === END CI TEST ARGUMENTS ===
 
 """
-TC-ICDB-2.3: ICD State Machine - With both client registrations and no active subscription - 
+TC-ICDB-2.3: ICD State Machine - With both client registrations and no active subscription -
 Multiple Fabrics.
 
 Purpose:
