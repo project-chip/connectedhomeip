@@ -614,6 +614,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     except ResultError as e:
         # We just print the message without stack trace, as the actual failure with stack trace has already been logged.
         log.error("%s", e)
+        sys.exit(2)
     except Exception as e:
         log.error("Caught exception during test execution: %s", e, exc_info=True)
         raise
