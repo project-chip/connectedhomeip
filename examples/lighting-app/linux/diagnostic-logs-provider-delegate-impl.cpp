@@ -167,7 +167,7 @@ CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSp
     // Prefer determining end-of-log by comparing the current offset to the total file size,
     // so that the last non-empty chunk is marked as EOF even when the file size is an exact
     // multiple of bytesRequested. Fall back to the short-read/feof heuristic if needed.
-    size_t fileSize = GetFileSize(fp);
+    size_t fileSize    = GetFileSize(fp);
     long currentOffset = ftell(fp);
     if ((fileSize != 0) && (currentOffset != -1) && CanCastTo<size_t>(currentOffset))
     {
