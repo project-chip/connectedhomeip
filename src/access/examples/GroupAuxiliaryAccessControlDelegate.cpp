@@ -186,7 +186,8 @@ public:
                     // Groups cannot be created with endpoint 0, this state should never be reached
                     // because of restrictions with creating/joining groups. Something has gone wrong
                     // there if this condition is reached.
-                    if (endpoint.endpoint_id == kRootEndpointId) {
+                    if (endpoint.endpoint_id == kRootEndpointId)
+                    {
                         return CHIP_ERROR_INCORRECT_STATE;
                     }
 
@@ -227,19 +228,18 @@ public:
 
                 if (mFabricTable && mFabricTableIter.HasValue())
                 {
-                    if ((mFabricTableIter.Value() != mFabricTable->end())
-                        && (++mFabricTableIter.Value() != mFabricTable->end()))
+                    if ((mFabricTableIter.Value() != mFabricTable->end()) && (++mFabricTableIter.Value() != mFabricTable->end()))
                     {
-                        mFabricIndex       = mFabricTableIter.Value()->GetFabricIndex();
-                        mGroupInfoIterator = mGroupDataProvider->IterateGroupInfo(mFabricIndex);
-                        mIterateOverFabricIndices        = true;
+                        mFabricIndex              = mFabricTableIter.Value()->GetFabricIndex();
+                        mGroupInfoIterator        = mGroupDataProvider->IterateGroupInfo(mFabricIndex);
+                        mIterateOverFabricIndices = true;
                     }
                 }
                 else if (mFabricIndex < kMaxValidFabricIndex)
                 {
                     mFabricIndex++;
-                    mGroupInfoIterator = mGroupDataProvider->IterateGroupInfo(mFabricIndex);
-                    mIterateOverFabricIndices        = true;
+                    mGroupInfoIterator        = mGroupDataProvider->IterateGroupInfo(mFabricIndex);
+                    mIterateOverFabricIndices = true;
                 }
             }
         }
