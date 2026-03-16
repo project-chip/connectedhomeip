@@ -71,7 +71,7 @@ public:
     public:
         static constexpr bool kIsFabricScoped = true;
 
-        void SetFabricIndex(FabricIndex fabricIndex) { mEntry.SetFabricIndex(fabricIndex); }
+        void SetFabricIndex(FabricIndex fabricIndex) { TEMPORARY_RETURN_IGNORED mEntry.SetFabricIndex(fabricIndex); }
 
     private:
         CHIP_ERROR Unstage();
@@ -126,7 +126,7 @@ public:
         FabricIndex GetFabricIndex() const
         {
             FabricIndex fabricIndex = kUndefinedFabricIndex;
-            mEntry.GetFabricIndex(fabricIndex);
+            TEMPORARY_RETURN_IGNORED mEntry.GetFabricIndex(fabricIndex);
             return fabricIndex;
         }
 

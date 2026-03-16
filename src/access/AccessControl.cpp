@@ -25,6 +25,8 @@
 
 #include <lib/core/Global.h>
 
+#include <credentials/GroupDataProvider.h>
+
 namespace chip {
 namespace Access {
 
@@ -338,6 +340,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
                                 Privilege requestPrivilege)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsValidPrivilege(requestPrivilege), CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR result = CheckACL(subjectDescriptor, requestPath, requestPrivilege);
 
@@ -348,6 +351,20 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     }
 #endif
 
+    if ((CHIP_NO_ERROR != result) && (Access::AuthMode::kGroup == subjectDescriptor.authMode) &&
+        (Access::RequestType::kCommandInvokeRequest == requestPath.requestType) &&
+        (Access::Privilege::kOperate == requestPrivilege))
+    {
+        Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
+        VerifyOrReturnError(nullptr != groups, result);
+        Credentials::GroupDataProvider::GroupInfo info;
+        GroupId gid = GroupIdFromNodeId(subjectDescriptor.subject);
+        ReturnErrorOnFailure(groups->GetGroupInfo(subjectDescriptor.fabricIndex, gid, info));
+        if (info.HasAuxiliaryACL())
+        {
+            return CHIP_NO_ERROR;
+        }
+    }
     return result;
 }
 

@@ -31,7 +31,7 @@ if [ -z "$app" ]; then
     exit 1
 fi
 
-supported_idf_target=("esp32" "esp32c3" "esp32c2" "esp32c6" "esp32s3" "esp32h2")
+supported_idf_target=("esp32" "esp32c3" "esp32c2" "esp32c6" "esp32s3" "esp32h2" "esp32p4")
 
 if [ -z "$idf_target" ] || [[ ! "${supported_idf_target[*]}" =~ "$idf_target" ]]; then
     idf_target="esp32"

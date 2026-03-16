@@ -37,6 +37,7 @@
         _commissionerPasscode = cppCommissionerDeclaration->GetCommissionerPasscode();
         _qRCodeDisplayed = cppCommissionerDeclaration->GetQRCodeDisplayed();
         _cancelPasscode = cppCommissionerDeclaration->GetCancelPasscode();
+        _passcodeLength = cppCommissionerDeclaration->GetPasscodeLength();
     }
     return self;
 }
@@ -48,6 +49,7 @@
            commissionerPasscode:(BOOL)commissionerPasscode
                 qRCodeDisplayed:(BOOL)qRCodeDisplayed
                  cancelPasscode:(BOOL)cancelPasscode
+                 passcodeLength:(NSInteger)passcodeLength
 {
     self = [super init];
     if (self) {
@@ -58,20 +60,22 @@
         _commissionerPasscode = commissionerPasscode;
         _qRCodeDisplayed = qRCodeDisplayed;
         _cancelPasscode = cancelPasscode;
+        _passcodeLength = passcodeLength;
     }
     return self;
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"MCCommissionerDeclaration::errorCode:               %@\nMCCommissionerDeclaration::needsPasscode:           %d\nMCCommissionerDeclaration::noAppsFound:             %d\nMCCommissionerDeclaration::passcodeDialogDisplayed: %d\nMCCommissionerDeclaration::commissionerPasscode:    %d\nMCCommissionerDeclaration::qRCodeDisplayed:         %d\nMCCommissionerDeclaration::cancelPasscode:          %d",
+    return [NSString stringWithFormat:@"MCCommissionerDeclaration::errorCode:               %@\nMCCommissionerDeclaration::needsPasscode:           %d\nMCCommissionerDeclaration::noAppsFound:             %d\nMCCommissionerDeclaration::passcodeDialogDisplayed: %d\nMCCommissionerDeclaration::commissionerPasscode:    %d\nMCCommissionerDeclaration::qRCodeDisplayed:         %d\nMCCommissionerDeclaration::cancelPasscode:          %d\nMCCommissionerDeclaration::passcodeLength: %d",
                      [self stringForErrorCode:self.errorCode],
                      self.needsPasscode,
                      self.noAppsFound,
                      self.passcodeDialogDisplayed,
                      self.commissionerPasscode,
                      self.qRCodeDisplayed,
-                     self.cancelPasscode];
+                     self.cancelPasscode,
+                     self.passcodeLength];
 }
 
 - (NSString *)getErrorCodeString

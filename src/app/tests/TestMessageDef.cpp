@@ -33,6 +33,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 #include <lib/core/StringBuilderAdapters.h>
@@ -60,20 +61,21 @@ void ENFORCE_FORMAT(1, 2) TLVPrettyPrinter(const char * aFormat, ...)
     va_end(args);
 }
 
-CHIP_ERROR DebugPrettyPrint(const chip::System::PacketBufferHandle & aMsgBuf)
+template <typename T>
+void DebugPrettyPrint(const T & parser)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    EXPECT_SUCCESS(parser.PrettyPrint());
+#endif
+}
+
+template <>
+void DebugPrettyPrint(const chip::System::PacketBufferHandle & aMsgBuf)
+{
     chip::System::PacketBufferTLVReader reader;
     reader.Init(aMsgBuf.Retain());
-    err = reader.Next();
-    chip::TLV::Debug::Dump(reader, TLVPrettyPrinter);
-
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogProgress(DataManagement, "DebugPrettyPrint fails with err %" CHIP_ERROR_FORMAT, err.Format());
-    }
-
-    return err;
+    EXPECT_SUCCESS(reader.Next());
+    EXPECT_SUCCESS(chip::TLV::Debug::Dump(reader, TLVPrettyPrinter));
 }
 
 void BuildStatusIB(StatusIB::Builder & aStatusIBBuilder)
@@ -93,21 +95,18 @@ void ParseStatusIB(StatusIB::Parser & aStatusIBParser)
     StatusIB::Parser StatusIBParser;
     StatusIB statusIB;
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    aStatusIBParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(aStatusIBParser);
+
     err = aStatusIBParser.DecodeStatusIB(statusIB);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(statusIB.mStatus, chip::Protocols::InteractionModel::Status::InvalidSubscription);
-    EXPECT_FALSE(statusIB.mClusterStatus.HasValue());
+    EXPECT_FALSE(statusIB.mClusterStatus.has_value());
 }
 
 void BuildClusterPathIB(ClusterPathIB::Builder & aClusterPathBuilder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    aClusterPathBuilder.Node(1).Endpoint(2).Cluster(3).EndOfClusterPathIB();
-    err = aClusterPathBuilder.GetError();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aClusterPathBuilder.Node(1).Endpoint(2).Cluster(3).EndOfClusterPathIB());
+    EXPECT_SUCCESS(aClusterPathBuilder.GetError());
 }
 
 void ParseClusterPathIB(chip::TLV::TLVReader & aReader)
@@ -120,9 +119,7 @@ void ParseClusterPathIB(chip::TLV::TLVReader & aReader)
 
     err = clusterPathParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    clusterPathParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(clusterPathParser);
 
     err = clusterPathParser.GetNode(&node);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -142,7 +139,7 @@ void BuildDataVersionFilterIB(DataVersionFilterIB::Builder & aDataVersionFilterI
     ClusterPathIB::Builder & clusterPathBuilder = aDataVersionFilterIBBuilder.CreatePath();
     EXPECT_EQ(clusterPathBuilder.GetError(), CHIP_NO_ERROR);
     BuildClusterPathIB(clusterPathBuilder);
-    aDataVersionFilterIBBuilder.DataVersion(2).EndOfDataVersionFilterIB();
+    EXPECT_SUCCESS(aDataVersionFilterIBBuilder.DataVersion(2).EndOfDataVersionFilterIB());
     EXPECT_EQ(aDataVersionFilterIBBuilder.GetError(), CHIP_NO_ERROR);
 }
 
@@ -155,9 +152,7 @@ void ParseDataVersionFilterIB(chip::TLV::TLVReader & aReader)
 
     err = dataVersionFilterIBParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    dataVersionFilterIBParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(dataVersionFilterIBParser);
 
     err = dataVersionFilterIBParser.GetPath(&clusterPath);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -172,7 +167,7 @@ void BuildDataVersionFilterIBs(DataVersionFilterIBs::Builder & aDataVersionFilte
     DataVersionFilterIB::Builder & dataVersionFilterIBBuilder = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
     EXPECT_EQ(aDataVersionFilterIBsBuilder.GetError(), CHIP_NO_ERROR);
     BuildDataVersionFilterIB(dataVersionFilterIBBuilder);
-    aDataVersionFilterIBsBuilder.EndOfDataVersionFilterIBs();
+    EXPECT_SUCCESS(aDataVersionFilterIBsBuilder.EndOfDataVersionFilterIBs());
     EXPECT_EQ(aDataVersionFilterIBsBuilder.GetError(), CHIP_NO_ERROR);
 }
 
@@ -183,15 +178,13 @@ void ParseDataVersionFilterIBs(chip::TLV::TLVReader & aReader)
 
     err = dataVersionFilterIBsParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    dataVersionFilterIBsParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(dataVersionFilterIBsParser);
 }
 
 void BuildEventFilterIB(EventFilterIB::Builder & aEventFilterIBBuilder)
 {
-    aEventFilterIBBuilder.Node(1).EventMin(2).EndOfEventFilterIB();
-    EXPECT_EQ(aEventFilterIBBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aEventFilterIBBuilder.Node(1).EventMin(2).EndOfEventFilterIB());
+    EXPECT_SUCCESS(aEventFilterIBBuilder.GetError());
 }
 
 void ParseEventFilterIB(chip::TLV::TLVReader & aReader)
@@ -203,9 +196,7 @@ void ParseEventFilterIB(chip::TLV::TLVReader & aReader)
 
     err = eventFilterIBParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    eventFilterIBParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(eventFilterIBParser);
     err = eventFilterIBParser.GetNode(&node);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -220,7 +211,7 @@ void BuildEventFilters(EventFilterIBs::Builder & aEventFiltersBuilder)
     EventFilterIB::Builder & eventFilterBuilder = aEventFiltersBuilder.CreateEventFilter();
     EXPECT_EQ(aEventFiltersBuilder.GetError(), CHIP_NO_ERROR);
     BuildEventFilterIB(eventFilterBuilder);
-    aEventFiltersBuilder.EndOfEventFilters();
+    EXPECT_SUCCESS(aEventFiltersBuilder.EndOfEventFilters());
     EXPECT_EQ(aEventFiltersBuilder.GetError(), CHIP_NO_ERROR);
 }
 
@@ -231,9 +222,7 @@ void ParseEventFilters(chip::TLV::TLVReader & aReader)
 
     err = eventFiltersParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    eventFiltersParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(eventFiltersParser);
 }
 
 void BuildAttributePathIB(AttributePathIB::Builder & aAttributePathBuilder)
@@ -262,9 +251,7 @@ void ParseAttributePathIB(chip::TLV::TLVReader & aReader)
 
     err = attributePathParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    attributePathParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(attributePathParser);
 
     err = attributePathParser.GetEnableTagCompression(&enableTagCompression);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -297,8 +284,8 @@ void BuildAttributePathList(AttributePathIBs::Builder & aAttributePathListBuilde
     EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
     BuildAttributePathIB(attributePathBuilder);
 
-    aAttributePathListBuilder.EndOfAttributePathIBs();
-    EXPECT_EQ(aAttributePathListBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aAttributePathListBuilder.EndOfAttributePathIBs());
+    EXPECT_SUCCESS(aAttributePathListBuilder.GetError());
 }
 
 void ParseAttributePathList(chip::TLV::TLVReader & aReader)
@@ -310,17 +297,13 @@ void ParseAttributePathList(chip::TLV::TLVReader & aReader)
     err = attributePathListParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    attributePathListParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(attributePathListParser);
 }
 
 void BuildEventPath(EventPathIB::Builder & aEventPathBuilder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    aEventPathBuilder.Node(1).Endpoint(2).Cluster(3).Event(4).IsUrgent(true).EndOfEventPathIB();
-    err = aEventPathBuilder.GetError();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aEventPathBuilder.Node(1).Endpoint(2).Cluster(3).Event(4).IsUrgent(true).EndOfEventPathIB());
+    EXPECT_SUCCESS(aEventPathBuilder.GetError());
 }
 
 void ParseEventPath(EventPathIB::Parser & aEventPathParser)
@@ -332,9 +315,7 @@ void ParseEventPath(EventPathIB::Parser & aEventPathParser)
     chip::EventId event       = 4;
     bool isUrgent             = false;
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    aEventPathParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(aEventPathParser);
     err = aEventPathParser.GetNode(&node);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(node, 1u);
@@ -362,8 +343,8 @@ void BuildEventPaths(EventPathIBs::Builder & aEventPathsBuilder)
     EXPECT_EQ(eventPathBuilder.GetError(), CHIP_NO_ERROR);
     BuildEventPath(eventPathBuilder);
 
-    aEventPathsBuilder.EndOfEventPaths();
-    EXPECT_EQ(aEventPathsBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aEventPathsBuilder.EndOfEventPaths());
+    EXPECT_SUCCESS(aEventPathsBuilder.GetError());
 }
 
 void ParseEventPaths(chip::TLV::TLVReader & aReader)
@@ -373,15 +354,13 @@ void ParseEventPaths(chip::TLV::TLVReader & aReader)
 
     err = eventPathListParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    eventPathListParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(eventPathListParser);
 }
 
 void BuildCommandPath(CommandPathIB::Builder & aCommandPathBuilder)
 {
-    aCommandPathBuilder.EndpointId(1).ClusterId(3).CommandId(4).EndOfCommandPathIB();
-    EXPECT_EQ(aCommandPathBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aCommandPathBuilder.EndpointId(1).ClusterId(3).CommandId(4).EndOfCommandPathIB());
+    EXPECT_SUCCESS(aCommandPathBuilder.GetError());
 }
 
 void ParseCommandPath(chip::TLV::TLVReader & aReader)
@@ -395,9 +374,7 @@ void ParseCommandPath(chip::TLV::TLVReader & aReader)
     err = commandPathParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    commandPathParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(commandPathParser);
     err = commandPathParser.GetEndpointId(&endpointId);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(endpointId, 1u);
@@ -438,7 +415,7 @@ void BuildEventDataIB(EventDataIB::Builder & aEventDataIBBuilder)
         EXPECT_EQ(err, CHIP_NO_ERROR);
     }
 
-    aEventDataIBBuilder.EndOfEventDataIB();
+    EXPECT_SUCCESS(aEventDataIBBuilder.EndOfEventDataIB());
 }
 
 void ParseEventDataIB(EventDataIB::Parser & aEventDataIBParser)
@@ -451,9 +428,7 @@ void ParseEventDataIB(EventDataIB::Parser & aEventDataIBParser)
     uint64_t deltaUTCTimestamp    = 0;
     uint64_t deltaSystemTimestamp = 0;
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    aEventDataIBParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(aEventDataIBParser);
     {
         {
             EventPathIB::Parser eventPath;
@@ -488,7 +463,7 @@ void ParseEventDataIB(EventDataIB::Parser & aEventDataIBParser)
             chip::TLV::TLVReader reader;
             bool val = false;
             chip::TLV::TLVType container;
-            aEventDataIBParser.GetData(&reader);
+            EXPECT_SUCCESS(aEventDataIBParser.GetData(&reader));
             err = reader.EnterContainer(container);
             EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -515,8 +490,8 @@ void BuildEventStatusIB(EventStatusIB::Builder & aEventStatusIBBuilder)
     EXPECT_EQ(statusIBBuilder.GetError(), CHIP_NO_ERROR);
     BuildStatusIB(statusIBBuilder);
 
-    aEventStatusIBBuilder.EndOfEventStatusIB();
-    EXPECT_EQ(aEventStatusIBBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aEventStatusIBBuilder.EndOfEventStatusIB());
+    EXPECT_SUCCESS(aEventStatusIBBuilder.GetError());
 }
 
 void ParseEventStatusIB(EventStatusIB::Parser & aEventStatusIBParser)
@@ -524,9 +499,7 @@ void ParseEventStatusIB(EventStatusIB::Parser & aEventStatusIBParser)
     CHIP_ERROR err = CHIP_NO_ERROR;
     EventPathIB::Parser eventPathParser;
     StatusIB::Parser statusParser;
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    aEventStatusIBParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(aEventStatusIBParser);
     err = aEventStatusIBParser.GetPath(&eventPathParser);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -540,8 +513,8 @@ void BuildEventReportIB(EventReportIB::Builder & aEventReportIBBuilder)
     EXPECT_EQ(aEventReportIBBuilder.GetError(), CHIP_NO_ERROR);
     BuildEventDataIB(eventDataIBBuilder);
 
-    aEventReportIBBuilder.EndOfEventReportIB();
-    EXPECT_EQ(aEventReportIBBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aEventReportIBBuilder.EndOfEventReportIB());
+    EXPECT_SUCCESS(aEventReportIBBuilder.GetError());
 }
 
 void ParseEventReportIB(EventReportIB::Parser & aEventReportIBParser)
@@ -550,9 +523,7 @@ void ParseEventReportIB(EventReportIB::Parser & aEventReportIBParser)
     EventStatusIB::Parser eventStatusParser;
     EventDataIB::Parser eventDataParser;
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    aEventReportIBParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(aEventReportIBParser);
 
     err = aEventReportIBParser.GetEventData(&eventDataParser);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -563,8 +534,8 @@ void BuildEventReports(EventReportIBs::Builder & aEventReportsBuilder)
     EventReportIB::Builder & eventReportIBBuilder = aEventReportsBuilder.CreateEventReport();
     EXPECT_EQ(aEventReportsBuilder.GetError(), CHIP_NO_ERROR);
     BuildEventReportIB(eventReportIBBuilder);
-    aEventReportsBuilder.EndOfEventReports();
-    EXPECT_EQ(aEventReportsBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aEventReportsBuilder.EndOfEventReports());
+    EXPECT_SUCCESS(aEventReportsBuilder.GetError());
 }
 
 void ParseEventReports(chip::TLV::TLVReader & aReader)
@@ -574,9 +545,7 @@ void ParseEventReports(chip::TLV::TLVReader & aReader)
 
     err = eventReportsParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    eventReportsParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(eventReportsParser);
 }
 
 void BuildAttributeStatusIB(AttributeStatusIB::Builder & aAttributeStatusIBBuilder)
@@ -589,8 +558,8 @@ void BuildAttributeStatusIB(AttributeStatusIB::Builder & aAttributeStatusIBBuild
     EXPECT_EQ(statusIBBuilder.GetError(), CHIP_NO_ERROR);
     BuildStatusIB(statusIBBuilder);
 
-    aAttributeStatusIBBuilder.EndOfAttributeStatusIB();
-    EXPECT_EQ(aAttributeStatusIBBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aAttributeStatusIBBuilder.EndOfAttributeStatusIB());
+    EXPECT_SUCCESS(aAttributeStatusIBBuilder.GetError());
 }
 
 void ParseAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIBParser)
@@ -599,9 +568,7 @@ void ParseAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIBParser
     AttributePathIB::Parser attributePathParser;
     StatusIB::Parser StatusIBParser;
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    aAttributeStatusIBParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(aAttributeStatusIBParser);
     err = aAttributeStatusIBParser.GetPath(&attributePathParser);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -615,8 +582,8 @@ void BuildAttributeStatuses(AttributeStatusIBs::Builder & aAttributeStatusesBuil
     EXPECT_EQ(aAttributeStatusesBuilder.GetError(), CHIP_NO_ERROR);
     BuildAttributeStatusIB(aAttributeStatusIBBuilder);
 
-    aAttributeStatusesBuilder.EndOfAttributeStatuses();
-    EXPECT_EQ(aAttributeStatusesBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aAttributeStatusesBuilder.EndOfAttributeStatuses());
+    EXPECT_SUCCESS(aAttributeStatusesBuilder.GetError());
 }
 
 void ParseAttributeStatuses(chip::TLV::TLVReader & aReader)
@@ -627,9 +594,7 @@ void ParseAttributeStatuses(chip::TLV::TLVReader & aReader)
     err = attributeStatusParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    attributeStatusParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(attributeStatusParser);
 }
 
 void BuildAttributeDataIB(AttributeDataIB::Builder & aAttributeDataIBBuilder)
@@ -656,10 +621,9 @@ void BuildAttributeDataIB(AttributeDataIB::Builder & aAttributeDataIBBuilder)
         EXPECT_EQ(err, CHIP_NO_ERROR);
     }
 
-    err = aAttributeDataIBBuilder.GetError();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
-    aAttributeDataIBBuilder.EndOfAttributeDataIB();
-    EXPECT_EQ(aAttributeDataIBBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aAttributeDataIBBuilder.GetError());
+    EXPECT_SUCCESS(aAttributeDataIBBuilder.EndOfAttributeDataIB());
+    EXPECT_SUCCESS(aAttributeDataIBBuilder.GetError());
 }
 
 void ParseAttributeDataIB(AttributeDataIB::Parser & aAttributeDataIBParser)
@@ -667,9 +631,7 @@ void ParseAttributeDataIB(AttributeDataIB::Parser & aAttributeDataIBParser)
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathIB::Parser attributePathParser;
     chip::DataVersion version = 0;
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    aAttributeDataIBParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(aAttributeDataIBParser);
     err = aAttributeDataIBParser.GetPath(&attributePathParser);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -681,7 +643,7 @@ void ParseAttributeDataIB(AttributeDataIB::Parser & aAttributeDataIBParser)
         chip::TLV::TLVReader reader;
         bool val = false;
         chip::TLV::TLVType container;
-        aAttributeDataIBParser.GetData(&reader);
+        EXPECT_SUCCESS(aAttributeDataIBParser.GetData(&reader));
         err = reader.EnterContainer(container);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -703,8 +665,8 @@ void BuildAttributeDataIBs(AttributeDataIBs::Builder & aAttributeDataIBsBuilder)
     EXPECT_EQ(aAttributeDataIBsBuilder.GetError(), CHIP_NO_ERROR);
     BuildAttributeDataIB(attributeDataIBBuilder);
 
-    aAttributeDataIBsBuilder.EndOfAttributeDataIBs();
-    EXPECT_EQ(aAttributeDataIBsBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aAttributeDataIBsBuilder.EndOfAttributeDataIBs());
+    EXPECT_SUCCESS(aAttributeDataIBsBuilder.GetError());
 }
 
 void ParseAttributeDataIBs(chip::TLV::TLVReader & aReader)
@@ -714,9 +676,7 @@ void ParseAttributeDataIBs(chip::TLV::TLVReader & aReader)
 
     err = AttributeDataIBsParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    AttributeDataIBsParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(AttributeDataIBsParser);
 }
 
 void BuildAttributeReportIB(AttributeReportIB::Builder & aAttributeReportIBBuilder)
@@ -725,8 +685,8 @@ void BuildAttributeReportIB(AttributeReportIB::Builder & aAttributeReportIBBuild
     EXPECT_EQ(aAttributeReportIBBuilder.GetError(), CHIP_NO_ERROR);
     BuildAttributeDataIB(attributeDataIBBuilder);
 
-    aAttributeReportIBBuilder.EndOfAttributeReportIB();
-    EXPECT_EQ(aAttributeReportIBBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aAttributeReportIBBuilder.EndOfAttributeReportIB());
+    EXPECT_SUCCESS(aAttributeReportIBBuilder.GetError());
 }
 
 void ParseAttributeReportIB(AttributeReportIB::Parser & aAttributeReportIBParser)
@@ -735,9 +695,7 @@ void ParseAttributeReportIB(AttributeReportIB::Parser & aAttributeReportIBParser
     AttributeStatusIB::Parser attributeStatusParser;
     AttributeDataIB::Parser attributeDataParser;
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    aAttributeReportIBParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(aAttributeReportIBParser);
     err = aAttributeReportIBParser.GetAttributeData(&attributeDataParser);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
@@ -748,8 +706,8 @@ void BuildAttributeReportIBs(AttributeReportIBs::Builder & aAttributeReportIBsBu
     EXPECT_EQ(aAttributeReportIBsBuilder.GetError(), CHIP_NO_ERROR);
     BuildAttributeReportIB(attributeReportIBBuilder);
 
-    aAttributeReportIBsBuilder.EndOfAttributeReportIBs();
-    EXPECT_EQ(aAttributeReportIBsBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aAttributeReportIBsBuilder.EndOfAttributeReportIBs());
+    EXPECT_SUCCESS(aAttributeReportIBsBuilder.GetError());
 }
 
 void ParseAttributeReportIBs(chip::TLV::TLVReader & aReader)
@@ -760,7 +718,7 @@ void ParseAttributeReportIBs(chip::TLV::TLVReader & aReader)
     err = attributeReportIBsParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    attributeReportIBsParser.PrettyPrint();
+    EXPECT_SUCCESS(attributeReportIBsParser.PrettyPrint());
 #endif
 }
 
@@ -787,17 +745,15 @@ void BuildCommandDataIB(CommandDataIB::Builder & aCommandDataIBBuilder)
         EXPECT_EQ(err, CHIP_NO_ERROR);
     }
 
-    aCommandDataIBBuilder.EndOfCommandDataIB();
-    EXPECT_EQ(aCommandDataIBBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aCommandDataIBBuilder.EndOfCommandDataIB());
+    EXPECT_SUCCESS(aCommandDataIBBuilder.GetError());
 }
 
 void ParseCommandDataIB(CommandDataIB::Parser & aCommandDataIBParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPathIB::Parser commandPathParser;
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    aCommandDataIBParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(aCommandDataIBParser);
     err = aCommandDataIBParser.GetPath(&commandPathParser);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -805,7 +761,7 @@ void ParseCommandDataIB(CommandDataIB::Parser & aCommandDataIBParser)
         chip::TLV::TLVReader reader;
         bool val = false;
         chip::TLV::TLVType container;
-        aCommandDataIBParser.GetFields(&reader);
+        EXPECT_SUCCESS(aCommandDataIBParser.GetFields(&reader));
         err = reader.EnterContainer(container);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -831,8 +787,7 @@ void BuildCommandStatusIB(CommandStatusIB::Builder & aCommandStatusIBBuilder)
     EXPECT_EQ(statusIBBuilder.GetError(), CHIP_NO_ERROR);
     BuildStatusIB(statusIBBuilder);
 
-    aCommandStatusIBBuilder.EndOfCommandStatusIB();
-    EXPECT_EQ(aCommandStatusIBBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aCommandStatusIBBuilder.EndOfCommandStatusIB());
 }
 
 void ParseCommandStatusIB(CommandStatusIB::Parser & aCommandStatusIBParser)
@@ -840,9 +795,7 @@ void ParseCommandStatusIB(CommandStatusIB::Parser & aCommandStatusIBParser)
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPathIB::Parser commandPathParser;
     StatusIB::Parser statusParser;
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    aCommandStatusIBParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(aCommandStatusIBParser);
     err = aCommandStatusIBParser.GetPath(&commandPathParser);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -861,8 +814,8 @@ void BuildInvokeResponseIBWithCommandDataIB(InvokeResponseIB::Builder & aInvokeR
     CommandDataIB::Builder & commandDataBuilder = aInvokeResponseIBBuilder.CreateCommand();
     EXPECT_EQ(aInvokeResponseIBBuilder.GetError(), CHIP_NO_ERROR);
     BuildCommandDataIB(commandDataBuilder);
-    aInvokeResponseIBBuilder.EndOfInvokeResponseIB();
-    EXPECT_EQ(aInvokeResponseIBBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aInvokeResponseIBBuilder.EndOfInvokeResponseIB());
+    EXPECT_SUCCESS(aInvokeResponseIBBuilder.GetError());
 }
 
 void BuildInvokeResponseIBWithCommandStatusIB(InvokeResponseIB::Builder & aInvokeResponseIBBuilder)
@@ -870,8 +823,8 @@ void BuildInvokeResponseIBWithCommandStatusIB(InvokeResponseIB::Builder & aInvok
     CommandStatusIB::Builder & commandStatusBuilder = aInvokeResponseIBBuilder.CreateStatus();
     EXPECT_EQ(aInvokeResponseIBBuilder.GetError(), CHIP_NO_ERROR);
     BuildCommandStatusIB(commandStatusBuilder);
-    aInvokeResponseIBBuilder.EndOfInvokeResponseIB();
-    EXPECT_EQ(aInvokeResponseIBBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aInvokeResponseIBBuilder.EndOfInvokeResponseIB());
+    EXPECT_SUCCESS(aInvokeResponseIBBuilder.GetError());
 }
 
 void ParseInvokeResponseIBWithCommandDataIB(InvokeResponseIB::Parser & aInvokeResponseIBParser)
@@ -879,9 +832,7 @@ void ParseInvokeResponseIBWithCommandDataIB(InvokeResponseIB::Parser & aInvokeRe
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandDataIB::Parser commandDataParser;
     CommandStatusIB::Parser statusIBParser;
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    aInvokeResponseIBParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(aInvokeResponseIBParser);
     err = aInvokeResponseIBParser.GetCommand(&commandDataParser);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
@@ -891,9 +842,7 @@ void ParseInvokeResponseIBWithCommandStatusIB(InvokeResponseIB::Parser & aInvoke
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandDataIB::Parser commandDataParser;
     CommandStatusIB::Parser statusIBParser;
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    aInvokeResponseIBParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(aInvokeResponseIBParser);
     err = aInvokeResponseIBParser.GetStatus(&statusIBParser);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
@@ -904,8 +853,8 @@ void BuildInvokeRequests(InvokeRequests::Builder & aInvokeRequestsBuilder)
     EXPECT_EQ(aInvokeRequestsBuilder.GetError(), CHIP_NO_ERROR);
     BuildCommandDataIB(aCommandDataIBBuilder);
 
-    aInvokeRequestsBuilder.EndOfInvokeRequests();
-    EXPECT_EQ(aInvokeRequestsBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aInvokeRequestsBuilder.EndOfInvokeRequests());
+    EXPECT_SUCCESS(aInvokeRequestsBuilder.GetError());
 }
 
 void ParseInvokeRequests(chip::TLV::TLVReader & aReader)
@@ -915,9 +864,7 @@ void ParseInvokeRequests(chip::TLV::TLVReader & aReader)
     err = invokeRequestsParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    invokeRequestsParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(invokeRequestsParser);
 }
 
 void BuildInvokeResponses(InvokeResponseIBs::Builder & aInvokeResponsesBuilder)
@@ -926,8 +873,8 @@ void BuildInvokeResponses(InvokeResponseIBs::Builder & aInvokeResponsesBuilder)
     EXPECT_EQ(aInvokeResponsesBuilder.GetError(), CHIP_NO_ERROR);
     BuildInvokeResponseIBWithCommandDataIB(invokeResponseIBBuilder);
 
-    aInvokeResponsesBuilder.EndOfInvokeResponses();
-    EXPECT_EQ(aInvokeResponsesBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(aInvokeResponsesBuilder.EndOfInvokeResponses());
+    EXPECT_SUCCESS(aInvokeResponsesBuilder.GetError());
 }
 
 void ParseInvokeResponses(chip::TLV::TLVReader & aReader)
@@ -937,9 +884,7 @@ void ParseInvokeResponses(chip::TLV::TLVReader & aReader)
     err = invokeResponsesParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    invokeResponsesParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(invokeResponsesParser);
 }
 
 void BuildInvokeRequestMessage(chip::TLV::TLVWriter & aWriter)
@@ -955,8 +900,8 @@ void BuildInvokeRequestMessage(chip::TLV::TLVWriter & aWriter)
 
     BuildInvokeRequests(invokeRequestsBuilder);
 
-    invokeRequestMessageBuilder.EndOfInvokeRequestMessage();
-    EXPECT_EQ(invokeRequestMessageBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(invokeRequestMessageBuilder.EndOfInvokeRequestMessage());
+    EXPECT_SUCCESS(invokeRequestMessageBuilder.GetError());
 }
 
 void ParseInvokeRequestMessage(chip::TLV::TLVReader & aReader)
@@ -968,13 +913,11 @@ void ParseInvokeRequestMessage(chip::TLV::TLVReader & aReader)
 
     bool suppressResponse = false;
     bool timedRequest     = false;
-    invokeRequestMessageParser.GetSuppressResponse(&suppressResponse);
-    invokeRequestMessageParser.GetTimedRequest(&timedRequest);
+    EXPECT_SUCCESS(invokeRequestMessageParser.GetSuppressResponse(&suppressResponse));
+    EXPECT_SUCCESS(invokeRequestMessageParser.GetTimedRequest(&timedRequest));
     EXPECT_TRUE(suppressResponse);
     EXPECT_TRUE(timedRequest);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    invokeRequestMessageParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(invokeRequestMessageParser);
     EXPECT_EQ(invokeRequestMessageParser.ExitContainer(), CHIP_NO_ERROR);
 }
 
@@ -993,8 +936,8 @@ void BuildInvokeResponseMessage(chip::TLV::TLVWriter & aWriter)
     invokeResponseMessageBuilder.MoreChunkedMessages(true);
     EXPECT_EQ(invokeResponseMessageBuilder.GetError(), CHIP_NO_ERROR);
 
-    invokeResponseMessageBuilder.EndOfInvokeResponseMessage();
-    EXPECT_EQ(invokeResponseMessageBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(invokeResponseMessageBuilder.EndOfInvokeResponseMessage());
+    EXPECT_SUCCESS(invokeResponseMessageBuilder.GetError());
 }
 
 void ParseInvokeResponseMessage(chip::TLV::TLVReader & aReader)
@@ -1014,9 +957,7 @@ void ParseInvokeResponseMessage(chip::TLV::TLVReader & aReader)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(moreChunkedMessages);
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    invokeResponseMessageParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(invokeResponseMessageParser);
     EXPECT_EQ(invokeResponseMessageParser.ExitContainer(), CHIP_NO_ERROR);
 }
 
@@ -1042,8 +983,8 @@ void BuildReportDataMessage(chip::TLV::TLVWriter & aWriter)
     reportDataMessageBuilder.MoreChunkedMessages(true).SuppressResponse(true);
     EXPECT_EQ(reportDataMessageBuilder.GetError(), CHIP_NO_ERROR);
 
-    reportDataMessageBuilder.EndOfReportDataMessage();
-    EXPECT_EQ(reportDataMessageBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(reportDataMessageBuilder.EndOfReportDataMessage());
+    EXPECT_SUCCESS(reportDataMessageBuilder.GetError());
 }
 
 void ParseReportDataMessage(chip::TLV::TLVReader & aReader)
@@ -1056,11 +997,9 @@ void ParseReportDataMessage(chip::TLV::TLVReader & aReader)
     AttributeReportIBs::Parser attributeReportIBsParser;
     EventReportIBs::Parser eventReportsParser;
     bool moreChunkedMessages = false;
-    reportDataParser.Init(aReader);
+    EXPECT_SUCCESS(reportDataParser.Init(aReader));
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    reportDataParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(reportDataParser);
     err = reportDataParser.GetSuppressResponse(&suppressResponse);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(suppressResponse);
@@ -1109,8 +1048,8 @@ void BuildReadRequestMessage(chip::TLV::TLVWriter & aWriter)
     EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
     BuildDataVersionFilterIBs(dataVersionFilters);
 
-    readRequestBuilder.EndOfReadRequestMessage();
-    EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(readRequestBuilder.EndOfReadRequestMessage());
+    EXPECT_SUCCESS(readRequestBuilder.GetError());
 }
 
 void ParseReadRequestMessage(chip::TLV::TLVReader & aReader)
@@ -1126,9 +1065,7 @@ void ParseReadRequestMessage(chip::TLV::TLVReader & aReader)
 
     err = readRequestParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    readRequestParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(readRequestParser);
     err = readRequestParser.GetAttributeRequests(&attributePathListParser);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -1168,8 +1105,8 @@ void BuildWriteRequestMessage(chip::TLV::TLVWriter & aWriter)
     writeRequestBuilder.MoreChunkedMessages(true);
     EXPECT_EQ(writeRequestBuilder.GetError(), CHIP_NO_ERROR);
 
-    writeRequestBuilder.EndOfWriteRequestMessage();
-    EXPECT_EQ(writeRequestBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(writeRequestBuilder.EndOfWriteRequestMessage());
+    EXPECT_SUCCESS(writeRequestBuilder.GetError());
 }
 
 void ParseWriteRequestMessage(chip::TLV::TLVReader & aReader)
@@ -1184,9 +1121,7 @@ void ParseWriteRequestMessage(chip::TLV::TLVReader & aReader)
 
     err = writeRequestParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    writeRequestParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(writeRequestParser);
     err = writeRequestParser.GetSuppressResponse(&suppressResponse);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(suppressResponse);
@@ -1215,8 +1150,8 @@ void BuildWriteResponseMessage(chip::TLV::TLVWriter & aWriter)
     EXPECT_EQ(writeResponseBuilder.GetError(), CHIP_NO_ERROR);
     BuildAttributeStatuses(attributeStatuses);
 
-    writeResponseBuilder.EndOfWriteResponseMessage();
-    EXPECT_EQ(writeResponseBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(writeResponseBuilder.EndOfWriteResponseMessage());
+    EXPECT_SUCCESS(writeResponseBuilder.GetError());
 }
 
 void ParseWriteResponseMessage(chip::TLV::TLVReader & aReader)
@@ -1227,9 +1162,7 @@ void ParseWriteResponseMessage(chip::TLV::TLVReader & aReader)
     AttributeStatusIBs::Parser attributeStatusesParser;
     err = writeResponseParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    writeResponseParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(writeResponseParser);
     err = writeResponseParser.GetWriteResponses(&attributeStatusesParser);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(writeResponseParser.ExitContainer(), CHIP_NO_ERROR);
@@ -1272,8 +1205,8 @@ void BuildSubscribeRequestMessage(chip::TLV::TLVWriter & aWriter)
     EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
     BuildDataVersionFilterIBs(dataVersionFilters);
 
-    subscribeRequestBuilder.EndOfSubscribeRequestMessage();
-    EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(subscribeRequestBuilder.EndOfSubscribeRequestMessage());
+    EXPECT_SUCCESS(subscribeRequestBuilder.GetError());
 }
 
 void ParseSubscribeRequestMessage(chip::TLV::TLVReader & aReader)
@@ -1292,9 +1225,7 @@ void ParseSubscribeRequestMessage(chip::TLV::TLVReader & aReader)
 
     err = subscribeRequestParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    subscribeRequestParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(subscribeRequestParser);
     err = subscribeRequestParser.GetAttributeRequests(&attributePathListParser);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -1337,8 +1268,8 @@ void BuildSubscribeResponseMessage(chip::TLV::TLVWriter & aWriter)
     subscribeResponseBuilder.MaxInterval(2);
     EXPECT_EQ(subscribeResponseBuilder.GetError(), CHIP_NO_ERROR);
 
-    subscribeResponseBuilder.EndOfSubscribeResponseMessage();
-    EXPECT_EQ(subscribeResponseBuilder.GetError(), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(subscribeResponseBuilder.EndOfSubscribeResponseMessage());
+    EXPECT_SUCCESS(subscribeResponseBuilder.GetError());
 }
 
 void ParseSubscribeResponseMessage(chip::TLV::TLVReader & aReader)
@@ -1350,9 +1281,7 @@ void ParseSubscribeResponseMessage(chip::TLV::TLVReader & aReader)
     uint16_t maxInterval                = 0;
     err                                 = subscribeResponseParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    subscribeResponseParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(subscribeResponseParser);
     err = subscribeResponseParser.GetSubscriptionId(&subscriptionId);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     EXPECT_EQ(subscriptionId, 1u);
@@ -1385,9 +1314,7 @@ void ParseTimedRequestMessage(chip::TLV::TLVReader & aReader)
 
     err = timedRequestMessageParser.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    timedRequestMessageParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(timedRequestMessageParser);
     err = timedRequestMessageParser.GetTimeoutMs(&timeout);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -1403,7 +1330,7 @@ TEST_F(TestMessageDef, TestDataVersionFilterIB)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    dataVersionFilterIBBuilder.Init(&writer);
+    EXPECT_SUCCESS(dataVersionFilterIBBuilder.Init(&writer));
     BuildDataVersionFilterIB(dataVersionFilterIBBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1448,7 +1375,7 @@ TEST_F(TestMessageDef, TestEventFilter)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    eventFilterBuilder.Init(&writer);
+    EXPECT_SUCCESS(eventFilterBuilder.Init(&writer));
     BuildEventFilterIB(eventFilterBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1494,7 +1421,7 @@ TEST_F(TestMessageDef, TestClusterPathIB)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    clusterPathBuilder.Init(&writer);
+    EXPECT_SUCCESS(clusterPathBuilder.Init(&writer));
     BuildClusterPathIB(clusterPathBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1516,7 +1443,7 @@ TEST_F(TestMessageDef, TestAttributePath)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    attributePathBuilder.Init(&writer);
+    EXPECT_SUCCESS(attributePathBuilder.Init(&writer));
     BuildAttributePathIB(attributePathBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1564,7 +1491,7 @@ TEST_F(TestMessageDef, TestEventPath)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    eventPathBuilder.Init(&writer);
+    EXPECT_SUCCESS(eventPathBuilder.Init(&writer));
     BuildEventPath(eventPathBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1576,7 +1503,7 @@ TEST_F(TestMessageDef, TestEventPath)
     err = reader.Next();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    eventPathParser.Init(reader);
+    EXPECT_SUCCESS(eventPathParser.Init(reader));
     ParseEventPath(eventPathParser);
 }
 
@@ -1638,7 +1565,7 @@ TEST_F(TestMessageDef, TestEventDataIB)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    eventDataIBBuilder.Init(&writer);
+    EXPECT_SUCCESS(eventDataIBBuilder.Init(&writer));
     BuildEventDataIB(eventDataIBBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1650,7 +1577,7 @@ TEST_F(TestMessageDef, TestEventDataIB)
     err = reader.Next();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    eventDataIBParser.Init(reader);
+    EXPECT_SUCCESS(eventDataIBParser.Init(reader));
     ParseEventDataIB(eventDataIBParser);
 }
 
@@ -1662,7 +1589,7 @@ TEST_F(TestMessageDef, TestEventReportIB)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    eventReportIBBuilder.Init(&writer);
+    EXPECT_SUCCESS(eventReportIBBuilder.Init(&writer));
     BuildEventReportIB(eventReportIBBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1674,7 +1601,7 @@ TEST_F(TestMessageDef, TestEventReportIB)
     err = reader.Next();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    eventReportIBParser.Init(reader);
+    EXPECT_EQ(eventReportIBParser.Init(reader), CHIP_NO_ERROR);
     ParseEventReportIB(eventReportIBParser);
 }
 
@@ -1685,7 +1612,7 @@ TEST_F(TestMessageDef, TestEventReports)
     chip::System::PacketBufferTLVReader reader;
     EventReportIBs::Builder eventReportsBuilder;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    eventReportsBuilder.Init(&writer);
+    EXPECT_SUCCESS(eventReportsBuilder.Init(&writer));
     BuildEventReports(eventReportsBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1706,8 +1633,8 @@ TEST_F(TestMessageDef, TestEmptyEventReports)
     chip::System::PacketBufferTLVReader reader;
     EventReportIBs::Builder eventReportsBuilder;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    eventReportsBuilder.Init(&writer);
-    eventReportsBuilder.EndOfEventReports();
+    EXPECT_SUCCESS(eventReportsBuilder.Init(&writer));
+    EXPECT_SUCCESS(eventReportsBuilder.EndOfEventReports());
     EXPECT_EQ(eventReportsBuilder.GetError(), CHIP_NO_ERROR);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1729,7 +1656,7 @@ TEST_F(TestMessageDef, TestAttributeReportIB)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    attributeReportIBBuilder.Init(&writer);
+    EXPECT_SUCCESS(attributeReportIBBuilder.Init(&writer));
     BuildAttributeReportIB(attributeReportIBBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1741,7 +1668,7 @@ TEST_F(TestMessageDef, TestAttributeReportIB)
     err = reader.Next();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    attributeReportIBParser.Init(reader);
+    EXPECT_SUCCESS(attributeReportIBParser.Init(reader));
     ParseAttributeReportIB(attributeReportIBParser);
 }
 
@@ -1752,7 +1679,7 @@ TEST_F(TestMessageDef, TestAttributeReportIBs)
     chip::System::PacketBufferTLVReader reader;
     AttributeReportIBs::Builder attributeReportIBsBuilder;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    attributeReportIBsBuilder.Init(&writer);
+    EXPECT_SUCCESS(attributeReportIBsBuilder.Init(&writer));
     BuildAttributeReportIBs(attributeReportIBsBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1773,8 +1700,8 @@ TEST_F(TestMessageDef, TestEmptyAttributeReportIBs)
     chip::System::PacketBufferTLVReader reader;
     AttributeReportIBs::Builder attributeReportIBsBuilder;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    attributeReportIBsBuilder.Init(&writer);
-    attributeReportIBsBuilder.EndOfAttributeReportIBs();
+    EXPECT_SUCCESS(attributeReportIBsBuilder.Init(&writer));
+    EXPECT_SUCCESS(attributeReportIBsBuilder.EndOfAttributeReportIBs());
     EXPECT_EQ(attributeReportIBsBuilder.GetError(), CHIP_NO_ERROR);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1796,7 +1723,7 @@ TEST_F(TestMessageDef, TestStatusIB)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    statusIBBuilder.Init(&writer);
+    EXPECT_SUCCESS(statusIBBuilder.Init(&writer));
     BuildStatusIB(statusIBBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1808,7 +1735,7 @@ TEST_F(TestMessageDef, TestStatusIB)
     err = reader.Next();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    StatusIBParser.Init(reader);
+    EXPECT_SUCCESS(StatusIBParser.Init(reader));
     ParseStatusIB(StatusIBParser);
 }
 
@@ -1820,7 +1747,7 @@ TEST_F(TestMessageDef, TestEventStatusIB)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    eventStatusIBBuilder.Init(&writer);
+    EXPECT_SUCCESS(eventStatusIBBuilder.Init(&writer));
     BuildEventStatusIB(eventStatusIBBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1832,7 +1759,7 @@ TEST_F(TestMessageDef, TestEventStatusIB)
     err = reader.Next();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    eventStatusIBParser.Init(reader);
+    EXPECT_SUCCESS(eventStatusIBParser.Init(reader));
     ParseEventStatusIB(eventStatusIBParser);
 }
 
@@ -1844,7 +1771,7 @@ TEST_F(TestMessageDef, TestAttributeStatusIB)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    attributeStatusIBBuilder.Init(&writer);
+    EXPECT_SUCCESS(attributeStatusIBBuilder.Init(&writer));
     BuildAttributeStatusIB(attributeStatusIBBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1856,7 +1783,7 @@ TEST_F(TestMessageDef, TestAttributeStatusIB)
     err = reader.Next();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    attributeStatusIBParser.Init(reader);
+    EXPECT_SUCCESS(attributeStatusIBParser.Init(reader));
     ParseAttributeStatusIB(attributeStatusIBParser);
 }
 
@@ -1890,7 +1817,7 @@ TEST_F(TestMessageDef, TestAttributeDataIB)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    AttributeDataIBBuilder.Init(&writer);
+    EXPECT_SUCCESS(AttributeDataIBBuilder.Init(&writer));
     BuildAttributeDataIB(AttributeDataIBBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1902,7 +1829,7 @@ TEST_F(TestMessageDef, TestAttributeDataIB)
     err = reader.Next();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    AttributeDataIBParser.Init(reader);
+    EXPECT_SUCCESS(AttributeDataIBParser.Init(reader));
     ParseAttributeDataIB(AttributeDataIBParser);
 }
 
@@ -1913,7 +1840,7 @@ TEST_F(TestMessageDef, TestAttributeDataIBs)
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     AttributeDataIBs::Builder AttributeDataIBsBuilder;
-    AttributeDataIBsBuilder.Init(&writer);
+    EXPECT_SUCCESS(AttributeDataIBsBuilder.Init(&writer));
     BuildAttributeDataIBs(AttributeDataIBsBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1935,7 +1862,7 @@ TEST_F(TestMessageDef, TestCommandDataIB)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    commandDataIBBuilder.Init(&writer);
+    EXPECT_SUCCESS(commandDataIBBuilder.Init(&writer));
     BuildCommandDataIB(commandDataIBBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1947,7 +1874,7 @@ TEST_F(TestMessageDef, TestCommandDataIB)
     err = reader.Next();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    commandDataIBParser.Init(reader);
+    EXPECT_SUCCESS(commandDataIBParser.Init(reader));
     ParseCommandDataIB(commandDataIBParser);
 }
 
@@ -1959,7 +1886,7 @@ TEST_F(TestMessageDef, TestCommandStatusIB)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    commandStatusIBBuilder.Init(&writer);
+    EXPECT_SUCCESS(commandStatusIBBuilder.Init(&writer));
     BuildCommandStatusIB(commandStatusIBBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1971,7 +1898,7 @@ TEST_F(TestMessageDef, TestCommandStatusIB)
     err = reader.Next();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    commandStatusIBParser.Init(reader);
+    EXPECT_SUCCESS(commandStatusIBParser.Init(reader));
     ParseCommandStatusIB(commandStatusIBParser);
 }
 
@@ -1983,7 +1910,7 @@ TEST_F(TestMessageDef, TestInvokeResponseIBWithCommandDataIB)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    invokeResponseIBBuilder.Init(&writer);
+    EXPECT_SUCCESS(invokeResponseIBBuilder.Init(&writer));
     BuildInvokeResponseIBWithCommandDataIB(invokeResponseIBBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -1995,31 +1922,28 @@ TEST_F(TestMessageDef, TestInvokeResponseIBWithCommandDataIB)
     err = reader.Next();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    invokeResponseIBParser.Init(reader);
+    EXPECT_SUCCESS(invokeResponseIBParser.Init(reader));
     ParseInvokeResponseIBWithCommandDataIB(invokeResponseIBParser);
 }
 
 TEST_F(TestMessageDef, TestInvokeResponseIBWithCommandStatusIB)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     InvokeResponseIB::Builder invokeResponseIBBuilder;
     InvokeResponseIB::Parser invokeResponseIBParser;
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    invokeResponseIBBuilder.Init(&writer);
+    EXPECT_SUCCESS(invokeResponseIBBuilder.Init(&writer));
     BuildInvokeResponseIBWithCommandStatusIB(invokeResponseIBBuilder);
     chip::System::PacketBufferHandle buf;
-    err = writer.Finalize(&buf);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_SUCCESS(writer.Finalize(&buf));
 
     DebugPrettyPrint(buf);
 
     reader.Init(std::move(buf));
-    err = reader.Next();
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_SUCCESS(reader.Next());
 
-    invokeResponseIBParser.Init(reader);
+    EXPECT_SUCCESS(invokeResponseIBParser.Init(reader));
     ParseInvokeResponseIBWithCommandStatusIB(invokeResponseIBParser);
 }
 
@@ -2031,7 +1955,7 @@ TEST_F(TestMessageDef, TestInvokeResponseIBWithMalformData)
     chip::System::PacketBufferTLVWriter writer;
     chip::System::PacketBufferTLVReader reader;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    invokeResponseIBBuilder.Init(&writer);
+    EXPECT_SUCCESS(invokeResponseIBBuilder.Init(&writer));
     BuildWrongInvokeResponseIB(invokeResponseIBBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -2054,7 +1978,7 @@ TEST_F(TestMessageDef, TestInvokeRequests)
     chip::System::PacketBufferTLVReader reader;
     InvokeRequests::Builder invokeRequestsBuilder;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    invokeRequestsBuilder.Init(&writer);
+    EXPECT_SUCCESS(invokeRequestsBuilder.Init(&writer));
     BuildInvokeRequests(invokeRequestsBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -2075,7 +1999,7 @@ TEST_F(TestMessageDef, TestInvokeResponses)
     chip::System::PacketBufferTLVReader reader;
     InvokeResponseIBs::Builder invokeResponsesBuilder;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    invokeResponsesBuilder.Init(&writer);
+    EXPECT_SUCCESS(invokeResponsesBuilder.Init(&writer));
     BuildInvokeResponses(invokeResponsesBuilder);
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);
@@ -2361,7 +2285,7 @@ TEST_F(TestMessageDef, TestCheckPointRollback)
     chip::TLV::TLVWriter checkpoint;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
     AttributeDataIBs::Builder attributeDataIBsBuilder;
-    attributeDataIBsBuilder.Init(&writer);
+    EXPECT_SUCCESS(attributeDataIBsBuilder.Init(&writer));
 
     // encode one attribute element
     AttributeDataIB::Builder & attributeDataIBBuilder1 = attributeDataIBsBuilder.CreateAttributeDataIBBuilder();
@@ -2376,7 +2300,7 @@ TEST_F(TestMessageDef, TestCheckPointRollback)
     // rollback to previous checkpoint
     attributeDataIBsBuilder.Rollback(checkpoint);
 
-    attributeDataIBsBuilder.EndOfAttributeDataIBs();
+    EXPECT_SUCCESS(attributeDataIBsBuilder.EndOfAttributeDataIBs());
     EXPECT_EQ(attributeDataIBsBuilder.GetError(), CHIP_NO_ERROR);
 
     chip::System::PacketBufferHandle buf;
@@ -2392,9 +2316,7 @@ TEST_F(TestMessageDef, TestCheckPointRollback)
     err = AttributeDataIBsParser.Init(reader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    AttributeDataIBsParser.PrettyPrint();
-#endif
+    DebugPrettyPrint(AttributeDataIBsParser);
     while (CHIP_NO_ERROR == (err = AttributeDataIBsParser.Next()))
     {
         ++NumDataElement;

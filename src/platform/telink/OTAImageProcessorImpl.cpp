@@ -22,7 +22,9 @@
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
+#include <system/SystemError.h>
 
 #include <zephyr/dfu/mcuboot.h>
 #include <zephyr/storage/flash_map.h>
@@ -56,7 +58,8 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    return DeviceLayer::SystemLayer().ScheduleLambda([this] { mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
+    return DeviceLayer::SystemLayer().ScheduleLambda(
+        [this] { TEMPORARY_RETURN_IGNORED mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
 }
 const struct device * flash_dev;
 
@@ -167,12 +170,12 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
                           static_cast<unsigned>(mParams.totalFileBytes));
             if (downloadedBytesRestored)
             {
-                mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
+                TEMPORARY_RETURN_IGNORED mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
                 downloadedBytesRestored = 0;
             }
             else
             {
-                mDownloader->FetchNextData();
+                TEMPORARY_RETURN_IGNORED mDownloader->FetchNextData();
             }
         }
         else
@@ -213,10 +216,10 @@ CHIP_ERROR OTAImageProcessorImpl::RestoreBytes(ByteSpan & aBlock)
         // Align to the nearest lower multiple of sector size (4 KB) for Flash erase/write
         downloadedBytesRestored = ROUND_DOWN(downloadedBytesRestored, 0x1000);
         ChipLogDetail(SoftwareUpdate, "Restored %u/%u bytes", static_cast<unsigned>(downloadedBytesRestored),
-                      static_cast<unsigned>(mParams.totalFileBytes))
+                      static_cast<unsigned>(mParams.totalFileBytes));
 
-            // Reinit Flash Stream with offset
-            ReturnErrorOnFailure(System::MapErrorZephyr(stream_flash_buffered_write(&stream, NULL, 0, true)));
+        // Reinit Flash Stream with offset
+        ReturnErrorOnFailure(System::MapErrorZephyr(stream_flash_buffered_write(&stream, NULL, 0, true)));
         ReturnErrorOnFailure(InitFlashStream(downloadedBytesRestored));
     }
     else
@@ -240,10 +243,31 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)
         VerifyOrReturnError(error != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
         ReturnErrorOnFailure(error);
 
+        uint16_t vendorId  = 0;
+        uint16_t productId = 0;
+
+        if (GetDeviceInstanceInfoProvider()->GetVendorId(vendorId) != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(DeviceLayer, "Failed to retrieve local Vendor ID for OTA validation");
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+        if (GetDeviceInstanceInfoProvider()->GetProductId(productId) != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(DeviceLayer, "Failed to retrieve local Product ID for OTA validation");
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+        if (header.mVendorId != vendorId || header.mProductId != productId)
+        {
+            ChipLogDetail(DeviceLayer, "The argument is invalid, mVendorId: 0x%x - \
+                          mProductId: 0x%x \t vendorId : 0x%x - productId : 0x%x",
+                          header.mVendorId, header.mProductId, vendorId, productId);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
         mParams.totalFileBytes = header.mPayloadSize;
 
         // Restore interrupted OTA process
-        RestoreBytes(header.mImageDigest);
+        TEMPORARY_RETURN_IGNORED RestoreBytes(header.mImageDigest);
 
         mHeaderParser.Clear();
     }

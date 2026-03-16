@@ -310,6 +310,9 @@ static BOOL AttributeIsSpecifiedInAccessControlCluster(AttributeId aAttributeId)
     case Attributes::Arl::Id: {
         return YES;
     }
+    case Attributes::AuxiliaryACL::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -803,6 +806,15 @@ static BOOL AttributeIsSpecifiedInGeneralCommissioningCluster(AttributeId aAttri
     case Attributes::TCUpdateDeadline::Id: {
         return YES;
     }
+    case Attributes::RecoveryIdentifier::Id: {
+        return YES;
+    }
+    case Attributes::NetworkRecoveryReason::Id: {
+        return YES;
+    }
+    case Attributes::IsCommissioningWithoutPower::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -936,6 +948,9 @@ static BOOL AttributeIsSpecifiedInGeneralDiagnosticsCluster(AttributeId aAttribu
         return YES;
     }
     case Attributes::TestEventTriggersEnabled::Id: {
+        return YES;
+    }
+    case Attributes::DeviceLoadStatus::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -1451,6 +1466,9 @@ static BOOL AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(Attribute
     case Attributes::ProductAppearance::Id: {
         return YES;
     }
+    case Attributes::DeviceLocation::Id: {
+        return YES;
+    }
     case Attributes::ConfigurationVersion::Id: {
         return YES;
     }
@@ -1600,6 +1618,9 @@ static BOOL AttributeIsSpecifiedInGroupKeyManagementCluster(AttributeId aAttribu
         return YES;
     }
     case Attributes::MaxGroupKeysPerFabric::Id: {
+        return YES;
+    }
+    case Attributes::GroupcastAdoption::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2284,6 +2305,9 @@ static BOOL AttributeIsSpecifiedInSmokeCOAlarmCluster(AttributeId aAttributeId)
     case Attributes::ExpiryDate::Id: {
         return YES;
     }
+    case Attributes::Unmounted::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -2542,6 +2566,46 @@ static BOOL AttributeIsSpecifiedInScenesManagementCluster(AttributeId aAttribute
     }
     }
 }
+static BOOL AttributeIsSpecifiedInGroupcastCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Groupcast;
+    switch (aAttributeId) {
+    case Attributes::Membership::Id: {
+        return YES;
+    }
+    case Attributes::MaxMembershipCount::Id: {
+        return YES;
+    }
+    case Attributes::MaxMcastAddrCount::Id: {
+        return YES;
+    }
+    case Attributes::UsedMcastAddrCount::Id: {
+        return YES;
+    }
+    case Attributes::FabricUnderTest::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known Groupcast attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInHEPAFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::HepaFilterMonitoring;
@@ -2624,6 +2688,49 @@ static BOOL AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(Attribu
     }
     default: {
         // Not a known ActivatedCarbonFilterMonitoring attribute.
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInWaterTankLevelMonitoringCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WaterTankLevelMonitoring;
+    switch (aAttributeId) {
+    case Attributes::Condition::Id: {
+        return YES;
+    }
+    case Attributes::DegradationDirection::Id: {
+        return YES;
+    }
+    case Attributes::ChangeIndication::Id: {
+        return YES;
+    }
+    case Attributes::InPlaceIndicator::Id: {
+        return YES;
+    }
+    case Attributes::LastChangedTime::Id: {
+        return YES;
+    }
+    case Attributes::ReplacementProductList::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known WaterTankLevelMonitoring attribute.
         return NO;
     }
     }
@@ -3164,6 +3271,9 @@ static BOOL AttributeIsSpecifiedInPowerTopologyCluster(AttributeId aAttributeId)
     case Attributes::ActiveEndpoints::Id: {
         return YES;
     }
+    case Attributes::ElectricalCircuitNodes::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -3576,10 +3686,13 @@ static BOOL AttributeIsSpecifiedInClosureControlCluster(AttributeId aAttributeId
     case Attributes::CurrentErrorList::Id: {
         return YES;
     }
-    case Attributes::OverallState::Id: {
+    case Attributes::OverallCurrentState::Id: {
         return YES;
     }
-    case Attributes::OverallTarget::Id: {
+    case Attributes::OverallTargetState::Id: {
+        return YES;
+    }
+    case Attributes::LatchControlModes::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -3610,7 +3723,7 @@ static BOOL AttributeIsSpecifiedInClosureDimensionCluster(AttributeId aAttribute
     case Attributes::CurrentState::Id: {
         return YES;
     }
-    case Attributes::Target::Id: {
+    case Attributes::TargetState::Id: {
         return YES;
     }
     case Attributes::Resolution::Id: {
@@ -3638,6 +3751,9 @@ static BOOL AttributeIsSpecifiedInClosureDimensionCluster(AttributeId aAttribute
         return YES;
     }
     case Attributes::ModulationType::Id: {
+        return YES;
+    }
+    case Attributes::LatchControlModes::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -3980,6 +4096,18 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::SetpointHoldExpiryTimestamp::Id: {
+        return YES;
+    }
+    case Attributes::MaxThermostatSuggestions::Id: {
+        return YES;
+    }
+    case Attributes::ThermostatSuggestions::Id: {
+        return YES;
+    }
+    case Attributes::CurrentThermostatSuggestion::Id: {
+        return YES;
+    }
+    case Attributes::ThermostatSuggestionNotFollowingReason::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -4566,6 +4694,9 @@ static BOOL AttributeIsSpecifiedInOccupancySensingCluster(AttributeId aAttribute
         return YES;
     }
     case Attributes::HoldTimeLimits::Id: {
+        return YES;
+    }
+    case Attributes::PredictedOccupancy::Id: {
         return YES;
     }
     case Attributes::PIROccupiedToUnoccupiedDelay::Id: {
@@ -5227,6 +5358,67 @@ static BOOL AttributeIsSpecifiedInSoilMeasurementCluster(AttributeId aAttributeI
     }
     }
 }
+static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AmbientContextSensing;
+    switch (aAttributeId) {
+    case Attributes::HumanActivityDetected::Id: {
+        return YES;
+    }
+    case Attributes::ObjectIdentified::Id: {
+        return YES;
+    }
+    case Attributes::AudioContextDetected::Id: {
+        return YES;
+    }
+    case Attributes::AmbientContextType::Id: {
+        return YES;
+    }
+    case Attributes::AmbientContextTypeSupported::Id: {
+        return YES;
+    }
+    case Attributes::ObjectCountReached::Id: {
+        return YES;
+    }
+    case Attributes::ObjectCountConfig::Id: {
+        return YES;
+    }
+    case Attributes::ObjectCount::Id: {
+        return YES;
+    }
+    case Attributes::SimultaneousDetectionLimit::Id: {
+        return YES;
+    }
+    case Attributes::HoldTime::Id: {
+        return YES;
+    }
+    case Attributes::HoldTimeLimits::Id: {
+        return YES;
+    }
+    case Attributes::PredictedActivity::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        // Not a known AmbientContextSensing attribute.
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInWiFiNetworkManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -5765,6 +5957,15 @@ static BOOL AttributeIsSpecifiedInContentControlCluster(AttributeId aAttributeId
     case Attributes::BlockUnrated::Id: {
         return YES;
     }
+    case Attributes::BlockChannelList::Id: {
+        return YES;
+    }
+    case Attributes::BlockApplicationList::Id: {
+        return YES;
+    }
+    case Attributes::BlockContentTimeWindow::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -5815,7 +6016,10 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
 {
     using namespace Clusters::ZoneManagement;
     switch (aAttributeId) {
-    case Attributes::SupportedZoneSources::Id: {
+    case Attributes::MaxUserDefinedZones::Id: {
+        return YES;
+    }
+    case Attributes::MaxZones::Id: {
         return YES;
     }
     case Attributes::Zones::Id: {
@@ -5824,7 +6028,13 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
     case Attributes::Triggers::Id: {
         return YES;
     }
+    case Attributes::SensitivityMax::Id: {
+        return YES;
+    }
     case Attributes::Sensitivity::Id: {
+        return YES;
+    }
+    case Attributes::TwoDCartesianMax::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5864,7 +6074,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::NightVisionUsesInfrared::Id: {
         return YES;
     }
-    case Attributes::MinViewport::Id: {
+    case Attributes::MinViewportResolution::Id: {
         return YES;
     }
     case Attributes::RateDistortionTradeOffPoints::Id: {
@@ -5906,7 +6116,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::AllocatedSnapshotStreams::Id: {
         return YES;
     }
-    case Attributes::RankedVideoStreamPrioritiesList::Id: {
+    case Attributes::StreamUsagePriorities::Id: {
         return YES;
     }
     case Attributes::SoftRecordingPrivacyModeEnabled::Id: {
@@ -6025,6 +6235,9 @@ static BOOL AttributeIsSpecifiedInCameraAVSettingsUserLevelManagementCluster(Att
         return YES;
     }
     case Attributes::PanMax::Id: {
+        return YES;
+    }
+    case Attributes::MovementState::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6523,7 +6736,10 @@ static BOOL AttributeIsSpecifiedInCommodityMeteringCluster(AttributeId aAttribut
     case Attributes::MeteredQuantityTimestamp::Id: {
         return YES;
     }
-    case Attributes::MeasurementType::Id: {
+    case Attributes::TariffUnit::Id: {
+        return YES;
+    }
+    case Attributes::MaximumMeteredQuantities::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6696,6 +6912,9 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::GlobalStruct::Id: {
+        return YES;
+    }
+    case Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id: {
         return YES;
     }
     case Attributes::Unsupported::Id: {
@@ -7039,11 +7258,17 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ScenesManagement::Id: {
         return AttributeIsSpecifiedInScenesManagementCluster(aAttributeId);
     }
+    case Clusters::Groupcast::Id: {
+        return AttributeIsSpecifiedInGroupcastCluster(aAttributeId);
+    }
     case Clusters::HepaFilterMonitoring::Id: {
         return AttributeIsSpecifiedInHEPAFilterMonitoringCluster(aAttributeId);
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(aAttributeId);
+    }
+    case Clusters::WaterTankLevelMonitoring::Id: {
+        return AttributeIsSpecifiedInWaterTankLevelMonitoringCluster(aAttributeId);
     }
     case Clusters::BooleanStateConfiguration::Id: {
         return AttributeIsSpecifiedInBooleanStateConfigurationCluster(aAttributeId);
@@ -7173,6 +7398,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::SoilMeasurement::Id: {
         return AttributeIsSpecifiedInSoilMeasurementCluster(aAttributeId);
+    }
+    case Clusters::AmbientContextSensing::Id: {
+        return AttributeIsSpecifiedInAmbientContextSensingCluster(aAttributeId);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return AttributeIsSpecifiedInWiFiNetworkManagementCluster(aAttributeId);

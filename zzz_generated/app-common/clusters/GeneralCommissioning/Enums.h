@@ -46,6 +46,19 @@ enum class CommissioningErrorEnum : uint8_t
     kUnknownEnumValue = 8,
 };
 
+// Enum for NetworkRecoveryReasonEnum
+enum class NetworkRecoveryReasonEnum : uint8_t
+{
+    kUnspecified = 0x00,
+    kAuth        = 0x01,
+    kVisibility  = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
 // Enum for RegulatoryLocationTypeEnum
 enum class RegulatoryLocationTypeEnum : uint8_t
 {
@@ -63,6 +76,7 @@ enum class RegulatoryLocationTypeEnum : uint8_t
 enum class Feature : uint32_t
 {
     kTermsAndConditions = 0x1,
+    kNetworkRecovery    = 0x2,
 };
 } // namespace GeneralCommissioning
 } // namespace Clusters

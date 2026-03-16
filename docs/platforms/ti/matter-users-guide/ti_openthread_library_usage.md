@@ -104,7 +104,7 @@ In order to update the OpenThread configuration when building from source or a
 custom library, users may adjust features via the following configuration header
 file:
 
--   `${chip_root}/examples/platform/cc13x4_26x4/project_include/OpenThreadConfig.h`
+-   `${chip_root}/examples/platform/ti/cc13x4_26x4/project_include/OpenThreadConfig.h`
 
 Please refer to TI's standalone OpenThread Application build process for
 instructions on acquiring FTD/MTD libraries as they are automatically built when

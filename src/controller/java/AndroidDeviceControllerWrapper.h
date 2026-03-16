@@ -110,6 +110,7 @@ public:
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
     void OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted,
                                      CHIP_ERROR error) override;
+    void OnCommissioningStageStart(chip::PeerId peerId, chip::Controller::CommissioningStage stage) override;
     void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
     void OnScanNetworksSuccess(
         const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse) override;

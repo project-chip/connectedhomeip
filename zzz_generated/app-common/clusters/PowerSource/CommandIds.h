@@ -10,7 +10,15 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace PowerSource {
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+// Total number of client to server commands supported by the cluster
+inline constexpr uint32_t kAcceptedCommandsCount = 0;
+
+// Total number of server to client commands supported by the cluster (response commands)
+inline constexpr uint32_t kGeneratedCommandsCount = 0;
+
+} // namespace Commands
 } // namespace PowerSource
 } // namespace Clusters
 } // namespace app

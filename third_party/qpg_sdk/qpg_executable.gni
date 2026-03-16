@@ -19,6 +19,23 @@ import("${build_root}/toolchain/flashable_executable.gni")
 import("${chip_root}/src/platform/device.gni")
 import("qpg_sdk.gni")
 
+template("appuc_firmware_packer") {
+  forward_variables_from(invoker,
+                         [
+                           "appuc_output_name",
+                           "appuc_options",
+                           "deps",
+                           "data_deps",
+                         ])
+
+  action(target_name) {
+    script = "${qpg_sdk_root}/Tools/QorvoPlatformTools/appuc_firmware_packer.py"
+    outputs = [ appuc_output_name ]
+
+    args = appuc_options
+  }
+}
+
 # Run the generator script that takes a .HEX file and adds the OTA header to it.
 #
 # This requires a Python script, given by ota_header_generator,
@@ -48,27 +65,72 @@ template("gen_ota_header") {
     script = ota_header_generator
   }
 }
+template("hexmerge") {
+  forward_variables_from(invoker,
+                         [
+                           "hexmerge_generator",
+                           "hexmerge_output_name",
+                           "hexmerge_arguments",
+                           "deps",
+                           "data_deps",
+                         ])
+
+  action(target_name) {
+    outputs = [ hexmerge_output_name ]
+
+    args = hexmerge_arguments
+    script = hexmerge_generator
+  }
+}
+
+template("hexfill") {
+  forward_variables_from(invoker,
+                         [
+                           "hexfill_generator",
+                           "hexfill_output_name",
+                           "hexfill_arguments",
+                           "deps",
+                           "data_deps",
+                         ])
+
+  action(target_name) {
+    outputs = [ hexfill_output_name ]
+
+    args = hexfill_arguments
+    script = hexfill_generator
+  }
+}
 
 template("qpg_executable") {
   output_base_name = get_path_info(invoker.output_name, "name")
 
   qpg_target_name = target_name
+
   executable_target_name = "${target_name}.out"
 
-  # The executable is the final target.
-  if (chip_enable_ota_requestor) {
-    final_target = "$executable_target_name.ota"
-  } else {
-    final_target = executable_target_name
-  }
-
-  objcopy_image_name = invoker.output_name + ".hex"
   objcopy_image_format = "ihex"
   objcopy = "arm-none-eabi-objcopy"
+  objcopy_image_name = invoker.output_name + ".application.hex_"
+  app_unsigned_hex = objcopy_image_name
+  app_signed_hex = invoker.output_name + ".application.signed.hex_"
+  output_merged_hex = invoker.output_name + ".merged.hex_"
+  output_hex = invoker.output_name + ".hex"
 
   defines = []
   if (defined(invoker.defines)) {
     defines += invoker.defines
+  }
+
+  if (defined(invoker.app_name)) {
+    app_name = invoker.app_name
+  } else {
+    assert(false, "Unknown App!")
+  }
+
+  if (defined(invoker.project_dir)) {
+    project_dir = invoker.project_dir
+  } else {
+    assert(false, "Project path missing!")
   }
 
   # Copy flashing dependencies to the output directory so that the output
@@ -97,6 +159,47 @@ template("qpg_executable") {
     data_deps = [ ":${flashing_runtime_target}" ]
   }
 
+  appuc_firmware_packer(app_signed_hex) {
+    appuc_output_name = "${root_out_dir}/${app_signed_hex}"
+    out_dir = rebase_path(root_out_dir, root_build_dir)
+
+    appuc_options = [
+      "--appuc",
+      "1",
+      "--version",
+      "1",
+    ]
+    appuc_options += [
+      "--input",
+      "${out_dir}/${app_unsigned_hex}",
+    ]
+    appuc_options += [
+      "--output",
+      "${out_dir}/${app_signed_hex}",
+    ]
+    appuc_options += [
+      "--sign",
+      rebase_path(qpg_sdk_root, root_build_dir) +
+          "/Tools/SecureBoot/developer_key_private.der",
+    ]
+    appuc_options += [
+      "--cert",
+      rebase_path(qpg_sdk_root, root_build_dir) +
+          "/Tools/SecureBoot/developer_certificate_signed.cert",
+    ]
+
+    deps = [ ":$executable_target_name" ]
+  }
+
+  if (qpg_target_ic == "qpg6200") {
+    flash_start_addr = "0x10013000"
+    flash_app_start_offset = "0x7400"
+    nvm_start_addr = "0x1013f800"
+    nvm_end_addr = "0x10147800"
+  } else {
+    assert(false, "Unknown QPG board!")
+  }
+
   # If OTA requestor is enabled, generate OTA image from HEX
   if (chip_enable_ota_requestor) {
     gen_ota_header("$executable_target_name.ota") {
@@ -105,48 +208,98 @@ template("qpg_executable") {
       ota_header_generator = "${qpg_sdk_root}/Tools/Ota/generate_ota_img.py"
 
       ota_header_options = [
-        string_join("=",
-                    [
-                      "--chip_root",
-                      rebase_path(chip_root, root_build_dir),
-                    ]),
-        string_join("=",
-                    [
-                      "--in_file",
-                      "${out_dir}/${invoker.output_name}.hex",
-                    ]),
-        string_join("=",
-                    [
-                      "--out_file",
-                      "${out_dir}/${invoker.output_name}.ota",
-                    ]),
-        string_join("=",
-                    [
-                      "--pem_file_path",
-                      rebase_path(qpg_sdk_root, root_build_dir) +
-                          "/Tools/Ota/example_private_key.pem.example",
-                    ]),
-        "--pem_password=test1234",
-        "--sign",
+        "--header_version=1",
+        "--xp400x",
+        "--flash_start=${flash_start_addr}",
+        "--flash_app_start_offset=${flash_app_start_offset}",
+        "--compression",
+        "lzma",
+        "--matter",
       ]
 
-      # Use build-time overrules in OTA header creation
-      # Normally taken from CHIPProjectConfig.h by scripting
-      if (matter_device_vid != "") {
-        ota_header_options += [ "-vid=${matter_device_vid}" ]
-      }
-      if (matter_device_pid != "") {
-        ota_header_options += [ "-pid=${matter_device_pid}" ]
-      }
+      ota_header_options += [
+        "--chip_root",
+        rebase_path(chip_root, root_build_dir),
+        "--chip_config_header",
+        rebase_path(project_dir, root_build_dir) +
+            "/include/CHIPProjectConfig.h",
+      ]
+
+      ota_header_options += [
+        "--bl_image_file",
+        "${out_dir}/bootloader_${qpg_target_ic}.hex",
+        "--se_image_file",
+        rebase_path(qpg_sdk_root, root_build_dir) +
+            "/Tools/Binaries/se_firmware_release_xp4002_seuc_upgrade.hex",
+        "--in_file",
+        "${out_dir}/${app_signed_hex}",
+        "--out_file",
+        "${out_dir}/${invoker.output_name}.ota",
+      ]
+
+      ota_header_options += [
+        "--developer-key",
+        rebase_path(qpg_sdk_root, root_build_dir) +
+            "/Tools/SecureBoot/developer_key_private.der",
+        "--factory_data_config",
+        rebase_path(qpg_sdk_root, root_build_dir) + "/Tools/QorvoPlatformTools/Matter/Credentials/test_${app_name}_qpg6200.factory_data_config",
+      ]
+
       if (matter_ota_test_image) {
         ota_header_options += [ "-tui" ]
       }
-      deps = [ ":$executable_target_name" ]
+
+      deps = [
+        ":$app_signed_hex",
+        "${chip_root}/third_party/qpg_sdk:qpg_bootloader",
+      ]
     }
+  } else {
+    print("OTA Requestor disabled for ${app_name} from ${project_dir}")
+    print("Unused: ${flash_start_addr} and ${flash_app_start_offset}")
+  }
+
+  hexmerge("$output_merged_hex") {
+    out_dir = rebase_path(root_out_dir, root_build_dir)
+    hexmerge_output_name = "${root_out_dir}/gen/$output_merged_hex"
+    hexmerge_generator = "${qpg_sdk_root}/Tools/Hex/hexmerge.py"
+    hexmerge_arguments = [
+      "${out_dir}/${output_merged_hex}",
+      "${out_dir}/${app_signed_hex}",
+      "${out_dir}/bootloader_${qpg_target_ic}.hex",
+      "${out_dir}/${output_base_name}.factorydata.hex",
+      "--ignore_start_execution_addr",
+    ]
+    deps = [
+      ":$app_signed_hex",
+      "${chip_root}/third_party/qpg_sdk:qpg_bootloader",
+    ]
+  }
+
+  hexfill("${output_hex}") {
+    out_dir = rebase_path(root_out_dir, root_build_dir)
+    hexfill_output_name = "${root_out_dir}/${output_hex}"
+    hexfill_generator = "${qpg_sdk_root}/Tools/Hex/hexfill.py"
+    hexfill_arguments = [
+      "${out_dir}/${output_merged_hex}",
+      "${out_dir}/${output_hex}",
+      "--endex",
+      "${nvm_end_addr}",
+      "--start",
+      "${nvm_start_addr}",
+      "--value",
+      "0x0",
+      "--ignore_start_execution_addr",
+    ]
+
+    deps = [ ":$output_merged_hex" ]
   }
 
   group(qpg_target_name) {
-    data_deps = [ ":$final_target" ]
+    data_deps = [ ":${invoker.output_name}.hex" ]
+    if (chip_enable_ota_requestor) {
+      data_deps += [ ":$executable_target_name.ota" ]
+    }
 
     if (defined(invoker.data_deps)) {
       data_deps += invoker.data_deps

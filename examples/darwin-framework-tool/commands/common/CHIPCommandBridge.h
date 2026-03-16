@@ -27,11 +27,6 @@
 
 #include "../provider/OTAProviderDelegate.h"
 
-inline constexpr char kIdentityAlpha[] = "alpha";
-inline constexpr char kIdentityBeta[] = "beta";
-inline constexpr char kIdentityGamma[] = "gamma";
-inline constexpr char kControllerIdPrefix[] = "8DCADB14-AF1F-45D0-B084-00000000000";
-
 class CHIPCommandBridge : public Command {
 public:
     CHIPCommandBridge(const char * commandName, const char * helpText = nullptr)
@@ -70,8 +65,6 @@ public:
     }
 
     static OTAProviderDelegate * mOTADelegate;
-
-    static NSNumber * GetCommissionerFabricId(const char * identity);
 
 protected:
     // Will be called in a setting in which it's safe to touch the CHIP

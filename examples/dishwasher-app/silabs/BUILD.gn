@@ -74,7 +74,7 @@ if (wifi_soc) {
     ]
 
     include_dirs = [
-      "${chip_root}/src/platform/silabs/SiWx917",
+      "${chip_root}/src/platform/silabs/SiWx",
       "${silabs_project_dir}/include",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
@@ -103,19 +103,6 @@ if (wifi_soc) {
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
     ]
-
-    if (use_wf200) {
-      # TODO efr32_sdk should not need a header from this location
-      include_dirs += [ "${examples_plat_dir}/wf200" ]
-    }
-
-    if (chip_enable_ble_rs911x) {
-      # TODO efr32_sdk should not need a header from this location
-      include_dirs += [
-        "${examples_plat_dir}/rs911x",
-        "${examples_plat_dir}/rs911x/hal",
-      ]
-    }
 
     defines = []
     if (chip_enable_pw_rpc) {
@@ -151,13 +138,13 @@ silabs_executable("dishwasher_app") {
     "${example_enegy_management_dir}/energy-management-common/energy-reporting/src/PowerTopologyDelegate.cpp",
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/DataModelHelper.cpp",
     "src/DeviceEnergyManager.cpp",
     "src/DishwasherManager.cpp",
     "src/ElectricalEnergyMeasurementInstance.cpp",
     "src/ElectricalSensorManager.cpp",
     "src/PowerTopologyDelegateImpl.cpp",
-    "src/ZclCallbacks.cpp",
     "src/operational-state-delegate-impl.cpp",
   ]
 

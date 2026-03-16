@@ -22,22 +22,30 @@
 #include <task.h>
 
 #include <app/icd/server/ICDServerConfig.h>
-#include <lib/support/CodeUtils.h>
 
 #include <lib/support/CodeUtils.h>
 #if SILABS_LOG_ENABLED
 #include "silabs_utils.h"
-
 #endif // SILABS_LOG_ENABLED
+
+#define SOC_PLL_REF_FREQUENCY 40000000 // /* PLL input REFERENCE clock 40MHZ */
+// Note: Change this macro to required PLL frequency in hertz
+#define PS4_SOC_FREQ 180000000 /* PLL out clock 180MHz */
+#define SWITCH_QSPI_TO_SOC_PLL
+#define ICACHE_DISABLE
+#define DEBUG_DISABLE
+
+/* QSPI clock config params */
+#define INTF_PLL_500_CTRL_VALUE 0xD900
+#define INTF_PLL_CLK 80000000 /* PLL out clock 80 MHz */
 
 // TODO add includes ?
 extern "C" {
-#include "em_core.h"
 #if defined(SL_SI91X_BOARD_INIT)
 #include "rsi_board.h"
 #endif // SL_SI91X_BOARD_INIT
-#include "sl_event_handler.h"
 
+#include "rsi_rom_clks.h"
 #include "sl_si91x_hal_soc_soft_reset.h"
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
@@ -61,10 +69,6 @@ const sl_rgb_led_t * ledPinArray[SL_LED_COUNT] = { &led_led0 };
 uint8_t ledPinArray[SL_LED_COUNT] = { SL_LED_LED0_PIN, SL_LED_LED1_PIN };
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 #endif // ENABLE_WSTK_LEDS
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
-void soc_pll_config(void);
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
 #ifdef SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
@@ -84,9 +88,44 @@ namespace {
 uint8_t sButtonStates[SL_SI91x_BUTTON_COUNT] = { 0 };
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && defined(SL_CATALOG_SIMPLE_BUTTON_PRESENT)
 bool btn0_pressed = false;
-#endif /* SL_ICD_ENABLED */
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && defined(SL_CATALOG_SIMPLE_BUTTON_PRESENT)
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
+int soc_pll_config(void)
+{
+    int32_t status = RSI_OK;
+
+    RSI_CLK_M4SocClkConfig(M4CLK, M4_ULPREFCLK, 0);
+    // Configures the required registers for 180 Mhz clock in PS4
+    RSI_PS_PS4SetRegisters();
+    // Configure the PLL frequency
+    // Configure the SOC PLL to 180MHz
+    RSI_CLK_SetSocPllFreq(M4CLK, PS4_SOC_FREQ, SOC_PLL_REF_FREQUENCY);
+    // Switch M4 clock to PLL clock for speed operations
+    RSI_CLK_M4SocClkConfig(M4CLK, M4_SOCPLLCLK, 0);
+
+    SysTick_Config(SystemCoreClock / configTICK_RATE_HZ);
+
+#ifdef SWITCH_QSPI_TO_SOC_PLL
+    /* program intf pll to 160Mhz */
+    SPI_MEM_MAP_PLL(INTF_PLL_500_CTRL_REG9) = INTF_PLL_500_CTRL_VALUE;
+    status                                  = RSI_CLK_SetIntfPllFreq(M4CLK, INTF_PLL_CLK, SOC_PLL_REF_FREQUENCY);
+    if (status != RSI_OK)
+    {
+        ChipLogError(DeviceLayer, "Failed to Config Interface PLL Clock, status: %ld", status);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "Configured Interface PLL Clock to %d", INTF_PLL_CLK);
+    }
+
+    RSI_CLK_QspiClkConfig(M4CLK, QSPI_INTFPLLCLK, 0, 0, 1);
+#endif /* SWITCH_QSPI_TO_SOC_PLL */
+    return status;
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 } // namespace
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
@@ -94,8 +133,7 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
-    // TODO: Setting the highest priority for SVCall_IRQn to avoid the HardFault issue
-    NVIC_SetPriority(SVCall_IRQn, CORE_INTERRUPT_HIGHEST_PRIORITY);
+    mButtonCallback = nullptr;
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
     // Configuration the clock rate
@@ -155,6 +193,12 @@ CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
+void SilabsPlatform::StartScheduler()
+{
+    vTaskStartScheduler();
+}
+#endif // SL_CATALOG_CUSTOM_MAIN_PRESENT
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 bool SilabsPlatform::GetRGBLedState(uint8_t led)
@@ -174,11 +218,6 @@ CHIP_ERROR SilabsPlatform::GetLedColor(uint8_t led, uint16_t & r, uint16_t & g, 
     return CHIP_NO_ERROR;
 }
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
-
-void SilabsPlatform::StartScheduler()
-{
-    vTaskStartScheduler();
-}
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction)
@@ -214,6 +253,12 @@ extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction)
         sButtonStates[btn] = btnAction;
     }
     Silabs::GetPlatform().mButtonCallback(btn, btnAction);
+}
+
+extern "C" void sl_si91x_button_isr(uint8_t pin, int8_t state)
+{
+    (pin == SL_BUTTON_BTN0_PIN) ? sl_button_on_change(SL_BUTTON_BTN0_NUMBER, state)
+                                : sl_button_on_change(SL_BUTTON_BTN1_NUMBER, state);
 }
 
 uint8_t SilabsPlatform::GetButtonState(uint8_t button)

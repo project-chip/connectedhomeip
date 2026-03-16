@@ -28,9 +28,9 @@ TI Matter examples allow the use of factory data in the following two ways:
 
 Each element is described in more detail below:
 
-1. Factory Data JSON: This file is located at src/platform/cc13xx_26xx.
-   Developers can configure this per device. Elements in this file are from the
-   specification.
+1. Factory Data JSON: This file is located at
+   src/platform/ti/cc13xx_26xx/factory_data_cc13xx_26xx.json. Developers can
+   configure this per device. Elements in this file are from the specification.
 2. Matter Application with dummy factory data: Any TI Matter example application
 3. MCUBoot: MCUBoot image used for OTA. This is built with the Matter
    application and does not require additional build steps from developers.
@@ -110,6 +110,6 @@ being copied into the JSON file.
 The example application can be built using the instructions in the example's
 README. The factory data from the JSON file will be formatted into a hex file
 that will then be merged into the final executable. The final executable will be
-named _{example-application}-mcuboot.hex_ for CC13x4, and the factory data that
-was inputted into the JSON file will be named
-_{example-application}-factory-data.hex_.
+named _{example-application}-mcuboot.hex_ for CC13x4*26x4, and the factory data
+that was inputted into the JSON file will be named
+*{example-application}-factory-data.hex\_.

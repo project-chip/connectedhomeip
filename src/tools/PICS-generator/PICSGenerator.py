@@ -22,14 +22,17 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-import chip.clusters as Clusters
 from pics_generator_support import map_cluster_name_to_pics_xml, pics_xml_file_list_loader
 from rich.console import Console
 
-# Add the path to python_testing folder, in order to be able to import from chip.testing.matter_testing
+import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
+from matter.testing.runner import default_matter_test_main
+
+# Add the path to python_testing folder, in order to be able to import from matter.testing.matter_testing
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
-from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters  # noqa: E402
+from matter.testing.matter_testing import MatterBaseTest  # noqa: E402
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters  # noqa: E402
 
 console = None
 xml_clusters = None
@@ -188,20 +191,21 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
                     continue
 
     # Grabbing the header from the XML templates
-    inputFile = open(f"{xmlPath}{fileName}", "r")
-    outputFile = open(f"{outputPathStr}/{fileName}", "ab")
-    xmlHeader = ""
-    inputLine = inputFile.readline().lstrip()
+    with (open(f"{xmlPath}{fileName}") as inputFile,
+          open(f"{outputPathStr}/{fileName}", "ab") as outputFile):
 
-    while 'clusterPICS' not in inputLine:
-        xmlHeader += inputLine
+        xmlHeader = ""
         inputLine = inputFile.readline().lstrip()
 
-    # Write the PICS XML header
-    outputFile.write(xmlHeader.encode())
+        while 'clusterPICS' not in inputLine:
+            xmlHeader += inputLine
+            inputLine = inputFile.readline().lstrip()
 
-    # Write the PICS XML data
-    tree.write(outputFile)
+        # Write the PICS XML header
+        outputFile.write(xmlHeader.encode())
+
+        # Write the PICS XML data
+        tree.write(outputFile)
 
 
 async def DeviceMapping(devCtrl, nodeID, outputPathStr):
@@ -364,6 +368,10 @@ parser.add_argument('--pics-output', required=True)
 parser.add_argument('--dm-xml')
 args, unknown = parser.parse_known_args()
 
+# The matter_testing framework does not accept unknown args,
+# so all the handled args are removed from argv
+sys.argv = sys.argv[:1] + unknown
+
 xmlTemplatePathStr = args.pics_template
 if not xmlTemplatePathStr.endswith('/'):
     xmlTemplatePathStr += '/'
@@ -429,6 +437,8 @@ class DeviceMappingTest(MatterBaseTest):
                 xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
             elif specVersion == 0x1040100:
                 xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
+            elif specVersion == 0x1040200:
+                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
             elif specVersion == 0x1050000:
                 xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
             else:

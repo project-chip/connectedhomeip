@@ -33,7 +33,9 @@ static_library("backend") {
     "counter.h",
     "esp32_tracing.cpp",
     "esp32_tracing.h",
+    "matter_esp_insights.h",
   ]
+
   if (matter_enable_esp_insights_system_stats) {
     sources += [
       "insights_sys_stats.cpp",

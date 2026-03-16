@@ -40,7 +40,7 @@ CHIP_ERROR TizenThreadDriver::Init(BaseDriver::NetworkStatusChangeCallback * net
     VerifyOrReturnError(ConnectivityMgr().IsThreadAttached(), CHIP_NO_ERROR);
     VerifyOrReturnError(ThreadStackMgr().GetThreadProvision(mStagingNetwork) == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    mSavedNetwork.Init(mStagingNetwork.AsByteSpan());
+    TEMPORARY_RETURN_IGNORED mSavedNetwork.Init(mStagingNetwork.AsByteSpan());
 
     return CHIP_NO_ERROR;
 }
@@ -64,7 +64,7 @@ Status TizenThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, Mutabl
     Thread::OperationalDataset newDataset;
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
-    newDataset.Init(operationalDataset);
+    TEMPORARY_RETURN_IGNORED newDataset.Init(operationalDataset);
     VerifyOrReturnError(newDataset.IsCommissioned(), Status::kOutOfRange);
 
     VerifyOrReturnError(!mStagingNetwork.IsCommissioned() || memcmp(extpanid, newExtpanid, Thread::kSizeExtendedPanId) == 0,
@@ -179,7 +179,7 @@ ThreadCapabilities TizenThreadDriver::GetSupportedThreadFeatures()
 uint16_t TizenThreadDriver::GetThreadVersion()
 {
     uint16_t version = 0;
-    DeviceLayer::ThreadStackMgr().GetThreadVersion(version);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::ThreadStackMgr().GetThreadVersion(version);
     return version;
 }
 

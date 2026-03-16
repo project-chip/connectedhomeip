@@ -70,7 +70,7 @@ exit:
     {
         response.status = static_cast<chip::app::Clusters::KeypadInput::StatusEnum>(ret);
     }
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void KeypadInputManager::InitializeWithObjects(jobject managerObject)

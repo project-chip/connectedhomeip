@@ -88,6 +88,11 @@ TEST(TestTxtFields, TestGetTxtFieldKey)
 
     strcpy(key, "CP");
     EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kCommissionerPasscode);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    strcpy(key, "JF");
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kJointFabricMode);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 }
 
 TEST(TestTxtFields, TestGetTxtFieldKeyCaseInsensitive)
@@ -102,6 +107,15 @@ TEST(TestTxtFields, TestGetTxtFieldKeyCaseInsensitive)
     EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kVendorProduct);
     strcpy(key, "vP");
     EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kVendorProduct);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    strcpy(key, "jf");
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kJointFabricMode);
+    strcpy(key, "jF");
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kJointFabricMode);
+    strcpy(key, "Jf");
+    EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kJointFabricMode);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     strcpy(key, "Xx");
     EXPECT_EQ(GetTxtFieldKey(GetSpan(key)), TxtFieldKey::kUnknown);
@@ -176,6 +190,29 @@ TEST(TestTxtFields, TestGetCommissioningMode)
     sprintf(cm, "%u", static_cast<uint16_t>(std::numeric_limits<uint8_t>::max()) + 1);
     EXPECT_EQ(GetCommissioningMode(GetSpan(cm)), 0);
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+TEST(TestTxtFields, TestGetJointFabricMode)
+{
+    char jfm[64];
+    strcpy(jfm, "0");
+    EXPECT_FALSE(GetJointFabricMode(GetSpan(jfm)).HasAny());
+
+    strcpy(jfm, "1");
+    EXPECT_TRUE(GetJointFabricMode(GetSpan(jfm)).HasOnly(JointFabricMode::kAvailable));
+
+    strcpy(jfm, "2");
+    EXPECT_TRUE(GetJointFabricMode(GetSpan(jfm)).HasOnly(JointFabricMode::kAdministrator));
+
+    strcpy(jfm, "14");
+    EXPECT_TRUE(GetJointFabricMode(GetSpan(jfm))
+                    .HasAll(JointFabricMode::kAdministrator, JointFabricMode::kAnchor, JointFabricMode::kDatastore));
+
+    // input higher than max uint8_t will result in 0
+    strcpy(jfm, "4660"); // 0x1234
+    EXPECT_FALSE(GetJointFabricMode(GetSpan(jfm)).HasAny());
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 TEST(TestTxtFields, TestGetDeviceType)
 {
@@ -408,6 +445,16 @@ TEST(TestTxtFields, TestFillDiscoveredNodeDataFromTxt)
     EXPECT_EQ(filled.pairingHint, 1);
     filled.pairingHint = 0;
     EXPECT_TRUE(NodeDataIsEmpty(filled));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    // Joint Fabric mode
+    strcpy(key, "JF");
+    strcpy(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
+    EXPECT_TRUE(filled.jointFabricMode.HasOnly(JointFabricMode::kAvailable));
+    filled.jointFabricMode.ClearAll();
+    EXPECT_TRUE(NodeDataIsEmpty(filled));
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 }
 
 bool NodeDataIsEmpty(const ResolvedNodeData & nodeData)

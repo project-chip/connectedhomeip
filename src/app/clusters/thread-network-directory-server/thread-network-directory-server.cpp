@@ -48,7 +48,7 @@ ThreadNetworkDirectoryServer::ThreadNetworkDirectoryServer(EndpointId endpoint, 
 ThreadNetworkDirectoryServer::~ThreadNetworkDirectoryServer()
 {
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
 }
 
 CHIP_ERROR ThreadNetworkDirectoryServer::Init()
@@ -143,7 +143,7 @@ CHIP_ERROR ThreadNetworkDirectoryServer::ReadThreadNetworks(const ConcreteDataAt
             char networkName[kSizeNetworkName + 1];
             ThreadNetworkStruct::Type network;
 
-            dataset.Init(datasetSpan);
+            TEMPORARY_RETURN_IGNORED dataset.Init(datasetSpan);
             SuccessOrExit(err = dataset.GetExtendedPanIdAsByteSpan(network.extendedPanID));
             SuccessOrExit(err = dataset.GetNetworkName(networkName));
             network.networkName = CharSpan::fromCharString(networkName);
@@ -180,7 +180,7 @@ void ThreadNetworkDirectoryServer::InvokeCommand(HandlerContext & ctx)
 void ThreadNetworkDirectoryServer::HandleAddNetworkRequest(HandlerContext & ctx,
                                                            const ThreadNetworkDirectory::Commands::AddNetwork::DecodableType & req)
 {
-    OperationalDataset dataset;
+    OperationalDatasetView dataset;
     ByteSpan extendedPanIdSpan;
     uint64_t activeTimestamp;
     union
@@ -200,7 +200,6 @@ void ThreadNetworkDirectoryServer::HandleAddNetworkRequest(HandlerContext & ctx,
     CHIP_ERROR err;
     auto status          = IMStatus::ConstraintError;
     const char * context = nullptr;
-    // TODO: An immutable OperationalDatasetView on top of a ByteSpan (without copying) would be useful here.
     SuccessOrExitAction(err = dataset.Init(req.operationalDataset), context = "OperationalDataset");
     SuccessOrExitAction(err = dataset.GetExtendedPanIdAsByteSpan(extendedPanIdSpan), context = "ExtendedPanID");
     SuccessOrExitAction(err = dataset.GetActiveTimestamp(activeTimestamp), context = "ActiveTimestamp");

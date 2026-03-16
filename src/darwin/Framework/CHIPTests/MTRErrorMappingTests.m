@@ -19,7 +19,7 @@
 
 // NOTE: This is a .mm file, so that it can include MTRError_Internal.h
 
-#import "MTRError_Testable.h"
+#import "MTRError_Test.h"
 
 @interface MTRErrorMappingTests : XCTestCase
 @end

@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/server/ICDServerConfig.h>
+#include <platform/NetworkCommissioning.h>
 
 #include <array>
 #include <cmsis_os2.h>
@@ -55,23 +56,11 @@ constexpr size_t kWifiMacAddressLength = 6;
 #define WFX_MAX_SSID_LENGTH (32)
 #define MAX_JOIN_RETRIES_COUNT (5)
 
-/* Note that these are same as RSI_security */
-typedef enum
-{
-    WFX_SEC_UNSPECIFIED    = 0,
-    WFX_SEC_NONE           = 1,
-    WFX_SEC_WEP            = 2,
-    WFX_SEC_WPA            = 3,
-    WFX_SEC_WPA2           = 4,
-    WFX_SEC_WPA3           = 5,
-    WFX_SEC_WPA_WPA2_MIXED = 6,
-} wfx_sec_t;
-
 typedef struct wfx_wifi_scan_result
 {
     uint8_t ssid[WFX_MAX_SSID_LENGTH]; // excludes null-character
     size_t ssid_length;
-    wfx_sec_t security;
+    chip::BitFlags<chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> security;
     uint8_t bssid[kWifiMacAddressLength];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
@@ -90,7 +79,7 @@ typedef struct wfx_wifi_scan_ext
     uint32_t overrun_count;
 } wfx_wifi_scan_ext_t;
 
-#ifdef RS911X_WIFI
+#ifdef SL_MATTER_SIWX_WIFI_ENABLE
 /*
  * This Sh%t is here to support WFXUtils - and the Matter stuff that uses it
  * We took it from the SDK (for WF200)
@@ -159,7 +148,7 @@ public:
         size_t ssidLength                       = 0;
         uint8_t passkey[WFX_MAX_PASSKEY_LENGTH] = { 0 };
         size_t passkeyLength                    = 0;
-        wfx_sec_t security                      = WFX_SEC_UNSPECIFIED;
+        chip::BitFlags<chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> security;
 
         WifiCredentials & operator=(const WifiCredentials & other)
         {
@@ -180,7 +169,7 @@ public:
             ssidLength = 0;
             memset(passkey, 0, WFX_MAX_PASSKEY_LENGTH);
             passkeyLength = 0;
-            security      = WFX_SEC_UNSPECIFIED;
+            security.ClearAll();
         }
     };
 
@@ -353,6 +342,11 @@ public:
         return static_cast<uint32_t>(1UL << chip::to_underlying(chip::app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4));
     }
 
+    /**
+     * @brief Function resets reconnection attempt interval back to the minimum value
+     */
+    void ResetConnectionRetryInterval();
+
 protected:
     /**
      * @brief Function notifies the PlatformManager that an IPv6 event occured on the WiFi interface.
@@ -363,6 +357,12 @@ protected:
     void NotifyIPv6Change(bool gotIPv6Addr);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+    /**
+     * @brief Updates the IPv4 address in the Wi-Fi interface and notifies the application layer about the new IP address.
+     *
+     * @param[in] ip New IPv4 address
+     */
+    void GotIPv4Address(uint32_t ip);
     /**
      * @brief Function notifies the PlatformManager that an IPv4 event occured on the WiFi interface.
      *
@@ -427,8 +427,6 @@ typedef struct wfx_rsi_s
     uint16_t ap_chan; /* The chan our STA is using	*/
     chip::DeviceLayer::Silabs::WifiInterface::WifiCredentials credentials;
     ScanCallback scan_cb;
-    uint8_t * scan_ssid; /* Which one are we scanning for */
-    size_t scan_ssid_length;
 #ifdef SL_WFX_CONFIG_SOFTAP
     chip::DeviceLayer::Silabs::WifiInterface::MacAddress softap_mac;
 #endif

@@ -31,6 +31,7 @@ pw_python_package("matter-idl") {
   inputs += matter_idl_generator_templates
   inputs += [
     # Dependency grammar
+    "matter/idl/lint/lint_rules_grammar.lark",
     "matter/idl/matter_grammar.lark",
 
     # Marker file to indicate to mypy that matter_idl is type-annotated
@@ -43,16 +44,32 @@ pw_python_package("matter-idl") {
     # Unit test data
     "matter/idl/tests/available_tests.yaml",
     "matter/idl/tests/inputs/cluster_struct_attribute.matter",
+    "matter/idl/tests/inputs/cluster_with_commands.matter",
     "matter/idl/tests/inputs/global_struct_attribute.matter",
+    "matter/idl/tests/inputs/large_all_clusters_app.matter",
+    "matter/idl/tests/inputs/large_lighting_app.matter",
     "matter/idl/tests/inputs/optional_argument.matter",
     "matter/idl/tests/inputs/several_clusters.matter",
     "matter/idl/tests/inputs/simple_attribute.matter",
+    "matter/idl/tests/outputs/cluster_struct_attribute/cpp-tlvmeta/clusters_meta.cpp",
+    "matter/idl/tests/outputs/cluster_with_commands/cpp-tlvmeta/clusters_meta.cpp",
+    "matter/idl/tests/outputs/large_all_clusters_app/cpp-app/callback-stub.cpp",
+    "matter/idl/tests/outputs/large_all_clusters_app/cpp-app/cluster-callbacks.cpp",
+    "matter/idl/tests/outputs/large_lighting_app/cpp-app/callback-stub.cpp",
+    "matter/idl/tests/outputs/large_lighting_app/cpp-app/cluster-callbacks.cpp",
+    "matter/idl/tests/outputs/proto/first_cluster.proto",
+    "matter/idl/tests/outputs/proto/second_cluster.proto",
+    "matter/idl/tests/outputs/proto/third_cluster.proto",
+    "matter/idl/tests/outputs/several_clusters/cpp-app/callback-stub.cpp",
+    "matter/idl/tests/outputs/several_clusters/cpp-app/cluster-callbacks.cpp",
     "matter/idl/tests/outputs/several_clusters/java/ChipClusters.java",
     "matter/idl/tests/outputs/several_clusters/java/ChipEventStructs.java",
     "matter/idl/tests/outputs/several_clusters/java/ChipStructs.java",
-    "matter/idl/tests/outputs/several_clusters/java/ClusterInfoMapping.java",
     "matter/idl/tests/outputs/several_clusters/java/ClusterIDMapping.java",
+    "matter/idl/tests/outputs/several_clusters/java/ClusterInfoMapping.java",
+    "matter/idl/tests/outputs/several_clusters/java/ClusterReadMapping.java",
     "matter/idl/tests/outputs/several_clusters/java/ClusterWriteMapping.java",
+    "matter/idl/tests/outputs/several_clusters/java/SecondClusterFabricDescriptorStruct.kt",
   ]
 
   sources = matter_idl_generator_sources

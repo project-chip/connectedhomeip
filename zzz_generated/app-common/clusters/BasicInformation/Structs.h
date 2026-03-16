@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -40,8 +40,12 @@ namespace Structs {
 namespace CapabilityMinimaStruct {
 enum class Fields : uint8_t
 {
-    kCaseSessionsPerFabric  = 0,
-    kSubscriptionsPerFabric = 1,
+    kCaseSessionsPerFabric            = 0,
+    kSubscriptionsPerFabric           = 1,
+    kSimultaneousInvocationsSupported = 2,
+    kSimultaneousWritesSupported      = 3,
+    kReadPathsSupported               = 4,
+    kSubscribePathsSupported          = 5,
 };
 
 struct Type
@@ -49,6 +53,10 @@ struct Type
 public:
     uint16_t caseSessionsPerFabric  = static_cast<uint16_t>(0);
     uint16_t subscriptionsPerFabric = static_cast<uint16_t>(0);
+    Optional<uint16_t> simultaneousInvocationsSupported;
+    Optional<uint16_t> simultaneousWritesSupported;
+    Optional<uint16_t> readPathsSupported;
+    Optional<uint16_t> subscribePathsSupported;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

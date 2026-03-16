@@ -5,6 +5,9 @@ chip-build-asr/                  @tx2rx
 /src/platform/Ameba/             @pankore
 ameba/                           @pankore
 chip-build-ameba/                @pankore
+/src/platform/realtek/           @pankore
+realtek/                         @pankore
+chip-build-realtek/              @pankore
 
 /src/platform/Beken/             @zhengyaohan
 

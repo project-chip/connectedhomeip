@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -87,7 +87,6 @@ public:
 using DecodableType = Type;
 
 } // namespace MPTZPresetStruct
-namespace ViewportStruct = Clusters::detail::Structs::ViewportStruct;
 namespace DPTZStruct {
 enum class Fields : uint8_t
 {
@@ -99,7 +98,7 @@ struct Type
 {
 public:
     uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Structs::ViewportStruct::Type viewport;
+    Globals::Structs::ViewportStruct::Type viewport;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

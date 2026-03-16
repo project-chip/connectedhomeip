@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,19 +17,25 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace CurrentSessions {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(CurrentSessions::Id,
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kManage, std::nullopt);
 } // namespace CurrentSessions
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    CurrentSessions::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace SolicitOffer {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(SolicitOffer::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
@@ -57,6 +64,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace EndSession
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace WebRTCTransportProvider
 } // namespace Clusters
 } // namespace app

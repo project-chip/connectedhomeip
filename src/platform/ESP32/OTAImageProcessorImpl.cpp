@@ -100,25 +100,25 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -130,7 +130,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
         ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -280,36 +280,6 @@ esp_err_t OTAImageProcessorImpl::DeltaOTAWriteCallback(const uint8_t * buf, size
 }
 #endif // CONFIG_ENABLE_DELTA_OTA
 
-#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
-esp_err_t OTAImageProcessorImpl::ProcessRcpImage(const uint8_t * buffer, uint32_t bufLen)
-{
-    esp_err_t err = ESP_OK;
-
-    if (!mRcpFirmwareDownloaded)
-    {
-        size_t rcpOtaReceivedLen = 0;
-        err                      = esp_rcp_ota_receive(this->mRcpOtaHandle, buffer, bufLen, &rcpOtaReceivedLen);
-
-        if (esp_rcp_ota_get_state(this->mRcpOtaHandle) == ESP_RCP_OTA_STATE_FINISHED)
-        {
-            this->mBrFirmwareSize = esp_rcp_ota_get_subfile_size(this->mRcpOtaHandle, FILETAG_HOST_FIRMWARE);
-            err                   = esp_ota_write(this->mOTAUpdateHandle, buffer + rcpOtaReceivedLen, bufLen - rcpOtaReceivedLen);
-            this->mRcpFirmwareDownloaded = true;
-        }
-    }
-    else if (this->mBrFirmwareSize > 0)
-    {
-        err = esp_ota_write(this->mOTAUpdateHandle, buffer, bufLen);
-    }
-    else
-    {
-        err = ESP_FAIL;
-    }
-
-    return err;
-}
-#endif
-
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
@@ -327,7 +297,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     if (imageProcessor->mOTAUpdatePartition == NULL)
     {
         ChipLogError(SoftwareUpdate, "OTA partition not found");
-        imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_INTERNAL);
+        TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_INTERNAL);
         return;
     }
 #ifdef CONFIG_ENABLE_DELTA_OTA
@@ -340,7 +310,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     if (err != ESP_OK)
     {
-        imageProcessor->mDownloader->OnPreparedForDownload(ESP32Utils::MapError(err));
+        TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(ESP32Utils::MapError(err));
         return;
     }
 #ifdef CONFIG_ENABLE_DELTA_OTA
@@ -367,18 +337,15 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     }
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
-#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
-    imageProcessor->mRcpOtaHandle          = 0;
-    imageProcessor->mBrFirmwareSize        = 0;
-    imageProcessor->mRcpFirmwareDownloaded = false;
-    if (esp_rcp_ota_begin(&imageProcessor->mRcpOtaHandle) != ESP_OK)
+#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+    if (imageProcessor->mOtaRcpDelegate && imageProcessor->mOtaRcpDelegate->OnOtaRcpPrepareDownload() != ESP_OK)
     {
         return;
     }
-#endif
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER
 
     imageProcessor->mHeaderParser.Init();
-    imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
     PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadInProgress);
 }
 
@@ -420,14 +387,15 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
     err = esp_ota_end(imageProcessor->mOTAUpdateHandle);
     DeltaOTACleanUp(reinterpret_cast<intptr_t>(imageProcessor));
-#elif defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
-    esp_err_t err = esp_rcp_ota_end(imageProcessor->mRcpOtaHandle);
-    err |= esp_ota_end(imageProcessor->mOTAUpdateHandle);
-    imageProcessor->mRcpOtaHandle          = 0;
-    imageProcessor->mBrFirmwareSize        = 0;
-    imageProcessor->mRcpFirmwareDownloaded = false;
 #else
-    esp_err_t err = esp_ota_end(imageProcessor->mOTAUpdateHandle);
+    esp_err_t err = ESP_OK;
+#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+    if (imageProcessor->mOtaRcpDelegate)
+    {
+        err = imageProcessor->mOtaRcpDelegate->OnOtaRcpFinalize();
+    }
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER
+    err |= esp_ota_end(imageProcessor->mOTAUpdateHandle);
 #endif // CONFIG_ENABLE_DELTA_OTA
     if (err != ESP_OK)
     {
@@ -446,7 +414,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         otaState = DeviceLayer::kOtaDownloadComplete;
     }
 
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
     PostOTAStateChangeEvent(otaState);
 }
 
@@ -467,21 +435,18 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
     DeltaOTACleanUp(reinterpret_cast<intptr_t>(imageProcessor));
 #endif // CONFIG_ENABLE_DELTA_OTA
 
-#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
-    if (esp_rcp_ota_abort(imageProcessor->mRcpOtaHandle) != ESP_OK)
+#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+    if (imageProcessor->mOtaRcpDelegate && imageProcessor->mOtaRcpDelegate->OnOtaRcpAbort() != ESP_OK)
     {
         ESP_LOGE(TAG, "ESP RCP OTA abort failed");
     }
-    imageProcessor->mRcpOtaHandle          = 0;
-    imageProcessor->mBrFirmwareSize        = 0;
-    imageProcessor->mRcpFirmwareDownloaded = false;
-#endif
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER
 
     if (esp_ota_abort(imageProcessor->mOTAUpdateHandle) != ESP_OK)
     {
         ESP_LOGE(TAG, "ESP OTA abort failed");
     }
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
     PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadAborted);
 }
 
@@ -539,10 +504,23 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     // Apply the patch and writes that data to the passive partition.
     err = esp_delta_ota_feed_patch(imageProcessor->mDeltaOTAUpdateHandle, blockToWrite.data() + index, blockToWrite.size() - index);
-#elif defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
-    err                                    = imageProcessor->ProcessRcpImage(blockToWrite.data(), blockToWrite.size());
 #else
-    err           = esp_ota_write(imageProcessor->mOTAUpdateHandle, blockToWrite.data(), blockToWrite.size());
+#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+    if (imageProcessor->mOtaRcpDelegate)
+    {
+        size_t rcpOtaReceivedLen = 0;
+        err = imageProcessor->mOtaRcpDelegate->OnOtaRcpProcessBlock(blockToWrite.data(), blockToWrite.size(), rcpOtaReceivedLen);
+        if (err == ESP_OK && blockToWrite.size() > rcpOtaReceivedLen)
+        {
+            err = esp_ota_write(imageProcessor->mOTAUpdateHandle, blockToWrite.data() + rcpOtaReceivedLen,
+                                blockToWrite.size() - rcpOtaReceivedLen);
+        }
+    }
+    else
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER
+    {
+        err = esp_ota_write(imageProcessor->mOTAUpdateHandle, blockToWrite.data(), blockToWrite.size());
+    }
 #endif // CONFIG_ENABLE_DELTA_OTA
 
 #ifdef CONFIG_ENABLE_ENCRYPTED_OTA
@@ -558,7 +536,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     }
 
     imageProcessor->mParams.downloadedBytes += blockToWrite.size();
-    imageProcessor->mDownloader->FetchNextData();
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
 }
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
@@ -578,7 +556,8 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
 #ifdef CONFIG_OTA_AUTO_REBOOT_ON_APPLY
     // HandleApply is called after delayed action time seconds are elapsed, so it would be safe to schedule the restart
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CONFIG_OTA_AUTO_REBOOT_DELAY_MS), HandleRestart, nullptr);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CONFIG_OTA_AUTO_REBOOT_DELAY_MS),
+                                                                   HandleRestart, nullptr);
 #else
     ESP_LOGI(TAG, "Please reboot the device manually to apply the new image");
 #endif
@@ -588,14 +567,14 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
     if (block.empty())
     {
-        ReleaseBlock();
+        TEMPORARY_RETURN_IGNORED ReleaseBlock();
         return CHIP_NO_ERROR;
     }
     if (mBlock.size() < block.size())
     {
         if (!mBlock.empty())
         {
-            ReleaseBlock();
+            TEMPORARY_RETURN_IGNORED ReleaseBlock();
         }
         uint8_t * mBlock_ptr = static_cast<uint8_t *>(Platform::MemoryAlloc(block.size()));
         if (mBlock_ptr == nullptr)

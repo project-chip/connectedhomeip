@@ -58,7 +58,7 @@ if (wifi_soc) {
     ]
 
     include_dirs = [
-      "${chip_root}/src/platform/silabs/SiWx917",
+      "${chip_root}/src/platform/silabs/SiWx",
       "${silabs_project_dir}/include",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
@@ -92,15 +92,6 @@ if (wifi_soc) {
       # TODO efr32_sdk should not need a header from this location
       include_dirs += [ "${examples_plat_dir}/wf200" ]
     }
-
-    if (chip_enable_ble_rs911x) {
-      # TODO efr32_sdk should not need a header from this location
-      include_dirs += [
-        "${chip_root}/src/platform/silabs/efr32/rs911x",
-        "${examples_plat_dir}/rs911x",
-        "${examples_plat_dir}/rs911x/hal",
-      ]
-    }
   }
 }
 
@@ -116,8 +107,8 @@ silabs_executable("window_app") {
   sources = [
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/WindowManager.cpp",
-    "src/ZclCallbacks.cpp",
   ]
 
   if (!disable_lcd) {

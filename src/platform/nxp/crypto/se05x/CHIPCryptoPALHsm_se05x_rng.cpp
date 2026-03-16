@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021, 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,20 +24,25 @@
 
 #include "CHIPCryptoPALHsm_se05x_utils.h"
 #include <lib/core/CHIPEncoding.h>
+#include <mbedtls/ctr_drbg.h>
+#include <mbedtls/entropy.h>
 
 namespace chip {
 namespace Crypto {
 
+#if ENABLE_SE05X_RND_GEN
+
 CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 {
-    // TODO - Add rollback
     sss_status_t status;
     sss_rng_context_t ctx_rng = { 0 };
 
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrReturnError(se05x_sessionOpen() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    ChipLogDetail(Crypto, "se05x::Random number generation using se05x");
+
+    VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
     status = sss_rng_context_init(&ctx_rng, &gex_sss_chip_ctx.session /* Session */);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
@@ -49,6 +54,8 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 
     return CHIP_NO_ERROR;
 }
+
+#endif
 
 } // namespace Crypto
 } // namespace chip

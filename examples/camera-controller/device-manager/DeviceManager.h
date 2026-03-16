@@ -24,6 +24,12 @@
 
 namespace camera {
 
+enum class WebRTCOfferType : uint8_t
+{
+    kProvideOffer = 0,
+    kSolicitOffer = 1
+};
+
 class DeviceManager
 {
 public:
@@ -44,20 +50,30 @@ public:
     /**
      * @brief Sends a VideoStreamAllocate command to the device.
      *
-     * @param nodeId      The node ID of the remote camera device.
-     * @param streamUsage The usage of the stream(Recording, LiveView, etc) that this allocation is for.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or an appropriate error code on failure.
+     * @param nodeId       The node ID of the remote camera device.
+     * @param streamUsage  The usage of the stream(Recording, LiveView, etc) that this allocation is for.
+     * @param offerType    The type of WebRTC offer to use (ProvideOffer or SolicitOffer).
+     * @param minResWidth  Optional minimum width for the video stream. If not specified, uses default value.
+     * @param minResHeight Optional minimum height for the video stream. If not specified, uses default value.
+     * @param minFrameRate Optional minimum frame rate for the video stream. If not specified, uses default value.
+     * @param minBitRate   Optional minimum bit rate for the video stream. If not specified, uses default value.
+     * @return CHIP_ERROR  CHIP_NO_ERROR on success, or an appropriate error code on failure.
      */
-    CHIP_ERROR AllocateVideoStream(chip::NodeId nodeId, uint8_t streamUsage);
+    CHIP_ERROR AllocateVideoStream(chip::NodeId nodeId, uint8_t streamUsage,
+                                   WebRTCOfferType offerType             = WebRTCOfferType::kProvideOffer,
+                                   chip::Optional<uint16_t> minResWidth  = chip::NullOptional,
+                                   chip::Optional<uint16_t> minResHeight = chip::NullOptional,
+                                   chip::Optional<uint16_t> minFrameRate = chip::NullOptional,
+                                   chip::Optional<uint32_t> minBitRate   = chip::NullOptional);
 
     /**
      * @brief Sends a VideoStreamDeallocate command to the device.
      *
      * @param nodeId        The node ID of the remote camera device.
-     * @param videoStreamID The VideoStreamID for the stream to be deallocated.
+     * @param videoStreamId The VideoStreamID for the stream to be deallocated.
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or an appropriate error code on failure.
      */
-    CHIP_ERROR DeallocateVideoStream(chip::NodeId nodeId, uint16_t videoStreamID);
+    CHIP_ERROR DeallocateVideoStream(chip::NodeId nodeId, uint16_t videoStreamId);
 
     void HandleAttributeData(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader & data);
 
@@ -65,17 +81,29 @@ public:
 
     void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 
-    void StopVideoStreamProcess(uint16_t streamID);
+    void StopVideoStream(uint16_t streamId);
+
+    /**
+     * @brief Callback invoked when WebRTC session is established
+     *
+     * @param streamId The video stream ID for which the session was established
+     */
+    void OnWebRTCSessionEstablished(uint16_t streamId);
 
 private:
     chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
+    chip::NodeId mNodeId                                 = chip::kUndefinedNodeId;
+    uint8_t mStreamUsage                                 = 0;
+    WebRTCOfferType mOfferType                           = WebRTCOfferType::kProvideOffer;
     std::map<uint16_t, pid_t> mVideoStreamProcesses; // Stream ID -> Process ID mapping
+    uint16_t mPendingVideoStreamId = 0;              // Track the stream ID we're setting up
 
     AVStreamManagement mAVStreamManagment;
 
     void HandleVideoStreamAllocateResponse(chip::TLV::TLVReader & data);
-
-    void StartVideoStreamProcess(uint16_t streamID);
+    void InitiateWebRTCSession(uint16_t videoStreamId);
+    void StartVideoStreamProcess(uint16_t streamId);
+    void StopVideoStreamProcess(uint16_t streamId);
 };
 
 } // namespace camera

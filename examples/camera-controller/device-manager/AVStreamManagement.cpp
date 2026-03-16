@@ -23,15 +23,14 @@ using namespace ::chip;
 
 namespace {
 
-constexpr uint16_t kMinFrameRate   = 30;
-constexpr uint16_t kMaxFrameRate   = 120;
-constexpr uint32_t kDefaultBitRate = 10'000; // bits per second
-constexpr uint16_t kMinFragmentLen = 1;
-constexpr uint16_t kMaxFragmentLen = 10;
-constexpr uint16_t kMinWidth       = 640;
-constexpr uint16_t kMinHeight      = 360;
-constexpr uint16_t kMaxWidth       = 1920;
-constexpr uint16_t kMaxHeight      = 1080;
+constexpr uint16_t kMinFrameRate     = 30;
+constexpr uint16_t kMaxFrameRate     = 120;
+constexpr uint32_t kDefaultBitRate   = 10000; // bits per second
+constexpr uint16_t kKeyFrameInterval = 4000;
+constexpr uint16_t kMinWidth         = 640;
+constexpr uint16_t kMinHeight        = 480;
+constexpr uint16_t kMaxWidth         = 1920;
+constexpr uint16_t kMaxHeight        = 1080;
 
 } // namespace
 
@@ -42,15 +41,17 @@ void AVStreamManagement::Init(Controller::DeviceCommissioner * commissioner)
     // Ensure that mCommissioner is not already initialized
     VerifyOrDie(mCommissioner == nullptr);
 
-    ChipLogProgress(NotSpecified, "Initilize CommissionerControl");
+    ChipLogProgress(Camera, "Initilize CommissionerControl");
     mCommissioner = commissioner;
 }
 
-CHIP_ERROR AVStreamManagement::AllocateVideoStream(NodeId nodeId, EndpointId endpointId, uint8_t streamUsage)
+CHIP_ERROR AVStreamManagement::AllocateVideoStream(NodeId nodeId, EndpointId endpointId, uint8_t streamUsage,
+                                                   Optional<uint16_t> minResWidth, Optional<uint16_t> minResHeight,
+                                                   Optional<uint16_t> minFrameRate, Optional<uint32_t> minBitRate)
 {
     VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(NotSpecified, "Sending VideoStreamAllocate to (node=0x" ChipLogFormatX64 ", ep=%u, usage=%u)",
+    ChipLogProgress(Camera, "Sending VideoStreamAllocate to (node=0x" ChipLogFormatX64 ", ep=%u, usage=%u)",
                     ChipLogValueX64(nodeId), endpointId, streamUsage);
 
     // Clear any stale data from previous requests.
@@ -60,17 +61,59 @@ CHIP_ERROR AVStreamManagement::AllocateVideoStream(NodeId nodeId, EndpointId end
     mVideoStreamAllocate.videoCodec =
         app::Clusters::CameraAvStreamManagement::VideoCodecEnum::kH264; // Default to H.264; adjust as needed.
 
-    mVideoStreamAllocate.minFrameRate = kMinFrameRate;
+    // Handle frame rate configuration with validation
+    uint16_t requestedMinFrameRate = minFrameRate.ValueOr(kMinFrameRate);
+    if (requestedMinFrameRate > kMaxFrameRate)
+    {
+        ChipLogProgress(Camera, "Requested min frame rate (%u) exceeds max frame rate (%u), clamping to max", requestedMinFrameRate,
+                        kMaxFrameRate);
+        requestedMinFrameRate = kMaxFrameRate;
+    }
+
+    mVideoStreamAllocate.minFrameRate = requestedMinFrameRate;
     mVideoStreamAllocate.maxFrameRate = kMaxFrameRate;
 
-    mVideoStreamAllocate.minResolution = { .width = kMinWidth, .height = kMinHeight };
+    // Handle resolution configuration with validation
+    uint16_t requestedMinWidth  = minResWidth.ValueOr(kMinWidth);
+    uint16_t requestedMinHeight = minResHeight.ValueOr(kMinHeight);
+
+    // Ensure min values don't exceed max values
+    if (requestedMinWidth > kMaxWidth)
+    {
+        ChipLogProgress(Camera, "Requested min width (%u) exceeds max width (%u), clamping to max", requestedMinWidth, kMaxWidth);
+        requestedMinWidth = kMaxWidth;
+    }
+
+    if (requestedMinHeight > kMaxHeight)
+    {
+        ChipLogProgress(Camera, "Requested min height (%u) exceeds max height (%u), clamping to max", requestedMinHeight,
+                        kMaxHeight);
+        requestedMinHeight = kMaxHeight;
+    }
+
+    mVideoStreamAllocate.minResolution = { .width = requestedMinWidth, .height = requestedMinHeight };
     mVideoStreamAllocate.maxResolution = { .width = kMaxWidth, .height = kMaxHeight };
 
-    mVideoStreamAllocate.minBitRate = kDefaultBitRate;
-    mVideoStreamAllocate.maxBitRate = kDefaultBitRate;
+    // Handle bit rate configuration with validation
+    uint32_t requestedMinBitRate = minBitRate.ValueOr(kDefaultBitRate);
+    if (requestedMinBitRate > kDefaultBitRate)
+    {
+        // If requested min bit rate is higher than default, use it as both min and max
+        mVideoStreamAllocate.minBitRate = requestedMinBitRate;
+        mVideoStreamAllocate.maxBitRate = requestedMinBitRate;
+        ChipLogProgress(Camera, "Using custom bit rate: %u (both min and max)", requestedMinBitRate);
+    }
+    else
+    {
+        // Use requested min bit rate and default max bit rate
+        mVideoStreamAllocate.minBitRate = requestedMinBitRate;
+        mVideoStreamAllocate.maxBitRate = kDefaultBitRate;
+    }
 
-    mVideoStreamAllocate.minFragmentLen = kMinFragmentLen;
-    mVideoStreamAllocate.maxFragmentLen = kMaxFragmentLen;
+    mVideoStreamAllocate.keyFrameInterval = kKeyFrameInterval;
+
+    mVideoStreamAllocate.watermarkEnabled.SetValue(false);
+    mVideoStreamAllocate.OSDEnabled.SetValue(false);
 
     mEndpointId  = endpointId;
     mCommandType = CommandType::kVideoStreamAllocate;
@@ -81,7 +124,7 @@ CHIP_ERROR AVStreamManagement::DeallocateVideoStream(NodeId nodeId, EndpointId e
 {
     VerifyOrReturnError(mCommissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(NotSpecified, "Sending VideoStreamDeallocate to (node=0x" ChipLogFormatX64 ", ep=%u, videoStreamID=%u)",
+    ChipLogProgress(Camera, "Sending VideoStreamDeallocate to (node=0x" ChipLogFormatX64 ", ep=%u, videoStreamID=%u)",
                     ChipLogValueX64(nodeId), endpointId, videoStreamID);
 
     mVideoStreamDeallocate.videoStreamID = videoStreamID;
@@ -94,12 +137,12 @@ CHIP_ERROR AVStreamManagement::DeallocateVideoStream(NodeId nodeId, EndpointId e
 void AVStreamManagement::OnResponse(app::CommandSender * client, const app::ConcreteCommandPath & path,
                                     const app::StatusIB & status, TLV::TLVReader * data)
 {
-    ChipLogProgress(NotSpecified, "AVStreamManagement: OnResponse.");
+    ChipLogProgress(Camera, "AVStreamManagement: OnResponse.");
 
     CHIP_ERROR error = status.ToChipError();
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(NotSpecified, "Response Failure: %s", ErrorStr(error));
+        ChipLogError(Camera, "Response Failure: %s", ErrorStr(error));
         return;
     }
 
@@ -112,25 +155,25 @@ void AVStreamManagement::OnResponse(app::CommandSender * client, const app::Conc
 void AVStreamManagement::OnError(const app::CommandSender * client, CHIP_ERROR error)
 {
     // Handle the error, then reset mCommandSender
-    ChipLogProgress(NotSpecified, "AVStreamManagement: OnError: Error: %s", ErrorStr(error));
+    ChipLogError(Camera, "AVStreamManagement: OnError. Error: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
 void AVStreamManagement::OnDone(app::CommandSender * client)
 {
-    ChipLogProgress(NotSpecified, "AVStreamManagement: OnDone.");
+    ChipLogProgress(Camera, "AVStreamManagement: OnDone.");
 
     switch (mCommandType)
     {
     case CommandType::kVideoStreamAllocate:
-        ChipLogProgress(NotSpecified, "AVStreamManagement: Command VideoStreamAllocate has been successfully processed.");
+        ChipLogProgress(Camera, "AVStreamManagement: Command VideoStreamAllocate has been successfully processed.");
         break;
 
     case CommandType::kVideoStreamDeallocate:
-        ChipLogProgress(NotSpecified, "AVStreamManagement: Command VideoStreamDeallocate has been successfully processed.");
+        ChipLogProgress(Camera, "AVStreamManagement: Command VideoStreamDeallocate has been successfully processed.");
         break;
 
     default:
-        ChipLogError(NotSpecified, "AVStreamManagement: Unknown or unhandled command type in OnDone.");
+        ChipLogError(Camera, "AVStreamManagement: Unknown or unhandled command type in OnDone.");
         break;
     }
 
@@ -163,14 +206,14 @@ void AVStreamManagement::OnDeviceConnectedFn(void * context, Messaging::Exchange
                                              const SessionHandle & sessionHandle)
 {
     AVStreamManagement * self = reinterpret_cast<AVStreamManagement *>(context);
-    VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
+    VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnDeviceConnectedFn: context is null"));
 
     OperationalDeviceProxy device(&exchangeMgr, sessionHandle);
 
     CHIP_ERROR err = self->SendCommandForType(self->mCommandType, &device);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to send AVStreamManagement command.");
+        ChipLogError(Camera, "Failed to send AVStreamManagement command.");
         self->OnDone(nullptr);
     }
 }
@@ -179,7 +222,7 @@ void AVStreamManagement::OnDeviceConnectionFailureFn(void * context, const Scope
 {
     LogErrorOnFailure(err);
     AVStreamManagement * self = reinterpret_cast<AVStreamManagement *>(context);
-    VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
+    VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnDeviceConnectedFn: context is null"));
     self->OnDone(nullptr);
 }
 

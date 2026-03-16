@@ -17,7 +17,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/clusters/wifi-network-diagnostics-server/WiFiDiagnosticsTestEventTriggerHandler.h>
-#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-server.h>
+#include <app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
 
@@ -36,9 +36,12 @@ namespace {
  */
 void SetTestEventTrigger_Disconnection()
 {
-    uint16_t reasonCode = 3; // Deauthenticated because sending STA is leaving (or has left) IBSS or ESS.
-
-    WiFiDiagnosticsServer::Instance().OnDisconnectionDetected(reasonCode);
+    auto delegate = DeviceLayer::GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+    if (delegate != nullptr)
+    {
+        uint16_t reasonCode = 3; // Deauthenticated because sending STA is leaving (or has left) IBSS or ESS.
+        delegate->OnDisconnectionDetected(reasonCode);
+    }
 }
 
 /**
@@ -46,11 +49,15 @@ void SetTestEventTrigger_Disconnection()
  */
 void SetTestEventTrigger_AssociationFailure()
 {
-    uint8_t associationFailureCause =
-        static_cast<uint8_t>(WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAuthenticationFailed);
-    uint16_t status = 4; // IEEE 802.11-2020 Status Codes, AP is unable to handle additional associated STAs
+    auto delegate = DeviceLayer::GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+    if (delegate != nullptr)
+    {
+        uint8_t associationFailureCause =
+            static_cast<uint8_t>(WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAuthenticationFailed);
+        uint16_t status = 4; // IEEE 802.11-2020 Status Codes, AP is unable to handle additional associated STAs
 
-    WiFiDiagnosticsServer::Instance().OnAssociationFailureDetected(associationFailureCause, status);
+        delegate->OnAssociationFailureDetected(associationFailureCause, status);
+    }
 }
 
 /**
@@ -58,8 +65,12 @@ void SetTestEventTrigger_AssociationFailure()
  */
 void SetTestEventTrigger_ConnectionStatus()
 {
-    uint8_t connectionStatus = static_cast<uint8_t>(WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected);
-    WiFiDiagnosticsServer::Instance().OnConnectionStatusChanged(connectionStatus);
+    auto delegate = DeviceLayer::GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+    if (delegate != nullptr)
+    {
+        uint8_t connectionStatus = static_cast<uint8_t>(WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected);
+        delegate->OnConnectionStatusChanged(connectionStatus);
+    }
 }
 
 } // anonymous namespace

@@ -20,7 +20,6 @@
  * Declarations of function that can be used to query the endpoint configuration
  * for the device.
  */
-
 #include <app/util/af-types.h>
 
 /**
@@ -35,7 +34,8 @@ uint16_t emberAfEndpointCount();
 /**
  * @brief Enable/disable endpoints
  */
-bool emberAfEndpointEnableDisable(chip::EndpointId endpoint, bool enable);
+bool emberAfEndpointEnableDisable(chip::EndpointId endpoint, bool enable,
+                                  MatterClusterShutdownType shutdownType = MatterClusterShutdownType::kClusterShutdown);
 
 /**
  * Returns whether the endpoint at the specified index (which must be less than

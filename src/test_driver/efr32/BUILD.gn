@@ -55,12 +55,7 @@ efr32_sdk("sdk") {
     "${examples_common_plat_dir}",
   ]
 
-  defines = [
-    "PW_RPC_ENABLED",
-
-    # Thread is built but test driver do not have the NETWORK_COMMISSIONING cluster or zap config.
-    "_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_",
-  ]
+  defines = [ "PW_RPC_ENABLED" ]
 }
 
 config("efr32_ldflags") {
@@ -101,7 +96,7 @@ source_set("efr32_test_main") {
   ]
 
   # OpenThread Settings
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     deps += [
       "${chip_root}/third_party/openthread:openthread",
       "${chip_root}/third_party/openthread:openthread-platform",

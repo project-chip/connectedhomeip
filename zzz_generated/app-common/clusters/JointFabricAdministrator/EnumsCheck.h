@@ -43,6 +43,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricAdministrato
     using EnumType = JointFabricAdministrator::StatusCodeEnum;
     switch (val)
     {
+    case EnumType::kBusy:
+    case EnumType::kPAKEParameterError:
+    case EnumType::kWindowNotOpen:
     case EnumType::kVIDNotVerified:
     case EnumType::kInvalidAdministratorFabricIndex:
         return val;

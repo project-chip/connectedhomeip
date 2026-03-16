@@ -199,5 +199,23 @@ menu "Energy Gateway Example App Configuration"
         default "n"
         help
             Enable test triggers used by the Electrical Grid Conditions tests
-        
+
+    config CHIP_DEVICE_CONFIG_ENABLE_METER_IDENTIFICATION_TRIGGER
+        bool "Enable MTRID (MeterIdentification) triggers"
+        default "n"
+        help
+            Enable test triggers used by the Meter Identification tests
+
+    config CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
+        bool "Enable COMMTR (CommodityMetering) triggers"
+        default "n"
+        help
+            Enable test triggers used by the Commodity Metering tests
+
+    config CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_TARIFF_TRIGGER
+        bool "Enable SETRF (CommodityTariff) triggers"
+        default "n"
+        help
+            Enable test triggers used by the Commodity Tariff tests
+
 endmenu

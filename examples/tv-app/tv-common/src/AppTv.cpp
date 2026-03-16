@@ -66,7 +66,7 @@ class MyUserPrompter : public UserPrompter
 
     // tv should override this with a dialog prompt
     inline void PromptForCommissionPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
-                                            uint16_t pairingHint, const char * pairingInstruction) override
+                                            uint16_t pairingHint, const char * pairingInstruction, uint8_t passcodeLength) override
     {
         return;
     }
@@ -79,7 +79,8 @@ class MyUserPrompter : public UserPrompter
 
     // tv should override this with a dialog prompt
     inline void PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
-                                               uint32_t passcode, uint16_t pairingHint, const char * pairingInstruction) override
+                                               uint32_t passcode, uint8_t passcodeLength, uint16_t pairingHint,
+                                               const char * pairingInstruction) override
     {
         return;
     }
@@ -131,10 +132,11 @@ class MyPasscodeService : public PasscodeService
         }
     }
 
-    uint32_t GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
+    PasscodeInfo GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
     {
         // TODO: randomly generate this value
-        return 12345678;
+        ChipLogDetail(AppServer, "GetCommissionerPasscode: returning a passcode");
+        return { 12345678, 8 };
     }
 
     void FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
@@ -175,7 +177,7 @@ class MyPostCommissioningListener : public PostCommissioningListener
             cluster.ReadAttribute<Binding::Attributes::Binding::TypeInfo>(this, OnReadSuccessResponse, OnReadFailureResponse);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed in reading binding. Error %s", ErrorStr(err));
+            ChipLogError(Controller, "Failed in reading binding: %" CHIP_ERROR_FORMAT, err.Format());
             clearContext();
         }
     }
@@ -254,9 +256,9 @@ class MyPostCommissioningListener : public PostCommissioningListener
         Optional<SessionHandle> opt   = mSecureSession.Get();
         SessionHandle & sessionHandle = opt.Value();
         auto rotatingIdSpan           = CharSpan{ mRotatingId.data(), mRotatingId.size() };
-        ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId,
-                                                             rotatingIdSpan, mPasscode, bindings, OnSuccessResponse,
-                                                             OnFailureResponse);
+        TEMPORARY_RETURN_IGNORED ContentAppPlatform::GetInstance().ManageClientAccess(
+            *mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId, rotatingIdSpan, mPasscode, bindings,
+            OnSuccessResponse, OnFailureResponse);
         clearContext();
     }
 
@@ -714,8 +716,8 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
 
         std::shared_ptr<DevicePairedCommand> pairingCommand = std::make_shared<DevicePairedCommand>(vendorId, productId, nodeId);
 
-        GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                    &pairingCommand->mOnDeviceConnectionFailureCallback);
+        TEMPORARY_RETURN_IGNORED GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                             &pairingCommand->mOnDeviceConnectionFailureCallback);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 }

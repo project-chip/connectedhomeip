@@ -29,6 +29,8 @@ import memdf.util.config
 import pandas as pd  # type: ignore
 from memdf import Config, ConfigDescription
 
+log = logging.getLogger(__name__)
+
 BLOCKLIST_CONFIG: ConfigDescription = {
     'symbol.block': {
         'help': 'Block symbol',
@@ -55,7 +57,7 @@ def main(argv):
 
         block_re: Optional[Pattern] = config.get_re('symbol.block')
         if block_re is None:
-            logging.warning('No block list')
+            log.warning("No block list")
         else:
             frames = []
             for filename in config.get('args.inputs', []):

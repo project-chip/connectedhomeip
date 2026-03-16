@@ -28,6 +28,7 @@
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
+#include <app/CASESessionManager.h>
 #include <app/CommandHandlerImpl.h>
 #include <app/CommandResponseSender.h>
 #include <app/CommandSender.h>
@@ -35,6 +36,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/DataVersionFilter.h>
+#include <app/DeviceLoadStatusProvider.h>
 #include <app/EventPathParams.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
@@ -42,6 +44,7 @@
 #include <app/ReadHandler.h>
 #include <app/StatusResponse.h>
 #include <app/SubscriptionResumptionSessionEstablisher.h>
+#include <app/SubscriptionStats.h>
 #include <app/SubscriptionsInfoProvider.h>
 #include <app/TimedHandler.h>
 #include <app/WriteClient.h>
@@ -66,8 +69,7 @@
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
-
-#include <app/CASESessionManager.h>
+#include <transport/MessageStats.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
@@ -92,7 +94,8 @@ class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public FabricTable::Delegate,
                                public SubscriptionsInfoProvider,
                                public TimedHandlerDelegate,
-                               public WriteHandlerDelegate
+                               public WriteHandlerDelegate,
+                               public DeviceLoadStatusProvider
 {
 public:
     /**
@@ -429,6 +432,11 @@ public:
     // Returns the old data model provider value.
     DataModel::Provider * SetDataModelProvider(DataModel::Provider * model);
 
+    // DeviceLoadStatusProvider functions implementation
+    MessageStats GetMessageStats() override;
+
+    SubscriptionStats GetSubscriptionStats(FabricIndex fabric) override;
+
 private:
     /* DataModel::ActionContext implementation */
     Messaging::ExchangeContext * CurrentExchange() override { return mCurrentExchange; }
@@ -630,13 +638,13 @@ private:
      * Validates that the command exists and on success returns the data for the command in `entry`.
      */
     Status CheckCommandExistence(const ConcreteCommandPath & aCommandPath, DataModel::AcceptedCommandEntry & entry);
-    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry & entry);
+    Status CheckCommandAccess(const DataModel::InvokeRequest & aRequest, const Access::Privilege aRequiredPrivilege);
     Status CheckCommandFlags(const DataModel::InvokeRequest & aRequest, const DataModel::AcceptedCommandEntry & entry);
 
     /**
-     * Check if the given attribute path is a valid path in the data model provider.
+     * Find the AttributeEntry that corresponds to the given attribute, if there is one.
      */
-    bool IsExistentAttributePath(const ConcreteAttributePath & path);
+    std::optional<DataModel::AttributeEntry> FindAttributeEntry(const ConcreteAttributePath & path);
 
     static void ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState);
 

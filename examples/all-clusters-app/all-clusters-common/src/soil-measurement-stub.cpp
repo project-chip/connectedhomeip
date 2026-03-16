@@ -16,18 +16,22 @@
  *    limitations under the License.
  */
 
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <soil-measurement-stub.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoilMeasurement;
+using namespace chip::app::Clusters::SoilMeasurement::Attributes;
 
-static const Globals::Structs::MeasurementAccuracyRangeStruct::Type kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
+namespace {
+
+const Globals::Structs::MeasurementAccuracyRangeStruct::Type kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
     { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
 };
 
-static const Globals::Structs::MeasurementAccuracyStruct::Type kDefaultSoilMoistureMeasurementLimits = {
+const SoilMoistureMeasurementLimits::TypeInfo::Type kDefaultSoilMoistureMeasurementLimits = {
     .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
     .measured         = true,
     .minMeasuredValue = 0,
@@ -36,30 +40,48 @@ static const Globals::Structs::MeasurementAccuracyStruct::Type kDefaultSoilMoist
         kDefaultSoilMoistureMeasurementLimitsAccuracyRange)
 };
 
-namespace {
-static std::unique_ptr<Instance> gSoilMeasurementInstance;
+LazyRegisteredServerCluster<SoilMeasurementCluster> gServer;
+
+constexpr EndpointId kEndpointWithSoilMeasurement = 1;
+
+bool ValidEndpointForSoilMeasurement(EndpointId endpoint)
+{
+    if (endpoint != kEndpointWithSoilMeasurement)
+    {
+        ChipLogError(AppServer, "SoilMeasurement cluster invalid endpoint");
+        return false;
+    }
+    return true;
+}
+
 } // namespace
 
-Instance * SoilMeasurement::GetInstance()
+void emberAfSoilMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    return gSoilMeasurementInstance.get();
+    VerifyOrReturn(ValidEndpointForSoilMeasurement(endpoint));
+
+    gServer.Create(endpoint, kDefaultSoilMoistureMeasurementLimits);
+
+    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration()));
+
+    // Set initial measured value to min since all clusters does not perform any actual measurements
+    LogErrorOnFailure(gServer.Cluster().SetSoilMoistureMeasuredValue(kDefaultSoilMoistureMeasurementLimits.minMeasuredValue));
 }
 
-void SoilMeasurement::Shutdown()
+void emberAfSoilMeasurementClusterShutdownCallback(EndpointId endpoint)
 {
-    VerifyOrDie(gSoilMeasurementInstance);
-    gSoilMeasurementInstance->Shutdown();
-    gSoilMeasurementInstance.reset(nullptr);
+    VerifyOrReturn(ValidEndpointForSoilMeasurement(endpoint));
+    LogErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster()));
+
+    gServer.Destroy();
 }
 
-void emberAfSoilMeasurementClusterInitCallback(EndpointId endpointId)
-{
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(!gSoilMeasurementInstance);
+namespace chip::app::Clusters::SoilMeasurement {
 
-    gSoilMeasurementInstance = std::make_unique<Instance>(endpointId);
-    if (gSoilMeasurementInstance)
-    {
-        gSoilMeasurementInstance->Init(kDefaultSoilMoistureMeasurementLimits);
-    }
+CHIP_ERROR
+SetSoilMoistureMeasuredValue(const SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue)
+{
+    return gServer.Cluster().SetSoilMoistureMeasuredValue(soilMoistureMeasuredValue);
 }
+
+} // namespace chip::app::Clusters::SoilMeasurement

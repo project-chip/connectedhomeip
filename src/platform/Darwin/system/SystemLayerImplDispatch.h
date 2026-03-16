@@ -28,6 +28,11 @@
 #include <system/SystemLayer.h>
 #include <system/SystemTimer.h>
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#include <mutex>
+#include <vector>
+#endif
+
 namespace chip {
 namespace System {
 
@@ -38,24 +43,25 @@ public:
     ~LayerImplDispatch() override { VerifyOrDie(mLayerState.Destroy()); }
 
     // Layer overrides.
-    CHIP_ERROR Init() override;
+    CriticalFailure Init() override;
     void Shutdown() override;
     bool IsInitialized() const override { return mLayerState.IsInitialized(); }
-    CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
+    CriticalFailure StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ExtendTimerTo(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) override;
     bool IsTimerActive(TimerCompleteCallback onComplete, void * appState) override;
     Clock::Timeout GetRemainingTime(TimerCompleteCallback onComplete, void * appState) override;
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
-    CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
+    CriticalFailure ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
     // LayerDispatch overrides.
     void SetDispatchQueue(dispatch_queue_t dispatchQueue) override { mDispatchQueue = dispatchQueue; };
     dispatch_queue_t GetDispatchQueue() override { return mDispatchQueue; };
     void HandleDispatchQueueEvents(Clock::Timeout timeout) override;
-    CHIP_ERROR ScheduleWorkWithBlock(dispatch_block_t block) override;
+    CriticalFailure ScheduleWorkWithBlock(dispatch_block_t block) override;
+    CriticalFailure StartTimerWithBlock(dispatch_block_t block, Clock::Timeout delay) override;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    // LayerSocket overrides.
+    // LayerSockets overrides.
     CHIP_ERROR StartWatchingSocket(int fd, SocketWatchToken * tokenOut) override;
     CHIP_ERROR SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data) override;
     CHIP_ERROR RequestCallbackOnPendingRead(SocketWatchToken token) override;
@@ -120,12 +126,34 @@ protected:
     TimerList mExpiredTimers;
     void EnableTimer(const char * source, TimerList::Node *);
     void DisableTimer(const char * source, TimerList::Node *);
-    CHIP_ERROR StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState, bool shouldCancel);
+    CriticalFailure StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState, bool shouldCancel);
     void HandleTimerEvents(Clock::Timeout timeout);
 
     ObjectLifeCycle mLayerState;
 
     dispatch_queue_t mDispatchQueue = nullptr;
+
+private:
+    inline bool HasTimerSource(TimerList::Node * timer)
+    {
+#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        VerifyOrDie(nullptr != timer->mTimerSource);
+#endif
+        return nullptr != timer->mTimerSource;
+    }
+
+    inline bool HasDispatchQueue(dispatch_queue_t queue)
+    {
+#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        VerifyOrDie(nullptr != queue);
+#endif
+        return nullptr != queue;
+    }
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    std::mutex mTestQueueMutex;
+    std::vector<dispatch_block_t> mTestQueuedBlocks;
+#endif
 };
 
 using LayerImpl = LayerImplDispatch;

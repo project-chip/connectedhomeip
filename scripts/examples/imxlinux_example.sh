@@ -1,7 +1,6 @@
-#!/usr/bin/env bash
-
+#!/bin/bash
 #
-#    Copyright (c) 2022 Project CHIP Authors
+#    Copyright (c) 2022, 2025 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -18,17 +17,78 @@
 
 set -e
 set -x
-if [ "$#" != 2 && "$#" != 3 ]; then
-    exit -1
+helpFunction() {
+    cat <<EOF
+Usage: $0 -s|--src <src folder> -o|--out <out folder> [-d|--debug] [-n|--no-init] [-t|--trusty] [-m|--imx_ele]
+    -s, --src       Source folder
+    -o, --out       Output folder
+    -d, --debug     Debug build (optional)
+    -n, --no-init   No init mode (optional)
+    -t, --trusty    Build with Trusty OS backed security enhancement (optional)
+    -m, --imx_ele   Build with IMX ELE (EdgeLock Enclave) based security enhancement (optional)
+EOF
+    exit 1
+}
+
+trusty=false
+imx_ele=false
+imx_ele_path="third_party/imx-secure-enclave/repo/"
+release_build=true
+PARSED_OPTIONS="$(getopt -o s:o:tmdn --long src:,out:,trusty,imx_ele,debug,no-init -- "$@")"
+if [ $? -ne 0 ]; then
+    helpFunction
+fi
+eval set -- "$PARSED_OPTIONS"
+while true; do
+    case "$1" in
+        -s | --src)
+            src="$2"
+            shift 2
+            ;;
+        -o | --out)
+            out="$2"
+            shift 2
+            ;;
+        -t | --trusty)
+            trusty=true
+            shift
+            ;;
+        -m | --imx_ele)
+            imx_ele=true
+            shift
+            ;;
+        -d | --debug)
+            release_build=false
+            shift
+            ;;
+        -n | --no-init)
+            no_init=1
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Invalid option: $1" >&2
+            exit 1
+            ;;
+    esac
+done
+
+if [ -z "$src" ] || [ -z "$out" ]; then
+    echo "Some or all of the required -s|--src and -o|--out parameters are empty."
+    helpFunction
 fi
 
-source "$(dirname "$0")/../../scripts/activate.sh"
+if [ "$no_init" != 1 ]; then
+    source "$(dirname "$0")/../../scripts/activate.sh"
+fi
 
 if [ "$IMX_SDK_ROOT" = "" -o ! -d "$IMX_SDK_ROOT" ]; then
     echo "the Yocto SDK path is not specified with the shell env IMX_SDK_ROOT or an invalid path is specified"
-    exit -1
+    exit 1
 fi
-env
 
 entries="$(echo "$(ls "$IMX_SDK_ROOT")" | tr -s '\n' ',')"
 IFS=',' read -ra entry_array <<<"$entries"
@@ -100,13 +160,19 @@ if [ -z "$target_cpu" -o -z "$cross_compile" ]; then
     exit 1
 fi
 
-release_build=true
-if [ "$3" = "debug" ]; then
-    release_build=false
+if [ "$imx_ele" = "true" ]; then
+    if [ -f "$imx_ele_path/Makefile" ]; then
+        make -C "$imx_ele_path" "install_version"
+    else
+        echo "Makefile does not exist in $imx_ele_path."
+        exit 1
+    fi
 fi
 
-PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"", "-DCHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD=\"udhcpc -b -i %s \"'
-gn gen --check --fail-on-unused-args --root="$1" "$2" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\"
+PLATFORM_CFLAGS='-DCHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME=\"mlan0\"'
+gn gen --check --fail-on-unused-args --root="$src" "$out" --args="target_os=\"linux\" target_cpu=\"$target_cpu\" arm_arch=\"$arm_arch\"
+chip_with_trusty_os=$trusty
+chip_with_imx_ele=$imx_ele
 treat_warnings_as_errors=false
 import(\"//build_overrides/build.gni\")
 sysroot=\"$sdk_target_sysroot\"
@@ -117,4 +183,4 @@ target_cxx=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/$cross_compile/
 target_ar=\"$IMX_SDK_ROOT/sysroots/x86_64-pokysdk-linux/usr/bin/$cross_compile/$cross_compile-ar\"
 $(if [ "$release_build" = "true" ]; then echo "is_debug=false"; else echo "optimize_debug=true"; fi)"
 
-ninja -C "$2"
+ninja -C "$out"

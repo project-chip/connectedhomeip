@@ -711,7 +711,7 @@ Davis, CA 95616, USA
       <field id="0" name="CredentialType" type="CredentialTypeEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="CredentialIndex" type="uint16" default="0">
+      <field id="1" name="CredentialIndex" type="uint16">
         <mandatoryConform/>
       </field>
     </struct>
@@ -764,28 +764,28 @@ Davis, CA 95616, USA
         <feature name="DPS"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x0011" name="NumberOfTotalUsersSupported" type="uint16" default="0">
+    <attribute id="0x0011" name="NumberOfTotalUsersSupported" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="USR"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0012" name="NumberOfPINUsersSupported" type="uint16" default="0">
+    <attribute id="0x0012" name="NumberOfPINUsersSupported" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="PIN"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0013" name="NumberOfRFIDUsersSupported" type="uint16" default="0">
+    <attribute id="0x0013" name="NumberOfRFIDUsersSupported" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="RID"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0014" name="NumberOfWeekDaySchedulesSupportedPerUser" type="uint8" default="0">
+    <attribute id="0x0014" name="NumberOfWeekDaySchedulesSupportedPerUser" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -795,7 +795,7 @@ Davis, CA 95616, USA
         <max value="0xFD"/>
       </constraint>
     </attribute>
-    <attribute id="0x0015" name="NumberOfYearDaySchedulesSupportedPerUser" type="uint8" default="0">
+    <attribute id="0x0015" name="NumberOfYearDaySchedulesSupportedPerUser" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -805,7 +805,7 @@ Davis, CA 95616, USA
         <max value="0xFD"/>
       </constraint>
     </attribute>
-    <attribute id="0x0016" name="NumberOfHolidaySchedulesSupported" type="uint8" default="0">
+    <attribute id="0x0016" name="NumberOfHolidaySchedulesSupported" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -815,42 +815,42 @@ Davis, CA 95616, USA
         <max value="0xFD"/>
       </constraint>
     </attribute>
-    <attribute id="0x0017" name="MaxPINCodeLength" type="uint8" default="MS">
+    <attribute id="0x0017" name="MaxPINCodeLength" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="PIN"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0018" name="MinPINCodeLength" type="uint8" default="MS">
+    <attribute id="0x0018" name="MinPINCodeLength" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="PIN"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0019" name="MaxRFIDCodeLength" type="uint8" default="MS">
+    <attribute id="0x0019" name="MaxRFIDCodeLength" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="RID"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x001A" name="MinRFIDCodeLength" type="uint8" default="MS">
+    <attribute id="0x001A" name="MinRFIDCodeLength" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="RID"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x001B" name="CredentialRulesSupport" type="CredentialRulesBitmap" default="1">
+    <attribute id="0x001B" name="CredentialRulesSupport" type="CredentialRulesBitmap">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="USR"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x001C" name="NumberOfCredentialsSupportedPerUser" type="uint8" default="0">
+    <attribute id="0x001C" name="NumberOfCredentialsSupportedPerUser" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -880,7 +880,7 @@ Davis, CA 95616, USA
       <quality reportable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0025" name="OperatingMode" type="OperatingModeEnum" default="0">
+    <attribute id="0x0025" name="OperatingMode" type="OperatingModeEnum">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
       <quality reportable="true"/>
       <mandatoryConform/>
@@ -888,7 +888,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0026" name="SupportedOperatingModes" type="OperatingModesBitmap" default="0xFFF6">
+    <attribute id="0x0026" name="SupportedOperatingModes" type="OperatingModesBitmap">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -923,7 +923,7 @@ Davis, CA 95616, USA
       <quality reportable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0030" name="WrongCodeEntryLimit" type="uint8" default="MS">
+    <attribute id="0x0030" name="WrongCodeEntryLimit" type="uint8">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
       <quality reportable="true"/>
       <mandatoryConform>
@@ -939,7 +939,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0031" name="UserCodeTemporaryDisableTime" type="uint8" default="MS">
+    <attribute id="0x0031" name="UserCodeTemporaryDisableTime" type="uint8">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
       <quality reportable="true"/>
       <mandatoryConform>
@@ -967,7 +967,7 @@ Davis, CA 95616, USA
         </andTerm>
       </optionalConform>
     </attribute>
-    <attribute id="0x0033" name="RequirePINforRemoteOperation" type="bool" default="false">
+    <attribute id="0x0033" name="RequirePINforRemoteOperation" type="bool">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
       <quality reportable="true"/>
       <mandatoryConform>
@@ -994,7 +994,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0080" name="AliroReaderVerificationKey" type="octstr" default="null">
+    <attribute id="0x0080" name="AliroReaderVerificationKey" type="octstr">
       <access read="true" readPrivilege="admin"/>
       <quality nullable="true"/>
       <mandatoryConform>
@@ -1004,7 +1004,7 @@ Davis, CA 95616, USA
         <allowed value="65"/>
       </constraint>
     </attribute>
-    <attribute id="0x0081" name="AliroReaderGroupIdentifier" type="octstr" default="null">
+    <attribute id="0x0081" name="AliroReaderGroupIdentifier" type="octstr">
       <access read="true" readPrivilege="admin"/>
       <quality nullable="true"/>
       <mandatoryConform>
@@ -1024,7 +1024,7 @@ Davis, CA 95616, USA
         <allowed value="16"/>
       </constraint>
     </attribute>
-    <attribute id="0x0083" name="AliroExpeditedTransactionSupportedProtocolVersions" type="list" default="empty">
+    <attribute id="0x0083" name="AliroExpeditedTransactionSupportedProtocolVersions" type="list">
       <entry type="octstr">
         <constraint>
           <allowed value="2"/>
@@ -1039,7 +1039,7 @@ Davis, CA 95616, USA
         <maxCount value="16"/>
       </constraint>
     </attribute>
-    <attribute id="0x0084" name="AliroGroupResolvingKey" type="octstr" default="null">
+    <attribute id="0x0084" name="AliroGroupResolvingKey" type="octstr">
       <access read="true" readPrivilege="admin"/>
       <quality nullable="true"/>
       <mandatoryConform>
@@ -1049,7 +1049,7 @@ Davis, CA 95616, USA
         <allowed value="16"/>
       </constraint>
     </attribute>
-    <attribute id="0x0085" name="AliroSupportedBLEUWBProtocolVersions" type="list" default="empty">
+    <attribute id="0x0085" name="AliroSupportedBLEUWBProtocolVersions" type="list">
       <entry type="octstr">
         <constraint>
           <allowed value="2"/>
@@ -1064,21 +1064,21 @@ Davis, CA 95616, USA
         <maxCount value="16"/>
       </constraint>
     </attribute>
-    <attribute id="0x0086" name="AliroBLEAdvertisingVersion" type="uint8" default="0">
+    <attribute id="0x0086" name="AliroBLEAdvertisingVersion" type="uint8">
       <access read="true" readPrivilege="admin"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="ALBU"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0087" name="NumberOfAliroCredentialIssuerKeysSupported" type="uint16" default="0">
+    <attribute id="0x0087" name="NumberOfAliroCredentialIssuerKeysSupported" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="ALIRO"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0088" name="NumberOfAliroEndpointKeysSupported" type="uint16" default="0">
+    <attribute id="0x0088" name="NumberOfAliroEndpointKeysSupported" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -1147,9 +1147,6 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="1" name="UserStatus" type="UserStatusEnum">
-        <default>
-          <enum default="OccupiedEnabled"/>
-        </default>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
@@ -1157,9 +1154,6 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="2" name="UserType" type="UserTypeEnum">
-        <default>
-          <enum default="UnrestrictedUser"/>
-        </default>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -1200,9 +1194,6 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="1" name="UserStatus" type="UserStatusEnum">
-        <default>
-          <enum default="Available"/>
-        </default>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
@@ -1216,7 +1207,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="3" name="PINCode" type="octstr" default="empty">
+      <field id="3" name="PINCode" type="octstr">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -1430,7 +1421,7 @@ Davis, CA 95616, USA
           </between>
         </constraint>
       </field>
-      <field id="2" name="Status" type="enum8" default="SUCCESS">
+      <field id="2" name="Status" type="enum8">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1583,7 +1574,7 @@ Davis, CA 95616, USA
           </between>
         </constraint>
       </field>
-      <field id="2" name="Status" type="enum8" default="SUCCESS">
+      <field id="2" name="Status" type="enum8">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1685,7 +1676,7 @@ Davis, CA 95616, USA
           </between>
         </constraint>
       </field>
-      <field id="1" name="Status" type="enum8" default="SUCCESS">
+      <field id="1" name="Status" type="enum8">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -1802,9 +1793,6 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="1" name="UserStatus" type="UserStatusEnum">
-        <default>
-          <enum default="OccupiedEnabled"/>
-        </default>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
@@ -1812,9 +1800,6 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="2" name="UserType" type="UserTypeEnum">
-        <default>
-          <enum default="UnrestrictedUser"/>
-        </default>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
@@ -1858,9 +1843,6 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="1" name="UserStatus" type="UserStatusEnum">
-        <default>
-          <enum default="Available"/>
-        </default>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
@@ -1874,7 +1856,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="3" name="RFIDCode" type="octstr" default="empty">
+      <field id="3" name="RFIDCode" type="octstr">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -1944,21 +1926,18 @@ Davis, CA 95616, USA
           </between>
         </constraint>
       </field>
-      <field id="2" name="UserName" type="string" default="empty">
+      <field id="2" name="UserName" type="string">
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
           <maxLength value="10"/>
         </constraint>
       </field>
-      <field id="3" name="UserUniqueID" type="uint32" default="0xFFFFFFFF">
+      <field id="3" name="UserUniqueID" type="uint32">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="4" name="UserStatus" type="UserStatusEnum">
-        <default>
-          <enum default="OccupiedEnabled"/>
-        </default>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
@@ -1973,9 +1952,6 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="5" name="UserType" type="UserTypeEnum">
-        <default>
-          <enum default="UnrestrictedUser"/>
-        </default>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
@@ -2015,9 +1991,6 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="6" name="CredentialRule" type="CredentialRuleEnum">
-        <default>
-          <enum default="Single"/>
-        </default>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -2054,35 +2027,26 @@ Davis, CA 95616, USA
           </between>
         </constraint>
       </field>
-      <field id="1" name="UserName" type="string" default="empty">
+      <field id="1" name="UserName" type="string">
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
           <maxLength value="10"/>
         </constraint>
       </field>
-      <field id="2" name="UserUniqueID" type="uint32" default="0">
+      <field id="2" name="UserUniqueID" type="uint32">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="3" name="UserStatus" type="UserStatusEnum">
-        <default>
-          <enum default="Available"/>
-        </default>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="4" name="UserType" type="UserTypeEnum">
-        <default>
-          <enum default="UnrestrictedUser"/>
-        </default>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="5" name="CredentialRule" type="CredentialRuleEnum">
-        <default>
-          <enum default="Single"/>
-        </default>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
@@ -2183,9 +2147,6 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="4" name="UserStatus" type="UserStatusEnum">
-        <default>
-          <enum default="OccupiedEnabled"/>
-        </default>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
@@ -2200,9 +2161,6 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="5" name="UserType" type="UserTypeEnum">
-        <default>
-          <enum default="UnrestrictedUser"/>
-        </default>
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>
@@ -2252,7 +2210,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="1" name="UserIndex" type="uint16" default="0">
+      <field id="1" name="UserIndex" type="uint16">
         <quality nullable="true"/>
         <mandatoryConform/>
         <constraint>

@@ -252,6 +252,11 @@ struct Type;
 struct DecodableType;
 } // namespace GlobalEchoRequest
 
+namespace TestCheckCommandFlags {
+struct Type;
+struct DecodableType;
+} // namespace TestCheckCommandFlags
+
 namespace TestDifferentVendorMeiRequest {
 struct Type;
 struct DecodableType;
@@ -1805,6 +1810,35 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GlobalEchoRequest
+namespace TestCheckCommandFlags {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestCheckCommandFlags::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return true; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestCheckCommandFlags::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+    static constexpr bool kIsFabricScoped = true;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+};
+}; // namespace TestCheckCommandFlags
 namespace TestDifferentVendorMeiRequest {
 enum class Fields : uint8_t
 {

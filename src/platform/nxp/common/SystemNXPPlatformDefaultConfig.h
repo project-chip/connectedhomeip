@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2022, 2025 Project CHIP Authors
  *    Copyright (c) 2020 Google LLC.
  *    All rights reserved.
  *
@@ -85,3 +85,7 @@ struct ChipDeviceEvent;
 #ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS
 #define CHIP_SYSTEM_CONFIG_NUM_TIMERS 32
 #endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
+
+#ifndef CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+#define CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE 0
+#endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE

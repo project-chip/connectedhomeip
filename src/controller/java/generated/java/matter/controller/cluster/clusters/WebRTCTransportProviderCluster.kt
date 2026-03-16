@@ -107,6 +107,9 @@ class WebRTCTransportProviderCluster(
     ICEServers: List<WebRTCTransportProviderClusterICEServerStruct>?,
     ICETransportPolicy: String?,
     metadataEnabled: Boolean?,
+    SFrameConfig: WebRTCTransportProviderClusterSFrameStruct?,
+    videoStreams: List<UShort>?,
+    audioStreams: List<UShort>?,
     timedInvokeTimeout: Duration? = null,
   ): SolicitOfferResponse {
     val commandId: UInt = 0u
@@ -144,6 +147,27 @@ class WebRTCTransportProviderCluster(
     metadataEnabled?.let {
       tlvWriter.put(ContextSpecificTag(TAG_METADATA_ENABLED_REQ), metadataEnabled)
     }
+
+    val TAG_S_FRAME_CONFIG_REQ: Int = 7
+    SFrameConfig?.let { SFrameConfig.toTlv(ContextSpecificTag(TAG_S_FRAME_CONFIG_REQ), tlvWriter) }
+
+    val TAG_VIDEO_STREAMS_REQ: Int = 8
+    videoStreams?.let {
+      tlvWriter.startArray(ContextSpecificTag(TAG_VIDEO_STREAMS_REQ))
+      for (item in videoStreams.iterator()) {
+        tlvWriter.put(AnonymousTag, item)
+      }
+      tlvWriter.endArray()
+    }
+
+    val TAG_AUDIO_STREAMS_REQ: Int = 9
+    audioStreams?.let {
+      tlvWriter.startArray(ContextSpecificTag(TAG_AUDIO_STREAMS_REQ))
+      for (item in audioStreams.iterator()) {
+        tlvWriter.put(AnonymousTag, item)
+      }
+      tlvWriter.endArray()
+    }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -175,13 +199,9 @@ class WebRTCTransportProviderCluster(
 
       if (tag == ContextSpecificTag(TAG_WEB_RTC_SESSION_ID)) {
         webRTCSessionID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_DEFERRED_OFFER)) {
+      } else if (tag == ContextSpecificTag(TAG_DEFERRED_OFFER)) {
         deferredOffer_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_VIDEO_STREAM_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_VIDEO_STREAM_ID)) {
         videoStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -198,9 +218,7 @@ class WebRTCTransportProviderCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
         audioStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -250,6 +268,9 @@ class WebRTCTransportProviderCluster(
     ICEServers: List<WebRTCTransportProviderClusterICEServerStruct>?,
     ICETransportPolicy: String?,
     metadataEnabled: Boolean?,
+    SFrameConfig: WebRTCTransportProviderClusterSFrameStruct?,
+    videoStreams: List<UShort>?,
+    audioStreams: List<UShort>?,
     timedInvokeTimeout: Duration? = null,
   ): ProvideOfferResponse {
     val commandId: UInt = 2u
@@ -295,6 +316,27 @@ class WebRTCTransportProviderCluster(
     metadataEnabled?.let {
       tlvWriter.put(ContextSpecificTag(TAG_METADATA_ENABLED_REQ), metadataEnabled)
     }
+
+    val TAG_S_FRAME_CONFIG_REQ: Int = 9
+    SFrameConfig?.let { SFrameConfig.toTlv(ContextSpecificTag(TAG_S_FRAME_CONFIG_REQ), tlvWriter) }
+
+    val TAG_VIDEO_STREAMS_REQ: Int = 10
+    videoStreams?.let {
+      tlvWriter.startArray(ContextSpecificTag(TAG_VIDEO_STREAMS_REQ))
+      for (item in videoStreams.iterator()) {
+        tlvWriter.put(AnonymousTag, item)
+      }
+      tlvWriter.endArray()
+    }
+
+    val TAG_AUDIO_STREAMS_REQ: Int = 11
+    audioStreams?.let {
+      tlvWriter.startArray(ContextSpecificTag(TAG_AUDIO_STREAMS_REQ))
+      for (item in audioStreams.iterator()) {
+        tlvWriter.put(AnonymousTag, item)
+      }
+      tlvWriter.endArray()
+    }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -323,9 +365,7 @@ class WebRTCTransportProviderCluster(
 
       if (tag == ContextSpecificTag(TAG_WEB_RTC_SESSION_ID)) {
         webRTCSessionID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_VIDEO_STREAM_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_VIDEO_STREAM_ID)) {
         videoStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -342,9 +382,7 @@ class WebRTCTransportProviderCluster(
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
+      } else if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
         audioStreamID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)

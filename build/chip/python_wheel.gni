@@ -19,18 +19,18 @@ import("$dir_pw_build/python.gni")
 import("${chip_root}/src/system/system.gni")
 
 declare_args() {
-  chip_python_version = "0.0"
-  chip_python_package_prefix = "chip"
+  chip_python_version = "1.0.0"
+  chip_python_package_prefix = "matter"
   chip_python_supports_stack_locking = chip_system_config_locking != "none"
 }
 
-template("chip_python_wheel_action") {
+template("matter_python_wheel_action") {
   _dist_dir = "${root_out_dir}/controller/python"
 
   _py_manifest_file = "${target_gen_dir}/${target_name}.py_manifest.json"
 
   pw_python_action(target_name) {
-    script = "build-chip-wheel.py"
+    script = "build-matter-wheel.py"
     forward_variables_from(invoker, "*")
 
     _py_manifest_files_rebased = []
@@ -62,13 +62,13 @@ template("chip_python_wheel_action") {
     write_file(_py_manifest_file, _py_manifest, "json")
 
     args = [
-      "--package_name",
+      "--package-name",
       py_package_name,
-      "--build_number",
+      "--build-number",
       chip_python_version,
-      "--build_dir",
+      "--build-dir",
       rebase_path("${target_gen_dir}/${target_name}.py_build", root_build_dir),
-      "--dist_dir",
+      "--dist-dir",
       rebase_path(_dist_dir, root_build_dir),
       "--manifest",
       rebase_path(_py_manifest_file, root_build_dir),

@@ -228,7 +228,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = MT793XConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD

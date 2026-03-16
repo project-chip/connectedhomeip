@@ -1,0 +1,10 @@
+libAppDataModelTests
+libAppClusterBuildingBlockTests
+libIMInterfaceTests
+libChipCryptoTests
+libAddressResolveTests
+libASN1Tests
+libMessagingTestHelpers
+libInteractionModelTests
+libRetransmitTests
+libMinimalMdnsCoreTests

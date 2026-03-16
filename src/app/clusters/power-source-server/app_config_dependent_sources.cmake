@@ -16,5 +16,5 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/power-source-server.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
 )

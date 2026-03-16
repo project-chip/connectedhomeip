@@ -11,6 +11,13 @@ namespace app {
 namespace Clusters {
 namespace UnitTesting {
 namespace Commands {
+
+// Total number of client to server commands supported by the cluster
+inline constexpr uint32_t kAcceptedCommandsCount = 28;
+
+// Total number of server to client commands supported by the cluster (response commands)
+inline constexpr uint32_t kGeneratedCommandsCount = 16;
+
 namespace Test {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace Test
@@ -114,6 +121,10 @@ inline constexpr CommandId Id = 0x00000018;
 namespace GlobalEchoRequest {
 inline constexpr CommandId Id = 0x00000019;
 } // namespace GlobalEchoRequest
+
+namespace TestCheckCommandFlags {
+inline constexpr CommandId Id = 0x0000001A;
+} // namespace TestCheckCommandFlags
 
 namespace TestDifferentVendorMeiRequest {
 inline constexpr CommandId Id = 0xFFF200AA;

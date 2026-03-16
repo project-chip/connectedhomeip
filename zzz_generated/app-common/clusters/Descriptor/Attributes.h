@@ -96,11 +96,11 @@ struct TypeInfo
 namespace TagList {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType>;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::SemanticTagStruct::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::SemanticTagStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TagList::Id; }

@@ -3,7 +3,7 @@
 '''
 
 # This file contains generated struct, enum, command definition.
-# Users are not expected to import this file, instead, users can use import chip.clusters,
+# Users are not expected to import this file, instead, users can use import matter.clusters,
 # which will import all symbols from this file and can get a readable, pretty naming like
 # clusters.OnOff.commands.OnCommand
 from __future__ import annotations

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,17 +17,23 @@ namespace app {
 namespace Clusters {
 namespace Groups {
 
-inline constexpr uint32_t kRevision = 4;
+inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
+
 namespace NameSupport {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NameSupport::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace NameSupport
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    NameSupport::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace AddGroup {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(AddGroup::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
@@ -60,6 +67,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace AddGroupIfIdentifying
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace Groups
 } // namespace Clusters
 } // namespace app

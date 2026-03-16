@@ -149,10 +149,6 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     {
         action = static_cast<LightingManager::Action_t>(aEvent->LightEvent.Action);
         actor  = aEvent->LightEvent.Actor;
-        if (action == LightingManager::LEVEL_ACTION)
-        {
-            sLightLED.SetLevel(value);
-        }
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
@@ -166,7 +162,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 
     if (err == CHIP_NO_ERROR)
     {
-        initiated = LightMgr().InitiateAction(actor, action, NULL);
+        initiated = LightMgr().InitiateAction(actor, action, &value);
 
         if (!initiated)
         {
@@ -232,21 +228,29 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     }
 }
 
-void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor, uint8_t * aValue)
 {
-    // Action initiated, update the light led
-    bool lightOn = aAction == LightingManager::ON_ACTION;
-    SILABS_LOG("Turning light %s", (lightOn) ? "On" : "Off")
+    if (aAction == LightingManager::LEVEL_ACTION)
+    {
+        VerifyOrReturn(aValue != nullptr);
+        sLightLED.SetLevel(*aValue);
+    }
+    else
+    {
+        // Action initiated, update the light led
+        bool lightOn = aAction == LightingManager::ON_ACTION;
+        SILABS_LOG("Turning light %s", (lightOn) ? "On" : "Off")
 
-    sLightLED.Set(lightOn);
+        sLightLED.Set(lightOn);
 
 #ifdef DISPLAY_ENABLED
-    sAppTask.GetLCD().WriteDemoUI(lightOn);
+        sAppTask.GetLCD().WriteDemoUI(lightOn);
 #endif
 
-    if (aActor == AppEvent::kEventType_Button)
-    {
-        sAppTask.mSyncClusterToButtonAction = true;
+        if (aActor == AppEvent::kEventType_Button)
+        {
+            sAppTask.mSyncClusterToButtonAction = true;
+        }
     }
 }
 
@@ -264,18 +268,18 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState,
+                                                                               reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
 }
 
-void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint8_t * aValue)
+void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction)
 {
     AppEvent event;
     event.Type              = AppEvent::kEventType_Light;
     event.LightEvent.Actor  = aActor;
     event.LightEvent.Action = aAction;
-    event.LightEvent.Value  = *aValue;
     event.Handler           = LightActionEventHandler;
     PostEvent(&event);
 }

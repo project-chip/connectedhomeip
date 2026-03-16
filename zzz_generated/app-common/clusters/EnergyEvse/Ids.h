@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster EnergyEvse (cluster code: 153/0x0499)
+// Identifier constant values for cluster EnergyEvse (cluster code: 153/0x0099)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

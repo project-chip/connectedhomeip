@@ -38,6 +38,7 @@ static_library("fake") {
   deps = [
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
   ]
   public_deps = [
     "${chip_root}/src/lib/dnssd:platform_header",

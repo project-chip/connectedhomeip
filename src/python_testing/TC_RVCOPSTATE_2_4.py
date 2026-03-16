@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CHIP_RVC_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcopstate_2_4_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -30,7 +30,7 @@
 #       --passcode 20202021
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #       --endpoint 1
-#       --app-pipe_prefix /tmp/chip_rvc_fifo_
+#       --app-pipe /tmp/rvcopstate_2_4_fifo
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -39,9 +39,15 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+import matter.testing.matchers as matchers
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 # Takes an OpState or RvcOpState state enum and returns a string representation
@@ -72,7 +78,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
 
     async def send_go_home_cmd(self) -> Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcOperationalState.Commands.GoHome(), endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
                             "Unexpected return type for GoHome")
         return ret
 
@@ -89,7 +95,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         self.print_step(step_number, "Read OperationalState")
         operational_state = await self.read_mod_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
-        logging.info("OperationalState: %s" % operational_state)
+        log.info("OperationalState: %s" % operational_state)
         asserts.assert_equal(operational_state, expected_state,
                              "OperationalState(%s) should be %s" % (operational_state, state_enum_to_text(expected_state)))
 
@@ -107,9 +113,14 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
-        asserts.assert_true(self.check_pics("RVCOPSTATE.S.A0004"), "RVCOPSTATE.S.A0004 must be supported")
-        asserts.assert_true(self.check_pics("RVCOPSTATE.S.C04.Tx"), "RVCOPSTATE.S.C04.Tx must be supported")
-        asserts.assert_true(self.check_pics("RVCOPSTATE.S.C80.Rsp"), "RVCOPSTATE.S.C80.Rsp must be supported")
+        required_pics = [
+            "RVCOPSTATE.S.A0004",
+            "RVCOPSTATE.S.C04.Tx",
+            "RVCOPSTATE.S.C80.Rsp",
+            "RVCOPSTATE.S.M.CAN_MANUALLY_CONTROLLED",
+        ]
+        for pics in required_pics:
+            asserts.assert_true(self.check_pics(pics), f"{pics} must be supported")
 
         op_states = Clusters.OperationalState.Enums.OperationalStateEnum
         rvc_op_states = Clusters.RvcOperationalState.Enums.OperationalStateEnum

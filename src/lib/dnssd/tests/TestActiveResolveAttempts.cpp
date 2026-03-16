@@ -19,6 +19,7 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/ActiveResolveAttempts.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 namespace {
 
@@ -128,7 +129,7 @@ TEST(TestActiveResolveAttempts, TestSingleBrowseAddRemove)
     EXPECT_EQ(attempts.GetTimeUntilNextExpectedResponse(), std::make_optional<Timeout>(1900_ms32));
 
     // once complete, nothing to schedule
-    attempts.CompleteAllBrowses();
+    EXPECT_SUCCESS(attempts.CompleteAllBrowses());
     EXPECT_FALSE(attempts.GetTimeUntilNextExpectedResponse().has_value());
     EXPECT_FALSE(attempts.NextScheduled().has_value());
 }
@@ -267,7 +268,6 @@ TEST(TestActiveResolveAttempts, TestLRU)
         std::optional<ActiveResolveAttempts::ScheduledAttempt> s = attempts.NextScheduled();
         while (s.has_value())
         {
-            // NOLINTNEXTLINE(bugprone-unchecked-optional-access): this is checked in the while loop
             EXPECT_NE(s->ResolveData().peerId.GetNodeId(), 9999u);
             s = attempts.NextScheduled();
         }
@@ -376,7 +376,7 @@ TEST(TestActiveResolveAttempts, TestCombination)
     // Complete all, we should see no more scheduled.
     attempts.Complete(MakePeerId(2));
     attempts.Complete(MakePeerId(1));
-    attempts.CompleteAllBrowses();
+    EXPECT_SUCCESS(attempts.CompleteAllBrowses());
 
     EXPECT_FALSE(attempts.GetTimeUntilNextExpectedResponse().has_value());
     EXPECT_FALSE(attempts.NextScheduled().has_value());

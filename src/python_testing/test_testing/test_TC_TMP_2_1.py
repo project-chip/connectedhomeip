@@ -21,10 +21,10 @@ import typing
 from dataclasses import dataclass
 from pathlib import Path
 
-import chip.clusters as Clusters
-from chip.clusters import Attribute
-from chip.clusters.Types import NullValue
-from chip.testing.runner import MockTestRunner
+import matter.clusters as Clusters
+from matter.clusters import Attribute
+from matter.clusters.Types import NullValue
+from matter.testing.runner import MockTestRunner
 
 
 @dataclass
@@ -158,7 +158,7 @@ def test_spec_to_attribute_cache(test_spec: TestSpec) -> Attribute.AsyncReadTran
     resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
     resp.attributes = {1: {c: {attr.MaxMeasuredValue: test_spec.max,
                                attr.MinMeasuredValue: test_spec.min, attr.MeasuredValue: test_spec.measured, attr.Tolerance: test_spec.tolerance}}}
-    resp.attributes[1][c][attr.AttributeList] = [a.attribute_id for a in resp.attributes[1][c].keys()]
+    resp.attributes[1][c][attr.AttributeList] = [a.attribute_id for a in resp.attributes[1][c]]
 
     return resp
 
@@ -169,7 +169,7 @@ def test_spec_to_attribute_cache_no_tolerance(test_spec: TestSpec) -> Attribute.
     resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
     resp.attributes = {1: {c: {attr.MaxMeasuredValue: test_spec.max,
                                attr.MinMeasuredValue: test_spec.min, attr.MeasuredValue: test_spec.measured, attr.Tolerance: test_spec.tolerance}}}
-    resp.attributes[1][c][attr.AttributeList] = [a.attribute_id for a in resp.attributes[1][c].keys()]
+    resp.attributes[1][c][attr.AttributeList] = [a.attribute_id for a in resp.attributes[1][c]]
 
     return resp
 
