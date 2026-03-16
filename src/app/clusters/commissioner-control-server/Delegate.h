@@ -18,6 +18,9 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <lib/core/DataModelTypes.h>
+#include <lib/core/Optional.h>
+#include <lib/support/Span.h>
 
 namespace chip::app::Clusters::CommissionerControl {
 

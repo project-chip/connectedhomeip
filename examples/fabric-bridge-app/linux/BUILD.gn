@@ -42,7 +42,6 @@ executable("fabric-bridge-app") {
     "${chip_root}/examples/fabric-bridge-app/fabric-bridge-common:app-config",
     "${chip_root}/examples/fabric-bridge-app/fabric-bridge-common:fabric-bridge-lib",
     "${chip_root}/examples/platform/linux:app-main",
-    "${chip_root}/src/app/clusters/commissioner-control-server:commissioner-control-server",
     "${chip_root}/src/lib",
   ]
 
