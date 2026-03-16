@@ -39,7 +39,7 @@ class CancellableQueue(Generic[QueueElementT]):
 
     def put(self, item: QueueElementT | EndOfQueue) -> None:
         """
-        Put an item to the queue and notify a singleconsumer.
+        Put an item to the queue and notify a single consumer.
 
         Raises:
             QueueCancelled: if the queue is already cancelled.
