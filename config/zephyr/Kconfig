@@ -170,6 +170,13 @@ config CHIP_FACTORY_RESET_ERASE_NVS
 	  configuration is supposed to be cleared on a factory reset, including
 	  device-specific entries.
 
+config CHIP_OPENTHREAD_NETWORK_SWITCH_PATH
+	bool "Keep Thread enabled when switching between commissioned datasets"
+	default n
+	help
+		Keep Thread enabled while switching between commissioned
+		datasets to reduce detached window during fail-safe rollback/connect.
+
 module = MATTER
 module-str = Matter
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
