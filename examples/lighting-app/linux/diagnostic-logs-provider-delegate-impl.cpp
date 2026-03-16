@@ -24,6 +24,7 @@
 #include <cerrno>
 #include <cstdio>
 #include <string>
+#include <limits>
 
 using namespace chip;
 using namespace chip::app::Clusters::DiagnosticLogs;
@@ -98,8 +99,7 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     VerifyOrReturnValue(filePath.HasValue(), CHIP_ERROR_NOT_FOUND);
 
     // Guard against infinite loop if all handles are exhausted
-    VerifyOrReturnError(mFiles.size() < UINT16_MAX, CHIP_ERROR_NO_MEMORY);
-
+    VerifyOrReturnError(mFiles.size() < std::numeric_limits<LogSessionHandle>::max(), CHIP_ERROR_NO_MEMORY);
     auto fp = fopen(filePath.Value().c_str(), "rb");
     VerifyOrReturnValue(!(nullptr == fp && errno == ENOENT), CHIP_ERROR_NOT_FOUND);
     VerifyOrReturnValue(nullptr != fp, CHIP_ERROR_INTERNAL);
