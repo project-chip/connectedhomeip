@@ -130,7 +130,7 @@ public:
 
         if (mFabricIndex == kUndefinedFabricIndex)
         {
-            mAllFabrics = true;
+            mIterateOverFabricIndices = true;
             // If the fabric table is defined, it can be used to find and iterate over all
             // valid existing fabric indices. Otherwise, iteration can be done starting from
             // the minimum fabric index and going up
@@ -176,13 +176,20 @@ public:
             return CHIP_ERROR_SENTINEL;
         }
 
-        while (mGroupInfoIterator != nullptr || mEndpointIterator != nullptr || mAllFabrics)
+        while (mGroupInfoIterator != nullptr || mEndpointIterator != nullptr || mIterateOverFabricIndices)
         {
             if (mEndpointIterator != nullptr)
             {
                 Credentials::GroupDataProvider::GroupEndpoint endpoint;
                 if (mEndpointIterator->Next(endpoint))
                 {
+                    // Groups cannot be created with endpoint 0, this state should never be reached
+                    // because of restrictions with creating/joining groups. Something has gone wrong 
+                    // there if this condition is reached.
+                    if (endpoint.endpoint_id == kRootEndpointId) {
+                        return CHIP_ERROR_INCORRECT_STATE;
+                    }
+
                     auto * delegate = Platform::New<EntryDelegate>();
                     if (delegate == nullptr)
                     {
@@ -211,23 +218,28 @@ public:
                 mGroupInfoIterator = nullptr;
             }
 
-            if (mAllFabrics)
+            if (mIterateOverFabricIndices)
             {
-                mAllFabrics = false;
+                // This indicates that there are no more fabric indices to iterate over (unless it is 
+                // determined in the conditions below that at least 1 more is remaining, in which 
+                // case this will be set to true again).
+                mIterateOverFabricIndices = false;
+
                 if (mFabricTable && mFabricTableIter.HasValue())
                 {
-                    if (mFabricTableIter.Value() != mFabricTable->end() && ++mFabricTableIter.Value() != mFabricTable->end())
+                    if ((mFabricTableIter.Value() != mFabricTable->end()) 
+                        && (++mFabricTableIter.Value() != mFabricTable->end()))
                     {
                         mFabricIndex       = mFabricTableIter.Value()->GetFabricIndex();
                         mGroupInfoIterator = mGroupDataProvider->IterateGroupInfo(mFabricIndex);
-                        mAllFabrics        = true;
+                        mIterateOverFabricIndices        = true;
                     }
                 }
                 else if (mFabricIndex < kMaxValidFabricIndex)
                 {
                     mFabricIndex++;
                     mGroupInfoIterator = mGroupDataProvider->IterateGroupInfo(mFabricIndex);
-                    mAllFabrics        = true;
+                    mIterateOverFabricIndices        = true;
                 }
             }
         }
@@ -239,11 +251,15 @@ private:
     Credentials::GroupDataProvider * mGroupDataProvider;
     FabricTable * mFabricTable;
     FabricIndex mFabricIndex;
-    bool mAllFabrics = false;
     chip::Optional<chip::ConstFabricIterator> mFabricTableIter;
     Credentials::GroupDataProvider::GroupInfoIterator * mGroupInfoIterator = nullptr;
     Credentials::GroupDataProvider::EndpointIterator * mEndpointIterator   = nullptr;
     GroupId mGroupId                                                       = kUndefinedGroupId;
+
+    // When true, this indicates the entries are not fabric scoped. AuxiliaryEntries() through
+    // the Next() funciton will iterate over all fabrics to fetch auxiliary ACL entries. This 
+    // will be set to true when a fabric index is not specified (kUndefinedFabricIndex).
+    bool mIterateOverFabricIndices = false;
 };
 
 } // namespace
@@ -267,39 +283,26 @@ CHIP_ERROR GroupAuxiliaryAccessControlDelegate::AuxiliaryEntries(AccessControl::
 CHIP_ERROR GroupAuxiliaryAccessControlDelegate::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                                       Privilege requestPrivilege)
 {
-    AccessControl::EntryIterator iterator;
-    ReturnErrorOnFailure(AuxiliaryEntries(iterator, &subjectDescriptor.fabricIndex));
+    CHIP_ERROR err = CHIP_ERROR_ACCESS_DENIED;
 
-    AccessControl::Entry entry;
-    while (iterator.Next(entry) == CHIP_NO_ERROR)
+    if (IsGroupId(subjectDescriptor.subject) && (mGroupDataProvider != nullptr))
     {
-        // Simplest form of Auxliliary ACL Entry format assumes only 1 subject and 1 target per entry.
-        // With more compelx ACL entry format, checks should be done accross all subjects and targets
-        size_t numSubjects;
-        size_t numTargets;
-        ReturnErrorOnFailure(entry.GetSubjectCount(numSubjects));
-        ReturnErrorOnFailure(entry.GetTargetCount(numTargets));
-        VerifyOrReturnError(numSubjects == 1, CHIP_ERROR_SENTINEL);
-        VerifyOrReturnError(numTargets == 1, CHIP_ERROR_SENTINEL);
-
-        NodeId subjectFromEntry;
-        ReturnErrorOnFailure(entry.GetSubject(0, subjectFromEntry));
-        if (subjectFromEntry != subjectDescriptor.subject)
+        GroupId groupId = GroupIdFromNodeId(subjectDescriptor.subject);
+        if (mGroupDataProvider->HasEndpoint(subjectDescriptor.fabricIndex, groupId, requestPath.endpoint))
         {
-            continue;
+            if (requestPath.endpoint == kRootEndpointId)
+            {
+                // Root endpoint should never be present in the group
+                err = CHIP_ERROR_INCORRECT_STATE;
+            }
+            else if (requestPrivilege == Privilege::kOperate && subjectDescriptor.authMode == Access::AuthMode::kGroup)
+            {
+                err = CHIP_NO_ERROR;
+            }
         }
-
-        AccessControl::Entry::Target targetFromEntry;
-        ReturnErrorOnFailure(entry.GetTarget(0, targetFromEntry));
-        if (targetFromEntry.endpoint != requestPath.endpoint)
-        {
-            continue;
-        }
-
-        return CHIP_NO_ERROR;
     }
 
-    return CHIP_ERROR_ACCESS_DENIED;
+    return err;
 }
 
 } // namespace Examples

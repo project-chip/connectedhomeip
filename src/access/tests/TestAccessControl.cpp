@@ -1189,8 +1189,15 @@ constexpr CheckData groupCheckData[] = {
       .privilege         = Privilege::kOperate,
       .allow             = true },
 
+    // Not allowed (access denied) because TestGroupAuxiliaryCheck will purposely NOT add the kHasAuxiliaryACL flag to the group.
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x2222) },
       .requestPath       = { .endpoint = 20, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate,
+      .allow             = false },
+
+    // Not allowed (access denied) because the wrong request type is used.
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x1111) },
+      .requestPath       = { .endpoint = 10, .requestType = Access::RequestType::kAttributeWriteRequest },
       .privilege         = Privilege::kOperate,
       .allow             = false },
 
@@ -1199,14 +1206,22 @@ constexpr CheckData groupCheckData[] = {
       .privilege         = Privilege::kOperate,
       .allow             = true },
 
+    // Not allowed (access denied) because TestGroupAuxiliaryCheck will purposely NOT add the kHasAuxiliaryACL flag to the group.
     { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x4444) },
       .requestPath       = { .endpoint = 40, .requestType = Access::RequestType::kCommandInvokeRequest },
       .privilege         = Privilege::kOperate,
       .allow             = false },
 
+    // Not allowed (access denied) because the wrong privilige is used.
     { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x3333) },
       .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
       .privilege         = Privilege::kManage,
+      .allow             = false },
+
+    // Not allowed (access denied) because the wrong auth mode is used.
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kNone, .subject = NodeIdFromGroupId(0x3333) },
+      .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate,
       .allow             = false },
 };
 
@@ -2218,7 +2233,7 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryCheck)
         EXPECT_EQ(provider->AddEndpoint(1, info.group_id, 10), CHIP_NO_ERROR);
     }
 
-    // Set up group 2 data for fabric 1
+    // Set up group 2 data for fabric 1, with no kHasAuxiliaryACL
     {
         Credentials::GroupDataProvider::GroupInfo info;
         info.group_id = 0x2222;
