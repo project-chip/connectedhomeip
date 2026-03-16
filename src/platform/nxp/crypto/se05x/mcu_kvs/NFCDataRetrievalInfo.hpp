@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <lib/core/CHIPError.h>
 #include <stdint.h>
 
@@ -69,12 +70,22 @@ public:
     uint32_t GetRemainingFailSafeTimerForSE05x();
 
     /**
+     * @brief Get operational data set that is stored in SE05x during NFC commissioning
+     * @param None
+     * @return CHIP_NO_ERROR on success, appropriate error code on failure
+     */
+    CHIP_ERROR GetOperationalDataSetFormSE05x(char * opDataSet, size_t * opDataSetLen);
+
+    /**
      * @brief Get the singleton instance
      * @return Reference to the NFCDataRetrievalInfo singleton
      */
     static NFCDataRetrievalInfo & GetInstance();
 
 private:
+    char op_data_set[256]  = { 0 };
+    size_t op_data_set_len = sizeof(op_data_set);
+
 #if defined(CONFIG_SE05X_HOST_GPIO)
     /**
      * @brief Check if device is commissioned and initialize GPIO notification if needed

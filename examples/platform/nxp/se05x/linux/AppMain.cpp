@@ -161,8 +161,8 @@
 #if ENABLE_SE05X_DEVICE_ATTESTATION
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
-#include <third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio.h>
 #include <examples/platform/nxp/common/app_se05x/include/AppSe05x.h>
+#include <third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio.h>
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -830,6 +830,9 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     if (LinuxDeviceOptions::GetInstance().hardwareVersionString.HasValue())
         gExampleDeviceInstanceInfoProvider.SetHardwareVersionString(
             LinuxDeviceOptions::GetInstance().hardwareVersionString.Value());
+
+    err = chip::NXP::App::Se05x::PostInit();
+    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)
