@@ -145,7 +145,7 @@ class TC_ICDB_2_3(ICDBaseTest):
             TestStep(5, "TH2 sends UnregisterClient command with TH2's checkInNodeID.",
                      "Command success."),
             TestStep(6, "Wait for a full active-to-idle-to-active ICD transition cycle. TH1 reads the ICDCounter attribute.",
-                     "Verify ICDCounter is greater than the value from step 3."),
+                     "Verify ICDCounter is greater than the value from step 4."),
             TestStep(7, "TH1 sends UnregisterClient command with TH1's checkInNodeID.",
                      "Command success."),
             TestStep(8, "Wait for a full active-to-idle-to-active ICD transition cycle. TH1 reads the ICDCounter attribute.",
