@@ -577,17 +577,15 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
             log.info("Scheduling iteration %d", i)
             for test in context.obj.tests:
                 log.debug("Enqueuing test %s", test.name)
-                work_queue.put(functools.partial(TestResult.run_test,
-                    test.name, i, dry_run, context.obj.log_config, functools.partial(test.Run,
-                        runner, apps_register, subproc_info_repo, pics_file,
-                        test_timeout_seconds, dry_run,
-                        test_runtime=context.obj.runtime,
-                        ble_controller_app=ble_controller_app,
-                        ble_controller_tool=ble_controller_tool,
-                        op_network='Thread' if thread_required else 'WiFi',
-                        thread_ba_host=thread_ba_host,
-                        thread_ba_port=thread_ba_port,
-                    )))
+                work_queue.put(functools.partial(TestResult.run_test, test.name, i, dry_run, context.obj.log_config,
+                                                 functools.partial(test.Run, runner, apps_register, subproc_info_repo, pics_file,
+                                                                   test_timeout_seconds, dry_run,
+                                                                   test_runtime=context.obj.runtime,
+                                                                   ble_controller_app=ble_controller_app,
+                                                                   ble_controller_tool=ble_controller_tool,
+                                                                   op_network='Thread' if thread_required else 'WiFi',
+                                                                   thread_ba_host=thread_ba_host,
+                                                                   thread_ba_port=thread_ba_port)))
 
             # If this is the last iteration schedule finalization event.
             if i == iterations:
