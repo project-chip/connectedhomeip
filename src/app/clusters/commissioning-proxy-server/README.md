@@ -1,99 +1,92 @@
 # Commissioning Proxy Cluster
 
-This Commisioning Proxy cluster provides a proxy service allowing a Commissioner
-to utilize commissioning transports not supported locally, or to extend the
-commissioning range of the Commissioner. Commissioners can use the proxy to
-discover and establish a connection to commissionable devices that are reachable
-by the proxy. The proxy connection acts as a tunnel through which the
-Commissioner can establish a PASE session with the commissionable device, and
-ultimatelycommission it.
+The Commissioning Proxy cluster (cluster ID 0x0455, Matter spec §10.5) provides
+a proxy service that allows a Commissioner to use commissioning transports not
+supported locally, or to extend its commissioning range. Commissioners can use
+the proxy to discover and establish a connection to commissionable devices that
+are reachable by the proxy. The proxy connection acts as a tunnel through which
+the Commissioner can run a PASE session with the commissionable device and
+ultimately commission it.
 
 ## Overview
 
 This directory contains an implementation of the Matter Commissioning Proxy
-cluster server. This implementation (`CommissioningProxyCluster.h` and
+cluster server. The implementation (`CommissioningProxyCluster.h` and
 `CommissioningProxyCluster.cpp`) is designed for flexibility and requires a
-delegate to handle the appliance-specific logic.
+delegate to handle the application-specific logic.
 
-The cluster implementation handles command validation, feature-based attribute
-and command filtering, and opt-out state checking. The application is
-responsible for implementing the `CommissioingProxy::Delegate` interface to
-handle the actual selected commissioning management.
+The cluster handles command validation, feature-based attribute and command
+filtering, and opt-out state checking. The application is responsible for
+implementing the `CommissioningProxy::Delegate` interface to perform the actual
+transport management (e.g. Wi-Fi PAF session setup and teardown).
 
 ## Features
 
 The cluster supports the following optional features:
 
--   **WiFiNetworkInterface (WI)**: Allows Wi-Fi PAF Commissioning
--   **BackgroundScan (BGS)**: Allows background scan of commissioning transports
+-   **WiFiNetworkInterface (WI)**: Allows Wi-Fi PAF commissioning
+-   **BackgroundScan (BGS)**: Allows background scanning of commissioning
+    transports
 
 ## Usage
 
-For new applications using the `CodeDrivenDataModelProvider`, we strongly
-recommend instantiating and registering the cluster directly. This approach
-provides the most flexibility and control.
+For new applications using the `CodeDrivenDataModelProvider`, instantiate and
+register the cluster directly. This provides the most flexibility and control.
 
 ### 1. Implement the Delegate
 
 Create a class that inherits from
-`chip::app::Clusters::CommissioningProxy::Delegate` and implement its
-virtual methods. The delegate handles all appliance-specific logic. This
-Delegate will be accessed by the chip task to interact with the application. It
-is the Delegate's implementation's responsibility to put proper synchronization
-mechanisms during those interaction.
+`chip::app::Clusters::CommissioningProxy::Delegate` and implement its virtual
+methods. The delegate handles all application-specific transport logic and is
+called from the Matter task; the implementation is responsible for any required
+synchronization.
 
 ```cpp
-#include <app/clusters/commissioing-proxy-server/CommissioningProxyDelegate.h>
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyDelegate.h>
 
-class Delegate
+class MyCPDelegate : public chip::app::Clusters::CommissioningProxy::Delegate
 {
 public:
-    virtual ~Delegate() = default;
-
-    void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
-    EndpointId GetEndpointId() const { return mEndpointId; }
-
-    /**
-     * @brief Handles starting a Scan Request of required Transport and Bands
-     *
-     * @param transport  Which transports to use
-     * @param wiFiBands  The frequency of the transports (if applicable)
-     * @param commandObj The command handler object from the command
-     * @param request    Invokde path
-     * @return Success if successful
-     *
-     * The delegate handles all the transport specific options.
-     */
-    virtual Protocols::InteractionModel::Status
+    // Scan for commissionable devices using the requested transport and bands.
+    Protocols::InteractionModel::Status
     ProxyScanRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
                      chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
                      chip::app::CommandHandler * commandObj,
-                     const DataModel::InvokeRequest & request) = 0;
+                     const DataModel::InvokeRequest & request) override;
 
-    // ... implement other required methods
+    // Open a PAF session to the commissionee identified by the request.
+    Protocols::InteractionModel::Status
+    ProxyConnectRequest(const Commands::ProxyConnectRequest::DecodableType & request,
+                        chip::app::CommandHandler * commandObj,
+                        const chip::app::ConcreteCommandPath & commandPath) override;
 
-    // ------------------------------------------------------------------
-    // Get attribute methods
-    virtual uint8_t GetScanMaxTime()         = 0;
+    // Forward a commissioning message to the commissionee and return the response.
+    Protocols::InteractionModel::Status
+    ProxyMessageRequest(const Commands::ProxyMessageRequest::DecodableType & request,
+                        chip::app::CommandHandler * commandObj,
+                        const chip::app::ConcreteCommandPath & commandPath) override;
 
-    // ------------------------------------------------------------------
-    // Set attribute methods
-    virtual void SetScanMaxTime(uint8_t seconds) = 0;
+    // Tear down a proxy session.
+    Protocols::InteractionModel::Status
+    ProxyDisconnectRequest(const Commands::ProxyDisconnectRequest::DecodableType & request,
+                           chip::app::CommandHandler * commandObj,
+                           const chip::app::ConcreteCommandPath & commandPath) override;
 
-    // ... implement other getters and setters
+    // Attribute accessors
+    uint8_t GetScanMaxTime() override;
+    void    SetScanMaxTime(uint8_t seconds) override;
 
-protected:
-    EndpointId mEndpointId = 0;
+    // ... implement other required attribute getters/setters
 };
 ```
 
-### 2. Instantiate Delegate and Cluster
+### 2. Instantiate the Delegate and Cluster
 
-Instantiate your delegate and the `CommissioningProxyCluster` for each
-required endpoint. Using `RegisteredServerCluster` simplifies registration.
+Instantiate your delegate and the `CommissioningProxyCluster` for each required
+endpoint. Use `RegisteredServerCluster` to simplify registration.
 
 ```cpp
-#include <app/clusters/device-energy-management-server/CommissioningProxyCluster.h>
+#include <app/clusters/commissioning-proxy-server/CommissioningProxyCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
 // In a .cpp file
@@ -113,35 +106,33 @@ chip::app::RegisteredServerCluster<chip::app::Clusters::CommissioningProxy::Comm
 ### 3. Register the Cluster
 
 In your application's initialization sequence, register the cluster instance
-with either the `CodegenDataModelProvider` (legacy) or the
-`CodeDrivenDataModelProvider`.
+with the `CodegenDataModelProvider`:
 
 ```cpp
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 void ApplicationInit()
 {
-    // Register the Commissioning Proxy Code Driven mechanism
-    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gCPCluster.Registration()) == CHIP_NO_ERROR);
-    // ...
+    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(
+        gCPCluster.Registration()) == CHIP_NO_ERROR);
 }
 ```
 
+A complete working example can be found in
+`examples/commissioning-proxy-app/linux/main.cpp`.
+
 ## Legacy Usage
 
-For backwards compatibility with applications that rely on older ZAP-generated
+For backwards compatibility with applications that rely on ZAP-generated
 patterns, a compatibility layer is provided in `CodegenIntegration.h` and
 `CodegenIntegration.cpp`.
 
-In this model, you configure the  cluster in your `.zap`
-file and use the `Instance` class:
-
 ```cpp
-#include <app/clusters/device-energy-management-server/CodegenIntegration.h>
+#include <app/clusters/commissioning-proxy-server/CodegenIntegration.h>
 
-// Create and initialize the instance
 chip::app::Clusters::CommissioningProxy::Instance gCPInstance(
-    endpointId, myDelegate, chip::app::Clusters::CommissioningProxy::Feature::kPowerAdjustment
+    endpointId, myDelegate,
+    chip::app::Clusters::CommissioningProxy::Feature::kWiFiNetworkInterface
 );
 
 void ApplicationInit()
@@ -154,11 +145,69 @@ void ApplicationInit()
 
 The delegate must implement the following methods:
 
-| Method                             | Description                            |
-| ---------------------------------- | -------------------------------------- |
-| `ProxyConnectRequest()`            | Connect Commissioner to CP             |
-| `ProxyDisconnectRequest()  `       | Disconnect Commissioner from CP        |
-| `ProxyScanRequest()`               | Scan for commissionable devices        |
-| `ProxyMessageRequest()`            | Send Commissioning messages to CP      |
-| `ProxyBackGroundScanStartRequest()`| Start a background scan                |
-| `ProxyBackGroundScanStopRequest()` | Stop background scanning               |
+| Method                              | Description                                         |
+| ----------------------------------- | --------------------------------------------------- |
+| `ProxyScanRequest()`                | Scan for commissionable devices                     |
+| `ProxyConnectRequest()`             | Open a transport session to the commissionee        |
+| `ProxyMessageRequest()`             | Forward a commissioning message to the commissionee |
+| `ProxyDisconnectRequest()`          | Tear down an active proxy session                   |
+| `ProxyBackGroundScanStartRequest()` | Start a background scan (BGS feature)               |
+| `ProxyBackGroundScanStopRequest()`  | Stop background scanning (BGS feature)              |
+
+## Async Command Handling
+
+`ProxyConnectRequest` and `ProxyMessageRequest` are asynchronous — they return
+`std::nullopt` from `InvokeCommand` to prevent an immediate response, and call
+`CommandHandler::AddResponse()` or `CommandHandler::AddStatus()` from a
+transport callback once the operation completes.
+
+To keep the exchange alive across the async operation, store a
+`CommandHandler::Handle` and extend the exchange response timeout:
+
+```cpp
+// Store the handle before returning nullopt
+CommandHandler::Handle handle(commandObj);
+if (auto * ec = commandObj->GetExchangeContext())
+{
+    ec->SetResponseTimeout(chip::System::Clock::Seconds16(responseTimeout + 10));
+}
+// … return std::nullopt from InvokeCommand …
+
+// Later, in your transport callback:
+auto * handler = handle.Get();
+if (handler != nullptr)
+{
+    handler->AddResponse(commandPath, response);
+}
+```
+
+## Wi-Fi PAF Transport Integration
+
+When the `kWiFiNetworkInterface` feature is enabled the delegate interacts with
+`chip::WiFiPAF::WiFiPAFLayer` to open, send over, receive from, and close PAF
+(NAN) sessions:
+
+-   `ProxyConnectRequest` — calls `WiFiPAFLayer::WiFiPAFSubscribe()` to open a
+    PAF session identified by the commissionee's discriminator and peer address.
+-   `ProxyMessageRequest` — calls `WiFiPAFLayer::SendMessage()` to send the
+    tunnelled commissioning packet over PAFTP.
+-   `ProxyDisconnectRequest` — calls `WiFiPAFLayer::RmPafSession()` to release
+    the PAF session.
+
+Incoming PAF messages are routed back to the cluster via a
+`WiFiPAFLayerDelegate` subclass that intercepts `WiFiPAFMessageReceived` and
+matches the peer against the active session map.
+
+## Cluster State
+
+The cluster tracks proxy state internally:
+
+-   `kState_CPDisconnected` — no active proxy session
+-   `kState_CPConnected` — a PAF session is open and ready to forward messages
+
+State transitions:
+
+```
+ProxyConnectRequest ──► OnPafConnectSuccess ──► kState_CPConnected
+kState_CPConnected  ──► ProxyDisconnectRequest ──► kState_CPDisconnected
+```

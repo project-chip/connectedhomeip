@@ -1,27 +1,21 @@
-# CHIP Linux Lighting Example
+# CHIP Linux Commissioning Proxy Example
 
-An example showing the use of CHIP on the Linux. The document will describe how
-to build and run CHIP Linux Lighting Example on Raspberry Pi. This doc is tested
-on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
-Raspberry Pi Desktop 20.10 (aarch64)**
+An example showing the use of the Matter Commissioning Proxy cluster on Linux.
+The Commissioning Proxy (CP) acts as a tunnel between a Commissioner (chip-tool)
+and a Commissionee that is reachable via a transport not available on the
+Commissioner — for example, Wi-Fi Aware (PAF).
 
-To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
-**EVK**, see the associated
-[README document](../../../docs/platforms/nxp/nxp_imx8m_linux_examples.md) for
-details.
+This document describes how to build and run the Commissioning Proxy app and
+how to commission a device through it using chip-tool.
 
 <hr>
 
--   [CHIP Linux Lighting Example](#chip-linux-lighting-example)
+-   [CHIP Linux Commissioning Proxy Example](#chip-linux-commissioning-proxy-example)
     -   [Building](#building)
     -   [Commandline arguments](#commandline-arguments)
-    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
-    -   [Running RPC Console](#running-rpc-console)
+    -   [Running the Commissioning Proxy](#running-the-commissioning-proxy)
+    -   [Commissioning a Device via the Proxy](#commissioning-a-device-via-the-proxy)
     -   [Device Tracing](#device-tracing)
-    -   [Trigger event using lighting-app event named pipe](#trigger-event-using-lighting-app-event-named-pipe)
-        -   [Trigger `SoftwareFault` events](#trigger-softwarefault-events)
-        -   [Trigger `HardwareFault` events](#trigger-hardwarefault-events)
-        -   [Trigger Switch events](#trigger-switch-events)
 
 <hr>
 
@@ -33,7 +27,7 @@ details.
 
 -   Build the example application:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ cd ~/connectedhomeip/examples/commissioning-proxy-app/linux
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug
@@ -41,213 +35,108 @@ details.
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ cd ~/connectedhomeip/examples/commissioning-proxy-app/linux
           $ rm -rf out/
-
--   Build the example with pigweed RPC
-
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
-          $ ninja -C out/debug
 
 ## Commandline arguments
 
 -   `--wifi`
 
-    Enables WiFi management feature. Required for WiFi commissioning.
+    Enables WiFi management feature. Required for Wi-Fi PAF commissioning.
 
--   `--thread`
+-   `--discriminator <value>`
 
-    Enables Thread management feature, requires ot-br-posix dbus daemon running.
-    Required for Thread commissioning.
+    Set the discriminator used to identify this proxy node during commissioning.
 
--   `--ble-controller <selector>`
+-   `--passcode <value>`
 
-    Use the specific Bluetooth controller for BLE advertisement and connections.
-    For details on controller selection refer to
-    [Linux BLE Settings](/platforms/linux/ble_settings.md).
+    Set the PASE passcode for commissioning the proxy node itself.
 
-## Running the Complete Example on Raspberry Pi 4
+-   `--app-pipe <path>`
 
-> If you want to test Echo protocol, please enable Echo handler
->
->     gn gen out/debug --args='chip_app_use_echo=true'
->     ninja -C out/debug
+    Path of a named pipe used to send commands to the running app. Optional.
 
--   Prerequisites
+-   `--allow-large-payload`
 
-    1. A Raspberry Pi 4 board
-    2. A USB Bluetooth Dongle, Ubuntu desktop will send Bluetooth advertisement,
-       which will block CHIP from connecting via BLE. On Ubuntu server, you need
-       to install `pi-bluetooth` via APT.
-    3. Ubuntu 20.04 or newer image for ARM64 platform.
+    Enable TCP transport for large payload support (recommended when chip-tool
+    connects over TCP).
 
--   Building
+## Running the Commissioning Proxy
 
-    Follow [Building](#building) section of this document.
+The proxy app must first be commissioned onto the fabric before it can proxy
+commissioning for other devices. Start the proxy app on a node that has Wi-Fi
+Aware (NAN) capability:
 
--   Running
+```
+$ ./out/debug/chip-commissioning-proxy-app --wifi --allow-large-payload
+```
 
-    -   [Optional] Plug USB Bluetooth dongle
+Then commission the proxy node itself using chip-tool (one time):
 
-        -   Plug USB Bluetooth dongle and find its bluetooth controller selector
-            as described in
-            [Linux BLE Settings](/platforms/linux/ble_settings.md).
+```
+$ ./chip-tool pairing onnetwork <proxy-node-id> <passcode>
+```
 
-    -   Run Linux Lighting Example App
+For example:
 
-              $ cd ~/connectedhomeip/examples/lighting-app/linux
-              $ sudo out/debug/chip-lighting-app --ble-controller [bluetooth device number]
-              # In this example, the device we want to use is hci1
-              $ sudo out/debug/chip-lighting-app --ble-controller 1
+```
+$ ./chip-tool pairing onnetwork 0x7ce 20202021
+```
 
-    -   Test the device using ChipDeviceController on your laptop / workstation
-        etc.
+## Commissioning a Device via the Proxy
 
-## Running RPC Console
+Once the proxy node is commissioned, you can use `chip-tool pairing proxy` to
+commission a Commissionee through the proxy. The proxy will establish a Wi-Fi
+PAF (NAN) connection to the Commissionee and tunnel PASE/commissioning packets
+between chip-tool and the device.
 
--   As part of building the example with RPCs enabled the chip_rpc python
-    interactive console is installed into your venv. The python wheel files are
-    also created in the output folder: out/debug/chip_rpc_console_wheels. To
-    install the wheel files without rebuilding:
-    `pip3 install out/debug/chip_rpc_console_wheels/*.whl`
+### Command syntax
 
--   To use the chip-rpc console after it has been installed run:
-    `chip-console -s localhost:33000 -o /<YourFolder>/pw_log.out`
+```
+$ ./chip-tool pairing proxy <node-id> <ssid> <password> <setup-pin-code> <discriminator> <proxy-node-id>
+```
 
--   Then you can Get and Set the light using the RPCs:
-    `rpcs.chip.rpc.Lighting.Get()`
+| Argument          | Description                                              |
+| ----------------- | -------------------------------------------------------- |
+| `node-id`         | Node ID to assign to the new device to be commissioned       |
+| `ssid`            | Wi-Fi network SSID to configure on the device            |
+| `password`        | Wi-Fi network password                                   |
+| `setup-pin-code`  | Commissionee's PASE setup PIN code                       |
+| `discriminator`   | Commissionee's discriminator                             |
+| `proxy-node-id`   | Node ID of the already-commissioned commissioning proxy  |
 
-    `rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))`
+### Example
+
+```
+$ ./chip-tool pairing proxy 1999 "MyNetwork" "MyPassword" 20202021 3840 0x7ce
+```
+
+This commissions device node 1999 via the proxy at node 0x7ce onto the Wi-Fi
+network "MyNetwork".
+
+### Network topology
+
+```
+chip-tool  <-- TCP/IP -->  Commissioning Proxy App  <-- Wi-Fi PAF (NAN) -->  Commissionee
+```
+
+1.  chip-tool establishes a CASE session to the commissioning proxy.
+2.  chip-tool sends `ProxyConnectRequest` — the proxy opens a PAF session to
+    the Commissionee.
+3.  chip-tool sends PASE and commissioning messages via `ProxyMessageRequest`
+    — the proxy forwards each message over PAF and returns the response.
+4.  Upon commissioning completion, chip-tool sends `ProxyDisconnectRequest` to
+    tear down the PAF session.
 
 ## Device Tracing
 
-Device tracing is available to analyze the device performance. To turn on
-tracing, build with RPC enabled. See [Building with RPC enabled](#building).
-
-Obtain tracing json file.
+Device tracing is available to analyze performance. Build with RPC enabled and
+obtain a tracing JSON file:
 
 ```
-    $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -s localhost:33000 \
-     -o {OUTPUT_FILE} -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
-```
-
-## Trigger event using lighting-app event named pipe
-
-You can send a command to lighting-app to trigger specific event by adding the
---app-pipe argument and providing the path of the file to use `<file_path>`.
-
-### Example to enable named pipes
-
-```
-sudo out/debug/chip-lighting-app --app-pipe /tmp/chip_lighting_fifo
-```
-
-### Trigger `SoftwareFault` events
-
-1. Generate event `SoftwareFault` when a software fault takes place on the Node.
-
-```
-$ echo '{"Name":"SoftwareFault"}' > /tmp/chip_lighting_fifo
-```
-
-### Trigger `HardwareFault` events
-
-1. Generate event `HardwareFaultChange` to indicate a change in the set of
-   hardware faults currently detected by the Node.
-
-```
-$ echo '{"Name":"HardwareFaultChange"}' > /tmp/chip_lighting_fifo
-```
-
-2. Generate event `RadioFaultChange` to indicate a change in the set of radio
-   faults currently detected by the Node.
-
-```
-$ echo '{"Name":"RadioFaultChange"}' > /tmp/chip_lighting_fifo
-```
-
-3. Generate event `NetworkFaultChange` to indicate a change in the set of
-   network faults currently detected by the Node.
-
-```
-$ echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_lighting_fifo
-```
-
-4. Generate event `BootReason` to indicate the reason that caused the device to
-   start-up, from the following set of `BootReasons`.
-
--   `PowerOnReboot` The Node has booted as the result of physical interaction
-    with the device resulting in a reboot.
-
--   `BrownOutReset` The Node has rebooted as the result of a brown-out of the
-    Node’s power supply.
-
--   `SoftwareWatchdogReset` The Node has rebooted as the result of a software
-    watchdog timer.
-
--   `HardwareWatchdogReset` The Node has rebooted as the result of a hardware
-    watchdog timer.
-
--   `SoftwareUpdateCompleted` The Node has rebooted as the result of a completed
-    software update.
-
--   `SoftwareReset` The Node has rebooted as the result of a software initiated
-    reboot.
-
-```
-$ echo '{"Name":"<BootReason>"}' > /tmp/chip_lighting_fifo
-```
-
-### Trigger Switch events
-
-1. Generate event `SwitchLatched`, when the latching switch is moved to a new
-   position.
-
-```
-$ echo '{"Name":"SwitchLatched","NewPosition":3}' > /tmp/chip_lighting_fifo
-```
-
-2. Generate event `InitialPress`, when the momentary switch starts to be
-   pressed.
-
-```
-$ echo '{"Name":"InitialPress","NewPosition":3}' > /tmp/chip_lighting_fifo
-```
-
-3. Generate event `LongPress`, when the momentary switch has been pressed for a
-   "long" time.
-
-```
-$ echo '{"Name":"LongPress","NewPosition":3}' > /tmp/chip_lighting_fifo
-```
-
-4. Generate event `ShortRelease`, when the momentary switch has been released.
-
-```
-$ echo '{"Name":"ShortRelease","PreviousPosition":3}' > /tmp/chip_lighting_fifo
-```
-
-5. Generate event `LongRelease` when the momentary switch has been released and
-   after having been pressed for a long time.
-
-```
-$ echo '{"Name":"LongRelease","PreviousPosition":3}' > /tmp/chip_lighting_fifo
-```
-
-6. Generate event `MultiPressOngoing` to indicate how many times the momentary
-   switch has been pressed in a multi-press sequence, during that sequence.
-
-```
-$ echo '{"Name":"MultiPressOngoing","NewPosition":3,"CurrentNumberOfPressesCounted":4}' > /tmp/chip_lighting_fifo
-```
-
-7. Generate event `MultiPressComplete` to indicate how many times the momentary
-   switch has been pressed in a multi-press sequence, after it has been detected
-   that the sequence has ended.
-
-```
-$ echo '{"Name":"MultiPressComplete","PreviousPosition":3,"TotalNumberOfPressesCounted":2}' > /tmp/chip_lighting_fifo
+$ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py \
+    -s localhost:33000 \
+    -o {OUTPUT_FILE} \
+    -t {ELF_FILE} \
+    {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
 ```
