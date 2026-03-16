@@ -16,12 +16,12 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/closure-dimension-cluster-logic.cpp"
+    "${CLUSTER_DIR}/ClosureDimensionClusterLogic.cpp"
     "${CLUSTER_DIR}/closure-dimension-cluster-logic.h"
     "${CLUSTER_DIR}/closure-dimension-cluster-objects.h"
     "${CLUSTER_DIR}/closure-dimension-delegate.h"
-    "${CLUSTER_DIR}/closure-dimension-matter-context.cpp"
+    "${CLUSTER_DIR}/ClosureDimensionClusterMatterContext.cpp"
     "${CLUSTER_DIR}/closure-dimension-matter-context.h"
-    "${CLUSTER_DIR}/closure-dimension-server.cpp"
+    "${CLUSTER_DIR}/ClosureDimensionCluster.cpp"
     "${CLUSTER_DIR}/closure-dimension-server.h"
 )

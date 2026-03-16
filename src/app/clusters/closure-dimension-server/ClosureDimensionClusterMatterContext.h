@@ -16,24 +16,37 @@
  *    limitations under the License.
  */
 
-#include "closure-dimension-matter-context.h"
-#include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/reporting/reporting.h>
+#pragma once
+
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureDimension {
 
-void MatterContext::MarkDirty(const AttributeId attributeId)
+/** @brief
+ *    Interface to allow interaction with interaction model and ember layers. Can be faked for unit testing.
+ */
+class MatterContext
 {
-    MatterReportingAttributeChangeCallback(mEndpoint, Id, attributeId);
+public:
+    MatterContext(EndpointId endpoint) : mEndpoint(endpoint) {}
 
-    ConcreteAttributePath attributePath(mEndpoint, Id, attributeId);
-    MatterClosureDimensionClusterServerAttributeChangedCallback(attributePath);
-}
+    /**
+     * @brief calls the attribute change callback
+     * @param[in] attributeId Attribute ID whose value needs to be marked dirty.
+     */
+    virtual void MarkDirty(AttributeId attributeId);
+
+    virtual ~MatterContext() = default;
+
+    EndpointId GetEndpointId() const { return mEndpoint; }
+
+private:
+    EndpointId mEndpoint;
+};
 
 } // namespace ClosureDimension
 } // namespace Clusters

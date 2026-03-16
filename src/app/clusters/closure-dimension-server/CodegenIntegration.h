@@ -17,4 +17,4 @@
 
 #pragma once
 
-#include <app/clusters/closure-dimension-server/ClosureDimensionClusterLogic.h>
+#include <app/clusters/closure-dimension-server/ClosureDimensionCluster.h>

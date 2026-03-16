@@ -8809,12 +8809,13 @@ provisional cluster AmbientContextSensing = 1073 {
   }
 
   info event AmbientContextDetectStarted = 0 {
-    optional AmbientContextTypeStruct ambientContextType[] = 0;
-    optional int16u objectCount = 1;
+    optional AmbientContextTypeStruct ambientContextDetected = 0;
+    optional boolean objectCountReached = 1;
+    optional int16u objectCount = 2;
   }
 
   info event AmbientContextDetectEnded = 1 {
-    event_no startEventNumber = 0;
+    posix_ms eventStartTime = 0;
   }
 
   readonly attribute optional boolean humanActivityDetected = 0;
