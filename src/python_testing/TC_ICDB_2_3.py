@@ -190,7 +190,8 @@ class TC_ICDB_2_3(ICDBaseTest):
         th1_monitored_subject = th1_registered_clients[0].monitoredSubject
 
         # Verify exactly one RegisteredClients entry is present.
-        asserts.assert_equal(len(th1_registered_clients), 1, f"Exactly one RegisteredClients entry must be present, got {len(th1_registered_clients)}, {th1_registered_clients}")
+        asserts.assert_equal(len(th1_registered_clients), 1,
+                             f"Exactly one RegisteredClients entry must be present, got {len(th1_registered_clients)}, {th1_registered_clients}")
 
         # Verify that the RegisteredClients entry's checkInNodeID and monitoredSubject match TH1's node ID.
         asserts.assert_equal(th1_check_in_node_id, self.matter_test_config.controller_node_id,
