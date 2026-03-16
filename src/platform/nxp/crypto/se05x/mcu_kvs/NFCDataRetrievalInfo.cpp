@@ -18,10 +18,10 @@
 
 #include "NFCDataRetrievalInfo.hpp"
 
+#include <credentials/CHIPCert.h>
 #include <cstdio>
 #include <cstring>
 #include <inttypes.h>
-#include <credentials/CHIPCert.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/KeyValueStoreManager.h>
@@ -140,8 +140,7 @@ CHIP_ERROR NFCDataRetrievalInfo::CheckCommissioningStatusAndInitGPIO()
     size_t fab_idx_len              = sizeof(fab_idx);
 
     // Check if fabric index info exists in KVS (indicates device is commissioned)
-    CHIP_ERROR status =
-        PersistedStorage::KeyValueStoreMgrImpl()._Get(kFabricIndexKey, fab_idx, sizeof(fab_idx), &fab_idx_len, 0);
+    CHIP_ERROR status = PersistedStorage::KeyValueStoreMgrImpl()._Get(kFabricIndexKey, fab_idx, sizeof(fab_idx), &fab_idx_len, 0);
 
     if (status == CHIP_NO_ERROR)
     {
@@ -275,10 +274,8 @@ CHIP_ERROR NFCDataRetrievalInfo::SynchronizeNetworkCredentials()
 
     uint8_t buffer[kMaxBufferSize];
     char password[DeviceLayer::Internal::kMaxWiFiKeyLength] = { 0 };
-    char op_data_set[256]                                   = { 0 };
-    size_t ssid_len                                         = sizeof(op_data_set);
+    size_t ssid_len                                         = sizeof(this->op_data_set);
     size_t password_len                                     = sizeof(password);
-    size_t op_data_set_len                                  = sizeof(op_data_set);
     uint32_t network_cred_id                                = 0;
 
     // Get network credential ID from network commissioning cluster
@@ -324,6 +321,20 @@ CHIP_ERROR NFCDataRetrievalInfo::SynchronizeNetworkCredentials()
     {
         ChipLogDetail(Crypto, "SE05x: No valid network credentials found");
     }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR NFCDataRetrievalInfo::GetOperationalDataSetFormSE05x(char * opDataSet, size_t * opDataSetLen)
+{
+    VerifyOrReturnError(opDataSet != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(opDataSetLen != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    ReturnErrorOnFailure(SynchronizeNetworkCredentials());
+
+    VerifyOrReturnError(*opDataSetLen >= op_data_set_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(opDataSet, op_data_set, op_data_set_len);
+    *opDataSetLen = op_data_set_len;
 
     return CHIP_NO_ERROR;
 }
