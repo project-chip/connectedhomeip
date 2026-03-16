@@ -30,7 +30,7 @@ QueueElementT = TypeVar("QueueElementT")
 
 
 class CancellableQueue(Generic[QueueElementT]):
-    """Queue that supports synchronized cancellation and end-of-queue signaling."""
+    """Single-consumer queue that supports synchronized cancellation and end-of-queue signaling."""
 
     def __init__(self) -> None:
         self._cond = threading.Condition()
@@ -39,7 +39,7 @@ class CancellableQueue(Generic[QueueElementT]):
 
     def put(self, item: QueueElementT | EndOfQueue) -> None:
         """
-        Put an item to the queue and notify a single consumer.
+        Put an item to the queue and notify consumers.
 
         Raises:
             QueueCancelled: if the queue is already cancelled.
@@ -48,7 +48,7 @@ class CancellableQueue(Generic[QueueElementT]):
             if self._cancel_event.is_set():
                 raise QueueCancelled
             self._queue.put(item)
-            self._cond.notify()
+            self._cond.notify_all()
 
     def get(self, timeout: float | None = None) -> QueueElementT:
         """
