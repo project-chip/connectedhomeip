@@ -217,6 +217,11 @@
         ],
         "Binding": ["FeatureMap", "ClusterRevision"],
         "Chime": ["SelectedChime", "Enabled"],
+        "Commissioner Control": [
+            "SupportedDeviceCategories",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Closure Control": [
             "CountdownTime",
             "MainState",

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +31,7 @@ inline constexpr EndpointId kAggregatorEndpointId = 1;
 class CommissionerControlDelegate : public Delegate
 {
 public:
-    CommissionerControlDelegate() : mCommissionerControlServer(this, kAggregatorEndpointId) {}
+    CommissionerControlDelegate() : mCommissionerControlServer(kAggregatorEndpointId, this) {}
 
     CHIP_ERROR HandleCommissioningApprovalRequest(const CommissioningApprovalRequest & request) override;
     // TODO(#35627) clientNodeId should move towards ScopedNodeId.

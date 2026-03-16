@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -116,7 +116,7 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
         mLabel.ClearValue();
     }
 
-    CHIP_ERROR err = mCommissionerControlServer.GenerateCommissioningRequestResultEvent(kAggregatorEndpointId, result);
+    CHIP_ERROR err = mCommissionerControlServer.mCluster.Cluster().GenerateCommissioningRequestResultEvent(result);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -241,13 +241,12 @@ CHIP_ERROR CommissionerControlInit()
     BitMask<Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories;
     supportedDeviceCategories.SetField(Clusters::CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization, 1);
 
-    Protocols::InteractionModel::Status status =
-        sCommissionerControlDelegate->GetCommissionerControlServer().SetSupportedDeviceCategoriesValue(
-            Clusters::CommissionerControl::kAggregatorEndpointId, supportedDeviceCategories);
+    err = sCommissionerControlDelegate->GetCommissionerControlServer().mCluster.Cluster().SetSupportedDeviceCategories(
+        supportedDeviceCategories);
 
-    if (status != Protocols::InteractionModel::Status::Success)
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to set SupportedDeviceCategories: %d", static_cast<int>(status));
+        ChipLogError(NotSpecified, "Failed to set SupportedDeviceCategories: %" CHIP_ERROR_FORMAT, err.Format());
         sCommissionerControlDelegate.reset();
         return CHIP_ERROR_INTERNAL;
     }

@@ -19,10 +19,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace CommissionerControl {
+namespace chip::app::Clusters::CommissionerControl {
 
 // Spec indicates that IP Address is either 4 or 16 bytes.
 static constexpr size_t kIpAddressBufferSize = 16;
@@ -100,7 +97,4 @@ public:
     virtual ~Delegate() = default;
 };
 
-} // namespace CommissionerControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::CommissionerControl
