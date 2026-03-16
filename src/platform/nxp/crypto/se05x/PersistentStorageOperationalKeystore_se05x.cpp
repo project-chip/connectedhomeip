@@ -144,6 +144,7 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::RemoveOpKeypairForFabric(FabricInde
     uint32_t keyId = CHIP_SE05x_NODE_OP_KEY_INDEX + fabricIndex;
     SE05x_Result_t exists;
     bool allDeleted = true;
+    uint8_t kvsFabricCount = 0;
 
     ChipLogDetail(
         Crypto, "PersistentStorageOpKeystorese05x::RemoveOpKeypairForFabric ::Delete NIST256 key in SE05x (at id = 0x%" PRIx32 ")",
@@ -184,6 +185,21 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::RemoveOpKeypairForFabric(FabricInde
             break;
         }
     }
+
+    // To check if there are any fabrics with host node operational key
+    for (FabricIndex i = kMinValidFabricIndex; i <= kMaxValidFabricIndex; i++)
+    {
+        uint8_t kvs_node_oper_key[256] = { 0 };
+        uint16_t kvs_key_len                         = sizeof(kvs_node_oper_key);
+        CHIP_ERROR kvErr = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(i).KeyName(), kvs_node_oper_key, kvs_key_len);
+        if (kvErr == CHIP_NO_ERROR)
+        {
+            allDeleted = false;
+            kvsFabricCount++;
+        }
+    }
+
+    ChipLogProgress(Crypto, "Fabrics in KVS =: %u", kvsFabricCount);
 
     if (allDeleted)
     {
