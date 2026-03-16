@@ -109,8 +109,8 @@ target_sources(app
     ${ENERGY_MGMT_DIR}/device-energy-management/src/device-energy-management-mode.cpp
     ${ENERGY_MGMT_DIR}/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp
     ${ENERGY_MGMT_DIR}/device-energy-management/src/DeviceEnergyManagementManager.cpp
-    ${ENERGY_MGMT_DIR}/electrical-sensor/src/ElectricalPowerMeasurementDelegate.cpp
-    ${ENERGY_MGMT_DIR}/electrical-sensor/src/PowerTopologyDelegate.cpp
+    ${ENERGY_MGMT_DIR}/electrical-sensor/src/ElectricalPowerMeasurementDelegateImpl.cpp
+    ${ENERGY_MGMT_DIR}/electrical-sensor/src/PowerTopologyDelegateImpl.cpp
     ${ENERGY_MGMT_DIR}/utils/src/EnergyTimeUtils.cpp
     ${ENERGY_MGMT_DIR}/energy-management-triggers/DEMTestEventTriggers.cpp
     ${ENERGY_MGMT_DIR}/energy-management-triggers/EnergyReportingEventTriggers.cpp
