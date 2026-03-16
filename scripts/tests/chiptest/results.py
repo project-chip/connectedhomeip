@@ -436,6 +436,7 @@ class ResultProcessingThread(threading.Thread):
         if self.is_alive():
             log.warning("Result processing thread is still alive, it might be stuck on processing results")
 
-        self._summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
-        if self.summary_file is not None:
-            self._summary.write_json(self.summary_file)
+        with self._lock:
+            self._summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
+            if self.summary_file is not None:
+                self._summary.write_json(self.summary_file)
