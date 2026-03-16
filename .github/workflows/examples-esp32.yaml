@@ -105,7 +105,7 @@ jobs:
               run: rm -rf out/esp32-m5stack-all-clusters-minimal examples/all-clusters-minimal-app/esp32/managed_components
 
             - name: Check for changed paths
-              uses: dorny/paths-filter@v3
+              uses: dorny/paths-filter@v4
               id: changed_paths
               with:
                 filters: |

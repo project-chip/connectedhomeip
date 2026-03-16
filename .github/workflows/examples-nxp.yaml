@@ -56,7 +56,7 @@ jobs:
                   extra-submodule-parameters: --recursive
 
             - name: Detect changed paths
-              uses: dorny/paths-filter@v3
+              uses: dorny/paths-filter@v4
               id: changed_paths
               with:
                   filters: |
@@ -163,7 +163,7 @@ jobs:
               with:
                   platform: nxp
             - name: Detect changed paths
-              uses: dorny/paths-filter@v3
+              uses: dorny/paths-filter@v4
               id: changed_paths
               with:
                   filters: |
