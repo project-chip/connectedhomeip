@@ -434,9 +434,9 @@ class ResultProcessingThread(threading.Thread):
         # Wait for the thread to finish processing results.
         self.join(self.THREAD_TERMINATE_TIMEOUT_S)
         if self.is_alive():
-            log.warning("Result processing thread is still alive, it might be stuck on processing results")
+            log.warning("Result processing thread is still alive, it might be stuck on processing results. "
+                        "Result summary and report might be incomplete or corrupted")
 
-        with self._lock:
-            self._summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
-            if self.summary_file is not None:
-                self._summary.write_json(self.summary_file)
+        self._summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
+        if self.summary_file is not None:
+            self._summary.write_json(self.summary_file)
