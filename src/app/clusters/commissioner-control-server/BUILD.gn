@@ -19,7 +19,6 @@ source_set("commissioner-control-server") {
     "CommissionerControlCluster.cpp",
     "CommissionerControlCluster.h",
     "Delegate.h",
-    "commissioner-control-server.h",
   ]
 
   public_deps = [
