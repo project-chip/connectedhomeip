@@ -270,6 +270,7 @@ void DeviceCallbacks::OnColorPostAttributeChangeCallback(EndpointId endpointId, 
         (attributeId == ColorControl::Attributes::ColorMode::Id) ||
         (attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id))
     {
+        ChipLogProgress(Zcl, "Ignoring unimplemented attribute ID: %" PRIx32, attributeId);
         return;
     }
 
