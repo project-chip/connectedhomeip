@@ -416,7 +416,8 @@ class ResultProcessingThread(threading.Thread):
                 return
 
             log.debug("All results for iteration %i are in, checking failure count", iteration)
-            if (observed_failures := sum(exc is not None for exc in self._summary.exceptions[iteration])) != self.expected_failures:
+            observed_failures = sum(exc is not None for exc in self._summary.exceptions[iteration].values())
+            if observed_failures != self.expected_failures:
                 raise ResultError(
                     f"Iteration {iteration}: expected failure count {self.expected_failures}, but got {observed_failures}")
 
