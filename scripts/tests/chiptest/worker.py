@@ -63,4 +63,4 @@ class WorkerThread(threading.Thread):
         # Wait for the thread to finish.
         self.join(self.THREAD_TERMINATE_TIMEOUT_S)
         if self.is_alive():
-            log.warning("Result processing thread is still alive, it might be stuck on processing results")
+            log.warning("Worker thread is still alive, it might be stuck on processing results")
