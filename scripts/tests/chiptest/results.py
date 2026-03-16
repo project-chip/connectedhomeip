@@ -20,13 +20,16 @@ import datetime
 import enum
 import json
 import logging
+import queue
+import threading
 import time
 from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, ClassVar, TypeAlias
 
 from chiptest.log_config import LogConfig
+from chiptest.queue import EndOfQueue
 
 log = logging.getLogger(__name__)
 
@@ -171,6 +174,7 @@ class RunSummary(RunStats):
     run_timestamp: datetime.datetime | str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
     results: list[TestResult] = field(default_factory=list, init=False)
     test_stats: dict[str, RunStats] = field(default_factory=dict, init=False)
+    exceptions: dict[int, dict[str, BaseException | str | None]] = field(default_factory=dict, init=False)
 
     def record(self, result: TestResult) -> None:
         """Record a test result."""
@@ -183,6 +187,11 @@ class RunSummary(RunStats):
         if result.name not in self.test_stats:
             self.test_stats[result.name] = RunStats()
         self.test_stats[result.name].record(result)
+
+        # Record exception per iteration.
+        if result.iteration not in self.exceptions:
+            self.exceptions[result.iteration] = {}
+        self.exceptions[result.iteration][result.name] = result.exception
 
     def write_json(self, path: Path) -> None:
         """Write the test run summary to a JSON file."""
@@ -349,3 +358,78 @@ class RunSummary(RunStats):
 
         # Final vertical padding.
         print()
+
+
+class ResultError(Exception):
+    """Exception raised when processing results."""
+
+
+ResultQueueT: TypeAlias = queue.Queue[TestResult | EndOfQueue]
+
+
+@dataclass(eq=False)
+class ResultProcessingThread(threading.Thread):
+    """Thread that processes test results from the result queue, keeps track of test run summary and prints it at the end."""
+
+    result_queue: ResultQueueT
+    iterations: int
+    tests_per_iteration: int
+    expected_failures: int
+    keep_going: bool
+    summary_file: Path | None
+
+    exception: Exception | None = field(default=None, init=False)
+    """Any exception raised during result processing, which can be re-raised in the main thread after joining"""
+
+    THREAD_TERMINATE_TIMEOUT_S: ClassVar[float] = 5.0
+
+    def __post_init__(self) -> None:
+        super().__init__(name="Results")
+
+        self._lock = threading.Lock()
+        self._summary = RunSummary(self.iterations)
+
+    def run(self) -> None:
+        log.debug("Starting result processing thread")
+        try:
+            while True:
+                # Check for end of queue sentinel.
+                if isinstance(result := self.result_queue.get(), EndOfQueue):
+                    log.debug("No more results to process, finishing result processing thread")
+                    return
+
+                self._process_result(result)
+        except Exception as e:
+            self.exception = e
+
+    def _process_result(self, result: TestResult) -> None:
+        iteration = result.iteration
+        with self._lock:
+            self._summary.record(result)
+
+            # Check for keep going on failure.
+            if result.exception is not None and not self.keep_going:
+                raise ResultError("Task failed and --keep-going flag is not set.")
+
+            # Check if all results for the iteration are in.
+            if len(self._summary.exceptions[iteration]) != self.tests_per_iteration:
+                return
+
+            log.debug("All results for iteration %i are in, checking failure count", iteration)
+            if (observed_failures := sum(exc is not None for exc in self._summary.exceptions[iteration])) != self.expected_failures:
+                raise ResultError(
+                    f"Iteration {iteration}: expected failure count {self.expected_failures}, but got {observed_failures}")
+
+    def terminate(self) -> None:
+        """Terminate the result processing thread."""
+        # Put an end of queue sentinel to finalize result processing and allow the thread to finish.
+        self.result_queue.put(EndOfQueue())
+
+        # Wait for the thread to finish processing results.
+        self.join(self.THREAD_TERMINATE_TIMEOUT_S)
+        if self.is_alive():
+            log.warning("Result processing thread is still alive, it might be stuck on processing results")
+
+        self._summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
+        if self.summary_file is not None:
+            self._summary.write_json(self.summary_file)

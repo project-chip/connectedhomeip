@@ -15,8 +15,10 @@
 # limitations under the License.
 
 import enum
+import functools
 import logging
 import os
+import queue
 import random
 import sys
 import time
@@ -30,9 +32,11 @@ import click
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_config import LOG_LEVELS, LogConfig
-from chiptest.results import RunSummary, TestResult
+from chiptest.queue import CancellableQueue
+from chiptest.results import ResultError, ResultProcessingThread, ResultQueueT, RunSummary, TestResult
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
+from chiptest.worker import WorkerThread, WorkQueueT
 from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
@@ -511,14 +515,19 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         raise click.BadOptionUsage("commissioning-method",
                                    f"Option --commissioning-method={commissioning_method} is available on Linux platform only")
 
-    run_summary = RunSummary(iterations)
     ble_controller_app = None
     ble_controller_tool = None
     thread_ba_host = None
     thread_ba_port = None
     to_terminate: list[Terminable] = []
+    result_queue: ResultQueueT = queue.Queue()
+    work_queue: WorkQueueT = CancellableQueue()
 
     try:
+        # Initialize result thread first so that it's closed last.
+        to_terminate.append(result_thread := ResultProcessingThread(
+            result_queue, iterations, len(context.obj.tests), expected_failures, keep_going, summary_file))
+
         if sys.platform == 'linux':
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
@@ -556,42 +565,57 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
         runner = chiptest.runner.Runner(executor=executor)
 
-        log.info("Each test will be executed %d times", iterations)
-
         to_terminate.append(apps_register := AppsRegister())
         apps_register.init()
 
-        for i in range(1, iterations + 1):
-            log.info("Starting iteration %d", i)
-            observed_failures = 0
-            for test in context.obj.tests:
-                try:
-                    run_summary.record(result := TestResult.run_test(
-                        test.name, i, dry_run, context.obj.log_config, lambda: test.Run(
-                            runner, apps_register, subproc_info_repo, pics_file,
-                            test_timeout_seconds, dry_run,
-                            test_runtime=context.obj.runtime,
-                            ble_controller_app=ble_controller_app,
-                            ble_controller_tool=ble_controller_tool,
-                            op_network='Thread' if thread_required else 'WiFi',
-                            thread_ba_host=thread_ba_host,
-                            thread_ba_port=thread_ba_port,
-                        )))
-                    if result.exception is not None:
-                        if isinstance(result.exception, BaseException):
-                            raise result.exception
-                        raise RuntimeError(result.exception)
-                except Exception:
-                    observed_failures += 1
-                    if not keep_going:
-                        sys.exit(2)
+        # Initialize the worker thread last, to ensure it's terminated first.
+        to_terminate.append(worker_thread := WorkerThread(work_queue, result_queue))
 
-            if observed_failures != expected_failures:
-                log.error("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
-                sys.exit(2)
+        # Schedule all tests.
+        log.info("Each test will be executed %d times", iterations)
+        for i in range(1, iterations + 1):
+            log.info("Scheduling iteration %d", i)
+            for test in context.obj.tests:
+                log.debug("Enqueuing test %s", test.name)
+                work_queue.put(functools.partial(TestResult.run_test,
+                    test.name, i, dry_run, context.obj.log_config, functools.partial(test.Run,
+                        runner, apps_register, subproc_info_repo, pics_file,
+                        test_timeout_seconds, dry_run,
+                        test_runtime=context.obj.runtime,
+                        ble_controller_app=ble_controller_app,
+                        ble_controller_tool=ble_controller_tool,
+                        op_network='Thread' if thread_required else 'WiFi',
+                        thread_ba_host=thread_ba_host,
+                        thread_ba_port=thread_ba_port,
+                    )))
+
+            # If this is the last iteration schedule finalization event.
+            if i == iterations:
+                work_queue.close()
+
+        log.info("All jobs scheduled")
+
+        # Start worker and result threads.
+        result_thread.start()
+        worker_thread.start()
+
+        # Wait for exception or completion.
+        while True:
+            # First check if there is an exception first in result thread, then in worker and propagate it to the main thread.
+            if (exception := result_thread.exception or worker_thread.exception) is not None:
+                raise exception
+
+            # If the worker thread has finished processing all tasks, break the loop.
+            if not worker_thread.is_alive():
+                break
+
+            time.sleep(0.5)
     except KeyboardInterrupt:
         log.info("Interrupting execution on user request")
         raise
+    except ResultError as e:
+        # We just print the message without stack trace, as the actual failure with stack trace has already been logged.
+        log.error("%s", e)
     except Exception as e:
         log.error("Caught exception during test execution: %s", e, exc_info=True)
         raise
@@ -602,10 +626,6 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                 item.terminate()
             except Exception as e:
                 log.warning("Encountered exception during cleanup: %r", e)
-
-        run_summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
-        if summary_file is not None:
-            run_summary.write_json(summary_file)
 
 
 @main.command(
