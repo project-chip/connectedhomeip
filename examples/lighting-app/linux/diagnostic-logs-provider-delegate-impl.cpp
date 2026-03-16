@@ -23,8 +23,8 @@
 
 #include <cerrno>
 #include <cstdio>
-#include <string>
 #include <limits>
+#include <string>
 
 using namespace chip;
 using namespace chip::app::Clusters::DiagnosticLogs;
