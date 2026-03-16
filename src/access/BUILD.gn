@@ -36,6 +36,7 @@ source_set("access_config") {
 source_set("types") {
   sources = [
     "AuthMode.h",
+    "AuxiliaryType.h",
     "Privilege.h",
     "RequestPath.h",
     "SubjectDescriptor.h",
@@ -57,6 +58,8 @@ static_library("access") {
     "AccessControl.h",
     "examples/ExampleAccessControlDelegate.cpp",
     "examples/ExampleAccessControlDelegate.h",
+    "examples/GroupAuxiliaryAccessControlDelegate.cpp",
+    "examples/GroupAuxiliaryAccessControlDelegate.h",
     "examples/PermissiveAccessControlDelegate.cpp",
     "examples/PermissiveAccessControlDelegate.h",
   ]

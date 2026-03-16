@@ -8883,7 +8883,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command UpOrOpen
  *
- * Moves window covering to InstalledOpenLimitLift and InstalledOpenLimitTilt
+ * Upon receipt of this command, the window covering will adjust its position so the physical lift/slide and tilt is at the maximum open/up position.
  */
 - (void)upOrOpenWithParams:(MTRWindowCoveringClusterUpOrOpenParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)upOrOpenWithCompletion:(MTRStatusCompletion)completion
@@ -8891,7 +8891,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command DownOrClose
  *
- * Moves window covering to InstalledClosedLimitLift and InstalledCloseLimitTilt
+ * Upon receipt of this command, the window covering will adjust its position so the physical lift/slide and tilt is at the maximum closed/down position.
  */
 - (void)downOrCloseWithParams:(MTRWindowCoveringClusterDownOrCloseParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)downOrCloseWithCompletion:(MTRStatusCompletion)completion
@@ -8899,7 +8899,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command StopMotion
  *
- * Stop any adjusting of window covering
+ * Upon receipt of this command, the window covering will stop any adjusting to the physical tilt and lift/slide that is currently occurring.
  */
 - (void)stopMotionWithParams:(MTRWindowCoveringClusterStopMotionParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)stopMotionWithCompletion:(MTRStatusCompletion)completion
@@ -8913,7 +8913,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command GoToLiftPercentage
  *
- * Go to lift percentage specified
+ * This command is used to set the target lift position of the window covering to the percentage value specified in the command.
  */
 - (void)goToLiftPercentageWithParams:(MTRWindowCoveringClusterGoToLiftPercentageParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
@@ -8925,7 +8925,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command GoToTiltPercentage
  *
- * Go to tilt percentage specified
+ * This command is used to set the target tilt position of the window covering to the percentage value specified in the command.
  */
 - (void)goToTiltPercentageWithParams:(MTRWindowCoveringClusterGoToTiltPercentageParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 

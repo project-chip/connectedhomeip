@@ -63,11 +63,9 @@ struct StaticInitLLVMProfile {
     help="Determines the verbosity of script output.",
 )
 @click.option(
-    "--no-log-timestamps",
-    default=False,
-    is_flag=True,
-    help="Skip timestaps in log output",
-)
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestamps in log output')
 @click.option(
     "--output",
     help="What file to output when runnning under clang profiling",
@@ -76,10 +74,8 @@ struct StaticInitLLVMProfile {
     "--raw-profile-filename",
     help="Filename to use for output",
 )
-def main(log_level, no_log_timestamps, output, raw_profile_filename):
-    log_fmt = "%(asctime)s %(levelname)-7s %(message)s"
-    if no_log_timestamps:
-        log_fmt = "%(levelname)-7s %(message)s"
+def main(log_level, log_timestamps, output, raw_profile_filename):
+    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     expected_output = jinja2.Template(_CPP_TEMPLATE).render(raw_profile_filename=raw_profile_filename)
