@@ -259,7 +259,7 @@ class TC_ICDB_2_3(ICDBaseTest):
 
         # Verify ICDCounter is greater than the value from step 4.
         asserts.assert_greater(current_icd_counter_after_th2_unregister, current_icd_counter_after_full_cycle,
-                               f"Current ICDCounter ({current_icd_counter_after_th2_unregister}) must be greater than the value from step 3 ({current_icd_counter_after_full_cycle}).")
+                               f"Current ICDCounter ({current_icd_counter_after_th2_unregister}) must be greater than the value from step 4 ({current_icd_counter_after_full_cycle}).")
 
         # *** STEP 7 ***
         # TH1 sends UnregisterClient command with the TH1's checkInNodeID.
