@@ -57,10 +57,14 @@ class WorkerThread(threading.Thread):
             self.exception = e
 
     def terminate(self) -> None:
+        # If the thread was never started, there is nothing to join.
+        if self.ident is None:
+            return
+
         # Cancel the work queue to unblock the thread if it's waiting for work, and prevent putting new work to the queue.
         self._work_queue.cancel()
 
         # Wait for the thread to finish.
         self.join(self.THREAD_TERMINATE_TIMEOUT_S)
         if self.is_alive():
-            log.warning("Worker thread is still alive, it might be stuck on processing results")
+            log.warning("Worker thread is still alive, it might be stuck on processing work items")
