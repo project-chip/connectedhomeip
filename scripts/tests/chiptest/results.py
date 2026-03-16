@@ -423,6 +423,11 @@ class ResultProcessingThread(threading.Thread):
 
     def terminate(self) -> None:
         """Terminate the result processing thread."""
+
+        # If the thread was never started, there is nothing to join.
+        if self.ident is None:
+            return
+
         # Put an end of queue sentinel to finalize result processing and allow the thread to finish.
         self.result_queue.put(EndOfQueue())
 
