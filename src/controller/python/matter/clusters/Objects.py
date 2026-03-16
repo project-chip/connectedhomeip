@@ -42516,11 +42516,13 @@ class AmbientContextSensing(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="ambientContextType", Tag=0, Type=typing.Optional[typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct]]),
-                        ClusterObjectFieldDescriptor(Label="objectCount", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="ambientContextDetected", Tag=0, Type=typing.Optional[AmbientContextSensing.Structs.AmbientContextTypeStruct]),
+                        ClusterObjectFieldDescriptor(Label="objectCountReached", Tag=1, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="objectCount", Tag=2, Type=typing.Optional[uint]),
                     ])
 
-            ambientContextType: typing.Optional[typing.List[AmbientContextSensing.Structs.AmbientContextTypeStruct]] = None
+            ambientContextDetected: typing.Optional[AmbientContextSensing.Structs.AmbientContextTypeStruct] = None
+            objectCountReached: typing.Optional[bool] = None
             objectCount: typing.Optional[uint] = None
 
         @dataclass
@@ -42537,10 +42539,10 @@ class AmbientContextSensing(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="startEventNumber", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="eventStartTime", Tag=0, Type=uint),
                     ])
 
-            startEventNumber: uint = 0
+            eventStartTime: uint = 0
 
 
 @dataclass
