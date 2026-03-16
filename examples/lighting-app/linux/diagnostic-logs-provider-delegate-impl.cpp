@@ -56,6 +56,27 @@ size_t GetFileSize(FILE * fp)
 
     return static_cast<size_t>(fileSize);
 }
+
+class LogSessionScopeGuard
+{
+public:
+    LogSessionScopeGuard(LogProvider & provider, LogSessionHandle handle) : mProvider(provider), mHandle(handle), mActive(true) {}
+
+    ~LogSessionScopeGuard()
+    {
+        if (mActive && mHandle != kInvalidLogSessionHandle)
+        {
+            (void) mProvider.EndLogCollection(mHandle);
+        }
+    }
+
+    void Dismiss() { mActive = false; }
+
+private:
+    LogProvider & mProvider;
+    LogSessionHandle mHandle;
+    bool mActive;
+};
 } // namespace
 
 LogProvider::~LogProvider()
@@ -80,11 +101,14 @@ CHIP_ERROR LogProvider::GetLogForIntent(IntentEnum intent, MutableByteSpan & out
     err = StartLogCollection(intent, sessionHandle, outTimeStamp, outTimeSinceBoot);
     VerifyOrReturnError(CHIP_NO_ERROR == err, err, outBuffer.reduce_size(0));
 
+    LogSessionScopeGuard sessionGuard(*this, sessionHandle);
+
     bool unusedOutIsEndOfLog;
     err = CollectLog(sessionHandle, outBuffer, unusedOutIsEndOfLog);
     VerifyOrReturnError(CHIP_NO_ERROR == err, err, outBuffer.reduce_size(0));
 
     err = EndLogCollection(sessionHandle);
+    sessionGuard.Dismiss();
     VerifyOrReturnError(CHIP_NO_ERROR == err, err, outBuffer.reduce_size(0));
 
     return CHIP_NO_ERROR;
