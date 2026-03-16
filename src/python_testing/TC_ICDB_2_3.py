@@ -62,8 +62,8 @@ Test Plan:
 import logging
 
 from mobly import asserts
-
 from support_modules.icd_support import ICDBaseTest, ICDTransition
+
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError
