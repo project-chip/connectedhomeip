@@ -163,8 +163,21 @@ CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSp
     }
 
     outBuffer.reduce_size(bytesRead);
-    // Treat short reads (including 0 bytes) as end-of-log, and also respect EOF.
-    outIsEndOfLog = (bytesRead < bytesRequested) || (feof(fp) != 0);
+
+    // Prefer determining end-of-log by comparing the current offset to the total file size,
+    // so that the last non-empty chunk is marked as EOF even when the file size is an exact
+    // multiple of bytesRequested. Fall back to the short-read/feof heuristic if needed.
+    size_t fileSize = GetFileSize(fp);
+    long currentOffset = ftell(fp);
+    if ((fileSize != 0) && (currentOffset != -1) && CanCastTo<size_t>(currentOffset))
+    {
+        outIsEndOfLog = (static_cast<size_t>(currentOffset) >= fileSize);
+    }
+    else
+    {
+        // Fallback: Treat short reads (including 0 bytes) as end-of-log, and also respect EOF.
+        outIsEndOfLog = (bytesRead < bytesRequested) || (feof(fp) != 0);
+    }
 
     return CHIP_NO_ERROR;
 }
