@@ -1619,7 +1619,7 @@ TEST_F(TestGroupcastCluster, TestAuxiliaryAccessUpdatedEvent)
 
         // Now call JoinGroup again with same data but different multicast policy
         data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
-        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
         AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
 
         auto event = logOnlyEvents.GetNextEvent();
