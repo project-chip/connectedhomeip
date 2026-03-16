@@ -18,8 +18,8 @@ source_set("commissioner-control-server") {
   sources = [
     "CommissionerControlCluster.cpp",
     "CommissionerControlCluster.h",
-    "commissioner-control-server.h",
     "Delegate.h",
+    "commissioner-control-server.h",
   ]
 
   public_deps = [
