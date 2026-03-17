@@ -109,10 +109,6 @@ bouffalolab_executable("lighting_app") {
   defines +=
       [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
 
-  if (enable_lwip_pbuf_ram) {
-    defines += [ "CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM=1" ]
-  }
-
   bl_plat_name = "bl602"
   sources = [
     "${examples_plat_dir}/common/route_hook/bl_route_hook.c",
@@ -144,6 +140,7 @@ bouffalolab_executable("lighting_app") {
     ":sdk",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
@@ -231,10 +228,6 @@ bouffalolab_executable("lighting_app") {
   inputs = [ ldscript ]
 
   if (chip_print_memory_usage) {
-    if (enable_lwip_pbuf_ram) {
-      ldflags += [ "-Wl,--defsym=__RAM_PBUF_POOL=0" ]
-    }
-
     ldflags += [
       "-Wl,--print-memory-usage",
       "-fstack-usage",

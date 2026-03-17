@@ -34,6 +34,7 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/SafeInt.h>
+#include <stddef.h>
 
 using namespace chip;
 using namespace chip::Credentials;
@@ -189,11 +190,23 @@ exit:
     return res;
 }
 
-bool IsBase64String(const char * str, uint32_t strLen)
+bool IsBase64String(const char * str, size_t strLen)
 {
     for (; strLen > 0; strLen--, str++)
     {
         if (!isalnum(*str) && *str != '+' && *str != '/' && *str != '=' && !isspace(*str))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool IsHexString(const uint8_t * s, size_t len)
+{
+    for (size_t i = 0; i < len; i++)
+    {
+        if (!isxdigit(s[i]))
         {
             return false;
         }

@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import com.R;
+import com.chip.casting.R;
 import com.chip.casting.TvCastingApp;
 
 /**

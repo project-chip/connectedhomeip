@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <app/data-model/List.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -47,6 +48,7 @@
 #include <unistd.h>
 
 using namespace ::chip;
+using namespace ::chip::app;
 using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
@@ -71,6 +73,11 @@ enum class WiFiStatsCountType
     kWiFiMulticastPacketTxCount,
     kWiFiOverrunCount
 };
+
+#if defined(__GLIBC__)
+// Static variable to store the maximum heap size
+static size_t maxHeapHighWatermark = 0;
+#endif
 
 CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
 {
@@ -218,9 +225,7 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
-#ifndef __GLIBC__
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#else
+#if defined(__GLIBC__)
     struct mallinfo mallocInfo = mallinfo();
 
     // Get the current amount of heap memory, in bytes, that are not being utilized
@@ -228,29 +233,34 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeap
     currentHeapFree = mallocInfo.fordblks;
 
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
-#ifndef __GLIBC__
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#else
+#if defined(__GLIBC__)
     struct mallinfo mallocInfo = mallinfo();
 
     // Get the current amount of heap memory, in bytes, that are being used by
     // the current running program.
     currentHeapUsed = mallocInfo.uordblks;
 
+    // Update the maximum heap high watermark if the current heap usage exceeds it.
+    if (currentHeapUsed > maxHeapHighWatermark)
+    {
+        maxHeapHighWatermark = currentHeapUsed;
+    }
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-#ifndef __GLIBC__
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#else
+#if defined(__GLIBC__)
     struct mallinfo mallocInfo = mallinfo();
 
     // The usecase of this function is embedded devices,on which we would need to intercept
@@ -258,12 +268,35 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     // has been used by the Node.
     // On Linux, since it uses virtual memory, whereby a page of memory could be copied to
     // the hard disk, called swap space, and free up that page of memory. So it is impossible
-    // to know accurately peak physical memory it use. We just return the current heap memory
-    // being used by the current running program.
-    currentHeapHighWatermark = mallocInfo.uordblks;
+    // to know accurately peak physical memory it use.
+    // Update the maximum heap high watermark if the current heap usage exceeds it.
+    if (mallocInfo.uordblks > static_cast<int>(maxHeapHighWatermark))
+    {
+        maxHeapHighWatermark = mallocInfo.uordblks;
+    }
+
+    // Set the current heap high watermark.
+    currentHeapHighWatermark = maxHeapHighWatermark;
 
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+    // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
+    // value of the CurrentHeapUsed.
+
+#if defined(__GLIBC__)
+    // Get the current amount of heap memory, in bytes, that are being used by
+    // the current running program and reset the max heap high watermark to current heap amount.
+    struct mallinfo mallocInfo = mallinfo();
+    maxHeapHighWatermark       = mallocInfo.uordblks;
+#endif
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
@@ -436,6 +469,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         {
             if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_PACKET)
             {
+                uint8_t size           = 0;
                 NetworkInterface * ifp = new NetworkInterface();
 
                 Platform::CopyString(ifp->Name, ifa->ifa_name);
@@ -445,6 +479,22 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 ifp->type          = ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name);
                 ifp->offPremiseServicesReachableIPv4.SetNull();
                 ifp->offPremiseServicesReachableIPv6.SetNull();
+
+                if (ConnectivityUtils::GetInterfaceIPv4Addrs(ifa->ifa_name, size, ifp) == CHIP_NO_ERROR)
+                {
+                    if (size > 0)
+                    {
+                        ifp->IPv4Addresses = DataModel::List<const chip::ByteSpan>(ifp->Ipv4AddressSpans, size);
+                    }
+                }
+
+                if (ConnectivityUtils::GetInterfaceIPv6Addrs(ifa->ifa_name, size, ifp) == CHIP_NO_ERROR)
+                {
+                    if (size > 0)
+                    {
+                        ifp->IPv6Addresses = DataModel::List<const chip::ByteSpan>(ifp->Ipv6AddressSpans, size);
+                    }
+                }
 
                 if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, ifp->MacAddress, kMaxHardwareAddrSize) !=
                     CHIP_NO_ERROR)
@@ -727,6 +777,16 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
     overrunCount = count - mOverrunCount;
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
+{
+    if (DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
+    {
+        beaconRxCount = mBeaconRxCount;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()

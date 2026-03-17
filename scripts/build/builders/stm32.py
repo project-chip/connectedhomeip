@@ -25,20 +25,17 @@ class stm32App(Enum):
     def ExampleName(self):
         if self == stm32App.LIGHT:
             return 'lighting-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == stm32App.LIGHT:
             return 'chip-stm32-lighting-example'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
         if self == stm32App.LIGHT:
             return 'lighting_app.flashbundle.txt'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'stm32')
@@ -50,8 +47,7 @@ class stm32Board(Enum):
     def GetIC(self):
         if self == stm32Board.STM32WB55XX:
             return 'STM32WB5MM-DK'
-        else:
-            raise Exception('Unknown board #: %r' % self)
+        raise Exception('Unknown board #: %r' % self)
 
 
 class stm32Builder(GnBuilder):

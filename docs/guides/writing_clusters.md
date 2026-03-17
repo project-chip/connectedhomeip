@@ -1,183 +1,474 @@
-# Writing and updating clusters
+# Writing and Updating Clusters
 
-The following checklist can be used to write a new cluster
+This guide provides a comprehensive walkthrough for creating a new Matter
+cluster implementation, referred to as a "code-driven" cluster.
 
--   Generate the XML based on the specification
--   Define a new `src/app/clusters/<cluster-name>` folder for the cluster code
-    and integrate this into the build system
--   Implement cluster logic and unit tests under the new folder
--   Integrate the cluster into an example application
-    -   Add codegen-integration support for the cluster
-    -   integrate into an example app (e.g. all-clusters app)
--   Add integration tests for the new cluster
+## Overview of the Process
 
-## Cluster definitions
+Writing a new cluster involves the following key stages:
 
-Clusters are defined against the Matter specification. The underlying code for
-them is code-generated, based on XML definitions from
-[src/app/zap-templates/zcl/data-model/chip](https://github.com/project-chip/connectedhomeip/tree/master/src/app/zap-templates/zcl/data-model/chip)
-In order to define a new cluster, use
-[Alchemy](https://github.com/project-chip/alchemy) to parse the specification
-`asciidoc` and generate/update the relevant XML files. Manual editing is
-discouraged as we have found that mistakes are easy to make and hard to spot.
+1. **Define the Cluster:** Generate or update the cluster definition XML based
+   on the Matter specification.
+2. **Implement the Cluster:** Write the C++ implementation for the cluster's
+   logic and data management.
+3. **Integrate with Build System:** Add the necessary files to integrate the new
+   cluster into the build process.
+4. **Integrate with Application:** Connect the cluster to an application's code
+   generation configuration.
+5. **Test:** Add unit and integration tests to verify the cluster's
+   functionality.
 
-Once you have a new or updated XML, run
-[code generation](../zap_and_codegen/code_generation.md). It is often sufficient
-to `./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'`
+---
 
-## Integrating into the build system
+## Part 1: Cluster Definition (XML)
 
-The build system maps cluster `UPPER_SNAKE_CASE` names into folder names. The
-mapping is done in
+Clusters are defined based on the Matter specification. The C++ code for them is
+generated from XML definitions located in
+`src/app/zap-templates/zcl/data-model/chip`.
+
+-   **Generate XML:** To create or update a cluster XML, use
+    [Alchemy](https://github.com/project-chip/alchemy) to parse the
+    specification's `asciidoc`. Manual editing of XML is discouraged, as it is
+    error-prone.
+-   **Run Code Generation:** Once the XML is ready, run the code generation
+    script. It's often sufficient to run:
+
+    ```bash
+    ./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'
+    ```
+
+    For more details, see the
+    [code generation guide](../zap_and_codegen/code_generation.md).
+
+---
+
+## Part 2: C++ Implementation
+
+### File Structure
+
+Create a new directory for your cluster at
+`src/app/clusters/<cluster-directory>/`. This directory will house the cluster
+implementation and its unit tests.
+
+For zap-based support, the directory mapping is defined in
 [src/app/zap_cluster_list.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap_cluster_list.json)
-and this file will need your new cluster added.
+under the `ServerDirectories` key. This maps the `UPPER_SNAKE_CASE` define of
+the cluster to the directory name under `src/app/clusters`.
 
-The mapping defines the folder under which the cluster resides, inside
-[src/app/clusters](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters)
+#### Naming conventions
 
-## Cluster layout
+Names vary, however to be consistent with most of the existing code use:
 
-This layout describes a "code-driven capable cluster" implementation. You can
-see how an existing cluster implements this such as
-[Software Diagnostics](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters/software-diagnostics-server).
+-   `cluster-name-server` for the cluster directory name
+-   `ClusterNameSnakeCluster.h/cpp` for the `ServerClusterInterface`
+    implementation
 
-### Cluster implementation basic design
+### Recommended Implementation Pattern
 
-You will generally have 2 major classes:
+For optimal flash and RAM usage on resource-constrained devices, we strongly
+recommend a **combined implementation** pattern. You should avoid splitting the
+implementation into separate logic and translation layers, as this introduces
+unnecessary overhead.
 
--   `ClusterLogic` is intended to be type-safe implementation of the cluster.
-    -   It contains all the logic for the cluster
-    -   It contains all attribute storage for the cluster
-    -   Is unit tested
--   `ClusterImplementation` that provides a translation between value
-    encoders/decoders and a `ClusterLogic`
+-   **Combined Implementation (Recommended):**
 
-    -   This implements
-        [DefaultServerCluster](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/DefaultServerCluster.h)
-        or more generally the
-        [ServerClusterInterface](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/ServerClusterInterface.h)
-        interface.
+    -   The cluster's logic, data storage, and `ServerClusterInterface`
+        implementation are all contained within a single class (often by
+        deriving from `DefaultServerCluster`).
+    -   This minimizes boilerplate and virtual function translation layers,
+        resulting in a significantly smaller flash footprint.
+    -   **Example:** The
+        [Basic Information](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters/basic-information)
+        cluster is a good example of a combined implementation.
 
--   (optional) a `ClusterDriver` that provides callbacks to an application for
-    cluster interactions. Within the SDK the name `Delegate` is often used,
-    however since the delegate term is often overloaded, we suggest using the
-    term `Driver` for this.
+-   **Modular Implementation / `ClusterLogic` (Not Recommended):**
 
-Unit tests will reside in `src/app/clusters/<cluster>/tests` and will test
-`ClusterLogic` at a minimum, including varying features, correctness for
-attributes/commands and functionality.
+    -   Historically, some clusters separated core business logic into a
+        type-safe `ClusterLogic` class, with a `ClusterImplementation` class
+        acting as a translation layer.
+    -   While this isolated the logic for testing, it adds noticeable flash and
+        RAM overhead and is **discouraged** for new clusters.
+    -   **Example:** The
+        [Administrator Commissioning](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters/administrator-commissioning-server)
+        cluster demonstrates this legacy modular implementation.
 
-`ClusterImplementation` can also be unit tested depending on the complexity of
-its implementation. If its implementation is reasonably simple, the integration
-tests should validate it.
+-   **`ClusterDriver` (or `Delegate`):**
+    -   An optional interface providing callbacks to the application for cluster
+        interactions. We recommend the term `Driver` to avoid confusion with the
+        overloaded term `Delegate`.
 
-### Implementation considerations
+### Design Principles
 
-It is common that exposed attributes are optional or depend on feature enabling.
-Ensure that your class always returns correct data depending on selected
-features and functionality: this should be part of unit testing.
+When designing and implementing a cluster, adhere to the following principles to
+ensure a high-quality and developer-friendly experience:
 
-Consider if optimizing for flash/ram usage is required: common/large clusters
-may need this, other application clusters may be able to accept an overhead for
-maintainability. If compile-time flash/ram optimization is needed, use templates
-to select available features/attributes and if they are enabled or not.
+#### Prioritize Easy Application Development
 
-Ensure that every attribute update will notify via the context
-`interactionContext->dataModelChangeListener`
-(https://github.com/project-chip/connectedhomeip/blob/master/src/app/data-model-provider/Context.h).
-This is required for subscriptions to work and should be unit tested:
+Clusters should aim to do as much work as possible autonomously, reducing the
+burden on the application developer.
 
--   `CHIP_ERROR ClusterServerInterface::Startup(ServerClusterContext & context)`
-    will receive the context needed to communicate with the outside world
--   the `context` contains the
-    [InteractionModelContext](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/ServerClusterContext.h)
-    to use
+-   **Handle Common Logic Internally:** Implement persistence (NVM), timers, and
+    complex state machines within the cluster itself. The application should
+    only be notified of significant events or changes it needs to act upon. _For
+    example, a state machine managing a multi-step process like a firmware
+    update, door lock/unlock sequence with retries, or a calibration procedure
+    should typically reside within the cluster, rather than requiring the
+    application to manage the intermediate steps and timeouts._
+-   **Provide Helper Abstractions:** If a cluster requires the application to
+    implement complex logic, consider providing helper classes or default
+    implementations that simplify the task.
+-   **Encapsulate Complexity:** Avoid deferring low-level details (like raw
+    storage keys or individual timer management) to the application.
 
-### Persistent storage
+#### Delegate/Driver Pattern for Validation
 
-> [!IMPORTANT] Attribute persistence support is not fully defined in the new
-> cluster format. This will be available after
-> [#37924](https://github.com/project-chip/connectedhomeip/issues/37924) is
-> fixed.
+When an application needs to be involved in a cluster operation (especially
+writes or commands), use a delegate (or driver) interface that acts as a
+"pre-check."
 
-For general storage, the cluster context
-[provides](https://github.com/project-chip/connectedhomeip/blob/master/src/app/server-cluster/ServerClusterContext.h)
-a `PersistentStorageDelegate`.
+-   **Pre-Write Validation:** For writable attributes, provide a callback that
+    allows the application to accept or reject the new value _before_ it is
+    applied to the cluster's internal state or persisted.
+-   **Delegate Veto:** Callbacks must return a
+    `Protocols::InteractionModel::Status`. Returning any status other than
+    Success allows the application to reject the proposed change. The cluster
+    MUST honor this by failing the operation and propagating the delegate's
+    status code to the initiator.
+-   **Perform Cluster-Level Checks First:** The cluster remains responsible for
+    all spec-defined validations (e.g., range checks, constraint validations, or
+    state-based restrictions) before involving the application delegate.
+-   **Avoid Redundant Notifications:** Ensure that no-op operations (e.g.,
+    writing the same value that is already present) are handled early and do not
+    trigger delegate callbacks or change notifications.
 
-### Integration with application-specific code generation
+### BUILD file layout
 
-When using code generation for applications (i.e. a `*.zap` file), every
-application will have a source set that explicitly defines enabled items. To
-integrate with the codegen data model provider/generated code, following changes
-are needed:
+The description below will describe build files under
+`src/app/clusters/<cluster-directory>/`. You are expected to have the following
+items:
 
--   create a `CodegenIntegration.cpp` file intended to make use of this static
-    application configuration.
--   Add build system files: `app_config_dependent_sources.gni` and
-    `app_config_dependent_sources.cmake` that contain this file and additional
-    dependencies. See existing clusters for examples.
--   Make use of static configuration data as described below
+#### `BUILD.gn`
 
-#### Cluster-specific application configuration
+This file will contain a target that is named `<cluster-directory>`, usually a
+`source_set`. This file gets referenced from
+[src/app/chip_data_model.gni](https://github.com/project-chip/connectedhomeip/blob/master/src/app/chip_data_model.gni)
+by adding a dependency as `deps += [ "${_app_root}/clusters/${cluster}" ]`, so
+the default target name is important.
 
-These are generated files available for inclusion as
-`<app/static-cluster-config/<cluster-name>.h`. They are generated from
-[ServerClusterConfig.jinja](https://github.com/project-chip/connectedhomeip/blob/master/scripts/py_matter_idl/matter/idl/generators/cpp/application/ServerClusterConfig.jinja)
-and provide the following information:
+#### `app_config_dependent_sources`
 
--   `chip::app::Clusters::<NAME>::kFixedClusterConfig` as an array of
-    [ClusterConfiguration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/util/cluster-config.h).
-    Both initialization and static asserts can be done based on these
-    configurations.
+There are two code generation integration support files: one for `GN` and one
+for `CMake`. The way these work is that
+`chip_data_model.gni`/`chip_data_model.cmake` will include these files and
+bundle _ALL_ referenced sources into _ONE SINGLE SOURCE SET_, together with
+ember code-generated settings (e.g. `endpoint_config.h` and similar files that
+are application-specific)
 
--   `chip::app::Clusters::<NAME>::IsAttributeEnabledOnSomeEndpoint` and
-    `chip::app::Clusters::<NAME>::IsCommandEnabledOnSomeEndpoint` are available
-    to check if a specific item is enabled on _any_ endpoint. This can be useful
-    for dynamic cluster support for code generation (e.g. to define the maximal
-    things supported by a cluster that could be instantiated on an endpoint)
+As a result, there will be a difference between `.gni` and `.cmake`:
 
-Further defines are available through inclusion of
-[src/app/util/config.h](https://github.com/project-chip/connectedhomeip/blob/master/src/app/util/config.h),
-which will include `gen_config.h` and `endpoint_config.h` as generated files
-through `ZAP`. These provide:
+-   `app_config_dependent_sources.gni` will typically just contain
+    `CodegenIntegration.cpp` and any other helper/compatibility layers (e.g.
+    `CodegenIntegration.h` if applicable)
+-   `app_config_dependent_sources.cmake` will contain all the files that the
+    `.gni` file contains PLUS any dependencies that the `BUILD.gn` would pull in
+    but cmake would not (i.e. dependencies not in the `libCHIP` builds). These
+    extra files are often the `*.h/*.cpp` files that were in the `BUILD.gn`
+    source set.
 
--   `CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT` as a count of dynamic endpoints
-    for the ember framework
--   `MATTER_DM_<CLUSTER_DEFINE>_ENDPOINT_COUNT` for a count of static endpoints
-    (same as the kFixedClusterConfig array size)
--   `MATTER_DM_<CLUSTER_DEFINE>_SERVER` definition as a flag if `CLUSTER` is in
-    use by the application at all
--   `<CLUSTER_DEFINE>_ENABLE_<CMD_DEFINE>_CMD` to define if a specific command
-    is enabled on a cluster
+**EXAMPLE** taken from
+([src/app/clusters/basic-information](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters/basic-information)):
 
-Beyond that, the following callbacks will be available to initialize and
-shutdown clusters. Implement these as needed inside the `CodegenIntegration.cpp`
-file:
+```
+# BUILD.gn
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 
--   `Matter<Cluster>ClusterServerInitCallback` - single callback for
-    initializing the cluster
--   `emberAf<Cluster>ClusterInitCallback` and
-    `Matter<Cluster>ServerShutdownCallback` are called on endpoint startup and
-    shutdown.
+source_set("basic-information") {
+   sources = [ ... ]
+   public_deps = [ ... ]
+}
+```
 
-Optional compatibility layers:
+```
+# app_config_dependent_sources.gni
+app_config_dependent_sources = [ "CodegenIntegration.cpp" ]
+```
 
--   `Matter<Cluster>ClusterServerAttributeChangedCallback` is currently called
-    by ember-clusters after attribute changes. Consider if this should be called
-    by a `Driver` registered to the cluster.
+```
+# app_config_dependent_sources.cmake
+# This block adds the codegen integration sources, similar to app_config_dependent_sources.gni
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
 
-#### Update code-generation configuration
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/BasicInformationCluster.cpp"
+    "${CLUSTER_DIR}/BasicInformationCluster.h"
+)
+```
 
-To avoid duplication of implementations from ember, update
-[src/app/common/templates/config-data.yaml](https://github.com/project-chip/connectedhomeip/blob/master/src/app/common/templates/config-data.yaml)
-and set `CommandHandlerInterfaceOnlyClusters` since ember command dispatch will
-not be needed
+### Implementation Details
 
-Update `attributeAccessInterfaceAttributes` in
-[src/app/zap-templates/zcl/zcl.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap-templates/zcl/zcl.json)
-and
-[src/app/zap-templates/zcl/zcl-with-test-extensions.json](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap-templates/zcl/zcl-with-test-extensions.json)
-to mark all attributes of the cluster as
-`attribute access interface attributes`, so that ember does not reserve RAM for
-them (`ClusterLogic` should contain this RAM now). List-typed attributes do not
-need to be added in these lists.
+#### Attribute and Feature Handling
+
+Your implementation must correctly report which attributes and commands are
+available based on the enabled features and optional items.
+
+-   Use a feature map to control elements dependent on features.
+-   Use boolean flags or `BitFlags` for purely optional elements.
+-   Ensure your unit tests cover different combinations of enabled features and
+    optional attributes/commands.
+
+#### Attribute Accessors
+
+Your cluster implementation must provide public getter and setter APIs for each
+attribute to allow applications to interact with cluster state.
+
+-   **Getter Methods:** Provide a getter method for every attribute (e.g.,
+    `GetCurrentSensitivityLevel()`, `GetAlarmsActive()`). Applications need
+    these to read the current cluster state.
+
+    -   **Return by value (preferred):** Getters should return copies of data
+        whenever practical. This avoids lifetime and ownership concerns.
+
+    -   **Avoid returning pointers or references:** Returning pointers or
+        references to internal cluster data create lifetime risks—if the
+        underlying memory is deallocated while the caller still holds the
+        pointer, use-after-free bugs can occur. If you must return a pointer or
+        reference, clearly document that the returned value is only valid for
+        immediate use and must not be stored.
+
+-   **Setter Methods:** Provide methods to modify all non-fixed (mutable)
+    attributes in spec-compliant ways. For simple attributes, this may be a
+    straightforward setter (e.g., `SetCurrentSensitivityLevel()`). However, spec
+    compliance may require updating multiple attributes together atomically—in
+    such cases, provide a higher-level API that encapsulates the required
+    behavior rather than individual setters. When the application's driver state
+    changes, these methods can be used to update the cluster's state
+    accordingly. Setters are also responsible for triggering attribute change
+    notifications (see
+    [Attribute Change Notifications](#attribute-change-notifications)).
+
+-   **Example:** The
+    [Boolean State Configuration](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h)
+    cluster demonstrates this pattern.
+
+#### Attribute Change Notifications
+
+For subscriptions to work correctly, you must notify the system whenever an
+attribute's value changes.
+
+-   The `Startup` method of your cluster receives a `ServerClusterContext`.
+-   Use the context to call
+    `interactionContext->dataModelChangeListener->MarkDirty(path)`. A
+    `NotifyAttributeChanged` helper exists for paths managed by this cluster.
+
+    -   For write implementations, you can use `NotifyAttributeChangedIfSuccess`
+        together with a separate `WriteImpl` such that any successful attribute
+        write will notify.
+
+        Canonical example code would look like:
+
+        ```cpp
+        DataModel::ActionReturnStatus SomeCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                          AttributeValueDecoder & decoder)
+        {
+                // Delegate everything to WriteImpl. If write succeeds, notify that the attribute changed.
+                return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
+        }
+        ```
+
+    -   For the `NotifyAttributeChangedIfSuccess` ensure that WriteImpl is
+        returning
+        [ActionReturnStatus::FixedStatus::kWriteSuccessNoOp](https://github.com/project-chip/connectedhomeip/blob/master/src/app/data-model-provider/ActionReturnStatus.h)
+        when no notification should be sent.
+
+        **Crucial:** No-op writes (where the value remains unchanged) MUST NOT
+        trigger:
+
+        -   Network attribute change notifications.
+        -   Application-level delegate/driver callbacks.
+
+        Canonical example is:
+
+        ```cpp
+        VerifyOrReturnValue(mValue != newValue, ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+        ```
+
+-   **Per-Attribute Change Callbacks:** As a concrete realization of the
+    [Delegate/Driver Pattern for Validation](#delegate-driver-pattern-for-validation),
+    each mutable attribute should have a corresponding
+    `On<AttributeName>Changed` callback in the delegate interface. These are
+    _pre-write_ hooks invoked after spec-level validation and the no-op guard,
+    but _before_ the value is committed. The callback must always receive the
+    **proposed new value**, not the current (stale) value. Returning `true`
+    accepts the change; returning `false` vetoes it. The cluster must then fail
+    the operation with `Protocols::InteractionModel::Status::Failure` (for APIs
+    returning `Status`) or `CHIP_ERROR_INCORRECT_STATE` (for APIs returning
+    `CHIP_ERROR`). Default implementations should return `true` so applications
+    only override the callbacks they need.
+
+    **Example:** The
+    [Boolean State Configuration delegate](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/boolean-state-configuration-server/boolean-state-configuration-delegate.h)
+    declares:
+
+    ```cpp
+    virtual bool OnCurrentSensitivityLevelChanged(uint8_t newValue) { return true; }
+    virtual bool OnAlarmsActiveChanged(chip::BitMask<AlarmModeBitmap> newValue) { return true; }
+    virtual bool OnAlarmsSuppressedChanged(chip::BitMask<AlarmModeBitmap> newValue) { return true; }
+    virtual bool OnAlarmsEnabledChanged(chip::BitMask<AlarmModeBitmap> newValue) { return true; }
+    virtual bool OnSensorFaultChanged(chip::BitMask<SensorFaultBitmap> newValue) { return true; }
+    ```
+
+    And the cluster invokes them in the standard order—validate, guard no-op,
+    call delegate, then commit and notify:
+
+    ```cpp
+    VerifyOrReturnError(level < mSupportedSensitivityLevels, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(mCurrentSensitivityLevel != level, CHIP_NO_ERROR);
+
+    if (mDelegate != nullptr)
+    {
+        VerifyOrReturnError(mDelegate->OnCurrentSensitivityLevelChanged(level), CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    mCurrentSensitivityLevel = level;
+    NotifyAttributeChanged(CurrentSensitivityLevel::Id);
+    ```
+
+#### Persistent Storage
+
+-   **Attributes:** For scalar attribute values, use `AttributePersistence` from
+    `src/app/persistence/AttributePersistence.h`. The `ServerClusterContext`
+    provides an `AttributePersistenceProvider`.
+-   **General Storage:** For non-attribute data, the context provides a
+    `PersistentStorageDelegate`.
+
+#### Optimizing for Flash/RAM
+
+For common or large clusters, you may need to optimize for resource usage.
+Consider using `C++` templates to compile-time select features and attributes,
+which can significantly reduce flash and RAM footprint.
+
+### Advanced `ServerClusterInterface` Details
+
+While `ReadAttribute`, `WriteAttribute`, and `InvokeCommand` are the most
+commonly implemented methods, the `ServerClusterInterface` has other methods for
+more advanced use cases.
+
+#### List Attribute Writes (`ListAttributeWriteNotification`)
+
+This method is an advanced callback for handling large list attributes that may
+require special handling, such as persisting them to storage in chunks. A
+typical example of a cluster that might use this is the **Binding cluster**. For
+most clusters, the default implementation is sufficient.
+
+#### Event Permissions (`EventInfo`)
+
+You must implement the `EventInfo` method if your cluster emits any events that
+require non-default permissions to be read. For example, an event might require
+`Administrator` privileges. While not common, this should be verified for every
+new cluster implementation and checked during code reviews to ensure event
+access is correctly restricted.
+
+#### Accepted vs. Generated Commands
+
+The distinction between `AcceptedCommands` and `GeneratedCommands` can be
+understood using a REST API analogy:
+
+-   **`AcceptedCommands`**: These are the "requests" that the server cluster can
+    process. In the Matter specification, these are commands sent from the
+    client to the server (`client => server`).
+-   **`GeneratedCommands`**: These are the "responses" that the server cluster
+    can generate after processing an accepted command. In the spec, these are
+    commands sent from the server back to the client (`server => client`).
+
+These lists are built based on the cluster's definition in the Matter
+specification.
+
+### Unit Testing
+
+Unit tests should reside in `src/app/clusters/<cluster-name>/tests/`.
+
+Use the `chip::Testing::ClusterTester` utility to write your unit tests. This
+modern API removes the need to manually mock encoders, handlers, or raw TLV
+buffers. More on [ClusterTester Helper Class Guide](cluster_tester.md).
+
+-   **Test Setup:** Create a mock delegate to inject fake data into your cluster
+    instance.
+-   **Menu Verification:** Ensure `Attributes()` and `AcceptedCommands()` return
+    the correct metadata, or `ClusterTester` will reject your reads/invocations.
+-   **Reads:** Test `ReadAttribute` via `tester.ReadAttribute()` and verify data
+    matches your mock.
+-   **Commands:** Test commands via `tester.Invoke()` and ensure specific
+    `Protocols::InteractionModel::Status` codes are returned accurately based on
+    delegate responses.
+-   **Reporting:** Verify reporting logic by reading `tester.GetDirtyList()` to
+    ensure state changes properly mark attributes as dirty, while No-Op writes
+    do not.
+
+---
+
+## Part 3: Build and Application Integration
+
+### Build System Integration
+
+The build system maps cluster names to their source directories. Add your new
+cluster to this mapping:
+
+-   Edit `src/app/zap_cluster_list.json` and add an entry for your cluster,
+    pointing to the directory you created.
+
+### Application Integration (`CodegenIntegration.cpp`)
+
+To integrate your cluster with an application's `.zap` file configuration, you
+need to bridge the gap between the statically generated code and your C++
+implementation.
+
+1. **Create `CodegenIntegration.cpp`:** This file will contain the integration
+   logic.
+2. **Create Build Files:** Add `app_config_dependent_sources.gni` and
+   `app_config_dependent_sources.cmake` to your cluster directory. These files
+   should list `CodegenIntegration.cpp` and its dependencies. See existing
+   clusters for examples.
+3. **Use Generated Configuration:** The code generator creates a header file at
+   `<app/static-cluster-config/<cluster-name>.h` that provides static,
+   application-specific configuration. Use this to initialize your cluster
+   correctly for each endpoint.
+4. **Implement Callbacks:** Implement
+   `Matter<Cluster>ClusterInitCallback(EndpointId)` and
+   `Matter<Cluster>ClusterShutdownCallback(EndpointId)` in your
+   `CodegenIntegration.cpp`.
+5. **Update `config-data.yaml`:** To enable these callbacks, add your cluster to
+   the `CodeDrivenClusters` array in
+   `src/app/common/templates/config-data.yaml`.
+6. **Update ZAP Configuration:** To prevent the Ember framework from allocating
+   memory for your cluster's attributes, you must:
+    - In `src/app/zap-templates/zcl/zcl.json` and
+      `zcl-with-test-extensions.json`, add all non-list attributes of your
+      cluster to `attributeAccessInterfaceAttributes`. This marks them as
+      externally handled.
+7. **Regenerate ZAP:** Once `config-data.yaml` and
+   `zcl.json/zcl-with-test-extensions.json` are updated, run the ZAP
+   regeneration command, like
+
+    ```bash
+    ./scripts/run_in_build_env.sh 'scripts/tools/zap_regen_all.py'
+    ```
+
+---
+
+## Part 4: Example Application and Integration Testing
+
+-   Write unit tests to ensure cluster test coverage
+-   **Integrate into an Example:** Add your cluster to an example application,
+    such as the `all-clusters-app`, to test it in a real-world scenario.
+    -   use tools such as `chip-tool` or `matter-repl` to manually validate the
+        cluster
+-   **Add Integration Tests:** Write integration tests to validate the
+    end-to-end functionality of your cluster against the example application.

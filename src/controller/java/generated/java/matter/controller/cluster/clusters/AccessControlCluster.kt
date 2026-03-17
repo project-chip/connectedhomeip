@@ -95,6 +95,17 @@ class AccessControlCluster(
     object SubscriptionEstablished : ArlAttributeSubscriptionState()
   }
 
+  class AuxiliaryACLAttribute(val value: List<AccessControlClusterAccessControlEntryStruct>?)
+
+  sealed class AuxiliaryACLAttributeSubscriptionState {
+    data class Success(val value: List<AccessControlClusterAccessControlEntryStruct>?) :
+      AuxiliaryACLAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : AuxiliaryACLAttributeSubscriptionState()
+
+    object SubscriptionEstablished : AuxiliaryACLAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -944,6 +955,109 @@ class AccessControlCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(ArlAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readAuxiliaryACLAttribute(): AuxiliaryACLAttribute {
+    val ATTRIBUTE_ID: UInt = 7u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Auxiliaryacl attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<AccessControlClusterAccessControlEntryStruct>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<AccessControlClusterAccessControlEntryStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(AccessControlClusterAccessControlEntryStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return AuxiliaryACLAttribute(decodedValue)
+  }
+
+  suspend fun subscribeAuxiliaryACLAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<AuxiliaryACLAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 7u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            AuxiliaryACLAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Auxiliaryacl attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<AccessControlClusterAccessControlEntryStruct>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<AccessControlClusterAccessControlEntryStruct> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(AccessControlClusterAccessControlEntryStruct.fromTlv(AnonymousTag, tlvReader))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(AuxiliaryACLAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(AuxiliaryACLAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

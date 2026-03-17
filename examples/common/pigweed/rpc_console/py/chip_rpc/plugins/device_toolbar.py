@@ -21,7 +21,6 @@ in the toolbar whenever the 'Refresh' button is pressed.
 """
 
 from prompt_toolkit.layout import WindowAlign
-
 from pw_console.plugin_mixin import PluginMixin
 from pw_console.widgets import ToolbarButton, WindowPaneToolbar
 

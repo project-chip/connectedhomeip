@@ -38,26 +38,6 @@
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    wifi_mode_t curWiFiMode;
-
-    esp_err_t err = esp_wifi_get_mode(&curWiFiMode);
-    if (err != ESP_OK)
-    {
-        ChipLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", esp_err_to_name(err));
-        return ESP32Utils::MapError(err);
-    }
-
-    apEnabled = (curWiFiMode == WIFI_MODE_AP || curWiFiMode == WIFI_MODE_APSTA);
-
-    return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-}
-
 CHIP_ERROR ESP32Utils::IsStationEnabled(bool & staEnabled)
 {
     wifi_mode_t curWiFiMode;
@@ -134,55 +114,21 @@ CHIP_ERROR ESP32Utils::EnableStationMode(void)
         return ESP32Utils::MapError(err);
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    // If station mode is not already enabled (implying the current mode is WIFI_MODE_AP), change
-    // the mode to WIFI_MODE_APSTA.
-    if (curWiFiMode == WIFI_MODE_AP)
+    if (curWiFiMode == WIFI_MODE_STA || curWiFiMode == WIFI_MODE_APSTA)
     {
-        ChipLogProgress(DeviceLayer, "Changing ESP WiFi mode: %s -> %s", WiFiModeToStr(WIFI_MODE_AP),
-                        WiFiModeToStr(WIFI_MODE_APSTA));
-
-        err = esp_wifi_set_mode(WIFI_MODE_APSTA);
-        if (err != ESP_OK)
-        {
-            ChipLogError(DeviceLayer, "esp_wifi_set_mode() failed: %s", esp_err_to_name(err));
-            return ESP32Utils::MapError(err);
-        }
+        // Station mode is already enabled.
+        return CHIP_NO_ERROR;
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
-    return CHIP_NO_ERROR;
-}
+    wifi_mode_t destWiFiMode = curWiFiMode == WIFI_MODE_AP ? WIFI_MODE_APSTA : WIFI_MODE_STA;
 
-CHIP_ERROR ESP32Utils::SetAPMode(bool enabled)
-{
-    wifi_mode_t curWiFiMode;
-    wifi_mode_t targetWiFiMode = WIFI_MODE_STA;
+    ChipLogProgress(DeviceLayer, "Changing ESP WiFi mode: %s -> %s", WiFiModeToStr(curWiFiMode), WiFiModeToStr(destWiFiMode));
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    targetWiFiMode = (enabled) ? WIFI_MODE_APSTA : WIFI_MODE_STA;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-
-    // Get the current ESP WiFI mode.
-    esp_err_t err = esp_wifi_get_mode(&curWiFiMode);
+    err = esp_wifi_set_mode(destWiFiMode);
     if (err != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_wifi_get_mode() failed: %s", esp_err_to_name(err));
+        ChipLogError(DeviceLayer, "esp_wifi_set_mode() failed: %s", esp_err_to_name(err));
         return ESP32Utils::MapError(err);
-    }
-
-    // If station mode is not already enabled (implying the current mode is WIFI_MODE_AP), change
-    // the mode to WIFI_MODE_APSTA.
-    if (curWiFiMode != targetWiFiMode)
-    {
-        ChipLogProgress(DeviceLayer, "Changing ESP WiFi mode: %s -> %s", WiFiModeToStr(curWiFiMode), WiFiModeToStr(targetWiFiMode));
-
-        err = esp_wifi_set_mode(targetWiFiMode);
-        if (err != ESP_OK)
-        {
-            ChipLogError(DeviceLayer, "esp_wifi_set_mode() failed: %s", esp_err_to_name(err));
-            return ESP32Utils::MapError(err);
-        }
     }
 
     return CHIP_NO_ERROR;
@@ -302,9 +248,20 @@ CHIP_ERROR ESP32Utils::ClearWiFiStationProvision(void)
 {
     wifi_config_t stationConfig;
 
+    esp_err_t err = esp_wifi_disconnect();
+    if (err != ESP_OK)
+    {
+        ChipLogProgress(DeviceLayer, "esp_wifi_disconnect() failed: %s", esp_err_to_name(err));
+        // Does not return error here as we just call esp_wifi_disconnect() to ensure that the Wi-Fi is not connecting.
+    }
     // Clear the ESP WiFi station configuration.
     memset(&stationConfig, 0, sizeof(stationConfig));
-    esp_wifi_set_config(WIFI_IF_STA, &stationConfig);
+    err = esp_wifi_set_config(WIFI_IF_STA, &stationConfig);
+    if (err != ESP_OK)
+    {
+        ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", esp_err_to_name(err));
+        return MapError(err);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -312,25 +269,11 @@ CHIP_ERROR ESP32Utils::ClearWiFiStationProvision(void)
 CHIP_ERROR ESP32Utils::InitWiFiStack(void)
 {
     wifi_init_config_t cfg;
-    uint8_t ap_mac[6];
-    wifi_mode_t mode;
     esp_err_t err = esp_netif_init();
     if (err != ESP_OK)
     {
         return ESP32Utils::MapError(err);
     }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    // Lets not create a default AP interface if already present
-    if (!esp_netif_get_handle_from_ifkey(kDefaultWiFiAPNetifKey))
-    {
-        if (!esp_netif_create_default_wifi_ap())
-        {
-            ChipLogError(DeviceLayer, "Failed to create the WiFi AP netif");
-            return CHIP_ERROR_INTERNAL;
-        }
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 
     // Lets not create a default station interface if already present
     if (!esp_netif_get_handle_from_ifkey(kDefaultWiFiStationNetifKey))
@@ -350,18 +293,6 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
         return ESP32Utils::MapError(err);
     }
 
-    esp_wifi_get_mode(&mode);
-    if ((mode == WIFI_MODE_AP) || (mode == WIFI_MODE_APSTA))
-    {
-        esp_fill_random(ap_mac, sizeof(ap_mac));
-        /* Bit 0 of the first octet of MAC Address should always be 0 */
-        ap_mac[0] &= (uint8_t) ~0x01;
-        err = esp_wifi_set_mac(WIFI_IF_AP, ap_mac);
-        if (err != ESP_OK)
-        {
-            return ESP32Utils::MapError(err);
-        }
-    }
     err = esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
     if (err != ESP_OK)
     {

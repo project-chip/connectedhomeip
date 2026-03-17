@@ -23,11 +23,13 @@ from typing import List
 
 import coloredlogs
 
+log = logging.getLogger(__name__)
+
 SCRIPT_ROOT = os.path.dirname(__file__)
 
 
 def build_expected_output(root: str, out: str) -> List[str]:
-    with open(os.path.join(SCRIPT_ROOT, 'expected_test_cmakelists.txt'), 'rt') as file:
+    with open(os.path.join(SCRIPT_ROOT, 'expected_test_cmakelists.txt')) as file:
         for line in file.readlines():
             yield line.replace("{root}", root).replace("{out}", out)
 
@@ -40,9 +42,9 @@ def build_actual_output(root: str, out: str) -> List[str]:
     subprocess.run([
         binary,
         project,
-    ], stdout=subprocess.PIPE, check=True, encoding='UTF-8', )
+    ], stdout=subprocess.PIPE, check=True, encoding='UTF-8')
 
-    with open(cmake, 'rt') as f:
+    with open(cmake) as f:
         for line in f.readlines():
             yield line
 
@@ -54,15 +56,15 @@ def main():
     ROOT = '/TEST/BUILD/ROOT'
     OUT = '/OUTPUT/DIR'
 
-    expected = [line for line in build_expected_output(ROOT, OUT)]
-    actual = [line for line in build_actual_output(ROOT, OUT)]
+    expected = list(build_expected_output(ROOT, OUT))
+    actual = list(build_actual_output(ROOT, OUT))
 
-    diffs = [line for line in difflib.unified_diff(expected, actual)]
+    diffs = list(difflib.unified_diff(expected, actual))
 
     if diffs:
-        logging.error("DIFFERENCE between expected and generated output")
+        log.error("DIFFERENCE between expected and generated output")
         for line in diffs:
-            logging.warning("  " + line.strip())
+            log.warning("  %s", line.strip())
         sys.exit(1)
 
 

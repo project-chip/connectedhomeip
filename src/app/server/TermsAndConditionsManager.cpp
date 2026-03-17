@@ -24,9 +24,9 @@ static chip::app::TermsAndConditionsManager sTermsAndConditionsManager;
 static chip::app::DefaultTermsAndConditionsProvider sTermsAndConditionsProviderInstance;
 static chip::app::DefaultTermsAndConditionsStorageDelegate sTermsAndConditionsStorageDelegateInstance;
 
-chip::app::TermsAndConditionsManager * chip::app::TermsAndConditionsManager::GetInstance()
+chip::app::TermsAndConditionsManager & chip::app::TermsAndConditionsManager::GetInstance()
 {
-    return &sTermsAndConditionsManager;
+    return sTermsAndConditionsManager;
 }
 
 CHIP_ERROR chip::app::TermsAndConditionsManager::Init(chip::PersistentStorageDelegate * inPersistentStorageDelegate,

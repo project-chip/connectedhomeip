@@ -37,13 +37,16 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_AVSM_2_9(MatterBaseTest, AVSMTestBase):
@@ -58,12 +61,12 @@ class TC_AVSM_2_9(MatterBaseTest, AVSMTestBase):
             TestStep("precondition", "DUT commissioned and preconditions", is_commissioning=True),
             TestStep(
                 1,
-                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER",
-                "Verify VDO is supported.",
+                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT",
+                "Verify VDO is supported. Do not run if not.",
             ),
             TestStep(
                 2,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated video streams in the list is 1. Store StreamID as aStreamIDToDelete.",
             ),
             TestStep(
@@ -78,7 +81,7 @@ class TC_AVSM_2_9(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 5,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated video streams in the list is 0.",
             ),
         ]
@@ -87,7 +90,7 @@ class TC_AVSM_2_9(MatterBaseTest, AVSMTestBase):
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo)
     )
     async def test_TC_AVSM_2_9(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -98,7 +101,7 @@ class TC_AVSM_2_9(MatterBaseTest, AVSMTestBase):
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         vdoSupport = aFeatureMap & cluster.Bitmaps.Feature.kVideo
         asserts.assert_equal(vdoSupport, cluster.Bitmaps.Feature.kVideo, "Video Feature is not supported.")
 
@@ -106,36 +109,29 @@ class TC_AVSM_2_9(MatterBaseTest, AVSMTestBase):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
         aStreamIDToDelete = aAllocatedVideoStreams[0].videoStreamID
 
         self.step(3)
         try:
             await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(aStreamIDToDelete + 1)))
-            asserts.assert_true(
-                False, "Unexpected success when expecting NOT_FOUND due to videoStreamID set to aStreamIDToDelete + 1"
-            )
+            asserts.fail("Unexpected success when expecting NOT_FOUND due to videoStreamID set to aStreamIDToDelete + 1")
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
                 Status.NotFound,
                 "Unexpected error returned when expecting NOT_FOUND due to videoStreamID set to aStreamIDToDelete + 1",
             )
-            pass
 
         self.step(4)
-        try:
-            await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(aStreamIDToDelete)))
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
+        await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(aStreamIDToDelete)))
 
         self.step(5)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(len(aAllocatedVideoStreams), 0, "The number of allocated video streams in the list is not 0")
 
 

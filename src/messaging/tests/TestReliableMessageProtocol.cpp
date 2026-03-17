@@ -31,6 +31,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -70,7 +71,7 @@ public:
     std::queue<ReliableMessageAnalyticsDelegate::TransmitEvent> mTransmitEvents;
 };
 
-class TestReliableMessageProtocol : public chip::Test::LoopbackMessagingContext
+class TestReliableMessageProtocol : public chip::Testing::LoopbackMessagingContext
 {
 public:
     // Performs setup for each individual test in the test suite
@@ -79,7 +80,7 @@ public:
 #if CHIP_CRYPTO_PSA
         ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
 #endif
-        chip::Test::LoopbackMessagingContext::SetUp();
+        chip::Testing::LoopbackMessagingContext::SetUp();
         GetSessionAliceToBob()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
         GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
     }
@@ -364,7 +365,7 @@ TEST_F(TestReliableMessageProtocol, CheckAddClearRetrans)
 
     ReliableMessageMgr::RetransTableEntry * entry;
 
-    rm->AddToRetransTable(rc, &entry);
+    EXPECT_SUCCESS(rm->AddToRetransTable(rc, &entry));
     EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
     rm->ClearRetransTable(*entry);
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
@@ -704,8 +705,10 @@ TEST_F(TestReliableMessageProtocol, CheckResendApplicationMessageWithPeerExchang
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
     EXPECT_TRUE(mockReceiver.IsOnMessageReceivedCalled);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 }
 
 TEST_F(TestReliableMessageProtocol, CheckDuplicateMessageClosedExchange)
@@ -757,8 +760,10 @@ TEST_F(TestReliableMessageProtocol, CheckDuplicateMessageClosedExchange)
     // Let's not drop the duplicate message
     mockReceiver.SetDropAckResponse(false);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 
     // Wait for the first re-transmit and ack (should take 64ms)
     GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 3; });
@@ -849,8 +854,10 @@ TEST_F(TestReliableMessageProtocol, CheckDuplicateOldMessageClosedExchange)
     // Let's not drop the duplicate message's ack.
     mockReceiver.SetDropAckResponse(false);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 
     // Wait for the first re-transmit and ack (should take 64ms)
     rm->StartTimer();
@@ -914,8 +921,10 @@ TEST_F(TestReliableMessageProtocol, CheckResendSessionEstablishmentMessageWithPe
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
     EXPECT_TRUE(mockReceiver.IsOnMessageReceivedCalled);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 }
 
 TEST_F(TestReliableMessageProtocol, CheckDuplicateMessage)
@@ -964,8 +973,10 @@ TEST_F(TestReliableMessageProtocol, CheckDuplicateMessage)
     EXPECT_EQ(loopback.mDroppedMessageCount, 0u);
     EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 
     // Let's not drop the duplicate message
     mockReceiver.SetDropAckResponse(false);
@@ -1034,7 +1045,7 @@ TEST_F(TestReliableMessageProtocol, CheckReceiveAfterStandaloneAck)
     EXPECT_TRUE(receiverRc->IsAckPending());
 
     // Send the standalone ack.
-    receiverRc->SendStandaloneAckMessage();
+    EXPECT_SUCCESS(receiverRc->SendStandaloneAckMessage());
     DrainAndServiceIO();
 
     // Ensure the ack was sent.
@@ -1062,8 +1073,10 @@ TEST_F(TestReliableMessageProtocol, CheckReceiveAfterStandaloneAck)
     // Ensure that we have received that response.
     EXPECT_TRUE(mockSender.IsOnMessageReceivedCalled);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 }
@@ -1187,8 +1200,10 @@ TEST_F(TestReliableMessageProtocol, CheckPiggybackAfterPiggyback)
     EXPECT_TRUE(mockSender.IsOnMessageReceivedCalled);
     EXPECT_TRUE(mockSender.mReceivedPiggybackAck);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 }
@@ -1371,8 +1386,10 @@ TEST_F(TestReliableMessageProtocol, CheckMessageAfterClosed)
     // immediately on the receiver, due to the exchange being closed.
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 }
@@ -1926,8 +1943,10 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseDelayed)
     err = CreateSessionAliceToBob();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 }
 
 TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
@@ -2048,8 +2067,10 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     err = CreateSessionAliceToBob();
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &mockReceiver);
 }
 
 #if CHIP_CONFIG_MRP_ANALYTICS_ENABLED

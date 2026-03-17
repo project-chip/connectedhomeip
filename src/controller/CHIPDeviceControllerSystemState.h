@@ -36,6 +36,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/TimerDelegate.h>
 #include <protocols/bdx/BdxTransferServer.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -72,29 +73,33 @@ inline constexpr size_t kMaxDeviceTransportTcpActiveConnectionCount = CHIP_CONFI
 inline constexpr size_t kMaxDeviceTransportTcpPendingPackets = CHIP_CONFIG_MAX_TCP_PENDING_PACKETS;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-using DeviceTransportMgr =
-    TransportMgr<Transport::UDP /* IPv6 */
+using DeviceTransportMgr = TransportMgr<
+    Transport::UDP /* UDP over IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
-                 ,
-                 Transport::UDP /* IPv4 */
+    ,
+    Transport::UDP /* UDP over IPv4 */
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-                 ,
-                 Transport::BLE<kMaxDeviceTransportBlePendingPackets> /* BLE */
+    ,
+    Transport::BLE<kMaxDeviceTransportBlePendingPackets> /* BLE */
 #endif
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-                 ,
-                 Transport::TCP<kMaxDeviceTransportTcpActiveConnectionCount, kMaxDeviceTransportTcpPendingPackets>
+    ,
+    Transport::TCP<kMaxDeviceTransportTcpActiveConnectionCount, kMaxDeviceTransportTcpPendingPackets> /* TCP over IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+    ,
+    Transport::TCP<kMaxDeviceTransportTcpActiveConnectionCount, kMaxDeviceTransportTcpPendingPackets> /* TCP over IPv4 */
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                 ,
-                 Transport::WiFiPAF<kMaxDeviceTransportWiFiPAFPendingPackets> /* WiFiPAF */
+    ,
+    Transport::WiFiPAF<kMaxDeviceTransportWiFiPAFPendingPackets> /* WiFiPAF */
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-                 ,
-                 Transport::NFC /* NFC */
+    ,
+    Transport::NFC /* NFC */
 #endif
-                 >;
+    >;
 
 namespace Controller {
 
@@ -140,7 +145,7 @@ struct DeviceControllerSystemStateParams
     SessionSetupPool * sessionSetupPool                                           = nullptr;
     CASEClientPool * caseClientPool                                               = nullptr;
     FabricTable::Delegate * fabricTableDelegate                                   = nullptr;
-    chip::app::reporting::ReportScheduler::TimerDelegate * timerDelegate          = nullptr;
+    TimerDelegate * timerDelegate                                                 = nullptr;
     chip::app::reporting::ReportScheduler * reportScheduler                       = nullptr;
 };
 
@@ -275,7 +280,7 @@ private:
     SessionSetupPool * mSessionSetupPool                                           = nullptr;
     CASEClientPool * mCASEClientPool                                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider                            = nullptr;
-    app::reporting::ReportScheduler::TimerDelegate * mTimerDelegate                = nullptr;
+    TimerDelegate * mTimerDelegate                                                 = nullptr;
     app::reporting::ReportScheduler * mReportScheduler                             = nullptr;
     Crypto::SessionKeystore * mSessionKeystore                                     = nullptr;
     FabricTable::Delegate * mFabricTableDelegate                                   = nullptr;

@@ -124,7 +124,7 @@ void ZephyrWifiDriver::OnNetworkConnStatusChanged(const wifi_conn_status & connS
 
     if (status == Status::kSuccess)
     {
-        ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
+        TEMPORARY_RETURN_IGNORED ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
     }
 
     if (mpNetworkStatusChangeCallback)
@@ -182,7 +182,7 @@ CHIP_ERROR ZephyrWifiDriver::RevertConfiguration()
             return CHIP_NO_ERROR;
         }
 
-        WiFiManager::Instance().Disconnect();
+        TEMPORARY_RETURN_IGNORED WiFiManager::Instance().Disconnect();
     }
 
     if (mStagingNetwork.IsConfigured())
@@ -256,7 +256,8 @@ void ZephyrWifiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * call
     VerifyOrExit(WiFiManager::StationStatus::CONNECTING != stationStatus, status = Status::kOtherConnectionFailure);
     VerifyOrExit(networkId.data_equal(mStagingNetwork.GetSsidSpan()), status = Status::kNetworkIDNotFound);
 
-    WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling);
+    TEMPORARY_RETURN_IGNORED WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(),
+                                                             handling);
 
 exit:
     if (mpConnectCallback != nullptr)

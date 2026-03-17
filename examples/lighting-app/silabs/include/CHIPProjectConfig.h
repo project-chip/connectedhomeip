@@ -37,6 +37,12 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 #endif
 
+#ifdef __ZEPHYR__
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_NAME "Matter"
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY (K_PRIO_PREEMPT(10))
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE 10240
+#endif
+
 // For convenience, Chip Security Test Mode can be enabled and the
 // requirement for authentication in various protocols can be disabled.
 //

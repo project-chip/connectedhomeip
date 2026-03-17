@@ -64,6 +64,13 @@ JavaVM * sJVM = nullptr;
 JniGlobalReference sAndroidChipPlatformExceptionCls;
 jmethodID sOnLogMessageMethod = nullptr;
 JniGlobalReference sJavaLogCallbackObject;
+
+// Java object containing the listener to notify when a service is resolved.
+// It can be used by an Android application to be notified when the
+//  Operational discovery is done.
+jobject mJListenerObject          = nullptr;
+jmethodID mServiceResolveListener = nullptr;
+
 } // namespace
 
 CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
@@ -73,7 +80,7 @@ CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
 
     ChipLogProgress(DeviceLayer, "AndroidChipPlatform JNI_OnLoad() called");
 
-    chip::Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
     // Save a reference to the JVM.  Will need this to call back into Java.
     JniReferences::GetInstance().SetJavaVm(jvm, "chip/platform/AndroidChipPlatform");
@@ -123,7 +130,8 @@ JNI_METHOD(void, initChipStack)(JNIEnv * env, jobject self)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().InitChipStack();
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Error initializing CHIP stack: %s", ErrorStr(err)));
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(DeviceLayer, "Error initializing CHIP stack: %" CHIP_ERROR_FORMAT, err.Format()));
 }
 
 // for NFCCommissioningManager
@@ -155,7 +163,8 @@ JNI_METHOD(void, onNfcTagResponse)(JNIEnv * env, jobject self, jbyteArray jbArra
         System::PacketBufferHandle::NewWithData(reinterpret_cast<const uint8_t *>(data), static_cast<size_t>(length));
     VerifyOrReturn(!buffer.IsNull(), ChipLogError(DeviceLayer, "Failed to allocate packet buffer"));
 
-    chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().OnNfcTagResponse(Transport::PeerAddress::NFC(), std::move(buffer));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().OnNfcTagResponse(Transport::PeerAddress::NFC(),
+                                                                                                     std::move(buffer));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 }
 
@@ -167,7 +176,7 @@ JNI_METHOD(void, onNfcTagError)(JNIEnv * env, jobject self)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     chip::DeviceLayer::StackLock lock;
-    chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().OnNfcTagError(Transport::PeerAddress::NFC());
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().OnNfcTagError(Transport::PeerAddress::NFC());
 #endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 }
 
@@ -399,6 +408,11 @@ JNI_MDNSCALLBACK_METHOD(void, handleServiceResolve)
 {
     using ::chip::Dnssd::HandleResolve;
     HandleResolve(instanceName, serviceType, hostName, address, port, attributes, callbackHandle, contextHandle);
+
+    if (mServiceResolveListener != nullptr)
+    {
+        env->CallVoidMethod(mJListenerObject, mServiceResolveListener, instanceName, serviceType);
+    }
 }
 
 JNI_MDNSCALLBACK_METHOD(void, handleServiceBrowse)
@@ -434,9 +448,73 @@ JNI_METHOD(jboolean, updateCommissionableDataProviderData)
                                                                 spake2pIterationCount, setupPasscode, discriminator);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to update commissionable data provider data: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Failed to update commissionable data provider data: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
 
     return true;
+}
+
+JNI_METHOD(void, setServiceResolveListener)
+(JNIEnv * env, jclass self, jobject jListenerObject)
+{
+    VerifyOrReturn(env != nullptr, ChipLogError(DeviceLayer, "setServiceResolveListener(): Invalid env"));
+
+    // Clean up old global ref if it exists
+    if (mJListenerObject != nullptr)
+    {
+        env->DeleteGlobalRef(mJListenerObject);
+        mJListenerObject = nullptr;
+    }
+    mServiceResolveListener = nullptr;
+
+    if (jListenerObject == nullptr)
+    {
+        // Listener disabled
+        return;
+    }
+
+    mJListenerObject = env->NewGlobalRef(jListenerObject);
+    if (mJListenerObject == nullptr)
+    {
+        ChipLogError(Controller, "Failed to create weak global ref for listener");
+        JniReferences::GetInstance().ThrowError(env, sAndroidChipPlatformExceptionCls, CHIP_ERROR_INTERNAL);
+        return;
+    }
+
+    jclass listenerClass = env->GetObjectClass(jListenerObject);
+    if (listenerClass == nullptr)
+    {
+        ChipLogError(Controller, "Failed to get listener class");
+
+        // If an exception is already pending, do not throw another one
+        if (env->ExceptionCheck())
+        {
+            // An exception occured
+            return;
+        }
+
+        JniReferences::GetInstance().ThrowError(env, sAndroidChipPlatformExceptionCls, CHIP_ERROR_INTERNAL);
+        return;
+    }
+
+    mServiceResolveListener = env->GetMethodID(listenerClass, "onServiceResolve", "(Ljava/lang/String;Ljava/lang/String;)V");
+
+    // Clean up local reference to listenerClass
+    env->DeleteLocalRef(listenerClass);
+
+    if (mServiceResolveListener == nullptr)
+    {
+        ChipLogError(Controller, "Failed to access listener 'onServiceResolve' method");
+
+        // If an exception is already pending, do not throw another one
+        if (env->ExceptionCheck())
+        {
+            // An exception occured
+            return;
+        }
+
+        JniReferences::GetInstance().ThrowError(env, sAndroidChipPlatformExceptionCls, CHIP_ERROR_INTERNAL);
+        return;
+    }
 }

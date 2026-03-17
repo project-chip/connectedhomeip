@@ -39,7 +39,7 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(LockActionEventHandler);
-    InitCommonParts();
+    ReturnErrorOnFailure(InitCommonParts());
 
     LedManager::getInstance().setLed(LedManager::EAppLed_App0, LockMgr().IsLocked());
 

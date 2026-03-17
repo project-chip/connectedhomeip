@@ -17,6 +17,10 @@ import os
 import subprocess
 import threading
 
+from .command_dedup import CommandDedup
+
+log = logging.getLogger(__name__)
+
 
 class LogPipe(threading.Thread):
 
@@ -39,7 +43,7 @@ class LogPipe(threading.Thread):
     def run(self):
         """Run the thread, logging everything."""
         for line in iter(self.pipeReader.readline, ''):
-            logging.log(self.level, line.strip('\n'))
+            log.log(self.level, line.strip('\n'))
 
         self.pipeReader.close()
 
@@ -53,16 +57,22 @@ class ShellRunner:
     def __init__(self, root: str):
         self.dry_run = False
         self.root_dir = root
+        self.deduplicator = CommandDedup()
 
     def StartCommandExecution(self):
         pass
 
-    def Run(self, cmd, title=None):
-        outpipe = LogPipe(logging.INFO)
-        errpipe = LogPipe(logging.WARN)
+    def Run(self, cmd, title=None, dedup=False):
 
         if title:
-            logging.info(title)
+            log.info(title)
+
+        if dedup and self.deduplicator.is_duplicate(cmd):
+            log.info("Skipping duplicate command...")
+            return
+
+        outpipe = LogPipe(logging.INFO)
+        errpipe = LogPipe(logging.WARNING)
 
         with subprocess.Popen(cmd, cwd=self.root_dir,
                               stdout=outpipe, stderr=errpipe) as s:
@@ -71,5 +81,4 @@ class ShellRunner:
             code = s.wait()
             if code != 0:
                 raise Exception('Command %r failed: %d' % (cmd, code))
-            else:
-                logging.info('Command %r completed', cmd)
+            log.info('Command %r completed', cmd)

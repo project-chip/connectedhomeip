@@ -63,15 +63,17 @@ CHIP_ERROR AttestationTrustStoreBridge::GetPaaCertFromJava(const chip::ByteSpan 
     JniLocalReferenceScope scope(env);
 
     VerifyOrReturnError(mAttestationTrustStoreDelegate.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
-    JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/AttestationTrustStoreDelegate",
-                                                  attestationTrustStoreDelegateCls);
+    TEMPORARY_RETURN_IGNORED JniReferences::GetInstance().GetLocalClassRef(
+        env, "chip/devicecontroller/AttestationTrustStoreDelegate", attestationTrustStoreDelegateCls);
     VerifyOrReturnError(attestationTrustStoreDelegateCls != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
-    JniReferences::GetInstance().FindMethod(env, mAttestationTrustStoreDelegate.ObjectRef(), "getProductAttestationAuthorityCert",
-                                            "([B)[B", &getProductAttestationAuthorityCertMethod);
+    TEMPORARY_RETURN_IGNORED JniReferences::GetInstance().FindMethod(env, mAttestationTrustStoreDelegate.ObjectRef(),
+                                                                     "getProductAttestationAuthorityCert", "([B)[B",
+                                                                     &getProductAttestationAuthorityCertMethod);
     VerifyOrReturnError(getProductAttestationAuthorityCertMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    JniReferences::GetInstance().N2J_ByteArray(env, skid.data(), static_cast<jsize>(skid.size()), javaSkid);
+    TEMPORARY_RETURN_IGNORED JniReferences::GetInstance().N2J_ByteArray(env, skid.data(), static_cast<jsize>(skid.size()),
+                                                                        javaSkid);
     VerifyOrReturnError(javaSkid != nullptr, CHIP_ERROR_NO_MEMORY);
 
     jbyteArray javaPaaCert = (jbyteArray) env->CallObjectMethod(mAttestationTrustStoreDelegate.ObjectRef(),
@@ -79,7 +81,7 @@ CHIP_ERROR AttestationTrustStoreBridge::GetPaaCertFromJava(const chip::ByteSpan 
     VerifyOrReturnError(javaPaaCert != nullptr, CHIP_ERROR_CA_CERT_NOT_FOUND);
 
     JniByteArray paaCertBytes(env, javaPaaCert);
-    CopySpanToMutableSpan(paaCertBytes.byteSpan(), outPaaDerBuffer);
+    TEMPORARY_RETURN_IGNORED CopySpanToMutableSpan(paaCertBytes.byteSpan(), outPaaDerBuffer);
 
     return CHIP_NO_ERROR;
 }

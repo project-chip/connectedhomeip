@@ -450,22 +450,23 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     EmberAfPluginDoorLockUserInfo lockUser;
     char userNames[DOOR_LOCK_MAX_USER_NAME_SIZE];
 
-    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_LockUser[userIndex], reinterpret_cast<uint8_t *>(&lockUser),
-                                     sizeof(EmberAfPluginDoorLockUserInfo), outLen);
+    TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_LockUser[userIndex],
+                                                              reinterpret_cast<uint8_t *>(&lockUser),
+                                                              sizeof(EmberAfPluginDoorLockUserInfo), outLen);
     userInDb = lockUser;
 
     CredentialStruct credentialsUsers[APP_MAX_CREDENTIAL];
-    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_UserCredentials[userIndex],
-                                     reinterpret_cast<uint8_t *>(credentialsUsers),
-                                     sizeof(CredentialStruct) * LockParams.numberOfCredentialsPerUser, outLen);
+    TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+        LockSettingsStorage::kConfigKey_UserCredentials[userIndex], reinterpret_cast<uint8_t *>(credentialsUsers),
+        sizeof(CredentialStruct) * LockParams.numberOfCredentialsPerUser, outLen);
     for (size_t i = 0; i < userInDb.credentials.size(); ++i)
     {
         credentialsInStorage[i] = credentialsUsers[i];
     }
     userInDb.credentials = chip::Span<const CredentialStruct>(credentialsInStorage, userInDb.credentials.size());
 
-    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_LockUserName[userIndex],
-                                     reinterpret_cast<uint8_t *>(userNames), sizeof(userNames), outLen);
+    TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_LockUserName[userIndex],
+                                                              reinterpret_cast<uint8_t *>(userNames), sizeof(userNames), outLen);
 
     chip::Platform::CopyString(mCurrentUserNames, userNames);
     userInDb.userName = chip::CharSpan(mCurrentUserNames, userInDb.userName.size());
@@ -496,11 +497,10 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
 
     ChipLogProgress(Zcl,
                     "Found occupied user "
-                    "[endpoint=%d,name=\"%.*s\",credentialsCount=%u,uniqueId=%x,type=%u,credentialRule=%u,"
+                    "[endpoint=%d,name=\"%s\",credentialsCount=%u,uniqueId=%x,type=%u,credentialRule=%u,"
                     "createdBy=%d,lastModifiedBy=%d]",
-                    endpointId, static_cast<int>(user.userName.size()), user.userName.data(), user.credentials.size(),
-                    user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy,
-                    user.lastModifiedBy);
+                    endpointId, NullTerminated(user.userName).c_str(), user.credentials.size(), user.userUniqueId,
+                    to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
     return true;
 }
 
@@ -527,15 +527,16 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
     CredentialStruct credentialsUsers[APP_MAX_CREDENTIAL];
     char userNames[DOOR_LOCK_MAX_USER_NAME_SIZE];
 
-    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_LockUser[userIndex], reinterpret_cast<uint8_t *>(&lockUser),
-                                     sizeof(EmberAfPluginDoorLockUserInfo), outLen);
+    TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_LockUser[userIndex],
+                                                              reinterpret_cast<uint8_t *>(&lockUser),
+                                                              sizeof(EmberAfPluginDoorLockUserInfo), outLen);
 
-    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_UserCredentials[userIndex],
-                                     reinterpret_cast<uint8_t *>(credentialsUsers),
-                                     sizeof(CredentialStruct) * LockParams.numberOfCredentialsPerUser, outLen);
+    TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+        LockSettingsStorage::kConfigKey_UserCredentials[userIndex], reinterpret_cast<uint8_t *>(credentialsUsers),
+        sizeof(CredentialStruct) * LockParams.numberOfCredentialsPerUser, outLen);
 
-    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_LockUserName[userIndex],
-                                     reinterpret_cast<uint8_t *>(userNames), sizeof(userNames), outLen);
+    TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_LockUserName[userIndex],
+                                                              reinterpret_cast<uint8_t *>(userNames), sizeof(userNames), outLen);
 
     auto & userInStorage        = lockUser;
     auto & credentialsInStorage = credentialsUsers;
@@ -639,39 +640,44 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
         ChipLogError(Zcl, "CredentialTypeEnum::kProgrammingPIN must not be specified as a new credential\n");
         break;
     case CredentialTypeEnum::kPin:
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialPin[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(&lockCredentials), sizeof(EmberAfPluginDoorLockCredentialInfo),
-                                         outLen);
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialDataPin[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialPin[credentialIndex],
+                                                                  reinterpret_cast<uint8_t *>(&lockCredentials),
+                                                                  sizeof(EmberAfPluginDoorLockCredentialInfo), outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialDataPin[credentialIndex], reinterpret_cast<uint8_t *>(lockCredentialsData),
+            kMaxCredentialSize, outLen);
         break;
     case CredentialTypeEnum::kFace:
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialFace[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(&lockCredentials), sizeof(EmberAfPluginDoorLockCredentialInfo),
-                                         outLen);
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialDataFace[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialFace[credentialIndex],
+                                                                  reinterpret_cast<uint8_t *>(&lockCredentials),
+                                                                  sizeof(EmberAfPluginDoorLockCredentialInfo), outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialDataFace[credentialIndex], reinterpret_cast<uint8_t *>(lockCredentialsData),
+            kMaxCredentialSize, outLen);
         break;
     case CredentialTypeEnum::kFingerprint:
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialFingerprint[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(&lockCredentials), sizeof(EmberAfPluginDoorLockCredentialInfo),
-                                         outLen);
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialDataFingerprint[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialFingerprint[credentialIndex], reinterpret_cast<uint8_t *>(&lockCredentials),
+            sizeof(EmberAfPluginDoorLockCredentialInfo), outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialDataFingerprint[credentialIndex],
+            reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
         break;
     case CredentialTypeEnum::kFingerVein:
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialFingervein[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(&lockCredentials), sizeof(EmberAfPluginDoorLockCredentialInfo),
-                                         outLen);
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialDataFingerVein[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialFingervein[credentialIndex], reinterpret_cast<uint8_t *>(&lockCredentials),
+            sizeof(EmberAfPluginDoorLockCredentialInfo), outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialDataFingerVein[credentialIndex],
+            reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
         break;
     case CredentialTypeEnum::kRfid:
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialRfid[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(&lockCredentials), sizeof(EmberAfPluginDoorLockCredentialInfo),
-                                         outLen);
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialDataRfid[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialRfid[credentialIndex],
+                                                                  reinterpret_cast<uint8_t *>(&lockCredentials),
+                                                                  sizeof(EmberAfPluginDoorLockCredentialInfo), outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialDataRfid[credentialIndex], reinterpret_cast<uint8_t *>(lockCredentialsData),
+            kMaxCredentialSize, outLen);
         break;
     default:
         ChipLogError(Zcl,
@@ -747,39 +753,44 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
         ChipLogError(Zcl, "CredentialTypeEnum::kProgrammingPIN must not be specified as a new credential\n");
         break;
     case CredentialTypeEnum::kPin:
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialPin[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(&lockCredentials), sizeof(EmberAfPluginDoorLockCredentialInfo),
-                                         outLen);
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialDataPin[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialPin[credentialIndex],
+                                                                  reinterpret_cast<uint8_t *>(&lockCredentials),
+                                                                  sizeof(EmberAfPluginDoorLockCredentialInfo), outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialDataPin[credentialIndex], reinterpret_cast<uint8_t *>(lockCredentialsData),
+            kMaxCredentialSize, outLen);
         break;
     case CredentialTypeEnum::kFace:
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialFace[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(&lockCredentials), sizeof(EmberAfPluginDoorLockCredentialInfo),
-                                         outLen);
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialDataFace[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialFace[credentialIndex],
+                                                                  reinterpret_cast<uint8_t *>(&lockCredentials),
+                                                                  sizeof(EmberAfPluginDoorLockCredentialInfo), outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialDataFace[credentialIndex], reinterpret_cast<uint8_t *>(lockCredentialsData),
+            kMaxCredentialSize, outLen);
         break;
     case CredentialTypeEnum::kFingerprint:
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialFingerprint[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(&lockCredentials), sizeof(EmberAfPluginDoorLockCredentialInfo),
-                                         outLen);
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialDataFingerprint[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialFingerprint[credentialIndex], reinterpret_cast<uint8_t *>(&lockCredentials),
+            sizeof(EmberAfPluginDoorLockCredentialInfo), outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialDataFingerprint[credentialIndex],
+            reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
         break;
     case CredentialTypeEnum::kFingerVein:
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialFingervein[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(&lockCredentials), sizeof(EmberAfPluginDoorLockCredentialInfo),
-                                         outLen);
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialDataFingerVein[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialFingervein[credentialIndex], reinterpret_cast<uint8_t *>(&lockCredentials),
+            sizeof(EmberAfPluginDoorLockCredentialInfo), outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialDataFingerVein[credentialIndex],
+            reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
         break;
     case CredentialTypeEnum::kRfid:
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialRfid[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(&lockCredentials), sizeof(EmberAfPluginDoorLockCredentialInfo),
-                                         outLen);
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialDataRfid[credentialIndex],
-                                         reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialRfid[credentialIndex],
+                                                                  reinterpret_cast<uint8_t *>(&lockCredentials),
+                                                                  sizeof(EmberAfPluginDoorLockCredentialInfo), outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialDataRfid[credentialIndex], reinterpret_cast<uint8_t *>(lockCredentialsData),
+            kMaxCredentialSize, outLen);
         break;
     default:
         ChipLogError(Zcl,
@@ -934,8 +945,9 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
 #if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
     size_t outLen;
 
-    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_WeekDaySchedules[userIndex][weekdayIndex],
-                                     reinterpret_cast<uint8_t *>(&mWeekdaySchedule), sizeof(WeekDaysScheduleInfo), outLen);
+    TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+        LockSettingsStorage::kConfigKey_WeekDaySchedules[userIndex][weekdayIndex], reinterpret_cast<uint8_t *>(&mWeekdaySchedule),
+        sizeof(WeekDaysScheduleInfo), outLen);
 
     auto & scheduleInStorage = mWeekdaySchedule;
 #else
@@ -1017,8 +1029,9 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 #if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
     size_t outLen;
 
-    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_YearDaySchedules[userIndex][yearDayIndex],
-                                     reinterpret_cast<uint8_t *>(&mYeardaySchedule), sizeof(YearDayScheduleInfo), outLen);
+    TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+        LockSettingsStorage::kConfigKey_YearDaySchedules[userIndex][yearDayIndex], reinterpret_cast<uint8_t *>(&mYeardaySchedule),
+        sizeof(YearDayScheduleInfo), outLen);
 
     auto & scheduleInStorage = mYeardaySchedule;
 #else
@@ -1090,8 +1103,9 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
 #if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
     size_t outLen;
 
-    ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_HolidaySchedules[holidayIndex],
-                                     reinterpret_cast<uint8_t *>(&mHolidaySchedule), sizeof(HolidayScheduleInfo), outLen);
+    TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_HolidaySchedules[holidayIndex],
+                                                              reinterpret_cast<uint8_t *>(&mHolidaySchedule),
+                                                              sizeof(HolidayScheduleInfo), outLen);
 
     auto & scheduleInStorage = mHolidaySchedule;
 #else
@@ -1173,11 +1187,12 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
 
     for (uint8_t credentialDataIdx = 0; credentialDataIdx < APP_MAX_CREDENTIAL; credentialDataIdx++)
     {
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialPin[credentialDataIdx],
-                                         reinterpret_cast<uint8_t *>(&lockCredentials), sizeof(EmberAfPluginDoorLockCredentialInfo),
-                                         outLen);
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialDataPin[credentialDataIdx],
-                                         reinterpret_cast<uint8_t *>(lockCredentialsData), kMaxCredentialSize, outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialPin[credentialDataIdx],
+                                                                  reinterpret_cast<uint8_t *>(&lockCredentials),
+                                                                  sizeof(EmberAfPluginDoorLockCredentialInfo), outLen);
+        TEMPORARY_RETURN_IGNORED ZephyrConfig::ReadConfigValueBin(
+            LockSettingsStorage::kConfigKey_CredentialDataPin[credentialDataIdx], reinterpret_cast<uint8_t *>(lockCredentialsData),
+            kMaxCredentialSize, outLen);
 
         auto & currentCredential         = lockCredentials;
         auto & credentialDataInStorage   = lockCredentialsData;

@@ -125,8 +125,8 @@ if [[ -d "${ANDROID_NDK_HOME}/toolchains" && -d "${ANDROID_HOME}/platforms" ]]; 
 else
     echo
     echo "Hint: Set \$ANDROID_HOME and \$ANDROID_NDK_HOME to enable building for Android"
-    echo "      The required android sdk platform version is 21. It can be obtained from"
-    echo "      https://dl.google.com/android/repository/platform-26_r02.zip"
+    echo "      The required android sdk platform version is 30. It can be obtained from"
+    echo "      https://dl.google.com/android/repository/platform-30_r03.zip"
 fi
 
 echo

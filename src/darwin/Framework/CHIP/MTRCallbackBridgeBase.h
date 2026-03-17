@@ -46,12 +46,12 @@ public:
      * bridge allocated with `new`, the bridge object must not be accessed by
      * the caller.  The action block will handle deleting the bridge.
      */
-    void DispatchAction(MTRBaseDevice * device) &&
+    void DispatchAction(MTRBaseDevice * device, bool needsLargePayloadSupport = false) &&
     {
         if (device.isPASEDevice) {
             ActionWithPASEDevice(device);
         } else {
-            ActionWithNodeID(device.nodeID, device.concreteController);
+            ActionWithNodeID(device.nodeID, device.concreteController, needsLargePayloadSupport);
         }
     }
 
@@ -86,7 +86,7 @@ protected:
                                          }];
     }
 
-    void ActionWithNodeID(chip::NodeId nodeID, MTRDeviceController_Concrete * _Nullable controller)
+    void ActionWithNodeID(chip::NodeId nodeID, MTRDeviceController_Concrete * _Nullable controller, bool needsLargePayloadSupport)
     {
         LogRequestStart();
 
@@ -96,7 +96,10 @@ protected:
             return;
         }
 
+        MTRSessionParameters params = needsLargePayloadSupport ? MTRSessionParametersSupportsLargePayloads : 0;
+
         [controller getSessionForNode:nodeID
+                           parameters:params
                            completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
                                const chip::Optional<chip::SessionHandle> & session, NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                                MaybeDoAction(exchangeManager, session, error);

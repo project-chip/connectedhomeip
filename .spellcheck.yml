@@ -61,6 +61,9 @@ matrix:
           # Ignore code markers
           - open: '<code>'
             close: '</code>'
+          # Ignore Acronyms
+          - open: '(?<![a-z])\b[A-Z]{2,}\b'
+            close: '\b'
 
       # converts markdown to HTML
       - pyspelling.filters.markdown:

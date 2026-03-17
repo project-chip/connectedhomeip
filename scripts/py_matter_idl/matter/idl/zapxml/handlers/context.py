@@ -18,6 +18,8 @@ from typing import List, Optional
 
 from matter.idl.matter_idl_types import Attribute, Idl, ParseMetaData
 
+log = logging.getLogger(__name__)
+
 
 class IdlPostProcessor:
     """Defines a callback that will apply after an entire parsing
@@ -117,8 +119,7 @@ class Context:
         # NOTE: this may get added several times as both 'client' and 'server'
         #       however matter should not differentiate between the two
         code = attribute.definition.code
-        logging.info('Adding global attribute 0x%X (%d): %s' %
-                     (code, code, attribute.definition.name))
+        log.info("Adding global attribute 0x%X (%d): '%s'", code, code, attribute.definition.name)
 
         self._global_attributes[code] = attribute
 
@@ -131,7 +132,7 @@ class Context:
             if where:
                 msg = msg + " at " + where
 
-            logging.warning(msg)
+            log.warning(msg)
             self._not_handled.add(path)
 
     def AddIdlPostProcessor(self, processor: IdlPostProcessor, has_priority: bool = False):

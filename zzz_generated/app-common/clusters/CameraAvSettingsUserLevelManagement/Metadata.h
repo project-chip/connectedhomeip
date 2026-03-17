@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace CameraAvSettingsUserLevelManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace MPTZPosition {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MPTZPosition::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -57,10 +59,18 @@ namespace PanMax {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PanMax::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace PanMax
+namespace MovementState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MovementState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace MovementState
+constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace MPTZSetPosition {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(MPTZSetPosition::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
@@ -91,6 +101,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(DPTZRelativeMove
 } // namespace DPTZRelativeMove
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace CameraAvSettingsUserLevelManagement
 } // namespace Clusters
 } // namespace app

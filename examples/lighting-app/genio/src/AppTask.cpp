@@ -28,6 +28,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -322,14 +323,15 @@ CHIP_ERROR AppTask::Init()
     sWiFiNetworkCommissioningInstance.Init();
 #endif
 
+    // Initialize device attestation config before server init so Operational
+    // Credentials sees the configured provider during cluster construction.
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     chip::Server::GetInstance().Init(initParams);
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
@@ -538,11 +540,15 @@ void AppTask::OccupancyEventHandler(AppEvent * aEvent)
         return;
     }
 
-    uint8_t attributeValue = aEvent->OccupancytEvent.Present ? 1 : 0;
+    auto cluster = app::Clusters::OccupancySensing::FindClusterOnEndpoint(1);
+    if (!cluster)
+    {
+        MT793X_LOG("Cannot find occupancy cluster on endpoint 1");
+        return;
+    }
 
-    MT793X_LOG("Lighting occupancy: %u", attributeValue);
-
-    OccupancySensing::Attributes::Occupancy::Set(1, attributeValue);
+    MT793X_LOG("Lighting occupancy: %u", aEvent->OccupancytEvent.Present);
+    cluster->SetOccupancy(aEvent->OccupancytEvent.Present);
 }
 
 void AppTask::SingleButtonEventHandler(AppEvent * aEvent)

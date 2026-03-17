@@ -23,6 +23,7 @@
  */
 
 #include <array>
+#include <type_traits>
 
 #include <pw_unit_test/framework.h>
 
@@ -356,4 +357,56 @@ TEST(TestSpan, TestConversionConstructors)
 
     // The following should not compile
     // Span<const Foo> error1 = std::array<Foo, 3>(); // Span would point into a temporary value
+}
+
+namespace {
+template <typename T>
+void PassSpanArg(const Span<T> &)
+{}
+} // namespace
+
+TEST(TestSpan, TestConstructorTypeDeduction)
+{
+    const uint8_t nums[]                                   = { 1, 2 };
+    uint8_t nonConstNums[]                                 = { 1, 2 };
+    const uint8_t otherNums[]                              = { 1, 2, 3 };
+    std::array<uint8_t, 2> numsArray                       = { 1, 2 };
+    const std::array<uint8_t, 2> numsConstArray            = { 1, 2 };
+    std::array<const uint8_t, 2> constNumsArray            = { 1, 2 };
+    const std::array<const uint8_t, 2> constNumsConstArray = { 1, 2 };
+
+    // These will fail to compile if type deduction is not working correctly.
+    PassSpanArg(Span(nums));
+    PassSpanArg(Span(nums, 1));
+    PassSpanArg(Span(numsArray));
+    PassSpanArg(Span(numsConstArray));
+    PassSpanArg(Span(constNumsArray));
+    PassSpanArg(Span(constNumsConstArray));
+
+    Span a(nums);
+    EXPECT_TRUE(a.data_equal(Span<const uint8_t>(otherNums, 2)));
+    static_assert(std::is_same_v<decltype(a), Span<const uint8_t>>);
+
+    static_assert(std::is_same_v<decltype(Span(nonConstNums)), Span<uint8_t>>);
+
+    Span b(nums, 1);
+    EXPECT_TRUE(b.data_equal(Span<const uint8_t>(otherNums, 1)));
+
+    Span c(numsArray);
+    EXPECT_TRUE(c.data_equal(Span<const uint8_t>(otherNums, 2)));
+    static_assert(std::is_same_v<decltype(c), Span<uint8_t>>);
+    c[0] = 42;
+    EXPECT_EQ(numsArray[0], 42); // Verify the underlying array was modified.
+
+    Span d(numsConstArray);
+    EXPECT_TRUE(d.data_equal(Span<const uint8_t>(otherNums, 2)));
+    static_assert(std::is_same_v<decltype(d), Span<const uint8_t>>);
+
+    Span e(constNumsArray);
+    EXPECT_TRUE(e.data_equal(Span<const uint8_t>(otherNums, 2)));
+    static_assert(std::is_same_v<decltype(e), Span<const uint8_t>>);
+
+    Span f(constNumsConstArray);
+    EXPECT_TRUE(f.data_equal(Span<const uint8_t>(otherNums, 2)));
+    static_assert(std::is_same_v<decltype(f), Span<const uint8_t>>);
 }

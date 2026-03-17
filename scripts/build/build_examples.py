@@ -34,13 +34,9 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
-
-
-def CommaSeparate(items) -> str:
-    return ', '.join([x for x in items])
 
 
 def ValidateRepoPath(context, parameter, value):
@@ -137,10 +133,9 @@ def ValidateTargetNames(context, parameter, values):
     type=click.File("wt"),
     help='Where to write the dry run output')
 @click.option(
-    '--no-log-timestamps',
-    default=False,
-    is_flag=True,
-    help='Skip timestaps in log output')
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestamps in log output')
 @click.option(
     '--pw-command-launcher',
     help=(
@@ -149,11 +144,9 @@ def ValidateTargetNames(context, parameter, values):
 @click.pass_context
 def main(context, log_level, verbose, target, enable_link_map_file, repo,
          out_prefix, ninja_jobs, pregen_dir, clean, dry_run, dry_run_output,
-         enable_flashbundle, no_log_timestamps, pw_command_launcher):
+         enable_flashbundle, log_timestamps, pw_command_launcher):
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
-    if no_log_timestamps:
-        log_fmt = '%(levelname)-7s %(message)s'
+    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     if 'PW_PROJECT_ROOT' not in os.environ:
@@ -169,13 +162,12 @@ before running this script.
     else:
         runner = ShellRunner(root=repo)
 
-    requested_targets = set([t.lower() for t in target])
-    logging.info('Building targets: %s', CommaSeparate(requested_targets))
-
     context.obj = build.Context(
         repository_path=repo, output_prefix=out_prefix, verbose=verbose,
         ninja_jobs=ninja_jobs, runner=runner
     )
+
+    requested_targets = {t.lower() for t in target}
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
         enable_link_map_file=enable_link_map_file,
         enable_flashbundle=enable_flashbundle,
@@ -200,23 +192,31 @@ def cmd_generate(context):
 @click.option(
     '--format',
     default='summary',
-    type=click.Choice(['summary', 'expanded', 'json'], case_sensitive=False),
+    type=click.Choice(['summary', 'expanded', 'json', 'completion'], case_sensitive=False),
     help="""
-        summary - list of shorthand strings summarzing the available targets;
+        summary - list of shorthand strings summarizing the available targets;
 
         expanded - list all possible targets rather than the shorthand string;
 
-        json - a JSON representation of the available targets
+        json - a JSON representation of the available targets;
+
+        completion - a list of strings suitable for shell completion;
         """)
+@click.argument('COMPLETION-PREFIX', default='')
 @click.pass_context
-def cmd_targets(context, format):
+def cmd_targets(context, format, completion_prefix):
     if format == 'expanded':
+        build.target.report_rejected_parts = False
         for target in build.targets.BUILD_TARGETS:
-            build.target.report_rejected_parts = False
             for s in target.AllVariants():
                 print(s)
     elif format == 'json':
         print(json.dumps([target.ToDict() for target in build.targets.BUILD_TARGETS], indent=4))
+    elif format == 'completion':
+        build.target.report_rejected_parts = False
+        for target in build.targets.BUILD_TARGETS:
+            for s in target.CompletionStrings(completion_prefix):
+                print(s)
     else:
         for target in build.targets.BUILD_TARGETS:
             print(target.HumanString())

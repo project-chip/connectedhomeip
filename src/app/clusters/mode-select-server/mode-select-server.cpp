@@ -26,14 +26,16 @@
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
-#include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/odd-sized-integers.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <tracing/macros.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/CodegenAttributeValuePairValidator.h>
+#include <app/clusters/scenes-server/CodegenEndpointToIndex.h>
 #include <app/clusters/scenes-server/scenes-server.h>
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
@@ -88,15 +90,13 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         if (gSupportedModeManager == nullptr)
         {
             ChipLogError(Zcl, "ModeSelect: SupportedModesManager is NULL");
-            aEncoder.EncodeEmptyList();
-            return CHIP_NO_ERROR;
+            return aEncoder.EncodeEmptyList();
         }
         const ModeSelect::SupportedModesManager::ModeOptionsProvider modeOptionsProvider =
             gSupportedModeManager->getModeOptionsProvider(aPath.mEndpointId);
         if (modeOptionsProvider.begin() == nullptr)
         {
-            aEncoder.EncodeEmptyList();
-            return CHIP_NO_ERROR;
+            return aEncoder.EncodeEmptyList();
         }
         CHIP_ERROR err;
         err = aEncoder.EncodeList([modeOptionsProvider](const auto & encoder) -> CHIP_ERROR {
@@ -145,10 +145,9 @@ static constexpr size_t kModeSelectMaxEnpointCount =
 
 static void timerCallback(System::Layer *, void * callbackContext);
 static void sceneModeSelectCallback(EndpointId endpoint);
-using ModeSelectEndPointPair = scenes::DefaultSceneHandlerImpl::EndpointStatePair<uint8_t>;
-using ModeSelectTransitionTimeInterface =
-    scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<kModeSelectMaxEnpointCount,
-                                                             MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT>;
+using ModeSelectEndPointPair            = scenes::DefaultSceneHandlerImpl::EndpointStatePair<uint8_t>;
+using ModeSelectTransitionTimeInterface = scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<scenes::CodegenEndpointToIndex<
+    ModeSelect::Id, MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT, kModeSelectMaxEnpointCount>>;
 
 class DefaultModeSelectSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
@@ -157,23 +156,9 @@ public:
     // As per spec, 1 attribute is scenable in the mode select cluster
     static constexpr uint8_t kScenableAttributeCount = 1;
 
-    DefaultModeSelectSceneHandler() = default;
-    ~DefaultModeSelectSceneHandler() override {}
+    DefaultModeSelectSceneHandler() : scenes::DefaultSceneHandlerImpl(scenes::CodegenAttributeValuePairValidator::Instance()) {}
 
-    // Default function for the mode select cluster, only puts the mode select cluster ID in the span if supported on the given
-    // endpoint
-    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
-    {
-        if (emberAfContainsServer(endpoint, ModeSelect::Id) && clusterBuffer.size() >= 1)
-        {
-            clusterBuffer[0] = ModeSelect::Id;
-            clusterBuffer.reduce_size(1);
-        }
-        else
-        {
-            clusterBuffer.reduce_size(0);
-        }
-    }
+    ~DefaultModeSelectSceneHandler() override = default;
 
     // Default function for mode select cluster, only checks if mode select is enabled on the endpoint
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
@@ -235,26 +220,25 @@ public:
             VerifyOrReturnError(decodePair.attributeID == Attributes::CurrentMode::Id, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorOnFailure(mSceneEndpointStatePairs.InsertPair(
-                ModeSelectEndPointPair(endpoint, static_cast<uint8_t>(decodePair.valueUnsigned8.HasValue()))));
+                ModeSelectEndPointPair(endpoint, static_cast<uint8_t>(decodePair.valueUnsigned8.Value()))));
         }
         // Verify that the EFS was completely read
         CHIP_ERROR err = pair_iterator.GetStatus();
         if (CHIP_NO_ERROR != err)
         {
-            mSceneEndpointStatePairs.RemovePair(endpoint);
+            TEMPORARY_RETURN_IGNORED mSceneEndpointStatePairs.RemovePair(endpoint);
             return err;
         }
 
         VerifyOrReturnError(mTransitionTimeInterface.sceneEventControl(endpoint) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(timeMs), timerCallback,
-                                              mTransitionTimeInterface.sceneEventControl(endpoint));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(timeMs), timerCallback,
+                                                                       mTransitionTimeInterface.sceneEventControl(endpoint));
 
         return CHIP_NO_ERROR;
     }
 
 private:
-    ModeSelectTransitionTimeInterface mTransitionTimeInterface =
-        ModeSelectTransitionTimeInterface(ModeSelect::Id, sceneModeSelectCallback);
+    ModeSelectTransitionTimeInterface mTransitionTimeInterface = ModeSelectTransitionTimeInterface(sceneModeSelectCallback);
 };
 static DefaultModeSelectSceneHandler sModeSelectSceneHandler;
 
@@ -276,7 +260,7 @@ static void sceneModeSelectCallback(EndpointId endpoint)
     ModeSelectEndPointPair savedState;
     ReturnOnFailure(sModeSelectSceneHandler.mSceneEndpointStatePairs.GetPair(endpoint, savedState));
     ChangeToMode(endpoint, savedState.mValue);
-    sModeSelectSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint);
+    TEMPORARY_RETURN_IGNORED sModeSelectSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint);
 }
 
 #endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,15 +20,21 @@ namespace JointFabricAdministrator {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace AdministratorFabricIndex {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(AdministratorFabricIndex::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kAdminister, std::nullopt);
 } // namespace AdministratorFabricIndex
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
+    AdministratorFabricIndex::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ICACCSRRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ICACCSRRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kAdminister);
@@ -55,6 +62,8 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AnnounceJointFab
 } // namespace AnnounceJointFabricAdministrator
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace JointFabricAdministrator
 } // namespace Clusters
 } // namespace app

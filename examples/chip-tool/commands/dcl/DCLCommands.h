@@ -37,8 +37,6 @@ public:
     {
         auto client = chip::tool::dcl::DCLClient(mHostName, mPort);
         return RunCommand(client);
-
-        return CHIP_NO_ERROR;
     }
 
     virtual CHIP_ERROR RunCommand(chip::tool::dcl::DCLClient & client) = 0;

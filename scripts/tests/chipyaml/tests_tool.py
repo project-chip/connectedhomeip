@@ -19,7 +19,7 @@ import json
 from typing import List
 
 import click
-from matter_chip_tool_adapter.decoder import MatterLog
+from chipyaml.adapters.chiptool.decoder import MatterLog
 from runner import runner_base
 from tests_logger import TestColoredLogPrinter, WebSocketRunnerLogger
 
@@ -66,5 +66,4 @@ def send_raw_command(command: str, server_path: str, server_arguments: str):
     log_printer = TestColoredLogPrinter()
     log_printer.print(MatterLog.decode_logs(json_payload.get('logs')))
 
-    success = not bool(len([lambda x: x.get('error') for x in json_payload.get('results')]))
-    return success
+    return not bool(len([lambda x: x.get('error') for x in json_payload.get('results')]))

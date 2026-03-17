@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,9 +17,10 @@ namespace app {
 namespace Clusters {
 namespace OccupancySensing {
 
-inline constexpr uint32_t kRevision = 5;
+inline constexpr uint32_t kRevision = 7;
 
 namespace Attributes {
+
 namespace Occupancy {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Occupancy::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -40,6 +42,12 @@ namespace HoldTimeLimits {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(HoldTimeLimits::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace HoldTimeLimits
+namespace PredictedOccupancy {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(PredictedOccupancy::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace PredictedOccupancy
 namespace PIROccupiedToUnoccupiedDelay {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PIROccupiedToUnoccupiedDelay::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
@@ -85,10 +93,23 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(PhysicalContactUnoccup
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           Access::Privilege::kManage);
 } // namespace PhysicalContactUnoccupiedToOccupiedThreshold
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    Occupancy::kMetadataEntry,
+    OccupancySensorType::kMetadataEntry,
+    OccupancySensorTypeBitmap::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {
+namespace OccupancyChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OccupancyChanged
+
+} // namespace Events
 } // namespace OccupancySensing
 } // namespace Clusters
 } // namespace app

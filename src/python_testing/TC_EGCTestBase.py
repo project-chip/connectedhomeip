@@ -19,12 +19,13 @@ import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
 from mobly import asserts
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
+
+log = logging.getLogger(__name__)
 
 
 class ElectricalGridConditionsTestBaseHelper:
@@ -64,7 +65,7 @@ class ElectricalGridConditionsTestBaseHelper:
         matter_asserts.assert_valid_enum(
             struct.localCarbonLevel, "LocalCarbonLevel attribute must return a ThreeLevelEnum", cluster.Enums.ThreeLevelEnum)
 
-        logger.info(f"EGC: from: {self.convert_epoch_s_to_time(struct.periodStart, tz=None)} to {self.convert_epoch_s_to_time(struct.periodEnd, tz=None)} : GridC: {struct.gridCarbonIntensity} / GridCLevel: {struct.gridCarbonLevel} / LocalC: {struct.localCarbonIntensity} / LocalCLevel: {struct.localCarbonLevel}")
+        log.info(f"EGC: from: {self.convert_epoch_s_to_time(struct.periodStart, tz=None)} to {self.convert_epoch_s_to_time(struct.periodEnd, tz=None)} : GridC: {struct.gridCarbonIntensity} / GridCLevel: {struct.gridCarbonLevel} / LocalC: {struct.localCarbonIntensity} / LocalCLevel: {struct.localCarbonLevel}")
 
     async def send_test_event_trigger_current_conditions_update(self):
         await self.send_test_event_triggers(eventTrigger=self.kEventTriggerCurrentConditionsUpdate)
@@ -78,5 +79,4 @@ class ElectricalGridConditionsTestBaseHelper:
             matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)
 
             return matter_epoch + delta_from_epoch
-        else:
-            return None
+        return None

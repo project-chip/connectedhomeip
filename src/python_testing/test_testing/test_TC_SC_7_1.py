@@ -20,10 +20,10 @@ import sys
 from pathlib import Path
 from random import randbytes
 
-import chip.clusters as Clusters
-from chip.clusters import Attribute
-from chip.testing.matter_testing import MatterTestConfig
-from chip.testing.runner import MockTestRunner
+import matter.clusters as Clusters
+from matter.clusters import Attribute
+from matter.testing.matter_test_config import MatterTestConfig
+from matter.testing.runner import MockTestRunner
 
 
 def read_trusted_root(filled: bool) -> Attribute.AsyncReadTransaction.ReadResponse:
@@ -37,11 +37,11 @@ def read_trusted_root(filled: bool) -> Attribute.AsyncReadTransaction.ReadRespon
 def main():
     # All QR and manual codes use vendor ID 0xFFF1, product ID 0x8000.
     qr_2222_20202021 = 'MT:Y.K908OC16750648G00'
-    qr_3333_20202021 = 'MT:Y.K900C415W80648G00'
+    qr_3333_20202024 = 'MT:-24J0C0R15AB1648G00'
     qr_2222_20202024 = 'MT:Y.K908OC16N71648G00'
-    qr_3840_20202021 = 'MT:Y.K90-Q000KA0648G00'
+    qr_3840_20202022 = 'MT:-24J0AFN000O0648G00'
     manual_2222_20202021 = '20054912334'
-    manual_3333_20202021 = '31693312339'
+    manual_3333_20202024 = '31693612332'
     manual_2222_20202024 = '20055212333'
 
     test_runner = MockTestRunner(Path(__file__).parent / '../TC_SC_7_1.py',
@@ -62,7 +62,7 @@ def main():
     if ok:
         failures.append('Expected assertion on test with 1 discriminator')
 
-    test_config = MatterTestConfig(discriminators=[2222, 3333], setup_passcodes=[20202021, 20202021])
+    test_config = MatterTestConfig(discriminators=[2222, 3333], setup_passcodes=[20202021, 20202022])
     test_runner.set_test_config(test_config)
     ok = test_runner.run_test_with_mock_read(read_trusted_root(False))
     if ok:
@@ -82,14 +82,14 @@ def main():
         failures.append('Expected assertion on test with 1 manual code')
 
     # Two QR or manual codes with post cert marked should fail
-    test_config = MatterTestConfig(qr_code_content=[qr_2222_20202021, qr_3333_20202021],
+    test_config = MatterTestConfig(qr_code_content=[qr_2222_20202021, qr_3333_20202024],
                                    global_test_params={'post_cert_test': True})
     test_runner.set_test_config(test_config)
     ok = test_runner.run_test_with_mock_read(read_trusted_root(False))
     if ok:
         failures.append('Expected assertion on post-cert test with 2 QR codes')
 
-    test_config = MatterTestConfig(manual_code=[manual_2222_20202021, manual_3333_20202021],
+    test_config = MatterTestConfig(manual_code=[manual_2222_20202021, manual_3333_20202024],
                                    global_test_params={'post_cert_test': True})
     test_runner.set_test_config(test_config)
     ok = test_runner.run_test_with_mock_read(read_trusted_root(False))
@@ -122,35 +122,55 @@ def main():
     if ok:
         failures.append('Expected assertion on test with 2 manual codes with the same discriminator')
 
-    # Post cert test should fail on default discriminator
-    test_config = MatterTestConfig(qr_code_content=[qr_3840_20202021], global_test_params={'post_cert_test': True})
+    # Two devices with the the same passcode should fail
+    test_config = MatterTestConfig(qr_code_content=[qr_2222_20202024, qr_3333_20202024])
     test_runner.set_test_config(test_config)
     ok = test_runner.run_test_with_mock_read(read_trusted_root(False))
     if ok:
-        failures.append('Expected assertion on post-cert test with default code')
+        failures.append('Expected assertion on test with 2 QR codes with the same passcode')
+
+    test_config = MatterTestConfig(manual_code=[manual_2222_20202024, manual_3333_20202024])
+    test_runner.set_test_config(test_config)
+    ok = test_runner.run_test_with_mock_read(read_trusted_root(False))
+    if ok:
+        failures.append('Expected assertion on test with 2 manual codes with the same passcode')
+
+    # Post cert test should fail on default discriminator
+    test_config = MatterTestConfig(qr_code_content=[qr_3840_20202022], global_test_params={'post_cert_test': True})
+    test_runner.set_test_config(test_config)
+    ok = test_runner.run_test_with_mock_read(read_trusted_root(False))
+    if ok:
+        failures.append('Expected assertion on post-cert test with default discriminator')
+
+    # Post cert test should fail on default passcode
+    test_config = MatterTestConfig(qr_code_content=[qr_2222_20202021], global_test_params={'post_cert_test': True})
+    test_runner.set_test_config(test_config)
+    ok = test_runner.run_test_with_mock_read(read_trusted_root(False))
+    if ok:
+        failures.append('Expected assertion on post-cert test with default passcode')
 
     # Test should fail if there is fabric info
-    test_config = MatterTestConfig(qr_code_content=[qr_2222_20202021, qr_3333_20202021])
+    test_config = MatterTestConfig(qr_code_content=[qr_2222_20202021, qr_3333_20202024])
     test_runner.set_test_config(test_config)
     ok = test_runner.run_test_with_mock_read(read_trusted_root(True))
     if ok:
         failures.append('Expected assertion on test when fabrics are present')
 
-    # Test should pass on codes with two different discriminators
-    test_config = MatterTestConfig(qr_code_content=[qr_2222_20202021, qr_3333_20202021])
+    # Test should pass on codes with two different discriminators and passcodes
+    test_config = MatterTestConfig(qr_code_content=[qr_2222_20202021, qr_3333_20202024])
     test_runner.set_test_config(test_config)
     ok = test_runner.run_test_with_mock_read(read_trusted_root(False))
     if not ok:
         failures.append('Expected pass on QR code test')
 
-    test_config = MatterTestConfig(manual_code=[manual_2222_20202021, manual_3333_20202021])
+    test_config = MatterTestConfig(manual_code=[manual_2222_20202021, manual_3333_20202024])
     test_runner.set_test_config(test_config)
     ok = test_runner.run_test_with_mock_read(read_trusted_root(False))
     if not ok:
         failures.append('Expected pass on manual code test')
 
     # Test should pass on post-cert test
-    test_config = MatterTestConfig(qr_code_content=[qr_2222_20202021], global_test_params={'post_cert_test': True})
+    test_config = MatterTestConfig(qr_code_content=[qr_3333_20202024], global_test_params={'post_cert_test': True})
     test_runner.set_test_config(test_config)
     ok = test_runner.run_test_with_mock_read(read_trusted_root(False))
     if not ok:

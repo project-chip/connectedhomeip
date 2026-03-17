@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace SmokeCoAlarm {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 19;
+
 namespace ExpressedState {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace ExpressedState
@@ -63,6 +67,10 @@ inline constexpr AttributeId Id = 0x0000000B;
 namespace ExpiryDate {
 inline constexpr AttributeId Id = 0x0000000C;
 } // namespace ExpiryDate
+
+namespace Unmounted {
+inline constexpr AttributeId Id = 0x0000000D;
+} // namespace Unmounted
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

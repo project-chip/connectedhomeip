@@ -37,7 +37,10 @@ public:
         mHandler(commandsHandler)
     {
         AddArgument("advertise-operational", 0, 1, &mAdvertiseOperational,
-                    "Advertise operational node over DNS-SD and accept incoming CASE sessions.");
+                    "Advertise operational node over DNS-SD and accept incoming CASE sessions.  Defaults to true.");
+        AddArgument("interface-id", -1, INT32_MAX, &mInterfaceId,
+                    "Specific interface to use for advertising operationally. The exact meaning of this signed integer depends on "
+                    "the platform. Only used when advertise-operational is true.");
     }
 
     /////////// CHIPCommand Interface /////////

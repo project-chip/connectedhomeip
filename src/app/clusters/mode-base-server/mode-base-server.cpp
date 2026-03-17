@@ -22,11 +22,14 @@
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
-#include <app/clusters/on-off-server/on-off-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <tracing/macros.h>
+
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#include <app/clusters/on-off-server/on-off-server.h>
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
 
 using namespace chip;
 using namespace chip::app;
@@ -63,8 +66,8 @@ void Instance::Shutdown()
     {
         return;
     }
-    UnregisterThisInstance();
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED UnregisterThisInstance();
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -175,7 +178,7 @@ Status Instance::UpdateCurrentMode(uint8_t aNewMode)
     {
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::CurrentMode::Id);
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mCurrentMode);
+        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mCurrentMode);
         MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;
@@ -196,7 +199,7 @@ Status Instance::UpdateStartUpMode(DataModel::Nullable<uint8_t> aNewStartUpMode)
     {
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::StartUpMode::Id);
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mStartUpMode);
+        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mStartUpMode);
         MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;
@@ -217,7 +220,7 @@ Status Instance::UpdateOnMode(DataModel::Nullable<uint8_t> aNewOnMode)
     {
         // Write new value to persistent storage.
         ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, mClusterId, Attributes::OnMode::Id);
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mOnMode);
+        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mOnMode);
         MatterReportingAttributeChangeCallback(path);
     }
     return Protocols::InteractionModel::Status::Success;
@@ -272,8 +275,7 @@ CHIP_ERROR Instance::GetModeValueByModeTag(uint16_t modeTagValue, uint8_t & valu
         {
             if (mTags[ii].value == modeTagValue)
             {
-                mDelegate->GetModeValueByIndex(i, value);
-                return CHIP_NO_ERROR;
+                return mDelegate->GetModeValueByIndex(i, value);
             }
         }
         mTags = tagsBuffer;
@@ -414,7 +416,7 @@ void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeTo
 
     if (response.status == to_underlying(StatusCode::kSuccess))
     {
-        UpdateCurrentMode(newMode);
+        TEMPORARY_RETURN_IGNORED UpdateCurrentMode(newMode);
         ChipLogProgress(Zcl, "ModeBase: HandleChangeToMode changed to mode %u", newMode);
     }
 

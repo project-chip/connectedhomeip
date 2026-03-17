@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,9 +17,10 @@ namespace app {
 namespace Clusters {
 namespace GroupKeyManagement {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace GroupKeyMap {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(GroupKeyMap::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -37,10 +39,24 @@ namespace MaxGroupKeysPerFabric {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxGroupKeysPerFabric::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MaxGroupKeysPerFabric
+namespace GroupcastAdoption {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(GroupcastAdoption::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kAdminister, Access::Privilege::kAdminister);
+} // namespace GroupcastAdoption
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    GroupKeyMap::kMetadataEntry,
+    GroupTable::kMetadataEntry,
+    MaxGroupsPerFabric::kMetadataEntry,
+    MaxGroupKeysPerFabric::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace KeySetWrite {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(KeySetWrite::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
@@ -64,6 +80,8 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace KeySetReadAllIndices
 
 } // namespace Commands
+
+namespace Events {} // namespace Events
 } // namespace GroupKeyManagement
 } // namespace Clusters
 } // namespace app

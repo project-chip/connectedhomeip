@@ -1,0 +1,25 @@
+{{> header}}
+// This file is generated from devices-Types.h.zapt
+
+#pragma once
+
+#include <app/data-model-provider/MetadataTypes.h>
+
+#include "Ids.h"
+
+namespace chip {
+namespace app {
+namespace Device {
+namespace Type {
+{{#zcl_device_types}}
+
+constexpr DataModel::DeviceTypeEntry k{{asUpperCamelCase caption}} = {
+   .deviceTypeId = k{{asUpperCamelCase caption}}DeviceTypeId,
+   .deviceTypeRevision = k{{asUpperCamelCase caption}}DeviceTypeRevision,
+};
+{{/zcl_device_types}}
+
+} // namespace Type
+} // namespace Device
+} // namespace app
+} // namespace chip

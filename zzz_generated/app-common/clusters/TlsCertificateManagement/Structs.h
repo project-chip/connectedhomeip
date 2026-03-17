@@ -83,7 +83,7 @@ struct Type
 {
 public:
     uint16_t ccdid = static_cast<uint16_t>(0);
-    Optional<chip::ByteSpan> clientCertificate;
+    Optional<DataModel::Nullable<chip::ByteSpan>> clientCertificate;
     Optional<DataModel::List<const chip::ByteSpan>> intermediateCertificates;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
@@ -104,7 +104,7 @@ struct DecodableType
 {
 public:
     uint16_t ccdid = static_cast<uint16_t>(0);
-    Optional<chip::ByteSpan> clientCertificate;
+    Optional<DataModel::Nullable<chip::ByteSpan>> clientCertificate;
     Optional<DataModel::DecodableList<chip::ByteSpan>> intermediateCertificates;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 

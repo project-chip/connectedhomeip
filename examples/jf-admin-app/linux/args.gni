@@ -33,6 +33,8 @@ matter_enable_tracing_support = true
 chip_enable_additional_data_advertising = true
 chip_enable_rotating_device_id = true
 
-chip_enable_read_client = false
+chip_enable_read_client = true
+chip_build_controller = true
+chip_support_commissioning_in_controller = true
 
 chip_device_config_enable_joint_fabric = true

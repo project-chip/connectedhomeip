@@ -87,7 +87,7 @@ bl_iot_sdk("sdk") {
     include_dirs += [ "${examples_plat_dir}/common/plat" ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     defines += [ "OPENTHREAD_CONFIG_PLATFORM_XTAL_ACCURACY=40" ]
   }
 
@@ -142,6 +142,8 @@ bouffalolab_executable("lighting_app") {
     ":bouffalolab-lighting",
     ":sdk",
     "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
@@ -155,7 +157,7 @@ bouffalolab_executable("lighting_app") {
     "${examples_plat_dir}/common/iot_sdk",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     deps += [
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
@@ -224,7 +226,7 @@ bouffalolab_executable("lighting_app") {
       "${examples_plat_dir}/common/rpc/pw_sys_io:pw_sys_io",
     ]
 
-    if (chip_enable_openthread) {
+    if (chip_enable_thread) {
       deps += [
         "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
         "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",

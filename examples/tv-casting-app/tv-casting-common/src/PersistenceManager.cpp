@@ -399,9 +399,9 @@ CHIP_ERROR PersistenceManager::ReadAllVideoPlayers(TargetVideoPlayerInfo outVide
 
         if (videoPlayersContainerTagNum == kContentAppEndpointsContainerTag)
         {
-            outVideoPlayers[videoPlayerIndex].Initialize(nodeId, fabricIndex, nullptr, nullptr, vendorId, productId, deviceType,
-                                                         deviceName, hostName, numIPs, ipAddress, port, instanceName,
-                                                         chip::System::Clock::Timestamp(lastDiscoveredMs));
+            TEMPORARY_RETURN_IGNORED outVideoPlayers[videoPlayerIndex].Initialize(
+                nodeId, fabricIndex, nullptr, nullptr, vendorId, productId, deviceType, deviceName, hostName, numIPs, ipAddress,
+                port, instanceName, chip::System::Clock::Timestamp(lastDiscoveredMs));
             if (MACAddressLength > 0)
             {
                 chip::CharSpan MACAddress(MACAddressBuf, MACAddressLength);
@@ -536,7 +536,7 @@ void PersistenceManager::OnFabricRemoved(const FabricTable & fabricTable, Fabric
         }
     }
 
-    WriteAllVideoPlayers(cachedVideoPlayers);
+    TEMPORARY_RETURN_IGNORED WriteAllVideoPlayers(cachedVideoPlayers);
 }
 
 CHIP_ERROR PersistenceManager::PurgeVideoPlayerCache()

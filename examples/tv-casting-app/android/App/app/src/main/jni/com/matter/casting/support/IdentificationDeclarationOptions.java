@@ -38,18 +38,21 @@ public class IdentificationDeclarationOptions {
    * @param commissionerPasscode the commissioner passcode flag.
    * @param commissionerPasscodeReady the commissioner passcode ready flag.
    * @param cancelPasscode the cancel passcode flag.
+   * @param passcodeLength the passcode length.
    */
   public IdentificationDeclarationOptions(
       boolean noPasscode,
       boolean cdUponPasscodeDialog,
       boolean commissionerPasscode,
       boolean commissionerPasscodeReady,
-      boolean cancelPasscode) {
+      boolean cancelPasscode,
+      int passcodeLength) {
     this.noPasscode = noPasscode;
     this.cdUponPasscodeDialog = cdUponPasscodeDialog;
     this.commissionerPasscode = commissionerPasscode;
     this.commissionerPasscodeReady = commissionerPasscodeReady;
     this.cancelPasscode = cancelPasscode;
+    this.passcodeLength = passcodeLength;
   }
 
   /**
@@ -87,6 +90,8 @@ public class IdentificationDeclarationOptions {
    * to exit the commissioning process.
    */
   private boolean cancelPasscode = false;
+  /** Feature: Coordinate Passcode Dialogs Flag - to indicate the passcode length. */
+  private int passcodeLength = 0;
   /**
    * Feature: Target Content Application - The set of content app Vendor IDs (and optionally,
    * Product IDs) that can be used for authentication. Also, if TargetAppInfo is passed in,
@@ -94,6 +99,8 @@ public class IdentificationDeclarationOptions {
    * TargetApp is not found in the on-device CastingStore.
    */
   private List<TargetAppInfo> targetAppInfos = new ArrayList<>();
+  /** Instance name string. */
+  private String instanceName = "";
 
   /**
    * @brief Adds a TargetAppInfo to the IdentificationDeclarationOptions.java TargetAppInfos list,
@@ -132,8 +139,20 @@ public class IdentificationDeclarationOptions {
     return cancelPasscode;
   }
 
+  public int getPasscodeLength() {
+    return passcodeLength;
+  }
+
   public List<TargetAppInfo> getTargetAppInfoList() {
     return targetAppInfos;
+  }
+
+  public String getInstanceName() {
+    return instanceName;
+  }
+
+  public void setInstanceName(String instanceName) {
+    this.instanceName = instanceName;
   }
 
   @Override
@@ -153,6 +172,9 @@ public class IdentificationDeclarationOptions {
         .append("\n");
     sb.append("IdentificationDeclarationOptions::cancelPasscode:            ")
         .append(cancelPasscode)
+        .append("\n");
+    sb.append("IdentificationDeclarationOptions::passcodeLength:            ")
+        .append(passcodeLength)
         .append("\n");
     sb.append("IdentificationDeclarationOptions::targetAppInfos list: \n");
 

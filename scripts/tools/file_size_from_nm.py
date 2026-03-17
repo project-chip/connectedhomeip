@@ -14,12 +14,22 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#     "click",
+#     "cxxfilt",
+#     "coloredlogs",
+#     "pandas",
+#     "plotly",
+# ]
+# ///
+#
 # Displays a treemap code size as read by `nm` over a binary
 #
 # Example call:
 #
-# scripts/tools/file_size_from_nm.py \
+# uv run --script ./scripts/tools/file_size_from_nm.py \
 #     --max-depth 5                  \
 #     out/nrf-nrf52840dk-light-data-model-enabled/nrfconnect/zephyr/zephyr.elf
 #
@@ -34,13 +44,7 @@
 #   good way to disambiguate
 #
 
-# Requires:
-#    click
-#    cxxfilt
-#    coloredlogs
-#    pandas
-#    plotly
-
+import contextlib
 import fnmatch
 import logging
 import re
@@ -54,14 +58,11 @@ import coloredlogs
 import cxxfilt
 import plotly.express as px
 
+log = logging.getLogger(__name__)
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    "debug": logging.DEBUG,
-    "info": logging.INFO,
-    "warn": logging.WARN,
-    "fatal": logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 __CHART_STYLES__ = {
@@ -136,11 +137,9 @@ def tree_display_name(name: str) -> list[str]:
     'emberAf' prefixes to make them common and uses 'vtable for' information
     """
 
-    try:
+    # Allow to display the name as-is in case of failure.
+    with contextlib.suppress(cxxfilt.InvalidName):
         name = cxxfilt.demangle(name)
-    except cxxfilt.InvalidName:
-        # Allow display of the name as-is
-        pass
 
     if name.startswith("non-virtual thunk to "):
         name = name[21:]
@@ -176,11 +175,10 @@ def tree_display_name(name: str) -> list[str]:
         if not m:
             continue
         d = m.groupdict()
-        logging.debug("Ember callback found: %s -> %r", name, d)
+        log.debug("Ember callback found: '%s' -> %r", name, d)
         if 'command' in d:
             return ["chip", "app", "Clusters", d['cluster'], "EMBER", d['command'], name]
-        else:
-            return ["chip", "app", "Clusters", d['cluster'], "EMBER", name]
+        return ["chip", "app", "Clusters", d['cluster'], "EMBER", name]
 
     if 'MatterPreAttributeChangeCallback' in name:
         return ["EMBER", "CALLBACKS", name]
@@ -421,7 +419,15 @@ def build_treemap(
     root = f"FILE: {name}"
     if zoom:
         root = root + f" (FILTER: {zoom})"
-    data: dict[str, list] = dict(name=[root], parent=[""], size=[0], hover=[""], name_with_size=[""], short_name=[""], id=[root])
+    data: dict[str, list] = {
+        "name": [root],
+        "parent": [""],
+        "size": [0],
+        "hover": [""],
+        "name_with_size": [""],
+        "short_name": [""],
+        "id": [root],
+    }
 
     known_parents: set[str] = set()
     total_sizes: dict = {}
@@ -487,12 +493,12 @@ def build_treemap(
                 data["name_with_size"][idx] = f"{label}: {total_size}"
             else:
                 # The "full name" is generally quite long, so shorten it...
-                data["name_with_size"][idx] = f"{data["short_name"][idx]}: {total_size}"
+                data["name_with_size"][idx] = f"{data['short_name'][idx]}: {total_size}"
         else:
             # When using object files, the paths hare are the full "foo::bar::....::method"
             # so clean them up a bit
             short_name = shorten_name(data["short_name"][idx])
-            data["name_with_size"][idx] = f"{short_name}: {data["size"][idx]}"
+            data["name_with_size"][idx] = f"{short_name}: {data['size'][idx]}"
 
     extra_args = {}
     if color is not None:
@@ -652,7 +658,7 @@ def symbols_from_objdump(elf_file: str) -> list[Symbol]:
 
         if symbol_file_name not in sources:
             if symbol_file_name not in unknown_file_names:
-                logging.warning('Source %r is not known', symbol_file_name)
+                log.warning('Source %r is not known', symbol_file_name)
                 unknown_file_names.add(symbol_file_name)
             path = [captures['section'], 'UNKNOWN', symbol_file_name, captures['name']]
         else:
@@ -709,7 +715,7 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
             "v",
             "V",
         }:
-            logging.debug("Found %s of size %d", name, size)
+            log.debug("Found '%s' of size %d", name, size)
             symbols.append(Symbol(name=name, symbol_type=t, size=size, tree_path=tree_display_name(name)))
         elif t in {
             # BSS - 0-initialized, not code
@@ -718,7 +724,7 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
         }:
             pass
         else:
-            logging.error("SKIPPING SECTION %s", t)
+            log.error("SKIPPING SECTION '%s'", t)
 
     return symbols
 
@@ -751,16 +757,16 @@ def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
 
     Symbols are the same if their "name" if the have the same tree path.
     """
-    orig_items = dict([(list_id(v.tree_path), v) for v in orig])
-    base_items = dict([(list_id(v.tree_path), v) for v in base])
+    orig_items = {list_id(v.tree_path): v for v in orig}
+    base_items = {list_id(v.tree_path): v for v in base}
 
     unique_paths = set(orig_items.keys()).union(set(base_items.keys()))
 
     result = []
 
     for path in unique_paths:
-        orig_symbol = orig_items.get(path, None)
-        base_symbol = base_items.get(path, None)
+        orig_symbol = orig_items.get(path)
+        base_symbol = base_items.get(path)
 
         if not orig_symbol:
             if not base_symbol:

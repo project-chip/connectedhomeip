@@ -11,10 +11,9 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-table.h>
 #include <app/util/ember-strings.h>
-#include <app/util/odd-sized-integers.h>
+#include <lib/support/odd-sized-integers.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -136,6 +135,7 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, {{accessorGetterTyp
     {{/if}}
     {{/if}}
 {{/inline}}
+{{#unless (isInConfigList parent.name "CodeDrivenClusters")}}
 
 Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value, MarkAttributeDirty markDirty)
 {
@@ -202,6 +202,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodabl
   return Set(endpoint, value.Value());
 }
 {{/if}}
+{{/unless}}
 
 } // namespace {{asUpperCamelCase label}}
 

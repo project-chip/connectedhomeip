@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,9 +17,10 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-inline constexpr uint32_t kRevision = 7;
+inline constexpr uint32_t kRevision = 9;
 
 namespace Attributes {
+
 namespace LocalTemperature {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(LocalTemperature::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -276,10 +278,38 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SetpointHoldExpiryTime
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace SetpointHoldExpiryTimestamp
+namespace MaxThermostatSuggestions {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxThermostatSuggestions::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace MaxThermostatSuggestions
+namespace ThermostatSuggestions {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ThermostatSuggestions::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace ThermostatSuggestions
+namespace CurrentThermostatSuggestion {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentThermostatSuggestion::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace CurrentThermostatSuggestion
+namespace ThermostatSuggestionNotFollowingReason {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatSuggestionNotFollowingReason::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace ThermostatSuggestionNotFollowingReason
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    LocalTemperature::kMetadataEntry,
+    ControlSequenceOfOperation::kMetadataEntry,
+    SystemMode::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace SetpointRaiseLower {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetpointRaiseLower::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
@@ -304,12 +334,48 @@ namespace SetActivePresetRequest {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(SetActivePresetRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kOperate);
 } // namespace SetActivePresetRequest
+namespace AddThermostatSuggestion {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(AddThermostatSuggestion::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
+} // namespace AddThermostatSuggestion
+namespace RemoveThermostatSuggestion {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(RemoveThermostatSuggestion::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
+} // namespace RemoveThermostatSuggestion
 namespace AtomicRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AtomicRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);
 } // namespace AtomicRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace SystemModeChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SystemModeChange
+namespace LocalTemperatureChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace LocalTemperatureChange
+namespace OccupancyChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OccupancyChange
+namespace SetpointChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SetpointChange
+namespace RunningStateChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace RunningStateChange
+namespace RunningModeChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace RunningModeChange
+namespace ActiveScheduleChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ActiveScheduleChange
+namespace ActivePresetChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ActivePresetChange
+
+} // namespace Events
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app

@@ -126,29 +126,30 @@ public:
     void LogStateDebug() const;
 
 private:
-    // Private data members:
-    State_t mRxState;
-    uint16_t mRxLength;
     void * mAppState;
+
+    State_t mRxState;
     System::PacketBufferHandle mRxBuf;
     SequenceNumber_t mRxNextSeqNum;
     SequenceNumber_t mRxNewestUnackedSeqNum;
     SequenceNumber_t mRxOldestUnackedSeqNum;
     uint16_t mRxFragmentSize;
+    uint16_t mRxLength;
 
     State_t mTxState;
-    uint16_t mTxLength;
     System::PacketBufferHandle mTxBuf;
     SequenceNumber_t mTxNextSeqNum;
     SequenceNumber_t mTxNewestUnackedSeqNum;
     SequenceNumber_t mTxOldestUnackedSeqNum;
-    bool mExpectingAck;
     uint16_t mTxFragmentSize;
+    uint16_t mTxLength;
 
     uint16_t mRxCharCount;
     uint16_t mRxPacketCount;
     uint16_t mTxCharCount;
     uint16_t mTxPacketCount;
+
+    bool mExpectingAck;
 
     // Private functions:
     bool IsValidAck(SequenceNumber_t ack_num) const;

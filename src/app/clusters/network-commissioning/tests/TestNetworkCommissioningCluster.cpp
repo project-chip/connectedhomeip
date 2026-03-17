@@ -15,10 +15,15 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app/AttributePathParams.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
-#include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
-#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/ClusterTester.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Enums.h>
@@ -27,62 +32,99 @@
 #include <clusters/NetworkCommissioning/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/ReadOnlyBuffer.h>
 #include <platform/NetworkCommissioning.h>
+#include <vector>
 
-#include "FakeWifiDriver.h"
+#include "FakeDrivers.h"
 
 namespace {
 
 using namespace chip;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::NetworkCommissioning::Attributes;
 
+using chip::app::ClusterShutdownType;
 using chip::app::DataModel::AttributeEntry;
+using chip::Testing::ClusterTester;
+using chip::Testing::IsAttributesListEqualTo;
 
+class NoopBreadcrumbTracker : public BreadCrumbTracker
+{
+public:
+    void SetBreadCrumb(uint64_t v) override {}
+};
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestNetworkCommissioningCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
+    inline static NoopBreadcrumbTracker tracker;
+    inline static NetworkCommissioningCluster::Context defaultContext{
+        .breadcrumbTracker   = tracker,
+        .failSafeContext     = Server::GetInstance().GetFailSafeContext(),
+        .platformManager     = DeviceLayer::PlatformMgr(),
+        .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+    };
 };
 
 TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 {
     {
         Testing::FakeWiFiDriver fakeWifiDriver;
-        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver);
 
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(cluster.Attributes({ kRootEndpointId, NetworkCommissioning::Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      NetworkCommissioning::Attributes::MaxNetworks::kMetadataEntry,
-                      NetworkCommissioning::Attributes::Networks::kMetadataEntry,
-                      NetworkCommissioning::Attributes::InterfaceEnabled::kMetadataEntry,
-                      NetworkCommissioning::Attributes::LastNetworkingStatus::kMetadataEntry,
-                      NetworkCommissioning::Attributes::LastNetworkID::kMetadataEntry,
-                      NetworkCommissioning::Attributes::LastConnectErrorValue::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
+        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, defaultContext);
 
         // NOTE: this is AWKWARD: we pass in a wifi driver, yet attributes are still depending
         //       on device enabling. Ideally we should not allow compiling odd things at all.
         //       For now keep the logic as inherited from previous implementation.
+        std::vector<AttributeEntry> expectedAttributes;
+        expectedAttributes.push_back(MaxNetworks::kMetadataEntry);
+        expectedAttributes.push_back(Networks::kMetadataEntry);
+        expectedAttributes.push_back(InterfaceEnabled::kMetadataEntry);
+        expectedAttributes.push_back(LastNetworkingStatus::kMetadataEntry);
+        expectedAttributes.push_back(LastNetworkID::kMetadataEntry);
+        expectedAttributes.push_back(LastConnectErrorValue::kMetadataEntry);
+
 #if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      NetworkCommissioning::Attributes::ScanMaxTimeSeconds::kMetadataEntry,
-                      NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::kMetadataEntry,
-                      NetworkCommissioning::Attributes::SupportedWiFiBands::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
+        expectedAttributes.push_back(ScanMaxTimeSeconds::kMetadataEntry);
+        expectedAttributes.push_back(ConnectMaxTimeSeconds::kMetadataEntry);
+        expectedAttributes.push_back(SupportedWiFiBands::kMetadataEntry);
 #endif
 
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster, expectedAttributes));
     }
 
     // TODO: more tests for ethernet and thread should be added
+}
+
+TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
+{
+    Testing::FakeWiFiDriver fakeWifiDriver;
+    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, defaultContext);
+
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    {
+        // no notification if enable fails
+        tester.GetDirtyList().clear();
+        fakeWifiDriver.SetEnabledAllowed(false);
+        ASSERT_FALSE(tester.WriteAttribute(InterfaceEnabled::Id, false).IsSuccess());
+        ASSERT_TRUE(tester.GetDirtyList().empty());
+    }
+
+    {
+        // Receive a notification if enable succeeds
+        tester.GetDirtyList().clear();
+        fakeWifiDriver.SetEnabledAllowed(true);
+        ASSERT_TRUE(tester.WriteAttribute(InterfaceEnabled::Id, true).IsSuccess());
+        ASSERT_EQ(tester.GetDirtyList().size(), 1u);
+        ASSERT_EQ(tester.GetDirtyList()[0],
+                  app::AttributePathParams(kRootEndpointId, NetworkCommissioning::Id, InterfaceEnabled::Id));
+    }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
 } // namespace

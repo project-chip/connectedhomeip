@@ -31,7 +31,11 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
-#include <platform/internal/GenericPlatformManagerImpl_Zephyr.ipp>
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#include <platform/internal/GenericPlatformManagerImpl_ZephyrSelect.ipp>
+#else
+#include <platform/internal/GenericPlatformManagerImpl_ZephyrNoSelect.ipp>
+#endif
 
 #include <malloc.h>
 #include <zephyr/drivers/entropy.h>
@@ -76,7 +80,7 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 void PlatformManagerImpl::OperationalHoursSavingTimerEventHandler(k_timer * timer)
 {
-    PlatformMgr().ScheduleWork([](intptr_t arg) {
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t arg) {
         CHIP_ERROR error = sInstance.UpdateOperationalHours(nullptr);
         if (error != CHIP_NO_ERROR)
         {
@@ -101,7 +105,7 @@ CHIP_ERROR PlatformManagerImpl::UpdateOperationalHours(uint32_t * totalOperation
 
     if (deltaTime > 0)
     {
-        ConfigurationMgr().StoreTotalOperationalHours(totalTime);
+        TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalTime);
         mSavedOperationalHoursSinceBoot = upTimeH;
     }
 

@@ -18,11 +18,8 @@
 
 #pragma once
 
-#include <app/clusters/closure-control-server/closure-control-cluster-delegate.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-matter-context.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
-#include <app/clusters/closure-control-server/closure-control-server.h>
+#include <app/clusters/closure-control-server/ClosureControlClusterDelegate.h>
+#include <app/clusters/closure-control-server/CodegenIntegration.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/TestEventTriggerDelegate.h>
@@ -43,7 +40,7 @@ namespace ClosureControl {
  * for closure control operations such as Stop, MoveTo, Calibration, and
  * error retrieval, and Test event triggering.
  */
-class ClosureControlDelegate : public DelegateBase, public TestEventTriggerHandler
+class ClosureControlDelegate : public ClosureControlClusterDelegate, public TestEventTriggerHandler
 {
 public:
     ClosureControlDelegate() {}
@@ -55,9 +52,7 @@ public:
                                                             const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status HandleCalibrateCommand() override;
 
-    CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override;
     bool IsReadyToMove() override;
-    bool IsManualLatchingNeeded() override;
     ElapsedS GetCalibrationCountdownTime() override;
     ElapsedS GetMovingCountdownTime() override;
     ElapsedS GetWaitingForMotionCountdownTime() override;
@@ -66,12 +61,12 @@ public:
 
     // Delegate specific functions and variables
 
-    void SetLogic(ClusterLogic * logic) { mLogic = logic; }
+    void SetClusterInstance(ClosureControlCluster * clusterInstance) { mClusterInstance = clusterInstance; }
 
-    ClusterLogic * GetLogic() const { return mLogic; }
+    ClosureControlCluster & GetClusterInstance() { return *mClusterInstance; }
 
 private:
-    ClusterLogic * mLogic;
+    ClosureControlCluster * mClusterInstance;
 };
 
 /**
@@ -79,27 +74,46 @@ private:
  * @brief Represents a Closure Control cluster endpoint.
  *
  * This class encapsulates the logic and interfaces required to manage a Closure Control cluster endpoint.
- * It integrates the delegate, context, logic, and interface components for the endpoint.
+ * It integrates the conformance, init params, delegate and cluster instance for the endpoint.
+ *
+ * NOTE: Set the Conformance, Init Params and Delegate before initializing the Endpoint.
+ *       The Cluster Instance is initialized in the Init() function.
  *
  * @param mEndpoint The endpoint ID associated with this Closure Control endpoint.
- * @param mContext The Matter context for the endpoint.
  * @param mDelegate The delegate instance for handling commands.
- * @param mLogic The cluster logic associated with the endpoint.
- * @param mInterface The interface for interacting with the cluster.
+ * @param mClusterInstance The cluster instance for interacting with the cluster.
  */
 class ClosureControlEndpoint
 {
 public:
-    ClosureControlEndpoint(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
+    ClosureControlEndpoint(EndpointId endpoint) : mEndpoint(endpoint), mDelegate(), mClusterInstance(nullptr)
     {
-        mDelegate.SetLogic(&mLogic);
+        ClusterConformance conformance;
+        conformance.FeatureMap()
+            .Set(Feature::kPositioning)
+            .Set(Feature::kMotionLatching)
+            .Set(Feature::kSpeed)
+            .Set(Feature::kVentilation)
+            .Set(Feature::kPedestrian)
+            .Set(Feature::kCalibration)
+            .Set(Feature::kProtection)
+            .Set(Feature::kManuallyOperable);
+        conformance.OptionalAttributes().Set<Attributes::CountdownTime::Id>();
+
+        ClusterInitParameters initParams;
+
+        MatterClosureControlSetConformance(mEndpoint, conformance);
+        MatterClosureControlSetInitParams(mEndpoint, initParams);
+        MatterClosureControlSetDelegate(mEndpoint, mDelegate);
     }
 
     /**
      * @brief Initializes the ClosureControlEndpoint instance.
      *
-     * @return CHIP_ERROR indicating the result of the initialization.
+     * It initializes the Cluster Instance for the Closure Control Endpoint and sets the same instance to the delegate.
+     *
+     * @return CHIP_ERROR_INTERNAL if the Closure Control Cluster is not Initialized
+     *         CHIP_NO_ERROR in case of success
      */
     CHIP_ERROR Init();
 
@@ -110,12 +124,87 @@ public:
      */
     ClosureControlDelegate & GetDelegate() { return mDelegate; }
 
+    /**
+     * @brief Returns a reference to the ClosureControlCluster instance associated with this object.
+     *
+     * @return ClosureControlCluster& Reference to the internal ClosureControlCluster object.
+     */
+    ClosureControlCluster & GetClusterInstance() { return *mClusterInstance; }
+
+    /**
+     * @brief Handles the completion of a stop motion action.
+     *
+     * This function is called when a motion action has been stopped.
+     * It should update the internal state of the closure control endpoint to reflect the
+     * stopping of the motion action.
+     */
+    void OnStopMotionActionComplete();
+
+    /**
+     * @brief Handles the completion of the stop calibration action.
+     *
+     * This function is called when the calibration action has been stopped.
+     * It should update the internal state of the closure control endpoint to reflect the
+     * stopping of the calibration action.
+     */
+    void OnStopCalibrateActionComplete();
+
+    /**
+     * @brief Handles the completion of a calibration action.
+     *
+     * This method is called when the calibration process is finished.
+     * It should update the internal state of the closure control endpoint to reflect the
+     * completion of the calibration action, resets the countdown timer and generates
+     * a motion completed event.
+     */
+    void OnCalibrateActionComplete();
+
+    /**
+     * @brief Handles the completion of a motion action for closure control.
+     *
+     * This function is called when a move-to action has finished executing.
+     * It should update the internal state of the closure control endpoint to reflect the
+     * completion of the move-to action, resets the countdown timer and generates
+     * a motion completed event.
+     */
+    void OnMoveToActionComplete();
+
+    /**
+     * @brief Handles the completion of a panel motion action for closure endpoint.
+     *
+     * This function is called when a panel motion action has been completed.
+     * It updates the internal state of the closure endpoint to reflect
+     * the completion of the panel motion action.
+     */
+    void OnPanelMotionActionComplete();
+
+    /**
+     * @brief Retrieves the endpoint ID associated with this Closure Control endpoint.
+     *
+     * @return The EndpointId of this Closure Control endpoint.
+     */
+    EndpointId GetEndpointId() const { return mEndpoint; }
+
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
-    MatterContext mContext;
     ClosureControlDelegate mDelegate;
-    ClusterLogic mLogic;
-    Interface mInterface;
+    ClosureControlCluster * mClusterInstance;
+
+    /**
+     * @brief Updates the current state of the closure control endpoint from the target state.
+     *
+     * This function retrieves the target state and updates the current state accordingly.
+     * It ensures that the current state reflects the latest target position, latch status, and speed.
+     */
+    void UpdateCurrentStateFromTargetState();
+
+    /**
+     * @brief Maps a TargetPositionEnum value to the corresponding CurrentPositionEnum value.
+     *
+     * @param value The TargetPositionEnum value to be mapped.
+     * @return CurrentPositionEnum The corresponding CurrentPositionEnum value.
+     */
+    CurrentPositionEnum MapTargetPositionToCurrentPositioning(TargetPositionEnum value);
 };
 
 } // namespace ClosureControl

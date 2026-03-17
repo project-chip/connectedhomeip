@@ -48,6 +48,9 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+
 #if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
 #include "Rpc.h"
 #endif // PW_RPC_ENABLED
@@ -63,13 +66,21 @@
 #endif
 
 // Application level logic
+#include "AppConfig.h"
+#if BASE_APP_BUILD
+#include "BaseAppTask.h"
+#else
 #include "AppTask.h"
+#endif
 #include "ota.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
+
+app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(chip::kRootEndpointId);
 
 namespace {
 constexpr uint32_t kInitOTARequestorDelaySec = 3;
@@ -120,14 +131,19 @@ void Application_Init(void)
     ChipLogProgress(NotSpecified, "Qorvo " APP_NAME " Launching");
     ChipLogProgress(NotSpecified, "============================");
 
-    error = GetAppTask().Init();
+#if BASE_APP_BUILD
+    BaseAppTask & appTask = BaseAppTask::GetAppTask();
+#else
+    AppTask & appTask = AppTask::GetAppTask();
+#endif
+    error = appTask.Init();
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "GetAppTask().Init() failed");
         return;
     }
 
-    error = GetAppTask().StartAppTask();
+    error = appTask.StartAppTask();
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "GetAppTask().StartAppTask() failed");
@@ -219,6 +235,8 @@ CHIP_ERROR CHIP_Init(void)
         goto exit;
     }
 
+    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
+
     ChipLogProgress(NotSpecified, "Starting OpenThread task");
     ret = ThreadStackMgrImpl().StartThreadTask();
     if (ret != CHIP_NO_ERROR)
@@ -229,7 +247,7 @@ CHIP_ERROR CHIP_Init(void)
 #endif // CHIP_ENABLE_OPENTHREAD
 
     ChipLogProgress(NotSpecified, "Starting Platform Manager Event Loop");
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {

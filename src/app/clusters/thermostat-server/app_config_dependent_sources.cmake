@@ -21,6 +21,10 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/thermostat-delegate.h"
     "${CLUSTER_DIR}/thermostat-server-atomic.cpp"
     "${CLUSTER_DIR}/thermostat-server-presets.cpp"
+    "${CLUSTER_DIR}/thermostat-server-presets.h"
+    "${CLUSTER_DIR}/thermostat-server-suggestions.cpp"
     "${CLUSTER_DIR}/thermostat-server.cpp"
     "${CLUSTER_DIR}/thermostat-server.h"
+    "${CLUSTER_DIR}/ThermostatSuggestionStructWithOwnedMembers.cpp"
+    "${CLUSTER_DIR}/ThermostatSuggestionStructWithOwnedMembers.h"
 )

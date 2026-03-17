@@ -8,6 +8,8 @@ pull_request_rules:
       label:
         toggle:
           - conflict
+  # WARNING: If the rule name below is changed, you must also update the
+  # condition `check-failure~=Automatic merge on PullApprove` to match the new name.
   - name: Automatic merge on PullApprove
     conditions:
       - or:
@@ -17,7 +19,18 @@ pull_request_rules:
       - '#review-threads-unresolved=0'
       - '-draft'
       - label!=docker
-      - '#check-failure=0'
+      # Workaround for Mergify deadlock due to using "#check-failure=0":
+      # Mergify’s own action check can appear as failed/cancelled if conditions stop matching;
+      # and GitHub keeps those historic failures forever. Since `#check-failure=0` counts ALL
+      # failures (including historic ones), this would cause a deadlock and block merges indefinitely.
+      # We whitelist only this self-check so merges aren’t deadlocked, while all other failures still block.
+      - or:
+          - '#check-failure=0'
+          - and:
+              - '#check-failure=1'
+              # WARNING: This must match the rule name defined above.
+              # If the rule name changes, update this condition accordingly.
+              - check-failure~=Automatic merge on PullApprove
       - '#check-pending=0'
       - check-success~=Build
       - or:

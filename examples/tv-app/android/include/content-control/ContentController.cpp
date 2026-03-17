@@ -71,7 +71,7 @@ bool ContentController::HandleGetBlockUnrated()
 }
 
 // Command Delegates
-void ContentController::HandleUpdatePIN(chip::Optional<chip::CharSpan> oldPIN, chip::CharSpan newPIN) {}
+void ContentController::HandleUpdatePIN(chip::CharSpan oldPIN, chip::CharSpan newPIN) {}
 
 void ContentController::HandleResetPIN(chip::app::CommandResponseHelper<ResetPINResponseType> & helper) {}
 
@@ -79,7 +79,7 @@ void ContentController::HandleEnable() {}
 
 void ContentController::HandleDisable() {}
 
-void ContentController::HandleAddBonusTime(chip::Optional<chip::CharSpan> PINCode, chip::Optional<uint32_t> bonusTime) {}
+void ContentController::HandleAddBonusTime(chip::Optional<chip::CharSpan> PINCode, uint32_t bonusTime) {}
 
 void ContentController::HandleSetScreenDailyTime(uint32_t screenDailyTime) {}
 

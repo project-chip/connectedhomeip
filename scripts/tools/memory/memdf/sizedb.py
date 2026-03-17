@@ -25,6 +25,8 @@ from typing import IO, Dict, Iterable, List, Optional, Union
 
 import memdf.util.sqlite
 
+log = logging.getLogger(__name__)
+
 ChangeInfo = collections.namedtuple('ChangeInfo', [
     'columns', 'rows', 'things', 'builds', 'stale_builds', 'artifacts',
     'stale_artifacts'
@@ -91,7 +93,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
         cd = {k: kwargs.get(k, 0) for k in ('pr', 'artifact', 'commented')}
         build = self.store_and_return_id('build', thing_id=thing, **bd, **cd)
         if build is None:
-            logging.error('Failed to store %s %s %s', thing, bd, cd)
+            log.error("Failed to store '%s' '%s' '%s'", thing, bd, cd)
         else:
             for d in kwargs['sizes']:
                 self.store('size', build_id=build, **d)
@@ -125,14 +127,14 @@ class SizeDatabase(memdf.util.sqlite.Database):
         origin = {'file': filename}
         path = Path(filename)
         if path.suffix == '.json':
-            logging.info('ASJ: reading JSON %s', path)
+            log.info("ASJ: reading JSON '%s'", path)
             with open(path, encoding='utf-8') as f:
                 self.add_sizes_from_json(f.read(), origin)
         elif path.suffix == '.zip':
-            logging.info('ASZ: reading ZIP %s', path)
+            log.info("ASZ: reading ZIP '%s'", path)
             self.add_sizes_from_zipfile(path, origin)
         else:
-            logging.warning('Unknown file type "%s" ignored', filename)
+            log.warning("Unknown file type '%s' ignored", filename)
 
     def select_thing_id(self, platform: str, config: str,
                         target: str) -> Optional[str]:

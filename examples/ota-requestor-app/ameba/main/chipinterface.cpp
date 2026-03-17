@@ -15,13 +15,12 @@
  *    limitations under the License.
  */
 
+#include <chip_porting.h>
 #include <platform_stdlib.h>
 
-#include "AmebaObserver.h"
-#include "CHIPDeviceManager.h"
-#include "DeviceCallbacks.h"
-#include "chip_porting.h"
-#include <DeviceInfoProviderImpl.h>
+#include <AmebaObserver.h>
+#include <CHIPDeviceManager.h>
+#include <DeviceCallbacks.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
@@ -30,6 +29,7 @@
 
 #include <lib/core/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/Ameba/DeviceInfoProviderImpl.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
@@ -53,6 +53,9 @@ using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
+static DeviceCallbacks EchoCallbacks;
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
 namespace { // Network Commissioning
 constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
@@ -70,20 +73,18 @@ void NetWorkCommissioningInstInit()
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 }
 
-static DeviceCallbacks EchoCallbacks;
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
     static AmebaObserver sAmebaObserver;
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.appDelegate       = &sAmebaObserver;
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     chip::Server::GetInstance().Init(initParams);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     NetWorkCommissioningInstInit();
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);

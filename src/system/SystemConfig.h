@@ -176,6 +176,19 @@
 #undef SUCCESS
 #endif
 #include <lwip/opt.h>
+
+// TODO: this is an awkward workaround for some platforms (AmebaD - platform_stdlib_rtl8721d)
+// defining false as 0, resulting in casting `inconsistent types/ bool and int` errors for
+// lambda argument deduction.
+//
+// Currently this happens as an inclusion of `lwip/opt.h`, so the undefine is added in this header
+#ifdef false
+#undef false
+#endif
+#ifdef true
+#undef true
+#endif
+
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /* Configuration option variables defined below */
@@ -517,6 +530,16 @@ struct LwIPEvent;
 #ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS
 #define CHIP_SYSTEM_CONFIG_NUM_TIMERS 32
 #endif /* CHIP_SYSTEM_CONFIG_NUM_TIMERS */
+
+/**
+ *  @def CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+ *
+ *  @brief
+ *      Defines whether (1) or not (0) to enable the use of Thread Local Storage (TLS).
+ */
+#ifndef CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+#define CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE 1
+#endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
 
 /**
  *  @def CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS

@@ -25,7 +25,9 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
+#include "thermostat-delegate-impl.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/thermostat-server/thermostat-server.h>
 
 /**********************************************************
  * Defines and Constants
@@ -180,4 +182,10 @@ int8_t TemperatureManager::GetHeatingSetPoint()
 int8_t TemperatureManager::GetCoolingSetPoint()
 {
     return mCoolingCelsiusSetPoint;
+}
+
+void emberAfThermostatClusterInitCallback(chip::EndpointId endpoint)
+{
+    auto & delegate = ThermostatDelegate::GetInstance();
+    SetDefaultDelegate(endpoint, &delegate);
 }

@@ -12,11 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 # This is the equivalent to app_config_dependent_sources.gni
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/ValveConfigurationAndControlCluster.cpp"
+    "${CLUSTER_DIR}/ValveConfigurationAndControlCluster.h"
     "${CLUSTER_DIR}/valve-configuration-and-control-delegate.h"
-    "${CLUSTER_DIR}/valve-configuration-and-control-server.cpp"
-    "${CLUSTER_DIR}/valve-configuration-and-control-server.h"
+    "${CLUSTER_DIR}/TimeSyncTracker.h"
 )

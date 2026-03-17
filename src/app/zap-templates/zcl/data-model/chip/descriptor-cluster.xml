@@ -28,14 +28,6 @@ Git: 0.7-summer-2025-596-gf0e61cb16
     <item fieldId="1" name="Revision" type="int16u" min="1"/>
   </struct>
 
-  <struct name="SemanticTagStruct">
-    <cluster code="0x001d"/>
-    <item fieldId="0" name="MfgCode" type="vendor_id" isNullable="true"/>
-    <item fieldId="1" name="NamespaceID" type="enum8"/>
-    <item fieldId="2" name="Tag" type="enum8"/>
-    <item fieldId="3" name="Label" type="char_string" isNullable="true" optional="true" length="64"/>
-  </struct>
-
   <cluster>
     <domain>General</domain>
     <name>Descriptor</name>

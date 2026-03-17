@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace Actions {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace ActionList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(ActionList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -33,10 +35,16 @@ namespace SetupURL {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SetupURL::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SetupURL
+constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+    ActionList::kMetadataEntry,
+    EndpointLists::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace InstantAction {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(InstantAction::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
@@ -87,6 +95,16 @@ inline constexpr DataModel::AcceptedCommandEntry
 } // namespace DisableActionWithDuration
 
 } // namespace Commands
+
+namespace Events {
+namespace StateChanged {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace StateChanged
+namespace ActionFailed {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ActionFailed
+
+} // namespace Events
 } // namespace Actions
 } // namespace Clusters
 } // namespace app

@@ -28,6 +28,10 @@ namespace CYW30739 {
 class EventManagementTestEventTriggerHandler : public app::GenericEventManagementTestEventTriggerHandler
 {
 public:
+    EventManagementTestEventTriggerHandler(app::Clusters::GeneralDiagnosticsCluster * generalDiagnosticsClusterInstance = nullptr) :
+        app::GenericEventManagementTestEventTriggerHandler(generalDiagnosticsClusterInstance)
+    {}
+
     static constexpr uint64_t kFillUpEventLoggingBuffer = 0xffff'ffff'1388'0000;
 
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;

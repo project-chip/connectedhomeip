@@ -54,7 +54,7 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     ReturnErrorOnFailure(writeResponse.Init(reader));
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    writeResponse.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED writeResponse.PrettyPrint();
 #endif
 
     err = writeResponse.GetWriteResponses(&attributeStatusesParser);
@@ -171,7 +171,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
         ReturnErrorOnFailure(FinalizeMessage(true));
     }
 
-    // Do not allow timed request with chunks.
+    // Per Matter specification: a Write Request that is part of a Timed Write Interaction SHALL NOT be chunked.
     VerifyOrReturnError(!(mTimedWriteTimeoutMs.HasValue() && !mChunks.IsNull()), CHIP_ERROR_NO_MEMORY);
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
@@ -201,7 +201,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
     mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
-    mWriteRequestBuilder.TimedRequest(mTimedWriteTimeoutMs.HasValue());
+    mWriteRequestBuilder.TimedRequest(mTimedRequestFieldValue);
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
     mWriteRequestBuilder.CreateWriteRequests();
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
@@ -247,7 +247,8 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
     return err;
 }
 
-CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data)
+CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data,
+                                               TestListEncodingOverride testListEncodingOverride)
 {
     ReturnErrorOnFailure(EnsureMessage());
 
@@ -269,7 +270,8 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         // list operation.
         // TODO (#38270): Generalize this behavior; send a non-empty ReplaceAll list for all clusters in a later Matter version and
         // enforce all clusters to support it in testing and in certification.
-        bool encodeEmptyListAsReplaceAll = !(path.mClusterId == Clusters::AccessControl::Id);
+        bool encodeEmptyListAsReplaceAll = (path.mClusterId != Clusters::AccessControl::Id) ||
+            (testListEncodingOverride == TestListEncodingOverride::kForceLegacyEncoding);
 
         if (encodeEmptyListAsReplaceAll)
         {
@@ -279,7 +281,7 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         {
 
             dataReader.Init(data);
-            dataReader.OpenContainer(valueReader);
+            TEMPORARY_RETURN_IGNORED dataReader.OpenContainer(valueReader);
             bool chunkingNeeded = false;
 
             // Encode as many list-items as possible into a single AttributeDataIB, which will be included in a single
@@ -300,7 +302,7 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
 
         // We will restart iterating on ValueReader, only appending the items we need to append.
         dataReader.Init(data);
-        dataReader.OpenContainer(valueReader);
+        TEMPORARY_RETURN_IGNORED dataReader.OpenContainer(valueReader);
 
         CHIP_ERROR err            = CHIP_NO_ERROR;
         uint16_t currentItemCount = 0;
@@ -613,7 +615,7 @@ exit:
 
     if (sendStatusResponse)
     {
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     }
 
     if (mState != State::AwaitingResponse)

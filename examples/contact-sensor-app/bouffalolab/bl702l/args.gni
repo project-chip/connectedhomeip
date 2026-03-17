@@ -21,9 +21,10 @@ bl_iot_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 chip_detail_logging = false
 is_debug = false
-chip_progress_logging = true
+chip_progress_logging = false
 chip_error_logging = true
 
 chip_enable_icd_server = true
 chip_enable_icd_lit = true
 chip_enable_icd_dsls = true
+chip_app_data_model_target = "//:bouffalolab_contact_sensor"
