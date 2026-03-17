@@ -27,8 +27,6 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --passcode 20202021 --secured-device-port 5542
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
