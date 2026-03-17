@@ -828,14 +828,41 @@ void ValidateAuxiliaryEntries(AccessControl & ac, FabricIndex fabric, const std:
             NodeId subject;
             if (entry.GetSubject(s, subject) == CHIP_NO_ERROR && IsGroupId(subject))
             {
-
-                for (size_t t = 0; t < targetCount; ++t)
+                GroupId groupId = GroupIdFromNodeId(subject);
+                if (targetCount > 0)
                 {
-                    Entry::Target target;
-                    if (entry.GetTarget(t, target) == CHIP_NO_ERROR)
+                    for (size_t t = 0; t < targetCount; ++t)
                     {
-                        actualSet.insert(
-                            { .fabricIndex = entryFabric, .groupId = GroupIdFromNodeId(subject), .endpointId = target.endpoint });
+                        Entry::Target target;
+                        if (entry.GetTarget(t, target) == CHIP_NO_ERROR)
+                        {
+                            actualSet.insert({ .fabricIndex = entryFabric, .groupId = groupId, .endpointId = target.endpoint });
+                        }
+                    }
+                }
+                else
+                {
+                    // Target can be unspecified, which represents a wildcard of all endpoints from
+                    // a root node's descriptor cluster part list being represented from 1 entry.
+                    // This can be verified in end-to-end tests, but for the purposes of unit tests
+                    // here checking against the group auxiliary delegate in access control, endpoint
+                    // information can be pulled from the group data provider.
+                    Credentials::GroupDataProvider * provider = Credentials::GetGroupDataProvider();
+                    if (provider)
+                    {
+                        auto * it = provider->IterateEndpoints(entryFabric, groupId);
+                        if (it)
+                        {
+                            Credentials::GroupDataProvider::GroupEndpoint endpoint;
+                            while (it->Next(endpoint))
+                            {
+                                if (endpoint.endpoint_id != kRootEndpointId)
+                                {
+                                    actualSet.insert({ .fabricIndex = entryFabric, .groupId = groupId, .endpointId = endpoint.endpoint_id });
+                                }
+                            }
+                            it->Release();
+                        }
                     }
                 }
             }
