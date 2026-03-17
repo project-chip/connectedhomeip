@@ -379,50 +379,47 @@ TEST_F(TestGroupKeyManagementCluster, TestKeySetWriteSameId)
     ASSERT_EQ(storedKeySet.epoch_keys[0].start_time, kStartTime + kStartTimeOffset);
 }
 
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+class MockGroupDataProvider : public Credentials::GroupDataProviderImpl
+{
+public:
+    MockGroupDataProvider() : GroupDataProviderImpl() {}
+    ~MockGroupDataProvider() override = default;
 
-// When all GroupKey iterator pool slots are exhausted, IterateGroupKeys returns nullptr.
-// WriteGroupKeyMap (AppendItem path) must detect this and return CHIP_ERROR_NO_MEMORY
-// rather than dereferencing a null pointer.
-// NOTE: this Test is only relevant for non-heap builds, where the pool size is fixed and can be exhausted. In heap-based builds,
-// IterateGroupKeys will not return nullptr due to exhaustion, so this test is not applicable.
+    // Always returns nullptr to simulate iterator pool exhaustion.
+    GroupKeyIterator * IterateGroupKeys(FabricIndex fabric_index) override { return nullptr; }
+};
+
+// When IterateGroupKeys returns nullptr, WriteGroupKeyMap (AppendItem path) must detect
+// this and return CHIP_ERROR_NO_MEMORY rather than dereferencing a null pointer.
 TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeIteratorExhausted)
 {
-    // Exhaust every slot in the GroupKeyIterator pool so that the next call to
-    // IterateGroupKeys returns nullptr.
-    std::vector<Credentials::GroupDataProvider::GroupKeyIterator *> heldIterators;
-    for (size_t i = 0; i < Credentials::GroupDataProviderImpl::kIteratorsMax; ++i)
-    {
-        auto * iter = mRealProvider.IterateGroupKeys(kTestFabricIndex);
-        ASSERT_NE(iter, nullptr);
-        heldIterators.push_back(iter);
-    }
+    MockGroupDataProvider mockGroupDataProvider;
 
-    // Sanity-check: pool is now full, the next allocation must return nullptr.
-    ASSERT_EQ(mRealProvider.IterateGroupKeys(kTestFabricIndex), nullptr);
+    auto * storage = &mTestContext.StorageDelegate();
+    mockGroupDataProvider.SetStorageDelegate(storage);
+    mockGroupDataProvider.SetSessionKeystore(&mMockKeystore);
+    ASSERT_EQ(mockGroupDataProvider.Init(), CHIP_NO_ERROR);
+    Credentials::SetGroupDataProvider(&mockGroupDataProvider);
 
-    // An AppendItem write triggers the IterateGroupKeys call inside WriteGroupKeyMap.
-    // With the pool exhausted the fixed code must return CHIP_ERROR_NO_MEMORY instead
-    // of crashing with a null-pointer dereference.
-    // ClearAllThenAppendItems: the ReplaceAll (clear) step does not call IterateGroupKeys,
-    // so it succeeds; the subsequent AppendItem step is where the nullptr check fires.
+    // Sanity check: Ensure the mock is working as intended and IterateGroupKeys returns nullptr.
+    ASSERT_EQ(mockGroupDataProvider.IterateGroupKeys(kTestFabricIndex), nullptr);
+
+    // An AppendItem write triggers the IterateGroupKeys call inside WriteGroupKeyMap. Thus, we use ClearAllThenAppendItems and we
+    // do not test ReplaceAll since it does not call IterateGroupKeys.
+    // With the mock returning nullptr (to simulate ObjectPool exhaustion), the code must return CHIP_ERROR_NO_MEMORY instead of
+    // crashing with a null-pointer dereference.
     auto keys        = TestHelpers::CreateGroupKeyMapList(1, kTestFabricIndex);
     auto listToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
-    CHIP_ERROR err = tester
+    GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mockGroupDataProvider } };
+    ClusterTester tester2{ mockCluster };
+
+    CHIP_ERROR err = tester2
                          .WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite,
                                          ListWritingPattern::ClearAllThenAppendItems)
                          .GetUnderlyingError();
 
     EXPECT_EQ(err, CHIP_ERROR_NO_MEMORY);
-
-    // Release all held iterators to avoid leaking resources.
-    for (auto * iter : heldIterators)
-    {
-        iter->Release();
-    }
 }
-
-#endif // !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 } // namespace
