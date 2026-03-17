@@ -787,7 +787,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
                 auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
-                VerifyOrReturnError(nullptr != iterator, Status::Failure);
+                VerifyOrReturnError(nullptr != iterator, Status::ResourceExhausted);
 
                 while (iterator->Next(subscriptionInfo))
                 {
@@ -2225,7 +2225,8 @@ bool InteractionModelEngine::HasSubscriptionsToResume()
     // Look through persisted subscriptions and see if any aren't already in mReadHandlers pool
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
     auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
-    VerifyOrReturnValue(iterator != nullptr, false);
+    // Conservatively assume there may be subscriptions to resume if we cannot get an iterator.
+    VerifyOrReturnValue(iterator != nullptr, true);
     bool foundSubscriptionToResume = false;
     while (iterator->Next(subscriptionInfo))
     {

@@ -845,7 +845,7 @@ public:
 };
 
 // Test verifies that ResumeSubscriptions handles a nullptr iterator gracefully by returning CHIP_ERROR_NO_MEMORY and not crashing
-TEST_F(TestInteractionModelEngine, TestResumeSubscriptions_HandlesNullIterators)
+TEST_F(TestInteractionModelEngine, TestResumeSubscriptionsHandlesNullIterators)
 {
     InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
 
@@ -859,8 +859,10 @@ TEST_F(TestInteractionModelEngine, TestResumeSubscriptions_HandlesNullIterators)
     EXPECT_EQ(engine->ResumeSubscriptions(), CHIP_ERROR_NO_MEMORY);
 }
 
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+
 // Test verifies that HasSubscriptionsToResume handles a nullptr iterator gracefully by returning false and not crashing.
-TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestHasSubscriptionsToResume_HandlesNullIterator)
+TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestHasSubscriptionsToResumeHandlesNullIterator)
 {
     InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
 
@@ -873,6 +875,7 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestHasSubscriptionsToResume_Han
 
     EXPECT_FALSE(engine->HasSubscriptionsToResume());
 }
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
