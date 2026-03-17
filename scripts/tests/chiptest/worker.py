@@ -23,7 +23,7 @@ from chiptest.work_queue import CancellableQueue, EndOfQueue, QueueCancelled
 log = logging.getLogger(__name__)
 
 
-WorkQueueT: TypeAlias = CancellableQueue[Callable[[], TestResult]]
+TaskQueueT: TypeAlias = CancellableQueue[Callable[[], TestResult]]
 
 
 class WorkerThread(threading.Thread):
@@ -31,10 +31,10 @@ class WorkerThread(threading.Thread):
 
     THREAD_TERMINATE_TIMEOUT_S: ClassVar[float] = 5.0
 
-    def __init__(self, work_queue: WorkQueueT, result_queue: ResultQueueT) -> None:
+    def __init__(self, task_queue: TaskQueueT, result_queue: ResultQueueT) -> None:
         super().__init__(name="Worker")
 
-        self._work_queue = work_queue
+        self._task_queue = task_queue
         self._result_queue = result_queue
         self.exception: BaseException | None = None
 
@@ -42,7 +42,7 @@ class WorkerThread(threading.Thread):
         log.debug("Starting worker thread")
         try:
             while True:
-                work_func = self._work_queue.get()
+                work_func = self._task_queue.get()
                 self._result_queue.put(result := work_func())
 
                 # Ensure to propagate KeyboardInterrupt if it's raised during execution, to prevent next test from running.
@@ -57,14 +57,12 @@ class WorkerThread(threading.Thread):
             self.exception = e
 
     def terminate(self) -> None:
-        # If the thread was never started, there is nothing to join.
-        if self.ident is None:
-            return
+        # Immediately cancel the work queue to unblock the thread if it's waiting for work, and prevent putting new work to the
+        # queue. It's effectively a no-op if the queue is already closed or cancelled.
+        self._task_queue.cancel()
 
-        # Cancel the work queue to unblock the thread if it's waiting for work, and prevent putting new work to the queue.
-        self._work_queue.cancel()
-
-        # Wait for the thread to finish.
-        self.join(self.THREAD_TERMINATE_TIMEOUT_S)
-        if self.is_alive():
-            log.warning("Worker thread is still alive, it might be stuck on processing work items")
+        # Wait for the thread to finish if it had been started.
+        if self.ident is not None:
+            self.join(self.THREAD_TERMINATE_TIMEOUT_S)
+            if self.is_alive():
+                log.warning("Worker thread is still alive, it might be stuck on processing work items")

@@ -20,7 +20,6 @@ import datetime
 import enum
 import json
 import logging
-import queue
 import threading
 import time
 from collections.abc import Callable, Iterable
@@ -29,7 +28,7 @@ from pathlib import Path
 from typing import Any, ClassVar, TypeAlias
 
 from chiptest.log_config import LogConfig
-from chiptest.work_queue import EndOfQueue
+from chiptest.work_queue import CancellableQueue, EndOfQueue
 
 log = logging.getLogger(__name__)
 
@@ -364,7 +363,7 @@ class ResultError(Exception):
     """Exception raised when processing results."""
 
 
-ResultQueueT: TypeAlias = queue.Queue[TestResult | EndOfQueue]
+ResultQueueT: TypeAlias = CancellableQueue[TestResult]
 
 
 @dataclass(eq=False)
@@ -423,19 +422,15 @@ class ResultProcessingThread(threading.Thread):
 
     def terminate(self) -> None:
         """Terminate the result processing thread."""
+        # Close the result queue to finalize result processing and allow the thread to finish.
+        self.result_queue.close()
 
-        # If the thread was never started, there is nothing to join.
-        if self.ident is None:
-            return
-
-        # Put an end of queue sentinel to finalize result processing and allow the thread to finish.
-        self.result_queue.put(EndOfQueue())
-
-        # Wait for the thread to finish processing results.
-        self.join(self.THREAD_TERMINATE_TIMEOUT_S)
-        if self.is_alive():
-            log.warning("Result processing thread is still alive, it might be stuck on processing results. "
-                        "Result summary and report might be incomplete or corrupted")
+        # Wait for the thread to finish processing results if it had been started.
+        if self.ident is not None:
+            self.join(self.THREAD_TERMINATE_TIMEOUT_S)
+            if self.is_alive():
+                log.warning("Result processing thread is still alive, it might be stuck on processing results. "
+                            "Result summary and report might be incomplete or corrupted")
 
         self._summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
         if self.summary_file is not None:

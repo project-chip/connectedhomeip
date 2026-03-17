@@ -18,7 +18,6 @@ import enum
 import functools
 import logging
 import os
-import queue
 import random
 import sys
 import time
@@ -36,7 +35,7 @@ from chiptest.results import ResultError, ResultProcessingThread, ResultQueueT, 
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chiptest.work_queue import CancellableQueue
-from chiptest.worker import WorkerThread, WorkQueueT
+from chiptest.worker import TaskQueueT, WorkerThread
 from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
@@ -521,8 +520,8 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     thread_ba_host = None
     thread_ba_port = None
     to_terminate: list[Terminable] = []
-    result_queue: ResultQueueT = queue.Queue()
-    work_queue: WorkQueueT = CancellableQueue()
+    task_queue: TaskQueueT = CancellableQueue()
+    result_queue: ResultQueueT = CancellableQueue()
 
     try:
         # Initialize result thread first so that it's closed last.
@@ -570,7 +569,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         apps_register.init()
 
         # Initialize the worker thread last, to ensure it's terminated first.
-        to_terminate.append(worker_thread := WorkerThread(work_queue, result_queue))
+        to_terminate.append(worker_thread := WorkerThread(task_queue, result_queue))
 
         # Schedule all tests.
         log.info("Each test will be executed %d times", iterations)
@@ -578,7 +577,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
             log.info("Scheduling iteration %d", i)
             for test in context.obj.tests:
                 log.debug("Enqueuing test %s", test.name)
-                work_queue.put(functools.partial(TestResult.run_test, test.name, i, dry_run, context.obj.log_config,
+                task_queue.put(functools.partial(TestResult.run_test, test.name, i, dry_run, context.obj.log_config,
                                                  functools.partial(test.Run, runner, apps_register, subproc_info_repo, pics_file,
                                                                    test_timeout_seconds, dry_run,
                                                                    test_runtime=context.obj.runtime,
@@ -588,9 +587,9 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                                                                    thread_ba_host=thread_ba_host,
                                                                    thread_ba_port=thread_ba_port)))
 
-            # If this is the last iteration schedule finalization event.
+            # If this is the last iteration schedule finalization event by closing the task queue.
             if i == iterations:
-                work_queue.close()
+                task_queue.close()
 
         log.info("All jobs scheduled")
 
@@ -604,7 +603,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
             if (exception := result_thread.exception or worker_thread.exception) is not None:
                 raise exception
 
-            # If the worker thread has finished processing all tasks, break the loop.
+            # If the worker thread has finished processing all tasks, finalize the execution.
             if not worker_thread.is_alive():
                 break
 
