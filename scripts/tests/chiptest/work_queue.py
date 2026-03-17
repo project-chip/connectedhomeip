@@ -111,7 +111,7 @@ class CancellableQueue(Generic[QueueElementT]):
             self._cond.notify_all()
 
     def close(self) -> None:
-        """Put an EndOfQueue sentinel to the queue to indicate no more work."""
+        """Set end-of-queue event and notify all consumers."""
         with self._cond:
             if self._end_of_queue.is_set():
                 return
