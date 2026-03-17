@@ -622,12 +622,15 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         log.error("Caught exception during test execution: %s", e, exc_info=True)
         raise
     finally:
+        cleanup_errors: list[Exception] = []
         for item in reversed(to_terminate):
             try:
                 log.info("Cleaning up %s", item.__class__.__name__)
                 item.terminate()
             except Exception as e:
-                log.warning("Encountered exception during cleanup: %r", e)
+                cleanup_errors.append(e)
+        if cleanup_errors:
+            raise ExceptionGroup("Encountered exceptions during cleanup", cleanup_errors)
 
 
 @main.command(
