@@ -3013,7 +3013,7 @@ endpoint 8 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster CarbonMonoxideConcentrationMeasurement {

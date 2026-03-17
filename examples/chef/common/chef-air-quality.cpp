@@ -19,26 +19,14 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
-#include <map>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
 #ifdef MATTER_DM_PLUGIN_AIR_QUALITY_SERVER
-#include <app/clusters/air-quality-server/air-quality-server.h>
+#include <app/clusters/air-quality-server/CodegenIntegration.h>
 using namespace chip::app::Clusters::AirQuality;
-
-static chip::BitMask<Feature, uint32_t> airQualityFeatures(Feature::kFair, Feature::kModerate, Feature::kVeryPoor,
-                                                           Feature::kExtremelyPoor);
-static std::map<int, Instance *> gAirQualityClusterInstance{};
-
-void emberAfAirQualityClusterInitCallback(chip::EndpointId endpointId)
-{
-    Instance * clusterInstance = new Instance(endpointId, airQualityFeatures);
-    TEMPORARY_RETURN_IGNORED clusterInstance->Init();
-    gAirQualityClusterInstance[endpointId] = clusterInstance;
-}
 
 Protocols::InteractionModel::Status chefAirQualityWriteCallback(EndpointId endpoint, ClusterId clusterId,
                                                                 const EmberAfAttributeMetadata * attributeMetadata,
@@ -46,14 +34,14 @@ Protocols::InteractionModel::Status chefAirQualityWriteCallback(EndpointId endpo
 {
     Protocols::InteractionModel::Status ret = Protocols::InteractionModel::Status::Success;
 
-    if (gAirQualityClusterInstance.find(endpoint) == gAirQualityClusterInstance.end())
+    AirQualityCluster * clusterInstance = FindClusterOnEndpoint(endpoint);
+    if (clusterInstance == nullptr)
     {
         ChipLogError(DeviceLayer, "Invalid Endpoind ID: %d", endpoint);
         return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
 
-    Instance * clusterInstance = gAirQualityClusterInstance[endpoint];
-    AttributeId attributeId    = attributeMetadata->attributeId;
+    AttributeId attributeId = attributeMetadata->attributeId;
 
     switch (attributeId)
     {

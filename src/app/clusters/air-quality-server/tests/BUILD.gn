@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,11 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# This is the equivalent to app_config_dependent_sources.gni
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/CodegenIntegration.h"
-    "${CLUSTER_DIR}/CodegenIntegration.cpp"
-    "${CLUSTER_DIR}/air-quality-server.h"
-)
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libTestAirQualityCluster"
+
+  test_sources = [ "TestAirQualityCluster.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/air-quality-server",
+    "${chip_root}/src/app/server-cluster/testing:testing",
+    "${chip_root}/src/lib/support",
+  ]
+}
