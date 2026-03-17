@@ -47,8 +47,8 @@ import logging
 import os
 
 from mobly import asserts
-from support_modules.icd_support import (MAX_CI_IDLE_CYCLE_WAIT_S, ICDBaseTest, ICDTestEventTriggerOperations, uat_bit_name,
-                                         uat_set_hints)
+from support_modules.icd_support import (MAX_CI_IDLE_CYCLE_WAIT_S, ICDBaseTest, ICDTransition, ICDTestEventTriggerOperations,
+                                         uat_bit_name, uat_set_hints)
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError
@@ -95,21 +95,13 @@ class TC_ICDB_1_2(ICDBaseTest):
             TestStep(3, "TH sends RegisterClient command with parameters: CheckInNodeID: <th_node_id>, MonitoredSubject: <th_node_id>, and Key: <any_16_byte_octstr>.", """
                      DUT ActiveModeDuration timer is reset.
                      DUT responds with an ICDCounter value, store the value as icd_counter_at_registration."""),
-            TestStep(4, "Wait for ActiveModeDuration plus a 1-second buffer.",
-                     "DUT transitions from Active Mode to Idle Mode."),
-            TestStep(5, "Use UAT hint/instructions to transition DUT from Idle Mode to Active Mode.", """
-                     For each UAT hint performed, after the DUT transitions from Idle Mode to Active Mode and sends a check-in message back:
+            TestStep(4, "Wait for DUT to transition to Idle Mode, then use UAT hint/instructions to transition DUT from Idle Mode to Active Mode.", """
+                     For each UAT hint performed, after the DUT transitions from Idle Mode to Active Mode and sends a check-in message:
                      Verify the ICDCounter value increased.
                      Verify the ActiveModeThreshold value is unchanged."""),
-            TestStep(6, "TH reads from the DUT the RegisteredClients attribute.",
+            TestStep(5, "TH reads from the DUT the RegisteredClients attribute.",
                      "If clients are registered, unregister them."),
         ]
-
-    async def _read_icdm_attribute_expect_success(self, attribute):
-        return await self.read_single_attribute_check_success(endpoint=self.ROOT_NODE_ENDPOINT_ID, cluster=cluster, attribute=attribute)
-
-    async def _send_single_icdm_command(self, command):
-        return await self.send_single_cmd(command, endpoint=self.ROOT_NODE_ENDPOINT_ID)
 
     def pics_TC_ICDB_1_2(self) -> list[str]:
         return [
@@ -134,10 +126,10 @@ class TC_ICDB_1_2(ICDBaseTest):
         # TH reads from the DUT the ActiveModeDuration, ActiveModeThreshold,
         # UserActiveModeTriggerHint, and UserActiveModeTriggerInstruction attributes
         self.step(2)
-        active_mode_duration_ms = await self._read_icdm_attribute_expect_success(attributes.ActiveModeDuration)
-        active_mode_threshold_ms = await self._read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
-        user_active_mode_trigger_hint = await self._read_icdm_attribute_expect_success(attributes.UserActiveModeTriggerHint)
-        user_active_mode_trigger_instruction = await self._read_icdm_attribute_expect_success(attributes.UserActiveModeTriggerInstruction)
+        active_mode_duration_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeDuration)
+        active_mode_threshold_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
+        user_active_mode_trigger_hint = await self.read_icdm_attribute_expect_success(attributes.UserActiveModeTriggerHint)
+        user_active_mode_trigger_instruction = await self.read_icdm_attribute_expect_success(attributes.UserActiveModeTriggerInstruction)
         log.info(f"ActiveModeDuration: {active_mode_duration_ms}ms")
         log.info(f"ActiveModeThreshold: {active_mode_threshold_ms}ms")
         log.info(f"UserActiveModeTriggerHint: 0x{user_active_mode_trigger_hint:08X}")
@@ -153,7 +145,7 @@ class TC_ICDB_1_2(ICDBaseTest):
                 monitoredSubject=self.default_controller.nodeId,
                 key=bytes.fromhex(os.urandom(16).hex()),
                 clientType=clientTypeEnum.kPermanent)
-            response = await self._send_single_icdm_command(cmd)
+            response = await self.send_single_icdm_command(cmd)
         except InteractionModelError as e:
             asserts.assert_fail(f"Unexpected error returned when registering client: {e}, command: {cmd}")
 
@@ -161,15 +153,10 @@ class TC_ICDB_1_2(ICDBaseTest):
         log.info(f"RegisterClient response ICDCounter: {icd_counter_at_registration}")
 
         # *** STEP 4 ***
-        # Wait for ActiveModeDuration plus a 1-second buffer so DUT transitions from Active Mode to Idle Mode
+        # Wait for DUT to transition to Idle Mode, then use UAT hint/instructions to transition DUT from Idle Mode to Active Mode.
         self.step(4)
-        wait_time_for_idle_s = (active_mode_duration_ms / 1000.0) + 1.0
-        log.info(f"Waiting {wait_time_for_idle_s}s for DUT to transition to Idle Mode...")
-        await asyncio.sleep(wait_time_for_idle_s)
+        await self.wait_for_transition(ICDTransition.ActiveToIdle, active_mode_duration_ms=active_mode_duration_ms)
 
-        # *** STEP 5 ***
-        # Use UAT hint/instructions to transition DUT from Idle Mode to Active Mode.
-        self.step(5)
         is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
         # For CI, we use a generic trigger regardless of hint bit, so
@@ -190,8 +177,7 @@ class TC_ICDB_1_2(ICDBaseTest):
             # because it’s already in Idle Mode from the previous step. For hints after the first,
             # wait for the DUT to transition back to Idle Mode.
             if i > 1:
-                log.info(f"Waiting {wait_time_for_idle_s}s for DUT to transition to Idle Mode...")
-                await asyncio.sleep(wait_time_for_idle_s)
+                await self.wait_for_transition(ICDTransition.ActiveToIdle, active_mode_duration_ms=active_mode_duration_ms)
 
             # Transition DUT from Idle Mode to Active Mode
             if is_ci:
@@ -214,13 +200,13 @@ class TC_ICDB_1_2(ICDBaseTest):
                     f" > ")  # looks good in the logs, I promise
 
             # Verify the ICDCounter value increased
-            current_icd_counter = await self._read_icdm_attribute_expect_success(attributes.ICDCounter)
+            current_icd_counter = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
             log.info(f"ICDCounter after '{bit_name}': {current_icd_counter} (was {previous_icd_counter})")
             asserts.assert_greater(current_icd_counter, previous_icd_counter,
                                    f"ICDCounter should have incremented after '{bit_name}'. Previous: {previous_icd_counter}, Current: {current_icd_counter}")
 
             # Verify the ActiveModeThreshold value is unchanged
-            current_active_mode_threshold_ms = await self._read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
+            current_active_mode_threshold_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
             log.info(
                 f"ActiveModeThreshold after '{bit_name}': {current_active_mode_threshold_ms}ms (expected {active_mode_threshold_ms}ms)")
             asserts.assert_equal(current_active_mode_threshold_ms, active_mode_threshold_ms,
@@ -228,10 +214,10 @@ class TC_ICDB_1_2(ICDBaseTest):
 
             previous_icd_counter = current_icd_counter
 
-        # *** STEP 6 ***
+        # *** STEP 5 ***
         # TH reads from the DUT the RegisteredClients attribute
         # If clients are registered, unregister them
-        self.step(6)
+        self.step(5)
         await self.unregister_all_clients()
 
 

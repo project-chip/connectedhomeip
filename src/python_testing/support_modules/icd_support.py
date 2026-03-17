@@ -18,6 +18,7 @@
 Support module for ICD test modules containing shared functionality.
 """
 
+import asyncio
 import logging
 import re
 from enum import IntEnum
@@ -85,7 +86,7 @@ kUatColorInstructionBitMask = (
 
 
 def uat_bit_name(bit):
-    """Derive a readable name from the SDK enum, e.g. 'kResetButtonLightsBlink' → 'Reset Button Lights Blink'."""
+    """Derive a readable name from the SDK enum, e.g. 'kResetButtonLightsBlink' -> 'Reset Button Lights Blink'."""
     return re.sub(r'([a-z])([A-Z])', r'\1 \2', bit.name.removeprefix('k'))
 
 
@@ -98,6 +99,18 @@ def uat_set_hints(hint_bitmap):
     return hints
 
 # ============================================================================
+# ICDTransition - ICD state transition types for wait helpers
+# ============================================================================
+
+
+class ICDTransition(IntEnum):
+    """ICD state transition types used by compute_wait_time and wait_for_transition."""
+    ActiveToIdle = 1  # DUT transitions from Active to Idle (one ActiveModeDuration + 1s buffer)
+    IdleToActive = 2  # DUT completes one full Idle cycle and transitions to Active (one IdleModeDuration + 1s buffer)
+    FullCycle = 3     # ActiveToIdle followed by IdleToActive
+
+
+# ============================================================================
 # ICDBaseTest - Main Base Class
 # ============================================================================
 
@@ -107,9 +120,73 @@ class ICDBaseTest(MatterBaseTest):
 
     ROOT_NODE_ENDPOINT_ID = 0
 
+    async def read_icdm_attribute_expect_success(self, attribute, controller=None, node_id=None):
+        return await self.read_single_attribute_check_success(
+            endpoint=self.ROOT_NODE_ENDPOINT_ID,
+            cluster=cluster,
+            attribute=attribute,
+            dev_ctrl=controller,
+            node_id=node_id)
+
+    async def send_single_icdm_command(self, command, controller=None, node_id=None):
+        return await self.send_single_cmd(
+            command,
+            endpoint=self.ROOT_NODE_ENDPOINT_ID,
+            dev_ctrl=controller,
+            node_id=node_id)
+
+    def compute_wait_time(self, transition: ICDTransition, *,
+                          active_mode_duration_ms: int = None,
+                          idle_mode_duration_s: int = None) -> float:
+        """Return the number of seconds to wait for the given ICD state transition.
+
+        ActiveToIdle: Requires active_mode_duration_ms; idle_mode_duration_s must not be provided.
+        IdleToActive: Requires idle_mode_duration_s; active_mode_duration_ms must not be provided.
+        FullCycle: Requires both.
+        """
+        if transition == ICDTransition.ActiveToIdle:
+            if active_mode_duration_ms is None:
+                raise ValueError("ActiveToIdle requires active_mode_duration_ms")
+            if idle_mode_duration_s is not None:
+                raise ValueError("ActiveToIdle does not use idle_mode_duration_s")
+            wait_s = (active_mode_duration_ms / 1000.0) + 1.0
+            log.info(f"ActiveToIdle: active_mode_duration_ms={active_mode_duration_ms} -> Wait time: {wait_s}s")
+            return wait_s
+
+        if transition == ICDTransition.IdleToActive:
+            if idle_mode_duration_s is None:
+                raise ValueError("IdleToActive requires idle_mode_duration_s")
+            if active_mode_duration_ms is not None:
+                raise ValueError("IdleToActive does not use active_mode_duration_ms")
+            wait_s = idle_mode_duration_s + 1.0
+            log.info(f"IdleToActive: idle_mode_duration_s={idle_mode_duration_s} -> Wait time: {wait_s}s")
+            return wait_s
+
+        if transition == ICDTransition.FullCycle:
+            if active_mode_duration_ms is None:
+                raise ValueError("FullCycle requires active_mode_duration_ms")
+            if idle_mode_duration_s is None:
+                raise ValueError("FullCycle requires idle_mode_duration_s")
+            wait_s = (active_mode_duration_ms / 1000.0) + 1.0 + idle_mode_duration_s + 1.0
+            log.info(
+                f"FullCycle: active_mode_duration_ms={active_mode_duration_ms}, idle_mode_duration_s={idle_mode_duration_s} -> Wait time: {wait_s}s")
+            return wait_s
+
+        raise ValueError(f"Unknown ICDTransition: {transition}")
+
+    async def wait_for_transition(self, transition: ICDTransition, *,
+                                  active_mode_duration_ms: int = None,
+                                  idle_mode_duration_s: int = None) -> None:
+        """Sleep for the duration needed for the given ICD state transition."""
+        wait_s = self.compute_wait_time(transition,
+                                        active_mode_duration_ms=active_mode_duration_ms,
+                                        idle_mode_duration_s=idle_mode_duration_s)
+        log.info(f"Waiting {wait_s}s for {transition.name}...")
+        await asyncio.sleep(wait_s)
+
     async def unregister_all_clients(self):
         """Unregisters all entries in the DUT's RegisteredClients attribute."""
-        registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
+        registeredClients = await self.read_icdm_attribute_expect_success(attributes.RegisteredClients)
 
         if not registeredClients:
             log.info("RegisteredClients is empty.")
@@ -119,6 +196,6 @@ class ICDBaseTest(MatterBaseTest):
         for client in registeredClients:
             try:
                 log.info(f"Unregistering client: {client}...")
-                await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
+                await self.send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
             except InteractionModelError as e:
                 asserts.assert_fail(f"Unexpected error returned when unregistering client: {e}")
