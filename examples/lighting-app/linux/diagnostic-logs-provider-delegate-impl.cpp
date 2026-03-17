@@ -140,6 +140,11 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
 
     outHandle                 = mLogSessionHandle;
     mFiles[mLogSessionHandle] = fp;
+
+    // This implementation does not provide timestamps; ensure out-params are cleared
+    outTimeStamp.ClearValue();
+    outTimeSinceBoot.ClearValue();
+
     return CHIP_NO_ERROR;
 }
 
