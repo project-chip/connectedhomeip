@@ -264,8 +264,6 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
     if (arg != nullptr)
     {
         sl_wifi_ssid_t * requestedSsidPtr = static_cast<sl_wifi_ssid_t *>(arg);
-        VerifyOrReturnError((std::is_same_v<decltype(requestedSsidPtr), sl_wifi_ssid_t *>), SL_STATUS_INVALID_HANDLE,
-                            ChipLogDetail(DeviceLayer, "Expected sl_wifi_ssid_t *"));
         requestedSsidSpan = chip::ByteSpan(requestedSsidPtr->value, requestedSsidPtr->length);
     }
 
