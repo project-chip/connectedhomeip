@@ -83,7 +83,7 @@ LogProvider::~LogProvider()
 {
     for (auto f : mFiles)
     {
-        errno  = 0;
+        errno   = 0;
         auto rv = fclose(f.second);
         if (rv != 0)
         {
