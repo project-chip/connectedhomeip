@@ -55,10 +55,9 @@ def find_program(names):
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Set the verbosity of script output.')
 @click.option(
-    '--no-log-timestamps',
-    default=False,
-    is_flag=True,
-    help='Skip timestamps in log output.')
+    '--log-timestamps/--no-log-timestamps',
+    default=True,
+    help='Show timestamps in log output')
 @click.option(
     '--compile-commands-glob',
     show_default=True,
@@ -82,11 +81,9 @@ def find_program(names):
     nargs=-1,
     type=click.Path(exists=True))
 def main(compile_commands_glob, source, mapping_file_dir,
-         iwyu_args, clang_args, log_level, no_log_timestamps):
+         iwyu_args, clang_args, log_level, log_timestamps):
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
-    if no_log_timestamps:
-        log_fmt = '%(levelname)-7s %(message)s'
+    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     # checking if a program IWYU exists
