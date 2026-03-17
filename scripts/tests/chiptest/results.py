@@ -370,40 +370,38 @@ ResultQueueT: TypeAlias = CancellableQueue[TestResult]
 class ResultProcessingThread(threading.Thread):
     """Thread that processes test results from the result queue, keeps track of test run summary and prints it at the end."""
 
-    result_queue: ResultQueueT
     iterations: int
     tests_per_iteration: int
     expected_failures: int
     keep_going: bool
     summary_file: Path | None
 
-    exception: Exception | None = field(default=None, init=False)
-    """Any exception raised during result processing, which can be re-raised in the main thread after joining"""
-
     THREAD_TERMINATE_TIMEOUT_S: ClassVar[float] = 5.0
 
     def __post_init__(self) -> None:
         super().__init__(name="Results")
 
-        self._lock = threading.Lock()
+        self._summary_lock = threading.Lock()
         self._summary = RunSummary(self.iterations)
 
-    def run(self) -> None:
-        log.debug("Starting result processing thread")
-        try:
-            while True:
-                # Check for end of queue sentinel.
-                if isinstance(result := self.result_queue.get(), EndOfQueue):
-                    log.debug("No more results to process, finishing result processing thread")
-                    return
+        self.result_queue: ResultQueueT = CancellableQueue()
+        self.exception: BaseException | None = None
 
-                self._process_result(result)
-        except Exception as e:
+    def run(self) -> None:
+        try:
+            log.debug("Starting result processing thread")
+            while True:
+                self._process_result(self.result_queue.get())
+        except EndOfQueue:
+            log.debug("No more results to process, finishing result processing thread")
+        except BaseException as e:
             self.exception = e
+        finally:
+            log.debug("Result processing thread finished")
 
     def _process_result(self, result: TestResult) -> None:
         iteration = result.iteration
-        with self._lock:
+        with self._summary_lock:
             self._summary.record(result)
 
             # Check for keep going on failure.
@@ -411,7 +409,7 @@ class ResultProcessingThread(threading.Thread):
                 raise ResultError("Task failed and --keep-going flag is not set.")
 
             # Check if all results for the iteration are in.
-            if len(self._summary.exceptions[iteration]) != self.tests_per_iteration:
+            if len(self._summary.exceptions[iteration]) < self.tests_per_iteration:
                 return
 
             log.debug("All results for iteration %i are in, checking failure count", iteration)
@@ -422,16 +420,25 @@ class ResultProcessingThread(threading.Thread):
 
     def terminate(self) -> None:
         """Terminate the result processing thread."""
-        # Close the result queue to finalize result processing and allow the thread to finish.
-        self.result_queue.close()
+        try:
+            # Close the result queue to unblock the thread if it's waiting for results.
+            self.result_queue.close()
 
-        # Wait for the thread to finish processing results if it had been started.
-        if self.ident is not None:
-            self.join(self.THREAD_TERMINATE_TIMEOUT_S)
-            if self.is_alive():
-                log.warning("Result processing thread is still alive, it might be stuck on processing results. "
-                            "Result summary and report might be incomplete or corrupted")
+            if self.ident is not None:
+                self.join(self.THREAD_TERMINATE_TIMEOUT_S)
+                if self.is_alive():
+                    raise RuntimeError("Result processing thread is still alive, it might be stuck on processing results")
+        except Exception as e:
+            # Try to forcefully cancel the result queue to unblock the thread.
+            self.result_queue.cancel()
 
-        self._summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
-        if self.summary_file is not None:
-            self._summary.write_json(self.summary_file)
+            # Wait for the thread to finish processing results if it had been started.
+            if self.ident is not None:
+                self.join(self.THREAD_TERMINATE_TIMEOUT_S)
+                if self.is_alive():
+                    raise RuntimeError(
+                        "Failed to terminate result processing thread. Result summary may be incomplete or corrupted") from e
+        finally:
+            self._summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
+            if self.summary_file is not None:
+                self._summary.write_json(self.summary_file)

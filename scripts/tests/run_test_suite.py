@@ -31,7 +31,7 @@ import click
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_config import LOG_LEVELS, LogConfig
-from chiptest.results import ResultError, ResultProcessingThread, ResultQueueT, RunSummary, TestResult
+from chiptest.results import ResultError, ResultProcessingThread, RunSummary, TestResult
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chiptest.work_queue import CancellableQueue
@@ -521,12 +521,11 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     thread_ba_port = None
     to_terminate: list[Terminable] = []
     task_queue: TaskQueueT = CancellableQueue()
-    result_queue: ResultQueueT = CancellableQueue()
 
     try:
         # Initialize result thread first so that it's closed last.
-        to_terminate.append(result_thread := ResultProcessingThread(
-            result_queue, iterations, len(context.obj.tests), expected_failures, keep_going, summary_file))
+        to_terminate.append(result_thread := ResultProcessingThread(iterations, len(context.obj.tests), expected_failures,
+                                                                    keep_going, summary_file))
 
         if sys.platform == 'linux':
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
@@ -569,7 +568,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         apps_register.init()
 
         # Initialize the worker thread last, to ensure it's terminated first.
-        to_terminate.append(worker_thread := WorkerThread(task_queue, result_queue))
+        to_terminate.append(worker_thread := WorkerThread(task_queue, result_thread.result_queue))
 
         # Schedule all tests.
         log.info("Each test will be executed %d times", iterations)
@@ -603,8 +602,12 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
             if (exception := result_thread.exception or worker_thread.exception) is not None:
                 raise exception
 
-            # If the worker thread has finished processing all tasks, finalize the execution.
+            # If the worker thread has finished processing all tasks, finalize the result processing.
             if not worker_thread.is_alive():
+                result_thread.result_queue.close()
+
+            # Wait for the result thread to finish after closing the result queue to capture any exceptions.
+            if not result_thread.is_alive():
                 break
 
             time.sleep(0.5)

@@ -13,12 +13,10 @@
 # limitations under the License.
 
 import contextlib
-import logging
 import queue
 import threading
 from typing import Generic, TypeVar
 
-log = logging.getLogger(__name__)
 
 class QueueCancelled(Exception):
     """Raised by CancellableQueue when cancellation is observed."""
@@ -107,26 +105,16 @@ class CancellableQueue(Generic[QueueElementT]):
         """Set cancel event and notify all consumers."""
         with self._cond:
             if self._cancel_event.is_set():
-                log.warning("cancel() called on WorkQueue that is already cancelled")
                 return
 
             self._cancel_event.set()
             self._cond.notify_all()
 
-    def cancelled(self) -> bool:
-        """Check if the queue is cancelled."""
-        return self._cancel_event.is_set()
-
     def close(self) -> None:
         """Put an EndOfQueue sentinel to the queue to indicate no more work."""
         with self._cond:
             if self._end_of_queue.is_set():
-                log.warning("close() called on WorkQueue that is already closed")
                 return
 
             self._end_of_queue.set()
             self._cond.notify_all()
-
-    def closed(self) -> bool:
-        """Check if the queue is closed."""
-        return self._end_of_queue.is_set()

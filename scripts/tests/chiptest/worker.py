@@ -39,8 +39,8 @@ class WorkerThread(threading.Thread):
         self.exception: BaseException | None = None
 
     def run(self) -> None:
-        log.debug("Starting worker thread")
         try:
+            log.debug("Starting worker thread")
             while True:
                 work_func = self._task_queue.get()
                 self._result_queue.put(result := work_func())
@@ -52,17 +52,21 @@ class WorkerThread(threading.Thread):
         except EndOfQueue:
             log.debug("Received end of work signal")
         except QueueCancelled:
-            log.info("Received a cancel event")
+            # While it's not expected for the work queue to be cancelled in normal flow, it's not a bug but a part of cleanup.
+            log.warning("Received a cancel event")
         except BaseException as e:
             self.exception = e
+        finally:
+            log.debug("Worker thread finished")
 
     def terminate(self) -> None:
-        # Immediately cancel the work queue to unblock the thread if it's waiting for work, and prevent putting new work to the
-        # queue. It's effectively a no-op if the queue is already closed or cancelled.
+        # Immediately cancel the work queue to unblock the thread if it's waiting for work. In regular flow, the work queue is
+        # expected to be externally closed instead, to allow for graceful shutdown. In that case, cancellation is effectively a
+        # no-op, as the thread should be already stopped.
         self._task_queue.cancel()
 
         # Wait for the thread to finish if it had been started.
         if self.ident is not None:
             self.join(self.THREAD_TERMINATE_TIMEOUT_S)
             if self.is_alive():
-                log.warning("Worker thread is still alive, it might be stuck on processing work items")
+                raise RuntimeError("Worker thread is still alive, it might be stuck on processing work items")
