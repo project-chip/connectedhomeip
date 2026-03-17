@@ -257,7 +257,7 @@ private:
     GroupId mGroupId                                                       = kUndefinedGroupId;
 
     // When true, this indicates the entries are not fabric scoped. AuxiliaryEntries() through
-    // the Next() funciton will iterate over all fabrics to fetch auxiliary ACL entries. This
+    // the Next() function will iterate over all fabrics to fetch auxiliary ACL entries. This
     // will be set to true when a fabric index is not specified (kUndefinedFabricIndex).
     bool mIterateOverFabricIndices = false;
 };
