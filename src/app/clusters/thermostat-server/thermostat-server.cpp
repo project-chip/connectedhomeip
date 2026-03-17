@@ -1141,30 +1141,6 @@ void MatterThermostatClusterServerAttributeChangedCallback(const ConcreteAttribu
     Thermostat::MatterThermostatClusterServerAttributeChangedCallback(attributePath);
 }
 
-bool emberAfThermostatClusterClearWeeklyScheduleCallback(app::CommandHandler * commandObj,
-                                                         const app::ConcreteCommandPath & commandPath,
-                                                         const Commands::ClearWeeklySchedule::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterGetWeeklyScheduleCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::GetWeeklySchedule::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::SetWeeklySchedule::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
 bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData)
