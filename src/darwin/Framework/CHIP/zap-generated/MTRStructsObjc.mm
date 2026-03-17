@@ -8738,7 +8738,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _ambientContextType = nil;
+        _ambientContextDetected = nil;
+
+        _objectCountReached = nil;
 
         _objectCount = nil;
     }
@@ -8749,7 +8751,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRAmbientContextSensingClusterAmbientContextDetectStartedEvent alloc] init];
 
-    other.ambientContextType = self.ambientContextType;
+    other.ambientContextDetected = self.ambientContextDetected;
+    other.objectCountReached = self.objectCountReached;
     other.objectCount = self.objectCount;
 
     return other;
@@ -8757,7 +8760,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextType:%@; objectCount:%@; >", NSStringFromClass([self class]), _ambientContextType, _objectCount];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextDetected:%@; objectCountReached:%@; objectCount:%@; >", NSStringFromClass([self class]), _ambientContextDetected, _objectCountReached, _objectCount];
     return descriptionString;
 }
 
@@ -8768,7 +8771,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _startEventNumber = @(0);
+        _eventStartTime = @(0);
     }
     return self;
 }
@@ -8777,14 +8780,14 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRAmbientContextSensingClusterAmbientContextDetectEndedEvent alloc] init];
 
-    other.startEventNumber = self.startEventNumber;
+    other.eventStartTime = self.eventStartTime;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startEventNumber:%@; >", NSStringFromClass([self class]), _startEventNumber];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: eventStartTime:%@; >", NSStringFromClass([self class]), _eventStartTime];
     return descriptionString;
 }
 

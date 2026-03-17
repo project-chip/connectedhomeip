@@ -96,6 +96,12 @@ public:
 
     void OnShutDown() override;
 
+    // ConfigurationVersionDelegate, however NOT overridable to save
+    // some flash in case this feature is never used. This means applications that may
+    // change configurations at runtime pay a bit more flash, however those are probably more
+    // dynamic (i.e. larger) systems like bridges or more complex systems.
+    CHIP_ERROR IncreaseConfigurationVersion();
+
 private:
     // write without notification
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);

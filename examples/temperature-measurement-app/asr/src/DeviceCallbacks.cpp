@@ -34,6 +34,7 @@
 #if defined CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT || defined CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT
 #include "route_hook/asr_route_hook.h"
 #endif
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
 constexpr uint32_t kReportDelaySec = 3;
 
@@ -92,14 +93,13 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
 
 void TempMeas(System::Layer * systemLayer, void * appState)
 {
-
     int16_t temperature = 2550;
     int16_t humidity    = 5000;
 
     ASR_LOG("Sensor T:%d H:%d", temperature, humidity);
 
-    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(
-        /* endpoint ID */ 1, /* temperature in 0.01*C */ int16_t(temperature));
+    LogErrorOnFailure(
+        app::Clusters::TemperatureMeasurement::SetMeasuredValue(/* endpoint ID */ 1, /* temperature in 0.01*C */ temperature));
 
     // chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(
     //     /* endpoint ID */ 1, /* humidity in 0.01*C */ int16_t(humidity));

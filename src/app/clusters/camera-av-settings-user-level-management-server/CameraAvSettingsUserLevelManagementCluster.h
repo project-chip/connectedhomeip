@@ -190,7 +190,8 @@ public:
      * called by the interaction model at the appropriate times.
      * @param aEndpointId       The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFeatures         The bitflags value that identifies which features are supported by this instance.
-
+     * @param aMaxPresets       The maximum number of MPTZ presets supported.
+     *
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     CameraAvSettingsUserLevelManagementCluster(EndpointId aEndpointId,

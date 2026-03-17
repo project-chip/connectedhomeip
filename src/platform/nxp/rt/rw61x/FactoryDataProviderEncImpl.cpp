@@ -66,8 +66,6 @@ using namespace ::chip::Crypto;
 namespace chip {
 namespace DeviceLayer {
 
-FactoryDataProviderImpl FactoryDataProviderImpl::sInstance;
-
 static constexpr size_t kAesKeyBlobLength = Crypto::kP256_PrivateKey_Length + ELS_BLOB_METADATA_SIZE + ELS_WRAP_OVERHEAD;
 
 #define TAG_ID_FOR_AES_KEY_BOLB 0xFE
@@ -540,10 +538,13 @@ CHIP_ERROR FactoryDataProviderImpl::Validate()
     return CHIP_NO_ERROR;
 }
 
+#ifndef CONFIG_CHIP_FACTORY_DATA_PROVIDER_CUSTOM_SINGLETON_IMPL
 FactoryDataProvider & FactoryDataPrvdImpl()
 {
-    return FactoryDataProviderImpl::sInstance;
+    static FactoryDataProviderImpl sInstance;
+    return sInstance;
 }
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

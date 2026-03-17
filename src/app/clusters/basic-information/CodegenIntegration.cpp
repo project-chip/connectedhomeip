@@ -94,6 +94,16 @@ public:
 
 } // namespace
 
+namespace chip::app::Clusters::BasicInformation {
+
+BasicInformationCluster * GetClusterInstance()
+{
+    VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+    return &gServer.Cluster();
+}
+
+} // namespace chip::app::Clusters::BasicInformation
+
 void MatterBasicInformationClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);

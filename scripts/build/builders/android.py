@@ -19,6 +19,8 @@ from enum import Enum, auto
 
 from .builder import Builder, BuilderOutput
 
+log = logging.getLogger(__name__)
+
 
 class AndroidBoard(Enum):
     ARM = auto()
@@ -176,17 +178,17 @@ class AndroidBuilder(Builder):
                 # Test environment - assume the path is valid
                 sdk_manager = path
                 checked_details.append(f"{path} (test environment - assumed valid)")
-                logging.info(f"Using SDK manager for {for_purpose} from test environment: {sdk_manager}")
+                log.info(f"Using SDK manager for {for_purpose} from test environment: {sdk_manager}")
                 break
             # Real environment - check actual file existence
             exists = os.path.isfile(path)
             executable = os.access(path, os.X_OK)
             checked_details.append(f"{path} (exists: {exists}, executable: {executable})")
-            logging.debug(f"Checking SDK manager path for {for_purpose}: {path} - exists: {exists}, executable: {executable}")
+            log.debug(f"Checking SDK manager path for {for_purpose}: {path} - exists: {exists}, executable: {executable}")
 
             if exists and executable:
                 sdk_manager = path
-                logging.info(f"Found SDK manager for {for_purpose} at: {sdk_manager}")
+                log.info(f"Found SDK manager for {for_purpose} at: {sdk_manager}")
                 break
 
         return sdk_manager, checked_details
@@ -203,16 +205,16 @@ class AndroidBuilder(Builder):
                 title="Accepting NDK licenses using: %s" % sdk_manager_for_licenses,
             )
         else:
-            logging.warning("No SDK manager found for license acceptance - licenses may need to be accepted manually")
+            log.warning("No SDK manager found for license acceptance - licenses may need to be accepted manually")
 
     def validate_build_environment(self):
         # Log Android environment paths for debugging
         android_ndk_home = os.environ.get("ANDROID_NDK_HOME", "")
         android_home = os.environ.get("ANDROID_HOME", "")
 
-        logging.info("Android environment paths:")
-        logging.info(f"  ANDROID_NDK_HOME: {android_ndk_home}")
-        logging.info(f"  ANDROID_HOME: {android_home}")
+        log.info("Android environment paths:")
+        log.info(f"  ANDROID_NDK_HOME: {android_ndk_home}")
+        log.info(f"  ANDROID_HOME: {android_home}")
 
         for k in ["ANDROID_NDK_HOME", "ANDROID_HOME"]:
             if k not in os.environ:
@@ -225,9 +227,9 @@ class AndroidBuilder(Builder):
         sdk_manager, checked_details = self._find_sdk_manager("validation")
 
         if not sdk_manager:
-            logging.error("SDK manager not found in any expected location")
+            log.error("SDK manager not found in any expected location")
             for detail in checked_details:
-                logging.error(f"  {detail}")
+                log.error(f"  {detail}")
 
             android_home = os.environ["ANDROID_HOME"]
             possible_fixes = [
@@ -314,7 +316,7 @@ class AndroidBuilder(Builder):
             "CHIPClusterID.jar": "src/controller/java/CHIPClusterID.jar",
         }
 
-        for jarName in jars.keys():
+        for jarName in jars:
             self._Execute(
                 [
                     "cp",
@@ -339,7 +341,7 @@ class AndroidBuilder(Builder):
                 ]
             )
 
-        for jarName in jars.keys():
+        for jarName in jars:
             self._Execute(
                 [
                     "cp",

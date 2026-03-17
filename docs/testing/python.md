@@ -894,3 +894,117 @@ for that run, e.g.:
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test
 execution.
+
+# Test Module Guards
+
+Guards let you run test steps only when certain conditions are met (e.g., a
+cluster has a feature, attribute, or command).
+
+See below sections for usage examples please.
+
+## Cluster Guards
+
+The following are inherited from the `matter_testing` module, so they do not
+need to be imported. For more examples on these guards, see
+`src/python_testing/support_modules/binfo_attributes_verification.py`.
+
+Use these to skip a test step when the endpoint or cluster does not support the
+feature, attribute, or command under test.
+
+### Attribute Guard
+
+Runs the test step only if the endpoint and cluster contain the given attribute:
+
+Example:
+
+```python
+self.step(<STEP_NUMBER>)
+if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperationalState):
+    # If attribute exists then test step continues, else test step is skipped.
+```
+
+### Feature Guard
+
+Runs the test step only if the cluster on the endpoint supports the given
+feature:
+
+Example:
+
+```python
+self.step(<STEP_NUMBER>)
+if await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible):
+    # IF feature available then do test step, else test step is skipped.
+```
+
+### Command Guard
+
+Runs the test step only if the endpoint has the cluster that supports the given
+command:
+
+Example:
+
+```python
+self.step(<STEP_NUMBER>)
+if await self.command_guard(endpoint=self.endpoint, command=commands.Resume):
+    # If command available, then do test step here, else test step is skipped
+```
+
+## Additional Test Guards
+
+This section covers the PICS guard and the `run_if_endpoint_matches` decorator,
+with an example for each.
+
+### PICS Guard
+
+Inherited from `matter_testing` (no import needed). Runs the test step only if
+the given PICS key is enabled in the PICS file:
+
+Example:
+
+```python
+if self.pics_guard(self.check_pics(<PICS here>)):
+    self.step(<STEP_NUMBER>)
+    # Do test step logic here
+else:
+    self.skip_step(<STEP_NUMBER>)
+    #skip test step
+```
+
+### run_if_endpoint_matches decorator
+
+Import the decorator and the check functions from `matter.testing.decorators`:
+
+```python
+from matter.testing.decorators import has_feature, has_command, has_attribute, has_cluster, run_if_endpoint_matches
+```
+
+Skips the whole test if the specified endpoint does not have the required
+cluster, feature, attribute, or command. Apply the decorator above the test
+function.
+
+Examples:
+
+```python
+#Feature:
+@run_if_endpoint_matches(
+        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
+    )
+async def test_TC_AVSM_2_2(self):
+    # Do test step logic if feature exists, else this test is skipped
+
+#Cluster
+@run_if_endpoint_matches(has_cluster(Clusters.AdministratorCommissioning))
+async def test_TC_CADMIN_1_3(self):
+    # Do test step logic if cluster exists, else this test is skipped
+
+#Attribute:
+@run_if_endpoint_matches(has_attribute(Clusters.AccessControl.Attributes.Extension))
+async def test_TC_ACL_2_3(self):
+    # Do test step logic if attribute exists, else this test is skipped
+
+#Command
+@run_if_endpoint_matches(has_command(Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement))
+async def test_TC_OPCREDS_3_8(self):
+    # Do test step logic if command is available, else this test is skipped
+
+```

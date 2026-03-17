@@ -15,6 +15,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <algorithm>
+#include <vector>
+
+#include <pw_unit_test/framework.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-cluster-logic.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-cluster-objects.h>
@@ -23,10 +29,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <pw_unit_test/framework.h>
 #include <system/SystemClock.h>
 #include <system/SystemTimer.h>
-#include <vector>
 
 using namespace chip::app::Clusters::ClosureDimension;
 

@@ -25,15 +25,14 @@
 
 #include <vector>
 
+#include <app/clusters/zone-management-server/TwoDCartesianZoneStorage.h>
 #include <app/clusters/zone-management-server/zone-geometry.h>
-#include <app/clusters/zone-management-server/zone-management-server.h>
 
 #include <pw_unit_test/framework.h>
 
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
-using namespace chip::Testing;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ZoneManagement;

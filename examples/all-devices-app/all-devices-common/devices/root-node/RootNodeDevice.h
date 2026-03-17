@@ -33,6 +33,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <devices/Types.h>
 #include <devices/interface/SingleEndpointDevice.h>
+#include <lib/support/TimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip {
@@ -61,6 +62,7 @@ public:
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         EventManagement & eventManagement;
         SafeAttributePersistenceProvider & safeAttributePersistenceProvider;
+        TimerDelegate & timerDelegate;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -73,7 +75,7 @@ public:
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointId parentId = kInvalidEndpointId) override;
-    void UnRegister(CodeDrivenDataModelProvider & provider) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
 
 protected:
     Context mContext;

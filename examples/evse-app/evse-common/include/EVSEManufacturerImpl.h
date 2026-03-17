@@ -20,9 +20,9 @@
 
 #include <DEMManufacturerDelegate.h>
 #include <DeviceEnergyManagementManager.h>
-#include <ElectricalPowerMeasurementDelegate.h>
+#include <ElectricalPowerMeasurementDelegateImpl.h>
 #include <EnergyEvseManager.h>
-#include <PowerTopologyDelegate.h>
+#include <PowerTopologyDelegateImpl.h>
 
 using chip::Protocols::InteractionModel::Status;
 namespace chip {
