@@ -130,7 +130,7 @@ public:
     virtual CHIP_ERROR LoadZones(std::vector<ZoneInformationStorage> & aZones) = 0;
 
     virtual CHIP_ERROR LoadTriggers(std::vector<ZoneTriggerControlStruct> & aTriggers) = 0;
- 
+
     ZoneManagementCluster * GetZoneManagementCluster() const { return mZoneManagementServer; }
 protected:
     friend class ZoneManagementCluster;
