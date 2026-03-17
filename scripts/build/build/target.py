@@ -470,7 +470,7 @@ class BuildTarget:
         else:
             # TODO: can we check if builds are compatible?
             builder.output_dir = os.path.join(output_prefix, name)
-        # Append suffix to the output dir to indicated non-default build profile.
+        # Append suffix to the output dir to indicate a non-default build profile.
         if builder_options.build_profile != BuildProfile.DEFAULT:
             builder.output_dir += '-' + builder_options.build_profile
         builder.verbose = verbose
