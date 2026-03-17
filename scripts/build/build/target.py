@@ -45,7 +45,7 @@ import re
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional
 
-from builders.builder import BuildProfile, BuilderOptions
+from builders.builder import BuilderOptions, BuildProfile
 
 log = logging.getLogger(__name__)
 
