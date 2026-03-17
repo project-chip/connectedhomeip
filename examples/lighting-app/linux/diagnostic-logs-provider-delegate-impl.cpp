@@ -83,10 +83,12 @@ LogProvider::~LogProvider()
 {
     for (auto f : mFiles)
     {
+        errno  = 0;
         auto rv = fclose(f.second);
         if (rv != 0)
         {
-            ChipLogError(NotSpecified, "Error when closing file pointer: %d", errno);
+            int err = (errno == 0) ? EIO : errno;
+            ChipLogError(NotSpecified, "Error when closing file pointer: %d", err);
         }
     }
     mFiles.clear();
