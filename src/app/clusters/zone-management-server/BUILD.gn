@@ -27,8 +27,7 @@ source_set("zone-management-server") {
   sources = [
     "ZoneManagementCluster.cpp",
     "ZoneManagementCluster.h",
-    "zone-geometry.h"
-
+    "zone-geometry.h",
   ]
 
   deps = [
