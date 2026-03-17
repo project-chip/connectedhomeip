@@ -11769,39 +11769,6 @@ public class ClusterReadMapping {
           readThermostatThermostatRunningModeCommandParams
         );
         result.put("readThermostatRunningModeAttribute", readThermostatThermostatRunningModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readThermostatStartOfWeekCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readThermostatStartOfWeekAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ThermostatCluster) cluster).readStartOfWeekAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readThermostatStartOfWeekCommandParams
-        );
-        result.put("readStartOfWeekAttribute", readThermostatStartOfWeekAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readThermostatNumberOfWeeklyTransitionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readThermostatNumberOfWeeklyTransitionsAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ThermostatCluster) cluster).readNumberOfWeeklyTransitionsAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readThermostatNumberOfWeeklyTransitionsCommandParams
-        );
-        result.put("readNumberOfWeeklyTransitionsAttribute", readThermostatNumberOfWeeklyTransitionsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readThermostatNumberOfDailyTransitionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readThermostatNumberOfDailyTransitionsAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ThermostatCluster) cluster).readNumberOfDailyTransitionsAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readThermostatNumberOfDailyTransitionsCommandParams
-        );
-        result.put("readNumberOfDailyTransitionsAttribute", readThermostatNumberOfDailyTransitionsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThermostatTemperatureSetpointHoldCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThermostatTemperatureSetpointHoldAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -11883,10 +11850,10 @@ public class ClusterReadMapping {
         InteractionInfo readThermostatOccupiedSetbackAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.ThermostatCluster) cluster).readOccupiedSetbackAttribute(
-              (ChipClusters.ThermostatCluster.OccupiedSetbackAttributeCallback) callback
+              (ChipClusters.IntegerAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedThermostatClusterOccupiedSetbackAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
           readThermostatOccupiedSetbackCommandParams
         );
         result.put("readOccupiedSetbackAttribute", readThermostatOccupiedSetbackAttributeInteractionInfo);
@@ -11894,10 +11861,10 @@ public class ClusterReadMapping {
         InteractionInfo readThermostatOccupiedSetbackMinAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.ThermostatCluster) cluster).readOccupiedSetbackMinAttribute(
-              (ChipClusters.ThermostatCluster.OccupiedSetbackMinAttributeCallback) callback
+              (ChipClusters.IntegerAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedThermostatClusterOccupiedSetbackMinAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
           readThermostatOccupiedSetbackMinCommandParams
         );
         result.put("readOccupiedSetbackMinAttribute", readThermostatOccupiedSetbackMinAttributeInteractionInfo);
@@ -11905,10 +11872,10 @@ public class ClusterReadMapping {
         InteractionInfo readThermostatOccupiedSetbackMaxAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.ThermostatCluster) cluster).readOccupiedSetbackMaxAttribute(
-              (ChipClusters.ThermostatCluster.OccupiedSetbackMaxAttributeCallback) callback
+              (ChipClusters.IntegerAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedThermostatClusterOccupiedSetbackMaxAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
           readThermostatOccupiedSetbackMaxCommandParams
         );
         result.put("readOccupiedSetbackMaxAttribute", readThermostatOccupiedSetbackMaxAttributeInteractionInfo);
@@ -11916,10 +11883,10 @@ public class ClusterReadMapping {
         InteractionInfo readThermostatUnoccupiedSetbackAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.ThermostatCluster) cluster).readUnoccupiedSetbackAttribute(
-              (ChipClusters.ThermostatCluster.UnoccupiedSetbackAttributeCallback) callback
+              (ChipClusters.IntegerAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedThermostatClusterUnoccupiedSetbackAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
           readThermostatUnoccupiedSetbackCommandParams
         );
         result.put("readUnoccupiedSetbackAttribute", readThermostatUnoccupiedSetbackAttributeInteractionInfo);
@@ -11927,10 +11894,10 @@ public class ClusterReadMapping {
         InteractionInfo readThermostatUnoccupiedSetbackMinAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.ThermostatCluster) cluster).readUnoccupiedSetbackMinAttribute(
-              (ChipClusters.ThermostatCluster.UnoccupiedSetbackMinAttributeCallback) callback
+              (ChipClusters.IntegerAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedThermostatClusterUnoccupiedSetbackMinAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
           readThermostatUnoccupiedSetbackMinCommandParams
         );
         result.put("readUnoccupiedSetbackMinAttribute", readThermostatUnoccupiedSetbackMinAttributeInteractionInfo);
@@ -11938,10 +11905,10 @@ public class ClusterReadMapping {
         InteractionInfo readThermostatUnoccupiedSetbackMaxAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.ThermostatCluster) cluster).readUnoccupiedSetbackMaxAttribute(
-              (ChipClusters.ThermostatCluster.UnoccupiedSetbackMaxAttributeCallback) callback
+              (ChipClusters.IntegerAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedThermostatClusterUnoccupiedSetbackMaxAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
           readThermostatUnoccupiedSetbackMaxCommandParams
         );
         result.put("readUnoccupiedSetbackMaxAttribute", readThermostatUnoccupiedSetbackMaxAttributeInteractionInfo);

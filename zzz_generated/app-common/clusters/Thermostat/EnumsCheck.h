@@ -153,23 +153,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::SetpointRai
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::StartOfWeekEnum val)
-{
-    using EnumType = Thermostat::StartOfWeekEnum;
-    switch (val)
-    {
-    case EnumType::kSunday:
-    case EnumType::kMonday:
-    case EnumType::kTuesday:
-    case EnumType::kWednesday:
-    case EnumType::kThursday:
-    case EnumType::kFriday:
-    case EnumType::kSaturday:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::SystemModeEnum val)
 {
     using EnumType = Thermostat::SystemModeEnum;

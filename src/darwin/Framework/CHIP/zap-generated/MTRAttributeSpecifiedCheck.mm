@@ -3990,15 +3990,6 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::ThermostatRunningMode::Id: {
         return YES;
     }
-    case Attributes::StartOfWeek::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfWeeklyTransitions::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfDailyTransitions::Id: {
-        return YES;
-    }
     case Attributes::TemperatureSetpointHold::Id: {
         return YES;
     }

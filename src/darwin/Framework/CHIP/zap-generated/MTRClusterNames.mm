@@ -5642,18 +5642,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ThermostatRunningMode";
             break;
 
-        case MTRAttributeIDTypeClusterThermostatAttributeStartOfWeekID:
-            result = @"StartOfWeek";
-            break;
-
-        case MTRAttributeIDTypeClusterThermostatAttributeNumberOfWeeklyTransitionsID:
-            result = @"NumberOfWeeklyTransitions";
-            break;
-
-        case MTRAttributeIDTypeClusterThermostatAttributeNumberOfDailyTransitionsID:
-            result = @"NumberOfDailyTransitions";
-            break;
-
         case MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldID:
             result = @"TemperatureSetpointHold";
             break;
@@ -11287,18 +11275,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"SetpointRaiseLower";
             break;
 
-        case MTRCommandIDTypeClusterThermostatCommandSetWeeklyScheduleID:
-            result = @"SetWeeklySchedule";
-            break;
-
-        case MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleID:
-            result = @"GetWeeklySchedule";
-            break;
-
-        case MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID:
-            result = @"ClearWeeklySchedule";
-            break;
-
         case MTRCommandIDTypeClusterThermostatCommandSetActiveScheduleRequestID:
             result = @"SetActiveScheduleRequest";
             break;
@@ -13726,10 +13702,6 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
     case MTRClusterIDTypeThermostatID:
 
         switch (commandID) {
-
-        case MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleResponseID:
-            result = @"GetWeeklyScheduleResponse";
-            break;
 
         case MTRCommandIDTypeClusterThermostatCommandAddThermostatSuggestionResponseID:
             result = @"AddThermostatSuggestionResponse";

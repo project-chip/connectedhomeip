@@ -71,12 +71,6 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Thermostat::
             return SystemMode::kMetadataEntry;
         case ThermostatRunningMode::Id:
             return ThermostatRunningMode::kMetadataEntry;
-        case StartOfWeek::Id:
-            return StartOfWeek::kMetadataEntry;
-        case NumberOfWeeklyTransitions::Id:
-            return NumberOfWeeklyTransitions::kMetadataEntry;
-        case NumberOfDailyTransitions::Id:
-            return NumberOfDailyTransitions::kMetadataEntry;
         case TemperatureSetpointHold::Id:
             return TemperatureSetpointHold::kMetadataEntry;
         case TemperatureSetpointHoldDuration::Id:
@@ -167,12 +161,6 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Thermo
         {
         case SetpointRaiseLower::Id:
             return SetpointRaiseLower::kMetadataEntry;
-        case SetWeeklySchedule::Id:
-            return SetWeeklySchedule::kMetadataEntry;
-        case GetWeeklySchedule::Id:
-            return GetWeeklySchedule::kMetadataEntry;
-        case ClearWeeklySchedule::Id:
-            return ClearWeeklySchedule::kMetadataEntry;
         case SetActiveScheduleRequest::Id:
             return SetActiveScheduleRequest::kMetadataEntry;
         case SetActivePresetRequest::Id:

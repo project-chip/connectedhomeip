@@ -80,12 +80,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, systemMode);
     case Attributes::ThermostatRunningMode::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, thermostatRunningMode);
-    case Attributes::StartOfWeek::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, startOfWeek);
-    case Attributes::NumberOfWeeklyTransitions::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfWeeklyTransitions);
-    case Attributes::NumberOfDailyTransitions::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfDailyTransitions);
     case Attributes::TemperatureSetpointHold::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, temperatureSetpointHold);
     case Attributes::TemperatureSetpointHoldDuration::TypeInfo::GetAttributeId():

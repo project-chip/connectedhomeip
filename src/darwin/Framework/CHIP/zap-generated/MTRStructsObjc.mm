@@ -8220,45 +8220,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRThermostatClusterWeeklyScheduleTransitionStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _transitionTime = @(0);
-
-        _heatSetpoint = nil;
-
-        _coolSetpoint = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRThermostatClusterWeeklyScheduleTransitionStruct alloc] init];
-
-    other.transitionTime = self.transitionTime;
-    other.heatSetpoint = self.heatSetpoint;
-    other.coolSetpoint = self.coolSetpoint;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: transitionTime:%@; heatSetpoint:%@; coolSetpoint:%@; >", NSStringFromClass([self class]), _transitionTime, _heatSetpoint, _coolSetpoint];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRThermostatClusterThermostatScheduleTransition : MTRThermostatClusterWeeklyScheduleTransitionStruct
-@dynamic transitionTime;
-@dynamic heatSetpoint;
-@dynamic coolSetpoint;
-@end
-
 @implementation MTRThermostatClusterSystemModeChangeEvent
 - (instancetype)init
 {

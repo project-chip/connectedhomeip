@@ -156,23 +156,6 @@ enum class SetpointRaiseLowerModeEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for StartOfWeekEnum
-enum class StartOfWeekEnum : uint8_t
-{
-    kSunday    = 0x00,
-    kMonday    = 0x01,
-    kTuesday   = 0x02,
-    kWednesday = 0x03,
-    kThursday  = 0x04,
-    kFriday    = 0x05,
-    kSaturday  = 0x06,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 7,
-};
-
 // Enum for SystemModeEnum
 enum class SystemModeEnum : uint8_t
 {
@@ -233,7 +216,6 @@ enum class Feature : uint32_t
     kHeating                     = 0x1,
     kCooling                     = 0x2,
     kOccupancy                   = 0x4,
-    kScheduleConfiguration       = 0x8,
     kSetback                     = 0x10,
     kAutoMode                    = 0x20,
     kLocalTemperatureNotExposed  = 0x40,
@@ -304,13 +286,6 @@ enum class ScheduleDayOfWeekBitmap : uint8_t
     kFriday    = 0x20,
     kSaturday  = 0x40,
     kAway      = 0x80,
-};
-
-// Bitmap for ScheduleModeBitmap
-enum class ScheduleModeBitmap : uint8_t
-{
-    kHeatSetpointPresent = 0x1,
-    kCoolSetpointPresent = 0x2,
 };
 
 // Bitmap for ScheduleTypeFeaturesBitmap

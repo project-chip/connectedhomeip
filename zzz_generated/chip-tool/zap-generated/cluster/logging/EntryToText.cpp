@@ -3043,12 +3043,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SystemMode";
         case chip::app::Clusters::Thermostat::Attributes::ThermostatRunningMode::Id:
             return "ThermostatRunningMode";
-        case chip::app::Clusters::Thermostat::Attributes::StartOfWeek::Id:
-            return "StartOfWeek";
-        case chip::app::Clusters::Thermostat::Attributes::NumberOfWeeklyTransitions::Id:
-            return "NumberOfWeeklyTransitions";
-        case chip::app::Clusters::Thermostat::Attributes::NumberOfDailyTransitions::Id:
-            return "NumberOfDailyTransitions";
         case chip::app::Clusters::Thermostat::Attributes::TemperatureSetpointHold::Id:
             return "TemperatureSetpointHold";
         case chip::app::Clusters::Thermostat::Attributes::TemperatureSetpointHoldDuration::Id:
@@ -5945,12 +5939,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Id:
             return "SetpointRaiseLower";
-        case chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Id:
-            return "SetWeeklySchedule";
-        case chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::Id:
-            return "GetWeeklySchedule";
-        case chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Id:
-            return "ClearWeeklySchedule";
         case chip::app::Clusters::Thermostat::Commands::SetActiveScheduleRequest::Id:
             return "SetActiveScheduleRequest";
         case chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::Id:
@@ -6917,8 +6905,6 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
     case chip::app::Clusters::Thermostat::Id: {
         switch (id)
         {
-        case chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::Id:
-            return "GetWeeklyScheduleResponse";
         case chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestionResponse::Id:
             return "AddThermostatSuggestionResponse";
         case chip::app::Clusters::Thermostat::Commands::AtomicResponse::Id:

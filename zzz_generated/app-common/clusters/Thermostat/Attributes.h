@@ -331,42 +331,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ThermostatRunningMode
-namespace StartOfWeek {
-struct TypeInfo
-{
-    using Type             = chip::app::Clusters::Thermostat::StartOfWeekEnum;
-    using DecodableType    = chip::app::Clusters::Thermostat::StartOfWeekEnum;
-    using DecodableArgType = chip::app::Clusters::Thermostat::StartOfWeekEnum;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::StartOfWeek::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace StartOfWeek
-namespace NumberOfWeeklyTransitions {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfWeeklyTransitions::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace NumberOfWeeklyTransitions
-namespace NumberOfDailyTransitions {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfDailyTransitions::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace NumberOfDailyTransitions
 namespace TemperatureSetpointHold {
 struct TypeInfo
 {
@@ -454,9 +418,9 @@ struct TypeInfo
 namespace OccupiedSetback {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupiedSetback::Id; }
@@ -466,9 +430,9 @@ struct TypeInfo
 namespace OccupiedSetbackMin {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupiedSetbackMin::Id; }
@@ -478,9 +442,9 @@ struct TypeInfo
 namespace OccupiedSetbackMax {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupiedSetbackMax::Id; }
@@ -490,9 +454,9 @@ struct TypeInfo
 namespace UnoccupiedSetback {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UnoccupiedSetback::Id; }
@@ -502,9 +466,9 @@ struct TypeInfo
 namespace UnoccupiedSetbackMin {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UnoccupiedSetbackMin::Id; }
@@ -514,9 +478,9 @@ struct TypeInfo
 namespace UnoccupiedSetbackMax {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UnoccupiedSetbackMax::Id; }
@@ -897,10 +861,6 @@ struct TypeInfo
             static_cast<chip::app::Clusters::Thermostat::SystemModeEnum>(0);
         Attributes::ThermostatRunningMode::TypeInfo::DecodableType thermostatRunningMode =
             static_cast<chip::app::Clusters::Thermostat::ThermostatRunningModeEnum>(0);
-        Attributes::StartOfWeek::TypeInfo::DecodableType startOfWeek =
-            static_cast<chip::app::Clusters::Thermostat::StartOfWeekEnum>(0);
-        Attributes::NumberOfWeeklyTransitions::TypeInfo::DecodableType numberOfWeeklyTransitions = static_cast<uint8_t>(0);
-        Attributes::NumberOfDailyTransitions::TypeInfo::DecodableType numberOfDailyTransitions   = static_cast<uint8_t>(0);
         Attributes::TemperatureSetpointHold::TypeInfo::DecodableType temperatureSetpointHold =
             static_cast<chip::app::Clusters::Thermostat::TemperatureSetpointHoldEnum>(0);
         Attributes::TemperatureSetpointHoldDuration::TypeInfo::DecodableType temperatureSetpointHoldDuration;
@@ -912,13 +872,13 @@ struct TypeInfo
             static_cast<chip::app::Clusters::Thermostat::SetpointChangeSourceEnum>(0);
         Attributes::SetpointChangeAmount::TypeInfo::DecodableType setpointChangeAmount;
         Attributes::SetpointChangeSourceTimestamp::TypeInfo::DecodableType setpointChangeSourceTimestamp = static_cast<uint32_t>(0);
-        Attributes::OccupiedSetback::TypeInfo::DecodableType occupiedSetback;
-        Attributes::OccupiedSetbackMin::TypeInfo::DecodableType occupiedSetbackMin;
-        Attributes::OccupiedSetbackMax::TypeInfo::DecodableType occupiedSetbackMax;
-        Attributes::UnoccupiedSetback::TypeInfo::DecodableType unoccupiedSetback;
-        Attributes::UnoccupiedSetbackMin::TypeInfo::DecodableType unoccupiedSetbackMin;
-        Attributes::UnoccupiedSetbackMax::TypeInfo::DecodableType unoccupiedSetbackMax;
-        Attributes::EmergencyHeatDelta::TypeInfo::DecodableType emergencyHeatDelta = static_cast<uint8_t>(0);
+        Attributes::OccupiedSetback::TypeInfo::DecodableType occupiedSetback                             = static_cast<uint8_t>(0);
+        Attributes::OccupiedSetbackMin::TypeInfo::DecodableType occupiedSetbackMin                       = static_cast<uint8_t>(0);
+        Attributes::OccupiedSetbackMax::TypeInfo::DecodableType occupiedSetbackMax                       = static_cast<uint8_t>(0);
+        Attributes::UnoccupiedSetback::TypeInfo::DecodableType unoccupiedSetback                         = static_cast<uint8_t>(0);
+        Attributes::UnoccupiedSetbackMin::TypeInfo::DecodableType unoccupiedSetbackMin                   = static_cast<uint8_t>(0);
+        Attributes::UnoccupiedSetbackMax::TypeInfo::DecodableType unoccupiedSetbackMax                   = static_cast<uint8_t>(0);
+        Attributes::EmergencyHeatDelta::TypeInfo::DecodableType emergencyHeatDelta                       = static_cast<uint8_t>(0);
         Attributes::ACType::TypeInfo::DecodableType ACType         = static_cast<chip::app::Clusters::Thermostat::ACTypeEnum>(0);
         Attributes::ACCapacity::TypeInfo::DecodableType ACCapacity = static_cast<uint16_t>(0);
         Attributes::ACRefrigerantType::TypeInfo::DecodableType ACRefrigerantType =

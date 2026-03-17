@@ -38545,9 +38545,6 @@ public class ChipClusters {
     private static final long CONTROL_SEQUENCE_OF_OPERATION_ATTRIBUTE_ID = 27L;
     private static final long SYSTEM_MODE_ATTRIBUTE_ID = 28L;
     private static final long THERMOSTAT_RUNNING_MODE_ATTRIBUTE_ID = 30L;
-    private static final long START_OF_WEEK_ATTRIBUTE_ID = 32L;
-    private static final long NUMBER_OF_WEEKLY_TRANSITIONS_ATTRIBUTE_ID = 33L;
-    private static final long NUMBER_OF_DAILY_TRANSITIONS_ATTRIBUTE_ID = 34L;
     private static final long TEMPERATURE_SETPOINT_HOLD_ATTRIBUTE_ID = 35L;
     private static final long TEMPERATURE_SETPOINT_HOLD_DURATION_ATTRIBUTE_ID = 36L;
     private static final long THERMOSTAT_PROGRAMMING_OPERATION_MODE_ATTRIBUTE_ID = 37L;
@@ -38617,109 +38614,6 @@ public class ChipClusters {
       BaseTLVType amounttlvValue = new IntType(amount);
       elements.add(new StructElement(amountFieldID, amounttlvValue));
 
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void setWeeklySchedule(DefaultClusterCallback callback, Integer numberOfTransitionsForSequence, Integer dayOfWeekForSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions) {
-      setWeeklySchedule(callback, numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence, transitions, 0);
-    }
-
-    public void setWeeklySchedule(DefaultClusterCallback callback, Integer numberOfTransitionsForSequence, Integer dayOfWeekForSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions, int timedInvokeTimeoutMs) {
-      final long commandId = 1L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long numberOfTransitionsForSequenceFieldID = 0L;
-      BaseTLVType numberOfTransitionsForSequencetlvValue = new UIntType(numberOfTransitionsForSequence);
-      elements.add(new StructElement(numberOfTransitionsForSequenceFieldID, numberOfTransitionsForSequencetlvValue));
-
-      final long dayOfWeekForSequenceFieldID = 1L;
-      BaseTLVType dayOfWeekForSequencetlvValue = new UIntType(dayOfWeekForSequence);
-      elements.add(new StructElement(dayOfWeekForSequenceFieldID, dayOfWeekForSequencetlvValue));
-
-      final long modeForSequenceFieldID = 2L;
-      BaseTLVType modeForSequencetlvValue = new UIntType(modeForSequence);
-      elements.add(new StructElement(modeForSequenceFieldID, modeForSequencetlvValue));
-
-      final long transitionsFieldID = 3L;
-      BaseTLVType transitionstlvValue = ArrayType.generateArrayType(transitions, (elementtransitions) -> elementtransitions.encodeTlv());
-      elements.add(new StructElement(transitionsFieldID, transitionstlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void getWeeklySchedule(GetWeeklyScheduleResponseCallback callback, Integer daysToReturn, Integer modeToReturn) {
-      getWeeklySchedule(callback, daysToReturn, modeToReturn, 0);
-    }
-
-    public void getWeeklySchedule(GetWeeklyScheduleResponseCallback callback, Integer daysToReturn, Integer modeToReturn, int timedInvokeTimeoutMs) {
-      final long commandId = 2L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long daysToReturnFieldID = 0L;
-      BaseTLVType daysToReturntlvValue = new UIntType(daysToReturn);
-      elements.add(new StructElement(daysToReturnFieldID, daysToReturntlvValue));
-
-      final long modeToReturnFieldID = 1L;
-      BaseTLVType modeToReturntlvValue = new UIntType(modeToReturn);
-      elements.add(new StructElement(modeToReturnFieldID, modeToReturntlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          final long numberOfTransitionsForSequenceFieldID = 0L;
-          Integer numberOfTransitionsForSequence = null;
-          final long dayOfWeekForSequenceFieldID = 1L;
-          Integer dayOfWeekForSequence = null;
-          final long modeForSequenceFieldID = 2L;
-          Integer modeForSequence = null;
-          final long transitionsFieldID = 3L;
-          ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions = null;
-          for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == numberOfTransitionsForSequenceFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-                UIntType castingValue = element.value(UIntType.class);
-                numberOfTransitionsForSequence = castingValue.value(Integer.class);
-              }
-            } else if (element.contextTagNum() == dayOfWeekForSequenceFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-                UIntType castingValue = element.value(UIntType.class);
-                dayOfWeekForSequence = castingValue.value(Integer.class);
-              }
-            } else if (element.contextTagNum() == modeForSequenceFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-                UIntType castingValue = element.value(UIntType.class);
-                modeForSequence = castingValue.value(Integer.class);
-              }
-            } else if (element.contextTagNum() == transitionsFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.Array) {
-                ArrayType castingValue = element.value(ArrayType.class);
-                transitions = castingValue.map((elementcastingValue) -> ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct.decodeTlv(elementcastingValue));
-              }
-            }
-          }
-          callback.onSuccess(numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence, transitions);
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void clearWeeklySchedule(DefaultClusterCallback callback) {
-      clearWeeklySchedule(callback, 0);
-    }
-
-    public void clearWeeklySchedule(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-      final long commandId = 3L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
@@ -38878,10 +38772,6 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public interface GetWeeklyScheduleResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer numberOfTransitionsForSequence, Integer dayOfWeekForSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions);
-    }
-
     public interface AddThermostatSuggestionResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer uniqueID);
     }
@@ -38903,30 +38793,6 @@ public class ChipClusters {
     }
 
     public interface SetpointChangeAmountAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
-    public interface OccupiedSetbackAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
-    public interface OccupiedSetbackMinAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
-    public interface OccupiedSetbackMaxAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
-    public interface UnoccupiedSetbackAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
-    public interface UnoccupiedSetbackMinAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
-    public interface UnoccupiedSetbackMaxAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
     }
 
@@ -39235,15 +39101,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, HVAC_SYSTEM_TYPE_CONFIGURATION_ATTRIBUTE_ID, true);
-    }
-
-    public void writeHVACSystemTypeConfigurationAttribute(DefaultClusterCallback callback, Integer value) {
-      writeHVACSystemTypeConfigurationAttribute(callback, value, 0);
-    }
-
-    public void writeHVACSystemTypeConfigurationAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), HVAC_SYSTEM_TYPE_CONFIGURATION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeHVACSystemTypeConfigurationAttribute(
@@ -39740,84 +39597,6 @@ public class ChipClusters {
         }, THERMOSTAT_RUNNING_MODE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readStartOfWeekAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_OF_WEEK_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, START_OF_WEEK_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeStartOfWeekAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_OF_WEEK_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, START_OF_WEEK_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readNumberOfWeeklyTransitionsAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_WEEKLY_TRANSITIONS_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, NUMBER_OF_WEEKLY_TRANSITIONS_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeNumberOfWeeklyTransitionsAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_WEEKLY_TRANSITIONS_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, NUMBER_OF_WEEKLY_TRANSITIONS_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readNumberOfDailyTransitionsAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_DAILY_TRANSITIONS_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, NUMBER_OF_DAILY_TRANSITIONS_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeNumberOfDailyTransitionsAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_DAILY_TRANSITIONS_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, NUMBER_OF_DAILY_TRANSITIONS_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readTemperatureSetpointHoldAttribute(
         IntegerAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TEMPERATURE_SETPOINT_HOLD_ATTRIBUTE_ID);
@@ -39899,15 +39678,6 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, THERMOSTAT_PROGRAMMING_OPERATION_MODE_ATTRIBUTE_ID, true);
-    }
-
-    public void writeThermostatProgrammingOperationModeAttribute(DefaultClusterCallback callback, Integer value) {
-      writeThermostatProgrammingOperationModeAttribute(callback, value, 0);
-    }
-
-    public void writeThermostatProgrammingOperationModeAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), THERMOSTAT_PROGRAMMING_OPERATION_MODE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeThermostatProgrammingOperationModeAttribute(
@@ -40028,174 +39798,156 @@ public class ChipClusters {
     }
 
     public void readOccupiedSetbackAttribute(
-        OccupiedSetbackAttributeCallback callback) {
+        IntegerAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OCCUPIED_SETBACK_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, OCCUPIED_SETBACK_ATTRIBUTE_ID, true);
     }
 
-    public void writeOccupiedSetbackAttribute(DefaultClusterCallback callback, Integer value) {
-      writeOccupiedSetbackAttribute(callback, value, 0);
-    }
-
-    public void writeOccupiedSetbackAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), OCCUPIED_SETBACK_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
     public void subscribeOccupiedSetbackAttribute(
-        OccupiedSetbackAttributeCallback callback, int minInterval, int maxInterval) {
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OCCUPIED_SETBACK_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, OCCUPIED_SETBACK_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readOccupiedSetbackMinAttribute(
-        OccupiedSetbackMinAttributeCallback callback) {
+        IntegerAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OCCUPIED_SETBACK_MIN_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, OCCUPIED_SETBACK_MIN_ATTRIBUTE_ID, true);
     }
 
     public void subscribeOccupiedSetbackMinAttribute(
-        OccupiedSetbackMinAttributeCallback callback, int minInterval, int maxInterval) {
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OCCUPIED_SETBACK_MIN_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, OCCUPIED_SETBACK_MIN_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readOccupiedSetbackMaxAttribute(
-        OccupiedSetbackMaxAttributeCallback callback) {
+        IntegerAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OCCUPIED_SETBACK_MAX_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, OCCUPIED_SETBACK_MAX_ATTRIBUTE_ID, true);
     }
 
     public void subscribeOccupiedSetbackMaxAttribute(
-        OccupiedSetbackMaxAttributeCallback callback, int minInterval, int maxInterval) {
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OCCUPIED_SETBACK_MAX_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, OCCUPIED_SETBACK_MAX_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readUnoccupiedSetbackAttribute(
-        UnoccupiedSetbackAttributeCallback callback) {
+        IntegerAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNOCCUPIED_SETBACK_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, UNOCCUPIED_SETBACK_ATTRIBUTE_ID, true);
     }
 
-    public void writeUnoccupiedSetbackAttribute(DefaultClusterCallback callback, Integer value) {
-      writeUnoccupiedSetbackAttribute(callback, value, 0);
-    }
-
-    public void writeUnoccupiedSetbackAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), UNOCCUPIED_SETBACK_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
     public void subscribeUnoccupiedSetbackAttribute(
-        UnoccupiedSetbackAttributeCallback callback, int minInterval, int maxInterval) {
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNOCCUPIED_SETBACK_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, UNOCCUPIED_SETBACK_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readUnoccupiedSetbackMinAttribute(
-        UnoccupiedSetbackMinAttributeCallback callback) {
+        IntegerAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNOCCUPIED_SETBACK_MIN_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, UNOCCUPIED_SETBACK_MIN_ATTRIBUTE_ID, true);
     }
 
     public void subscribeUnoccupiedSetbackMinAttribute(
-        UnoccupiedSetbackMinAttributeCallback callback, int minInterval, int maxInterval) {
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNOCCUPIED_SETBACK_MIN_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, UNOCCUPIED_SETBACK_MIN_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readUnoccupiedSetbackMaxAttribute(
-        UnoccupiedSetbackMaxAttributeCallback callback) {
+        IntegerAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNOCCUPIED_SETBACK_MAX_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, UNOCCUPIED_SETBACK_MAX_ATTRIBUTE_ID, true);
     }
 
     public void subscribeUnoccupiedSetbackMaxAttribute(
-        UnoccupiedSetbackMaxAttributeCallback callback, int minInterval, int maxInterval) {
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNOCCUPIED_SETBACK_MAX_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, UNOCCUPIED_SETBACK_MAX_ATTRIBUTE_ID, minInterval, maxInterval);

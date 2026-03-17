@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-inline constexpr uint32_t kRevision = 9;
+inline constexpr uint32_t kRevision = 11;
 
 namespace Attributes {
 
@@ -60,7 +60,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(PIHeatingDemand::Id, B
 namespace HVACSystemTypeConfiguration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(HVACSystemTypeConfiguration::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          Access::Privilege::kManage);
+                                                          std::nullopt);
 } // namespace HVACSystemTypeConfiguration
 namespace LocalTemperatureCalibration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(LocalTemperatureCalibration::Id,
@@ -122,20 +122,6 @@ namespace ThermostatRunningMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatRunningMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ThermostatRunningMode
-namespace StartOfWeek {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(StartOfWeek::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
-} // namespace StartOfWeek
-namespace NumberOfWeeklyTransitions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfWeeklyTransitions::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
-} // namespace NumberOfWeeklyTransitions
-namespace NumberOfDailyTransitions {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfDailyTransitions::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
-} // namespace NumberOfDailyTransitions
 namespace TemperatureSetpointHold {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TemperatureSetpointHold::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
@@ -148,7 +134,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TemperatureSetpointHol
 namespace ThermostatProgrammingOperationMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatProgrammingOperationMode::Id,
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          Access::Privilege::kManage);
+                                                          std::nullopt);
 } // namespace ThermostatProgrammingOperationMode
 namespace ThermostatRunningState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatRunningState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -169,7 +155,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SetpointChangeSourceTi
 } // namespace SetpointChangeSourceTimestamp
 namespace OccupiedSetback {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OccupiedSetback::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kManage);
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace OccupiedSetback
 namespace OccupiedSetbackMin {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OccupiedSetbackMin::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -181,7 +167,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(OccupiedSetbackMax::Id
 } // namespace OccupiedSetbackMax
 namespace UnoccupiedSetback {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(UnoccupiedSetback::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, Access::Privilege::kManage);
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace UnoccupiedSetback
 namespace UnoccupiedSetbackMin {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(UnoccupiedSetbackMin::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -314,18 +300,6 @@ namespace SetpointRaiseLower {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetpointRaiseLower::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace SetpointRaiseLower
-namespace SetWeeklySchedule {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetWeeklySchedule::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kManage);
-} // namespace SetWeeklySchedule
-namespace GetWeeklySchedule {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GetWeeklySchedule::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
-} // namespace GetWeeklySchedule
-namespace ClearWeeklySchedule {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ClearWeeklySchedule::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kManage);
-} // namespace ClearWeeklySchedule
 namespace SetActiveScheduleRequest {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(SetActiveScheduleRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kOperate);

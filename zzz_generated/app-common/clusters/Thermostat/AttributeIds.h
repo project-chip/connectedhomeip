@@ -14,7 +14,7 @@ namespace Thermostat {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 69;
+inline constexpr uint32_t kAttributesCount = 66;
 
 namespace LocalTemperature {
 inline constexpr AttributeId Id = 0x00000000;
@@ -111,18 +111,6 @@ inline constexpr AttributeId Id = 0x0000001C;
 namespace ThermostatRunningMode {
 inline constexpr AttributeId Id = 0x0000001E;
 } // namespace ThermostatRunningMode
-
-namespace StartOfWeek {
-inline constexpr AttributeId Id = 0x00000020;
-} // namespace StartOfWeek
-
-namespace NumberOfWeeklyTransitions {
-inline constexpr AttributeId Id = 0x00000021;
-} // namespace NumberOfWeeklyTransitions
-
-namespace NumberOfDailyTransitions {
-inline constexpr AttributeId Id = 0x00000022;
-} // namespace NumberOfDailyTransitions
 
 namespace TemperatureSetpointHold {
 inline constexpr AttributeId Id = 0x00000023;

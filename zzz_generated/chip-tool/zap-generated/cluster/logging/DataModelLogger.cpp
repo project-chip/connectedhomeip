@@ -4691,40 +4691,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("TransitionTime", indent + 1, value.transitionTime);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TransitionTime'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("HeatSetpoint", indent + 1, value.heatSetpoint);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HeatSetpoint'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("CoolSetpoint", indent + 1, value.coolSetpoint);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CoolSetpoint'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -12618,18 +12584,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(
-        DataModelLogger::LogValue("numberOfTransitionsForSequence", indent + 1, value.numberOfTransitionsForSequence));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("dayOfWeekForSequence", indent + 1, value.dayOfWeekForSequence));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("modeForSequence", indent + 1, value.modeForSequence));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("transitions", indent + 1, value.transitions));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const Thermostat::Commands::AddThermostatSuggestionResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -19079,21 +19033,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ThermostatRunningMode", 1, value);
         }
-        case Thermostat::Attributes::StartOfWeek::Id: {
-            chip::app::Clusters::Thermostat::StartOfWeekEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StartOfWeek", 1, value);
-        }
-        case Thermostat::Attributes::NumberOfWeeklyTransitions::Id: {
-            uint8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("NumberOfWeeklyTransitions", 1, value);
-        }
-        case Thermostat::Attributes::NumberOfDailyTransitions::Id: {
-            uint8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("NumberOfDailyTransitions", 1, value);
-        }
         case Thermostat::Attributes::TemperatureSetpointHold::Id: {
             chip::app::Clusters::Thermostat::TemperatureSetpointHoldEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -19130,32 +19069,32 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("SetpointChangeSourceTimestamp", 1, value);
         }
         case Thermostat::Attributes::OccupiedSetback::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OccupiedSetback", 1, value);
         }
         case Thermostat::Attributes::OccupiedSetbackMin::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OccupiedSetbackMin", 1, value);
         }
         case Thermostat::Attributes::OccupiedSetbackMax::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OccupiedSetbackMax", 1, value);
         }
         case Thermostat::Attributes::UnoccupiedSetback::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("UnoccupiedSetback", 1, value);
         }
         case Thermostat::Attributes::UnoccupiedSetbackMin::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("UnoccupiedSetbackMin", 1, value);
         }
         case Thermostat::Attributes::UnoccupiedSetbackMax::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("UnoccupiedSetbackMax", 1, value);
         }
@@ -24246,11 +24185,6 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
     case Thermostat::Id: {
         switch (path.mCommandId)
         {
-        case Thermostat::Commands::GetWeeklyScheduleResponse::Id: {
-            Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GetWeeklyScheduleResponse", 1, value);
-        }
         case Thermostat::Commands::AddThermostatSuggestionResponse::Id: {
             Thermostat::Commands::AddThermostatSuggestionResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));

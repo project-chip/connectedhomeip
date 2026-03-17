@@ -13,26 +13,14 @@ namespace Thermostat {
 namespace Commands {
 
 // Total number of client to server commands supported by the cluster
-inline constexpr uint32_t kAcceptedCommandsCount = 9;
+inline constexpr uint32_t kAcceptedCommandsCount = 6;
 
 // Total number of server to client commands supported by the cluster (response commands)
-inline constexpr uint32_t kGeneratedCommandsCount = 3;
+inline constexpr uint32_t kGeneratedCommandsCount = 2;
 
 namespace SetpointRaiseLower {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace SetpointRaiseLower
-
-namespace SetWeeklySchedule {
-inline constexpr CommandId Id = 0x00000001;
-} // namespace SetWeeklySchedule
-
-namespace GetWeeklySchedule {
-inline constexpr CommandId Id = 0x00000002;
-} // namespace GetWeeklySchedule
-
-namespace ClearWeeklySchedule {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace ClearWeeklySchedule
 
 namespace SetActiveScheduleRequest {
 inline constexpr CommandId Id = 0x00000005;
@@ -53,10 +41,6 @@ inline constexpr CommandId Id = 0x00000008;
 namespace AtomicRequest {
 inline constexpr CommandId Id = 0x000000FE;
 } // namespace AtomicRequest
-
-namespace GetWeeklyScheduleResponse {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace GetWeeklyScheduleResponse
 
 namespace AddThermostatSuggestionResponse {
 inline constexpr CommandId Id = 0x00000002;

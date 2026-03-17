@@ -5125,7 +5125,7 @@ cluster PumpConfigurationAndControl = 512 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 9;
+  revision 11;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -5192,16 +5192,6 @@ cluster Thermostat = 513 {
     kBoth = 2;
   }
 
-  enum StartOfWeekEnum : enum8 {
-    kSunday = 0;
-    kMonday = 1;
-    kTuesday = 2;
-    kWednesday = 3;
-    kThursday = 4;
-    kFriday = 5;
-    kSaturday = 6;
-  }
-
   enum SystemModeEnum : enum8 {
     kOff = 0;
     kAuto = 1;
@@ -5237,7 +5227,6 @@ cluster Thermostat = 513 {
     kHeating = 0x1;
     kCooling = 0x2;
     kOccupancy = 0x4;
-    kScheduleConfiguration = 0x8;
     kSetback = 0x10;
     kAutoMode = 0x20;
     kLocalTemperatureNotExposed = 0x40;
@@ -5294,11 +5283,6 @@ cluster Thermostat = 513 {
     kFriday = 0x20;
     kSaturday = 0x40;
     kAway = 0x80;
-  }
-
-  bitmap ScheduleModeBitmap : bitmap8 {
-    kHeatSetpointPresent = 0x1;
-    kCoolSetpointPresent = 0x2;
   }
 
   bitmap ScheduleTypeFeaturesBitmap : bitmap16 {
@@ -5365,12 +5349,6 @@ cluster Thermostat = 513 {
     epoch_s expirationTime = 3;
   }
 
-  struct WeeklyScheduleTransitionStruct {
-    int16u transitionTime = 0;
-    nullable temperature heatSetpoint = 1;
-    nullable temperature coolSetpoint = 2;
-  }
-
   provisional info event SystemModeChange = 0 {
     optional SystemModeEnum previousSystemMode = 0;
     SystemModeEnum currentSystemMode = 1;
@@ -5421,7 +5399,7 @@ cluster Thermostat = 513 {
   readonly attribute optional temperature absMaxCoolSetpointLimit = 6;
   readonly attribute optional int8u PICoolingDemand = 7;
   readonly attribute optional int8u PIHeatingDemand = 8;
-  attribute access(write: manage) optional HVACSystemTypeBitmap HVACSystemTypeConfiguration = 9;
+  readonly attribute access(write: manage) optional HVACSystemTypeBitmap HVACSystemTypeConfiguration = 9;
   attribute access(write: manage) optional int8s localTemperatureCalibration = 16;
   attribute optional temperature occupiedCoolingSetpoint = 17;
   attribute optional temperature occupiedHeatingSetpoint = 18;
@@ -5436,22 +5414,19 @@ cluster Thermostat = 513 {
   attribute access(write: manage) ControlSequenceOfOperationEnum controlSequenceOfOperation = 27;
   attribute access(write: manage) SystemModeEnum systemMode = 28;
   readonly attribute optional ThermostatRunningModeEnum thermostatRunningMode = 30;
-  readonly attribute optional StartOfWeekEnum startOfWeek = 32;
-  readonly attribute optional int8u numberOfWeeklyTransitions = 33;
-  readonly attribute optional int8u numberOfDailyTransitions = 34;
   attribute access(write: manage) optional TemperatureSetpointHoldEnum temperatureSetpointHold = 35;
   attribute access(write: manage) optional nullable int16u temperatureSetpointHoldDuration = 36;
-  attribute access(write: manage) optional ProgrammingOperationModeBitmap thermostatProgrammingOperationMode = 37;
+  readonly attribute access(write: manage) optional ProgrammingOperationModeBitmap thermostatProgrammingOperationMode = 37;
   readonly attribute optional RelayStateBitmap thermostatRunningState = 41;
   readonly attribute optional SetpointChangeSourceEnum setpointChangeSource = 48;
   readonly attribute optional nullable int16s setpointChangeAmount = 49;
   readonly attribute optional epoch_s setpointChangeSourceTimestamp = 50;
-  attribute access(write: manage) optional nullable int8u occupiedSetback = 52;
-  readonly attribute optional nullable int8u occupiedSetbackMin = 53;
-  readonly attribute optional nullable int8u occupiedSetbackMax = 54;
-  attribute access(write: manage) optional nullable int8u unoccupiedSetback = 55;
-  readonly attribute optional nullable int8u unoccupiedSetbackMin = 56;
-  readonly attribute optional nullable int8u unoccupiedSetbackMax = 57;
+  readonly attribute access(write: manage) optional int8u occupiedSetback = 52;
+  readonly attribute optional int8u occupiedSetbackMin = 53;
+  readonly attribute optional int8u occupiedSetbackMax = 54;
+  readonly attribute access(write: manage) optional int8u unoccupiedSetback = 55;
+  readonly attribute optional int8u unoccupiedSetbackMin = 56;
+  readonly attribute optional int8u unoccupiedSetbackMax = 57;
   attribute access(write: manage) optional int8u emergencyHeatDelta = 58;
   attribute access(write: manage) optional ACTypeEnum ACType = 64;
   attribute access(write: manage) optional int16u ACCapacity = 65;
@@ -5485,25 +5460,6 @@ cluster Thermostat = 513 {
   request struct SetpointRaiseLowerRequest {
     SetpointRaiseLowerModeEnum mode = 0;
     int8s amount = 1;
-  }
-
-  response struct GetWeeklyScheduleResponse = 0 {
-    int8u numberOfTransitionsForSequence = 0;
-    ScheduleDayOfWeekBitmap dayOfWeekForSequence = 1;
-    ScheduleModeBitmap modeForSequence = 2;
-    WeeklyScheduleTransitionStruct transitions[] = 3;
-  }
-
-  request struct SetWeeklyScheduleRequest {
-    int8u numberOfTransitionsForSequence = 0;
-    ScheduleDayOfWeekBitmap dayOfWeekForSequence = 1;
-    ScheduleModeBitmap modeForSequence = 2;
-    WeeklyScheduleTransitionStruct transitions[] = 3;
-  }
-
-  request struct GetWeeklyScheduleRequest {
-    ScheduleDayOfWeekBitmap daysToReturn = 0;
-    ScheduleModeBitmap modeToReturn = 1;
   }
 
   response struct AddThermostatSuggestionResponse = 2 {
@@ -5540,19 +5496,15 @@ cluster Thermostat = 513 {
     optional int16u timeout = 2;
   }
 
-  /** Upon receipt, the attributes for the indicated setpoint(s) SHALL have the amount specified in the Amount field added to them. */
+  /** This command will raise or lower the setpoint based on the provided values. */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
-  /** This command is used to update the thermostat weekly setpoint schedule from a management system. */
-  command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
-  /** The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command. */
-  command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
-  /** This command is used to clear the weekly schedule. */
-  command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
-  /** Upon receipt, if the Schedules attribute contains a ScheduleStruct whose ScheduleHandle field matches the value of the ScheduleHandle field, the server SHALL set the thermostat's ActiveScheduleHandle attribute to the value of the ScheduleHandle field. */
+  /** This command will set the active schedule to the provided schedule handle. */
   command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
-  /** ID */
+  /** This command will set the active preset to the provided preset handle. */
   command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  /** This command will add a new suggestion based on the specified values. */
   command access(invoke: manage) AddThermostatSuggestion(AddThermostatSuggestionRequest): AddThermostatSuggestionResponse = 7;
+  /** This command will remove the specified suggestion. */
   command access(invoke: manage) RemoveThermostatSuggestion(RemoveThermostatSuggestionRequest): DefaultSuccess = 8;
   /** Begins, Commits or Cancels an atomic write */
   command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
@@ -5560,7 +5512,7 @@ cluster Thermostat = 513 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 9;
+  revision 11;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -5627,16 +5579,6 @@ cluster Thermostat = 513 {
     kBoth = 2;
   }
 
-  enum StartOfWeekEnum : enum8 {
-    kSunday = 0;
-    kMonday = 1;
-    kTuesday = 2;
-    kWednesday = 3;
-    kThursday = 4;
-    kFriday = 5;
-    kSaturday = 6;
-  }
-
   enum SystemModeEnum : enum8 {
     kOff = 0;
     kAuto = 1;
@@ -5672,7 +5614,6 @@ cluster Thermostat = 513 {
     kHeating = 0x1;
     kCooling = 0x2;
     kOccupancy = 0x4;
-    kScheduleConfiguration = 0x8;
     kSetback = 0x10;
     kAutoMode = 0x20;
     kLocalTemperatureNotExposed = 0x40;
@@ -5729,11 +5670,6 @@ cluster Thermostat = 513 {
     kFriday = 0x20;
     kSaturday = 0x40;
     kAway = 0x80;
-  }
-
-  bitmap ScheduleModeBitmap : bitmap8 {
-    kHeatSetpointPresent = 0x1;
-    kCoolSetpointPresent = 0x2;
   }
 
   bitmap ScheduleTypeFeaturesBitmap : bitmap16 {
@@ -5800,12 +5736,6 @@ cluster Thermostat = 513 {
     epoch_s expirationTime = 3;
   }
 
-  struct WeeklyScheduleTransitionStruct {
-    int16u transitionTime = 0;
-    nullable temperature heatSetpoint = 1;
-    nullable temperature coolSetpoint = 2;
-  }
-
   provisional info event SystemModeChange = 0 {
     optional SystemModeEnum previousSystemMode = 0;
     SystemModeEnum currentSystemMode = 1;
@@ -5856,7 +5786,7 @@ cluster Thermostat = 513 {
   readonly attribute optional temperature absMaxCoolSetpointLimit = 6;
   readonly attribute optional int8u PICoolingDemand = 7;
   readonly attribute optional int8u PIHeatingDemand = 8;
-  attribute access(write: manage) optional HVACSystemTypeBitmap HVACSystemTypeConfiguration = 9;
+  readonly attribute access(write: manage) optional HVACSystemTypeBitmap HVACSystemTypeConfiguration = 9;
   attribute access(write: manage) optional int8s localTemperatureCalibration = 16;
   attribute optional temperature occupiedCoolingSetpoint = 17;
   attribute optional temperature occupiedHeatingSetpoint = 18;
@@ -5871,22 +5801,19 @@ cluster Thermostat = 513 {
   attribute access(write: manage) ControlSequenceOfOperationEnum controlSequenceOfOperation = 27;
   attribute access(write: manage) SystemModeEnum systemMode = 28;
   readonly attribute optional ThermostatRunningModeEnum thermostatRunningMode = 30;
-  readonly attribute optional StartOfWeekEnum startOfWeek = 32;
-  readonly attribute optional int8u numberOfWeeklyTransitions = 33;
-  readonly attribute optional int8u numberOfDailyTransitions = 34;
   attribute access(write: manage) optional TemperatureSetpointHoldEnum temperatureSetpointHold = 35;
   attribute access(write: manage) optional nullable int16u temperatureSetpointHoldDuration = 36;
-  attribute access(write: manage) optional ProgrammingOperationModeBitmap thermostatProgrammingOperationMode = 37;
+  readonly attribute access(write: manage) optional ProgrammingOperationModeBitmap thermostatProgrammingOperationMode = 37;
   readonly attribute optional RelayStateBitmap thermostatRunningState = 41;
   readonly attribute optional SetpointChangeSourceEnum setpointChangeSource = 48;
   readonly attribute optional nullable int16s setpointChangeAmount = 49;
   readonly attribute optional epoch_s setpointChangeSourceTimestamp = 50;
-  attribute access(write: manage) optional nullable int8u occupiedSetback = 52;
-  readonly attribute optional nullable int8u occupiedSetbackMin = 53;
-  readonly attribute optional nullable int8u occupiedSetbackMax = 54;
-  attribute access(write: manage) optional nullable int8u unoccupiedSetback = 55;
-  readonly attribute optional nullable int8u unoccupiedSetbackMin = 56;
-  readonly attribute optional nullable int8u unoccupiedSetbackMax = 57;
+  readonly attribute access(write: manage) optional int8u occupiedSetback = 52;
+  readonly attribute optional int8u occupiedSetbackMin = 53;
+  readonly attribute optional int8u occupiedSetbackMax = 54;
+  readonly attribute access(write: manage) optional int8u unoccupiedSetback = 55;
+  readonly attribute optional int8u unoccupiedSetbackMin = 56;
+  readonly attribute optional int8u unoccupiedSetbackMax = 57;
   attribute access(write: manage) optional int8u emergencyHeatDelta = 58;
   attribute access(write: manage) optional ACTypeEnum ACType = 64;
   attribute access(write: manage) optional int16u ACCapacity = 65;
@@ -5920,25 +5847,6 @@ cluster Thermostat = 513 {
   request struct SetpointRaiseLowerRequest {
     SetpointRaiseLowerModeEnum mode = 0;
     int8s amount = 1;
-  }
-
-  response struct GetWeeklyScheduleResponse = 0 {
-    int8u numberOfTransitionsForSequence = 0;
-    ScheduleDayOfWeekBitmap dayOfWeekForSequence = 1;
-    ScheduleModeBitmap modeForSequence = 2;
-    WeeklyScheduleTransitionStruct transitions[] = 3;
-  }
-
-  request struct SetWeeklyScheduleRequest {
-    int8u numberOfTransitionsForSequence = 0;
-    ScheduleDayOfWeekBitmap dayOfWeekForSequence = 1;
-    ScheduleModeBitmap modeForSequence = 2;
-    WeeklyScheduleTransitionStruct transitions[] = 3;
-  }
-
-  request struct GetWeeklyScheduleRequest {
-    ScheduleDayOfWeekBitmap daysToReturn = 0;
-    ScheduleModeBitmap modeToReturn = 1;
   }
 
   response struct AddThermostatSuggestionResponse = 2 {
@@ -5975,19 +5883,15 @@ cluster Thermostat = 513 {
     optional int16u timeout = 2;
   }
 
-  /** Upon receipt, the attributes for the indicated setpoint(s) SHALL have the amount specified in the Amount field added to them. */
+  /** This command will raise or lower the setpoint based on the provided values. */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
-  /** This command is used to update the thermostat weekly setpoint schedule from a management system. */
-  command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
-  /** The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command. */
-  command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
-  /** This command is used to clear the weekly schedule. */
-  command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
-  /** Upon receipt, if the Schedules attribute contains a ScheduleStruct whose ScheduleHandle field matches the value of the ScheduleHandle field, the server SHALL set the thermostat's ActiveScheduleHandle attribute to the value of the ScheduleHandle field. */
+  /** This command will set the active schedule to the provided schedule handle. */
   command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
-  /** ID */
+  /** This command will set the active preset to the provided preset handle. */
   command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  /** This command will add a new suggestion based on the specified values. */
   command access(invoke: manage) AddThermostatSuggestion(AddThermostatSuggestionRequest): AddThermostatSuggestionResponse = 7;
+  /** This command will remove the specified suggestion. */
   command access(invoke: manage) RemoveThermostatSuggestion(RemoveThermostatSuggestionRequest): DefaultSuccess = 8;
   /** Begins, Commits or Cancels an atomic write */
   command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
@@ -9254,9 +9158,6 @@ endpoint 0 {
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;
     callback attribute thermostatRunningMode default = 0x00;
-    ram      attribute startOfWeek default = 0;
-    ram      attribute numberOfWeeklyTransitions default = 7;
-    ram      attribute numberOfDailyTransitions default = 4;
     ram      attribute temperatureSetpointHold default = 0x00;
     callback attribute temperatureSetpointHoldDuration;
     callback attribute thermostatProgrammingOperationMode default = 0x00;

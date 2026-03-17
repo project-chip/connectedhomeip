@@ -32514,9 +32514,6 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="controlSequenceOfOperation", Tag=0x0000001B, Type=Thermostat.Enums.ControlSequenceOfOperationEnum),
                 ClusterObjectFieldDescriptor(Label="systemMode", Tag=0x0000001C, Type=Thermostat.Enums.SystemModeEnum),
                 ClusterObjectFieldDescriptor(Label="thermostatRunningMode", Tag=0x0000001E, Type=typing.Optional[Thermostat.Enums.ThermostatRunningModeEnum]),
-                ClusterObjectFieldDescriptor(Label="startOfWeek", Tag=0x00000020, Type=typing.Optional[Thermostat.Enums.StartOfWeekEnum]),
-                ClusterObjectFieldDescriptor(Label="numberOfWeeklyTransitions", Tag=0x00000021, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="numberOfDailyTransitions", Tag=0x00000022, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="temperatureSetpointHold", Tag=0x00000023, Type=typing.Optional[Thermostat.Enums.TemperatureSetpointHoldEnum]),
                 ClusterObjectFieldDescriptor(Label="temperatureSetpointHoldDuration", Tag=0x00000024, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="thermostatProgrammingOperationMode", Tag=0x00000025, Type=typing.Optional[uint]),
@@ -32524,12 +32521,12 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="setpointChangeSource", Tag=0x00000030, Type=typing.Optional[Thermostat.Enums.SetpointChangeSourceEnum]),
                 ClusterObjectFieldDescriptor(Label="setpointChangeAmount", Tag=0x00000031, Type=typing.Union[None, Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="setpointChangeSourceTimestamp", Tag=0x00000032, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="occupiedSetback", Tag=0x00000034, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="occupiedSetbackMin", Tag=0x00000035, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="occupiedSetbackMax", Tag=0x00000036, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="unoccupiedSetback", Tag=0x00000037, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="unoccupiedSetbackMin", Tag=0x00000038, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="unoccupiedSetbackMax", Tag=0x00000039, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="occupiedSetback", Tag=0x00000034, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="occupiedSetbackMin", Tag=0x00000035, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="occupiedSetbackMax", Tag=0x00000036, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="unoccupiedSetback", Tag=0x00000037, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="unoccupiedSetbackMin", Tag=0x00000038, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="unoccupiedSetbackMax", Tag=0x00000039, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="emergencyHeatDelta", Tag=0x0000003A, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="ACType", Tag=0x00000040, Type=typing.Optional[Thermostat.Enums.ACTypeEnum]),
                 ClusterObjectFieldDescriptor(Label="ACCapacity", Tag=0x00000041, Type=typing.Optional[uint]),
@@ -32585,9 +32582,6 @@ class Thermostat(Cluster):
     controlSequenceOfOperation: Thermostat.Enums.ControlSequenceOfOperationEnum = 0
     systemMode: Thermostat.Enums.SystemModeEnum = 0
     thermostatRunningMode: typing.Optional[Thermostat.Enums.ThermostatRunningModeEnum] = None
-    startOfWeek: typing.Optional[Thermostat.Enums.StartOfWeekEnum] = None
-    numberOfWeeklyTransitions: typing.Optional[uint] = None
-    numberOfDailyTransitions: typing.Optional[uint] = None
     temperatureSetpointHold: typing.Optional[Thermostat.Enums.TemperatureSetpointHoldEnum] = None
     temperatureSetpointHoldDuration: typing.Union[None, Nullable, uint] = None
     thermostatProgrammingOperationMode: typing.Optional[uint] = None
@@ -32595,12 +32589,12 @@ class Thermostat(Cluster):
     setpointChangeSource: typing.Optional[Thermostat.Enums.SetpointChangeSourceEnum] = None
     setpointChangeAmount: typing.Union[None, Nullable, int] = None
     setpointChangeSourceTimestamp: typing.Optional[uint] = None
-    occupiedSetback: typing.Union[None, Nullable, uint] = None
-    occupiedSetbackMin: typing.Union[None, Nullable, uint] = None
-    occupiedSetbackMax: typing.Union[None, Nullable, uint] = None
-    unoccupiedSetback: typing.Union[None, Nullable, uint] = None
-    unoccupiedSetbackMin: typing.Union[None, Nullable, uint] = None
-    unoccupiedSetbackMax: typing.Union[None, Nullable, uint] = None
+    occupiedSetback: typing.Optional[uint] = None
+    occupiedSetbackMin: typing.Optional[uint] = None
+    occupiedSetbackMax: typing.Optional[uint] = None
+    unoccupiedSetback: typing.Optional[uint] = None
+    unoccupiedSetbackMin: typing.Optional[uint] = None
+    unoccupiedSetbackMax: typing.Optional[uint] = None
     emergencyHeatDelta: typing.Optional[uint] = None
     ACType: typing.Optional[Thermostat.Enums.ACTypeEnum] = None
     ACCapacity: typing.Optional[uint] = None
@@ -32733,20 +32727,6 @@ class Thermostat(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3
 
-        class StartOfWeekEnum(MatterIntEnum):
-            kSunday = 0x00
-            kMonday = 0x01
-            kTuesday = 0x02
-            kWednesday = 0x03
-            kThursday = 0x04
-            kFriday = 0x05
-            kSaturday = 0x06
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 7
-
         class SystemModeEnum(MatterIntEnum):
             kOff = 0x00
             kAuto = 0x01
@@ -32794,7 +32774,6 @@ class Thermostat(Cluster):
             kHeating = 0x1
             kCooling = 0x2
             kOccupancy = 0x4
-            kScheduleConfiguration = 0x8
             kSetback = 0x10
             kAutoMode = 0x20
             kLocalTemperatureNotExposed = 0x40
@@ -32844,10 +32823,6 @@ class Thermostat(Cluster):
             kFriday = 0x20
             kSaturday = 0x40
             kAway = 0x80
-
-        class ScheduleModeBitmap(IntFlag):
-            kHeatSetpointPresent = 0x1
-            kCoolSetpointPresent = 0x2
 
         class ScheduleTypeFeaturesBitmap(IntFlag):
             kSupportsPresets = 0x1
@@ -32976,21 +32951,6 @@ class Thermostat(Cluster):
             effectiveTime: 'uint' = 0
             expirationTime: 'uint' = 0
 
-        @dataclass
-        class WeeklyScheduleTransitionStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="heatSetpoint", Tag=1, Type=typing.Union[Nullable, int]),
-                        ClusterObjectFieldDescriptor(Label="coolSetpoint", Tag=2, Type=typing.Union[Nullable, int]),
-                    ])
-
-            transitionTime: 'uint' = 0
-            heatSetpoint: 'typing.Union[Nullable, int]' = NullValue
-            coolSetpoint: 'typing.Union[Nullable, int]' = NullValue
-
     class Commands:
         @dataclass
         class SetpointRaiseLower(ClusterCommand):
@@ -33011,68 +32971,6 @@ class Thermostat(Cluster):
             amount: int = 0
 
         @dataclass
-        class GetWeeklyScheduleResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000201
-            command_id: typing.ClassVar[int] = 0x00000000
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="numberOfTransitionsForSequence", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="dayOfWeekForSequence", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="modeForSequence", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="transitions", Tag=3, Type=typing.List[Thermostat.Structs.WeeklyScheduleTransitionStruct]),
-                    ])
-
-            numberOfTransitionsForSequence: uint = 0
-            dayOfWeekForSequence: uint = 0
-            modeForSequence: uint = 0
-            transitions: typing.List[Thermostat.Structs.WeeklyScheduleTransitionStruct] = field(default_factory=lambda: [])
-
-        @dataclass
-        class SetWeeklySchedule(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000201
-            command_id: typing.ClassVar[int] = 0x00000001
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="numberOfTransitionsForSequence", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="dayOfWeekForSequence", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="modeForSequence", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="transitions", Tag=3, Type=typing.List[Thermostat.Structs.WeeklyScheduleTransitionStruct]),
-                    ])
-
-            numberOfTransitionsForSequence: uint = 0
-            dayOfWeekForSequence: uint = 0
-            modeForSequence: uint = 0
-            transitions: typing.List[Thermostat.Structs.WeeklyScheduleTransitionStruct] = field(default_factory=lambda: [])
-
-        @dataclass
-        class GetWeeklySchedule(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000201
-            command_id: typing.ClassVar[int] = 0x00000002
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'GetWeeklyScheduleResponse'
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="daysToReturn", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="modeToReturn", Tag=1, Type=uint),
-                    ])
-
-            daysToReturn: uint = 0
-            modeToReturn: uint = 0
-
-        @dataclass
         class AddThermostatSuggestionResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x00000002
@@ -33087,19 +32985,6 @@ class Thermostat(Cluster):
                     ])
 
             uniqueID: uint = 0
-
-        @dataclass
-        class ClearWeeklySchedule(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000201
-            command_id: typing.ClassVar[int] = 0x00000003
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                    ])
 
         @dataclass
         class SetActiveScheduleRequest(ClusterCommand):
@@ -33595,54 +33480,6 @@ class Thermostat(Cluster):
             value: typing.Optional[Thermostat.Enums.ThermostatRunningModeEnum] = None
 
         @dataclass
-        class StartOfWeek(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000201
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000020
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[Thermostat.Enums.StartOfWeekEnum])
-
-            value: typing.Optional[Thermostat.Enums.StartOfWeekEnum] = None
-
-        @dataclass
-        class NumberOfWeeklyTransitions(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000201
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000021
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: typing.Optional[uint] = None
-
-        @dataclass
-        class NumberOfDailyTransitions(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000201
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000022
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: typing.Optional[uint] = None
-
-        @dataclass
         class TemperatureSetpointHold(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -33766,9 +33603,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: typing.Union[None, Nullable, uint] = None
+            value: typing.Optional[uint] = None
 
         @dataclass
         class OccupiedSetbackMin(ClusterAttributeDescriptor):
@@ -33782,9 +33619,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: typing.Union[None, Nullable, uint] = None
+            value: typing.Optional[uint] = None
 
         @dataclass
         class OccupiedSetbackMax(ClusterAttributeDescriptor):
@@ -33798,9 +33635,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: typing.Union[None, Nullable, uint] = None
+            value: typing.Optional[uint] = None
 
         @dataclass
         class UnoccupiedSetback(ClusterAttributeDescriptor):
@@ -33814,9 +33651,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: typing.Union[None, Nullable, uint] = None
+            value: typing.Optional[uint] = None
 
         @dataclass
         class UnoccupiedSetbackMin(ClusterAttributeDescriptor):
@@ -33830,9 +33667,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: typing.Union[None, Nullable, uint] = None
+            value: typing.Optional[uint] = None
 
         @dataclass
         class UnoccupiedSetbackMax(ClusterAttributeDescriptor):
@@ -33846,9 +33683,9 @@ class Thermostat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: typing.Union[None, Nullable, uint] = None
+            value: typing.Optional[uint] = None
 
         @dataclass
         class EmergencyHeatDelta(ClusterAttributeDescriptor):

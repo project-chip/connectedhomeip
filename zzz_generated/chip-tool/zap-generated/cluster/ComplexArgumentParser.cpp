@@ -5272,45 +5272,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::T
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WeeklyScheduleTransitionStruct.transitionTime", "transitionTime",
-                                                                  value.isMember("transitionTime")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WeeklyScheduleTransitionStruct.heatSetpoint", "heatSetpoint",
-                                                                  value.isMember("heatSetpoint")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("WeeklyScheduleTransitionStruct.coolSetpoint", "coolSetpoint",
-                                                                  value.isMember("coolSetpoint")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transitionTime");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transitionTime, value["transitionTime"]));
-    valueCopy.removeMember("transitionTime");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatSetpoint");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.heatSetpoint, value["heatSetpoint"]));
-    valueCopy.removeMember("heatSetpoint");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "coolSetpoint");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.coolSetpoint, value["coolSetpoint"]));
-    valueCopy.removeMember("coolSetpoint");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.transitionTime);
-    ComplexArgumentParser::Finalize(request.heatSetpoint);
-    ComplexArgumentParser::Finalize(request.coolSetpoint);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type & request,
                                         Json::Value & value)
 {

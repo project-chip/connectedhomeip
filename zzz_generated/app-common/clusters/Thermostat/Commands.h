@@ -52,30 +52,10 @@ struct Type;
 struct DecodableType;
 } // namespace SetpointRaiseLower
 
-namespace GetWeeklyScheduleResponse {
-struct Type;
-struct DecodableType;
-} // namespace GetWeeklyScheduleResponse
-
-namespace SetWeeklySchedule {
-struct Type;
-struct DecodableType;
-} // namespace SetWeeklySchedule
-
-namespace GetWeeklySchedule {
-struct Type;
-struct DecodableType;
-} // namespace GetWeeklySchedule
-
 namespace AddThermostatSuggestionResponse {
 struct Type;
 struct DecodableType;
 } // namespace AddThermostatSuggestionResponse
-
-namespace ClearWeeklySchedule {
-struct Type;
-struct DecodableType;
-} // namespace ClearWeeklySchedule
 
 namespace SetActiveScheduleRequest {
 struct Type;
@@ -147,128 +127,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetpointRaiseLower
-namespace GetWeeklyScheduleResponse {
-enum class Fields : uint8_t
-{
-    kNumberOfTransitionsForSequence = 0,
-    kDayOfWeekForSequence           = 1,
-    kModeForSequence                = 2,
-    kTransitions                    = 3,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetWeeklyScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    uint8_t numberOfTransitionsForSequence                      = static_cast<uint8_t>(0);
-    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
-    chip::BitMask<ScheduleModeBitmap> modeForSequence           = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
-    DataModel::List<const Structs::WeeklyScheduleTransitionStruct::Type> transitions;
-
-    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetWeeklyScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    uint8_t numberOfTransitionsForSequence                      = static_cast<uint8_t>(0);
-    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
-    chip::BitMask<ScheduleModeBitmap> modeForSequence           = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
-    DataModel::DecodableList<Structs::WeeklyScheduleTransitionStruct::DecodableType> transitions;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetWeeklyScheduleResponse
-namespace SetWeeklySchedule {
-enum class Fields : uint8_t
-{
-    kNumberOfTransitionsForSequence = 0,
-    kDayOfWeekForSequence           = 1,
-    kModeForSequence                = 2,
-    kTransitions                    = 3,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetWeeklySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    uint8_t numberOfTransitionsForSequence                      = static_cast<uint8_t>(0);
-    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
-    chip::BitMask<ScheduleModeBitmap> modeForSequence           = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
-    DataModel::List<const Structs::WeeklyScheduleTransitionStruct::Type> transitions;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetWeeklySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    uint8_t numberOfTransitionsForSequence                      = static_cast<uint8_t>(0);
-    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
-    chip::BitMask<ScheduleModeBitmap> modeForSequence           = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
-    DataModel::DecodableList<Structs::WeeklyScheduleTransitionStruct::DecodableType> transitions;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetWeeklySchedule
-namespace GetWeeklySchedule {
-enum class Fields : uint8_t
-{
-    kDaysToReturn = 0,
-    kModeToReturn = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetWeeklySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    chip::BitMask<ScheduleDayOfWeekBitmap> daysToReturn = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
-    chip::BitMask<ScheduleModeBitmap> modeToReturn      = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetWeeklySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    chip::BitMask<ScheduleDayOfWeekBitmap> daysToReturn = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
-    chip::BitMask<ScheduleModeBitmap> modeToReturn      = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetWeeklySchedule
 namespace AddThermostatSuggestionResponse {
 enum class Fields : uint8_t
 {
@@ -302,35 +160,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddThermostatSuggestionResponse
-namespace ClearWeeklySchedule {
-enum class Fields : uint8_t
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearWeeklySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearWeeklySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ClearWeeklySchedule
 namespace SetActiveScheduleRequest {
 enum class Fields : uint8_t
 {

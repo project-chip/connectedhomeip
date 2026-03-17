@@ -46,13 +46,6 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ThermostatCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class GetWeeklyScheduleResponse(
-    val numberOfTransitionsForSequence: UByte,
-    val dayOfWeekForSequence: UByte,
-    val modeForSequence: UByte,
-    val transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>,
-  )
-
   class AddThermostatSuggestionResponse(val uniqueID: UByte)
 
   class AtomicResponse(
@@ -101,66 +94,6 @@ class ThermostatCluster(private val controller: MatterController, private val en
     data class Error(val exception: Exception) : SetpointChangeAmountAttributeSubscriptionState()
 
     object SubscriptionEstablished : SetpointChangeAmountAttributeSubscriptionState()
-  }
-
-  class OccupiedSetbackAttribute(val value: UByte?)
-
-  sealed class OccupiedSetbackAttributeSubscriptionState {
-    data class Success(val value: UByte?) : OccupiedSetbackAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : OccupiedSetbackAttributeSubscriptionState()
-
-    object SubscriptionEstablished : OccupiedSetbackAttributeSubscriptionState()
-  }
-
-  class OccupiedSetbackMinAttribute(val value: UByte?)
-
-  sealed class OccupiedSetbackMinAttributeSubscriptionState {
-    data class Success(val value: UByte?) : OccupiedSetbackMinAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : OccupiedSetbackMinAttributeSubscriptionState()
-
-    object SubscriptionEstablished : OccupiedSetbackMinAttributeSubscriptionState()
-  }
-
-  class OccupiedSetbackMaxAttribute(val value: UByte?)
-
-  sealed class OccupiedSetbackMaxAttributeSubscriptionState {
-    data class Success(val value: UByte?) : OccupiedSetbackMaxAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : OccupiedSetbackMaxAttributeSubscriptionState()
-
-    object SubscriptionEstablished : OccupiedSetbackMaxAttributeSubscriptionState()
-  }
-
-  class UnoccupiedSetbackAttribute(val value: UByte?)
-
-  sealed class UnoccupiedSetbackAttributeSubscriptionState {
-    data class Success(val value: UByte?) : UnoccupiedSetbackAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : UnoccupiedSetbackAttributeSubscriptionState()
-
-    object SubscriptionEstablished : UnoccupiedSetbackAttributeSubscriptionState()
-  }
-
-  class UnoccupiedSetbackMinAttribute(val value: UByte?)
-
-  sealed class UnoccupiedSetbackMinAttributeSubscriptionState {
-    data class Success(val value: UByte?) : UnoccupiedSetbackMinAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : UnoccupiedSetbackMinAttributeSubscriptionState()
-
-    object SubscriptionEstablished : UnoccupiedSetbackMinAttributeSubscriptionState()
-  }
-
-  class UnoccupiedSetbackMaxAttribute(val value: UByte?)
-
-  sealed class UnoccupiedSetbackMaxAttributeSubscriptionState {
-    data class Success(val value: UByte?) : UnoccupiedSetbackMaxAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : UnoccupiedSetbackMaxAttributeSubscriptionState()
-
-    object SubscriptionEstablished : UnoccupiedSetbackMaxAttributeSubscriptionState()
   }
 
   class ACCoilTemperatureAttribute(val value: Short?)
@@ -341,157 +274,6 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
     val TAG_AMOUNT_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_AMOUNT_REQ), amount)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-  }
-
-  suspend fun setWeeklySchedule(
-    numberOfTransitionsForSequence: UByte,
-    dayOfWeekForSequence: UByte,
-    modeForSequence: UByte,
-    transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>,
-    timedInvokeTimeout: Duration? = null,
-  ) {
-    val commandId: UInt = 1u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_NUMBER_OF_TRANSITIONS_FOR_SEQUENCE_REQ: Int = 0
-    tlvWriter.put(
-      ContextSpecificTag(TAG_NUMBER_OF_TRANSITIONS_FOR_SEQUENCE_REQ),
-      numberOfTransitionsForSequence,
-    )
-
-    val TAG_DAY_OF_WEEK_FOR_SEQUENCE_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE_REQ), dayOfWeekForSequence)
-
-    val TAG_MODE_FOR_SEQUENCE_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_MODE_FOR_SEQUENCE_REQ), modeForSequence)
-
-    val TAG_TRANSITIONS_REQ: Int = 3
-    tlvWriter.startArray(ContextSpecificTag(TAG_TRANSITIONS_REQ))
-    for (item in transitions.iterator()) {
-      item.toTlv(AnonymousTag, tlvWriter)
-    }
-    tlvWriter.endArray()
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-  }
-
-  suspend fun getWeeklySchedule(
-    daysToReturn: UByte,
-    modeToReturn: UByte,
-    timedInvokeTimeout: Duration? = null,
-  ): GetWeeklyScheduleResponse {
-    val commandId: UInt = 2u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_DAYS_TO_RETURN_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_DAYS_TO_RETURN_REQ), daysToReturn)
-
-    val TAG_MODE_TO_RETURN_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_MODE_TO_RETURN_REQ), modeToReturn)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-
-    val tlvReader = TlvReader(response.payload)
-    tlvReader.enterStructure(AnonymousTag)
-    val TAG_NUMBER_OF_TRANSITIONS_FOR_SEQUENCE: Int = 0
-    var numberOfTransitionsForSequence_decoded: UByte? = null
-
-    val TAG_DAY_OF_WEEK_FOR_SEQUENCE: Int = 1
-    var dayOfWeekForSequence_decoded: UByte? = null
-
-    val TAG_MODE_FOR_SEQUENCE: Int = 2
-    var modeForSequence_decoded: UByte? = null
-
-    val TAG_TRANSITIONS: Int = 3
-    var transitions_decoded: List<ThermostatClusterWeeklyScheduleTransitionStruct>? = null
-
-    while (!tlvReader.isEndOfContainer()) {
-      val tag = tlvReader.peekElement().tag
-
-      if (tag == ContextSpecificTag(TAG_NUMBER_OF_TRANSITIONS_FOR_SEQUENCE)) {
-        numberOfTransitionsForSequence_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE)) {
-        dayOfWeekForSequence_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_MODE_FOR_SEQUENCE)) {
-        modeForSequence_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_TRANSITIONS)) {
-        transitions_decoded =
-          buildList<ThermostatClusterWeeklyScheduleTransitionStruct> {
-            tlvReader.enterArray(tag)
-            while (!tlvReader.isEndOfContainer()) {
-              add(ThermostatClusterWeeklyScheduleTransitionStruct.fromTlv(AnonymousTag, tlvReader))
-            }
-            tlvReader.exitContainer()
-          }
-      } else {
-        tlvReader.skipElement()
-      }
-    }
-
-    if (numberOfTransitionsForSequence_decoded == null) {
-      throw IllegalStateException("numberOfTransitionsForSequence not found in TLV")
-    }
-
-    if (dayOfWeekForSequence_decoded == null) {
-      throw IllegalStateException("dayOfWeekForSequence not found in TLV")
-    }
-
-    if (modeForSequence_decoded == null) {
-      throw IllegalStateException("modeForSequence not found in TLV")
-    }
-
-    if (transitions_decoded == null) {
-      throw IllegalStateException("transitions not found in TLV")
-    }
-
-    tlvReader.exitContainer()
-
-    return GetWeeklyScheduleResponse(
-      numberOfTransitionsForSequence_decoded,
-      dayOfWeekForSequence_decoded,
-      modeForSequence_decoded,
-      transitions_decoded,
-    )
-  }
-
-  suspend fun clearWeeklySchedule(timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 3u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -1600,49 +1382,6 @@ class ThermostatCluster(private val controller: MatterController, private val en
       }
 
     return decodedValue
-  }
-
-  suspend fun writeHVACSystemTypeConfigurationAttribute(
-    value: UByte,
-    timedWriteTimeout: Duration? = null,
-  ) {
-    val ATTRIBUTE_ID: UInt = 9u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
   }
 
   suspend fun subscribeHVACSystemTypeConfigurationAttribute(
@@ -3530,283 +3269,6 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun readStartOfWeekAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 32u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Startofweek attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun subscribeStartOfWeekAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 32u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            UByteSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Startofweek attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(UByteSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readNumberOfWeeklyTransitionsAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 33u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Numberofweeklytransitions attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun subscribeNumberOfWeeklyTransitionsAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 33u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            UByteSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Numberofweeklytransitions attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(UByteSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readNumberOfDailyTransitionsAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 34u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Numberofdailytransitions attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun subscribeNumberOfDailyTransitionsAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 34u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            UByteSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Numberofdailytransitions attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(UByteSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
   suspend fun readTemperatureSetpointHoldAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 35u
 
@@ -4130,49 +3592,6 @@ class ThermostatCluster(private val controller: MatterController, private val en
       }
 
     return decodedValue
-  }
-
-  suspend fun writeThermostatProgrammingOperationModeAttribute(
-    value: UByte,
-    timedWriteTimeout: Duration? = null,
-  ) {
-    val ATTRIBUTE_ID: UInt = 37u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
   }
 
   suspend fun subscribeThermostatProgrammingOperationModeAttribute(
@@ -4616,7 +4035,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun readOccupiedSetbackAttribute(): OccupiedSetbackAttribute {
+  suspend fun readOccupiedSetbackAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 52u
 
     val attributePath =
@@ -4643,64 +4062,19 @@ class ThermostatCluster(private val controller: MatterController, private val en
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UByte? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return OccupiedSetbackAttribute(decodedValue)
-  }
-
-  suspend fun writeOccupiedSetbackAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 52u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
+    return decodedValue
   }
 
   suspend fun subscribeOccupiedSetbackAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<OccupiedSetbackAttributeSubscriptionState> {
+  ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 52u
     val attributePaths =
       listOf(
@@ -4719,7 +4093,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            OccupiedSetbackAttributeSubscriptionState.Error(
+            UByteSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -4739,27 +4113,22 @@ class ThermostatCluster(private val controller: MatterController, private val en
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: UByte? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                tlvReader.getUByte(AnonymousTag)
-              } else {
-                null
-              }
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
             } else {
-              tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(OccupiedSetbackAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(OccupiedSetbackAttributeSubscriptionState.SubscriptionEstablished)
+          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readOccupiedSetbackMinAttribute(): OccupiedSetbackMinAttribute {
+  suspend fun readOccupiedSetbackMinAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 53u
 
     val attributePath =
@@ -4786,24 +4155,19 @@ class ThermostatCluster(private val controller: MatterController, private val en
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UByte? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return OccupiedSetbackMinAttribute(decodedValue)
+    return decodedValue
   }
 
   suspend fun subscribeOccupiedSetbackMinAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<OccupiedSetbackMinAttributeSubscriptionState> {
+  ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 53u
     val attributePaths =
       listOf(
@@ -4822,7 +4186,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            OccupiedSetbackMinAttributeSubscriptionState.Error(
+            UByteSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -4842,27 +4206,22 @@ class ThermostatCluster(private val controller: MatterController, private val en
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: UByte? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                tlvReader.getUByte(AnonymousTag)
-              } else {
-                null
-              }
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
             } else {
-              tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(OccupiedSetbackMinAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(OccupiedSetbackMinAttributeSubscriptionState.SubscriptionEstablished)
+          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readOccupiedSetbackMaxAttribute(): OccupiedSetbackMaxAttribute {
+  suspend fun readOccupiedSetbackMaxAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 54u
 
     val attributePath =
@@ -4889,24 +4248,19 @@ class ThermostatCluster(private val controller: MatterController, private val en
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UByte? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return OccupiedSetbackMaxAttribute(decodedValue)
+    return decodedValue
   }
 
   suspend fun subscribeOccupiedSetbackMaxAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<OccupiedSetbackMaxAttributeSubscriptionState> {
+  ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 54u
     val attributePaths =
       listOf(
@@ -4925,7 +4279,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            OccupiedSetbackMaxAttributeSubscriptionState.Error(
+            UByteSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -4945,27 +4299,22 @@ class ThermostatCluster(private val controller: MatterController, private val en
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: UByte? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                tlvReader.getUByte(AnonymousTag)
-              } else {
-                null
-              }
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
             } else {
-              tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(OccupiedSetbackMaxAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(OccupiedSetbackMaxAttributeSubscriptionState.SubscriptionEstablished)
+          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readUnoccupiedSetbackAttribute(): UnoccupiedSetbackAttribute {
+  suspend fun readUnoccupiedSetbackAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 55u
 
     val attributePath =
@@ -4992,64 +4341,19 @@ class ThermostatCluster(private val controller: MatterController, private val en
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UByte? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return UnoccupiedSetbackAttribute(decodedValue)
-  }
-
-  suspend fun writeUnoccupiedSetbackAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 55u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
+    return decodedValue
   }
 
   suspend fun subscribeUnoccupiedSetbackAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<UnoccupiedSetbackAttributeSubscriptionState> {
+  ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 55u
     val attributePaths =
       listOf(
@@ -5068,7 +4372,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            UnoccupiedSetbackAttributeSubscriptionState.Error(
+            UByteSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -5088,27 +4392,22 @@ class ThermostatCluster(private val controller: MatterController, private val en
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: UByte? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                tlvReader.getUByte(AnonymousTag)
-              } else {
-                null
-              }
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
             } else {
-              tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(UnoccupiedSetbackAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(UnoccupiedSetbackAttributeSubscriptionState.SubscriptionEstablished)
+          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readUnoccupiedSetbackMinAttribute(): UnoccupiedSetbackMinAttribute {
+  suspend fun readUnoccupiedSetbackMinAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 56u
 
     val attributePath =
@@ -5135,24 +4434,19 @@ class ThermostatCluster(private val controller: MatterController, private val en
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UByte? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return UnoccupiedSetbackMinAttribute(decodedValue)
+    return decodedValue
   }
 
   suspend fun subscribeUnoccupiedSetbackMinAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<UnoccupiedSetbackMinAttributeSubscriptionState> {
+  ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 56u
     val attributePaths =
       listOf(
@@ -5171,7 +4465,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            UnoccupiedSetbackMinAttributeSubscriptionState.Error(
+            UByteSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -5191,27 +4485,22 @@ class ThermostatCluster(private val controller: MatterController, private val en
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: UByte? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                tlvReader.getUByte(AnonymousTag)
-              } else {
-                null
-              }
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
             } else {
-              tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(UnoccupiedSetbackMinAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(UnoccupiedSetbackMinAttributeSubscriptionState.SubscriptionEstablished)
+          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readUnoccupiedSetbackMaxAttribute(): UnoccupiedSetbackMaxAttribute {
+  suspend fun readUnoccupiedSetbackMaxAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 57u
 
     val attributePath =
@@ -5238,24 +4527,19 @@ class ThermostatCluster(private val controller: MatterController, private val en
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UByte? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return UnoccupiedSetbackMaxAttribute(decodedValue)
+    return decodedValue
   }
 
   suspend fun subscribeUnoccupiedSetbackMaxAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<UnoccupiedSetbackMaxAttributeSubscriptionState> {
+  ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 57u
     val attributePaths =
       listOf(
@@ -5274,7 +4558,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            UnoccupiedSetbackMaxAttributeSubscriptionState.Error(
+            UByteSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -5294,21 +4578,16 @@ class ThermostatCluster(private val controller: MatterController, private val en
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: UByte? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                tlvReader.getUByte(AnonymousTag)
-              } else {
-                null
-              }
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
             } else {
-              tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(UnoccupiedSetbackMaxAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(UnoccupiedSetbackMaxAttributeSubscriptionState.SubscriptionEstablished)
+          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }

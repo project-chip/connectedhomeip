@@ -12248,9 +12248,6 @@ public class ClusterIDMapping {
             ControlSequenceOfOperation(27L),
             SystemMode(28L),
             ThermostatRunningMode(30L),
-            StartOfWeek(32L),
-            NumberOfWeeklyTransitions(33L),
-            NumberOfDailyTransitions(34L),
             TemperatureSetpointHold(35L),
             TemperatureSetpointHoldDuration(36L),
             ThermostatProgrammingOperationMode(37L),
@@ -12342,9 +12339,6 @@ public class ClusterIDMapping {
 
         public enum Command {
             SetpointRaiseLower(0L),
-            SetWeeklySchedule(1L),
-            GetWeeklySchedule(2L),
-            ClearWeeklySchedule(3L),
             SetActiveScheduleRequest(5L),
             SetActivePresetRequest(6L),
             AddThermostatSuggestion(7L),
@@ -12378,40 +12372,6 @@ public class ClusterIDMapping {
                     }
                     public static SetpointRaiseLowerCommandField value(int id) throws NoSuchFieldError {
                         for (SetpointRaiseLowerCommandField field : SetpointRaiseLowerCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum SetWeeklyScheduleCommandField {NumberOfTransitionsForSequence(0),DayOfWeekForSequence(1),ModeForSequence(2),Transitions(3),;
-                    private final int id;
-                    SetWeeklyScheduleCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static SetWeeklyScheduleCommandField value(int id) throws NoSuchFieldError {
-                        for (SetWeeklyScheduleCommandField field : SetWeeklyScheduleCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum GetWeeklyScheduleCommandField {DaysToReturn(0),ModeToReturn(1),;
-                    private final int id;
-                    GetWeeklyScheduleCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static GetWeeklyScheduleCommandField value(int id) throws NoSuchFieldError {
-                        for (GetWeeklyScheduleCommandField field : GetWeeklyScheduleCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

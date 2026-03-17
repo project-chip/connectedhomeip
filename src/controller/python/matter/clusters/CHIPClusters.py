@@ -8514,30 +8514,6 @@ class ChipClusters:
                     "amount": "int",
                 },
             },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "SetWeeklySchedule",
-                "args": {
-                    "numberOfTransitionsForSequence": "int",
-                    "dayOfWeekForSequence": "int",
-                    "modeForSequence": "int",
-                    "transitions": "WeeklyScheduleTransitionStruct",
-                },
-            },
-            0x00000002: {
-                "commandId": 0x00000002,
-                "commandName": "GetWeeklySchedule",
-                "args": {
-                    "daysToReturn": "int",
-                    "modeToReturn": "int",
-                },
-            },
-            0x00000003: {
-                "commandId": 0x00000003,
-                "commandName": "ClearWeeklySchedule",
-                "args": {
-                },
-            },
             0x00000005: {
                 "commandId": 0x00000005,
                 "commandName": "SetActiveScheduleRequest",
@@ -8638,7 +8614,6 @@ class ChipClusters:
                 "attributeId": 0x00000009,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000010: {
                 "attributeName": "LocalTemperatureCalibration",
@@ -8737,24 +8712,6 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
-            0x00000020: {
-                "attributeName": "StartOfWeek",
-                "attributeId": 0x00000020,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000021: {
-                "attributeName": "NumberOfWeeklyTransitions",
-                "attributeId": 0x00000021,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000022: {
-                "attributeName": "NumberOfDailyTransitions",
-                "attributeId": 0x00000022,
-                "type": "int",
-                "reportable": True,
-            },
             0x00000023: {
                 "attributeName": "TemperatureSetpointHold",
                 "attributeId": 0x00000023,
@@ -8774,7 +8731,6 @@ class ChipClusters:
                 "attributeId": 0x00000025,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000029: {
                 "attributeName": "ThermostatRunningState",
@@ -8805,7 +8761,6 @@ class ChipClusters:
                 "attributeId": 0x00000034,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000035: {
                 "attributeName": "OccupiedSetbackMin",
@@ -8824,7 +8779,6 @@ class ChipClusters:
                 "attributeId": 0x00000037,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000038: {
                 "attributeName": "UnoccupiedSetbackMin",

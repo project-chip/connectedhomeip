@@ -218,31 +218,6 @@ public:
 using DecodableType = Type;
 
 } // namespace ThermostatSuggestionStruct
-namespace WeeklyScheduleTransitionStruct {
-enum class Fields : uint8_t
-{
-    kTransitionTime = 0,
-    kHeatSetpoint   = 1,
-    kCoolSetpoint   = 2,
-};
-
-struct Type
-{
-public:
-    uint16_t transitionTime = static_cast<uint16_t>(0);
-    DataModel::Nullable<int16_t> heatSetpoint;
-    DataModel::Nullable<int16_t> coolSetpoint;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace WeeklyScheduleTransitionStruct
 } // namespace Structs
 } // namespace Thermostat
 } // namespace Clusters
