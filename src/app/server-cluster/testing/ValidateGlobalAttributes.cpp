@@ -17,37 +17,6 @@
 
 namespace chip::Testing {
 
-bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
-                             std::initializer_list<const app::DataModel::AttributeEntry> expected)
-{
-    std::vector<app::DataModel::AttributeEntry> attributes(expected.begin(), expected.end());
-    return IsAttributesListEqualTo(cluster, std::move(attributes));
-}
-
-bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, const std::vector<app::DataModel::AttributeEntry> & expected)
-{
-    VerifyOrDie(cluster.GetPaths().size() == 1);
-    auto path = cluster.GetPaths()[0];
-    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> attributesBuilder;
-    if (CHIP_ERROR err = cluster.Attributes(path, attributesBuilder); err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Test, "Failed to get attributes list from cluster. Error: %" CHIP_ERROR_FORMAT, err.Format());
-        return false;
-    }
-
-    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
-
-    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()));
-    for (const auto & entry : expected)
-    {
-        SuccessOrDie(expectedBuilder.Append(entry));
-    }
-
-    SuccessOrDie(expectedBuilder.AppendElements(app::DefaultServerCluster::GlobalAttributes()));
-
-    return EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
-}
-
 bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
                                    std::initializer_list<const app::DataModel::AcceptedCommandEntry> expected)
 {

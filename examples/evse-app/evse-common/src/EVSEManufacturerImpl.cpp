@@ -28,7 +28,6 @@
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
-#include <app/clusters/power-source-server/power-source-server.h>
 #include <app/server/Server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -445,28 +444,31 @@ CHIP_ERROR EVSEManufacturer::InitializePowerMeasurementCluster()
  */
 CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpointId)
 {
-    Protocols::InteractionModel::Status status;
+    PowerSourceCluster::WiredConfiguration config(CharSpan::fromCharString("Primary Mains Power"), PowerSource::WiredCurrentTypeEnum::kAc);
 
-    status = PowerSource::Attributes::Status::Set(endpointId, PowerSourceStatusEnum::kActive);
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(PowerSource::Feature::kWired));
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::WiredNominalVoltage::Set(endpointId, 230'000); // 230V in mv
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::WiredMaximumCurrent::Set(endpointId, 32'000); // 32A in mA
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+    config.nominalVoltage = 230'000; // 230V in mv
+    config.maximumCurrent = 32'000; // 32A in mA
 
-    status = PowerSource::Attributes::WiredCurrentType::Set(endpointId, PowerSource::WiredCurrentTypeEnum::kAc);
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::Description::Set(endpointId, "Primary Mains Power"_span);
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+    AttributeId optionalAttributes[] = {
+        WiredNominalVoltage::Id,
+        WiredMaximumCurrent::Id
+    };
+
+    mPSInstance.Create(endpointId, Span(optionalAttributes), config);
+
+    CHIP_ERROR err;
+
+    ReturnErrorOnFailure(mPSInstance.Cluster().SetStatus(PowerSourceStatusEnum::kActive));
 
     chip::EndpointId endpointArray[] = { endpointId };
     Span<EndpointId> endpointList    = Span<EndpointId>(endpointArray);
 
     // Note per API - we do not need to maintain the span after the SetEndpointList has been called
-    // since it takes a copy (see power-source-server/CodegenIntegration.cpp)
-    return PowerSourceServer::Instance().SetEndpointList(endpointId, endpointList);
+    // since it takes a copy (see power-source-server/PowerSourceCluster.cpp)
+    ReturnErrorOnFailure(mPSInstance.Cluster().SetEndpointList(endpointList));
+
+    // Register the cluster so that the `DataModelProvider` can see it.
+    return mPSInstance.Register();
 }
 
 void EVSEManufacturer::UpdateEVFakeReadings(const Amperage_mA maximumChargeCurrent)

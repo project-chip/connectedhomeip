@@ -17,9 +17,9 @@
  */
 
 #include "CodegenIntegration.h"
-#include "PowerSourceCluster.h"
 
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <app/server/Server.h>
+#include <app/static-cluster-config/PowerSource.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -46,46 +46,52 @@ public:
     {
         PowerSourceCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         BitFlags<Feature> features(featureMap);
-        using namespace chip::Protocols::InteractionModel;
+        using namespace chip::Protocols;
 
         // Enforce a valid configuration from ember
 
         char descriptionBuffer[Description::TypeInfo::MaxLength()];
         MutableCharSpan description(descriptionBuffer);
-        VerifyOrDie(Description::Get(endpointId, description) == Status::Success);
+        if (Description::Get(endpointId, description) != InteractionModel::Status::Success)
+        {
+            // an acceptable default of empty string
+            description.reduce_size(0);
+        }
 
         if (features.Has(Feature::kWired))
         {
             PowerSourceCluster::WiredCurrentTypeEnum currentType;
             VerifyOrDie(optionalAttributeSet.IsSet(WiredCurrentType::Id));
-            VerifyOrDie(WiredCurrentType::Get(endpointId, &currentType) == Status::Success);
+            VerifyOrDie(WiredCurrentType::Get(endpointId, &currentType) == InteractionModel::Status::Success);
 
             PowerSourceCluster::WiredConfiguration config(description, currentType);
 
             uint32_t nominalVoltage{};
-            if (WiredNominalVoltage::Get(endpointId, &nominalVoltage) == Status::Success)
+            if (WiredNominalVoltage::Get(endpointId, &nominalVoltage) == InteractionModel::Status::Success)
             {
                 config.nominalVoltage = nominalVoltage;
             }
 
             uint32_t maximumCurrent{};
-            if (WiredMaximumCurrent::Get(endpointId, &maximumCurrent) == Status::Success)
+            if (WiredMaximumCurrent::Get(endpointId, &maximumCurrent) == InteractionModel::Status::Success)
             {
                 config.maximumCurrent = maximumCurrent;
             }
 
-            gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeBits, DeviceLayer::SystemLayer(), config);
+            gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeSet, DeviceLayer::SystemLayer(), config);
         }
         else if (features.Has(Feature::kBattery))
         {
-            PowerSourceCluster::BatReplaceabilityEnum replaceability;
+            // default value
+            PowerSourceCluster::BatReplaceabilityEnum replaceability = PowerSourceCluster::BatReplaceabilityEnum::kUnspecified;
             VerifyOrDie(optionalAttributeSet.IsSet(BatReplaceability::Id));
-            VerifyOrDie(BatReplaceability::Get(endpointId, &replaceability) == Status::Success);
+            // try to read, if fails, default will be used
+            BatReplaceability::Get(endpointId, &replaceability);
 
             PowerSourceCluster::BatteryConfiguration config(description, replaceability);
 
             uint32_t capacity{};
-            if (BatCapacity::Get(endpointId, &capacity) == Status::Success)
+            if (BatCapacity::Get(endpointId, &capacity) == InteractionModel::Status::Success)
             {
                 config.capacity = capacity;
             }
@@ -95,36 +101,36 @@ public:
                 char replacementDescriptionBuffer[BatReplacementDescription::TypeInfo::MaxLength()];
                 MutableCharSpan replacementDescription(replacementDescriptionBuffer);
                 VerifyOrDie(optionalAttributeSet.IsSet(BatReplacementDescription::Id));
-                VerifyOrDie(BatReplacementDescription::Get(endpointId, replacementDescription) == Status::Success);
+                VerifyOrDie(BatReplacementDescription::Get(endpointId, replacementDescription) == InteractionModel::Status::Success);
 
                 uint8_t quantity;
                 VerifyOrDie(optionalAttributeSet.IsSet(BatQuantity::Id));
-                VerifyOrDie(BatQuantity::Get(endpointId, &quantity) == Status::Success);
+                VerifyOrDie(BatQuantity::Get(endpointId, &quantity) == InteractionModel::Status::Success);
 
                 config.MakeReplaceable(replacementDescription, quantity);
 
                 PowerSourceCluster::BatCommonDesignationEnum commonDesignation{};
-                if (BatCommonDesignation::Get(endpointId, &commonDesignation) == Status::Success)
+                if (BatCommonDesignation::Get(endpointId, &commonDesignation) == InteractionModel::Status::Success)
                 {
                     config.commonDesignation = commonDesignation;
                 }
 
                 char ansiDesignationBuffer[BatANSIDesignation::TypeInfo::MaxLength()];
-                MutableCharSpan ansiDesignation{};
-                if (BatANSIDesignation::Get(endpointId, ansiDesignation) == Status::Success)
+                MutableCharSpan ansiDesignation(ansiDesignationBuffer);
+                if (BatANSIDesignation::Get(endpointId, ansiDesignation) == InteractionModel::Status::Success)
                 {
                     config.ansiDesignation = ansiDesignation;
                 }
 
                 char iecDesignationBuffer[BatIECDesignation::TypeInfo::MaxLength()];
-                MutableCharSpan iecDesignation{};
-                if (BatIECDesignation::Get(endpointId, iecDesignation) == Status::Success)
+                MutableCharSpan iecDesignation(iecDesignationBuffer);
+                if (BatIECDesignation::Get(endpointId, iecDesignation) == InteractionModel::Status::Success)
                 {
                     config.iecDesignation = iecDesignation;
                 }
 
                 PowerSourceCluster::BatApprovedChemistryEnum approvedChemistry{};
-                if (BatApprovedChemistry::Get(endpointId, &approvedChemistry) == Status::Success)
+                if (BatApprovedChemistry::Get(endpointId, &approvedChemistry) == InteractionModel::Status::Success)
                 {
                     config.approvedChemistry = approvedChemistry;
                 }
@@ -133,35 +139,35 @@ public:
             {
                 config.MakeRechargeable();
             }
-            gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeBits, DeviceLayer::SystemLayer(), config);
+            gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeSet, DeviceLayer::SystemLayer(), config);
         }
 
-        PowerSourceCluster cluster = gServers[clusterInstanceIndex].Cluster();
+        PowerSourceCluster & cluster = gServers[clusterInstanceIndex].Cluster();
 
         // Get all set defaults for attributes from ember.
 
 #define DieIfInvalidValue(expr, attr_name)\
         {\
-            CHIP_ERROR err = (expr);\
-            VerifyOrDieWithMsg(err == CHIP_NO_ERROR || err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, NotSpecified, "Unexpected error %" CHIP_ERROR_FORMAT " when trying to set attribute `" #attr_name "`.", err);\
+            CHIP_ERROR error_val = (expr);\
+            VerifyOrDieWithMsg(error_val == CHIP_NO_ERROR || error_val == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, NotSpecified, "Unexpected error %" CHIP_ERROR_FORMAT " when trying to set attribute `" #attr_name "`.", error_val.Format());\
         }
 
 #define SetAttributeDefaultFromEmber(type, attr_name)\
-        if (type val{}; attr_name::Get(endpointId, &val) == Status::Success)\
+        if (type val{}; attr_name::Get(endpointId, &val) == InteractionModel::Status::Success)\
         {\
-            DieIfInvalidValue(cluster.Set##attr_name(val));\
+            DieIfInvalidValue(cluster.Set##attr_name(val), attr_name);\
         }
 
 #define SetNullableAttributeDefaultFromEmber(type, attr_name)\
-        if (DataModel::Nullable<type> val{}; attr_name::Get(endpointId, val) == Status::Success)\
+        if (DataModel::Nullable<type> val{}; attr_name::Get(endpointId, val) == InteractionModel::Status::Success)\
         {\
-            if (val.isNull())\
+            if (val.IsNull())\
             {\
-                cluster.Set##attr_name(NullOptional); /* null is valid. */\
+                (void) cluster.Set##attr_name(NullOptional); /* null is valid, can ignore the error */\
             }\
             else\
             {\
-                DieIfInvalidValue(cluster.Set##attr_name(Optional(val.value())));\
+                DieIfInvalidValue(cluster.Set##attr_name(Optional(val.Value())), attr_name);\
             }\
         }
 
@@ -230,7 +236,53 @@ void MatterPowerSourceClusterShutdownCallback(EndpointId endpointId, MatterClust
         integrationDelegate, shutdownType);
 }
 
+void MatterPowerSourcePluginServerInitCallback() {}
+
 namespace chip::app::Clusters::PowerSource {
+
+void LazyInstance::Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes, const PowerSourceCluster::WiredConfiguration & config)
+{
+    uint32_t optAttrBits;
+    for (auto attrId : optionalAttributes)
+    {
+        optAttrBits |= (1 << attrId);
+    }
+
+    server.Create(endpointId, optAttrBits, DeviceLayer::SystemLayer(), config);
+}
+
+void LazyInstance::Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes, const PowerSourceCluster::BatteryConfiguration & config)
+{
+    uint32_t optAttrBits;
+    for (auto attrId : optionalAttributes)
+    {
+        optAttrBits |= (1 << attrId);
+    }
+
+    server.Create(endpointId, optAttrBits, DeviceLayer::SystemLayer(), config);
+}
+
+CHIP_ERROR LazyInstance::Register()
+{
+    // This will call `Startup()` on the cluster
+    return CodegenDataModelProvider::Instance().Registry().Register(server.Registration());
+}
+
+CHIP_ERROR LazyInstance::Unregister()
+{
+    // This will call `Shutdown()` on the cluster
+    return CodegenDataModelProvider::Instance().Registry().Unregister(&server.Cluster());
+}
+
+PowerSourceCluster & LazyInstance::Cluster()
+{
+    return server.Cluster();
+}
+
+const PowerSourceCluster & LazyInstance::Cluster() const
+{
+    return server.Cluster();
+}
 
 PowerSourceCluster * FindClusterOnEndpoint(EndpointId endpointId)
 {

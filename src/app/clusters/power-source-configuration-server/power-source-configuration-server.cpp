@@ -20,7 +20,6 @@
  * @brief Implementation for the Descriptor Server Cluster
  ***************************************************************************/
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -29,6 +28,9 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+
+// TODO: In the future we would like to use `PowerSourceCluster.h` instead of this to not have dependency on ember
+#include <app/clusters/power-source-server/CodegenIntegration.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -70,8 +72,14 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
             {
                 uint8_t order = 0;
                 if (idx >= kMaxPowerSources)
+                {
                     break;
-                PowerSource::Attributes::Order::Get(endpoint, &order);
+                }
+                if (auto * cluster = FindClusterOnEndpoint(endpoint); cluster == nullptr)
+                {
+                    continue;
+                }
+                order = cluster->GetOrder();
                 orderEpPair[idx] = std::make_pair(endpoint, order);
                 idx++;
             }

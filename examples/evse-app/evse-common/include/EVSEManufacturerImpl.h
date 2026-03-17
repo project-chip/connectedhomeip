@@ -198,6 +198,7 @@ private:
     EnergyEvseManager * mEvseInstance;
     ElectricalSensorManager * mESManager;
     DeviceEnergyManagementManager * mDEMInstance;
+    PowerSource::LazyInstance mPSInstance;
 
     int64_t mLastChargingEnergyMeter    = 0;
     int64_t mLastDischargingEnergyMeter = 0;

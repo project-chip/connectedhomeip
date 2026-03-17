@@ -34,7 +34,7 @@ namespace Testing {
 ///
 /// Parameters:
 ///     cluster - The cluster interface to test.
-///     expected - An initializer list of expected attribute entries (may be empty for only globals)
+///     expected - initializer_list or any other iterable of expected attribute entries (may be empty for only globals)
 ///
 /// @note This function will assert (die) if `cluster.GetPaths()` does not return exactly one path.
 ///
@@ -43,16 +43,37 @@ namespace Testing {
 /// ClusterImpl cluster(kTestEndpointId, ....);
 /// ASSERT_TRUE(IsAttributesListEqualTo(cluster, { Attributes::SomeAttribute::kMetadataEntry }));
 /// ```
-bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
-                             std::initializer_list<const app::DataModel::AttributeEntry> expected);
 
-/// Overload of IsAttributesListEqualTo that accepts a standard vector of attribute entries.
-///
-/// Parameters:
-///     cluster - The cluster interface to test.
-///     expected - A vector containing the expected attribute entries (must include all
-///                non-global, non-optional attributes).
-bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, const std::vector<app::DataModel::AttributeEntry> & expected);
+template<class T>
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, T expected)
+{
+    VerifyOrDie(cluster.GetPaths().size() == 1);
+    auto path = cluster.GetPaths()[0];
+    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> attributesBuilder;
+    if (CHIP_ERROR err = cluster.Attributes(path, attributesBuilder); err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Test, "Failed to get attributes list from cluster. Error: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+
+    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
+
+    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()));
+    for (const auto & entry : expected)
+    {
+        SuccessOrDie(expectedBuilder.Append(entry));
+    }
+
+    SuccessOrDie(expectedBuilder.AppendElements(app::DefaultServerCluster::GlobalAttributes()));
+
+    return EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
+}
+
+// Overload for std::initializer_list to not get "template argument deduction failed" when calling `IsAttributesListEqualTo({...})`
+template <typename T>
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::initializer_list<T> expected) {
+    return IsAttributesListEqualTo<std::initializer_list<T>>(cluster, expected);
+}
 
 /// Compares the accepted commands of a cluster against an expected set.
 ///
