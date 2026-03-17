@@ -120,6 +120,21 @@ class ICDBaseTest(MatterBaseTest):
 
     ROOT_NODE_ENDPOINT_ID = 0
 
+    async def read_icdm_attribute_expect_success(self, attribute, controller=None, node_id=None):
+        return await self.read_single_attribute_check_success(
+            endpoint=self.ROOT_NODE_ENDPOINT_ID,
+            cluster=cluster,
+            attribute=attribute,
+            dev_ctrl=controller,
+            node_id=node_id)
+
+    async def send_single_icdm_command(self, command, controller=None, node_id=None):
+        return await self.send_single_cmd(
+            command,
+            endpoint=self.ROOT_NODE_ENDPOINT_ID,
+            dev_ctrl=controller,
+            node_id=node_id)
+
     def compute_wait_time(self, transition: ICDTransition, *,
                           active_mode_duration_ms: int = None,
                           idle_mode_duration_s: int = None) -> float:
@@ -171,7 +186,7 @@ class ICDBaseTest(MatterBaseTest):
 
     async def unregister_all_clients(self):
         """Unregisters all entries in the DUT's RegisteredClients attribute."""
-        registeredClients = await self._read_icdm_attribute_expect_success(attributes.RegisteredClients)
+        registeredClients = await self.read_icdm_attribute_expect_success(attributes.RegisteredClients)
 
         if not registeredClients:
             log.info("RegisteredClients is empty.")
@@ -181,6 +196,6 @@ class ICDBaseTest(MatterBaseTest):
         for client in registeredClients:
             try:
                 log.info(f"Unregistering client: {client}...")
-                await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
+                await self.send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
             except InteractionModelError as e:
                 asserts.assert_fail(f"Unexpected error returned when unregistering client: {e}")

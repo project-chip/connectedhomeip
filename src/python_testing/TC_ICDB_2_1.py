@@ -128,13 +128,6 @@ class TC_ICDB_2_1(ICDBaseTest):
             "ICDM.S.F00",
         ]
 
-    async def read_icdm_attribute_expect_success(self, attribute):
-        return await self.read_single_attribute_check_success(
-            endpoint=self.ROOT_NODE_ENDPOINT_ID, cluster=cluster, attribute=attribute)
-
-    async def send_single_icdm_command(self, command):
-        return await self.send_single_cmd(command, endpoint=self.ROOT_NODE_ENDPOINT_ID)
-
     @async_test_body
     async def test_TC_ICDB_2_1(self):
         TH = self.default_controller
