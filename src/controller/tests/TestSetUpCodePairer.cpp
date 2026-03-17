@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#include <pw_unit_test/framework.h>
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/SetUpCodePairer.h>
