@@ -47,7 +47,7 @@ import logging
 import os
 
 from mobly import asserts
-from support_modules.icd_support import (MAX_CI_IDLE_CYCLE_WAIT_S, ICDBaseTest, ICDTransition, ICDTestEventTriggerOperations,
+from support_modules.icd_support import (MAX_CI_IDLE_CYCLE_WAIT_S, ICDBaseTest, ICDTestEventTriggerOperations, ICDTransition,
                                          uat_bit_name, uat_set_hints)
 
 import matter.clusters as Clusters
