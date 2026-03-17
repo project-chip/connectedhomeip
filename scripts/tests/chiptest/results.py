@@ -405,7 +405,7 @@ class ResultProcessingThread(threading.Thread):
             self._summary.record(result)
 
             # Check for keep going on failure.
-            if result.exception is not None and not self.keep_going:
+            if result.exception is not None and not isinstance(result.exception, KeyboardInterrupt) and not self.keep_going:
                 raise ResultError("Task failed and --keep-going flag is not set.")
 
             # Check if all results for the iteration are in.
@@ -413,7 +413,8 @@ class ResultProcessingThread(threading.Thread):
                 return
 
             log.debug("All results for iteration %i are in, checking failure count", iteration)
-            observed_failures = sum(exc is not None for exc in self._summary.exceptions[iteration].values())
+            observed_failures = sum(exc is not None and not isinstance(exc, KeyboardInterrupt)
+                                    for exc in self._summary.exceptions[iteration].values())
             if observed_failures != self.expected_failures:
                 raise ResultError(
                     f"Iteration {iteration}: expected failure count {self.expected_failures}, but got {observed_failures}")
