@@ -28,6 +28,50 @@ namespace app {
 namespace Clusters {
 namespace ProximityRanging {
 
+// Enum for BLTCSSecurityLevelEnum
+enum class BLTCSSecurityLevelEnum : uint8_t
+{
+    kCsSecurityLevelUnknown = 0x00,
+    kCsSecurityLevelOne     = 0x01,
+    kCsSecurityLevelTwo     = 0x02,
+    kCsSecurityLevelThree   = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for NADMEnum
+enum class NADMEnum : uint8_t
+{
+    kAttackExtremelyUnlikely = 0x00,
+    kAttackVeryUnlikely      = 0x01,
+    kAttackUnlikely          = 0x02,
+    kAttackIsPossible        = 0x03,
+    kAttackIsLikely          = 0x04,
+    kAttackVeryLikely        = 0x05,
+    kAttackExtremelyLikely   = 0x06,
+    kUnknown                 = 0xFF,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
+};
+
+// Enum for RDRReferenceEnum
+enum class RDRReferenceEnum : uint8_t
+{
+    kDeviceCoordinates = 0x00,
+    kEarthCoordinates  = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
 // Enum for RangingRoleEnum
 enum class RangingRoleEnum : uint8_t
 {
@@ -54,6 +98,20 @@ enum class RangingSecurityEnum : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
+};
+
+// Enum for RangingSessionStatusEnum
+enum class RangingSessionStatusEnum : uint8_t
+{
+    kSessionEndTimeReached = 0x00,
+    kPeerNotFound          = 0x01,
+    kHardwareError         = 0x02,
+    kStopRequested         = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
 };
 
 // Enum for RangingTechEnum
@@ -102,7 +160,7 @@ enum class RadioBandBitmap : uint16_t
     k5g   = 0x4,
     k6g   = 0x8,
     k60g  = 0x10,
-    k1g   = 0x20,
+    kS1g  = 0x20,
     k45g  = 0x40,
 };
 

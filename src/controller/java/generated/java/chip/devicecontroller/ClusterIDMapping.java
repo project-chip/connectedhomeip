@@ -15491,7 +15491,9 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            RangingResult(0L),
+            RangingSessionStatus(1L),;
             private final long id;
             Event(long id) {
                 this.id = id;

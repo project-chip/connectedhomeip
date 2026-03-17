@@ -62,11 +62,6 @@ struct Type;
 struct DecodableType;
 } // namespace StopRangingRequest
 
-namespace RangingResult {
-struct Type;
-struct DecodableType;
-} // namespace RangingResult
-
 } // namespace Commands
 
 namespace Commands {
@@ -198,42 +193,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopRangingRequest
-namespace RangingResult {
-enum class Fields : uint8_t
-{
-    kSessionID         = 0,
-    kRangingResultData = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::RangingResult::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
-
-    uint8_t sessionID = static_cast<uint8_t>(0);
-    Structs::RangingMeasurementDataStruct::Type rangingResultData;
-
-    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::RangingResult::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
-
-    uint8_t sessionID = static_cast<uint8_t>(0);
-    Structs::RangingMeasurementDataStruct::DecodableType rangingResultData;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace RangingResult
 } // namespace Commands
 } // namespace ProximityRanging
 } // namespace Clusters

@@ -318,6 +318,8 @@ matter_eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/PowerSourceClusterBatChargeFaultChangeEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/PowerSourceClusterBatFaultChangeEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/PowerSourceClusterWiredFaultChangeEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/ProximityRangingClusterRangingResultEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/ProximityRangingClusterRangingSessionStatusEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/PushAvStreamTransportClusterPushTransportBeginEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/PushAvStreamTransportClusterPushTransportEndEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/RefrigeratorAlarmClusterNotifyEvent.kt",

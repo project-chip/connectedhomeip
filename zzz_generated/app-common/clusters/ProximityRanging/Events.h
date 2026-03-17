@@ -42,7 +42,80 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ProximityRanging {
-namespace Events {} // namespace Events
+namespace Events {
+namespace RangingResult {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kSessionID         = 0,
+    kRangingResultData = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::RangingResult::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint8_t sessionID = static_cast<uint8_t>(0);
+    Structs::RangingMeasurementDataStruct::Type rangingResultData;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::RangingResult::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
+
+    uint8_t sessionID = static_cast<uint8_t>(0);
+    Structs::RangingMeasurementDataStruct::DecodableType rangingResultData;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace RangingResult
+namespace RangingSessionStatus {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kSessionID = 0,
+    kStatus    = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::RangingSessionStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint8_t sessionID               = static_cast<uint8_t>(0);
+    RangingSessionStatusEnum status = static_cast<RangingSessionStatusEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::RangingSessionStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
+
+    uint8_t sessionID               = static_cast<uint8_t>(0);
+    RangingSessionStatusEnum status = static_cast<RangingSessionStatusEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace RangingSessionStatus
+} // namespace Events
 } // namespace ProximityRanging
 } // namespace Clusters
 } // namespace app

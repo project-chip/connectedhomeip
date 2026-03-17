@@ -12239,29 +12239,35 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
   public Optional<Long> BLEDeviceId;
   public Optional<byte[]> BLTDevIK;
   public Optional<Long> timeOfMeasurement;
+  public Optional<Long> timeOfMeasurementOffset;
   public @Nullable Integer distance;
-  public Optional<Integer> accuracy;
+  public Optional<Integer> errorMargin;
   public Optional<ChipStructs.ProximityRangingClusterRDRStruct> rdr;
+  public Optional<Integer> detectedAttackLevel;
   public @Nullable Optional<Integer> rssi;
   public @Nullable Optional<Integer> txPower;
   private static final long WI_FI_DEV_IK_ID = 0L;
   private static final long BLE_DEVICE_ID_ID = 1L;
   private static final long BLT_DEV_IK_ID = 2L;
   private static final long TIME_OF_MEASUREMENT_ID = 3L;
-  private static final long DISTANCE_ID = 4L;
-  private static final long ACCURACY_ID = 5L;
-  private static final long RDR_ID = 6L;
-  private static final long RSSI_ID = 7L;
-  private static final long TX_POWER_ID = 8L;
+  private static final long TIME_OF_MEASUREMENT_OFFSET_ID = 4L;
+  private static final long DISTANCE_ID = 5L;
+  private static final long ERROR_MARGIN_ID = 6L;
+  private static final long RDR_ID = 7L;
+  private static final long DETECTED_ATTACK_LEVEL_ID = 8L;
+  private static final long RSSI_ID = 9L;
+  private static final long TX_POWER_ID = 10L;
 
   public ProximityRangingClusterRangingMeasurementDataStruct(
     Optional<byte[]> wiFiDevIK,
     Optional<Long> BLEDeviceId,
     Optional<byte[]> BLTDevIK,
     Optional<Long> timeOfMeasurement,
+    Optional<Long> timeOfMeasurementOffset,
     @Nullable Integer distance,
-    Optional<Integer> accuracy,
+    Optional<Integer> errorMargin,
     Optional<ChipStructs.ProximityRangingClusterRDRStruct> rdr,
+    Optional<Integer> detectedAttackLevel,
     @Nullable Optional<Integer> rssi,
     @Nullable Optional<Integer> txPower
   ) {
@@ -12269,9 +12275,11 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
     this.BLEDeviceId = BLEDeviceId;
     this.BLTDevIK = BLTDevIK;
     this.timeOfMeasurement = timeOfMeasurement;
+    this.timeOfMeasurementOffset = timeOfMeasurementOffset;
     this.distance = distance;
-    this.accuracy = accuracy;
+    this.errorMargin = errorMargin;
     this.rdr = rdr;
+    this.detectedAttackLevel = detectedAttackLevel;
     this.rssi = rssi;
     this.txPower = txPower;
   }
@@ -12282,9 +12290,11 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
     values.add(new StructElement(BLE_DEVICE_ID_ID, BLEDeviceId.<BaseTLVType>map((nonOptionalBLEDeviceId) -> new UIntType(nonOptionalBLEDeviceId)).orElse(new EmptyType())));
     values.add(new StructElement(BLT_DEV_IK_ID, BLTDevIK.<BaseTLVType>map((nonOptionalBLTDevIK) -> new ByteArrayType(nonOptionalBLTDevIK)).orElse(new EmptyType())));
     values.add(new StructElement(TIME_OF_MEASUREMENT_ID, timeOfMeasurement.<BaseTLVType>map((nonOptionaltimeOfMeasurement) -> new UIntType(nonOptionaltimeOfMeasurement)).orElse(new EmptyType())));
+    values.add(new StructElement(TIME_OF_MEASUREMENT_OFFSET_ID, timeOfMeasurementOffset.<BaseTLVType>map((nonOptionaltimeOfMeasurementOffset) -> new UIntType(nonOptionaltimeOfMeasurementOffset)).orElse(new EmptyType())));
     values.add(new StructElement(DISTANCE_ID, distance != null ? new UIntType(distance) : new NullType()));
-    values.add(new StructElement(ACCURACY_ID, accuracy.<BaseTLVType>map((nonOptionalaccuracy) -> new IntType(nonOptionalaccuracy)).orElse(new EmptyType())));
+    values.add(new StructElement(ERROR_MARGIN_ID, errorMargin.<BaseTLVType>map((nonOptionalerrorMargin) -> new IntType(nonOptionalerrorMargin)).orElse(new EmptyType())));
     values.add(new StructElement(RDR_ID, rdr.<BaseTLVType>map((nonOptionalrdr) -> nonOptionalrdr.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(DETECTED_ATTACK_LEVEL_ID, detectedAttackLevel.<BaseTLVType>map((nonOptionaldetectedAttackLevel) -> new UIntType(nonOptionaldetectedAttackLevel)).orElse(new EmptyType())));
     values.add(new StructElement(RSSI_ID, rssi != null ? rssi.<BaseTLVType>map((nonOptionalrssi) -> new IntType(nonOptionalrssi)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(TX_POWER_ID, txPower != null ? txPower.<BaseTLVType>map((nonOptionaltxPower) -> new IntType(nonOptionaltxPower)).orElse(new EmptyType()) : new NullType()));
 
@@ -12299,9 +12309,11 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
     Optional<Long> BLEDeviceId = Optional.empty();
     Optional<byte[]> BLTDevIK = Optional.empty();
     Optional<Long> timeOfMeasurement = Optional.empty();
+    Optional<Long> timeOfMeasurementOffset = Optional.empty();
     @Nullable Integer distance = null;
-    Optional<Integer> accuracy = Optional.empty();
+    Optional<Integer> errorMargin = Optional.empty();
     Optional<ChipStructs.ProximityRangingClusterRDRStruct> rdr = Optional.empty();
+    Optional<Integer> detectedAttackLevel = Optional.empty();
     @Nullable Optional<Integer> rssi = null;
     @Nullable Optional<Integer> txPower = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
@@ -12325,20 +12337,30 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
           UIntType castingValue = element.value(UIntType.class);
           timeOfMeasurement = Optional.of(castingValue.value(Long.class));
         }
+      } else if (element.contextTagNum() == TIME_OF_MEASUREMENT_OFFSET_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          timeOfMeasurementOffset = Optional.of(castingValue.value(Long.class));
+        }
       } else if (element.contextTagNum() == DISTANCE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           distance = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == ACCURACY_ID) {
+      } else if (element.contextTagNum() == ERROR_MARGIN_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
           IntType castingValue = element.value(IntType.class);
-          accuracy = Optional.of(castingValue.value(Integer.class));
+          errorMargin = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == RDR_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
           StructType castingValue = element.value(StructType.class);
           rdr = Optional.of(ChipStructs.ProximityRangingClusterRDRStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == DETECTED_ATTACK_LEVEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          detectedAttackLevel = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == RSSI_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
@@ -12357,9 +12379,11 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
       BLEDeviceId,
       BLTDevIK,
       timeOfMeasurement,
+      timeOfMeasurementOffset,
       distance,
-      accuracy,
+      errorMargin,
       rdr,
+      detectedAttackLevel,
       rssi,
       txPower
     );
@@ -12381,14 +12405,20 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
     output.append("\ttimeOfMeasurement: ");
     output.append(timeOfMeasurement);
     output.append("\n");
+    output.append("\ttimeOfMeasurementOffset: ");
+    output.append(timeOfMeasurementOffset);
+    output.append("\n");
     output.append("\tdistance: ");
     output.append(distance);
     output.append("\n");
-    output.append("\taccuracy: ");
-    output.append(accuracy);
+    output.append("\terrorMargin: ");
+    output.append(errorMargin);
     output.append("\n");
     output.append("\trdr: ");
     output.append(rdr);
+    output.append("\n");
+    output.append("\tdetectedAttackLevel: ");
+    output.append(detectedAttackLevel);
     output.append("\n");
     output.append("\trssi: ");
     output.append(rssi);
@@ -12464,18 +12494,22 @@ public static class ProximityRangingClusterBLERangingDeviceRoleConfigStruct {
 public static class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct {
   public Integer role;
   public byte[] peerBLTDevIK;
+  public Optional<Integer> BLTCSSecurityLevel;
   public Optional<byte[]> ltk;
   private static final long ROLE_ID = 0L;
   private static final long PEER_BLT_DEV_IK_ID = 1L;
-  private static final long LTK_ID = 2L;
+  private static final long BLTCS_SECURITY_LEVEL_ID = 2L;
+  private static final long LTK_ID = 3L;
 
   public ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
     Integer role,
     byte[] peerBLTDevIK,
+    Optional<Integer> BLTCSSecurityLevel,
     Optional<byte[]> ltk
   ) {
     this.role = role;
     this.peerBLTDevIK = peerBLTDevIK;
+    this.BLTCSSecurityLevel = BLTCSSecurityLevel;
     this.ltk = ltk;
   }
 
@@ -12483,6 +12517,7 @@ public static class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStr
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ROLE_ID, new UIntType(role)));
     values.add(new StructElement(PEER_BLT_DEV_IK_ID, new ByteArrayType(peerBLTDevIK)));
+    values.add(new StructElement(BLTCS_SECURITY_LEVEL_ID, BLTCSSecurityLevel.<BaseTLVType>map((nonOptionalBLTCSSecurityLevel) -> new UIntType(nonOptionalBLTCSSecurityLevel)).orElse(new EmptyType())));
     values.add(new StructElement(LTK_ID, ltk.<BaseTLVType>map((nonOptionalltk) -> new ByteArrayType(nonOptionalltk)).orElse(new EmptyType())));
 
     return new StructType(values);
@@ -12494,6 +12529,7 @@ public static class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStr
     }
     Integer role = null;
     byte[] peerBLTDevIK = null;
+    Optional<Integer> BLTCSSecurityLevel = Optional.empty();
     Optional<byte[]> ltk = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ROLE_ID) {
@@ -12506,6 +12542,11 @@ public static class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStr
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           peerBLTDevIK = castingValue.value(byte[].class);
         }
+      } else if (element.contextTagNum() == BLTCS_SECURITY_LEVEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          BLTCSSecurityLevel = Optional.of(castingValue.value(Integer.class));
+        }
       } else if (element.contextTagNum() == LTK_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
@@ -12516,6 +12557,7 @@ public static class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStr
     return new ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
       role,
       peerBLTDevIK,
+      BLTCSSecurityLevel,
       ltk
     );
   }
@@ -12529,6 +12571,9 @@ public static class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStr
     output.append("\n");
     output.append("\tpeerBLTDevIK: ");
     output.append(Arrays.toString(peerBLTDevIK));
+    output.append("\n");
+    output.append("\tBLTCSSecurityLevel: ");
+    output.append(BLTCSSecurityLevel);
     output.append("\n");
     output.append("\tltk: ");
     output.append(ltk.isPresent() ? Arrays.toString(ltk.get()) : "");
@@ -12692,26 +12737,26 @@ public static class ProximityRangingClusterRangingTriggerConditionStruct {
 public static class ProximityRangingClusterReportingConditionStruct {
   public Optional<Integer> minDistanceCondition;
   public Optional<Integer> maxDistanceCondition;
-  public Optional<Integer> accuracyCondition;
+  public Optional<Integer> errorMarginCondition;
   private static final long MIN_DISTANCE_CONDITION_ID = 0L;
   private static final long MAX_DISTANCE_CONDITION_ID = 1L;
-  private static final long ACCURACY_CONDITION_ID = 2L;
+  private static final long ERROR_MARGIN_CONDITION_ID = 2L;
 
   public ProximityRangingClusterReportingConditionStruct(
     Optional<Integer> minDistanceCondition,
     Optional<Integer> maxDistanceCondition,
-    Optional<Integer> accuracyCondition
+    Optional<Integer> errorMarginCondition
   ) {
     this.minDistanceCondition = minDistanceCondition;
     this.maxDistanceCondition = maxDistanceCondition;
-    this.accuracyCondition = accuracyCondition;
+    this.errorMarginCondition = errorMarginCondition;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(MIN_DISTANCE_CONDITION_ID, minDistanceCondition.<BaseTLVType>map((nonOptionalminDistanceCondition) -> new UIntType(nonOptionalminDistanceCondition)).orElse(new EmptyType())));
     values.add(new StructElement(MAX_DISTANCE_CONDITION_ID, maxDistanceCondition.<BaseTLVType>map((nonOptionalmaxDistanceCondition) -> new UIntType(nonOptionalmaxDistanceCondition)).orElse(new EmptyType())));
-    values.add(new StructElement(ACCURACY_CONDITION_ID, accuracyCondition.<BaseTLVType>map((nonOptionalaccuracyCondition) -> new UIntType(nonOptionalaccuracyCondition)).orElse(new EmptyType())));
+    values.add(new StructElement(ERROR_MARGIN_CONDITION_ID, errorMarginCondition.<BaseTLVType>map((nonOptionalerrorMarginCondition) -> new UIntType(nonOptionalerrorMarginCondition)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -12722,7 +12767,7 @@ public static class ProximityRangingClusterReportingConditionStruct {
     }
     Optional<Integer> minDistanceCondition = Optional.empty();
     Optional<Integer> maxDistanceCondition = Optional.empty();
-    Optional<Integer> accuracyCondition = Optional.empty();
+    Optional<Integer> errorMarginCondition = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == MIN_DISTANCE_CONDITION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -12734,17 +12779,17 @@ public static class ProximityRangingClusterReportingConditionStruct {
           UIntType castingValue = element.value(UIntType.class);
           maxDistanceCondition = Optional.of(castingValue.value(Integer.class));
         }
-      } else if (element.contextTagNum() == ACCURACY_CONDITION_ID) {
+      } else if (element.contextTagNum() == ERROR_MARGIN_CONDITION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          accuracyCondition = Optional.of(castingValue.value(Integer.class));
+          errorMarginCondition = Optional.of(castingValue.value(Integer.class));
         }
       }
     }
     return new ProximityRangingClusterReportingConditionStruct(
       minDistanceCondition,
       maxDistanceCondition,
-      accuracyCondition
+      errorMarginCondition
     );
   }
 
@@ -12758,8 +12803,8 @@ public static class ProximityRangingClusterReportingConditionStruct {
     output.append("\tmaxDistanceCondition: ");
     output.append(maxDistanceCondition);
     output.append("\n");
-    output.append("\taccuracyCondition: ");
-    output.append(accuracyCondition);
+    output.append("\terrorMarginCondition: ");
+    output.append(errorMarginCondition);
     output.append("\n");
     output.append("}\n");
     return output.toString();

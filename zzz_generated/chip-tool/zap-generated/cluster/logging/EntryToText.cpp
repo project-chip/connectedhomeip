@@ -7024,8 +7024,6 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::Id:
             return "StartRangingResponse";
-        case chip::app::Clusters::ProximityRanging::Commands::RangingResult::Id:
-            return "RangingResult";
         default:
             return "Unknown";
         }

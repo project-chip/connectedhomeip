@@ -5030,6 +5030,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
+        CHIP_ERROR err = LogValue("TimeOfMeasurementOffset", indent + 1, value.timeOfMeasurementOffset);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TimeOfMeasurementOffset'");
+            return err;
+        }
+    }
+    {
         CHIP_ERROR err = LogValue("Distance", indent + 1, value.distance);
         if (err != CHIP_NO_ERROR)
         {
@@ -5038,10 +5046,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("Accuracy", indent + 1, value.accuracy);
+        CHIP_ERROR err = LogValue("ErrorMargin", indent + 1, value.errorMargin);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Accuracy'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ErrorMargin'");
             return err;
         }
     }
@@ -5050,6 +5058,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Rdr'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("DetectedAttackLevel", indent + 1, value.detectedAttackLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DetectedAttackLevel'");
             return err;
         }
     }
@@ -5118,6 +5134,14 @@ CHIP_ERROR DataModelLogger::LogValue(
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PeerBLTDevIK'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("BLTCSSecurityLevel", indent + 1, value.BLTCSSecurityLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'BLTCSSecurityLevel'");
             return err;
         }
     }
@@ -5224,10 +5248,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("AccuracyCondition", indent + 1, value.accuracyCondition);
+        CHIP_ERROR err = LogValue("ErrorMarginCondition", indent + 1, value.errorMarginCondition);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AccuracyCondition'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ErrorMarginCondition'");
             return err;
         }
     }
@@ -11936,6 +11960,54 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ProximityRanging::Events::RangingResult::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("SessionID", indent + 1, value.sessionID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SessionID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("RangingResultData", indent + 1, value.rangingResultData);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'RangingResultData'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ProximityRanging::Events::RangingSessionStatus::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("SessionID", indent + 1, value.sessionID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SessionID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Status", indent + 1, value.status);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Status'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const TargetNavigator::Events::TargetUpdated::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -12988,15 +13060,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("resultCode", indent + 1, value.resultCode));
     ReturnErrorOnFailure(DataModelLogger::LogValue("sessionID", indent + 1, value.sessionID));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ProximityRanging::Commands::RangingResult::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("sessionID", indent + 1, value.sessionID));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("rangingResultData", indent + 1, value.rangingResultData));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -24774,11 +24837,6 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartRangingResponse", 1, value);
         }
-        case ProximityRanging::Commands::RangingResult::Id: {
-            ProximityRanging::Commands::RangingResult::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("RangingResult", 1, value);
-        }
         }
         break;
     }
@@ -26057,6 +26115,22 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::AmbientContextSensing::Events::AmbientContextDetectEnded::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AmbientContextDetectEnded", 1, value);
+        }
+        }
+        break;
+    }
+    case ProximityRanging::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case ProximityRanging::Events::RangingResult::Id: {
+            chip::app::Clusters::ProximityRanging::Events::RangingResult::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RangingResult", 1, value);
+        }
+        case ProximityRanging::Events::RangingSessionStatus::Id: {
+            chip::app::Clusters::ProximityRanging::Events::RangingSessionStatus::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RangingSessionStatus", 1, value);
         }
         }
         break;

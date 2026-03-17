@@ -26,12 +26,14 @@ import matter.tlv.TlvWriter
 class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
   val role: UInt,
   val peerBLTDevIK: ByteArray,
+  val BLTCSSecurityLevel: Optional<UInt>,
   val ltk: Optional<ByteArray>,
 ) {
   override fun toString(): String = buildString {
     append("ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct {\n")
     append("\trole : $role\n")
     append("\tpeerBLTDevIK : $peerBLTDevIK\n")
+    append("\tBLTCSSecurityLevel : $BLTCSSecurityLevel\n")
     append("\tltk : $ltk\n")
     append("}\n")
   }
@@ -41,6 +43,10 @@ class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ROLE), role)
       put(ContextSpecificTag(TAG_PEER_BLT_DEV_IK), peerBLTDevIK)
+      if (BLTCSSecurityLevel.isPresent) {
+        val optBLTCSSecurityLevel = BLTCSSecurityLevel.get()
+        put(ContextSpecificTag(TAG_BLTCS_SECURITY_LEVEL), optBLTCSSecurityLevel)
+      }
       if (ltk.isPresent) {
         val optltk = ltk.get()
         put(ContextSpecificTag(TAG_LTK), optltk)
@@ -52,7 +58,8 @@ class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
   companion object {
     private const val TAG_ROLE = 0
     private const val TAG_PEER_BLT_DEV_IK = 1
-    private const val TAG_LTK = 2
+    private const val TAG_BLTCS_SECURITY_LEVEL = 2
+    private const val TAG_LTK = 3
 
     fun fromTlv(
       tlvTag: Tag,
@@ -61,6 +68,12 @@ class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
       tlvReader.enterStructure(tlvTag)
       val role = tlvReader.getUInt(ContextSpecificTag(TAG_ROLE))
       val peerBLTDevIK = tlvReader.getByteArray(ContextSpecificTag(TAG_PEER_BLT_DEV_IK))
+      val BLTCSSecurityLevel =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_BLTCS_SECURITY_LEVEL))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_BLTCS_SECURITY_LEVEL)))
+        } else {
+          Optional.empty()
+        }
       val ltk =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_LTK))) {
           Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_LTK)))
@@ -73,6 +86,7 @@ class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
       return ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
         role,
         peerBLTDevIK,
+        BLTCSSecurityLevel,
         ltk,
       )
     }

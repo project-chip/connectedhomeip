@@ -26,13 +26,13 @@ import matter.tlv.TlvWriter
 class ProximityRangingClusterReportingConditionStruct(
   val minDistanceCondition: Optional<UInt>,
   val maxDistanceCondition: Optional<UInt>,
-  val accuracyCondition: Optional<UInt>,
+  val errorMarginCondition: Optional<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("ProximityRangingClusterReportingConditionStruct {\n")
     append("\tminDistanceCondition : $minDistanceCondition\n")
     append("\tmaxDistanceCondition : $maxDistanceCondition\n")
-    append("\taccuracyCondition : $accuracyCondition\n")
+    append("\terrorMarginCondition : $errorMarginCondition\n")
     append("}\n")
   }
 
@@ -47,9 +47,9 @@ class ProximityRangingClusterReportingConditionStruct(
         val optmaxDistanceCondition = maxDistanceCondition.get()
         put(ContextSpecificTag(TAG_MAX_DISTANCE_CONDITION), optmaxDistanceCondition)
       }
-      if (accuracyCondition.isPresent) {
-        val optaccuracyCondition = accuracyCondition.get()
-        put(ContextSpecificTag(TAG_ACCURACY_CONDITION), optaccuracyCondition)
+      if (errorMarginCondition.isPresent) {
+        val opterrorMarginCondition = errorMarginCondition.get()
+        put(ContextSpecificTag(TAG_ERROR_MARGIN_CONDITION), opterrorMarginCondition)
       }
       endStructure()
     }
@@ -58,7 +58,7 @@ class ProximityRangingClusterReportingConditionStruct(
   companion object {
     private const val TAG_MIN_DISTANCE_CONDITION = 0
     private const val TAG_MAX_DISTANCE_CONDITION = 1
-    private const val TAG_ACCURACY_CONDITION = 2
+    private const val TAG_ERROR_MARGIN_CONDITION = 2
 
     fun fromTlv(
       tlvTag: Tag,
@@ -77,9 +77,9 @@ class ProximityRangingClusterReportingConditionStruct(
         } else {
           Optional.empty()
         }
-      val accuracyCondition =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ACCURACY_CONDITION))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ACCURACY_CONDITION)))
+      val errorMarginCondition =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_MARGIN_CONDITION))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ERROR_MARGIN_CONDITION)))
         } else {
           Optional.empty()
         }
@@ -89,7 +89,7 @@ class ProximityRangingClusterReportingConditionStruct(
       return ProximityRangingClusterReportingConditionStruct(
         minDistanceCondition,
         maxDistanceCondition,
-        accuracyCondition,
+        errorMarginCondition,
       )
     }
   }

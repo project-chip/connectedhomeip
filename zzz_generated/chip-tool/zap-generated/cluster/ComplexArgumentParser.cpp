@@ -5661,16 +5661,24 @@ ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("timeOfMeasurement");
 
+    if (value.isMember("timeOfMeasurementOffset"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "timeOfMeasurementOffset");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.timeOfMeasurementOffset, value["timeOfMeasurementOffset"]));
+    }
+    valueCopy.removeMember("timeOfMeasurementOffset");
+
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "distance");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.distance, value["distance"]));
     valueCopy.removeMember("distance");
 
-    if (value.isMember("accuracy"))
+    if (value.isMember("errorMargin"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "accuracy");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.accuracy, value["accuracy"]));
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "errorMargin");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.errorMargin, value["errorMargin"]));
     }
-    valueCopy.removeMember("accuracy");
+    valueCopy.removeMember("errorMargin");
 
     if (value.isMember("rdr"))
     {
@@ -5678,6 +5686,14 @@ ComplexArgumentParser::Setup(const char * label,
         ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.rdr, value["rdr"]));
     }
     valueCopy.removeMember("rdr");
+
+    if (value.isMember("detectedAttackLevel"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "detectedAttackLevel");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.detectedAttackLevel, value["detectedAttackLevel"]));
+    }
+    valueCopy.removeMember("detectedAttackLevel");
 
     if (value.isMember("rssi"))
     {
@@ -5702,9 +5718,11 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ProximityRanging::Stru
     ComplexArgumentParser::Finalize(request.BLEDeviceId);
     ComplexArgumentParser::Finalize(request.BLTDevIK);
     ComplexArgumentParser::Finalize(request.timeOfMeasurement);
+    ComplexArgumentParser::Finalize(request.timeOfMeasurementOffset);
     ComplexArgumentParser::Finalize(request.distance);
-    ComplexArgumentParser::Finalize(request.accuracy);
+    ComplexArgumentParser::Finalize(request.errorMargin);
     ComplexArgumentParser::Finalize(request.rdr);
+    ComplexArgumentParser::Finalize(request.detectedAttackLevel);
     ComplexArgumentParser::Finalize(request.rssi);
     ComplexArgumentParser::Finalize(request.txPower);
 }
@@ -5766,6 +5784,14 @@ CHIP_ERROR ComplexArgumentParser::Setup(
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.peerBLTDevIK, value["peerBLTDevIK"]));
     valueCopy.removeMember("peerBLTDevIK");
 
+    if (value.isMember("BLTCSSecurityLevel"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "BLTCSSecurityLevel");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.BLTCSSecurityLevel, value["BLTCSSecurityLevel"]));
+    }
+    valueCopy.removeMember("BLTCSSecurityLevel");
+
     if (value.isMember("ltk"))
     {
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "ltk");
@@ -5781,6 +5807,7 @@ void ComplexArgumentParser::Finalize(
 {
     ComplexArgumentParser::Finalize(request.role);
     ComplexArgumentParser::Finalize(request.peerBLTDevIK);
+    ComplexArgumentParser::Finalize(request.BLTCSSecurityLevel);
     ComplexArgumentParser::Finalize(request.ltk);
 }
 
@@ -5893,12 +5920,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("maxDistanceCondition");
 
-    if (value.isMember("accuracyCondition"))
+    if (value.isMember("errorMarginCondition"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "accuracyCondition");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.accuracyCondition, value["accuracyCondition"]));
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "errorMarginCondition");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.errorMarginCondition, value["errorMarginCondition"]));
     }
-    valueCopy.removeMember("accuracyCondition");
+    valueCopy.removeMember("errorMarginCondition");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -5907,7 +5935,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ProximityRanging::Stru
 {
     ComplexArgumentParser::Finalize(request.minDistanceCondition);
     ComplexArgumentParser::Finalize(request.maxDistanceCondition);
-    ComplexArgumentParser::Finalize(request.accuracyCondition);
+    ComplexArgumentParser::Finalize(request.errorMarginCondition);
 }
 
 CHIP_ERROR

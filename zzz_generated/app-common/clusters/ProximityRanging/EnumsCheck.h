@@ -25,6 +25,50 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::BLTCSSecurityLevelEnum val)
+{
+    using EnumType = ProximityRanging::BLTCSSecurityLevelEnum;
+    switch (val)
+    {
+    case EnumType::kCsSecurityLevelUnknown:
+    case EnumType::kCsSecurityLevelOne:
+    case EnumType::kCsSecurityLevelTwo:
+    case EnumType::kCsSecurityLevelThree:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::NADMEnum val)
+{
+    using EnumType = ProximityRanging::NADMEnum;
+    switch (val)
+    {
+    case EnumType::kAttackExtremelyUnlikely:
+    case EnumType::kAttackVeryUnlikely:
+    case EnumType::kAttackUnlikely:
+    case EnumType::kAttackIsPossible:
+    case EnumType::kAttackIsLikely:
+    case EnumType::kAttackVeryLikely:
+    case EnumType::kAttackExtremelyLikely:
+    case EnumType::kUnknown:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::RDRReferenceEnum val)
+{
+    using EnumType = ProximityRanging::RDRReferenceEnum;
+    switch (val)
+    {
+    case EnumType::kDeviceCoordinates:
+    case EnumType::kEarthCoordinates:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::RangingRoleEnum val)
 {
     using EnumType = ProximityRanging::RangingRoleEnum;
@@ -48,6 +92,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::Rangi
     {
     case EnumType::kSecureRanging:
     case EnumType::kOpenRanging:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::RangingSessionStatusEnum val)
+{
+    using EnumType = ProximityRanging::RangingSessionStatusEnum;
+    switch (val)
+    {
+    case EnumType::kSessionEndTimeReached:
+    case EnumType::kPeerNotFound:
+    case EnumType::kHardwareError:
+    case EnumType::kStopRequested:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

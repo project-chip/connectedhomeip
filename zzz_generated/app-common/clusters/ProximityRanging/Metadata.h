@@ -65,7 +65,15 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(StopRangingReque
 
 } // namespace Commands
 
-namespace Events {} // namespace Events
+namespace Events {
+namespace RangingResult {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace RangingResult
+namespace RangingSessionStatus {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace RangingSessionStatus
+
+} // namespace Events
 } // namespace ProximityRanging
 } // namespace Clusters
 } // namespace app

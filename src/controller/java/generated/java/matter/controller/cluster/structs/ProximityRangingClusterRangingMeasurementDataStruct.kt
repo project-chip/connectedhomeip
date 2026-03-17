@@ -28,9 +28,11 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
   val BLEDeviceId: Optional<ULong>,
   val BLTDevIK: Optional<ByteArray>,
   val timeOfMeasurement: Optional<UInt>,
+  val timeOfMeasurementOffset: Optional<UInt>,
   val distance: UShort?,
-  val accuracy: Optional<Short>,
+  val errorMargin: Optional<Short>,
   val rdr: Optional<ProximityRangingClusterRDRStruct>,
+  val detectedAttackLevel: Optional<UByte>,
   val rssi: Optional<Byte>?,
   val txPower: Optional<Byte>?,
 ) {
@@ -40,9 +42,11 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
     append("\tBLEDeviceId : $BLEDeviceId\n")
     append("\tBLTDevIK : $BLTDevIK\n")
     append("\ttimeOfMeasurement : $timeOfMeasurement\n")
+    append("\ttimeOfMeasurementOffset : $timeOfMeasurementOffset\n")
     append("\tdistance : $distance\n")
-    append("\taccuracy : $accuracy\n")
+    append("\terrorMargin : $errorMargin\n")
     append("\trdr : $rdr\n")
+    append("\tdetectedAttackLevel : $detectedAttackLevel\n")
     append("\trssi : $rssi\n")
     append("\ttxPower : $txPower\n")
     append("}\n")
@@ -67,18 +71,26 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
         val opttimeOfMeasurement = timeOfMeasurement.get()
         put(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT), opttimeOfMeasurement)
       }
+      if (timeOfMeasurementOffset.isPresent) {
+        val opttimeOfMeasurementOffset = timeOfMeasurementOffset.get()
+        put(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT_OFFSET), opttimeOfMeasurementOffset)
+      }
       if (distance != null) {
         put(ContextSpecificTag(TAG_DISTANCE), distance)
       } else {
         putNull(ContextSpecificTag(TAG_DISTANCE))
       }
-      if (accuracy.isPresent) {
-        val optaccuracy = accuracy.get()
-        put(ContextSpecificTag(TAG_ACCURACY), optaccuracy)
+      if (errorMargin.isPresent) {
+        val opterrorMargin = errorMargin.get()
+        put(ContextSpecificTag(TAG_ERROR_MARGIN), opterrorMargin)
       }
       if (rdr.isPresent) {
         val optrdr = rdr.get()
         optrdr.toTlv(ContextSpecificTag(TAG_RDR), this)
+      }
+      if (detectedAttackLevel.isPresent) {
+        val optdetectedAttackLevel = detectedAttackLevel.get()
+        put(ContextSpecificTag(TAG_DETECTED_ATTACK_LEVEL), optdetectedAttackLevel)
       }
       if (rssi != null) {
         if (rssi.isPresent) {
@@ -105,11 +117,13 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
     private const val TAG_BLE_DEVICE_ID = 1
     private const val TAG_BLT_DEV_IK = 2
     private const val TAG_TIME_OF_MEASUREMENT = 3
-    private const val TAG_DISTANCE = 4
-    private const val TAG_ACCURACY = 5
-    private const val TAG_RDR = 6
-    private const val TAG_RSSI = 7
-    private const val TAG_TX_POWER = 8
+    private const val TAG_TIME_OF_MEASUREMENT_OFFSET = 4
+    private const val TAG_DISTANCE = 5
+    private const val TAG_ERROR_MARGIN = 6
+    private const val TAG_RDR = 7
+    private const val TAG_DETECTED_ATTACK_LEVEL = 8
+    private const val TAG_RSSI = 9
+    private const val TAG_TX_POWER = 10
 
     fun fromTlv(
       tlvTag: Tag,
@@ -140,6 +154,12 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
         } else {
           Optional.empty()
         }
+      val timeOfMeasurementOffset =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT_OFFSET))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TIME_OF_MEASUREMENT_OFFSET)))
+        } else {
+          Optional.empty()
+        }
       val distance =
         if (!tlvReader.isNull()) {
           tlvReader.getUShort(ContextSpecificTag(TAG_DISTANCE))
@@ -147,9 +167,9 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_DISTANCE))
           null
         }
-      val accuracy =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ACCURACY))) {
-          Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_ACCURACY)))
+      val errorMargin =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_MARGIN))) {
+          Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_ERROR_MARGIN)))
         } else {
           Optional.empty()
         }
@@ -158,6 +178,12 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
           Optional.of(
             ProximityRangingClusterRDRStruct.fromTlv(ContextSpecificTag(TAG_RDR), tlvReader)
           )
+        } else {
+          Optional.empty()
+        }
+      val detectedAttackLevel =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DETECTED_ATTACK_LEVEL))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_DETECTED_ATTACK_LEVEL)))
         } else {
           Optional.empty()
         }
@@ -191,9 +217,11 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
         BLEDeviceId,
         BLTDevIK,
         timeOfMeasurement,
+        timeOfMeasurementOffset,
         distance,
-        accuracy,
+        errorMargin,
         rdr,
+        detectedAttackLevel,
         rssi,
         txPower,
       )

@@ -1795,13 +1795,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRProximityRangingClusterRangingResultParams (InternalMethods)
-
-- (nullable instancetype)initWithDecodableStruct:(const chip::app::Clusters::ProximityRanging::Commands::RangingResult::DecodableType &)decodableStruct;
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ProximityRanging::Commands::RangingResult::DecodableType &)decodableStruct;
-
-@end
-
 @interface MTRWiFiNetworkManagementClusterNetworkPassphraseRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

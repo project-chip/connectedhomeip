@@ -16,7 +16,7 @@ namespace Commands {
 inline constexpr uint32_t kAcceptedCommandsCount = 2;
 
 // Total number of server to client commands supported by the cluster (response commands)
-inline constexpr uint32_t kGeneratedCommandsCount = 2;
+inline constexpr uint32_t kGeneratedCommandsCount = 1;
 
 namespace StartRangingRequest {
 inline constexpr CommandId Id = 0x00000000;
@@ -29,10 +29,6 @@ inline constexpr CommandId Id = 0x00000002;
 namespace StartRangingResponse {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace StartRangingResponse
-
-namespace RangingResult {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace RangingResult
 
 } // namespace Commands
 } // namespace ProximityRanging

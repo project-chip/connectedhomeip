@@ -86,9 +86,11 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kBLEDeviceId), BLEDeviceId);
     encoder.Encode(to_underlying(Fields::kBLTDevIK), BLTDevIK);
     encoder.Encode(to_underlying(Fields::kTimeOfMeasurement), timeOfMeasurement);
+    encoder.Encode(to_underlying(Fields::kTimeOfMeasurementOffset), timeOfMeasurementOffset);
     encoder.Encode(to_underlying(Fields::kDistance), distance);
-    encoder.Encode(to_underlying(Fields::kAccuracy), accuracy);
+    encoder.Encode(to_underlying(Fields::kErrorMargin), errorMargin);
     encoder.Encode(to_underlying(Fields::kRdr), rdr);
+    encoder.Encode(to_underlying(Fields::kDetectedAttackLevel), detectedAttackLevel);
     encoder.Encode(to_underlying(Fields::kRssi), rssi);
     encoder.Encode(to_underlying(Fields::kTxPower), txPower);
     return encoder.Finalize();
@@ -120,17 +122,25 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, timeOfMeasurement);
         }
+        else if (__context_tag == to_underlying(Fields::kTimeOfMeasurementOffset))
+        {
+            err = DataModel::Decode(reader, timeOfMeasurementOffset);
+        }
         else if (__context_tag == to_underlying(Fields::kDistance))
         {
             err = DataModel::Decode(reader, distance);
         }
-        else if (__context_tag == to_underlying(Fields::kAccuracy))
+        else if (__context_tag == to_underlying(Fields::kErrorMargin))
         {
-            err = DataModel::Decode(reader, accuracy);
+            err = DataModel::Decode(reader, errorMargin);
         }
         else if (__context_tag == to_underlying(Fields::kRdr))
         {
             err = DataModel::Decode(reader, rdr);
+        }
+        else if (__context_tag == to_underlying(Fields::kDetectedAttackLevel))
+        {
+            err = DataModel::Decode(reader, detectedAttackLevel);
         }
         else if (__context_tag == to_underlying(Fields::kRssi))
         {
@@ -187,6 +197,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kRole), role);
     encoder.Encode(to_underlying(Fields::kPeerBLTDevIK), peerBLTDevIK);
+    encoder.Encode(to_underlying(Fields::kBLTCSSecurityLevel), BLTCSSecurityLevel);
     encoder.Encode(to_underlying(Fields::kLtk), ltk);
     return encoder.Finalize();
 }
@@ -208,6 +219,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kPeerBLTDevIK))
         {
             err = DataModel::Decode(reader, peerBLTDevIK);
+        }
+        else if (__context_tag == to_underlying(Fields::kBLTCSSecurityLevel))
+        {
+            err = DataModel::Decode(reader, BLTCSSecurityLevel);
         }
         else if (__context_tag == to_underlying(Fields::kLtk))
         {
@@ -304,7 +319,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kMinDistanceCondition), minDistanceCondition);
     encoder.Encode(to_underlying(Fields::kMaxDistanceCondition), maxDistanceCondition);
-    encoder.Encode(to_underlying(Fields::kAccuracyCondition), accuracyCondition);
+    encoder.Encode(to_underlying(Fields::kErrorMarginCondition), errorMarginCondition);
     return encoder.Finalize();
 }
 
@@ -326,9 +341,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, maxDistanceCondition);
         }
-        else if (__context_tag == to_underlying(Fields::kAccuracyCondition))
+        else if (__context_tag == to_underlying(Fields::kErrorMarginCondition))
         {
-            err = DataModel::Decode(reader, accuracyCondition);
+            err = DataModel::Decode(reader, errorMarginCondition);
         }
 
         ReturnErrorOnFailure(err);

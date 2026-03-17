@@ -50,11 +50,11 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    uint16_t azimuth          = static_cast<uint16_t>(0);
-    int16_t elevation         = static_cast<int16_t>(0);
-    uint8_t azimuthAccuracy   = static_cast<uint8_t>(0);
-    uint8_t elevationAccuracy = static_cast<uint8_t>(0);
-    uint8_t reference         = static_cast<uint8_t>(0);
+    uint16_t azimuth           = static_cast<uint16_t>(0);
+    int16_t elevation          = static_cast<int16_t>(0);
+    uint8_t azimuthAccuracy    = static_cast<uint8_t>(0);
+    uint8_t elevationAccuracy  = static_cast<uint8_t>(0);
+    RDRReferenceEnum reference = static_cast<RDRReferenceEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -69,15 +69,17 @@ using DecodableType = Type;
 namespace RangingMeasurementDataStruct {
 enum class Fields : uint8_t
 {
-    kWiFiDevIK         = 0,
-    kBLEDeviceId       = 1,
-    kBLTDevIK          = 2,
-    kTimeOfMeasurement = 3,
-    kDistance          = 4,
-    kAccuracy          = 5,
-    kRdr               = 6,
-    kRssi              = 7,
-    kTxPower           = 8,
+    kWiFiDevIK               = 0,
+    kBLEDeviceId             = 1,
+    kBLTDevIK                = 2,
+    kTimeOfMeasurement       = 3,
+    kTimeOfMeasurementOffset = 4,
+    kDistance                = 5,
+    kErrorMargin             = 6,
+    kRdr                     = 7,
+    kDetectedAttackLevel     = 8,
+    kRssi                    = 9,
+    kTxPower                 = 10,
 };
 
 struct Type
@@ -87,9 +89,11 @@ public:
     Optional<uint64_t> BLEDeviceId;
     Optional<chip::ByteSpan> BLTDevIK;
     Optional<uint32_t> timeOfMeasurement;
+    Optional<uint32_t> timeOfMeasurementOffset;
     DataModel::Nullable<uint16_t> distance;
-    Optional<int16_t> accuracy;
+    Optional<int16_t> errorMargin;
     Optional<Structs::RDRStruct::Type> rdr;
+    Optional<NADMEnum> detectedAttackLevel;
     Optional<DataModel::Nullable<int8_t>> rssi;
     Optional<DataModel::Nullable<int8_t>> txPower;
 
@@ -129,9 +133,10 @@ using DecodableType = Type;
 namespace BLTChannelSoundingDeviceRoleConfigStruct {
 enum class Fields : uint8_t
 {
-    kRole         = 0,
-    kPeerBLTDevIK = 1,
-    kLtk          = 2,
+    kRole               = 0,
+    kPeerBLTDevIK       = 1,
+    kBLTCSSecurityLevel = 2,
+    kLtk                = 3,
 };
 
 struct Type
@@ -139,6 +144,7 @@ struct Type
 public:
     RangingRoleEnum role = static_cast<RangingRoleEnum>(0);
     chip::ByteSpan peerBLTDevIK;
+    Optional<BLTCSSecurityLevelEnum> BLTCSSecurityLevel;
     Optional<chip::ByteSpan> ltk;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -206,7 +212,7 @@ enum class Fields : uint8_t
 {
     kMinDistanceCondition = 0,
     kMaxDistanceCondition = 1,
-    kAccuracyCondition    = 2,
+    kErrorMarginCondition = 2,
 };
 
 struct Type
@@ -214,7 +220,7 @@ struct Type
 public:
     Optional<uint16_t> minDistanceCondition;
     Optional<uint16_t> maxDistanceCondition;
-    Optional<uint16_t> accuracyCondition;
+    Optional<uint16_t> errorMarginCondition;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

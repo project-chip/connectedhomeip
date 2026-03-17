@@ -8911,6 +8911,29 @@ provisional cluster AmbientContextSensing = 1073 {
 provisional cluster ProximityRanging = 1075 {
   revision 1;
 
+  enum BLTCSSecurityLevelEnum : enum8 {
+    kCSSECURITYLEVELUNKNOWN = 0 [spec_name = "CS_SECURITY_LEVEL_UNKNOWN"];
+    kCSSECURITYLEVELONE = 1 [spec_name = "CS_SECURITY_LEVEL_ONE"];
+    kCSSECURITYLEVELTWO = 2 [spec_name = "CS_SECURITY_LEVEL_TWO"];
+    kCSSECURITYLEVELTHREE = 3 [spec_name = "CS_SECURITY_LEVEL_THREE"];
+  }
+
+  enum NADMEnum : enum8 {
+    kAttackExtremelyUnlikely = 0;
+    kAttackVeryUnlikely = 1;
+    kAttackUnlikely = 2;
+    kAttackIsPossible = 3;
+    kAttackIsLikely = 4;
+    kAttackVeryLikely = 5;
+    kAttackExtremelyLikely = 6;
+    kUnknown = 255;
+  }
+
+  enum RDRReferenceEnum : enum8 {
+    kDeviceCoordinates = 0;
+    kEarthCoordinates = 1;
+  }
+
   enum RangingRoleEnum : enum8 {
     kWiFiSubscriberRole = 0;
     kWiFiPublisherRole = 1;
@@ -8923,6 +8946,13 @@ provisional cluster ProximityRanging = 1075 {
   enum RangingSecurityEnum : enum8 {
     kSecureRanging = 0;
     kOpenRanging = 1;
+  }
+
+  enum RangingSessionStatusEnum : enum8 {
+    kSessionEndTimeReached = 0;
+    kPeerNotFound = 1;
+    kHardwareError = 2;
+    kStopRequested = 3;
   }
 
   enum RangingTechEnum : enum8 {
@@ -8953,7 +8983,7 @@ provisional cluster ProximityRanging = 1075 {
     k5G = 0x4 [spec_name = "5G"];
     k6G = 0x8 [spec_name = "6G"];
     k60G = 0x10 [spec_name = "60G"];
-    k1G = 0x20 [spec_name = "1G"];
+    kS1G = 0x20 [spec_name = "S1G"];
     k45G = 0x40 [spec_name = "45G"];
   }
 
@@ -8975,7 +9005,7 @@ provisional cluster ProximityRanging = 1075 {
     int16s elevation = 1;
     int8u azimuthAccuracy = 2;
     int8u elevationAccuracy = 3;
-    int8u reference = 4;
+    RDRReferenceEnum reference = 4;
   }
 
   struct RangingMeasurementDataStruct {
@@ -8983,11 +9013,13 @@ provisional cluster ProximityRanging = 1075 {
     optional int64u BLEDeviceId = 1;
     optional octet_string BLTDevIK = 2;
     optional epoch_s timeOfMeasurement = 3;
-    nullable int16u distance = 4;
-    optional int16s accuracy = 5;
-    optional RDRStruct rdr = 6;
-    optional nullable int8s rssi = 7;
-    optional nullable int8s txPower = 8;
+    optional elapsed_s timeOfMeasurementOffset = 4;
+    nullable int16u distance = 5;
+    optional int16s errorMargin = 6;
+    optional RDRStruct rdr = 7;
+    optional NADMEnum detectedAttackLevel = 8;
+    optional nullable int8s rssi = 9;
+    optional nullable int8s txPower = 10;
   }
 
   struct BLERangingDeviceRoleConfigStruct {
@@ -8998,7 +9030,8 @@ provisional cluster ProximityRanging = 1075 {
   struct BLTChannelSoundingDeviceRoleConfigStruct {
     RangingRoleEnum role = 0;
     octet_string<16> peerBLTDevIK = 1;
-    optional octet_string<16> ltk = 2;
+    optional BLTCSSecurityLevelEnum BLTCSSecurityLevel = 2;
+    optional octet_string<16> ltk = 3;
   }
 
   struct RangingCapabilitiesStruct {
@@ -9016,13 +9049,23 @@ provisional cluster ProximityRanging = 1075 {
   struct ReportingConditionStruct {
     optional int16u minDistanceCondition = 0;
     optional int16u maxDistanceCondition = 1;
-    optional int16u accuracyCondition = 2;
+    optional int16u errorMarginCondition = 2;
   }
 
   struct WiFiRangingDeviceRoleConfigStruct {
     RangingRoleEnum role = 0;
     octet_string<16> peerWiFiDevIK = 1;
     optional octet_string<32> pmk = 2;
+  }
+
+  info event RangingResult = 0 {
+    int8u sessionID = 0;
+    RangingMeasurementDataStruct rangingResultData = 1;
+  }
+
+  info event RangingSessionStatus = 1 {
+    int8u sessionID = 0;
+    RangingSessionStatusEnum status = 1;
   }
 
   readonly attribute RangingCapabilitiesStruct rangingCapabilities[] = 0;
@@ -9055,11 +9098,6 @@ provisional cluster ProximityRanging = 1075 {
 
   request struct StopRangingRequestRequest {
     int8u sessionID = 0;
-  }
-
-  response struct RangingResult = 3 {
-    int8u sessionID = 0;
-    RangingMeasurementDataStruct rangingResultData = 1;
   }
 
   /** This command allows the client to request the start of a ranging session. */

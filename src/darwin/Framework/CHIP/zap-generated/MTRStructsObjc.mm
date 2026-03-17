@@ -8845,11 +8845,15 @@ NS_ASSUME_NONNULL_BEGIN
 
         _timeOfMeasurement = nil;
 
+        _timeOfMeasurementOffset = nil;
+
         _distance = nil;
 
-        _accuracy = nil;
+        _errorMargin = nil;
 
         _rdr = nil;
+
+        _detectedAttackLevel = nil;
 
         _rssi = nil;
 
@@ -8866,9 +8870,11 @@ NS_ASSUME_NONNULL_BEGIN
     other.bleDeviceId = self.bleDeviceId;
     other.bltDevIK = self.bltDevIK;
     other.timeOfMeasurement = self.timeOfMeasurement;
+    other.timeOfMeasurementOffset = self.timeOfMeasurementOffset;
     other.distance = self.distance;
-    other.accuracy = self.accuracy;
+    other.errorMargin = self.errorMargin;
     other.rdr = self.rdr;
+    other.detectedAttackLevel = self.detectedAttackLevel;
     other.rssi = self.rssi;
     other.txPower = self.txPower;
 
@@ -8877,7 +8883,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: wiFiDevIK:%@; bleDeviceId:%@; bltDevIK:%@; timeOfMeasurement:%@; distance:%@; accuracy:%@; rdr:%@; rssi:%@; txPower:%@; >", NSStringFromClass([self class]), [_wiFiDevIK base64EncodedStringWithOptions:0], _bleDeviceId, [_bltDevIK base64EncodedStringWithOptions:0], _timeOfMeasurement, _distance, _accuracy, _rdr, _rssi, _txPower];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: wiFiDevIK:%@; bleDeviceId:%@; bltDevIK:%@; timeOfMeasurement:%@; timeOfMeasurementOffset:%@; distance:%@; errorMargin:%@; rdr:%@; detectedAttackLevel:%@; rssi:%@; txPower:%@; >", NSStringFromClass([self class]), [_wiFiDevIK base64EncodedStringWithOptions:0], _bleDeviceId, [_bltDevIK base64EncodedStringWithOptions:0], _timeOfMeasurement, _timeOfMeasurementOffset, _distance, _errorMargin, _rdr, _detectedAttackLevel, _rssi, _txPower];
     return descriptionString;
 }
 
@@ -8922,6 +8928,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _peerBLTDevIK = [NSData data];
 
+        _bltcsSecurityLevel = nil;
+
         _ltk = nil;
     }
     return self;
@@ -8933,6 +8941,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.role = self.role;
     other.peerBLTDevIK = self.peerBLTDevIK;
+    other.bltcsSecurityLevel = self.bltcsSecurityLevel;
     other.ltk = self.ltk;
 
     return other;
@@ -8940,7 +8949,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: role:%@; peerBLTDevIK:%@; ltk:%@; >", NSStringFromClass([self class]), _role, [_peerBLTDevIK base64EncodedStringWithOptions:0], [_ltk base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: role:%@; peerBLTDevIK:%@; bltcsSecurityLevel:%@; ltk:%@; >", NSStringFromClass([self class]), _role, [_peerBLTDevIK base64EncodedStringWithOptions:0], _bltcsSecurityLevel, [_ltk base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -9021,7 +9030,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _maxDistanceCondition = nil;
 
-        _accuracyCondition = nil;
+        _errorMarginCondition = nil;
     }
     return self;
 }
@@ -9032,14 +9041,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.minDistanceCondition = self.minDistanceCondition;
     other.maxDistanceCondition = self.maxDistanceCondition;
-    other.accuracyCondition = self.accuracyCondition;
+    other.errorMarginCondition = self.errorMarginCondition;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: minDistanceCondition:%@; maxDistanceCondition:%@; accuracyCondition:%@; >", NSStringFromClass([self class]), _minDistanceCondition, _maxDistanceCondition, _accuracyCondition];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: minDistanceCondition:%@; maxDistanceCondition:%@; errorMarginCondition:%@; >", NSStringFromClass([self class]), _minDistanceCondition, _maxDistanceCondition, _errorMarginCondition];
     return descriptionString;
 }
 
@@ -9073,6 +9082,66 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: role:%@; peerWiFiDevIK:%@; pmk:%@; >", NSStringFromClass([self class]), _role, [_peerWiFiDevIK base64EncodedStringWithOptions:0], [_pmk base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRProximityRangingClusterRangingResultEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sessionID = @(0);
+
+        _rangingResultData = [MTRProximityRangingClusterRangingMeasurementDataStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRProximityRangingClusterRangingResultEvent alloc] init];
+
+    other.sessionID = self.sessionID;
+    other.rangingResultData = self.rangingResultData;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; rangingResultData:%@; >", NSStringFromClass([self class]), _sessionID, _rangingResultData];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRProximityRangingClusterRangingSessionStatusEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sessionID = @(0);
+
+        _status = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRProximityRangingClusterRangingSessionStatusEvent alloc] init];
+
+    other.sessionID = self.sessionID;
+    other.status = self.status;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sessionID:%@; status:%@; >", NSStringFromClass([self class]), _sessionID, _status];
     return descriptionString;
 }
 

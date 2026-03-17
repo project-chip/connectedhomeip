@@ -10,7 +10,16 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ProximityRanging {
-namespace Events {} // namespace Events
+namespace Events {
+namespace RangingResult {
+inline constexpr EventId Id = 0x00000000;
+} // namespace RangingResult
+
+namespace RangingSessionStatus {
+inline constexpr EventId Id = 0x00000001;
+} // namespace RangingSessionStatus
+
+} // namespace Events
 } // namespace ProximityRanging
 } // namespace Clusters
 } // namespace app
