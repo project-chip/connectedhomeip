@@ -51,7 +51,7 @@ public:
     ZoneMgmtServer(Delegate & delegate, EndpointId endpointId, BitFlags<Feature> features, uint8_t maxUserDefinedZones,
                    uint8_t maxZones, uint8_t sensitivityMax, const TwoDCartesianVertexStruct & twoDCartesianMax);
     ~ZoneMgmtServer();
-    
+
     /**
      * @brief Initialise the Zone Management server instance.
      * This function must be called after defining a ZoneMgmtServer class object.
