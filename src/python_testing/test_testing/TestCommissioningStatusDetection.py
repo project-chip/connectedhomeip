@@ -29,6 +29,7 @@ and devices commissioned on other fabrics.
 """
 
 import asyncio
+import contextlib
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -74,14 +75,17 @@ def build_expected_instance_name(compressed_fabric_id: int, node_id: int) -> str
     return f'{compressed_fabric_id:016X}-{node_id:016X}'
 
 
-def create_mock_attribute_result(endpoint: int, root_cert_count: int):
-    """Create a mock ReadAttribute result with specified number of root certificates."""
+def create_mock_attribute_result(root_cert_count: int):
+    """Create a mock ReadAttribute result with specified number of root certificates.
+
+    OperationalCredentials is node-scoped and always on endpoint 0.
+    """
     # Import here to avoid issues if module not available
     try:
         import matter.clusters as Clusters
         mock_certs = [b'cert_data'] * root_cert_count
         return {
-            endpoint: {
+            0: {
                 Clusters.OperationalCredentials: {
                     Clusters.OperationalCredentials.Attributes.TrustedRootCertificates: mock_certs
                 }
@@ -94,12 +98,45 @@ def create_mock_attribute_result(endpoint: int, root_cert_count: int):
         mock_opcreds_attrs = MagicMock()
         mock_opcreds_attrs.TrustedRootCertificates = mock_certs
         return {
-            endpoint: {
+            0: {
                 mock_opcreds: {
                     mock_opcreds_attrs: mock_certs
                 }
             }
         }
+
+
+@contextlib.contextmanager
+def mock_mdns_module():
+    """Context manager to inject a mock mdns_discovery module into sys.modules.
+
+    This is necessary because the real mdns_discovery depends on zeroconf,
+    which may not be installed in unit test environments. By injecting a mock
+    module, the `from mdns_discovery.mdns_discovery import MdnsDiscovery`
+    inside _is_device_operational_via_dnssd resolves correctly.
+    """
+    mock_mdns_mod = MagicMock()
+    mock_parent = MagicMock()
+    mock_parent.mdns_discovery = mock_mdns_mod
+
+    saved_parent = sys.modules.get('mdns_discovery')
+    saved_child = sys.modules.get('mdns_discovery.mdns_discovery')
+
+    sys.modules['mdns_discovery'] = mock_parent
+    sys.modules['mdns_discovery.mdns_discovery'] = mock_mdns_mod
+
+    try:
+        yield mock_mdns_mod
+    finally:
+        # Restore original modules
+        if saved_parent is not None:
+            sys.modules['mdns_discovery'] = saved_parent
+        else:
+            sys.modules.pop('mdns_discovery', None)
+        if saved_child is not None:
+            sys.modules['mdns_discovery.mdns_discovery'] = saved_child
+        else:
+            sys.modules.pop('mdns_discovery.mdns_discovery', None)
 
 
 # =============================================================================
@@ -121,12 +158,12 @@ async def test_dnssd_device_found_on_this_fabric():
     mock_controller = MockDeviceController()
     expected_instance_name = build_expected_instance_name(TEST_COMPRESSED_FABRIC_ID, TEST_NODE_ID)
 
-    with patch('mdns_discovery.mdns_discovery.MdnsDiscovery') as MockMdnsDiscovery:
+    with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
         mock_mdns.get_operational_services = AsyncMock(return_value=[
             MockMdnsServiceInfo(instance_name=expected_instance_name)
         ])
-        MockMdnsDiscovery.return_value = mock_mdns
+        mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
@@ -149,13 +186,13 @@ async def test_dnssd_device_on_different_fabric():
 
     mock_controller = MockDeviceController()
 
-    with patch('mdns_discovery.mdns_discovery.MdnsDiscovery') as MockMdnsDiscovery:
+    with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
         # Device advertising on different fabric (different compressed fabric ID)
         mock_mdns.get_operational_services = AsyncMock(return_value=[
             MockMdnsServiceInfo(instance_name="AAAAAAAAAAAAAAAA-00000000000004D2")  # Different fabric, same node
         ])
-        MockMdnsDiscovery.return_value = mock_mdns
+        mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
@@ -178,10 +215,10 @@ async def test_dnssd_no_services_found():
 
     mock_controller = MockDeviceController()
 
-    with patch('mdns_discovery.mdns_discovery.MdnsDiscovery') as MockMdnsDiscovery:
+    with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
         mock_mdns.get_operational_services = AsyncMock(return_value=[])
-        MockMdnsDiscovery.return_value = mock_mdns
+        mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
@@ -204,10 +241,10 @@ async def test_dnssd_exception_handling():
 
     mock_controller = MockDeviceController()
 
-    with patch('mdns_discovery.mdns_discovery.MdnsDiscovery') as MockMdnsDiscovery:
+    with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
         mock_mdns.get_operational_services = AsyncMock(side_effect=Exception("DNS-SD network error"))
-        MockMdnsDiscovery.return_value = mock_mdns
+        mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
@@ -216,14 +253,16 @@ async def test_dnssd_exception_handling():
     return None
 
 
-async def test_dnssd_import_error_handling():
+async def test_dnssd_import_error_propagates():
     """
-    Test: mdns_discovery module not available.
+    Test: ImportError propagates when mdns_discovery is unavailable.
 
     Scenario: Running in environment without mdns_discovery installed.
-    Expected: Returns False gracefully (falls back to PASE/CASE).
+    Expected: ImportError propagates (NOT silently caught).
 
-    Value: Ensures the code works even if optional DNS-SD module is missing.
+    Value: Ensures that a missing mdns_discovery module causes a clear,
+    loud failure instead of silently degrading to a slower path.
+    The module is always expected to be available in test environments.
     """
     from matter.testing.commissioning import _is_device_operational_via_dnssd
 
@@ -231,10 +270,11 @@ async def test_dnssd_import_error_handling():
 
     # Simulate ImportError by patching the import inside the function
     with patch.dict('sys.modules', {'mdns_discovery': None, 'mdns_discovery.mdns_discovery': None}):
-        # The function catches ImportError and returns False
-        result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
-        if result:
-            return "Expected False when mdns_discovery module not available"
+        try:
+            await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
+            return "Expected ImportError to propagate when mdns_discovery module not available"
+        except (ImportError, ModuleNotFoundError):
+            pass  # Expected - ImportError should now propagate
     return None
 
 
@@ -252,14 +292,14 @@ async def test_dnssd_multiple_services_finds_correct_one():
     mock_controller = MockDeviceController()
     expected_instance_name = build_expected_instance_name(TEST_COMPRESSED_FABRIC_ID, TEST_NODE_ID)
 
-    with patch('mdns_discovery.mdns_discovery.MdnsDiscovery') as MockMdnsDiscovery:
+    with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
         mock_mdns.get_operational_services = AsyncMock(return_value=[
             MockMdnsServiceInfo(instance_name="OTHERFABRICID00000-0000000000005678"),
             MockMdnsServiceInfo(instance_name=expected_instance_name),  # Our device
             MockMdnsServiceInfo(instance_name="ANOTHERFABRIC0000-0000000000009999"),
         ])
-        MockMdnsDiscovery.return_value = mock_mdns
+        mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
@@ -283,12 +323,12 @@ async def test_dnssd_same_fabric_different_node():
     # Same fabric, different node
     different_node_instance = build_expected_instance_name(TEST_COMPRESSED_FABRIC_ID, 9999)
 
-    with patch('mdns_discovery.mdns_discovery.MdnsDiscovery') as MockMdnsDiscovery:
+    with mock_mdns_module() as mock_mdns_mod:
         mock_mdns = MagicMock()
         mock_mdns.get_operational_services = AsyncMock(return_value=[
             MockMdnsServiceInfo(instance_name=different_node_instance)
         ])
-        MockMdnsDiscovery.return_value = mock_mdns
+        mock_mdns_mod.MdnsDiscovery.return_value = mock_mdns
 
         result = await _is_device_operational_via_dnssd(mock_controller, TEST_NODE_ID)
 
@@ -728,7 +768,7 @@ def main():
         ("A2. DNS-SD: device on DIFFERENT fabric", test_dnssd_device_on_different_fabric),
         ("A3. DNS-SD: no services found", test_dnssd_no_services_found),
         ("A4. DNS-SD: exception handling", test_dnssd_exception_handling),
-        ("A5. DNS-SD: import error handling", test_dnssd_import_error_handling),
+        ("A5. DNS-SD: import error propagates", test_dnssd_import_error_propagates),
         ("A6. DNS-SD: multiple services finds correct one", test_dnssd_multiple_services_finds_correct_one),
         ("A7. DNS-SD: same fabric different node", test_dnssd_same_fabric_different_node),
 

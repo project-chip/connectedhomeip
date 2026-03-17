@@ -33,6 +33,8 @@ from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.setup_payload import SetupPayload
 
+import matter.clusters as Clusters
+
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
 
@@ -410,9 +412,9 @@ async def _is_device_operational_via_dnssd(
     Returns:
         True if device is advertising as operational on this fabric, False otherwise
     """
-    try:
-        from mdns_discovery.mdns_discovery import MdnsDiscovery
+    from mdns_discovery.mdns_discovery import MdnsDiscovery
 
+    try:
         # Build expected instance name for this fabric+node
         compressed_fabric_id = dev_ctrl.GetCompressedFabricId()
         expected_instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
@@ -435,9 +437,6 @@ async def _is_device_operational_via_dnssd(
         LOGGER.info(f"Device {node_id} not found operational on fabric {compressed_fabric_id:016X} via DNS-SD")
         return False
 
-    except ImportError:
-        LOGGER.warning("mdns_discovery module not available, skipping DNS-SD check")
-        return False
     except Exception as e:
         LOGGER.warning(f"DNS-SD check failed, will fall back to connection attempt: {e}")
         return False
@@ -540,14 +539,14 @@ async def _establish_pase_or_case_session(
 async def is_commissioned(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
-    endpoint: int = 0,
     pase_params: Optional[dict] = None
 ) -> bool:
     """
     Check if a device has any commissioned fabrics.
 
     Uses DNS-SD to check if the device is operational on this fabric, avoiding long timeouts.
-    Then reads the TrustedRootCertificates attribute.
+    Then reads the TrustedRootCertificates attribute from endpoint 0 (OperationalCredentials
+    is node-scoped per the Matter spec and always resides on endpoint 0).
 
     Note: This function attempts a fast DNS-SD check first. If the device is found
     operational on the current fabric via DNS-SD, it returns True.
@@ -555,7 +554,6 @@ async def is_commissioned(
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
-        endpoint: Endpoint to query (default 0)
         pase_params: Optional parameters for establishing PASE if device is not commissioned.
                     Format: {'setup_code': str, 'discriminator': int, 'passcode': int}
 
@@ -592,20 +590,18 @@ async def is_commissioned(
                 "Cannot check commissioning status without risking long connection timeout."
             )
 
-        # Import locally to avoid potential circular dependencies
-        import matter.clusters as Clusters
-
         # Try both PASE and CASE in parallel - use whichever succeeds first
         LOGGER.info(f"Device {node_id} not found via DNS-SD, trying parallel PASE/CASE connection")
         await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
 
+        # OperationalCredentials is node-scoped, always on endpoint 0
         result = await dev_ctrl.ReadAttribute(
             nodeId=node_id,
-            attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+            attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
         )
 
         # Extract the trusted root certificates list
-        root_certs = result[endpoint][Clusters.OperationalCredentials][
+        root_certs = result[0][Clusters.OperationalCredentials][
             Clusters.OperationalCredentials.Attributes.TrustedRootCertificates
         ]
 
@@ -620,19 +616,18 @@ async def is_commissioned(
 async def get_commissioned_fabric_count(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
-    endpoint: int = 0,
     pase_params: Optional[dict] = None
 ) -> int:
     """
     Get the number of commissioned fabrics on a device.
 
     Uses DNS-SD to check if the device is operational on this fabric, avoiding long timeouts.
-    Then reads the TrustedRootCertificates attribute and returns the count.
+    Then reads the TrustedRootCertificates attribute from endpoint 0 and returns the count.
+    OperationalCredentials is node-scoped per the Matter spec and always resides on endpoint 0.
 
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
-        endpoint: Endpoint to query (default 0)
         pase_params: Optional parameters for establishing PASE if device is not commissioned.
                     Format: {'setup_code': str, 'discriminator': int, 'passcode': int}
 
@@ -646,9 +641,6 @@ async def get_commissioned_fabric_count(
         RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
     """
     try:
-        # Import locally to avoid potential circular dependencies
-        import matter.clusters as Clusters
-
         # Fast DNS-SD check to determine if device is operational on this fabric
         # This avoids the long CASE timeout if device is not commissioned
         is_operational = await _is_device_operational_via_dnssd(dev_ctrl, node_id)
@@ -658,7 +650,7 @@ async def get_commissioned_fabric_count(
             LOGGER.info(f"Device {node_id} is operational via DNS-SD, using CASE connection")
             result = await dev_ctrl.ReadAttribute(
                 nodeId=node_id,
-                attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+                attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
             )
         elif pase_params is not None:
             # Device not operational on this fabric via DNS-SD - could be:
@@ -669,7 +661,7 @@ async def get_commissioned_fabric_count(
             await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
             result = await dev_ctrl.ReadAttribute(
                 nodeId=node_id,
-                attributes=[(endpoint, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
+                attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
             )
         else:
             # No PASE params and not operational - can't proceed without risking long timeout
@@ -679,7 +671,8 @@ async def get_commissioned_fabric_count(
             )
 
         # Extract the trusted root certificates list
-        root_certs = result[endpoint][Clusters.OperationalCredentials][
+        # OperationalCredentials is node-scoped, always on endpoint 0
+        root_certs = result[0][Clusters.OperationalCredentials][
             Clusters.OperationalCredentials.Attributes.TrustedRootCertificates
         ]
 
