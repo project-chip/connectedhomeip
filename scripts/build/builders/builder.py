@@ -29,6 +29,7 @@ class BuildProfile(StrEnum):
     RELEASE = "release"                  # Release profile optimized for performance.
     RELEASE_SIZE = "release-size"        # Release profile optimized for size.
 
+
 log = logging.getLogger(__name__)
 
 
