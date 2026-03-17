@@ -32,10 +32,10 @@ import click
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_config import LOG_LEVELS, LogConfig
-from chiptest.queue import CancellableQueue
 from chiptest.results import ResultError, ResultProcessingThread, ResultQueueT, RunSummary, TestResult
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
+from chiptest.work_queue import CancellableQueue
 from chiptest.worker import WorkerThread, WorkQueueT
 from chipyaml.paths_finder import PathsFinder
 

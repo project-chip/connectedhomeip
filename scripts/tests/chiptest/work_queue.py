@@ -30,7 +30,7 @@ QueueElementT = TypeVar("QueueElementT")
 
 
 class CancellableQueue(Generic[QueueElementT]):
-    """Single-consumer queue that supports synchronized cancellation and end-of-queue signaling."""
+    """Queue that supports synchronized cancellation and end-of-queue signaling."""
 
     def __init__(self) -> None:
         self._cond = threading.Condition()
@@ -58,7 +58,6 @@ class CancellableQueue(Generic[QueueElementT]):
             QueueCancelled: if cancellation event is observed.
             EndOfQueue: when there is no more work to do.
             TimeoutError: on timeout if `timeout` is not None.
-            queue.Empty: if the queue is empty and `timeout` is 0.
         """
         with self._cond:
             if timeout != 0:

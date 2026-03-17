@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Any, ClassVar, TypeAlias
 
 from chiptest.log_config import LogConfig
-from chiptest.queue import EndOfQueue
+from chiptest.work_queue import EndOfQueue
 
 log = logging.getLogger(__name__)
 
