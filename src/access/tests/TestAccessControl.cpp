@@ -25,6 +25,7 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <lib/core/Optional.h>
 #include <set>
 
 #include <pw_unit_test/framework.h>
@@ -922,6 +923,18 @@ struct CheckData
     bool allow;
 };
 
+struct GroupCheckData
+{
+    SubjectDescriptor subjectDescriptor;
+    RequestPath requestPath;
+    Privilege privilege;
+    // If not specified, this means the expected result is NOT CHIP_NO_ERROR, but also may not be CHIP_ERROR_ACCESS_DENIED.
+    // This can happen if tests have malformed access control requests or group data fetch requests, which are expected to 
+    // fail earlier in execution. Main purpose of tests that don't specify this are to ensure some sort of failure in the 
+    // process of doing the check occurs before approving/denying access.
+    Optional<CHIP_ERROR> expectedResult;
+};
+
 constexpr CheckData checkData1[] = {
     // Checks for implicit PASE
     { .subjectDescriptor = { .fabricIndex = 0, .authMode = AuthMode::kPase, .subject = kPaseVerifier0 },
@@ -1183,46 +1196,70 @@ constexpr CheckData checkData1[] = {
       .allow             = true },
 };
 
-constexpr CheckData groupCheckData[] = {
+const GroupCheckData groupCheckData[] = {
+    // Allowed (access granted)
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x1111) },
       .requestPath       = { .endpoint = 10, .requestType = Access::RequestType::kCommandInvokeRequest },
       .privilege         = Privilege::kOperate,
-      .allow             = true },
+      .expectedResult            = Optional<CHIP_ERROR>::Value(CHIP_NO_ERROR) },
 
     // Not allowed (access denied) because TestGroupAuxiliaryCheck will purposely NOT add the kHasAuxiliaryACL flag to the group.
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x2222) },
       .requestPath       = { .endpoint = 20, .requestType = Access::RequestType::kCommandInvokeRequest },
       .privilege         = Privilege::kOperate,
-      .allow             = false },
+      .expectedResult            = Optional<CHIP_ERROR>::Value(CHIP_ERROR_ACCESS_DENIED) },
 
     // Not allowed (access denied) because the wrong request type is used.
     { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x1111) },
       .requestPath       = { .endpoint = 10, .requestType = Access::RequestType::kAttributeWriteRequest },
       .privilege         = Privilege::kOperate,
-      .allow             = false },
+      .expectedResult            = Optional<CHIP_ERROR>::Value(CHIP_ERROR_ACCESS_DENIED) },
 
+    // Not allowed (access denied) because access should never be granted for endpoint 0.
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x1111) },
+      .requestPath       = { .endpoint = 0, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate,
+      .expectedResult            = Optional<CHIP_ERROR>::Value(CHIP_ERROR_ACCESS_DENIED) },
+
+    // Allowed (access granted)
     { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x3333) },
       .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
       .privilege         = Privilege::kOperate,
-      .allow             = true },
+      .expectedResult            = Optional<CHIP_ERROR>::Value(CHIP_NO_ERROR) },
 
     // Not allowed (access denied) because TestGroupAuxiliaryCheck will purposely NOT add the kHasAuxiliaryACL flag to the group.
     { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x4444) },
       .requestPath       = { .endpoint = 40, .requestType = Access::RequestType::kCommandInvokeRequest },
       .privilege         = Privilege::kOperate,
-      .allow             = false },
+      .expectedResult            = Optional<CHIP_ERROR>::Value(CHIP_ERROR_ACCESS_DENIED) },
 
     // Not allowed (access denied) because the wrong privilige is used.
     { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x3333) },
       .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
       .privilege         = Privilege::kManage,
-      .allow             = false },
+      .expectedResult            = Optional<CHIP_ERROR>::Value(CHIP_ERROR_ACCESS_DENIED) },
 
     // Not allowed (access denied) because the wrong auth mode is used.
     { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kNone, .subject = NodeIdFromGroupId(0x3333) },
       .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
       .privilege         = Privilege::kOperate,
-      .allow             = false },
+      .expectedResult            = Optional<CHIP_ERROR>::Value(CHIP_ERROR_ACCESS_DENIED) },
+
+    // Not allowed (access denied) because the endpoint does not exist on the group
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x3333) },
+      .requestPath       = { .endpoint = 9, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate,
+      .expectedResult            = Optional<CHIP_ERROR>::Value(CHIP_ERROR_ACCESS_DENIED) },
+
+    // Not allowed (failure in execution) because the endpoint doesn't exist on the specified fabric index for the group
+    { .subjectDescriptor = { .fabricIndex = 9, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x3333) },
+      .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate },
+
+    // Not allowed (failure in execution) because the group does not exist
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x9999) },
+      .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate },
 };
 
 class TestAccessControl : public ::testing::Test
@@ -2231,6 +2268,9 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryCheck)
         info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
         EXPECT_EQ(provider->SetGroupInfo(1, info), CHIP_NO_ERROR);
         EXPECT_EQ(provider->AddEndpoint(1, info.group_id, 10), CHIP_NO_ERROR);
+        // Noramally, Endpoint 0 should not be allowed to join a group. Test will confirm access control
+        // checks with this fail.
+        EXPECT_EQ(provider->AddEndpoint(1, info.group_id, 0), CHIP_NO_ERROR);
     }
 
     // Set up group 2 data for fabric 1, with no kHasAuxiliaryACL
@@ -2263,8 +2303,11 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryCheck)
 
     for (const auto & data : groupCheckData)
     {
-        CHIP_ERROR expectedResult = data.allow ? CHIP_NO_ERROR : CHIP_ERROR_ACCESS_DENIED;
-        EXPECT_EQ(accessControl.Check(data.subjectDescriptor, data.requestPath, data.privilege), expectedResult);
+        if (data.expectedResult.HasValue()) {
+            EXPECT_EQ(accessControl.Check(data.subjectDescriptor, data.requestPath, data.privilege), data.expectedResult.Value());
+        } else {
+            EXPECT_NE(accessControl.Check(data.subjectDescriptor, data.requestPath, data.privilege), CHIP_NO_ERROR);
+        }
     }
 
     // Cleanup

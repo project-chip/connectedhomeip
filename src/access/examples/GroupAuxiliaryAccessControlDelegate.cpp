@@ -183,12 +183,12 @@ public:
                 Credentials::GroupDataProvider::GroupEndpoint endpoint;
                 if (mEndpointIterator->Next(endpoint))
                 {
-                    // Groups cannot be created with endpoint 0, this state should never be reached
-                    // because of restrictions with creating/joining groups. Something has gone wrong
-                    // there if this condition is reached.
+                    // Groups cannot be created with endpoint 0, so this state should never be reached
+                    // because of restrictions with creating/joining groups. We skip here in the case
+                    // this does occur, no entry would be needed to validate against for endpoint 0.
                     if (endpoint.endpoint_id == kRootEndpointId)
                     {
-                        return CHIP_ERROR_INCORRECT_STATE;
+                        continue;
                     }
 
                     auto * delegate = Platform::New<EntryDelegate>();
@@ -268,6 +268,13 @@ namespace chip {
 namespace Access {
 namespace Examples {
 
+/*
+* This function (in conjunction with Next() from the AuxiliaryEntryIteratorDelegate) will create an auxiliary
+* ACL entry for every <fabric index, group ID, endpoint ID> that belongs based on the information from 
+* the group data provider. This is the simplest base case of what a set of auxiliary ACL entries will look 
+* like. The structure of auxiliary ACL entries can be formatted differently, as long as the equivalence class 
+* maps to this simplest base case.
+*/
 CHIP_ERROR GroupAuxiliaryAccessControlDelegate::AuxiliaryEntries(AccessControl::EntryIterator & iterator,
                                                                  const FabricIndex * fabricIndex) const
 {
@@ -283,26 +290,16 @@ CHIP_ERROR GroupAuxiliaryAccessControlDelegate::AuxiliaryEntries(AccessControl::
 CHIP_ERROR GroupAuxiliaryAccessControlDelegate::Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                                                       Privilege requestPrivilege)
 {
-    CHIP_ERROR err = CHIP_ERROR_ACCESS_DENIED;
-
     if (IsGroupId(subjectDescriptor.subject) && (mGroupDataProvider != nullptr))
     {
         GroupId groupId = GroupIdFromNodeId(subjectDescriptor.subject);
-        if (mGroupDataProvider->HasEndpoint(subjectDescriptor.fabricIndex, groupId, requestPath.endpoint))
+        if ((requestPath.endpoint != kRootEndpointId) && (mGroupDataProvider->HasEndpoint(subjectDescriptor.fabricIndex, groupId, requestPath.endpoint)) && (requestPath.requestType == Access::RequestType::kCommandInvokeRequest) && (requestPrivilege == Privilege::kOperate) && (subjectDescriptor.authMode == Access::AuthMode::kGroup))
         {
-            if (requestPath.endpoint == kRootEndpointId)
-            {
-                // Root endpoint should never be present in the group
-                err = CHIP_ERROR_INCORRECT_STATE;
-            }
-            else if (requestPrivilege == Privilege::kOperate && subjectDescriptor.authMode == Access::AuthMode::kGroup)
-            {
-                err = CHIP_NO_ERROR;
-            }
+            return CHIP_NO_ERROR;
         }
     }
 
-    return err;
+    return CHIP_ERROR_ACCESS_DENIED;
 }
 
 } // namespace Examples
