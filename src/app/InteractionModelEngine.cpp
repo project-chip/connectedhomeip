@@ -51,6 +51,7 @@
 #include <lib/support/FibonacciUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <transport/raw/GroupcastTesting.h>
 
 #include <cinttypes>
 
@@ -1097,6 +1098,25 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
         status = Status::InvalidAction;
     }
 
+    // Groupcast Testing
+    auto & testing = Groupcast::GetTesting();
+    if (testing.IsEnabled())
+    {
+        Clusters::Groupcast::Events::GroupcastTesting::Type event;
+        testing.SetFabricIndex(apExchangeContext->GetSessionHandle()->GetFabricIndex());
+        if ((testing.GetTestResultEnum() == Groupcast::Testing::Result::kSuccess) && (status != Status::Success))
+        {
+            testing.SetTestResult(Groupcast::Testing::Result::kGeneralError);
+        }
+        // Convert to event type
+        testing.ToEventType(event);
+        testing.Clear();
+        // Generate event
+        DataModel::EventsGenerator & eventGenerator = EventManagement::GetInstance();
+        eventGenerator.GenerateEvent(event, kRootEndpointId);
+        eventGenerator.ScheduleUrgentEventDeliverySync();
+    }
+
     if (status != Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
         return StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
@@ -1817,6 +1837,16 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
     Access::Privilege privilegeToCheck = commandExists ? acceptedCommandEntry.GetInvokePrivilege() : Access::Privilege::kOperate;
 
     Status accessStatus = CheckCommandAccess(request, privilegeToCheck);
+    // Groupcast Testing
+    auto & testing = Groupcast::GetTesting();
+    if (testing.IsEnabled())
+    {
+        testing.SetAccessAllowed(Status::Success == accessStatus);
+        if (!testing.GetAccessAllowed().ValueOr(false))
+        {
+            testing.SetTestResult(Groupcast::Testing::Result::kFailedAuth);
+        }
+    }
     VerifyOrReturnValue(accessStatus == Status::Success, accessStatus);
 
     if (!commandExists)

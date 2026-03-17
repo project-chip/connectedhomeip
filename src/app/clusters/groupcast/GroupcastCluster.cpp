@@ -8,11 +8,11 @@
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <transport/raw/GroupcastTesting.h>
 
 using chip::Protocols::InteractionModel::Status;
 
 using namespace chip::Credentials;
-using GroupDataProvider = GroupDataProvider;
 using GroupInfo         = GroupDataProvider::GroupInfo;
 using GroupEndpoint     = GroupDataProvider::GroupEndpoint;
 using GroupInfoIterator = GroupDataProvider::GroupInfoIterator;
@@ -176,6 +176,8 @@ Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Co
 {
     VerifyOrReturnError(mFabricUnderTest == kUndefinedFabricIndex || mFabricUnderTest == fabricIndex, Status::ConstraintError);
 
+    auto & testing = chip::Groupcast::GetTesting();
+    testing.Clear();
     if (data.testOperation == Groupcast::GroupcastTestingEnum::kDisableTesting)
     {
         // cancel any existing GroupcastTesting timer
@@ -200,6 +202,8 @@ Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Co
 
     mTestingState = data.testOperation;
     SetFabricUnderTest(fabricIndex);
+    testing.SetEnabled(true);
+    testing.SetFabricIndex(fabricIndex);
     return Status::Success;
 }
 
@@ -247,6 +251,8 @@ void GroupcastCluster::GroupcastTestingTimer::TimerFired()
 {
     mCluster.SetFabricUnderTest(kUndefinedFabricIndex);
     mCluster.mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
+    chip::Groupcast::GetTesting().SetEnabled(false);
+    chip::Groupcast::GetTesting().Clear();
 }
 
 CHIP_ERROR GroupcastCluster::ReadMembership(const chip::Access::SubjectDescriptor & subject, EndpointId endpoint,
