@@ -37,7 +37,6 @@ public:
     CHIP_ERROR Init();
     void Deinit();
 
-
     uint8_t GetSensitivity() const
     {
         if (mCluster.IsConstructed())
@@ -51,7 +50,6 @@ public:
 
     Protocols::InteractionModel::Status GenerateZoneTriggeredEvent(uint16_t zoneID, ZoneEventTriggeredReasonEnum triggerReason);
     Protocols::InteractionModel::Status GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEventStoppedReasonEnum stopReason);
-
 
     CHIP_ERROR SetSensitivity(uint8_t sensitivity);
 
