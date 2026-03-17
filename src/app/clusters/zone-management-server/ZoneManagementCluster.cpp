@@ -16,14 +16,13 @@
  *
  */
 
-#include "ZoneManagementCluster.h"
-#include "zone-geometry.h"
-
 #include <algorithm>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/ZoneManagement/Metadata.h>
+#include <app/clusters/zone-management-server/ZoneManagementCluster.h>
+#include <app/clusters/zone-management-server/zone-geometry.h>
 #include <cmath>
 
 using namespace chip::app::Clusters::ZoneManagement::Attributes;

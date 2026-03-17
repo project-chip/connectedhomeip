@@ -81,17 +81,6 @@ void ZoneMgmtServer::Deinit()
     mCluster.Destroy();
 }
 
-const std::vector<ZoneInformationStorage> & ZoneMgmtServer::GetZones() const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetZones();
-}
-
-uint8_t ZoneMgmtServer::GetMaxZones() const
-{
-    return mCluster.IsConstructed() ? mCluster.Cluster().GetMaxZones() : mConfig.maxZones;
-}
-
 Optional<ZoneTriggerControlStruct> ZoneMgmtServer::GetTriggerForZone(uint16_t zoneId) const
 {
     VerifyOrReturnValue(mCluster.IsConstructed(), NullOptional,
@@ -114,14 +103,9 @@ Protocols::InteractionModel::Status ZoneMgmtServer::GenerateZoneStoppedEvent(uin
     return mCluster.Cluster().GenerateZoneStoppedEvent(zoneID, stopReason);
 }
 
-bool ZoneMgmtServer::HasFeature(Feature feature) const
-{
-    return mCluster.IsConstructed() ? mCluster.Cluster().HasFeature(feature) : mFeatures.Has(feature);
-}
-
 CHIP_ERROR ZoneMgmtServer::SetSensitivity(uint8_t sensitivity)
 {
-    VerifyOrReturnError(sensitivity >= 1 && sensitivity <= GetSensitivityMax(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(sensitivity >= 1 && sensitivity <= mCluster.Cluster().GetSensitivityMax(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     if (!mCluster.IsConstructed())
     {
@@ -131,27 +115,6 @@ CHIP_ERROR ZoneMgmtServer::SetSensitivity(uint8_t sensitivity)
 
     ReturnErrorOnFailure(mCluster.Cluster().SetSensitivity(sensitivity));
     return CHIP_NO_ERROR;
-}
-
-const std::vector<ZoneTriggerControlStruct> & ZoneMgmtServer::GetTriggers() const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    return mCluster.Cluster().GetTriggers();
-}
-
-uint8_t ZoneMgmtServer::GetMaxUserDefinedZones() const
-{
-    return mCluster.IsConstructed() ? mCluster.Cluster().GetMaxUserDefinedZones() : mConfig.maxUserDefinedZones;
-}
-
-uint8_t ZoneMgmtServer::GetSensitivityMax() const
-{
-    return mCluster.IsConstructed() ? mCluster.Cluster().GetSensitivityMax() : mConfig.sensitivityMax;
-}
-
-const TwoDCartesianVertexStruct & ZoneMgmtServer::GetTwoDCartesianMax() const
-{
-    return mCluster.IsConstructed() ? mCluster.Cluster().GetTwoDCartesianMax() : mConfig.twoDCartesianMax;
 }
 
 } // namespace ZoneManagement

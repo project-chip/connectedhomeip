@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app/clusters/zone-management-server/ZoneManagementCluster.h>
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
 #include <optional>
 
@@ -38,8 +37,7 @@ public:
     CHIP_ERROR Init();
     void Deinit();
 
-    const std::vector<ZoneInformationStorage> & GetZones() const;
-    uint8_t GetMaxZones() const;
+
     uint8_t GetSensitivity() const
     {
         if (mCluster.IsConstructed())
@@ -54,14 +52,8 @@ public:
     Protocols::InteractionModel::Status GenerateZoneTriggeredEvent(uint16_t zoneID, ZoneEventTriggeredReasonEnum triggerReason);
     Protocols::InteractionModel::Status GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEventStoppedReasonEnum stopReason);
 
-    bool HasFeature(Feature feature) const;
 
     CHIP_ERROR SetSensitivity(uint8_t sensitivity);
-
-    const std::vector<ZoneTriggerControlStruct> & GetTriggers() const;
-    uint8_t GetMaxUserDefinedZones() const;
-    uint8_t GetSensitivityMax() const;
-    const TwoDCartesianVertexStruct & GetTwoDCartesianMax() const;
 
     chip::app::LazyRegisteredServerCluster<ZoneManagementCluster> mCluster;
 
