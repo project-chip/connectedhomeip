@@ -112,6 +112,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-management-server/tests",
       "${chip_root}/src/app/clusters/zone-management-server/tests",
+      "${chip_root}/src/app/clusters/zone-management-server/tests:tests-backwards-compatibility",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/icd/server/tests",

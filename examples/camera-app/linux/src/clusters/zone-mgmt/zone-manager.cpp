@@ -144,7 +144,7 @@ void ZoneManager::OnAttributeChanged(AttributeId attributeId)
     switch (attributeId)
     {
     case Sensitivity::Id: {
-        mCameraDevice->GetCameraHALInterface().SetDetectionSensitivity(GetZoneMgmtServer()->GetSensitivity());
+        mCameraDevice->GetCameraHALInterface().SetDetectionSensitivity(GetZoneManagementCluster()->GetSensitivity());
         break;
     }
     default:
@@ -185,8 +185,8 @@ void ZoneManager::OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void *
             // Emit ZoneStopped with reason ActionStopped
             ChipLogProgress(Camera, "Generating ZoneStopped event for ZoneId = %u with reason:kActionStopped",
                             trigCtxtIter->triggerCtrl.zoneID);
-            zoneManager->GetZoneMgmtServer()->GenerateZoneStoppedEvent(trigCtxtIter->triggerCtrl.zoneID,
-                                                                       ZoneEventStoppedReasonEnum::kActionStopped);
+            zoneManager->GetZoneManagementCluster()->GenerateZoneStoppedEvent(trigCtxtIter->triggerCtrl.zoneID,
+                                                                              ZoneEventStoppedReasonEnum::kActionStopped);
             // Set the triggerState to BlindDuration
             trigCtxtIter->triggerState = TriggerState::InBlindDuration;
         }
@@ -195,8 +195,8 @@ void ZoneManager::OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void *
             // Emit ZoneStopped with reason Timeout
             ChipLogProgress(Camera, "Generating ZoneStopped event for ZoneId = %u with reason:kTimeout",
                             trigCtxtIter->triggerCtrl.zoneID);
-            zoneManager->GetZoneMgmtServer()->GenerateZoneStoppedEvent(trigCtxtIter->triggerCtrl.zoneID,
-                                                                       ZoneEventStoppedReasonEnum::kTimeout);
+            zoneManager->GetZoneManagementCluster()->GenerateZoneStoppedEvent(trigCtxtIter->triggerCtrl.zoneID,
+                                                                              ZoneEventStoppedReasonEnum::kTimeout);
             // Set the triggerState to BlindDuration
             trigCtxtIter->triggerState = TriggerState::InBlindDuration;
         }
@@ -217,7 +217,7 @@ void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
                                        chip::app::Clusters::ZoneManagement::ZoneEventTriggeredReasonEnum triggerReason)
 {
     // Ensure that a trigger exists for the zoneId
-    auto trigger = GetZoneMgmtServer()->GetTriggerForZone(zoneId);
+    auto trigger = GetZoneManagementCluster()->GetTriggerForZone(zoneId);
     VerifyOrReturn(trigger.HasValue(), ChipLogError(Camera, "Trigger not found for ZoneId"));
 
     ChipLogProgress(Camera, "Zone activity detected for ZoneId = %u", zoneId);
@@ -229,7 +229,7 @@ void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
     {
         // Generate the event for the initial trigger
         ChipLogProgress(Camera, "Generating ZoneTriggered event for ZoneId = %u", zoneId);
-        GetZoneMgmtServer()->GenerateZoneTriggeredEvent(zoneId, triggerReason);
+        GetZoneManagementCluster()->GenerateZoneTriggeredEvent(zoneId, triggerReason);
 
         ZoneTriggerContext trigCtxt;
         trigCtxt.triggerState = TriggerState::Triggered;
@@ -277,5 +277,5 @@ void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
 void ZoneManager::OnZoneStoppedEvent(uint16_t zoneId, chip::app::Clusters::ZoneManagement::ZoneEventStoppedReasonEnum stopReason)
 {
     ChipLogProgress(Camera, "Generating ZoneStopped event for ZoneId = %u", zoneId);
-    GetZoneMgmtServer()->GenerateZoneStoppedEvent(zoneId, stopReason);
+    GetZoneManagementCluster()->GenerateZoneStoppedEvent(zoneId, stopReason);
 }
