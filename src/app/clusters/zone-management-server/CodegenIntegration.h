@@ -30,10 +30,33 @@ namespace ZoneManagement {
 class ZoneMgmtServer
 {
 public:
+    /**
+     *
+     * @param aDelegate                         A reference to the delegate to be used by this cluster.
+     *                                          Note: the caller must ensure that the delegate lives throughout the instance's
+     *                                          lifetime.
+     *
+     * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aFeatures                         The bitflags value that identifies which features are supported by this instance.
+     * @param aMaxUserDefinedZones               The maximum number of user-defined zones supported by the device.
+     *                                          This value is specified by the device manufacturer.
+     * @param aMaxZones                         The maximum number of zones that are allowed to exist on the device. This is the
+     *                                          sum of the predefined built-in zones and the user-defined zones.
+     * @param aSensitivityMax                   The hardware-specific value for the number of supported sensitivity levels.
+     *                                          This value is specified by the device manufacturer.
+     * @param aTwoDCartesianMax                 The maximum X and Y points that are allowed for TwoD Cartesian Zones.
+     *
+     */
     ZoneMgmtServer(Delegate & delegate, EndpointId endpointId, BitFlags<Feature> features, uint8_t maxUserDefinedZones,
                    uint8_t maxZones, uint8_t sensitivityMax, const TwoDCartesianVertexStruct & twoDCartesianMax);
     ~ZoneMgmtServer();
-
+    
+    /**
+     * @brief Initialise the Zone Management server instance.
+     * This function must be called after defining a ZoneMgmtServer class object.
+     * @return Returns an error if some of the constraint/feature validation checks fail or
+     * the CommandHandler or AttributeHandler registration fails, else returns CHIP_NO_ERROR.
+     */
     CHIP_ERROR Init();
     void Deinit();
 
