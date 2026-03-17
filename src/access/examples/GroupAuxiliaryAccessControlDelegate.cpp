@@ -269,12 +269,12 @@ namespace Access {
 namespace Examples {
 
 /*
-* This function (in conjunction with Next() from the AuxiliaryEntryIteratorDelegate) will create an auxiliary
-* ACL entry for every <fabric index, group ID, endpoint ID> that belongs based on the information from
-* the group data provider. This is the simplest base case of what a set of auxiliary ACL entries will look
-* like. The structure of auxiliary ACL entries can be formatted differently, as long as the equivalence class
-* maps to this simplest base case.
-*/
+ * This function (in conjunction with Next() from the AuxiliaryEntryIteratorDelegate) will create an auxiliary
+ * ACL entry for every <fabric index, group ID, endpoint ID> that belongs based on the information from
+ * the group data provider. This is the simplest base case of what a set of auxiliary ACL entries will look
+ * like. The structure of auxiliary ACL entries can be formatted differently, as long as the equivalence class
+ * maps to this simplest base case.
+ */
 CHIP_ERROR GroupAuxiliaryAccessControlDelegate::AuxiliaryEntries(AccessControl::EntryIterator & iterator,
                                                                  const FabricIndex * fabricIndex) const
 {
@@ -293,7 +293,10 @@ CHIP_ERROR GroupAuxiliaryAccessControlDelegate::Check(const SubjectDescriptor & 
     if (IsGroupId(subjectDescriptor.subject) && (mGroupDataProvider != nullptr))
     {
         GroupId groupId = GroupIdFromNodeId(subjectDescriptor.subject);
-        if ((requestPath.endpoint != kRootEndpointId) && (mGroupDataProvider->HasEndpoint(subjectDescriptor.fabricIndex, groupId, requestPath.endpoint)) && (requestPath.requestType == Access::RequestType::kCommandInvokeRequest) && (requestPrivilege == Privilege::kOperate) && (subjectDescriptor.authMode == Access::AuthMode::kGroup))
+        if ((requestPath.endpoint != kRootEndpointId) &&
+            (mGroupDataProvider->HasEndpoint(subjectDescriptor.fabricIndex, groupId, requestPath.endpoint)) &&
+            (requestPath.requestType == Access::RequestType::kCommandInvokeRequest) && (requestPrivilege == Privilege::kOperate) &&
+            (subjectDescriptor.authMode == Access::AuthMode::kGroup))
         {
             return CHIP_NO_ERROR;
         }
