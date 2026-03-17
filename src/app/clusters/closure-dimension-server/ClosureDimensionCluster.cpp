@@ -16,8 +16,8 @@
  *
  */
 
-#include "closure-dimension-server.h"
-#include "closure-dimension-cluster-logic.h"
+#include "ClosureDimensionCluster.h"
+#include "ClosureDimensionClusterLogic.h"
 
 namespace chip {
 namespace app {

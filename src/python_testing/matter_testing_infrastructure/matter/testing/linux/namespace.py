@@ -126,11 +126,13 @@ class NetworkResource:
         else:
             cmd = shlex.split(netcmd.cmd)
 
-        log.debug("Executing: '%s' check=%s", cmd, check)
+        log.debug("Executing: '%s' check=%s", shlex.join(cmd), check)
         try:
-            subprocess.run(cmd, check=check)
+            # We're not interested in stdout/stderr for successful execution.
+            subprocess.run(cmd, check=check, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Failed to execute '{cmd}'. Are you using --privileged if running in docker?") from e
+            raise RuntimeError(f"Failed to execute '{shlex.join(cmd)}'. Are you using --privileged if running in docker?",
+                               f"Command stdout: '{e.stdout.rstrip()}'", f"Command stderr: '{e.stderr.rstrip()}'") from e
 
     def setup(self):
         """Run commands to setup a resource."""
@@ -200,16 +202,18 @@ class NetworkLink(NetworkResource):
     def wait_for_duplicate_address_detection(self) -> bool:
         # IPv6 does Duplicate Address Detection even though we know ULAs provided are isolated.
         # Wait for 'tentative' address to be gone.
-        log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
-
         cmd = ['ip', 'addr']
         if self.ns:
+            log.info("Waiting for IPv6 DaD for namespace %s to complete (no tentative addresses)", self.ns.name)
             cmd = self.ns.wrap_cmd(cmd)
+        else:
+            log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
 
         # Wait at most 10 seconds.
         start_time = time.time()
         while time.time() - start_time < 10:
-            if 'tentative' not in subprocess.check_output(cmd, text=True):
+            # We're not interested in stderr, so we can discard it.
+            if 'tentative' not in subprocess.check_output(cmd, text=True, stderr=subprocess.DEVNULL):
                 log.info("No more tentative addresses")
                 return True
             time.sleep(0.1)

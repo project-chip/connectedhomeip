@@ -41,7 +41,6 @@
     0x0000003F, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
-    /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
@@ -53,7 +52,6 @@
     /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
@@ -70,7 +68,6 @@
     0x00000004, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
-    /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
@@ -82,7 +79,6 @@
     /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
@@ -99,7 +95,6 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
-    /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
@@ -111,7 +106,6 @@
     /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
-    /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -91,14 +91,6 @@ public:
         bool mExhausted = false;
     };
 
-    struct WiFiNetwork
-    {
-        char ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
-        uint8_t ssidLen = 0;
-        char credentials[DeviceLayer::Internal::kMaxWiFiKeyLength];
-        uint8_t credentialsLen = 0;
-    };
-
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
@@ -129,13 +121,13 @@ public:
     static SlWiFiDriver * GetInstance() { return mDriver; }
 
 private:
-    bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
+    bool NetworkMatch(const Silabs::WifiInterface::WiFiCredentials & network, ByteSpan networkId);
     bool StartScanWiFiNetworks(ByteSpan ssid);
     static void OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult);
 
     static SlWiFiDriver * mDriver;
-    WiFiNetwork mSavedNetwork   = {};
-    WiFiNetwork mStagingNetwork = {};
+    Silabs::WifiInterface::WiFiCredentials mSavedNetwork   = {};
+    Silabs::WifiInterface::WiFiCredentials mStagingNetwork = {};
     ScanCallback * mpScanCallback;
     ConnectCallback * mpConnectCallback;
     NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
