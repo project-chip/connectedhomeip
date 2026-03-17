@@ -74,6 +74,7 @@ class CancellableQueue(Generic[QueueElementT]):
             QueueCancelled: if cancellation event is observed.
             EndOfQueue: when there is no more work to do.
             TimeoutError: on timeout if `timeout` is not None.
+            queue.Empty: if called with `timeout=0` and the queue is empty while the queue is neither cancelled nor closed.
         """
         with self._cond:
             if timeout != 0:
