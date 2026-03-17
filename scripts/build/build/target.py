@@ -45,7 +45,7 @@ import re
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional
 
-from builders.builder import BuilderOptions
+from builders.builder import BuildProfile, BuilderOptions
 
 log = logging.getLogger(__name__)
 
@@ -470,6 +470,9 @@ class BuildTarget:
         else:
             # TODO: can we check if builds are compatible?
             builder.output_dir = os.path.join(output_prefix, name)
+        # Append suffix to the output dir to indicated non-default build profile.
+        if builder_options.build_profile != BuildProfile.DEFAULT:
+            builder.output_dir += '-' + builder_options.build_profile
         builder.verbose = verbose
         builder.ninja_jobs = ninja_jobs
         builder.chip_dir = os.path.abspath(repository_path)
