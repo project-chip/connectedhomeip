@@ -2,6 +2,7 @@
 Matter-specific assertions building on top of Mobly asserts.
 """
 
+from datetime import datetime
 from typing import Any, Callable, List, Optional, Type, TypeVar
 
 from mobly import asserts
@@ -23,6 +24,20 @@ def is_valid_uint_value(value: Any, bit_count: int = 64) -> bool:
     return value < (1 << bit_count)
 
 
+def is_valid_unixtimestamp(value: Any) -> bool:
+    """Checks if 'value' is a valid unix timestamp."""
+    try:
+        datetime.fromtimestamp(value)
+        return True
+    except (OSError, OverflowError, TypeError, ValueError):
+        return False
+
+
+def assert_is_unixtimestamp(value: Any, description: str):
+    """Assert if value is a valid unixtimestamp."""
+    asserts.assert_true(is_valid_unixtimestamp(value), f"{description} must be a valid unixtimestamp")
+
+
 def is_valid_int_value(value: Any, bit_count: int = 8) -> bool:
     """
     Checks if 'value' is a signed integer that fits into 'bit_count' bits.
@@ -33,7 +48,7 @@ def is_valid_int_value(value: Any, bit_count: int = 8) -> bool:
     return isinstance(value, int) and (min_val <= value <= max_val)
 
 
-def is_valid_bool_value(value: Any) -> bool:
+def is_valid_bool_value(value: Any, description: str) -> bool:
     """
     Checks if 'value' is a boolean.
     """
