@@ -858,7 +858,8 @@ void ValidateAuxiliaryEntries(AccessControl & ac, FabricIndex fabric, const std:
                             {
                                 if (endpoint.endpoint_id != kRootEndpointId)
                                 {
-                                    actualSet.insert({ .fabricIndex = entryFabric, .groupId = groupId, .endpointId = endpoint.endpoint_id });
+                                    actualSet.insert(
+                                        { .fabricIndex = entryFabric, .groupId = groupId, .endpointId = endpoint.endpoint_id });
                                 }
                             }
                             it->Release();
