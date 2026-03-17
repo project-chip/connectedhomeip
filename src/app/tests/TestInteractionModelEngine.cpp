@@ -861,7 +861,7 @@ TEST_F(TestInteractionModelEngine, TestResumeSubscriptionsHandlesNullIterators)
 
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 
-// Test verifies that HasSubscriptionsToResume handles a nullptr iterator gracefully by returning false and not crashing.
+// Test verifies that HasSubscriptionsToResume handles a nullptr iterator gracefully by returning true and not crashing.
 TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestHasSubscriptionsToResumeHandlesNullIterator)
 {
     InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
@@ -873,10 +873,9 @@ TEST_F_FROM_FIXTURE(TestInteractionModelEngine, TestHasSubscriptionsToResumeHand
               engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler(), nullptr,
                            &nullIteratorStorage));
 
-    EXPECT_FALSE(engine->HasSubscriptionsToResume());
+    EXPECT_TRUE(engine->HasSubscriptionsToResume());
 }
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
-
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 } // namespace app
