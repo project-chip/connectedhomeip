@@ -80,11 +80,11 @@ jobs:
               run: |
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
                 echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
-            - name: Checkout
-              uses: actions/checkout@v5
-              with:
-                # This ensures we are always testing master code
-                ref: ${{ github.event_name == 'pull_request' && github.head_ref || 'master' }}
+            # - name: Checkout
+            #   uses: actions/checkout@v5
+            #   with:
+            #     # This ensures we are always testing master code
+            #     ref: ${{ github.event_name == 'pull_request' && github.head_ref || 'master' }}
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
