@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/clusters/zone-management-server/ZoneManagementCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
 #include <optional>
 
