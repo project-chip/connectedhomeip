@@ -158,23 +158,6 @@ class TC_ICDB_2_3(ICDBaseTest):
             "ICDM.S.F00",
         ]
 
-    async def read_icdm_attribute_expect_success(self, attribute):
-        return await self.read_single_attribute_check_success(
-            endpoint=self.ROOT_NODE_ENDPOINT_ID, cluster=cluster, attribute=attribute)
-
-    async def send_single_icdm_command(self, command):
-        return await self.send_single_cmd(command, endpoint=self.ROOT_NODE_ENDPOINT_ID)
-
-    async def th2_read_icdm_attribute_expect_success(self, attribute):
-        return await self.read_single_attribute_check_success(
-            endpoint=self.ROOT_NODE_ENDPOINT_ID, cluster=cluster, attribute=attribute,
-            dev_ctrl=self.th2, node_id=self.th2_dut_node_id)
-
-    async def th2_send_single_icdm_command(self, command):
-        return await self.send_single_cmd(
-            command, endpoint=self.ROOT_NODE_ENDPOINT_ID,
-            dev_ctrl=self.th2, node_id=self.th2_dut_node_id)
-
     @async_test_body
     async def test_TC_ICDB_2_3(self):
 
@@ -204,7 +187,7 @@ class TC_ICDB_2_3(ICDBaseTest):
         # *** STEP 2 ***
         # TH2 reads from the DUT the RegisteredClients attribute.
         self.step(2)
-        th2_registered_clients = await self.th2_read_icdm_attribute_expect_success(attributes.RegisteredClients)
+        th2_registered_clients = await self.read_icdm_attribute_expect_success(attributes.RegisteredClients, controller=self.th2, node_id=self.th2_dut_node_id)
         th2_check_in_node_id = th2_registered_clients[0].checkInNodeID
         th2_monitored_subject = th2_registered_clients[0].monitoredSubject
 
@@ -246,7 +229,7 @@ class TC_ICDB_2_3(ICDBaseTest):
         # TH2 sends UnregisterClient command with the TH2's checkInNodeID.
         self.step(5)
         try:
-            await self.th2_send_single_icdm_command(commands.UnregisterClient(checkInNodeID=th2_check_in_node_id))
+            await self.send_single_icdm_command(commands.UnregisterClient(checkInNodeID=th2_check_in_node_id), controller=self.th2, node_id=self.th2_dut_node_id)
         except InteractionModelError as e:
             asserts.assert_fail(f"UnregisterClient command with checkInNodeID {th2_check_in_node_id} failed with error: {e}")
 
