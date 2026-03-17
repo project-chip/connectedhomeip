@@ -313,8 +313,6 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
     }
     // null callback to indicate that the scan is complete
     wfx_rsi.scan_cb(nullptr);
-
-    // cleanup the callback
     wfx_rsi.scan_cb = nullptr;
     wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kScanStarted);
     osSemaphoreRelease(sScanCompleteSemaphore);
