@@ -929,8 +929,8 @@ struct GroupCheckData
     RequestPath requestPath;
     Privilege privilege;
     // If not specified, this means the expected result is NOT CHIP_NO_ERROR, but also may not be CHIP_ERROR_ACCESS_DENIED.
-    // This can happen if tests have malformed access control requests or group data fetch requests, which are expected to 
-    // fail earlier in execution. Main purpose of tests that don't specify this are to ensure some sort of failure in the 
+    // This can happen if tests have malformed access control requests or group data fetch requests, which are expected to
+    // fail earlier in execution. Main purpose of tests that don't specify this are to ensure some sort of failure in the
     // process of doing the check occurs before approving/denying access.
     Optional<CHIP_ERROR> expectedResult;
 };
