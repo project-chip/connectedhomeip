@@ -1,13 +1,13 @@
 #pragma once
 
-#include <app/clusters/air-quality-server/air-quality-server.h>
+#include <app/clusters/air-quality-server/CodegenIntegration.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace AirQuality {
 
-Instance * GetInstance();
+AirQualityCluster * GetInstance();
 
 void Shutdown();
 

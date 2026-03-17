@@ -1,6 +1,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/air-quality-server/air-quality-server.h>
+#include <app/clusters/air-quality-server/CodegenIntegration.h>
 #include <app/clusters/concentration-measurement-server/concentration-measurement-server.h>
 
 #include <relative-humidity-sensor-manager.h>
@@ -129,7 +129,7 @@ public:
 private:
     inline static AirQualitySensorManager * mInstance;
     EndpointId mEndpointId;
-    AirQuality::Instance mAirQualityInstance;
+    AirQualityCluster * mAirQualityCluster = nullptr;
     ConcentrationMeasurement::Instance<true, true, true, true, true, true> mCarbonDioxideConcentrationMeasurementInstance;
     ConcentrationMeasurement::Instance<true, true, true, true, true, true> mCarbonMonoxideConcentrationMeasurementInstance;
     ConcentrationMeasurement::Instance<true, true, true, true, true, true> mNitrogenDioxideConcentrationMeasurementInstance;
@@ -150,10 +150,6 @@ private:
      */
     AirQualitySensorManager(EndpointId aEndpointId) :
         mEndpointId(aEndpointId),
-        mAirQualityInstance(mEndpointId,
-                            BitMask<AirQuality::Feature, uint32_t>(AirQuality::Feature::kModerate, AirQuality::Feature::kFair,
-                                                                   AirQuality::Feature::kVeryPoor,
-                                                                   AirQuality::Feature::kExtremelyPoor)),
         mCarbonDioxideConcentrationMeasurementInstance(mEndpointId, CarbonDioxideConcentrationMeasurement::Id,
                                                        ConcentrationMeasurement::MeasurementMediumEnum::kAir,
                                                        ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
@@ -184,7 +180,7 @@ private:
         mFormaldehydeConcentrationMeasurementInstance(mEndpointId, FormaldehydeConcentrationMeasurement::Id,
                                                       ConcentrationMeasurement::MeasurementMediumEnum::kAir,
                                                       ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
-        mTemperatureSensorManager(mEndpointId), mHumiditySensorManager(mEndpointId){};
+        mTemperatureSensorManager(mEndpointId), mHumiditySensorManager(mEndpointId) {};
 };
 
 } // namespace Clusters

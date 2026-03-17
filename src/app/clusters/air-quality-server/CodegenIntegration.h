@@ -18,7 +18,10 @@
 
 #pragma once
 
-// Note: This file exists for backwards compatibility only.
-// New code should directly use AirQualityCluster.h instead.
+#include <app/clusters/air-quality-server/AirQualityCluster.h>
 
-#include <app/clusters/air-quality-server/CodegenIntegration.h>
+namespace chip::app::Clusters::AirQuality {
+
+AirQualityCluster * FindClusterOnEndpoint(EndpointId endpointId);
+
+} // namespace chip::app::Clusters::AirQuality

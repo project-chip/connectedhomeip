@@ -18,59 +18,69 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace AirQuality {
 
-class Instance : public AttributeAccessInterface
+/**
+ * Code-driven implementation of the Matter Air Quality cluster.
+ * Manages a single AirQuality attribute with feature-gated validation.
+ * Instances are created by the framework via CodegenIntegration.
+ */
+class AirQualityCluster : public DefaultServerCluster
 {
 public:
     /**
-     * Creates an air quality cluster instance. The Init() function needs to be called for this instance to be registered and
-     * called by the interaction model at the appropriate times.
-     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aFeature The bitmask value that identifies which features are supported by this instance.
+     * @param endpointId The endpoint on which this cluster exists.
      */
-    Instance(EndpointId aEndpointId, BitMask<Feature> aFeature);
+    AirQualityCluster(EndpointId endpointId);
 
-    ~Instance() override;
-
-    /**
-     * Initialises the air quality cluster instance
-     * @return Returns an error if an air quality cluster has not been enabled in zap for the given endpoint ID or
-     * if the AttributeHandler registration fails.
-     */
-    CHIP_ERROR Init();
+    // Server cluster implementation
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     /**
      * Returns true if the feature is supported.
      * @param feature the feature to check.
      */
-    bool HasFeature(Feature aFeature) const;
+    bool HasFeature(AirQuality::Feature aFeature) const;
 
     /**
      * Sets the AirQuality attribute.
      * @param aNewAirQuality The value to which the AirQuality attribute is to be set.
      * @return Returns a ConstraintError if the aNewAirQuality value is not valid. Returns Success otherwise.
      */
-    Protocols::InteractionModel::Status UpdateAirQuality(AirQualityEnum aNewAirQuality);
+    Protocols::InteractionModel::Status SetAirQuality(AirQuality::AirQualityEnum aNewAirQuality);
+
+    // Backward compatibility alias
+    inline Protocols::InteractionModel::Status UpdateAirQuality(AirQuality::AirQualityEnum aNewAirQuality)
+    {
+        return SetAirQuality(aNewAirQuality);
+    }
 
     /**
      * @return The current AirQuality enum.
      */
-    AirQualityEnum GetAirQuality();
+    AirQuality::AirQualityEnum GetAirQuality() const;
 
-private:
-    EndpointId mEndpointId;
-    AirQualityEnum mAirQuality = AirQualityEnum::kUnknown;
-    BitMask<Feature> mFeature;
+    /**
+     * Sets the feature map for this cluster instance.
+     * Called by CodegenIntegration during creation.
+     */
+    void SetFeatureMap(BitFlags<AirQuality::Feature> features);
 
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+protected:
+    AirQuality::AirQualityEnum mAirQuality = AirQuality::AirQualityEnum::kUnknown;
+    BitFlags<AirQuality::Feature> mFeature;
 };
+
+namespace AirQuality {
+
+// Backward compatibility alias
+using Instance = AirQualityCluster;
 
 } // namespace AirQuality
 } // namespace Clusters
