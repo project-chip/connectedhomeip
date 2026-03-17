@@ -172,6 +172,26 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision()
     }
 }
 
+bool ConnectivityManagerImpl::_IsWiFiAPActive()
+{
+    return mWiFiAPState == kWiFiAPState_Active;
+}
+
+bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled()
+{
+    return mWiFiAPMode == kWiFiAPMode_ApplicationControlled;
+}
+
+System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout()
+{
+    return mWiFiAPIdleTimeout;
+}
+
+ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
+{
+    return mWiFiAPMode;
+}
+
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

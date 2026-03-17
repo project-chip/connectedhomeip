@@ -27,9 +27,9 @@ from typing import Any, Protocol
 
 import chiptest
 import click
-import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
+from chiptest.log_config import LOG_LEVELS, LogConfig
 from chiptest.results import RunSummary, TestResult
 from chiptest.runner import Executor, SubprocessKind
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
@@ -53,17 +53,13 @@ class ManualHandling(enum.Enum):
     ONLY = enum.auto()
 
 
-# Supported log levels, mapping string values required for argument
-# parsing into logging constants
-__LOG_LEVELS__ = logging.getLevelNamesMapping()
-
-
 @dataclass
 class RunContext:
     root: str
     tests: list[chiptest.TestDefinition]
     runtime: TestRunTime
     find_path: list[str]
+    log_config: LogConfig
 
     # Deprecated options passed to `cmd_run`
     deprecated_chip_tool_path: Path | None = None
@@ -106,8 +102,12 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
 @click.option(
     '--log-level',
     default='info',
-    type=click.Choice(tuple(__LOG_LEVELS__.keys()), case_sensitive=False),
-    help='Determines the verbosity of script output.')
+    type=click.Choice(LOG_LEVELS, case_sensitive=False),
+    help='Set the verbosity of logger')
+@click.option(
+    '--log-level-tests',
+    type=click.Choice(LOG_LEVELS, case_sensitive=False),
+    help='Set the verbosity of logger during test execution. Use --log-level if not defined')
 @click.option(
     '--target',
     default=['all'],
@@ -175,13 +175,14 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     '--chip-tool', type=ExistingFilePath, cls=DeprecatedOption, replacement='--tool-path chip-tool:<path>',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
-def main(context: click.Context, log_level: str, target: str, target_glob: str, target_skip_glob: str, log_timestamps: bool,
-         root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...], exclude_tags: tuple[TestTag, ...],
-         test_order_seed: str | None, find_path: list[str], runner: TestRunTime, chip_tool: Path | None) -> None:
+def main(context: click.Context, log_level: str, log_level_tests: str | None, target: str, target_glob: str, target_skip_glob: str,
+         log_timestamps: bool, root: str, internal_inside_unshare: bool, include_tags: tuple[TestTag, ...],
+         exclude_tags: tuple[TestTag, ...], test_order_seed: str | None, find_path: list[str], runner: TestRunTime,
+         chip_tool: Path | None) -> None:
 
     # Ensures somewhat pretty logging of what is going on
-    log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s' if log_timestamps else '%(levelname)-7s %(message)s'
-    coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
+    log_config = LogConfig(log_level, log_level_tests if log_level_tests is not None else log_level, log_timestamps)
+    log_config.set_fmt()
 
     if sys.platform == "linux":
         if not internal_inside_unshare:
@@ -263,7 +264,7 @@ def main(context: click.Context, log_level: str, target: str, target_glob: str, 
         random.seed(test_order_seed)
         random.shuffle(tests_filtered)
 
-    context.obj = RunContext(root=root, tests=tests_filtered, runtime=runner, find_path=find_path)
+    context.obj = RunContext(root=root, tests=tests_filtered, runtime=runner, find_path=find_path, log_config=log_config)
     if chip_tool:
         context.obj.deprecated_chip_tool_path = Path(chip_tool)
 
@@ -566,7 +567,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
             for test in context.obj.tests:
                 try:
                     run_summary.record(result := TestResult.run_test(
-                        test.name, i, dry_run, lambda: test.Run(
+                        test.name, i, dry_run, context.obj.log_config, lambda: test.Run(
                             runner, apps_register, subproc_info_repo, pics_file,
                             test_timeout_seconds, dry_run,
                             test_runtime=context.obj.runtime,
@@ -577,15 +578,16 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                             thread_ba_port=thread_ba_port,
                         )))
                     if result.exception is not None:
-                        raise result.exception
+                        if isinstance(result.exception, BaseException):
+                            raise result.exception
+                        raise RuntimeError(result.exception)
                 except Exception:
                     observed_failures += 1
                     if not keep_going:
                         sys.exit(2)
 
             if observed_failures != expected_failures:
-                log.error("Iteration %d: expected failure count %d, but got %d",
-                          i, expected_failures, observed_failures)
+                log.error("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
                 sys.exit(2)
     except KeyboardInterrupt:
         log.info("Interrupting execution on user request")

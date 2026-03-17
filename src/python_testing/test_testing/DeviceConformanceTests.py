@@ -144,7 +144,7 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         if is_ci:
             # This is a manually curated list of features that are present in the SDK, but not in the spec.
-            ci_ignore_features = {}
+            ci_ignore_features = {Clusters.AccessControl.id: [0x04]}
             ignore_feature_masks.update(ci_ignore_features)
 
         success = True
