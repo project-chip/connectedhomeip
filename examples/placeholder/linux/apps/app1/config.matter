@@ -9216,7 +9216,7 @@ endpoint 0 {
     callback attribute ACLouverPosition default = 0x00;
     callback attribute ACCoilTemperature;
     callback attribute ACCapacityformat default = 0x00;
-    ram      attribute featureMap default = 0x000b;
+    ram      attribute featureMap default = 0x3;
     callback attribute clusterRevision;
   }
 
