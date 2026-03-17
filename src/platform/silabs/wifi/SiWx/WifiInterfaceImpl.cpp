@@ -19,22 +19,20 @@
 #include "sl_matter_wifi_config.h"
 #endif // SL_MATTER_GN_BUILD
 
-#include <cmsis_os2.h>
-#include <sl_cmsis_os2_common.h>
-
-#include <algorithm>
-
 #include "ble_config.h"
 #include "sl_status.h"
 #include "sl_wifi_device.h"
 
+#include <algorithm>
 #include <app/icd/server/ICDServerConfig.h>
+#include <cmsis_os2.h>
 #include <inet/IPAddress.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/silabs/wifi/SiWx/WifiInterfaceImpl.h>
+#include <sl_cmsis_os2_common.h>
 
 extern "C" {
 #include "sl_si91x_driver.h"
