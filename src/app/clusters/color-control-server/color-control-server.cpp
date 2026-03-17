@@ -2047,6 +2047,45 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
     computePwmFromHsv(endpoint);
 }
 
+/**
+ * @brief initialize the hue and saturation transition state to the current value and set the quiet report
+ *
+ * @param endpoint target endpoint
+ */
+void ColorControlServer::initHueSatTransitionState(EndpointId endpoint)
+{
+    ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
+    VerifyOrReturn(nullptr != colorHueTransitionState);
+    Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
+    VerifyOrReturn(nullptr != colorSaturationTransitionState);
+    uint16_t epIndex = getEndpointIndex(endpoint);
+    uint8_t currentHue;
+    Status status = Attributes::CurrentHue::Get(endpoint, &currentHue);
+    if (status == Status::Success)
+    {
+        colorHueTransitionState->initialHue = colorHueTransitionState->currentHue = currentHue;
+        SetQuietReportAttribute(quietHue[epIndex], currentHue, false /* isEndOfTransition */, 0);
+    }
+    if (ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kEnhancedHue))
+    {
+        uint16_t currentEnhancedHue;
+        status = Attributes::EnhancedCurrentHue::Get(endpoint, &currentEnhancedHue);
+        if (status == Status::Success)
+        {
+            colorHueTransitionState->initialEnhancedHue = colorHueTransitionState->currentEnhancedHue = currentEnhancedHue;
+            SetQuietReportAttribute(quietEnhancedHue[epIndex], currentEnhancedHue, false /* isEndOfTransition */, 0);
+        }
+    }
+    uint8_t currentSaturation;
+    status = Attributes::CurrentSaturation::Get(endpoint, &currentSaturation);
+    if (status == Status::Success)
+    {
+        colorSaturationTransitionState->initialValue = colorSaturationTransitionState->currentValue =
+            static_cast<uint16_t>(currentSaturation);
+        SetQuietReportAttribute(quietSaturation[epIndex], currentSaturation, false /* isEndOfTransition */, 0);
+    }
+}
+
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_XY
@@ -3278,6 +3317,9 @@ void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     ColorControlServer::Instance().startUpColorTempCommand(endpoint);
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
+    ColorControlServer::Instance().initHueSatTransitionState(endpoint);
+#endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
 #if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     // Registers Scene handlers for the color control cluster on the server
     app::Clusters::ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(
