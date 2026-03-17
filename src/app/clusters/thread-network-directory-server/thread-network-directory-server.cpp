@@ -133,6 +133,7 @@ CHIP_ERROR ThreadNetworkDirectoryServer::ReadThreadNetworks(const ConcreteDataAt
         CHIP_ERROR err = CHIP_NO_ERROR;
         ExtendedPanId exPanId;
         auto * iterator = mStorage.IterateNetworkIds();
+        VerifyOrReturnError(iterator != nullptr, CHIP_ERROR_NO_MEMORY);
         while (iterator->Next(exPanId))
         {
             uint8_t datasetBuffer[kSizeOperationalDataset];
