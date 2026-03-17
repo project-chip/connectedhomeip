@@ -105,8 +105,7 @@ Protocols::InteractionModel::Status ZoneMgmtServer::GenerateZoneStoppedEvent(uin
 
 CHIP_ERROR ZoneMgmtServer::SetSensitivity(uint8_t sensitivity)
 {
-    VerifyOrReturnError(sensitivity >= 1 && sensitivity <= mConfig.sensitivityMax,
-                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(sensitivity >= 1 && sensitivity <= mConfig.sensitivityMax, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     if (!mCluster.IsConstructed())
     {
