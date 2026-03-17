@@ -138,7 +138,6 @@ protected:
 
     void SetZoneManagementCluster(ZoneManagementCluster * zoneManagementCluster) { mZoneManagementServer = zoneManagementCluster; }
     ZoneManagementCluster * GetZoneManagementCluster() const { return mZoneManagementServer; }
-
 };
 
 } // namespace ZoneManagement

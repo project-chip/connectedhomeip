@@ -19,13 +19,13 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/zone-management-server/Delegate.h>
+#include <app/clusters/zone-management-server/TwoDCartesianZoneStorage.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/core/CHIPError.h>
-#include <protocols/interaction_model/StatusCode.h>
-#include <app/clusters/zone-management-server/TwoDCartesianZoneStorage.h>
-#include <app/clusters/zone-management-server/Delegate.h>
 #include <optional>
+#include <protocols/interaction_model/StatusCode.h>
 #include <string>
 #include <vector>
 
