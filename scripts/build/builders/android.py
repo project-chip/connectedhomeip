@@ -126,9 +126,6 @@ class AndroidBuilder(Builder):
                  board: AndroidBoard,
                  app: AndroidApp):
         super(AndroidBuilder, self).__init__(root, runner)
-        if self.options.build_profile == BuildProfile.DEFAULT:
-            # Set default build profile to DEBUG if not specified explicitly by the user.
-            self.options.build_profile = BuildProfile.DEBUG
         self.board = board
         self.app = app
 
@@ -416,7 +413,8 @@ class AndroidBuilder(Builder):
                 gn_args["chip_build_test_static_libraries"] = False
 
             match self.options.build_profile:
-                case BuildProfile.DEBUG:
+                # Explicitly treat DEFAULT as DEBUG when building examples.
+                case BuildProfile.DEFAULT | BuildProfile.DEBUG:
                     gn_args.update({"is_debug": True, "optimize_debug": False})
                 case BuildProfile.DEBUG_OPTIMIZED:
                     gn_args.update({"is_debug": True, "optimize_debug": True})

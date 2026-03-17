@@ -215,13 +215,13 @@ class TizenBuilder(GnBuilder):
             raise Exception("CPU architecture is not supported")
 
         args = super().GnBuildArgs()
+        args.extend(self.extra_gn_options)
         args.extend([
             'target_os="tizen"',
             'target_cpu="%s"' % self.board.value.target_cpu,
             'tizen_sdk_root="%s"' % os.environ['TIZEN_SDK_ROOT'],
             'tizen_sdk_sysroot="%s"' % sysroot,
         ])
-        args.extend(self.extra_gn_options)
         return args
 
     def _bundle(self):
