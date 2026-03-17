@@ -37,6 +37,7 @@
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 using namespace ::chip::DeviceLayer::NetworkCommissioning;
+using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 namespace DeviceLayer {
@@ -337,7 +338,6 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 #if defined(SL_WIFI) && SL_WIFI
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
-    using namespace ::chip::DeviceLayer::Internal;
     WiFiScanResponse ap = {};
 
     VerifyOrReturnError(BssId.size() >= kWiFiBSSIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
