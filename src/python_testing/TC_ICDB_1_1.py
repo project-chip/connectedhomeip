@@ -165,7 +165,8 @@ class TC_ICDB_1_1(ICDBaseTest):
 
         # Verify the ActiveModeThreshold value is unchanged.
         current_active_mode_threshold_ms = await self.read_icdm_attribute_expect_success(attributes.ActiveModeThreshold)
-        log.info(f"ActiveModeThreshold after idle cycle: {current_active_mode_threshold_ms}ms (expected {active_mode_threshold_ms}ms)")
+        log.info(
+            f"ActiveModeThreshold after idle cycle: {current_active_mode_threshold_ms}ms (expected {active_mode_threshold_ms}ms)")
         asserts.assert_equal(current_active_mode_threshold_ms, active_mode_threshold_ms,
                              f"ActiveModeThreshold value must be unchanged but changed after idle cycle. Expected: {active_mode_threshold_ms}ms, Current: {current_active_mode_threshold_ms}ms")
 
