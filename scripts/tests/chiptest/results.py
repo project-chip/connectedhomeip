@@ -25,6 +25,7 @@ import time
 from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from types import TracebackType
 from typing import Any
 
 from chiptest.log_config import LogConfig
@@ -185,7 +186,7 @@ class RunSummary(RunStats):
     def __enter__(self):
         return self._lock.__enter__()
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None:
         return self._lock.__exit__(exc_type, exc_val, exc_tb)
 
     def record(self, result: TestResult) -> None:
