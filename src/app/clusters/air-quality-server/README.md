@@ -45,10 +45,10 @@ AirQualityEnum current = instance->GetAirQuality();
 
 ## Internal Architecture
 
-- `AirQualityCluster` (in `AirQualityCluster.h`) is the code-driven cluster
-  inheriting from `DefaultServerCluster`. It handles `ReadAttribute()` and
-  attribute enumeration.
-- `AirQuality::Instance` (in `CodegenIntegration.h`) wraps `AirQualityCluster`
-  with a `RegisteredServerCluster` and provides the application-facing API.
-  `Init()` registers with `CodegenDataModelProvider`, and the destructor
-  unregisters.
+-   `AirQualityCluster` (in `AirQualityCluster.h`) is the code-driven cluster
+    inheriting from `DefaultServerCluster`. It handles `ReadAttribute()` and
+    attribute enumeration.
+-   `AirQuality::Instance` (in `CodegenIntegration.h`) wraps `AirQualityCluster`
+    with a `RegisteredServerCluster` and provides the application-facing API.
+    `Init()` registers with `CodegenDataModelProvider`, and the destructor
+    unregisters.
