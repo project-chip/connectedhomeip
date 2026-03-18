@@ -1,54 +1,41 @@
 # Air Quality Cluster
 
-This cluster uses a code-driven implementation based on `DefaultServerCluster`.
+This cluster follows a code-driven approach using `AirQualityCluster`
+(`DefaultServerCluster`).
 
-## Overview
+## Code-Driven Usage
 
-The `AirQualityCluster` manages a single `AirQuality` attribute (enum) with
-feature-gated validation. Features (`Fair`, `Moderate`, `VeryPoor`,
-`ExtremelyPoor`) control which enum values are allowed.
+```cpp
+#include <app/clusters/air-quality-server/AirQualityCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
-Applications create `AirQuality::Instance` objects and call `Init()` to register
-them with the data model provider, preserving the same API as the legacy
-`AttributeAccessInterface` implementation.
+using namespace chip::app::Clusters;
 
-## Usage
+RegisteredServerCluster<AirQualityCluster> gCluster(endpointId,
+    BitFlags<AirQuality::Feature>(AirQuality::Feature::kFair, AirQuality::Feature::kModerate));
 
-### Creating and initializing
+// Register during init
+CodegenDataModelProvider::Instance().Registry().Register(gCluster.Registration());
+
+// Set and get air quality
+gCluster.Cluster().SetAirQuality(AirQuality::AirQualityEnum::kGood);
+AirQuality::AirQualityEnum current = gCluster.Cluster().GetAirQuality();
+```
+
+## Legacy (ZAP) Usage
+
+The backward-compatible `AirQuality::Instance` wrapper handles registration
+internally:
 
 ```cpp
 #include <app/clusters/air-quality-server/air-quality-server.h>
 
-using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AirQuality;
 
-// Create with endpoint and features
 auto * instance = new Instance(endpointId, BitMask<Feature>(Feature::kFair, Feature::kModerate));
 instance->Init();
-```
 
-### Setting the air quality value
-
-```cpp
-auto status = instance->UpdateAirQuality(AirQualityEnum::kGood);
-if (status != Protocols::InteractionModel::Status::Success)
-{
-    // Value rejected (feature not enabled or invalid value)
-}
-```
-
-### Reading the current value
-
-```cpp
+instance->UpdateAirQuality(AirQualityEnum::kGood);
 AirQualityEnum current = instance->GetAirQuality();
 ```
-
-## Internal Architecture
-
--   `AirQualityCluster` (in `AirQualityCluster.h`) is the code-driven cluster
-    inheriting from `DefaultServerCluster`. It handles `ReadAttribute()` and
-    attribute enumeration.
--   `AirQuality::Instance` (in `CodegenIntegration.h`) wraps `AirQualityCluster`
-    with a `RegisteredServerCluster` and provides the application-facing API.
-    `Init()` registers with `CodegenDataModelProvider`, and the destructor
-    unregisters.
