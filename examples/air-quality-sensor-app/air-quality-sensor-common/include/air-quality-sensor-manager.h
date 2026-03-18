@@ -180,7 +180,7 @@ private:
         mFormaldehydeConcentrationMeasurementInstance(mEndpointId, FormaldehydeConcentrationMeasurement::Id,
                                                       ConcentrationMeasurement::MeasurementMediumEnum::kAir,
                                                       ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
-        mTemperatureSensorManager(mEndpointId), mHumiditySensorManager(mEndpointId) {};
+        mTemperatureSensorManager(mEndpointId), mHumiditySensorManager(mEndpointId){};
 };
 
 } // namespace Clusters

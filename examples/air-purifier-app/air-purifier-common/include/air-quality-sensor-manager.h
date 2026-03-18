@@ -61,7 +61,7 @@ public:
                                               ConcentrationMeasurement::MeasurementUnitEnum::kPpm),
         formaldehydeConcentrationMeasurementInstance(mEndpointId, FormaldehydeConcentrationMeasurement::Id,
                                                      ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-                                                     ConcentrationMeasurement::MeasurementUnitEnum::kPpm) {};
+                                                     ConcentrationMeasurement::MeasurementUnitEnum::kPpm){};
 
     void Init();
 
