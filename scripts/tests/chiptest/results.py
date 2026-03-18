@@ -20,6 +20,7 @@ import datetime
 import enum
 import json
 import logging
+import threading
 import time
 from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass, field
@@ -166,11 +167,26 @@ class RunStats:
 
 @dataclass
 class RunSummary(RunStats):
-    """Summary of a test run, including results of all iterations and aggregated statistics (both global and per-test)."""
+    """
+    Summary of a test run, including results of all iterations and aggregated statistics (both global and per-test).
+
+    If operated in multithreaded environment, it should be used as a context manager to ensure thread safety when recording results.
+    """
     iterations: int
+    tests_per_iteration: int
     run_timestamp: datetime.datetime | str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
     results: list[TestResult] = field(default_factory=list, init=False)
     test_stats: dict[str, RunStats] = field(default_factory=dict, init=False)
+    exceptions: dict[int, dict[str, BaseException | str | None]] = field(default_factory=dict, init=False)
+
+    def __post_init__(self):
+        self._lock = threading.Lock()
+
+    def __enter__(self):
+        return self._lock.__enter__()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return self._lock.__exit__(exc_type, exc_val, exc_tb)
 
     def record(self, result: TestResult) -> None:
         """Record a test result."""
@@ -183,6 +199,28 @@ class RunSummary(RunStats):
         if result.name not in self.test_stats:
             self.test_stats[result.name] = RunStats()
         self.test_stats[result.name].record(result)
+
+        # Record exception per iteration.
+        if result.iteration not in self.exceptions:
+            self.exceptions[result.iteration] = {}
+        self.exceptions[result.iteration][result.name] = result.exception
+
+    @property
+    def expected_test_count(self) -> int:
+        return self.iterations * self.tests_per_iteration
+
+    @property
+    def current_iteration(self) -> int:
+        return len(self.exceptions)
+
+    @property
+    def successful_failed_tests(self) -> tuple[int, int]:
+        successful, failed = tuple(map(sum, zip(
+            (0, 0),  # Needed to avoid empty input to map when there are no results yet.
+            *((exception is None, exception is not None)
+              for exceptions in self.exceptions.values()
+              for exception in exceptions.values()))))
+        return successful, failed
 
     def write_json(self, path: Path) -> None:
         """Write the test run summary to a JSON file."""
@@ -209,7 +247,7 @@ class RunSummary(RunStats):
     def from_json(cls, path: Path) -> RunSummary:
         """Read the test run summary from a JSON file."""
         raw = json.loads(path.read_text())
-        ret = RunSummary(iterations=raw.get("iterations", 1))
+        ret = RunSummary(iterations=raw.get("iterations", 1), tests_per_iteration=raw.get("tests_per_iteration", 0))
 
         # Recover a timestamp.
         timestamp = raw.get("run_timestamp", "unknown")

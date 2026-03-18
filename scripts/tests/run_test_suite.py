@@ -32,6 +32,7 @@ from chiptest.glob_matcher import GlobMatcher
 from chiptest.log_config import LOG_LEVELS, LogConfig
 from chiptest.results import RunSummary, TestResult
 from chiptest.runner import Executor, SubprocessKind
+from chiptest.status import PeriodicStatusThread
 from chiptest.test_definition import TEST_THREAD_DATASET, SubprocessInfoRepo, TestDefinition, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
@@ -371,6 +372,13 @@ class CommissioningMethod(enum.StrEnum):
     type=click.Path(dir_okay=False, path_type=Path),
     default=None,
     help='If provided, write a JSON test-run summary to this file at the end of the run.')
+@click.option(
+    '--periodic-status',
+    default=50,
+    show_default=True,
+    type=click.IntRange(min=0),
+    help=('Periodically show the status of test execution. '
+          '0: turn off, other values: periodicity of report in number of logged messages.'))
 # Deprecated flags:
 @click.option(
     '--all-clusters-app', type=ExistingFilePath, cls=DeprecatedOption, replacement='--app-path all-clusters:<path>',
@@ -426,7 +434,7 @@ class CommissioningMethod(enum.StrEnum):
 @click.pass_context
 def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: list[str], tool_path: list[str], discover_paths: bool,
             help_paths: bool, pics_file: Path, keep_going: bool, test_timeout_seconds: int | None, expected_failures: int,
-            commissioning_method: CommissioningMethod, summary_file: Path | None,
+            commissioning_method: CommissioningMethod, summary_file: Path | None, periodic_status: int,
             # Deprecated CLI flags
             all_clusters_app: Path | None, lock_app: Path | None, ota_provider_app: Path | None, ota_requestor_app: Path | None,
             fabric_bridge_app: Path | None, tv_app: Path | None, bridge_app: Path | None, lit_icd_app: Path | None,
@@ -511,7 +519,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         raise click.BadOptionUsage("commissioning-method",
                                    f"Option --commissioning-method={commissioning_method} is available on Linux platform only")
 
-    run_summary = RunSummary(iterations)
+    run_summary = RunSummary(iterations, tests_per_iteration=len(context.obj.tests))
     ble_controller_app = None
     ble_controller_tool = None
     thread_ba_host = None
@@ -556,17 +564,20 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
 
         runner = chiptest.runner.Runner(executor=executor)
 
-        log.info("Each test will be executed %d times", iterations)
-
         to_terminate.append(apps_register := AppsRegister())
         apps_register.init()
 
+        to_terminate.append(status_thread := PeriodicStatusThread(run_summary, context.obj.log_config.filter.msg_counter,
+                                                                  periodicity=periodic_status))
+        status_thread.start()
+
+        log.info("Each test will be executed %d times", iterations)
         for i in range(1, iterations + 1):
             log.info("Starting iteration %d", i)
             observed_failures = 0
             for test in context.obj.tests:
                 try:
-                    run_summary.record(result := TestResult.run_test(
+                    result = TestResult.run_test(
                         test.name, i, dry_run, context.obj.log_config, lambda: test.Run(
                             runner, apps_register, subproc_info_repo, pics_file,
                             test_timeout_seconds, dry_run,
@@ -576,7 +587,10 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                             op_network='Thread' if thread_required else 'WiFi',
                             thread_ba_host=thread_ba_host,
                             thread_ba_port=thread_ba_port,
-                        )))
+                        ))
+                    with run_summary:
+                        run_summary.record(result)
+
                     if result.exception is not None:
                         if isinstance(result.exception, BaseException):
                             raise result.exception
@@ -603,9 +617,10 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
             except Exception as e:
                 log.warning("Encountered exception during cleanup: %r", e)
 
-        run_summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
-        if summary_file is not None:
-            run_summary.write_json(summary_file)
+        with run_summary:
+            run_summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
+            if summary_file is not None:
+                run_summary.write_json(summary_file)
 
 
 @main.command(
