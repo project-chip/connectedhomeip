@@ -423,7 +423,7 @@ private:
     {
         if (reader.GetType() == TLV::kTLVType_Null)
         {
-            value = {};
+            memset(&value, 0xFF, sizeof(value));
             return CHIP_NO_ERROR;
         }
         return reader.Get(value);
@@ -445,7 +445,7 @@ private:
     {
         if (reader.GetType() == TLV::kTLVType_Null)
         {
-            memset(value, 0, N);
+            memset(value, 0xFF, N);
             return CHIP_NO_ERROR;
         }
         return reader.GetString(value, N);
