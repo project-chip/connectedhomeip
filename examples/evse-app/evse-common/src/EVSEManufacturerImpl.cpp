@@ -456,8 +456,6 @@ CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpo
 
     mPSInstance.Create(endpointId, Span(optionalAttributes), config);
 
-    CHIP_ERROR err;
-
     ReturnErrorOnFailure(mPSInstance.Cluster().SetStatus(PowerSourceStatusEnum::kActive));
 
     chip::EndpointId endpointArray[] = { endpointId };

@@ -23,7 +23,7 @@
 #include <clusters/PowerSource/Commands.h>
 #include <clusters/PowerSource/Enums.h>
 #include <clusters/PowerSource/Events.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <variant>
 #include <algorithm>
 #include <bitset>
@@ -366,7 +366,7 @@ private:
             }
         }
 
-        return Span(static_cast<const EnumT *>(buffer), bufInd);
+        return Span(buffer, bufInd);
     }
 
     template<class EventT, class EnumT, size_t ValCount = to_underlying(EnumT::kUnknownEnumValue)>

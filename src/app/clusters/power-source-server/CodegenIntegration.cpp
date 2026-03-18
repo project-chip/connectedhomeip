@@ -242,24 +242,24 @@ namespace chip::app::Clusters::PowerSource {
 
 void LazyInstance::Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes, const PowerSourceCluster::WiredConfiguration & config)
 {
-    uint32_t optAttrBits;
+    uint32_t optAttrBits{};
     for (auto attrId : optionalAttributes)
     {
         optAttrBits |= (1 << attrId);
     }
 
-    server.Create(endpointId, optAttrBits, DeviceLayer::SystemLayer(), config);
+    server.Create(endpointId, PowerSourceCluster::OptionalAttributeSet(optAttrBits), DeviceLayer::SystemLayer(), config);
 }
 
 void LazyInstance::Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes, const PowerSourceCluster::BatteryConfiguration & config)
 {
-    uint32_t optAttrBits;
+    uint32_t optAttrBits{};
     for (auto attrId : optionalAttributes)
     {
         optAttrBits |= (1 << attrId);
     }
 
-    server.Create(endpointId, optAttrBits, DeviceLayer::SystemLayer(), config);
+    server.Create(endpointId, PowerSourceCluster::OptionalAttributeSet(optAttrBits), DeviceLayer::SystemLayer(), config);
 }
 
 CHIP_ERROR LazyInstance::Register()

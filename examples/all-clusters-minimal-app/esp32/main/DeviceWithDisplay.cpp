@@ -241,9 +241,17 @@ public:
             {
                 // update the battery percent remaining here for hardcoded endpoint 1
                 auto * powerSource = app::Clusters::PowerSource::FindClusterOnEndpoint(1);
-                if (powerSource != nullptr && powerSource->SetBatPercentRemaining(static_cast<uint8_t>(n * 2)))
+                if (powerSource != nullptr)
                 {
-                    ESP_LOGI(TAG, "Battery percent remaining changed to : %d", n);
+                    CHIP_ERROR err = powerSource->SetBatPercentRemaining(static_cast<uint8_t>(n * 2));
+                    if (err == CHIP_NO_ERROR)
+                    {
+                        ESP_LOGI(TAG, "Battery percent remaining changed to : %d", n);
+                    }
+                    else
+                    {
+                        ESP_LOGE(TAG, "Failed to set battery percent remaining: %" CHIP_ERROR_FORMAT, err.Format());
+                    }
                 }
             }
             value = buffer;
@@ -315,9 +323,17 @@ public:
 
                 // update the battery charge level here for hardcoded endpoint 1
                 auto * powerSource = app::Clusters::PowerSource::FindClusterOnEndpoint(1);
-                if (powerSource != nullptr && powerSource->SetBatChargeLevel(attributeValue))
+                if (powerSource != nullptr)
                 {
-                    ESP_LOGI(TAG, "Battery charge level changed to : %u", static_cast<uint8_t>(attributeValue));
+                    CHIP_ERROR err = powerSource->SetBatChargeLevel(attributeValue);
+                    if (err == CHIP_NO_ERROR)
+                    {
+                        ESP_LOGI(TAG, "Battery charge level changed to : %u", static_cast<uint8_t>(attributeValue));
+                    }
+                    else
+                    {
+                        ESP_LOGE(TAG, "Failed to set battery charge level: %" CHIP_ERROR_FORMAT, err.Format());
+                    }
                 }
             }
             else
@@ -639,8 +655,18 @@ void SetupPretendDevices()
     auto * powerSource = app::Clusters::PowerSource::FindClusterOnEndpoint(1);
     if (powerSource != nullptr)
     {
-        powerSource->SetBatPercentRemaining(static_cast<uint8_t>(70 * 2));
-        powerSource->SetBatChargeLevel(app::Clusters::PowerSource::BatChargeLevelEnum::kOk);
+        CHIP_ERROR err;
+        err = powerSource->SetBatPercentRemaining(static_cast<uint8_t>(70 * 2)) != CHIP_NO_ERROR;
+        if (err != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "Failed to set battery percent remaining: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+        err = powerSource->SetBatChargeLevel(app::Clusters::PowerSource::BatChargeLevelEnum::kOk);
+        if (err != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "Failed to set battery charge level: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 }
 
