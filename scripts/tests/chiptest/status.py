@@ -35,7 +35,7 @@ class PeriodicStatusThread(threading.Thread):
     periodicity: int
 
     def __post_init__(self) -> None:
-        super().__init__(name="Status")
+        super().__init__(name="Status", daemon=True)
 
     def run(self) -> None:
         if self.periodicity == 0:
