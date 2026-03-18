@@ -38,4 +38,7 @@ instance->Init();
 
 instance->UpdateAirQuality(AirQualityEnum::kGood);
 AirQualityEnum current = instance->GetAirQuality();
+
+// The destructor unregisters the cluster, so delete when no longer needed
+delete instance;
 ```
