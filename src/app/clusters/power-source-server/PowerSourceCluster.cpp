@@ -96,8 +96,8 @@ using namespace PowerSource::Events;
 
 PowerSourceCluster::PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet,
                                        System::Layer & systemLayer, const WiredConfiguration & config) :
-    DefaultServerCluster({ endpointId, PowerSource::Id }), mOptionalAttributeSet(optionalAttributeSet), mFeatures(WiredFeatures()),
-    mSystemLayer(systemLayer)
+    DefaultServerCluster({ endpointId, PowerSource::Id }),
+    mOptionalAttributeSet(optionalAttributeSet), mFeatures(WiredFeatures()), mSystemLayer(systemLayer)
 {
     forceOptionalAttributesValidity();
 
@@ -116,8 +116,9 @@ PowerSourceCluster::PowerSourceCluster(EndpointId endpointId, const OptionalAttr
 
 PowerSourceCluster::PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet,
                                        System::Layer & systemLayer, const BatteryConfiguration & config) :
-    DefaultServerCluster({ endpointId, PowerSource::Id }), mOptionalAttributeSet(optionalAttributeSet),
-    mFeatures(BatteryFeatures(config.isReplaceable(), config.isRechargeable())), mSystemLayer(systemLayer)
+    DefaultServerCluster({ endpointId, PowerSource::Id }),
+    mOptionalAttributeSet(optionalAttributeSet), mFeatures(BatteryFeatures(config.isReplaceable(), config.isRechargeable())),
+    mSystemLayer(systemLayer)
 {
     forceOptionalAttributesValidity();
 

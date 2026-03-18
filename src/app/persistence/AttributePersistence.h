@@ -173,8 +173,8 @@ public:
     // - validate that the decoded value is different from the current one
     // - writes to storage
     template <typename T, typename std::enable_if_t<std::is_enum_v<T>> * = nullptr>
-    DataModel::ActionReturnStatus DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
-                                                         DataModel::Nullable<T> & value)
+    DataModel::ActionReturnStatus DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path,
+                                                                  AttributeValueDecoder & decoder, DataModel::Nullable<T> & value)
     {
         DataModel::Nullable<T> decodedValue{};
         ReturnErrorOnFailure(decoder.Decode(decodedValue));
