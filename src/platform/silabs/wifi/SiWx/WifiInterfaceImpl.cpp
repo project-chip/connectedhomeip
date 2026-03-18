@@ -771,16 +771,8 @@ sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
     ChipLogError(DeviceLayer, "sl_net_up failed: 0x%lx", static_cast<uint32_t>(status));
 
     wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kStationConnecting).Clear(WifiInterface::WifiState::kStationConnected);
-    if (status == SL_STATUS_SI91X_NO_AP_FOUND)
-    {
-        mUseQuickJoin = false; // Scan and join
-        ScheduleConnectionAttempt();
-    }
-    else
-    {
-        mUseQuickJoin = true; // Quick join
-        ScheduleConnectionAttempt();
-    }
+    mUseQuickJoin = (status == SL_STATUS_SI91X_NO_AP_FOUND) ? false : true; // Quick join
+    ScheduleConnectionAttempt();
 
     return status;
 }
@@ -808,16 +800,8 @@ sl_status_t WifiInterfaceImpl::JoinCallback(sl_wifi_event_t event, char * result
         ChipLogError(DeviceLayer, "JoinCallback: failed: 0x%lx", status);
         wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kStationConnected);
 
-        if (status == SL_STATUS_SI91X_NO_AP_FOUND)
-        {
-            mInstance.mUseQuickJoin = false; // Scan and join
-            mInstance.ScheduleConnectionAttempt();
-        }
-        else
-        {
-            mInstance.mUseQuickJoin = true; // Quick join
-            mInstance.ScheduleConnectionAttempt();
-        }
+        mInstance.mUseQuickJoin = (status == SL_STATUS_SI91X_NO_AP_FOUND) ? false : true; // Quick join
+        mInstance.ScheduleConnectionAttempt();
     }
 
     return status;
