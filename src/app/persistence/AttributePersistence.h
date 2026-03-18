@@ -156,8 +156,7 @@ public:
     // - verifies that it is a valid enum value
     // - writes to storage
     template <typename T, typename std::enable_if_t<std::is_enum_v<T>> * = nullptr>
-    DataModel::ActionReturnStatus DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path,
-                                                                  AttributeValueDecoder & decoder, DataModel::Nullable<T> & value)
+    DataModel::ActionReturnStatus StoreNativeEndianValue(const ConcreteAttributePath & path, DataModel::Nullable<T> & value)
     {
         VerifyOrReturnError(value.IsNull() || value.Value() != T::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
@@ -174,7 +173,7 @@ public:
     // - validate that the decoded value is different from the current one
     // - writes to storage
     template <typename T, typename std::enable_if_t<std::is_enum_v<T>> * = nullptr>
-    DataModel::ActionReturnStatus StoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
+    DataModel::ActionReturnStatus DecodeAndStoreNativeEndianValue(const ConcreteAttributePath & path, AttributeValueDecoder & decoder,
                                                          DataModel::Nullable<T> & value)
     {
         DataModel::Nullable<T> decodedValue{};

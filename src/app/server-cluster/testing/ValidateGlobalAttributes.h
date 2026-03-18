@@ -44,7 +44,7 @@ namespace Testing {
 /// ASSERT_TRUE(IsAttributesListEqualTo(cluster, { Attributes::SomeAttribute::kMetadataEntry }));
 /// ```
 
-template <class T>
+template<class T>
 bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, T expected)
 {
     VerifyOrDie(cluster.GetPaths().size() == 1);
@@ -70,9 +70,8 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, T expected)
 }
 
 // Overload for std::initializer_list to not get "template argument deduction failed" when calling `IsAttributesListEqualTo({...})`
-template <typename T>
-bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::initializer_list<T> expected)
-{
+template <typename T = const app::DataModel::AttributeEntry>
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::initializer_list<T> expected) {
     return IsAttributesListEqualTo<std::initializer_list<T>>(cluster, expected);
 }
 
