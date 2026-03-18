@@ -162,5 +162,6 @@ void AirQualitySensorAppAttrUpdateDelegate::OnEventCommandReceived(const char * 
     {
         ChipLogError(NotSpecified, "Failed to schedule work for AirQualitySensorAttrUpdateHandler: %" CHIP_ERROR_FORMAT,
                      err.Format());
+        Platform::Delete(handler);
     }
 }

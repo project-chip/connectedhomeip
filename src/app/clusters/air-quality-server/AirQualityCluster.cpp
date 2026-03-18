@@ -19,6 +19,7 @@
 #include <app/clusters/air-quality-server/AirQualityCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/AirQuality/Metadata.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {

@@ -54,7 +54,7 @@ public:
     /**
      * Sets the AirQuality attribute.
      * @param aNewAirQuality The value to which the AirQuality attribute is to be set.
-     * @return Returns a ConstraintError if the aNewAirQuality value is not valid. Returns Success otherwise.
+     * @return Returns ConstraintError or InvalidValue if the aNewAirQuality value is not valid; returns Success otherwise.
      */
     inline Protocols::InteractionModel::Status UpdateAirQuality(AirQualityEnum aNewAirQuality)
     {
@@ -64,7 +64,7 @@ public:
     /**
      * @return The current AirQuality enum.
      */
-    inline AirQualityEnum GetAirQuality() { return mCluster.Cluster().GetAirQuality(); }
+    inline AirQualityEnum GetAirQuality() const { return mCluster.Cluster().GetAirQuality(); }
 
 private:
     RegisteredServerCluster<AirQualityCluster> mCluster;
