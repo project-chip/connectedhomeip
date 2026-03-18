@@ -444,15 +444,13 @@ CHIP_ERROR EVSEManufacturer::InitializePowerMeasurementCluster()
  */
 CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpointId)
 {
-    PowerSourceCluster::WiredConfiguration config(CharSpan::fromCharString("Primary Mains Power"), PowerSource::WiredCurrentTypeEnum::kAc);
+    PowerSourceCluster::WiredConfiguration config(CharSpan::fromCharString("Primary Mains Power"),
+                                                  PowerSource::WiredCurrentTypeEnum::kAc);
 
     config.nominalVoltage = 230'000; // 230V in mv
-    config.maximumCurrent = 32'000; // 32A in mA
+    config.maximumCurrent = 32'000;  // 32A in mA
 
-    AttributeId optionalAttributes[] = {
-        WiredNominalVoltage::Id,
-        WiredMaximumCurrent::Id
-    };
+    AttributeId optionalAttributes[] = { WiredNominalVoltage::Id, WiredMaximumCurrent::Id };
 
     mPSInstance.Create(endpointId, Span(optionalAttributes), config);
 

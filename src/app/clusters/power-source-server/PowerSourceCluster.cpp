@@ -20,65 +20,63 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/PowerSource/Metadata.h>
 
-
 using namespace chip;
 using namespace app;
 using namespace app::Clusters;
 
 namespace {
-    template <typename T>
-    CHIP_ERROR EncodeValue(AttributeValueEncoder & encoder, const T & value, CHIP_ERROR err)
+template <typename T>
+CHIP_ERROR EncodeValue(AttributeValueEncoder & encoder, const T & value, CHIP_ERROR err)
+{
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
-        if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            return encoder.EncodeNull();
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            return encoder.EncodeNull();
-        }
-        return encoder.Encode(value);
+        return encoder.EncodeNull();
     }
-    template <typename T>
-    CHIP_ERROR EncodeOptional(AttributeValueEncoder & encoder, const Optional<T> & value, CHIP_ERROR err = CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            return encoder.EncodeNull();
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-        if (!value.HasValue())
-        {
-            return encoder.EncodeNull();
-        }
-        return encoder.Encode(value.Value());
+        return encoder.EncodeNull();
     }
+    return encoder.Encode(value);
+}
+template <typename T>
+CHIP_ERROR EncodeOptional(AttributeValueEncoder & encoder, const Optional<T> & value, CHIP_ERROR err = CHIP_NO_ERROR)
+{
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        return encoder.EncodeNull();
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+    if (!value.HasValue())
+    {
+        return encoder.EncodeNull();
+    }
+    return encoder.Encode(value.Value());
+}
 
-    template <typename T>
-    CHIP_ERROR EncodeListOfValues(AttributeValueEncoder & encoder, const T & valueList, CHIP_ERROR err = CHIP_NO_ERROR)
+template <typename T>
+CHIP_ERROR EncodeListOfValues(AttributeValueEncoder & encoder, const T & valueList, CHIP_ERROR err = CHIP_NO_ERROR)
+{
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
-        if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            return encoder.EncodeEmptyList();
-        }
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-        return encoder.EncodeList([&valueList](const auto & enc) -> CHIP_ERROR {
-            for (const auto & value : valueList)
-            {
-                ReturnErrorOnFailure(enc.Encode(value));
-            }
-
-            return CHIP_NO_ERROR;
-        });
+        return encoder.EncodeEmptyList();
     }
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+    return encoder.EncodeList([&valueList](const auto & enc) -> CHIP_ERROR {
+        for (const auto & value : valueList)
+        {
+            ReturnErrorOnFailure(enc.Encode(value));
+        }
+
+        return CHIP_NO_ERROR;
+    });
+}
 } // anonymous namespace
-
 
 namespace chip {
 namespace app {
@@ -88,16 +86,18 @@ using namespace PowerSource;
 using namespace PowerSource::Attributes;
 using namespace PowerSource::Events;
 
-#define DieIfInvalidValue(expr, attr_name)\
-    {\
-        CHIP_ERROR error_val = (expr);\
-        VerifyOrDieWithMsg(error_val == CHIP_NO_ERROR || error_val == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Zcl, "Unexpected error %" CHIP_ERROR_FORMAT " when trying to set attribute `" #attr_name "`.", error_val.Format());\
+#define DieIfInvalidValue(expr, attr_name)                                                                                         \
+    {                                                                                                                              \
+        CHIP_ERROR error_val = (expr);                                                                                             \
+        VerifyOrDieWithMsg(error_val == CHIP_NO_ERROR || error_val == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Zcl,                    \
+                           "Unexpected error %" CHIP_ERROR_FORMAT " when trying to set attribute `" #attr_name "`.",               \
+                           error_val.Format());                                                                                    \
     }
 
-PowerSourceCluster::PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet, System::Layer & systemLayer, const WiredConfiguration& config) :
-    DefaultServerCluster({ endpointId, PowerSource::Id }), mOptionalAttributeSet(optionalAttributeSet),
-    mFeatures(WiredFeatures()),
-    mSystemLayer(systemLayer)
+PowerSourceCluster::PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet,
+                                       System::Layer & systemLayer, const WiredConfiguration & config) :
+    DefaultServerCluster({ endpointId, PowerSource::Id }),
+    mOptionalAttributeSet(optionalAttributeSet), mFeatures(WiredFeatures()), mSystemLayer(systemLayer)
 {
     forceOptionalAttributesValidity();
 
@@ -105,16 +105,19 @@ PowerSourceCluster::PowerSourceCluster(EndpointId endpointId, const OptionalAttr
     CHIP_ERROR err;
 
     // mandatory attributes marked `Fixed` when `kWired` features is set
-    VerifyOrDieWithMsg((err = SetDescription(config.description)) == CHIP_NO_ERROR, Zcl, "Can't set the attribute `Description`, error: %" CHIP_ERROR_FORMAT, err.Format());
-    VerifyOrDieWithMsg((err = SetWiredCurrentType(config.currentType)) == CHIP_NO_ERROR, Zcl, "Can't set the attribute `WiredCurrentType`, error: %" CHIP_ERROR_FORMAT, err.Format());
+    VerifyOrDieWithMsg((err = SetDescription(config.description)) == CHIP_NO_ERROR, Zcl,
+                       "Can't set the attribute `Description`, error: %" CHIP_ERROR_FORMAT, err.Format());
+    VerifyOrDieWithMsg((err = SetWiredCurrentType(config.currentType)) == CHIP_NO_ERROR, Zcl,
+                       "Can't set the attribute `WiredCurrentType`, error: %" CHIP_ERROR_FORMAT, err.Format());
 
     // optional attributes marked `Fixed`
     DieIfInvalidValue(SetWiredMaximumCurrent(config.maximumCurrent), WiredMaximumCurrent);
 }
 
-PowerSourceCluster::PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet, System::Layer & systemLayer, const BatteryConfiguration& config) :
-    DefaultServerCluster({ endpointId, PowerSource::Id }), mOptionalAttributeSet(optionalAttributeSet),
-    mFeatures(BatteryFeatures(config.isReplaceable(), config.isRechargeable())),
+PowerSourceCluster::PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet,
+                                       System::Layer & systemLayer, const BatteryConfiguration & config) :
+    DefaultServerCluster({ endpointId, PowerSource::Id }),
+    mOptionalAttributeSet(optionalAttributeSet), mFeatures(BatteryFeatures(config.isReplaceable(), config.isRechargeable())),
     mSystemLayer(systemLayer)
 {
     forceOptionalAttributesValidity();
@@ -123,19 +126,24 @@ PowerSourceCluster::PowerSourceCluster(EndpointId endpointId, const OptionalAttr
     CHIP_ERROR err;
 
     // mandatory attributes marked `Fixed` when `kBattery` features is set
-    VerifyOrDieWithMsg((err = SetDescription(config.description)) == CHIP_NO_ERROR, Zcl, "Can't set the attribute `Description`, error: %" CHIP_ERROR_FORMAT, err.Format());
-    VerifyOrDieWithMsg((err = SetBatReplaceability(config.replaceability)) == CHIP_NO_ERROR, Zcl, "Can't set the attribute `BatReplaceability`, error: %" CHIP_ERROR_FORMAT, err.Format());
+    VerifyOrDieWithMsg((err = SetDescription(config.description)) == CHIP_NO_ERROR, Zcl,
+                       "Can't set the attribute `Description`, error: %" CHIP_ERROR_FORMAT, err.Format());
+    VerifyOrDieWithMsg((err = SetBatReplaceability(config.replaceability)) == CHIP_NO_ERROR, Zcl,
+                       "Can't set the attribute `BatReplaceability`, error: %" CHIP_ERROR_FORMAT, err.Format());
 
     if (config.isReplaceable())
     {
         // mandatory attributes marked `Fixed` when `kReplaceable` feature is set
-        VerifyOrDieWithMsg((err = SetBatReplacementDescription(config.replacementDescription)) == CHIP_NO_ERROR, Zcl, "Can't set the attribute `BatReplacementDescription`, error: %" CHIP_ERROR_FORMAT, err.Format());
-        VerifyOrDieWithMsg((err = SetBatQuantity(config.quantity)) == CHIP_NO_ERROR, Zcl, "Can't set the attribute `BatQuantity`, error: %" CHIP_ERROR_FORMAT, err.Format());
+        VerifyOrDieWithMsg((err = SetBatReplacementDescription(config.replacementDescription)) == CHIP_NO_ERROR, Zcl,
+                           "Can't set the attribute `BatReplacementDescription`, error: %" CHIP_ERROR_FORMAT, err.Format());
+        VerifyOrDieWithMsg((err = SetBatQuantity(config.quantity)) == CHIP_NO_ERROR, Zcl,
+                           "Can't set the attribute `BatQuantity`, error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // no mandatory attributes marked `Fixed` when `kRechargeable` feature is set
 
-    // optional attributes marked `Fixed` (deliberately ignoring errors because these will check if the optional attribute is enabled)
+    // optional attributes marked `Fixed` (deliberately ignoring errors because these will check if the optional attribute is
+    // enabled)
     DieIfInvalidValue(SetBatCommonDesignation(config.commonDesignation), BatCommonDesignation);
     DieIfInvalidValue(SetBatANSIDesignation(config.ansiDesignation), BatANSIDesignation);
     DieIfInvalidValue(SetBatIECDesignation(config.iecDesignation), BatIECDesignation);
@@ -229,7 +237,9 @@ DataModel::ActionReturnStatus PowerSourceCluster::ReadAttribute(const DataModel:
     case BatChargingCurrent::Id:
         return EncodeOptional(encoder, mAttributes.battery.rechargeable.chargingCurrent);
     case ActiveBatChargeFaults::Id:
-        return EncodeListOfValues(encoder, BitSetToSpan(mAttributes.battery.rechargeable.activeFaults, mAttributes.battery.rechargeable.mActiveChargeFaultsBuf));
+        return EncodeListOfValues(
+            encoder,
+            BitSetToSpan(mAttributes.battery.rechargeable.activeFaults, mAttributes.battery.rechargeable.mActiveChargeFaultsBuf));
     case EndpointList::Id:
         return EncodeListOfValues(encoder, mAttributes.GetPoweredEndpoints());
     case Globals::Attributes::FeatureMap::Id:
@@ -246,36 +256,34 @@ CHIP_ERROR PowerSourceCluster::Attributes(const ConcreteClusterPath & path,
 {
     AttributeListBuilder attributeListBuilder(builder);
 
-    constexpr DataModel::AttributeEntry kOptionalAttributes[] = {
-        WiredAssessedInputVoltage::kMetadataEntry,
-        WiredAssessedInputFrequency::kMetadataEntry,
-        WiredCurrentType::kMetadataEntry,
-        WiredAssessedCurrent::kMetadataEntry,
-        WiredNominalVoltage::kMetadataEntry,
-        WiredMaximumCurrent::kMetadataEntry,
-        WiredPresent::kMetadataEntry,
-        ActiveWiredFaults::kMetadataEntry,
-        BatVoltage::kMetadataEntry,
-        BatPercentRemaining::kMetadataEntry,
-        BatTimeRemaining::kMetadataEntry,
-        BatChargeLevel::kMetadataEntry,
-        BatReplacementNeeded::kMetadataEntry,
-        BatReplaceability::kMetadataEntry,
-        BatPresent::kMetadataEntry,
-        ActiveBatFaults::kMetadataEntry,
-        BatReplacementDescription::kMetadataEntry,
-        BatCommonDesignation::kMetadataEntry,
-        BatANSIDesignation::kMetadataEntry,
-        BatIECDesignation::kMetadataEntry,
-        BatApprovedChemistry::kMetadataEntry,
-        BatCapacity::kMetadataEntry,
-        BatQuantity::kMetadataEntry,
-        BatChargeState::kMetadataEntry,
-        BatTimeToFullCharge::kMetadataEntry,
-        BatFunctionalWhileCharging::kMetadataEntry,
-        BatChargingCurrent::kMetadataEntry,
-        ActiveBatChargeFaults::kMetadataEntry
-    };
+    constexpr DataModel::AttributeEntry kOptionalAttributes[] = { WiredAssessedInputVoltage::kMetadataEntry,
+                                                                  WiredAssessedInputFrequency::kMetadataEntry,
+                                                                  WiredCurrentType::kMetadataEntry,
+                                                                  WiredAssessedCurrent::kMetadataEntry,
+                                                                  WiredNominalVoltage::kMetadataEntry,
+                                                                  WiredMaximumCurrent::kMetadataEntry,
+                                                                  WiredPresent::kMetadataEntry,
+                                                                  ActiveWiredFaults::kMetadataEntry,
+                                                                  BatVoltage::kMetadataEntry,
+                                                                  BatPercentRemaining::kMetadataEntry,
+                                                                  BatTimeRemaining::kMetadataEntry,
+                                                                  BatChargeLevel::kMetadataEntry,
+                                                                  BatReplacementNeeded::kMetadataEntry,
+                                                                  BatReplaceability::kMetadataEntry,
+                                                                  BatPresent::kMetadataEntry,
+                                                                  ActiveBatFaults::kMetadataEntry,
+                                                                  BatReplacementDescription::kMetadataEntry,
+                                                                  BatCommonDesignation::kMetadataEntry,
+                                                                  BatANSIDesignation::kMetadataEntry,
+                                                                  BatIECDesignation::kMetadataEntry,
+                                                                  BatApprovedChemistry::kMetadataEntry,
+                                                                  BatCapacity::kMetadataEntry,
+                                                                  BatQuantity::kMetadataEntry,
+                                                                  BatChargeState::kMetadataEntry,
+                                                                  BatTimeToFullCharge::kMetadataEntry,
+                                                                  BatFunctionalWhileCharging::kMetadataEntry,
+                                                                  BatChargingCurrent::kMetadataEntry,
+                                                                  ActiveBatChargeFaults::kMetadataEntry };
 
     return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(kOptionalAttributes), mOptionalAttributeSet);
 }
@@ -363,17 +371,28 @@ void PowerSourceCluster::forceOptionalAttributesValidity()
 
 // Getter implementations
 
-#define ValidateFeature(feature_name, attr_name) \
-    VerifyOrDieWithMsg(Features().Has(Feature::feature_name), Zcl, "Attempting to read attribute `" #attr_name "` when feature `" #feature_name "` is not set.");
+#define ValidateFeature(feature_name, attr_name)                                                                                   \
+    VerifyOrDieWithMsg(Features().Has(Feature::feature_name), Zcl,                                                                 \
+                       "Attempting to read attribute `" #attr_name "` when feature `" #feature_name "` is not set.");
 
-#define ValidateOptionalAttribute(attr_name) \
-    VerifyOrDieWithMsg(mOptionalAttributeSet.IsSet(attr_name::Id), Zcl, "Attempting to read attribute `" #attr_name "` when it is not specified as supported optional attribute.");
+#define ValidateOptionalAttribute(attr_name)                                                                                       \
+    VerifyOrDieWithMsg(mOptionalAttributeSet.IsSet(attr_name::Id), Zcl,                                                            \
+                       "Attempting to read attribute `" #attr_name "` when it is not specified as supported optional attribute.");
 
-inline PowerSourceCluster::PowerSourceStatusEnum PowerSourceCluster::GetStatus() const { return mAttributes.status; }
+inline PowerSourceCluster::PowerSourceStatusEnum PowerSourceCluster::GetStatus() const
+{
+    return mAttributes.status;
+}
 
-inline uint8_t PowerSourceCluster::GetOrder() const { return mAttributes.order; }
+inline uint8_t PowerSourceCluster::GetOrder() const
+{
+    return mAttributes.order;
+}
 
-inline CharSpan PowerSourceCluster::GetDescription() const { return mAttributes.GetDescription(); }
+inline CharSpan PowerSourceCluster::GetDescription() const
+{
+    return mAttributes.GetDescription();
+}
 
 inline Optional<uint32_t> PowerSourceCluster::GetWiredAssessedInputVoltage() const
 {
@@ -548,7 +567,9 @@ inline PowerSourceCluster::BatApprovedChemistryEnum PowerSourceCluster::GetBatAp
 inline uint32_t PowerSourceCluster::GetBatCapacity() const
 {
     ValidateFeature(kBattery, BatCapacity);
-    VerifyOrDieWithMsg(Features().Has(Feature::kReplaceable) || Features().Has(Feature::kRechargeable), Zcl, "Attempting to read attribute `BatCapacity` when neither feature `kReplaceable` nor feature `kRechargeable` is set.");
+    VerifyOrDieWithMsg(
+        Features().Has(Feature::kReplaceable) || Features().Has(Feature::kRechargeable), Zcl,
+        "Attempting to read attribute `BatCapacity` when neither feature `kReplaceable` nor feature `kRechargeable` is set.");
     ValidateOptionalAttribute(BatCapacity);
 
     return mAttributes.battery.capacity;
@@ -605,20 +626,23 @@ inline Span<const PowerSourceCluster::BatChargeFaultEnum> PowerSourceCluster::Ge
     return BitSetToSpan(mAttributes.battery.rechargeable.activeFaults, mAttributes.battery.rechargeable.mActiveChargeFaultsBuf);
 }
 
-inline Span<const EndpointId> PowerSourceCluster::GetEndpointList() const { return mAttributes.GetPoweredEndpoints(); }
+inline Span<const EndpointId> PowerSourceCluster::GetEndpointList() const
+{
+    return mAttributes.GetPoweredEndpoints();
+}
 
 // Setter implementations
 
 #undef ValidateFeature
 #undef ValidateOptionalAttribute
 
-#define VerifyFeatureOrReturnError(feature_name) \
+#define VerifyFeatureOrReturnError(feature_name)                                                                                   \
     VerifyOrReturnError(Features().Has(Feature::feature_name), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-#define VerifyOptionalAttributeOrReturnError(attr_name) \
+#define VerifyOptionalAttributeOrReturnError(attr_name)                                                                            \
     VerifyOrReturnError(mOptionalAttributeSet.IsSet(attr_name::Id), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-#define VerifyStringAttributeSizeOrReturnError(string_var_name, max_size) \
+#define VerifyStringAttributeSizeOrReturnError(string_var_name, max_size)                                                          \
     VerifyOrReturnError(string_var_name.size() <= max_size, CHIP_ERROR_INVALID_STRING_LENGTH);
 
 inline CHIP_ERROR PowerSourceCluster::SetStatus(PowerSourceStatusEnum val)
@@ -717,7 +741,6 @@ inline CHIP_ERROR PowerSourceCluster::AddActiveWiredFault(WiredFaultEnum val)
 
     return CHIP_NO_ERROR;
 }
-
 
 inline CHIP_ERROR PowerSourceCluster::RemoveActiveWiredFault(WiredFaultEnum val)
 {
@@ -879,7 +902,6 @@ inline CHIP_ERROR PowerSourceCluster::AddActiveBatFault(BatFaultEnum val)
     return CHIP_NO_ERROR;
 }
 
-
 inline CHIP_ERROR PowerSourceCluster::RemoveActiveBatFault(BatFaultEnum val)
 {
     VerifyFeatureOrReturnError(kBattery);
@@ -972,7 +994,8 @@ inline CHIP_ERROR PowerSourceCluster::SetActiveBatChargeFaults(Span<const BatCha
         return CHIP_NO_ERROR; // no-op if equal
     }
 
-    GenerateEvent<BatChargeFaultChange::Type>(mAttributes.battery.rechargeable.mActiveChargeFaultsBuf, mAttributes.battery.rechargeable.activeFaults, bitset);
+    GenerateEvent<BatChargeFaultChange::Type>(mAttributes.battery.rechargeable.mActiveChargeFaultsBuf,
+                                              mAttributes.battery.rechargeable.activeFaults, bitset);
 
     mAttributes.battery.rechargeable.activeFaults = bitset;
     NotifyAttributeChanged(ActiveBatChargeFaults::Id);
@@ -994,14 +1017,14 @@ inline CHIP_ERROR PowerSourceCluster::AddActiveBatChargeFault(BatChargeFaultEnum
     auto bitset = mAttributes.battery.rechargeable.activeFaults;
     bitset.set(to_underlying(val));
 
-    GenerateEvent<BatChargeFaultChange::Type>(mAttributes.battery.rechargeable.mActiveChargeFaultsBuf, mAttributes.battery.rechargeable.activeFaults, bitset);
+    GenerateEvent<BatChargeFaultChange::Type>(mAttributes.battery.rechargeable.mActiveChargeFaultsBuf,
+                                              mAttributes.battery.rechargeable.activeFaults, bitset);
 
     mAttributes.battery.rechargeable.activeFaults = bitset;
     NotifyAttributeChanged(ActiveBatChargeFaults::Id);
 
     return CHIP_NO_ERROR;
 }
-
 
 inline CHIP_ERROR PowerSourceCluster::RemoveActiveBatChargeFault(BatChargeFaultEnum val)
 {
@@ -1016,7 +1039,8 @@ inline CHIP_ERROR PowerSourceCluster::RemoveActiveBatChargeFault(BatChargeFaultE
     auto bitset = mAttributes.battery.rechargeable.activeFaults;
     bitset.set(to_underlying(val), false);
 
-    GenerateEvent<BatChargeFaultChange::Type>(mAttributes.battery.rechargeable.mActiveChargeFaultsBuf, mAttributes.battery.rechargeable.activeFaults, bitset);
+    GenerateEvent<BatChargeFaultChange::Type>(mAttributes.battery.rechargeable.mActiveChargeFaultsBuf,
+                                              mAttributes.battery.rechargeable.activeFaults, bitset);
 
     mAttributes.battery.rechargeable.activeFaults = bitset;
     NotifyAttributeChanged(ActiveBatChargeFaults::Id);
@@ -1039,7 +1063,7 @@ inline CHIP_ERROR PowerSourceCluster::SetEndpointList(Span<const EndpointId> val
     mAttributes.mPoweredEndpointsCount = val.size();
 
     std::copy(val.begin(), val.end(), mAttributes.mPoweredEndpointsBuffer.Get());
-        NotifyAttributeChanged(EndpointList::Id);
+    NotifyAttributeChanged(EndpointList::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -1049,13 +1073,8 @@ inline CHIP_ERROR PowerSourceCluster::SetDescription(CharSpan val)
 {
     VerifyStringAttributeSizeOrReturnError(val, Description::TypeInfo::MaxLength());
 
-    return SetStringAndNotify(
-        val,
-        mAttributes.GetDescription(),
-        mAttributes.mDescriptionBuffer,
-        Description::TypeInfo::MaxLength(),
-        Description::Id
-    );
+    return SetStringAndNotify(val, mAttributes.GetDescription(), mAttributes.mDescriptionBuffer, Description::TypeInfo::MaxLength(),
+                              Description::Id);
 }
 
 inline CHIP_ERROR PowerSourceCluster::SetWiredCurrentType(WiredCurrentTypeEnum val)
@@ -1099,13 +1118,9 @@ inline CHIP_ERROR PowerSourceCluster::SetBatReplacementDescription(CharSpan val)
     VerifyOptionalAttributeOrReturnError(BatReplacementDescription);
     VerifyStringAttributeSizeOrReturnError(val, BatReplacementDescription::TypeInfo::MaxLength());
 
-    return SetStringAndNotify(
-        val,
-        mAttributes.battery.replaceable.GetReplacementDescription(),
-        mAttributes.battery.replaceable.mReplacementDescriptionBuffer,
-        BatReplacementDescription::TypeInfo::MaxLength(),
-        BatReplacementDescription::Id
-    );
+    return SetStringAndNotify(val, mAttributes.battery.replaceable.GetReplacementDescription(),
+                              mAttributes.battery.replaceable.mReplacementDescriptionBuffer,
+                              BatReplacementDescription::TypeInfo::MaxLength(), BatReplacementDescription::Id);
 }
 
 inline CHIP_ERROR PowerSourceCluster::SetBatCommonDesignation(BatCommonDesignationEnum val)
@@ -1125,13 +1140,9 @@ inline CHIP_ERROR PowerSourceCluster::SetBatANSIDesignation(CharSpan val)
     VerifyOptionalAttributeOrReturnError(BatANSIDesignation);
     VerifyStringAttributeSizeOrReturnError(val, BatANSIDesignation::TypeInfo::MaxLength());
 
-    return SetStringAndNotify(
-        val,
-        mAttributes.battery.replaceable.GetANSIDesignation(),
-        mAttributes.battery.replaceable.mANSIDesignationBuffer,
-        BatANSIDesignation::TypeInfo::MaxLength(),
-        BatANSIDesignation::Id
-    );
+    return SetStringAndNotify(val, mAttributes.battery.replaceable.GetANSIDesignation(),
+                              mAttributes.battery.replaceable.mANSIDesignationBuffer, BatANSIDesignation::TypeInfo::MaxLength(),
+                              BatANSIDesignation::Id);
 }
 
 inline CHIP_ERROR PowerSourceCluster::SetBatIECDesignation(CharSpan val)
@@ -1141,13 +1152,9 @@ inline CHIP_ERROR PowerSourceCluster::SetBatIECDesignation(CharSpan val)
     VerifyOptionalAttributeOrReturnError(BatIECDesignation);
     VerifyStringAttributeSizeOrReturnError(val, BatIECDesignation::TypeInfo::MaxLength());
 
-    return SetStringAndNotify(
-        val,
-        mAttributes.battery.replaceable.GetIECDesignation(),
-        mAttributes.battery.replaceable.mIECDesignationBuffer,
-        BatIECDesignation::TypeInfo::MaxLength(),
-        BatIECDesignation::Id
-    );
+    return SetStringAndNotify(val, mAttributes.battery.replaceable.GetIECDesignation(),
+                              mAttributes.battery.replaceable.mIECDesignationBuffer, BatIECDesignation::TypeInfo::MaxLength(),
+                              BatIECDesignation::Id);
 }
 
 inline CHIP_ERROR PowerSourceCluster::SetBatApprovedChemistry(BatApprovedChemistryEnum val)
@@ -1163,7 +1170,8 @@ inline CHIP_ERROR PowerSourceCluster::SetBatApprovedChemistry(BatApprovedChemist
 inline CHIP_ERROR PowerSourceCluster::SetBatCapacity(uint32_t val)
 {
     VerifyFeatureOrReturnError(kBattery);
-    VerifyOrReturnError(Features().Has(Feature::kReplaceable) || Features().Has(Feature::kRechargeable), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(Features().Has(Feature::kReplaceable) || Features().Has(Feature::kRechargeable),
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOptionalAttributeOrReturnError(BatCapacity);
 
     SetAndNotify(mAttributes.battery.capacity, val, BatCapacity::Id);

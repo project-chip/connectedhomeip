@@ -32,8 +32,10 @@ namespace PowerSource {
 struct LazyInstance
 {
     LazyRegisteredServerCluster<PowerSourceCluster> server;
-    void Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes, const PowerSourceCluster::WiredConfiguration & config);
-    void Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes, const PowerSourceCluster::BatteryConfiguration & config);
+    void Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes,
+                const PowerSourceCluster::WiredConfiguration & config);
+    void Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes,
+                const PowerSourceCluster::BatteryConfiguration & config);
     CHIP_ERROR Register();
     CHIP_ERROR Unregister();
     PowerSourceCluster & Cluster();

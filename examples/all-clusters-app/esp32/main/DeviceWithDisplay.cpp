@@ -30,6 +30,7 @@
 #include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 #include <app/clusters/power-source-server/CodegenIntegration.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 
 #include <string>
 #include <tuple>

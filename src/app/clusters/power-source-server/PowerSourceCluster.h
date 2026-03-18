@@ -17,16 +17,16 @@
 
 #pragma once
 
+#include <algorithm>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
+#include <bitset>
 #include <clusters/PowerSource/Attributes.h>
 #include <clusters/PowerSource/Commands.h>
 #include <clusters/PowerSource/Enums.h>
 #include <clusters/PowerSource/Events.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <variant>
-#include <algorithm>
-#include <bitset>
 
 namespace chip {
 namespace app {
@@ -35,46 +35,32 @@ namespace Clusters {
 class PowerSourceCluster : public DefaultServerCluster
 {
 public:
-    using PowerSourceStatusEnum = PowerSource::PowerSourceStatusEnum;
-    using WiredCurrentTypeEnum = PowerSource::WiredCurrentTypeEnum;
-    using WiredFaultEnum = PowerSource::WiredFaultEnum;
-    using BatChargeLevelEnum = PowerSource::BatChargeLevelEnum;
-    using BatReplaceabilityEnum = PowerSource::BatReplaceabilityEnum;
-    using BatFaultEnum = PowerSource::BatFaultEnum;
+    using PowerSourceStatusEnum    = PowerSource::PowerSourceStatusEnum;
+    using WiredCurrentTypeEnum     = PowerSource::WiredCurrentTypeEnum;
+    using WiredFaultEnum           = PowerSource::WiredFaultEnum;
+    using BatChargeLevelEnum       = PowerSource::BatChargeLevelEnum;
+    using BatReplaceabilityEnum    = PowerSource::BatReplaceabilityEnum;
+    using BatFaultEnum             = PowerSource::BatFaultEnum;
     using BatCommonDesignationEnum = PowerSource::BatCommonDesignationEnum;
     using BatApprovedChemistryEnum = PowerSource::BatApprovedChemistryEnum;
-    using BatChargeStateEnum = PowerSource::BatChargeStateEnum;
-    using BatChargeFaultEnum = PowerSource::BatChargeFaultEnum;
+    using BatChargeStateEnum       = PowerSource::BatChargeStateEnum;
+    using BatChargeFaultEnum       = PowerSource::BatChargeFaultEnum;
 
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<
-        PowerSource::Attributes::WiredAssessedInputVoltage::Id,
-        PowerSource::Attributes::WiredAssessedInputFrequency::Id,
-        PowerSource::Attributes::WiredCurrentType::Id,
-        PowerSource::Attributes::WiredAssessedCurrent::Id,
-        PowerSource::Attributes::WiredNominalVoltage::Id,
-        PowerSource::Attributes::WiredMaximumCurrent::Id,
-        PowerSource::Attributes::WiredPresent::Id,
-        PowerSource::Attributes::ActiveWiredFaults::Id,
-        PowerSource::Attributes::BatVoltage::Id,
-        PowerSource::Attributes::BatPercentRemaining::Id,
-        PowerSource::Attributes::BatTimeRemaining::Id,
-        PowerSource::Attributes::BatChargeLevel::Id,
-        PowerSource::Attributes::BatReplacementNeeded::Id,
-        PowerSource::Attributes::BatReplaceability::Id,
-        PowerSource::Attributes::BatPresent::Id,
-        PowerSource::Attributes::ActiveBatFaults::Id,
-        PowerSource::Attributes::BatReplacementDescription::Id,
-        PowerSource::Attributes::BatCommonDesignation::Id,
-        PowerSource::Attributes::BatANSIDesignation::Id,
-        PowerSource::Attributes::BatIECDesignation::Id,
-        PowerSource::Attributes::BatApprovedChemistry::Id,
-        PowerSource::Attributes::BatCapacity::Id,
-        PowerSource::Attributes::BatQuantity::Id,
-        PowerSource::Attributes::BatChargeState::Id,
-        PowerSource::Attributes::BatTimeToFullCharge::Id,
-        PowerSource::Attributes::BatFunctionalWhileCharging::Id,
-        PowerSource::Attributes::BatChargingCurrent::Id,
-        PowerSource::Attributes::ActiveBatChargeFaults::Id>;
+        PowerSource::Attributes::WiredAssessedInputVoltage::Id, PowerSource::Attributes::WiredAssessedInputFrequency::Id,
+        PowerSource::Attributes::WiredCurrentType::Id, PowerSource::Attributes::WiredAssessedCurrent::Id,
+        PowerSource::Attributes::WiredNominalVoltage::Id, PowerSource::Attributes::WiredMaximumCurrent::Id,
+        PowerSource::Attributes::WiredPresent::Id, PowerSource::Attributes::ActiveWiredFaults::Id,
+        PowerSource::Attributes::BatVoltage::Id, PowerSource::Attributes::BatPercentRemaining::Id,
+        PowerSource::Attributes::BatTimeRemaining::Id, PowerSource::Attributes::BatChargeLevel::Id,
+        PowerSource::Attributes::BatReplacementNeeded::Id, PowerSource::Attributes::BatReplaceability::Id,
+        PowerSource::Attributes::BatPresent::Id, PowerSource::Attributes::ActiveBatFaults::Id,
+        PowerSource::Attributes::BatReplacementDescription::Id, PowerSource::Attributes::BatCommonDesignation::Id,
+        PowerSource::Attributes::BatANSIDesignation::Id, PowerSource::Attributes::BatIECDesignation::Id,
+        PowerSource::Attributes::BatApprovedChemistry::Id, PowerSource::Attributes::BatCapacity::Id,
+        PowerSource::Attributes::BatQuantity::Id, PowerSource::Attributes::BatChargeState::Id,
+        PowerSource::Attributes::BatTimeToFullCharge::Id, PowerSource::Attributes::BatFunctionalWhileCharging::Id,
+        PowerSource::Attributes::BatChargingCurrent::Id, PowerSource::Attributes::ActiveBatChargeFaults::Id>;
 
     struct WiredConfiguration
     {
@@ -84,9 +70,7 @@ public:
         uint32_t maximumCurrent{};
 
         // To force the user to specify these mandatory fixed attributes (taking the corresponding feature into account).
-        WiredConfiguration(CharSpan desc, WiredCurrentTypeEnum currType):
-            description(desc), currentType(currType)
-        {}
+        WiredConfiguration(CharSpan desc, WiredCurrentTypeEnum currType) : description(desc), currentType(currType) {}
     };
 
     struct BatteryConfiguration
@@ -103,15 +87,15 @@ public:
 
         // To force the user to specify mandatory fixed attributes (taking the corresponding features into account).
 
-        BatteryConfiguration(CharSpan desc, BatReplaceabilityEnum replability):
+        BatteryConfiguration(CharSpan desc, BatReplaceabilityEnum replability) :
             description(desc), replaceability(replability), replaceable(false), rechargeable(false)
         {}
 
         void MakeReplaceable(CharSpan replDescription, uint8_t quan)
         {
-            replaceable = true;
+            replaceable            = true;
             replacementDescription = replDescription;
-            quantity = quan;
+            quantity               = quan;
         }
 
         void MakeRechargeable() { rechargeable = true; }
@@ -124,13 +108,15 @@ public:
         bool rechargeable;
     };
 
-    PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet, System::Layer & systemLayer, const WiredConfiguration& config);
-    PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet, System::Layer & systemLayer, const BatteryConfiguration& config);
+    PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet, System::Layer & systemLayer,
+                       const WiredConfiguration & config);
+    PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet, System::Layer & systemLayer,
+                       const BatteryConfiguration & config);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                        AttributeValueEncoder & encoder) override;
+                                                AttributeValueEncoder & encoder) override;
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
@@ -209,7 +195,6 @@ public:
     CHIP_ERROR SetEndpointList(Span<const EndpointId> val);
 
 private:
-
     // Setters for `Fixed` attributes
 
     CHIP_ERROR SetDescription(CharSpan val);
@@ -241,7 +226,10 @@ private:
 
     struct ReplaceableBatteryAttributes
     {
-        CharSpan GetReplacementDescription() const { return CharSpan(mReplacementDescriptionBuffer, strlen(mReplacementDescriptionBuffer)); }
+        CharSpan GetReplacementDescription() const
+        {
+            return CharSpan(mReplacementDescriptionBuffer, strlen(mReplacementDescriptionBuffer));
+        }
         BatCommonDesignationEnum commonDesignation = BatCommonDesignationEnum::kUnspecified;
         CharSpan GetANSIDesignation() const { return CharSpan(mANSIDesignationBuffer, strlen(mANSIDesignationBuffer)); }
         CharSpan GetIECDesignation() const { return CharSpan(mIECDesignationBuffer, strlen(mIECDesignationBuffer)); }
@@ -249,8 +237,8 @@ private:
         uint8_t quantity{};
 
         char mReplacementDescriptionBuffer[PowerSource::Attributes::BatReplacementDescription::TypeInfo::MaxLength() + 1] = { 0 };
-        char mANSIDesignationBuffer[PowerSource::Attributes::BatANSIDesignation::TypeInfo::MaxLength() + 1] = { 0 };
-        char mIECDesignationBuffer[PowerSource::Attributes::BatIECDesignation::TypeInfo::MaxLength() + 1] = { 0 };
+        char mANSIDesignationBuffer[PowerSource::Attributes::BatANSIDesignation::TypeInfo::MaxLength() + 1]               = { 0 };
+        char mIECDesignationBuffer[PowerSource::Attributes::BatIECDesignation::TypeInfo::MaxLength() + 1]                 = { 0 };
     };
 
     struct RechargeableBatteryAttributes
@@ -287,7 +275,10 @@ private:
         PowerSourceStatusEnum status = PowerSourceStatusEnum::kUnspecified;
         uint8_t order{};
         CharSpan GetDescription() const { return CharSpan(mDescriptionBuffer, strlen(mDescriptionBuffer)); }
-        Span<const EndpointId> GetPoweredEndpoints() const { return Span<const EndpointId>(mPoweredEndpointsBuffer.Get(), mPoweredEndpointsCount); };
+        Span<const EndpointId> GetPoweredEndpoints() const
+        {
+            return Span<const EndpointId>(mPoweredEndpointsBuffer.Get(), mPoweredEndpointsCount);
+        };
 
         char mDescriptionBuffer[PowerSource::Attributes::Description::TypeInfo::MaxLength() + 1] = { 0 };
 
@@ -312,8 +303,7 @@ private:
     static inline BitFlags<PowerSource::Feature> BatteryFeatures(bool replaceable, bool rechargeable)
     {
         auto flags = BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery);
-        return flags.Set(PowerSource::Feature::kReplaceable, replaceable)
-                    .Set(PowerSource::Feature::kRechargeable, rechargeable);
+        return flags.Set(PowerSource::Feature::kReplaceable, replaceable).Set(PowerSource::Feature::kRechargeable, rechargeable);
     }
 
     void forceOptionalAttributesValidity();
@@ -328,7 +318,7 @@ private:
     }
 
     // maxSize without null byte
-    CHIP_ERROR SetStringAndNotify(CharSpan val, CharSpan current, char* buffer, size_t maxSize, AttributeId id)
+    CHIP_ERROR SetStringAndNotify(CharSpan val, CharSpan current, char * buffer, size_t maxSize, AttributeId id)
     {
         if (current.data_equal(val))
         {
@@ -354,7 +344,7 @@ private:
         return val;
     }
 
-    template<class EnumT, size_t ValCount = to_underlying(EnumT::kUnknownEnumValue)>
+    template <class EnumT, size_t ValCount = to_underlying(EnumT::kUnknownEnumValue)>
     static Span<const EnumT> BitSetToSpan(std::bitset<ValCount> bitset, EnumT * buffer)
     {
         size_t bufInd = 0;
@@ -369,16 +359,13 @@ private:
         return Span(buffer, bufInd);
     }
 
-    template<class EventT, class EnumT, size_t ValCount = to_underlying(EnumT::kUnknownEnumValue)>
-    void GenerateEvent(EnumT oldBuf[ValCount],
-                       std::bitset<ValCount> oldBitSet,
-                       std::bitset<ValCount> newBitSet)
+    template <class EventT, class EnumT, size_t ValCount = to_underlying(EnumT::kUnknownEnumValue)>
+    void GenerateEvent(EnumT oldBuf[ValCount], std::bitset<ValCount> oldBitSet, std::bitset<ValCount> newBitSet)
     {
         EnumT newBuf[ValCount];
-        Span<const EnumT> oldSpan = BitSetToSpan(oldBitSet, oldBuf),
-                          newSpan = BitSetToSpan(newBitSet, newBuf);
+        Span<const EnumT> oldSpan = BitSetToSpan(oldBitSet, oldBuf), newSpan = BitSetToSpan(newBitSet, newBuf);
 
-        EventT event_data{oldSpan, newSpan};
+        EventT event_data{ oldSpan, newSpan };
         mContext->interactionContext.eventsGenerator.GenerateEvent(event_data, mPath.mEndpointId);
     }
 
@@ -390,16 +377,16 @@ private:
     System::Layer & mSystemLayer;
 
     // notify timer stuff
-    std::atomic_bool mBatPercentRemainingNotifyTimerExpired{true};
-    std::atomic_bool mBatTimeRemainingNotifyTimerExpired{true};
-    std::atomic_bool mBatTimeToFullChargeNotifyTimerExpired{true};
+    std::atomic_bool mBatPercentRemainingNotifyTimerExpired{ true };
+    std::atomic_bool mBatTimeRemainingNotifyTimerExpired{ true };
+    std::atomic_bool mBatTimeToFullChargeNotifyTimerExpired{ true };
 
     static constexpr System::Clock::Timeout notifyTimerDuration = System::Clock::Seconds16(10);
 
     static void SetTimerExpired(System::Layer *, void * pAtomicBool)
     {
-        std::atomic_bool* p = reinterpret_cast<std::atomic_bool *>(pAtomicBool);
-        *p = true;
+        std::atomic_bool * p = reinterpret_cast<std::atomic_bool *>(pAtomicBool);
+        *p                   = true;
     }
 };
 

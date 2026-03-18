@@ -18,9 +18,9 @@
 
 #include "CodegenIntegration.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/Server.h>
 #include <app/static-cluster-config/PowerSource.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <include/platform/CHIPDeviceLayer.h>
@@ -34,7 +34,7 @@ using namespace chip::app::Clusters::PowerSource::Attributes;
 namespace {
 
 constexpr size_t kPowerSourceFixedClusterCount = PowerSource::StaticApplicationConfig::kFixedClusterConfig.size();
-constexpr size_t kPowerSourceMaxClusterCount = kPowerSourceFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kPowerSourceMaxClusterCount   = kPowerSourceFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<PowerSourceCluster> gServers[kPowerSourceMaxClusterCount];
 
@@ -101,7 +101,8 @@ public:
                 char replacementDescriptionBuffer[BatReplacementDescription::TypeInfo::MaxLength()];
                 MutableCharSpan replacementDescription(replacementDescriptionBuffer);
                 VerifyOrDie(optionalAttributeSet.IsSet(BatReplacementDescription::Id));
-                VerifyOrDie(BatReplacementDescription::Get(endpointId, replacementDescription) == InteractionModel::Status::Success);
+                VerifyOrDie(BatReplacementDescription::Get(endpointId, replacementDescription) ==
+                            InteractionModel::Status::Success);
 
                 uint8_t quantity;
                 VerifyOrDie(optionalAttributeSet.IsSet(BatQuantity::Id));
@@ -146,30 +147,32 @@ public:
 
         // Get all set defaults for attributes from ember.
 
-#define DieIfInvalidValue(expr, attr_name)\
-        {\
-            CHIP_ERROR error_val = (expr);\
-            VerifyOrDieWithMsg(error_val == CHIP_NO_ERROR || error_val == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, NotSpecified, "Unexpected error %" CHIP_ERROR_FORMAT " when trying to set attribute `" #attr_name "`.", error_val.Format());\
-        }
+#define DieIfInvalidValue(expr, attr_name)                                                                                         \
+    {                                                                                                                              \
+        CHIP_ERROR error_val = (expr);                                                                                             \
+        VerifyOrDieWithMsg(error_val == CHIP_NO_ERROR || error_val == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, NotSpecified,           \
+                           "Unexpected error %" CHIP_ERROR_FORMAT " when trying to set attribute `" #attr_name "`.",               \
+                           error_val.Format());                                                                                    \
+    }
 
-#define SetAttributeDefaultFromEmber(type, attr_name)\
-        if (type val{}; attr_name::Get(endpointId, &val) == InteractionModel::Status::Success)\
-        {\
-            DieIfInvalidValue(cluster.Set##attr_name(val), attr_name);\
-        }
+#define SetAttributeDefaultFromEmber(type, attr_name)                                                                              \
+    if (type val{}; attr_name::Get(endpointId, &val) == InteractionModel::Status::Success)                                         \
+    {                                                                                                                              \
+        DieIfInvalidValue(cluster.Set##attr_name(val), attr_name);                                                                 \
+    }
 
-#define SetNullableAttributeDefaultFromEmber(type, attr_name)\
-        if (DataModel::Nullable<type> val{}; attr_name::Get(endpointId, val) == InteractionModel::Status::Success)\
-        {\
-            if (val.IsNull())\
-            {\
-                (void) cluster.Set##attr_name(NullOptional); /* null is valid, can ignore the error */\
-            }\
-            else\
-            {\
-                DieIfInvalidValue(cluster.Set##attr_name(Optional(val.Value())), attr_name);\
-            }\
-        }
+#define SetNullableAttributeDefaultFromEmber(type, attr_name)                                                                      \
+    if (DataModel::Nullable<type> val{}; attr_name::Get(endpointId, val) == InteractionModel::Status::Success)                     \
+    {                                                                                                                              \
+        if (val.IsNull())                                                                                                          \
+        {                                                                                                                          \
+            (void) cluster.Set##attr_name(NullOptional); /* null is valid, can ignore the error */                                 \
+        }                                                                                                                          \
+        else                                                                                                                       \
+        {                                                                                                                          \
+            DieIfInvalidValue(cluster.Set##attr_name(Optional(val.Value())), attr_name);                                           \
+        }                                                                                                                          \
+    }
 
         SetAttributeDefaultFromEmber(PowerSourceCluster::PowerSourceStatusEnum, Status);
         SetAttributeDefaultFromEmber(uint8_t, Order);
@@ -240,7 +243,8 @@ void MatterPowerSourcePluginServerInitCallback() {}
 
 namespace chip::app::Clusters::PowerSource {
 
-void LazyInstance::Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes, const PowerSourceCluster::WiredConfiguration & config)
+void LazyInstance::Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes,
+                          const PowerSourceCluster::WiredConfiguration & config)
 {
     uint32_t optAttrBits{};
     for (auto attrId : optionalAttributes)
@@ -251,7 +255,8 @@ void LazyInstance::Create(EndpointId endpointId, Span<const AttributeId> optiona
     server.Create(endpointId, PowerSourceCluster::OptionalAttributeSet(optAttrBits), DeviceLayer::SystemLayer(), config);
 }
 
-void LazyInstance::Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes, const PowerSourceCluster::BatteryConfiguration & config)
+void LazyInstance::Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes,
+                          const PowerSourceCluster::BatteryConfiguration & config)
 {
     uint32_t optAttrBits{};
     for (auto attrId : optionalAttributes)

@@ -79,7 +79,7 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
                 {
                     continue;
                 }
-                order = cluster->GetOrder();
+                order            = cluster->GetOrder();
                 orderEpPair[idx] = std::make_pair(endpoint, order);
                 idx++;
             }
