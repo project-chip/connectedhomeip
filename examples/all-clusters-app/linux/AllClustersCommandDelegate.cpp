@@ -1018,7 +1018,7 @@ void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
 {
     AirQuality::Instance * airQualityInstance = AirQuality::GetInstance();
     Protocols::InteractionModel::Status status =
-        airQualityInstance->UpdateAirQuality(static_cast<AirQuality::AirQualityEnum>(aNewValue));
+        airQualityInstance->SetAirQuality(static_cast<AirQuality::AirQualityEnum>(aNewValue));
 
     if (status != Protocols::InteractionModel::Status::Success)
     {

@@ -35,7 +35,7 @@ void AirQualitySensorManager::Init()
     // Air Quality - look up the framework-created cluster
     airQualityCluster = FindClusterOnEndpoint(mEndpointId);
     VerifyOrDie(airQualityCluster != nullptr);
-    airQualityCluster->UpdateAirQuality(AirQualityEnum::kGood);
+    airQualityCluster->SetAirQuality(AirQualityEnum::kGood);
 
     // CO2
     TEMPORARY_RETURN_IGNORED carbonDioxideConcentrationMeasurementInstance.Init();

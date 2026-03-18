@@ -37,7 +37,7 @@ Protocols::InteractionModel::Status chefAirQualityWriteCallback(EndpointId endpo
     AirQualityCluster * clusterInstance = FindClusterOnEndpoint(endpoint);
     if (clusterInstance == nullptr)
     {
-        ChipLogError(DeviceLayer, "Invalid Endpoind ID: %d", endpoint);
+        ChipLogError(DeviceLayer, "Invalid Endpoint ID: %d", endpoint);
         return Protocols::InteractionModel::Status::UnsupportedEndpoint;
     }
 
@@ -47,7 +47,7 @@ Protocols::InteractionModel::Status chefAirQualityWriteCallback(EndpointId endpo
     {
     case chip::app::Clusters::AirQuality::Attributes::AirQuality::Id: {
         AirQualityEnum m                           = static_cast<AirQualityEnum>(buffer[0]);
-        Protocols::InteractionModel::Status status = clusterInstance->UpdateAirQuality(m);
+        Protocols::InteractionModel::Status status = clusterInstance->SetAirQuality(m);
         if (Protocols::InteractionModel::Status::Success == status)
         {
             break;
