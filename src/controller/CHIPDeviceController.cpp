@@ -2628,10 +2628,7 @@ CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningInfo(ReadCommissioningIn
             {
                 ChipLogProgress(Controller, "NetworkCommissioning Features: has Ethernet. endpointid = %u", path.mEndpointId);
                 info.network.eth.endpoint = path.mEndpointId;
-                if (mDefaultCommissioner == &mAutoCommissioner)
-                {
-                    mAutoCommissioner.SetNetworkSetupNeeded(false);
-                }
+                mAutoCommissioner.SetNetworkSetupNeeded(false);
             }
         }
         return CHIP_NO_ERROR;
