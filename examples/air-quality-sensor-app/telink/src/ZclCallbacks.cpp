@@ -43,4 +43,3 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                         to_underlying(AirQuality));
     }
 }
-
