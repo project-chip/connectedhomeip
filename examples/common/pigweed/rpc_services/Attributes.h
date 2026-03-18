@@ -421,11 +421,21 @@ private:
     template <typename T>
     CHIP_ERROR TlvGet(TLV::TLVReader & reader, T & value)
     {
+        if (reader.GetType() == TLV::kTLVType_Null)
+        {
+            value = {};
+            return CHIP_NO_ERROR;
+        }
         return reader.Get(value);
     }
 
     CHIP_ERROR TlvGet(TLV::TLVReader & reader, chip_rpc_AttributeData_data_bytes_t & value)
     {
+        if (reader.GetType() == TLV::kTLVType_Null)
+        {
+            value.size = 0;
+            return CHIP_NO_ERROR;
+        }
         value.size = reader.GetLength();
         return reader.GetBytes(value.bytes, sizeof(value.bytes));
     }
@@ -433,6 +443,11 @@ private:
     template <size_t N>
     CHIP_ERROR TlvGet(TLV::TLVReader & reader, char (&value)[N])
     {
+        if (reader.GetType() == TLV::kTLVType_Null)
+        {
+            memset(value, 0, N);
+            return CHIP_NO_ERROR;
+        }
         return reader.GetString(value, N);
     }
 
@@ -482,7 +497,12 @@ private:
 
     static ::pw::Status CheckTlvTagAndType(TLV::TLVReader * reader, TLV::Tag expectedTag, TLV::TLVType expectedType)
     {
-        if (reader->GetTag() != expectedTag || reader->GetType() != expectedType)
+        if (reader->GetType() == TLV::TLVType::kTLVType_Null)
+        {
+            ChipLogProgress(Support, "[Pw] Got NULL type.");
+        }
+        if (reader->GetTag() != expectedTag ||
+            (reader->GetType() != expectedType && reader->GetType() != TLV::TLVType::kTLVType_Null))
         {
             return ::pw::Status::NotFound();
         }
