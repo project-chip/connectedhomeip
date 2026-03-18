@@ -246,15 +246,14 @@ CHIP_ERROR FanControlCluster::Attributes(const ConcreteClusterPath & path,
 }
 
 CHIP_ERROR FanControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
-                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if (SupportsStep())
     {
-        static const DataModel::AcceptedCommandEntry acceptedCommands[] = {
+        static const DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
             Commands::Step::kMetadataEntry,
         };
-
-        return builder.Append(Span<const DataModel::AcceptedCommandEntry>(acceptedCommands));
+        return builder.ReferenceExisting(kAcceptedCommands);
     }
     return CHIP_NO_ERROR;
 }
