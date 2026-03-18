@@ -26,6 +26,7 @@
 #include <ota-provider-common/BdxOtaSender.h>
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 /**
@@ -60,7 +61,7 @@ public:
         uint32_t minApplicableSoftwareVersion;
         uint32_t maxApplicableSoftwareVersion;
         char otaURL[kOtaUrlMaxLen];
-        uint16_t otaFileDesignator;
+        std::string otaFileDesignator;
     };
 
     //////////// OTAProviderDelegate Implementation ///////////////
@@ -133,12 +134,12 @@ private:
     void
     SaveCommandSnapshot(const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
 
-    uint16_t AppendFilePath(const std::string & newFilePath);
+    std::string MapFileToDesignator(const std::string & filePath);
 
     BdxOtaSender mBdxOtaSender;
     std::vector<DeviceSoftwareVersionModel> mCandidates;
-    std::vector<std::string> mFilePaths;
-    uint16_t mSelectedFileDesignator = UINT16_MAX;
+    std::unordered_map<std::string, std::string> mFileDesignatorMap;
+    std::string mSelectedFileDesignator;
     char mImageUri[kUriMaxLen];
     bool mImageUriIsSupplied = false;
     OTAQueryStatus mQueryImageStatus;

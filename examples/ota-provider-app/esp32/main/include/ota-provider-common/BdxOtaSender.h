@@ -19,7 +19,7 @@
 #include <protocols/bdx/TransferFacilitator.h>
 
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 #pragma once
 
@@ -105,8 +105,8 @@ public:
      */
     const char * GetFileDesignator() const { return mFileDesignator; }
 
-    // No-op, ESP32's BdxOtaSender doesn't need to SetFilePaths since it uses a callback
-    void SetFilePaths(const std::vector<std::string> &) {}
+    // No-op, ESP32's BdxOtaSender doesn't need to SetFileDesignatorMap since it uses a callback
+    void SetFileDesignatorMap(const std::unordered_map<std::string, std::string> &) {}
 
 private:
     // Inherited from bdx::TransferFacilitator

@@ -108,24 +108,22 @@ void OTAProviderExample::SetOTAFilePath(const char * path)
 {
     if (path != nullptr)
     {
-        mFilePaths.clear();
-        AppendFilePath(path);
-        // Select the file we just appended, which has an index of 0 and thus a designator of "0"
-        mSelectedFileDesignator = 0;
-        mBdxOtaSender.SetFilePaths(mFilePaths);
+        mFileDesignatorMap.clear();
+        mSelectedFileDesignator = MapFileToDesignator(path);
+        // BdxOtaSender needs its own copy to resolve designators during transfer
+        mBdxOtaSender.SetFileDesignatorMap(mFileDesignatorMap);
     }
     else
     {
-        mFilePaths.clear();
-        mSelectedFileDesignator = UINT16_MAX;
+        mFileDesignatorMap.clear();
     }
 }
 
-uint16_t OTAProviderExample::AppendFilePath(const std::string & newFilePath)
+std::string OTAProviderExample::MapFileToDesignator(const std::string & newFilePath)
 {
-    mFilePaths.push_back(newFilePath);
-    uint16_t index = static_cast<uint16_t>(mFilePaths.size() - 1);
-    return index;
+    std::string designator         = std::to_string(mFileDesignatorMap.size());
+    mFileDesignatorMap[designator] = newFilePath;
+    return designator;
 }
 
 void OTAProviderExample::SetImageUri(const char * imageUri)
@@ -145,8 +143,7 @@ void OTAProviderExample::SetImageUri(const char * imageUri)
 void OTAProviderExample::SetOTACandidates(std::vector<OTAProviderExample::DeviceSoftwareVersionModel> candidates)
 {
     mCandidates = std::move(candidates);
-    mFilePaths.clear();
-
+    mFileDesignatorMap.clear();
     // Validate that each candidate matches the info in the image header
     for (auto & candidate : mCandidates)
     {
@@ -171,10 +168,10 @@ void OTAProviderExample::SetOTACandidates(std::vector<OTAProviderExample::Device
         }
         parser.Clear();
 
-        // Assign the file designator to the index of the appended file path
-        candidate.otaFileDesignator = AppendFilePath(candidate.otaURL);
+        // Generate a file designator for this candidate's OTA file
+        candidate.otaFileDesignator = MapFileToDesignator(candidate.otaURL);
     }
-    mBdxOtaSender.SetFilePaths(mFilePaths);
+    mBdxOtaSender.SetFileDesignatorMap(mFileDesignatorMap);
 }
 
 static bool CompareSoftwareVersions(const OTAProviderExample::DeviceSoftwareVersionModel & a,
@@ -286,18 +283,15 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
         {
             // Only supporting BDX protocol for now
 
-            // mSelectedFileDesignator is supposed to equal the index of mFilePaths
-            if (mSelectedFileDesignator >= mFilePaths.size())
+            // Validate the selected file designator before building the URI
+            if (mFileDesignatorMap.find(mSelectedFileDesignator) == mFileDesignatorMap.end())
             {
-                ChipLogError(SoftwareUpdate, "Invalid file designator: %u", mSelectedFileDesignator);
+                ChipLogError(SoftwareUpdate, "Invalid file designator: %s", mSelectedFileDesignator.c_str());
                 commandObj->AddStatus(commandPath, Status::Failure);
                 return;
             }
 
-            StringBuilder<6> designator;
-            designator.Add(static_cast<int>(mSelectedFileDesignator));
-            chip::CharSpan fileDesignatorSpan = chip::CharSpan::fromCharString(designator.c_str());
-
+            chip::CharSpan fileDesignatorSpan = chip::CharSpan::fromCharString(mSelectedFileDesignator.c_str());
             MutableCharSpan uri(mImageUri);
             CHIP_ERROR error = chip::bdx::MakeURI(nodeId, fileDesignatorSpan, uri);
             if (error != CHIP_NO_ERROR)
@@ -430,23 +424,24 @@ void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, cons
             else
             {
                 // None of the candidates matched
-                mQueryImageStatus       = OTAQueryStatus::kNotAvailable;
-                mSelectedFileDesignator = UINT16_MAX;
+                mQueryImageStatus = OTAQueryStatus::kNotAvailable;
+                mSelectedFileDesignator.clear();
             }
         }
-        else if (mFilePaths.size() == 1) // If OTA file is directly provided
+        else if (mFileDesignatorMap.size() == 1) // If OTA file is directly provided
         {
             // Parse the header and set version info based on the header
             OTAImageHeaderParser parser;
             OTAImageHeader header;
-            VerifyOrDie(ParseOTAHeader(parser, mFilePaths[0].c_str(), header) == true);
+            auto entry = mFileDesignatorMap.begin();
+            VerifyOrDie(ParseOTAHeader(parser, entry->second.c_str(), header) == true);
             VerifyOrDie(sizeof(mSoftwareVersionString) > header.mSoftwareVersionString.size());
             mSoftwareVersion = header.mSoftwareVersion;
             memcpy(mSoftwareVersionString, header.mSoftwareVersionString.data(), header.mSoftwareVersionString.size());
             parser.Clear();
 
-            // Select the only available file path, which has an index of 0 and designator of "0"
-            mSelectedFileDesignator = 0;
+            // Select the only available file path
+            mSelectedFileDesignator = entry->first;
         }
 
         // Reset the ImageURI if it is not supplied by the user since it may contain file designators that are not relevant for
@@ -535,14 +530,10 @@ void OTAProviderExample::HandleNotifyUpdateApplied(app::CommandHandler * command
 
 const char * OTAProviderExample::GetFilePathForDesignator(const char * designator) const
 {
-    uint16_t index       = 0;
-    size_t designatorLen = strlen(designator);
-
-    auto [ptr, ec] = std::from_chars(designator, designator + designatorLen, index);
-    if (ec != std::errc{} || ptr != designator + designatorLen || index >= mFilePaths.size())
+    auto it = mFileDesignatorMap.find(designator);
+    if (it == mFileDesignatorMap.end())
     {
         return nullptr;
     }
-
-    return mFilePaths[index].c_str();
+    return it->second.c_str();
 }

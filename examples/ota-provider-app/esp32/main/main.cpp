@@ -210,7 +210,8 @@ CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & block
         isEof = false;
         return CHIP_ERROR_READ_FAILED;
     }
-    ESP_LOGI(TAG, "Read %u bytes from %s", size, otaFilename);
+    ESP_LOGI(TAG, "OTA Transfer: %" PRIu32 "/%" PRIu32 " bytes (%.1f%%)", (uint32_t)(offset + size), otaImageLen,
+             (float)(offset + size) * 100 / otaImageLen);
     return CHIP_NO_ERROR;
 }
 

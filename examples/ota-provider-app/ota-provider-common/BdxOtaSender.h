@@ -19,7 +19,7 @@
 #include <protocols/bdx/TransferFacilitator.h>
 
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 #pragma once
 
@@ -33,7 +33,7 @@ public:
 
     void AbortTransfer();
 
-    void SetFilePaths(const std::vector<std::string> & filePaths) { mFilePaths = &filePaths; }
+    void SetFileDesignatorMap(const std::unordered_map<std::string, std::string> & map) { mFileDesignatorMap = map; }
 
 private:
     // Inherited from bdx::TransferFacilitator
@@ -43,9 +43,7 @@ private:
 
     // Null-terminated string representing file designator
     char mFileDesignator[chip::bdx::kMaxFileDesignatorLen];
-    const std::vector<std::string> * mFilePaths = nullptr;
-    uint16_t mSelectedFileIndex                 = UINT16_MAX;
-
+    std::unordered_map<std::string, std::string> mFileDesignatorMap;
     uint32_t mNumBytesSent = 0;
 
     bool mInitialized = false;

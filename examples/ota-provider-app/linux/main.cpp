@@ -110,7 +110,6 @@ static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
     }
     else
     {
-        uint16_t otaFileIndex = 0;
         for (const auto & iter : devSofVerModValue)
         {
             OTAProviderExample::DeviceSoftwareVersionModel candidate;
@@ -124,7 +123,6 @@ static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
             candidate.maxApplicableSoftwareVersion =
                 static_cast<uint32_t>(iter.get("maxApplicableSoftwareVersion", 1000).asUInt64());
             chip::Platform::CopyString(candidate.otaURL, iter.get("otaURL", "https://test.com").asCString());
-            candidate.otaFileDesignator = otaFileIndex++;
             candidates.push_back(candidate);
             ret = true;
         }

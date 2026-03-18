@@ -123,19 +123,14 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         memcpy(mFileDesignator, fd, fdl);
         mFileDesignator[fdl] = 0;
 
-        // Reset selected file index before processing a new file designator
-        mSelectedFileIndex = UINT16_MAX;
-
         // Select the file path to serve based on the file designator
-        uint16_t index = 0;
-        auto [ptr, ec] = std::from_chars(mFileDesignator, mFileDesignator + fdl, index);
-        if (mFilePaths == nullptr || ec != std::errc{} || ptr != (mFileDesignator + fdl) || index >= mFilePaths->size())
+        auto it = mFileDesignatorMap.find(mFileDesignator);
+        if (it == mFileDesignatorMap.end())
         {
             VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown) == CHIP_NO_ERROR,
                            ChipLogError(BDX, "AbortTransfer failed"));
             return;
         }
-        mSelectedFileIndex = index;
 
         break;
     }
@@ -167,13 +162,14 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             return;
         }
 
-        if (mFilePaths == nullptr || mSelectedFileIndex >= mFilePaths->size())
+        auto entry = mFileDesignatorMap.find(mFileDesignator);
+        if (entry == mFileDesignatorMap.end())
         {
             VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown) == CHIP_NO_ERROR,
                            ChipLogError(BDX, "AbortTransfer failed"));
             return;
         }
-        std::ifstream otaFile((*mFilePaths)[mSelectedFileIndex], std::ifstream::in);
+        std::ifstream otaFile(entry->second.c_str(), std::ifstream::in);
         if (!otaFile.good())
         {
             ChipLogError(BDX, "OTA file open failed");
@@ -256,7 +252,6 @@ void BdxOtaSender::Reset()
     mInitialized  = false;
     mNumBytesSent = 0;
     memset(mFileDesignator, 0, chip::bdx::kMaxFileDesignatorLen);
-    mSelectedFileIndex = UINT16_MAX;
 }
 
 void BdxOtaSender::AbortTransfer()
