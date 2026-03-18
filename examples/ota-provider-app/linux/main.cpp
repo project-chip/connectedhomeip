@@ -289,6 +289,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "maxBDXBlockSize", chip::ArgParser::kArgumentRequired, kOptionMaxBDXBlockSize },
     {},
 };
+
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
                              "  -a, --applyUpdateAction <proceed | awaitNextAction | discontinue>\n"
                              "        Value for the Action field in the first ApplyUpdateResponse.\n"

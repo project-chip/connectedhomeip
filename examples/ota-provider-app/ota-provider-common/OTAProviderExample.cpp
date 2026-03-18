@@ -26,10 +26,8 @@
 #include <crypto/RandUtils.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/StringBuilder.h>
 #include <protocols/bdx/BdxUri.h>
 
-#include <charconv>
 #include <fstream>
 #include <string.h>
 
@@ -116,6 +114,9 @@ void OTAProviderExample::SetOTAFilePath(const char * path)
     else
     {
         mFileDesignatorMap.clear();
+        mSelectedFileDesignator.clear();
+        // Keep BdxOtaSender's internal map in sync when clearing the path
+        mBdxOtaSender.SetFileDesignatorMap(mFileDesignatorMap);
     }
 }
 

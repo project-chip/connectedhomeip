@@ -24,7 +24,6 @@
 #include <messaging/Flags.h>
 #include <protocols/bdx/BdxTransferSession.h>
 
-#include <charconv>
 #include <fstream>
 
 using chip::bdx::StatusCode;
@@ -123,9 +122,9 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         memcpy(mFileDesignator, fd, fdl);
         mFileDesignator[fdl] = 0;
 
-        // Select the file path to serve based on the file designator
-        auto it = mFileDesignatorMap.find(mFileDesignator);
-        if (it == mFileDesignatorMap.end())
+        // Validate that the designator exists in the map
+        auto entry = mFileDesignatorMap.find(mFileDesignator);
+        if (entry == mFileDesignatorMap.end())
         {
             VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown) == CHIP_NO_ERROR,
                            ChipLogError(BDX, "AbortTransfer failed"));
