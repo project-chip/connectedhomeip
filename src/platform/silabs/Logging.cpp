@@ -109,7 +109,8 @@ size_t AddTimeStampAndPrefixStr(char * logBuffer, const char * prefix, size_t ma
     {
         return 0; // Likely a snprintf error
     }
-    return timestampLen + snprintf(logBuffer + timestampLen, maxSize - timestampLen, "%s", prefix);
+    int chWritten = snprintf(logBuffer + timestampLen, maxSize - timestampLen, "%s", prefix);
+    return (chWritten > 0) ? static_cast<size_t>(chWritten) + timestampLen : timestampLen;
 }
 size_t FormatTimestamp(char * buffer, size_t maxSize, uint64_t timestampMillis)
 {
