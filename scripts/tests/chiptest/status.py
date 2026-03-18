@@ -67,8 +67,7 @@ class PeriodicStatusThread(threading.Thread):
                 f"Iteration {current_iteration}/{iterations}: "
                 f"{successful_tests + failed_tests}/{expected_test_count} tests ({', '.join(test_status)})"
             )
-            log.info("", extra={"status": status_message})
-            self.log_counter.decrement()  # Decrement the counter to account for the log message printed by this thread.
+            log.info("", extra={"status": status_message, "count": False})
 
         log.debug("Status overview thread has stopped")
 

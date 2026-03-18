@@ -49,12 +49,6 @@ class LogMessageCounter:
             self._counter += 1
             self._cond.notify_all()
 
-    def decrement(self) -> None:
-        """Atomically decrement the shared message count."""
-        with self._cond:
-            self._counter -= 1
-            self._cond.notify_all()
-
     def cancel(self) -> None:
         """Cancel any waiting on the counter."""
         with self._cond:
@@ -100,8 +94,9 @@ class ProcessThreadTaskFilter(logging.Filter):
         if not hasattr(record, "status"):
             record.status = ""
 
-        # Count printed messages.
-        self.msg_counter.increment()
+        # Count printed messages if they're not explicitly marked to be ignored by setting the "count" attribute to False.
+        if getattr(record, "count", True):
+            self.msg_counter.increment()
 
         return True
 
