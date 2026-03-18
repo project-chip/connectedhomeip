@@ -75,7 +75,8 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
                 {
                     break;
                 }
-                if (auto * cluster = FindClusterOnEndpoint(endpoint); cluster == nullptr)
+                auto * cluster = FindClusterOnEndpoint(endpoint);
+                if (cluster == nullptr)
                 {
                     continue;
                 }
