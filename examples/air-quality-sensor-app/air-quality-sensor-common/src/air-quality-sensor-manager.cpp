@@ -9,10 +9,9 @@ using namespace chip::app::Clusters::AirQuality;
 
 void AirQualitySensorManager::Init()
 {
-    // Air Quality - look up the framework-created cluster
-    mAirQualityCluster = FindClusterOnEndpoint(mEndpointId);
-    VerifyOrDie(mAirQualityCluster != nullptr);
-    mAirQualityCluster->SetAirQuality(AirQualityEnum::kGood);
+    // Air Quality
+    TEMPORARY_RETURN_IGNORED mAirQualityInstance.Init();
+    mAirQualityInstance.UpdateAirQuality(AirQualityEnum::kGood);
 
     // CO2
     TEMPORARY_RETURN_IGNORED mCarbonDioxideConcentrationMeasurementInstance.Init();
@@ -140,12 +139,12 @@ void AirQualitySensorManager::Init()
 
 AirQualityEnum AirQualitySensorManager::GetAirQuality()
 {
-    return mAirQualityCluster->GetAirQuality();
+    return mAirQualityInstance.GetAirQuality();
 }
 
 void AirQualitySensorManager::OnAirQualityChangeHandler(AirQualityEnum newValue)
 {
-    mAirQualityCluster->SetAirQuality(newValue);
+    mAirQualityInstance.UpdateAirQuality(newValue);
     ChipLogDetail(NotSpecified, "Updated AirQuality value: %huu", chip::to_underlying(newValue));
 }
 

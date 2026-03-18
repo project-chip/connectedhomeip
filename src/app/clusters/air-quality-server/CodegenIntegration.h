@@ -19,9 +19,58 @@
 #pragma once
 
 #include <app/clusters/air-quality-server/AirQualityCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
-namespace chip::app::Clusters::AirQuality {
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace AirQuality {
 
-AirQualityCluster * FindClusterOnEndpoint(EndpointId endpointId);
+class Instance
+{
+public:
+    /**
+     * Creates an air quality cluster instance. The Init() function needs to be called for this instance to be registered and
+     * called by the interaction model at the appropriate times.
+     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aFeature The bitmask value that identifies which features are supported by this instance.
+     */
+    Instance(EndpointId aEndpointId, BitMask<Feature> aFeature);
 
-} // namespace chip::app::Clusters::AirQuality
+    ~Instance();
+
+    /**
+     * Initialises the air quality cluster instance by registering it with the data model provider.
+     * @return Returns an error if the registration fails.
+     */
+    CHIP_ERROR Init();
+
+    /**
+     * Returns true if the feature is supported.
+     * @param feature the feature to check.
+     */
+    inline bool HasFeature(Feature aFeature) const { return mCluster.Cluster().HasFeature(aFeature); }
+
+    /**
+     * Sets the AirQuality attribute.
+     * @param aNewAirQuality The value to which the AirQuality attribute is to be set.
+     * @return Returns a ConstraintError if the aNewAirQuality value is not valid. Returns Success otherwise.
+     */
+    inline Protocols::InteractionModel::Status UpdateAirQuality(AirQualityEnum aNewAirQuality)
+    {
+        return mCluster.Cluster().SetAirQuality(aNewAirQuality);
+    }
+
+    /**
+     * @return The current AirQuality enum.
+     */
+    inline AirQualityEnum GetAirQuality() { return mCluster.Cluster().GetAirQuality(); }
+
+private:
+    RegisteredServerCluster<AirQualityCluster> mCluster;
+};
+
+} // namespace AirQuality
+} // namespace Clusters
+} // namespace app
+} // namespace chip

@@ -8,25 +8,29 @@ The `AirQualityCluster` manages a single `AirQuality` attribute (enum) with
 feature-gated validation. Features (`Fair`, `Moderate`, `VeryPoor`,
 `ExtremelyPoor`) control which enum values are allowed.
 
-The framework creates cluster instances automatically via `CodegenIntegration`.
-Applications access instances using `FindClusterOnEndpoint()`.
+Applications create `AirQuality::Instance` objects and call `Init()` to register
+them with the data model provider, preserving the same API as the legacy
+`AttributeAccessInterface` implementation.
 
 ## Usage
 
-### Accessing the cluster instance
+### Creating and initializing
 
 ```cpp
-#include <app/clusters/air-quality-server/CodegenIntegration.h>
+#include <app/clusters/air-quality-server/air-quality-server.h>
 
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::AirQuality;
 
-AirQualityCluster * cluster = AirQuality::FindClusterOnEndpoint(endpointId);
+// Create with endpoint and features
+auto * instance = new Instance(endpointId, BitMask<Feature>(Feature::kFair, Feature::kModerate));
+instance->Init();
 ```
 
 ### Setting the air quality value
 
 ```cpp
-auto status = cluster->SetAirQuality(AirQuality::AirQualityEnum::kGood);
+auto status = instance->UpdateAirQuality(AirQualityEnum::kGood);
 if (status != Protocols::InteractionModel::Status::Success)
 {
     // Value rejected (feature not enabled or invalid value)
@@ -36,29 +40,15 @@ if (status != Protocols::InteractionModel::Status::Success)
 ### Reading the current value
 
 ```cpp
-AirQuality::AirQualityEnum current = cluster->GetAirQuality();
+AirQualityEnum current = instance->GetAirQuality();
 ```
 
-## Migration from Legacy API
+## Internal Architecture
 
-Previously, applications manually created instances:
-
-```cpp
-// Old pattern (no longer needed)
-AirQuality::Instance * instance = new AirQuality::Instance(endpoint, featureBits);
-instance->Init();
-instance->UpdateAirQuality(AirQuality::AirQualityEnum::kGood);
-```
-
-Now the framework manages instances. The Accessors for `AirQuality` and
-`FeatureMap` attributes are no longer available. Use the cluster API instead:
-
-```cpp
-// New pattern
-auto * cluster = AirQuality::FindClusterOnEndpoint(endpoint);
-cluster->SetAirQuality(AirQuality::AirQualityEnum::kGood);
-```
-
-`UpdateAirQuality()` is retained as a backward-compatibility alias for
-`SetAirQuality()`. The type alias `AirQuality::Instance` maps to
-`AirQualityCluster` for backward compatibility.
+- `AirQualityCluster` (in `AirQualityCluster.h`) is the code-driven cluster
+  inheriting from `DefaultServerCluster`. It handles `ReadAttribute()` and
+  attribute enumeration.
+- `AirQuality::Instance` (in `CodegenIntegration.h`) wraps `AirQualityCluster`
+  with a `RegisteredServerCluster` and provides the application-facing API.
+  `Init()` registers with `CodegenDataModelProvider`, and the destructor
+  unregisters.

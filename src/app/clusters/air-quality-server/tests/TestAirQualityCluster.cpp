@@ -40,16 +40,14 @@ struct TestAirQualityCluster : public ::testing::Test
 
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    void SetUp() override
-    {
-        airQuality.SetFeatureMap(
-            BitFlags<Feature>(Feature::kFair, Feature::kModerate, Feature::kVeryPoor, Feature::kExtremelyPoor));
-        ASSERT_EQ(airQuality.Startup(testContext.Get()), CHIP_NO_ERROR);
-    }
+    void SetUp() override { ASSERT_EQ(airQuality.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
     void TearDown() override { airQuality.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
-    TestAirQualityCluster() : airQuality(kRootEndpointId) {}
+    TestAirQualityCluster() :
+        airQuality(kRootEndpointId,
+                   BitFlags<Feature>(Feature::kFair, Feature::kModerate, Feature::kVeryPoor, Feature::kExtremelyPoor))
+    {}
 
     TestServerClusterContext testContext;
     AirQualityCluster airQuality;
@@ -65,7 +63,7 @@ struct TestAirQualityClusterNoFeatures : public ::testing::Test
 
     void TearDown() override { airQuality.Shutdown(ClusterShutdownType::kClusterShutdown); }
 
-    TestAirQualityClusterNoFeatures() : airQuality(kRootEndpointId) {}
+    TestAirQualityClusterNoFeatures() : airQuality(kRootEndpointId, BitFlags<Feature>()) {}
 
     TestServerClusterContext testContext;
     AirQualityCluster airQuality;
@@ -176,20 +174,12 @@ TEST_F(TestAirQualityClusterNoFeatures, HasFeatureReturnsFalse)
     EXPECT_FALSE(airQuality.HasFeature(Feature::kExtremelyPoor));
 }
 
-TEST_F(TestAirQualityCluster, BackwardCompatAlias)
-{
-    // UpdateAirQuality should work as an alias for SetAirQuality
-    EXPECT_EQ(airQuality.UpdateAirQuality(AirQualityEnum::kGood), Protocols::InteractionModel::Status::Success);
-    EXPECT_EQ(airQuality.GetAirQuality(), AirQualityEnum::kGood);
-}
-
 TEST_F(TestAirQualityCluster, PartialFeaturesFairOnly)
 {
     // Teardown the all-features instance and create one with only kFair
     airQuality.Shutdown(ClusterShutdownType::kClusterShutdown);
 
-    AirQualityCluster fairOnly(kRootEndpointId);
-    fairOnly.SetFeatureMap(BitFlags<Feature>(Feature::kFair));
+    AirQualityCluster fairOnly(kRootEndpointId, BitFlags<Feature>(Feature::kFair));
     ASSERT_EQ(fairOnly.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     // Fair should be accepted
@@ -226,7 +216,7 @@ TEST_F(TestAirQualityCluster, ReadAttributeAfterSet)
     EXPECT_EQ(airQualityVal, to_underlying(AirQualityEnum::kExtremelyPoor));
 }
 
-TEST_F(TestAirQualityClusterNoFeatures, FeatureMapReflectsSetFeatureMap)
+TEST_F(TestAirQualityClusterNoFeatures, FeatureMapReadsZero)
 {
     ClusterTester tester(airQuality);
 
@@ -234,10 +224,4 @@ TEST_F(TestAirQualityClusterNoFeatures, FeatureMapReflectsSetFeatureMap)
     uint32_t features{};
     ASSERT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, features), CHIP_NO_ERROR);
     EXPECT_EQ(features, 0u);
-
-    // Set a specific combination and re-read
-    airQuality.SetFeatureMap(BitFlags<Feature>(Feature::kModerate, Feature::kExtremelyPoor));
-
-    ASSERT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, features), CHIP_NO_ERROR);
-    EXPECT_EQ(features, to_underlying(Feature::kModerate) | to_underlying(Feature::kExtremelyPoor));
 }

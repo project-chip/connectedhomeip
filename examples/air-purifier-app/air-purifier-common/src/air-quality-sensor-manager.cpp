@@ -32,10 +32,9 @@ void AirQualitySensorManager::Init()
      * They are also fixed.
      */
 
-    // Air Quality - look up the framework-created cluster
-    airQualityCluster = FindClusterOnEndpoint(mEndpointId);
-    VerifyOrDie(airQualityCluster != nullptr);
-    airQualityCluster->SetAirQuality(AirQualityEnum::kGood);
+    // Air Quality
+    TEMPORARY_RETURN_IGNORED airQualityInstance.Init();
+    airQualityInstance.UpdateAirQuality(AirQualityEnum::kGood);
 
     // CO2
     TEMPORARY_RETURN_IGNORED carbonDioxideConcentrationMeasurementInstance.Init();

@@ -16,13 +16,38 @@
  */
 
 #include <air-quality-instance.h>
+#include <app/util/af-types.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AirQuality;
 
-AirQualityCluster * AirQuality::GetInstance()
+Instance * gAirQualityCluster = nullptr;
+
+Instance * AirQuality::GetInstance()
 {
-    return FindClusterOnEndpoint(1);
+    return gAirQualityCluster;
 }
 
-void AirQuality::Shutdown() {}
+void AirQuality::Shutdown()
+{
+    if (gAirQualityCluster != nullptr)
+    {
+        delete gAirQualityCluster;
+        gAirQualityCluster = nullptr;
+    }
+}
+
+void MatterAirQualityClusterInitCallback(chip::EndpointId endpointId)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(gAirQualityCluster == nullptr);
+    chip::BitMask<Feature, uint32_t> airQualityFeatures(Feature::kModerate, Feature::kFair, Feature::kVeryPoor,
+                                                        Feature::kExtremelyPoor);
+    gAirQualityCluster = new Instance(1, airQualityFeatures);
+    TEMPORARY_RETURN_IGNORED gAirQualityCluster->Init();
+}
+
+void MatterAirQualityClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    AirQuality::Shutdown();
+}

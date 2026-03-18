@@ -16,93 +16,46 @@
  *    limitations under the License.
  */
 
-#include "CodegenIntegration.h"
-#include <app/clusters/air-quality-server/AirQualityCluster.h>
-#include <app/static-cluster-config/AirQuality.h>
+#include <app/clusters/air-quality-server/CodegenIntegration.h>
 #include <app/util/attribute-storage.h>
-#include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace AirQuality {
 
-namespace {
+Instance::Instance(EndpointId aEndpointId, BitMask<Feature> aFeature) : mCluster(aEndpointId, aFeature) {}
 
-constexpr uint16_t kAirQualityFixedClusterCount =
-    static_cast<uint16_t>(Clusters::AirQuality::StaticApplicationConfig::kFixedClusterConfig.size());
-constexpr uint16_t kAirQualityMaxClusterCount = kAirQualityFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
-LazyRegisteredServerCluster<AirQualityCluster> gServers[kAirQualityMaxClusterCount];
-
-class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+Instance::~Instance()
 {
-public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
-                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
+    if (err != CHIP_NO_ERROR)
     {
-        gServers[clusterInstanceIndex].Create(endpointId);
-        gServers[clusterInstanceIndex].Cluster().SetFeatureMap(BitFlags<Clusters::AirQuality::Feature>(featureMap));
-        return gServers[clusterInstanceIndex].Registration();
+        ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
+                     mCluster.Cluster().GetPaths()[0].mEndpointId, ChipLogValueMEI(AirQuality::Id), err.Format());
     }
+}
 
-    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+CHIP_ERROR Instance::Init()
+{
+    // Check if the cluster has been selected in zap
+    VerifyOrDie(emberAfContainsServer(mCluster.Cluster().GetPaths()[0].mEndpointId, Id) == true);
+
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
+    if (err != CHIP_NO_ERROR)
     {
-        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
-        return &gServers[clusterInstanceIndex].Cluster();
+        ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
+                     mCluster.Cluster().GetPaths()[0].mEndpointId, ChipLogValueMEI(AirQuality::Id), err.Format());
     }
-
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
-};
-
-} // namespace
-
-void MatterAirQualityClusterInitCallback(EndpointId endpointId)
-{
-    IntegrationDelegate integrationDelegate;
-
-    CodegenClusterIntegration::RegisterServer(
-        {
-            .endpointId                = endpointId,
-            .clusterId                 = Clusters::AirQuality::Id,
-            .fixedClusterInstanceCount = kAirQualityFixedClusterCount,
-            .maxClusterInstanceCount   = kAirQualityMaxClusterCount,
-            .fetchFeatureMap           = true,
-            .fetchOptionalAttributes   = false,
-        },
-        integrationDelegate);
+    return err;
 }
 
-void MatterAirQualityClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
-{
-    IntegrationDelegate integrationDelegate;
 
-    CodegenClusterIntegration::UnregisterServer(
-        {
-            .endpointId                = endpointId,
-            .clusterId                 = Clusters::AirQuality::Id,
-            .fixedClusterInstanceCount = kAirQualityFixedClusterCount,
-            .maxClusterInstanceCount   = kAirQualityMaxClusterCount,
-        },
-        integrationDelegate, shutdownType);
-}
+} // namespace AirQuality
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
-namespace chip::app::Clusters::AirQuality {
-
-AirQualityCluster * FindClusterOnEndpoint(EndpointId endpointId)
-{
-    IntegrationDelegate integrationDelegate;
-
-    ServerClusterInterface * airQuality = CodegenClusterIntegration::FindClusterOnEndpoint(
-        {
-            .endpointId                = endpointId,
-            .clusterId                 = chip::app::Clusters::AirQuality::Id,
-            .fixedClusterInstanceCount = kAirQualityFixedClusterCount,
-            .maxClusterInstanceCount   = kAirQualityMaxClusterCount,
-        },
-        integrationDelegate);
-
-    return static_cast<AirQualityCluster *>(airQuality);
-}
-
-} // namespace chip::app::Clusters::AirQuality
+void __attribute__((weak)) MatterAirQualityClusterInitCallback(chip::EndpointId) {}
+void __attribute__((weak)) MatterAirQualityClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}

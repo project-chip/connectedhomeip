@@ -43,3 +43,17 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                         to_underlying(AirQuality));
     }
 }
+
+/** @brief AirQuality Cluster Init
+ *
+ * This function is called when a specific cluster is initialized. It gives the
+ * application an opportunity to take care of cluster initialization procedures.
+ * It is called exactly once for each endpoint where cluster is present.
+ *
+ * @param endpoint   Ver.: always
+ *
+ */
+void MatterAirQualityClusterInitCallback(EndpointId endpoint)
+{
+    // TODO: implement any additional Cluster Server init actions
+}

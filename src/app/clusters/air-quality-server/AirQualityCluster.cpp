@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,9 @@ namespace Clusters {
 using AirQuality::AirQualityEnum;
 using AirQuality::Feature;
 
-AirQualityCluster::AirQualityCluster(EndpointId endpointId) : DefaultServerCluster({ endpointId, AirQuality::Id }) {}
+AirQualityCluster::AirQualityCluster(EndpointId endpointId, BitFlags<Feature> features) :
+    DefaultServerCluster({ endpointId, AirQuality::Id }), mFeature(features)
+{}
 
 DataModel::ActionReturnStatus AirQualityCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                AttributeValueEncoder & encoder)
@@ -59,58 +61,37 @@ bool AirQualityCluster::HasFeature(Feature aFeature) const
 
 Protocols::InteractionModel::Status AirQualityCluster::SetAirQuality(AirQualityEnum aNewAirQuality)
 {
+    using Status = Protocols::InteractionModel::Status;
     // Check that the value is valid according to the enabled features.
     switch (aNewAirQuality)
     {
-    case AirQualityEnum::kFair: {
-        if (!HasFeature(Feature::kFair))
-        {
-            return Protocols::InteractionModel::Status::ConstraintError;
-        }
-    }
-    break;
-    case AirQualityEnum::kModerate: {
-        if (!HasFeature(Feature::kModerate))
-        {
-            return Protocols::InteractionModel::Status::ConstraintError;
-        }
-    }
-    break;
-    case AirQualityEnum::kVeryPoor: {
-        if (!HasFeature(Feature::kVeryPoor))
-        {
-            return Protocols::InteractionModel::Status::ConstraintError;
-        }
-    }
-    break;
-    case AirQualityEnum::kExtremelyPoor: {
-        if (!HasFeature(Feature::kExtremelyPoor))
-        {
-            return Protocols::InteractionModel::Status::ConstraintError;
-        }
-    }
-    break;
+    case AirQualityEnum::kFair:
+        VerifyOrReturnError(HasFeature(Feature::kFair), Status::ConstraintError);
+        break;
+    case AirQualityEnum::kModerate:
+        VerifyOrReturnError(HasFeature(Feature::kModerate), Status::ConstraintError);
+        break;
+    case AirQualityEnum::kVeryPoor:
+        VerifyOrReturnError(HasFeature(Feature::kVeryPoor), Status::ConstraintError);
+        break;
+    case AirQualityEnum::kExtremelyPoor:
+        VerifyOrReturnError(HasFeature(Feature::kExtremelyPoor), Status::ConstraintError);
+        break;
     case AirQualityEnum::kUnknown:
     case AirQualityEnum::kGood:
     case AirQualityEnum::kPoor:
         break;
-    default: {
-        return Protocols::InteractionModel::Status::InvalidValue;
-    }
+    default:
+        return Status::InvalidValue;
     }
 
     SetAttributeValue(mAirQuality, aNewAirQuality, AirQuality::Attributes::AirQuality::Id);
-    return Protocols::InteractionModel::Status::Success;
+    return Status::Success;
 }
 
 AirQualityEnum AirQualityCluster::GetAirQuality() const
 {
     return mAirQuality;
-}
-
-void AirQualityCluster::SetFeatureMap(BitFlags<Feature> features)
-{
-    mFeature = features;
 }
 
 } // namespace Clusters
