@@ -31,6 +31,7 @@ _FIELD_STYLES = coloredlogs.DEFAULT_FIELD_STYLES | {
     # the formatting in that case.
     "task": {"bold": False},
     "message": {"bold": False},
+    "status": {"color": "blue", "bold": True},
 }
 
 
@@ -96,6 +97,8 @@ class ProcessThreadTaskFilter(logging.Filter):
 
         record.process_thread = f"[{proc_thread}] " if proc_thread else ""
         record.task = f"{self.task_name}: " if self.task_name else ""
+        if not hasattr(record, "status"):
+            record.status = ""
 
         # Count printed messages.
         self.msg_counter.increment()
@@ -126,7 +129,8 @@ class LogConfig:
         if level is None:
             level = self.level_regular
 
-        fmt = ("%(asctime)s.%(msecs)03d " if self.timestamps else "") + "%(levelname)-7s %(process_thread)s%(task)s%(message)s"
+        fmt = "%(asctime)s.%(msecs)03d " if self.timestamps else ""
+        fmt += "%(levelname)-7s %(process_thread)s%(task)s%(message)s%(status)s"
 
         logger = logging.getLogger()
         coloredlogs.install(level=level, fmt=fmt, logger=logger, field_styles=_FIELD_STYLES)

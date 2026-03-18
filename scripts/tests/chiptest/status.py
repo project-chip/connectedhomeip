@@ -63,9 +63,11 @@ class PeriodicStatusThread(threading.Thread):
             if not test_status:
                 test_status.append("no tests completed")
 
-            # Style: bold, blue
-            log.info("\033[34;1mIteration %i/%i: %i/%i tests (%s)\033[0m", current_iteration, iterations,
-                     successful_tests + failed_tests, expected_test_count, ", ".join(test_status))
+            status_message = (
+                f"Iteration {current_iteration}/{iterations}: "
+                f"{successful_tests + failed_tests}/{expected_test_count} tests ({', '.join(test_status)})"
+            )
+            log.info("", extra={"status": status_message})
             self.log_counter.decrement()  # Decrement the counter to account for the log message printed by this thread.
 
         log.debug("Status overview thread has stopped")
