@@ -124,7 +124,8 @@ size_t FormatTimestamp(char * buffer, size_t maxSize, uint64_t timestampMillis)
     uint8_t minutes = totalSeconds % 60;
     uint32_t hours  = totalSeconds / 60;
 
-    return snprintf(buffer, maxSize, "[%04lu:%02u:%02u.%03u]", hours, minutes, seconds, milliseconds);
+    int chWritten = snprintf(buffer, maxSize, "[%04lu:%02u:%02u.%03u]", hours, minutes, seconds, milliseconds);
+    return (chWritten > 0) ? static_cast<size_t>(chWritten) : 0;
 }
 
 void HandleLog(const char * module, LogCategory category, const char * aFormat, va_list v)
@@ -144,7 +145,11 @@ void HandleLog(const char * module, LogCategory category, const char * aFormat, 
     if (moduleLen > 0)
     {
         // Prepend module name if available
-        prefixLen += snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "[%s] ", module);
+        int moduleNameLen = snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "[%s] ", module);
+        if (moduleNameLen > 0)
+        {
+            prefixLen += static_cast<size_t>(moduleNameLen);
+        }
     }
 
     if (prefixLen >= sizeof formattedMsg)
