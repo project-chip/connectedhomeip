@@ -42,17 +42,17 @@ struct TestPowerSourceCluster : public ::testing::Test
     TestPowerSourceCluster() {}
 
     TestServerClusterContext testContext;
-    
+
     // Call only when ALL valid optional attributes are enabled
     void TestReadAllAttributes(ClusterTester & tester, bool battery, bool replaceable = false, bool rechargeable = false)
     {
 #define Read(attr_name) { attr_name::TypeInfo::DecodableType val; EXPECT_EQ(tester.ReadAttribute(attr_name::Id, val), CHIP_NO_ERROR); }
-        
+
         Read(Status);
         Read(Order);
         Read(Description);
         Read(EndpointList);
-        
+
         if (!battery)
         {
             Read(WiredAssessedInputVoltage);
@@ -64,7 +64,7 @@ struct TestPowerSourceCluster : public ::testing::Test
             Read(WiredPresent);
             Read(ActiveWiredFaults);
         }
-        
+
         if (battery)
         {
             Read(BatVoltage);
@@ -75,7 +75,7 @@ struct TestPowerSourceCluster : public ::testing::Test
             Read(BatReplaceability);
             Read(BatPresent);
             Read(ActiveBatFaults);
-            
+
             if (replaceable)
             {
                 Read(BatReplacementDescription);
@@ -85,7 +85,7 @@ struct TestPowerSourceCluster : public ::testing::Test
                 Read(BatApprovedChemistry);
                 Read(BatQuantity);
             }
-            
+
             if (rechargeable)
             {
                 Read(BatChargeState);
@@ -110,7 +110,7 @@ struct TestPowerSourceCluster : public ::testing::Test
         cluster.GetOrder();
         cluster.GetDescription();
         cluster.GetEndpointList();
-        
+
         if (!battery)
         {
             cluster.GetWiredAssessedInputVoltage();
@@ -122,7 +122,7 @@ struct TestPowerSourceCluster : public ::testing::Test
             cluster.GetWiredPresent();
             cluster.GetActiveWiredFaults();
         }
-        
+
         if (battery)
         {
             cluster.GetBatVoltage();
@@ -133,7 +133,7 @@ struct TestPowerSourceCluster : public ::testing::Test
             cluster.GetBatReplaceability();
             cluster.GetBatPresent();
             cluster.GetActiveBatFaults();
-            
+
             if (replaceable)
             {
                 cluster.GetBatReplacementDescription();
@@ -143,7 +143,7 @@ struct TestPowerSourceCluster : public ::testing::Test
                 cluster.GetBatApprovedChemistry();
                 cluster.GetBatQuantity();
             }
-            
+
             if (rechargeable)
             {
                 cluster.GetBatChargeState();
@@ -152,7 +152,7 @@ struct TestPowerSourceCluster : public ::testing::Test
                 cluster.GetBatChargingCurrent();
                 cluster.GetActiveBatChargeFaults();
             }
-            
+
             if (replaceable || rechargeable)
             {
                 cluster.GetBatCapacity();
