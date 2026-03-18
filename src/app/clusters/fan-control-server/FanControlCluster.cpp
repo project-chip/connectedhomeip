@@ -246,7 +246,7 @@ CHIP_ERROR FanControlCluster::Attributes(const ConcreteClusterPath & path,
 }
 
 CHIP_ERROR FanControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if (SupportsStep())
     {
