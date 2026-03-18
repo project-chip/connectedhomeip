@@ -51,7 +51,6 @@ CHIP_ERROR Instance::Init()
     return err;
 }
 
-
 } // namespace AirQuality
 } // namespace Clusters
 } // namespace app

@@ -157,7 +157,7 @@ void AirQualitySensorAppAttrUpdateDelegate::OnEventCommandReceived(const char * 
     }
 
     CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork(AirQualitySensorAttrUpdateHandler::HandleCommand,
-                                                  reinterpret_cast<intptr_t>(handler));
+                                                                   reinterpret_cast<intptr_t>(handler));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to schedule work for AirQualitySensorAttrUpdateHandler: %" CHIP_ERROR_FORMAT,
