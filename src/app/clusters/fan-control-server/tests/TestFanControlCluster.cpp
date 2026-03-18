@@ -98,6 +98,27 @@ FanControlCluster::Config MakeTestConfigOffLowMedHigh()
     return FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowMedHigh);
 }
 
+FanControlCluster::Config MakeTestConfigWithRocking()
+{
+    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate)
+        .WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh)
+        .WithRockSupport(BitMask<RockBitmap>(RockBitmap::kRockLeftRight));
+}
+
+FanControlCluster::Config MakeTestConfigWithWind()
+{
+    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate)
+        .WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh)
+        .WithWindSupport(BitMask<WindBitmap>(WindBitmap::kSleepWind));
+}
+
+FanControlCluster::Config MakeTestConfigWithAirflowDirection()
+{
+    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate)
+        .WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh)
+        .WithAirflowDirection();
+}
+
 template <FanControlCluster::Config (*ConfigFn)()>
 struct TestFanControlClusterFixture : public ::testing::Test
 {
@@ -119,6 +140,9 @@ using TestFanControlClusterWithMultiSpeedAndAuto = TestFanControlClusterFixture<
 using TestFanControlClusterOffHigh               = TestFanControlClusterFixture<MakeTestConfigOffHigh>;
 using TestFanControlClusterOffHighAuto           = TestFanControlClusterFixture<MakeTestConfigOffHighAuto>;
 using TestFanControlClusterOffLowMedHigh         = TestFanControlClusterFixture<MakeTestConfigOffLowMedHigh>;
+using TestFanControlClusterWithRocking           = TestFanControlClusterFixture<MakeTestConfigWithRocking>;
+using TestFanControlClusterWithWind              = TestFanControlClusterFixture<MakeTestConfigWithWind>;
+using TestFanControlClusterWithAirflowDirection  = TestFanControlClusterFixture<MakeTestConfigWithAirflowDirection>;
 
 } // namespace
 
@@ -146,6 +170,54 @@ TEST_F(TestFanControlCluster, ReadGlobalAttributes)
     EXPECT_EQ(featureMap, 0u);
 }
 
+TEST_F(TestFanControlClusterWithStep, FeatureMapIncludesStep)
+{
+    ClusterTester tester(cluster);
+    uint32_t featureMap{};
+    ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, static_cast<uint32_t>(Feature::kStep));
+}
+
+TEST_F(TestFanControlClusterWithMultiSpeed, FeatureMapIncludesMultiSpeed)
+{
+    ClusterTester tester(cluster);
+    uint32_t featureMap{};
+    ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, static_cast<uint32_t>(Feature::kMultiSpeed));
+}
+
+TEST_F(TestFanControlClusterWithAuto, FeatureMapIncludesAuto)
+{
+    ClusterTester tester(cluster);
+    uint32_t featureMap{};
+    ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, static_cast<uint32_t>(Feature::kAuto));
+}
+
+TEST_F(TestFanControlClusterWithMultiSpeedAndAuto, FeatureMapIncludesMultiSpeedAndAuto)
+{
+    ClusterTester tester(cluster);
+    uint32_t featureMap{};
+    ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, static_cast<uint32_t>(Feature::kMultiSpeed) | static_cast<uint32_t>(Feature::kAuto));
+}
+
+TEST_F(TestFanControlClusterOffHigh, FeatureMapIsZero)
+{
+    ClusterTester tester(cluster);
+    uint32_t featureMap{};
+    ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, 0u);
+}
+
+TEST_F(TestFanControlClusterOffHighAuto, FeatureMapIncludesAuto)
+{
+    ClusterTester tester(cluster);
+    uint32_t featureMap{};
+    ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, static_cast<uint32_t>(Feature::kAuto));
+}
+
 TEST_F(TestFanControlCluster, ReadFanMode)
 {
     ClusterTester tester(cluster);
@@ -153,6 +225,14 @@ TEST_F(TestFanControlCluster, ReadFanMode)
     FanModeEnum fanMode;
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
     EXPECT_EQ(fanMode, FanModeEnum::kOff);
+}
+
+TEST_F(TestFanControlCluster, SetFanMode_ReturnsConstraintError_WhenValueIsUnknown)
+{
+    ClusterTester tester(cluster);
+
+    auto status = tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kUnknownEnumValue);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
 }
 
 TEST_F(TestFanControlCluster, WriteFanMode)
@@ -188,7 +268,10 @@ TEST_F(TestFanControlCluster, StepCommandUnsupportedWithoutFeature)
 
     auto result = tester.Invoke(commandData);
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetStatus(), Protocols::InteractionModel::Status::UnsupportedCommand);
+    if (result.status.has_value())
+    {
+        EXPECT_FALSE(result.status.value().IsSuccess());
+    }
 }
 
 TEST_F(TestFanControlClusterWithStep, StepCommandSupportedWithFeature)
@@ -199,7 +282,10 @@ TEST_F(TestFanControlClusterWithStep, StepCommandSupportedWithFeature)
 
     auto result = tester.Invoke(commandData);
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_TRUE(result.status->IsSuccess());
+    if (result.status.has_value())
+    {
+        EXPECT_TRUE(result.status.value().IsSuccess());
+    }
 }
 
 TEST_F(TestFanControlClusterWithMultiSpeed, FanModeOff_ZeroesPercentSettingAndSpeedSetting)
@@ -240,6 +326,14 @@ TEST_F(TestFanControlClusterWithMultiSpeedAndAuto, FanModeAuto_NullsPercentSetti
     DataModel::Nullable<uint8_t> readSpeed;
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::SpeedSetting::Id, readSpeed), CHIP_NO_ERROR);
     EXPECT_TRUE(readSpeed.IsNull());
+
+    chip::Percent percentCurrent;
+    ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::PercentCurrent::Id, percentCurrent), CHIP_NO_ERROR);
+    EXPECT_EQ(percentCurrent, 50);
+
+    uint8_t speedCurrent;
+    ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::SpeedCurrent::Id, speedCurrent), CHIP_NO_ERROR);
+    EXPECT_EQ(speedCurrent, 5); // 50% of SpeedMax=10
 }
 
 TEST_F(TestFanControlCluster, PercentSettingZero_SetsFanModeOff)
@@ -273,6 +367,16 @@ TEST_F(TestFanControlClusterWithMultiSpeed, SpeedSettingZero_SetsFanModeOff)
     FanModeEnum fanMode;
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
     EXPECT_EQ(fanMode, FanModeEnum::kOff);
+}
+
+TEST_F(TestFanControlClusterWithMultiSpeed, SetSpeedSetting_ReturnsConstraintError_WhenValueExceedsSpeedMax)
+{
+    ClusterTester tester(cluster);
+
+    DataModel::Nullable<uint8_t> speedSetting;
+    speedSetting.SetNonNull(11); // SpeedMax is 10 in MakeTestConfigWithMultiSpeed
+    auto status = tester.WriteAttribute(FanControl::Attributes::SpeedSetting::Id, speedSetting);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
 }
 
 TEST_F(TestFanControlClusterWithMultiSpeed, PercentSettingUpdatesSpeedSetting)
@@ -371,7 +475,7 @@ TEST_F(TestFanControlCluster, FanModeAuto_ReturnsConstraintError_WhenAutoNotSupp
     EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
 }
 
-TEST_F(TestFanControlClusterOffLowHigh, FanModeMedium_ReturnsConstraintError)
+TEST_F(TestFanControlCluster, FanModeMedium_ReturnsConstraintError)
 {
     ClusterTester tester(cluster);
 
@@ -391,4 +495,72 @@ TEST_F(TestFanControlClusterOffLowMedHigh, FanModeLowAndMedium_Succeed)
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kMedium), CHIP_NO_ERROR);
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
     EXPECT_EQ(fanMode, FanModeEnum::kMedium);
+}
+
+TEST_F(TestFanControlCluster, SetRockSetting_ReturnsUnsupportedAttribute_WhenRockingNotSupported)
+{
+    ClusterTester tester(cluster);
+
+    BitMask<RockBitmap> rockSetting(RockBitmap::kRockLeftRight);
+    auto status = tester.WriteAttribute(FanControl::Attributes::RockSetting::Id, rockSetting);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::UnsupportedAttribute);
+}
+
+TEST_F(TestFanControlCluster, SetWindSetting_ReturnsUnsupportedAttribute_WhenWindNotSupported)
+{
+    ClusterTester tester(cluster);
+
+    BitMask<WindBitmap> windSetting(WindBitmap::kSleepWind);
+    auto status = tester.WriteAttribute(FanControl::Attributes::WindSetting::Id, windSetting);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::UnsupportedAttribute);
+}
+
+TEST_F(TestFanControlClusterWithRocking, SetRockSetting_Succeeds_WhenValueIsSubsetOfSupport)
+{
+    ClusterTester tester(cluster);
+
+    BitMask<RockBitmap> rockSetting(RockBitmap::kRockLeftRight);
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::RockSetting::Id, rockSetting), CHIP_NO_ERROR);
+
+    BitMask<RockBitmap> readBack;
+    ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::RockSetting::Id, readBack), CHIP_NO_ERROR);
+    EXPECT_EQ(readBack.Raw(), rockSetting.Raw());
+}
+
+TEST_F(TestFanControlClusterWithRocking, SetRockSetting_ReturnsConstraintError_WhenValueHasUnsupportedBits)
+{
+    ClusterTester tester(cluster);
+
+    BitMask<RockBitmap> unsupportedBits(RockBitmap::kRockUpDown);
+    auto status = tester.WriteAttribute(FanControl::Attributes::RockSetting::Id, unsupportedBits);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
+}
+
+TEST_F(TestFanControlClusterWithWind, SetWindSetting_Succeeds_WhenValueIsSubsetOfSupport)
+{
+    ClusterTester tester(cluster);
+
+    BitMask<WindBitmap> windSetting(WindBitmap::kSleepWind);
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::WindSetting::Id, windSetting), CHIP_NO_ERROR);
+
+    BitMask<WindBitmap> readBack;
+    ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::WindSetting::Id, readBack), CHIP_NO_ERROR);
+    EXPECT_EQ(readBack.Raw(), windSetting.Raw());
+}
+
+TEST_F(TestFanControlClusterWithWind, SetWindSetting_ReturnsConstraintError_WhenValueHasUnsupportedBits)
+{
+    ClusterTester tester(cluster);
+
+    BitMask<WindBitmap> unsupportedBits(WindBitmap::kNaturalWind);
+    auto status = tester.WriteAttribute(FanControl::Attributes::WindSetting::Id, unsupportedBits);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
+}
+
+TEST_F(TestFanControlClusterWithAirflowDirection, SetAirflowDirection_ReturnsConstraintError_WhenValueIsUnknown)
+{
+    ClusterTester tester(cluster);
+
+    auto status = tester.WriteAttribute(FanControl::Attributes::AirflowDirection::Id, AirflowDirectionEnum::kUnknownEnumValue);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
 }

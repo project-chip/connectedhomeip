@@ -58,7 +58,7 @@ CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncode
 {
     // Return PercentSetting attribute value for now
     DataModel::Nullable<Percent> percentSetting;
-    PercentSetting::Get(mEndpoint, percentSetting);
+    FanControl::GetPercentSetting(mEndpoint, percentSetting);
     Percent ret = 0;
     if (!percentSetting.IsNull())
     {
@@ -72,7 +72,7 @@ CHIP_ERROR FanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
 {
     // Return SpeedCurrent attribute value for now
     DataModel::Nullable<uint8_t> speedSetting;
-    SpeedSetting::Get(mEndpoint, speedSetting);
+    FanControl::GetSpeedSetting(mEndpoint, speedSetting);
     uint8_t ret = 0;
     if (!speedSetting.IsNull())
     {
@@ -89,11 +89,10 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
 
     VerifyOrReturnError(aDirection != StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
-    uint8_t speedMax;
-    SpeedMax::Get(mEndpoint, &speedMax);
-
+    uint8_t speedMax = 0;
     DataModel::Nullable<uint8_t> speedSetting;
-    SpeedSetting::Get(mEndpoint, speedSetting);
+    FanControl::GetSpeedSetting(mEndpoint, speedSetting);
+    FanControl::GetSpeedMax(mEndpoint, speedMax);
 
     uint8_t newSpeedSetting = speedSetting.IsNull() ? 0 : speedSetting.Value();
 

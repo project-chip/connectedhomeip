@@ -92,10 +92,11 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
 
     VerifyOrReturnError(aDirection != FanControl::StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
-    uint8_t speedMax;
-    FanControl::Attributes::SpeedMax::Get(mEndpointId, &speedMax);
+    uint8_t speedMax = 0;
+    FanControl::GetSpeedMax(mEndpointId, speedMax);
 
-    DataModel::Nullable<uint8_t> speedSetting = GetSpeedSetting();
+    DataModel::Nullable<uint8_t> speedSetting;
+    FanControl::GetSpeedSetting(mEndpointId, speedSetting);
 
     uint8_t newSpeedSetting = speedSetting.IsNull() ? 0 : speedSetting.Value();
 
@@ -213,9 +214,12 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         // In theory these should always be NULL together or not at all, so hopefully
         // the checks for only percent.IsNull() or only speed.IsNull() are more theoretical
         // than practical.
-        DataModel::Nullable<Percent> percent = GetPercentSetting();
-        DataModel::Nullable<uint8_t> speed   = GetSpeedSetting();
-        uint8_t speedMax                     = GetSpeedMax();
+        DataModel::Nullable<Percent> percent;
+        DataModel::Nullable<uint8_t> speed;
+        uint8_t speedMax = 0;
+        FanControl::GetPercentSetting(mEndpointId, percent);
+        FanControl::GetSpeedSetting(mEndpointId, speed);
+        FanControl::GetSpeedMax(mEndpointId, speedMax);
         if (speedMax == 0)
         {
             ChipLogError(NotSpecified, "Out of bounds value for SpeedMax, setting to default (1)");
@@ -385,40 +389,21 @@ void AirPurifierManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedS
 DataModel::Nullable<uint8_t> AirPurifierManager::GetSpeedSetting()
 {
     DataModel::Nullable<uint8_t> speedSetting;
-    Status status = FanControl::Attributes::SpeedSetting::Get(mEndpointId, speedSetting);
-
-    if (status != Status::Success)
-    {
-        ChipLogError(NotSpecified, "AirPurifierManager::GetSpeedSetting: failed to get SpeedSetting attribute: %d",
-                     to_underlying(status));
-    }
-
+    FanControl::GetSpeedSetting(mEndpointId, speedSetting);
     return speedSetting;
 }
 
 DataModel::Nullable<Percent> AirPurifierManager::GetPercentSetting()
 {
     DataModel::Nullable<Percent> percentSetting;
-    Status status = FanControl::Attributes::PercentSetting::Get(mEndpointId, percentSetting);
-
-    if (status != Status::Success)
-    {
-        ChipLogError(NotSpecified, "AirPurifierManager::GetPercentSetting: failed to get PercentSetting attribute: %d",
-                     to_underlying(status));
-    }
-
+    FanControl::GetPercentSetting(mEndpointId, percentSetting);
     return percentSetting;
 }
 
 uint8_t AirPurifierManager::GetSpeedMax()
 {
     uint8_t speedMax = 1;
-    Status status    = FanControl::Attributes::SpeedMax::Get(mEndpointId, &speedMax);
-    if (status != Status::Success)
-    {
-        ChipLogError(NotSpecified, "AirPurifierManager::GetPercentSetting: failed to get SpeedMax attribute: %d",
-                     to_underlying(status));
-    }
+    FanControl::GetSpeedMax(mEndpointId, speedMax);
     return speedMax;
 }
 
