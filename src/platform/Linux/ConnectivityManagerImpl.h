@@ -323,28 +323,5 @@ private:
     NetworkStatusChangeCallback * mpStatusChangeCallback;
 };
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-inline ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
-{
-    return mWiFiAPMode;
-}
-
-inline bool ConnectivityManagerImpl::_IsWiFiAPActive()
-{
-    return mWiFiAPState == kWiFiAPState_Active;
-}
-
-inline bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled()
-{
-    return mWiFiAPMode == kWiFiAPMode_ApplicationControlled;
-}
-
-inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout()
-{
-    return mWiFiAPIdleTimeout;
-}
-
-#endif
-
 } // namespace DeviceLayer
 } // namespace chip
