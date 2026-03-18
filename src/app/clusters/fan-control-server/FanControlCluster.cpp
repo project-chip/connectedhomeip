@@ -250,8 +250,11 @@ CHIP_ERROR FanControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
 {
     if (SupportsStep())
     {
-        DataModel::AcceptedCommandEntry entry = Commands::Step::kMetadataEntry;
-        return builder.Append(entry);
+        static const DataModel::AcceptedCommandEntry acceptedCommands[] = {
+            Commands::Step::kMetadataEntry,
+        };
+
+        return builder.Append(Span<const DataModel::AcceptedCommandEntry>(acceptedCommands));
     }
     return CHIP_NO_ERROR;
 }
