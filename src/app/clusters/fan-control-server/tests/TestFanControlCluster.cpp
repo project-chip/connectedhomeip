@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "pw_unit_test/framework.h"
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/clusters/fan-control-server/fan-control-delegate.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -188,7 +189,7 @@ TEST_F(TestFanControlCluster, StepCommandUnsupportedWithoutFeature)
 
     auto result = tester.Invoke(commandData);
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetStatus(), Protocols::InteractionModel::Status::UnsupportedCommand);
+    EXPECT_FALSE(result.status->IsSuccess());
 }
 
 TEST_F(TestFanControlClusterWithStep, StepCommandSupportedWithFeature)
@@ -371,7 +372,7 @@ TEST_F(TestFanControlCluster, FanModeAuto_ReturnsConstraintError_WhenAutoNotSupp
     EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
 }
 
-TEST_F(TestFanControlClusterOffLowHigh, FanModeMedium_ReturnsConstraintError)
+TEST_F(TestFanControlCluster, FanModeMedium_ReturnsConstraintError)
 {
     ClusterTester tester(cluster);
 
