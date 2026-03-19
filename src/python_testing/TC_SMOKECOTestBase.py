@@ -24,6 +24,7 @@ from matter.testing.matter_testing import MatterBaseTest
 
 log = logging.getLogger(__name__)
 
+
 class SmokeCoBaseTest(MatterBaseTest):
 
     smokeco_cluster = Clusters.SmokeCoAlarm
@@ -31,7 +32,7 @@ class SmokeCoBaseTest(MatterBaseTest):
     async def read_smokeco_attribute_expect_success(self, attribute):
         return await self.read_single_attribute_check_success(cluster=self.smokeco_cluster, endpoint=self.get_endpoint(), attribute=attribute)
 
-    async def read_smokeco_event(self,smokeco_event):
+    async def read_smokeco_event(self, smokeco_event):
         urgent = 1
         events_response = await self.default_controller.ReadEvent(
             self.dut_node_id,
@@ -47,7 +48,7 @@ class SmokeCoBaseTest(MatterBaseTest):
             if event.Header.EventId == smokeco_event.event_id:
                 log.info(f"Event retrieved {event}")
                 smoke_alarm_event_data = event.Data
-        if smoke_alarm_event_data is None :
+        if smoke_alarm_event_data is None:
             asserts.fail(f"Failed to retrieve event for {smokeco_event}")
         return smoke_alarm_event_data
 
