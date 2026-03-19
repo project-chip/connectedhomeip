@@ -92,8 +92,12 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
 
     VerifyOrReturnError(aDirection != FanControl::StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
-    uint8_t speedMax;
-    FanControl::Attributes::SpeedMax::Get(mEndpointId, &speedMax);
+    uint8_t speedMax         = 0;
+    auto * fanControlCluster = FanControl::FindClusterOnEndpoint(mEndpointId);
+    if (fanControlCluster != nullptr)
+    {
+        speedMax = fanControlCluster->GetSpeedMax();
+    }
 
     DataModel::Nullable<uint8_t> speedSetting = GetSpeedSetting();
 
@@ -385,26 +389,21 @@ void AirPurifierManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedS
 DataModel::Nullable<uint8_t> AirPurifierManager::GetSpeedSetting()
 {
     DataModel::Nullable<uint8_t> speedSetting;
-    Status status = FanControl::Attributes::SpeedSetting::Get(mEndpointId, speedSetting);
-
-    if (status != Status::Success)
+    auto * fanControlCluster = FanControl::FindClusterOnEndpoint(mEndpointId);
+    if (fanControlCluster != nullptr)
     {
-        ChipLogError(NotSpecified, "AirPurifierManager::GetSpeedSetting: failed to get SpeedSetting attribute: %d",
-                     to_underlying(status));
+        speedSetting = fanControlCluster->GetSpeedSetting();
     }
-
     return speedSetting;
 }
 
 DataModel::Nullable<Percent> AirPurifierManager::GetPercentSetting()
 {
     DataModel::Nullable<Percent> percentSetting;
-    Status status = FanControl::Attributes::PercentSetting::Get(mEndpointId, percentSetting);
-
-    if (status != Status::Success)
+    auto * fanControlCluster = FanControl::FindClusterOnEndpoint(mEndpointId);
+    if (fanControlCluster != nullptr)
     {
-        ChipLogError(NotSpecified, "AirPurifierManager::GetPercentSetting: failed to get PercentSetting attribute: %d",
-                     to_underlying(status));
+        percentSetting = fanControlCluster->GetSpeedSetting();
     }
 
     return percentSetting;
@@ -412,12 +411,11 @@ DataModel::Nullable<Percent> AirPurifierManager::GetPercentSetting()
 
 uint8_t AirPurifierManager::GetSpeedMax()
 {
-    uint8_t speedMax = 1;
-    Status status    = FanControl::Attributes::SpeedMax::Get(mEndpointId, &speedMax);
-    if (status != Status::Success)
+    uint8_t speedMax         = 1;
+    auto * fanControlCluster = FanControl::FindClusterOnEndpoint(mEndpointId);
+    if (fanControlCluster != nullptr)
     {
-        ChipLogError(NotSpecified, "AirPurifierManager::GetPercentSetting: failed to get SpeedMax attribute: %d",
-                     to_underlying(status));
+        speedMax = fanControlCluster->GetSpeedSetting();
     }
     return speedMax;
 }
