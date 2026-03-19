@@ -148,6 +148,8 @@ TEST(TestThermostatServerPresets, SetActivePresetSuccessCallsDelegate)
 
     EXPECT_EQ(status, Status::Success);
     EXPECT_TRUE(delegate.mSetActivePresetHandleCalled);
+
+    SetDefaultDelegate(kEndpoint, nullptr);
 }
 
 } // namespace
