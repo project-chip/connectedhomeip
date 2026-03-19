@@ -20,6 +20,7 @@ This module contains classes and functions designed to handle the commissioning 
 """
 
 import logging
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, List, Optional
 
@@ -46,10 +47,12 @@ class SetupPayloadInfo:
         filter_type (discovery.FilterType): The type of filter used for discrimination. Default is `FilterType.LONG_DISCRIMINATOR`.
         filter_value (int): The value associated with the filter type. Default is `0`.
         passcode (int): A unique code or password required for setup. Default is `0`.
+        setup_code (Optional[str]): Setup code. Optional string, default None.
     """
     filter_type: discovery.FilterType = discovery.FilterType.LONG_DISCRIMINATOR
     filter_value: int = 0
     passcode: int = 0
+    setup_code: Optional[str] = None
 
 
 @dataclass
@@ -122,6 +125,199 @@ class PairingStatus:
         return str(self.exception) if self.exception else "Pairing Successful"
 
 
+class CommissioningMethod(ABC):
+    def __init__(self, dev_ctrl, node_id, info, commissioning_info, logger):
+        self.dev_ctrl = dev_ctrl
+        self.node_id = node_id
+        self.info = info
+        self.commissioning_info = commissioning_info
+        self.logger = logger
+
+    async def start(self):
+        self.dev_ctrl.ResetCommissioningParameters()
+        self._set_tc_ack_if_needed()
+
+        await self._prepare()
+        await self._find_or_establish_pase_if_needed()
+        return await self._commission()
+
+    def _set_tc_ack_if_needed(self):
+        if (
+            self.commissioning_info.tc_version_to_simulate is not None
+            and self.commissioning_info.tc_user_response_to_simulate is not None
+        ):
+            self.dev_ctrl.SetTCAcknowledgements(
+                self.commissioning_info.tc_version_to_simulate,
+                self.commissioning_info.tc_user_response_to_simulate,
+            )
+
+    async def _find_or_establish_pase_if_needed(self):
+        asserts.assert_equal(
+            self.info.filter_type,
+            DiscoveryFilterType.LONG_DISCRIMINATOR,
+            "Generic setup-code PASE flow requires a long discriminator",
+        )
+
+        setup_code = self.info.setup_code
+        if setup_code is None:
+            setup_code = self.dev_ctrl.CreateManualCode(
+                self.info.filter_value,
+                self.info.passcode,
+            )
+
+        commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
+            setupCode=setup_code,
+            nodeId=self.node_id,
+        )
+        if commissionee is None:
+            raise RuntimeError("Failed to find or establish PASE session")
+
+    @abstractmethod
+    async def _prepare(self):
+        pass
+
+    @abstractmethod
+    async def _commission(self):
+        pass
+
+
+class CommissioningNetworkOnNetwork(CommissioningMethod):
+    async def _prepare(self):
+        pass
+
+    async def _commission(self):
+        return await self.dev_ctrl.Commission(self.node_id)
+
+
+class CommissioningBleWiFi(CommissioningMethod):
+    async def _prepare(self):
+        asserts.assert_is_not_none(
+            self.commissioning_info.wifi_ssid,
+            "WiFi SSID must be provided for ble-wifi commissioning",
+        )
+        asserts.assert_is_not_none(
+            self.commissioning_info.wifi_passphrase,
+            "WiFi Passphrase must be provided for ble-wifi commissioning",
+        )
+
+        self.dev_ctrl.SetWiFiCredentials(
+            self.commissioning_info.wifi_ssid,
+            self.commissioning_info.wifi_passphrase,
+        )
+
+    async def _commission(self):
+        return await self.dev_ctrl.ConnectBLE(
+            self.info.filter_value,
+            self.info.passcode,
+            self.node_id,
+            isShortDiscriminator=(
+                self.info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR
+            )
+        )
+
+
+class CommissioningBleThread(CommissioningMethod):
+    async def _prepare(self):
+        asserts.assert_is_not_none(
+            self.commissioning_info.thread_operational_dataset,
+            "Thread dataset must be provided for ble-thread commissioning",
+        )
+
+        self.dev_ctrl.SetThreadOperationalDataset(
+            self.commissioning_info.thread_operational_dataset,
+        )
+
+    async def _commission(self):
+        return await self.dev_ctrl.ConnectBLE(
+            self.info.filter_value,
+            self.info.passcode,
+            self.node_id,
+            isShortDiscriminator=(
+                self.info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR
+            )
+        )
+
+
+class CommissioningNfcThread(CommissioningMethod):
+    async def _prepare(self):
+        asserts.assert_is_not_none(
+            self.commissioning_info.thread_operational_dataset,
+            "Thread dataset must be provided for nfc-thread commissioning",
+        )
+
+        self.dev_ctrl.SetThreadOperationalDataset(
+            self.commissioning_info.thread_operational_dataset,
+        )
+
+    async def _commission(self):
+        return await self.dev_ctrl.ConnectNFC(self.info.filter_value, self.info.passcode, self.node_id)
+
+
+class CommissioningNfcWiFi(CommissioningMethod):
+    async def _prepare(self):
+        asserts.assert_is_not_none(
+            self.commissioning_info.wifi_ssid,
+            "WiFi SSID must be provided for nfc-wifi commissioning",
+        )
+        asserts.assert_is_not_none(
+            self.commissioning_info.wifi_passphrase,
+            "WiFi Passphrase must be provided for nfc-wifi commissioning",
+        )
+
+        self.dev_ctrl.SetWiFiCredentials(
+            self.commissioning_info.wifi_ssid,
+            self.commissioning_info.wifi_passphrase,
+        )
+
+    async def _commission(self):
+        return await self.dev_ctrl.ConnectNFC(self.info.filter_value, self.info.passcode, self.node_id)
+
+
+class CommissioningThreadMeshcop(CommissioningMethod):
+    async def _prepare(self):
+        asserts.assert_is_not_none(
+            self.commissioning_info.thread_operational_dataset,
+            "Thread dataset must be provided for thread-meshcop commissioning",
+        )
+        asserts.assert_is_not_none(
+            self.commissioning_info.thread_ba_host,
+            "thread_ba_host must be provided for thread-meshcop commissioning",
+        )
+        asserts.assert_is_not_none(
+            self.commissioning_info.thread_ba_port,
+            "thread_ba_port must be provided for thread-meshcop commissioning",
+        )
+
+    async def _commission(self):
+        return await self.dev_ctrl.CommissionThreadMeshcop(
+            self.node_id,
+            self.info.passcode,
+            self.info.filter_value,
+            self.commissioning_info.thread_ba_host,
+            self.commissioning_info.thread_ba_port,
+            self.commissioning_info.thread_operational_dataset,
+        )
+
+
+class CommissioningFlow:
+    @staticmethod
+    def create(commissioning_method: str | None, dev_ctrl, node_id, info, commissioning_info, logger):
+        if commissioning_method == "on-network":
+            return CommissioningNetworkOnNetwork(dev_ctrl, node_id, info, commissioning_info, logger)
+        elif commissioning_method == "ble-wifi":
+            return CommissioningBleWiFi(dev_ctrl, node_id, info, commissioning_info, logger)
+        elif commissioning_method == "ble-thread":
+            return CommissioningBleThread(dev_ctrl, node_id, info, commissioning_info, logger)
+        elif commissioning_method == "nfc-thread":
+            return CommissioningNfcThread(dev_ctrl, node_id, info, commissioning_info, logger)
+        elif commissioning_method == "nfc-wifi":
+            return CommissioningNfcWiFi(dev_ctrl, node_id, info, commissioning_info, logger)
+        elif commissioning_method == "thread-meshcop":
+            return CommissioningThreadMeshcop(dev_ctrl, node_id, info, commissioning_info, logger)
+
+        raise ValueError(f"Invalid commissioning method {commissioning_method}")
+
+
 async def commission_device(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, info: SetupPayloadInfo, commissioning_info: CommissioningInfo
 ) -> PairingStatus:
@@ -143,124 +339,25 @@ async def commission_device(
         with storing the reason for pairing failure by storing the exception raised during commissioning process.
 
     """
-
-    if commissioning_info.tc_version_to_simulate is not None and commissioning_info.tc_user_response_to_simulate is not None:
-        LOGGER.debug(
-            f"Setting TC Acknowledgements to version {commissioning_info.tc_version_to_simulate} with user response "
-            f"{commissioning_info.tc_user_response_to_simulate}."
+    try:
+        commissioning = CommissioningFlow.create(
+            commissioning_method=commissioning_info.commissioning_method,
+            dev_ctrl=dev_ctrl,
+            node_id=node_id,
+            info=info,
+            commissioning_info=commissioning_info,
+            logger=LOGGER,
         )
-        dev_ctrl.SetTCAcknowledgements(commissioning_info.tc_version_to_simulate, commissioning_info.tc_user_response_to_simulate)
 
-    if commissioning_info.commissioning_method == "on-network":
-        try:
-            await dev_ctrl.CommissionOnNetwork(
-                nodeId=node_id, setupPinCode=info.passcode, filterType=info.filter_type, filter=info.filter_value
-            )
-            return PairingStatus()
-        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.exception("Commissioning failed")
-            return PairingStatus(exception=e)
-    elif commissioning_info.commissioning_method == "ble-wifi":
-        try:
-            asserts.assert_is_not_none(commissioning_info.wifi_ssid, "WiFi SSID must be provided for ble-wifi commissioning")
-            asserts.assert_is_not_none(commissioning_info.wifi_passphrase,
-                                       "WiFi Passphrase must be provided for ble-wifi commissioning")
-            # Type assertions to help mypy understand these are not None after the asserts
-            assert commissioning_info.wifi_ssid is not None
-            assert commissioning_info.wifi_passphrase is not None
-            await dev_ctrl.CommissionBleWiFi(
-                info.filter_value,
-                info.passcode,
-                node_id,
-                commissioning_info.wifi_ssid,
-                commissioning_info.wifi_passphrase,
-                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
-            )
-            return PairingStatus()
-        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.exception("Commissioning failed")
-            return PairingStatus(exception=e)
-    elif commissioning_info.commissioning_method == "ble-thread":
-        try:
-            asserts.assert_is_not_none(commissioning_info.thread_operational_dataset,
-                                       "Thread dataset must be provided for ble-thread commissioning")
-            # Type assertion to help mypy understand this is not None after the assert
-            assert commissioning_info.thread_operational_dataset is not None
-            await dev_ctrl.CommissionBleThread(
-                info.filter_value,
-                info.passcode,
-                node_id,
-                commissioning_info.thread_operational_dataset,
-                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
-            )
-            return PairingStatus()
-        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.exception("Commissioning failed")
-            return PairingStatus(exception=e)
-    elif commissioning_info.commissioning_method == "nfc-thread":
-        try:
-            asserts.assert_is_not_none(commissioning_info.thread_operational_dataset,
-                                       "Thread dataset must be provided for nfc-thread commissioning")
-            # Type assertion to help mypy understand this is not None after the assert
-            assert commissioning_info.thread_operational_dataset is not None
-            await dev_ctrl.CommissionNfcThread(
-                info.filter_value,
-                info.passcode,
-                node_id,
-                commissioning_info.thread_operational_dataset,
-            )
-            return PairingStatus()
-        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.exception("Commissioning failed")
-            return PairingStatus(exception=e)
-    elif commissioning_info.commissioning_method == "nfc-wifi":
-        try:
-            asserts.assert_is_not_none(commissioning_info.wifi_ssid, "WiFi SSID must be provided for nfc-wifi commissioning")
-            asserts.assert_is_not_none(commissioning_info.wifi_passphrase,
-                                       "WiFi Passphrase must be provided for nfc-wifi commissioning")
-            # Type assertion to help mypy understand this is not None after the assert
-            assert commissioning_info.wifi_ssid is not None
-            assert commissioning_info.wifi_passphrase is not None
-            await dev_ctrl.CommissionNfcWiFi(
-                info.filter_value,
-                info.passcode,
-                node_id,
-                commissioning_info.wifi_ssid,
-                commissioning_info.wifi_passphrase,
-            )
-            return PairingStatus()
-        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.exception("Commissioning failed")
-            return PairingStatus(exception=e)
-    elif commissioning_info.commissioning_method == "thread-meshcop":
-        try:
-            asserts.assert_is_not_none(commissioning_info.thread_operational_dataset,
-                                       "Thread dataset must be provided for thread-meshcop commissioning")
-            # Type assertion to help mypy understand this is not None after the assert
-            assert commissioning_info.thread_operational_dataset is not None
-            asserts.assert_is_not_none(commissioning_info.thread_ba_host,
-                                       "thread_ba_host must be provided for thread-meshcop commissioning")
-            # Type assertion to help mypy understand this is not None after the assert
-            assert commissioning_info.thread_ba_host is not None
-            asserts.assert_is_not_none(commissioning_info.thread_ba_port,
-                                       "thread_ba_port must be provided for thread-meshcop commissioning")
-            # Type assertion to help mypy understand this is not None after the assert
-            assert commissioning_info.thread_ba_port is not None
+        await commissioning.start()
+        return PairingStatus()
 
-            await dev_ctrl.CommissionThreadMeshcop(
-                node_id,
-                info.passcode,
-                info.filter_value,
-                commissioning_info.thread_ba_host,
-                commissioning_info.thread_ba_port,
-                commissioning_info.thread_operational_dataset,
-            )
-            return PairingStatus()
-        except ChipStackError as e:  # chipstack-ok: Can not use 'with' because we handle and return the exception, not assert it
-            LOGGER.exception("Commissioning failed")
-            return PairingStatus(exception=e)
-    else:
-        raise ValueError("Invalid commissioning method %s!" % commissioning_info.commissioning_method)
+    except ChipStackError as e:
+        LOGGER.exception("Commissioning failed")
+        return PairingStatus(exception=e)
+    except Exception as e:
+        LOGGER.exception("Commissioning failed")
+        return PairingStatus(exception=e)
 
 
 async def commission_devices(
@@ -301,48 +398,66 @@ def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadI
     Returns:
          List[SetupPayloadInfo]: List of Payload used by the test case
     """
-    setup_payloads = []
+    infos: List[SetupPayloadInfo] = []
+
+    manual_code_equivalents = []
+
     for qr_code in matter_test_config.qr_code_content:
         try:
-            setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
-        except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
-            asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
+            setup_payload = SetupPayload().ParseQrCode(qr_code)
 
-    manual_code_equivalents = [(s.long_discriminator >> 8, s.setup_passcode) for s in setup_payloads]
+            info = SetupPayloadInfo()
+            info.passcode = setup_payload.setup_passcode
+            info.setup_code = qr_code
+
+            if setup_payload.short_discriminator is not None:
+                info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
+                info.filter_value = setup_payload.short_discriminator
+            else:
+                info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
+                info.filter_value = setup_payload.long_discriminator
+
+            infos.append(info)
+
+            manual_code_equivalents.append(
+                (setup_payload.short_discriminator, setup_payload.setup_passcode)
+            )
+
+        except ChipStackError:
+            asserts.fail(f"QR code '{qr_code}' failed to parse properly as a Matter setup code.")
+
     for manual_code in matter_test_config.manual_code:
         try:
-            # Remove any duplicate codes - where the discriminator and passcode match a previously added QR code.
-            # This lets testers pass in the QR and equivalent manual code in order to run
-            # the DD tests with a single set of parameters
             temp_payload = SetupPayload().ParseManualPairingCode(manual_code)
+
             if (temp_payload.short_discriminator, temp_payload.setup_passcode) in manual_code_equivalents:
                 continue
-            setup_payloads.append(temp_payload)
-        except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
-            asserts.fail(
-                f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
 
-    infos = []
-    for setup_payload in setup_payloads:
-        info = SetupPayloadInfo()
-        info.passcode = setup_payload.setup_passcode
-        if setup_payload.short_discriminator is not None:
+            info = SetupPayloadInfo()
+            info.passcode = temp_payload.setup_passcode
+            info.setup_code = manual_code
             info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
-            info.filter_value = setup_payload.short_discriminator
-        else:
-            info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
-            info.filter_value = setup_payload.long_discriminator
-        infos.append(info)
+            info.filter_value = temp_payload.short_discriminator
+
+            infos.append(info)
+
+        except ChipStackError:
+            asserts.fail(
+                f"Manual code '{manual_code}' failed to parse properly as a Matter setup code. "
+                "Check that all digits are correct and length is 11 or 21 characters."
+            )
 
     num_passcodes = 0 if matter_test_config.setup_passcodes is None else len(matter_test_config.setup_passcodes)
     num_discriminators = 0 if matter_test_config.discriminators is None else len(matter_test_config.discriminators)
     asserts.assert_equal(num_passcodes, num_discriminators, "Must have same number of discriminators as passcodes")
+
     if matter_test_config.discriminators:
         for idx, discriminator in enumerate(matter_test_config.discriminators):
             info = SetupPayloadInfo()
             info.passcode = matter_test_config.setup_passcodes[idx]
             info.filter_type = DiscoveryFilterType.LONG_DISCRIMINATOR
             info.filter_value = discriminator
+            info.setup_code = None
             infos.append(info)
 
     return infos
