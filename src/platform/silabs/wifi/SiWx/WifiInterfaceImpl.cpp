@@ -800,7 +800,7 @@ sl_status_t WifiInterfaceImpl::JoinCallback(sl_wifi_event_t event, char * result
         ChipLogError(DeviceLayer, "JoinCallback: failed: 0x%lx", status);
         wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kStationConnected);
 
-        mInstance.mUseQuickJoin = (status == SL_STATUS_SI91X_NO_AP_FOUND) ? false : true; // Quick join
+        mInstance.mUseQuickJoin = !(status == SL_STATUS_SI91X_NO_AP_FOUND);
         mInstance.ScheduleConnectionAttempt();
     }
 
