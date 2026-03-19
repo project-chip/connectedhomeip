@@ -506,7 +506,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
             dataAttributePath.mEndpointId = mapping.endpoint_id;
             // Groupcast Testing
             auto & testing = Groupcast::GetTesting();
-            if (testing.IsEnabled())
+            if (testing.IsEnabled() && testing.IsFabricUnderTest(fabric))
             {
                 testing.SetGroupID(groupId);
                 testing.SetEndpointID(dataAttributePath.mEndpointId);

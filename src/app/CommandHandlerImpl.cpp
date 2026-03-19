@@ -528,7 +528,7 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
         const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
         // Groupcast Testing
         auto & testing = Groupcast::GetTesting();
-        if (testing.IsEnabled())
+        if (testing.IsEnabled() && testing.IsFabricUnderTest(fabric))
         {
             testing.SetGroupID(groupId);
             testing.SetEndpointID(mapping.endpoint_id);

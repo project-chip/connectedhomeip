@@ -1169,9 +1169,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
     iter.Release();
     // Groupcast Testing
     auto & testing = chip::Groupcast::GetTesting();
-    if (testing.IsEnabled())
+    if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
     {
-        testing.SetFabricIndex(groupContext.fabric_index);
         testing.SetGroupID(packetHeaderCopy.GetDestinationGroupId().Value());
         if (!decrypted)
         {

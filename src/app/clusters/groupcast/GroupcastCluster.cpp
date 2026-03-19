@@ -89,7 +89,7 @@ DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::R
     case Groupcast::Attributes::UsedMcastAddrCount::Id:
         return ReadUsedMcastAddrCount(request.path.mEndpointId, encoder);
     case Groupcast::Attributes::FabricUnderTest::Id:
-        return encoder.Encode(mFabricUnderTest);
+        return encoder.Encode(chip::Groupcast::GetTesting().GetFabricIndex());
     }
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
@@ -174,10 +174,9 @@ CHIP_ERROR GroupcastCluster::GeneratedCommands(const ConcreteClusterPath & path,
 
 Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Commands::GroupcastTesting::DecodableType data)
 {
-    VerifyOrReturnError(mFabricUnderTest == kUndefinedFabricIndex || mFabricUnderTest == fabricIndex, Status::ConstraintError);
+    FabricIndex fabricUnderTest = chip::Groupcast::GetTesting().GetFabricIndex();
+    VerifyOrReturnError(fabricUnderTest == kUndefinedFabricIndex || fabricUnderTest == fabricIndex, Status::ConstraintError);
 
-    auto & testing = chip::Groupcast::GetTesting();
-    testing.Clear();
     if (data.testOperation == Groupcast::GroupcastTestingEnum::kDisableTesting)
     {
         // cancel any existing GroupcastTesting timer
@@ -202,14 +201,19 @@ Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Co
 
     mTestingState = data.testOperation;
     SetFabricUnderTest(fabricIndex);
-    testing.SetEnabled(true);
-    testing.SetFabricIndex(fabricIndex);
     return Status::Success;
 }
 
 void GroupcastCluster::SetFabricUnderTest(FabricIndex fabricUnderTest)
 {
-    SetAttributeValue(mFabricUnderTest, fabricUnderTest, Groupcast::Attributes::FabricUnderTest::Id);
+    auto & testing = chip::Groupcast::GetTesting();
+    if (fabricUnderTest != testing.GetFabricIndex())
+    {
+        testing.Clear();
+        testing.SetFabricIndex(fabricUnderTest);
+        NotifyAttributeChanged(Groupcast::Attributes::FabricUnderTest::Id);
+    }
+    testing.SetEnabled(fabricUnderTest != kUndefinedFabricIndex);
 }
 
 // MembershipChangedTimer implementation
@@ -251,8 +255,6 @@ void GroupcastCluster::GroupcastTestingTimer::TimerFired()
 {
     mCluster.SetFabricUnderTest(kUndefinedFabricIndex);
     mCluster.mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
-    chip::Groupcast::GetTesting().SetEnabled(false);
-    chip::Groupcast::GetTesting().Clear();
 }
 
 CHIP_ERROR GroupcastCluster::ReadMembership(const chip::Access::SubjectDescriptor & subject, EndpointId endpoint,

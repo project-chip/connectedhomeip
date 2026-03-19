@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +37,8 @@ class Testing
 {
 public:
     /**
-     * @brief Test result enum matching GroupcastTestResultEnum from the Groupcast cluster
+     * @brief Test result enum matching GroupcastTestResultEnum from the Groupcast cluster.
+     * This cannot point to the raw code-generated type due to build deps, so it is copied for convenience.
      */
     enum Result : uint8_t
     {
@@ -87,6 +88,7 @@ public:
     uint8_t GetTestResult() const { return mTestResult; }
     Result GetTestResultEnum() const { return static_cast<Result>(mTestResult); }
     chip::FabricIndex GetFabricIndex() const { return mFabricIndex; }
+    bool IsFabricUnderTest(chip::FabricIndex fabricIndex) { return mFabricIndex == fabricIndex; }
 
     // Setters for required fields
     void SetEnabled(bool enabled) { mEnabled = enabled; }
@@ -101,27 +103,29 @@ public:
     bool HasDestinationIpAddress() const { return mDestinationIpAddressLength > 0; }
 
     /**
-     * @brief Set source IP address from Inet::IPAddress
-     * @param ipAddress IPAddress containing the IPv6 address (IPv4 addresses are stored as IPv4-mapped IPv6)
+     * @brief Set source IP address from Inet::IPAddress.
+     * @param ipAddress IPAddress containing the IPv6 address
      */
     void SetSourceIpAddress(const Inet::IPAddress & ipAddress)
     {
         if (ipAddress.IsIPv6())
         {
-            memcpy(mSourceIpAddress, ipAddress.Addr, kIPv6AddressLength);
+            uint8_t * p = mSourceIpAddress;
+            ipAddress.WriteAddress(p);
             mSourceIpAddressLength = kIPv6AddressLength;
         }
     }
 
     /**
-     * @brief Set destination IP address from Inet::IPAddress
-     * @param ipAddress IPAddress containing the IPv6 address (IPv4 addresses are stored as IPv4-mapped IPv6)
+     * @brief Set destination IP address from Inet::IPAddress.
+     * @param ipAddress IPAddress containing the IPv6 address
      */
     void SetDestinationIpAddress(const Inet::IPAddress & ipAddress)
     {
         if (ipAddress.IsIPv6())
         {
-            memcpy(mDestinationIpAddress, ipAddress.Addr, kIPv6AddressLength);
+            uint8_t * p = mDestinationIpAddress;
+            ipAddress.WriteAddress(p);
             mDestinationIpAddressLength = kIPv6AddressLength;
         }
     }
@@ -184,12 +188,11 @@ public:
         mElementID                  = chip::Optional<uint32_t>();
         mAccessAllowed              = chip::Optional<bool>();
         mTestResult                 = 0;
-        mFabricIndex                = kUndefinedFabricIndex;
     }
 
 private:
     bool mEnabled = false;
-    // IP addresses stored as IPv6 address bytes (16 bytes)
+    // IP addresses stored as IPv6 address bytes (16 bytes) in network byte order (RFC 4291)
     uint8_t mSourceIpAddress[kIPv6AddressLength];
     uint8_t mDestinationIpAddress[kIPv6AddressLength];
     size_t mSourceIpAddressLength      = 0;
