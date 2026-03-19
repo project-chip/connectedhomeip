@@ -3136,6 +3136,9 @@ endpoint 1 {
     persist  attribute systemMode default = 0x01;
     ram      attribute temperatureSetpointHold default = 0;
     ram      attribute temperatureSetpointHoldDuration;
+    ram      attribute setpointChangeSource default = 0;
+    ram      attribute setpointChangeAmount;
+    ram      attribute setpointChangeSourceTimestamp default = 0;
     callback attribute presetTypes;
     callback attribute scheduleTypes;
     ram      attribute numberOfPresets default = 0;
