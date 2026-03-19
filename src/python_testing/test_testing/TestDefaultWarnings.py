@@ -15,11 +15,8 @@
 #    limitations under the License.
 #
 
-import os
-import sys
 from typing import Callable
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import DefaultChecker as DefaultChecker
 from mobly import asserts
 

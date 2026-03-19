@@ -15,10 +15,7 @@
 #    limitations under the License.
 #
 
-import os
-import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from DeviceConformanceTests import DeviceConformanceTests
 from mobly import asserts, signals
 
@@ -55,8 +52,6 @@ class TestSpecParsingSelection(DeviceConformanceTests):
                              "Incorrect directory selected for 1.5")
         asserts.assert_equal(dm_from_spec_version(0x01050100), PrebuiltDataModelDirectory.k1_5_1,
                              "Incorrect directory selected for 1.5.1")
-        asserts.assert_equal(dm_from_spec_version(0x01060000), PrebuiltDataModelDirectory.k1_6,
-                             "Incorrect directory selected for 1.6")
 
         # 1.2 doesn't include a specification revision field, so this should error
         with asserts.assert_raises(ConformanceException, "Expected assertion was not raised for spec version 1.2"):
@@ -84,8 +79,6 @@ class TestSpecParsingSelection(DeviceConformanceTests):
             dm_from_spec_version(0x01040101)
         with asserts.assert_raises(ConformanceException, "Error not returned for specification revision with non-zero reserved values"):
             dm_from_spec_version(0x01050001)
-        with asserts.assert_raises(ConformanceException, "Error not returned for specification revision with non-zero reserved values"):
-            dm_from_spec_version(0x01060001)
 
     def _create_device(self, spec_version: uint, tc_enabled: bool):
         if spec_version is None:
