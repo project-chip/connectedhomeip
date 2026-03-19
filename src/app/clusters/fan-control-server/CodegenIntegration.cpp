@@ -133,6 +133,50 @@ FanControlCluster * FindClusterOnEndpoint(EndpointId endpointId)
     return static_cast<FanControlCluster *>(cluster);
 }
 
+Status GetFanMode(EndpointId endpointId, FanModeEnum & value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetFanMode();
+    return Status::Success;
+}
+
+Status GetPercentSetting(EndpointId endpointId, DataModel::Nullable<chip::Percent> & value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetPercentSetting();
+    return Status::Success;
+}
+
+Status GetSpeedSetting(EndpointId endpointId, DataModel::Nullable<uint8_t> & value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetSpeedSetting();
+    return Status::Success;
+}
+
+Status GetSpeedMax(EndpointId endpointId, uint8_t & value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetSpeedMax();
+    return Status::Success;
+}
+
 Status SetSpeedSetting(EndpointId endpointId, DataModel::Nullable<uint8_t> value)
 {
     FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);

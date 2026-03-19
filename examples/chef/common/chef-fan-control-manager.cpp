@@ -36,7 +36,6 @@ using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::FanControl;
-using namespace chip::app::Clusters::FanControl::Attributes;
 using Protocols::InteractionModel::Status;
 
 namespace {
@@ -94,17 +93,15 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
 
     Protocols::InteractionModel::Status status;
 
-    uint8_t speedMax;
-    status = SpeedMax::Get(mEndpoint, &speedMax);
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, Status::InvalidCommand);
-
-    uint8_t speedCurrent;
-    status = SpeedCurrent::Get(mEndpoint, &speedCurrent);
+    uint8_t speedMax = 0;
+    status           = FanControl::GetSpeedMax(mEndpoint, speedMax);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, Status::InvalidCommand);
 
     DataModel::Nullable<uint8_t> speedSetting;
-    status = SpeedSetting::Get(mEndpoint, speedSetting);
+    status = FanControl::GetSpeedSetting(mEndpoint, speedSetting);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, Status::InvalidCommand);
+
+    uint8_t speedCurrent = speedSetting.IsNull() ? 0 : speedSetting.Value();
 
     uint8_t newSpeedSetting    = speedSetting.ValueOr(0);
     uint8_t speedValue         = speedSetting.ValueOr(speedCurrent);
@@ -303,7 +300,7 @@ void ChefFanControlManager::Init()
 DataModel::Nullable<Percent> ChefFanControlManager::GetPercentSetting()
 {
     DataModel::Nullable<Percent> percentSetting;
-    Status status = FanControl::Attributes::PercentSetting::Get(mEndpoint, percentSetting);
+    Status status = FanControl::GetPercentSetting(mEndpoint, percentSetting);
 
     if (status != Status::Success)
     {
@@ -317,7 +314,7 @@ DataModel::Nullable<Percent> ChefFanControlManager::GetPercentSetting()
 DataModel::Nullable<uint8_t> ChefFanControlManager::GetSpeedSetting()
 {
     DataModel::Nullable<uint8_t> speedSetting;
-    Status status = FanControl::Attributes::SpeedSetting::Get(mEndpoint, speedSetting);
+    Status status = FanControl::GetSpeedSetting(mEndpoint, speedSetting);
 
     if (status != Status::Success)
     {
@@ -343,12 +340,12 @@ Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(EndpointId 
     ChipLogProgress(DeviceLayer, "ChefFanControlManager::OnCommand");
 
     FanControl::FanModeEnum fanMode;
-    FanControl::Attributes::FanMode::Get(endpointId, &fanMode);
+    FanControl::GetFanMode(endpointId, fanMode);
 
     if (fanMode == FanControl::FanModeEnum::kOff) // Off mode implies Speed/Percent setting values are 0. Set fan to HIGH.
     {
-        uint8_t speedMax;
-        Status status = SpeedMax::Get(mEndpoint, &speedMax);
+        uint8_t speedMax = 0;
+        Status status    = FanControl::GetSpeedMax(endpointId, speedMax);
         if (status == Status::Success)
         {
             status = FanControl::SetSpeedSetting(mEndpoint, DataModel::Nullable<uint8_t>(speedMax));
@@ -419,7 +416,7 @@ Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(EndpointId
     ChipLogProgress(DeviceLayer, "ChefFanControlManager::OffCommand");
 
     FanControl::FanModeEnum fanMode;
-    FanControl::Attributes::FanMode::Get(endpointId, &fanMode);
+    FanControl::GetFanMode(endpointId, fanMode);
 
     if (fanMode == FanControl::FanModeEnum::kOff) // Off mode implies Speed/Percent current values are 0.
     {
@@ -428,8 +425,9 @@ Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(EndpointId
 
     Status status;
 
-    uint8_t speedCurrent;
-    status = SpeedCurrent::Get(endpointId, &speedCurrent);
+    DataModel::Nullable<uint8_t> speedSetting;
+    status = FanControl::GetSpeedSetting(endpointId, speedSetting);
+    uint8_t speedCurrent = (status == Status::Success && !speedSetting.IsNull()) ? speedSetting.Value() : 0;
 
     if (status == Protocols::InteractionModel::Status::Success && speedCurrent)
     {
@@ -443,9 +441,11 @@ Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(EndpointId
         MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::SpeedCurrent::Id);
     }
 
-    uint8_t percentCurrent;
-    status = PercentCurrent::Get(endpointId, &percentCurrent);
+    DataModel::Nullable<Percent> percentSetting;
+    status = FanControl::GetPercentSetting(endpointId, percentSetting);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+
+    uint8_t percentCurrent = (!percentSetting.IsNull()) ? percentSetting.Value() : 0;
 
     if (percentCurrent)
     {

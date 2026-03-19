@@ -27,6 +27,11 @@ namespace chip::app::Clusters::FanControl {
 
 FanControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
+Protocols::InteractionModel::Status GetFanMode(EndpointId endpointId, FanModeEnum & value);
+Protocols::InteractionModel::Status GetPercentSetting(EndpointId endpointId, DataModel::Nullable<chip::Percent> & value);
+Protocols::InteractionModel::Status GetSpeedSetting(EndpointId endpointId, DataModel::Nullable<uint8_t> & value);
+Protocols::InteractionModel::Status GetSpeedMax(EndpointId endpointId, uint8_t & value);
+
 Protocols::InteractionModel::Status SetFanMode(EndpointId endpointId, FanModeEnum value);
 Protocols::InteractionModel::Status SetPercentSetting(EndpointId endpointId, DataModel::Nullable<chip::Percent> value);
 Protocols::InteractionModel::Status SetSpeedSetting(EndpointId endpointId, DataModel::Nullable<uint8_t> value);
