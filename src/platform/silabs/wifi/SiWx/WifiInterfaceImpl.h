@@ -57,7 +57,7 @@ public:
     bool IsStationConnected() override;
     bool IsStationModeEnabled() override;
     bool IsStationReady() override;
-    CHIP_ERROR TriggerDisconnection() override;
+    void TriggerDisconnection() override;
     void ClearWifiCredentials() override;
     CHIP_ERROR SetWifiCredentials(const WiFiCredentials & credentials) override;
     CHIP_ERROR GetWifiCredentials(WiFiCredentials & credentials) override;

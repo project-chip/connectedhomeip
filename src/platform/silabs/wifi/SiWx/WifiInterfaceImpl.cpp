@@ -1074,10 +1074,9 @@ bool WifiInterfaceImpl::IsStationReady()
     return wfx_rsi.dev_state.Has(WifiState::kStationInit);
 }
 
-CHIP_ERROR WifiInterfaceImpl::TriggerDisconnection()
+void WifiInterfaceImpl::TriggerDisconnection()
 {
     PostWifiPlatformEvent(WifiPlatformEvent::kStationDisconnect);
-    return CHIP_NO_ERROR;
 }
 
 void WifiInterfaceImpl::NotifyConnectivity(void)

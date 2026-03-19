@@ -238,11 +238,9 @@ public:
      *
      * @note The disconnection is not immediate. It can take a certain amount of time for the device to be in a disconnected state
      * once the function is called. When the function returns, the device might not have yet disconnected from the Wi-Fi network.
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR, disconnection request was succesfully triggered
-     *         otherwise, CHIP_ERROR_INTERNAL
+     * The implementation may only enqueue a disconnect (e.g. post an event); there is no synchronous success/failure to report.
      */
-    virtual CHIP_ERROR TriggerDisconnection() = 0;
+    virtual void TriggerDisconnection() = 0;
 
     /**
      * @brief Gets the connected access point information.
