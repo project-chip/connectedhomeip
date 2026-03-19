@@ -20,7 +20,7 @@
 #
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
-#   run1: # Runs through all tests
+#   run1: # Runs through all tests with debug mode enabled (dumps attribute data on failure)
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -29,6 +29,7 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --debug
 #     factory-reset: true
 #     quiet: true
 #   run2: # tests PASE connection using manual code (12.1 only)
@@ -185,24 +186,14 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run18: # Runs through all tests with debug mode enabled (dumps attribute data on failure)
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --debug
-#     factory-reset: true
-#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 import os
 from dataclasses import dataclass
 from typing import Any, Callable
+
+from matter.testing.device_conformance_tests import get_supersets
 
 import matter.clusters as Clusters
 import matter.clusters.ClusterObjects
@@ -215,7 +206,6 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.decorators import async_test_body
-from matter.testing.device_conformance_tests import get_supersets
 from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds,
                                                  attribute_id_type, cluster_id_type, command_id_type)
 from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation, UnknownProblemLocation
@@ -1020,14 +1010,8 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
         return [TestStep(0, "TH performs a wildcard read of all attributes and endpoints on the device"),
                 TestStep(1, "TH creates a MatterTlvJson dump of the wildcard attributes for submission to certification.")]
 
-    @async_test_body
-    async def test_TC_IDM_12_1(self):
+    def test_TC_IDM_12_1(self):
         # wildcard read - already done.
-
-        do_test_over_pase = self.user_params.get("use_pase_only", False)
-        if do_test_over_pase:
-            setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
-            await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
         self.step(0)
 
         # Create the dump
@@ -1214,7 +1198,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 if len(taglist) not in range(TAG_LIST_EP_RANGE_MIN, TAG_LIST_EP_RANGE_MAX):
                     self.fail_current_test("Number of tagList is not in the range of 1 to 6")
 
-            no_duplicate_tag = []
+            no_duplicate_tag_keys = set()
             for tag_struct in taglist:
                 self.print_step(5.1, "verifying atleast 1 NamespaceID and tag property in the taglist struct for endpoint: {endpoint_id}".format(
                     endpoint_id=endpoint_id))
@@ -1225,12 +1209,13 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 if not isinstance(tag_struct.tag, int):
                     self.fail_current_test("Atleast 1 Tag is not present")
 
-                if tag_struct.tag in no_duplicate_tag:
+                mfg_code_key = None if isinstance(tag_struct.mfgCode, Nullable) else int(tag_struct.mfgCode)
+                tag_key = (mfg_code_key, int(tag_struct.namespaceID), int(tag_struct.tag))
+                if tag_key in no_duplicate_tag_keys:
                     self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
-                                      problem="duplicate Tags found in taglist struct", spec_location="TagList")
-                    self.fail_current_test("Duplicate tag found")
-                no_duplicate_tag.append(tag_struct.tag)
-
+                                      problem=f"duplicate Tag found in taglist struct: {tag_key}", spec_location="TagList")
+                    self.fail_current_test(f"Duplicate tag found: {tag_key}")
+                no_duplicate_tag_keys.add(tag_key)
                 self.print_step(5.2, "verifying namespaceID value falls under defined namespaces for endpoint: {endpoint_id}".format(
                     endpoint_id=endpoint_id))
 
