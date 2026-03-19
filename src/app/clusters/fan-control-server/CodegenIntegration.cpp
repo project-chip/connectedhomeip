@@ -59,7 +59,7 @@ public:
         config.WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh);
 
         if (features.Has(FanControl::Feature::kMultiSpeed))
-            config.WithSpeedMax(1);
+            config.WithSpeedMax(100);
         if (features.Has(FanControl::Feature::kRocking))
             config.WithRockSupport(
                 BitMask<RockBitmap>(RockBitmap::kRockLeftRight, RockBitmap::kRockUpDown, RockBitmap::kRockRound));
