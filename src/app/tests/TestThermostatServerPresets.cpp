@@ -18,6 +18,7 @@
 
 #include "ThermostatAttrAccessTestAccess.h"
 #include <app/tests/test-ember-api.h>
+#include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
 
@@ -27,6 +28,22 @@ using namespace chip::app::Clusters::Thermostat;
 using namespace chip::Protocols::InteractionModel;
 
 namespace {
+
+class TestThermostatServerPresets : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+    }
+
+    static void TearDownTestSuite()
+    {
+        chip::DeviceLayer::PlatformMgr().Shutdown();
+        chip::Platform::MemoryShutdown();
+    }
+};
 
 class TestThermostatDelegate : public Delegate
 {
@@ -132,7 +149,7 @@ extern ThermostatAttrAccess gThermostatAttrAccess;
 
 namespace {
 
-TEST(TestThermostatServerPresets, SetActivePresetSuccessCallsDelegate)
+TEST_F(TestThermostatServerPresets, SetActivePresetSuccessCallsDelegate)
 {
     constexpr EndpointId kEndpoint = 0;
 
