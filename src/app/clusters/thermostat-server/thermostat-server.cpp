@@ -31,6 +31,8 @@
 #include <app/util/endpoint-config-api.h>
 #include <clusters/Thermostat/Metadata.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/TimeUtils.h>
+#include <system/SystemClock.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -844,17 +846,100 @@ void MatterThermostatClusterServerAttributeChangedCallback(const ConcreteAttribu
     case OccupiedCoolingSetpoint::Id:
         clearActivePreset = supportsPresets && occupied;
         EnsureDeadband(attributePath);
+        gThermostatAttrAccess.UpdateSetpointChangeAttributes(attributePath.mEndpointId, attributePath.mAttributeId);
         break;
     case UnoccupiedHeatingSetpoint::Id:
     case UnoccupiedCoolingSetpoint::Id:
         clearActivePreset = supportsPresets && !occupied;
         EnsureDeadband(attributePath);
+        gThermostatAttrAccess.UpdateSetpointChangeAttributes(attributePath.mEndpointId, attributePath.mAttributeId);
         break;
     }
     if (clearActivePreset)
     {
         ChipLogProgress(Zcl, "Setting active preset to null");
         gThermostatAttrAccess.SetActivePreset(attributePath.mEndpointId, std::nullopt);
+    }
+}
+
+void ThermostatAttrAccess::SavePreviousSetpointValue(EndpointId endpoint, AttributeId attributeId, int16_t value)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (ep < MATTER_ARRAY_SIZE(mPreviousSetpointValues))
+    {
+        mPreviousSetpointValues[ep] = { attributeId, value };
+    }
+}
+
+bool ThermostatAttrAccess::GetPreviousSetpointValue(EndpointId endpoint, AttributeId attributeId, int16_t & value)
+{
+    uint16_t ep =
+        emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (ep < MATTER_ARRAY_SIZE(mPreviousSetpointValues) && mPreviousSetpointValues[ep].attributeId == attributeId)
+    {
+        value = mPreviousSetpointValues[ep].value;
+        return true;
+    }
+    return false;
+}
+
+void ThermostatAttrAccess::UpdateSetpointChangeAttributes(EndpointId endpoint, AttributeId changedAttributeId)
+{
+    int16_t previousValue;
+    if (!GetPreviousSetpointValue(endpoint, changedAttributeId, previousValue))
+    {
+        return;
+    }
+
+    int16_t newValue = 0;
+    Status readStatus;
+    switch (changedAttributeId)
+    {
+    case OccupiedHeatingSetpoint::Id:
+        readStatus = OccupiedHeatingSetpoint::Get(endpoint, &newValue);
+        break;
+    case OccupiedCoolingSetpoint::Id:
+        readStatus = OccupiedCoolingSetpoint::Get(endpoint, &newValue);
+        break;
+    case UnoccupiedHeatingSetpoint::Id:
+        readStatus = UnoccupiedHeatingSetpoint::Get(endpoint, &newValue);
+        break;
+    case UnoccupiedCoolingSetpoint::Id:
+        readStatus = UnoccupiedCoolingSetpoint::Get(endpoint, &newValue);
+        break;
+    default:
+        return;
+    }
+
+    if (readStatus != Status::Success)
+    {
+        return;
+    }
+
+    // SetpointChangeAmount = new value − previous value
+    int16_t changeAmount = static_cast<int16_t>(newValue - previousValue);
+    SetpointChangeAmount::Set(endpoint, DataModel::MakeNullable(changeAmount));
+
+    // SetpointChangeSource: ask the delegate; default to Manual
+    auto source    = SetpointChangeSourceEnum::kManual;
+    auto * delegate = GetDelegate(endpoint);
+    if (delegate != nullptr)
+    {
+        source = delegate->GetSetpointChangeSource();
+    }
+    SetpointChangeSource::Set(endpoint, source);
+
+    // SetpointChangeSourceTimestamp: current time in Chip epoch seconds
+    System::Clock::Microseconds64 utcTime;
+    if (System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR)
+    {
+        uint64_t chipEpochMicros;
+        if (UnixEpochToChipEpochMicros(utcTime.count(), chipEpochMicros))
+        {
+            auto chipEpochSeconds = static_cast<uint32_t>(chipEpochMicros / 1000000);
+            SetpointChangeSourceTimestamp::Set(endpoint, chipEpochSeconds);
+        }
     }
 }
 
@@ -983,6 +1068,30 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
             ChipLogError(Zcl, "Error: Can not read Unoccupied Heating Setpoint");
             return Status::Failure;
         }
+
+    // Save current setpoint value before the write, so UpdateSetpointChangeAttributes()
+    // can compute the change amount after the write completes.
+    switch (attributePath.mAttributeId)
+    {
+    case OccupiedHeatingSetpoint::Id:
+        if (HeatSupported)
+            gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, OccupiedHeatingSetpoint);
+        break;
+    case OccupiedCoolingSetpoint::Id:
+        if (CoolSupported)
+            gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, OccupiedCoolingSetpoint);
+        break;
+    case UnoccupiedHeatingSetpoint::Id:
+        if (HeatSupported && OccupancySupported)
+            gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, UnoccupiedHeatingSetpoint);
+        break;
+    case UnoccupiedCoolingSetpoint::Id:
+        if (CoolSupported && OccupancySupported)
+            gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, UnoccupiedCoolingSetpoint);
+        break;
+    default:
+        break;
+    }
 
     switch (attributePath.mAttributeId)
     {

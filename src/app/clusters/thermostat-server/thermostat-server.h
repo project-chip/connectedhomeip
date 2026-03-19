@@ -56,6 +56,16 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
 
+    /**
+     * @brief Saves the current value of a setpoint attribute before it is changed, so the change
+     *        amount can be computed once the write completes.
+     *
+     * @param endpoint    The endpoint whose setpoint is about to change.
+     * @param attributeId The attribute ID of the setpoint being changed.
+     * @param value       The current (pre-change) value of the setpoint.
+     */
+    void SavePreviousSetpointValue(EndpointId endpoint, AttributeId attributeId, int16_t value);
+
 private:
     /**
      * @brief Set the Active Preset to a given preset handle, or null
@@ -234,6 +244,34 @@ private:
     };
 
     AtomicWriteSession mAtomicWriteSessions[kThermostatEndpointCount];
+
+    /**
+     * @brief Retrieves the setpoint value saved by SavePreviousSetpointValue for the given endpoint
+     *        and attribute.
+     *
+     * @param endpoint    The endpoint.
+     * @param attributeId The attribute ID to look up.
+     * @param value       Output parameter set to the saved value if found.
+     * @return true if a matching saved value was found, false otherwise.
+     */
+    bool GetPreviousSetpointValue(EndpointId endpoint, AttributeId attributeId, int16_t & value);
+
+    /**
+     * @brief Updates SetpointChangeSource, SetpointChangeAmount, and SetpointChangeSourceTimestamp
+     *        after a setpoint attribute write has completed.
+     *
+     * @param endpoint          The endpoint on which the setpoint changed.
+     * @param changedAttributeId The attribute ID of the setpoint that changed.
+     */
+    void UpdateSetpointChangeAttributes(EndpointId endpoint, AttributeId changedAttributeId);
+
+    struct PreviousSetpointValue
+    {
+        AttributeId attributeId = kInvalidAttributeId;
+        int16_t value           = 0;
+    };
+
+    PreviousSetpointValue mPreviousSetpointValues[kThermostatEndpointCount];
 };
 
 /**

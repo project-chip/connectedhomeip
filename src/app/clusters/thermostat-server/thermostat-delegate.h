@@ -234,6 +234,16 @@ public:
      */
     virtual CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) = 0;
 
+    /**
+     * @brief Get the source of the last setpoint change.
+     *
+     * Override this method to return Schedule or External when the setpoint is
+     * changed by a schedule or an external source rather than a manual user action.
+     *
+     * @return The source of the last setpoint change (default: Manual).
+     */
+    virtual SetpointChangeSourceEnum GetSetpointChangeSource() { return SetpointChangeSourceEnum::kManual; }
+
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
     // This should be removed once #39949 is fixed.
