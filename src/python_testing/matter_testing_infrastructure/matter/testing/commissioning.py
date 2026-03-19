@@ -126,12 +126,11 @@ class PairingStatus:
 
 
 class CommissioningMethod(ABC):
-    def __init__(self, dev_ctrl, node_id, info, commissioning_info, logger):
+    def __init__(self, dev_ctrl, node_id, info, commissioning_info):
         self.dev_ctrl = dev_ctrl
         self.node_id = node_id
         self.info = info
         self.commissioning_info = commissioning_info
-        self.logger = logger
 
     async def start(self):
         self.dev_ctrl.ResetCommissioningParameters()
@@ -152,11 +151,6 @@ class CommissioningMethod(ABC):
             )
 
     async def _find_or_establish_pase_if_needed(self):
-        asserts.assert_equal(
-            self.info.filter_type,
-            DiscoveryFilterType.LONG_DISCRIMINATOR,
-            "Generic setup-code PASE flow requires a long discriminator",
-        )
 
         setup_code = self.info.setup_code
         if setup_code is None:
@@ -301,19 +295,19 @@ class CommissioningThreadMeshcop(CommissioningMethod):
 
 class CommissioningFlow:
     @staticmethod
-    def create(commissioning_method: str | None, dev_ctrl, node_id, info, commissioning_info, logger):
+    def create(commissioning_method: str | None, dev_ctrl, node_id, info, commissioning_info):
         if commissioning_method == "on-network":
-            return CommissioningNetworkOnNetwork(dev_ctrl, node_id, info, commissioning_info, logger)
+            return CommissioningNetworkOnNetwork(dev_ctrl, node_id, info, commissioning_info)
         elif commissioning_method == "ble-wifi":
-            return CommissioningBleWiFi(dev_ctrl, node_id, info, commissioning_info, logger)
+            return CommissioningBleWiFi(dev_ctrl, node_id, info, commissioning_info)
         elif commissioning_method == "ble-thread":
-            return CommissioningBleThread(dev_ctrl, node_id, info, commissioning_info, logger)
+            return CommissioningBleThread(dev_ctrl, node_id, info, commissioning_info)
         elif commissioning_method == "nfc-thread":
-            return CommissioningNfcThread(dev_ctrl, node_id, info, commissioning_info, logger)
+            return CommissioningNfcThread(dev_ctrl, node_id, info, commissioning_info)
         elif commissioning_method == "nfc-wifi":
-            return CommissioningNfcWiFi(dev_ctrl, node_id, info, commissioning_info, logger)
+            return CommissioningNfcWiFi(dev_ctrl, node_id, info, commissioning_info)
         elif commissioning_method == "thread-meshcop":
-            return CommissioningThreadMeshcop(dev_ctrl, node_id, info, commissioning_info, logger)
+            return CommissioningThreadMeshcop(dev_ctrl, node_id, info, commissioning_info)
 
         raise ValueError(f"Invalid commissioning method {commissioning_method}")
 
@@ -345,8 +339,7 @@ async def commission_device(
             dev_ctrl=dev_ctrl,
             node_id=node_id,
             info=info,
-            commissioning_info=commissioning_info,
-            logger=LOGGER,
+            commissioning_info=commissioning_info
         )
 
         await commissioning.start()
@@ -356,6 +349,9 @@ async def commission_device(
         LOGGER.exception("Commissioning failed")
         return PairingStatus(exception=e)
     except Exception as e:
+        # Intentionally catch unexpected exceptions here and convert them to a
+        # PairingStatus failure so the test infrastructure reports commissioning
+        # failures uniformly instead of crashing the test runner.
         LOGGER.exception("Commissioning failed")
         return PairingStatus(exception=e)
 
