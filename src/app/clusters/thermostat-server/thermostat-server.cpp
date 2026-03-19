@@ -31,7 +31,6 @@
 #include <app/util/endpoint-config-api.h>
 #include <clusters/Thermostat/Metadata.h>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/support/TimeUtils.h>
 #include <system/SystemClock.h>
 
 using namespace chip;
@@ -931,15 +930,10 @@ void ThermostatAttrAccess::UpdateSetpointChangeAttributes(EndpointId endpoint, A
     SetpointChangeSource::Set(endpoint, source);
 
     // SetpointChangeSourceTimestamp: current time in Chip epoch seconds
-    System::Clock::Microseconds64 utcTime;
-    if (System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR)
+    uint32_t chipEpochSeconds;
+    if (System::Clock::GetClock_MatterEpochS(chipEpochSeconds) == CHIP_NO_ERROR)
     {
-        uint64_t chipEpochMicros;
-        if (UnixEpochToChipEpochMicros(utcTime.count(), chipEpochMicros))
-        {
-            auto chipEpochSeconds = static_cast<uint32_t>(chipEpochMicros / 1000000);
-            SetpointChangeSourceTimestamp::Set(endpoint, chipEpochSeconds);
-        }
+        SetpointChangeSourceTimestamp::Set(endpoint, chipEpochSeconds);
     }
 }
 
