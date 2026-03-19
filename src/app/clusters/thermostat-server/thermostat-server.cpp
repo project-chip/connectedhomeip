@@ -922,7 +922,7 @@ void ThermostatAttrAccess::UpdateSetpointChangeAttributes(EndpointId endpoint, A
     SetpointChangeAmount::Set(endpoint, DataModel::MakeNullable(changeAmount));
 
     // SetpointChangeSource: ask the delegate; default to Manual
-    auto source    = SetpointChangeSourceEnum::kManual;
+    auto source     = SetpointChangeSourceEnum::kManual;
     auto * delegate = GetDelegate(endpoint);
     if (delegate != nullptr)
     {
