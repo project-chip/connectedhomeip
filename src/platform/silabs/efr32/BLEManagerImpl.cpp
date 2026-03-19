@@ -126,8 +126,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
     // SW timer for BLE timeouts and interval change.
     sbleAdvTimeoutTimer = osTimerNew(BleAdvTimeoutHandler, osTimerOnce, NULL, NULL);
 
+    // Preserve kSiLabsBLEStackInitialize so a boot event that set it before _Init() (e.g. from HandleBootEvent) is not lost.
+    bool hadBleStackInit = mFlags.Has(Flags::kSiLabsBLEStackInitialize);
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+    mFlags.Set(Flags::kSiLabsBLEStackInitialize, hadBleStackInit);
 
     // Check that an address was not already configured at boot.
     // This covers the init-shutdown-init case to comply with the BLE address change at boot only requirement

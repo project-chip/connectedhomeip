@@ -24,6 +24,7 @@
 #include "AccessRestrictionProvider.h"
 #endif
 
+#include "AuxiliaryType.h"
 #include "Privilege.h"
 #include "RequestPath.h"
 #include "SubjectDescriptor.h"
@@ -88,11 +89,13 @@ public:
             virtual CHIP_ERROR GetAuthMode(AuthMode & authMode) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
             virtual CHIP_ERROR GetFabricIndex(FabricIndex & fabricIndex) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
             virtual CHIP_ERROR GetPrivilege(Privilege & privilege) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR GetAuxiliaryType(AuxiliaryType & auxiliaryType) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
             // Simple setters
             virtual CHIP_ERROR SetAuthMode(AuthMode authMode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
             virtual CHIP_ERROR SetFabricIndex(FabricIndex fabricIndex) { return CHIP_ERROR_NOT_IMPLEMENTED; }
             virtual CHIP_ERROR SetPrivilege(Privilege privilege) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+            virtual CHIP_ERROR SetAuxiliaryType(AuxiliaryType auxiliaryType) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
             // Subjects
             virtual CHIP_ERROR GetSubjectCount(size_t & count) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -133,11 +136,13 @@ public:
         CHIP_ERROR GetAuthMode(AuthMode & authMode) const { return mDelegate->GetAuthMode(authMode); }
         CHIP_ERROR GetFabricIndex(FabricIndex & fabricIndex) const { return mDelegate->GetFabricIndex(fabricIndex); }
         CHIP_ERROR GetPrivilege(Privilege & privilege) const { return mDelegate->GetPrivilege(privilege); }
+        CHIP_ERROR GetAuxiliaryType(AuxiliaryType & auxiliaryType) const { return mDelegate->GetAuxiliaryType(auxiliaryType); }
 
         // Simple setters
         CHIP_ERROR SetAuthMode(AuthMode authMode) { return mDelegate->SetAuthMode(authMode); }
         CHIP_ERROR SetFabricIndex(FabricIndex fabricIndex) { return mDelegate->SetFabricIndex(fabricIndex); }
         CHIP_ERROR SetPrivilege(Privilege privilege) { return mDelegate->SetPrivilege(privilege); }
+        CHIP_ERROR SetAuxiliaryType(AuxiliaryType auxiliaryType) { return mDelegate->SetAuxiliaryType(auxiliaryType); }
 
         /**
          * Gets the number of subjects.
@@ -400,6 +405,11 @@ public:
         // Iteration
         virtual CHIP_ERROR Entries(EntryIterator & iterator, const FabricIndex * fabricIndex) const { return CHIP_NO_ERROR; }
 
+        virtual CHIP_ERROR AuxiliaryEntries(EntryIterator & iterator, const FabricIndex * fabricIndex) const
+        {
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+        }
+
         // Check
         // Return CHIP_NO_ERROR if allowed, CHIP_ERROR_ACCESS_DENIED if denied,
         // CHIP_ERROR_NOT_IMPLEMENTED to use the default check algorithm (against entries),
@@ -418,6 +428,11 @@ public:
 
     ~AccessControl()
     {
+        if (IsGroupAuxiliaryDelegateRegistered())
+        {
+            mGroupAuxDelegate->Release();
+        }
+
         // Never-initialized AccessControl instances will not have the delegate set.
         if (IsInitialized())
         {
@@ -613,13 +628,13 @@ public:
     /**
      * Iterates over entries in the access control list.
      *
-     * @param [in]  fabric   Fabric over which to iterate entries.
+     * @param [in]  fabricIndex   Fabric over which to iterate entries.
      * @param [out] iterator Iterator controlling the iteration.
      */
-    CHIP_ERROR Entries(FabricIndex fabric, EntryIterator & iterator) const
+    CHIP_ERROR Entries(FabricIndex fabricIndex, EntryIterator & iterator) const
     {
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-        return mDelegate->Entries(iterator, &fabric);
+        return mDelegate->Entries(iterator, &fabricIndex);
     }
 
     /**
@@ -634,11 +649,58 @@ public:
         return mDelegate->Entries(iterator, fabricIndex);
     }
 
+    /**
+     * Iterates over auxiliary entries for the given fabric.
+     *
+     * @param [in]  fabricIndex   Fabric index for which to iterate auxiliary entries.
+     * @param [out] iterator      Iterator controlling the iteration.
+     */
+    CHIP_ERROR AuxiliaryEntries(FabricIndex fabricIndex, EntryIterator & iterator) const
+    {
+        VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(IsGroupAuxiliaryDelegateRegistered(), CHIP_ERROR_INCORRECT_STATE);
+        return mGroupAuxDelegate->AuxiliaryEntries(iterator, &fabricIndex);
+    }
+
     // Adds a listener to the end of the listener list, if not already in the list.
     void AddEntryListener(EntryListener & listener);
 
     // Removes a listener from the listener list, if in the list.
     void RemoveEntryListener(EntryListener & listener);
+
+    /**
+     * @brief Registers a delegate to handle auxiliary access control entries. There
+     * can only be 1 group auxiliary access control delegate registered at a time. To
+     * replace the delegate after one has been set previously, one MUST unregister the
+     * currently set delegate before calling this registration function.
+     *
+     * @param[in] delegate The delegate to register.
+     *
+     * @retval #CHIP_ERROR_INVALID_ARGUMENT if the delegate is null.
+     * @retval #CHIP_ERROR_INCORRECT_STATE if a delegate is already registered.
+     * @retval #CHIP_NO_ERROR on success.
+     */
+    CHIP_ERROR RegisterGroupAuxiliaryDelegate(Delegate * delegate)
+    {
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mGroupAuxDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        mGroupAuxDelegate = delegate;
+        return CHIP_NO_ERROR;
+    }
+
+    bool IsGroupAuxiliaryDelegateRegistered() const { return (mGroupAuxDelegate != nullptr); }
+
+    /**
+     * @brief Unregisters the delegate handling auxiliary access control entries.
+     */
+    void UnregisterGroupAuxiliaryDelegate()
+    {
+        if (IsGroupAuxiliaryDelegateRegistered())
+        {
+            mGroupAuxDelegate->Release();
+            mGroupAuxDelegate = nullptr;
+        }
+    }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     // Set an optional AcceessRestriction object for MNGD feature.
@@ -694,6 +756,15 @@ private:
 
 private:
     Delegate * mDelegate = nullptr;
+
+    // This is an access control delegate that is specifically set to handle auxiliary ACL entries
+    // based on group information. It is part of server init params, and can also be set at runtime using
+    // RegisterGroupAuxiliaryDelegate(). It is needed for functionality in the groupcast cluster protected by
+    // the LN feature, and the access control cluster protected by the AUX feature. It is expected that
+    // this delegate will have an implementation of the AuxiliaryEntries() funciton for reporting these
+    // entries. It is also expected to implement a Check() function to actually use these entries
+    // to approve/deny access control.
+    Delegate * mGroupAuxDelegate = nullptr;
 
     DeviceTypeResolver * mDeviceTypeResolver = nullptr;
 

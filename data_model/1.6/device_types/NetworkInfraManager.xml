@@ -61,7 +61,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
     <revision revision="2" summary="Added Thread Network Diagnostics requirement; extended &quot;Other Requirements&quot; section"/>
-    <revision revision="3" summary=""/>
+    <revision revision="3" summary="Added Network Identity Management cluster. Added optional Thread Border Router Diagnostics cluster"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditionRequirements>

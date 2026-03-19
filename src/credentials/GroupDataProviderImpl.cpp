@@ -869,6 +869,10 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, c
     if (group.Find(mStorage, fabric, info.group_id))
     {
         // Existing group_id
+        if (group.endpoint_count > 0 && (group.HasAuxiliaryACL() != info.HasAuxiliaryACL()))
+        {
+            mAuxAclNotificationNeeded = true;
+        }
         group.Copy(info);
         ReturnErrorOnFailure(group.Save(mStorage));
         GroupModified(fabric_index, info.group_id);
@@ -925,6 +929,10 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     if (found)
     {
         // Update existing entry
+        if (group.endpoint_count > 0 && (group.HasAuxiliaryACL() != info.HasAuxiliaryACL()))
+        {
+            mAuxAclNotificationNeeded = true;
+        }
         return group.Save(mStorage);
     }
     if (index < fabric.group_count)
@@ -994,6 +1002,8 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_ind
     ReturnErrorOnFailure(fabric.Load(mStorage));
     VerifyOrReturnError(group.Get(mStorage, fabric, index), CHIP_ERROR_NOT_FOUND);
 
+    bool notifyNeeded = (group.HasAuxiliaryACL() && group.endpoint_count > 0);
+
     // Remove endpoints
     EndpointData endpoint(fabric_index, group.group_id, group.first_endpoint);
     size_t count = 0;
@@ -1008,6 +1018,12 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_ind
     }
 
     ReturnErrorOnFailure(group.Delete(mStorage));
+
+    if (notifyNeeded)
+    {
+        mAuxAclNotificationNeeded = true;
+    }
+
     if (group.first)
     {
         // Remove first group
@@ -1068,6 +1084,12 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
         group.next           = fabric.first_group;
         group.prev           = kUndefinedGroupId;
         ReturnErrorOnFailure(group.Save(mStorage));
+
+        if (group.HasAuxiliaryACL())
+        {
+            mAuxAclNotificationNeeded = true;
+        }
+
         // Update fabric
         fabric.first_group = group.group_id;
         fabric.group_count++;
@@ -1083,6 +1105,12 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
     // New endpoint, insert last
     endpoint.endpoint_id = endpoint_id;
     ReturnErrorOnFailure(endpoint.Save(mStorage));
+
+    if (group.HasAuxiliaryACL())
+    {
+        mAuxAclNotificationNeeded = true;
+    }
+
     if (endpoint.first)
     {
         // First endpoint of group
@@ -1118,6 +1146,11 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
 
     // Existing endpoint
     TEMPORARY_RETURN_IGNORED endpoint.Delete(mStorage);
+
+    if (group.HasAuxiliaryACL())
+    {
+        mAuxAclNotificationNeeded = true;
+    }
 
     if (endpoint.first)
     {
@@ -1354,6 +1387,8 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoints(chip::FabricIndex fabric_index
     VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(group.Find(mStorage, fabric, group_id), CHIP_ERROR_KEY_NOT_FOUND);
 
+    bool notifyNeeded = (group.HasAuxiliaryACL() && group.endpoint_count > 0);
+
     EndpointData endpoint(fabric_index, group.group_id, group.first_endpoint);
     size_t endpoint_index = 0;
     while (endpoint_index < group.endpoint_count)
@@ -1366,6 +1401,12 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoints(chip::FabricIndex fabric_index
     group.first_endpoint = kInvalidEndpointId;
     group.endpoint_count = 0;
     ReturnErrorOnFailure(group.Save(mStorage));
+
+    if (notifyNeeded)
+    {
+        mAuxAclNotificationNeeded = true;
+    }
+
     GroupModified(fabric_index, group.group_id);
     return CHIP_NO_ERROR;
 }
@@ -1818,8 +1859,11 @@ CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
         keyset_count++;
     }
 
-    // Remove fabric
-    return fabric.Delete(mStorage);
+    // Remove fabric, and ensure no auxiliary acl changed
+    // event will be emitted from this action
+    err                       = fabric.Delete(mStorage);
+    mAuxAclNotificationNeeded = false;
+    return err;
 }
 
 //
