@@ -123,8 +123,8 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         mFileDesignator[fdl] = 0;
 
         // Validate that the designator exists in the map
-        auto entry = mFileDesignatorMap.find(mFileDesignator);
-        if (entry == mFileDesignatorMap.end())
+        const auto entry = mFileDesignatorMap.find(mFileDesignator);
+        if (entry == mFileDesignatorMap.cend())
         {
             VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown) == CHIP_NO_ERROR,
                            ChipLogError(BDX, "AbortTransfer failed"));
@@ -161,8 +161,8 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             return;
         }
 
-        auto entry = mFileDesignatorMap.find(mFileDesignator);
-        if (entry == mFileDesignatorMap.end())
+        const auto entry = mFileDesignatorMap.find(mFileDesignator);
+        if (entry == mFileDesignatorMap.cend())
         {
             VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown) == CHIP_NO_ERROR,
                            ChipLogError(BDX, "AbortTransfer failed"));

@@ -285,7 +285,7 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
             // Only supporting BDX protocol for now
 
             // Validate the selected file designator before building the URI
-            if (mFileDesignatorMap.find(mSelectedFileDesignator) == mFileDesignatorMap.end())
+            if (mFileDesignatorMap.find(mSelectedFileDesignator) == mFileDesignatorMap.cend())
             {
                 ChipLogError(SoftwareUpdate, "Invalid file designator: %s", mSelectedFileDesignator.c_str());
                 commandObj->AddStatus(commandPath, Status::Failure);
@@ -531,8 +531,8 @@ void OTAProviderExample::HandleNotifyUpdateApplied(app::CommandHandler * command
 
 const char * OTAProviderExample::GetFilePathForDesignator(const char * designator) const
 {
-    auto it = mFileDesignatorMap.find(designator);
-    if (it == mFileDesignatorMap.end())
+    const auto it = mFileDesignatorMap.find(designator);
+    if (it == mFileDesignatorMap.cend())
     {
         return nullptr;
     }
