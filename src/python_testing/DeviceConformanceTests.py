@@ -16,7 +16,4 @@
 #
 
 # Re-export from the canonical location in the matter.testing package.
-from matter.testing.device_conformance_tests import (  # noqa: F401
-    DeviceConformanceTests,
-    get_supersets,
-)
+from matter.testing.device_conformance_tests import DeviceConformanceTests, get_supersets  # noqa: F401
