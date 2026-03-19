@@ -426,7 +426,7 @@ Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(EndpointId
     Status status;
 
     DataModel::Nullable<uint8_t> speedSetting;
-    status = FanControl::GetSpeedSetting(endpointId, speedSetting);
+    status               = FanControl::GetSpeedSetting(endpointId, speedSetting);
     uint8_t speedCurrent = (status == Status::Success && !speedSetting.IsNull()) ? speedSetting.Value() : 0;
 
     if (status == Protocols::InteractionModel::Status::Success && speedCurrent)
