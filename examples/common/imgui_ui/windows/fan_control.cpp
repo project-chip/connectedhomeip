@@ -16,6 +16,7 @@
  */
 #include "fan_control.h"
 #include "accessor_updaters.h"
+#include <app/clusters/fan-control-server/fan-control-server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
@@ -76,48 +77,195 @@ static const std::string GetWindBitmapValueString(chip::BitMask<chip::app::Clust
                                 { { chip::app::Clusters::FanControl::WindBitmap::kSleepWind, "Sleep" },
                                   { chip::app::Clusters::FanControl::WindBitmap::kNaturalWind, "Natural" } });
 }
+namespace {
+using namespace chip;
+using namespace chip::app::Clusters::FanControl;
+using Protocols::InteractionModel::Status;
+Status GetFanMode(EndpointId ep, FanModeEnum * value)
+{
+    if (auto * c = FindClusterOnEndpoint(ep))
+    {
+        *value = c->GetFanMode();
+        return Status::Success;
+    }
+    return Status::UnsupportedEndpoint;
+}
+Status SetFanModeUI(EndpointId ep, FanModeEnum value)
+{
+    return chip::app::Clusters::FanControl::SetFanMode(ep, value);
+}
 
+Status GetAirflowDirection(EndpointId ep, AirflowDirectionEnum * value)
+{
+    if (auto * c = FindClusterOnEndpoint(ep))
+    {
+        *value = c->GetAirflowDirection();
+        return Status::Success;
+    }
+    return Status::UnsupportedEndpoint;
+}
+Status SetAirflowDirectionUI(EndpointId ep, AirflowDirectionEnum value)
+{
+    return chip::app::Clusters::FanControl::SetAirflowDirection(ep, value);
+}
+
+Status GetFanModeSequence(EndpointId ep, FanModeSequenceEnum * value)
+{
+    if (auto * c = FindClusterOnEndpoint(ep))
+    {
+        *value = c->GetFanModeSequence();
+        return Status::Success;
+    }
+    return Status::UnsupportedEndpoint;
+}
+Status SetFanModeSequenceUI(EndpointId ep, FanModeSequenceEnum value)
+{
+    return Status::UnsupportedWrite;
+}
+
+Status GetPercentCurrent(EndpointId ep, Percent * value)
+{
+    if (auto * c = FindClusterOnEndpoint(ep))
+    {
+        *value = c->GetPercentCurrent();
+        return Status::Success;
+    }
+    return Status::UnsupportedEndpoint;
+}
+
+Status GetSpeedMax(EndpointId ep, uint8_t * value)
+{
+    if (auto * c = FindClusterOnEndpoint(ep))
+    {
+        *value = c->GetSpeedMax();
+        return Status::Success;
+    }
+    return Status::UnsupportedEndpoint;
+}
+
+Status GetSpeedCurrent(EndpointId ep, uint8_t * value)
+{
+    if (auto * c = FindClusterOnEndpoint(ep))
+    {
+        *value = c->GetSpeedCurrent();
+        return Status::Success;
+    }
+    return Status::UnsupportedEndpoint;
+}
+
+Status GetFeatureMap(EndpointId ep, uint32_t * value)
+{
+    if (auto * c = FindClusterOnEndpoint(ep))
+    {
+        *value = c->GetFeatureMap();
+        return Status::Success;
+    }
+    return Status::UnsupportedEndpoint;
+}
+
+Status GetPercentSetting(EndpointId ep, app::DataModel::Nullable<Percent> & value)
+{
+    if (auto * c = FindClusterOnEndpoint(ep))
+    {
+        value = c->GetPercentSetting();
+        return Status::Success;
+    }
+    return Status::UnsupportedEndpoint;
+}
+Status SetPercentSettingUI(EndpointId ep, const app::DataModel::Nullable<Percent> & value)
+{
+    return chip::app::Clusters::FanControl::SetPercentSetting(ep, value);
+}
+
+Status GetSpeedSetting(EndpointId ep, app::DataModel::Nullable<uint8_t> & value)
+{
+    if (auto * c = FindClusterOnEndpoint(ep))
+    {
+        value = c->GetSpeedSetting();
+        return Status::Success;
+    }
+    return Status::UnsupportedEndpoint;
+}
+Status SetSpeedSettingUI(EndpointId ep, const app::DataModel::Nullable<uint8_t> & value)
+{
+    return chip::app::Clusters::FanControl::SetSpeedSetting(ep, value);
+}
+
+Status GetRockSupport(EndpointId ep, BitMask<RockBitmap> * value)
+{
+    if (auto * c = FindClusterOnEndpoint(ep))
+    {
+        *value = c->GetRockSupport();
+        return Status::Success;
+    }
+    return Status::UnsupportedEndpoint;
+}
+Status SetRockSupportUI(EndpointId ep, BitMask<RockBitmap> value)
+{
+    return Status::UnsupportedWrite;
+}
+
+Status GetRockSetting(EndpointId ep, BitMask<RockBitmap> * value)
+{
+    if (auto * c = FindClusterOnEndpoint(ep))
+    {
+        *value = c->GetRockSetting();
+        return Status::Success;
+    }
+    return Status::UnsupportedEndpoint;
+}
+Status SetRockSettingUI(EndpointId ep, BitMask<RockBitmap> value)
+{
+    return chip::app::Clusters::FanControl::SetRockSetting(ep, value);
+}
+
+Status GetWindSupport(EndpointId ep, BitMask<WindBitmap> * value)
+{
+    if (auto * c = FindClusterOnEndpoint(ep))
+    {
+        *value = c->GetWindSupport();
+        return Status::Success;
+    }
+    return Status::UnsupportedEndpoint;
+}
+Status SetWindSupportUI(EndpointId ep, BitMask<WindBitmap> value)
+{
+    return Status::UnsupportedWrite;
+}
+
+Status GetWindSetting(EndpointId ep, BitMask<WindBitmap> * value)
+{
+    if (auto * c = FindClusterOnEndpoint(ep))
+    {
+        *value = c->GetWindSetting();
+        return Status::Success;
+    }
+    return Status::UnsupportedEndpoint;
+}
+Status SetWindSettingUI(EndpointId ep, BitMask<WindBitmap> value)
+{
+    return chip::app::Clusters::FanControl::SetWindSetting(ep, value);
+}
+} // namespace
+// --- 2. UPDATE THIS FUNCTION ---
 void FanControl::UpdateState()
 {
-    UpdateStateEnum(mEndpointId, mTargetFanMode, mFanMode, &chip::app::Clusters::FanControl::Attributes::FanMode::Set,
-                    &chip::app::Clusters::FanControl::Attributes::FanMode::Get);
+    UpdateStateEnum(mEndpointId, mTargetFanMode, mFanMode, &SetFanModeUI, &GetFanMode);
+    UpdateStateEnum(mEndpointId, mTargetAirflowDirection, mAirflowDirection, &SetAirflowDirectionUI, &GetAirflowDirection);
+    UpdateStateEnum(mEndpointId, mTargetFanModeSequence, mFanModeSequence, &SetFanModeSequenceUI, &GetFanModeSequence);
 
-    UpdateStateEnum(mEndpointId, mTargetAirflowDirection, mAirflowDirection,
-                    &chip::app::Clusters::FanControl::Attributes::AirflowDirection::Set,
-                    &chip::app::Clusters::FanControl::Attributes::AirflowDirection::Get);
+    UpdateStateReadOnly(mEndpointId, mTargetPercent, mPercent, &GetPercentCurrent);
+    UpdateStateReadOnly(mEndpointId, mTargetSpeedMax, mSpeedMax, &GetSpeedMax);
+    UpdateStateReadOnly(mEndpointId, mTargetSpeedCurrent, mSpeedCurrent, &GetSpeedCurrent);
+    UpdateStateReadOnly(mEndpointId, mTargetFeatureMap, mFeatureMap, &GetFeatureMap);
 
-    UpdateStateEnum(mEndpointId, mTargetFanModeSequence, mFanModeSequence,
-                    &chip::app::Clusters::FanControl::Attributes::FanModeSequence::Set,
-                    &chip::app::Clusters::FanControl::Attributes::FanModeSequence::Get);
+    UpdateStateNullable(mEndpointId, mTargetPercentSetting, mPercentSetting, &SetPercentSettingUI, &GetPercentSetting);
+    UpdateStateNullable(mEndpointId, mTargetSpeedSetting, mSpeedSetting, &SetSpeedSettingUI, &GetSpeedSetting);
 
-    UpdateStateReadOnly(mEndpointId, mTargetPercent, mPercent, &chip::app::Clusters::FanControl::Attributes::PercentCurrent::Get);
-
-    UpdateStateReadOnly(mEndpointId, mTargetSpeedMax, mSpeedMax, &chip::app::Clusters::FanControl::Attributes::SpeedMax::Get);
-
-    UpdateStateReadOnly(mEndpointId, mTargetSpeedCurrent, mSpeedCurrent,
-                        &chip::app::Clusters::FanControl::Attributes::SpeedCurrent::Get);
-
-    UpdateStateReadOnly(mEndpointId, mTargetFeatureMap, mFeatureMap, &chip::app::Clusters::FanControl::Attributes::FeatureMap::Get);
-
-    UpdateStateNullable(mEndpointId, mTargetPercentSetting, mPercentSetting,
-                        &chip::app::Clusters::FanControl::Attributes::PercentSetting::Set,
-                        &chip::app::Clusters::FanControl::Attributes::PercentSetting::Get);
-
-    UpdateStateNullable(mEndpointId, mTargetSpeedSetting, mSpeedSetting,
-                        &chip::app::Clusters::FanControl::Attributes::SpeedSetting::Set,
-                        &chip::app::Clusters::FanControl::Attributes::SpeedSetting::Get);
-
-    UpdateStateEnum(mEndpointId, mTargetRockSupport, mRockSupport, &chip::app::Clusters::FanControl::Attributes::RockSupport::Set,
-                    &chip::app::Clusters::FanControl::Attributes::RockSupport::Get);
-
-    UpdateStateEnum(mEndpointId, mTargetRockSetting, mRockSetting, &chip::app::Clusters::FanControl::Attributes::RockSetting::Set,
-                    &chip::app::Clusters::FanControl::Attributes::RockSetting::Get);
-
-    UpdateStateEnum(mEndpointId, mTargetWindSupport, mWindSupport, &chip::app::Clusters::FanControl::Attributes::WindSupport::Set,
-                    &chip::app::Clusters::FanControl::Attributes::WindSupport::Get);
-
-    UpdateStateEnum(mEndpointId, mTargetWindSetting, mWindSetting, &chip::app::Clusters::FanControl::Attributes::WindSetting::Set,
-                    &chip::app::Clusters::FanControl::Attributes::WindSetting::Get);
+    UpdateStateEnum(mEndpointId, mTargetRockSupport, mRockSupport, &SetRockSupportUI, &GetRockSupport);
+    UpdateStateEnum(mEndpointId, mTargetRockSetting, mRockSetting, &SetRockSettingUI, &GetRockSetting);
+    UpdateStateEnum(mEndpointId, mTargetWindSupport, mWindSupport, &SetWindSupportUI, &GetWindSupport);
+    UpdateStateEnum(mEndpointId, mTargetWindSetting, mWindSetting, &SetWindSettingUI, &GetWindSetting);
 }
 
 void FanControl::Render()
