@@ -30,7 +30,7 @@ public:
 
     // Only the UpdatePossible attribute can be configured through this class. The source of the other attributes is the
     // OTARequestorInterface passed into the constructor, so use that object instead to change those attributes.
-    void SetUpdatePossible(bool updatePossible) { mUpdatePossible = updatePossible; }
+    void SetUpdatePossible(bool updatePossible);
     bool GetUpdatePossible() const { return mUpdatePossible; }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;

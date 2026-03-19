@@ -200,8 +200,15 @@ TEST_F(TestOTARequestorCluster, UpdatePossibleIsModifiable)
 
     EXPECT_TRUE(cluster.GetUpdatePossible());
 
+    auto & changeListener = context.ChangeListener();
+    changeListener.DirtyList().clear();
+
     cluster.SetUpdatePossible(false);
     EXPECT_FALSE(cluster.GetUpdatePossible());
+    ASSERT_EQ(changeListener.DirtyList().size(), 1u);
+    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
+    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id);
 }
 
 TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)

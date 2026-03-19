@@ -41,6 +41,12 @@ OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInte
     DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)), mOtaRequestor(otaRequestor)
 {}
 
+void OTARequestorCluster::SetUpdatePossible(bool updatePossible)
+{
+    mUpdatePossible = updatePossible;
+    NotifyAttributeChanged(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id);
+}
+
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
     return DefaultServerCluster::Startup(context);
