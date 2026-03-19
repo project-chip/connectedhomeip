@@ -40,7 +40,7 @@ import logging
 from TC_SMOKECOTestBase import SmokeCoBaseTest
 
 import matter.clusters as Clusters
-from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
