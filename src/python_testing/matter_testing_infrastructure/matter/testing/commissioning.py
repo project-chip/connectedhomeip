@@ -151,6 +151,22 @@ class CommissioningMethod(ABC):
             )
 
     async def _find_or_establish_pase_if_needed(self):
+        return
+
+    @abstractmethod
+    async def _prepare(self):
+        pass
+
+    @abstractmethod
+    async def _commission(self):
+        pass
+
+
+class CommissioningNetworkOnNetwork(CommissioningMethod):
+    async def _prepare(self):
+        pass
+
+    async def _find_or_establish_pase_if_needed(self):
 
         setup_code = self.info.setup_code
         if setup_code is None:
@@ -165,19 +181,6 @@ class CommissioningMethod(ABC):
         )
         if commissionee is None:
             raise RuntimeError("Failed to find or establish PASE session")
-
-    @abstractmethod
-    async def _prepare(self):
-        pass
-
-    @abstractmethod
-    async def _commission(self):
-        pass
-
-
-class CommissioningNetworkOnNetwork(CommissioningMethod):
-    async def _prepare(self):
-        pass
 
     async def _commission(self):
         return await self.dev_ctrl.Commission(self.node_id)
