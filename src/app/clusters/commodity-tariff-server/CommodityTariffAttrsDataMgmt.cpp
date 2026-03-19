@@ -274,7 +274,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStr
         chip::CharSpan tmpLabel(labelBuffer, input.label.Value().size());
 
         // Copy using SpanCopier::Copy (requires pre-allocated memory)
-        ReturnErrorOnFailure(SpanCopier<char>::Copy(input.label.Value(), tmpLabel, input.label.Value().size()));
+        ReturnErrorOnFailure(SpanCopier<char>::Copy(input.label.Value(), labelBuffer, input.label.Value().size()));
 
         // Set the output
         output.label.SetNonNull(tmpLabel);
@@ -291,7 +291,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStr
         output.dayEntryIDs = DataModel::List<const uint32_t>(buffer, input.dayEntryIDs.size());
 
         // Copy using SpanCopier::Copy
-        ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.dayEntryIDs, output.dayEntryIDs, input.dayEntryIDs.size()));
+        ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.dayEntryIDs, buffer, input.dayEntryIDs.size()));
     }
     else
     {
@@ -312,7 +312,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<TariffPeriodStr
         // Copy using SpanCopier::Copy
         ReturnErrorOnFailure(
             SpanCopier<uint32_t>::Copy(chip::Span<const uint32_t>(input.tariffComponentIDs.data(), input.tariffComponentIDs.size()),
-                                       output.tariffComponentIDs, input.tariffComponentIDs.size()));
+                                       buffer, input.tariffComponentIDs.size()));
     }
     else
     {
@@ -340,7 +340,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayPatternStruc
         output.dayEntryIDs = DataModel::List<const uint32_t>(buffer, input.dayEntryIDs.size());
 
         // Copy using SpanCopier::Copy
-        ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.dayEntryIDs, output.dayEntryIDs, input.dayEntryIDs.size()));
+        ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.dayEntryIDs, buffer, input.dayEntryIDs.size()));
     }
     else
     {
@@ -368,7 +368,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<DayStruct::Type
         output.dayEntryIDs = DataModel::List<const uint32_t>(buffer, input.dayEntryIDs.size());
 
         // Copy using SpanCopier::Copy
-        ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.dayEntryIDs, output.dayEntryIDs, input.dayEntryIDs.size()));
+        ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.dayEntryIDs, buffer, input.dayEntryIDs.size()));
     }
     else
     {
@@ -399,7 +399,7 @@ CHIP_ERROR CTC_BaseDataClass<DataModel::Nullable<DataModel::List<CalendarPeriodS
         DataModel::List<const uint32_t> tmpList(buffer, input.dayPatternIDs.size());
 
         // Copy using SpanCopier::Copy
-        ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.dayPatternIDs, tmpList, input.dayPatternIDs.size()));
+        ReturnErrorOnFailure(SpanCopier<uint32_t>::Copy(input.dayPatternIDs, buffer, input.dayPatternIDs.size()));
 
         // Set the output
         output.dayPatternIDs = tmpList;

@@ -123,7 +123,7 @@ TEST_F(TestScopedMemoryBuffer, TestRelease)
     EXPECT_EQ(TestCounterMemoryManagement::Counter(), 0);
 }
 
-TEST_F(TestScopedBuffer, TestCopyFromSpanWithDifferentTypes)
+TEST_F(TestScopedMemoryBuffer, TestCopyFromSpanWithDifferentTypes)
 {
     const uint32_t source[] = { 0x1234, 0x5678, 0x9ABC, 0xDEF0 };
     chip::Span<const uint32_t> sourceSpan(source, 4);

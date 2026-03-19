@@ -204,27 +204,22 @@ template <typename T>
 struct SpanCopier
 {
     /**
-     * @brief Copies span data to a newly allocated list
+     * @brief Copies span data to a pre-allocated buffer
      * @param source Input span to copy from
-     * @param destination Output list to populate (must have pre-allocated memory)
+     * @param destination_buffer Pre-allocated output buffer (must be large enough)
      * @param maxCount Maximum number of elements to copy (default: unlimited)
-     * @return CHIP_NO_ERROR if copy succeeded, CHIP_ERROR_BUFFER_TOO_SMALL if destination
-     *         is too small, CHIP_ERROR_INVALID_ARGUMENT if destination has no memory
+     * @return CHIP_NO_ERROR on success, error code on failure
      */
-    static CHIP_ERROR Copy(const Span<const T> & source, DataModel::List<const T> & destination,
-                           size_t maxCount = std::numeric_limits<size_t>::max())
+    static CHIP_ERROR Copy(Span<const T> source, T * destination_buffer, size_t maxCount = std::numeric_limits<size_t>::max())
     {
-        // Destination must have pre-allocated memory
-        VerifyOrReturnError(!destination.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(destination.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
+        // Destination buffer must be provided
+        VerifyOrReturnError(destination_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(source.size() <= maxCount, CHIP_ERROR_INVALID_LIST_LENGTH);
-        VerifyOrReturnError(source.size() <= destination.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
         if (!source.empty())
         {
-            const size_t size = std::min(source.size(), maxCount) * sizeof(T);
-            std::memmove(const_cast<T *>(destination.data()), source.begin(), size);
+            const size_t bytesToCopy = source.size() * sizeof(T);
+            std::memmove(destination_buffer, source.data(), bytesToCopy);
         }
 
         return CHIP_NO_ERROR;
@@ -236,26 +231,21 @@ template <>
 struct SpanCopier<char>
 {
     /**
-     * @brief Copies character span to a CharSpan
+     * @brief Copies character span to a pre-allocated buffer
      * @param source Input span to copy from
-     * @param destination Output span to populate (must have pre-allocated memory)
+     * @param destination_buffer Pre-allocated output buffer (must be large enough)
      * @param maxCount Maximum number of characters to copy (default: unlimited)
-     * @return CHIP_NO_ERROR if copy succeeded, CHIP_ERROR_BUFFER_TOO_SMALL if destination
-     *         is too small, CHIP_ERROR_INVALID_ARGUMENT if destination has no memory
+     * @return CHIP_NO_ERROR on success, error code on failure
      */
-    static CHIP_ERROR Copy(const CharSpan & source, CharSpan & destination, size_t maxCount = std::numeric_limits<size_t>::max())
+    static CHIP_ERROR Copy(const CharSpan source, char * destination_buffer, size_t maxCount = std::numeric_limits<size_t>::max())
     {
-        // Destination must have pre-allocated memory
-        VerifyOrReturnError(!destination.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(destination.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
+        // Destination buffer must be provided
+        VerifyOrReturnError(destination_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(source.size() <= maxCount, CHIP_ERROR_INVALID_STRING_LENGTH);
-        VerifyOrReturnError(source.size() <= destination.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
         if (!source.empty())
         {
-            const size_t size = std::min(source.size(), maxCount);
-            std::memmove(const_cast<char *>(destination.data()), source.begin(), size);
+            std::memmove(destination_buffer, source.data(), source.size());
         }
 
         return CHIP_NO_ERROR;
@@ -278,26 +268,32 @@ struct SpanCopier<char>
      *
      * @warning The caller must ensure symmetric CopyData()/CleanupStruct() pairs exist
      */
-    static CHIP_ERROR CopyToNullable(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
+    static CHIP_ERROR CopyToNullable(const CharSpan source, DataModel::Nullable<CharSpan> & destination,
                                      size_t maxCount = std::numeric_limits<size_t>::max())
     {
-        destination.SetNull();
-
-        VerifyOrReturnError(!source.empty(), CHIP_NO_ERROR);
+        if (source.empty())
+        {
+            destination.SetNull();
+            return CHIP_NO_ERROR;
+        }
 
         VerifyOrReturnError(source.size() <= maxCount, CHIP_ERROR_INVALID_STRING_LENGTH);
 
-        if (!source.empty())
-        {
-            char * buffer = static_cast<char *>(Platform::MemoryCalloc(1, source.size()));
-            VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_NO_MEMORY);
+        char * buffer = static_cast<char *>(Platform::MemoryCalloc(1, source.size()));
+        VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_NO_MEMORY);
 
-            CharSpan tmpSpan = CharSpan(buffer, source.size());
+        CharSpan tmpSpan = CharSpan(buffer, source.size());
 
-            (void) Copy(source, tmpSpan, source.size());
+        auto freeGuard = [&buffer](CHIP_ERROR err) {
+            if (err != CHIP_NO_ERROR)
+            {
+                chip::Platform::MemoryFree(buffer);
+            }
+            return err;
+        };
 
-            destination.SetNonNull(tmpSpan);
-        }
+        ReturnErrorOnFailure(freeGuard(Copy(source, buffer, source.size())));
+        destination.SetNonNull(tmpSpan);
 
         return CHIP_NO_ERROR;
     }
