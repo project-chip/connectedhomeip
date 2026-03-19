@@ -21,33 +21,33 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
  #include <app-common/zap-generated/cluster-enums.h>
- 
+
  #include <imgui.h>
- 
+
  #include <lib/support/TypeTraits.h>
- 
+
  #include <math.h>
  #include <string>
  #include <string_view>
  #include <type_traits>
  #include <utility>
  #include <vector>
- 
+
  namespace example {
  namespace Ui {
  namespace Windows {
- 
+
  template <typename T>
  static const std::string GetBitmapValueString(const T maxValue, chip::BitMask<T> bitmask,
                                                const std::vector<std::pair<T, std::string_view>> & valuesToNames)
- 
+
  {
      // Check if any new value was added and communicate to user that the code needs updating.
      if (chip::to_underlying(maxValue) << 1 <= bitmask.Raw())
      {
          return "UI code needs uptating to support new value";
      }
- 
+
      std::string result;
      for (const auto & entry : valuesToNames)
      {
@@ -60,10 +60,10 @@
              result += entry.second;
          }
      }
- 
+
      return result.empty() ? "Unknown" : result;
  }
- 
+
  static const std::string GetRockBitmapValueString(chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> bitmask)
  {
      return GetBitmapValueString(chip::app::Clusters::FanControl::RockBitmap::kRockRound, bitmask,
@@ -71,7 +71,7 @@
                                    { chip::app::Clusters::FanControl::RockBitmap::kRockUpDown, "Up-down" },
                                    { chip::app::Clusters::FanControl::RockBitmap::kRockRound, "Round" } });
  }
- 
+
  static const std::string GetWindBitmapValueString(chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> bitmask)
  {
      return GetBitmapValueString(chip::app::Clusters::FanControl::WindBitmap::kNaturalWind, bitmask,
@@ -90,7 +90,7 @@ Status SetFanModeUI(EndpointId ep, FanModeEnum value)
 {
     return FanControl::SetFanMode(ep, value);
 }
- 
+
  Status GetAirflowDirection(EndpointId ep, AirflowDirectionEnum * value)
  {
      if (auto * c = FindClusterOnEndpoint(ep))
@@ -104,7 +104,7 @@ Status SetAirflowDirectionUI(EndpointId ep, AirflowDirectionEnum value)
 {
     return FanControl::SetAirflowDirection(ep, value);
 }
- 
+
  Status GetFanModeSequence(EndpointId ep, FanModeSequenceEnum * value)
  {
      if (auto * c = FindClusterOnEndpoint(ep))
@@ -118,7 +118,7 @@ Status SetAirflowDirectionUI(EndpointId ep, AirflowDirectionEnum value)
  {
      return Status::UnsupportedWrite;
  }
- 
+
  Status GetPercentCurrent(EndpointId ep, Percent * value)
  {
      if (auto * c = FindClusterOnEndpoint(ep))
@@ -128,12 +128,12 @@ Status SetAirflowDirectionUI(EndpointId ep, AirflowDirectionEnum value)
      }
      return Status::UnsupportedEndpoint;
  }
- 
+
 static Status GetSpeedMaxAdapter(EndpointId ep, uint8_t * value)
 {
     return FanControl::GetSpeedMax(ep, *value);
 }
- 
+
  Status GetSpeedCurrent(EndpointId ep, uint8_t * value)
  {
      if (auto * c = FindClusterOnEndpoint(ep))
@@ -143,7 +143,7 @@ static Status GetSpeedMaxAdapter(EndpointId ep, uint8_t * value)
      }
      return Status::UnsupportedEndpoint;
  }
- 
+
  Status GetFeatureMap(EndpointId ep, uint32_t * value)
  {
      if (auto * c = FindClusterOnEndpoint(ep))
@@ -153,7 +153,7 @@ static Status GetSpeedMaxAdapter(EndpointId ep, uint8_t * value)
      }
      return Status::UnsupportedEndpoint;
  }
- 
+
 Status SetPercentSettingUI(EndpointId ep, const app::DataModel::Nullable<Percent> & value)
 {
     return FanControl::SetPercentSetting(ep, value);
@@ -163,7 +163,7 @@ Status SetSpeedSettingUI(EndpointId ep, const app::DataModel::Nullable<uint8_t> 
 {
     return FanControl::SetSpeedSetting(ep, value);
 }
- 
+
  Status GetRockSupport(EndpointId ep, BitMask<RockBitmap> * value)
  {
      if (auto * c = FindClusterOnEndpoint(ep))
@@ -177,7 +177,7 @@ Status SetSpeedSettingUI(EndpointId ep, const app::DataModel::Nullable<uint8_t> 
  {
      return Status::UnsupportedWrite;
  }
- 
+
  Status GetRockSetting(EndpointId ep, BitMask<RockBitmap> * value)
  {
      if (auto * c = FindClusterOnEndpoint(ep))
@@ -191,7 +191,7 @@ Status SetRockSettingUI(EndpointId ep, BitMask<RockBitmap> value)
 {
     return FanControl::SetRockSetting(ep, value);
 }
- 
+
  Status GetWindSupport(EndpointId ep, BitMask<WindBitmap> * value)
  {
      if (auto * c = FindClusterOnEndpoint(ep))
@@ -205,7 +205,7 @@ Status SetRockSettingUI(EndpointId ep, BitMask<RockBitmap> value)
  {
      return Status::UnsupportedWrite;
  }
- 
+
  Status GetWindSetting(EndpointId ep, BitMask<WindBitmap> * value)
  {
      if (auto * c = FindClusterOnEndpoint(ep))
@@ -226,7 +226,7 @@ Status SetWindSettingUI(EndpointId ep, BitMask<WindBitmap> value)
      UpdateStateEnum(mEndpointId, mTargetFanMode, mFanMode, &SetFanModeUI, &GetFanModeAdapter);
      UpdateStateEnum(mEndpointId, mTargetAirflowDirection, mAirflowDirection, &SetAirflowDirectionUI, &GetAirflowDirection);
      UpdateStateEnum(mEndpointId, mTargetFanModeSequence, mFanModeSequence, &SetFanModeSequenceUI, &GetFanModeSequence);
- 
+
      UpdateStateReadOnly(mEndpointId, mTargetPercent, mPercent, &GetPercentCurrent);
      UpdateStateReadOnly(mEndpointId, mTargetSpeedMax, mSpeedMax, &GetSpeedMaxAdapter);
      UpdateStateReadOnly(mEndpointId, mTargetSpeedCurrent, mSpeedCurrent, &GetSpeedCurrent);
@@ -240,12 +240,12 @@ Status SetWindSettingUI(EndpointId ep, BitMask<WindBitmap> value)
      UpdateStateEnum(mEndpointId, mTargetWindSupport, mWindSupport, &SetWindSupportUI, &GetWindSupport);
      UpdateStateEnum(mEndpointId, mTargetWindSetting, mWindSetting, &SetWindSettingUI, &GetWindSetting);
  }
- 
+
  void FanControl::Render()
  {
      ImGui::Begin(mTitle.c_str());
      ImGui::Text("On Endpoint %d", mEndpointId);
- 
+
      int uiFanMode          = static_cast<int>(mFanMode);
      int uiPercentSetting   = static_cast<int>(mPercentSetting);
      int uiSpeedSetting     = static_cast<int>(mSpeedSetting);
@@ -259,93 +259,92 @@ Status SetWindSettingUI(EndpointId ep, BitMask<WindBitmap> value)
      int uiRockSupport      = mRockSupport.Raw();
      int uiWindSetting      = mWindSetting.Raw();
      int uiWindSupport      = mWindSupport.Raw();
- 
+
      ImGui::SliderInt("Mode value", &uiFanMode, static_cast<int>(chip::app::Clusters::FanControl::FanModeEnum::kOff),
                       static_cast<int>(chip::app::Clusters::FanControl::FanModeEnum::kSmart));
      if (static_cast<int>(mFanMode) != uiFanMode)
      {
          mTargetFanMode = static_cast<chip::app::Clusters::FanControl::FanModeEnum>(uiFanMode);
      }
- 
+
      ImGui::LabelText("Mode sequence", "%d", uiFanModeSequence);
      if (static_cast<int>(mFanModeSequence) != uiFanModeSequence)
      {
          mTargetFanModeSequence = static_cast<chip::app::Clusters::FanControl::FanModeSequenceEnum>(uiFanModeSequence);
      }
- 
+
      ImGui::SliderInt("Percent setting", &uiPercentSetting, 0, 100);
      if (static_cast<int>(mPercentSetting) != uiPercentSetting)
      {
          mTargetPercentSetting.Update(uiPercentSetting);
      }
- 
+
      ImGui::LabelText("Percent", "%d", uiPercent);
      if (static_cast<int>(mPercent) != uiPercent)
      {
          mTargetPercent = static_cast<chip::Percent>(uiPercent);
      }
- 
+
      ImGui::SliderInt("Speed setting", &uiSpeedSetting, 0, 10);
      if (mSpeedSetting != static_cast<uint8_t>(uiSpeedSetting))
      {
          mTargetSpeedSetting.Update(uiSpeedSetting);
      }
- 
+
      ImGui::LabelText("Speed current", "%d", uiSpeedCurrent);
      if (static_cast<int>(mSpeedCurrent) != uiSpeedCurrent)
      {
          mTargetSpeedCurrent = static_cast<uint8_t>(uiSpeedCurrent);
      }
- 
+
      ImGui::LabelText("Speed Max", "%d", uiSpeedMax);
      if (static_cast<int>(mSpeedMax) != uiSpeedMax)
      {
          mTargetSpeedMax = static_cast<uint8_t>(uiSpeedMax);
      }
- 
+
      ImGui::LabelText("Feature map", "%d", uiFeatureMap);
      if (static_cast<int>(mFeatureMap) != uiFeatureMap)
      {
          mTargetFeatureMap = static_cast<uint32_t>(uiFeatureMap);
      }
- 
+
      ImGui::SliderInt("Airflow direction", &uiAirflowDirection, 1, 0,
                       mAirflowDirection == chip::app::Clusters::FanControl::AirflowDirectionEnum::kForward ? "Forward" : "Reverse");
      if (static_cast<int>(mAirflowDirection) != uiAirflowDirection)
      {
          mTargetAirflowDirection = static_cast<chip::app::Clusters::FanControl::AirflowDirectionEnum>(uiAirflowDirection);
      }
- 
+
      ImGui::LabelText("Rock support", "%s", GetRockBitmapValueString(uiRockSupport).c_str());
      if (static_cast<int>(mRockSupport.Raw()) != uiRockSupport)
      {
          mTargetRockSupport = static_cast<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>(uiRockSupport);
      }
- 
+
      const auto rockSettingString = GetRockBitmapValueString(mRockSetting);
      ImGui::SliderInt("Rock setting", &uiRockSetting, 0, 1, rockSettingString.c_str());
      if (uiRockSetting != mRockSetting.Raw())
      {
          mTargetRockSetting = static_cast<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>(uiRockSetting);
      }
- 
+
      ImGui::LabelText("Wind support", "%s", GetWindBitmapValueString(uiWindSupport).c_str());
      if (static_cast<int>(mWindSupport.Raw()) != uiWindSupport)
      {
          mTargetWindSupport = static_cast<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>(uiWindSupport);
      }
- 
+
      const auto windSettingString = GetWindBitmapValueString(mWindSetting);
      ImGui::SliderInt("Wind setting", &uiWindSetting, 0, 2, windSettingString.c_str());
      if (uiWindSetting != mWindSetting.Raw())
      {
          mTargetWindSetting = static_cast<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>(uiWindSetting);
      }
- 
+
      ImGui::End();
  }
- 
+
  } // namespace Windows
  } // namespace Ui
  } // namespace example
- 
