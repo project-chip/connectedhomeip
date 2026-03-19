@@ -298,15 +298,15 @@ class CommissioningFlow:
     def create(commissioning_method: str | None, dev_ctrl, node_id, info, commissioning_info):
         if commissioning_method == "on-network":
             return CommissioningNetworkOnNetwork(dev_ctrl, node_id, info, commissioning_info)
-        elif commissioning_method == "ble-wifi":
+        if commissioning_method == "ble-wifi":
             return CommissioningBleWiFi(dev_ctrl, node_id, info, commissioning_info)
-        elif commissioning_method == "ble-thread":
+        if commissioning_method == "ble-thread":
             return CommissioningBleThread(dev_ctrl, node_id, info, commissioning_info)
-        elif commissioning_method == "nfc-thread":
+        if commissioning_method == "nfc-thread":
             return CommissioningNfcThread(dev_ctrl, node_id, info, commissioning_info)
-        elif commissioning_method == "nfc-wifi":
+        if commissioning_method == "nfc-wifi":
             return CommissioningNfcWiFi(dev_ctrl, node_id, info, commissioning_info)
-        elif commissioning_method == "thread-meshcop":
+        if commissioning_method == "thread-meshcop":
             return CommissioningThreadMeshcop(dev_ctrl, node_id, info, commissioning_info)
 
         raise ValueError(f"Invalid commissioning method {commissioning_method}")
@@ -345,7 +345,7 @@ async def commission_device(
         await commissioning.start()
         return PairingStatus()
 
-    except ChipStackError as e:
+    except ChipStackError as e:  # chipstack-ok
         LOGGER.exception("Commissioning failed")
         return PairingStatus(exception=e)
     except Exception as e:
@@ -419,7 +419,7 @@ def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadI
                 (setup_payload.short_discriminator, setup_payload.setup_passcode)
             )
 
-        except ChipStackError:
+        except ChipStackError:  # chipstack-ok
             asserts.fail(f"QR code '{qr_code}' failed to parse properly as a Matter setup code.")
 
     for manual_code in matter_test_config.manual_code:
@@ -437,7 +437,7 @@ def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadI
 
             infos.append(info)
 
-        except ChipStackError:
+        except ChipStackError:  # chipstack-ok
             asserts.fail(
                 f"Manual code '{manual_code}' failed to parse properly as a Matter setup code. "
                 "Check that all digits are correct and length is 11 or 21 characters."
