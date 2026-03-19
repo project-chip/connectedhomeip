@@ -48,7 +48,7 @@ def is_valid_int_value(value: Any, bit_count: int = 8) -> bool:
     return isinstance(value, int) and (min_val <= value <= max_val)
 
 
-def is_valid_bool_value(value: Any, description: str) -> bool:
+def is_valid_bool_value(value: Any) -> bool:
     """
     Checks if 'value' is a boolean.
     """
