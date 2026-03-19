@@ -5,7 +5,6 @@ click
 colorama
 coloredlogs
 diskcache
-mypy==1.16.0
 sdbus; sys_platform == "linux"
 types-PyYAML
 tabulate

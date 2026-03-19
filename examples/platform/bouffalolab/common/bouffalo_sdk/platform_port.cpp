@@ -40,6 +40,10 @@ void platform_port_init(void)
     __libc_init_array();
 
     bflb_mtd_init();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    board_emac_gpio_init();
+#endif
 }
 
 extern "C" void vAssertCalled(void)

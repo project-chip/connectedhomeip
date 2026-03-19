@@ -11565,10 +11565,18 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("AmbientContextType", indent + 1, value.ambientContextType);
+        CHIP_ERROR err = DataModelLogger::LogValue("AmbientContextDetected", indent + 1, value.ambientContextDetected);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AmbientContextType'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'AmbientContextDetected'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("ObjectCountReached", indent + 1, value.objectCountReached);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ObjectCountReached'");
             return err;
         }
     }
@@ -11589,10 +11597,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("StartEventNumber", indent + 1, value.startEventNumber);
+        CHIP_ERROR err = DataModelLogger::LogValue("EventStartTime", indent + 1, value.eventStartTime);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'StartEventNumber'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'EventStartTime'");
             return err;
         }
     }
@@ -13757,6 +13765,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxPathsPerInvoke", 1, value);
         }
+        case BasicInformation::Attributes::DeviceLocation::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DeviceLocation", 1, value);
+        }
         case BasicInformation::Attributes::ConfigurationVersion::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -15301,6 +15314,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::Clusters::BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ProductAppearance", 1, value);
+        }
+        case BridgedDeviceBasicInformation::Attributes::DeviceLocation::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DeviceLocation", 1, value);
         }
         case BridgedDeviceBasicInformation::Attributes::ConfigurationVersion::Id: {
             uint32_t value;

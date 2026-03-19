@@ -42,11 +42,20 @@ NSString * MTRPrivateAttributeNameForID(MTRClusterIDType clusterID, MTRAttribute
 {
     NSString * result = nil;
 
-    switch ((MTRPrivateClusterIDType) clusterID) {
+    if ((clusterID & 0xFFFF0000) != 0) {
+        switch ((MTRPrivateClusterIDType) clusterID) {
 
-    default:
-        result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
-        break;
+        default:
+            result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
+            break;
+        }
+    } else {
+        switch ((MTRClusterIDType) clusterID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
+            break;
+        }
     }
 
     return result;
@@ -58,11 +67,20 @@ NSString * MTRPrivateRequestCommandNameForID(MTRClusterIDType clusterID, MTRComm
 {
     NSString * result = nil;
 
-    switch ((MTRPrivateClusterIDType) clusterID) {
+    if ((clusterID & 0xFFFF0000) != 0) {
+        switch ((MTRPrivateClusterIDType) clusterID) {
 
-    default:
-        result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
-        break;
+        default:
+            result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
+            break;
+        }
+    } else {
+        switch ((MTRClusterIDType) clusterID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
+            break;
+        }
     }
 
     return result;
@@ -72,11 +90,20 @@ NSString * MTRPrivateResponseCommandNameForID(MTRClusterIDType clusterID, MTRCom
 {
     NSString * result = nil;
 
-    switch ((MTRPrivateClusterIDType) clusterID) {
+    if ((clusterID & 0xFFFF0000) != 0) {
+        switch ((MTRPrivateClusterIDType) clusterID) {
 
-    default:
-        result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
-        break;
+        default:
+            result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
+            break;
+        }
+    } else {
+        switch ((MTRClusterIDType) clusterID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
+            break;
+        }
     }
 
     return result;
@@ -88,11 +115,20 @@ NSString * MTRPrivateEventNameForID(MTRClusterIDType clusterID, MTREventIDType e
 {
     NSString * result = nil;
 
-    switch ((MTRPrivateClusterIDType) clusterID) {
+    if ((clusterID & 0xFFFF0000) != 0) {
+        switch ((MTRPrivateClusterIDType) clusterID) {
 
-    default:
-        result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
-        break;
+        default:
+            result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
+            break;
+        }
+    } else {
+        switch ((MTRClusterIDType) clusterID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown clusterID %u>", clusterID];
+            break;
+        }
     }
 
     return result;

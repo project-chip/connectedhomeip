@@ -20,7 +20,7 @@
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 #include <stdlib.h>
 

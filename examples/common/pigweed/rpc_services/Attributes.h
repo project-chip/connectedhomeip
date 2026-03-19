@@ -221,10 +221,7 @@ public:
         }
 
         Access::SubjectDescriptor subjectDescriptor{ .authMode = chip::Access::AuthMode::kInternalDeviceAccess };
-        app::DataModel::WriteAttributeRequest write_request;
-        write_request.path = path;
-        write_request.operationFlags.Set(app::DataModel::OperationFlags::kInternal);
-        write_request.subjectDescriptor = &subjectDescriptor;
+        app::DataModel::WriteAttributeRequest write_request(path, subjectDescriptor);
 
         uint8_t raw_value_buffer[64]; // enough to hold general types
         pw::Result<TLV::TLVReader> tlvReader = ReadIntoTlv(request.data, chip::MutableByteSpan(raw_value_buffer));
@@ -392,10 +389,7 @@ private:
         // TODO: this assumes a singleton data model provider
         app::DataModel::Provider * provider = app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
 
-        app::DataModel::ReadAttributeRequest request;
-        request.path = path;
-        request.operationFlags.Set(app::DataModel::OperationFlags::kInternal);
-        request.subjectDescriptor = &subjectDescriptor;
+        app::DataModel::ReadAttributeRequest request(path, subjectDescriptor);
 
         app::DataModel::ServerClusterFinder serverClusterFinder(provider);
         auto info = serverClusterFinder.Find(path);
