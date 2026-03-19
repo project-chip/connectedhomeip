@@ -29,4 +29,35 @@
 {{/if}}
 {{/zcl_clusters}}
 
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
+@implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} (PrivateExtensions)
+
+{{#zcl_commands}}
+{{#if manufacturerCode}}
+{{#if (is_str_equal source 'client')}}
+{{#*inline "commandImpl"}}
+{{#if (isSupported cluster command=command)}}
+{{#*inline "paramsType"}}MTR{{cluster}}Cluster{{command}}Params{{/inline}}
+{{> base_clusters_command_impl cluster=cluster}}
+{{/if}}
+{{/inline}}
+{{> commandImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
+                command=(asUpperCamelCase name preserveAcronyms=true)}}
+{{/if}}
+{{/if}}
+{{/zcl_commands}}
+
+{{#zcl_attributes_server removeKeys='isOptional'}}
+{{#if manufacturerCode}}
+{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
+{{> base_clusters_attribute_impl}}
+{{/if}}
+{{/if}}
+{{/zcl_attributes_server}}
+
+@end
+{{/if}}
+{{/zcl_clusters}}
+
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)

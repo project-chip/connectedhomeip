@@ -23,9 +23,7 @@
 #include "TLSCertificateManagementCluster.h"
 
 #include <app/ConcreteAttributePath.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server/Server.h>
 #include <clusters/TlsCertificateManagement/Attributes.h>
 #include <clusters/TlsCertificateManagement/Commands.h>
 #include <clusters/TlsCertificateManagement/Metadata.h>
@@ -60,12 +58,13 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Commands::RemoveClientCertificate::kMetadataEntry,
 };
 
-TLSCertificateManagementCluster::TLSCertificateManagementCluster(EndpointId endpointId, TLSCertificateManagementDelegate & delegate,
+TLSCertificateManagementCluster::TLSCertificateManagementCluster(const Context & context, EndpointId endpointId,
+                                                                 TLSCertificateManagementDelegate & delegate,
                                                                  Tls::CertificateDependencyChecker & dependencyChecker,
                                                                  CertificateTable & certificateTable, uint8_t maxRootCertificates,
                                                                  uint8_t maxClientCertificates) :
     DefaultServerCluster(ConcreteClusterPath(endpointId, TlsCertificateManagement::Id)),
-    mDelegate(delegate), mDependencyChecker(dependencyChecker), mCertificateTable(certificateTable),
+    mContext(context), mDelegate(delegate), mDependencyChecker(dependencyChecker), mCertificateTable(certificateTable),
     mMaxRootCertificates(maxRootCertificates), mMaxClientCertificates(maxClientCertificates)
 {
     VerifyOrDieWithMsg(mMaxRootCertificates >= 5, NotSpecified, "Spec requires MaxRootCertificates be >= 5");
@@ -86,7 +85,7 @@ CHIP_ERROR TLSCertificateManagementCluster::Startup(ServerClusterContext & conte
 
     ReturnErrorOnFailure(mCertificateTable.Init(context.storage));
 
-    return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    return mContext.fabricTable.AddFabricDelegate(this);
 }
 
 void TLSCertificateManagementCluster::Shutdown(ClusterShutdownType shutdownType)
@@ -94,7 +93,7 @@ void TLSCertificateManagementCluster::Shutdown(ClusterShutdownType shutdownType)
     ChipLogProgress(DataManagement, "TLSCertificateManagementCluster: shutdown");
 
     mCertificateTable.Finish();
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    mContext.fabricTable.RemoveFabricDelegate(this);
 
     DefaultServerCluster::Shutdown(shutdownType);
 }

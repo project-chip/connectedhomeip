@@ -30,9 +30,9 @@
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/GLibTypeDeleter.h>
+#include <platform/PlatformError.h>
 #include <platform/PlatformManager.h>
 
-#include "ErrorUtils.h"
 #include "NetworkCommissioningDriver.h"
 
 using namespace ::chip::DeviceLayer::NetworkCommissioning;
@@ -1107,7 +1107,7 @@ CHIP_ERROR WiFiManager::GetBssId(MutableByteSpan & value)
 
     GAutoPtr<char> bssIdStr;
     int wifiErr = wifi_manager_ap_get_bssid(connectedAp, &bssIdStr.GetReceiver());
-    VerifyOrReturnError(wifiErr == WIFI_MANAGER_ERROR_NONE, TizenToChipError(wifiErr),
+    VerifyOrReturnError(wifiErr == WIFI_MANAGER_ERROR_NONE, MATTER_PLATFORM_ERROR(wifiErr),
                         ChipLogError(DeviceLayer, "FAIL: Get AP BSSID: %s", get_error_message(wifiErr)));
 
     uint8_t * data = value.data();

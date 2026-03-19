@@ -31,13 +31,13 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     framework:
         name: Build framework
         if: github.actor != 'restyled-io[bot]'
-        
+
         strategy:
             matrix:
                 os: [ macos-26 ]
@@ -132,7 +132,7 @@ jobs:
                   mkdir -p /tmp/darwin/framework-tests
                   find ~/Library/Developer/Xcode/DerivedData /Library/Logs/DiagnosticReports -name '*.ips' -print0 | xargs -0 -J % cp % /tmp/darwin/framework-tests
             - name: Uploading log files
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               if: failure() && !env.ACT
               with:
                   name: darwin-framework-test-logs-${{ matrix.options.flavor }}

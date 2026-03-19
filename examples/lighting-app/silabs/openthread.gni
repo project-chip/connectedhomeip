@@ -21,7 +21,7 @@ silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 app_data_model =
     "${chip_root}/examples/lighting-app/silabs/data_model:silabs-lighting"
 chip_enable_ota_requestor = true
-chip_enable_openthread = true
+chip_enable_thread = true
 
 # Not needed for the Lighting-app
 chip_enable_read_client = false

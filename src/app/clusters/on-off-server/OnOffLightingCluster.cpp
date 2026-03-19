@@ -391,7 +391,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOffWithEffect(const Da
     {
         if (mScenesIntegrationDelegate != nullptr)
         {
-            LogErrorOnFailure(mScenesIntegrationDelegate->StoreCurrentGlobalScene(request.subjectDescriptor->fabricIndex));
+            LogErrorOnFailure(mScenesIntegrationDelegate->StoreCurrentGlobalScene(request.subjectDescriptor.fabricIndex));
         }
 
         DataModel::ActionReturnStatus status =
@@ -421,7 +421,7 @@ DataModel::ActionReturnStatus OnOffLightingCluster::HandleOnWithRecallGlobalScen
 
     if (mScenesIntegrationDelegate != nullptr)
     {
-        CHIP_ERROR err = mScenesIntegrationDelegate->RecallGlobalScene(request.subjectDescriptor->fabricIndex);
+        CHIP_ERROR err = mScenesIntegrationDelegate->RecallGlobalScene(request.subjectDescriptor.fabricIndex);
         if (err != CHIP_NO_ERROR)
         {
             // Spec requirement:

@@ -25,10 +25,12 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/clusters/tls-certificate-management-server",
     "${chip_root}/src/app/clusters/tls-client-management-server",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols",
   ]
 }

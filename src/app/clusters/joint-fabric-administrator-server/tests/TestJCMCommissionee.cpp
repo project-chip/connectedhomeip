@@ -260,20 +260,19 @@ protected:
             return CHIP_ERROR_INTERNAL;
         }
 
-        constexpr uint8_t kDummyRootCert[] = { 0xA1, 0xB2, 0xC3, 0xD4 };
-
         CertsAttr::DecodableType value;
 
-        uint8_t buffer[64];
+        // Include extra space in the buffer for TLV header
+        std::vector<uint8_t> buffer(TestCerts::sTestCert_Root01_Chip.size() + 16);
         TLV::TLVWriter writer;
-        writer.Init(buffer, sizeof(buffer));
+        writer.Init(buffer.data(), buffer.size());
         TLV::TLVType outerType;
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outerType));
-        ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), ByteSpan(kDummyRootCert, sizeof(kDummyRootCert))));
+        ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), ByteSpan(TestCerts::sTestCert_Root01_Chip)));
         ReturnErrorOnFailure(writer.EndContainer(outerType));
 
         TLV::TLVReader reader;
-        reader.Init(buffer, writer.GetLengthWritten());
+        reader.Init(buffer.data(), writer.GetLengthWritten());
         ReturnErrorOnFailure(reader.Next());
 
         TLV::TLVType innerType;
@@ -583,6 +582,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminCertsPopulatesCommissioner
     commandHandler.SetExchangeContext(exchangeCtx1);
 
     SingleStageJCMCommissionee commissionee(handle, EndpointId{ 79 }, [](CHIP_ERROR) {});
+    commissionee.mInfo.rootPublicKey.CopyFromSpan(TestCerts::sTestCert_Root01_PublicKey);
 
     bool callbackCalled      = false;
     CHIP_ERROR callbackError = CHIP_ERROR_INTERNAL;
@@ -596,11 +596,11 @@ TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminCertsPopulatesCommissioner
     EXPECT_TRUE(callbackCalled);
     EXPECT_EQ(callbackError, CHIP_NO_ERROR);
 
-    constexpr uint8_t kExpectedRootCert[] = { 0xA1, 0xB2, 0xC3, 0xD4 };
-
-    ASSERT_EQ(commissionee.mInfo.adminRCAC.AllocatedSize(), sizeof(kExpectedRootCert));
+    ASSERT_EQ(commissionee.mInfo.adminRCAC.AllocatedSize(), TestCerts::sTestCert_Root01_Chip.size());
     ASSERT_NE(commissionee.mInfo.adminRCAC.Get(), nullptr);
-    EXPECT_EQ(memcmp(commissionee.mInfo.adminRCAC.Get(), kExpectedRootCert, sizeof(kExpectedRootCert)), 0);
+    EXPECT_EQ(memcmp(commissionee.mInfo.adminRCAC.Get(), TestCerts::sTestCert_Root01_Chip.data(),
+                     TestCerts::sTestCert_Root01_Chip.size()),
+              0);
 }
 
 TEST_F_FROM_FIXTURE(TestJCMCommissionee, TestReadAdminNOCsPopulatesCommissionerCerts)

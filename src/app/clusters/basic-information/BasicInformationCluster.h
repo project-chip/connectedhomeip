@@ -44,6 +44,7 @@ public:
         DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider;
         DeviceLayer::ConfigurationManager & configurationManager;
         DeviceLayer::PlatformManager & platformManager;
+        uint16_t subscriptionsPerFabric;
     };
 
     using OptionalAttributesSet = chip::app::OptionalAttributeSet< //
@@ -94,6 +95,12 @@ public:
     void OnStartUp(uint32_t softwareVersion) override;
 
     void OnShutDown() override;
+
+    // ConfigurationVersionDelegate, however NOT overridable to save
+    // some flash in case this feature is never used. This means applications that may
+    // change configurations at runtime pay a bit more flash, however those are probably more
+    // dynamic (i.e. larger) systems like bridges or more complex systems.
+    CHIP_ERROR IncreaseConfigurationVersion();
 
 private:
     // write without notification

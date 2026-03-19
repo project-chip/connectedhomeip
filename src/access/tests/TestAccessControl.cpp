@@ -18,12 +18,36 @@
 
 #include "access/AccessControl.h"
 #include "access/examples/ExampleAccessControlDelegate.h"
+#include "access/examples/GroupAuxiliaryAccessControlDelegate.h"
+#include <credentials/FabricTable.h>
+#include <credentials/GroupDataProvider.h>
+#include <credentials/GroupDataProviderImpl.h>
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <credentials/tests/CHIPCert_unit_test_vectors.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
+#include <lib/core/Optional.h>
+#include <set>
 
 #include <pw_unit_test/framework.h>
 
+#include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
+
+namespace {
+
+constexpr uint16_t kMaxGroupsPerFabric    = 5;
+constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+
+chip::TestPersistentStorageDelegate gTestStorage;
+chip::Crypto::DefaultSessionKeystore gSessionKeystore;
+chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+chip::Access::Examples::GroupAuxiliaryAccessControlDelegate gGroupAuxiliaryAccessControlDelegate(&gGroupsProvider);
+
+} // namespace
 
 namespace chip {
 namespace Access {
@@ -438,6 +462,12 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR GetAuxiliaryType(AuxiliaryType & auxiliaryType) const override
+    {
+        auxiliaryType = mAuxiliaryType;
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR GetFabricIndex(FabricIndex & fabricIndex) const override
     {
         fabricIndex = mFabricIndex;
@@ -453,6 +483,12 @@ public:
     CHIP_ERROR SetAuthMode(AuthMode authMode) override
     {
         mAuthMode = authMode;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR SetAuxiliaryType(AuxiliaryType auxiliaryType) override
+    {
+        mAuxiliaryType = auxiliaryType;
         return CHIP_NO_ERROR;
     }
 
@@ -536,13 +572,14 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    FabricIndex mFabricIndex = 1;
-    Privilege mPrivilege     = Privilege::kView;
-    AuthMode mAuthMode       = AuthMode::kCase;
-    NodeId mSubject          = kOperationalNodeId0;
-    Target mTarget           = { .flags = Target::kCluster, .cluster = kOnOffCluster };
-    size_t mSubjectCount     = 1;
-    size_t mTargetCount      = 1;
+    FabricIndex mFabricIndex     = 1;
+    Privilege mPrivilege         = Privilege::kView;
+    AuthMode mAuthMode           = AuthMode::kCase;
+    AuxiliaryType mAuxiliaryType = AuxiliaryType::kSystem;
+    NodeId mSubject              = kOperationalNodeId0;
+    Target mTarget               = { .flags = Target::kCluster, .cluster = kOnOffCluster };
+    size_t mSubjectCount         = 1;
+    size_t mTargetCount          = 1;
 };
 
 bool operator==(const Target & a, const Target & b)
@@ -659,6 +696,27 @@ struct EntryData
     }
 };
 
+struct AuxiliaryEquivalenceEntry
+{
+    chip::FabricIndex fabricIndex;
+    chip::GroupId groupId;
+    chip::EndpointId endpointId;
+
+    bool operator<(const AuxiliaryEquivalenceEntry & other) const
+    {
+        if (fabricIndex != other.fabricIndex)
+            return fabricIndex < other.fabricIndex;
+        if (groupId != other.groupId)
+            return groupId < other.groupId;
+        return endpointId < other.endpointId;
+    }
+
+    bool operator==(const AuxiliaryEquivalenceEntry & other) const
+    {
+        return fabricIndex == other.fabricIndex && groupId == other.groupId && endpointId == other.endpointId;
+    }
+};
+
 CHIP_ERROR CompareEntry(const Entry & entry, const EntryData & entryData)
 {
     AuthMode authMode = AuthMode::kNone;
@@ -741,6 +799,81 @@ CHIP_ERROR LoadAccessControl(AccessControl & ac, const EntryData * entryData, si
     return CHIP_NO_ERROR;
 }
 
+/**
+ * The format of Auxiliary entries is up to the implementation of the appropriate
+ * access control delegate. This means there is not only 1 valid format of entries, rather
+ * there is a set of rules that the collection of entries follows. This function reduces
+ * the entries reported to the base equivalence class to compare with an expected set.
+ */
+void ValidateAuxiliaryEntries(AccessControl & ac, FabricIndex fabric, const std::set<AuxiliaryEquivalenceEntry> & expectedSet)
+{
+    EntryIterator iterator;
+    EXPECT_EQ(ac.AuxiliaryEntries(fabric, iterator), CHIP_NO_ERROR);
+
+    std::set<AuxiliaryEquivalenceEntry> actualSet;
+    Entry entry;
+
+    while (iterator.Next(entry) == CHIP_NO_ERROR)
+    {
+        FabricIndex entryFabric;
+        size_t subjectCount = 0;
+        size_t targetCount  = 0;
+
+        EXPECT_EQ(entry.GetFabricIndex(entryFabric), CHIP_NO_ERROR);
+        EXPECT_EQ(entry.GetSubjectCount(subjectCount), CHIP_NO_ERROR);
+        EXPECT_EQ(entry.GetTargetCount(targetCount), CHIP_NO_ERROR);
+
+        for (size_t s = 0; s < subjectCount; ++s)
+        {
+            NodeId subject;
+            if (entry.GetSubject(s, subject) == CHIP_NO_ERROR && IsGroupId(subject))
+            {
+                GroupId groupId = GroupIdFromNodeId(subject);
+                if (targetCount > 0)
+                {
+                    for (size_t t = 0; t < targetCount; ++t)
+                    {
+                        Entry::Target target;
+                        if (entry.GetTarget(t, target) == CHIP_NO_ERROR)
+                        {
+                            actualSet.insert({ .fabricIndex = entryFabric, .groupId = groupId, .endpointId = target.endpoint });
+                        }
+                    }
+                }
+                else
+                {
+                    // Target can be unspecified, which represents a wildcard of all endpoints from
+                    // a root node's descriptor cluster part list being represented from 1 entry.
+                    // This can be verified in end-to-end tests, but for the purposes of unit tests
+                    // here checking against the group auxiliary delegate in access control, endpoint
+                    // information can be pulled from the group data provider.
+                    Credentials::GroupDataProvider * provider = Credentials::GetGroupDataProvider();
+                    if (provider)
+                    {
+                        auto * it = provider->IterateEndpoints(entryFabric, groupId);
+                        if (it)
+                        {
+                            Credentials::GroupDataProvider::GroupEndpoint endpoint;
+                            while (it->Next(endpoint))
+                            {
+                                if (endpoint.endpoint_id != kRootEndpointId)
+                                {
+                                    actualSet.insert(
+                                        { .fabricIndex = entryFabric, .groupId = groupId, .endpointId = endpoint.endpoint_id });
+                                }
+                            }
+                            it->Release();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Comparing sets provides a clear diff if the test fails
+    EXPECT_EQ(actualSet, expectedSet);
+}
+
 constexpr size_t kNumFabric1EntriesInEntryData1 = 4;
 constexpr size_t kNumFabric2EntriesInEntryData1 = 5;
 
@@ -816,6 +949,18 @@ struct CheckData
     RequestPath requestPath;
     Privilege privilege;
     bool allow;
+};
+
+struct GroupCheckData
+{
+    SubjectDescriptor subjectDescriptor;
+    RequestPath requestPath;
+    Privilege privilege;
+    // If not specified, this means the expected result is NOT CHIP_NO_ERROR, but also may not be CHIP_ERROR_ACCESS_DENIED.
+    // This can happen if tests have malformed access control requests or group data fetch requests, which are expected to
+    // fail earlier in execution. Main purpose of tests that don't specify this are to ensure some sort of failure in the
+    // process of doing the check occurs before approving/denying access.
+    Optional<CHIP_ERROR> expectedResult;
 };
 
 constexpr CheckData checkData1[] = {
@@ -1079,20 +1224,100 @@ constexpr CheckData checkData1[] = {
       .allow             = true },
 };
 
+const GroupCheckData groupCheckData[] = {
+    // Allowed (access granted)
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x1111) },
+      .requestPath       = { .endpoint = 10, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate,
+      .expectedResult    = Optional<CHIP_ERROR>::Value(CHIP_NO_ERROR) },
+
+    // Not allowed (access denied) because TestGroupAuxiliaryCheck will purposely NOT add the kHasAuxiliaryACL flag to the group.
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x2222) },
+      .requestPath       = { .endpoint = 20, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate,
+      .expectedResult    = Optional<CHIP_ERROR>::Value(CHIP_ERROR_ACCESS_DENIED) },
+
+    // Not allowed (access denied) because the wrong request type is used.
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x1111) },
+      .requestPath       = { .endpoint = 10, .requestType = Access::RequestType::kAttributeWriteRequest },
+      .privilege         = Privilege::kOperate,
+      .expectedResult    = Optional<CHIP_ERROR>::Value(CHIP_ERROR_ACCESS_DENIED) },
+
+    // Not allowed (access denied) because access should never be granted for endpoint 0.
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x1111) },
+      .requestPath       = { .endpoint = 0, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate,
+      .expectedResult    = Optional<CHIP_ERROR>::Value(CHIP_ERROR_ACCESS_DENIED) },
+
+    // Allowed (access granted)
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x3333) },
+      .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate,
+      .expectedResult    = Optional<CHIP_ERROR>::Value(CHIP_NO_ERROR) },
+
+    // Not allowed (access denied) because TestGroupAuxiliaryCheck will purposely NOT add the kHasAuxiliaryACL flag to the group.
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x4444) },
+      .requestPath       = { .endpoint = 40, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate,
+      .expectedResult    = Optional<CHIP_ERROR>::Value(CHIP_ERROR_ACCESS_DENIED) },
+
+    // Not allowed (access denied) because the wrong privilige is used.
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x3333) },
+      .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kManage,
+      .expectedResult    = Optional<CHIP_ERROR>::Value(CHIP_ERROR_ACCESS_DENIED) },
+
+    // Not allowed (access denied) because the wrong auth mode is used.
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kNone, .subject = NodeIdFromGroupId(0x3333) },
+      .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate,
+      .expectedResult    = Optional<CHIP_ERROR>::Value(CHIP_ERROR_ACCESS_DENIED) },
+
+    // Not allowed (access denied) because the endpoint does not exist on the group
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x3333) },
+      .requestPath       = { .endpoint = 9, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate,
+      .expectedResult    = Optional<CHIP_ERROR>::Value(CHIP_ERROR_ACCESS_DENIED) },
+
+    // Not allowed (failure in execution) because the endpoint doesn't exist on the specified fabric index for the group
+    { .subjectDescriptor = { .fabricIndex = 9, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x3333) },
+      .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate },
+
+    // Not allowed (failure in execution) because the group does not exist
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = NodeIdFromGroupId(0x9999) },
+      .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
+      .privilege         = Privilege::kOperate },
+};
+
 class TestAccessControl : public ::testing::Test
 {
 public: // protected
     void SetUp() override { ASSERT_EQ(ClearAccessControl(accessControl), CHIP_NO_ERROR); }
     static void SetUpTestSuite()
     {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+
+        // Set and init access control delegate
         AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate();
         SetAccessControl(accessControl);
         SuccessOrDie(GetAccessControl().Init(delegate, testDeviceTypeResolver));
+
+        // Set and init group data provider
+        gTestStorage.ClearStorage();
+        gGroupsProvider.SetStorageDelegate(&gTestStorage);
+        gGroupsProvider.SetSessionKeystore(&gSessionKeystore);
+        ASSERT_EQ(gGroupsProvider.Init(), CHIP_NO_ERROR);
+        chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
+
+        // Register group auxilary access control delegate
+        SuccessOrDie(GetAccessControl().RegisterGroupAuxiliaryDelegate(&gGroupAuxiliaryAccessControlDelegate));
     }
     static void TearDownTestSuite()
     {
         GetAccessControl().Finish();
         ResetAccessControlToDefault();
+        chip::Platform::MemoryShutdown();
     }
 };
 
@@ -1877,6 +2102,248 @@ TEST_F(TestAccessControl, TestFabricFilteredReadEntry)
             }
         }
     }
+}
+
+TEST_F(TestAccessControl, TestGroupAuxiliaryDelegateRegistration)
+{
+    // The delegate is already registered in SetUpTestSuite.
+    AccessControl::Delegate * delegate = &gGroupAuxiliaryAccessControlDelegate;
+
+    // Verify registering again fails.
+    EXPECT_EQ(accessControl.RegisterGroupAuxiliaryDelegate(delegate), CHIP_ERROR_INCORRECT_STATE);
+
+    // Verify unregistration.
+    accessControl.UnregisterGroupAuxiliaryDelegate();
+
+    // Verify AuxiliaryEntries returns CHIP_ERROR_INCORRECT_STATE when no delegate is registered.
+    EntryIterator iterator;
+    EXPECT_EQ(accessControl.AuxiliaryEntries(1, iterator), CHIP_ERROR_INCORRECT_STATE);
+
+    // Verify registration again after unregistration.
+    EXPECT_EQ(accessControl.RegisterGroupAuxiliaryDelegate(delegate), CHIP_NO_ERROR);
+}
+
+TEST_F(TestAccessControl, TestGroupAuxiliaryEntries)
+{
+    // Ensure GroupDataProvider is available
+    Credentials::GroupDataProvider * provider = Credentials::GetGroupDataProvider();
+    ASSERT_NE(provider, nullptr);
+
+    FabricIndex fabric1 = 1;
+    FabricIndex fabric2 = 2;
+
+    // Set up group 1 data for fabric 1
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x1111;
+        info.SetName("Group 1");
+        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        EXPECT_EQ(provider->SetGroupInfo(fabric1, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric1, info.group_id, 10), CHIP_NO_ERROR);
+    }
+
+    // Set up group 2 data for fabric 1
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x2222;
+        info.SetName("Group 2");
+        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        EXPECT_EQ(provider->SetGroupInfo(fabric1, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric1, info.group_id, 20), CHIP_NO_ERROR);
+    }
+
+    // Set up group data for fabric 2
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x3333;
+        info.SetName("Group 3");
+        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        EXPECT_EQ(provider->SetGroupInfo(fabric2, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric2, info.group_id, 30), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric2, info.group_id, 40), CHIP_NO_ERROR);
+    }
+
+    // Set up group data for fabric 2, WITHOUT kHasAuxiliaryACL. This group information
+    // should not appear in any auxiliary ACL entry.
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x4444;
+        info.SetName("Group 4");
+        EXPECT_EQ(provider->SetGroupInfo(fabric2, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric2, info.group_id, 50), CHIP_NO_ERROR);
+    }
+
+    // Define Golden Sets (The base equivalence classes) that are expected
+    std::set<AuxiliaryEquivalenceEntry> expectedFabric1 = { { .fabricIndex = fabric1, .groupId = 0x1111, .endpointId = 10 },
+                                                            { .fabricIndex = fabric1, .groupId = 0x2222, .endpointId = 20 } };
+
+    std::set<AuxiliaryEquivalenceEntry> expectedFabric2 = {
+        { .fabricIndex = fabric2, .groupId = 0x3333, .endpointId = 30 },
+        { .fabricIndex = fabric2, .groupId = 0x3333, .endpointId = 40 },
+    };
+
+    // Execute Validation
+    ValidateAuxiliaryEntries(accessControl, fabric1, expectedFabric1);
+    ValidateAuxiliaryEntries(accessControl, fabric2, expectedFabric2);
+
+    // Cleanup
+    EXPECT_EQ(provider->RemoveFabric(fabric1), CHIP_NO_ERROR);
+    EXPECT_EQ(provider->RemoveFabric(fabric2), CHIP_NO_ERROR);
+}
+
+TEST_F(TestAccessControl, TestGroupAuxiliaryEntriesAllFabrics)
+{
+    // Ensure GroupDataProvider is available
+    Credentials::GroupDataProvider * provider = Credentials::GetGroupDataProvider();
+    ASSERT_NE(provider, nullptr);
+
+    FabricIndex fabric1 = 1;
+    FabricIndex fabric2 = 2;
+
+    // Set up group data for fabric 1
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x1111;
+        info.flags    = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        EXPECT_EQ(provider->SetGroupInfo(fabric1, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric1, info.group_id, 10), CHIP_NO_ERROR);
+    }
+
+    // Set up group data for fabric 2
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x2222;
+        info.flags    = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        EXPECT_EQ(provider->SetGroupInfo(fabric2, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(fabric2, info.group_id, 20), CHIP_NO_ERROR);
+    }
+
+    // Define expected set across all fabrics
+    std::set<AuxiliaryEquivalenceEntry> expectedAll = { { .fabricIndex = fabric1, .groupId = 0x1111, .endpointId = 10 },
+                                                        { .fabricIndex = fabric2, .groupId = 0x2222, .endpointId = 20 } };
+
+    // Path 1: Manual iteration (no FabricTable)
+    {
+        // Unregister global delegate first
+        GetAccessControl().UnregisterGroupAuxiliaryDelegate();
+
+        Examples::GroupAuxiliaryAccessControlDelegate manualDelegate(provider, nullptr);
+        EXPECT_EQ(GetAccessControl().RegisterGroupAuxiliaryDelegate(&manualDelegate), CHIP_NO_ERROR);
+
+        ValidateAuxiliaryEntries(accessControl, kUndefinedFabricIndex, expectedAll);
+        GetAccessControl().UnregisterGroupAuxiliaryDelegate();
+    }
+
+    // Path 2: FabricTable iteration
+    {
+        // Setup a test Fabric Table
+        PersistentStorageOperationalKeystore opKeyStore;
+        Credentials::PersistentStorageOpCertStore opCertStore;
+        FabricTable fabricTable;
+
+        EXPECT_EQ(opKeyStore.Init(&gTestStorage), CHIP_NO_ERROR);
+        EXPECT_EQ(opCertStore.Init(&gTestStorage), CHIP_NO_ERROR);
+
+        FabricTable::InitParams initParams;
+        initParams.storage             = &gTestStorage;
+        initParams.operationalKeystore = &opKeyStore;
+        initParams.opCertStore         = &opCertStore;
+        EXPECT_EQ(fabricTable.Init(initParams), CHIP_NO_ERROR);
+
+        FabricIndex f1, f2;
+        EXPECT_EQ(fabricTable.AddNewFabricForTestIgnoringCollisions(
+                      TestCerts::GetRootACertAsset().mCert, TestCerts::GetIAA1CertAsset().mCert,
+                      TestCerts::GetNodeA1CertAsset().mCert, TestCerts::GetNodeA1CertAsset().mKey, &f1),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(fabricTable.AddNewFabricForTestIgnoringCollisions(
+                      TestCerts::GetRootACertAsset().mCert, TestCerts::GetIAA1CertAsset().mCert,
+                      TestCerts::GetNodeA2CertAsset().mCert, TestCerts::GetNodeA2CertAsset().mKey, &f2),
+                  CHIP_NO_ERROR);
+
+        // Create GroupAuxiliaryAccessControlDelegate with fabric table
+        Examples::GroupAuxiliaryAccessControlDelegate tableDelegate(provider, &fabricTable);
+        EXPECT_EQ(GetAccessControl().RegisterGroupAuxiliaryDelegate(&tableDelegate), CHIP_NO_ERROR);
+
+        // Validate entries
+        ValidateAuxiliaryEntries(accessControl, kUndefinedFabricIndex, expectedAll);
+
+        // Cleanup
+        GetAccessControl().UnregisterGroupAuxiliaryDelegate();
+        fabricTable.Shutdown();
+        opCertStore.Finish();
+        opKeyStore.Finish();
+    }
+
+    // Restore global delegate for other tests
+    EXPECT_EQ(GetAccessControl().RegisterGroupAuxiliaryDelegate(&gGroupAuxiliaryAccessControlDelegate), CHIP_NO_ERROR);
+
+    // Cleanup
+    EXPECT_EQ(provider->RemoveFabric(fabric1), CHIP_NO_ERROR);
+    EXPECT_EQ(provider->RemoveFabric(fabric2), CHIP_NO_ERROR);
+}
+
+TEST_F(TestAccessControl, TestGroupAuxiliaryCheck)
+{
+    // Ensure GroupDataProvider is available
+    Credentials::GroupDataProvider * provider = Credentials::GetGroupDataProvider();
+    ASSERT_NE(provider, nullptr);
+
+    // Set up group 1 data for fabric 1
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x1111;
+        info.SetName("Group 1");
+        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        EXPECT_EQ(provider->SetGroupInfo(1, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(1, info.group_id, 10), CHIP_NO_ERROR);
+        // Noramally, Endpoint 0 should not be allowed to join a group. Test will confirm access control
+        // checks with this fail.
+        EXPECT_EQ(provider->AddEndpoint(1, info.group_id, 0), CHIP_NO_ERROR);
+    }
+
+    // Set up group 2 data for fabric 1, with no kHasAuxiliaryACL
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x2222;
+        info.SetName("Group 2");
+        EXPECT_EQ(provider->SetGroupInfo(1, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(1, info.group_id, 20), CHIP_NO_ERROR);
+    }
+
+    // Set up group 3 data for fabric 2
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x3333;
+        info.SetName("Group 3");
+        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        EXPECT_EQ(provider->SetGroupInfo(2, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(2, info.group_id, 30), CHIP_NO_ERROR);
+    }
+
+    // Set up group 4 data for fabric 2, with no kHasAuxiliaryACL
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = 0x4444;
+        info.SetName("Group 4");
+        EXPECT_EQ(provider->SetGroupInfo(2, info), CHIP_NO_ERROR);
+        EXPECT_EQ(provider->AddEndpoint(2, info.group_id, 40), CHIP_NO_ERROR);
+    }
+
+    for (const auto & data : groupCheckData)
+    {
+        if (data.expectedResult.HasValue())
+        {
+            EXPECT_EQ(accessControl.Check(data.subjectDescriptor, data.requestPath, data.privilege), data.expectedResult.Value());
+        }
+        else
+        {
+            EXPECT_NE(accessControl.Check(data.subjectDescriptor, data.requestPath, data.privilege), CHIP_NO_ERROR);
+        }
+    }
+
+    // Cleanup
+    EXPECT_EQ(provider->RemoveFabric(1), CHIP_NO_ERROR);
+    EXPECT_EQ(provider->RemoveFabric(2), CHIP_NO_ERROR);
 }
 
 TEST_F(TestAccessControl, TestIterator)

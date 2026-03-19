@@ -351,7 +351,7 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
     dataInput.SetChangeListener(&mContext->interactionContext.dataModelChangeListener);
     // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmmited`
 
-    if (request.operationFlags.Has(DataModel::OperationFlags::kInternal))
+    if (request.subjectDescriptor.authMode == Access::AuthMode::kInternalDeviceAccess)
     {
         // Internal requests use the non-External interface that has less enforcement
         // than the external version (e.g. does not check/enforce writable settings, does not

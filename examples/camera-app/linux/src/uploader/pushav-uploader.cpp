@@ -504,9 +504,16 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
 
     if (res != CURLE_OK)
     {
-        ChipLogError(Camera, "CURL upload  failed [%s] %s", data.first.c_str(), curl_easy_strerror(res));
+        ChipLogError(Camera, "CURL upload failed [%s] %s, retrying...", data.first.c_str(), curl_easy_strerror(res));
+        res = curl_easy_perform(curl);
+
+        if (res != CURLE_OK)
+        {
+            ChipLogError(Camera, "CURL upload failed again [%s] %s", data.first.c_str(), curl_easy_strerror(res));
+        }
     }
-    else
+
+    if (res == CURLE_OK)
     {
         ChipLogDetail(Camera, "CURL uploaded file  %s size: %zu", data.first.c_str(), static_cast<size_t>(size));
     }
@@ -515,7 +522,8 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     {
         if (!std::filesystem::remove(data.first, ec))
         {
-            ChipLogError(Camera, "Failed to delete file: %s, error: %s", data.first.c_str(), ec.message().c_str());
+            ChipLogError(Camera, "Failed to delete file: %s, error code: %d, error: %s, category: %s. May cause file accumulation.",
+                         data.first.c_str(), ec.value(), ec.message().c_str(), ec.category().name());
         }
         else
         {
