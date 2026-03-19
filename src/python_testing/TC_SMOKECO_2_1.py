@@ -49,7 +49,7 @@ log = logging.getLogger(__name__)
 class TC_SMOKECO_2_1(SmokeCoBaseTest):
 
     def desc_TC_SMOKECO_2_1(self) -> str:
-        return "[TC-SMOKECO-2.7] Unmount Attribute with DUT as Server"
+        return "[TC-SMOKECO-2.1] Attributes with DUT as Server"
 
     def steps_TC_SMOKECO_2_1(self) -> list[TestStep]:
         return [
@@ -84,7 +84,7 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
 
     def pics_TC_SMOKECO_2_1(self) -> list[str]:
         return [
-            "SMOKECO.S.A000d",
+            "SMOKECO.S",
         ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.SmokeCoAlarm))
@@ -107,7 +107,7 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
 
         self.step(6)
         if self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.DeviceMuted):
-            await self.read_attribute_check_range(self.smokeco_cluster.Attributes.DeviceMuted, 0, 2)
+            await self.read_attribute_check_range(self.smokeco_cluster.Attributes.DeviceMuted, 0, 1)
 
         self.step(7)
         await self.read_attribute_check_bool(self.smokeco_cluster.Attributes.TestInProgress)
