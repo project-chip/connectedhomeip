@@ -189,7 +189,7 @@ TEST_F(TestFanControlCluster, StepCommandUnsupportedWithoutFeature)
 
     auto result = tester.Invoke(commandData);
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_FALSE(result.status->IsSuccess());
+    EXPECT_FALSE(result.status.value().IsSuccess());
 }
 
 TEST_F(TestFanControlClusterWithStep, StepCommandSupportedWithFeature)
@@ -200,7 +200,7 @@ TEST_F(TestFanControlClusterWithStep, StepCommandSupportedWithFeature)
 
     auto result = tester.Invoke(commandData);
     ASSERT_TRUE(result.status.has_value());
-    EXPECT_TRUE(result.status->IsSuccess());
+    EXPECT_TRUE(result.status.value().IsSuccess());
 }
 
 TEST_F(TestFanControlClusterWithMultiSpeed, FanModeOff_ZeroesPercentSettingAndSpeedSetting)
