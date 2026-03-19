@@ -771,7 +771,7 @@ sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
     ChipLogError(DeviceLayer, "sl_net_up failed: 0x%lx", static_cast<uint32_t>(status));
 
     wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kStationConnecting).Clear(WifiInterface::WifiState::kStationConnected);
-    mUseQuickJoin = (status == SL_STATUS_SI91X_NO_AP_FOUND) ? false : true; // Quick join
+    mUseQuickJoin = !(status == SL_STATUS_SI91X_NO_AP_FOUND);
     ScheduleConnectionAttempt();
 
     return status;
