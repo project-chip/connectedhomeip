@@ -415,7 +415,7 @@ uint8_t AirPurifierManager::GetSpeedMax()
     auto * fanControlCluster = FanControl::FindClusterOnEndpoint(mEndpointId);
     if (fanControlCluster != nullptr)
     {
-        speedMax = fanControlCluster->GetSpeedSetting();
+        speedMax = fanControlCluster->GetSpeedSetting().ValueOr(1);
     }
     return speedMax;
 }
