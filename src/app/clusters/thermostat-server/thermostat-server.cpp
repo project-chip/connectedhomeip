@@ -917,7 +917,7 @@ void ThermostatAttrAccess::UpdateSetpointChangeAttributes(EndpointId endpoint, A
     }
 
     // SetpointChangeAmount = new value − previous value
-    int16_t changeAmount = static_cast<int16_t>(newValue - previousValue);
+    int16_t changeAmount = static_cast<int16_t>(static_cast<int32_t>(newValue) - previousValue);
     SetpointChangeAmount::Set(endpoint, DataModel::MakeNullable(changeAmount));
 
     // SetpointChangeSource: ask the delegate; default to Manual
