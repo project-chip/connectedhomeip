@@ -128,10 +128,8 @@ void FanControlCluster::ApplySpeedSettingChanged()
         return;
     }
 
-    // percent = floor(speed/SpeedMax * 100)
     uint8_t speedMax             = mSpeedMax;
-    float speed                  = static_cast<float>(mSpeedSetting.Value());
-    chip::Percent percentSetting = static_cast<chip::Percent>(speed / speedMax * 100);
+    chip::Percent percentSetting = static_cast<chip::Percent>((mSpeedSetting.Value() * 100) / speedMax);
     mPercentSetting.SetNonNull(percentSetting);
     NotifyAttributeChanged(PercentSetting::Id);
 }
