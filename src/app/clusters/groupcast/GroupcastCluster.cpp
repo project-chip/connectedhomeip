@@ -42,7 +42,15 @@ GroupcastCluster::GroupcastCluster(GroupcastContext && context, BitFlags<Groupca
     mMembershipChangedTimer(*this), mGroupcastTestingTimer(*this)
 {}
 
-GroupcastCluster::~GroupcastCluster() {}
+GroupcastCluster::~GroupcastCluster()
+{
+    // Context will be non null when the cluster is initialized. Calling
+    // Shutdown() to ensure proper cleanup if the cluster was started.
+    if (mContext != nullptr)
+    {
+        Shutdown(ClusterShutdownType::kPermanentRemove);
+    }
+}
 
 CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
 {

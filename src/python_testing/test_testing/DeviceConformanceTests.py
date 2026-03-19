@@ -144,6 +144,7 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         if is_ci:
             # This is a manually curated list of features that are present in the SDK, but not in the spec.
+            # TODO(#43606): Remove the AUX feature (0x04) from here once spec updates are merged to include the feature.
             ci_ignore_features = {Clusters.AccessControl.id: [0x04]}
             ignore_feature_masks.update(ci_ignore_features)
 
