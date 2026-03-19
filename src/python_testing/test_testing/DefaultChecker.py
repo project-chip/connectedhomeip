@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,4 +16,17 @@
 #
 
 # Re-export from the canonical location in the matter.testing package.
-from matter.testing.device_conformance_tests import DeviceConformanceTests, get_supersets  # noqa: F401
+from matter.testing.default_checker import (  # noqa: F401
+    DEFAULT_FIXED_LABEL_VALUES,
+    FLAG_DEFAULT_CALENDAR_FORMAT,
+    FLAG_FAULT_INJECTION,
+    FLAG_FIXED_LABEL_DEFAULT_VALUES,
+    FLAG_FIXED_LABEL_EMPTY,
+    FLAG_PRODUCT_NAME,
+    FLAG_SAMPLE_MEI,
+    FLAG_UNIT_TESTING,
+    FLAG_VENDOR_ID,
+    FLAG_VENDOR_NAME,
+    DefaultChecker,
+    warning_wrapper,
+)
