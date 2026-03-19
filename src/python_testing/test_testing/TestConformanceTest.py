@@ -19,7 +19,7 @@ import logging
 from enum import StrEnum
 from typing import Any
 
-from DeviceConformanceTests import DeviceConformanceTests
+from matter.testing.device_conformance_tests import DeviceConformanceTests
 from fake_device_builder import create_minimal_cluster, create_minimal_dt
 from mobly import asserts
 

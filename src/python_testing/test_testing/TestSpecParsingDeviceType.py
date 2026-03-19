@@ -17,7 +17,7 @@
 import re
 import xml.etree.ElementTree as ElementTree
 
-from DeviceConformanceTests import DeviceConformanceTests, get_supersets
+from matter.testing.device_conformance_tests import DeviceConformanceTests, get_supersets
 from fake_device_builder import create_minimal_dt
 from jinja2 import Template
 from mobly import asserts

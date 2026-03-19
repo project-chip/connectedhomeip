@@ -16,7 +16,7 @@
 #
 
 
-from DeviceConformanceTests import DeviceConformanceTests
+from matter.testing.device_conformance_tests import DeviceConformanceTests
 from mobly import asserts, signals
 
 import matter.clusters as Clusters

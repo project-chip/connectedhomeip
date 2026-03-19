@@ -17,7 +17,7 @@
 
 from typing import Callable
 
-import DefaultChecker as DefaultChecker
+import matter.testing.default_checker as DefaultChecker
 from mobly import asserts
 
 import matter.clusters as Clusters
