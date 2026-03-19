@@ -118,6 +118,7 @@ public:
     FanControl::FanModeEnum GetFanMode() const { return mFanMode; }
     DataModel::Nullable<chip::Percent> GetPercentSetting() const { return mPercentSetting; }
     DataModel::Nullable<uint8_t> GetSpeedSetting() const { return mSpeedSetting; }
+    uint8_t GetSpeedMax() const { return mSpeedMax; }
 
     // Setters
     DataModel::ActionReturnStatus SetFanMode(FanControl::FanModeEnum value);

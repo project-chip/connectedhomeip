@@ -58,7 +58,12 @@ CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncode
 {
     // Return PercentSetting attribute value for now
     DataModel::Nullable<Percent> percentSetting;
-    PercentSetting::Get(mEndpoint, percentSetting);
+
+    auto * cluster = chip::app::Clusters::FanControl::FindClusterOnEndpoint(mEndpoint);
+    if (cluster != nullptr)
+    {
+        percentSetting = cluster->GetPercentSetting();
+    }
     Percent ret = 0;
     if (!percentSetting.IsNull())
     {
@@ -72,7 +77,12 @@ CHIP_ERROR FanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
 {
     // Return SpeedCurrent attribute value for now
     DataModel::Nullable<uint8_t> speedSetting;
-    SpeedSetting::Get(mEndpoint, speedSetting);
+    auto * cluster = chip::app::Clusters::FanControl::FindClusterOnEndpoint(mEndpoint);
+    if (cluster != nullptr)
+    {
+
+        speedSetting = cluster->GetSpeedSetting();
+    }
     uint8_t ret = 0;
     if (!speedSetting.IsNull())
     {
@@ -90,10 +100,15 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
     VerifyOrReturnError(aDirection != StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
     uint8_t speedMax;
-    SpeedMax::Get(mEndpoint, &speedMax);
-
     DataModel::Nullable<uint8_t> speedSetting;
-    SpeedSetting::Get(mEndpoint, speedSetting);
+
+    // New Code-Driven logic
+    auto * cluster = chip::app::Clusters::FanControl::FindClusterOnEndpoint(mEndpoint);
+    if (cluster != nullptr)
+    {
+        speedSetting = cluster->GetSpeedSetting();
+        speedMax     = cluster->GetSpeedMax();
+    }
 
     uint8_t newSpeedSetting = speedSetting.IsNull() ? 0 : speedSetting.Value();
 
