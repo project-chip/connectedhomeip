@@ -82,7 +82,7 @@ public:
         this->pop_back();
     }
 
-    void clear() { this->clear(); }
+    void clear() { Base::clear(); }
 
     // Lookup
     bool contains(const T & value) const { return find(value) != this->end(); }
