@@ -7,6 +7,10 @@
 -   [Device Attestation](#device_attestation)
 -   [SCP03 Authentication](#scp03)
 -   [Using Trust Provisioned Verifiers of SE051H for SPAKE2+](#trust_prov_verifiers_se051h)
+-   [SE051H NFC / Unpowered Commissioning](#se051h_nfc_unpowered_commissioning)
+-   [GPIO Notification on NFC Commissioning Complete](#gpio_noti_on_nfc_comm_complete)
+
+## GPIO Notification on NFC Commissioning Complete
 
 <hr>
 
@@ -382,3 +386,305 @@ When running the example, pass the iteration count via command line:
 ```bash
 ./thermostat-app --spake2p-iterations 1000
 ```
+
+<a name="se051h_nfc_unpowered_commissioning"></a>
+
+## SE051H NFC / Unpowered Commissioning
+
+SE051H secure element supports NFC-based commissioning for Matter devices
+without requiring device power during the commissioning process.
+
+### Step 1: SE051H Provisioning (One-Time)
+
+Provision the SE051H with necessary cryptographic objects using the provisioning
+example.
+
+**Reference:**
+[SE051H Provision Example](https://github.com/NXP/plug-and-trust/blob/int/CHIPSE_Release/demos/se051h_nfc_comm_prov/readme.md)
+
+### Step 2: Read Passcode from SE051H
+
+The SE051H contains a binary file with the passcode and salt required for NFC
+commissioning. Retrieve the passcode using the get-passcode example.
+
+**Reference:**
+[SE051H Get Passcode Example](https://github.com/NXP/plug-and-trust/blob/int/CHIPSE_Release/demos/se05x_get_passcode/readme.md)
+
+### Step 3: Build chip-tool with NFC Support
+
+Build the chip-tool on an Ubuntu machine with NFC commissioning support:
+
+```bash
+./scripts/build/build_examples.py --target linux-x64-chip-tool-nfc-commission build
+```
+
+### Step 4: Perform NFC Commissioning
+
+1. Connect the PCSC reader to your Ubuntu machine
+2. Connect jumper J6 on the OM-SE051ARD board to pins 2-3 to use the onboard
+   antenna
+3. Run the commissioning command:
+
+```bash
+./out/linux-x64-chip-tool-nfc-commission/chip-tool pairing nfc-wifi 1 <ssid> <password> <passcode> 3840
+```
+
+Replace `<ssid>`, `<password>`, and `<passcode>` (from Step 2) with your values.
+
+### Step 5: Build and Run Thermostat Example
+
+Build the thermostat example with SE05x support enabled. Refer to
+[Supported Platforms](#supported_platforms) for platform-specific build
+instructions.
+
+#### Integration details
+
+During the boot up of the device, required content is read from the SE05x and stored in
+the KVS file system for CASE (Certificate Authenticated Session Establishment)
+operations.
+
+**Content Read from SE05x (assuming Fabric ID = 1):**
+
+| Content                            | Key ID                                  | Key Name   |
+| ---------------------------------- | --------------------------------------- | ---------- |
+| Node Operational Certificate       | Part of operational credential cluster¹ | f/1/n      |
+| Root Certificate                   | Part of operational credential cluster² | f/1/r      |
+| Intermediate Certificate Authority | Part of operational credential cluster³ | f/1/i      |
+| IPK Epoch Key                      | 0x7FFF3601                              | f/1/k/0    |
+| Node Operational Key Pair          | 0x7FFF3101⁴                             | f/1/o      |
+| ACL (Access Control List)          | 0x7FFF3501                              | f/1/ac/0/0 |
+| Fabric Group Info                  | -                                       | f/1/g      |
+| Metadata                           | Vendor ID from 0x7FFE0028               | f/1/m      |
+| Fabric Index Info                  | -                                       | g/fidx     |
+| WiFi SSID                          | 0x7FFF3401⁵                             | wifi-ssid  |
+| WiFi Password                      | 0x7FFF3401⁵                             | wifi-pass  |
+
+**Notes:**
+
+1. Binary file ID containing the node operational certificate is embedded in the
+   operational credential cluster TLV
+2. Binary file ID containing the root certificate is embedded in the operational
+   credential cluster TLV
+3. Binary file ID containing the intermediate certificate authority is embedded
+   in the operational credential cluster TLV
+4. The node operational key pair cannot be fully read from SE05x. Only the
+   public key is extracted. Private key bytes contain the node operational key
+   ID (reference key) used for ECDSA signing operations
+5. It is recommended to protect this key ID using an authenticated session
+
+### Step 6: Test with chip-tool
+
+Establish a CASE session using the node operational key created during NFC
+commissioning:
+
+```bash
+./out/linux-x64-chip-tool-nfc-commission/chip-tool thermostat read local-temperature 1 1
+```
+
+<a name="gpio_noti_on_nfc_comm_complete"></a>
+
+## GPIO Notification on NFC Commissioning Complete
+
+SE051H sends a notification on the IO2 pin when NFC commissioning completes.
+This can trigger a GPIO interrupt on the host MCU to initiate the remaining
+commissioning flow.
+
+### Notification Configuration
+
+SE051H can send one or two notifications:
+
+1. During Add NOC (Node Operational Credentials) command
+2. During Connect Network command
+
+**Default:** Notification is sent on Connect Network command only.
+
+To change this behavior, update the configuration in:
+`matter/third_party/simw-top-mini/repo/demos/se051h_nfc_comm_prov/common/se051h_nfc_comm_prov.h`
+
+```c:matter/third_party/simw-top-mini/repo/demos/se051h_nfc_comm_prov/common/se051h_nfc_comm_prov.h
+#define SE051H_PBKDF_PARAMS_ID 0x7FFF3002
+#define PBKDF_PARAMS                                                           \
+  0x24, 0x00, 0x02, 0x25, 0x01, 0x01, 0x01, 0x25, 0x02, 0x00, 0x00, 0x35,      \
+      0x03, 0x26, 0x01, 0xF4, 0x01, 0x00, 0x00, 0x26, 0x02, 0x2C, 0x01, 0x00,  \
+      0x00, 0x25, 0x03, 0xA0, 0x0F, 0x25, 0x04, 0x13, 0x00, 0x25, 0x05, 0x0C,  \
+      0x00, 0x26, 0x06, 0x00, 0x00, 0x05, 0x01, 0x25, 0x07, 0x01, 0x00, 0x25,  \
+      0x08, 0x00, 0x00, 0x26, 0x09, 0x00, 0xFA, 0x00, 0x00, 0x18,
+```
+
+**Modify byte 3 to configure notifications:**
+
+-   `0x00` - No notifications
+-   `0x01` - Notification on Add NOC command only
+-   `0x02` - Notification on Connect Network command only (default)
+-   `0x03` - Notifications on both Add NOC and Connect Network commands
+
+### Platform Support
+
+GPIO notification is currently implemented on:
+
+-   FRDM-i.MX93
+-   RW61x
+-   RT1060 EVKB
+-   W72
+
+**Enable GPIO notification:**
+
+-   GN Build: `chip_se05x_host_gpio=frdm_imx93`
+-   CMake Build: `-DCONFIG_SE05X_HOST_GPIO=y`
+
+> **Important Notes:**
+>
+> 1. GPIO notification monitoring is active only when SE051H is in NFC
+>    commissioning mode
+> 2. The monitoring thread/task stops if non-NFC commissioning is performed
+
+### Platform-Specific GPIO Connections
+
+To enable GPIO notification functionality, additional hardware modifications are required on the OM-SE051ARD board.
+
+#### Hardware Setup Requirements
+
+**OM-SE051ARD Board Modifications:**
+
+1. **Connect SE051ARD enable pin** (J13-2) to **SE051ARD VDD** (J11-1)
+2. **Remove the jumper** on SE051ARD J14
+3. **Connect Host Enable Pin** (to control secure element power) to **SE051ARD SE_VDD** (J14-2)
+4. **Connect Host GPIO Notification Pin** to **SE051ARD IO2** (J11)
+5. **Set J10 on SE051ARD board**. This connects the pull-up resistor to IO2 which let IO2 be always high be default.
+
+> **Note:** If the host GPIO cannot drive the SE05x directly, use an additional OM-SE051ARD board as a switch/driver circuit.
+The connection of the 3 platforms tested are given below.
+
+---
+
+#### FRDM-i.MX93 GPIO Configuration
+
+**Pin Assignments:**
+
+| Function                  | FRDM-i.MX93 Pin         |
+| ------------------------- | ----------------------- |
+| Enable Pin                | Pin 29 on P11 Connector |
+| GPIO Notification Pin     | Pin 31 on P11 Connector |
+
+**Hardware Connections (with SE051ARD switch and DUT board):**
+
+| Source                                  | Destination                     |
+| --------------------------------------- | ------------------------------- |
+| FRDM-i.MX93 3.3V                        | SE051ARD (switch) Vin (J16-2)   |
+| FRDM-i.MX93 Pin 31 on P11 Connector     | SE051ARD (DUT) IO2 (J11)        |
+| FRDM-i.MX93 Pin 29 on P11 Connector     | SE051ARD (switch) Enable (J13-2)|
+| SE051ARD (switch) Vout (J11-5)          | SE051ARD (DUT) SE_VDD (J14-2)   |
+
+**Software Implementation:**
+
+A dedicated thread monitors the GPIO pin state and triggers the commissioning flow upon notification.
+
+**Implementation File:**
+```
+third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio.c
+```
+
+**Default Behavior:** The example application restarts upon receiving a GPIO notification.
+
+> **For Production:** Customize the GPIO notification behavior by modifying the `se05x_host_gpio_notification_monitor_init()` function in the implementation file above.
+
+---
+
+#### RW612 GPIO Configuration
+
+**Pin Assignments:**
+
+| Function                  | RW612 Pin |
+| ------------------------- | --------- |
+| Enable Pin                | J1_12     |
+| GPIO Notification Pin     | J1_10     |
+
+**Hardware Connections (with SE051ARD switch and DUT board):**
+
+| Source                                  | Destination                     |
+| --------------------------------------- | ------------------------------- |
+| RW612 3.3V                              | SE051ARD (switch) Vin (J16-2)   |
+| RW612 J1_10                             | SE051ARD (DUT) IO2 (J11)        |
+| RW612 J1_12                             | SE051ARD (switch) Enable (J13-2)|
+| SE051ARD (switch) Vout (J11-5)          | SE051ARD (DUT) SE_VDD (J14-2)   |
+
+**Software Implementation:**
+
+A dedicated thread monitors the GPIO pin state and triggers the commissioning flow upon notification.
+
+**Implementation File:**
+```
+third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio_rw61x.c
+```
+
+**Default Behavior:** The example application restarts upon receiving a GPIO notification.
+
+> **For Production:** Customize the GPIO notification behavior by modifying the `se05x_host_gpio_notification_monitor_init()` function in the implementation file above.
+
+---
+
+#### RT1060 EVKB GPIO Configuration
+
+**Pin Assignments:**
+
+| Function                  | RT1060 EVKB Pin |
+| ------------------------- | --------------- |
+| Enable Pin                | J17_1           |
+| GPIO Notification Pin     | J17_2           |
+
+**Hardware Connections (with SE051ARD switch and DUT board):**
+
+| Source                                  | Destination                     |
+| --------------------------------------- | ------------------------------- |
+| EVKBMIMXRT1060 3.3V                     | SE051ARD (switch) Vin (J16-2)   |
+| EVKBMIMXRT1060 J17_2                    | SE051ARD (DUT) IO2 (J11)        |
+| EVKBMIMXRT1060 J17_1                    | SE051ARD (switch) Enable (J13-2)|
+| SE051ARD (switch) Vout (J11-5)          | SE051ARD (DUT) SE_VDD (J14-2)   |
+
+**Software Implementation:**
+
+A dedicated thread monitors the GPIO pin state and triggers the commissioning flow upon notification.
+
+**Implementation File:**
+```
+third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio_rt1060.c
+```
+
+**Default Behavior:** The example application restarts upon receiving a GPIO notification.
+
+> **For Production:** Customize the GPIO notification behavior by modifying the `se05x_host_gpio_notification_monitor_init()` function in the implementation file above.
+
+---
+
+#### FRDM W72 GPIO Configuration
+
+**Pin Assignments:**
+
+| Function                  | RT1060 EVKB Pin |
+| ------------------------- | --------------- |
+| Enable Pin                | TBU             |
+| GPIO Notification Pin     | TBU             |
+
+**Hardware Connections (with SE051ARD switch and DUT board):**
+
+| Source                                  | Destination                     |
+| --------------------------------------- | ------------------------------- |
+| TBU                                     | SE051ARD (switch) Vin (J16-2)   |
+| TBU                                     | SE051ARD (DUT) IO2 (J11)        |
+| TBU                                     | SE051ARD (switch) Enable (J13-2)|
+| TBU                                     | SE051ARD (DUT) SE_VDD (J14-2)   |
+
+**Software Implementation:**
+
+A dedicated thread monitors the GPIO pin state and triggers the commissioning flow upon notification.
+
+**Implementation File:**
+```
+third_party/simw-top-mini/repo/demos/se05x_host_gpio/se05x_host_gpio_w72.c
+```
+
+**Default Behavior:** The example application restarts upon receiving a GPIO notification.
+
+> **For Production:** Customize the GPIO notification behavior by modifying the `se05x_host_gpio_notification_monitor_init()` function in the implementation file above.
+
+---
