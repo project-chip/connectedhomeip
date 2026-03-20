@@ -47,6 +47,8 @@
 
 #define VERSION_8_12 ((8) << (8 * 3) | (12) << (8 * 2) | (32) << (8 * 1))
 
+#define VERSION_8_18 ((8) << (8 * 3) | (18) << (8 * 2) | (32) << (8 * 1))
+
 #define MAKE_SE05X_NETWORK_ID(keyID) (0x7FFF3400 + keyID)
 #define SE051H_COMM_PARAMETERS 0x7FFF3002
 
@@ -156,6 +158,10 @@ CHIP_ERROR se05x_read_node_oper_cert(uint8_t * noc_buf, size_t * noc_buf_len)
     TLVType outerContainer = kTLVType_NotSpecified;
     TLVReader reader;
 
+    // Get SE05x applet version for version-specific handling
+    sss_se05x_session_t * se05x_session = reinterpret_cast<sss_se05x_session_t *>(&gex_sss_chip_ctx.session);
+    VerifyOrReturnError(se05x_session != nullptr, CHIP_ERROR_INTERNAL);
+
     // Validate input parameters
     VerifyOrReturnError(noc_buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(noc_buf_len != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -184,12 +190,28 @@ CHIP_ERROR se05x_read_node_oper_cert(uint8_t * noc_buf, size_t * noc_buf_len)
     ReturnErrorOnFailure(reader.Next(kTLVType_Structure, AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerContainer));
 
-    ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, ContextTag(0xFF)));
-    ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, ContextTag(0xFD)));
-    ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, ContextTag(0xFC)));
-    ReturnErrorOnFailure(reader.Next(kTLVType_List, ContextTag(0xFB)));
-    ReturnErrorOnFailure(reader.Next(kTLVType_List, ContextTag(0xF9)));
-    ReturnErrorOnFailure(reader.Next(kTLVType_List, ContextTag(0xF8)));
+    const uint32_t applet_version = se05x_session->s_ctx.applet_version;
+
+    // SE05x applet versions > 8.18 use CommonTag format with 16-bit tag values
+    // instead of ContextTag with 8-bit values
+    if (applet_version <= VERSION_8_18)
+    {
+        ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, ContextTag(0xFF)));
+        ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, ContextTag(0xFD)));
+        ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, ContextTag(0xFC)));
+        ReturnErrorOnFailure(reader.Next(kTLVType_List, ContextTag(0xFB)));
+        ReturnErrorOnFailure(reader.Next(kTLVType_List, ContextTag(0xF9)));
+        ReturnErrorOnFailure(reader.Next(kTLVType_List, ContextTag(0xF8)));
+    }
+    else
+    {
+        ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, CommonTag(0xFFFF)));
+        ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, CommonTag(0xFFFD)));
+        ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, CommonTag(0xFFFC)));
+        ReturnErrorOnFailure(reader.Next(kTLVType_List, CommonTag(0xFFFB)));
+        ReturnErrorOnFailure(reader.Next(kTLVType_List, CommonTag(0xFFF9)));
+        ReturnErrorOnFailure(reader.Next(kTLVType_List, CommonTag(0xFFF8)));
+    }
 
     // Extract NOC chain ID
     ReturnErrorOnFailure(reader.Next(kTLVType_List, ContextTag(0x00)));
@@ -233,16 +255,19 @@ CHIP_ERROR se05x_read_node_oper_cert(uint8_t * noc_buf, size_t * noc_buf_len)
     status  = se05x_get_certificate(g_noc_chain_id, noc_buf, &buf_len);
     VerifyOrReturnError(status == CHIP_NO_ERROR, status);
 
-    /* NOC Chain format:
-     *   [0-1]: Total length (2 bytes)
-     *   [2-3]: NOC length (2 bytes, little-endian)
-     *   [4-5]: Reserved/padding (2 bytes)
-     *   [6..]: NOC data
-     *   [...]: ICA length (2 bytes, little-endian)
-     *   [...]: ICA data
-     */
-    constexpr size_t kNocChainHeaderSize = 6;
-    constexpr size_t kNocLengthOffset    = 4;
+    // NOC Chain format for applet version <= 8.18:
+    //   [0-1]: Total length (2 bytes)
+    //   [2-3]: Reserved (2 bytes)
+    //   [4-5]: NOC length (2 bytes, little-endian)
+    //   [6..]: NOC data
+    //
+    // NOC Chain format for applet version > 8.18:
+    //   [0-1]: Total length (2 bytes)
+    //   [2-4]: Reserved (3 bytes)
+    //   [5-6]: NOC length (2 bytes, little-endian)
+    //   [7..]: NOC data
+    const size_t kNocChainHeaderSize = (applet_version <= VERSION_8_18) ? 6 : 7;
+    const size_t kNocLengthOffset = (applet_version <= VERSION_8_18) ? 4 : 5;
 
     VerifyOrReturnError(buf_len >= kNocChainHeaderSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -325,6 +350,12 @@ CHIP_ERROR se05x_read_ICA(uint8_t * ica_buf, size_t * ica_buf_len)
     VerifyOrReturnError(ica_buf_len != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(*ica_buf_len > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
+    // Get SE05x applet version for version-specific handling
+    sss_se05x_session_t * se05x_session = reinterpret_cast<sss_se05x_session_t *>(&gex_sss_chip_ctx.session);
+    VerifyOrReturnError(se05x_session != nullptr, CHIP_ERROR_INTERNAL);
+
+    const uint32_t applet_version = se05x_session->s_ctx.applet_version;
+
     // Validate that NOC chain ID has been initialized
     VerifyOrReturnError(g_noc_chain_id != 0, CHIP_ERROR_INCORRECT_STATE);
 
@@ -343,8 +374,8 @@ CHIP_ERROR se05x_read_ICA(uint8_t * ica_buf, size_t * ica_buf_len)
      *   [...]:   ICA length (2 bytes, little-endian)
      *   [...+2]: ICA certificate data
      */
-    constexpr size_t kChainHeaderSize = 6;
-    constexpr size_t kNocLengthOffset = 4;
+    const size_t kChainHeaderSize = (applet_version <= VERSION_8_18) ? 6 : 7;
+    const size_t kNocLengthOffset = (applet_version <= VERSION_8_18) ? 4 : 5;
     constexpr size_t kLengthFieldSize = 2;
 
     // Validate minimum buffer size for header
