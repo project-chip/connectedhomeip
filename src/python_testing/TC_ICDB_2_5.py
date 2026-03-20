@@ -44,7 +44,7 @@ import asyncio
 import logging
 
 from mobly import asserts
-from support_modules.icd_support import (ICDBaseTest, assert_subscription_heartbeat_received)
+from support_modules.icd_support import ICDBaseTest, assert_subscription_heartbeat_received
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
