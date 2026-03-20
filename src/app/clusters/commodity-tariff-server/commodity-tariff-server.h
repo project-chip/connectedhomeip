@@ -138,7 +138,7 @@ public:
     CHIP_ERROR TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx);
     void TariffDataUpd_Finish(bool is_success);
 
-    void TryToactivateDelayedTariff(uint32_t now);
+    void TryToActivateDelayedTariff(uint32_t now);
     void CleanupTariffData();
 
 private:
