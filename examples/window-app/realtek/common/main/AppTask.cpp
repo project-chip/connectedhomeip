@@ -62,6 +62,7 @@ using namespace ::chip::System;
 #define MAX_NUMBER_OF_GAP_MESSAGE 0x10                                                     //!<  GAP message queue size
 #define MAX_NUMBER_OF_IO_MESSAGE 0x10                                                      //!<  IO message queue size
 #define MAX_NUMBER_OF_EVENT_MESSAGE (MAX_NUMBER_OF_GAP_MESSAGE + MAX_NUMBER_OF_IO_MESSAGE) //!< Event message queue size
+#define IO_MSG_WAIT_TIMEOUT 500
 
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 5000
 #define RESET_TRIGGER_TIMEOUT 1500
@@ -142,15 +143,15 @@ bool AppTask::PostMessage(T_IO_MSG * p_msg)
         return false;
     }
 
-    if (os_msg_send(app_io_queue_handle, p_msg, 0) == false)
-    {
-        ChipLogError(DeviceLayer, "send_io_msg_to_app fail");
-        return false;
-    }
-
     if (os_msg_send(app_evt_queue_handle, &event, 0) == false)
     {
         ChipLogError(DeviceLayer, "send_evt_msg_to_app fail");
+        return false;
+    }
+
+    if (os_msg_send(app_io_queue_handle, p_msg, 0) == false)
+    {
+        ChipLogError(DeviceLayer, "send_io_msg_to_app fail");
         return false;
     }
 
@@ -190,7 +191,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             if (event == EVENT_IO_TO_APP)
             {
                 T_IO_MSG io_msg;
-                if (os_msg_recv(app_io_queue_handle, &io_msg, 0) == true)
+                if (os_msg_recv(app_io_queue_handle, &io_msg, IO_MSG_WAIT_TIMEOUT) == true)
                 {
                     switch (io_msg.type)
                     {
@@ -209,6 +210,10 @@ void AppTask::AppTaskMain(void * pvParameter)
                     default:
                         break;
                     }
+                }
+                else
+                {
+                    ChipLogError(DeviceLayer, "CRITICAL: Received EVENT_IO_TO_APP but failed to retrieve IO message.");
                 }
             }
             else
