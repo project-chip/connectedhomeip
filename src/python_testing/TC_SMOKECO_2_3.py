@@ -106,7 +106,7 @@ class TC_SMOKECO_2_3(SmokeCoBaseTest):
                      "Verify that COState attribute has a value of 0 (Normal)"),
             TestStep(20, "TH reads ExpressedState attribute from DUT",
                      "Verify that ExpressedState attribute has a value of 0 (Normal)"),
-            TestStep(21, "TH reads AllClear event from DUT", "Verify that AllClear event has a new event recor"),
+            TestStep(21, "TH reads AllClear event from DUT", "Verify that AllClear event has a new event record."),
         ]
 
     def pics_TC_SMOKECO_2_3(self) -> list[str]:

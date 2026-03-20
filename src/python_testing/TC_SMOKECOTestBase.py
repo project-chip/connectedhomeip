@@ -45,7 +45,7 @@ class SmokeCoBaseTest(MatterBaseTest):
         if len(events_response) == 0:
             asserts.fail("Failed to read events")
         smoke_alarm_event_data = None
-        # Read tand match events
+        # Read and match events
         for event in events_response:
             if event.Header.EventId == smokeco_event.event_id:
                 log.info(f"Event retrieved {event}")
@@ -71,7 +71,7 @@ class SmokeCoBaseTest(MatterBaseTest):
         assert_is_unixtimestamp(attr, f"Attribute with value: {attr}")
 
     async def alarm_primary_functionality_base_test(self, state_attribute, alarm_event, expressed_state_enum_value, pixit_warning, pixit_critical, pixit_clear):
-        """Define what attribtues,events,enum values and pixit to use depending if is smoke alarm or co alarm for tests SMOKECO 2.2 and SMOKECO 2.3."""
+        """Define what attributes,events,enum values and pixit to use depending if is smoke alarm or co alarm for tests SMOKECO 2.2 and SMOKECO 2.3."""
         # Step 1, "Commission DUT to TH."
         self.step(1)  # Commissioning already done
 
@@ -99,7 +99,7 @@ class SmokeCoBaseTest(MatterBaseTest):
         asserts.assert_equal(test_event_trigger_enabled, True, "TestEventTriggersEnabled is not True")
 
         self.step(5)
-        # By defalt on endpoint 0
+        # By default on endpoint 0
         await self.send_test_event_triggers(eventTrigger=pixit_warning)
 
         self.step(6)
@@ -117,7 +117,7 @@ class SmokeCoBaseTest(MatterBaseTest):
         asserts.assert_equal(smoke_alarm_event_data.alarmSeverityLevel, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
 
         self.step(9)
-        # Manually Start the Seft Test
+        # Manually Start the Self Test
         if self.is_pics_sdk_ci_only:
             # LongPress will trigger the SelfTest in the SmokeCo cluster
             command_dict = {"Name": "LongPress", "EndpointId": self.get_endpoint(), "NewPosition": 0}
