@@ -271,7 +271,9 @@ private:
         int16_t value           = 0;
     };
 
-    PreviousSetpointValue mPreviousSetpointValues[kThermostatEndpointCount];
+    static constexpr size_t kTrackedSetpointCount = 4;
+
+    PreviousSetpointValue mPreviousSetpointValues[kThermostatEndpointCount][kTrackedSetpointCount];
 };
 
 /**

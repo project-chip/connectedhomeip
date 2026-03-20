@@ -515,6 +515,27 @@ Delegate * GetDelegate(EndpointId endpoint)
     return (ep >= MATTER_ARRAY_SIZE(gDelegateTable) ? nullptr : gDelegateTable[ep]);
 }
 
+bool GetTrackedSetpointIndex(AttributeId attributeId, size_t & index)
+{
+    switch (attributeId)
+    {
+    case OccupiedHeatingSetpoint::Id:
+        index = 0;
+        return true;
+    case OccupiedCoolingSetpoint::Id:
+        index = 1;
+        return true;
+    case UnoccupiedHeatingSetpoint::Id:
+        index = 2;
+        return true;
+    case UnoccupiedCoolingSetpoint::Id:
+        index = 3;
+        return true;
+    default:
+        return false;
+    }
+}
+
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep =
@@ -865,9 +886,10 @@ void ThermostatAttrAccess::SavePreviousSetpointValue(EndpointId endpoint, Attrib
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
-    if (ep < MATTER_ARRAY_SIZE(mPreviousSetpointValues))
+    size_t setpointIndex;
+    if (ep < MATTER_ARRAY_SIZE(mPreviousSetpointValues) && GetTrackedSetpointIndex(attributeId, setpointIndex))
     {
-        mPreviousSetpointValues[ep] = { attributeId, value };
+        mPreviousSetpointValues[ep][setpointIndex] = { attributeId, value };
     }
 }
 
@@ -875,9 +897,11 @@ bool ThermostatAttrAccess::GetPreviousSetpointValue(EndpointId endpoint, Attribu
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
-    if (ep < MATTER_ARRAY_SIZE(mPreviousSetpointValues) && mPreviousSetpointValues[ep].attributeId == attributeId)
+    size_t setpointIndex;
+    if (ep < MATTER_ARRAY_SIZE(mPreviousSetpointValues) && GetTrackedSetpointIndex(attributeId, setpointIndex) &&
+        mPreviousSetpointValues[ep][setpointIndex].attributeId == attributeId)
     {
-        value = mPreviousSetpointValues[ep].value;
+        value = mPreviousSetpointValues[ep][setpointIndex].value;
         return true;
     }
     return false;
