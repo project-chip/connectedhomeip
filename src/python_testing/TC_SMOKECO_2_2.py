@@ -49,26 +49,27 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
-class TC_SMOKECO_2_2(SmokeCoBaseTest):
 
+class TC_SMOKECO_2_2(SmokeCoBaseTest):
 
     @async_test_body
     async def setup_test(self):
         super().setup_test()
         self.gd_cluster = Clusters.GeneralDiagnostics
-        self.pixit_test_event_warning_smoke_alarm = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.WARNING", 0x005c000000000090)
-        self.pixit_test_event_critical_smoke_alarm = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CRITICAL", 0x005c00000000009c)
+        self.pixit_test_event_warning_smoke_alarm = self.user_params.get(
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.WARNING", 0x005c000000000090)
+        self.pixit_test_event_critical_smoke_alarm = self.user_params.get(
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CRITICAL", 0x005c00000000009c)
         self.pixit_test_event_clear_smoke_alarm = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CLEAR", 0x005c0000000000a0)
 
-        if isinstance(self.pixit_test_event_warning_smoke_alarm,bytes):
+        if isinstance(self.pixit_test_event_warning_smoke_alarm, bytes):
             self.pixit_test_event_warning_smoke_alarm = int.from_bytes(self.pixit_test_event_warning_smoke_alarm, byteorder='big')
 
-        if isinstance(self.pixit_test_event_critical_smoke_alarm,bytes):
+        if isinstance(self.pixit_test_event_critical_smoke_alarm, bytes):
             self.pixit_test_event_critical_smoke_alarm = int.from_bytes(self.pixit_test_event_critical_smoke_alarm, byteorder='big')
 
-        if isinstance(self.pixit_test_event_clear_smoke_alarm,bytes):
+        if isinstance(self.pixit_test_event_clear_smoke_alarm, bytes):
             self.pixit_test_event_clear_smoke_alarm = int.from_bytes(self.pixit_test_event_clear_smoke_alarm, byteorder='big')
-
 
     def desc_TC_SMOKECO_2_2(self) -> str:
         return "[TC-SMOKECO-2.2] Primary Functionality - Smoke Alarm with DUT as Server"

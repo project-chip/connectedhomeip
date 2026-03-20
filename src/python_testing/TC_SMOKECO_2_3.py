@@ -49,24 +49,24 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 class TC_SMOKECO_2_3(SmokeCoBaseTest):
 
-
     @async_test_body
     async def setup_test(self):
         super().setup_test()
         self.gd_cluster = Clusters.GeneralDiagnostics
-        self.pixit_test_event_warning_co_alarm = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.WARNING", 0x005c000000000091)
-        self.pixit_test_event_critical_co_alarm = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CRITICAL", 0x005c00000000009d)
+        self.pixit_test_event_warning_co_alarm = self.user_params.get(
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.WARNING", 0x005c000000000091)
+        self.pixit_test_event_critical_co_alarm = self.user_params.get(
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CRITICAL", 0x005c00000000009d)
         self.pixit_test_event_clear_co_alarm = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CLEAR", 0x005c0000000000a1)
 
-        if isinstance(self.pixit_test_event_warning_co_alarm,bytes):
+        if isinstance(self.pixit_test_event_warning_co_alarm, bytes):
             self.pixit_test_event_warning_co_alarm = int.from_bytes(self.pixit_test_event_warning_co_alarm, byteorder='big')
 
-        if isinstance(self.pixit_test_event_critical_co_alarm,bytes):
+        if isinstance(self.pixit_test_event_critical_co_alarm, bytes):
             self.pixit_test_event_critical_co_alarm = int.from_bytes(self.pixit_test_event_critical_co_alarm, byteorder='big')
 
-        if isinstance(self.pixit_test_event_clear_co_alarm,bytes):
+        if isinstance(self.pixit_test_event_clear_co_alarm, bytes):
             self.pixit_test_event_clear_co_alarm = int.from_bytes(self.pixit_test_event_clear_co_alarm, byteorder='big')
-
 
     def desc_TC_SMOKECO_2_3(self) -> str:
         return "[TC-SMOKECO-2.3] Primary Functionality - CO Alarm with DUT as Server"
@@ -75,24 +75,37 @@ class TC_SMOKECO_2_3(SmokeCoBaseTest):
         return [
             TestStep(1, "Commission DUT to TH"),
             TestStep(2, "TH subscribes to COState attribute from DUT", "Verify that COState attribute has a value of 0 (Normal)"),
-            TestStep(3, "TH reads ExpressedState attribute from DUT", "Verify that ExpressedState attribute has a value of 0 (Normal)"),
-            TestStep(4, "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster", "Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
+            TestStep(3, "TH reads ExpressedState attribute from DUT",
+                     "Verify that ExpressedState attribute has a value of 0 (Normal)"),
+            TestStep(4, "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
+                     "Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
             TestStep(5, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning CO Alarm Test Event"),
-            TestStep(6, "TH waits for a report of COState attribute from DUT with a timeout of 300 seconds", "Verify that COState attribute has a value of 1 (Warning)"),
-            TestStep(7, "SMOKECO.S.A0000(ExpressedState) TH reads ExpressedState attribute from DUT", "Verify that ExpressedState attribute has a value of 2 (COAlarm)"),
-            TestStep(8, "TH reads COAlarm event from DUT", "Verify that COAlarm event has a new event record and AlarmSeverityLevel field indicates the COState attribute current value of 1"),
+            TestStep(6, "TH waits for a report of COState attribute from DUT with a timeout of 300 seconds",
+                     "Verify that COState attribute has a value of 1 (Warning)"),
+            TestStep(7, "SMOKECO.S.A0000(ExpressedState) TH reads ExpressedState attribute from DUT",
+                     "Verify that ExpressedState attribute has a value of 2 (COAlarm)"),
+            TestStep(8, "TH reads COAlarm event from DUT",
+                     "Verify that COAlarm event has a new event record and AlarmSeverityLevel field indicates the COState attribute current value of 1"),
             TestStep(9, "Start manually DUT self-test"),
-            TestStep(10, "After a few seconds, TH reads TestInProgress attribute from DUT", "Verify that TestInProgress attribute has a value of 0 (False)"),
+            TestStep(10, "After a few seconds, TH reads TestInProgress attribute from DUT",
+                     "Verify that TestInProgress attribute has a value of 0 (False)"),
             TestStep(11, "SMOKECO.S.C00.Rsp(SelfTestRequest) TH sends SelfTestRequest command to DUT"),
-            TestStep(12, "After a few seconds, TH receives the cluster-specific Status Code from DUT", "Verify that Status Code shows BUSY"),
-            TestStep(13, "TH reads TestInProgress attribute from DUT", "Verify that TestInProgress attribute has a value of 0 (False)"),
+            TestStep(12, "After a few seconds, TH receives the cluster-specific Status Code from DUT",
+                     "Verify that Status Code shows BUSY"),
+            TestStep(13, "TH reads TestInProgress attribute from DUT",
+                     "Verify that TestInProgress attribute has a value of 0 (False)"),
             TestStep(14, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Critical CO Alarm Test Event"),
-            TestStep(15, "TH waits for a report of COState attribute from DUT with a timeout of 300 seconds", "Verify that COState attribute has a value of 2 (Critical)"),
-            TestStep(16, "TH reads ExpressedState attribute from DUT", "Verify that ExpressedState attribute has a value of 2 (COAlarm)"),
-            TestStep(17, "TH reads COAlarm event from DUT", "Verify that COAlarm event has a new event record and AlarmSeverityLevel field indicates the COState attribute current value of 2"),
+            TestStep(15, "TH waits for a report of COState attribute from DUT with a timeout of 300 seconds",
+                     "Verify that COState attribute has a value of 2 (Critical)"),
+            TestStep(16, "TH reads ExpressedState attribute from DUT",
+                     "Verify that ExpressedState attribute has a value of 2 (COAlarm)"),
+            TestStep(17, "TH reads COAlarm event from DUT",
+                     "Verify that COAlarm event has a new event record and AlarmSeverityLevel field indicates the COState attribute current value of 2"),
             TestStep(18, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER for CO Alarm Test Event Clear"),
-            TestStep(19, "TH waits for a report of COState attribute from DUT with a timeout of 300 seconds", "Verify that COState attribute has a value of 0 (Normal)"),
-            TestStep(20, "TH reads ExpressedState attribute from DUT", "Verify that ExpressedState attribute has a value of 0 (Normal)"),
+            TestStep(19, "TH waits for a report of COState attribute from DUT with a timeout of 300 seconds",
+                     "Verify that COState attribute has a value of 0 (Normal)"),
+            TestStep(20, "TH reads ExpressedState attribute from DUT",
+                     "Verify that ExpressedState attribute has a value of 0 (Normal)"),
             TestStep(21, "TH reads AllClear event from DUT", "Verify that AllClear event has a new event recor"),
         ]
 
