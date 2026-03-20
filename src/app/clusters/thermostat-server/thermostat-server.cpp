@@ -901,7 +901,7 @@ bool ThermostatAttrAccess::GetPreviousSetpointValue(EndpointId endpoint, Attribu
     if (ep < MATTER_ARRAY_SIZE(mPreviousSetpointValues) && GetTrackedSetpointIndex(attributeId, setpointIndex) &&
         mPreviousSetpointValues[ep][setpointIndex].attributeId == attributeId)
     {
-        value = mPreviousSetpointValues[ep][setpointIndex].value;
+        value                                      = mPreviousSetpointValues[ep][setpointIndex].value;
         mPreviousSetpointValues[ep][setpointIndex] = {};
         return true;
     }
