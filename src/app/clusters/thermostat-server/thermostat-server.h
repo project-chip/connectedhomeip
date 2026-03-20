@@ -246,8 +246,8 @@ private:
     AtomicWriteSession mAtomicWriteSessions[kThermostatEndpointCount];
 
     /**
-     * @brief Retrieves the setpoint value saved by SavePreviousSetpointValue for the given endpoint
-     *        and attribute.
+     * @brief Retrieves and consumes the setpoint value saved by SavePreviousSetpointValue for the
+     *        given endpoint and attribute.
      *
      * @param endpoint    The endpoint.
      * @param attributeId The attribute ID to look up.
