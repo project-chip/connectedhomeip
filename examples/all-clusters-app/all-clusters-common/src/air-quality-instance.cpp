@@ -16,7 +16,6 @@
  */
 
 #include <air-quality-instance.h>
-#include <app/util/af-types.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AirQuality;
@@ -37,7 +36,7 @@ void AirQuality::Shutdown()
     }
 }
 
-void MatterAirQualityClusterInitCallback(chip::EndpointId endpointId)
+void emberAfAirQualityClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gAirQualityCluster == nullptr);
@@ -47,7 +46,7 @@ void MatterAirQualityClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gAirQualityCluster->Init();
 }
 
-void MatterAirQualityClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
+void emberAfAirQualityClusterShutdownCallback(chip::EndpointId endpointId)
 {
     AirQuality::Shutdown();
 }

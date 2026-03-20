@@ -33,7 +33,7 @@ static chip::BitMask<Feature, uint32_t> airQualityFeatures(Feature::kFair, Featu
                                                            Feature::kExtremelyPoor);
 static std::map<int, Instance *> gAirQualityClusterInstance{};
 
-void MatterAirQualityClusterInitCallback(chip::EndpointId endpointId)
+void emberAfAirQualityClusterInitCallback(chip::EndpointId endpointId)
 {
     Instance * clusterInstance = new Instance(endpointId, airQualityFeatures);
     TEMPORARY_RETURN_IGNORED clusterInstance->Init();

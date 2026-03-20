@@ -53,7 +53,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  * @param endpoint   Ver.: always
  *
  */
-void MatterAirQualityClusterInitCallback(EndpointId endpoint)
+void emberAfAirQualityClusterInitCallback(EndpointId endpoint)
 {
     // TODO: implement any additional Cluster Server init actions
 }
