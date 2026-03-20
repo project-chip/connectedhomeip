@@ -1091,30 +1091,6 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
             return Status::Failure;
         }
 
-    // Save current setpoint value before the write, so UpdateSetpointChangeAttributes()
-    // can compute the change amount after the write completes.
-    switch (attributePath.mAttributeId)
-    {
-    case OccupiedHeatingSetpoint::Id:
-        if (HeatSupported)
-            gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, OccupiedHeatingSetpoint);
-        break;
-    case OccupiedCoolingSetpoint::Id:
-        if (CoolSupported)
-            gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, OccupiedCoolingSetpoint);
-        break;
-    case UnoccupiedHeatingSetpoint::Id:
-        if (HeatSupported && OccupancySupported)
-            gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, UnoccupiedHeatingSetpoint);
-        break;
-    case UnoccupiedCoolingSetpoint::Id:
-        if (CoolSupported && OccupancySupported)
-            gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, UnoccupiedCoolingSetpoint);
-        break;
-    default:
-        break;
-    }
-
     switch (attributePath.mAttributeId)
     {
     case OccupiedHeatingSetpoint::Id: {
@@ -1124,8 +1100,13 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit ||
             requested > MaxHeatSetpointLimit)
             return Status::InvalidValue;
-        return CheckCoolingSetpointDeadband(AutoSupported, requested, std::min(MaxCoolSetpointLimit, AbsMaxCoolSetpointLimit),
-                                            DeadBandTemp);
+        Status status = CheckCoolingSetpointDeadband(AutoSupported, requested,
+                                                     std::min(MaxCoolSetpointLimit, AbsMaxCoolSetpointLimit), DeadBandTemp);
+        if (status == Status::Success)
+        {
+            gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, OccupiedHeatingSetpoint);
+        }
+        return status;
     }
 
     case OccupiedCoolingSetpoint::Id: {
@@ -1135,8 +1116,13 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit ||
             requested > MaxCoolSetpointLimit)
             return Status::InvalidValue;
-        return CheckHeatingSetpointDeadband(AutoSupported, requested, std::max(MinHeatSetpointLimit, AbsMinHeatSetpointLimit),
-                                            DeadBandTemp);
+        Status status = CheckHeatingSetpointDeadband(AutoSupported, requested,
+                                                     std::max(MinHeatSetpointLimit, AbsMinHeatSetpointLimit), DeadBandTemp);
+        if (status == Status::Success)
+        {
+            gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, OccupiedCoolingSetpoint);
+        }
+        return status;
     }
 
     case UnoccupiedHeatingSetpoint::Id: {
@@ -1146,8 +1132,13 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         if (requested < AbsMinHeatSetpointLimit || requested < MinHeatSetpointLimit || requested > AbsMaxHeatSetpointLimit ||
             requested > MaxHeatSetpointLimit)
             return Status::InvalidValue;
-        return CheckCoolingSetpointDeadband(AutoSupported, requested, std::min(MaxCoolSetpointLimit, AbsMaxCoolSetpointLimit),
-                                            DeadBandTemp);
+        Status status = CheckCoolingSetpointDeadband(AutoSupported, requested,
+                                                     std::min(MaxCoolSetpointLimit, AbsMaxCoolSetpointLimit), DeadBandTemp);
+        if (status == Status::Success)
+        {
+            gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, UnoccupiedHeatingSetpoint);
+        }
+        return status;
     }
     case UnoccupiedCoolingSetpoint::Id: {
         requested = static_cast<int16_t>(chip::Encoding::LittleEndian::Get16(value));
@@ -1156,8 +1147,13 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         if (requested < AbsMinCoolSetpointLimit || requested < MinCoolSetpointLimit || requested > AbsMaxCoolSetpointLimit ||
             requested > MaxCoolSetpointLimit)
             return Status::InvalidValue;
-        return CheckHeatingSetpointDeadband(AutoSupported, requested, std::max(MinHeatSetpointLimit, AbsMinHeatSetpointLimit),
-                                            DeadBandTemp);
+        Status status = CheckHeatingSetpointDeadband(AutoSupported, requested,
+                                                     std::max(MinHeatSetpointLimit, AbsMinHeatSetpointLimit), DeadBandTemp);
+        if (status == Status::Success)
+        {
+            gThermostatAttrAccess.SavePreviousSetpointValue(endpoint, attributePath.mAttributeId, UnoccupiedCoolingSetpoint);
+        }
+        return status;
     }
 
     case MinHeatSetpointLimit::Id: {
