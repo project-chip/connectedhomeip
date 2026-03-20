@@ -69,7 +69,7 @@ void CommodityTariffInstance::TariffTimeUpdCb()
 
     if (CHIP_NO_ERROR == GetClock_MatterEpochS(currentTimestamp))
     {
-        GetDelegate()->TryToactivateDelayedTariff(currentTimestamp);
+        GetDelegate()->TryToActivateDelayedTariff(currentTimestamp);
     }
 
     TariffTimeAttrsSync();

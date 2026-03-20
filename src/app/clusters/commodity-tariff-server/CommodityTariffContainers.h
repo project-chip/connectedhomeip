@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <cassert>
 #include <pw_containers/algorithm.h>
 #include <pw_containers/vector.h>
 
@@ -132,6 +131,17 @@ public:
         return Base::insert(std::make_pair(key, value));
     }
 
+    void remove(const Key & key)
+    {
+        auto it = find(key);
+        if (it == this->end())
+        {
+            return;
+        }
+
+        Base::remove({ key, it->second });
+    }
+
     // Lookup
     bool contains(const Key & key) const { return find(key) != this->end(); }
 
@@ -159,7 +169,7 @@ public:
         {
             ChipLogError(AppServer, "Can't place new entry - the buffer is full");
             // This is a programming error. Using operator[] on a full map for a new key.
-            assert(!this->full());
+            VerifyOrDie(!this->full());
         }
 
         Base::insert({ key, Value{} });

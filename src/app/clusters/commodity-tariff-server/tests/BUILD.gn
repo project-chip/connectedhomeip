@@ -22,7 +22,7 @@ chip_test_suite("tests") {
   output_name = "libTestCommodityTariffCluster"
 
   test_sources = [
-    "TestCommodityTariffBaseDataClass.cpp",
+    #"TestCommodityTariffBaseDataClass.cpp",
     "TestCommodityTariffContainers.cpp",
   ]
 

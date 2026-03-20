@@ -21,8 +21,6 @@
 
 #include <array>
 #include <cstdint>
-#include <mutex>
-#include <thread>
 
 #include <lib/support/CodeUtils.h>
 
@@ -48,7 +46,7 @@ protected:
     void SetUp() override
     {
         // Initialize CHIP stack if needed
-        Platform::MemoryInit();
+        TEMPORARY_RETURN_IGNORED Platform::MemoryInit();
     }
 
     void TearDown() override { Platform::MemoryShutdown(); }
