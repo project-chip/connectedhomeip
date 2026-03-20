@@ -935,6 +935,10 @@ void ThermostatAttrAccess::UpdateSetpointChangeAttributes(EndpointId endpoint, A
     {
         SetpointChangeSourceTimestamp::Set(endpoint, chipEpochSeconds);
     }
+    else
+    {
+        SetpointChangeSourceTimestamp::Set(endpoint, 0);
+    }
 }
 
 } // namespace Thermostat
