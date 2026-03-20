@@ -143,7 +143,7 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     if (ConnectivityMgr().IsWiFiStationProvisioned())
     {
         ChipLogProgress(DeviceLayer, "Disconnecting for current wifi");
-        ReturnErrorOnFailure(WifiInterface::GetInstance().TriggerDisconnection());
+        WifiInterface::GetInstance().TriggerDisconnection();
     }
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
 
@@ -163,8 +163,7 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %s", NullTerminated(ssid, ssidLen).c_str());
     // Resetting the retry connection state machine for a new access point connection
     WifiInterface::GetInstance().ResetConnectionRetryInterval();
-    // Configure the WFX WiFi interface.
-    WifiInterface::GetInstance().SetWifiCredentials(wifiConfig);
+    ReturnErrorOnFailure(WifiInterface::GetInstance().SetWifiCredentials(wifiConfig));
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
     return CHIP_NO_ERROR;

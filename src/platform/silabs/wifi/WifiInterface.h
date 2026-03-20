@@ -238,11 +238,9 @@ public:
      *
      * @note The disconnection is not immediate. It can take a certain amount of time for the device to be in a disconnected state
      * once the function is called. When the function returns, the device might not have yet disconnected from the Wi-Fi network.
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR, disconnection request was succesfully triggered
-     *         otherwise, CHIP_ERROR_INTERNAL
+     * The implementation may only enqueue a disconnect (e.g. post an event); there is no synchronous success/failure to report.
      */
-    virtual CHIP_ERROR TriggerDisconnection() = 0;
+    virtual void TriggerDisconnection() = 0;
 
     /**
      * @brief Gets the connected access point information.
@@ -288,8 +286,9 @@ public:
      *       The function will overwrite any existing Wi-Fi credentials.
      *
      * @param[in] credentials
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if ssidLength is 0 or exceeds max SSID length
      */
-    virtual void SetWifiCredentials(const WiFiCredentials & credentials) = 0;
+    virtual CHIP_ERROR SetWifiCredentials(const WiFiCredentials & credentials) = 0;
 
     /**
      * @brief Returns the configured Wi-Fi credentials
@@ -307,6 +306,7 @@ public:
      *        connection attempt was successful or not.
      *
      *        The returned error code only indicates if the connection attempt was triggered or not.
+     *        On retry after failure, the implementation may use quick join (no scan) when channel/BSSID are known.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR, the connection attempt was succesfully triggered
      *                    CHIP_ERROR_INCORRECT_STATE, the Wi-Fi station does not have any Wi-Fi credentials
