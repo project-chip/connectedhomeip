@@ -25,9 +25,9 @@
  #include <clusters/FanControl/Enums.h>
  #include <lib/support/BitFlags.h>
  #include <lib/support/BitMask.h>
- 
+
  namespace chip::app::Clusters {
- 
+
  class FanControlCluster : public DefaultServerCluster
  {
  public:
@@ -36,11 +36,11 @@
                                    FanControl::Attributes::SpeedCurrent::Id, FanControl::Attributes::RockSupport::Id,
                                    FanControl::Attributes::RockSetting::Id, FanControl::Attributes::WindSupport::Id,
                                    FanControl::Attributes::WindSetting::Id, FanControl::Attributes::AirflowDirection::Id>;
- 
+
      struct Config
      {
          Config(EndpointId endpointId, FanControl::Delegate * delegate) : mEndpointId(endpointId), mDelegate(delegate) {}
- 
+
          Config & WithFanModeSequence(FanControl::FanModeSequenceEnum fanModeSequence)
          {
              mFanModeSequence = fanModeSequence;
@@ -89,7 +89,7 @@
              mFeatureMap.Set(FanControl::Feature::kStep);
              return *this;
          }
- 
+
          EndpointId mEndpointId;
          FanControl::Delegate * mDelegate;
          bool mSupportsStep                               = false;
@@ -100,10 +100,10 @@
          OptionalAttributes mOptionalAttributes;
          BitFlags<FanControl::Feature> mFeatureMap;
      };
- 
+
      FanControlCluster(const Config & config);
      ~FanControlCluster() = default;
- 
+
      // ServerClusterInterface Implementation
      CHIP_ERROR Startup(ServerClusterContext & context) override;
      void Shutdown(ClusterShutdownType shutdownType) override;
@@ -116,13 +116,13 @@
                                  ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
      std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                 TLV::TLVReader & input_arguments, CommandHandler * handler) override;
- 
+
      // Getters
      FanControl::FanModeEnum GetFanMode() const { return mFanMode; }
      DataModel::Nullable<chip::Percent> GetPercentSetting() const { return mPercentSetting; }
      DataModel::Nullable<uint8_t> GetSpeedSetting() const { return mSpeedSetting; }
      uint8_t GetSpeedMax() const { return mSpeedMax; }
- 
+
      // Setters
      DataModel::ActionReturnStatus SetFanMode(FanControl::FanModeEnum value);
      DataModel::ActionReturnStatus SetPercentSetting(DataModel::Nullable<chip::Percent> value);
@@ -130,9 +130,9 @@
      DataModel::ActionReturnStatus SetRockSetting(BitMask<FanControl::RockBitmap> value);
      DataModel::ActionReturnStatus SetWindSetting(BitMask<FanControl::WindBitmap> value);
      DataModel::ActionReturnStatus SetAirflowDirection(FanControl::AirflowDirectionEnum value);
- 
+
      void SetDelegate(FanControl::Delegate * delegate);
- 
+
  private:
      bool SupportsMultiSpeed() const { return mOptionalAttributes.IsSet(FanControl::Attributes::SpeedMax::Id); }
      bool SupportsAuto() const
@@ -145,19 +145,19 @@
      bool SupportsWind() const { return mOptionalAttributes.IsSet(FanControl::Attributes::WindSupport::Id); }
      bool SupportsStep() const { return mSupportsStep; }
      bool SupportsAirflowDirection() const { return mOptionalAttributes.IsSet(FanControl::Attributes::AirflowDirection::Id); }
- 
+
      Protocols::InteractionModel::Status SetFanModeToOff();
      void ApplyFanModeOffSideEffects();
      void ApplyFanModeAutoSideEffects();
- 
+
      // Spec-required mode side effects
      void ApplyFanModeLowSideEffects();
      void ApplyFanModeMediumSideEffects();
      void ApplyFanModeHighSideEffects();
- 
+
      void ApplyPercentSettingChanged();
      void ApplySpeedSettingChanged();
- 
+
      // Attributes
      FanControl::FanModeEnum mFanMode = FanControl::FanModeEnum::kOff;
      FanControl::FanModeSequenceEnum mFanModeSequence;
@@ -166,7 +166,7 @@
      BitMask<FanControl::RockBitmap> mRockSetting;
      BitMask<FanControl::WindBitmap> mWindSetting;
      FanControl::AirflowDirectionEnum mAirflowDirection = FanControl::AirflowDirectionEnum::kForward;
- 
+
      bool mSupportsStep = false;
      uint8_t mSpeedMax;
      BitMask<FanControl::RockBitmap> mRockSupport;
@@ -175,5 +175,5 @@
      BitFlags<FanControl::Feature> mFeatureMap;
      FanControl::Delegate * mDelegate;
  };
- 
+
  } // namespace chip::app::Clusters

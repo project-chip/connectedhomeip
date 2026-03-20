@@ -30,35 +30,35 @@
  #include <lib/support/TypeTraits.h>
  #include <lib/support/logging/CHIPLogging.h>
  #include <protocols/interaction_model/StatusCode.h>
- 
+
  using namespace chip;
  using namespace chip::app;
  using namespace chip::app::Clusters;
  using namespace chip::app::Clusters::FanControl;
  using namespace chip::app::Clusters::FanControl::Attributes;
- 
+
  using Protocols::InteractionModel::Status;
- 
+
  namespace chip::app::Clusters {
- 
+
  FanControlCluster::FanControlCluster(const Config & config) :
      DefaultServerCluster({ config.mEndpointId, FanControl::Id }), mFanModeSequence(config.mFanModeSequence),
      mSupportsStep(config.mSupportsStep), mSpeedMax(config.mSpeedMax), mRockSupport(config.mRockSupport),
      mWindSupport(config.mWindSupport), mOptionalAttributes(config.mOptionalAttributes), mFeatureMap(config.mFeatureMap),
      mDelegate(config.mDelegate)
  {}
- 
+
  CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
  {
      ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
      return CHIP_NO_ERROR;
  }
- 
+
  void FanControlCluster::Shutdown(ClusterShutdownType shutdownType)
  {
      DefaultServerCluster::Shutdown(shutdownType);
  }
- 
+
  Protocols::InteractionModel::Status FanControlCluster::SetFanModeToOff()
  {
      if (mFanMode != FanModeEnum::kOff)
@@ -68,13 +68,13 @@
      }
      return Status::Success;
  }
- 
+
  void FanControlCluster::ApplyFanModeOffSideEffects()
  {
      mPercentSetting.SetNonNull(0);
      NotifyAttributeChanged(PercentSetting::Id);
      NotifyAttributeChanged(PercentCurrent::Id);
- 
+
      if (SupportsMultiSpeed())
      {
          mSpeedSetting.SetNonNull(0);
@@ -82,13 +82,13 @@
          NotifyAttributeChanged(SpeedCurrent::Id);
      }
  }
- 
+
  void FanControlCluster::ApplyFanModeLowSideEffects()
  {
      mPercentSetting.SetNonNull(33); // Spec mandates 33%
      NotifyAttributeChanged(PercentSetting::Id);
      NotifyAttributeChanged(PercentCurrent::Id);
- 
+
      if (SupportsMultiSpeed())
      {
          mSpeedSetting.SetNonNull(1); // Spec mandates Speed 1
@@ -96,13 +96,13 @@
          NotifyAttributeChanged(SpeedCurrent::Id);
      }
  }
- 
+
  void FanControlCluster::ApplyFanModeMediumSideEffects()
  {
      mPercentSetting.SetNonNull(66); // Spec mandates 66%
      NotifyAttributeChanged(PercentSetting::Id);
      NotifyAttributeChanged(PercentCurrent::Id);
- 
+
      if (SupportsMultiSpeed())
      {
          // Spec mandates ceil(SpeedMax / 2) for Medium
@@ -112,13 +112,13 @@
          NotifyAttributeChanged(SpeedCurrent::Id);
      }
  }
- 
+
  void FanControlCluster::ApplyFanModeHighSideEffects()
  {
      mPercentSetting.SetNonNull(100); // Spec mandates 100%
      NotifyAttributeChanged(PercentSetting::Id);
      NotifyAttributeChanged(PercentCurrent::Id);
- 
+
      if (SupportsMultiSpeed())
      {
          mSpeedSetting.SetNonNull(mSpeedMax); // Spec mandates SpeedMax
@@ -126,30 +126,30 @@
          NotifyAttributeChanged(SpeedCurrent::Id);
      }
  }
- 
+
  void FanControlCluster::ApplyFanModeAutoSideEffects()
  {
      mPercentSetting.SetNull();
      NotifyAttributeChanged(PercentSetting::Id);
- 
+
      if (SupportsMultiSpeed())
      {
          mSpeedSetting.SetNull();
          NotifyAttributeChanged(SpeedSetting::Id);
      }
  }
- 
+
  void FanControlCluster::ApplyPercentSettingChanged()
  {
      if (mPercentSetting.IsNull())
          return;
- 
+
      if (mPercentSetting.Value() == 0)
      {
          SetFanModeToOff();
          return;
      }
- 
+
      if (SupportsMultiSpeed())
      {
          uint8_t speedMax     = mSpeedMax;
@@ -159,24 +159,24 @@
          NotifyAttributeChanged(SpeedSetting::Id);
      }
  }
- 
+
  void FanControlCluster::ApplySpeedSettingChanged()
  {
      if (!SupportsMultiSpeed() || mSpeedSetting.IsNull())
          return;
- 
+
      if (mSpeedSetting.Value() == 0)
      {
          SetFanModeToOff();
          return;
      }
- 
+
      uint8_t speedMax             = mSpeedMax;
      chip::Percent percentSetting = static_cast<chip::Percent>((mSpeedSetting.Value() * 100) / speedMax);
      mPercentSetting.SetNonNull(percentSetting);
      NotifyAttributeChanged(PercentSetting::Id);
  }
- 
+
  DataModel::ActionReturnStatus FanControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                 AttributeValueEncoder & encoder)
  {
@@ -230,7 +230,7 @@
          return Status::UnsupportedAttribute;
      }
  }
- 
+
  DataModel::ActionReturnStatus FanControlCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                  AttributeValueDecoder & decoder)
  {
@@ -270,7 +270,7 @@
          return Status::UnsupportedAttribute;
      }
  }
- 
+
  CHIP_ERROR FanControlCluster::Attributes(const ConcreteClusterPath & path,
                                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
  {
@@ -281,11 +281,11 @@
          { SupportsRocking(), RockSetting::kMetadataEntry },     { SupportsWind(), WindSupport::kMetadataEntry },
          { SupportsWind(), WindSetting::kMetadataEntry },        { SupportsAirflowDirection(), AirflowDirection::kMetadataEntry },
      };
- 
+
      AttributeListBuilder listBuilder(builder);
      return listBuilder.Append(Span(FanControl::Attributes::kMandatoryMetadata), Span(optionalAttributes));
  }
- 
+
  CHIP_ERROR FanControlCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
  {
@@ -298,7 +298,7 @@
      }
      return CHIP_NO_ERROR;
  }
- 
+
  std::optional<DataModel::ActionReturnStatus> FanControlCluster::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                TLV::TLVReader & input_arguments,
                                                                                CommandHandler * handler)
@@ -308,13 +308,13 @@
      case Commands::Step::Id: {
          if (!SupportsStep())
              return Status::UnsupportedCommand;
- 
+
          Commands::Step::DecodableType commandData;
          VerifyOrReturnError(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
- 
+
          bool wrapValue      = commandData.wrap.ValueOr(false);
          bool lowestOffValue = commandData.lowestOff.ValueOr(false);
- 
+
          if (mDelegate == nullptr)
              return Status::Failure;
          return mDelegate->HandleStep(commandData.direction, wrapValue, lowestOffValue);
@@ -323,7 +323,7 @@
          return Status::UnsupportedCommand;
      }
  }
- 
+
  DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
  {
      uint8_t seq = chip::to_underlying(mFanModeSequence);
@@ -333,9 +333,9 @@
          return Status::ConstraintError;
      if (value == FanModeEnum::kAuto && !SupportsAuto())
          return Status::ConstraintError;
- 
+
      FanModeEnum newMode = value;
- 
+
      if (value == FanModeEnum::kOn)
      {
          newMode = FanModeEnum::kHigh;
@@ -353,9 +353,9 @@
              newMode = FanModeEnum::kHigh;
          }
      }
- 
+
      mFanMode = newMode;
- 
+
      if (newMode == FanModeEnum::kOff)
      {
          ApplyFanModeOffSideEffects();
@@ -376,10 +376,10 @@
      {
          ApplyFanModeAutoSideEffects();
      }
- 
+
      return NotifyAttributeChangedIfSuccess(FanMode::Id, Status::Success);
  }
- 
+
  DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nullable<chip::Percent> value)
  {
      if (value.IsNull())
@@ -390,17 +390,17 @@
          }
          return Status::Success;
      }
- 
+
      mPercentSetting = value;
      ApplyPercentSettingChanged();
      return NotifyAttributeChangedIfSuccess(PercentSetting::Id, Status::Success);
  }
- 
+
  DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Nullable<uint8_t> value)
  {
      if (!SupportsMultiSpeed())
          return Status::UnsupportedAttribute;
- 
+
      if (value.IsNull())
      {
          if (SupportsAuto())
@@ -409,55 +409,55 @@
          }
          return Status::Success;
      }
- 
+
      if (value.Value() > mSpeedMax)
          return Status::ConstraintError;
- 
+
      mSpeedSetting = value;
      ApplySpeedSettingChanged();
      return NotifyAttributeChangedIfSuccess(SpeedSetting::Id, Status::Success);
  }
- 
+
  DataModel::ActionReturnStatus FanControlCluster::SetRockSetting(BitMask<RockBitmap> value)
  {
      if (!SupportsRocking())
          return Status::UnsupportedAttribute;
- 
+
      uint8_t rawValue   = value.Raw();
      uint8_t rawSupport = mRockSupport.Raw();
      if ((rawValue & rawSupport) != rawValue)
          return Status::ConstraintError;
- 
+
      mRockSetting = value;
      return NotifyAttributeChangedIfSuccess(RockSetting::Id, Status::Success);
  }
- 
+
  DataModel::ActionReturnStatus FanControlCluster::SetWindSetting(BitMask<WindBitmap> value)
  {
      if (!SupportsWind())
          return Status::UnsupportedAttribute;
- 
+
      uint8_t rawValue   = value.Raw();
      uint8_t rawSupport = mWindSupport.Raw();
      if ((rawValue & rawSupport) != rawValue)
          return Status::ConstraintError;
- 
+
      mWindSetting = value;
      return NotifyAttributeChangedIfSuccess(WindSetting::Id, Status::Success);
  }
- 
+
  DataModel::ActionReturnStatus FanControlCluster::SetAirflowDirection(AirflowDirectionEnum value)
  {
      if (!SupportsAirflowDirection())
          return Status::UnsupportedAttribute;
- 
+
      mAirflowDirection = value;
      return NotifyAttributeChangedIfSuccess(AirflowDirection::Id, Status::Success);
  }
- 
+
  void FanControlCluster::SetDelegate(FanControl::Delegate * delegate)
  {
      mDelegate = delegate;
  }
- 
+
  } // namespace chip::app::Clusters
