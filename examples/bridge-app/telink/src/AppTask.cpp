@@ -408,7 +408,7 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
 CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(LightingActionEventHandler);
-    TEMPORARY_RETURN_IGNORED InitCommonParts();
+    ReturnErrorOnFailure(InitCommonParts());
 
     Protocols::InteractionModel::Status status;
 

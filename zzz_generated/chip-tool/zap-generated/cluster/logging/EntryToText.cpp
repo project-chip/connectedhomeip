@@ -602,6 +602,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SpecificationVersion";
         case chip::app::Clusters::BasicInformation::Attributes::MaxPathsPerInvoke::Id:
             return "MaxPathsPerInvoke";
+        case chip::app::Clusters::BasicInformation::Attributes::DeviceLocation::Id:
+            return "DeviceLocation";
         case chip::app::Clusters::BasicInformation::Attributes::ConfigurationVersion::Id:
             return "ConfigurationVersion";
         case chip::app::Clusters::BasicInformation::Attributes::GeneratedCommandList::Id:

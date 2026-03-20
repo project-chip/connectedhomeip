@@ -207,6 +207,7 @@
             "ProductAppearance",
             "SpecificationVersion",
             "MaxPathsPerInvoke",
+            "DeviceLocation",
             "ConfigurationVersion"
         ],
         "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
@@ -218,8 +219,11 @@
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": [
             "CountdownTime",
+            "MainState",
+            "CurrentErrorList",
             "OverallCurrentState",
             "OverallTargetState",
+            "LatchControlModes",
             "FeatureMap",
             "ClusterRevision"
         ],
