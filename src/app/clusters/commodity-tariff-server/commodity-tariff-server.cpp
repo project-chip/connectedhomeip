@@ -395,7 +395,7 @@ void Delegate::TariffDataUpd_Finish(bool is_success)
     }
 }
 
-void Delegate::TryToactivateDelayedTariff(uint32_t now)
+void Delegate::TryToActivateDelayedTariff(uint32_t now)
 {
     if (!DelayedTariffUpdateIsActive)
     {
