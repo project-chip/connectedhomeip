@@ -141,9 +141,9 @@ class TC_ICDB_2_5(ICDBaseTest):
                      "Store values for later use."),
             TestStep(4, "TH1 and TH2 each subscribe to the ICDCounter attribute, with MinIntervalFloor and MaxIntervalCeiling.", """
                      Verify MinIntervalFloor <= MaxInterval <= MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling) for both TH1 and TH2."""),
-            TestStep(5, "Wait for 1 or more max of MaxInterval1 and MaxInterval2.", """
-                     DUT sends subscription reports periodically to TH1 and TH2 within their respective MaxInterval1 and MaxInterval2 time.
-                     DUT does not send check-in message to TH1."""),
+            TestStep(5, "Wait for 1 or more MaxInterval.", """
+                     Verify DUT sent a subscription report to both TH1 and TH2 within MaxInterval.
+                     Verify ICDCounter is unchanged."""),
         ]
 
     def pics_TC_ICDB_2_5(self) -> list[str]:
@@ -234,7 +234,7 @@ class TC_ICDB_2_5(ICDBaseTest):
                                   f"TH2 MaxInterval {th2_max_interval_s}s exceeds MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling)")
 
         # *** STEP 5 ***
-        # Wait for 1 or more max of MaxInterval1 and MaxInterval2
+        # Wait for 1 or more MaxInterval.
         self.step(5)
         max_interval_s = max(th1_max_interval_s, th2_max_interval_s)
 
@@ -247,7 +247,7 @@ class TC_ICDB_2_5(ICDBaseTest):
             assert_subscription_heartbeat_received(th2_subscription, max_interval_s)
         )
 
-        # Verify DUT does not send check-in message to TH1 by checking ICDCounter is unchanged
+        # Verify ICDCounter is unchanged
         icd_counter_after = await self.read_icdm_attribute_expect_success(attributes.ICDCounter)
         asserts.assert_equal(icd_counter_after, icd_counter_before,
                              f"ICDCounter should not have changed while subscriptions are active. "
