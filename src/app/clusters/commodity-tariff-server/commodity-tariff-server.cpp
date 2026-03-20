@@ -384,10 +384,7 @@ void Delegate::TariffDataUpd_Finish(bool is_success)
     if (mTariffDataUpdatedCb != nullptr && updatedCount > 0)
     {
         ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
-        if (mTariffDataUpdatedCb != nullptr)
-        {
-            mTariffDataUpdatedCb(false, updatedAttrIds, updatedCount);
-        }
+        mTariffDataUpdatedCb(false, updatedAttrIds, updatedCount);
     }
     else
     {
