@@ -19,16 +19,63 @@
 #include "PersistentStorageOperationalKeystore.h"
 
 #include <lib/support/CHIPMem.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 
 #include <psa/crypto.h>
 
 namespace chip {
 namespace Crypto {
 
-PSAOperationalKeystore::PersistentP256Keypair::PersistentP256Keypair(FabricIndex fabricIndex)
+/* psa_key_id_t is uint32_t: max value has 10 digits */
+static constexpr uint8_t keyBufSize = 16;
+
+PSAOperationalKeystore::PersistentP256Keypair::PersistentP256Keypair(FabricIndex fabricIndex, PersistentStorageDelegate * storage,
+                                                                     bool reusePsaKey)
 {
     VerifyOrReturn(IsValidFabricIndex(fabricIndex));
-    ToPsaContext(mKeypair).key_id = GetPSAKeyAllocator().GetOpKeyId(fabricIndex);
+    VerifyOrReturn(storage != nullptr);
+
+    mFabricIndex = fabricIndex;
+    mStorage     = storage;
+
+    psa_key_id_t keyId = GetPSAKeyAllocator().GetOpKeyId(fabricIndex);
+
+    // Try to load existing key ID from storage
+    char buf[keyBufSize] = { 0 };
+    uint16_t bufSize     = sizeof(buf);
+
+    if (mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), buf, bufSize) == CHIP_NO_ERROR)
+    {
+        // Parse stored key ID
+        uint32_t storedKeyId = 0;
+        if (sscanf(buf, "%" SCNu32, &storedKeyId) == 1)
+        {
+            if (!reusePsaKey)
+            {
+                // here we are providing a psa key id for the pending operational key.
+                // a fabric can have at most 2 psa keys: one committed and one pending:
+                // pending becomes committed in CommitOpKeypairForFabric().
+                // committed cannot be removed at this stage because an expired failsafe timer
+                // triggered by an UpdateNOC() revert will remove the pending one.
+                keyId = ((storedKeyId - static_cast<psa_key_id_t>(KeyIdBase::Operational)) <= kMaxValidFabricIndex)
+                    ? (storedKeyId + kMaxValidFabricIndex)
+                    : (storedKeyId - kMaxValidFabricIndex);
+            }
+            else
+            {
+                // Use existing key
+                keyId        = static_cast<psa_key_id_t>(storedKeyId);
+                mIsCommitted = true;
+            }
+        }
+    }
+    else if (reusePsaKey)
+    {
+        // No key exists and not allocating new
+        return;
+    }
+
+    ToPsaContext(mKeypair).key_id = keyId;
     mInitialized                  = true;
 }
 
@@ -39,19 +86,14 @@ PSAOperationalKeystore::PersistentP256Keypair::~PersistentP256Keypair()
     ToPsaContext(mKeypair).key_id = 0;
 }
 
+bool PSAOperationalKeystore::PersistentP256Keypair::IsInitialized()
+{
+    return mInitialized;
+}
+
 inline psa_key_id_t PSAOperationalKeystore::PersistentP256Keypair::GetKeyId() const
 {
     return ToConstPsaContext(mKeypair).key_id;
-}
-
-bool PSAOperationalKeystore::PersistentP256Keypair::Exists() const
-{
-    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-    psa_status_t status             = psa_get_key_attributes(GetKeyId(), &attributes);
-
-    psa_reset_key_attributes(&attributes);
-
-    return status == PSA_SUCCESS;
 }
 
 CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Generate()
@@ -62,7 +104,8 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Generate()
     psa_key_id_t keyId              = 0;
     size_t publicKeyLength;
 
-    TEMPORARY_RETURN_IGNORED Destroy();
+    /* make sure we don't have stale key in the key store */
+    psa_destroy_key(GetKeyId());
 
     // Type based on ECC with the elliptic curve SECP256r1 -> PSA_ECC_FAMILY_SECP_R1
     psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
@@ -93,7 +136,30 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Destroy()
     VerifyOrReturnError(status != PSA_ERROR_INVALID_HANDLE, CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
+    if (mIsCommitted)
+    {
+        TEMPORARY_RETURN_IGNORED mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricOpKey(mFabricIndex).KeyName());
+    }
+
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Commit()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    char buf[keyBufSize] = { 0 };
+    snprintf(buf, keyBufSize, "%" PRIu32, GetKeyId());
+
+    err = mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(mFabricIndex).KeyName(), buf,
+                                    static_cast<uint16_t>(strlen(buf)));
+
+    if (CHIP_NO_ERROR == err)
+    {
+        mIsCommitted = true;
+    }
+
+    return err;
 }
 
 bool PSAOperationalKeystore::HasPendingOpKeypair() const
@@ -110,7 +176,7 @@ bool PSAOperationalKeystore::HasOpKeypairForFabric(FabricIndex fabricIndex) cons
         return mIsPendingKeypairActive;
     }
 
-    return PersistentP256Keypair(fabricIndex).Exists();
+    return PersistentP256Keypair(fabricIndex, mStorage, true).IsInitialized();
 }
 
 CHIP_ERROR PSAOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest)
@@ -124,7 +190,7 @@ CHIP_ERROR PSAOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabricIndex
 
     if (mPendingKeypair == nullptr)
     {
-        mPendingKeypair = Platform::New<PersistentP256Keypair>(fabricIndex);
+        mPendingKeypair = Platform::New<PersistentP256Keypair>(fabricIndex, mStorage, false);
     }
 
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_NO_MEMORY);
@@ -146,8 +212,6 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Deserialize(P256Serial
     psa_key_id_t keyId              = 0;
     VerifyOrReturnError(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, CHIP_ERROR_INVALID_ARGUMENT);
 
-    TEMPORARY_RETURN_IGNORED Destroy();
-
     // Type based on ECC with the elliptic curve SECP256r1 -> PSA_ECC_FAMILY_SECP_R1
     psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
     psa_set_key_bits(&attributes, kP256_PrivateKey_Length * 8);
@@ -161,6 +225,8 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Deserialize(P256Serial
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     memcpy(mPublicKey.Bytes(), input.ConstBytes(), mPublicKey.Length());
+
+    error = Commit();
 
 exit:
     LogPsaError(status);
@@ -180,12 +246,15 @@ CHIP_ERROR PSAOperationalKeystore::ActivateOpKeypairForFabric(FabricIndex fabric
 
 CHIP_ERROR PSAOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fabricIndex)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && mPendingFabricIndex == fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(mIsPendingKeypairActive, CHIP_ERROR_INCORRECT_STATE);
 
+    err = mPendingKeypair->Commit();
     ReleasePendingKeypair();
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR PSAOperationalKeystore::ExportOpKeypairForFabric(FabricIndex fabricIndex, Crypto::P256SerializedKeypair & outKeypair)
@@ -197,9 +266,9 @@ CHIP_ERROR PSAOperationalKeystore::ExportOpKeypairForFabric(FabricIndex fabricIn
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(HasOpKeypairForFabric(fabricIndex), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
-    size_t outSize = 0;
-    psa_status_t status =
-        psa_export_key(PersistentP256Keypair(fabricIndex).GetKeyId(), outKeypair.Bytes(), outKeypair.Capacity(), &outSize);
+    size_t outSize      = 0;
+    psa_status_t status = psa_export_key(PersistentP256Keypair(fabricIndex, mStorage, true).GetKeyId(), outKeypair.Bytes(),
+                                         outKeypair.Capacity(), &outSize);
 
     if (status == PSA_ERROR_BUFFER_TOO_SMALL)
     {
@@ -230,7 +299,7 @@ CHIP_ERROR PSAOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fabricIn
         return CHIP_NO_ERROR;
     }
 
-    return PersistentP256Keypair(fabricIndex).Destroy();
+    return PersistentP256Keypair(fabricIndex, mStorage, true).Destroy();
 }
 
 void PSAOperationalKeystore::RevertPendingKeypair()
@@ -251,8 +320,8 @@ CHIP_ERROR PSAOperationalKeystore::SignWithOpKeypair(FabricIndex fabricIndex, co
         return mPendingKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
     }
 
-    PersistentP256Keypair keypair(fabricIndex);
-    VerifyOrReturnError(keypair.Exists(), CHIP_ERROR_INVALID_FABRIC_INDEX);
+    PersistentP256Keypair keypair(fabricIndex, mStorage, true);
+    VerifyOrReturnError(keypair.IsInitialized(), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     return keypair.ECDSA_sign_msg(message.data(), message.size(), outSignature);
 }
@@ -287,15 +356,8 @@ CHIP_ERROR PSAOperationalKeystore::MigrateOpKeypairForFabric(FabricIndex fabricI
     {
         ReturnErrorOnFailure(operationalKeystore.ExportOpKeypairForFabric(fabricIndex, serializedKeypair));
 
-        PersistentP256Keypair keypair(fabricIndex);
+        PersistentP256Keypair keypair(fabricIndex, mStorage, false);
         ReturnErrorOnFailure(keypair.Deserialize(serializedKeypair));
-
-        // Migrated key is not useful anymore, remove it from the previous keystore.
-        ReturnErrorOnFailure(operationalKeystore.RemoveOpKeypairForFabric(fabricIndex));
-    }
-    else if (operationalKeystore.HasOpKeypairForFabric(fabricIndex))
-    {
-        ReturnErrorOnFailure(operationalKeystore.RemoveOpKeypairForFabric(fabricIndex));
     }
 
     return CHIP_NO_ERROR;

@@ -27,6 +27,20 @@ namespace Crypto {
 class PSAOperationalKeystore final : public OperationalKeystore
 {
 public:
+    /**
+     * @brief Initialize the Operational Keystore to map to a given storage delegate.
+     *
+     * @param storage Pointer to persistent storage delegate to use. Must outlive this instance.
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_INCORRECT_STATE if already initialized
+     */
+    CHIP_ERROR Init(PersistentStorageDelegate * storage)
+    {
+        VerifyOrReturnError(mStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        mStorage = storage;
+        return CHIP_NO_ERROR;
+    }
+
     bool HasPendingOpKeypair() const override;
     bool HasOpKeypairForFabric(FabricIndex fabricIndex) const override;
     CHIP_ERROR NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest) override;
@@ -45,7 +59,7 @@ protected:
     class PersistentP256Keypair : private P256Keypair
     {
     public:
-        explicit PersistentP256Keypair(FabricIndex fabricIndex);
+        explicit PersistentP256Keypair(FabricIndex fabricIndex, PersistentStorageDelegate * storage, bool reusePsaKey);
         ~PersistentP256Keypair() override;
 
         using P256Keypair::ECDSA_sign_msg;
@@ -53,10 +67,16 @@ protected:
         using P256Keypair::Pubkey;
 
         psa_key_id_t GetKeyId() const;
-        bool Exists() const;
+        bool IsInitialized();
         CHIP_ERROR Generate();
+        CHIP_ERROR Commit();
         CHIP_ERROR Destroy();
         CHIP_ERROR Deserialize(P256SerializedKeypair & input);
+
+    private:
+        FabricIndex mFabricIndex             = kUndefinedFabricIndex;
+        PersistentStorageDelegate * mStorage = nullptr;
+        bool mIsCommitted                    = false;
     };
 
     void ReleasePendingKeypair();

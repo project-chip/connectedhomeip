@@ -232,6 +232,10 @@ if (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE)
         target_sources(app PRIVATE
             ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/operational_keystore/source/OperationalKeystoreSE05X.cpp
         )
+    elseif (CONFIG_CHIP_APP_OPERATIONAL_KEYSTORE_PSA)
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/operational_keystore/source/OperationalKeystorePSA.cpp
+        )
     endif()
 endif()
 

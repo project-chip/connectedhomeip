@@ -87,7 +87,7 @@ bool sIsNetworkEnabled     = false;
 bool sHaveBLEConnections   = false;
 
 #ifdef CONFIG_CHIP_CRYPTO_PSA
-chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
+chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore;
 #endif
 
 #ifdef CONFIG_NET_L2_OPENTHREAD
@@ -217,6 +217,12 @@ CHIP_ERROR AppTask::Init()
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
 #ifdef CONFIG_CHIP_CRYPTO_PSA
+    err = sPSAOperationalKeystore.Init(&initParams.persistentStorageDelegate);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("sPSAOperationalKeystore.Init() failed");
+        return err;
+    }
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
