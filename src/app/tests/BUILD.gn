@@ -99,6 +99,7 @@ source_set("actions-cluster-test-srcs") {
     "${chip_root}/src/app/clusters/actions-server/ActionsCluster.cpp",
     "${chip_root}/src/app/clusters/actions-server/ActionsDelegate.h",
     "${chip_root}/src/app/clusters/actions-server/ActionsStructs.h",
+    "${chip_root}/src/app/clusters/actions-server/CodegenIntegration.h",
     "${chip_root}/src/app/clusters/actions-server/actions-server.h",
   ]
 
