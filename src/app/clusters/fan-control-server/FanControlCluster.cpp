@@ -25,6 +25,7 @@
 #include <clusters/FanControl/Commands.h>
 #include <clusters/FanControl/Enums.h>
 #include <clusters/FanControl/Metadata.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -43,7 +44,8 @@ namespace chip::app::Clusters {
 FanControlCluster::FanControlCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, FanControl::Id }), mFanModeSequence(config.mFanModeSequence),
     mSupportsStep(config.mSupportsStep), mSpeedMax(config.mSpeedMax), mRockSupport(config.mRockSupport),
-    mWindSupport(config.mWindSupport), mOptionalAttributes(config.mOptionalAttributes), mDelegate(config.mDelegate)
+    mWindSupport(config.mWindSupport), mOptionalAttributes(config.mOptionalAttributes), mFeatureMap(config.mFeatureMap),
+    mDelegate(config.mDelegate)
 {}
 
 CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
@@ -142,7 +144,7 @@ DataModel::ActionReturnStatus FanControlCluster::ReadAttribute(const DataModel::
     case Globals::Attributes::ClusterRevision::Id:
         return encoder.Encode(FanControl::kRevision);
     case Globals::Attributes::FeatureMap::Id:
-        return encoder.Encode<uint32_t>(0);
+        return encoder.Encode(mFeatureMap);
     case FanMode::Id:
         return encoder.Encode(mFanMode);
     case FanModeSequence::Id:
