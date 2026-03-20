@@ -44,7 +44,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 #include <cstdint>
 #include <optional>
@@ -535,12 +535,7 @@ CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId, ReadOnly
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 CHIP_ERROR CodegenDataModelProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId)
 {
-    char buffer[Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
-    MutableCharSpan epUniqueIdSpan(buffer);
-    ReturnErrorOnFailure(emberAfGetEndpointUniqueIdForEndPoint(endpointId, epUniqueIdSpan));
-
-    memcpy(epUniqueId.data(), epUniqueIdSpan.data(), epUniqueIdSpan.size());
-    return CHIP_NO_ERROR;
+    return emberAfGetEndpointUniqueIdForEndPoint(endpointId, epUniqueId);
 }
 #endif
 

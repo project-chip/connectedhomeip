@@ -32,6 +32,8 @@ struct BufferSink
     int64_t requestedPreBufferLengthMs; // 0 means live only
     int64_t minKeyframeIntervalMs;
     Transport * transport;
+    int64_t registrationTimeMs;  // Time when sink was registered, used for first frame delivery
+    bool hasDeliveredFirstFrame; // Track if we've successfully delivered at least one frame
 };
 
 struct PreRollFrame

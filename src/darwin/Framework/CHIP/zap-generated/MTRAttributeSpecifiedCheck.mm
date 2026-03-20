@@ -441,6 +441,9 @@ static BOOL AttributeIsSpecifiedInBasicInformationCluster(AttributeId aAttribute
     case Attributes::MaxPathsPerInvoke::Id: {
         return YES;
     }
+    case Attributes::DeviceLocation::Id: {
+        return YES;
+    }
     case Attributes::ConfigurationVersion::Id: {
         return YES;
     }
@@ -1466,6 +1469,9 @@ static BOOL AttributeIsSpecifiedInBridgedDeviceBasicInformationCluster(Attribute
     case Attributes::ProductAppearance::Id: {
         return YES;
     }
+    case Attributes::DeviceLocation::Id: {
+        return YES;
+    }
     case Attributes::ConfigurationVersion::Id: {
         return YES;
     }
@@ -1615,6 +1621,9 @@ static BOOL AttributeIsSpecifiedInGroupKeyManagementCluster(AttributeId aAttribu
         return YES;
     }
     case Attributes::MaxGroupKeysPerFabric::Id: {
+        return YES;
+    }
+    case Attributes::GroupcastAdoption::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2297,6 +2306,9 @@ static BOOL AttributeIsSpecifiedInSmokeCOAlarmCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::ExpiryDate::Id: {
+        return YES;
+    }
+    case Attributes::Unmounted::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -4687,6 +4699,9 @@ static BOOL AttributeIsSpecifiedInOccupancySensingCluster(AttributeId aAttribute
     case Attributes::HoldTimeLimits::Id: {
         return YES;
     }
+    case Attributes::PredictedOccupancy::Id: {
+        return YES;
+    }
     case Attributes::PIROccupiedToUnoccupiedDelay::Id: {
         return YES;
     }
@@ -5365,10 +5380,16 @@ static BOOL AttributeIsSpecifiedInAmbientContextSensingCluster(AttributeId aAttr
     case Attributes::AmbientContextTypeSupported::Id: {
         return YES;
     }
-    case Attributes::SimultaneousDetectionLimit::Id: {
+    case Attributes::ObjectCountReached::Id: {
         return YES;
     }
-    case Attributes::ObjectCountReached::Id: {
+    case Attributes::ObjectCountConfig::Id: {
+        return YES;
+    }
+    case Attributes::ObjectCount::Id: {
+        return YES;
+    }
+    case Attributes::SimultaneousDetectionLimit::Id: {
         return YES;
     }
     case Attributes::HoldTime::Id: {

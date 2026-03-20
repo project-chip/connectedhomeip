@@ -30,6 +30,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #   run2:
@@ -42,6 +43,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
@@ -51,6 +53,7 @@ import logging
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mdns_discovery.utils.asserts import (assert_valid_hostname, assert_valid_icd_key, assert_valid_ipv6_addresses,
                                           assert_valid_sai_key, assert_valid_sat_key, assert_valid_sii_key, assert_valid_t_key)
+from mdns_discovery.utils.network import is_dut_tcp_supported
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -84,18 +87,22 @@ class TC_SC_4_3(MatterBaseTest):
                 TestStep(3,
                          "If supports_icd is true, TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold.", ""),
                 TestStep(4, "If supports_icd is true, TH reads FeatureMap from the ICD Management cluster on EP0. If the LITS feature is set, set supports_lit to true. Otherwise set supports_lit to false.", ""),
-                TestStep(5, "TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.", ""),
-                TestStep(6, "TH performs a query for the SRV record against the qname instance_qname.",
+                TestStep(5, "TH checks if TCP is supported by the DUT.",
+                         "Set supports_tcp_dut to True if supported, otherwise, to False"),
+                TestStep(6, "TH checks if TCP is supported by the PICS.",
+                         "Set supports_tcp_pics to True if supported, otherwise, to False"),
+                TestStep(7, "TH constructs the instance name for the DUT as the 64-bit compressed Fabric identifier, and the assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.", ""),
+                TestStep(8, "TH performs a query for the SRV record against the qname instance_qname.",
                          "Verify SRV record is returned"),
-                TestStep(7, "TH performs a query for the TXT record against the qname instance_qname.",
+                TestStep(9, "TH performs a query for the TXT record against the qname instance_qname.",
                          "Verify TXT record is returned if the device supports ICD or TCP. The TXT record MAY be returned if these are not supported, but it is not required."),
-                TestStep(8, "TH performs a query for the AAAA record against the target listed in the SRV record",
+                TestStep(10, "TH performs a query for the AAAA record against the target listed in the SRV record",
                          "Verify AAAA record is returned"),
-                TestStep(9, "TH verifies the following from the returned records:",
+                TestStep(11, "TH verifies the following from the returned records:",
                          "The hostname must be a fixed-length twelve-character (or sixteen-character) hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.. ICD TXT key: • If supports_lit is false, verify that the ICD key is NOT present in the TXT record • If supports_lit is true, verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII) SII TXT key: • If supports_icd is true and supports_lit is false, set sit_mode to true • If supports_icd is true and supports_lit is true, set sit_mode to true if ICD=0 otherwise set sit_mode to false • If supports_icd is false, set sit_mode to false • If sit_mode is true, verify that the SII key IS present in the TXT record • if the SII key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms) SAI TXT key: • if supports_icd is true, verify that the SAI key is present in the TXT record • If the SAI key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms)"),
-                TestStep(10, "TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed Fabric identifier, expressed as a fixed-length, sixteencharacter hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.",
+                TestStep(12, "TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed Fabric identifier, expressed as a fixed-length, sixteencharacter hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.",
                          "Verify DUT returns a PTR record with DNS-SD instance name set to instance_name"),
-                TestStep(11, "TH performs a DNS-SD browse for _matter._tcp.local",
+                TestStep(13, "TH performs a DNS-SD browse for _matter._tcp.local",
                          "Verify DUT returns a PTR record with DNS-SD instance name set to instance_name"),
                 ]
 
@@ -156,36 +163,36 @@ class TC_SC_4_3(MatterBaseTest):
         except ValueError:
             return (False, f"Input ({input_value}) is not a valid decimal number.")
 
-    def verify_t_value(self, operational_record):
-        has_t = operational_record and operational_record.txt and 'T' in operational_record.txt
-        if not has_t:
-            asserts.assert_false(self.check_pics(TCP_PICS_STR),
-                                 f"T key must be included if TCP is supported - returned TXT record: {operational_record}")
-            return True, 'T is not provided or required'
+    # def verify_t_value(self, operational_record):
+    #     has_t = operational_record and operational_record.txt and 'T' in operational_record.txt
+    #     if not has_t:
+    #         asserts.assert_false(self.check_pics(TCP_PICS_STR),
+    #                              f"T key must be included if TCP is supported - returned TXT record: {operational_record}")
+    #         return True, 'T is not provided or required'
 
-        t_value = operational_record.txt['T']
-        log.info("T key is present in TXT record, verify if that it is a decimal value with no leading zeros and is less than or equal to 6. Convert the value to a bitmap and verify bit 0 is clear.")
-        # Verify t_value is a decimal number without leading zeros and less than or equal to 6
-        try:
-            assert_valid_t_key(t_value, enforce_provisional=False)
+    #     t_value = operational_record.txt['T']
+    #     log.info("T key is present in TXT record, verify if that it is a decimal value with no leading zeros and is less than or equal to 6. Convert the value to a bitmap and verify bit 0 is clear.")
+    #     # Verify t_value is a decimal number without leading zeros and less than or equal to 6
+    #     try:
+    #         assert_valid_t_key(t_value, enforce_provisional=False)
 
-            # Convert to bitmap and verify bit 0 is clear
-            T_int = int(t_value)
-            if T_int & 1 == 0:
-                return True, f"T value ({t_value}) is valid and bit 0 is clear."
-            return False, f"Bit 0 is not clear. T value ({t_value})"
+    #         # Convert to bitmap and verify bit 0 is clear
+    #         T_int = int(t_value)
+    #         if T_int & 1 == 0:
+    #             return True, f"T value ({t_value}) is valid and bit 0 is clear."
+    #         return False, f"Bit 0 is not clear. T value ({t_value})"
 
-            # Check that the value can be either 2, 4 or 6 depending on whether
-            # DUT is a TCPClient, TCPServer or both.
-            if self.check_pics(TCP_PICS_STR):
-                if (T_int & 0x04 != 0):
-                    return True, f"T value ({t_value}) represents valid TCP support info."
-                return False, f"T value ({t_value}) does not have TCP bits set even though the MCORE.SC.TCP PICS indicates it is required."
-            if (T_int & 0x04 != 0):
-                return False, f"T value ({t_value}) has the TCP bits set even though the MCORE.SC.TCP PICS is not set."
-            return True, f"T value ({t_value}) is valid."
-        except ValueError:
-            return False, f"T value ({t_value}) is not a valid integer"
+    #         # Check that the value can be either 2, 4 or 6 depending on whether
+    #         # DUT is a TCPClient, TCPServer or both.
+    #         if self.check_pics(TCP_PICS_STR):
+    #             if (T_int & 0x04 != 0):
+    #                 return True, f"T value ({t_value}) represents valid TCP support info."
+    #             return False, f"T value ({t_value}) does not have TCP bits set even though the MCORE.SC.TCP PICS indicates it is required."
+    #         if (T_int & 0x04 != 0):
+    #             return False, f"T value ({t_value}) has the TCP bits set even though the MCORE.SC.TCP PICS is not set."
+    #         return True, f"T value ({t_value}) is valid."
+    #     except ValueError:
+    #         return False, f"T value ({t_value}) is not a valid integer"
 
     @async_test_body
     async def test_TC_SC_4_3(self):
@@ -234,8 +241,18 @@ class TC_SC_4_3(MatterBaseTest):
         instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
 
         # *** STEP 6 ***
-        # TH performs a query for the SRV record against the qname instance_qname.
+        # TH checks if TCP is supported by the DUT
         self.step(6)
+        supports_tcp_dut = await is_dut_tcp_supported(instance_qname)
+
+        # *** STEP 7 ***
+        # TH checks if TCP is supported by the PICS
+        self.step(7)
+        supports_tcp_pics = self.check_pics(TCP_PICS_STR)
+
+        # *** STEP 8 ***
+        # TH performs a query for the SRV record against the qname instance_qname.
+        self.step(8)
         mdns = MdnsDiscovery()
         srv_record = await mdns.get_srv_record(
             service_name=instance_qname,
@@ -247,10 +264,10 @@ class TC_SC_4_3(MatterBaseTest):
         srv_record_returned = srv_record is not None and srv_record.service_name == instance_qname
         asserts.assert_true(srv_record_returned, "SRV record was not returned")
 
-        # *** STEP 7 ***
+        # *** STEP 9 ***
         # TH performs a query for the TXT record against the qname instance_qname.
         # Verify TXT record is returned
-        self.step(7)
+        self.step(9)
         txt_record = await mdns.get_txt_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
@@ -260,14 +277,14 @@ class TC_SC_4_3(MatterBaseTest):
         # Request the TXT record. The device may opt not to return a TXT record if there are no mandatory TXT keys
         txt_record_returned = txt_record is not None and txt_record.txt is not None and bool(
             txt_record.txt)
-        txt_record_required = supports_icd or self.check_pics(TCP_PICS_STR)
+        txt_record_required = supports_icd or supports_tcp_pics
 
         if txt_record_required:
             asserts.assert_true(txt_record_returned, "TXT record is required and was not returned or contains no values")
 
-        # *** STEP 8 ***
+        # *** STEP 10 ***
         # TH performs a query for the AAAA record against the target listed in the SRV record.
-        self.step(8)
+        self.step(10)
         quada_records = await mdns.get_quada_records(
             hostname=srv_record.hostname,
             log_output=True
@@ -276,7 +293,7 @@ class TC_SC_4_3(MatterBaseTest):
         # Verify AAAA record is returned
         asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{srv_record.hostname}'")
 
-        # # *** STEP 9 ***
+        # # *** STEP 11 ***
         # TH verifies the following from the returned records: The hostname must be a fixed-length twelve-character (or sixteen-character)
         # hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.. ICD TXT key: • If supports_lit is false, verify that the
         # ICD key is NOT present in the TXT record • If supports_lit is true, verify the ICD key IS present in the TXT record, and it has the
@@ -286,7 +303,7 @@ class TC_SC_4_3(MatterBaseTest):
         # it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms) SAI TXT key: • if supports_icd is true,
         # verify that the SAI key is present in the TXT record • If the SAI key is present, verify it is a decimal value with no leading
         # zeros and is less than or equal to 3600000 (1h in ms)
-        self.step(9)
+        self.step(11)
 
         def txt_has_key(key: str):
             return txt_record_returned and key in txt_record.txt
@@ -347,19 +364,22 @@ class TC_SC_4_3(MatterBaseTest):
                 asserts.assert_equal(int(txt_record.txt['SAT']), active_mode_threshold_ms)
 
         # T TXT KEY
-        result, message = self.verify_t_value(txt_record)
-        asserts.assert_true(result, message)
+        t_key_present = 'T' in txt_record.txt
+        if supports_tcp_dut:
+            asserts.assert_true(t_key_present, "T key must be present if DUT supports TCP.")
+        t_key = txt_record.txt.get('T', None)
+        assert_valid_t_key(t_key, t_key_present, supports_tcp_dut, supports_tcp_pics, enforce_provisional=False)
 
         # Verify the AAAA records contain a valid IPv6 address
         log.info("Verify the AAAA record contains a valid IPv6 address")
         ipv6_addresses = [f"{r.address}%{r.interface}" for r in quada_records]
         assert_valid_ipv6_addresses(ipv6_addresses)
 
-        # # *** STEP 10 ***
+        # # *** STEP 12 ***
         # TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed
         # Fabric identifier, expressed as a fixed-length, sixteencharacter hexadecimal string, encoded as ASCII (UTF-8)
         # text using capital letters.
-        self.step(10)
+        self.step(12)
         op_sub_type = self.get_operational_subtype(log_result=True)
         ptr_records = await mdns.get_ptr_records(
             service_types=[op_sub_type],
@@ -372,9 +392,9 @@ class TC_SC_4_3(MatterBaseTest):
             f"No PTR record with DNS-SD instance name '{instance_name}' was found."
         )
 
-        # # *** STEP 11 ***
+        # # *** STEP 13 ***
         # TH performs a DNS-SD browse for _matter._tcp.local
-        self.step(11)
+        self.step(13)
         ptr_records = await mdns.get_ptr_records(
             service_types=[MdnsServiceType.OPERATIONAL.value],
             log_output=True,

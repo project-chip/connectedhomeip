@@ -19,7 +19,6 @@
 get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(EVSE_COMMON_DIR ${CHIP_ROOT}/examples/evse-app/evse-common REALPATH)
 get_filename_component(ENERGY_MGMT_DIR ${CHIP_ROOT}/examples/energy-management REALPATH)
-get_filename_component(EVSE_TRIGGERS_DIR ${CHIP_ROOT}/examples/evse-app/energy-management-triggers REALPATH)
 get_filename_component(APP_COMMON_GEN_DIR ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated REALPATH)
 
 set(PRIV_INCLUDE_DIRS_LIST
@@ -27,7 +26,8 @@ set(PRIV_INCLUDE_DIRS_LIST
   "${EVSE_COMMON_DIR}/include"
   "${ENERGY_MGMT_DIR}/device-energy-management/include"
   "${ENERGY_MGMT_DIR}/electrical-sensor/include"
-  "${EVSE_TRIGGERS_DIR}"
+  "${ENERGY_MGMT_DIR}/utils/include"
+  "${ENERGY_MGMT_DIR}/energy-management-triggers"
   "${CMAKE_CURRENT_LIST_DIR}/include"
   "${CHIP_ROOT}/examples/platform/esp32"
 )
@@ -39,7 +39,8 @@ set(SRC_DIRS_LIST
   "${EVSE_COMMON_DIR}/src"
   "${ENERGY_MGMT_DIR}/device-energy-management/src"
   "${ENERGY_MGMT_DIR}/electrical-sensor/src"
-  "${EVSE_TRIGGERS_DIR}"
+  "${ENERGY_MGMT_DIR}/utils/src"
+  "${ENERGY_MGMT_DIR}/energy-management-triggers"
   "${CHIP_ROOT}/examples/platform/esp32/ota"
   "${CHIP_ROOT}/examples/platform/esp32/common"
   "${CHIP_ROOT}/examples/platform/esp32/time"

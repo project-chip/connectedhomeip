@@ -19,6 +19,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+class PushAvStreamTransportServer;
+
 // Internal namespace for helper functions
 namespace Internal {
 
@@ -63,6 +65,8 @@ public:
         }
     }
 
+    void SetCluster(PushAvStreamTransportServer * cluster) { mCluster = cluster; }
+
     Protocols::InteractionModel::Status
     NotifyTransportStarted(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
                            Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
@@ -75,6 +79,7 @@ public:
     {
         kInserted = 0x00,
         kUpdated  = 0x01,
+        kFailed   = 0x02,
     };
 
     struct PushAVStreamTransportDeallocateCallbackContext
@@ -143,6 +148,7 @@ private:
     PushAvStreamTransportDelegate * mDelegate                            = nullptr;
     TLSClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
     TLSCertificateManagementDelegate * mTLSCertificateManagementDelegate = nullptr;
+    PushAvStreamTransportServer * mCluster                               = nullptr;
 
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true
@@ -152,6 +158,10 @@ private:
      * Helper function that loads all the persistent attributes from the KVS.
      */
     void LoadPersistentAttributes();
+
+    // Helpers to store and load CurrentConnections list
+    CHIP_ERROR StoreCurrentConnections();
+    CHIP_ERROR LoadCurrentConnections();
 
     // Helper functions
     uint16_t GenerateConnectionID();
@@ -165,7 +175,7 @@ private:
     UpsertResultEnum
     UpsertStreamTransportConnection(const PushAvStreamTransport::TransportConfigurationStorage & transportConfiguration);
 
-    void RemoveStreamTransportConnection(const uint16_t connectionID);
+    CHIP_ERROR RemoveStreamTransportConnection(const uint16_t connectionID);
 
     static void PushAVStreamTransportDeallocateCallback(chip::System::Layer *, void * callbackContext);
 
@@ -192,5 +202,6 @@ private:
 };
 
 } // namespace Clusters
+
 } // namespace app
 } // namespace chip

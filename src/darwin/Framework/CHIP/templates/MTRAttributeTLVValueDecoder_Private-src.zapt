@@ -87,6 +87,45 @@ static id _Nullable DecodeAttributeValueFor{{asUpperCamelCase name preserveAcron
 {{/if}}
 {{/zcl_clusters}}
 
+{{#zcl_clusters}}
+{{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
+{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+static id _Nullable DecodePrivateAttributeValueFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::{{asUpperCamelCase name}};
+    switch (aAttributeId) {
+        {{#zcl_attributes_server removeKeys='isOptional'}}
+        {{#if clusterRef}}
+        {{#if manufacturerCode}}
+        {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
+        case Attributes::{{asUpperCamelCase name}}::Id: {
+            using TypeInfo = Attributes::{{asUpperCamelCase name}}::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nil;
+            }
+            {{asObjectiveCType type parent.name}} value;
+            {{>decode_value target="value" source="cppValue" cluster=parent.name errorCode="*aError = err; return nil;" depth=0}}
+            return value;
+        }
+        {{/if}}
+        {{/if}}
+        {{/if}}
+        {{/zcl_attributes_server}}
+        default: {
+            break;
+        }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
+{{/if}}
+{{/if}}
+{{/zcl_clusters}}
+
 id _Nullable MTRPrivateDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     if (IsGlobalAttribute(aPath.mAttributeId)) {
@@ -99,6 +138,15 @@ id _Nullable MTRPrivateDecodeAttributeValue(const ConcreteAttributePath & aPath,
         {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
         case Clusters::{{asUpperCamelCase name}}::Id: {
             return DecodeAttributeValueFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aPath.mAttributeId, aReader, aError);
+        }
+        {{/if}}
+        {{/if}}
+        {{/zcl_clusters}}
+        {{#zcl_clusters}}
+        {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
+        {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+        case Clusters::{{asUpperCamelCase name}}::Id: {
+            return DecodePrivateAttributeValueFor{{asUpperCamelCase name preserveAcronyms=true}}Cluster(aPath.mAttributeId, aReader, aError);
         }
         {{/if}}
         {{/if}}

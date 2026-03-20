@@ -20,6 +20,8 @@ from typing import Optional
 
 from .builder import Builder, BuilderOutput
 
+log = logging.getLogger(__name__)
+
 
 class Esp32Board(Enum):
     DevKitC = auto()
@@ -35,6 +37,7 @@ class Esp32App(Enum):
     ALL_DEVICES = auto()
     ENERGY_GATEWAY = auto()
     EVSE = auto()
+    WATER_HEATER = auto()
     LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
@@ -56,6 +59,8 @@ class Esp32App(Enum):
             return 'examples/energy-gateway-app'
         if self == Esp32App.EVSE:
             return 'examples/evse-app'
+        if self == Esp32App.WATER_HEATER:
+            return 'examples/water-heater-app'
         if self == Esp32App.LIGHT:
             return 'examples/lighting-app'
         if self == Esp32App.LOCK:
@@ -86,6 +91,8 @@ class Esp32App(Enum):
             return 'chip-energy-gateway-app'
         if self == Esp32App.EVSE:
             return 'chip-evse-app'
+        if self == Esp32App.WATER_HEATER:
+            return 'matter-water-heater-app'
         if self == Esp32App.LIGHT:
             return 'chip-lighting-app'
         if self == Esp32App.LOCK:
@@ -256,7 +263,7 @@ class Esp32Builder(Builder):
         self._IdfEnvExecute(cmd)
 
     def _build(self):
-        logging.info('Compiling Esp32 at %s', self.output_dir)
+        log.info('Compiling Esp32 at %s', self.output_dir)
 
         # Unfortunately sdkconfig is sticky and needs reset on every build
         self._Execute(

@@ -26,9 +26,6 @@
 # if unspecified, ref defaults to upstream/master (or master)
 # -d enables debug logging for Restyle CLI
 #
-# Note: This script requires sudo to restore file ownership after restyle
-#  (which uses Docker and changes ownership of restyled files to root). Run this script as a regular user;
-#  it will prompt for sudo only when needed to restore file ownership.
 
 here=${0%/*}
 
@@ -40,20 +37,50 @@ CHIP_ROOT=$(cd "$here/../.." && pwd)
 cd "$CHIP_ROOT"
 
 restyle-paths() {
-
-    local uid="${SUDO_UID:-$(id -u)}"
-    local gid="${SUDO_GID:-$(id -g)}"
+    [[ $# -eq 0 ]] && return 0
 
     echo "[restyle-diff.sh] Please wait, Restyling files (and Pulling restyler Docker images if needed)"
     restyle --config-file=.restyled.yaml "$@"
 
-    echo
-    echo "[restyle-diff.sh] Restoring file ownership to current user (sudo required)"
-    sudo chown -h "$uid:$gid" -- "$@"
+    # warn if restyle left any files owned by root (which means older restyle-CLI is being used)
+    root_owned=$(find "$@" -maxdepth 0 -user 0 2>/dev/null || true)
+    if [[ -n "$root_owned" ]]; then
+        echo
+        echo "[restyle-diff.sh] WARNING: The following restyled files are owned by root:"
+        echo "$root_owned"
+        echo
+        echo "[restyle-diff.sh] This typically means your restyle CLI is older than v0.80 which fixed this bug."
+        echo "[restyle-diff.sh] Please UPGRADE to a newer restyle CLI by running"
+        echo "[restyle-diff.sh] 1. rm -f \"\$(command -v restyle)\""
+        echo "[restyle-diff.sh] 2. re-run this script without using sudo (it will automatically download latest restyle-CLI version)."
+    fi
+
+}
+
+version_lt() {
+    local v1="$1" v2="$2"
+    local num1 num2 i=0
+    while :; do
+        num1="${v1%%.*}" v1="${v1#"$num1"}" v1="${v1#.}"
+        num2="${v2%%.*}" v2="${v2#"$num2"}" v2="${v2#.}"
+        num1=${num1:-0} num2=${num2:-0}
+        if [ "$num1" -lt "$num2" ] 2>/dev/null; then return 0; fi
+        if [ "$num1" -gt "$num2" ] 2>/dev/null; then return 1; fi
+        if [ -z "$v1" ] && [ -z "$v2" ]; then return 1; fi
+    done
 }
 
 ensure_restyle_installed() {
     if command -v restyle >/dev/null 2>&1; then
+        local version
+        version=$(restyle --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' || echo "0.0.0.0")
+        if version_lt "$version" "0.8.1.0"; then
+            echo "[restyle-diff.sh] WARNING: restyle version $version is older than the version 0.8.1.0 which is faster and most stable"
+            echo "[restyle-diff.sh] Please UPGRADE to a newer restyle CLI by running"
+            echo "[restyle-diff.sh] 1. rm -f \"\$(command -v restyle)\""
+            echo "[restyle-diff.sh] 2. re-run this script without using sudo (it will automatically download latest restyle-CLI version)."
+            exit 1
+        fi
         return 0
     fi
 

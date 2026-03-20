@@ -54,7 +54,7 @@ void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
         // BTN_0 is pressed
         // NOTE: the GPIO is masked since the interrupt is invoked before scheduler is started, thus this is required to hand over
         // control to scheduler, the PIN is unmasked in the power manager flow before going to sleep
-        status = sl_si91x_gpio_driver_mask_uulp_npss_interrupt(BIT(pin_intr));
+        status = sl_si91x_gpio_driver_mask_set_uulp_npss_interrupt(pin_intr);
         VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(DeviceLayer, "failed to mask interrupt: %ld", status));
     }
 }

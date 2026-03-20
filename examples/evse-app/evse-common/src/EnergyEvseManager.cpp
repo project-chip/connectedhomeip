@@ -42,70 +42,70 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 
-    // Restore ChargingEnabledUntil value
+    // Restore ChargingEnabledUntil value - via Instance (which owns the data)
     DataModel::Nullable<uint32_t> tempChargingEnabledUntil;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::ChargingEnabledUntil::Id),
                                      tempChargingEnabledUntil);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded ChargingEnabledUntil from NVM");
-        TEMPORARY_RETURN_IGNORED mDelegate->SetChargingEnabledUntil(tempChargingEnabledUntil);
+        TEMPORARY_RETURN_IGNORED SetChargingEnabledUntil(tempChargingEnabledUntil);
     }
     else
     {
         ChipLogError(AppServer, "EVSE: Unable to restore persisted ChargingEnabledUntil value");
     }
 
-    // Restore DischargingEnabledUntil value
+    // Restore DischargingEnabledUntil value - via Instance (which owns the data)
     DataModel::Nullable<uint32_t> tempDischargingEnabledUntil;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::DischargingEnabledUntil::Id),
                                      tempDischargingEnabledUntil);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded DischargingEnabledUntil from NVM");
-        TEMPORARY_RETURN_IGNORED mDelegate->SetDischargingEnabledUntil(tempDischargingEnabledUntil);
+        TEMPORARY_RETURN_IGNORED SetDischargingEnabledUntil(tempDischargingEnabledUntil);
     }
     else
     {
         ChipLogError(AppServer, "EVSE: Unable to restore persisted DischargingEnabledUntil value");
     }
 
-    // Restore UserMaximumChargeCurrent value
+    // Restore UserMaximumChargeCurrent value - via Instance (which owns the data)
     int64_t tempUserMaximumChargeCurrent;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::UserMaximumChargeCurrent::Id),
                                      tempUserMaximumChargeCurrent);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded UserMaximumChargeCurrent from NVM");
-        TEMPORARY_RETURN_IGNORED mDelegate->SetUserMaximumChargeCurrent(tempUserMaximumChargeCurrent);
+        TEMPORARY_RETURN_IGNORED SetUserMaximumChargeCurrent(tempUserMaximumChargeCurrent);
     }
     else
     {
         ChipLogError(AppServer, "EVSE: Unable to restore persisted UserMaximumChargeCurrent value");
     }
 
-    // Restore RandomizationDelayWindow value
+    // Restore RandomizationDelayWindow value - via Instance (which owns the data)
     uint32_t tempRandomizationDelayWindow;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::RandomizationDelayWindow::Id),
                                      tempRandomizationDelayWindow);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded RandomizationDelayWindow from NVM");
-        TEMPORARY_RETURN_IGNORED mDelegate->SetRandomizationDelayWindow(tempRandomizationDelayWindow);
+        TEMPORARY_RETURN_IGNORED SetRandomizationDelayWindow(tempRandomizationDelayWindow);
     }
     else
     {
         ChipLogError(AppServer, "EVSE: Unable to restore persisted RandomizationDelayWindow value");
     }
 
-    // Restore ApproximateEVEfficiency value
+    // Restore ApproximateEVEfficiency value - via Instance (which owns the data)
     DataModel::Nullable<uint16_t> tempApproxEVEfficiency;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::ApproximateEVEfficiency::Id),
                                      tempApproxEVEfficiency);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded ApproximateEVEfficiency from NVM");
-        TEMPORARY_RETURN_IGNORED mDelegate->SetApproximateEVEfficiency(tempApproxEVEfficiency);
+        TEMPORARY_RETURN_IGNORED SetApproximateEVEfficiency(tempApproxEVEfficiency);
     }
     else
     {

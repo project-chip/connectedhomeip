@@ -15,6 +15,7 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -132,9 +133,12 @@ public:
 struct TestBasicInformationCluster : public ::testing::Test
 {
     MockDeviceInstanceInfoProvider mDeviceInfoProvider;
-    BasicInformationCluster::Context mContext = { .deviceInstanceInfoProvider = mDeviceInfoProvider,
-                                                  .configurationManager       = chip::DeviceLayer::ConfigurationMgr(),
-                                                  .platformManager            = chip::DeviceLayer::PlatformMgr() };
+    BasicInformationCluster::Context mContext = {
+        .deviceInstanceInfoProvider = mDeviceInfoProvider,
+        .configurationManager       = chip::DeviceLayer::ConfigurationMgr(),
+        .platformManager            = chip::DeviceLayer::PlatformMgr(),
+        .subscriptionsPerFabric     = app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
+    };
 
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }

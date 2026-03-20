@@ -26,6 +26,7 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <credentials/CHIPCert.h>
+#include <credentials/FabricTable.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/TimeUtils.h>
@@ -479,9 +480,10 @@ struct TestTLSCertificateManagementCluster : public ::testing::Test
     MockTLSCertificateManagementDelegate mMockDelegate;
     MockCertificateTable mMockCertTable;
     MockCertificateDependencyChecker mMockDependencyChecker;
+    FabricTable mFabricTable;
 
-    TLSCertificateManagementCluster mCluster{ kTestEndpointId, mMockDelegate,        mMockDependencyChecker,
-                                              mMockCertTable,  kMaxRootCertificates, kMaxClientCertificates };
+    TLSCertificateManagementCluster mCluster{ { mFabricTable }, kTestEndpointId,      mMockDelegate,         mMockDependencyChecker,
+                                              mMockCertTable,   kMaxRootCertificates, kMaxClientCertificates };
 
     ClusterTester mClusterTester{ mCluster };
 
