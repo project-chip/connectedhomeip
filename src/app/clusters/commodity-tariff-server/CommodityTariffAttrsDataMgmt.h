@@ -18,11 +18,9 @@
 
 #pragma once
 #include "CommodityTariffContainers.h"
-#include <cstddef>
 #include <platform/LockTracker.h>
 
 #include <atomic>
-#include <cassert>
 
 namespace chip {
 

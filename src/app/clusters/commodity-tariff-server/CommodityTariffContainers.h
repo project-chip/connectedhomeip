@@ -76,7 +76,7 @@ public:
         // Swap with last element and pop (O(1) removal)
         if (it != this->end() - 1)
         {
-            *it = std::move(this->back());
+            memmove(static_cast<void *>(it), static_cast<const void *>(&(this->back())), sizeof(T));
         }
         this->pop_back();
     }

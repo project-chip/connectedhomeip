@@ -100,7 +100,12 @@ struct ThresholdsPerFeatureValidationContext
 
         bool haveJointFeatures(const FeatureEntry & other) const
         {
-            return (this->thresholdVal == other.thresholdVal) && ((this->featureVal.Raw() & other.featureVal.Raw()) != 0);
+            auto is_have = (this->thresholdVal == other.thresholdVal) && ((this->featureVal.Raw() & other.featureVal.Raw()) != 0);
+
+            ChipLogError(AppServer, "Duplicated threshold value among TCs for the 0x%" PRIx32 " feature in the same tariff period",
+                         other.featureVal.Raw());
+
+            return is_have;
         }
     };
 
@@ -109,49 +114,41 @@ struct ThresholdsPerFeatureValidationContext
 
     CHIP_ERROR AddThreshold(uint32_t feature, int64_t threshold)
     {
-        FeatureEntry entry = { .thresholdVal = threshold, .featureVal = feature };
+        FeatureEntry entry = { .thresholdVal = threshold, .featureVal = BitMask<Feature>(feature) };
 
         for (const auto & existingEntry : featuresPerThreshold)
         {
-            if (entry.haveJointFeatures(existingEntry))
-            {
-                return CHIP_ERROR_DUPLICATE_KEY_ID;
-            }
+            VerifyOrReturnError(!entry.haveJointFeatures(existingEntry), CHIP_ERROR_DUPLICATE_KEY_ID);
         }
 
-        if (!featuresPerThreshold.insert(entry))
-        {
-            return CHIP_ERROR_BUFFER_TOO_SMALL;
-        }
+        VerifyOrReturnError(featuresPerThreshold.insert(entry), CHIP_ERROR_BUFFER_TOO_SMALL);
 
         return CHIP_NO_ERROR;
     }
 };
 
+// Private helper function to build an ID set using CTC_UnorderedSet
+template <typename ListType, typename MemberPtr>
+static CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDefaultListAttrMaxLength>
+BuildIdSetFromList(const ListType & list, MemberPtr member)
+{
+    CommodityTariffContainers::CTC_UnorderedSet<uint32_t, CommodityTariffConsts::kDefaultListAttrMaxLength> idSet;
+    for (const auto & entry : list)
+    {
+        idSet.insert(entry.*member);
+    }
+    return idSet;
+}
+
 CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
 {
     bool DayEntriesData_is_available = false;
 
-    if (!GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffInfo).IsValid())
-    {
-        ChipLogError(AppServer, "TariffInfo management object is not present or invalid");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    else if (!GetMgmtObj(CommodityTariffAttrTypeEnum::kDayEntries).IsValid())
-    {
-        ChipLogError(AppServer, "DayEntries management object is not present or invalid");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    else if (!GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffComponents).IsValid())
-    {
-        ChipLogError(AppServer, "TariffComponents management object is not present or invalid");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    else if (!GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffPeriods).IsValid())
-    {
-        ChipLogError(AppServer, "TariffPeriods management object is not present or invalid");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    // Validate required management objects
+    VerifyOrReturnLogError(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffInfo).IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnLogError(GetMgmtObj(CommodityTariffAttrTypeEnum::kDayEntries).IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnLogError(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffComponents).IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnLogError(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffPeriods).IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
 
     if (GetMgmtObj(CommodityTariffAttrTypeEnum::kStartDate).HasNewValue())
     {
@@ -168,94 +165,46 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
     const auto & tariffPeriods =
         static_cast<TariffPeriodsDataClass &>(GetMgmtObj(CommodityTariffAttrTypeEnum::kTariffPeriods)).GetNewValue().Value();
 
-    auto isIdInList = [](const auto & list, auto MemberPtr, uint32_t idToFind) {
-        for (const auto & entry : list)
+    // Build ID sets for O(1) lookups
+    const auto dayEntryIdSet        = BuildIdSetFromList(dayEntries, &DayEntryStruct::Type::dayEntryID);
+    const auto tariffComponentIdSet = BuildIdSetFromList(tariffComponents, &TariffComponentStruct::Type::tariffComponentID);
+    const auto dayPatternIdSet      = BuildIdSetFromList(dayPatterns, &DayPatternStruct::Type::dayPatternID);
+
+    const auto validateIdsInSet = [](const auto & idSet, const auto & idsToValidate) -> CHIP_ERROR {
+        for (uint32_t id : idsToValidate)
         {
-            if (entry.*MemberPtr == idToFind)
-            {
-                return true;
-            }
+            VerifyOrReturnLogError(idSet.contains(id), CHIP_ERROR_KEY_NOT_FOUND);
         }
-        return false;
+        return CHIP_NO_ERROR;
     };
 
-    // Checks that all DayEntryIDs in Tariff Periods are in main DayEntries list:
-    for (const auto & item : UpdCtx.RefsToDayEntryIDsFromTariffPeriods)
-    {
-        if (!isIdInList(dayEntries, &DayEntryStruct::Type::dayEntryID, item))
-        {
-            ChipLogError(AppServer, "DayEntry ID%" PRIu32 " referenced from TariffPeriods doesn't exist in main DayEntries list",
-                         item);
-            return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
-        }
-    }
+    // Validate references from TariffPeriods
+    ReturnLogErrorOnFailure(validateIdsInSet(dayEntryIdSet, UpdCtx.RefsToDayEntryIDsFromTariffPeriods));
+    ReturnLogErrorOnFailure(validateIdsInSet(tariffComponentIdSet, UpdCtx.RefsToTariffComponentIDsFromTariffPeriods));
 
-    // Checks that all TariffComponentIDs in Tariff Periods are in main TariffComponents list:
-    for (const auto & item : UpdCtx.RefsToTariffComponentIDsFromTariffPeriods)
-    {
-        if (!isIdInList(tariffComponents, &TariffComponentStruct::Type::tariffComponentID, item))
-        {
-            ChipLogError(AppServer,
-                         "TariffComponent ID%" PRIu32 " referenced from TariffPeriods doesn't exist in main TariffComponents list",
-                         item);
-            return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
-        }
-    }
-
+    // Validate DayPatterns references
     if (GetMgmtObj(CommodityTariffAttrTypeEnum::kDayPatterns).IsValid())
     {
-        // Checks that all DEs refs are in main DE list:
-        for (const auto & item : UpdCtx.RefsToDayEntryIDsFromDays)
-        {
-            if (!isIdInList(dayEntries, &DayEntryStruct::Type::dayEntryID, item))
-            {
-                ChipLogError(AppServer, "DayEntry ID%" PRIu32 " referenced from DayPatterns doesn't exist in main DayEntries list",
-                             item);
-                return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
-            }
-        }
+        ReturnLogErrorOnFailure(validateIdsInSet(dayEntryIdSet, UpdCtx.RefsToDayEntryIDsFromDays));
     }
 
+    // Validate IndividualDays references
     if (GetMgmtObj(CommodityTariffAttrTypeEnum::kIndividualDays).IsValid() &&
-        (GetMgmtObj(CommodityTariffAttrTypeEnum::kIndividualDays).HasNewValue()))
+        GetMgmtObj(CommodityTariffAttrTypeEnum::kIndividualDays).HasNewValue())
     {
-        // Checks that all ID_DE_IDs are in main DE list:
-        for (const auto & item : UpdCtx.RefsToDayEntryIDsFromDays)
-        {
-            if (!isIdInList(dayEntries, &DayEntryStruct::Type::dayEntryID, item))
-            {
-                ChipLogError(AppServer,
-                             "DayEntry ID%" PRIu32 " referenced from IndividualDays doesn't exist in main DayEntries list", item);
-                return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
-            }
-        }
-
+        ReturnLogErrorOnFailure(validateIdsInSet(dayEntryIdSet, UpdCtx.RefsToDayEntryIDsFromDays));
         DayEntriesData_is_available = true;
     }
 
+    // Validate CalendarPeriods references
     if (GetMgmtObj(CommodityTariffAttrTypeEnum::kCalendarPeriods).IsValid() &&
-        (GetMgmtObj(CommodityTariffAttrTypeEnum::kCalendarPeriods).HasNewValue()))
+        GetMgmtObj(CommodityTariffAttrTypeEnum::kCalendarPeriods).HasNewValue())
     {
-        // Checks that all DayPatternIDs are in main DayPattern list:
-        for (const auto & item : UpdCtx.RefsToDayPatternIDsFromCalendarPeriods)
-        {
-            if (!isIdInList(dayPatterns, &DayPatternStruct::Type::dayPatternID, item))
-            {
-                ChipLogError(AppServer,
-                             "DayPattern ID%" PRIu32 " referenced from CalendarPeriods doesn't exist in main DayPatterns list",
-                             item);
-                return CHIP_ERROR_KEY_NOT_FOUND; // The item not found in original list
-            }
-        }
-
+        ReturnLogErrorOnFailure(validateIdsInSet(dayPatternIdSet, UpdCtx.RefsToDayPatternIDsFromCalendarPeriods));
         DayEntriesData_is_available = true;
     }
 
-    if (!DayEntriesData_is_available)
-    {
-        ChipLogError(AppServer, "Both IndividualDays and CalendarPeriods are not present or have no valid data");
-        return CHIP_ERROR_INVALID_DATA_LIST;
-    }
+    VerifyOrReturnLogError(DayEntriesData_is_available, CHIP_ERROR_INVALID_DATA_LIST);
 
     // Create lookup maps with const correctness
     CTC_UnorderedMap<uint32_t, const Structs::DayEntryStruct::Type *, CommodityTariffConsts::kDayEntriesAttrMaxLength>
@@ -263,13 +212,16 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
     CTC_UnorderedMap<uint32_t, const Structs::TariffComponentStruct::Type *, CommodityTariffConsts::kTariffComponentsAttrMaxLength>
         tariffComponentsMap;
 
-    CommodityTariffAttrsDataMgmt::ListToMap<Structs::DayEntryStruct::Type, &Structs::DayEntryStruct::Type::dayEntryID,
-                                            CommodityTariffConsts::kDayEntriesAttrMaxLength>(dayEntries, dayEntriesMap);
+    // Populate maps for O(1) lookup
+    for (const auto & entry : dayEntries)
+    {
+        dayEntriesMap.insert(entry.dayEntryID, &entry);
+    }
 
-    CommodityTariffAttrsDataMgmt::ListToMap<Structs::TariffComponentStruct::Type,
-                                            &Structs::TariffComponentStruct::Type::tariffComponentID,
-                                            CommodityTariffConsts::kTariffComponentsAttrMaxLength>(tariffComponents,
-                                                                                                   tariffComponentsMap);
+    for (const auto & component : tariffComponents)
+    {
+        tariffComponentsMap.insert(component.tariffComponentID, &component);
+    }
 
     struct DeStartDurationPair
     {
@@ -293,17 +245,10 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
         for (const uint32_t deID : deIDs)
         {
             // Check if DE exists in original context
-            if (!isIdInList(dayEntries, &DayEntryStruct::Type::dayEntryID, deID))
-            {
-                ChipLogError(AppServer, "DayEntry ID%" PRIu32 "doesn't exist in validation context", deID);
-                return CHIP_ERROR_KEY_NOT_FOUND; // Item not found in original list
-            }
+            VerifyOrReturnLogError(dayEntryIdSet.contains(deID), CHIP_ERROR_KEY_NOT_FOUND);
 
-            if (dayEntriesMap.find(deID) == dayEntriesMap.end())
-            {
-                ChipLogError(AppServer, "Unable to find DayEntry with ID%" PRIu32 "in the parsed data map", deID);
-                return CHIP_ERROR_KEY_NOT_FOUND; // Day entry not found in map
-            }
+            const auto it = dayEntriesMap.find(deID);
+            VerifyOrReturnLogError(it != dayEntriesMap.end(), CHIP_ERROR_KEY_NOT_FOUND);
 
             const auto dayEntry = dayEntriesMap[deID];
 
@@ -312,14 +257,7 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
             pair.duration =
                 dayEntry->duration.HasValue() ? dayEntry->duration.Value() : CommodityTariffConsts::kDayEntryDurationLimit;
 
-            // Check for duplicates
-            if (!seenStartDurationPairs.insert(pair))
-            {
-                ChipLogError(AppServer,
-                             "Duplicate startTime/duration combination (%u/%u) found in DayEntries of the same TariffPeriod",
-                             pair.startTime, pair.duration);
-                return CHIP_ERROR_DUPLICATE_KEY_ID; // Found duplicate startTime/duration combination
-            }
+            VerifyOrReturnLogError(seenStartDurationPairs.insert(pair), CHIP_ERROR_DUPLICATE_KEY_ID);
         }
 
         // Validate Tariff Components
@@ -327,39 +265,27 @@ CHIP_ERROR Delegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
 
         for (const uint32_t tcID : tcIDs)
         {
-            // Check if TC exists in original context
-            if (UpdCtx.TariffComponentKeyIDsFeatureMap.find(tcID) == UpdCtx.TariffComponentKeyIDsFeatureMap.end())
-            {
-                ChipLogError(AppServer, "TariffComponent ID%" PRIu32 "not found in validation context feature map", tcID);
-                return CHIP_ERROR_KEY_NOT_FOUND; // Item not found in original list
-            }
+            // O(1) existence check using set
+            VerifyOrReturnLogError(tariffComponentIdSet.contains(tcID), CHIP_ERROR_KEY_NOT_FOUND);
 
-            if (tariffComponentsMap.find(tcID) == tariffComponentsMap.end())
-            {
-                ChipLogError(AppServer, "Unable to find TariffComponent with ID%" PRIu32 "in the parsed data map", tcID);
-                return CHIP_ERROR_KEY_NOT_FOUND; // Tariff component not found in map
-            }
+            VerifyOrReturnLogError(UpdCtx.TariffComponentKeyIDsFeatureMap.find(tcID) !=
+                                       UpdCtx.TariffComponentKeyIDsFeatureMap.end(),
+                                   CHIP_ERROR_KEY_NOT_FOUND);
 
-            const auto tariffComponent = tariffComponentsMap[tcID];
+            const auto it = tariffComponentsMap.find(tcID);
+            VerifyOrReturnLogError(it != tariffComponentsMap.end(), CHIP_ERROR_KEY_NOT_FOUND);
+
+            const auto tariffComponent = it->second;
             const uint32_t featureID   = UpdCtx.TariffComponentKeyIDsFeatureMap[tcID];
 
-            // Skip if threshold is null or featureID is 0
+            // Skip validation for null thresholds, predicted components, or invalid feature IDs
             if (tariffComponent->threshold.IsNull() || tariffComponent->predicted.ValueOr(false) || featureID == 0)
             {
                 continue;
             }
 
             const int64_t thresholdValue = tariffComponent->threshold.Value();
-
-            // Check for duplicate threshold for this feature
-            CHIP_ERROR sts = CHIP_NO_ERROR;
-            if (CHIP_ERROR_DUPLICATE_KEY_ID == (sts = validationCtx.AddThreshold(featureID, thresholdValue)))
-            {
-                ChipLogError(AppServer,
-                             "Duplicated threshold value among TCs for the 0x%" PRIx32 " feature in the same tariff period",
-                             featureID);
-                return sts;
-            }
+            ReturnLogErrorOnFailure(validationCtx.AddThreshold(featureID, thresholdValue));
         }
     }
 
