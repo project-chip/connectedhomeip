@@ -56,7 +56,8 @@ public:
         // Create cluster with no delegate. App must set delegate via SetDefaultDelegate().
         FanControlCluster::Config config(endpointId, nullptr);
 
-        config.WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh);
+        config.WithFanModeSequence(features.Has(FanControl::Feature::kAuto) ? FanModeSequenceEnum::kOffLowHighAuto
+                                                                            : FanModeSequenceEnum::kOffLowHigh);
 
         if (features.Has(FanControl::Feature::kMultiSpeed))
             config.WithSpeedMax(100);

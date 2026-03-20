@@ -23,6 +23,7 @@
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/FanControl/Attributes.h>
 #include <clusters/FanControl/Enums.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/BitMask.h>
 
 namespace chip::app::Clusters {
@@ -53,11 +54,18 @@ public:
         Config & WithFanModeSequence(FanControl::FanModeSequenceEnum fanModeSequence)
         {
             mFanModeSequence = fanModeSequence;
+            if (fanModeSequence == FanControl::FanModeSequenceEnum::kOffLowHighAuto ||
+                fanModeSequence == FanControl::FanModeSequenceEnum::kOffLowMedHighAuto ||
+                fanModeSequence == FanControl::FanModeSequenceEnum::kOffHighAuto)
+            {
+                mFeatureMap.Set(FanControl::Feature::kAuto);
+            }
             return *this;
         }
         Config & WithSpeedMax(uint8_t speedMax)
         {
             mSpeedMax = speedMax;
+            mFeatureMap.Set(FanControl::Feature::kMultiSpeed);
             mOptionalAttributes.Set<FanControl::Attributes::SpeedMax::Id>();
             mOptionalAttributes.Set<FanControl::Attributes::SpeedSetting::Id>();
             mOptionalAttributes.Set<FanControl::Attributes::SpeedCurrent::Id>();
@@ -66,6 +74,7 @@ public:
         Config & WithRockSupport(BitMask<FanControl::RockBitmap> rockSupport)
         {
             mRockSupport = rockSupport;
+            mFeatureMap.Set(FanControl::Feature::kRocking);
             mOptionalAttributes.Set<FanControl::Attributes::RockSupport::Id>();
             mOptionalAttributes.Set<FanControl::Attributes::RockSetting::Id>();
             return *this;
@@ -73,18 +82,21 @@ public:
         Config & WithWindSupport(BitMask<FanControl::WindBitmap> windSupport)
         {
             mWindSupport = windSupport;
+            mFeatureMap.Set(FanControl::Feature::kWind);
             mOptionalAttributes.Set<FanControl::Attributes::WindSupport::Id>();
             mOptionalAttributes.Set<FanControl::Attributes::WindSetting::Id>();
             return *this;
         }
         Config & WithAirflowDirection()
         {
+            mFeatureMap.Set(FanControl::Feature::kAirflowDirection);
             mOptionalAttributes.Set<FanControl::Attributes::AirflowDirection::Id>();
             return *this;
         }
         Config & WithStep()
         {
             mSupportsStep = true;
+            mFeatureMap.Set(FanControl::Feature::kStep);
             return *this;
         }
 
@@ -96,6 +108,7 @@ public:
         BitMask<FanControl::RockBitmap> mRockSupport;
         BitMask<FanControl::WindBitmap> mWindSupport;
         OptionalAttributes mOptionalAttributes;
+        BitFlags<FanControl::Feature> mFeatureMap;
     };
 
     FanControlCluster(const Config & config);
@@ -163,6 +176,7 @@ private:
     BitMask<FanControl::RockBitmap> mRockSupport;
     BitMask<FanControl::WindBitmap> mWindSupport;
     OptionalAttributes mOptionalAttributes;
+    BitFlags<FanControl::Feature> mFeatureMap;
     FanControl::Delegate * mDelegate;
 };
 
