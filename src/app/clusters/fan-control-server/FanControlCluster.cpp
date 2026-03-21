@@ -132,11 +132,13 @@ void FanControlCluster::ApplyFanModeAutoSideEffects()
 {
     mPercentSetting.SetNull();
     NotifyAttributeChanged(PercentSetting::Id);
+    NotifyAttributeChanged(PercentCurrent::Id);
 
     if (SupportsMultiSpeed())
     {
         mSpeedSetting.SetNull();
         NotifyAttributeChanged(SpeedSetting::Id);
+        NotifyAttributeChanged(SpeedCurrent::Id);
     }
 }
 
@@ -414,6 +416,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
 
     mPercentSetting = value;
     ApplyPercentSettingChanged();
+    NotifyAttributeChanged(PercentCurrent::Id);
     return NotifyAttributeChangedIfSuccess(PercentSetting::Id, Status::Success);
 }
 
