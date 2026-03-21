@@ -128,14 +128,14 @@ static Status GetFeatureMapAdapter(EndpointId ep, uint32_t * value)
     return FanControl::GetFeatureMap(ep, *value);
 }
 
-Status SetPercentSettingUI(EndpointId ep, const app::DataModel::Nullable<Percent> & value)
+Status SetPercentSettingUI(EndpointId ep, Percent value)
 {
-    return FanControl::SetPercentSetting(ep, value);
+    return FanControl::SetPercentSetting(ep, app::DataModel::Nullable<Percent>(value));
 }
 
-Status SetSpeedSettingUI(EndpointId ep, const app::DataModel::Nullable<uint8_t> & value)
+Status SetSpeedSettingUI(EndpointId ep, uint8_t value)
 {
-    return FanControl::SetSpeedSetting(ep, value);
+    return FanControl::SetSpeedSetting(ep, app::DataModel::Nullable<uint8_t>(value));
 }
 
 static Status GetRockSupportAdapter(EndpointId ep, BitMask<RockBitmap> * value)

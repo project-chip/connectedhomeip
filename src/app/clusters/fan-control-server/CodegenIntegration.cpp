@@ -182,6 +182,10 @@ Status GetSpeedSetting(EndpointId endpointId, DataModel::Nullable<uint8_t> & val
     {
         return Status::UnsupportedEndpoint;
     }
+    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+    {
+        return Status::UnsupportedAttribute;
+    }
     value = cluster->GetSpeedSetting();
     return Status::Success;
 }
@@ -192,6 +196,10 @@ Status GetSpeedMax(EndpointId endpointId, uint8_t & value)
     if (cluster == nullptr)
     {
         return Status::UnsupportedEndpoint;
+    }
+    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+    {
+        return Status::UnsupportedAttribute;
     }
     value = cluster->GetSpeedMax();
     return Status::Success;
@@ -226,6 +234,10 @@ Status GetSpeedCurrent(EndpointId endpointId, uint8_t & value)
     {
         return Status::UnsupportedEndpoint;
     }
+    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+    {
+        return Status::UnsupportedAttribute;
+    }
     value = cluster->GetSpeedCurrent();
     return Status::Success;
 }
@@ -248,6 +260,10 @@ Status GetRockSupport(EndpointId endpointId, BitMask<RockBitmap> & value)
     {
         return Status::UnsupportedEndpoint;
     }
+    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kRocking))
+    {
+        return Status::UnsupportedAttribute;
+    }
     value = cluster->GetRockSupport();
     return Status::Success;
 }
@@ -258,6 +274,10 @@ Status GetRockSetting(EndpointId endpointId, BitMask<RockBitmap> & value)
     if (cluster == nullptr)
     {
         return Status::UnsupportedEndpoint;
+    }
+    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kRocking))
+    {
+        return Status::UnsupportedAttribute;
     }
     value = cluster->GetRockSetting();
     return Status::Success;
@@ -270,6 +290,10 @@ Status GetWindSupport(EndpointId endpointId, BitMask<WindBitmap> & value)
     {
         return Status::UnsupportedEndpoint;
     }
+    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kWind))
+    {
+        return Status::UnsupportedAttribute;
+    }
     value = cluster->GetWindSupport();
     return Status::Success;
 }
@@ -281,6 +305,10 @@ Status GetWindSetting(EndpointId endpointId, BitMask<WindBitmap> & value)
     {
         return Status::UnsupportedEndpoint;
     }
+    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kWind))
+    {
+        return Status::UnsupportedAttribute;
+    }
     value = cluster->GetWindSetting();
     return Status::Success;
 }
@@ -291,6 +319,10 @@ Status GetAirflowDirection(EndpointId endpointId, AirflowDirectionEnum & value)
     if (cluster == nullptr)
     {
         return Status::UnsupportedEndpoint;
+    }
+    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kAirflowDirection))
+    {
+        return Status::UnsupportedAttribute;
     }
     value = cluster->GetAirflowDirection();
     return Status::Success;
