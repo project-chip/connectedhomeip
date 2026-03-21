@@ -15,10 +15,6 @@
  * limitations under the License.
  */
 
-/****************************************************************************
- * @file
- ***************************************************************************/
-
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/FanControl/Attributes.h>
@@ -68,6 +64,7 @@ Protocols::InteractionModel::Status FanControlCluster::SetFanModeToOff()
         ApplyFanModeOffSideEffects();
         NotifyAttributeChanged(FanMode::Id);
     }
+    UpdateOnOffCluster(false);
     return Status::Success;
 }
 
@@ -89,14 +86,14 @@ void FanControlCluster::ApplyFanModeOffSideEffects()
 
 void FanControlCluster::ApplyFanModeLowSideEffects()
 {
-    mPercentSetting.SetNonNull(33); // Spec mandates 33%
+    mPercentSetting.SetNonNull(33);
     mPercentCurrent = 33;
     NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
 
     if (SupportsMultiSpeed())
     {
-        mSpeedSetting.SetNonNull(1); // Spec mandates Speed 1
+        mSpeedSetting.SetNonNull(1);
         mSpeedCurrent = 1;
         NotifyAttributeChanged(SpeedSetting::Id);
         NotifyAttributeChanged(SpeedCurrent::Id);
@@ -105,14 +102,13 @@ void FanControlCluster::ApplyFanModeLowSideEffects()
 
 void FanControlCluster::ApplyFanModeMediumSideEffects()
 {
-    mPercentSetting.SetNonNull(66); // Spec mandates 66%
+    mPercentSetting.SetNonNull(66);
     mPercentCurrent = 66;
     NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
 
     if (SupportsMultiSpeed())
     {
-        // Spec mandates ceil(SpeedMax / 2) for Medium
         uint8_t speedSetting = (mSpeedMax > 1) ? static_cast<uint8_t>((mSpeedMax + 1) / 2) : 1;
         mSpeedSetting.SetNonNull(speedSetting);
         mSpeedCurrent = speedSetting;
@@ -123,14 +119,14 @@ void FanControlCluster::ApplyFanModeMediumSideEffects()
 
 void FanControlCluster::ApplyFanModeHighSideEffects()
 {
-    mPercentSetting.SetNonNull(100); // Spec mandates 100%
+    mPercentSetting.SetNonNull(100);
     mPercentCurrent = 100;
     NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
 
     if (SupportsMultiSpeed())
     {
-        mSpeedSetting.SetNonNull(mSpeedMax); // Spec mandates SpeedMax
+        mSpeedSetting.SetNonNull(mSpeedMax);
         mSpeedCurrent = mSpeedMax;
         NotifyAttributeChanged(SpeedSetting::Id);
         NotifyAttributeChanged(SpeedCurrent::Id);
@@ -159,6 +155,34 @@ void FanControlCluster::ApplyFanModeAutoSideEffects()
     }
 }
 
+namespace {
+
+FanModeEnum ComputeFanModeFromPercent(chip::Percent percent, FanModeSequenceEnum fanModeSequence)
+{
+    if (percent == 0)
+        return FanModeEnum::kOff;
+
+    const bool hasThreeSpeeds =
+        (fanModeSequence == FanModeSequenceEnum::kOffLowMedHigh || fanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto);
+    const bool hasLow = (fanModeSequence != FanModeSequenceEnum::kOffHigh && fanModeSequence != FanModeSequenceEnum::kOffHighAuto);
+
+    if (hasThreeSpeeds)
+    {
+        if (percent <= 33)
+            return FanModeEnum::kLow;
+        if (percent <= 66)
+            return FanModeEnum::kMedium;
+        return FanModeEnum::kHigh;
+    }
+    if (hasLow)
+    {
+        return (percent <= 50) ? FanModeEnum::kLow : FanModeEnum::kHigh;
+    }
+    return FanModeEnum::kHigh;
+}
+
+} // namespace
+
 void FanControlCluster::ApplyPercentSettingChanged()
 {
     if (mPercentSetting.IsNull())
@@ -171,6 +195,14 @@ void FanControlCluster::ApplyPercentSettingChanged()
     }
 
     mPercentCurrent = mPercentSetting.Value();
+
+    FanModeEnum newMode = ComputeFanModeFromPercent(mPercentSetting.Value(), mFanModeSequence);
+    if (mFanMode != newMode)
+    {
+        mFanMode = newMode;
+        NotifyAttributeChanged(FanMode::Id);
+    }
+
     if (SupportsMultiSpeed())
     {
         uint8_t speedMax     = mSpeedMax;
@@ -181,6 +213,8 @@ void FanControlCluster::ApplyPercentSettingChanged()
         NotifyAttributeChanged(SpeedSetting::Id);
         NotifyAttributeChanged(SpeedCurrent::Id);
     }
+
+    UpdateOnOffCluster(true);
 }
 
 void FanControlCluster::ApplySpeedSettingChanged()
@@ -205,8 +239,18 @@ void FanControlCluster::ApplySpeedSettingChanged()
     mPercentSetting.SetNonNull(percent);
     mPercentCurrent = percent;
     mSpeedCurrent   = speedSetting;
+
+    FanModeEnum newMode = ComputeFanModeFromPercent(percent, mFanModeSequence);
+    if (mFanMode != newMode)
+    {
+        mFanMode = newMode;
+        NotifyAttributeChanged(FanMode::Id);
+    }
+
     NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
+
+    UpdateOnOffCluster(true);
 }
 
 DataModel::ActionReturnStatus FanControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -353,6 +397,9 @@ std::optional<DataModel::ActionReturnStatus> FanControlCluster::InvokeCommand(co
         Commands::Step::DecodableType commandData;
         VerifyOrReturnError(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
 
+        if (EnsureKnownEnumValue(commandData.direction) == StepDirectionEnum::kUnknownEnumValue)
+            return Status::ConstraintError;
+
         bool wrapValue      = commandData.wrap.ValueOr(false);
         bool lowestOffValue = commandData.lowestOff.ValueOr(false);
 
@@ -372,15 +419,15 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
     if (value == FanModeEnum::kLow &&
         (mFanModeSequence == FanModeSequenceEnum::kOffHighAuto || mFanModeSequence == FanModeSequenceEnum::kOffHigh))
     {
-        return Status::ConstraintError;
+        return Status::InvalidInState;
     }
     if (value == FanModeEnum::kMedium &&
         !(mFanModeSequence == FanModeSequenceEnum::kOffLowMedHigh || mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto))
     {
-        return Status::ConstraintError;
+        return Status::InvalidInState;
     }
     if (value == FanModeEnum::kAuto && !SupportsAuto())
-        return Status::ConstraintError;
+        return Status::InvalidInState;
 
     FanModeEnum newMode = value;
 
@@ -425,6 +472,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
         ApplyFanModeAutoSideEffects();
     }
 
+    UpdateOnOffCluster(newMode != FanModeEnum::kOff);
     return NotifyAttributeChangedIfSuccess(FanMode::Id, Status::Success);
 }
 
@@ -433,9 +481,8 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
     if (value.IsNull())
     {
         if (!SupportsAuto())
-            return Status::ConstraintError;
-        SetFanMode(FanModeEnum::kAuto);
-        return Status::Success;
+            return Status::InvalidInState;
+        return SetFanMode(FanModeEnum::kAuto);
     }
 
     if (value.Value() > 100)
@@ -455,9 +502,8 @@ DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Null
     if (value.IsNull())
     {
         if (!SupportsAuto())
-            return Status::ConstraintError;
-        SetFanMode(FanModeEnum::kAuto);
-        return Status::Success;
+            return Status::InvalidInState;
+        return SetFanMode(FanModeEnum::kAuto);
     }
 
     if (value.Value() > mSpeedMax)
@@ -501,11 +547,42 @@ DataModel::ActionReturnStatus FanControlCluster::SetAirflowDirection(AirflowDire
 {
     if (!SupportsAirflowDirection())
         return Status::UnsupportedAttribute;
-    if (value == AirflowDirectionEnum::kUnknownEnumValue)
+    if (EnsureKnownEnumValue(value) == AirflowDirectionEnum::kUnknownEnumValue)
         return Status::ConstraintError;
 
     mAirflowDirection = value;
     return NotifyAttributeChangedIfSuccess(AirflowDirection::Id, Status::Success);
+}
+
+void FanControlCluster::SetOnOffState(bool isOn)
+{
+    if (!isOn)
+    {
+        if (mFanMode != FanModeEnum::kOff)
+        {
+            mFanMode = FanModeEnum::kOff;
+            NotifyAttributeChanged(FanMode::Id);
+        }
+        ApplyFanModeOffSideEffects();
+    }
+    else
+    {
+        mPercentCurrent = mPercentSetting.ValueOr(100);
+        NotifyAttributeChanged(PercentCurrent::Id);
+        if (SupportsMultiSpeed())
+        {
+            mSpeedCurrent = mSpeedSetting.ValueOr(mSpeedMax);
+            NotifyAttributeChanged(SpeedCurrent::Id);
+        }
+    }
+}
+
+void FanControlCluster::UpdateOnOffCluster(bool isOn)
+{
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnFanStateChanged(isOn);
+    }
 }
 
 void FanControlCluster::SetDelegate(FanControl::Delegate * delegate)

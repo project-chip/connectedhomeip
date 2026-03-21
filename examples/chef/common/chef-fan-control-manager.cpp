@@ -22,6 +22,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
+#include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
@@ -49,8 +50,7 @@ public:
     Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
     DataModel::Nullable<uint8_t> GetSpeedSetting();
     DataModel::Nullable<Percent> GetPercentSetting();
-    Protocols::InteractionModel::Status OnCommand(EndpointId endpointId);
-    Protocols::InteractionModel::Status OffCommand(EndpointId endpointId);
+    void OnFanStateChanged(bool isOn) override;
 
 private:
     uint8_t mPercentCurrent = 0;
@@ -325,6 +325,25 @@ DataModel::Nullable<uint8_t> ChefFanControlManager::GetSpeedSetting()
     return speedSetting;
 }
 
+void ChefFanControlManager::OnFanStateChanged(bool isOn)
+{
+    bool currentOnOff = false;
+    Status status     = OnOff::Attributes::OnOff::Get(mEndpoint, &currentOnOff);
+
+    if (status == Status::Success)
+    {
+        if (currentOnOff != isOn)
+        {
+            ChipLogProgress(NotSpecified, "ChefFanControlManager: Synchronizing OnOff cluster to %d", isOn);
+            OnOff::Attributes::OnOff::Set(mEndpoint, isOn);
+        }
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "ChefFanControlManager: Failed to get OnOff attribute: %d", to_underlying(status));
+    }
+}
+
 } // anonymous namespace
 
 void emberAfFanControlClusterInitCallback(EndpointId endpoint)
@@ -335,139 +354,13 @@ void emberAfFanControlClusterInitCallback(EndpointId endpoint)
     mFanControlManager->Init();
 }
 
-Protocols::InteractionModel::Status ChefFanControlManager::OnCommand(EndpointId endpointId)
-{
-    ChipLogProgress(DeviceLayer, "ChefFanControlManager::OnCommand");
-
-    FanControl::FanModeEnum fanMode;
-    FanControl::GetFanMode(endpointId, fanMode);
-
-    if (fanMode == FanControl::FanModeEnum::kOff) // Off mode implies Speed/Percent setting values are 0. Set fan to HIGH.
-    {
-        uint8_t speedMax = 0;
-        Status status    = FanControl::GetSpeedMax(endpointId, speedMax);
-        if (status == Status::Success)
-        {
-            status = FanControl::SetSpeedSetting(mEndpoint, DataModel::Nullable<uint8_t>(speedMax));
-            if (status == Status::Success)
-            {
-                // Atribute change handler sets SpeedCurrent equal to SpeedSetting and updates FanMode.
-                MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::SpeedSetting::Id);
-            }
-            else
-            {
-                ChipLogError(DeviceLayer, "Error setting SpeedSetting: %d", to_underlying(status));
-                return status; // Speed is enabled since SpeedMax read was successful. So return failed status.
-            }
-        }
-        else
-        {
-            // Not returning error as speed is optional.
-            ChipLogError(DeviceLayer, "Error getting SpeedMax: %d", to_underlying(status));
-        }
-        uint8_t percentSettingValue = 100;
-        status                      = FanControl::SetPercentSetting(mEndpoint, DataModel::Nullable<Percent>(percentSettingValue));
-        if (status == Status::Success)
-        {
-            // Atribute change handler sets PercentCurrent equal to PercentSetting.
-            MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::PercentSetting::Id);
-        }
-        else
-        {
-            return status; // Percent is mandatory. So return failed status.
-        }
-    }
-
-    Status status;
-
-    DataModel::Nullable<uint8_t> speedSetting(GetSpeedSetting());
-
-    if (!speedSetting.IsNull() && speedSetting.Value())
-    {
-        uint8_t speedValue = speedSetting.Value();
-        status             = FanControl::SetSpeedSetting(endpointId, DataModel::Nullable<uint8_t>(speedValue));
-        if (status != Status::Success)
-        {
-            ChipLogError(DeviceLayer, "Error setting SpeedCurrent: %d", to_underlying(status));
-            return status;
-        }
-        MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::SpeedCurrent::Id);
-    }
-
-    DataModel::Nullable<uint8_t> percentSetting(GetPercentSetting());
-
-    if (!percentSetting.IsNull() && percentSetting.Value())
-    {
-        uint8_t percentValue = percentSetting.Value();
-        status               = FanControl::SetPercentSetting(endpointId, DataModel::Nullable<Percent>(percentValue));
-        if (status != Status::Success)
-        {
-            ChipLogError(DeviceLayer, "Error setting PercentCurrent: %d", to_underlying(status));
-            return status;
-        }
-        MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::PercentCurrent::Id);
-    }
-
-    return Status::Success;
-}
-
-Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(EndpointId endpointId)
-{
-    ChipLogProgress(DeviceLayer, "ChefFanControlManager::OffCommand");
-
-    FanControl::FanModeEnum fanMode;
-    FanControl::GetFanMode(endpointId, fanMode);
-
-    if (fanMode == FanControl::FanModeEnum::kOff) // Off mode implies Speed/Percent current values are 0.
-    {
-        return Status::Success;
-    }
-
-    Status status;
-
-    DataModel::Nullable<uint8_t> speedSetting;
-    status               = FanControl::GetSpeedSetting(endpointId, speedSetting);
-    uint8_t speedCurrent = (status == Status::Success && !speedSetting.IsNull()) ? speedSetting.Value() : 0;
-
-    if (status == Protocols::InteractionModel::Status::Success && speedCurrent)
-    {
-        uint8_t zero = 0;
-        status       = FanControl::SetSpeedSetting(endpointId, DataModel::Nullable<uint8_t>(zero));
-        if (status != Status::Success)
-        {
-            ChipLogError(DeviceLayer, "Error setting SpeedCurrent: %d", to_underlying(status));
-            return status;
-        }
-        MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::SpeedCurrent::Id);
-    }
-
-    DataModel::Nullable<Percent> percentSetting;
-    status = FanControl::GetPercentSetting(endpointId, percentSetting);
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-
-    uint8_t percentCurrent = (!percentSetting.IsNull()) ? percentSetting.Value() : 0;
-
-    if (percentCurrent)
-    {
-        uint8_t zero = 0;
-        status       = FanControl::SetPercentSetting(endpointId, DataModel::Nullable<Percent>(zero));
-        if (status != Status::Success)
-        {
-            ChipLogError(DeviceLayer, "Error setting PercentCurrent: %d", to_underlying(status));
-            return status;
-        }
-        MatterReportingAttributeChangeCallback(endpointId, FanControl::Id, FanControl::Attributes::PercentCurrent::Id);
-    }
-
-    return Status::Success;
-}
-
 void HandleOnOffAttributeChangeForFan(EndpointId endpointId, bool value)
 {
-    if (value)
-        mFanControlManager->OnCommand(endpointId);
-    else
-        mFanControlManager->OffCommand(endpointId);
+    FanControlCluster * fanCluster = FanControl::FindClusterOnEndpoint(endpointId);
+    if (fanCluster != nullptr)
+    {
+        fanCluster->SetOnOffState(value);
+    }
 }
 
 void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)

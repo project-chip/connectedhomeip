@@ -50,6 +50,10 @@ public:
             {
                 mFeatureMap.Set(FanControl::Feature::kAuto);
             }
+            else
+            {
+                mFeatureMap.Clear(FanControl::Feature::kAuto);
+            }
             return *this;
         }
         Config & WithSpeedMax(uint8_t speedMax)
@@ -140,6 +144,8 @@ public:
     DataModel::ActionReturnStatus SetWindSetting(BitMask<FanControl::WindBitmap> value);
     DataModel::ActionReturnStatus SetAirflowDirection(FanControl::AirflowDirectionEnum value);
 
+    void SetOnOffState(bool on);
+
     void SetDelegate(FanControl::Delegate * delegate);
 
 private:
@@ -166,6 +172,8 @@ private:
 
     void ApplyPercentSettingChanged();
     void ApplySpeedSettingChanged();
+
+    void UpdateOnOffCluster(bool isOn);
 
     // Attributes
     FanControl::FanModeEnum mFanMode = FanControl::FanModeEnum::kOff;
