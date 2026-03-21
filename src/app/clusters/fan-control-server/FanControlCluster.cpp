@@ -171,7 +171,12 @@ void FanControlCluster::ApplySpeedSettingChanged()
         return;
     }
 
-    uint8_t speedMax             = mSpeedMax;
+    uint8_t speedMax = mSpeedMax;
+    if (speedMax == 0)
+    {
+        ChipLogError(Zcl, "FanControlCluster: mSpeedMax is 0; cannot compute PercentSetting");
+        return;
+    }
     chip::Percent percentSetting = static_cast<chip::Percent>((mSpeedSetting.Value() * 100) / speedMax);
     mPercentSetting.SetNonNull(percentSetting);
     NotifyAttributeChanged(PercentSetting::Id);
@@ -266,6 +271,15 @@ DataModel::ActionReturnStatus FanControlCluster::WriteAttribute(const DataModel:
         ReturnErrorOnFailure(decoder.Decode(value));
         return SetAirflowDirection(value);
     }
+    case Globals::Attributes::ClusterRevision::Id:
+    case Globals::Attributes::FeatureMap::Id:
+    case FanModeSequence::Id:
+    case PercentCurrent::Id:
+    case SpeedMax::Id:
+    case SpeedCurrent::Id:
+    case RockSupport::Id:
+    case WindSupport::Id:
+        return Status::UnsupportedWrite;
     default:
         return Status::UnsupportedAttribute;
     }
