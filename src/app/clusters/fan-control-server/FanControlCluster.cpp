@@ -372,15 +372,15 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
     if (value == FanModeEnum::kLow &&
         (mFanModeSequence == FanModeSequenceEnum::kOffHighAuto || mFanModeSequence == FanModeSequenceEnum::kOffHigh))
     {
-        return Status::ConstraintError;
+        return Status::InvalidInState;
     }
     if (value == FanModeEnum::kMedium &&
         !(mFanModeSequence == FanModeSequenceEnum::kOffLowMedHigh || mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto))
     {
-        return Status::ConstraintError;
+        return Status::InvalidInState;
     }
     if (value == FanModeEnum::kAuto && !SupportsAuto())
-        return Status::ConstraintError;
+        return Status::InvalidInState;
 
     FanModeEnum newMode = value;
 
@@ -433,7 +433,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
     if (value.IsNull())
     {
         if (!SupportsAuto())
-            return Status::ConstraintError;
+            return Status::InvalidInState;
         SetFanMode(FanModeEnum::kAuto);
         return Status::Success;
     }
@@ -455,7 +455,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Null
     if (value.IsNull())
     {
         if (!SupportsAuto())
-            return Status::ConstraintError;
+            return Status::InvalidInState;
         SetFanMode(FanModeEnum::kAuto);
         return Status::Success;
     }

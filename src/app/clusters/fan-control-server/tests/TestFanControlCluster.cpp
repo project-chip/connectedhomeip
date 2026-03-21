@@ -440,20 +440,20 @@ TEST_F(TestFanControlCluster, FanModeSmart_MapsToHigh_WhenAutoNotSupported)
     EXPECT_EQ(fanMode, FanModeEnum::kHigh);
 }
 
-TEST_F(TestFanControlClusterOffHigh, FanModeLow_ReturnsConstraintError)
+TEST_F(TestFanControlClusterOffHigh, FanModeLow_ReturnsInvalidInState)
 {
     ClusterTester tester(cluster);
 
     auto status = tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kLow);
-    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::InvalidInState);
 }
 
-TEST_F(TestFanControlClusterOffHigh, FanModeMedium_ReturnsConstraintError)
+TEST_F(TestFanControlClusterOffHigh, FanModeMedium_ReturnsInvalidInState)
 {
     ClusterTester tester(cluster);
 
     auto status = tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kMedium);
-    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::InvalidInState);
 }
 
 TEST_F(TestFanControlClusterOffHighAuto, FanModeAuto_Succeeds)
@@ -467,20 +467,20 @@ TEST_F(TestFanControlClusterOffHighAuto, FanModeAuto_Succeeds)
     EXPECT_EQ(fanMode, FanModeEnum::kAuto);
 }
 
-TEST_F(TestFanControlCluster, FanModeAuto_ReturnsConstraintError_WhenAutoNotSupported)
+TEST_F(TestFanControlCluster, FanModeAuto_ReturnsInvalidInState_WhenAutoNotSupported)
 {
     ClusterTester tester(cluster);
 
     auto status = tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kAuto);
-    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::InvalidInState);
 }
 
-TEST_F(TestFanControlCluster, FanModeMedium_ReturnsConstraintError)
+TEST_F(TestFanControlCluster, FanModeMedium_ReturnsInvalidInState)
 {
     ClusterTester tester(cluster);
 
     auto status = tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kMedium);
-    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::InvalidInState);
 }
 
 TEST_F(TestFanControlClusterOffLowMedHigh, FanModeLowAndMedium_Succeed)
