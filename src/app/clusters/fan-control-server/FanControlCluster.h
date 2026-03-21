@@ -119,9 +119,18 @@ public:
 
     // Getters
     FanControl::FanModeEnum GetFanMode() const { return mFanMode; }
+    FanControl::FanModeSequenceEnum GetFanModeSequence() const { return mFanModeSequence; }
     DataModel::Nullable<chip::Percent> GetPercentSetting() const { return mPercentSetting; }
+    chip::Percent GetPercentCurrent() const { return mPercentSetting.ValueOr(0); }
     DataModel::Nullable<uint8_t> GetSpeedSetting() const { return mSpeedSetting; }
+    uint8_t GetSpeedCurrent() const { return mSpeedSetting.ValueOr(0); }
     uint8_t GetSpeedMax() const { return mSpeedMax; }
+    BitFlags<FanControl::Feature> GetFeatureMap() const { return mFeatureMap; }
+    BitMask<FanControl::RockBitmap> GetRockSupport() const { return mRockSupport; }
+    BitMask<FanControl::RockBitmap> GetRockSetting() const { return mRockSetting; }
+    BitMask<FanControl::WindBitmap> GetWindSupport() const { return mWindSupport; }
+    BitMask<FanControl::WindBitmap> GetWindSetting() const { return mWindSetting; }
+    FanControl::AirflowDirectionEnum GetAirflowDirection() const { return mAirflowDirection; }
 
     // Setters
     DataModel::ActionReturnStatus SetFanMode(FanControl::FanModeEnum value);

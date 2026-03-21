@@ -178,6 +178,105 @@ Status GetSpeedMax(EndpointId endpointId, uint8_t & value)
     return Status::Success;
 }
 
+Status GetFanModeSequence(EndpointId endpointId, FanModeSequenceEnum & value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetFanModeSequence();
+    return Status::Success;
+}
+
+Status GetPercentCurrent(EndpointId endpointId, chip::Percent & value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetPercentCurrent();
+    return Status::Success;
+}
+
+Status GetSpeedCurrent(EndpointId endpointId, uint8_t & value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetSpeedCurrent();
+    return Status::Success;
+}
+
+Status GetFeatureMap(EndpointId endpointId, uint32_t & value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetFeatureMap().Raw();
+    return Status::Success;
+}
+
+Status GetRockSupport(EndpointId endpointId, BitMask<RockBitmap> & value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetRockSupport();
+    return Status::Success;
+}
+
+Status GetRockSetting(EndpointId endpointId, BitMask<RockBitmap> & value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetRockSetting();
+    return Status::Success;
+}
+
+Status GetWindSupport(EndpointId endpointId, BitMask<WindBitmap> & value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetWindSupport();
+    return Status::Success;
+}
+
+Status GetWindSetting(EndpointId endpointId, BitMask<WindBitmap> & value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetWindSetting();
+    return Status::Success;
+}
+
+Status GetAirflowDirection(EndpointId endpointId, AirflowDirectionEnum & value)
+{
+    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    value = cluster->GetAirflowDirection();
+    return Status::Success;
+}
+
 Status SetSpeedSetting(EndpointId endpointId, DataModel::Nullable<uint8_t> value)
 {
     FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
