@@ -138,6 +138,16 @@ Status SetSpeedSettingUI(EndpointId ep, uint8_t value)
     return FanControl::SetSpeedSetting(ep, app::DataModel::Nullable<uint8_t>(value));
 }
 
+static Status GetPercentSettingAdapter(EndpointId ep, app::DataModel::Nullable<Percent> & value)
+{
+    return FanControl::GetPercentSetting(ep, value);
+}
+
+static Status GetSpeedSettingAdapter(EndpointId ep, app::DataModel::Nullable<uint8_t> & value)
+{
+    return FanControl::GetSpeedSetting(ep, value);
+}
+
 static Status GetRockSupportAdapter(EndpointId ep, BitMask<RockBitmap> * value)
 {
     return FanControl::GetRockSupport(ep, *value);
@@ -186,8 +196,8 @@ void FanControl::UpdateState()
     UpdateStateReadOnly(mEndpointId, mTargetSpeedCurrent, mSpeedCurrent, &GetSpeedCurrentAdapter);
     UpdateStateReadOnly(mEndpointId, mTargetFeatureMap, mFeatureMap, &GetFeatureMapAdapter);
 
-    UpdateStateNullable(mEndpointId, mTargetPercentSetting, mPercentSetting, &SetPercentSettingUI, &FanControl::GetPercentSetting);
-    UpdateStateNullable(mEndpointId, mTargetSpeedSetting, mSpeedSetting, &SetSpeedSettingUI, &FanControl::GetSpeedSetting);
+    UpdateStateNullable(mEndpointId, mTargetPercentSetting, mPercentSetting, &SetPercentSettingUI, &GetPercentSettingAdapter);
+    UpdateStateNullable(mEndpointId, mTargetSpeedSetting, mSpeedSetting, &SetSpeedSettingUI, &GetSpeedSettingAdapter);
 
     UpdateStateEnum(mEndpointId, mTargetRockSupport, mRockSupport, &SetRockSupportUI, &GetRockSupportAdapter);
     UpdateStateEnum(mEndpointId, mTargetRockSetting, mRockSetting, &SetRockSettingUI, &GetRockSettingAdapter);
