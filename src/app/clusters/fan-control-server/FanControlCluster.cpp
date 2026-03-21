@@ -349,8 +349,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
         return Status::ConstraintError;
     }
     if (value == FanModeEnum::kMedium &&
-        !(mFanModeSequence == FanModeSequenceEnum::kOffLowMedHigh ||
-          mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto))
+        !(mFanModeSequence == FanModeSequenceEnum::kOffLowMedHigh || mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto))
     {
         return Status::ConstraintError;
     }
