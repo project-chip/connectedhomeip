@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "pw_unit_test/framework.h"
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/clusters/fan-control-server/fan-control-delegate.h>
 #include <protocols/interaction_model/StatusCode.h>
