@@ -166,10 +166,9 @@ FanModeEnum ComputeFanModeFromPercent(chip::Percent percent, FanModeSequenceEnum
     if (percent == 0)
         return FanModeEnum::kOff;
 
-    const bool hasThreeSpeeds = (fanModeSequence == FanModeSequenceEnum::kOffLowMedHigh ||
-                                 fanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto);
-    const bool hasLow = (fanModeSequence != FanModeSequenceEnum::kOffHigh &&
-                         fanModeSequence != FanModeSequenceEnum::kOffHighAuto);
+    const bool hasThreeSpeeds =
+        (fanModeSequence == FanModeSequenceEnum::kOffLowMedHigh || fanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto);
+    const bool hasLow = (fanModeSequence != FanModeSequenceEnum::kOffHigh && fanModeSequence != FanModeSequenceEnum::kOffHighAuto);
 
     if (hasThreeSpeeds)
     {
