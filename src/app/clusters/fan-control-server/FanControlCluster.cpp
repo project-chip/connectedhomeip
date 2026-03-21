@@ -403,6 +403,9 @@ std::optional<DataModel::ActionReturnStatus> FanControlCluster::InvokeCommand(co
         Commands::Step::DecodableType commandData;
         VerifyOrReturnError(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
 
+        if (EnsureKnownEnumValue(commandData.direction) == StepDirectionEnum::kUnknownEnumValue)
+            return Status::ConstraintError;
+
         bool wrapValue      = commandData.wrap.ValueOr(false);
         bool lowestOffValue = commandData.lowestOff.ValueOr(false);
 
@@ -553,7 +556,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetAirflowDirection(AirflowDire
 {
     if (!SupportsAirflowDirection())
         return Status::UnsupportedAttribute;
-    if (value == AirflowDirectionEnum::kUnknownEnumValue)
+    if (EnsureKnownEnumValue(value) == AirflowDirectionEnum::kUnknownEnumValue)
         return Status::ConstraintError;
 
     mAirflowDirection = value;

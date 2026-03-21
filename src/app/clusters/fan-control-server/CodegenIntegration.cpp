@@ -54,8 +54,7 @@ public:
     {
         BitFlags<FanControl::Feature> features(featureMap);
 
-        // Create cluster with no delegate. App must set delegate via SetDefaultDelegate().
-        FanControlCluster::Config config(endpointId, nullptr);
+        FanControlCluster::Config config(endpointId, GetDelegate(endpointId));
 
         // Initialize FanModeSequence from attribute storage if available, otherwise use default.
         FanModeSequenceEnum fanModeSequence =
