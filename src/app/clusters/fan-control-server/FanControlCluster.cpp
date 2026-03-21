@@ -19,9 +19,9 @@
  * @file
  ***************************************************************************/
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <clusters/FanControl/Attributes.h>
 #include <clusters/FanControl/Commands.h>
 #include <clusters/FanControl/Enums.h>
