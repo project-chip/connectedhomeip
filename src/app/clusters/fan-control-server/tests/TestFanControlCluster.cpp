@@ -112,6 +112,13 @@ FanControlCluster::Config MakeTestConfigWithWind()
         .WithWindSupport(BitMask<WindBitmap>(WindBitmap::kSleepWind));
 }
 
+FanControlCluster::Config MakeTestConfigWithAirflowDirection()
+{
+    return FanControlCluster::Config(kTestEndpointId, &gTestDelegate)
+        .WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh)
+        .WithAirflowDirection();
+}
+
 template <FanControlCluster::Config (*ConfigFn)()>
 struct TestFanControlClusterFixture : public ::testing::Test
 {
@@ -135,6 +142,7 @@ using TestFanControlClusterOffHighAuto           = TestFanControlClusterFixture<
 using TestFanControlClusterOffLowMedHigh         = TestFanControlClusterFixture<MakeTestConfigOffLowMedHigh>;
 using TestFanControlClusterWithRocking           = TestFanControlClusterFixture<MakeTestConfigWithRocking>;
 using TestFanControlClusterWithWind              = TestFanControlClusterFixture<MakeTestConfigWithWind>;
+using TestFanControlClusterWithAirflowDirection  = TestFanControlClusterFixture<MakeTestConfigWithAirflowDirection>;
 
 } // namespace
 
@@ -217,6 +225,14 @@ TEST_F(TestFanControlCluster, ReadFanMode)
     FanModeEnum fanMode;
     ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, fanMode), CHIP_NO_ERROR);
     EXPECT_EQ(fanMode, FanModeEnum::kOff);
+}
+
+TEST_F(TestFanControlCluster, SetFanMode_ReturnsConstraintError_WhenValueIsUnknown)
+{
+    ClusterTester tester(cluster);
+
+    auto status = tester.WriteAttribute(FanControl::Attributes::FanMode::Id, FanModeEnum::kUnknownEnumValue);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
 }
 
 TEST_F(TestFanControlCluster, WriteFanMode)
@@ -530,5 +546,14 @@ TEST_F(TestFanControlClusterWithWind, SetWindSetting_ReturnsConstraintError_When
 
     BitMask<WindBitmap> unsupportedBits(WindBitmap::kNaturalWind);
     auto status = tester.WriteAttribute(FanControl::Attributes::WindSetting::Id, unsupportedBits);
+    EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
+}
+
+TEST_F(TestFanControlClusterWithAirflowDirection, SetAirflowDirection_ReturnsConstraintError_WhenValueIsUnknown)
+{
+    ClusterTester tester(cluster);
+
+    auto status =
+        tester.WriteAttribute(FanControl::Attributes::AirflowDirection::Id, AirflowDirectionEnum::kUnknownEnumValue);
     EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
 }

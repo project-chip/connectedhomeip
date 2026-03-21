@@ -21,6 +21,7 @@
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/FanControl.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/attribute-table.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
@@ -56,16 +57,34 @@ public:
         // Create cluster with no delegate. App must set delegate via SetDefaultDelegate().
         FanControlCluster::Config config(endpointId, nullptr);
 
-        config.WithFanModeSequence(features.Has(FanControl::Feature::kAuto) ? FanModeSequenceEnum::kOffLowHighAuto
-                                                                            : FanModeSequenceEnum::kOffLowHigh);
+        // Initialize FanModeSequence from attribute storage if available, otherwise use default.
+        FanModeSequenceEnum fanModeSequence = features.Has(FanControl::Feature::kAuto) ? FanModeSequenceEnum::kOffLowHighAuto
+                                                                                       : FanModeSequenceEnum::kOffLowHigh;
+        (void) emberAfReadAttribute(endpointId, FanControl::Id, FanModeSequence::Id,
+                                    reinterpret_cast<uint8_t *>(&fanModeSequence), sizeof(fanModeSequence));
+        config.WithFanModeSequence(fanModeSequence);
 
         if (features.Has(FanControl::Feature::kMultiSpeed))
-            config.WithSpeedMax(100);
+        {
+            uint8_t speedMax = 100;
+            if (emberAfReadAttribute(endpointId, FanControl::Id, SpeedMax::Id, &speedMax, sizeof(speedMax)) != Status::Success)
+            {
+                speedMax = 100;
+            }
+            config.WithSpeedMax(speedMax);
+        }
         if (features.Has(FanControl::Feature::kRocking))
-            config.WithRockSupport(
-                BitMask<RockBitmap>(RockBitmap::kRockLeftRight, RockBitmap::kRockUpDown, RockBitmap::kRockRound));
+        {
+            uint8_t rockSupportRaw = static_cast<uint8_t>(RockBitmap::kRockLeftRight | RockBitmap::kRockUpDown | RockBitmap::kRockRound);
+            (void) emberAfReadAttribute(endpointId, FanControl::Id, RockSupport::Id, &rockSupportRaw, sizeof(rockSupportRaw));
+            config.WithRockSupport(BitMask<RockBitmap>(rockSupportRaw));
+        }
         if (features.Has(FanControl::Feature::kWind))
-            config.WithWindSupport(BitMask<WindBitmap>(WindBitmap::kSleepWind, WindBitmap::kNaturalWind));
+        {
+            uint8_t windSupportRaw = static_cast<uint8_t>(WindBitmap::kSleepWind | WindBitmap::kNaturalWind);
+            (void) emberAfReadAttribute(endpointId, FanControl::Id, WindSupport::Id, &windSupportRaw, sizeof(windSupportRaw));
+            config.WithWindSupport(BitMask<WindBitmap>(windSupportRaw));
+        }
         if (features.Has(FanControl::Feature::kAirflowDirection))
             config.WithAirflowDirection();
         if (features.Has(FanControl::Feature::kStep))
