@@ -75,14 +75,16 @@ public:
         }
         if (features.Has(FanControl::Feature::kRocking))
         {
-            uint8_t rockSupportRaw =
-                static_cast<uint8_t>(RockBitmap::kRockLeftRight | RockBitmap::kRockUpDown | RockBitmap::kRockRound);
+            uint8_t rockSupportRaw = static_cast<uint8_t>(static_cast<uint8_t>(RockBitmap::kRockLeftRight) |
+                                                         static_cast<uint8_t>(RockBitmap::kRockUpDown) |
+                                                         static_cast<uint8_t>(RockBitmap::kRockRound));
             (void) emberAfReadAttribute(endpointId, FanControl::Id, RockSupport::Id, &rockSupportRaw, sizeof(rockSupportRaw));
             config.WithRockSupport(BitMask<RockBitmap>(rockSupportRaw));
         }
         if (features.Has(FanControl::Feature::kWind))
         {
-            uint8_t windSupportRaw = static_cast<uint8_t>(WindBitmap::kSleepWind | WindBitmap::kNaturalWind);
+            uint8_t windSupportRaw =
+                static_cast<uint8_t>(static_cast<uint8_t>(WindBitmap::kSleepWind) | static_cast<uint8_t>(WindBitmap::kNaturalWind));
             (void) emberAfReadAttribute(endpointId, FanControl::Id, WindSupport::Id, &windSupportRaw, sizeof(windSupportRaw));
             config.WithWindSupport(BitMask<WindBitmap>(windSupportRaw));
         }
