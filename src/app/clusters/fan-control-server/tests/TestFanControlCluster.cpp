@@ -178,6 +178,22 @@ TEST_F(TestFanControlClusterWithMultiSpeedAndAuto, FeatureMapIncludesMultiSpeedA
     EXPECT_EQ(featureMap, static_cast<uint32_t>(Feature::kMultiSpeed) | static_cast<uint32_t>(Feature::kAuto));
 }
 
+TEST_F(TestFanControlClusterOffHigh, FeatureMapIsZero)
+{
+    ClusterTester tester(cluster);
+    uint32_t featureMap{};
+    ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, 0u);
+}
+
+TEST_F(TestFanControlClusterOffHighAuto, FeatureMapIncludesAuto)
+{
+    ClusterTester tester(cluster);
+    uint32_t featureMap{};
+    ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, static_cast<uint32_t>(Feature::kAuto));
+}
+
 TEST_F(TestFanControlCluster, ReadFanMode)
 {
     ClusterTester tester(cluster);
