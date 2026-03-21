@@ -24,6 +24,7 @@
 #include <clusters/FanControl/Attributes.h>
 #include <clusters/FanControl/Commands.h>
 #include <clusters/FanControl/Enums.h>
+#include <clusters/FanControl/EnumsCheck.h>
 #include <clusters/FanControl/Metadata.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
@@ -192,9 +193,9 @@ DataModel::ActionReturnStatus FanControlCluster::ReadAttribute(const DataModel::
 {
     switch (request.path.mAttributeId)
     {
-    case Globals::Attributes::ClusterRevision::Id:
+    case ClusterRevision::Id:
         return encoder.Encode(FanControl::kRevision);
-    case Globals::Attributes::FeatureMap::Id:
+    case FeatureMap::Id:
         return encoder.Encode(mFeatureMap);
     case FanMode::Id:
         return encoder.Encode(mFanMode);
@@ -345,6 +346,8 @@ std::optional<DataModel::ActionReturnStatus> FanControlCluster::InvokeCommand(co
 
 DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
 {
+    if (EnsureKnownEnumValue(value) == FanModeEnum::kUnknownEnumValue)
+        return Status::ConstraintError;
     if (value == FanModeEnum::kLow &&
         (mFanModeSequence == FanModeSequenceEnum::kOffHighAuto || mFanModeSequence == FanModeSequenceEnum::kOffHigh))
     {
@@ -474,6 +477,8 @@ DataModel::ActionReturnStatus FanControlCluster::SetAirflowDirection(AirflowDire
 {
     if (!SupportsAirflowDirection())
         return Status::UnsupportedAttribute;
+    if (value == AirflowDirectionEnum::kUnknownEnumValue)
+        return Status::ConstraintError;
 
     mAirflowDirection = value;
     return NotifyAttributeChangedIfSuccess(AirflowDirection::Id, Status::Success);
