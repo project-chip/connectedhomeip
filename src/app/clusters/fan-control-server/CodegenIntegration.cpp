@@ -75,9 +75,9 @@ public:
         }
         if (features.Has(FanControl::Feature::kRocking))
         {
-            uint8_t rockSupportRaw = static_cast<uint8_t>(static_cast<uint8_t>(RockBitmap::kRockLeftRight) |
-                                                         static_cast<uint8_t>(RockBitmap::kRockUpDown) |
-                                                         static_cast<uint8_t>(RockBitmap::kRockRound));
+            uint8_t rockSupportRaw =
+                static_cast<uint8_t>(static_cast<uint8_t>(RockBitmap::kRockLeftRight) |
+                                     static_cast<uint8_t>(RockBitmap::kRockUpDown) | static_cast<uint8_t>(RockBitmap::kRockRound));
             (void) emberAfReadAttribute(endpointId, FanControl::Id, RockSupport::Id, &rockSupportRaw, sizeof(rockSupportRaw));
             config.WithRockSupport(BitMask<RockBitmap>(rockSupportRaw));
         }
