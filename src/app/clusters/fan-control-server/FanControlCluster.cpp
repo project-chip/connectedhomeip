@@ -406,10 +406,9 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
 {
     if (value.IsNull())
     {
-        if (SupportsAuto())
-        {
-            SetFanMode(FanModeEnum::kAuto);
-        }
+        if (!SupportsAuto())
+            return Status::ConstraintError;
+        SetFanMode(FanModeEnum::kAuto);
         return Status::Success;
     }
 
@@ -425,10 +424,9 @@ DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Null
 
     if (value.IsNull())
     {
-        if (SupportsAuto())
-        {
-            SetFanMode(FanModeEnum::kAuto);
-        }
+        if (!SupportsAuto())
+            return Status::ConstraintError;
+        SetFanMode(FanModeEnum::kAuto);
         return Status::Success;
     }
 
@@ -437,6 +435,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Null
 
     mSpeedSetting = value;
     ApplySpeedSettingChanged();
+    NotifyAttributeChanged(SpeedCurrent::Id);
     return NotifyAttributeChangedIfSuccess(SpeedSetting::Id, Status::Success);
 }
 
