@@ -21,6 +21,7 @@
 
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <clusters/FanControl/Attributes.h>
 #include <clusters/FanControl/Commands.h>
 #include <clusters/FanControl/Enums.h>
@@ -68,6 +69,7 @@ Protocols::InteractionModel::Status FanControlCluster::SetFanModeToOff()
         ApplyFanModeOffSideEffects();
         NotifyAttributeChanged(FanMode::Id);
     }
+    UpdateOnOffCluster(false);
     return Status::Success;
 }
 
@@ -217,6 +219,8 @@ void FanControlCluster::ApplyPercentSettingChanged()
         NotifyAttributeChanged(SpeedSetting::Id);
         NotifyAttributeChanged(SpeedCurrent::Id);
     }
+
+    UpdateOnOffCluster(true);
 }
 
 void FanControlCluster::ApplySpeedSettingChanged()
@@ -251,6 +255,8 @@ void FanControlCluster::ApplySpeedSettingChanged()
 
     NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
+
+    UpdateOnOffCluster(true);
 }
 
 DataModel::ActionReturnStatus FanControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -469,6 +475,10 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
         ApplyFanModeAutoSideEffects();
     }
 
+    if (newMode != FanModeEnum::kOff)
+    {
+        UpdateOnOffCluster(true);
+    }
     return NotifyAttributeChangedIfSuccess(FanMode::Id, Status::Success);
 }
 
@@ -550,34 +560,9 @@ DataModel::ActionReturnStatus FanControlCluster::SetAirflowDirection(AirflowDire
     return NotifyAttributeChangedIfSuccess(AirflowDirection::Id, Status::Success);
 }
 
-void FanControlCluster::SetOnOffState(bool on)
+void FanControlCluster::SetOnOffState(bool isOn)
 {
-    if (on)
-    {
-        if (mPercentSetting.IsNull())
-        {
-            mPercentCurrent = 0;
-        }
-        else
-        {
-            mPercentCurrent = mPercentSetting.Value();
-        }
-        NotifyAttributeChanged(PercentCurrent::Id);
-
-        if (SupportsMultiSpeed())
-        {
-            if (mSpeedSetting.IsNull())
-            {
-                mSpeedCurrent = 0;
-            }
-            else
-            {
-                mSpeedCurrent = mSpeedSetting.Value();
-            }
-            NotifyAttributeChanged(SpeedCurrent::Id);
-        }
-    }
-    else
+    if (!isOn)
     {
         mPercentCurrent = 0;
         NotifyAttributeChanged(PercentCurrent::Id);
@@ -585,6 +570,28 @@ void FanControlCluster::SetOnOffState(bool on)
         {
             mSpeedCurrent = 0;
             NotifyAttributeChanged(SpeedCurrent::Id);
+        }
+    }
+    else
+    {
+        mPercentCurrent = mPercentSetting.ValueOr(100);
+        NotifyAttributeChanged(PercentCurrent::Id);
+        if (SupportsMultiSpeed())
+        {
+            mSpeedCurrent = mSpeedSetting.ValueOr(mSpeedMax);
+            NotifyAttributeChanged(SpeedCurrent::Id);
+        }
+    }
+}
+
+void FanControlCluster::UpdateOnOffCluster(bool isOn)
+{
+    bool currentOnOff = false;
+    if (OnOff::Attributes::OnOff::Get(mPath.mEndpointId, &currentOnOff) == Protocols::InteractionModel::Status::Success)
+    {
+        if (currentOnOff != isOn)
+        {
+            OnOff::Attributes::OnOff::Set(mPath.mEndpointId, isOn);
         }
     }
 }
