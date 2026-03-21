@@ -478,8 +478,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
     {
         if (!SupportsAuto())
             return Status::InvalidInState;
-        SetFanMode(FanModeEnum::kAuto);
-        return Status::Success;
+        return SetFanMode(FanModeEnum::kAuto);
     }
 
     if (value.Value() > 100)
@@ -500,8 +499,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Null
     {
         if (!SupportsAuto())
             return Status::InvalidInState;
-        SetFanMode(FanModeEnum::kAuto);
-        return Status::Success;
+        return SetFanMode(FanModeEnum::kAuto);
     }
 
     if (value.Value() > mSpeedMax)
@@ -550,6 +548,45 @@ DataModel::ActionReturnStatus FanControlCluster::SetAirflowDirection(AirflowDire
 
     mAirflowDirection = value;
     return NotifyAttributeChangedIfSuccess(AirflowDirection::Id, Status::Success);
+}
+
+void FanControlCluster::SetOnOffState(bool on)
+{
+    if (on)
+    {
+        if (mPercentSetting.IsNull())
+        {
+            mPercentCurrent = 0;
+        }
+        else
+        {
+            mPercentCurrent = mPercentSetting.Value();
+        }
+        NotifyAttributeChanged(PercentCurrent::Id);
+
+        if (SupportsMultiSpeed())
+        {
+            if (mSpeedSetting.IsNull())
+            {
+                mSpeedCurrent = 0;
+            }
+            else
+            {
+                mSpeedCurrent = mSpeedSetting.Value();
+            }
+            NotifyAttributeChanged(SpeedCurrent::Id);
+        }
+    }
+    else
+    {
+        mPercentCurrent = 0;
+        NotifyAttributeChanged(PercentCurrent::Id);
+        if (SupportsMultiSpeed())
+        {
+            mSpeedCurrent = 0;
+            NotifyAttributeChanged(SpeedCurrent::Id);
+        }
+    }
 }
 
 void FanControlCluster::SetDelegate(FanControl::Delegate * delegate)

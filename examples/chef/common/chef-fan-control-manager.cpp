@@ -22,6 +22,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
+#include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
@@ -464,10 +465,11 @@ Protocols::InteractionModel::Status ChefFanControlManager::OffCommand(EndpointId
 
 void HandleOnOffAttributeChangeForFan(EndpointId endpointId, bool value)
 {
-    if (value)
-        mFanControlManager->OnCommand(endpointId);
-    else
-        mFanControlManager->OffCommand(endpointId);
+    FanControlCluster * fanCluster = FanControl::FindClusterOnEndpoint(endpointId);
+    if (fanCluster != nullptr)
+    {
+        fanCluster->SetOnOffState(value);
+    }
 }
 
 void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
