@@ -200,11 +200,11 @@ void FanControlCluster::ApplySpeedSettingChanged()
         ChipLogError(Zcl, "FanControlCluster: mSpeedMax is 0; cannot compute PercentSetting");
         return;
     }
-    uint8_t speedSetting   = mSpeedSetting.Value();
-    chip::Percent percent  = static_cast<chip::Percent>((speedSetting * 100) / speedMax);
+    uint8_t speedSetting  = mSpeedSetting.Value();
+    chip::Percent percent = static_cast<chip::Percent>((speedSetting * 100) / speedMax);
     mPercentSetting.SetNonNull(percent);
-    mPercentCurrent        = percent;
-    mSpeedCurrent         = speedSetting;
+    mPercentCurrent = percent;
+    mSpeedCurrent   = speedSetting;
     NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
 }
