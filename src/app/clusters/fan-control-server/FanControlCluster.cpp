@@ -159,6 +159,35 @@ void FanControlCluster::ApplyFanModeAutoSideEffects()
     }
 }
 
+namespace {
+
+FanModeEnum ComputeFanModeFromPercent(chip::Percent percent, FanModeSequenceEnum fanModeSequence)
+{
+    if (percent == 0)
+        return FanModeEnum::kOff;
+
+    const bool hasThreeSpeeds = (fanModeSequence == FanModeSequenceEnum::kOffLowMedHigh ||
+                                 fanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto);
+    const bool hasLow = (fanModeSequence != FanModeSequenceEnum::kOffHigh &&
+                         fanModeSequence != FanModeSequenceEnum::kOffHighAuto);
+
+    if (hasThreeSpeeds)
+    {
+        if (percent <= 33)
+            return FanModeEnum::kLow;
+        if (percent <= 66)
+            return FanModeEnum::kMedium;
+        return FanModeEnum::kHigh;
+    }
+    if (hasLow)
+    {
+        return (percent <= 50) ? FanModeEnum::kLow : FanModeEnum::kHigh;
+    }
+    return FanModeEnum::kHigh;
+}
+
+} // namespace
+
 void FanControlCluster::ApplyPercentSettingChanged()
 {
     if (mPercentSetting.IsNull())
@@ -171,6 +200,14 @@ void FanControlCluster::ApplyPercentSettingChanged()
     }
 
     mPercentCurrent = mPercentSetting.Value();
+
+    FanModeEnum newMode = ComputeFanModeFromPercent(mPercentSetting.Value(), mFanModeSequence);
+    if (mFanMode != newMode)
+    {
+        mFanMode = newMode;
+        NotifyAttributeChanged(FanMode::Id);
+    }
+
     if (SupportsMultiSpeed())
     {
         uint8_t speedMax     = mSpeedMax;
@@ -205,6 +242,14 @@ void FanControlCluster::ApplySpeedSettingChanged()
     mPercentSetting.SetNonNull(percent);
     mPercentCurrent = percent;
     mSpeedCurrent   = speedSetting;
+
+    FanModeEnum newMode = ComputeFanModeFromPercent(percent, mFanModeSequence);
+    if (mFanMode != newMode)
+    {
+        mFanMode = newMode;
+        NotifyAttributeChanged(FanMode::Id);
+    }
+
     NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
 }
