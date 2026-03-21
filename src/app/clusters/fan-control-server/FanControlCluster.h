@@ -169,6 +169,8 @@ private:
     void ApplyPercentSettingChanged();
     void ApplySpeedSettingChanged();
 
+    void UpdateOnOffCluster(bool isOn);
+
     // Attributes
     FanControl::FanModeEnum mFanMode = FanControl::FanModeEnum::kOff;
     FanControl::FanModeSequenceEnum mFanModeSequence;
