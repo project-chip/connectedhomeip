@@ -18,6 +18,7 @@
 
 #include <air-purifier-manager.h>
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
+#include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/util/attribute-table.h>
 
 using namespace chip;
@@ -204,64 +205,13 @@ void AirPurifierManager::HandleOnOff(AttributeId attributeId, uint8_t type, uint
         return;
     }
     bool on = static_cast<bool>(*value);
-    uint8_t new_speed;
-    uint8_t new_percent;
-    if (on)
+
+    FanControlCluster * fanCluster = FanControl::FindClusterOnEndpoint(mEndpointId);
+    if (fanCluster != nullptr)
     {
-        // If either of these come back as NULL, that should mean the fan is operating in auto mode.
-        // I have no idea what that means for this case, so I'll just set them to high because this
-        // is just an example.
-        // In theory these should always be NULL together or not at all, so hopefully
-        // the checks for only percent.IsNull() or only speed.IsNull() are more theoretical
-        // than practical.
-        DataModel::Nullable<Percent> percent;
-        DataModel::Nullable<uint8_t> speed;
-        uint8_t speedMax = 0;
-        FanControl::GetPercentSetting(mEndpointId, percent);
-        FanControl::GetSpeedSetting(mEndpointId, speed);
-        FanControl::GetSpeedMax(mEndpointId, speedMax);
-        if (speedMax == 0)
-        {
-            ChipLogError(NotSpecified, "Out of bounds value for SpeedMax, setting to default (1)");
-            speedMax = 1;
-        }
-        if (percent.IsNull() && speed.IsNull())
-        {
-            // Operating in auto mode, set to 100
-            new_percent = 100;
-            new_speed   = speedMax;
-        }
-        else if (percent.IsNull())
-        {
-            // This should never happen, but nonetheless, let's check and warn.
-            ChipLogError(NotSpecified,
-                         "AirPurifierManager::HandleOnOff: PercentSetting is null when SpeedSetting is not. Setting PercentCurrent "
-                         "from Speed");
-            new_speed   = speed.Value();
-            new_percent = static_cast<uint8_t>(new_speed * 100u / speedMax);
-        }
-        else if (speed.IsNull())
-        {
-            // This should never happen, but nonetheless, let's check and warn.
-            ChipLogError(NotSpecified,
-                         "AirPurifierManager::HandleOnOff: SpeedSetting is null when PercentSetting is not. Setting SpeedCurrent "
-                         "from Percent");
-            new_percent = percent.Value();
-            new_speed   = static_cast<uint8_t>(new_percent * speedMax / 100u);
-        }
-        else
-        {
-            new_percent = percent.Value();
-            new_speed   = speed.Value();
-        }
+        fanCluster->SetOnOffState(on);
     }
-    else
-    {
-        new_percent = 0;
-        new_speed   = 0;
-    }
-    FanControl::SetSpeedSetting(mEndpointId, DataModel::Nullable<uint8_t>(new_speed));
-    FanControl::SetPercentSetting(mEndpointId, DataModel::Nullable<Percent>(new_percent));
+
     mOnOffClusterOn = on;
 }
 
