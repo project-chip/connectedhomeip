@@ -553,7 +553,6 @@ TEST_F(TestFanControlClusterWithAirflowDirection, SetAirflowDirection_ReturnsCon
 {
     ClusterTester tester(cluster);
 
-    auto status =
-        tester.WriteAttribute(FanControl::Attributes::AirflowDirection::Id, AirflowDirectionEnum::kUnknownEnumValue);
+    auto status = tester.WriteAttribute(FanControl::Attributes::AirflowDirection::Id, AirflowDirectionEnum::kUnknownEnumValue);
     EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
 }
