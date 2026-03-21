@@ -65,6 +65,7 @@ Protocols::InteractionModel::Status FanControlCluster::SetFanModeToOff()
     {
         mFanMode = FanModeEnum::kOff;
         ApplyFanModeOffSideEffects();
+        NotifyAttributeChanged(FanMode::Id);
     }
     return Status::Success;
 }
@@ -157,6 +158,7 @@ void FanControlCluster::ApplyPercentSettingChanged()
         uint8_t speedSetting = static_cast<uint8_t>((speedMax * percent + 99) / 100);
         mSpeedSetting.SetNonNull(speedSetting);
         NotifyAttributeChanged(SpeedSetting::Id);
+        NotifyAttributeChanged(SpeedCurrent::Id);
     }
 }
 
@@ -180,6 +182,7 @@ void FanControlCluster::ApplySpeedSettingChanged()
     chip::Percent percentSetting = static_cast<chip::Percent>((mSpeedSetting.Value() * 100) / speedMax);
     mPercentSetting.SetNonNull(percentSetting);
     NotifyAttributeChanged(PercentSetting::Id);
+    NotifyAttributeChanged(PercentCurrent::Id);
 }
 
 DataModel::ActionReturnStatus FanControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
