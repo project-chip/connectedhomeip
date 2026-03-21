@@ -14,6 +14,8 @@
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
+  "FanControlCluster.cpp",
+  "FanControlCluster.h",
   "fan-control-delegate.h",
   "fan-control-server.h",
 ]
