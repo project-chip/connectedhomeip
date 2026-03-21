@@ -74,12 +74,14 @@ Protocols::InteractionModel::Status FanControlCluster::SetFanModeToOff()
 void FanControlCluster::ApplyFanModeOffSideEffects()
 {
     mPercentSetting.SetNonNull(0);
+    mPercentCurrent = 0;
     NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
 
     if (SupportsMultiSpeed())
     {
         mSpeedSetting.SetNonNull(0);
+        mSpeedCurrent = 0;
         NotifyAttributeChanged(SpeedSetting::Id);
         NotifyAttributeChanged(SpeedCurrent::Id);
     }
@@ -88,12 +90,14 @@ void FanControlCluster::ApplyFanModeOffSideEffects()
 void FanControlCluster::ApplyFanModeLowSideEffects()
 {
     mPercentSetting.SetNonNull(33); // Spec mandates 33%
+    mPercentCurrent = 33;
     NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
 
     if (SupportsMultiSpeed())
     {
         mSpeedSetting.SetNonNull(1); // Spec mandates Speed 1
+        mSpeedCurrent = 1;
         NotifyAttributeChanged(SpeedSetting::Id);
         NotifyAttributeChanged(SpeedCurrent::Id);
     }
@@ -102,6 +106,7 @@ void FanControlCluster::ApplyFanModeLowSideEffects()
 void FanControlCluster::ApplyFanModeMediumSideEffects()
 {
     mPercentSetting.SetNonNull(66); // Spec mandates 66%
+    mPercentCurrent = 66;
     NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
 
@@ -110,6 +115,7 @@ void FanControlCluster::ApplyFanModeMediumSideEffects()
         // Spec mandates ceil(SpeedMax / 2) for Medium
         uint8_t speedSetting = (mSpeedMax > 1) ? static_cast<uint8_t>((mSpeedMax + 1) / 2) : 1;
         mSpeedSetting.SetNonNull(speedSetting);
+        mSpeedCurrent = speedSetting;
         NotifyAttributeChanged(SpeedSetting::Id);
         NotifyAttributeChanged(SpeedCurrent::Id);
     }
@@ -118,12 +124,14 @@ void FanControlCluster::ApplyFanModeMediumSideEffects()
 void FanControlCluster::ApplyFanModeHighSideEffects()
 {
     mPercentSetting.SetNonNull(100); // Spec mandates 100%
+    mPercentCurrent = 100;
     NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
 
     if (SupportsMultiSpeed())
     {
         mSpeedSetting.SetNonNull(mSpeedMax); // Spec mandates SpeedMax
+        mSpeedCurrent = mSpeedMax;
         NotifyAttributeChanged(SpeedSetting::Id);
         NotifyAttributeChanged(SpeedCurrent::Id);
     }
@@ -131,12 +139,20 @@ void FanControlCluster::ApplyFanModeHighSideEffects()
 
 void FanControlCluster::ApplyFanModeAutoSideEffects()
 {
+    if (!mPercentSetting.IsNull())
+    {
+        mPercentCurrent = mPercentSetting.Value();
+    }
     mPercentSetting.SetNull();
     NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
 
     if (SupportsMultiSpeed())
     {
+        if (!mSpeedSetting.IsNull())
+        {
+            mSpeedCurrent = mSpeedSetting.Value();
+        }
         mSpeedSetting.SetNull();
         NotifyAttributeChanged(SpeedSetting::Id);
         NotifyAttributeChanged(SpeedCurrent::Id);
@@ -154,12 +170,14 @@ void FanControlCluster::ApplyPercentSettingChanged()
         return;
     }
 
+    mPercentCurrent = mPercentSetting.Value();
     if (SupportsMultiSpeed())
     {
         uint8_t speedMax     = mSpeedMax;
         uint16_t percent     = mPercentSetting.Value();
         uint8_t speedSetting = static_cast<uint8_t>((speedMax * percent + 99) / 100);
         mSpeedSetting.SetNonNull(speedSetting);
+        mSpeedCurrent = speedSetting;
         NotifyAttributeChanged(SpeedSetting::Id);
         NotifyAttributeChanged(SpeedCurrent::Id);
     }
@@ -182,8 +200,11 @@ void FanControlCluster::ApplySpeedSettingChanged()
         ChipLogError(Zcl, "FanControlCluster: mSpeedMax is 0; cannot compute PercentSetting");
         return;
     }
-    chip::Percent percentSetting = static_cast<chip::Percent>((mSpeedSetting.Value() * 100) / speedMax);
-    mPercentSetting.SetNonNull(percentSetting);
+    uint8_t speedSetting   = mSpeedSetting.Value();
+    chip::Percent percent  = static_cast<chip::Percent>((speedSetting * 100) / speedMax);
+    mPercentSetting.SetNonNull(percent);
+    mPercentCurrent        = percent;
+    mSpeedCurrent         = speedSetting;
     NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
 }
@@ -204,7 +225,7 @@ DataModel::ActionReturnStatus FanControlCluster::ReadAttribute(const DataModel::
     case PercentSetting::Id:
         return encoder.Encode(mPercentSetting);
     case PercentCurrent::Id:
-        return encoder.Encode(mPercentSetting.IsNull() ? static_cast<chip::Percent>(0) : mPercentSetting.Value());
+        return encoder.Encode(mPercentCurrent);
     case SpeedMax::Id:
         if (!SupportsMultiSpeed())
             return Status::UnsupportedAttribute;
@@ -216,7 +237,7 @@ DataModel::ActionReturnStatus FanControlCluster::ReadAttribute(const DataModel::
     case SpeedCurrent::Id:
         if (!SupportsMultiSpeed())
             return Status::UnsupportedAttribute;
-        return encoder.Encode(mSpeedSetting.IsNull() ? static_cast<uint8_t>(0) : mSpeedSetting.Value());
+        return encoder.Encode(mSpeedCurrent);
     case RockSupport::Id:
         if (!SupportsRocking())
             return Status::UnsupportedAttribute;
@@ -416,6 +437,9 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
         SetFanMode(FanModeEnum::kAuto);
         return Status::Success;
     }
+
+    if (value.Value() > 100)
+        return Status::ConstraintError;
 
     mPercentSetting = value;
     ApplyPercentSettingChanged();

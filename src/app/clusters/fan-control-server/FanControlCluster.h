@@ -54,7 +54,7 @@ public:
         }
         Config & WithSpeedMax(uint8_t speedMax)
         {
-            mSpeedMax = speedMax;
+            mSpeedMax = (speedMax == 0) ? 1 : (speedMax > 100 ? 100 : speedMax);
             mFeatureMap.Set(FanControl::Feature::kMultiSpeed);
             mOptionalAttributes.Set<FanControl::Attributes::SpeedMax::Id>();
             mOptionalAttributes.Set<FanControl::Attributes::SpeedSetting::Id>();
@@ -121,9 +121,9 @@ public:
     FanControl::FanModeEnum GetFanMode() const { return mFanMode; }
     FanControl::FanModeSequenceEnum GetFanModeSequence() const { return mFanModeSequence; }
     DataModel::Nullable<chip::Percent> GetPercentSetting() const { return mPercentSetting; }
-    chip::Percent GetPercentCurrent() const { return mPercentSetting.ValueOr(0); }
+    chip::Percent GetPercentCurrent() const { return mPercentCurrent; }
     DataModel::Nullable<uint8_t> GetSpeedSetting() const { return mSpeedSetting; }
-    uint8_t GetSpeedCurrent() const { return mSpeedSetting.ValueOr(0); }
+    uint8_t GetSpeedCurrent() const { return mSpeedCurrent; }
     uint8_t GetSpeedMax() const { return mSpeedMax; }
     BitFlags<FanControl::Feature> GetFeatureMap() const { return mFeatureMap; }
     BitMask<FanControl::RockBitmap> GetRockSupport() const { return mRockSupport; }
@@ -172,6 +172,8 @@ private:
     FanControl::FanModeSequenceEnum mFanModeSequence;
     DataModel::Nullable<chip::Percent> mPercentSetting = DataModel::Nullable<chip::Percent>(0);
     DataModel::Nullable<uint8_t> mSpeedSetting         = DataModel::Nullable<uint8_t>(0);
+    chip::Percent mPercentCurrent                     = 0;
+    uint8_t mSpeedCurrent                             = 0;
     BitMask<FanControl::RockBitmap> mRockSetting;
     BitMask<FanControl::WindBitmap> mWindSetting;
     FanControl::AirflowDirectionEnum mAirflowDirection = FanControl::AirflowDirectionEnum::kForward;
