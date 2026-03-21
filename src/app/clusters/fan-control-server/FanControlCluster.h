@@ -161,8 +161,8 @@ private:
     // Attributes
     FanControl::FanModeEnum mFanMode = FanControl::FanModeEnum::kOff;
     FanControl::FanModeSequenceEnum mFanModeSequence;
-    DataModel::Nullable<chip::Percent> mPercentSetting;
-    DataModel::Nullable<uint8_t> mSpeedSetting;
+    DataModel::Nullable<chip::Percent> mPercentSetting = DataModel::Nullable<chip::Percent>(0);
+    DataModel::Nullable<uint8_t> mSpeedSetting         = DataModel::Nullable<uint8_t>(0);
     BitMask<FanControl::RockBitmap> mRockSetting;
     BitMask<FanControl::WindBitmap> mWindSetting;
     FanControl::AirflowDirectionEnum mAirflowDirection = FanControl::AirflowDirectionEnum::kForward;
