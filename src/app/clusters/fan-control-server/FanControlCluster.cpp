@@ -340,11 +340,17 @@ std::optional<DataModel::ActionReturnStatus> FanControlCluster::InvokeCommand(co
 
 DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
 {
-    uint8_t seq = chip::to_underlying(mFanModeSequence);
-    if (value == FanModeEnum::kLow && seq >= 4)
+    if (value == FanModeEnum::kLow &&
+        (mFanModeSequence == FanModeSequenceEnum::kOffHighAuto || mFanModeSequence == FanModeSequenceEnum::kOffHigh))
+    {
         return Status::ConstraintError;
-    if (value == FanModeEnum::kMedium && seq != 0 && seq != 2)
+    }
+    if (value == FanModeEnum::kMedium &&
+        !(mFanModeSequence == FanModeSequenceEnum::kOffLowMedHigh ||
+          mFanModeSequence == FanModeSequenceEnum::kOffLowMedHighAuto))
+    {
         return Status::ConstraintError;
+    }
     if (value == FanModeEnum::kAuto && !SupportsAuto())
         return Status::ConstraintError;
 
