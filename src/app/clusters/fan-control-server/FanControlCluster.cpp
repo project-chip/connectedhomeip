@@ -472,10 +472,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
         ApplyFanModeAutoSideEffects();
     }
 
-    if (newMode != FanModeEnum::kOff)
-    {
-        UpdateOnOffCluster(true);
-    }
+    UpdateOnOffCluster(newMode != FanModeEnum::kOff);
     return NotifyAttributeChangedIfSuccess(FanMode::Id, Status::Success);
 }
 
