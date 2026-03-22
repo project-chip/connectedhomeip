@@ -22,6 +22,8 @@
 #include <DeviceEnergyManagementManager.h>
 #include <ElectricalSensorManager.h>
 #include <EnergyEvseManager.h>
+#include <app/clusters/power-source-server/PowerSourceCluster.h>
+#include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
 
 using chip::Protocols::InteractionModel::Status;
 namespace chip {
@@ -198,7 +200,7 @@ private:
     EnergyEvseManager * mEvseInstance;
     ElectricalSensorManager * mESManager;
     DeviceEnergyManagementManager * mDEMInstance;
-    PowerSource::LazyInstance mPSInstance;
+    LazyRegisteredServerCluster<PowerSourceCluster> mPSInstance;
 
     int64_t mLastChargingEnergyMeter    = 0;
     int64_t mLastDischargingEnergyMeter = 0;

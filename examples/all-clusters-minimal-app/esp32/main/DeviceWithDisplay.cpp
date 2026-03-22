@@ -657,7 +657,7 @@ void SetupPretendDevices()
     if (powerSource != nullptr)
     {
         CHIP_ERROR err;
-        err = powerSource->SetBatPercentRemaining(static_cast<uint8_t>(70 * 2)) != CHIP_NO_ERROR;
+        err = powerSource->SetBatPercentRemaining(static_cast<uint8_t>(70 * 2));
         if (err != CHIP_NO_ERROR)
         {
             ESP_LOGE(TAG, "Failed to set battery percent remaining: %" CHIP_ERROR_FORMAT, err.Format());

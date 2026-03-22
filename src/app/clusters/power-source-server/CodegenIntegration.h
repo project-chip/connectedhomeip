@@ -19,28 +19,10 @@
 
 #include "PowerSourceCluster.h"
 
-#include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
-
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace PowerSource {
-
-// A minimal wrapper for creating and registering a `PowerSource` cluster instance.
-// The instance is `lazy` because it doesn't construct a `PowerSourceCluster` when created.
-// `PowerSourceCluster` is created with the `Create` method.
-struct LazyInstance
-{
-    LazyRegisteredServerCluster<PowerSourceCluster> server;
-    void Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes,
-                const PowerSourceCluster::WiredConfiguration & config);
-    void Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes,
-                const PowerSourceCluster::BatteryConfiguration & config);
-    CHIP_ERROR Register();
-    CHIP_ERROR Unregister();
-    PowerSourceCluster & Cluster();
-    const PowerSourceCluster & Cluster() const;
-};
 
 PowerSourceCluster * FindClusterOnEndpoint(EndpointId id);
 

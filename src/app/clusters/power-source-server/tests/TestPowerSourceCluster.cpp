@@ -413,7 +413,7 @@ TEST_F(TestPowerSourceCluster, TestSetterBounds)
 
     CharSpan description            = CharSpan(longTestText, Description::TypeInfo::MaxLength());
     CharSpan replacementDescription = CharSpan(longTestText, BatReplacementDescription::TypeInfo::MaxLength());
-    CharSpan ansiDesignation        = CharSpan(longTestTest, BatANSIDesignation::TypeInfo::MaxLength());
+    CharSpan ansiDesignation        = CharSpan(longTestText, BatANSIDesignation::TypeInfo::MaxLength());
     CharSpan iecDesignation         = CharSpan(longTestText, BatIECDesignation::TypeInfo::MaxLength());
 
     PowerSourceCluster::BatteryConfiguration config(description, BatReplaceabilityEnum::kUnspecified);

@@ -450,9 +450,11 @@ CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpo
     config.nominalVoltage = 230'000; // 230V in mv
     config.maximumCurrent = 32'000;  // 32A in mA
 
-    AttributeId optionalAttributes[] = { WiredNominalVoltage::Id, WiredMaximumCurrent::Id };
+    PowerSourceCluster::OptionalAttributeSet optionalAttributes{};
+    optionalAttributes.Set<WiredNominalVoltage::Id>();
+    optionalAttributes.Set<WiredMaximumCurrent::Id>();
 
-    mPSInstance.Create(endpointId, Span(optionalAttributes), config);
+    mPSInstance.Create(endpointId, optionalAttributes, DeviceLayer::SystemLayer(), config);
 
     ReturnErrorOnFailure(mPSInstance.Cluster().SetStatus(PowerSourceStatusEnum::kActive));
 
@@ -464,7 +466,7 @@ CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpo
     ReturnErrorOnFailure(mPSInstance.Cluster().SetEndpointList(endpointList));
 
     // Register the cluster so that the `DataModelProvider` can see it.
-    return mPSInstance.Register();
+    return CodegenDataModelProvider::Instance().Registry().Register(mPSInstance.Registration());
 }
 
 void EVSEManufacturer::UpdateEVFakeReadings(const Amperage_mA maximumChargeCurrent)

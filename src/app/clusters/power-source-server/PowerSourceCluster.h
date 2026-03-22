@@ -26,6 +26,7 @@
 #include <clusters/PowerSource/Enums.h>
 #include <clusters/PowerSource/Events.h>
 #include <lib/support/ScopedMemoryBuffer.h>
+
 #include <variant>
 
 namespace chip {

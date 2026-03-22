@@ -243,52 +243,6 @@ void MatterPowerSourcePluginServerInitCallback() {}
 
 namespace chip::app::Clusters::PowerSource {
 
-void LazyInstance::Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes,
-                          const PowerSourceCluster::WiredConfiguration & config)
-{
-    uint32_t optAttrBits{};
-    for (auto attrId : optionalAttributes)
-    {
-        optAttrBits |= (1 << attrId);
-    }
-
-    server.Create(endpointId, PowerSourceCluster::OptionalAttributeSet(optAttrBits), DeviceLayer::SystemLayer(), config);
-}
-
-void LazyInstance::Create(EndpointId endpointId, Span<const AttributeId> optionalAttributes,
-                          const PowerSourceCluster::BatteryConfiguration & config)
-{
-    uint32_t optAttrBits{};
-    for (auto attrId : optionalAttributes)
-    {
-        optAttrBits |= (1 << attrId);
-    }
-
-    server.Create(endpointId, PowerSourceCluster::OptionalAttributeSet(optAttrBits), DeviceLayer::SystemLayer(), config);
-}
-
-CHIP_ERROR LazyInstance::Register()
-{
-    // This will call `Startup()` on the cluster
-    return CodegenDataModelProvider::Instance().Registry().Register(server.Registration());
-}
-
-CHIP_ERROR LazyInstance::Unregister()
-{
-    // This will call `Shutdown()` on the cluster
-    return CodegenDataModelProvider::Instance().Registry().Unregister(&server.Cluster());
-}
-
-PowerSourceCluster & LazyInstance::Cluster()
-{
-    return server.Cluster();
-}
-
-const PowerSourceCluster & LazyInstance::Cluster() const
-{
-    return server.Cluster();
-}
-
 PowerSourceCluster * FindClusterOnEndpoint(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
