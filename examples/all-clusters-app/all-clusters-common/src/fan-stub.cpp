@@ -171,8 +171,8 @@ void FanControlManager::OnFanStateChanged(bool isOn)
     }
 }
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type,
-    uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     if (attributePath.mClusterId == chip::app::Clusters::OnOff::Id &&
         attributePath.mAttributeId == chip::app::Clusters::OnOff::Attributes::OnOff::Id)
