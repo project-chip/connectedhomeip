@@ -70,16 +70,12 @@ Protocols::InteractionModel::Status FanControlCluster::SetFanModeToOff()
 
 void FanControlCluster::ApplyFanModeOffSideEffects()
 {
-    mPercentSetting.SetNonNull(0);
     mPercentCurrent = 0;
-    NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
 
     if (SupportsMultiSpeed())
     {
-        mSpeedSetting.SetNonNull(0);
         mSpeedCurrent = 0;
-        NotifyAttributeChanged(SpeedSetting::Id);
         NotifyAttributeChanged(SpeedCurrent::Id);
     }
 }
@@ -568,16 +564,40 @@ void FanControlCluster::SetOnOffState(bool isOn)
     }
     else
     {
+        if (!mPercentSetting.IsNull() && mPercentSetting.Value() == 0)
+        {
+            mPercentSetting.SetNonNull(100);
+            NotifyAttributeChanged(PercentSetting::Id);
+        }
+
         mPercentCurrent = mPercentSetting.ValueOr(100);
         NotifyAttributeChanged(PercentCurrent::Id);
+
         if (SupportsMultiSpeed())
         {
+            if (!mSpeedSetting.IsNull() && mSpeedSetting.Value() == 0)
+            {
+                mSpeedSetting.SetNonNull(mSpeedMax);
+                NotifyAttributeChanged(SpeedSetting::Id);
+            }
             mSpeedCurrent = mSpeedSetting.ValueOr(mSpeedMax);
             NotifyAttributeChanged(SpeedCurrent::Id);
         }
+
+        if (mFanMode == FanModeEnum::kOff)
+        {
+            if (mPercentSetting.IsNull())
+            {
+                mFanMode = SupportsAuto() ? FanModeEnum::kAuto : FanModeEnum::kHigh;
+            }
+            else
+            {
+                mFanMode = ComputeFanModeFromPercent(mPercentCurrent, mFanModeSequence);
+            }
+            NotifyAttributeChanged(FanMode::Id);
+        }
     }
 }
-
 void FanControlCluster::UpdateOnOffCluster(bool isOn)
 {
     if (mDelegate != nullptr)
