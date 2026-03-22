@@ -59,7 +59,7 @@ public:
         // Initialize FanModeSequence from attribute storage if available, otherwise use default.
         FanModeSequenceEnum defaultFanModeSequence =
             features.Has(FanControl::Feature::kAuto) ? FanModeSequenceEnum::kOffLowHighAuto : FanModeSequenceEnum::kOffLowHigh;
-            
+
         FanModeSequenceEnum fanModeSequence = defaultFanModeSequence;
 
         (void) emberAfReadAttribute(endpointId, FanControl::Id, FanModeSequence::Id, reinterpret_cast<uint8_t *>(&fanModeSequence),
