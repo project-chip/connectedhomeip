@@ -174,7 +174,7 @@ TEST_F(TestPowerSourceCluster, AttributeTest)
         optSet.Set<WiredMaximumCurrent::Id>(); // should be left at true
         optSet.Set<BatCapacity::Id>();         // should be set back to false
 
-        PowerSourceCluster::WiredConfiguration config(CharSpan{}, PowerSourceCluster::WiredCurrentTypeEnum::kAc);
+        PowerSourceCluster::WiredConfiguration config(CharSpan{}, WiredCurrentTypeEnum::kAc);
         PowerSourceCluster cluster(kRootEndpointId, optSet, DeviceLayer::SystemLayer(), config);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -205,7 +205,7 @@ TEST_F(TestPowerSourceCluster, AttributeTest)
             optSet.Set<BatTimeToFullCharge::Id>();  // should be set to true if rechargeable otherwise should be false
             optSet.Set<BatCapacity::Id>(); // should be set to true if replaceable or rechargeable otherwise should be false
 
-            PowerSourceCluster::BatteryConfiguration config(CharSpan{}, PowerSourceCluster::BatReplaceabilityEnum::kUnspecified);
+            PowerSourceCluster::BatteryConfiguration config(CharSpan{}, BatReplaceabilityEnum::kUnspecified);
             if (replaceable)
             {
                 config.MakeReplaceable(CharSpan{}, 0);
@@ -269,7 +269,7 @@ TEST_F(TestPowerSourceCluster, ReadAttributeTest)
 
     // Wired
     {
-        PowerSourceCluster::WiredConfiguration config(CharSpan{}, PowerSourceCluster::WiredCurrentTypeEnum::kDc);
+        PowerSourceCluster::WiredConfiguration config(CharSpan{}, WiredCurrentTypeEnum::kDc);
         PowerSourceCluster cluster(kRootEndpointId, allOptAttributes, DeviceLayer::SystemLayer(), config);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
@@ -285,7 +285,7 @@ TEST_F(TestPowerSourceCluster, ReadAttributeTest)
     {
         for (bool rechargeable : { false, true })
         {
-            PowerSourceCluster::BatteryConfiguration config(CharSpan{}, PowerSourceCluster::BatReplaceabilityEnum::kUnspecified);
+            PowerSourceCluster::BatteryConfiguration config(CharSpan{}, BatReplaceabilityEnum::kUnspecified);
             if (replaceable)
             {
                 config.MakeReplaceable(CharSpan{}, 0);
@@ -309,7 +309,7 @@ TEST_F(TestPowerSourceCluster, ReadAttributeTest)
 TEST_F(TestPowerSourceCluster, TestSetters)
 {
     // Rechargeable battery
-    PowerSourceCluster::BatteryConfiguration config(CharSpan{}, PowerSourceCluster::BatReplaceabilityEnum::kUnspecified);
+    PowerSourceCluster::BatteryConfiguration config(CharSpan{}, BatReplaceabilityEnum::kUnspecified);
     config.MakeRechargeable();
 
     PowerSourceCluster::OptionalAttributeSet optSet{};
@@ -372,7 +372,7 @@ TEST_F(TestPowerSourceCluster, TestGetters)
 
     // Wired
     {
-        PowerSourceCluster::WiredConfiguration config(CharSpan{}, PowerSourceCluster::WiredCurrentTypeEnum::kDc);
+        PowerSourceCluster::WiredConfiguration config(CharSpan{}, WiredCurrentTypeEnum::kDc);
         PowerSourceCluster cluster(kRootEndpointId, allOptAttributes, DeviceLayer::SystemLayer(), config);
 
         // if a getter is called when not supported, the test will die.
@@ -384,7 +384,7 @@ TEST_F(TestPowerSourceCluster, TestGetters)
     {
         for (bool rechargeable : { false, true })
         {
-            PowerSourceCluster::BatteryConfiguration config(CharSpan{}, PowerSourceCluster::BatReplaceabilityEnum::kUnspecified);
+            PowerSourceCluster::BatteryConfiguration config(CharSpan{}, BatReplaceabilityEnum::kUnspecified);
             if (replaceable)
             {
                 config.MakeReplaceable(CharSpan{}, 0);
@@ -399,11 +399,76 @@ TEST_F(TestPowerSourceCluster, TestGetters)
             RunAllSupportedGetters(cluster, true, replaceable, rechargeable);
         }
     }
-}
+}auto * cluster = FindClusterOnEndpoint(endpoint); 
 
 TEST_F(TestPowerSourceCluster, TestSetterBounds)
 {
-    {}
+    // Constraints on string sizes can't be tested for failing cases,
+    // because they are set in the constructor which when failing will die.
+    // So we can at least test that the maximum allowed length works.
+
+    char longTestText[] = "Very very long text used for descriptions and designations, totally longer than one hundred bytes. For testing purposes";
+
+    CharSpan description = CharSpan(longTestText, Description::TypeInfo::MaxLength());
+    CharSpan replacementDescription = CharSpan(longTestText, BatReplacementDescription::TypeInfo::MaxLength());
+    CharSpan ansiDesignation = CharSpan(longTestTest, BatANSIDesignation::TypeInfo::MaxLength());
+    CharSpan iecDesignation = CharSpan(longTestText, BatIECDesignation::TypeInfo::MaxLength());
+
+    PowerSourceCluster::BatteryConfiguration config(description, BatReplaceabilityEnum::kUnspecified);
+    config.MakeReplaceable(replacementDescription, 0);
+    config.ansiDesignation = ansiDesignation;
+    config.iecDesignation = iecDesignation;
+
+    PowerSourceCluster::OptionalAttributeSet allOptAttributes(
+        UINT32_MAX); // all attributes set to true, the cluster will filter out invalid ones
+
+    // This should not fail
+    PowerSourceCluster cluster(kRootEndpointId, allOptAttributes, DeviceLayer::SystemLayer(), config);
+
+    // Test BatPercentRemaining, which can be only from 0 to 200, or null.
+
+    EXPECT_EQ(cluster.SetBatPercentRemaining(NullOptional), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(0)), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(50)), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(150)), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(200)), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(201)), CHIP_ERROR_INVALID_INTEGER_VALUE);
+}
+
+TEST_F(TestPowerSourceCluster, TestPersistence)
+{
+    // Order attribute is marked with `Persistent` marker.
+
+    PowerSourceCluster::OptionalAttributeSet noOptAttributes(0);
+
+    uint8_t testOrder = 3;
+
+    PowerSourceCluster::WiredConfiguration config(CharSpan(), WiredCurrentTypeEnum::kAc);
+
+    {
+        PowerSourceCluster cluster(kRootEndpointId, noOptAttributes, DeviceLayer::SystemLayer(), config);
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        EXPECT_EQ(cluster.SetOrder(testOrder), CHIP_NO_ERROR);
+        EXPECT_EQ(cluster.GetOrder(), testOrder);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    {
+        PowerSourceCluster cluster(kRootEndpointId, noOptAttributes, DeviceLayer::SystemLayer(), config);
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        ClusterTester tester(cluster);
+
+        uint8_t readOrder{};
+        ASSERT_EQ(tester.ReadAttribute(Order::Id, readOrder), CHIP_NO_ERROR);
+        EXPECT_EQ(readOrder, testOrder);
+        EXPECT_EQ(cluster.GetOrder(), testOrder);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
 }
 
 } // namespace
