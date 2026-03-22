@@ -399,7 +399,8 @@ TEST_F(TestPowerSourceCluster, TestGetters)
             RunAllSupportedGetters(cluster, true, replaceable, rechargeable);
         }
     }
-}auto * cluster = FindClusterOnEndpoint(endpoint);
+}
+auto * cluster = FindClusterOnEndpoint(endpoint);
 
 TEST_F(TestPowerSourceCluster, TestSetterBounds)
 {
@@ -407,17 +408,18 @@ TEST_F(TestPowerSourceCluster, TestSetterBounds)
     // because they are set in the constructor which when failing will die.
     // So we can at least test that the maximum allowed length works.
 
-    char longTestText[] = "Very very long text used for descriptions and designations, totally longer than one hundred bytes. For testing purposes";
+    char longTestText[] =
+        "Very very long text used for descriptions and designations, totally longer than one hundred bytes. For testing purposes";
 
-    CharSpan description = CharSpan(longTestText, Description::TypeInfo::MaxLength());
+    CharSpan description            = CharSpan(longTestText, Description::TypeInfo::MaxLength());
     CharSpan replacementDescription = CharSpan(longTestText, BatReplacementDescription::TypeInfo::MaxLength());
-    CharSpan ansiDesignation = CharSpan(longTestTest, BatANSIDesignation::TypeInfo::MaxLength());
-    CharSpan iecDesignation = CharSpan(longTestText, BatIECDesignation::TypeInfo::MaxLength());
+    CharSpan ansiDesignation        = CharSpan(longTestTest, BatANSIDesignation::TypeInfo::MaxLength());
+    CharSpan iecDesignation         = CharSpan(longTestText, BatIECDesignation::TypeInfo::MaxLength());
 
     PowerSourceCluster::BatteryConfiguration config(description, BatReplaceabilityEnum::kUnspecified);
     config.MakeReplaceable(replacementDescription, 0);
     config.ansiDesignation = ansiDesignation;
-    config.iecDesignation = iecDesignation;
+    config.iecDesignation  = iecDesignation;
 
     PowerSourceCluster::OptionalAttributeSet allOptAttributes(
         UINT32_MAX); // all attributes set to true, the cluster will filter out invalid ones
