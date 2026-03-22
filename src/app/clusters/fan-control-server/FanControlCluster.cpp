@@ -70,12 +70,16 @@ Protocols::InteractionModel::Status FanControlCluster::SetFanModeToOff()
 
 void FanControlCluster::ApplyFanModeOffSideEffects()
 {
+    mPercentSetting.SetNonNull(0);
     mPercentCurrent = 0;
+    NotifyAttributeChanged(PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
 
     if (SupportsMultiSpeed())
     {
+        mSpeedSetting.SetNonNull(0);
         mSpeedCurrent = 0;
+        NotifyAttributeChanged(SpeedSetting::Id);
         NotifyAttributeChanged(SpeedCurrent::Id);
     }
 }
