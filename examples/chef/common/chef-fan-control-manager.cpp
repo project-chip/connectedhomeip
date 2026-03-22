@@ -328,7 +328,7 @@ DataModel::Nullable<uint8_t> ChefFanControlManager::GetSpeedSetting()
 void ChefFanControlManager::OnFanStateChanged(bool isOn)
 {
     bool currentOnOff = false;
-    Status status = OnOff::Attributes::OnOff::Get(mEndpointId, &currentOnOff);
+    Status status     = OnOff::Attributes::OnOff::Get(mEndpointId, &currentOnOff);
 
     if (status == Status::Success)
     {
@@ -343,7 +343,6 @@ void ChefFanControlManager::OnFanStateChanged(bool isOn)
         ChipLogError(NotSpecified, "AirPurifierManager: Failed to get OnOff attribute: %d", to_underlying(status));
     }
 }
-
 
 } // anonymous namespace
 
