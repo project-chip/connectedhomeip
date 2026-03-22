@@ -6,8 +6,8 @@ source. A power source can be either a battery or a wired power source.
 ## Overview
 
 This directory contains an implementation of Matter Power Source cluster. This
-implementation handles the persistence of the `Order` attribute, and notifies the
-data model when an attribute changes in the way that the spec mandates.
+implementation handles the persistence of the `Order` attribute, and notifies
+the data model when an attribute changes in the way that the spec mandates.
 
 ## Usage
 
