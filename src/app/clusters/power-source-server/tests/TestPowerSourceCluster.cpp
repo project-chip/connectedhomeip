@@ -399,7 +399,7 @@ TEST_F(TestPowerSourceCluster, TestGetters)
             RunAllSupportedGetters(cluster, true, replaceable, rechargeable);
         }
     }
-}auto * cluster = FindClusterOnEndpoint(endpoint); 
+}auto * cluster = FindClusterOnEndpoint(endpoint);
 
 TEST_F(TestPowerSourceCluster, TestSetterBounds)
 {
