@@ -328,14 +328,14 @@ DataModel::Nullable<uint8_t> ChefFanControlManager::GetSpeedSetting()
 void ChefFanControlManager::OnFanStateChanged(bool isOn)
 {
     bool currentOnOff = false;
-    Status status     = OnOff::Attributes::OnOff::Get(mEndpointId, &currentOnOff);
+    Status status     = OnOff::Attributes::OnOff::Get(mEndpoint, &currentOnOff);
 
     if (status == Status::Success)
     {
         if (currentOnOff != isOn)
         {
             ChipLogProgress(NotSpecified, "AirPurifierManager: Synchronizing OnOff cluster to %d", isOn);
-            OnOff::Attributes::OnOff::Set(mEndpointId, isOn);
+            OnOff::Attributes::OnOff::Set(mEndpoint, isOn);
         }
     }
     else
