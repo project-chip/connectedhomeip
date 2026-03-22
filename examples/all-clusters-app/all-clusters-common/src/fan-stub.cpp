@@ -156,7 +156,7 @@ void FanControlManager::OnFanStateChanged(bool isOn)
 {
     bool currentOnOff = false;
     Status status = OnOff::Attributes::OnOff::Get(mEndpointId, &currentOnOff);
-    
+
     if (status == Status::Success)
     {
         if (currentOnOff != isOn)
