@@ -429,12 +429,12 @@ TEST_F(TestPowerSourceCluster, TestSetterBounds)
     // Test BatPercentRemaining, which can be only from 0 to 200, or null.
 
     EXPECT_EQ(cluster.SetBatPercentRemaining(NullOptional), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(0)), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(50)), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(150)), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(200)), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(uint8_t{ 0 })), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(uint8_t{ 50 })), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(uint8_t{ 150 })), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(uint8_t{ 200 })), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(201)), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    EXPECT_EQ(cluster.SetBatPercentRemaining(MakeOptional(uint8_t{ 201 })), CHIP_ERROR_INVALID_INTEGER_VALUE);
 }
 
 TEST_F(TestPowerSourceCluster, TestPersistence)
