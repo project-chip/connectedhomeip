@@ -50,6 +50,10 @@ public:
             {
                 mFeatureMap.Set(FanControl::Feature::kAuto);
             }
+            else
+            {
+                mFeatureMap.Clear(FanControl::Feature::kAuto);
+            }
             return *this;
         }
         Config & WithSpeedMax(uint8_t speedMax)

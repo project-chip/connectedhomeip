@@ -558,13 +558,12 @@ void FanControlCluster::SetOnOffState(bool isOn)
 {
     if (!isOn)
     {
-        mPercentCurrent = 0;
-        NotifyAttributeChanged(PercentCurrent::Id);
-        if (SupportsMultiSpeed())
+        if (mFanMode != FanModeEnum::kOff)
         {
-            mSpeedCurrent = 0;
-            NotifyAttributeChanged(SpeedCurrent::Id);
+            mFanMode = FanModeEnum::kOff;
+            NotifyAttributeChanged(FanMode::Id);
         }
+        ApplyFanModeOffSideEffects();
     }
     else
     {
