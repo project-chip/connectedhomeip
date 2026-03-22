@@ -161,13 +161,13 @@ void FanControlManager::OnFanStateChanged(bool isOn)
     {
         if (currentOnOff != isOn)
         {
-            ChipLogProgress(NotSpecified, "AirPurifierManager: Synchronizing OnOff cluster to %d", isOn);
+            ChipLogProgress(NotSpecified, "FanControlManager: Synchronizing OnOff cluster to %d", isOn);
             OnOff::Attributes::OnOff::Set(mEndpoint, isOn);
         }
     }
     else
     {
-        ChipLogError(NotSpecified, "AirPurifierManager: Failed to get OnOff attribute: %d", to_underlying(status));
+        ChipLogError(NotSpecified, "FanControlManager: Failed to get OnOff attribute: %d", to_underlying(status));
     }
 }
 
