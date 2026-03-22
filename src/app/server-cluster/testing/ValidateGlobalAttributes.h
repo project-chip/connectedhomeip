@@ -69,7 +69,8 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, T expected)
     return EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
 }
 
-// Overload for std::initializer_list to not get "template argument deduction failed" when calling `IsAttributesListEqualTo(cluster, {...})`
+// Overload for std::initializer_list to not get "template argument deduction failed" when calling `IsAttributesListEqualTo(cluster,
+// {...})`
 template <typename T = const app::DataModel::AttributeEntry>
 bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::initializer_list<T> expected)
 {
@@ -116,7 +117,8 @@ bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster, T expe
     return EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
 }
 
-// Overload for std::initializer_list to not get "template argument deduction failed" when calling `IsAcceptedCommandsListEqualTo(cluster, {...})`
+// Overload for std::initializer_list to not get "template argument deduction failed" when calling
+// `IsAcceptedCommandsListEqualTo(cluster, {...})`
 template <typename T = const app::DataModel::AcceptedCommandEntry>
 bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster, std::initializer_list<T> expected)
 {
@@ -139,7 +141,7 @@ bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster, std::i
 /// ClusterImpl cluster(kTestEndpointId, ...);
 /// ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster, { Commands::SomeCommandResponse::kMetadataEntry }));
 /// ```
-template<class T>
+template <class T>
 bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, T expected)
 {
     VerifyOrDie(cluster.GetPaths().size() == 1);
@@ -162,7 +164,8 @@ bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, T exp
     return EqualGeneratedCommandSets(commandsBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
 }
 
-// Overload for std::initializer_list to not get "template argument deduction failed" when calling `IsGeneratedCommandsListEqualTo(cluster, {...})`
+// Overload for std::initializer_list to not get "template argument deduction failed" when calling
+// `IsGeneratedCommandsListEqualTo(cluster, {...})`
 template <typename T = const CommandId>
 bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, std::initializer_list<T> expected)
 {
