@@ -20,6 +20,7 @@
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/util/attribute-table.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -154,6 +155,25 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
     }
 
     return FanControl::SetSpeedSetting(mEndpointId, DataModel::Nullable<uint8_t>(newSpeedSetting));
+}
+
+void AirPurifierManager::OnFanStateChanged(bool isOn)
+{
+    bool currentOnOff = false;
+    Status status = OnOff::Attributes::OnOff::Get(mEndpointId, &currentOnOff);
+    
+    if (status == Status::Success)
+    {
+        if (currentOnOff != isOn)
+        {
+            ChipLogProgress(NotSpecified, "AirPurifierManager: Synchronizing OnOff cluster to %d", isOn);
+            OnOff::Attributes::OnOff::Set(mEndpointId, isOn);
+        }
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "AirPurifierManager: Failed to get OnOff attribute: %d", to_underlying(status));
+    }
 }
 
 void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
