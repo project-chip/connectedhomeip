@@ -155,7 +155,7 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
 void FanControlManager::OnFanStateChanged(bool isOn)
 {
     bool currentOnOff = false;
-    Status status = OnOff::Attributes::OnOff::Get(mEndpointId, &currentOnOff);
+    Status status     = OnOff::Attributes::OnOff::Get(mEndpointId, &currentOnOff);
 
     if (status == Status::Success)
     {
