@@ -57,10 +57,19 @@ public:
         FanControlCluster::Config config(endpointId, GetDelegate(endpointId));
 
         // Initialize FanModeSequence from attribute storage if available, otherwise use default.
-        FanModeSequenceEnum fanModeSequence =
+        FanModeSequenceEnum defaultFanModeSequence =
             features.Has(FanControl::Feature::kAuto) ? FanModeSequenceEnum::kOffLowHighAuto : FanModeSequenceEnum::kOffLowHigh;
+            
+        FanModeSequenceEnum fanModeSequence = defaultFanModeSequence;
+
         (void) emberAfReadAttribute(endpointId, FanControl::Id, FanModeSequence::Id, reinterpret_cast<uint8_t *>(&fanModeSequence),
                                     sizeof(fanModeSequence));
+
+        if (EnsureKnownEnumValue(fanModeSequence) == FanModeSequenceEnum::kUnknownEnumValue)
+        {
+            fanModeSequence = defaultFanModeSequence;
+        }
+
         config.WithFanModeSequence(fanModeSequence);
 
         if (features.Has(FanControl::Feature::kMultiSpeed))
