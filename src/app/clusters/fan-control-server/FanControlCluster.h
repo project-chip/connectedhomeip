@@ -173,8 +173,6 @@ private:
     void ApplyPercentSettingChanged();
     void ApplySpeedSettingChanged();
 
-    void UpdateOnOffCluster(bool isOn);
-
     // Attributes
     FanControl::FanModeEnum mFanMode = FanControl::FanModeEnum::kOff;
     FanControl::FanModeSequenceEnum mFanModeSequence;
@@ -187,6 +185,7 @@ private:
     FanControl::AirflowDirectionEnum mAirflowDirection = FanControl::AirflowDirectionEnum::kForward;
 
     bool mSupportsStep = false;
+    bool mIsOnOffOn    = false;
     uint8_t mSpeedMax;
     BitMask<FanControl::RockBitmap> mRockSupport;
     BitMask<FanControl::WindBitmap> mWindSupport;

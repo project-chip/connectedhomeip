@@ -46,8 +46,6 @@ public:
      */
     virtual Protocols::InteractionModel::Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) = 0;
 
-    virtual void OnFanStateChanged(bool isOn) {}
-
     Delegate(EndpointId aEndpoint) : mEndpoint(aEndpoint) {}
 
     virtual ~Delegate() = default;

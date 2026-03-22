@@ -313,6 +313,9 @@ TEST_F(TestFanControlClusterWithMultiSpeedAndAuto, FanModeAuto_NullsPercentSetti
 {
     ClusterTester tester(cluster);
 
+    // OnOff must be on for Current attributes to track the setting values.
+    cluster.SetOnOffState(true);
+
     DataModel::Nullable<chip::Percent> percentSetting;
     percentSetting.SetNonNull(50);
     ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);

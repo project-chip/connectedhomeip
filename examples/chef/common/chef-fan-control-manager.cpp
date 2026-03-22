@@ -50,7 +50,6 @@ public:
     Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
     DataModel::Nullable<uint8_t> GetSpeedSetting();
     DataModel::Nullable<Percent> GetPercentSetting();
-    void OnFanStateChanged(bool isOn) override;
 
 private:
     uint8_t mPercentCurrent = 0;
@@ -323,25 +322,6 @@ DataModel::Nullable<uint8_t> ChefFanControlManager::GetSpeedSetting()
     }
 
     return speedSetting;
-}
-
-void ChefFanControlManager::OnFanStateChanged(bool isOn)
-{
-    bool currentOnOff = false;
-    Status status     = OnOff::Attributes::OnOff::Get(mEndpoint, &currentOnOff);
-
-    if (status == Status::Success)
-    {
-        if (currentOnOff != isOn)
-        {
-            ChipLogProgress(NotSpecified, "ChefFanControlManager: Synchronizing OnOff cluster to %d", isOn);
-            OnOff::Attributes::OnOff::Set(mEndpoint, isOn);
-        }
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "ChefFanControlManager: Failed to get OnOff attribute: %d", to_underlying(status));
-    }
 }
 
 } // anonymous namespace
