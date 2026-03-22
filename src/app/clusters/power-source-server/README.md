@@ -77,7 +77,7 @@ void BatPercentRemainingChangedCallback(uint8_t newValue)
     chip::app::Clusters::PowerSourceCluster * cluster = chip::app::Clusters::PowerSource::FindClusterOnEndpoint(endpointId);
     if (cluster != nullptr)
     {
-        LogErrorOnFailure(cluster->SetBatPercentRemaining(isOccupied));
+        LogErrorOnFailure(cluster->SetBatPercentRemaining(MakeOptional(newValue)));
     }
     else
     {

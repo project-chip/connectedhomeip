@@ -400,7 +400,6 @@ TEST_F(TestPowerSourceCluster, TestGetters)
         }
     }
 }
-auto * cluster = FindClusterOnEndpoint(endpoint);
 
 TEST_F(TestPowerSourceCluster, TestSetterBounds)
 {
