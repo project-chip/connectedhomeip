@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 struct p256_test_vector
 {
     const uint8_t d[32];

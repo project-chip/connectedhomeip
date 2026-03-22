@@ -1322,6 +1322,7 @@ CHIP_ERROR P256Keypair::HazardousOperationLoadKeypairFromRaw(ByteSpan private_ke
 
 __attribute__((weak)) CHIP_ERROR P256Keypair::InitializeFromBitsOrReject(FixedByteSpan<kP256_PrivateKey_Length> privateKeyBits)
 {
+    IgnoreUnusedVariable(privateKeyBits);
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
