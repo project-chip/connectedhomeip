@@ -825,7 +825,8 @@ void Server::RejoinExistingMulticastGroups()
                     ? Transport::PeerAddress::Groupcast()
                     : Transport::PeerAddress::Multicast(fabric.GetFabricId(), groupInfo.group_id);
 #else
-                const Transport::PeerAddress & address = Transport::PeerAddress::Multicast(fabric.GetFabricId(), groupInfo.group_id);
+                const Transport::PeerAddress & address =
+                    Transport::PeerAddress::Multicast(fabric.GetFabricId(), groupInfo.group_id);
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
                 err = mTransports.MulticastGroupJoinLeave(address, true);
                 if (err != CHIP_NO_ERROR)
