@@ -24,6 +24,9 @@
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <lib/core/OTAImageHeader.h>
 #include <ota-provider-common/BdxOtaSender.h>
+
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 /**
@@ -42,7 +45,7 @@ public:
     static constexpr size_t kFilepathBufLen      = 256;
     static constexpr size_t kUriMaxLen           = 256;
 
-    typedef struct DeviceSoftwareVersionModel
+    struct DeviceSoftwareVersionModel
     {
         chip::VendorId vendorId;
         uint16_t productId;
@@ -52,8 +55,14 @@ public:
         bool softwareVersionValid;
         uint32_t minApplicableSoftwareVersion;
         uint32_t maxApplicableSoftwareVersion;
+<<<<<<< HEAD
         char otaURL[OTA_URL_MAX_LEN];
     } DeviceSoftwareVersionModel;
+=======
+        char otaURL[kOtaUrlMaxLen];
+        std::string otaFileDesignator;
+    };
+>>>>>>> ef634e957f ([OTA Provider] make file designator opaque for linux and ESP32 example Apps (#43559))
 
     //////////// OTAProviderDelegate Implementation ///////////////
     void HandleQueryImage(
@@ -91,6 +100,22 @@ public:
 
     void SetMaxBDXBlockSize(uint16_t blockSize) { mMaxBDXBlockSize = blockSize; }
 
+<<<<<<< HEAD
+=======
+    uint16_t GetVendorId() const { return mVendorId; }
+    uint16_t GetProductId() const { return mProductId; }
+    uint16_t GetHardwareVersion() const { return mHardwareVersion; }
+    uint32_t GetSoftwareVersion() const { return mRequestorSoftwareVersion; }
+    chip::Span<const DownloadProtocolEnum> GetProtocolsSupported() const
+    {
+        return chip::Span<const DownloadProtocolEnum>(mProtocolsSupported);
+    }
+    bool GetRequestorCanConsent() const { return mRequestorCanConsent; }
+    const char * GetLocation() const { return mLocation; }
+
+    const char * GetFilePathForDesignator(const char * designator) const;
+
+>>>>>>> ef634e957f ([OTA Provider] make file designator opaque for linux and ESP32 example Apps (#43559))
 private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
@@ -110,10 +135,14 @@ private:
     SendQueryImageResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                            const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
 
+    std::string MapFileToDesignator(const std::string & filePath);
+
     BdxOtaSender mBdxOtaSender;
     std::vector<DeviceSoftwareVersionModel> mCandidates;
-    char mOTAFilePath[kFilepathBufLen]; // null-terminated
+    std::unordered_map<std::string, std::string> mFileDesignatorMap;
+    std::string mSelectedFileDesignator;
     char mImageUri[kUriMaxLen];
+    bool mImageUriIsSupplied = false;
     OTAQueryStatus mQueryImageStatus;
     OTAApplyUpdateAction mUpdateAction;
     uint32_t mIgnoreQueryImageCount;
