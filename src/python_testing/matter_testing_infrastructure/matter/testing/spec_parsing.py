@@ -1557,13 +1557,18 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                     max_instances = None
                     constraint = composed_dt.find('constraint')
                     if constraint is not None:
-                        min_el = constraint.find('min')
-                        if min_el is not None and 'value' in min_el.attrib:
-                            min_instances = int(min_el.attrib['value'], 0)
+                        allowed_el = constraint.find('allowed')
+                        if allowed_el is not None and 'value' in allowed_el.attrib:
+                            min_instances = int(allowed_el.attrib['value'], 0)
+                            max_instances = int(allowed_el.attrib['value'], 0)
+                        else:
+                            min_el = constraint.find('min')
+                            if min_el is not None and 'value' in min_el.attrib:
+                                min_instances = int(min_el.attrib['value'], 0)
 
-                        max_el = constraint.find('max')
-                        if max_el is not None and 'value' in max_el.attrib:
-                            max_instances = int(max_el.attrib['value'], 0)
+                            max_el = constraint.find('max')
+                            if max_el is not None and 'value' in max_el.attrib:
+                                max_instances = int(max_el.attrib['value'], 0)
 
                     device_types[id].composed_device_types.append(XmlComposedDeviceTypeRequirement(
                         device_type_id=composed_id,
