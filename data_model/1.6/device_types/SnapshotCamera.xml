@@ -105,4 +105,9 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
   </clusters>
+  <composedDeviceTypes>
+    <deviceType deviceTypeId="0x0107" deviceTypeName="Occupancy Sensor">
+      <optionalConform/>
+    </deviceType>
+  </composedDeviceTypes>
 </deviceType>

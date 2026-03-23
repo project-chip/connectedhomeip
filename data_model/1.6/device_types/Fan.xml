@@ -90,4 +90,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </cluster>
   </clusters>
+  <composedDeviceTypes>
+    <deviceType deviceTypeId="0x0301" deviceTypeName="Thermostat">
+      <optionalConform/>
+    </deviceType>
+  </composedDeviceTypes>
 </deviceType>

@@ -87,4 +87,9 @@ Davis, CA 95616, USA
       </features>
     </cluster>
   </clusters>
+  <composedDeviceTypes>
+    <deviceType deviceTypeId="0x0100" deviceTypeName="On/Off Light">
+      <optionalConform/>
+    </deviceType>
+  </composedDeviceTypes>
 </deviceType>

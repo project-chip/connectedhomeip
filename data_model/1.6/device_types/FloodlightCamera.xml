@@ -62,4 +62,18 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
+  <composedDeviceTypes>
+    <deviceType deviceTypeId="0x0142" deviceTypeName="Camera">
+      <mandatoryConform/>
+      <constraint>
+        <allowed value="1"/>
+      </constraint>
+    </deviceType>
+    <deviceType deviceTypeId="0x0100" deviceTypeName="On/Off Light">
+      <mandatoryConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </deviceType>
+  </composedDeviceTypes>
 </deviceType>

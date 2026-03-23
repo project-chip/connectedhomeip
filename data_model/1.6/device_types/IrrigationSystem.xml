@@ -76,4 +76,12 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
   </clusters>
+  <composedDeviceTypes>
+    <deviceType deviceTypeId="0x0042" deviceTypeName="Water Valve">
+      <mandatoryConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </deviceType>
+  </composedDeviceTypes>
 </deviceType>

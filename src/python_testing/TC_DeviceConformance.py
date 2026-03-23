@@ -97,6 +97,7 @@ class TC_DeviceConformance(DeviceConformanceTests):
         if not success:
             self.fail_current_test("Problems with Device type revisions on one or more endpoints")
 
+
     def steps_TC_IDM_14_1(self):
         return [TestStep(0, "TH performs a wildcard read of all attributes and endpoints on the device"),
                 TestStep(1, """ For each root-node-restricted cluster in the list, ensure the cluster does not appear on any endpoint that is not the root node.

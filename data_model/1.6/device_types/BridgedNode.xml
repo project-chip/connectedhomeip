@@ -98,4 +98,9 @@ Davis, CA 95616, USA
       </otherwiseConform>
     </cluster>
   </clusters>
+  <composedDeviceTypes>
+    <deviceType deviceTypeId="0x0011" deviceTypeName="Power Source">
+      <optionalConform/>
+    </deviceType>
+  </composedDeviceTypes>
 </deviceType>

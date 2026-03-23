@@ -69,7 +69,14 @@ Davis, CA 95616, USA
     </cluster>
   </clusters>
   <composedDeviceTypes>
+    <deviceType deviceTypeId="0x050D" deviceTypeName="Device Energy Management">
+      <mandatoryConform/>
+    </deviceType>
     <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor">
+      <mandatoryConform/>
+      <constraint>
+        <min value="2"/>
+      </constraint>
       <clusterRequirements>
         <cluster id="0x0090" name="Electrical Power Measurement">
           <mandatoryConform/>
@@ -85,10 +92,17 @@ Davis, CA 95616, USA
         </cluster>
       </clusterRequirements>
     </deviceType>
-  </composedDeviceTypes>
-  <composedDeviceTypes>
-    <cluster id="0x0003" name="Identify" side="server">
+    <deviceType deviceTypeId="0x0011" deviceTypeName="Power Source">
+      <mandatoryConform/>
+      <constraint>
+        <min value="2"/>
+      </constraint>
+    </deviceType>
+    <deviceType deviceTypeId="0x0017" deviceTypeName="Solar Power">
       <optionalConform/>
-    </cluster>
+    </deviceType>
+    <deviceType deviceTypeId="0x0302" deviceTypeName="Temperature Sensor">
+      <optionalConform/>
+    </deviceType>
   </composedDeviceTypes>
 </deviceType>

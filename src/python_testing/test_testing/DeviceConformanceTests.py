@@ -28,7 +28,7 @@ from matter.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                             ProblemNotice, ProblemSeverity)
 from matter.testing.spec_parsing import (CommandType, PrebuiltDataModelDirectory, XmlDeviceType, XmlDeviceTypeClusterRequirements,
-                                         build_xml_device_types, build_xml_namespaces)
+                                         build_xml_device_types, build_xml_namespaces, conformance_support)
 from matter.tlv import uint
 
 
@@ -472,6 +472,44 @@ class DeviceConformanceTests(BasicCompositionTests):
             for extra in extra_clusters:
                 location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=extra)
                 fn(location=location, problem=f"Extra cluster found on endpoint with device types {device_type_list}")
+
+        # First, count instances of each device type across the entire device
+        device_type_counts: dict[int, int] = {}
+        for endpoint_id, endpoint in self.endpoints.items():
+            if Clusters.Descriptor not in endpoint:
+                continue
+            device_types = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
+            for dt in device_types:
+                device_type_counts[dt.deviceType] = device_type_counts.get(dt.deviceType, 0) + 1
+
+        # Now evaluate composed device type requirements for each device type found
+        for endpoint_id, endpoint in self.endpoints.items():
+            if Clusters.Descriptor not in endpoint:
+                continue
+
+            device_types = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
+            for dt in device_types:
+                device_type_id = dt.deviceType
+                if device_type_id not in self.xml_device_types:
+                    continue
+                
+                xml_device = self.xml_device_types[device_type_id]
+                for req in xml_device.composed_device_types:
+                    # Conformance Assessment
+                    conformance_decision = req.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES)
+                    count = device_type_counts.get(req.device_type_id, 0)
+                    location = DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id)
+
+                    if conformance_decision.is_mandatory() and count == 0:
+                        record_error(location, f"Mandatory composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} is missing on the device")
+                    elif not conformance_allowed(conformance_decision, allow_provisional) and count > 0:
+                        record_error(location, f"Disallowed composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} is present on the device")
+                    
+                    if conformance_allowed(conformance_decision, allow_provisional):
+                        if req.min_instances is not None and count < req.min_instances:
+                            record_error(location, f"Composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} expects at least {req.min_instances} instances, but found {count}")
+                        if req.max_instances is not None and count > req.max_instances:
+                            record_error(location, f"Composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} expects at most {req.max_instances} instances, but found {count}")
 
         return success, problems
 

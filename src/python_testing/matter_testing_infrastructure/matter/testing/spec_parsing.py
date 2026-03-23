@@ -247,6 +247,15 @@ class XmlTag:
 
 
 @dataclass
+class XmlComposedDeviceTypeRequirement:
+    device_type_id: int
+    device_type_name: str
+    conformance: ConformanceCallable
+    min_instances: Optional[int] = None
+    max_instances: Optional[int] = None
+
+
+@dataclass
 class XmlDeviceType:
     name: str
     revision: int
@@ -258,6 +267,7 @@ class XmlDeviceType:
     revision_desc: dict[int, str]
     superset_of_device_type_name: Optional[str] = None
     superset_of_device_type_id: int = 0
+    composed_device_types: list['XmlComposedDeviceTypeRequirement'] = field(default_factory=list)
 
     def __str__(self):
         msg = f'{self.name} - Revision {self.revision}, Class {self.classification_class}, Scope {self.classification_scope}\n'
@@ -1516,6 +1526,55 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 severity=ProblemSeverity.WARNING, problem=f"Unable to parse conformance for cluster - {ex}"))
             # NOTE: Spec currently does a bad job of matching these exactly to the names and codes
             # so this will need a bit of fancy handling here to get this right.
+
+        try:
+            main_composed_elements = d.findall('composedDeviceTypes')
+            for composed in main_composed_elements:
+                for composed_dt in composed.findall('deviceType'):
+                    try:
+                        composed_id = int(composed_dt.attrib['deviceTypeId'], 0)
+                        composed_name = composed_dt.attrib['deviceTypeName']
+                    except (KeyError, ValueError):
+                        problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                        severity=ProblemSeverity.WARNING, problem="Invalid composed device type id or name"))
+                        continue
+
+                    # Conformance
+                    conformance_xml, tmp_problem = get_conformance(composed_dt, id)
+                    if tmp_problem:
+                        problems.append(tmp_problem)
+                        continue
+                    
+                    try:
+                        conformance = parse_callable_from_xml(conformance_xml, ConformanceParseParameters(feature_map={}, attribute_map={}, command_map={}))
+                    except ConformanceException as ex:
+                        problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                        severity=ProblemSeverity.WARNING, problem=f"Unable to parse conformance for composed device type - {ex}"))
+                        continue
+
+                    min_instances = None
+                    max_instances = None
+                    constraint = composed_dt.find('constraint')
+                    if constraint is not None:
+                        min_el = constraint.find('min')
+                        if min_el is not None and 'value' in min_el.attrib:
+                            min_instances = int(min_el.attrib['value'], 0)
+                        
+                        max_el = constraint.find('max')
+                        if max_el is not None and 'value' in max_el.attrib:
+                            max_instances = int(max_el.attrib['value'], 0)
+
+                    device_types[id].composed_device_types.append(XmlComposedDeviceTypeRequirement(
+                        device_type_id=composed_id,
+                        device_type_name=composed_name,
+                        conformance=conformance,
+                        min_instances=min_instances,
+                        max_instances=max_instances
+                    ))
+        except Exception as e:
+            problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                            severity=ProblemSeverity.WARNING, problem=f"Error parsing composedDeviceTypes: {e}"))
+
     return device_types, problems
 
 

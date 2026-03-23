@@ -77,4 +77,22 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </cluster>
   </clusters>
+  <composedDeviceTypes>
+    <deviceType deviceTypeId="0x0513" deviceTypeName="Electrical Energy Tariff">
+      <optionalConform choice="a" more="true" min="1">
+        <condition name="ElectricalEnergy"/>
+      </optionalConform>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </deviceType>
+    <deviceType deviceTypeId="0x0514" deviceTypeName="Electrical Meter">
+      <optionalConform choice="a" more="true" min="1">
+        <condition name="ElectricalEnergy"/>
+      </optionalConform>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </deviceType>
+  </composedDeviceTypes>
 </deviceType>

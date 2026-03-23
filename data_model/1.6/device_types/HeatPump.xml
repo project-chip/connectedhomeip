@@ -71,7 +71,14 @@ Davis, CA 95616, USA
     </cluster>
   </clusters>
   <composedDeviceTypes>
+    <deviceType deviceTypeId="0x050D" deviceTypeName="Device Energy Management">
+      <mandatoryConform/>
+    </deviceType>
     <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor">
+      <mandatoryConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
       <clusterRequirements>
         <cluster id="0x0090" name="Electrical Power Measurement">
           <mandatoryConform/>
@@ -81,20 +88,22 @@ Davis, CA 95616, USA
         </cluster>
       </clusterRequirements>
     </deviceType>
+    <deviceType deviceTypeId="0x0011" deviceTypeName="Power Source">
+      <mandatoryConform/>
+    </deviceType>
+    <deviceType deviceTypeId="0x0302" deviceTypeName="Temperature Sensor">
+      <optionalConform/>
+    </deviceType>
     <deviceType deviceTypeId="0x0301" deviceTypeName="Thermostat">
+      <optionalConform/>
       <clusterRequirements>
         <cluster id="0x0041" name="User Label">
           <mandatoryConform/>
         </cluster>
       </clusterRequirements>
     </deviceType>
-  </composedDeviceTypes>
-  <composedDeviceTypes>
-    <cluster id="0x0003" name="Identify" side="server">
+    <deviceType deviceTypeId="0x050F" deviceTypeName="Water Heater">
       <optionalConform/>
-    </cluster>
-    <cluster id="0x0201" name="Thermostat" side="client">
-      <optionalConform/>
-    </cluster>
+    </deviceType>
   </composedDeviceTypes>
 </deviceType>

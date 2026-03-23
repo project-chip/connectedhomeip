@@ -76,4 +76,12 @@ Davis, CA 95616, USA
       </otherwiseConform>
     </cluster>
   </clusters>
+  <composedDeviceTypes>
+    <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor">
+      <mandatoryConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </deviceType>
+  </composedDeviceTypes>
 </deviceType>
