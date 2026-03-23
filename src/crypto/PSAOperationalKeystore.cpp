@@ -29,6 +29,9 @@ namespace Crypto {
 /* psa_key_id_t is uint32_t: max value has 10 digits */
 static constexpr uint8_t keyBufSize = 16;
 
+static constexpr uint16_t deltaOpKeyRange =
+    static_cast<psa_key_id_t>(to_underlying(KeyIdBase::OperationalSecondary) - to_underlying(KeyIdBase::DACPrivKey));
+
 PSAOperationalKeystore::PersistentP256Keypair::PersistentP256Keypair(FabricIndex fabricIndex, PersistentStorageDelegate * storage,
                                                                      bool reusePsaKey)
 {
@@ -57,9 +60,9 @@ PSAOperationalKeystore::PersistentP256Keypair::PersistentP256Keypair(FabricIndex
                 // pending becomes committed in CommitOpKeypairForFabric().
                 // committed cannot be removed at this stage because an expired failsafe timer
                 // triggered by an UpdateNOC() revert will remove the pending one.
-                keyId = ((storedKeyId - static_cast<psa_key_id_t>(KeyIdBase::Operational)) <= kMaxValidFabricIndex)
-                    ? (storedKeyId + kMaxValidFabricIndex)
-                    : (storedKeyId - kMaxValidFabricIndex);
+                keyId = ((storedKeyId - to_underlying(KeyIdBase::Operational)) <= kMaxValidFabricIndex)
+                    ? (storedKeyId + deltaOpKeyRange)
+                    : (storedKeyId - deltaOpKeyRange);
             }
             else
             {

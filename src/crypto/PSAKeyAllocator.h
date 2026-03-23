@@ -44,11 +44,12 @@ static_assert(kMaxICDClientKeys >= CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC 
  */
 enum class KeyIdBase : psa_key_id_t
 {
-    Minimum          = CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE,
-    Operational      = Minimum, ///< Base of the PSA key ID range for Node Operational Certificate private keys
-    DACPrivKey       = Operational + 2 * kMaxValidFabricIndex + 1,
-    ICDKeyRangeStart = DACPrivKey + 1,
-    Maximum          = ICDKeyRangeStart + kMaxICDClientKeys,
+    Minimum              = CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE,
+    Operational          = Minimum, ///< Base of the PSA key ID range for Node Operational Certificate private keys
+    DACPrivKey           = Operational + kMaxValidFabricIndex + 1,
+    ICDKeyRangeStart     = DACPrivKey + 1,
+    OperationalSecondary = ICDKeyRangeStart + kMaxICDClientKeys + 1,
+    Maximum              = OperationalSecondary + kMaxValidFabricIndex,
 };
 
 static_assert(to_underlying(KeyIdBase::Minimum) >= CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE &&
