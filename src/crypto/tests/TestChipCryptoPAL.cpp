@@ -1529,7 +1529,8 @@ TEST_F(TestChipCryptoPAL, TestP256_InitializeFromBitsOrReject)
     for (int ofs = -4; ofs < 2; ofs++)
     {
         memcpy(bits, kP256CurveOrder, sizeof(bits));
-        bits[kP256_PrivateKey_Length - 1] += ofs; // LSB of curve order is 0x51, no over/underflow handling needed
+        bits[kP256_PrivateKey_Length - 1] = static_cast<uint8_t>(
+            bits[kP256_PrivateKey_Length - 1] + ofs); // LSB of curve order is 0x51, no over/underflow handling needed
 
         keypair.Clear();
         CHIP_ERROR expected = (ofs <= -2) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
