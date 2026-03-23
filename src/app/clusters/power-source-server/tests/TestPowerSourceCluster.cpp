@@ -35,9 +35,17 @@ using namespace chip::Testing;
 
 struct TestPowerSourceCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void SetUpTestSuite()
+    {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(DeviceLayer::SystemLayer().Init(), CHIP_NO_ERROR);
+    }
 
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void TearDownTestSuite()
+    {
+        DeviceLayer::SystemLayer().Shutdown();
+        chip::Platform::MemoryShutdown();
+    }
 
     TestPowerSourceCluster() {}
 
