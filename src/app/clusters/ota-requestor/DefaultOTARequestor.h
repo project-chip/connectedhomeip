@@ -27,6 +27,7 @@
 #include <protocols/bdx/BdxMessages.h>
 
 #include "BDXDownloader.h"
+#include "OTARequestorAttributes.h"
 #include "OTARequestorDriver.h"
 #include "OTARequestorInterface.h"
 #include "OTARequestorStorage.h"
@@ -73,7 +74,10 @@ public:
     CHIP_ERROR GetUpdateStateAttribute(EndpointId endpointId, OTAUpdateStateEnum & state) override;
 
     // Get the current state of the OTA update
-    OTAUpdateStateEnum GetCurrentUpdateState() override { return mCurrentUpdateState; }
+    OTAUpdateStateEnum GetCurrentUpdateState() override
+    {
+        return mAttributes ? mAttributes->GetUpdateState() : OTAUpdateStateEnum::kUnknown;
+    }
 
     // Get the target version of the OTA update
     uint32_t GetTargetVersion() override { return mTargetVersion; }
@@ -113,7 +117,8 @@ public:
      * Called to perform some initialization. Note that some states that must be initalized in the CHIP context will be deferred to
      * InitState.
      */
-    CHIP_ERROR Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver, BDXDownloader & downloader);
+    CHIP_ERROR Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver, BDXDownloader & downloader,
+                    OTARequestorAttributes & attributes);
 
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
@@ -320,6 +325,7 @@ private:
     OTARequestorStorage * mStorage           = nullptr;
     OTARequestorDriver * mOtaRequestorDriver = nullptr;
     CASESessionManager * mCASESessionManager = nullptr;
+    OTARequestorAttributes * mAttributes     = nullptr;
     OnConnectedAction mOnConnectedAction     = kQueryImage;
     BDXDownloader * mBdxDownloader           = nullptr; // TODO: this should be OTADownloader
     BDXMessenger mBdxMessenger;                         // TODO: ideally this is held by the application
@@ -330,8 +336,6 @@ private:
     uint32_t mTargetVersion  = 0;
     char mFileDesignatorBuffer[bdx::kMaxFileDesignatorLen];
     CharSpan mFileDesignator;
-    OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
-    app::DataModel::Nullable<uint8_t> mCurrentUpdateStateProgress;
     Server * mServer = nullptr;
     ProviderLocationList mDefaultOtaProviderList;
     // Provider location used for the current/last update in progress. Note that on reboot, this value will be read from the

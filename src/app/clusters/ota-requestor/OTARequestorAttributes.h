@@ -17,7 +17,8 @@
  */
 
 /* This file contains the declaration for the OTARequestorAttributes class, which
- * stores the attributes in memory and notifies when an attribute changes.
+ * stores most attributes in memory and notifies when an attribute changes. The
+ * DefaultOTAProviders attribute is handled by ProviderLocationList instead.
  */
 
 #pragma once
@@ -30,8 +31,8 @@
 
 namespace chip {
 
-// Class that tracks the attributes in the OTA Requestor cluster. Marks attributes
-// dirty when they're changed.
+// Class that tracks the non-array attributes in the OTA Requestor cluster. Marks
+// attributes dirty when they're changed.
 class OTARequestorAttributes
 {
 public:

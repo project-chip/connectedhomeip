@@ -115,13 +115,14 @@ OTARequestorInterface * GetRequestorInstance()
 }
 
 CHIP_ERROR DefaultOTARequestor::Init(Server & server, OTARequestorStorage & storage, OTARequestorDriver & driver,
-                                     BDXDownloader & downloader)
+                                     BDXDownloader & downloader, OTARequestorAttributes & attributes)
 {
     mServer             = &server;
     mCASESessionManager = server.GetCASESessionManager();
     mStorage            = &storage;
     mOtaRequestorDriver = &driver;
     mBdxDownloader      = &downloader;
+    mAttributes         = &attributes;
 
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(mCurrentVersion));
 
@@ -401,13 +402,27 @@ void DefaultOTARequestor::CancelImageUpdate()
 
 CHIP_ERROR DefaultOTARequestor::GetUpdateStateProgressAttribute(EndpointId endpointId, DataModel::Nullable<uint8_t> & progress)
 {
-    progress = mCurrentUpdateStateProgress;
+    if (mAttributes)
+    {
+        progress = mAttributes->GetUpdateStateProgress();
+    }
+    else
+    {
+        progress = DataModel::NullNullable;
+    }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DefaultOTARequestor::GetUpdateStateAttribute(EndpointId endpointId, OTAUpdateStateEnum & state)
 {
-    state = mCurrentUpdateState;
+    if (mAttributes)
+    {
+        state = mAttributes->GetUpdateState();
+    }
+    else
+    {
+        state = OTAUpdateStateEnum::kUnknown;
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -646,7 +661,7 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
 
 void DefaultOTARequestor::OnUpdateProgressChanged(Nullable<uint8_t> percent)
 {
-    mCurrentUpdateStateProgress = percent;
+    (void) mAttributes->SetUpdateStateProgress(percent);
 }
 
 IdleStateReason DefaultOTARequestor::MapErrorToIdleStateReason(CHIP_ERROR error)
@@ -668,7 +683,7 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
     // The UpdateStateProgress attribute only applies to the downloading state
     if (newState != OTAUpdateStateEnum::kDownloading)
     {
-        mCurrentUpdateStateProgress.SetNull();
+        ReturnOnFailure(mAttributes->SetUpdateStateProgress(DataModel::NullNullable));
     }
 
     // Log the StateTransition event
@@ -679,9 +694,9 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
         targetSoftwareVersion.SetNonNull(mTargetVersion);
     }
 
-    OTAUpdateStateEnum prevState = mCurrentUpdateState;
+    OTAUpdateStateEnum prevState = mAttributes->GetUpdateState();
     // Update the new state before handling the state transition
-    mCurrentUpdateState = newState;
+    ReturnOnFailure(mAttributes->SetUpdateState(newState));
 
     if (prevState != newState)
     {
@@ -924,7 +939,7 @@ void DefaultOTARequestor::StoreCurrentUpdateInfo()
 
     if ((error == CHIP_NO_ERROR) || (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
     {
-        error = mStorage->StoreCurrentUpdateState(mCurrentUpdateState);
+        error = mStorage->StoreCurrentUpdateState(mAttributes->GetUpdateState());
     }
 
     if ((error == CHIP_NO_ERROR) || (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
@@ -961,10 +976,9 @@ void DefaultOTARequestor::LoadCurrentUpdateInfo()
         mUpdateToken = updateToken;
     }
 
-    if (mStorage->LoadCurrentUpdateState(mCurrentUpdateState) != CHIP_NO_ERROR)
-    {
-        mCurrentUpdateState = OTAUpdateStateEnum::kIdle;
-    }
+    OTAUpdateStateEnum updateState = OTAUpdateStateEnum::kIdle;
+    (void) mStorage->LoadCurrentUpdateState(updateState);
+    (void) mAttributes->SetUpdateState(updateState);
 
     if (mStorage->LoadTargetVersion(mTargetVersion) != CHIP_NO_ERROR)
     {
