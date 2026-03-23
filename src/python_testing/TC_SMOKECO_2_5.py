@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS /tmp/kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f --app-pipe /tmp/smokeco_2_4_fifo
+#     app-args: --discriminator 1234 --KVS /tmp/kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f --app-pipe /tmp/smokeco_2_5_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -49,7 +49,7 @@
 #       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.MANUALDEVICEMUTE:0x005c00000000009b
 #       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.MANUALDEVICEMUTE.CLEAR:0x005c0000000000ab
 #       --endpoint 1
-#       --app-pipe /tmp/smokeco_2_4_fifo
+#       --app-pipe /tmp/smokeco_2_5_fifo
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
 #     quiet: true

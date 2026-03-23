@@ -91,8 +91,6 @@ class SmokeCoBaseTest(MatterBaseTest):
         """ Scans instance attributes starting with 'pixit_'. 
         Converts values from bytes to big-endian integers.
         """
-        # We use list() to avoid 'dictionary changed size during iteration' 
-        # though we are only modifying values, it's a safe practice.
         for attr_name in list(vars(self)):
             if attr_name.startswith('pixit_'):
                 value = getattr(self, attr_name)
