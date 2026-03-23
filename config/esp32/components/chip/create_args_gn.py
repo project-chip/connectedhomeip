@@ -45,6 +45,8 @@ compile_commands_path = os.path.join(args.build_dir, "compile_commands.json")
 # eg: @\"/Users/esp/connectedhomeip/examples/lighting-app/esp32/build/toolchain/asmflags\"
 #     @\"/Users/esp/connectedhomeip/examples/lighting-app/esp32/build/toolchain/cflags\"
 # this function reads that file and returns the flags
+
+
 def expand_response_file(flag):
     """Expand response file references (flags starting with @) into their contents."""
     # Handle both @path and @"path" formats
