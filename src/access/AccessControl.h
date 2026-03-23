@@ -428,10 +428,12 @@ public:
 
     ~AccessControl()
     {
+#if CHIP_CONFIG_ENABLE_GROUPCAST
         if (IsGroupAuxiliaryDelegateRegistered())
         {
             mGroupAuxDelegate->Release();
         }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
         // Never-initialized AccessControl instances will not have the delegate set.
         if (IsInitialized())
@@ -649,6 +651,7 @@ public:
         return mDelegate->Entries(iterator, fabricIndex);
     }
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     /**
      * Iterates over auxiliary entries for the given fabric.
      *
@@ -661,6 +664,7 @@ public:
         VerifyOrReturnError(IsGroupAuxiliaryDelegateRegistered(), CHIP_ERROR_INCORRECT_STATE);
         return mGroupAuxDelegate->AuxiliaryEntries(iterator, &fabricIndex);
     }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     // Adds a listener to the end of the listener list, if not already in the list.
     void AddEntryListener(EntryListener & listener);
@@ -668,6 +672,7 @@ public:
     // Removes a listener from the listener list, if in the list.
     void RemoveEntryListener(EntryListener & listener);
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     /**
      * @brief Registers a delegate to handle auxiliary access control entries. There
      * can only be 1 group auxiliary access control delegate registered at a time. To
@@ -701,6 +706,7 @@ public:
             mGroupAuxDelegate = nullptr;
         }
     }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     // Set an optional AcceessRestriction object for MNGD feature.
@@ -757,6 +763,7 @@ private:
 private:
     Delegate * mDelegate = nullptr;
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     // This is an access control delegate that is specifically set to handle auxiliary ACL entries
     // based on group information. It is part of server init params, and can also be set at runtime using
     // RegisterGroupAuxiliaryDelegate(). It is needed for functionality in the groupcast cluster protected by
@@ -765,6 +772,7 @@ private:
     // entries. It is also expected to implement a Check() function to actually use these entries
     // to approve/deny access control.
     Delegate * mGroupAuxDelegate = nullptr;
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     DeviceTypeResolver * mDeviceTypeResolver = nullptr;
 

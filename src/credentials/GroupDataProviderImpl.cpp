@@ -332,6 +332,8 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistableData<kPersist
         // next
         ReturnErrorOnFailure(reader.Next(TagNext()));
         ReturnErrorOnFailure(reader.Get(next));
+
+#if CHIP_CONFIG_ENABLE_GROUPCAST
         // Groupcast
         CHIP_ERROR err = reader.Next(TagFlags());
         if (CHIP_NO_ERROR == err)
@@ -341,6 +343,8 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistableData<kPersist
             ReturnErrorOnFailure(reader.Get(value));
             flags = value;
         }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
+
         return reader.ExitContainer(container);
     }
 
@@ -868,11 +872,13 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, c
 
     if (group.Find(mStorage, fabric, info.group_id))
     {
+#if CHIP_CONFIG_ENABLE_GROUPCAST
         // Existing group_id
         if (group.endpoint_count > 0 && (group.HasAuxiliaryACL() != info.HasAuxiliaryACL()))
         {
             mAuxAclNotificationNeeded = true;
         }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
         group.Copy(info);
         ReturnErrorOnFailure(group.Save(mStorage));
         GroupModified(fabric_index, info.group_id);
@@ -928,11 +934,13 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
 
     if (found)
     {
+#if CHIP_CONFIG_ENABLE_GROUPCAST
         // Update existing entry
         if (group.endpoint_count > 0 && (group.HasAuxiliaryACL() != info.HasAuxiliaryACL()))
         {
             mAuxAclNotificationNeeded = true;
         }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
         return group.Save(mStorage);
     }
     if (index < fabric.group_count)
@@ -1002,7 +1010,9 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_ind
     ReturnErrorOnFailure(fabric.Load(mStorage));
     VerifyOrReturnError(group.Get(mStorage, fabric, index), CHIP_ERROR_NOT_FOUND);
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     bool notifyNeeded = (group.HasAuxiliaryACL() && group.endpoint_count > 0);
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     // Remove endpoints
     EndpointData endpoint(fabric_index, group.group_id, group.first_endpoint);
@@ -1019,10 +1029,12 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_ind
 
     ReturnErrorOnFailure(group.Delete(mStorage));
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     if (notifyNeeded)
     {
         mAuxAclNotificationNeeded = true;
     }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     if (group.first)
     {
@@ -1085,10 +1097,12 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
         group.prev           = kUndefinedGroupId;
         ReturnErrorOnFailure(group.Save(mStorage));
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
         if (group.HasAuxiliaryACL())
         {
             mAuxAclNotificationNeeded = true;
         }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
         // Update fabric
         fabric.first_group = group.group_id;
@@ -1106,10 +1120,12 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
     endpoint.endpoint_id = endpoint_id;
     ReturnErrorOnFailure(endpoint.Save(mStorage));
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     if (group.HasAuxiliaryACL())
     {
         mAuxAclNotificationNeeded = true;
     }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     if (endpoint.first)
     {
@@ -1147,10 +1163,12 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
     // Existing endpoint
     TEMPORARY_RETURN_IGNORED endpoint.Delete(mStorage);
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     if (group.HasAuxiliaryACL())
     {
         mAuxAclNotificationNeeded = true;
     }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     if (endpoint.first)
     {
@@ -1402,10 +1420,12 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoints(chip::FabricIndex fabric_index
     group.endpoint_count = 0;
     ReturnErrorOnFailure(group.Save(mStorage));
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     if (notifyNeeded)
     {
         mAuxAclNotificationNeeded = true;
     }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     GroupModified(fabric_index, group.group_id);
     return CHIP_NO_ERROR;
@@ -1862,7 +1882,9 @@ CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
     // Remove fabric, and ensure no auxiliary acl changed
     // event will be emitted from this action
     err                       = fabric.Delete(mStorage);
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     mAuxAclNotificationNeeded = false;
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
     return err;
 }
 

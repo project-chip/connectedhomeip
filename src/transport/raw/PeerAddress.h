@@ -259,6 +259,7 @@ public:
         return UDP(Inet::IPAddress::MakeIPv6PrefixMulticast(scope, prefixLength, prefix, groupId));
     }
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     static PeerAddress Groupcast()
     {
         constexpr uint8_t scope        = 0x05; // Site-Local
@@ -266,6 +267,7 @@ public:
         // IANA assigned address
         return UDP(Inet::IPAddress::MakeIPv6PrefixMulticast(scope, prefixLength, 0xff05000000000000, 0xfa));
     }
+#endif
 
 private:
     constexpr PeerAddress(uint16_t shortId) : mTransportType(Type::kNfc), mId{ .mNFCShortId = shortId } {}

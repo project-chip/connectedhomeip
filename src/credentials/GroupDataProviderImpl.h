@@ -33,8 +33,10 @@ public:
     static constexpr uint16_t kMaxMembershipPerFabric = kMaxMembershipCount / 2;
     static constexpr uint16_t kMaxGroupKeysPerFabric  = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC;
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     // TODO Make this configurable. Note: if PGA feature is enabled it SHALL be >= 4. else it SHALL = 1.
     static constexpr uint16_t kMaxMcastAddrCount = 4;
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     GroupDataProviderImpl() : GroupDataProvider(kMaxMembershipPerFabric, kMaxGroupKeysPerFabric) {}
     GroupDataProviderImpl(uint16_t maxGroupsPerFabric, uint16_t maxGroupKeysPerFabric) :
@@ -113,12 +115,23 @@ public:
 
     // Groupcast configurations
     uint16_t getMaxMembershipCount() override { return kMaxMembershipCount; }
-    uint16_t getMaxMcastAddrCount() override { return kMaxMcastAddrCount; }
+    uint16_t getMaxMcastAddrCount() override
+    {
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+        return kMaxMcastAddrCount;
+#else
+        return 1;
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
+    }
     bool ConsumeAuxAclNotificationNeeded() override
     {
+#if CHIP_CONFIG_ENABLE_GROUPCAST
         bool needed               = mAuxAclNotificationNeeded;
         mAuxAclNotificationNeeded = false;
         return needed;
+#else
+        return false;
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
     }
 
 protected:
@@ -276,7 +289,9 @@ protected:
     ObjectPool<KeySetIteratorImpl, kIteratorsMax> mKeySetIterators;
     ObjectPool<GroupSessionIteratorImpl, kIteratorsMax> mGroupSessionsIterator;
     ObjectPool<GroupKeyContext, kIteratorsMax> mGroupKeyContexPool;
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     bool mAuxAclNotificationNeeded = false;
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 };
 
 } // namespace Credentials

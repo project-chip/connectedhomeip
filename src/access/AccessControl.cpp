@@ -237,11 +237,13 @@ void AccessControl::Finish()
     mDelegate->Finish();
     mDelegate = nullptr;
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     if (IsGroupAuxiliaryDelegateRegistered())
     {
         mGroupAuxDelegate->Finish();
         UnregisterGroupAuxiliaryDelegate();
     }
+#endif
 }
 
 CHIP_ERROR AccessControl::CreateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t * index,
@@ -371,6 +373,7 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
     }
 #endif
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     if ((CHIP_NO_ERROR != result) && (Access::AuthMode::kGroup == subjectDescriptor.authMode) &&
         (Access::RequestType::kCommandInvokeRequest == requestPath.requestType) &&
         (Access::Privilege::kOperate == requestPrivilege) && IsGroupId(subjectDescriptor.subject))
@@ -385,6 +388,8 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
             return mGroupAuxDelegate->Check(subjectDescriptor, requestPath, requestPrivilege);
         }
     }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
+
     return result;
 }
 

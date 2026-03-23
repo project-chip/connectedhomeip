@@ -97,6 +97,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     });
     ReturnErrorOnFailure(provider.AddCluster(mGroupKeyManagementCluster.Registration()));
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     mGroupcastCluster.Create(
         GroupcastContext{
             .fabricTable       = mContext.fabricTable,
@@ -105,6 +106,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
         },
         BitFlags<Groupcast::Feature>{ Groupcast::Feature::kListener });
     ReturnErrorOnFailure(provider.AddCluster(mGroupcastCluster.Registration()));
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     mSoftwareDiagnosticsServerCluster.Create(SoftwareDiagnosticsServerCluster::OptionalAttributeSet{},
                                              mContext.diagnosticDataProvider);
@@ -156,11 +158,13 @@ void RootNodeDevice::Unregister(CodeDrivenDataModelProvider & provider)
         LogErrorOnFailure(provider.RemoveCluster(&mSoftwareDiagnosticsServerCluster.Cluster()));
         mSoftwareDiagnosticsServerCluster.Destroy();
     }
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     if (mGroupcastCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mGroupcastCluster.Cluster()));
         mGroupcastCluster.Destroy();
     }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
     if (mGroupKeyManagementCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mGroupKeyManagementCluster.Cluster()));

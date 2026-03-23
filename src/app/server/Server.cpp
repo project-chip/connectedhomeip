@@ -311,10 +311,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     if (initParams.groupAuxiliaryAccessControlDelegate != nullptr)
     {
         SuccessOrExit(mAccessControl.RegisterGroupAuxiliaryDelegate(initParams.groupAuxiliaryAccessControlDelegate));
     }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
     Access::SetAccessControl(mAccessControl);
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -795,7 +797,10 @@ void Server::RejoinExistingMulticastGroups()
     ChipLogProgress(AppServer, "Joining Multicast groups");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     bool groupcast_joined = false;
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
+
     for (const FabricInfo & fabric : mFabrics)
     {
         Credentials::GroupDataProvider::GroupInfo groupInfo;
@@ -806,17 +811,22 @@ void Server::RejoinExistingMulticastGroups()
             // GroupDataProvider was able to allocate rescources for an iterator
             while (iterator->Next(groupInfo))
             {
+#if CHIP_CONFIG_ENABLE_GROUPCAST
                 bool use_iana_addr = !groupInfo.UsePerGroupAddress();
                 if (use_iana_addr && groupcast_joined)
                 {
                     // Already joined groupcast address
                     continue;
                 }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
                 const Transport::PeerAddress & address = use_iana_addr
                     ? Transport::PeerAddress::Groupcast()
                     : Transport::PeerAddress::Multicast(fabric.GetFabricId(), groupInfo.group_id);
-
+#else
+                const Transport::PeerAddress & address = Transport::PeerAddress::Multicast(fabric.GetFabricId(), groupInfo.group_id);
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
                 err = mTransports.MulticastGroupJoinLeave(address, true);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -828,8 +838,10 @@ void Server::RejoinExistingMulticastGroups()
                     iterator->Release();
                     return;
                 }
+#if CHIP_CONFIG_ENABLE_GROUPCAST
                 if (use_iana_addr)
                     groupcast_joined = true;
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
             }
 
             iterator->Release();

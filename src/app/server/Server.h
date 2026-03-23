@@ -188,9 +188,11 @@ struct ServerInitParams
     // Access control delegate: MUST be injected. Used to look up access control rules. Must be
     // initialized before being provided.
     Access::AccessControl::Delegate * accessDelegate = nullptr;
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     // Access control auxiliary delegate: Optional. Used to look up auxiliary access control rules.
     // If provided, must be initialized before being provided.
     Access::AccessControl::Delegate * groupAuxiliaryAccessControlDelegate = nullptr;
+#endif
     // ACL storage: MUST be injected. Used to store ACL entries in persistent storage. Must NOT
     // be initialized before being provided.
     app::AclStorage * aclStorage = nullptr;
@@ -554,10 +556,13 @@ private:
                 return;
             }
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
             const Transport::PeerAddress & address = new_group.UsePerGroupAddress()
                 ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), new_group.group_id)
                 : Transport::PeerAddress::Groupcast();
-
+#else
+            const Transport::PeerAddress & address = Transport::PeerAddress::Multicast(fabric->GetFabricId(), new_group.group_id);
+#endif
             if (CHIP_NO_ERROR != mServer->GetTransportManager().MulticastGroupJoinLeave(address, true))
             {
                 ChipLogError(AppServer, "Unable to listen to group");

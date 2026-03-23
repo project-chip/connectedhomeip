@@ -80,6 +80,7 @@ void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == chip::kRootEndpointId);
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
@@ -93,12 +94,14 @@ void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 }
 
 void MatterGroupcastClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
     VerifyOrDie(endpointId == chip::kRootEndpointId);
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::UnregisterServer(
@@ -109,6 +112,7 @@ void MatterGroupcastClusterShutdownCallback(chip::EndpointId endpointId, MatterC
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
         integrationDelegate, shutdownType);
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 }
 
 void MatterGroupcastPluginServerInitCallback() {}

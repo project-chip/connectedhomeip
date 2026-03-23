@@ -41,4 +41,7 @@ declare_args() {
 
   # Flag that controls whether the camera server is enabled
   matter_enable_camera_server = false
+
+  # Flag that controls whether the Groupcast cluster is enabled
+  chip_enable_groupcast = true
 }
