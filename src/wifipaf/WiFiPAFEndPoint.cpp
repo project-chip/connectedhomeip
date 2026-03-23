@@ -902,6 +902,7 @@ CHIP_ERROR WiFiPAFEndPoint::Receive(PacketBufferHandle && data)
         // Failed to get SeqNum. => Pass down to PAFTP engine directly
         return RxPacketProcess(std::move(data));
     }
+    ChipLogProgress(WiFiPAF, "===SHM %s() <==[rx] seq=%u (exp=%u)", __func__,seqNum, ExpRxNextSeqNum);
     /*
         If reorder-queue is not empty => Need to queue the packet whose SeqNum is the next one at
         offset 0 to fill the hole.
