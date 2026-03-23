@@ -38,6 +38,7 @@
 #       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SERVICE.ALERT:005c00000000009a
 #       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SERVICE.CLEAR:005c0000000000aa
 #       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --app-pipe /tmp/smokeco_2_4_fifo
 #     factory-reset: true
 #     quiet: true
@@ -72,26 +73,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         self.pixit_test_event_service_alert = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SERVICE.ALERT", 0x005c00000000009a)
         self.pixit_test_event_service_clear = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SERVICE.CLEAR", 0x005c0000000000aa)
 
-        if isinstance(self.pixit_test_event_battery_warning, bytes):
-            self.pixit_test_event_battery_warning = int.from_bytes(self.pixit_test_event_battery_warning, byteorder='big')
-
-        if isinstance(self.pixit_test_event_battery_critical, bytes):
-            self.pixit_test_event_battery_critical = int.from_bytes(self.pixit_test_event_battery_critical, byteorder='big')
-
-        if isinstance(self.pixit_test_event_battery_clear, bytes):
-            self.pixit_test_event_battery_clear = int.from_bytes(self.pixit_test_event_battery_clear, byteorder='big')
-        
-        if isinstance(self.pixit_test_event_hardware_alert, bytes):
-            self.pixit_test_event_hardware_alert = int.from_bytes(self.pixit_test_event_hardware_alert, byteorder='big')
-
-        if isinstance(self.pixit_test_event_hardware_clear, bytes):
-            self.pixit_test_event_hardware_clear = int.from_bytes(self.pixit_test_event_hardware_clear, byteorder='big')
-
-        if isinstance(self.pixit_test_event_service_alert, bytes):
-            self.pixit_test_event_service_alert = int.from_bytes(self.pixit_test_event_service_alert, byteorder='big')
-
-        if isinstance(self.pixit_test_event_service_clear, bytes):
-            self.pixit_test_event_service_clear = int.from_bytes(self.pixit_test_event_service_clear, byteorder='big')
+        self.process_pixit_attributes()
 
     def desc_TC_SMOKECO_2_4(self) -> str:
         return "[TC-SMOKECO-2.4] Secondary Functionality - Mandatory with DUT as Server"
@@ -177,8 +159,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         test_event_triggers_enabled = await self.read_general_diagnostics_test_event_triggers_enabled()
         asserts.assert_equal(test_event_triggers_enabled,1)
 
-        # Start block 1
-
+        # Start block BatteryWarning
         self.step(5)
         await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_battery_warning)
 
@@ -194,10 +175,9 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         self.step(8)
         low_battery_event_data = await self.read_smokeco_event(smokeco_event=self.smokeco_cluster.Events.LowBattery)
         asserts.assert_equal(low_battery_event_data.alarmSeverityLevel,1)
+        # End block BatterWarning
 
-        # End block 1
-
-        # Start Block 2
+        # Start block BatteryCritical
         self.step(9)
         await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_battery_critical)
         
@@ -214,8 +194,9 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         low_battery_event_data = await self.read_smokeco_event(self.smokeco_cluster.Events.LowBattery)
         asserts.assert_equal(low_battery_event_data.alarmSeverityLevel,2)
 
-        # End block 2
+        # End block BatteryCritical
 
+        # Start block BatteryClear
         self.step(13)
         await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_battery_clear)
 
@@ -230,10 +211,12 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(16)
         # Only reads and verify has a new event
-        low_battery_event_data = await self.read_smokeco_event(self.smokeco_cluster.Events.AllClear)
+        await self.read_smokeco_event(self.smokeco_cluster.Events.AllClear)
         # Cancel the attribute report
         battery_alert_handler.cancel()
+        # End block BatteryClear
 
+        # Start HardwareFault
         # Subscribe to HardwareFault
         self.step(17)
         hardware_fault_handler = AttributeSubscriptionHandler(
@@ -275,7 +258,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         await self.read_smokeco_event(self.smokeco_cluster.Events.AllClear)
         # Clear the subscription
         hardware_fault_handler.cancel()
-        # End HardwareFault clear
+        # End clear HardwareFault
 
         # Start EndOfService check
         self.step(26)
@@ -359,6 +342,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         await self.read_smokeco_event(self.smokeco_cluster.Events.AllClear)
         # End of Manual Test
 
+        # Start SelfTestRequest
         self.step(44)
         self_test_cmd = self.smokeco_cluster.Commands.SelfTestRequest()
         await self.send_single_cmd(self_test_cmd, dev_ctrl=self.default_controller, endpoint=self.get_endpoint(), timedRequestTimeoutMs=5000)
@@ -386,6 +370,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(50)
         await self.read_smokeco_event(self.smokeco_cluster.Events.AllClear)
+        test_in_progress_handler.cancel()
 
 
 if __name__ == "__main__":
