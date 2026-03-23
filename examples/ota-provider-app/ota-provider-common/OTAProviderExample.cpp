@@ -226,7 +226,7 @@ bool OTAProviderExample::ParseOTAHeader(OTAImageHeaderParser & parser, const cha
     uint8_t otaFileContent[kOtaHeaderMaxSize];
     ByteSpan buffer(otaFileContent);
 
-    std::ifstream otaFile(otaFilePath, std::ifstream::in);
+    std::ifstream otaFile(otaFilePath, std::ifstream::in | std::ios::binary);
     if (!otaFile.is_open() || !otaFile.good())
     {
         ChipLogError(SoftwareUpdate, "Error opening OTA image file: %s", otaFilePath);

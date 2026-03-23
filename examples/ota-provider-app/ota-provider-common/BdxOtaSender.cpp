@@ -168,7 +168,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
                            ChipLogError(BDX, "AbortTransfer failed"));
             return;
         }
-        std::ifstream otaFile(entry->second.c_str(), std::ifstream::in);
+        std::ifstream otaFile(entry->second.c_str(), std::ifstream::in | std::ios::binary);
         if (!otaFile.good())
         {
             ChipLogError(BDX, "OTA file open failed");
