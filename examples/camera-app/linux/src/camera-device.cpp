@@ -458,6 +458,12 @@ void CameraDevice::Init()
     mPushAVTransportManager.Init();
 }
 
+void CameraDevice::Shutdown()
+{
+    // Close WebRTC connections while the SystemLayer is still alive, so that WebRTC callbacks can safely use ScheduleLambda.
+    mWebRTCProviderManager.CloseConnection();
+}
+
 CameraError CameraDevice::InitializeCameraDevice()
 {
     static bool gstreamerInitialized = false;
