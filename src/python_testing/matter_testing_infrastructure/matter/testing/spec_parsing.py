@@ -1546,7 +1546,8 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                         continue
 
                     try:
-                        conformance = parse_callable_from_xml(conformance_xml, ConformanceParseParameters(feature_map={}, attribute_map={}, command_map={}))
+                        conformance = parse_callable_from_xml(conformance_xml, ConformanceParseParameters(
+                            feature_map={}, attribute_map={}, command_map={}))
                     except ConformanceException as ex:
                         problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                         severity=ProblemSeverity.WARNING, problem=f"Unable to parse conformance for composed device type - {ex}"))

@@ -501,15 +501,19 @@ class DeviceConformanceTests(BasicCompositionTests):
                     location = DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id)
 
                     if conformance_decision.is_mandatory() and count == 0:
-                        record_error(location, f"Mandatory composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} is missing on the device")
+                        record_error(
+                            location, f"Mandatory composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} is missing on the device")
                     elif not conformance_allowed(conformance_decision, allow_provisional) and count > 0:
-                        record_error(location, f"Disallowed composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} is present on the device")
+                        record_error(
+                            location, f"Disallowed composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} is present on the device")
 
                     if conformance_allowed(conformance_decision, allow_provisional):
                         if req.min_instances is not None and count < req.min_instances:
-                            record_error(location, f"Composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} expects at least {req.min_instances} instances, but found {count}")
+                            record_error(
+                                location, f"Composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} expects at least {req.min_instances} instances, but found {count}")
                         if req.max_instances is not None and count > req.max_instances:
-                            record_error(location, f"Composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} expects at most {req.max_instances} instances, but found {count}")
+                            record_error(
+                                location, f"Composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} expects at most {req.max_instances} instances, but found {count}")
 
         return success, problems
 
