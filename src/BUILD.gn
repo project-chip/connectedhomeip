@@ -112,7 +112,6 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-management-server/tests",
       "${chip_root}/src/app/clusters/zone-management-server/tests",
-      "${chip_root}/src/app/clusters/zone-management-server/tests:tests-backwards-compatibility",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/icd/server/tests",
@@ -199,6 +198,7 @@ if (chip_build_tests) {
       # with ember
       # Disabled on EFR32 since "include <random>" fails with `::fabs` not defined
       tests += [
+        "${chip_root}/src/app/clusters/zone-management-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/data-model-providers/codedriven/tests",
         "${chip_root}/src/data-model-providers/codegen/tests",
         "${chip_root}/examples/common/server-cluster-shim/tests",
