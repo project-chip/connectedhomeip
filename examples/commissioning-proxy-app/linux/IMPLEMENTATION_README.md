@@ -82,25 +82,32 @@ itself between `WiFiPAFLayer` and the original server-side transport delegate:
 
 The delegate is installed lazily on the first `ProxyConnectRequest`.
 
-### Packet Flow
+### Packet Flow, using PAF as an example
 
 ```
-chip-tool                   commissioning-proxy-app          commissionee
+chip-tool                 commissioning-proxy-app (CP)       commissionee
+   |                                 |                            |
+   |◄- CP commissioned to Fabric ---►|                            |
    |                                 |                            |
    |-- CASE session ---------------► |                            |
+   |-- ProxyScanRequest (Optional)-► |                            |
+   |                                 |◄- PAF Publish ------------ |
+   |◄- ProxyScanResponse------------ |                            |
+   |                                 |                            |
    |-- ProxyConnectRequest --------► |                            |
    |                                 |-- WiFiPAFSubscribe ------► |
    |                                 |◄- PAF handshake ---------- |
    |◄- ProxyConnectResponse (sid) -- |                            |
    |                                 |                            |
-   |-- ProxyMessageRequest(sid,pkt)► |                            |
+   |-- PASE session --------------------------------------------► |
+   |-- ProxyMessageRequest(sid,pkt)-►|                            |
    |                                 |-- WiFiPAFLayer::Send ----► |
    |                                 |◄- WiFiPAFMessageReceived - |
    |◄- ProxyMessageResponse(sid,pkt) |                            |
    |  (repeat for each PASE/commissioning round-trip)             |
    |                                 |                            |
    |-- ProxyDisconnectRequest -----► |                            |
-   |                                 |-- RmPafSession ----------► |
+   |                                 |-- RmPAFSession ----------► |
    |◄- Status::Success ------------- |                            |
 ```
 
