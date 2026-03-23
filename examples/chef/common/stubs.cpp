@@ -691,8 +691,8 @@ void CastingvideoplayerContentappInit()
 }
 
 /*
- * This initializer is for the casting video player application rootnode_waterheater_21bd13d651. To not have this initialiser
- * affect new apps video player device types, use different endpoints.
+ * This initializer is for the water heater application rootnode_waterheater_21bd13d651. To not have this initialiser
+ * affect new water heater applications, use different endpoints.
  */
 void WaterHeaterInit()
 {
