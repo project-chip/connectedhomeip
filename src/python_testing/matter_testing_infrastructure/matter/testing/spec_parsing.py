@@ -1540,7 +1540,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                         continue
 
                     # Conformance
-                    conformance_xml, tmp_problem = get_conformance(composed_dt, id)
+                    conformance_xml, tmp_problem = get_conformance(composed_dt, uint(id))
                     if tmp_problem:
                         problems.append(tmp_problem)
                         continue
