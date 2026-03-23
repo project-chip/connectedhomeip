@@ -368,7 +368,7 @@ config MBEDTLS_HEAP_SIZE
 # Enable PSA Crypto dependencies for Matter
 
 choice CHIP_CRYPTO
-    default CHIP_CRYPTO_PSA if !CHIP_WIFI
+    default CHIP_CRYPTO_PSA
 
 endchoice
 
