@@ -70,6 +70,29 @@ class SmokeCoBaseTest(MatterBaseTest):
         assert_valid_uint32(attr, "Attribute is not in uint range")
         assert_is_unixtimestamp(attr, f"Attribute with value: {attr}")
 
+    def start_device_self_test(self):
+        """Start the device Self Test. Ask the user to manually start the self test. On CI it uses out of band communication."""
+        if self.is_pics_sdk_ci_only:
+            # LongPress will trigger the SelfTest in the SmokeCo cluster
+            command_dict = {"Name": "LongPress", "EndpointId": self.get_endpoint(), "NewPosition": 0}
+            self.write_to_app_pipe(command_dict=command_dict)
+        else:
+            self.wait_for_user_input(prompt_msg="Start manually DUT self-test", prompt_msg_placeholder="Enter 'y' when done")
+
+    def process_pixit_attributes(self):
+        """ Scans instance attributes starting with 'pixit_'. 
+        Converts values from bytes to big-endian integers.
+        """
+        # We use list() to avoid 'dictionary changed size during iteration' 
+        # though we are only modifying values, it's a safe practice.
+        for attr_name in list(vars(self)):
+            if attr_name.startswith('pixit_'):
+                value = getattr(self, attr_name)
+                if isinstance(value, bytes):
+                    # Convert bytes to int (big-endian)
+                    converted_value = int.from_bytes(value, byteorder='big')
+                    setattr(self, attr_name, converted_value)
+
     async def alarm_primary_functionality_base_test(self, state_attribute, alarm_event, expressed_state_enum_value, pixit_warning, pixit_critical, pixit_clear):
         """Define what attributes,events,enum values and pixit to use depending if is smoke alarm or co alarm for tests SMOKECO 2.2 and SMOKECO 2.3."""
         # Step 1, "Commission DUT to TH."
@@ -117,13 +140,7 @@ class SmokeCoBaseTest(MatterBaseTest):
         asserts.assert_equal(smoke_alarm_event_data.alarmSeverityLevel, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
 
         self.step(9)
-        # Manually Start the Self Test
-        if self.is_pics_sdk_ci_only:
-            # LongPress will trigger the SelfTest in the SmokeCo cluster
-            command_dict = {"Name": "LongPress", "EndpointId": self.get_endpoint(), "NewPosition": 0}
-            self.write_to_app_pipe(command_dict=command_dict)
-        else:
-            self.wait_for_user_input(prompt_msg="Start manually DUT self-test", prompt_msg_placeholder="Enter 'y' when done")
+        self.start_device_self_test()
 
         self.step(10)
         test_in_progress = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.TestInProgress)

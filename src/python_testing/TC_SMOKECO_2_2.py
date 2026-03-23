@@ -35,6 +35,7 @@
 #       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CLEAR:005c0000000000a0
 #       --endpoint 1
 #       --app-pipe /tmp/smokeco_2_2_fifo
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -61,15 +62,7 @@ class TC_SMOKECO_2_2(SmokeCoBaseTest):
         self.pixit_test_event_critical_smoke_alarm = self.user_params.get(
             "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CRITICAL", 0x005c00000000009c)
         self.pixit_test_event_clear_smoke_alarm = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CLEAR", 0x005c0000000000a0)
-
-        if isinstance(self.pixit_test_event_warning_smoke_alarm, bytes):
-            self.pixit_test_event_warning_smoke_alarm = int.from_bytes(self.pixit_test_event_warning_smoke_alarm, byteorder='big')
-
-        if isinstance(self.pixit_test_event_critical_smoke_alarm, bytes):
-            self.pixit_test_event_critical_smoke_alarm = int.from_bytes(self.pixit_test_event_critical_smoke_alarm, byteorder='big')
-
-        if isinstance(self.pixit_test_event_clear_smoke_alarm, bytes):
-            self.pixit_test_event_clear_smoke_alarm = int.from_bytes(self.pixit_test_event_clear_smoke_alarm, byteorder='big')
+        self.process_pixit_attributes()
 
     def desc_TC_SMOKECO_2_2(self) -> str:
         return "[TC-SMOKECO-2.2] Primary Functionality - Smoke Alarm with DUT as Server"
