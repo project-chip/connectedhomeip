@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  */
 
 #include "CodegenIntegration.h"
-
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
@@ -332,6 +331,3 @@ void ActionsServer::EndpointListModified(EndpointId aEndpoint)
 {
     MarkDirty(aEndpoint, Attributes::EndpointLists::Id);
 }
-
-void MatterActionsPluginServerInitCallback() {}
-void MatterActionsPluginServerShutdownCallback() {}
