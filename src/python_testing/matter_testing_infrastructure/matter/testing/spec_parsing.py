@@ -1544,7 +1544,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                     if tmp_problem:
                         problems.append(tmp_problem)
                         continue
-                    
+
                     try:
                         conformance = parse_callable_from_xml(conformance_xml, ConformanceParseParameters(feature_map={}, attribute_map={}, command_map={}))
                     except ConformanceException as ex:
@@ -1559,7 +1559,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                         min_el = constraint.find('min')
                         if min_el is not None and 'value' in min_el.attrib:
                             min_instances = int(min_el.attrib['value'], 0)
-                        
+
                         max_el = constraint.find('max')
                         if max_el is not None and 'value' in max_el.attrib:
                             max_instances = int(max_el.attrib['value'], 0)

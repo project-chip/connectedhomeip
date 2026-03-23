@@ -28,7 +28,7 @@ from matter.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                             ProblemNotice, ProblemSeverity)
 from matter.testing.spec_parsing import (CommandType, PrebuiltDataModelDirectory, XmlDeviceType, XmlDeviceTypeClusterRequirements,
-                                         build_xml_device_types, build_xml_namespaces, conformance_support)
+                                         build_xml_device_types, build_xml_namespaces)
 from matter.tlv import uint
 
 
@@ -492,7 +492,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                 device_type_id = dt.deviceType
                 if device_type_id not in self.xml_device_types:
                     continue
-                
+
                 xml_device = self.xml_device_types[device_type_id]
                 for req in xml_device.composed_device_types:
                     # Conformance Assessment
@@ -504,7 +504,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                         record_error(location, f"Mandatory composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} is missing on the device")
                     elif not conformance_allowed(conformance_decision, allow_provisional) and count > 0:
                         record_error(location, f"Disallowed composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} is present on the device")
-                    
+
                     if conformance_allowed(conformance_decision, allow_provisional):
                         if req.min_instances is not None and count < req.min_instances:
                             record_error(location, f"Composed device type {req.device_type_name} ({req.device_type_id}) for {xml_device.name} expects at least {req.min_instances} instances, but found {count}")
