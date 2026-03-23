@@ -199,9 +199,6 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v5
-              with:
-                # This ensures we are always testing master code
-                ref: ${{ github.event_name == 'pull_request' && github.head_ref || 'master' }}
             # NOTE: no bootstrap since we only use compile outputs from previous steps (including python venv in out/venv)
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
