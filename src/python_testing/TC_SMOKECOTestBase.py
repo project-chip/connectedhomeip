@@ -80,11 +80,8 @@ class SmokeCoBaseTest(MatterBaseTest):
             self.wait_for_user_input(prompt_msg="Start manually DUT self-test", prompt_msg_placeholder="Enter 'y' when done")
 
     def process_pixit_attributes(self):
-        """ Scans instance attributes starting with 'pixit_'. 
-        Converts values from bytes to big-endian integers.
-        """
-        # We use list() to avoid 'dictionary changed size during iteration' 
-        # though we are only modifying values, it's a safe practice.
+        """ Scans instance attributes starting with 'pixit_'.
+        Converts values from bytes to big-endian integers."""
         for attr_name in list(vars(self)):
             if attr_name.startswith('pixit_'):
                 value = getattr(self, attr_name)
