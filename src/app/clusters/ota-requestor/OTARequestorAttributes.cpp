@@ -66,7 +66,7 @@ CHIP_ERROR OTARequestorAttributes::SetUpdatePossible(bool updatePossible)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTARequestorAttributes::Init(app::DataModel::ProviderChangeListener & dataModelChangeListener, EndpointId endpointId)
+CHIP_ERROR OTARequestorAttributes::Init(EndpointId endpointId, app::DataModel::ProviderChangeListener & dataModelChangeListener)
 {
     VerifyOrReturnError(mDataModelChangeListener == nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidEndpointId(endpointId), CHIP_ERROR_INVALID_ARGUMENT);

@@ -47,7 +47,7 @@ public:
     bool GetUpdatePossible() const { return mUpdatePossible; }
     CHIP_ERROR SetUpdatePossible(bool updatePossible);
 
-    CHIP_ERROR Init(app::DataModel::ProviderChangeListener & dataModelChangeListener, EndpointId endpointId);
+    CHIP_ERROR Init(EndpointId endpointId, app::DataModel::ProviderChangeListener & dataModelChangeListener);
 
 private:
     OTAUpdateStateEnum mUpdateState = OTAUpdateStateEnum::kUnknown;

@@ -56,7 +56,7 @@ TEST_F(TestOTARequestorAttributes, RejectsInvalidEndpointId)
     chip::Testing::TestServerClusterContext context;
     OTARequestorAttributes attributes;
 
-    EXPECT_NE(attributes.Init(context.ChangeListener(), kInvalidEndpointId), CHIP_NO_ERROR);
+    EXPECT_NE(attributes.Init(kInvalidEndpointId, context.ChangeListener()), CHIP_NO_ERROR);
 }
 
 TEST_F(TestOTARequestorAttributes, SetUpdateStateChangesValueAndMarksChanged)
@@ -65,7 +65,7 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStateChangesValueAndMarksChanged)
     auto & changeListener = context.ChangeListener();
 
     OTARequestorAttributes attributes;
-    ASSERT_EQ(attributes.Init(changeListener, kTestEndpointId), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.Init(kTestEndpointId, changeListener), CHIP_NO_ERROR);
 
     // Set the current state so it won't match the first value tested below.
     EXPECT_EQ(attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kDelayedOnUserConsent), CHIP_NO_ERROR);
@@ -149,7 +149,7 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStateToCurrentValueDoesNotMarkChange
     auto & changeListener = context.ChangeListener();
 
     OTARequestorAttributes attributes;
-    ASSERT_EQ(attributes.Init(changeListener, kTestEndpointId), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.Init(kTestEndpointId, changeListener), CHIP_NO_ERROR);
 
     // Set a specific state.
     EXPECT_EQ(attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kApplying), CHIP_NO_ERROR);
@@ -166,7 +166,7 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStateProgressChangesValueAndMarksCha
     auto & changeListener = context.ChangeListener();
 
     OTARequestorAttributes attributes;
-    ASSERT_EQ(attributes.Init(changeListener, kTestEndpointId), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.Init(kTestEndpointId, changeListener), CHIP_NO_ERROR);
 
     // Set the current value so it won't match the first value tested below.
     EXPECT_EQ(attributes.SetUpdateStateProgress(DataModel::NullNullable), CHIP_NO_ERROR);
@@ -226,7 +226,7 @@ TEST_F(TestOTARequestorAttributes, InvalidUpdateStateProgressDoesNotChangeValue)
     auto & changeListener = context.ChangeListener();
 
     OTARequestorAttributes attributes;
-    ASSERT_EQ(attributes.Init(changeListener, kTestEndpointId), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.Init(kTestEndpointId, changeListener), CHIP_NO_ERROR);
 
     // Set the current value to later verify it hasn't changed.
     EXPECT_EQ(attributes.SetUpdateStateProgress(DataModel::NullNullable), CHIP_NO_ERROR);
@@ -243,7 +243,7 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStateProgressToCurrentValueDoesNotMa
     auto & changeListener = context.ChangeListener();
 
     OTARequestorAttributes attributes;
-    ASSERT_EQ(attributes.Init(changeListener, kTestEndpointId), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.Init(kTestEndpointId, changeListener), CHIP_NO_ERROR);
 
     // Set a specific value.
     EXPECT_EQ(attributes.SetUpdateStateProgress(42), CHIP_NO_ERROR);
@@ -260,7 +260,7 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStatePossibleChangesValueAndMarksCha
     auto & changeListener = context.ChangeListener();
 
     OTARequestorAttributes attributes;
-    ASSERT_EQ(attributes.Init(changeListener, kTestEndpointId), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.Init(kTestEndpointId, changeListener), CHIP_NO_ERROR);
 
     // Set the current value so it won't match the first value tested below.
     EXPECT_EQ(attributes.SetUpdatePossible(false), CHIP_NO_ERROR);
@@ -288,7 +288,7 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStatePossibleToCurrentValueDoesNotMa
     auto & changeListener = context.ChangeListener();
 
     OTARequestorAttributes attributes;
-    ASSERT_EQ(attributes.Init(changeListener, kTestEndpointId), CHIP_NO_ERROR);
+    ASSERT_EQ(attributes.Init(kTestEndpointId, changeListener), CHIP_NO_ERROR);
 
     // Set a specific value.
     EXPECT_EQ(attributes.SetUpdatePossible(false), CHIP_NO_ERROR);
