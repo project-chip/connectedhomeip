@@ -88,7 +88,11 @@ class TC_DeviceConformance(DeviceConformanceTests):
         allow_provisional = self.user_params.get("allow_provisional", False)
         success, problems = self.check_device_type(fail_on_extra_clusters, allow_provisional)
         self.problems.extend(problems)
-        if not success:
+
+        flat_dt_req_success, flat_dt_req_problems = self.check_flat_model_device_type_requirements(allow_provisional)
+        self.problems.extend(flat_dt_req_problems)
+
+        if not success or not flat_dt_req_success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")
 
     def test_TC_IDM_10_6(self):

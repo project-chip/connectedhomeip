@@ -473,6 +473,17 @@ class DeviceConformanceTests(BasicCompositionTests):
                 location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=extra)
                 fn(location=location, problem=f"Extra cluster found on endpoint with device types {device_type_list}")
 
+        return success, problems
+
+    def check_flat_model_device_type_requirements(self, allow_provisional: bool = False) -> tuple[bool, list[ProblemNotice]]:
+        success = True
+        problems = []
+
+        def record_error(location, problem):
+            nonlocal success
+            problems.append(ProblemNotice("IDM-10.5", location, ProblemSeverity.ERROR, problem, ""))
+            success = False
+
         # First, count instances of each device type across the entire device
         device_type_counts: dict[int, int] = {}
         for endpoint_id, endpoint in self.endpoints.items():
