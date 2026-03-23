@@ -20,6 +20,8 @@
  * to the OTA Requestor object that handles them
  */
 
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
+
 #include <app/clusters/ota-requestor/OTARequestorCluster.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -87,6 +89,7 @@ public:
     }
 };
 
+OTARequestorAttributes gAttributes;
 LazyRegisteredServerCluster<OTARequestorCluster> gServer;
 LazyRegisteredServerCluster<EmptyOtaRequestorCluster> gFallbackServer;
 
@@ -184,6 +187,15 @@ void OnSetGlobalOtaRequestorInstance(OTARequestorInterface * instance)
 }
 
 } // namespace
+
+namespace chip::app {
+
+OTARequestorAttributes & GetOTARequestorAttributes()
+{
+    return gAttributes;
+}
+
+} // namespace chip::app
 
 void MatterOtaSoftwareUpdateRequestorClusterInitCallback(EndpointId endpointId)
 {

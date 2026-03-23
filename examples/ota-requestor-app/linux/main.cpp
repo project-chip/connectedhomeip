@@ -17,6 +17,7 @@
  */
 
 #include "AppMain.h"
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
@@ -217,7 +218,8 @@ static void InitOTARequestor(void)
     gRequestorUser.SetSendNotifyUpdateApplied(gSendNotifyUpdateApplied);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    SuccessOrDie(gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader));
+    SuccessOrDie(gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
+                                     chip::app::GetOTARequestorAttributes()));
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     gImageProcessor.SetOTAImageFile(gOtaDownloadPath);

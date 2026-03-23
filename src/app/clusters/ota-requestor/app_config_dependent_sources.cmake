@@ -19,6 +19,7 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/BDXDownloader.cpp"
     "${CLUSTER_DIR}/BDXDownloader.h"
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/DefaultOTARequestor.cpp"
     "${CLUSTER_DIR}/DefaultOTARequestor.h"
     "${CLUSTER_DIR}/DefaultOTARequestorDriver.cpp"
