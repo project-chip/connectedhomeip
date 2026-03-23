@@ -23,8 +23,8 @@
 #include <stdint.h>
 
 #include "FreeRTOS.h"
-#include "app_msg.h"
 #include "TemperatureManager.h"
+#include "app_msg.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
