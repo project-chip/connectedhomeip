@@ -76,12 +76,7 @@ CHIP_ERROR Delegate::TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
     {
         CommodityTariffAttrTypeEnum attr = static_cast<CommodityTariffAttrTypeEnum>(iter);
         auto & mgmtObj                   = GetMgmtObj(attr);
-        CHIP_ERROR err                   = mgmtObj.UpdateBegin(&UpdCtx);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "EGW-CTC: UpdateBegin failed for attribute %d: %" CHIP_ERROR_FORMAT, iter, err.Format());
-            return err;
-        }
+        ReturnErrorOnFailure(mgmtObj.UpdateBegin(&UpdCtx));
     }
     return CHIP_NO_ERROR;
 }
