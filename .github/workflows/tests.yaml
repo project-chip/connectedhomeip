@@ -931,16 +931,16 @@ jobs:
             - name: Build linux-x64-camera
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-camera-asan-clang
+                  --target linux-x64-camera-asan
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-camera-asan-clang"
+                  && rm -rf out/linux-x64-camera-asan"
 
             - name: Build linux-x64-camera-controller
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-camera-controller-asan-clang
+                  --target linux-x64-camera-controller-asan
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-camera-controller-asan-clang"
+                  && rm -rf out/linux-x64-camera-controller-asan"
 
             - name: Build linux-x64-light-data-model-no-unique-id
               run: >-
@@ -1102,8 +1102,8 @@ jobs:
                   echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-asan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
                   echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-asan-clang-test/all-devices-app" >> /tmp/test_env.yaml
                   echo "BRIDGE_APP: objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-asan-clang-test-unified/chip-bridge-app" >> /tmp/test_env.yaml
-                  echo "CAMERA_APP: objdir-clone/linux-x64-camera-asan-clang/chip-camera-app" >> /tmp/test_env.yaml
-                  echo "CAMERA_CONTROLLER_APP: objdir-clone/linux-x64-camera-controller-asan-clang/chip-camera-controller" >> /tmp/test_env.yaml
+                  echo "CAMERA_APP: objdir-clone/linux-x64-camera-asan/chip-camera-app" >> /tmp/test_env.yaml
+                  echo "CAMERA_CONTROLLER_APP: objdir-clone/linux-x64-camera-controller-asan/chip-camera-controller" >> /tmp/test_env.yaml
                   echo "CHIP_LOCK_APP: objdir-clone/linux-x64-lock-${BUILD_VARIANT}-asan-clang-test-unified/chip-lock-app" >> /tmp/test_env.yaml
                   echo "CHIP_MICROWAVE_OVEN_APP: objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-asan-clang-test-unified/chip-microwave-oven-app" >> /tmp/test_env.yaml
                   echo "CHIP_RVC_APP: objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-asan-clang-test-unified/chip-rvc-app" >> /tmp/test_env.yaml
