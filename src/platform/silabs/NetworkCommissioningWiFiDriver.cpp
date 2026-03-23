@@ -249,7 +249,7 @@ bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     return true;
 }
 
-void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
+void SlWiFiDriver::OnScanWiFiNetworkDone(NetworkCommissioning::WiFiScanResponse * aScanResult)
 {
     SlWiFiDriver * nwDriver = NetworkCommissioning::SlWiFiDriver::GetInstance();
     // Cannot use the driver if the instance is not initialized.
@@ -278,18 +278,7 @@ void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
     }
     else
     {
-        NetworkCommissioning::WiFiScanResponse scanResponse = {};
-
-        scanResponse.security        = aScanResult->security;
-        scanResponse.channel         = aScanResult->chan;
-        scanResponse.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
-        scanResponse.signal.strength = aScanResult->rssi;
-        scanResponse.ssidLen         = aScanResult->ssid_length;
-        memcpy(scanResponse.ssid, aScanResult->ssid, scanResponse.ssidLen);
-        memcpy(scanResponse.bssid, aScanResult->bssid, sizeof(scanResponse.bssid));
-        scanResponse.wiFiBand = aScanResult->wiFiBand;
-
-        mScanResponseIter.Add(&scanResponse);
+        mScanResponseIter.Add(aScanResult);
     }
 }
 
