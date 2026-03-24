@@ -116,10 +116,7 @@ public:
     // Groupcast configurations
 #if CHIP_CONFIG_ENABLE_GROUPCAST
     uint16_t getMaxMembershipCount() override { return kMaxMembershipCount; }
-    uint16_t getMaxMcastAddrCount() override
-    {
-        return kMaxMcastAddrCount;
-    }
+    uint16_t getMaxMcastAddrCount() override { return kMaxMcastAddrCount; }
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
     bool ConsumeAuxAclNotificationNeeded() override
     {
