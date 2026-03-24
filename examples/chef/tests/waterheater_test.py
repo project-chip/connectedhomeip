@@ -45,8 +45,9 @@ class TC_WATERHEATER(MatterBaseTest):
     def steps_TC_WATERHEATER(self):
         return [TestStep(1, "Commissioning already done.", is_commissioning=True),
                 TestStep(2, "Test identify cluster."),
-                TestStep(3, "Set up PwRPC connection."),
-                TestStep(4, "PwRPC tests.")]
+                TestStep(3, "Test water heater mode cluster."),
+                TestStep(4, "Set up PwRPC connection."),
+                TestStep(5, "PwRPC tests: Tests that use at least 1 PwRPC call.")]
 
     async def _read_identify_time(self):
         return await self.read_single_attribute_check_success(
@@ -202,6 +203,61 @@ class TC_WATERHEATER(MatterBaseTest):
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.EstimatedHeatRequired)
         asserts.assert_equal(val, 0, "EstimatedHeatRequired should be 0 when temperature is above setpoint")
 
+    async def water_heater_mode_test(self):
+        cluster = Clusters.Objects.WaterHeaterMode
+        attributes = cluster.Attributes
+
+        # 1. Read SupportedModes
+        supported_modes = await self.read_single_attribute_check_success(
+            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.SupportedModes)
+
+        asserts.assert_equal(len(supported_modes), 2, "SupportedModes should have 2 entries")
+
+        # Verify Mode 0: Off
+        asserts.assert_equal(supported_modes[0].mode, 0, "Mode 0 should be 0")
+        asserts.assert_equal(supported_modes[0].label, "Off", "Label for mode 0 should be 'Off'")
+        asserts.assert_equal(len(supported_modes[0].modeTags), 1, "Mode 0 should have 1 tag")
+        asserts.assert_equal(supported_modes[0].modeTags[0].value, cluster.Enums.ModeTag.kOff, "Tag for mode 0 should be kOff")
+
+        # Verify Mode 1: Manual
+        asserts.assert_equal(supported_modes[1].mode, 1, "Mode 1 should be 1")
+        asserts.assert_equal(supported_modes[1].label, "Manual", "Label for mode 1 should be 'Manual'")
+        asserts.assert_equal(len(supported_modes[1].modeTags), 1, "Mode 1 should have 1 tag")
+        asserts.assert_equal(supported_modes[1].modeTags[0].value, cluster.Enums.ModeTag.kManual, "Tag for mode 1 should be kManual")
+
+        # 2. Read CurrentMode
+        current_mode = await self.read_single_attribute_check_success(
+            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.CurrentMode)
+
+        # 3. Change to Mode 1 (Manual)
+        await self.send_single_cmd(
+            cmd=cluster.Commands.ChangeToMode(newMode=1),
+            endpoint=self.ENDPOINT
+        )
+
+        # 4. Verify CurrentMode is 1
+        current_mode = await self.read_single_attribute_check_success(
+            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.CurrentMode)
+        asserts.assert_equal(current_mode, 1, "CurrentMode should be 1 (Manual)")
+
+        # 5. Change to Mode 0 (Off)
+        await self.send_single_cmd(
+            cmd=cluster.Commands.ChangeToMode(newMode=0),
+            endpoint=self.ENDPOINT
+        )
+
+        # 6. Verify CurrentMode is 0
+        current_mode = await self.read_single_attribute_check_success(
+            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.CurrentMode)
+        asserts.assert_equal(current_mode, 0, "CurrentMode should be 0 (Off)")
+
+        # 7. Try an invalid mode (e.g., 2) and verify it returns UnsupportedMode
+        response = await self.send_single_cmd(
+            cmd=cluster.Commands.ChangeToMode(newMode=2),
+            endpoint=self.ENDPOINT
+        )
+        asserts.assert_equal(response.status, 1, "Status should be UnsupportedMode (1)") # StatusCode::kUnsupportedMode = 0x01
+
     @async_test_body
     async def test_TC_WATERHEATER(self):
         # Step 1: Commissioning already done.
@@ -222,8 +278,12 @@ class TC_WATERHEATER(MatterBaseTest):
         asserts.assert_greater(identify_time, 0)
         asserts.assert_less_equal(identify_time, 5)
 
-        # Step 3: Set up PwRPC connection.
+        # Step 3: Test water heater mode cluster.
         self.step(3)
+        await self.water_heater_mode_test()
+
+        # Step 4: Set up PwRPC connection.
+        self.step(4)
         device_connection = create_device_serial_or_socket_connection(
             device="",
             baudrate=self._PW_RPC_BAUD_RATE,
@@ -236,8 +296,8 @@ class TC_WATERHEATER(MatterBaseTest):
             device_tracing=False,
         )
 
-        # Step 4: PwRPC tests. All tests using PwRPC calls.
-        self.step(4)
+        # Step 5: PwRPC tests. All tests using PwRPC calls.
+        self.step(5)
         with device_connection as device:
             await self.thermostat_test(device)
             await self.water_heater_management_test(device)
