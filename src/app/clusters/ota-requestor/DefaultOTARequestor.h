@@ -104,7 +104,10 @@ public:
     CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation) override;
 
     // Retrieve an iterator to the cached default OTA provider list
-    ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override { return mDefaultOtaProviderList.Begin(); }
+    ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override
+    {
+        return mAttributes->GetDefaultOtaProviderListIterator();
+    }
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state,
@@ -337,7 +340,6 @@ private:
     char mFileDesignatorBuffer[bdx::kMaxFileDesignatorLen];
     CharSpan mFileDesignator;
     Server * mServer = nullptr;
-    ProviderLocationList mDefaultOtaProviderList;
     // Provider location used for the current/last update in progress. Note that on reboot, this value will be read from the
     // persistent storage (if available), used for sending the NotifyApplied message, and then cleared. This will ensure determinism
     // in the OTARequestorDriver on reboot.

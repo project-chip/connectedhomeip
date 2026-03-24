@@ -528,7 +528,7 @@ CHIP_ERROR DefaultOTARequestor::TriggerImmediateQuery(FabricIndex fabricIndex)
     }
     else
     {
-        for (auto providerIter = mDefaultOtaProviderList.Begin(); providerIter.Next();)
+        for (auto providerIter = mAttributes->GetDefaultOtaProviderListIterator(); providerIter.Next();)
         {
             providerLocation = providerIter.GetValue();
 
@@ -609,32 +609,12 @@ void DefaultOTARequestor::NotifyUpdateApplied()
 
 CHIP_ERROR DefaultOTARequestor::ClearDefaultOtaProviderList(FabricIndex fabricIndex)
 {
-    CHIP_ERROR error = mDefaultOtaProviderList.Delete(fabricIndex);
-
-    // Ignore the error if no entry for the associated fabric index has been found.
-    VerifyOrReturnError(error != CHIP_ERROR_NOT_FOUND, CHIP_NO_ERROR);
-    ReturnErrorOnFailure(error);
-
-    return mStorage->StoreDefaultProviders(mDefaultOtaProviderList);
+    return mAttributes->ClearDefaultOtaProviderList(fabricIndex);
 }
 
 CHIP_ERROR DefaultOTARequestor::AddDefaultOtaProvider(const ProviderLocationType & providerLocation)
 {
-    // Look for an entry with the same fabric index indicated
-    auto iterator = mDefaultOtaProviderList.Begin();
-    while (iterator.Next())
-    {
-        ProviderLocationType pl = iterator.GetValue();
-        if (pl.GetFabricIndex() == providerLocation.GetFabricIndex())
-        {
-            ChipLogError(SoftwareUpdate, "Default OTA provider entry with fabric %d already exists", pl.GetFabricIndex());
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-        }
-    }
-
-    ReturnErrorOnFailure(mDefaultOtaProviderList.Add(providerLocation));
-
-    return mStorage->StoreDefaultProviders(mDefaultOtaProviderList);
+    return mAttributes->AddDefaultOtaProvider(providerLocation);
 }
 
 void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTAChangeReasonEnum reason)
@@ -661,7 +641,7 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
 
 void DefaultOTARequestor::OnUpdateProgressChanged(Nullable<uint8_t> percent)
 {
-    (void) mAttributes->SetUpdateStateProgress(percent);
+    TEMPORARY_RETURN_IGNORED mAttributes->SetUpdateStateProgress(percent);
 }
 
 IdleStateReason DefaultOTARequestor::MapErrorToIdleStateReason(CHIP_ERROR error)
@@ -962,7 +942,7 @@ void DefaultOTARequestor::StoreCurrentUpdateInfo()
 
 void DefaultOTARequestor::LoadCurrentUpdateInfo()
 {
-    TEMPORARY_RETURN_IGNORED mStorage->LoadDefaultProviders(mDefaultOtaProviderList);
+    TEMPORARY_RETURN_IGNORED mAttributes->SetStorageAndLoadDefaultOtaProviders(*mStorage);
 
     ProviderLocationType providerLocation;
     if (mStorage->LoadCurrentProviderLocation(providerLocation) == CHIP_NO_ERROR)
@@ -977,7 +957,7 @@ void DefaultOTARequestor::LoadCurrentUpdateInfo()
     }
 
     OTAUpdateStateEnum updateState = OTAUpdateStateEnum::kIdle;
-    (void) mStorage->LoadCurrentUpdateState(updateState);
+    TEMPORARY_RETURN_IGNORED mStorage->LoadCurrentUpdateState(updateState);
     mAttributes->SetUpdateState(updateState);
 
     if (mStorage->LoadTargetVersion(mTargetVersion) != CHIP_NO_ERROR)

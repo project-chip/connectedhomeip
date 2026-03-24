@@ -18,6 +18,7 @@
 
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 
+#include <app/clusters/ota-requestor/OTARequestorStorage.h>
 #include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/data-model/Nullable.h>
 #include <clusters/OtaSoftwareUpdateRequestor/AttributeIds.h>
@@ -87,6 +88,10 @@ CHIP_ERROR OTARequestorAttributes::ClearDefaultOtaProviderList(FabricIndex fabri
     {
         mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, DefaultOTAProviders::Id });
     }
+    if (mStorage)
+    {
+        ReturnErrorOnFailure(mStorage->StoreDefaultProviders(mProviders));
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -110,12 +115,22 @@ CHIP_ERROR OTARequestorAttributes::AddDefaultOtaProvider(const ProviderLocationT
     {
         mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, DefaultOTAProviders::Id });
     }
+    if (mStorage)
+    {
+        ReturnErrorOnFailure(mStorage->StoreDefaultProviders(mProviders));
+    }
     return CHIP_NO_ERROR;
 }
 
 ProviderLocationList::Iterator OTARequestorAttributes::GetDefaultOtaProviderListIterator()
 {
     return mProviders.Begin();
+}
+
+CHIP_ERROR OTARequestorAttributes::SetStorageAndLoadDefaultOtaProviders(OTARequestorStorage & storage)
+{
+    mStorage = &storage;
+    return mStorage->LoadDefaultProviders(mProviders);
 }
 
 } // namespace chip

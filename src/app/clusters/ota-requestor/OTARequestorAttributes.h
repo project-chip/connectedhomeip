@@ -24,8 +24,9 @@
 #pragma once
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
-#include <app/data-model/Nullable.h>
+#include <app/clusters/ota-requestor/OTARequestorStorage.h>
 #include <app/data-model-provider/ProviderChangeListener.h>
+#include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -54,6 +55,7 @@ public:
     ProviderLocationList::Iterator GetDefaultOtaProviderListIterator();
 
     CHIP_ERROR SetChangeListener(EndpointId endpointId, app::DataModel::ProviderChangeListener & dataModelChangeListener);
+    CHIP_ERROR SetStorageAndLoadDefaultOtaProviders(OTARequestorStorage & storage);
 
 private:
     ProviderLocationList mProviders;
@@ -62,7 +64,9 @@ private:
     bool mUpdatePossible = true;
 
     app::DataModel::ProviderChangeListener * mDataModelChangeListener = nullptr;
-    EndpointId mEndpointId = kInvalidEndpointId;
+    EndpointId mEndpointId                                            = kInvalidEndpointId;
+
+    OTARequestorStorage * mStorage = nullptr;
 };
 
 } // namespace chip
