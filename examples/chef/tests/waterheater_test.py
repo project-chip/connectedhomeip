@@ -129,11 +129,6 @@ class TC_WATERHEATER(MatterBaseTest):
         cluster = Clusters.Objects.WaterHeaterManagement
         attributes = cluster.Attributes
 
-        # 0. FeatureMap (read-only attribute) - verify its default value.
-        val = await self.read_single_attribute_check_success(
-            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.FeatureMap)
-        asserts.assert_equal(val, 0, "FeatureMap initial value should be 0")
-
         # 1. HeaterTypes (read-only attribute) - verify its default value.
         expected_heater_types = cluster.Bitmaps.HeaterTypesBitmap.kImmersionElement1 | cluster.Bitmaps.HeaterTypesBitmap.kHeatPump
         val = await self.read_single_attribute_check_success(
@@ -217,6 +212,11 @@ class TC_WATERHEATER(MatterBaseTest):
     async def water_heater_mode_test(self):
         cluster = Clusters.Objects.WaterHeaterMode
         attributes = cluster.Attributes
+
+        # 0. FeatureMap (read-only attribute) - verify its default value.
+        val = await self.read_single_attribute_check_success(
+            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.FeatureMap)
+        asserts.assert_equal(val, 0, "WaterHeaterMode FeatureMap initial value should be 0")
 
         # 1. Read SupportedModes
         supported_modes = await self.read_single_attribute_check_success(
