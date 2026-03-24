@@ -20,6 +20,16 @@
  *      PSA Crypto API based implementation of CHIP crypto primitives
  */
 
+// In mbedTLS v4.0, ECP and bignum function declarations moved to private headers.
+// These must be included before CHIPCryptoPALmbedTLS.h which transitively includes
+// the public mbedtls/ecp.h (they share the same include guard MBEDTLS_ECP_H).
+#include <mbedtls/version.h>
+#if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+#define MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
+#include <mbedtls/private/bignum.h>
+#include <mbedtls/private/ecp.h>
+#endif
+
 #include "CHIPCryptoPALPSA.h"
 #include "CHIPCryptoPALmbedTLS.h"
 
@@ -34,8 +44,11 @@
 
 #include <psa/crypto.h>
 
+#if (MBEDTLS_VERSION_NUMBER < 0x04000000)
 #include <mbedtls/bignum.h>
 #include <mbedtls/ecp.h>
+#endif
+
 #include <mbedtls/error.h>
 #include <mbedtls/x509_csr.h>
 
