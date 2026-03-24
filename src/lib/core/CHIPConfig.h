@@ -1137,7 +1137,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Enable (1) or disable (0) the Groupcast cluster.
  */
 #ifndef CHIP_CONFIG_ENABLE_GROUPCAST
-#define CHIP_CONFIG_ENABLE_GROUPCAST 1
+#define CHIP_CONFIG_ENABLE_GROUPCAST 0
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
 /**
