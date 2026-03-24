@@ -44,6 +44,7 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <set>
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
 namespace {
 
 using namespace chip;
@@ -1628,3 +1629,4 @@ TEST_F(TestGroupcastCluster, TestAuxiliaryAccessUpdatedEvent)
 }
 
 } // namespace
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
