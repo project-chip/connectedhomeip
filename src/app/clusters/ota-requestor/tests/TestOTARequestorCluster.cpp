@@ -133,14 +133,13 @@ TEST_F(TestOTARequestorCluster, AttributeListTest)
     OTARequestorCluster cluster(kTestEndpointId, otaRequestor, attributes);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(
-        chip::Testing::IsAttributesListEqualTo(cluster,
-                                               {
-                                                   DefaultOTAProviders::kMetadataEntry,
-                                                   UpdatePossible::kMetadataEntry,
-                                                   UpdateState::kMetadataEntry,
-                                                   UpdateStateProgress::kMetadataEntry,
-                                               }));
+    EXPECT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster,
+                                                       {
+                                                           DefaultOTAProviders::kMetadataEntry,
+                                                           UpdatePossible::kMetadataEntry,
+                                                           UpdateState::kMetadataEntry,
+                                                           UpdateStateProgress::kMetadataEntry,
+                                                       }));
 }
 
 TEST_F(TestOTARequestorCluster, AcceptedCommandsTest)
@@ -270,8 +269,7 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
     provider.fabricIndex    = 2;
     EXPECT_EQ(otaRequestor.AddDefaultOtaProvider(provider), CHIP_NO_ERROR);
     DataModel::DecodableList<DecodableProviderLocation> defaultOtaProviders;
-    EXPECT_EQ(tester.ReadAttribute(DefaultOTAProviders::Id, defaultOtaProviders),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(tester.ReadAttribute(DefaultOTAProviders::Id, defaultOtaProviders), CHIP_NO_ERROR);
     size_t defaultOtaProvidersSize;
     ASSERT_EQ(defaultOtaProviders.ComputeSize(&defaultOtaProvidersSize), CHIP_NO_ERROR);
     EXPECT_EQ(defaultOtaProvidersSize, 1u);
@@ -294,14 +292,12 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
 
     // Read and verify UpdateStateProgress.
     DataModel::Nullable<uint8_t> updateStateProgress;
-    EXPECT_EQ(tester.ReadAttribute(UpdateStateProgress::Id, updateStateProgress),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(tester.ReadAttribute(UpdateStateProgress::Id, updateStateProgress), CHIP_NO_ERROR);
     EXPECT_TRUE(updateStateProgress.IsNull());
 
     // Verify a non-null value as well.
     otaRequestor.SetUpdateStateProgress(85);
-    EXPECT_EQ(tester.ReadAttribute(UpdateStateProgress::Id, updateStateProgress),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(tester.ReadAttribute(UpdateStateProgress::Id, updateStateProgress), CHIP_NO_ERROR);
     EXPECT_FALSE(updateStateProgress.IsNull());
     EXPECT_EQ(updateStateProgress.Value(), 85);
 
@@ -368,18 +364,15 @@ TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite
     auto & changeListener = context.ChangeListener();
     changeListener.DirtyList().clear();
 
-    std::optional<DataModel::ActionReturnStatus> result =
-        tester.WriteAttribute(UpdatePossible::Id, false);
+    std::optional<DataModel::ActionReturnStatus> result = tester.WriteAttribute(UpdatePossible::Id, false);
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
 
-    result = tester.WriteAttribute(UpdateState::Id,
-                                   OtaSoftwareUpdateRequestor::UpdateStateEnum::kDelayedOnApply);
+    result = tester.WriteAttribute(UpdateState::Id, OtaSoftwareUpdateRequestor::UpdateStateEnum::kDelayedOnApply);
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
 
-    result = tester.WriteAttribute(UpdateStateProgress::Id,
-                                   DataModel::MakeNullable<uint8_t>(50));
+    result = tester.WriteAttribute(UpdateStateProgress::Id, DataModel::MakeNullable<uint8_t>(50));
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
 
