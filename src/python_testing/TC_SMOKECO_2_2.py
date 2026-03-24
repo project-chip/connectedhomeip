@@ -45,7 +45,7 @@ import logging
 from TC_SMOKECOTestBase import SmokeCoBaseTest
 
 import matter.clusters as Clusters
-from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body, has_feature, run_if_endpoint_matches
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -111,7 +111,7 @@ class TC_SMOKECO_2_2(SmokeCoBaseTest):
             "SMOKECO.S",
         ]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.SmokeCoAlarm))
+    @run_if_endpoint_matches(has_feature(cluster=Clusters.SmokeCoAlarm,feature=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm))
     async def test_TC_SMOKECO_2_2(self):
 
         # Runs the test using the base template
