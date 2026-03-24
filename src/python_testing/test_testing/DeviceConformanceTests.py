@@ -17,6 +17,7 @@
 
 
 from typing import Callable, Optional
+import logging
 
 import matter.clusters as Clusters
 from matter.testing.basic_composition import BasicCompositionTests
@@ -31,6 +32,7 @@ from matter.testing.spec_parsing import (CommandType, PrebuiltDataModelDirectory
                                          build_xml_device_types, build_xml_namespaces)
 from matter.tlv import uint
 
+logger = logging.getLogger(__name__)
 
 def get_supersets(xml_device_types: dict[int, XmlDeviceType]) -> list[set[int]]:
     ''' Returns a list of the sets of device type id that each constitute a single superset.
@@ -478,6 +480,15 @@ class DeviceConformanceTests(BasicCompositionTests):
     def check_flat_model_device_type_requirements(self, allow_provisional: bool = False) -> tuple[bool, list[ProblemNotice]]:
         success = True
         problems = []
+
+        try:
+            spec_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
+        except KeyError:
+            spec_version = 0
+
+        if spec_version < 0x01060000:
+            logger.info("Skipping flat model device type requirements check: this test is not enabled for versions below 1.6")
+            return success, problems
 
         def record_error(location, problem):
             nonlocal success

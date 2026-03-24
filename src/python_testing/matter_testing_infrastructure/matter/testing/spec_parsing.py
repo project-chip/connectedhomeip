@@ -1542,8 +1542,10 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                     # Conformance
                     conformance_xml, tmp_problem = get_conformance(composed_dt, uint(id))
                     if tmp_problem:
-                        problems.append(tmp_problem)
-                        continue
+                        # Composed device types in versions 1.5.1 and earlier often lack explicit conformance in XML.
+                        # Default them to optionalConform to prevent parser warnings.
+                        # TODO: Report as a problem once all data_model files are updated with composedDeviceType definitions.
+                        conformance_xml = ElementTree.Element('optionalConform')
 
                     try:
                         conformance = parse_callable_from_xml(conformance_xml, ConformanceParseParameters(
