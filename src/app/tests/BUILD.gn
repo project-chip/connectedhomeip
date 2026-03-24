@@ -351,4 +351,12 @@ chip_test_suite("tests") {
   if (chip_device_platform != "nrfconnect") {
     test_sources += [ "TestEventLogging.cpp" ]
   }
+
+  # Some test files use complex mock object initialization, which leads to high
+  # estimated stack usage. This is acceptable for test code but causes the build
+  # to fail when stack-usage warnings are treated as errors.
+  # Disable the error on Zephyr so these tests can compile.
+  if (chip_device_platform == "zephyr") {
+    cflags += [ "-Wno-error=stack-usage=" ]
+  }
 }
