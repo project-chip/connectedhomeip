@@ -703,18 +703,25 @@ void WaterHeaterInit()
     called = true;
 
 #if (MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                       \
-    (MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
+    (MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) && (MATTER_DM_WATER_HEATER_MODE_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
     if (!DeviceTypes::EndpointHasDeviceType(1, Device::kWaterHeaterDeviceTypeId))
     {
         return;
     }
+    // WaterHeaterManagement initialisation
     static WaterHeaterManagement::Chef::ChefDelegate delegate;
     delegate.SetEndpointId(1);
     static WaterHeaterManagement::Instance instance(
         1, delegate,
         WaterHeaterManagement::Feature(to_underlying(WaterHeaterManagement::Feature::kTankPercent) |
                                        to_underlying(WaterHeaterManagement::Feature::kEnergyManagement)));
-    VerifyOrDieWithMsg(instance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterManagement instance.");
+
+    // WaterHeaterMode initialisation
+    uint32_t WaterHeaterModefeatureMap = 0;
+    static ModeBase::DefaultChefDelegate WaterHeaterModeDelegate(WaterHeaterMode::Chef::kSupportedModes);
+    static ModeBase::Instance WaterHeaterModeInstance(&WaterHeaterModeDelegate, 1, WaterHeaterMode::Id, WaterHeaterModefeatureMap);
+    WaterHeaterModeInstance(WaterHeaterModeInstance->Init() == CHIP_NO_ERROR, Zcl,
+                            "Failed to initialise WaterHeaterMode instance.");
 #endif
 }
 
