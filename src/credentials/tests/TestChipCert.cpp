@@ -117,7 +117,7 @@ static bool DeterministicECDSASupported()
         P256Keypair keypair;
         P256ECDSASignature sig;
         const uint8_t probe = 0;
-        RETURN_SAFELY_IGNORED keypair.Initialize(ECPKeyTarget::ECDSA);
+        SuccessOrDie(keypair.Initialize(ECPKeyTarget::ECDSA));
         return keypair.ECDSA_sign_msg_det(&probe, 1, sig) != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }();
     return supported;
