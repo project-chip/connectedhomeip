@@ -34,6 +34,7 @@ from matter.tlv import uint
 
 logger = logging.getLogger(__name__)
 
+
 def get_supersets(xml_device_types: dict[int, XmlDeviceType]) -> list[set[int]]:
     ''' Returns a list of the sets of device type id that each constitute a single superset.
 
