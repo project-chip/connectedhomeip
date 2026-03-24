@@ -44,7 +44,6 @@ class TC_WATERHEATER(MatterBaseTest):
     INITIAL_TANK_PERCENTAGE = 50
     MIN_BOOST_DURATION = 60
 
-
     def desc_TC_WATERHEATER(self) -> str:
         return "[TC_WATERHEATER] chef waterheater functionality test."
 
@@ -123,7 +122,8 @@ class TC_WATERHEATER(MatterBaseTest):
         # 2. Read ThermostatRunningState and check it is Heat.
         val = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.ThermostatRunningState)
-        asserts.assert_equal(val, cluster.Bitmaps.RelayStateBitmap.kHeat, f"ThermostatRunningState should be {cluster.Bitmaps.RelayStateBitmap.kHeat}")
+        asserts.assert_equal(val, cluster.Bitmaps.RelayStateBitmap.kHeat,
+                             f"ThermostatRunningState should be {cluster.Bitmaps.RelayStateBitmap.kHeat}")
 
     async def water_heater_management_test(self, device):
         cluster = Clusters.Objects.WaterHeaterManagement
