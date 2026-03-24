@@ -394,8 +394,10 @@ public:
     }
 
     // Groupcast
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     virtual uint16_t getMaxMembershipCount() = 0;
     virtual uint16_t getMaxMcastAddrCount()  = 0;
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     /**
      * @brief Check if a notification is needed for Auxiliary ACL changes and reset the flag.

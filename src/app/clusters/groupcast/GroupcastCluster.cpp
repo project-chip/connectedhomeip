@@ -10,6 +10,8 @@
 #include <lib/support/CodeUtils.h>
 #include <transport/raw/GroupcastTesting.h>
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+
 using chip::Protocols::InteractionModel::Status;
 
 using namespace chip::Credentials;
@@ -778,3 +780,5 @@ void GroupcastCluster::EmitAuxiliaryAccessUpdated(const chip::Access::SubjectDes
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST

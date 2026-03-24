@@ -114,15 +114,13 @@ public:
     GroupSessionIterator * IterateGroupSessions(uint16_t session_id) override;
 
     // Groupcast configurations
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     uint16_t getMaxMembershipCount() override { return kMaxMembershipCount; }
     uint16_t getMaxMcastAddrCount() override
     {
-#if CHIP_CONFIG_ENABLE_GROUPCAST
         return kMaxMcastAddrCount;
-#else
-        return 1;
-#endif // CHIP_CONFIG_ENABLE_GROUPCAST
     }
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
     bool ConsumeAuxAclNotificationNeeded() override
     {
 #if CHIP_CONFIG_ENABLE_GROUPCAST

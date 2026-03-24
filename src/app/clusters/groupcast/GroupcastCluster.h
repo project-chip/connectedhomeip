@@ -30,6 +30,8 @@
 #include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -159,3 +161,5 @@ private:
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
