@@ -442,6 +442,34 @@ class AndroidBuilder(Builder):
                 gn_args["is_debug"] = False
                 gn_args["matter_enable_tracing_support"] = False
                 gn_args["use_static_libcxx"] = True
+
+                # TV Casting App size optimizations: compile only the
+                # ~36 casting-relevant clusters instead of the full
+                # generated cluster-objects.cpp, and use slim TLV
+                # decoder source overrides covering only the 18
+                # casting clusters so that ChipClusters.java
+                # read/subscribe APIs remain functional at runtime.
+                # These must be passed as explicit GN build args
+                # because args.gni is evaluated inside default_args
+                # (before args.gn is applied), so the
+                # if (optimize_apk_size) conditional there cannot see
+                # the args.gn value.
+                if self.app == AndroidApp.TV_CASTING_APP:
+                    gn_args["chip_cluster_objects_source_override"] = (
+                        "//third_party/connectedhomeip/examples/"
+                        "tv-casting-app/tv-casting-common/"
+                        "casting-cluster-objects.cpp"
+                    )
+                    gn_args["chip_tlv_decoder_attribute_source_override"] = (
+                        "//third_party/connectedhomeip/examples/"
+                        "tv-casting-app/tv-casting-common/"
+                        "casting-CHIPAttributeTLVValueDecoder.cpp"
+                    )
+                    gn_args["chip_tlv_decoder_event_source_override"] = (
+                        "//third_party/connectedhomeip/examples/"
+                        "tv-casting-app/tv-casting-common/"
+                        "casting-CHIPEventTLVValueDecoder.cpp"
+                    )
             gn_args.update(self.app.AppGnArgs())
 
             args_str = ""
