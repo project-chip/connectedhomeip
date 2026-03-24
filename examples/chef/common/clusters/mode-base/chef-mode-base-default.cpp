@@ -23,22 +23,22 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeBase;
 
-CHIP_ERROR ChefDelegate::Init()
+CHIP_ERROR DefaultChefDelegate::Init()
 {
     return CHIP_NO_ERROR;
 }
 
-void ChefDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
+void DefaultChefDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
     EndpointId endpointId = GetInstance()->GetEndpointId();
-    ChipLogDetail(DeviceLayer, "HandleChangeToMode: Endpoint %d", endpointId);
+    ChipLogDetail(DeviceLayer, "DefaultChefDelegate::HandleChangeToMode: Endpoint %d", endpointId);
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
-CHIP_ERROR ChefDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
+CHIP_ERROR DefaultChefDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
     EndpointId endpointId = GetInstance()->GetEndpointId();
-    ChipLogDetail(DeviceLayer, "GetModeLabelByIndex: Endpoint %d", endpointId);
+    ChipLogDetail(DeviceLayer, "DefaultChefDelegate::GetModeLabelByIndex: Endpoint %d", endpointId);
     if (modeIndex >= mModeOptions.size())
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -46,10 +46,10 @@ CHIP_ERROR ChefDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCha
     return chip::CopyCharSpanToMutableCharSpan(mModeOptions[modeIndex].label, label);
 }
 
-CHIP_ERROR ChefDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
+CHIP_ERROR DefaultChefDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
     EndpointId endpointId = GetInstance()->GetEndpointId();
-    ChipLogDetail(DeviceLayer, "GetModeValueByIndex: Endpoint %d", endpointId);
+    ChipLogDetail(DeviceLayer, "DefaultChefDelegate::GetModeValueByIndex: Endpoint %d", endpointId);
     if (modeIndex >= mModeOptions.size())
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -58,10 +58,10 @@ CHIP_ERROR ChefDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChefDelegate::GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<detail::Structs::ModeTagStruct::Type> & tags)
+CHIP_ERROR DefaultChefDelegate::GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<detail::Structs::ModeTagStruct::Type> & tags)
 {
     EndpointId endpointId = GetInstance()->GetEndpointId();
-    ChipLogDetail(DeviceLayer, "GetModeTagsByIndex: Endpoint %d", endpointId);
+    ChipLogDetail(DeviceLayer, "DefaultChefDelegate::GetModeTagsByIndex: Endpoint %d", endpointId);
     if (modeIndex >= mModeOptions.size())
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;

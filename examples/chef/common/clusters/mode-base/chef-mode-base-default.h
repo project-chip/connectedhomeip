@@ -26,11 +26,11 @@ namespace app {
 namespace Clusters {
 namespace ModeBase {
 
-class ChefDelegate : public Delegate
+class DefaultChefDelegate : public Delegate
 {
 public:
-    ChefDelegate(const Span<detail::Structs::ModeOptionStruct::Type> aModeOptions) : mModeOptions(aModeOptions) {}
-    ~ChefDelegate() override = default;
+    DefaultChefDelegate(const Span<detail::Structs::ModeOptionStruct::Type> aModeOptions) : mModeOptions(aModeOptions) {}
+    ~DefaultChefDelegate() override = default;
 
     CHIP_ERROR Init() override;
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override;
