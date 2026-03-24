@@ -76,7 +76,7 @@ CHIP_ERROR OTARequestorAttributes::SetChangeListener(EndpointId endpointId,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTARequestorAttributes::ClearDefaultOtaProviderList(FabricIndex fabricIndex)
+CHIP_ERROR OTARequestorAttributes::RemoveDefaultOtaProvider(FabricIndex fabricIndex)
 {
     CHIP_ERROR error = mProviders.Delete(fabricIndex);
 

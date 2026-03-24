@@ -609,7 +609,7 @@ void DefaultOTARequestor::NotifyUpdateApplied()
 
 CHIP_ERROR DefaultOTARequestor::ClearDefaultOtaProviderList(FabricIndex fabricIndex)
 {
-    return mAttributes->ClearDefaultOtaProviderList(fabricIndex);
+    return mAttributes->RemoveDefaultOtaProvider(fabricIndex);
 }
 
 CHIP_ERROR DefaultOTARequestor::AddDefaultOtaProvider(const ProviderLocationType & providerLocation)

@@ -50,8 +50,8 @@ public:
     bool GetUpdatePossible() const { return mUpdatePossible; }
     void SetUpdatePossible(bool updatePossible);
 
-    CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex);
     CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation);
+    CHIP_ERROR RemoveDefaultOtaProvider(FabricIndex fabricIndex);
     ProviderLocationList::Iterator GetDefaultOtaProviderListIterator();
 
     CHIP_ERROR SetChangeListener(EndpointId endpointId, app::DataModel::ProviderChangeListener & dataModelChangeListener);
