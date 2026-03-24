@@ -1405,7 +1405,9 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoints(chip::FabricIndex fabric_index
     VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(group.Find(mStorage, fabric, group_id), CHIP_ERROR_KEY_NOT_FOUND);
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     bool notifyNeeded = (group.HasAuxiliaryACL() && group.endpoint_count > 0);
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     EndpointData endpoint(fabric_index, group.group_id, group.first_endpoint);
     size_t endpoint_index = 0;

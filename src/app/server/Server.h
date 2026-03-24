@@ -562,7 +562,7 @@ private:
                 : Transport::PeerAddress::Groupcast();
 #else
             const Transport::PeerAddress & address = Transport::PeerAddress::Multicast(fabric->GetFabricId(), new_group.group_id);
-#endif
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
             if (CHIP_NO_ERROR != mServer->GetTransportManager().MulticastGroupJoinLeave(address, true))
             {
                 ChipLogError(AppServer, "Unable to listen to group");
@@ -571,6 +571,7 @@ private:
 
         void OnGroupRemoved(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override
         {
+#if CHIP_CONFIG_ENABLE_GROUPCAST
             if (old_group.UsePerGroupAddress())
             {
                 // Per group address no longer in use, unsubscribe
@@ -615,6 +616,15 @@ private:
                     VerifyOrReturn(CHIP_NO_ERROR == mServer->GetTransportManager().MulticastGroupJoinLeave(address, false));
                 }
             }
+#else
+            const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
+            if (fabric == nullptr) {
+                ChipLogError(AppServer, "Group removed from nonexistent fabric?");
+                return;
+            }
+            TEMPORARY_RETURN_IGNORED mServer->GetTransportManager().MulticastGroupJoinLeave(
+                Transport::PeerAddress::Multicast(fabric->GetFabricId(), old_group.group_id), false);
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
         };
 
     private:

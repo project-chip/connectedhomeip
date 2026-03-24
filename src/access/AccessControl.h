@@ -651,7 +651,6 @@ public:
         return mDelegate->Entries(iterator, fabricIndex);
     }
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
     /**
      * Iterates over auxiliary entries for the given fabric.
      *
@@ -661,10 +660,13 @@ public:
     CHIP_ERROR AuxiliaryEntries(FabricIndex fabricIndex, EntryIterator & iterator) const
     {
         VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+#if CHIP_CONFIG_ENABLE_GROUPCAST
         VerifyOrReturnError(IsGroupAuxiliaryDelegateRegistered(), CHIP_ERROR_INCORRECT_STATE);
         return mGroupAuxDelegate->AuxiliaryEntries(iterator, &fabricIndex);
-    }
+#else
+        return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
+    }
 
     // Adds a listener to the end of the listener list, if not already in the list.
     void AddEntryListener(EntryListener & listener);
