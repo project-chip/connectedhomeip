@@ -99,6 +99,7 @@ source_set("actions-cluster-test-srcs") {
     "${chip_root}/src/app/clusters/actions-server/ActionsCluster.cpp",
     "${chip_root}/src/app/clusters/actions-server/ActionsDelegate.h",
     "${chip_root}/src/app/clusters/actions-server/ActionsStructs.h",
+    "${chip_root}/src/app/clusters/actions-server/CodegenIntegration.h",
     "${chip_root}/src/app/clusters/actions-server/actions-server.h",
   ]
 
@@ -349,5 +350,13 @@ chip_test_suite("tests") {
   # but it's not set up to deal with the timestamps being that low.
   if (chip_device_platform != "nrfconnect") {
     test_sources += [ "TestEventLogging.cpp" ]
+  }
+
+  # Some test files use complex mock object initialization, which leads to high
+  # estimated stack usage. This is acceptable for test code but causes the build
+  # to fail when stack-usage warnings are treated as errors.
+  # Disable the error on Zephyr so these tests can compile.
+  if (chip_device_platform == "zephyr") {
+    cflags += [ "-Wno-error=stack-usage=" ]
   }
 }

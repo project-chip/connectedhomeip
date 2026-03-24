@@ -267,9 +267,9 @@ CHIP_ERROR ESPWiFiDriver::DisconnectFromNetwork()
 
 void ESPWiFiDriver::OnConnectWiFiNetwork()
 {
+    DeviceLayer::SystemLayer().CancelTimer(OnConnectWiFiNetworkFailed, NULL);
     if (mpConnectCallback)
     {
-        DeviceLayer::SystemLayer().CancelTimer(OnConnectWiFiNetworkFailed, NULL);
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
@@ -348,7 +348,10 @@ exit:
     {
         ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         mpConnectCallback = nullptr;
-        callback->OnResult(networkingStatus, CharSpan(), 0);
+        if (callback)
+        {
+            callback->OnResult(networkingStatus, CharSpan(), 0);
+        }
     }
 }
 
