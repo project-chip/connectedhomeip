@@ -123,10 +123,10 @@ class TC_WATERHEATER(MatterBaseTest):
         attributes = cluster.Attributes
 
         # 1. HeaterTypes (read-only attribute) - verify its default value.
-        # mHeaterTypes = kImmersionElement1 | kHeatPump = (1 << 0) | (1 << 3) = 9
+        # mHeaterTypes = kImmersionElement1 | kHeatPump = (1 << 0) | (1 << 2) = 5
         val = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.HeaterTypes)
-        asserts.assert_equal(val, 5, "HeaterTypes initial value should be 9")
+        asserts.assert_equal(val, 5, "HeaterTypes initial value should be 5")
 
         # 2. TankVolume (read-only attribute) - verify its default value.
         # mTankVolume = 150
