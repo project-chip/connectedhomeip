@@ -192,7 +192,7 @@ struct ServerInitParams
     // Access control auxiliary delegate: Optional. Used to look up auxiliary access control rules.
     // If provided, must be initialized before being provided.
     Access::AccessControl::Delegate * groupAuxiliaryAccessControlDelegate = nullptr;
-#endif
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
     // ACL storage: MUST be injected. Used to store ACL entries in persistent storage. Must NOT
     // be initialized before being provided.
     app::AclStorage * aclStorage = nullptr;

@@ -243,7 +243,7 @@ void AccessControl::Finish()
         mGroupAuxDelegate->Finish();
         UnregisterGroupAuxiliaryDelegate();
     }
-#endif
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 }
 
 CHIP_ERROR AccessControl::CreateEntry(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t * index,

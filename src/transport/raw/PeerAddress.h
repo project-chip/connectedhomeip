@@ -267,7 +267,7 @@ public:
         // IANA assigned address
         return UDP(Inet::IPAddress::MakeIPv6PrefixMulticast(scope, prefixLength, 0xff05000000000000, 0xfa));
     }
-#endif
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
 private:
     constexpr PeerAddress(uint16_t shortId) : mTransportType(Type::kNfc), mId{ .mNFCShortId = shortId } {}

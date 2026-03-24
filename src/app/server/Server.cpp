@@ -818,9 +818,7 @@ void Server::RejoinExistingMulticastGroups()
                     // Already joined groupcast address
                     continue;
                 }
-#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
                 const Transport::PeerAddress & address = use_iana_addr
                     ? Transport::PeerAddress::Groupcast()
                     : Transport::PeerAddress::Multicast(fabric.GetFabricId(), groupInfo.group_id);
