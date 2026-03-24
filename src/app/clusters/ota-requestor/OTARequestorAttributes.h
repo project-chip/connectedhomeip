@@ -33,7 +33,8 @@
 namespace chip {
 
 // Class that tracks the non-array attributes in the OTA Requestor cluster. Marks
-// attributes dirty when they're changed.
+// attributes dirty when they're changed. Updates the storage when the default OTA
+// providers list changes.
 class OTARequestorAttributes
 {
 public:
