@@ -719,6 +719,7 @@ void WaterHeaterInit()
         1, delegate,
         WaterHeaterManagement::Feature(to_underlying(WaterHeaterManagement::Feature::kTankPercent) |
                                        to_underlying(WaterHeaterManagement::Feature::kEnergyManagement)));
+    VerifyOrDieWithMsg(instance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterManagement instance.");
 
     // WaterHeaterMode initialisation
     uint32_t WaterHeaterModefeatureMap = 0;
