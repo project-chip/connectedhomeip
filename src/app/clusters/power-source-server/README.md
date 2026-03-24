@@ -53,6 +53,11 @@ overall provides dynamic lifetime management. An example using it can be seen in
 `examples/evse-app/evse-common/include/EVSEManufacturerImpl.h` and corresponding
 `EVSEManufacturerImpl.cpp`.
 
+### Note
+
+The attributes that can be set in the `WiredConfiguration` or `BatteryConfiguration` do not have their
+corresponding `.Set*` methods, because they are marked as `Fixed` and can be set only during construction.
+
 ## Legacy Usage (Not Recommended)
 
 For backwards compatibility with applications that rely on older ZAP-generated
