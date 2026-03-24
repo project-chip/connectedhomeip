@@ -1,4 +1,4 @@
-# TV Casting App — Darwin (iOS/macOS) Size Analysis
+#TV Casting App — Darwin(iOS / macOS) Size Analysis
 
 This document analyzes the binary size of the Matter TV Casting framework
 on Darwin (iOS/macOS) and describes how iOS developers can integrate a
@@ -27,11 +27,11 @@ in its `MatterTvCastingBridge.framework` binary.
 ### How to measure
 
 ```bash
-# Archive file size (includes metadata — less meaningful)
+#Archive file size(includes metadata — less meaningful)
 ls -lh out/darwin-casting-default/lib/libTvCastingCommon.a
 ls -lh out/darwin-casting-optimized/lib/libTvCastingCommon.a
 
-# Actual code + data size (sum of __TEXT and __DATA across all .o files)
+#Actual code + data size(sum of __TEXT and __DATA across all.o files)
 size out/darwin-casting-default/lib/libTvCastingCommon.a \
   | awk 'NR>1 {t+=$1; d+=$2} END {printf "Default — text: %.1f MB  data: %.1f MB\n", t/1048576, d/1048576}'
 size out/darwin-casting-optimized/lib/libTvCastingCommon.a \
@@ -159,7 +159,7 @@ The `chip_xcode_build_connector.sh` script builds an `args` array that
 gets passed to `gn gen`. You can add size-optimization flags there:
 
 ```bash
-# In chip_xcode_build_connector.sh, add to the args array:
+#In chip_xcode_build_connector.sh, add to the args array:
 args+=(
     'optimize_apk_size=true'
     'is_debug=false'
@@ -177,21 +177,21 @@ run the GN build directly:
 ```bash
 source scripts/activate.sh
 
-# Default build (current state) — uses target_os="mac" so no iOS SDK
-# sysroot is needed. The compiled code is the same; only the Mach-O
-# platform tag differs, so sizes are representative of iOS.
+#Default build(current state) — uses target_os = "mac" so no iOS SDK
+#sysroot is needed.The compiled code is the same; only the Mach - O
+#platform tag differs, so sizes are representative of iOS.
 #
-# NOTE: The import() must come first in the args string. GN does not
-# allow setting a variable before importing a file that declares it
-# with declare_args().
+#NOTE : The import() must come first in the args string.GN does not
+#allow setting a variable before importing a file that declares it
+#with declare_args().
 gn gen out/darwin-casting-default --args='import("//examples/tv-casting-app/darwin/args.gni") target_os="mac" target_cpu="arm64" build_tv_casting_common_a=true'
 ninja -C out/darwin-casting-default lib/libTvCastingCommon.a
 
-# Size-optimized build
+#Size - optimized build
 gn gen out/darwin-casting-optimized --args='import("//examples/tv-casting-app/darwin/args.gni") target_os="mac" target_cpu="arm64" build_tv_casting_common_a=true optimize_apk_size=true is_debug=false matter_enable_tracing_support=false'
 ninja -C out/darwin-casting-optimized lib/libTvCastingCommon.a
 
-# Compare
+#Compare
 ls -lh out/darwin-casting-default/lib/libTvCastingCommon.a
 ls -lh out/darwin-casting-optimized/lib/libTvCastingCommon.a
 ```

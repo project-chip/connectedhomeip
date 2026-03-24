@@ -239,3 +239,136 @@
 // ---------------------------------------------------------------------------
 
 #include <clusters/shared/Structs.ipp>
+
+// ---------------------------------------------------------------------------
+// Command metadata functions required by CodegenDataModelProvider.
+//
+// The full cluster-objects.cpp defines these for all ~200+ clusters.  Since
+// we only compile the casting-relevant subset, we provide slim versions that
+// cover only the clusters included above.  Any cluster not listed here
+// falls through to the default `return false`.
+// ---------------------------------------------------------------------------
+
+namespace chip {
+namespace app {
+
+bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
+{
+    switch (aCluster)
+    {
+    case Clusters::AdministratorCommissioning::Id: {
+        switch (aCommand)
+        {
+        case Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Id:
+        case Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id:
+        case Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::AccountLogin::Id: {
+        switch (aCommand)
+        {
+        case Clusters::AccountLogin::Commands::GetSetupPIN::Id:
+        case Clusters::AccountLogin::Commands::Login::Id:
+        case Clusters::AccountLogin::Commands::Logout::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::ContentControl::Id: {
+        switch (aCommand)
+        {
+        case Clusters::ContentControl::Commands::UpdatePIN::Id:
+        case Clusters::ContentControl::Commands::ResetPIN::Id:
+        case Clusters::ContentControl::Commands::Enable::Id:
+        case Clusters::ContentControl::Commands::Disable::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    default:
+        break;
+    }
+    return false;
+}
+
+bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
+{
+    switch (aCluster)
+    {
+    case Clusters::Groups::Id: {
+        switch (aCommand)
+        {
+        case Clusters::Groups::Commands::AddGroup::Id:
+        case Clusters::Groups::Commands::ViewGroup::Id:
+        case Clusters::Groups::Commands::GetGroupMembership::Id:
+        case Clusters::Groups::Commands::RemoveGroup::Id:
+        case Clusters::Groups::Commands::RemoveAllGroups::Id:
+        case Clusters::Groups::Commands::AddGroupIfIdentifying::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::GroupKeyManagement::Id: {
+        switch (aCommand)
+        {
+        case Clusters::GroupKeyManagement::Commands::KeySetWrite::Id:
+        case Clusters::GroupKeyManagement::Commands::KeySetRead::Id:
+        case Clusters::GroupKeyManagement::Commands::KeySetRemove::Id:
+        case Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::OperationalCredentials::Id: {
+        switch (aCommand)
+        {
+        case Clusters::OperationalCredentials::Commands::UpdateNOC::Id:
+        case Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Id:
+        case Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::TimeSynchronization::Id: {
+        switch (aCommand)
+        {
+        case Clusters::TimeSynchronization::Commands::SetTrustedTimeSource::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::IcdManagement::Id: {
+        switch (aCommand)
+        {
+        case Clusters::IcdManagement::Commands::RegisterClient::Id:
+        case Clusters::IcdManagement::Commands::UnregisterClient::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    default:
+        break;
+    }
+    return false;
+}
+
+bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
+{
+    // None of the casting-relevant clusters have commands flagged as large payload.
+    (void) aCluster;
+    (void) aCommand;
+    return false;
+}
+
+} // namespace app
+} // namespace chip

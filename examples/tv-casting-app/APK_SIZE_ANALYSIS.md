@@ -1,4 +1,4 @@
-# TV Casting App — APK Size Analysis
+#TV Casting App — APK Size Analysis
 
 This document analyzes the native library and APK size impact of the
 `optimize_apk_size` and `use_static_libcxx` build flags for the Matter TV
@@ -23,28 +23,30 @@ Casting App on Android (arm64-v8a).
 | Slim cluster-objects override | Compile ~36 casting clusters instead of ~200+ via `chip_cluster_objects_source_override` | Major `.so` reduction |
 | Slim TLV decoder overrides | Compile TLV decoders for 18 casting clusters only via `chip_tlv_decoder_attribute_source_override` and `chip_tlv_decoder_event_source_override` | Removes link-time deps on ~200+ clusters while keeping `ChipClusters.java` read/subscribe APIs functional |
 | Remove legacy chip-tool sources | Exclude ~20 source files + tracing/JSON deps | Further `.so` reduction |
-| Static libc++ with dead-code stripping | `−static-libstdc++` + `--gc-sections` + LTO | Eliminates separate 8.9 MB `libc++_shared.so`; only referenced symbols survive |
-| Compiler/linker flags | `-Os`, `-g0`, `-flto=thin`, `--icf=safe`, `-fvisibility=hidden` | ~10–20 % further `.so` reduction |
-| R8 Java shrinking | `minifyEnabled true` in Gradle debug build | Reduces DEX size (Java/Kotlin) |
+| Static libc++ with dead-code stripping | `−static-libstdc++` + `--gc-sections` + LTO | Eliminates separate 8.9 MB `libc++_shared.so`;
+only referenced symbols survive | | Compiler / linker flags | `- Os`, `- g0`, `- flto = thin`, `--icf = safe`, `-
+    fvisibility = hidden` | ~10–20 % further `.so` reduction | | R8 Java shrinking | `minifyEnabled true` in Gradle debug build |
+    Reduces DEX size(Java / Kotlin) |
 
----
+    -- -
 
-## 2. Optimized Build Breakdown
+       ##2. Optimized Build Breakdown
 
-When built with `optimize_apk_size=true` and `use_static_libcxx=true`, the
-resulting `libTvCastingApp.so` contains only the components required by the
-casting use case.
+           When built with `optimize_apk_size = true` and `use_static_libcxx = true`,
+                                                                                 the resulting `libTvCastingApp
+                                                                                     .so` contains only the components required by
+                                                                                         the casting use case.
 
-### Matter core infrastructure
-- Transport layer (TCP/UDP, MRP reliable messaging)
-- Cryptographic primitives (HKDF, AES-CCM, ECDSA via mbedTLS/BoringSSL)
-- Secure channel (CASE, PASE session establishment)
-- Messaging layer (exchange management, protocol dispatch)
-- Interaction model engine (read/write/invoke/subscribe)
+                                                                                 ## #Matter core infrastructure -
+    Transport layer(TCP / UDP, MRP reliable messaging) - Cryptographic primitives(HKDF, AES - CCM, ECDSA via mbedTLS / BoringSSL) -
+    Secure channel(CASE, PASE session establishment) - Messaging layer(exchange management, protocol dispatch) -
+    Interaction model engine(read / write / invoke / subscribe)
 
-### Casting-specific clusters (39 clusters, ~157 `.ipp` includes)
+        ## #Casting
+    -
+    specific clusters(39 clusters, ~157 `.ipp` includes)
 
-**Infrastructure clusters (21):**
+        * *Infrastructure clusters(21):**
 AccessControl, AdministratorCommissioning, BasicInformation, Binding,
 Descriptor, EthernetNetworkDiagnostics, FixedLabel, GeneralCommissioning,
 GeneralDiagnostics, GroupKeyManagement, Groups, IcdManagement, Identify,
@@ -206,7 +208,7 @@ To build for other ABIs, replace `arm64` with `arm`, `x64`, or `x86`.
 After both builds complete:
 
 ```bash
-# Native library sizes
+#Native library sizes
 ls -lh out/android-arm64-tv-casting-app/lib/jni/arm64-v8a/*.so
 ls -lh out/android-arm64-tv-casting-app-size-optimized/lib/jni/arm64-v8a/*.so
 ```
@@ -299,3 +301,4 @@ python -m pytest examples/tv-casting-app/tests/ -v
 
 *Updated March 2026 with measured build sizes after slim TLV decoder integration.*
 *Validates: Requirements 2.1, 2.2, 2.3, 2.4*
+

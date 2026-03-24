@@ -23,9 +23,9 @@ import re
 from hypothesis import given, settings, HealthCheck
 from hypothesis import strategies as st
 
-# ---------------------------------------------------------------------------
-# Paths
-# ---------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#Paths
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
@@ -63,9 +63,9 @@ FULL_EVENT_DECODER = os.path.join(
     "CHIPEventTLVValueDecoder.cpp",
 )
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#Helpers
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 
 def _read_file(path: str) -> str:
@@ -94,8 +94,8 @@ def _extract_function_signature(content: str, func_name: str) -> str:
     opening brace (if on the same line) removed.  This makes comparison
     resilient to minor formatting differences.
     """
-    # Match the return type + function name + params, possibly spanning
-    # multiple lines up to the opening brace.
+#Match the return type + function name + params, possibly spanning
+#multiple lines up to the opening brace.
     pattern = (
         r"((?:jobject)\s+"
         + re.escape(func_name)
@@ -105,14 +105,13 @@ def _extract_function_signature(content: str, func_name: str) -> str:
     if not m:
         return ""
     sig = m.group(1)
-    # Normalise whitespace
+#Normalise whitespace
     sig = re.sub(r"\s+", " ", sig).strip()
     return sig
 
-
-# ---------------------------------------------------------------------------
-# Property-based tests
-# ---------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#Property - based tests
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 
 @given(dummy=st.just(True))
@@ -175,10 +174,9 @@ def test_attribute_decoder_function_signature_matches(dummy):
         f"  Full: {full_sig}"
     )
 
-
-# ---------------------------------------------------------------------------
-# Property-based tests — Event decoder
-# ---------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#Property - based tests — Event decoder
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 
 @given(dummy=st.just(True))
@@ -241,10 +239,9 @@ def test_event_decoder_function_signature_matches(dummy):
         f"  Full: {full_sig}"
     )
 
-
-# ---------------------------------------------------------------------------
-# Allow running directly
-# ---------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#Allow running directly
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 if __name__ == "__main__":
     import sys
 
@@ -257,10 +254,7 @@ if __name__ == "__main__":
     ]
     all_passed = True
     for name, test_fn in tests:
-        try:
-            test_fn()
-            print(f"  PASS: {name}")
-        except AssertionError as e:
+try : test_fn() print(f "  PASS: {name}") except AssertionError as e:
             print(f"  FAIL: {name}\n    {e}")
             all_passed = False
         except Exception as e:

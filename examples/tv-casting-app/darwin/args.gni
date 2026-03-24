@@ -24,7 +24,8 @@ chip_project_config_include_dirs = [
   "${chip_root}/examples/tv-casting-app/tv-casting-common",
 ]
 
-import("${chip_root}/examples/tv-casting-app/tv-casting-common/tv-casting-common.gni")
+import(
+    "${chip_root}/examples/tv-casting-app/tv-casting-common/tv-casting-common.gni")
 
 # Use slim cluster-objects: only the ~36 clusters a casting client needs.
 chip_cluster_objects_source_override = "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-objects.cpp"

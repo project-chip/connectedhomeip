@@ -25,17 +25,17 @@ import re
 from hypothesis import given, settings, HealthCheck
 from hypothesis import strategies as st
 
-# ---------------------------------------------------------------------------
-# Paths
-# ---------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#Paths
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 CONFIG_GNI = os.path.join(REPO_ROOT, "build", "chip", "java", "config.gni")
 ARGS_GNI = os.path.join(REPO_ROOT, "examples", "tv-casting-app", "android", "args.gni")
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#Helpers
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 
 def _read_file(path: str) -> str:
@@ -50,37 +50,36 @@ def _strip_comments(text: str) -> str:
 
 def _extract_declare_args_block(text: str) -> str:
     """
-    Extract the body of the `declare_args() { ... }` block from config.gni.
-    """
-    pattern = r"declare_args\s*\(\s*\)\s*\{"
-    m = re.search(pattern, text)
-    assert m is not None, "Could not find `declare_args()` in config.gni"
-    depth = 1
-    pos = m.end()
-    while pos < len(text) and depth > 0:
-        if text[pos] == "{":
-            depth += 1
-        elif text[pos] == "}":
-            depth -= 1
-        pos += 1
-    return text[m.end() : pos - 1]
+    Extract the body of the `declare_args()
+{
+    ...
+}
+` block from config.gni.""
+                        "
+    pattern = r "declare_args\s*\(\s*\)\s*\{" m           = re.search(pattern, text) assert m is not None,
+    "Could not find `declare_args()` in config.gni" depth = 1 pos =
+        m.end() while pos < len(text) and depth > 0 : if text[pos] == "{" : depth += 1 elif text[pos] == "}" : depth -= 1 pos +=
+    1 return text [m.end():pos - 1]
 
+    def
+    _find_assignment_in_block(block : str, var_name : str) -> str |
+    None : ""
+           "
+           Find a `var_name = <value>` assignment in the block.Returns the RHS value as a string,
+    or
+    None if not found.""
+                      "
+    pattern = rf "^\s*{re.escape(var_name)}\s*=\s*(.+)" m = re.search(pattern, block, re.MULTILINE) if m
+    : return m.group(1)
+          .strip() return None
 
-def _find_assignment_in_block(block: str, var_name: str) -> str | None:
-    """
-    Find a `var_name = <value>` assignment in the block.
-    Returns the RHS value as a string, or None if not found.
-    """
-    pattern = rf"^\s*{re.escape(var_name)}\s*=\s*(.+)"
-    m = re.search(pattern, block, re.MULTILINE)
-    if m:
-        return m.group(1).strip()
-    return None
-
-
-def _extract_else_block(text: str) -> str:
-    """
-    Extract the body of the `} else {` block that follows the
+              def _extract_else_block(text : str)
+          ->str : ""
+                  "
+                  Extract the body of the `
+}
+else
+{` block that follows the
     `if (optimize_apk_size)` conditional in android/args.gni.
     """
     stripped = _strip_comments(text)
@@ -89,7 +88,7 @@ def _extract_else_block(text: str) -> str:
     if not match:
         return ""
 
-    # Walk past the if-block's opening brace
+#Walk past the if - block's opening brace
     brace_start = stripped.index("{", match.end())
     depth = 1
     pos = brace_start + 1
@@ -100,8 +99,8 @@ def _extract_else_block(text: str) -> str:
             depth -= 1
         pos += 1
 
-    # pos is now just past the closing } of the if-block.
-    # Look for `else {`
+#pos is now just past the closing } of the if - block.
+#Look for `else {`
     rest = stripped[pos:]
     else_match = re.search(r"else\s*\{", rest)
     if not else_match:
@@ -119,10 +118,9 @@ def _extract_else_block(text: str) -> str:
 
     return stripped[else_body_start : epos - 1]
 
-
-# ---------------------------------------------------------------------------
-# Property-based tests — config.gni declarations
-# ---------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#Property - based tests — config.gni declarations
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 
 @given(
@@ -153,7 +151,7 @@ def test_config_gni_declares_override_args_with_empty_default(override_arg):
         f"`{override_arg}` is not declared in the declare_args() block "
         f"of config.gni"
     )
-    # The default should be an empty string: ""
+#The default should be an empty string : ""
     assert value == '""', (
         f"`{override_arg}` has default `{value}` instead of `\"\"` in "
         f"config.gni — non-casting builds require the empty default"
@@ -189,10 +187,9 @@ def test_config_gni_preserves_matter_enable_tlv_decoder_cpp_true(dummy):
         f"existing behavior for all non-casting builds"
     )
 
-
-# ---------------------------------------------------------------------------
-# Property-based tests — args.gni default (else) block
-# ---------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#Property - based tests — args.gni default(else) block
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 
 @given(
@@ -259,10 +256,9 @@ def test_args_gni_default_block_does_not_disable_tlv_decoder(dummy):
         f"overridden for default development builds"
     )
 
-
-# ---------------------------------------------------------------------------
-# Allow running directly
-# ---------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#Allow running directly
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 if __name__ == "__main__":
     import sys
 
@@ -279,10 +275,7 @@ if __name__ == "__main__":
     ]
     all_passed = True
     for name, test_fn in tests:
-        try:
-            test_fn()
-            print(f"  PASS: {name}")
-        except AssertionError as e:
+    try : test_fn() print(f "  PASS: {name}") except AssertionError as e:
             print(f"  FAIL: {name}\n    {e}")
             all_passed = False
         except Exception as e:

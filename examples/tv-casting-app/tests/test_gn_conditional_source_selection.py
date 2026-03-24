@@ -8,79 +8,80 @@ This test parses `src/controller/java/BUILD.gn` and verifies that the
 both `chip_tlv_decoder_attribute_source_override` and
 `chip_tlv_decoder_event_source_override`, following the pattern:
 
-    if (override != "") { use override } else { use zap-generated }
+    if (override != "")
+{
+    use override
+}
+else { use zap - generated }
 
-This ensures that non-empty overrides compile the slim file, while empty
-(default) overrides compile the full zap-generated decoder.
-"""
+    This ensures that non -
+    empty overrides compile the slim file,
+    while empty(default) overrides compile the full zap -
+    generated decoder.""
+                      "
 
-import os
-import re
+    import os import re
 
-from hypothesis import given, settings, HealthCheck
-from hypothesis import strategies as st
+    from hypothesis import given,
+    settings,
+    HealthCheck from hypothesis import strategies as st
 
-# ---------------------------------------------------------------------------
-# Paths
-# ---------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#Paths
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
-BUILD_GN = os.path.join(REPO_ROOT, "src", "controller", "java", "BUILD.gn")
+    REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..",
+                                             "..")) BUILD_GN = os.path
+                                                                   .join(REPO_ROOT, "src", "controller", "java", "BUILD.gn")
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#Helpers
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
+                                                                       def _read_file(path : str)
+                                                                   ->str : with open(path, "r") as f
+    : return f.read()
 
-def _read_file(path: str) -> str:
-    with open(path, "r") as f:
-        return f.read()
+          def _extract_brace_block(text : str, start : int)
+                                                                   ->str : ""
+                                                                           "
+                                                                           Given
+    * text * and the index of an opening '{',
+    return the content between the braces(handling nested braces)
+               .""
+                "
+    assert text[start] == "{",
+    f
+    "Expected '{{' at position {start}" depth = 1 pos = start + 1 while pos < len(text) and depth > 0 : if text[pos] == "{" : depth
+    += 1 elif text[pos] == "}" : depth -= 1 pos +=
+    1 return text [start + 1:pos - 1]
 
+    def _find_tlv_decoder_block(content : str)
+        ->str : ""
+                "
+                Locate the `if (matter_enable_tlv_decoder_cpp)` block inside BUILD.gn and return its body text.""
+                                                                                                               "
+                pattern = r "if\s*\(\s*matter_enable_tlv_decoder_cpp\s*\)" m = re.search(pattern, content) assert m is not None,
+    ("Could not find `if (matter_enable_tlv_decoder_cpp)` in BUILD.gn")
+        brace_pos = content.index("{", m.end()) return _extract_brace_block(content, brace_pos)
 
-def _extract_brace_block(text: str, start: int) -> str:
-    """
-    Given *text* and the index of an opening '{', return the content
-    between the braces (handling nested braces).
-    """
-    assert text[start] == "{", f"Expected '{{' at position {start}"
-    depth = 1
-    pos = start + 1
-    while pos < len(text) and depth > 0:
-        if text[pos] == "{":
-            depth += 1
-        elif text[pos] == "}":
-            depth -= 1
-        pos += 1
-    return text[start + 1 : pos - 1]
+                        def _find_conditional_override(block : str, override_var : str, fallback_file : str) :
+    ""
+    "
+    Verify that
+    * block *
+    contains a conditional of the form :
 
-
-def _find_tlv_decoder_block(content: str) -> str:
-    """
-    Locate the `if (matter_enable_tlv_decoder_cpp)` block inside BUILD.gn
-    and return its body text.
-    """
-    pattern = r"if\s*\(\s*matter_enable_tlv_decoder_cpp\s*\)"
-    m = re.search(pattern, content)
-    assert m is not None, (
-        "Could not find `if (matter_enable_tlv_decoder_cpp)` in BUILD.gn"
-    )
-    brace_pos = content.index("{", m.end())
-    return _extract_brace_block(content, brace_pos)
-
-
-def _find_conditional_override(block: str, override_var: str, fallback_file: str):
-    """
-    Verify that *block* contains a conditional of the form:
-
-        if (<override_var> != "") {
-          sources += [ <override_var> ]
-        } else {
+    if (<override_var> != "")
+{
+    sources += [<override_var>]
+} else {
           sources += [ "<fallback_file>" ]
         }
 
     Returns (if_body, else_body) strings for further inspection.
     """
-    # Match the if-condition
+#Match the if - condition
     pattern = rf'if\s*\(\s*{re.escape(override_var)}\s*!=\s*""\s*\)'
     m = re.search(pattern, block)
     assert m is not None, (
@@ -88,11 +89,11 @@ def _find_conditional_override(block: str, override_var: str, fallback_file: str
         f"matter_enable_tlv_decoder_cpp block"
     )
 
-    # Extract the if-body
+#Extract the if - body
     if_brace = block.index("{", m.end())
     if_body = _extract_brace_block(block, if_brace)
 
-    # Find the else clause immediately after the if-block closing brace
+#Find the else clause immediately after the if - block closing brace
     after_if = if_brace + 1 + len(if_body) + 1  # skip past closing '}'
     rest = block[after_if:]
     else_match = re.match(r"\s*else\s*\{", rest)
@@ -105,12 +106,11 @@ def _find_conditional_override(block: str, override_var: str, fallback_file: str
 
     return if_body, else_body
 
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#Property - based tests
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-# ---------------------------------------------------------------------------
-# Property-based tests
-# ---------------------------------------------------------------------------
-
-# Override arg names paired with their zap-generated fallback filenames
+#Override arg names paired with their zap - generated fallback filenames
 OVERRIDE_CONFIGS = [
     ("chip_tlv_decoder_attribute_source_override",
      "zap-generated/CHIPAttributeTLVValueDecoder.cpp"),
@@ -151,27 +151,27 @@ def test_gn_conditional_source_selection(override_config, dummy_path):
     content = _read_file(BUILD_GN)
     block = _find_tlv_decoder_block(content)
 
-    # Verify the conditional pattern exists and extract bodies
+#Verify the conditional pattern exists and extract bodies
     if_body, else_body = _find_conditional_override(block, override_var, fallback_file)
 
-    # The if-body should reference the override variable (the dynamic path)
+#The if - body should reference the override variable(the dynamic path)
     assert override_var in if_body, (
         f"The if-branch for `{override_var} != \"\"` does not reference "
         f"`{override_var}` — expected `sources += [ {override_var} ]`"
     )
 
-    # The else-body should reference the zap-generated fallback file
+#The else - body should reference the zap - generated fallback file
     assert fallback_file in else_body, (
         f"The else-branch for `{override_var}` does not reference "
         f"`{fallback_file}` — expected `sources += [ \"{fallback_file}\" ]`"
     )
 
-    # The if-body should contain a sources += assignment
+#The if - body should contain a sources += assignment
     assert "sources +=" in if_body, (
         f"The if-branch for `{override_var}` does not contain `sources +=`"
     )
 
-    # The else-body should contain a sources += assignment
+#The else - body should contain a sources += assignment
     assert "sources +=" in else_body, (
         f"The else-branch for `{override_var}` does not contain `sources +=`"
     )
@@ -229,10 +229,9 @@ def test_both_override_conditionals_present(dummy):
             f"matter_enable_tlv_decoder_cpp block"
         )
 
-
-# ---------------------------------------------------------------------------
-# Allow running directly
-# ---------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+#Allow running directly
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 if __name__ == "__main__":
     import sys
 
@@ -247,10 +246,7 @@ if __name__ == "__main__":
     ]
     all_passed = True
     for name, test_fn in tests:
-        try:
-            test_fn()
-            print(f"  PASS: {name}")
-        except AssertionError as e:
+try : test_fn() print(f "  PASS: {name}") except AssertionError as e:
             print(f"  FAIL: {name}\n    {e}")
             all_passed = False
         except Exception as e:
