@@ -57,7 +57,7 @@ int main(int argc, char * argv[])
     if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sAirQualitySensorAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
-        sChipNamedPipeCommands.Stop();
+        SuccessOrLog(sChipNamedPipeCommands.Stop(), NotSpecified, "Failed to cleanup CHIP NamedPipeCommands");
     }
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED

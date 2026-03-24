@@ -156,6 +156,6 @@ void AirQualitySensorAppAttrUpdateDelegate::OnEventCommandReceived(const char * 
         return;
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(AirQualitySensorAttrUpdateHandler::HandleCommand,
-                                                  reinterpret_cast<intptr_t>(handler));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(AirQualitySensorAttrUpdateHandler::HandleCommand,
+                                                                           reinterpret_cast<intptr_t>(handler));
 }
