@@ -102,6 +102,8 @@ void InitIdentifyCluster()
 #include "clusters/water-heater-management/chef-water-heater-management.h"
 #endif
 
+#include "clusters/mode-base/chef-mode-base-default.h"
+
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
