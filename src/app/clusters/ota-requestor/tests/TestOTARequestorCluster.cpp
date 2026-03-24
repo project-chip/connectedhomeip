@@ -39,6 +39,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes;
 
 namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs {
 namespace ProviderLocation {
@@ -135,10 +136,10 @@ TEST_F(TestOTARequestorCluster, AttributeListTest)
     EXPECT_TRUE(
         chip::Testing::IsAttributesListEqualTo(cluster,
                                                {
-                                                   OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::kMetadataEntry,
-                                                   OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::kMetadataEntry,
-                                                   OtaSoftwareUpdateRequestor::Attributes::UpdateState::kMetadataEntry,
-                                                   OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::kMetadataEntry,
+                                                   DefaultOTAProviders::kMetadataEntry,
+                                                   UpdatePossible::kMetadataEntry,
+                                                   UpdateState::kMetadataEntry,
+                                                   UpdateStateProgress::kMetadataEntry,
                                                }));
 }
 
@@ -269,7 +270,7 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
     provider.fabricIndex    = 2;
     EXPECT_EQ(otaRequestor.AddDefaultOtaProvider(provider), CHIP_NO_ERROR);
     DataModel::DecodableList<DecodableProviderLocation> defaultOtaProviders;
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id, defaultOtaProviders),
+    EXPECT_EQ(tester.ReadAttribute(DefaultOTAProviders::Id, defaultOtaProviders),
               CHIP_NO_ERROR);
     size_t defaultOtaProvidersSize;
     ASSERT_EQ(defaultOtaProviders.ComputeSize(&defaultOtaProvidersSize), CHIP_NO_ERROR);
@@ -283,23 +284,23 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
 
     // Read and verify UpdatePossible.
     bool updatePossible;
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updatePossible), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.ReadAttribute(UpdatePossible::Id, updatePossible), CHIP_NO_ERROR);
     EXPECT_TRUE(updatePossible);
 
     // Read and verify UpdateState.
     OtaSoftwareUpdateRequestor::UpdateStateEnum updateState;
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id, updateState), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.ReadAttribute(UpdateState::Id, updateState), CHIP_NO_ERROR);
     EXPECT_EQ(updateState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kIdle);
 
     // Read and verify UpdateStateProgress.
     DataModel::Nullable<uint8_t> updateStateProgress;
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id, updateStateProgress),
+    EXPECT_EQ(tester.ReadAttribute(UpdateStateProgress::Id, updateStateProgress),
               CHIP_NO_ERROR);
     EXPECT_TRUE(updateStateProgress.IsNull());
 
     // Verify a non-null value as well.
     otaRequestor.SetUpdateStateProgress(85);
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id, updateStateProgress),
+    EXPECT_EQ(tester.ReadAttribute(UpdateStateProgress::Id, updateStateProgress),
               CHIP_NO_ERROR);
     EXPECT_FALSE(updateStateProgress.IsNull());
     EXPECT_EQ(updateStateProgress.Value(), 85);
@@ -332,14 +333,13 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)
     changeListener.DirtyList().clear();
 
     // Write the default OTA providers list.
-    namespace DefaultOtaProviders = OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders;
     OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type provider;
     provider.providerNodeID = 1234u;
     provider.endpoint       = 8;
     // This is the fabric index used in ClusterTester::WriteAttribute.
     provider.fabricIndex = chip::Testing::kTestFabricIndex;
     DataModel::List<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type> payload(&provider, 1u);
-    std::optional<DataModel::ActionReturnStatus> result = tester.WriteAttribute(DefaultOtaProviders::Id, payload);
+    std::optional<DataModel::ActionReturnStatus> result = tester.WriteAttribute(DefaultOTAProviders::Id, payload);
     ASSERT_TRUE(result.has_value());
     ASSERT_TRUE(result->IsSuccess());
 
@@ -353,7 +353,7 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)
     ASSERT_EQ(changeListener.DirtyList().size(), 1u);
     EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
     EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
-    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, DefaultOtaProviders::Id);
+    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, DefaultOTAProviders::Id);
 }
 
 TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite)
@@ -369,16 +369,16 @@ TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite
     changeListener.DirtyList().clear();
 
     std::optional<DataModel::ActionReturnStatus> result =
-        tester.WriteAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, false);
+        tester.WriteAttribute(UpdatePossible::Id, false);
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
 
-    result = tester.WriteAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id,
+    result = tester.WriteAttribute(UpdateState::Id,
                                    OtaSoftwareUpdateRequestor::UpdateStateEnum::kDelayedOnApply);
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
 
-    result = tester.WriteAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
+    result = tester.WriteAttribute(UpdateStateProgress::Id,
                                    DataModel::MakeNullable<uint8_t>(50));
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
@@ -392,6 +392,40 @@ TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite
     EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
 
     EXPECT_EQ(changeListener.DirtyList().size(), 0u);
+}
+
+TEST_F(TestOTARequestorCluster, ChangingAttributesMarksAsChanged)
+{
+    chip::Testing::TestServerClusterContext context;
+    MockOtaRequestor otaRequestor;
+    OTARequestorAttributes attributes;
+    OTARequestorCluster cluster(kTestEndpointId, otaRequestor, attributes);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    auto & changeListener = context.ChangeListener();
+
+    changeListener.DirtyList().clear();
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kApplying);
+    ASSERT_EQ(changeListener.DirtyList().size(), 1u);
+    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
+    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, UpdateState::Id);
+
+    changeListener.DirtyList().clear();
+    EXPECT_EQ(attributes.SetUpdateStateProgress(85), CHIP_NO_ERROR);
+    ASSERT_EQ(changeListener.DirtyList().size(), 1u);
+    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
+    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, UpdateStateProgress::Id);
+
+    changeListener.DirtyList().clear();
+    attributes.SetUpdatePossible(false);
+    ASSERT_EQ(changeListener.DirtyList().size(), 1u);
+    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
+    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, UpdatePossible::Id);
+
+    // DefaultOTAProviders is verified in the test WriteDefaultProvidersList.
 }
 
 } // namespace
