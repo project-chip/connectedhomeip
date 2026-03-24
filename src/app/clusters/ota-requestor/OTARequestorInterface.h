@@ -155,7 +155,7 @@ public:
 
 // Interface class to connect the OTA Software Update Requestor cluster command processing
 // with the core OTA Requestor logic
-class OTARequestorInterface : OTARequestorCommandInterface
+class OTARequestorInterface : public OTARequestorCommandInterface
 {
 public:
     using OTAUpdateStateEnum   = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;

@@ -27,7 +27,7 @@ namespace chip::app::Clusters {
 class OTARequestorCluster : public DefaultServerCluster
 {
 public:
-    OTARequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor, OTARequestorAttributes & attributes);
+    OTARequestorCluster(EndpointId endpointId, OTARequestorCommandInterface & otaCommands, OTARequestorAttributes & attributes);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
@@ -49,7 +49,7 @@ public:
 private:
     CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 
-    OTARequestorInterface & mOtaRequestor;
+    OTARequestorCommandInterface & mOtaCommands;
     OTARequestorAttributes & mAttributes;
 };
 

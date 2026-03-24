@@ -37,9 +37,9 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 
 } // namespace
 
-OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor,
+OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorCommandInterface & otaCommands,
                                          OTARequestorAttributes & attributes) :
-    DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)), mOtaRequestor(otaRequestor),
+    DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)), mOtaCommands(otaCommands),
     mAttributes(attributes)
 {}
 
@@ -159,7 +159,7 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
                          static_cast<unsigned>(kMaxMetadataLen));
             return Protocols::InteractionModel::Status::ConstraintError;
         }
-        mOtaRequestor.HandleAnnounceOTAProvider(handler, request.path, data);
+        mOtaCommands.HandleAnnounceOTAProvider(handler, request.path, data);
         return std::nullopt;
     }
     default:
