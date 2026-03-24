@@ -107,7 +107,7 @@ class TC_SMOKECO_2_3(SmokeCoBaseTest):
             "SMOKECO.S",
         ]
 
-    @run_if_endpoint_matches(has_feature(cluster=Clusters.SmokeCoAlarm,feature=Clusters.SmokeCoAlarm.Bitmaps.Feature.kCoAlarm))
+    @run_if_endpoint_matches(has_feature(cluster=Clusters.SmokeCoAlarm, feature=Clusters.SmokeCoAlarm.Bitmaps.Feature.kCoAlarm))
     async def test_TC_SMOKECO_2_3(self):
 
         # Runs the test using the base template
