@@ -236,29 +236,29 @@ class TC_WATERHEATER(MatterBaseTest):
 
         # 3. Change to Mode Manual
         await self.send_single_cmd(
-            cmd=cluster.Commands.ChangeToMode(newMode=cluster.Enums.ModeTag.kManual),
+            cmd=cluster.Commands.ChangeToMode(newMode=1),
             endpoint=self.ENDPOINT
         )
 
         # 4. Verify CurrentMode is Manual
         current_mode = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.CurrentMode)
-        asserts.assert_equal(current_mode, cluster.Enums.ModeTag.kManual, "CurrentMode should be 1 (Manual)")
+        asserts.assert_equal(current_mode, 1, "CurrentMode should be 1 (Manual)")
 
         # 5. Change to Mode 0 (Off)
         await self.send_single_cmd(
-            cmd=cluster.Commands.ChangeToMode(newMode=cluster.Enums.ModeTag.kOff),
+            cmd=cluster.Commands.ChangeToMode(newMode=0),
             endpoint=self.ENDPOINT
         )
 
         # 6. Verify CurrentMode is Off
         current_mode = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.CurrentMode)
-        asserts.assert_equal(current_mode, cluster.Enums.ModeTag.kOff, "CurrentMode should be 0 (Off)")
+        asserts.assert_equal(current_mode, 0, "CurrentMode should be 0 (Off)")
 
         # 7. Try an unsupported mode and verify it returns UnsupportedMode
         response = await self.send_single_cmd(
-            cmd=cluster.Commands.ChangeToMode(newMode=cluster.Enums.ModeTag.kTimed),
+            cmd=cluster.Commands.ChangeToMode(newMode=2),
             endpoint=self.ENDPOINT
         )
         asserts.assert_equal(response.status, Status.UnsupportedMode, "Status should be UnsupportedMode.")
