@@ -30,6 +30,8 @@ using namespace chip::app::Clusters::Groupcast::Attributes;
 using namespace chip::app::Clusters::Groupcast::StaticApplicationConfig;
 using chip::Protocols::InteractionModel::Status;
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+
 namespace {
 
 LazyRegisteredServerCluster<GroupcastCluster> gServer;
@@ -75,6 +77,8 @@ public:
 };
 
 } // namespace
+
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
 void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
 {
