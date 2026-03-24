@@ -67,3 +67,6 @@
 
 // Max Binding entries per fabric for CI tests
 #define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 1
+
+// Enable groupcast
+#define CHIP_CONFIG_ENABLE_GROUPCAST 1
