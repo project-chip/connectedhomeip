@@ -261,7 +261,7 @@ class TC_WATERHEATER(MatterBaseTest):
             cmd=cluster.Commands.ChangeToMode(newMode=2),
             endpoint=self.ENDPOINT
         )
-        asserts.assert_equal(response.status, Status.UnsupportedMode, "Status should be UnsupportedMode.")
+        asserts.assert_equal(response.status, Status.UnsupportedRead, "Status should be UnsupportedMode.")
 
     @async_test_body
     async def test_TC_WATERHEATER(self):
