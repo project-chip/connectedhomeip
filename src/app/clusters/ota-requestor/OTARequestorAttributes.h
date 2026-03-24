@@ -36,7 +36,8 @@ namespace chip {
 class OTARequestorAttributes
 {
 public:
-    using OTAUpdateStateEnum = OTARequestorInterface::OTAUpdateStateEnum;
+    using OTAUpdateStateEnum   = OTARequestorInterface::OTAUpdateStateEnum;
+    using ProviderLocationType = OTARequestorInterface::ProviderLocationType;
 
     OTAUpdateStateEnum GetUpdateState() const { return mUpdateState; }
     void SetUpdateState(OTAUpdateStateEnum updateState);
@@ -48,9 +49,14 @@ public:
     bool GetUpdatePossible() const { return mUpdatePossible; }
     void SetUpdatePossible(bool updatePossible);
 
+    CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex);
+    CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation);
+    ProviderLocationList::Iterator GetDefaultOtaProviderListIterator();
+
     CHIP_ERROR SetChangeListener(EndpointId endpointId, app::DataModel::ProviderChangeListener & dataModelChangeListener);
 
 private:
+    ProviderLocationList mProviders;
     OTAUpdateStateEnum mUpdateState = OTAUpdateStateEnum::kUnknown;
     app::DataModel::Nullable<uint8_t> mUpdateStateProgress;
     bool mUpdatePossible = true;

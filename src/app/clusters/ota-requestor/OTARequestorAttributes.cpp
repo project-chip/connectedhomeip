@@ -75,4 +75,47 @@ CHIP_ERROR OTARequestorAttributes::SetChangeListener(EndpointId endpointId,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR OTARequestorAttributes::ClearDefaultOtaProviderList(FabricIndex fabricIndex)
+{
+    CHIP_ERROR error = mProviders.Delete(fabricIndex);
+
+    // Ignore the error if no entry for the associated fabric index has been found.
+    VerifyOrReturnError(error != CHIP_ERROR_NOT_FOUND, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(error);
+
+    if (mDataModelChangeListener)
+    {
+        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, Attributes::DefaultOTAProviders::Id });
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTARequestorAttributes::AddDefaultOtaProvider(const ProviderLocationType & providerLocation)
+{
+    // Look for an entry with the same fabric index indicated
+    auto iterator = mProviders.Begin();
+    while (iterator.Next())
+    {
+        ProviderLocationType location = iterator.GetValue();
+        if (location.GetFabricIndex() == providerLocation.GetFabricIndex())
+        {
+            ChipLogError(SoftwareUpdate, "Default OTA provider entry with fabric %d already exists", location.GetFabricIndex());
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+    }
+
+    ReturnErrorOnFailure(mProviders.Add(providerLocation));
+
+    if (mDataModelChangeListener)
+    {
+        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, Attributes::DefaultOTAProviders::Id });
+    }
+    return CHIP_NO_ERROR;
+}
+
+ProviderLocationList::Iterator OTARequestorAttributes::GetDefaultOtaProviderListIterator()
+{
+    return mProviders.Begin();
+}
+
 } // namespace chip

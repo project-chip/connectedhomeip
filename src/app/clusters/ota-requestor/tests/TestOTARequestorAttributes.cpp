@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 #include <pw_unit_test/framework.h>
 
@@ -192,6 +191,163 @@ TEST_F(TestOTARequestorAttributes, SetUpdateStatePossibleMarksChangedWhenDiffere
     changeListener.DirtyList().clear();
     attributes.SetUpdatePossible(true);
     EXPECT_EQ(changeListener.DirtyList().size(), 0u);
+}
+
+TEST_F(TestOTARequestorAttributes, CanAddAndIterateProviders)
+{
+    OTARequestorAttributes attributes;
+
+    OTARequestorAttributes::ProviderLocationType new_location;
+    new_location.providerNodeID = 0x1234;
+    new_location.endpoint       = 10;
+    new_location.fabricIndex    = 1;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(new_location), CHIP_NO_ERROR);
+
+    new_location.providerNodeID = 0x5678;
+    new_location.endpoint       = 20;
+    new_location.fabricIndex    = 2;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(new_location), CHIP_NO_ERROR);
+
+    new_location.providerNodeID = 0x90ab;
+    new_location.endpoint       = 30;
+    new_location.fabricIndex    = 3;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(new_location), CHIP_NO_ERROR);
+
+    // Verify that all the providers were added.
+    ProviderLocationList::Iterator iterator = attributes.GetDefaultOtaProviderListIterator();
+    bool found_first                        = false;
+    bool found_second                       = false;
+    bool found_third                        = false;
+    while (iterator.Next())
+    {
+        auto location = iterator.GetValue();
+        if (location.providerNodeID == 0x1234 && location.endpoint == 10 && location.fabricIndex == 1)
+        {
+            found_first = true;
+        }
+        else if (location.providerNodeID == 0x5678 && location.endpoint == 20 && location.fabricIndex == 2)
+        {
+            found_second = true;
+        }
+        else if (location.providerNodeID == 0x90ab && location.endpoint == 30 && location.fabricIndex == 3)
+        {
+            found_third = true;
+        }
+        else
+        {
+            ADD_FAILURE() << "Unexpected location: " << location.providerNodeID << ", " << location.endpoint << ", "
+                          << location.fabricIndex;
+        }
+    }
+    EXPECT_TRUE(found_first);
+    EXPECT_TRUE(found_second);
+    EXPECT_TRUE(found_third);
+}
+
+TEST_F(TestOTARequestorAttributes, ClearingProvidersRemovesFromList)
+{
+    OTARequestorAttributes attributes;
+
+    // Add some locations.
+    OTARequestorAttributes::ProviderLocationType new_location;
+    new_location.providerNodeID = 0x1234;
+    new_location.endpoint       = 10;
+    new_location.fabricIndex    = 1;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(new_location), CHIP_NO_ERROR);
+
+    new_location.providerNodeID = 0x5678;
+    new_location.endpoint       = 20;
+    new_location.fabricIndex    = 2;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(new_location), CHIP_NO_ERROR);
+
+    new_location.providerNodeID = 0x90ab;
+    new_location.endpoint       = 30;
+    new_location.fabricIndex    = 3;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(new_location), CHIP_NO_ERROR);
+
+    // Remove the locations one at a time and verify they've been removed.
+    EXPECT_EQ(attributes.ClearDefaultOtaProviderList(2), CHIP_NO_ERROR);
+    ProviderLocationList::Iterator iterator = attributes.GetDefaultOtaProviderListIterator();
+    int count                               = 0;
+    while (iterator.Next())
+    {
+        auto & location = iterator.GetValue();
+        EXPECT_NE(location.fabricIndex, 2);
+        ++count;
+    }
+    EXPECT_EQ(count, 2);
+
+    EXPECT_EQ(attributes.ClearDefaultOtaProviderList(3), CHIP_NO_ERROR);
+    iterator = attributes.GetDefaultOtaProviderListIterator();
+    count                                   = 0;
+    while (iterator.Next())
+    {
+        auto & location = iterator.GetValue();
+        EXPECT_NE(location.fabricIndex, 3);
+        ++count;
+    }
+    EXPECT_EQ(count, 1);
+
+    EXPECT_EQ(attributes.ClearDefaultOtaProviderList(1), CHIP_NO_ERROR);
+    iterator = attributes.GetDefaultOtaProviderListIterator();
+    count                                   = 0;
+    while (iterator.Next())
+    {
+        auto & location = iterator.GetValue();
+        EXPECT_NE(location.fabricIndex, 1);
+        ++count;
+    }
+    EXPECT_EQ(count, 0);
+}
+
+TEST_F(TestOTARequestorAttributes, ChangingProvidersMarksChanged)
+{
+    chip::Testing::TestServerClusterContext context;
+    auto & changeListener = context.ChangeListener();
+
+    OTARequestorAttributes attributes;
+    ASSERT_EQ(attributes.SetChangeListener(kTestEndpointId, changeListener), CHIP_NO_ERROR);
+
+    changeListener.DirtyList().clear();
+    OTARequestorAttributes::ProviderLocationType location;
+    location.providerNodeID = 0x1234;
+    location.endpoint       = 10;
+    location.fabricIndex    = 1;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(location), CHIP_NO_ERROR);
+    ASSERT_EQ(changeListener.DirtyList().size(), 1u);
+    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
+    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, DefaultOTAProviders::Id);
+
+    changeListener.DirtyList().clear();
+    EXPECT_EQ(attributes.ClearDefaultOtaProviderList(1), CHIP_NO_ERROR);
+    ASSERT_EQ(changeListener.DirtyList().size(), 1u);
+    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
+    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, DefaultOTAProviders::Id);
+}
+
+TEST_F(TestOTARequestorAttributes, CannotAddProviderForFabricWithProvider)
+{
+    chip::Testing::TestServerClusterContext context;
+    auto & changeListener = context.ChangeListener();
+
+    OTARequestorAttributes attributes;
+
+    OTARequestorAttributes::ProviderLocationType location;
+    location.providerNodeID = 0x1234;
+    location.endpoint       = 10;
+    location.fabricIndex    = 1;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(location), CHIP_NO_ERROR);
+
+    ASSERT_EQ(attributes.SetChangeListener(kTestEndpointId, changeListener), CHIP_NO_ERROR);
+
+    changeListener.DirtyList().clear();
+    location.providerNodeID = 0x5678;
+    location.endpoint       = 20;
+    location.fabricIndex    = 1;
+    EXPECT_NE(attributes.AddDefaultOtaProvider(location), CHIP_NO_ERROR);
+    ASSERT_EQ(changeListener.DirtyList().size(), 0u);
 }
 
 } // namespace
