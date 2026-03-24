@@ -617,8 +617,9 @@ private:
                 }
             }
 #else
-            const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
-            if (fabric == nullptr) {
+            const FabricInfo * fabric              = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
+            if (fabric == nullptr)
+            {
                 ChipLogError(AppServer, "Group removed from nonexistent fabric?");
                 return;
             }

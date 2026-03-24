@@ -439,9 +439,9 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
             ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId())
             : Transport::PeerAddress::Groupcast();
 #else
-        multicastAddress = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
+        multicastAddress    = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
 #endif
-        destination      = &multicastAddress;
+        destination = &multicastAddress;
     }
     break;
     case Transport::Session::SessionType::kSecure: {
