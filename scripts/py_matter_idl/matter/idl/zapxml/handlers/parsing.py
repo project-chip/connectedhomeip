@@ -31,8 +31,7 @@ def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
             if value & (1 << (bits - 1)):
                 value -= 1 << bits
         return value
-    else:
-        return int(value)
+    return int(value)
 
 
 def AttrsToAccessPrivilege(attrs) -> AccessPrivilege:
@@ -49,14 +48,13 @@ def AttrsToAccessPrivilege(attrs) -> AccessPrivilege:
 
     if role.lower() == 'view':
         return AccessPrivilege.VIEW
-    elif role.lower() == 'operate':
+    if role.lower() == 'operate':
         return AccessPrivilege.OPERATE
-    elif role.lower() == 'manage':
+    if role.lower() == 'manage':
         return AccessPrivilege.MANAGE
-    elif role.lower() == 'administer':
+    if role.lower() == 'administer':
         return AccessPrivilege.ADMINISTER
-    else:
-        raise Exception('Unknown ACL role: %r' % role)
+    raise Exception('Unknown ACL role: %r' % role)
 
 
 def AttrsToAttribute(attrs) -> Attribute:
@@ -81,7 +79,7 @@ def AttrsToAttribute(attrs) -> Attribute:
     if 'max' in attrs:
         data_type.max_value = ParseInt(attrs['max'], data_type)
 
-    name = attrs['name'] if 'name' in attrs else ''
+    name = attrs.get('name', '')
 
     field = Field(
         data_type=data_type,

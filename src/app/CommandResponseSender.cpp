@@ -61,12 +61,12 @@ CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext *
         failureStatusToSend.SetValue(Status::Failure);
         ExitNow();
     }
-    StatusResponse::Send(Status::InvalidAction, mExchangeCtx.Get(), false /*aExpectResponse*/);
+    TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, mExchangeCtx.Get(), false /*aExpectResponse*/);
     return err;
 exit:
     if (failureStatusToSend.HasValue())
     {
-        StatusResponse::Send(failureStatusToSend.Value(), mExchangeCtx.Get(), false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(failureStatusToSend.Value(), mExchangeCtx.Get(), false /*aExpectResponse*/);
     }
     Close();
     return err;
@@ -115,10 +115,10 @@ void CommandResponseSender::StartSendingCommandResponses()
 
 void CommandResponseSender::OnDone(CommandHandlerImpl & apCommandObj)
 {
-    if (mState == State::ErrorSentDelayCloseUntilOnDone)
+    if (mState == State::ErrorSentDelayCloseUntilOnDone || apCommandObj.IsGroupRequest())
     {
-        // We have already sent a message to the client indicating that we are not expecting
-        // a response.
+        // We either have already sent a message to the client indicating that we are not expecting
+        // a response, or do not need to send response to a groupcast.
         Close();
         return;
     }

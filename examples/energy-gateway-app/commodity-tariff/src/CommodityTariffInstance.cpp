@@ -18,8 +18,6 @@
 
 #include <CommodityTariffInstance.h>
 #include <cinttypes>
-#include <cstdint>
-#include <unordered_set>
 
 using namespace chip;
 using namespace chip::app;
@@ -32,6 +30,9 @@ using namespace chip::app::Clusters::CommodityTariff::Attributes;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 using namespace chip::app::CommodityTariffAttrsDataMgmt;
 using namespace CommodityTariffConsts;
+using namespace chip::System;
+using namespace chip::System::Clock;
+using namespace chip::System::Clock::Literals;
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -43,51 +44,47 @@ using DayStructType               = DayStruct::Type;
 using DayPatternStructType        = DayPatternStruct::Type;
 using CalendarPeriodStructType    = CalendarPeriodStruct::Type;
 
-CHIP_ERROR CommodityTariffInstance::Init()
-{
-    return Instance::Init();
-}
-
-uint32_t CommodityTariffInstance::GetCurrentTimestamp()
-{
-    return TimestampNow + TestTimeOverlay;
-}
+// ============================================================================
+// Existing Tariff Implementation
+// ============================================================================
 
 void CommodityTariffInstance::ScheduleTariffTimeUpdate()
 {
-    DeviceLayer::SystemLayer().StartTimer(
-        System::Clock::Milliseconds32(kTimerPollIntervalInSec * 1000),
+    constexpr auto pollInterval = kTimerPollIntervalInSec * 1_s;
+
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
+        pollInterval, [](System::Layer *, void * context) { static_cast<CommodityTariffInstance *>(context)->TariffTimeUpdCb(); },
+        this);
+}
+
+void CommodityTariffInstance::CancelTariffTimeUpdate()
+{
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().CancelTimer(
         [](System::Layer *, void * context) { static_cast<CommodityTariffInstance *>(context)->TariffTimeUpdCb(); }, this);
 }
 
 void CommodityTariffInstance::TariffTimeUpdCb()
 {
-    GetDelegate()->TryToactivateDelayedTariff(TimestampNow);
-    TimestampNow += kTimerPollIntervalInSec;
+    uint32_t currentTimestamp = 0;
+
+    if (CHIP_NO_ERROR == GetClock_MatterEpochS(currentTimestamp))
+    {
+        GetDelegate()->TryToactivateDelayedTariff(currentTimestamp);
+    }
+
     TariffTimeAttrsSync();
     ScheduleTariffTimeUpdate();
 }
 
-void CommodityTariffInstance::ActivateTariffTimeTracking(uint32_t timestamp)
+CHIP_ERROR CommodityTariffInstance::Init()
 {
-    TimestampNow = timestamp;
-
     ScheduleTariffTimeUpdate();
-}
-
-void CommodityTariffInstance::TariffTimeTrackingSetOffset(uint32_t offset)
-{
-    if (offset)
-    {
-        TestTimeOverlay += offset;
-        return;
-    }
-
-    TestTimeOverlay = 0;
+    return Instance::Init();
 }
 
 void CommodityTariffInstance::Shutdown()
 {
+    CancelTariffTimeUpdate();
     Instance::Shutdown();
 }
 

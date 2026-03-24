@@ -77,7 +77,7 @@ static_library("stm32wb") {
     "${chip_root}/src/platform:platform_base",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../../OpenThread/DnssdImpl.cpp",
       "../../OpenThread/OpenThreadDnssdImpl.cpp",

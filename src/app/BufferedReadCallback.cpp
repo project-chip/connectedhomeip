@@ -24,7 +24,7 @@
 #include "system/TLVPacketBufferBackingStore.h"
 #include <app/BufferedReadCallback.h>
 #include <app/InteractionModelEngine.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 namespace chip {
 namespace app {
@@ -94,7 +94,7 @@ CHIP_ERROR BufferedReadCallback::GenerateListTLV(TLV::ScopedBufferTLVReader & aR
 
     ReturnErrorOnFailure(writer.EndContainer(outerType));
 
-    writer.Finalize(backingBuffer);
+    TEMPORARY_RETURN_IGNORED writer.Finalize(backingBuffer);
 
     aReader.Init(std::move(backingBuffer), totalBufSize);
 

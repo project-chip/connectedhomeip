@@ -161,11 +161,10 @@ def render_default(value: Union[str, int, bool]) -> str:
         #       however currently we never needed this. Escaping can be
         #       added once we use this info
         return f'"{value}"'
-    elif type(value) is bool:
+    if type(value) is bool:
         if value:
             return "true"
-        else:
-            return "false"
+        return "false"
     return str(value)
 
 

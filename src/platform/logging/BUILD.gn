@@ -32,7 +32,7 @@ group("default") {
     } else if (chip_device_platform == "ameba") {
       deps += [ "${chip_root}/src/platform/Ameba:logging" ]
     } else if (chip_device_platform == "realtek_bee") {
-      deps += [ "${chip_root}/src/platform/realtek/BEE:logging" ]
+      deps += [ "${chip_root}/src/platform/realtek/freertos:logging" ]
     } else if (chip_device_platform == "realtek_zephyr") {
       deps += [ "${chip_root}/src/platform/realtek/zephyr:logging" ]
     } else if (chip_device_platform == "asr") {
@@ -41,8 +41,6 @@ group("default") {
       deps += [ "${chip_root}/src/platform/webos:logging" ]
     } else if (chip_device_platform == "zephyr") {
       deps += [ "${chip_root}/src/platform/Zephyr:logging" ]
-    } else if (chip_device_platform == "nxp_zephyr") {
-      deps += [ "${chip_root}/src/platform/nxp/zephyr:logging" ]
     } else if (chip_device_platform == "nrfconnect") {
       deps += [ "${chip_root}/src/platform/nrfconnect:logging" ]
     } else if (chip_device_platform == "telink") {
@@ -50,7 +48,7 @@ group("default") {
     } else if (chip_device_platform == "efr32") {
       deps += [ "${chip_root}/src/platform/silabs/efr32:logging" ]
     } else if (chip_device_platform == "SiWx917") {
-      deps += [ "${chip_root}/src/platform/silabs/SiWx917:logging" ]
+      deps += [ "${chip_root}/src/platform/silabs/SiWx:logging" ]
     } else if (chip_device_platform == "linux") {
       deps += [ ":stdio" ]
     } else if (chip_device_platform == "tizen") {

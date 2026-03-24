@@ -47,7 +47,12 @@ declare_args() {
 }
 
 # Sanity check
-assert(!(chip_enable_wifi && chip_enable_openthread))
+assert(!(chip_enable_wifi && chip_enable_thread))
+
+# ThunderBoards and Explorer Kit
+if (stm32_board == "STM32WB5MM-DK") {
+  chip_enable_thread = true
+}
 
 stm32_sdk("sdk") {
   include_dirs = [
@@ -120,6 +125,14 @@ stm32_executable("lighting_app") {
     "DEBUG",
     "USE_HAL_DRIVER",
   ]
+
+  # OpenThread Settings
+  if (chip_enable_thread) {
+    deps += [
+      "${chip_root}/third_party/openthread:openthread",
+      "${chip_root}/third_party/openthread:openthread-platform",
+    ]
+  }
 
   if (chip_enable_ota_requestor) {
     defines += [ "STM32_OTA_ENABLED" ]

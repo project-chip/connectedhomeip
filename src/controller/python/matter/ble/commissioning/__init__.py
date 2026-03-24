@@ -112,7 +112,7 @@ def _StartAsyncConnection(discriminator: int, pin: int, deprecated_nodeid: Optio
                           the device
       pin:                the pin number used to pair with the device (must match the
                           device secret pin, typically available in a QR code)
-      deprecated_nodeid:  TEMPORARY, TO BE REMOVED nodeid that will be set during
+      deprecated_nodeid:  TEMPORARY, TO BE REMOVED node ID that will be set during
                           the commissioning. This will be replaced by setting the node id
                           at the time of setting operational credentials once such
                           credentials are supported.
@@ -141,7 +141,7 @@ def Connect(discriminator: int, pin: int, deprecated_nodeid: Optional[int] = Non
                           the device
       pin:                the pin number used to pair with the device (must match the
                           device secret pin, typically available in a QR code)
-      deprecated_nodeid:  TEMPORARY, TO BE REMOVED nodeid that will be set during
+      deprecated_nodeid:  TEMPORARY, TO BE REMOVED node ID that will be set during
                           the commissioning. This will be replaced by setting the node id
                           at the time of setting operational credentials once such
                           credentials are supported.

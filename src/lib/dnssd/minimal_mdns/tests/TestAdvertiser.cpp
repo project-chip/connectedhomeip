@@ -32,6 +32,7 @@
 #include <lib/dnssd/minimal_mdns/records/Srv.h>
 #include <lib/dnssd/minimal_mdns/records/Txt.h>
 #include <lib/dnssd/minimal_mdns/tests/CheckOnlyServer.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
@@ -240,31 +241,31 @@ CHIP_ERROR SendQuery(FullQName qname)
 class TestAdvertiser : public ::testing::Test
 {
 public:
-    static chip::Test::IOContext context;
+    static chip::Testing::IOContext context;
     static CheckOnlyServer server;
     static chip::Dnssd::ServiceAdvertiser * mdnsAdvertiser;
 
     static void SetUpTestSuite()
     {
-        chip::Platform::MemoryInit();
-        context.Init();
+        EXPECT_SUCCESS(chip::Platform::MemoryInit());
+        EXPECT_SUCCESS(context.Init());
         chip::Dnssd::GlobalMinimalMdnsServer::Instance().Server().Shutdown();
         chip::Dnssd::GlobalMinimalMdnsServer::Instance().SetReplacementServer(&server);
         mdnsAdvertiser = &chip::Dnssd::ServiceAdvertiser::Instance();
-        mdnsAdvertiser->Init(context.GetUDPEndPointManager());
+        EXPECT_SUCCESS(mdnsAdvertiser->Init(context.GetUDPEndPointManager()));
     }
     static void TearDownTestSuite()
     {
         server.Shutdown();
         context.Shutdown();
-        mdnsAdvertiser->RemoveServices();
+        EXPECT_SUCCESS(mdnsAdvertiser->RemoveServices());
         mdnsAdvertiser->Shutdown();
         chip::Dnssd::GlobalMinimalMdnsServer::Instance().SetReplacementServer(nullptr);
         chip::Platform::MemoryShutdown();
     }
 };
 
-chip::Test::IOContext TestAdvertiser::context;
+chip::Testing::IOContext TestAdvertiser::context;
 CheckOnlyServer TestAdvertiser::server;
 chip::Dnssd::ServiceAdvertiser * TestAdvertiser::mdnsAdvertiser;
 

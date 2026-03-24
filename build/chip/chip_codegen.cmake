@@ -41,7 +41,7 @@ function(chip_codegen TARGET_NAME)
     #
     # This translates them to the actually fully expanded path.
     execute_process(
-            COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/codegen_paths.py" "--idl" "${ARG_INPUT}" ${ARG_OUTPUTS}
+            COMMAND "${Python3_EXECUTABLE}" -X utf8 "${CHIP_ROOT}/scripts/codegen_paths.py" "--idl" "${ARG_INPUT}" ${ARG_OUTPUTS}
             OUTPUT_VARIABLE GENERATED_PATHS_OUT
     )
     string(REPLACE "\n" ";" GENERATED_PATHS "${GENERATED_PATHS_OUT}")
@@ -65,7 +65,7 @@ function(chip_codegen TARGET_NAME)
 
         add_custom_command(
             OUTPUT ${OUT_NAMES}
-            COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/codegen.py"
+            COMMAND "${Python3_EXECUTABLE}" -X utf8 "${CHIP_ROOT}/scripts/codegen.py"
             ARGS "--generator" "${ARG_GENERATOR}"
                  "--output-dir" "${GEN_FOLDER}"
                  "--expected-outputs" "${GEN_FOLDER}/expected.outputs"
@@ -219,7 +219,7 @@ function(chip_zapgen TARGET_NAME)
         #    Error: EEXIST: file already exists, mkdir '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/pkg/465fcc8a6282e28dc7a166859d5814d34e2fb94249a72fa9229033b5b32dff1a'
         add_custom_command(
             OUTPUT ${OUT_NAMES}
-            COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/tools/zap/generate.py"
+            COMMAND "${Python3_EXECUTABLE}" -X utf8 "${CHIP_ROOT}/scripts/tools/zap/generate.py"
             ARGS ${ZAPGEN_ARGS}
             DEPENDS
                 "${ARG_INPUT}"

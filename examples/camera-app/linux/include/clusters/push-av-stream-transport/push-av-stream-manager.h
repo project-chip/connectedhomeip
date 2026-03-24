@@ -18,8 +18,8 @@
 
 #pragma once
 #include <app-common/zap-generated/cluster-enums.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
-#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
+#include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
 #include <camera-device-interface.h>
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -59,7 +59,8 @@ public:
 
     // Add missing override keywords and fix signatures
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
-                                                              const uint16_t connectionID) override;
+                                                              const uint16_t connectionID,
+                                                              FabricIndex accessingFabricIndex) override;
 
     Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) override;
 
@@ -76,11 +77,11 @@ public:
     void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
                      Tls::CertificateTable::BufferedRootCert & rootCertEntry) override;
 
-    bool ValidateUrl(const std::string & url) override;
-
     bool ValidateStreamUsage(StreamUsageEnum streamUsage) override;
 
-    bool ValidateSegmentDuration(uint16_t segmentDuration) override;
+    bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override;
+
+    bool ValidateMaxPreRollLength(uint16_t maxPreRollLength, const DataModel::Nullable<uint16_t> & videoStreamId) override;
 
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
@@ -94,9 +95,9 @@ public:
 
     Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId) override;
 
-    Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId) override;
+    Protocols::InteractionModel::Status SetVideoStream(uint16_t videoStreamId) override;
 
-    Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId) override;
+    Protocols::InteractionModel::Status SetAudioStream(uint16_t audioStreamId) override;
 
     PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override;
 
@@ -106,34 +107,56 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
-    void OnZoneTriggeredEvent(uint16_t zoneId);
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
+
+    bool GetCMAFSessionNumber(const uint16_t connectionID, uint64_t & sessionNumber) override;
+
+    void HandleZoneTrigger(const std::vector<uint16_t> & zoneIds);
+
+    void RecordingStreamPrivacyModeChanged(bool privacyModeEnabled);
+
+    // Method to reset transport sink state - called by transports when starting transmission
+    void ResetTransportSinkStateForTransport(PushAVTransport * transport);
 
 private:
-    std::vector<PushAvStream> pushavStreams;
     MediaController * mMediaController                         = nullptr;
     CameraDeviceInterface * mCameraDevice                      = nullptr;
     PushAvStreamTransportServer * mPushAvStreamTransportServer = nullptr;
 
     AudioStreamStruct mAudioStreamParams;
     VideoStreamStruct mVideoStreamParams;
+
     std::unordered_map<uint16_t, std::unique_ptr<PushAVTransport>> mTransportMap; // map for the transport objects
     std::unordered_map<uint16_t, TransportOptionsStruct> mTransportOptionsMap;    // map for the transport options
-
-    double mTotalUsedBandwidthMbps = 0.0; // Tracks the total bandwidth used by all active transports
+    uint32_t mTotalUsedBandwidthbps = 0; // Tracks the total bandwidth used by all active transports
 
     std::vector<uint8_t> mBufferRootCert;
     std::vector<uint8_t> mBufferClientCert;
     std::vector<uint8_t> mBufferClientCertKey;
     std::vector<std::vector<uint8_t>> mBufferIntermediateCerts;
+    std::vector<PushAvStream> pushavStreams;
+
+    CHIP_ERROR IsAnyPrivacyModeActive(bool & isActive);
 
     /**
-     * @brief Calculates the total bandwidth in Mbps for the given video and audio stream IDs.
+     * @brief Checks if the specified CMAF interface type is supported.
+     * @param cmafInterface The CMAF interface enum to validate.
+     * @return true if the interface is supported, false otherwise.
+     */
+    bool IsCMAFInterfaceSupported(CMAFInterfaceEnum cmafInterface) const;
+
+    /**
+     * @brief Calculates the total bandwidth in bps for the given video and audio stream IDs.
      * @param videoStreamId Optional nullable video stream ID.
      * @param audioStreamId Optional nullable audio stream ID.
-     * @param outBandwidthMbps Output parameter for the calculated bandwidth in Mbps.
+     * @param outBandwidthbps Output parameter for the calculated bandwidth in bps.
      */
     void GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, double & outBandwidthMbps);
+                                const Optional<DataModel::Nullable<uint16_t>> & audioStreamId, uint32_t & outBandwidthbps);
 };
 
 } // namespace PushAvStreamTransport

@@ -32,12 +32,14 @@ struct BufferSink
     int64_t requestedPreBufferLengthMs; // 0 means live only
     int64_t minKeyframeIntervalMs;
     Transport * transport;
+    int64_t registrationTimeMs;  // Time when sink was registered, used for first frame delivery
+    bool hasDeliveredFirstFrame; // Track if we've successfully delivered at least one frame
 };
 
 struct PreRollFrame
 {
     std::string streamKey;                        // e.g., "a123" or "v456"
-    std::unique_ptr<char[]> data;                 // raw frame data
+    std::unique_ptr<uint8_t[]> data;              // raw frame data
     size_t size;                                  // bytes size
     int64_t ptsMs;                                // receive time
     std::unordered_set<BufferSink *> deliveredTo; // to prevent duplicate sends
@@ -47,7 +49,7 @@ class PreRollBuffer
 {
 public:
     PreRollBuffer();
-    void PushFrameToBuffer(const std::string & streamKey, const char * data, size_t size);
+    void PushFrameToBuffer(const std::string & streamKey, const uint8_t * data, size_t size, int64_t timestampMs);
     void RegisterTransportToBuffer(BufferSink * sink, const std::unordered_set<std::string> & streamKeys);
     void DeregisterTransportFromBuffer(BufferSink * sink);
     void SetMaxTotalBytes(size_t size);

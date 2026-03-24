@@ -56,11 +56,13 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
     auto rvcOpStateInstance = RvcOperationalState::GetRvcOperationalStateInstance();
     if (NewMode == RvcRunMode::ModeIdle)
     {
-        rvcOpStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+        TEMPORARY_RETURN_IGNORED rvcOpStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kStopped));
     }
     else
     {
-        rvcOpStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        TEMPORARY_RETURN_IGNORED rvcOpStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
 
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
@@ -129,7 +131,7 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     gRvcRunModeDelegate = new RvcRunMode::RvcRunModeDelegate;
     gRvcRunModeInstance = new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id,
                                                  chip::to_underlying(RvcRunMode::Feature::kDirectModeChange));
-    gRvcRunModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gRvcRunModeInstance->Init();
 }
 
 void emberAfRvcRunModeClusterShutdownCallback(chip::EndpointId endpointId)
@@ -231,7 +233,7 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     gRvcCleanModeDelegate = new RvcCleanMode::RvcCleanModeDelegate;
     gRvcCleanModeInstance = new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id,
                                                    chip::to_underlying(RvcCleanMode::Feature::kDirectModeChange));
-    gRvcCleanModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gRvcCleanModeInstance->Init();
 }
 
 void emberAfRvcCleanModeClusterShutdownCallback(chip::EndpointId endpointId)

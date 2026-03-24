@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
+#include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 
 namespace chip::app::Clusters::BooleanState {
 

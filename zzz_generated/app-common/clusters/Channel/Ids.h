@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster Channel (cluster code: 1284/0x04504)
+// Identifier constant values for cluster Channel (cluster code: 1284/0x0504)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

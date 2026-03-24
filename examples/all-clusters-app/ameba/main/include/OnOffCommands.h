@@ -39,7 +39,7 @@ Engine sShellSwitchOnOffReadSubCommands;
 Engine sShellSwitchGroupsOnOffSubCommands;
 #endif // defined(ENABLE_CHIP_SHELL)
 
-void ProcessOnOffUnicastBindingRead(BindingCommandData * data, const EmberBindingTableEntry & binding,
+void ProcessOnOffUnicastBindingRead(BindingCommandData * data, const Clusters::Binding::TableEntry & binding,
                                     OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
@@ -86,7 +86,7 @@ void ProcessOnOffUnicastBindingRead(BindingCommandData * data, const EmberBindin
     }
 }
 
-void ProcessOnOffUnicastBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding,
+void ProcessOnOffUnicastBindingCommand(BindingCommandData * data, const Clusters::Binding::TableEntry & binding,
                                        OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
@@ -145,7 +145,7 @@ void ProcessOnOffUnicastBindingCommand(BindingCommandData * data, const EmberBin
     }
 }
 
-void ProcessOnOffGroupBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding)
+void ProcessOnOffGroupBindingCommand(BindingCommandData * data, const Clusters::Binding::TableEntry & binding)
 {
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
 

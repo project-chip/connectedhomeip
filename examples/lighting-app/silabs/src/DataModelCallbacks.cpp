@@ -32,9 +32,9 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#ifdef DIC_ENABLE
-#include "dic.h"
-#endif // DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
+#include "MatterAws.h"
+#endif // SL_MATTER_ENABLE_AWS
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
@@ -44,13 +44,14 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 {
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
-    ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
+    ChipLogDetail(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
-#ifdef DIC_ENABLE
-        dic_sendmsg("light/state", (const char *) (value ? (*value ? "on" : "off") : "invalid"));
-#endif // DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
+        ChipLogProgress(Zcl, "sending light state update");
+        MatterAwsSendMsg("light/state", (const char *) (value ? (*value ? "on" : "off") : "invalid"));
+#endif // SL_MATTER_ENABLE_AWS
         LightMgr().InitiateAction(AppEvent::kEventType_Light, *value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
                                   value);
     }

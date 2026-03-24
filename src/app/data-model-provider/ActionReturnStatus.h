@@ -17,6 +17,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/CriticalFailure.h>
 #include <lib/support/StringBuilder.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -66,6 +67,7 @@ public:
     };
 
     ActionReturnStatus(CHIP_ERROR error) : mReturnStatus(error) {}
+    ActionReturnStatus(CriticalFailure error) : mReturnStatus(error) {}
     ActionReturnStatus(Protocols::InteractionModel::Status status) :
         mReturnStatus(Protocols::InteractionModel::ClusterStatusCode(status))
     {}

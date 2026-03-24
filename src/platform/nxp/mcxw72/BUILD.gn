@@ -62,14 +62,6 @@ config("nxp_platform_config") {
     "../common/ota",
   ]
 
-  # Needed for sources that use mbedtls
-  if (nxp_external_sdk) {
-    include_dirs += [
-      "${nxp_sdk_root}/middleware/mbedtls/include",
-      "${nxp_sdk_root}/middleware/mbedtls/port/sssapi",
-    ]
-  }
-
   defines = [ "EXTERNAL_BLEMANAGERIMPL_HEADER=\"platform/nxp/${nxp_platform}/BLEManagerImpl.h\"" ]
 }
 
@@ -89,7 +81,6 @@ static_library("nxp_platform") {
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "../common/CHIPDevicePlatformEvent.h",
-    "../common/ConfigurationManagerImpl.cpp",
     "../common/ConfigurationManagerImpl.h",
     "../common/ConnectivityManagerImpl.cpp",
     "../common/ConnectivityManagerImpl.h",
@@ -102,21 +93,29 @@ static_library("nxp_platform") {
     "../common/NetworkProvisioningServerImpl.h",
     "../common/PlatformManagerImpl.h",
     "../common/SoftwareUpdateManagerImpl.h",
+    "../mcxw71/ConfigurationManagerImpl.cpp",
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
   deps = [ "${chip_root}/src/app:app_config" ]
 
   if (chip_crypto == "platform") {
-    sources += [
-      "../common/crypto/PersistentStorageOpKeystoreBase.cpp",
-      "../common/crypto/PersistentStorageOpKeystoreBase.h",
-      "../common/crypto/S200/CHIPCryptoPalS200.cpp",
-      "../common/crypto/S200/PersistentStorageOpKeystoreS200.cpp",
-      "../common/crypto/S200/PersistentStorageOpKeystoreS200.h",
-    ]
+    if (nxp_crypto_impl != "se05x") {
+      sources += [
+        "../common/crypto/PersistentStorageOpKeystoreBase.cpp",
+        "../common/crypto/PersistentStorageOpKeystoreBase.h",
+        "../common/crypto/S200/PersistentStorageOpKeystoreS200.cpp",
+        "../common/crypto/S200/PersistentStorageOpKeystoreS200.h",
+      ]
+    }
+
+    sources += [ "../common/crypto/S200/CHIPCryptoPalS200.cpp" ]
 
     include_dirs = [ "${nxp_sdk_build_root}/mbedtls/config" ]
+  } else if (chip_crypto == "psa") {
+    if (chip_crypto_spake2p == "custom") {
+      sources += [ "../common/crypto/SecLibSpake2p.cpp" ]
+    }
   }
 
   if (chip_enable_ble) {
@@ -144,7 +143,7 @@ static_library("nxp_platform") {
     "${chip_root}/src/platform/logging:headers",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
       "../common/ThreadStackManagerImpl.cpp",
@@ -187,6 +186,12 @@ static_library("nxp_platform") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:syscalls_stub",
   ]
+
+  if (nxp_crypto_impl == "se05x") {
+    deps += [
+      "${chip_root}/src/platform/nxp/crypto/${nxp_crypto_impl}:nxp_crypto_lib",
+    ]
+  }
 
   public_configs = [ ":nxp_platform_config" ]
 }

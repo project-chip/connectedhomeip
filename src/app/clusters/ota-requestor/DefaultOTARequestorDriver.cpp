@@ -73,7 +73,7 @@ void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
 
     if (mImageProcessor->IsFirstImageRun())
     {
-        SystemLayer().ScheduleLambda([this] {
+        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([this] {
             CHIP_ERROR error = mImageProcessor->ConfirmCurrentImage();
 
             if (error != CHIP_NO_ERROR)
@@ -85,7 +85,7 @@ void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
 
             if (mSendNotifyUpdateApplied)
             {
-                mRequestor->NotifyUpdateApplied();
+                TEMPORARY_RETURN_IGNORED mRequestor->NotifyUpdateApplied();
             }
         });
     }
@@ -239,7 +239,7 @@ CHIP_ERROR DefaultOTARequestorDriver::UpdateNotFound(UpdateNotFoundReason reason
 void DefaultOTARequestorDriver::UpdateDownloaded()
 {
     VerifyOrDie(mRequestor != nullptr);
-    mRequestor->ApplyUpdate();
+    TEMPORARY_RETURN_IGNORED mRequestor->ApplyUpdate();
 }
 
 void DefaultOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
@@ -263,7 +263,7 @@ void DefaultOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
 void DefaultOTARequestorDriver::UpdateDiscontinued()
 {
     VerifyOrDie(mImageProcessor != nullptr);
-    mImageProcessor->Abort();
+    TEMPORARY_RETURN_IGNORED mImageProcessor->Abort();
 
     // Cancel all update timers
     UpdateCancelled();
@@ -332,7 +332,7 @@ void DefaultOTARequestorDriver::ProcessAnnounceOTAProviders(
     }
 
     // Point to the announced provider
-    mRequestor->SetCurrentProviderLocation(providerLocation);
+    TEMPORARY_RETURN_IGNORED mRequestor->SetCurrentProviderLocation(providerLocation);
 
     ScheduleDelayedAction(System::Clock::Seconds32(secToStart), StartDelayTimerHandler, this);
 }
@@ -361,7 +361,7 @@ void DefaultOTARequestorDriver::SendQueryImage()
     if ((currentUpdateState == OTAUpdateStateEnum::kIdle) || (currentUpdateState == OTAUpdateStateEnum::kDelayedOnQuery))
     {
         mProviderRetryCount++;
-        DeviceLayer::SystemLayer().ScheduleLambda([this] { mRequestor->TriggerImmediateQueryInternal(); });
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] { mRequestor->TriggerImmediateQueryInternal(); });
     }
     else
     {

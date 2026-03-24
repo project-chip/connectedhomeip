@@ -28,6 +28,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <transport/GroupPeerMessageCounter.h>
 #include <transport/PeerMessageCounter.h>
 
@@ -64,7 +65,7 @@ public:
 
         // Always Update storage for Test purposes
         temp = value + GROUP_MSG_COUNTER_MIN_INCREMENT;
-        mStorage->SyncSetKeyValue(key.KeyName(), &temp, sizeof(uint32_t));
+        EXPECT_SUCCESS(mStorage->SyncSetKeyValue(key.KeyName(), &temp, sizeof(uint32_t)));
     }
 };
 
@@ -412,7 +413,7 @@ TEST(TestGroupMessageCounter, GroupMessageCounterTest)
     // Counter should be random
     controlCounter = groupCientCounter.GetCounter(true);
     dataCounter    = groupCientCounter.GetCounter(false);
-    groupCientCounter.IncrementCounter(true);
+    EXPECT_SUCCESS(groupCientCounter.IncrementCounter(true));
 
     EXPECT_EQ((groupCientCounter.GetCounter(true) - controlCounter), 1u);
 
@@ -426,7 +427,7 @@ TEST(TestGroupMessageCounter, GroupMessageCounterTest)
     EXPECT_EQ((groupCientCounter2.GetCounter(false) - dataCounter), (uint32_t) GROUP_MSG_COUNTER_MIN_INCREMENT);
 
     // Test Roll over
-    groupCientCounter2.IncrementCounter(true);
+    EXPECT_SUCCESS(groupCientCounter2.IncrementCounter(true));
     EXPECT_EQ(groupCientCounter2.GetCounter(true), 0u);
 
     TestGroupOutgoingCounters groupCientCounter3(&delegate);
@@ -436,7 +437,7 @@ TEST(TestGroupMessageCounter, GroupMessageCounterTest)
 
     // Start Test with Control counter
     dataCounter = groupCientCounter.GetCounter(false);
-    groupCientCounter.IncrementCounter(false);
+    EXPECT_SUCCESS(groupCientCounter.IncrementCounter(false));
     EXPECT_EQ((groupCientCounter.GetCounter(false) - dataCounter), 1u);
 
     groupCientCounter.SetCounter(false, UINT32_MAX - GROUP_MSG_COUNTER_MIN_INCREMENT);
@@ -448,7 +449,7 @@ TEST(TestGroupMessageCounter, GroupMessageCounterTest)
     EXPECT_EQ(groupCientCounter4.GetCounter(false), UINT32_MAX);
 
     // Test Roll over
-    groupCientCounter4.IncrementCounter(false);
+    EXPECT_SUCCESS(groupCientCounter4.IncrementCounter(false));
     EXPECT_EQ(groupCientCounter4.GetCounter(false), 0u);
 
     TestGroupOutgoingCounters groupCientCounter5(&delegate);

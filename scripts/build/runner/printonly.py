@@ -14,21 +14,28 @@
 
 import shlex
 
+from .command_dedup import CommandDedup
+
 
 class PrintOnlyRunner:
     def __init__(self, output_file, root: str):
         self.output_file = output_file
         self.dry_run = True
         self.root = root
+        self.deduplicator = CommandDedup()
 
     def StartCommandExecution(self):
         self.output_file.write(
             "# Commands will be run in CHIP project root.\n")
         self.output_file.write('cd "%s"\n\n' % self.root)
 
-    def Run(self, cmd, title=None):
+    def Run(self, cmd, title=None, dedup=False):
         if title:
             self.output_file.write("# " + title + "\n")
+
+        if dedup & self.deduplicator.is_duplicate(cmd):
+            self.output_file.write("# DUPLICATE COMMAND SKIPPED\n")
+            return
 
         self.output_file.write(
             " ".join([shlex.quote(part) for part in cmd]) + "\n")

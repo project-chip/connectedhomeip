@@ -42,6 +42,7 @@ class IMXApp(Enum):
             return 'all-clusters-minimal-app/linux'
         if self == IMXApp.OTA_PROVIDER:
             return 'ota-provider-app/linux'
+        raise Exception('Unknown app type: %r' % self)
 
     def OutputNames(self):
         if self == IMXApp.CHIP_TOOL:
@@ -71,12 +72,14 @@ class IMXBuilder(GnBuilder):
                  runner,
                  app: IMXApp,
                  release: bool = False,
-                 trusty: bool = False):
+                 trusty: bool = False,
+                 ele: bool = False):
         super(IMXBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
         self.release = release
         self.trusty = trusty
+        self.ele = ele
         self.app = app
 
     def GnBuildArgs(self):
@@ -177,6 +180,9 @@ class IMXBuilder(GnBuilder):
 
         if self.trusty:
             args.append('chip_with_trusty_os=true')
+
+        if self.ele:
+            args.append('chip_with_imx_ele=true')
 
         return args
 

@@ -88,7 +88,7 @@ public:
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     void OnSessionConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override;
-    void OnConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr) override;
+    void OnConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     /**
      *  Send a CHIP message on this exchange.

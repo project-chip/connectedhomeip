@@ -36,7 +36,7 @@ constexpr System::Clock::Timeout kBdxPollIntervalMs = System::Clock::Millisecond
 // Timeout for the BDX transfer session
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
 
-constexpr uint16_t kBdxMaxBlockSize = 1024;
+constexpr uint16_t kBdxMaxBlockSize = CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE;
 
 CHIP_ERROR BDXDiagnosticLogsProvider::InitializeTransfer(CommandHandler * commandObj, const ConcreteCommandPath & path,
                                                          DiagnosticLogsProviderDelegate * delegate, IntentEnum intent,
@@ -178,19 +178,20 @@ void BDXDiagnosticLogsProvider::OnAckReceived()
     uint16_t blockSize = mTransfer.GetTransferBlockSize();
 
     auto blockBuf = System::PacketBufferHandle::New(blockSize);
-    VerifyOrReturn(!blockBuf.IsNull(), mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(CHIP_ERROR_NO_MEMORY)));
+    VerifyOrReturn(!blockBuf.IsNull(),
+                   TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(CHIP_ERROR_NO_MEMORY)));
 
     auto buffer     = MutableByteSpan(blockBuf->Start(), blockSize);
     bool isEndOfLog = false;
 
     // Get the log next chunk and see if it fits i.e. if is end of log is reported
     auto err = mDelegate->CollectLog(mLogSessionHandle, buffer, isEndOfLog);
-    VerifyOrReturn(CHIP_NO_ERROR == err, mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err)));
+    VerifyOrReturn(CHIP_NO_ERROR == err, TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err)));
 
     // If the buffer has empty space, end the log collection session.
     if (isEndOfLog)
     {
-        mDelegate->EndLogCollection(mLogSessionHandle, CHIP_ERROR_INTERNAL);
+        TEMPORARY_RETURN_IGNORED mDelegate->EndLogCollection(mLogSessionHandle, CHIP_ERROR_INTERNAL);
         mLogSessionHandle = kInvalidLogSessionHandle;
     }
 
@@ -204,7 +205,7 @@ void BDXDiagnosticLogsProvider::OnAckReceived()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(BDX, "PrepareBlock failed: %" CHIP_ERROR_FORMAT, err.Format());
-        mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err));
+        TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err));
     }
 }
 
@@ -278,7 +279,7 @@ void BDXDiagnosticLogsProvider::Reset(CHIP_ERROR error)
 
     if (mDelegate != nullptr)
     {
-        mDelegate->EndLogCollection(mLogSessionHandle, error);
+        TEMPORARY_RETURN_IGNORED mDelegate->EndLogCollection(mLogSessionHandle, error);
         mDelegate = nullptr;
     }
 

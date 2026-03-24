@@ -33,7 +33,7 @@ namespace System {
 
 LayerImplFreeRTOS::LayerImplFreeRTOS() : mHandlingTimerComplete(false) {}
 
-CHIP_ERROR LayerImplFreeRTOS::Init()
+CriticalFailure LayerImplFreeRTOS::Init()
 {
     VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -50,7 +50,7 @@ void LayerImplFreeRTOS::Shutdown()
     mLayerState.ResetFromInitialized();
 }
 
-CHIP_ERROR LayerImplFreeRTOS::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+CriticalFailure LayerImplFreeRTOS::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -70,7 +70,9 @@ CHIP_ERROR LayerImplFreeRTOS::StartTimer(Clock::Timeout delay, TimerCompleteCall
         // HandleExpiredTimers() to re-start the timer.
         if (!mHandlingTimerComplete)
         {
-            StartPlatformTimer(delay);
+            // NOTE(gmarcosb): You would think we could just propagate the failure here,
+            // but doing so results in failures in TestSystemTimer
+            TEMPORARY_RETURN_IGNORED StartPlatformTimer(delay);
         }
     }
     return CHIP_NO_ERROR;
@@ -114,7 +116,7 @@ void LayerImplFreeRTOS::CancelTimer(TimerCompleteCallback onComplete, void * app
     }
 }
 
-CHIP_ERROR LayerImplFreeRTOS::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
+CriticalFailure LayerImplFreeRTOS::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -151,7 +153,7 @@ CHIP_ERROR LayerImplFreeRTOS::ScheduleWork(TimerCompleteCallback onComplete, voi
 /**
  * Start the platform timer with specified millsecond duration.
  */
-CHIP_ERROR LayerImplFreeRTOS::StartPlatformTimer(System::Clock::Timeout aDelay)
+CriticalFailure LayerImplFreeRTOS::StartPlatformTimer(System::Clock::Timeout aDelay)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR status = PlatformEventing::StartTimer(*this, aDelay);
@@ -209,7 +211,9 @@ CHIP_ERROR LayerImplFreeRTOS::HandlePlatformTimer()
             delay = mTimerList.Earliest()->AwakenTime() - currentTime;
         }
 
-        StartPlatformTimer(delay);
+        // NOTE(gmarcosb): You would think we could just propagate the failure here,
+        // but doing so results in failures in TestSystemTimer
+        TEMPORARY_RETURN_IGNORED StartPlatformTimer(delay);
     }
 
     return CHIP_NO_ERROR;

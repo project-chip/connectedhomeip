@@ -225,7 +225,7 @@ then you can use `bt` (for `backtrace`) to see the backtrace of the call stack.
 #0  chip::Controller::DeviceCommissioner::PairDevice
     (this=0x7fffd8003a90, remoteDeviceId=1234, setUpCode=0x7fffef2555d0 "MT:-24J0AFN00KA0648G00", params=..., discoveryType=chip::Controller::DiscoveryType::kAll, resolutionData=...)
     at ../../src/controller/CHIPDeviceController.cpp:646
-#1  0x00007fffed040825 in pychip_DeviceController_ConnectWithCode (devCtrl=0x7fffd8003a90, onboardingPayload=0x7fffef2555d0 "MT:-24J0AFN00KA0648G00", nodeid=1234, discoveryType=2 '\002')
+#1  0x00007fffed040825 in pychip_DeviceController_ConnectWithCode (devCtrl=0x7fffd8003a90, onboardingPayload=0x7fffef2555d0 "MT:-24J0AFN00KA0648G00", nodeId=1234, discoveryType=2 '\002')
     at ../../src/controller/python/ChipDeviceController-ScriptBinding.cpp:395
 #2  0x00007ffff6ad5596 in ??? () at /usr/lib/libffi.so.8
 #3  0x00007ffff6ad200e in ??? () at /usr/lib/libffi.so.8

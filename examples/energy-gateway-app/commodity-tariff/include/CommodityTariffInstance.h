@@ -52,7 +52,7 @@ public:
     void CleanupTariffData();
 };
 
-class CommodityTariffInstance : public Instance
+class CommodityTariffInstance : public CommodityTariff::Instance
 {
 public:
     CommodityTariffInstance(EndpointId aEndpointId, CommodityTariffDelegate & aDelegate, Feature aFeature) :
@@ -72,19 +72,13 @@ public:
 
     CommodityTariffDelegate * GetDelegate() { return mCommodityTariffDelegate; };
 
-    void ActivateTariffTimeTracking(uint32_t timestamp);
-    void TariffTimeTrackingSetOffset(uint32_t offset);
-
 private:
     CommodityTariffDelegate * mCommodityTariffDelegate;
-    uint32_t TimestampNow    = 0;
-    uint32_t TestTimeOverlay = 0;
 
+    // Private methods for tariff time management
     void ScheduleTariffTimeUpdate();
+    void CancelTariffTimeUpdate();
     void TariffTimeUpdCb();
-
-protected:
-    uint32_t GetCurrentTimestamp() override;
 };
 
 } // namespace CommodityTariff

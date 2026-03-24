@@ -28,9 +28,9 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#ifdef DIC_ENABLE
-#include "dic_control.h"
-#endif // DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
+#include "MatterAwsControl.h"
+#endif // SL_MATTER_ENABLE_AWS
 
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
@@ -40,7 +40,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 {
     ClusterId clusterId                      = attributePath.mClusterId;
     [[maybe_unused]] AttributeId attributeId = attributePath.mAttributeId;
-    ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
+    ChipLogDetail(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     if (clusterId == Identify::Id)
     {

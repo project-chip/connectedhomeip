@@ -19,6 +19,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 class TestSimpleSubscriptionResumptionStorage : public ::testing::Test
@@ -80,7 +81,7 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionCount)
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
-    subscriptionStorage.Init(&storage);
+    EXPECT_SUCCESS(subscriptionStorage.Init(&storage));
 
     // Write some subscriptions and see the counts are correct
     chip::app::SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId = 6666, .mFabricIndex = 46 };
@@ -88,7 +89,7 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionCount)
     for (size_t i = 0; i < (CHIP_IM_MAX_NUM_SUBSCRIPTIONS / 2); i++)
     {
         subscriptionInfo.mSubscriptionId = static_cast<chip::SubscriptionId>(i);
-        subscriptionStorage.Save(subscriptionInfo);
+        EXPECT_SUCCESS(subscriptionStorage.Save(subscriptionInfo));
     }
 
     // Make sure iterator counts correctly
@@ -141,7 +142,7 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionMaxCount)
                   junkBytes.Get(), static_cast<uint16_t>(subscriptionStorage.TestMaxSubscriptionSize() / 2)),
               CHIP_NO_ERROR);
 
-    subscriptionStorage.Init(&storage);
+    EXPECT_SUCCESS(subscriptionStorage.Init(&storage));
 
     // First check the MaxCount is reset to CHIP_IM_MAX_NUM_SUBSCRIPTIONS
     uint16_t countMax = 0;
@@ -159,7 +160,7 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionState)
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
-    subscriptionStorage.Init(&storage);
+    EXPECT_SUCCESS(subscriptionStorage.Init(&storage));
 
     chip::app::SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo1 = {
         .mNodeId         = 1111,
@@ -240,8 +241,9 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionState)
     iterator->Release();
 
     // Delete fabric 1 and subscription 2 and check only 3 remains.
-    subscriptionStorage.Delete(subscriptionInfo1.mNodeId, subscriptionInfo1.mFabricIndex, subscriptionInfo1.mSubscriptionId);
-    subscriptionStorage.DeleteAll(subscriptionInfo2.mFabricIndex);
+    EXPECT_SUCCESS(
+        subscriptionStorage.Delete(subscriptionInfo1.mNodeId, subscriptionInfo1.mFabricIndex, subscriptionInfo1.mSubscriptionId));
+    EXPECT_SUCCESS(subscriptionStorage.DeleteAll(subscriptionInfo2.mFabricIndex));
 
     iterator = subscriptionStorage.IterateSubscriptions();
     EXPECT_EQ(iterator->Count(), 1u);
@@ -252,7 +254,7 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionState)
     iterator->Release();
 
     // Delete 3 also, and see that both count is 0 and MaxCount is removed from storage
-    subscriptionStorage.DeleteAll(subscriptionInfo3.mFabricIndex);
+    EXPECT_SUCCESS(subscriptionStorage.DeleteAll(subscriptionInfo3.mFabricIndex));
     iterator = subscriptionStorage.IterateSubscriptions();
     EXPECT_EQ(iterator->Count(), 0u);
     EXPECT_FALSE(iterator->Next(subscriptionInfo));
@@ -271,7 +273,7 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionStateUnexpectedF
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
-    subscriptionStorage.Init(&storage);
+    EXPECT_SUCCESS(subscriptionStorage.Init(&storage));
 
     // Write additional entries at the end of TLV and see it still loads correctly
     chip::app::SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo1 = {
@@ -308,7 +310,7 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionStateUnexpectedF
 
     const auto len = writer.GetLengthWritten();
 
-    writer.Finalize(backingBuffer);
+    EXPECT_SUCCESS(writer.Finalize(backingBuffer));
 
     EXPECT_EQ(storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumption(0).KeyName(), backingBuffer.Get(),
                                       static_cast<uint16_t>(len)),
@@ -327,7 +329,7 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionStateTooBigToLoa
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
-    subscriptionStorage.Init(&storage);
+    EXPECT_SUCCESS(subscriptionStorage.Init(&storage));
 
     // Write additional too-big data at the end of TLV and see it fails to loads and entry deleted
     chip::app::SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo1 = {
@@ -367,7 +369,7 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionStateTooBigToLoa
 
     const auto len = writer.GetLengthWritten();
 
-    writer.Finalize(backingBuffer);
+    EXPECT_SUCCESS(writer.Finalize(backingBuffer));
 
     EXPECT_EQ(storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumption(0).KeyName(), backingBuffer.Get(),
                                       static_cast<uint16_t>(len)),
@@ -386,7 +388,7 @@ TEST_F(TestSimpleSubscriptionResumptionStorage, TestSubscriptionStateJunkData)
 {
     chip::TestPersistentStorageDelegate storage;
     SimpleSubscriptionResumptionStorageTest subscriptionStorage;
-    subscriptionStorage.Init(&storage);
+    EXPECT_SUCCESS(subscriptionStorage.Init(&storage));
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> junkBytes;
     junkBytes.Calloc(subscriptionStorage.TestMaxSubscriptionSize() / 2);

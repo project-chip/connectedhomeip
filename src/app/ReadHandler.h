@@ -39,6 +39,7 @@
 #include <app/OperationalSessionSetup.h>
 #include <app/SubscriptionResumptionSessionEstablisher.h>
 #include <app/SubscriptionResumptionStorage.h>
+#include <app/reporting/Generations.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
@@ -268,9 +269,21 @@ public:
      * from the OnSubscriptionRequested callback above. The restriction is as below
      * MinIntervalFloor ≤ MaxInterval ≤ MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling)
      * Where SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT is set to 60m in the spec.
+     * For ICD publishers, this is set to the IdleModeDuration defined in the ICD Management Cluster.
+     * If the new max interval is less than the idle mode duration for an ICD device, the function will return
+     * CHIP_ERROR_INVALID_ARGUMENT.
      */
     CHIP_ERROR SetMaxReportingInterval(uint16_t aMaxInterval)
     {
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        if (aMaxInterval < mMaxInterval)
+        {
+            ChipLogProgress(DataManagement,
+                            "Fail to set MaxReportingInterval to %d as it is less than the current MaxInterval %d for ICD device",
+                            aMaxInterval, mMaxInterval);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mMinIntervalFloorSeconds <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(aMaxInterval <= std::max(GetPublisherSelectedIntervalLimit(), mSubscriberRequestedMaxInterval),
@@ -415,7 +428,7 @@ private:
     void AttributePathIsDirty(DataModel::Provider * apDataModel, const AttributePathParams & aAttributeChanged);
     bool IsDirty() const
     {
-        return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
+        return mDirtyGeneration.After(mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
     }
     void ClearForceDirtyFlag() { ClearStateFlag(ReadHandlerFlags::ForceDirty); }
     NodeId GetInitiatorNodeId() const
@@ -533,15 +546,15 @@ private:
     // This allows us to reset the iterator to the beginning of the current
     // cluster instead of the beginning of the whole report in AttributePathIsDirty, without
     // permanently missing dirty any paths.
-    uint64_t mDirtyGeneration = 0;
+    reporting::AttributeGeneration mDirtyGeneration{ 0 };
 
     // For subscriptions, we record the timestamp when we started to generate the last report.
     // The mCurrentReportsBeginGeneration records the timestamp for the current report, which won;t be used for checking if this
     // ReadHandler is dirty.
     // mPreviousReportsBeginGeneration will be set to mCurrentReportsBeginGeneration after we sent the last chunk of the current
     // report.
-    uint64_t mPreviousReportsBeginGeneration = 0;
-    uint64_t mCurrentReportsBeginGeneration  = 0;
+    reporting::AttributeGeneration mPreviousReportsBeginGeneration{ 0 };
+    reporting::AttributeGeneration mCurrentReportsBeginGeneration{ 0 };
     /*
      *           (mDirtyGeneration = b > a, this is a dirty read handler)
      *        +- Start Report -> mCurrentReportsBeginGeneration = c
@@ -560,7 +573,7 @@ private:
 
     // When we don't have enough resources for a new subscription, the oldest subscription might be evicted by interaction model
     // engine, the "oldest" subscription is the subscription with the smallest generation.
-    uint64_t mTransactionStartGeneration = 0;
+    reporting::AttributeGeneration mTransactionStartGeneration{ 0 };
 
     EventNumber mEventMin = 0;
 

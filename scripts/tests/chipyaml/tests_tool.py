@@ -66,5 +66,4 @@ def send_raw_command(command: str, server_path: str, server_arguments: str):
     log_printer = TestColoredLogPrinter()
     log_printer.print(MatterLog.decode_logs(json_payload.get('logs')))
 
-    success = not bool(len([lambda x: x.get('error') for x in json_payload.get('results')]))
-    return success
+    return not bool(len([lambda x: x.get('error') for x in json_payload.get('results')]))

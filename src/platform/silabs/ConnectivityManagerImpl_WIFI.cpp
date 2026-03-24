@@ -154,7 +154,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiFiStationMode val)
 {
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 
     if (mWiFiStationMode != val)
     {
@@ -179,7 +179,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
     {
         WifiInterface::GetInstance().ClearWifiCredentials();
 
-        DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
     }
 }
 
@@ -197,7 +197,7 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 {
     // Schedule a call to the DriveStationState method to adjust the station state as needed.
     ChipLogProgress(DeviceLayer, "_ON WIFI PROVISION CHANGE");
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -257,10 +257,7 @@ void ConnectivityManagerImpl::DriveStationState()
         {
             ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
 
-            CHIP_ERROR error = WifiInterface::GetInstance().TriggerDisconnection();
-            SuccessOrExitAction(error,
-                                ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %" CHIP_ERROR_FORMAT, error.Format()));
-
+            WifiInterface::GetInstance().TriggerDisconnection();
             ChangeWiFiStationState(kWiFiStationState_Disconnecting);
         }
 #endif

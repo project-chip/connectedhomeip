@@ -87,7 +87,7 @@ async def main():
     timeoutTicker = TestTimeout(options.testTimeout)
     timeoutTicker.start()
 
-    test = BaseTestHelper(nodeid=112233, testCommissioner=True,
+    test = BaseTestHelper(nodeId=112233, testCommissioner=True,
                           paaTrustStorePath=options.paaPath)
 
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
@@ -101,7 +101,7 @@ async def main():
         for testFailureStage in range(3, 20):
             FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress1,
                                               setuppin=20202021,
-                                              nodeid=1),
+                                              nodeId=1),
                       "Failed to establish PASE connection with device")
             FailIfNot(await test.TestCommissionFailureOnReport(1, testFailureStage),
                       "Commissioning failure tests failed for simulated report failure on stage {}".format(testFailureStage))
@@ -111,7 +111,7 @@ async def main():
         for testFailureStage in range(3, 20):
             FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress1,
                                               setuppin=20202021,
-                                              nodeid=1),
+                                              nodeId=1),
                       "Failed to establish PASE connection with device")
             FailIfNot(await test.TestCommissionFailure(1, testFailureStage),
                       "Commissioning failure tests failed for simulated stage failure on stage {}".format(testFailureStage))
@@ -119,12 +119,12 @@ async def main():
     # Ensure we can still commission for real
     FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress1,
                                       setuppin=20202021,
-                                      nodeid=1),
+                                      nodeId=1),
               "Failed to establish PASE connection with device")
     FailIfNot(await test.TestCommissionFailure(1, 0), "Failed to commission device")
 
     logger.info("Testing on off cluster")
-    FailIfNot(await test.TestOnOffCluster(nodeid=1,
+    FailIfNot(await test.TestOnOffCluster(nodeId=1,
                                           endpoint=LIGHTING_ENDPOINT_ID), "Failed to test on off cluster")
 
     timeoutTicker.stop()

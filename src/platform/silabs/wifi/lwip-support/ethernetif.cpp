@@ -25,17 +25,7 @@
 #include "lwip/ethip6.h"
 #include "lwip/timeouts.h"
 #include "netif/etharp.h"
-
-#ifdef RS911X_WIFI
-extern "C" {
-#include "rsi_driver.h"
-#include "rsi_pkt_mgmt.h"
-}
-#endif // RS911X_WIFI
-
-#ifdef WF200_WIFI
 #include "sl_wfx.h"
-#endif
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/silabs/wifi/WifiInterface.h>
@@ -75,7 +65,7 @@ static void low_level_init(struct netif * netif)
 
     /* Set netif MAC hardware address */
     chip::MutableByteSpan byteSpan(netif->hwaddr, ETH_HWADDR_LEN);
-    chip::DeviceLayer::Silabs::WifiInterface::GetInstance().GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::WifiInterface::GetInstance().GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
 
     /* Set netif maximum transfer unit */
     netif->mtu = 1500;
@@ -181,7 +171,6 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
  * @return
  *    ERR_OK if successful
  ******************************************************************************/
-#ifdef WF200_WIFI
 static err_t low_level_output(struct netif * netif, struct pbuf * p)
 {
     struct pbuf * q;
@@ -301,250 +290,6 @@ void sl_wfx_host_received_frame_callback(sl_wfx_received_ind_t * rx_buffer)
     }
 }
 
-#else /* For RS911x - using LWIP */
-
-static SemaphoreHandle_t ethout_sem;
-
-/**
- * @brief Allocates packets for the data about to be sent
- *
- * TODO: Validate if this warning still applied and fix the associated code
- * WARNING - Taken from RSI and broken up
- * This is my own RSI stuff for not copying code and allocating an extra
- * level of indirection - when using LWIP buffers
- * see also: int32_t rsi_wlan_send_data_xx(uint8_t *buffer, uint32_t length)
- *
- * @return void* pointer to the allocated packet buffer
- */
-static void * wfx_rsi_alloc_pkt(void)
-{
-    rsi_pkt_t * pkt;
-
-    // Allocate packet to send data
-    if ((pkt = rsi_pkt_alloc(&rsi_driver_cb->wlan_cb->wlan_tx_pool)) == NULL)
-    {
-        return (void *) 0;
-    }
-
-    return (void *) pkt;
-}
-
-/**
- * @brief Adds the buffer data to the allocated packet.
- *        the packet must be allocated before adding data to it.
- *
- * @param[in,out] p pointer to the allocated packet
- * @param[in] buf pointer to the data buffer to copy to the packet
- * @param[in] len length of the data buffer
- * @param[in] off the offset at which to put the data in the packet
- */
-void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off)
-{
-    rsi_pkt_t * pkt;
-
-    pkt = (rsi_pkt_t *) p;
-    memcpy(((char *) pkt->data) + off, buf, len);
-}
-
-/**
- * @brief Triggers the packet to sent on the wire
- *
- * @param p pointer to the packet to send
- * @param len length of the packet to send
- *
- * @return int32_t RSI_ERROR_NONE, if the packet was succesfully sent out
- *                 RSI_ERROR_RESPONSE_TIMEOUT, if we are unable to acquire the semaphore of the status
- *                 other error (< 0) if we were unable to send out the the packet
- */
-int32_t wfx_rsi_send_data(void * p, uint16_t len)
-{
-    int32_t status;
-    uint8_t * host_desc;
-    rsi_pkt_t * pkt;
-
-    pkt       = (rsi_pkt_t *) p;
-    host_desc = pkt->desc;
-    memset(host_desc, 0, RSI_HOST_DESC_LENGTH);
-    rsi_uint16_to_2bytes(host_desc, (len & 0xFFF));
-
-    // Fill packet type
-    host_desc[1] |= (RSI_WLAN_DATA_Q << 4);
-    host_desc[2] |= 0x01;
-
-    rsi_enqueue_pkt(&rsi_driver_cb->wlan_tx_q, pkt);
-
-#ifndef RSI_SEND_SEM_BITMAP
-    rsi_driver_cb_non_rom->send_wait_bitmap |= BIT(0);
-#endif
-    // Set TX packet pending event
-    rsi_set_event(RSI_TX_EVENT);
-
-    if (rsi_wait_on_wlan_semaphore(&rsi_driver_cb_non_rom->send_data_sem, RSI_SEND_DATA_RESPONSE_WAIT_TIME) != RSI_ERROR_NONE)
-    {
-        return RSI_ERROR_RESPONSE_TIMEOUT;
-    }
-    status = rsi_wlan_get_status();
-
-    return status;
-}
-
-/*****************************************************************************
- *  @fn  static err_t low_level_output(struct netif *netif, struct pbuf *p)
- *  @brief
- *    This function is called from LWIP task when LWIP stack
- *    has some data to be forwarded over WiFi Network
- *
- * @param[in] netif: lwip network interface
- *
- * @param[in] p: the packet to send
- *
- * @return
- *    ERR_OK if successful
- ******************************************************************************/
-static err_t low_level_output(struct netif * netif, struct pbuf * p)
-{
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-    UNUSED_PARAMETER(netif);
-    sl_status_t status = sl_wifi_send_raw_data_frame(SL_WIFI_CLIENT_INTERFACE, (uint8_t *) p->payload, p->len);
-    if (status != SL_STATUS_OK)
-    {
-        return ERR_IF;
-    }
-    return ERR_OK;
-#else
-    void * packet;
-    struct pbuf * q;
-    uint16_t framelength = 0;
-    uint16_t datalength  = 0;
-#if WIFI_DEBUG_ENABLED
-    ChipLogProgress(DeviceLayer, "LWIP : low_level_output");
-#endif
-    if (xSemaphoreTake(ethout_sem, portMAX_DELAY) != pdTRUE)
-    {
-        return ERR_IF;
-    }
-    /* Calculate total packet size */
-    for (q = p, framelength = 0; q != NULL; q = q->next)
-    {
-        framelength += q->len;
-    }
-    if (framelength < LWIP_FRAME_ALIGNMENT)
-    {
-        framelength = LWIP_FRAME_ALIGNMENT;
-    }
-#if WIFI_DEBUG_ENABLED
-    ChipLogProgress(DeviceLayer, "EN-RSI: Output");
-#endif
-    if ((netif->flags & (NETIF_FLAG_LINK_UP | NETIF_FLAG_UP)) != (NETIF_FLAG_LINK_UP | NETIF_FLAG_UP))
-    {
-        ChipLogError(DeviceLayer, "EN-RSI:NOT UP");
-        xSemaphoreGive(ethout_sem);
-        return ERR_IF;
-    }
-    packet = wfx_rsi_alloc_pkt();
-    if (!packet)
-    {
-        ChipLogError(DeviceLayer, "EN-RSI:No buf");
-        xSemaphoreGive(ethout_sem);
-        return ERR_IF;
-    }
-
-#if WIFI_DEBUG_ENABLED
-    uint8_t * b = (uint8_t *) p->payload;
-    ChipLogProgress(DeviceLayer, "EN-RSI: Out [%02x:%02x:%02x:%02x:%02x:%02x][%02x:%02x:%02x:%02x:%02x:%02x]type=%02x%02x", b[0],
-                    b[1], b[2], b[3], b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13]);
-#endif
-    /* Generate the packet */
-    for (q = p, datalength = 0; q != NULL; q = q->next)
-    {
-        wfx_rsi_pkt_add_data(packet, (uint8_t *) (q->payload), (uint16_t) q->len, datalength);
-        datalength += q->len;
-    }
-    if (datalength < LWIP_FRAME_ALIGNMENT)
-    {
-        /* Add junk data to the end for frame alignment if framelength is less than 60 */
-        wfx_rsi_pkt_add_data(packet, (uint8_t *) (p->payload), LWIP_FRAME_ALIGNMENT - datalength, datalength);
-    }
-#if WIFI_DEBUG_ENABLED
-    ChipLogProgress(DeviceLayer, "EN-RSI: Sending %d", framelength);
-#endif
-
-    /* forward the generated packet to RSI to
-     * send the data over wifi network
-     */
-    int32_t status = wfx_rsi_send_data(packet, datalength);
-    if (status != 0)
-    {
-        ChipLogError(DeviceLayer, "*ERR*EN-RSI:Send fail: %ld", status);
-        xSemaphoreGive(ethout_sem);
-        return ERR_IF;
-    }
-
-#if WIFI_DEBUG_ENABLED
-    ChipLogProgress(DeviceLayer, "EN-RSI:Xmit %d", framelength);
-#endif
-    xSemaphoreGive(ethout_sem);
-
-    return ERR_OK;
-#endif // RS9116
-}
-
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-/*****************************************************************************
- *  @fn  void sl_si91x_host_process_data_frame(uint8_t *buf, int len)
- *  @brief
- *    host received frame cb
- *
- * @param[in] buf: buffer
- *
- * @param[in] len: length
- *
- * @return
- *    None
- ******************************************************************************/
-sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface, sl_wifi_buffer_t * buffer)
-{
-    void * packet;
-    struct netif * ifp;
-    sl_si91x_packet_t * rsi_pkt;
-    packet  = sl_si91x_host_get_buffer_data(buffer, 0, NULL);
-    rsi_pkt = (sl_si91x_packet_t *) packet;
-    /* get the network interface for STATION interface,
-     * and forward the received frame buffer to LWIP
-     */
-    if ((ifp = GetNetworkInterface(SL_WFX_STA_INTERFACE)) != (struct netif *) 0)
-    {
-        low_level_input(ifp, rsi_pkt->data, rsi_pkt->length);
-    }
-    return SL_STATUS_OK;
-}
-#else
-
-/*****************************************************************************
- *  @fn  void wfx_host_received_sta_frame_cb(uint8_t *buf, int len)
- *  @brief
- *    host received frame cb
- *
-        @@ -409,17 +430,21 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
- * @return
- *    None
- ******************************************************************************/
-void wfx_host_received_sta_frame_cb(uint8_t * buf, int len)
-{
-    struct netif * ifp;
-
-    /* get the network interface for STATION interface,
-     * and forward the received frame buffer to LWIP
-     */
-    if ((ifp = chip::DeviceLayer::Silabs::Lwip::GetNetworkInterface(SL_WFX_STA_INTERFACE)) != (struct netif *) 0)
-    {
-        low_level_input(ifp, buf, len);
-    }
-}
-#endif
-
-#endif /* RS911x - with LWIP */
-
 /*****************************************************************************
  *  @fn  err_t sta_ethernetif_init(struct netif *netif)
  *  @brief
@@ -573,10 +318,6 @@ err_t sta_ethernetif_init(struct netif * netif)
 
     /* initialize the hardware */
     low_level_init(netif);
-#ifndef WF200_WIFI
-    /* Need single output only */
-    ethout_sem = xSemaphoreCreateBinaryStatic(&xEthernetIfSemaBuffer);
-    xSemaphoreGive(ethout_sem);
-#endif
+
     return ERR_OK;
 }

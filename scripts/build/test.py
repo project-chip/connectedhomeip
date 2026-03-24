@@ -25,7 +25,7 @@ SCRIPT_ROOT = os.path.dirname(__file__)
 
 
 def build_expected_output(source: str, root: str, out: str) -> List[str]:
-    with open(os.path.join(SCRIPT_ROOT, source), 'rt') as f:
+    with open(os.path.join(SCRIPT_ROOT, source)) as f:
         for line in f.readlines():
             yield line.replace("{root}", root).replace("{out}", out)
 
@@ -49,7 +49,6 @@ def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
         'TI_SYSCONFIG_ROOT': 'TEST_TI_SYSCONFIG_ROOT',
         'JAVA_HOME': 'TEST_JAVA_HOME',
         'GSDK_ROOT': 'TEST_GSDK_ROOT',
-        'WISECONNECT_SDK_ROOT': 'TEST_WISECONNECT_SDK_ROOT',
         'WIFI_SDK_ROOT': 'TEST_WIFI_SDK_ROOT',
     })
 
@@ -77,10 +76,10 @@ class TestBuilder(unittest.TestCase):
         ROOT = '/TEST/BUILD/ROOT'
         OUT = '/OUTPUT/DIR'
 
-        expected = [line for line in build_expected_output(expected_file, ROOT, OUT)]
-        actual = [line for line in build_actual_output(ROOT, OUT, args)]
+        expected = list(build_expected_output(expected_file, ROOT, OUT))
+        actual = list(build_actual_output(ROOT, OUT, args))
 
-        diffs = [line for line in difflib.unified_diff(expected, actual)]
+        diffs = list(difflib.unified_diff(expected, actual))
 
         if diffs:
             reference = os.path.basename(expected_file) + '.actual'

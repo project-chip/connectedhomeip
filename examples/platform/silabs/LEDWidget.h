@@ -37,10 +37,10 @@ public:
     uint8_t GetLevel();
 
 private:
-    uint8_t mLed;
-    uint8_t mLevel;
-    bool mLedStatus;
-    uint64_t mLastChangeTimeMS;
-    uint32_t mBlinkOnTimeMS;
-    uint32_t mBlinkOffTimeMS;
+    uint8_t mLed               = 0;
+    uint8_t mLevel             = 0;
+    bool mLedStatus            = false;
+    uint64_t mLastChangeTimeMS = 0;
+    uint32_t mBlinkOnTimeMS    = 0;
+    uint32_t mBlinkOffTimeMS   = 0;
 };

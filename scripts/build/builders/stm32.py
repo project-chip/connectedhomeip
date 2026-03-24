@@ -25,20 +25,20 @@ class stm32App(Enum):
     def ExampleName(self):
         if self == stm32App.LIGHT:
             return 'lighting-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == stm32App.LIGHT:
             return 'chip-stm32-lighting-example'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
         if self == stm32App.LIGHT:
-            return 'lighting_app.out.flashbundle.txt'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+            return 'lighting_app.flashbundle.txt'
+        raise Exception('Unknown app type: %r' % self)
+
+    def BuildRoot(self, root,stm32_chip):
+        return os.path.join(root, 'examples', self.ExampleName(), 'stm32',stm32_chip)
 
 
 class stm32Board(Enum):
@@ -50,8 +50,7 @@ class stm32Board(Enum):
             return 'STM32WB5MM-DK'
         elif stm32Board.STM32WBA6XX:
             return 'STM32WBA65I-DK1'
-        else:
-            raise Exception('Unknown board #: %r' % self)
+        raise Exception('Unknown board #: %r' % self)
 
 
 class stm32Builder(GnBuilder):
@@ -61,20 +60,17 @@ class stm32Builder(GnBuilder):
                  runner,
                  app: stm32App = stm32App.LIGHT,
                  board: stm32Board = stm32Board.STM32WB55XX):
+        super(stm32Builder, self).__init__(
+            root=app.BuildRoot(root,board.GetIC()),
+            runner=runner)
 
         self.board = board
         self.app = app
 
         stm32_chip = self.board.GetIC()
+        #self.extra_gn_options = [' stm32_ic_family="%s"' % stm32_chip]
 
-        super(stm32Builder, self).__init__(
-            root=os.path.join(root, 'examples',
-                              app.ExampleName(), 'stm32', stm32_chip),
-            runner=runner)
-        self.extra_gn_options = ['stm32_board="%s"' % stm32_chip]
-        self.extra_gn_options.append('stm32_board="%s"' % stm32_chip)
-
-        self.extra_gn_options.append('chip_config_network_layer_ble=true')
+        self.extra_gn_options =  ['chip_config_network_layer_ble=true']
         self.extra_gn_options.append('treat_warnings_as_errors=false')
 
     def GnBuildArgs(self):
@@ -82,7 +78,7 @@ class stm32Builder(GnBuilder):
         return self.extra_gn_options
 
     def build_outputs(self):
-        extensions = ["out", "out.hex"]
+        extensions = ["bin", "elf"]
         if self.options.enable_link_map_file:
             extensions.append("out.map")
         for ext in extensions:

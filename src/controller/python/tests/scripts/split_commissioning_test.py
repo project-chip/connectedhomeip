@@ -91,7 +91,7 @@ async def main():
     timeoutTicker.start()
 
     test = BaseTestHelper(
-        nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=False)
+        nodeId=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=False)
 
     FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
               "Failed to finish network commissioning")
@@ -99,31 +99,31 @@ async def main():
     logger.info("Testing PASE connection to device 1")
     FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress1,
                                       setuppin=20202021,
-                                      nodeid=1),
+                                      nodeId=1),
               "Failed to establish PASE connection with device 1")
 
     logger.info("Testing PASE connection to device 2")
     FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress2,
                                       setuppin=20202021,
-                                      nodeid=2),
+                                      nodeId=2),
               "Failed to establish PASE connection with device 2")
 
     logger.info("Attempting to execute a fabric-scoped command during PASE before AddNOC")
-    FailIfNot(await test.TestFabricScopedCommandDuringPase(nodeid=1),
+    FailIfNot(await test.TestFabricScopedCommandDuringPase(nodeId=1),
               "Did not get UNSUPPORTED_ACCESS for fabric-scoped command during PASE")
 
-    FailIfNot(await test.TestCommissionOnly(nodeid=1),
+    FailIfNot(await test.TestCommissionOnly(nodeId=1),
               "Failed to commission device 1")
 
-    FailIfNot(await test.TestCommissionOnly(nodeid=2),
+    FailIfNot(await test.TestCommissionOnly(nodeId=2),
               "Failed to commission device 2")
 
     logger.info("Testing on off cluster on device 1")
-    FailIfNot(await test.TestOnOffCluster(nodeid=1,
+    FailIfNot(await test.TestOnOffCluster(nodeId=1,
                                           endpoint=LIGHTING_ENDPOINT_ID), "Failed to test on off cluster on device 1")
 
     logger.info("Testing on off cluster on device 2")
-    FailIfNot(await test.TestOnOffCluster(nodeid=2,
+    FailIfNot(await test.TestOnOffCluster(nodeId=2,
                                           endpoint=LIGHTING_ENDPOINT_ID), "Failed to test on off cluster on device 2")
 
     timeoutTicker.stop()

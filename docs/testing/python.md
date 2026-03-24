@@ -45,7 +45,7 @@ Python tests located in src/python_testing
 
 ### A simple test
 
-```
+```python
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
@@ -71,18 +71,16 @@ class TC_MYTEST_1_1(MatterBaseTest):
     async def test_TC_MYTEST_1_1(self):
 
         vendor_name = await self.read_single_attribute_check_success(
-            dev_ctrl=self.default_controller, <span style="color:#38761D"># defaults to
-self.default_controlller</span>
-            node_id = self.dut_node_id, <span style="color:#38761D"># defaults to
-self.dut_node_id</span>
+            dev_ctrl=self.default_controller,  # defaults to self.default_controller
+            node_id = self.dut_node_id,  # defaults to self.dut_node_id
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.VendorName,
-            endpoint = 0, <span style="color:#38761D">#defaults to 0</span>
+            endpoint = 0,  # defaults to 0
         )
-        asserts.assert_equal(vendor_name, “Test vendor name”, “Unexpected vendor name”)
+        asserts.assert_equal(vendor_name, "Test vendor name", "Unexpected vendor name")
 
 if __name__ == "__main__":
-default_matter_test_main()
+    default_matter_test_main()
 ```
 
 ---
@@ -321,11 +319,11 @@ callbacks are called on update.
 
 Example for setting callbacks:
 
-```
+```python
 cb = EventSubscriptionHandler(cluster, cluster_id, event_id)
 
 urgent = 1
-subscription = await dev_ctrl.ReadEvent(nodeid=1, events=[(1, event, urgent)], reportInterval=[1, 3])
+subscription = await dev_ctrl.ReadEvent(nodeId=1, events=[(1, event, urgent)], reportInterval=[1, 3])
 subscription.SetEventUpdateCallback(callback=cb)
 
 try:
@@ -345,9 +343,9 @@ PyChipError
 
 Example:
 
-```
-res = await devCtrl.WriteAttribute(nodeid=0, attributes=[(0,Clusters.BasicInformation.Attributes.NodeLabel("Test"))])
-asserts.assert_equal(ret[0].status, Status.Success, “write failed”)
+```python
+res = await devCtrl.WriteAttribute(nodeId=0, attributes=[(0,Clusters.BasicInformation.Attributes.NodeLabel("Test"))])
+asserts.assert_equal(ret[0].status, Status.Success, "write failed")
 ```
 
 ### [SendCommand](./ChipDeviceCtrlAPI.md#sendcommand)
@@ -504,6 +502,40 @@ Fabric admin for default controller:
   second_ctrl = fa.new_fabric_admin.NewController(nodeId=node_id)
 ```
 
+Reboot the DUT during testing:
+
+```python
+# Simple reboot - device state persists
+await self.request_device_reboot()
+
+# Factory reset - clears device state (removes KVS)
+await self.request_device_factory_reset()
+```
+
+```shell
+# Example Command w/ run_python_test.py test runner:
+scripts/tests/run_python_test.py --factory-reset --app out/linux-x64-all-clusters/chip-all-clusters-app --app-args "--discriminator 1234 --KVS kvs1" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --endpoint 1" --script src/python_testing/TC_ACL_2_10.py --app-ready-pattern "APP STATUS: Starting event loop"
+```
+
+The `request_device_reboot()` and `request_device_factory_reset()` methods work
+differently depending on the environment. When the test is started with
+`run_python_test.py` as it is in the CI, need to make sure to import
+MatterBaseTest and have your test module inherit from it to make this
+functionality accessible during your test, the device is automatically rebooted
+and possibly factory reset during the test depending on test implementation
+using the restart_flag_file. When the test is started by some other means (e.g.,
+during certification testing), you'll be prompted to manually reboot or factory
+reset the device using the device-specific mechanism.
+
+If reboot utilized automatically expires existing controller sessions to device
+to force reconnection once device is back up and stable or if factory reset
+utilized the device will automatically re-enter commissioning mode to allow new
+commissioning once the device is back up and stable.
+
+See
+[TC-ACL-2.10](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_ACL_2_10.py)
+for an example testing ACL persistence across reboots.
+
 ## Automating manual steps
 
 Some test plans have manual steps that require the tester to manually change the
@@ -532,11 +564,11 @@ Note: The name of the pipe can be anything while is a valid file path.
 
 Example of usage:
 
-```bash
-First run the app with the desired app-pipe path:
+```shell
+# First run the app with the desired app-pipe path:
 ./out/darwin-arm64-all-clusters/chip-all-clusters-app --app-pipe  /tmp/ref_alm_2_2
 
-Then execute the test with the app-pipe argument with the value defined while running the app.
+# Then execute the test with the app-pipe argument with the value defined while running the app.
 python3 src/python_testing/TC_REFALM_2_2.py --commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00  --PICS src/app/tests/suites/certification/ci-pics-values --app-pipe /tmp/ref_alm_2_2  --int-arg PIXIT.REFALM.AlarmThreshold:1
 ```
 
@@ -682,15 +714,15 @@ First ensure the device is in commissioning mode. Then run the test against the
 device by supplying either the QR code, the manual pairing code or the
 discriminator / password pair.
 
-```
+```shell
 python3 TC_DeviceConformance.py --qr-code MT:-24J0AFN00KA0648G00
 ```
 
-```
+```shell
 python3 TC_DeviceConformance.py --manual-code 34970112332
 ```
 
-```
+```shell
 python3 TC_DeviceConformance.py --discriminator 3840 --passcode 20202021
 ```
 
@@ -699,7 +731,7 @@ python3 TC_DeviceConformance.py --discriminator 3840 --passcode 20202021
 If the device has already been commissioned into the python testing fabric, you
 can run the test directly
 
-```
+```shell
 python3 TC_DeviceConformance.py
 ```
 
@@ -712,7 +744,7 @@ using the `--commissioning-method` flag and the `--qr-code`, `--manual-code` or
 
 For example:
 
-```
+```shell
 python3 TC_DeviceConformance.py --discriminator 3840 --passcode 20202021 --commissioning-method on-network
 ```
 
@@ -736,7 +768,7 @@ the device, they can also be run against a MatterTlvJson machine readable file
 without requiring the device to be physically present. To run against a
 previously generated MatterTlvJson device dump file:
 
-```
+```shell
 python3 TC_DeviceConformance.py --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json
 ```
 
@@ -744,7 +776,7 @@ You can generate a MatterTlvJson file for a device by leveraging the
 certification test that generates these (TC-IDM-12.1, implemented in
 TC_DeviceBasicComposition.py).
 
-```
+```shell
 python3 TC_DeviceBasicComposition.py --qr-code MT:-24J0AFN00KA0648G00 --tests test_TC_IDM_12_1
 ```
 
@@ -862,3 +894,117 @@ for that run, e.g.:
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test
 execution.
+
+# Test Module Guards
+
+Guards let you run test steps only when certain conditions are met (e.g., a
+cluster has a feature, attribute, or command).
+
+See below sections for usage examples please.
+
+## Cluster Guards
+
+The following are inherited from the `matter_testing` module, so they do not
+need to be imported. For more examples on these guards, see
+`src/python_testing/support_modules/binfo_attributes_verification.py`.
+
+Use these to skip a test step when the endpoint or cluster does not support the
+feature, attribute, or command under test.
+
+### Attribute Guard
+
+Runs the test step only if the endpoint and cluster contain the given attribute:
+
+Example:
+
+```python
+self.step(<STEP_NUMBER>)
+if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperationalState):
+    # If attribute exists then test step continues, else test step is skipped.
+```
+
+### Feature Guard
+
+Runs the test step only if the cluster on the endpoint supports the given
+feature:
+
+Example:
+
+```python
+self.step(<STEP_NUMBER>)
+if await self.feature_guard(endpoint=self.endpoint, cluster=Clusters.BooleanStateConfiguration, feature_int=Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible):
+    # IF feature available then do test step, else test step is skipped.
+```
+
+### Command Guard
+
+Runs the test step only if the endpoint has the cluster that supports the given
+command:
+
+Example:
+
+```python
+self.step(<STEP_NUMBER>)
+if await self.command_guard(endpoint=self.endpoint, command=commands.Resume):
+    # If command available, then do test step here, else test step is skipped
+```
+
+## Additional Test Guards
+
+This section covers the PICS guard and the `run_if_endpoint_matches` decorator,
+with an example for each.
+
+### PICS Guard
+
+Inherited from `matter_testing` (no import needed). Runs the test step only if
+the given PICS key is enabled in the PICS file:
+
+Example:
+
+```python
+if self.pics_guard(self.check_pics(<PICS here>)):
+    self.step(<STEP_NUMBER>)
+    # Do test step logic here
+else:
+    self.skip_step(<STEP_NUMBER>)
+    #skip test step
+```
+
+### run_if_endpoint_matches decorator
+
+Import the decorator and the check functions from `matter.testing.decorators`:
+
+```python
+from matter.testing.decorators import has_feature, has_command, has_attribute, has_cluster, run_if_endpoint_matches
+```
+
+Skips the whole test if the specified endpoint does not have the required
+cluster, feature, attribute, or command. Apply the decorator above the test
+function.
+
+Examples:
+
+```python
+#Feature:
+@run_if_endpoint_matches(
+        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
+    )
+async def test_TC_AVSM_2_2(self):
+    # Do test step logic if feature exists, else this test is skipped
+
+#Cluster
+@run_if_endpoint_matches(has_cluster(Clusters.AdministratorCommissioning))
+async def test_TC_CADMIN_1_3(self):
+    # Do test step logic if cluster exists, else this test is skipped
+
+#Attribute:
+@run_if_endpoint_matches(has_attribute(Clusters.AccessControl.Attributes.Extension))
+async def test_TC_ACL_2_3(self):
+    # Do test step logic if attribute exists, else this test is skipped
+
+#Command
+@run_if_endpoint_matches(has_command(Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement))
+async def test_TC_OPCREDS_3_8(self):
+    # Do test step logic if command is available, else this test is skipped
+
+```

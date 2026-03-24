@@ -563,6 +563,15 @@ static BOOL CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(Attr
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInWaterTankLevelMonitoringCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::WaterTankLevelMonitoring;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInBooleanStateConfigurationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::BooleanStateConfiguration;
@@ -1013,6 +1022,15 @@ static BOOL CommandNeedsTimedInvokeInSoilMeasurementCluster(AttributeId aAttribu
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInAmbientContextSensingCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::AmbientContextSensing;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::WiFiNetworkManagement;
@@ -1173,6 +1191,18 @@ static BOOL CommandNeedsTimedInvokeInContentControlCluster(AttributeId aAttribut
 {
     using namespace Clusters::ContentControl;
     switch (aAttributeId) {
+    case Commands::UpdatePIN::Id: {
+        return YES;
+    }
+    case Commands::ResetPIN::Id: {
+        return YES;
+    }
+    case Commands::Enable::Id: {
+        return YES;
+    }
+    case Commands::Disable::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -1539,6 +1569,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(commandID);
     }
+    case Clusters::WaterTankLevelMonitoring::Id: {
+        return CommandNeedsTimedInvokeInWaterTankLevelMonitoringCluster(commandID);
+    }
     case Clusters::BooleanStateConfiguration::Id: {
         return CommandNeedsTimedInvokeInBooleanStateConfigurationCluster(commandID);
     }
@@ -1667,6 +1700,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::SoilMeasurement::Id: {
         return CommandNeedsTimedInvokeInSoilMeasurementCluster(commandID);
+    }
+    case Clusters::AmbientContextSensing::Id: {
+        return CommandNeedsTimedInvokeInAmbientContextSensingCluster(commandID);
     }
     case Clusters::WiFiNetworkManagement::Id: {
         return CommandNeedsTimedInvokeInWiFiNetworkManagementCluster(commandID);

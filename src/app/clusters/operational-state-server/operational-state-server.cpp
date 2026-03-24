@@ -29,6 +29,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/OperationalState/Metadata.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -53,7 +54,11 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId) : Instance(aDel
 
 Instance::~Instance()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    if (mDelegate)
+    {
+        mDelegate->SetInstance(nullptr);
+    }
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -400,6 +405,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetCountdownTime()));
         break;
     }
+    case OperationalState::Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(OperationalState::kRevision);
     }
     return CHIP_NO_ERROR;
 }

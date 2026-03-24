@@ -30,50 +30,47 @@ class QpgApp(Enum):
     def ExampleName(self):
         if self == QpgApp.LIGHT:
             return 'lighting-app'
-        elif self == QpgApp.LOCK:
+        if self == QpgApp.LOCK:
             return 'lock-app'
-        elif self == QpgApp.SHELL:
+        if self == QpgApp.SHELL:
             return 'shell'
-        elif self == QpgApp.PERSISTENT_STORAGE:
+        if self == QpgApp.PERSISTENT_STORAGE:
             return 'persistent-storage'
-        elif self == QpgApp.LIGHT_SWITCH:
+        if self == QpgApp.LIGHT_SWITCH:
             return 'light-switch-app'
-        elif self == QpgApp.THERMOSTAT:
+        if self == QpgApp.THERMOSTAT:
             return 'thermostat'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self, board_name):
         if self == QpgApp.LIGHT:
             return f'chip-{board_name}-lighting-example'
-        elif self == QpgApp.LOCK:
+        if self == QpgApp.LOCK:
             return f'chip-{board_name}-lock-example'
-        elif self == QpgApp.SHELL:
+        if self == QpgApp.SHELL:
             return f'chip-{board_name}-shell-example'
-        elif self == QpgApp.PERSISTENT_STORAGE:
+        if self == QpgApp.PERSISTENT_STORAGE:
             return f'chip-{board_name}-persistent_storage-example'
-        elif self == QpgApp.LIGHT_SWITCH:
+        if self == QpgApp.LIGHT_SWITCH:
             return f'chip-{board_name}-light-switch-example'
-        elif self == QpgApp.THERMOSTAT:
+        if self == QpgApp.THERMOSTAT:
             return f'chip-{board_name}-thermostat-example'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
         if self == QpgApp.LIGHT:
             return 'lighting_app.out.flashbundle.txt'
-        elif self == QpgApp.LOCK:
+        if self == QpgApp.LOCK:
             return 'lock_app.out.flashbundle.txt'
-        elif self == QpgApp.SHELL:
+        if self == QpgApp.SHELL:
             return 'shell_app.out.flashbundle.txt'
-        elif self == QpgApp.PERSISTENT_STORAGE:
+        if self == QpgApp.PERSISTENT_STORAGE:
             return 'persistent_storage_app.out.flashbundle.txt'
-        elif self == QpgApp.LIGHT_SWITCH:
+        if self == QpgApp.LIGHT_SWITCH:
             return 'light_switch_app.out.flashbundle.txt'
-        elif self == QpgApp.THERMOSTAT:
+        if self == QpgApp.THERMOSTAT:
             return 'thermostat.out.flashbundle.txt'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'qpg')

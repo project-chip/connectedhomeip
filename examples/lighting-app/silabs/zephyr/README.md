@@ -257,7 +257,7 @@ platform with the standard Silicon Labs lighting example.
 
 ### Additional Resources:
 
--   [Silicon Labs Matter Documentation](https://github.com/SiliconLabs/matter)
+-   [Silicon Labs Matter Documentation](https://github.com/SiliconLabsSoftware/matter_sdk)
 -   [SiWx917 Development Kit User Guide](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-development-kit)
 -   [Matter Specification](https://csa-iot.org/all-solutions/matter/)
 -   [Zephyr RTOS Documentation](https://docs.zephyrproject.org/)

@@ -18,7 +18,8 @@
 
 #pragma once
 
-#include "TrustVerification.h"
+#include <credentials/jcm/TrustVerification.h>
+#include <credentials/jcm/VendorIdVerificationClient.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -44,18 +45,14 @@ namespace JCM {
  * for commissioning Joint Fabric Administrator devices in a CHIP network. It extends the DeviceCommissioner class and
  * implements the JCM trust verification process.
  */
-class DeviceCommissioner : public chip::Controller::DeviceCommissioner
+class DeviceCommissioner : public chip::Controller::DeviceCommissioner,
+                           public Credentials::JCM::VendorIdVerificationClient,
+                           public Credentials::JCM::TrustVerificationStateMachine
 {
 public:
     // The constructor initializes the DeviceCommissioner with a reference to this device commissioner
     DeviceCommissioner() {}
     ~DeviceCommissioner() {}
-
-    void RegisterTrustVerificationDelegate(TrustVerificationDelegate * trustVerificationDelegate)
-    {
-        ChipLogProgress(Controller, "JCM: Setting trust verification delegate");
-        mTrustVerificationDelegate = trustVerificationDelegate;
-    }
 
     /*
      * StartJCMTrustVerification is a method that initiates the JCM trust verification process for the device.
@@ -64,7 +61,7 @@ public:
      *
      * @return CHIP_ERROR indicating success or failure of the operation.
      */
-    CHIP_ERROR StartJCMTrustVerification() override;
+    CHIP_ERROR StartJCMTrustVerification(DeviceProxy * proxy) override;
 
     /*
      * ContinueAfterUserConsent is a method that continues the JCM trust verification process after the user has
@@ -73,20 +70,20 @@ public:
      *
      * @param consent A boolean indicating whether the user granted consent (true) or denied it (false).
      */
-    void ContinueAfterUserConsent(bool consent);
+    void ContinueAfterUserConsent(const bool & consent) override;
 
-    /*
-     * ContinueAfterVendorIDVerification is a method that continues the JCM trust verification process after the
-     * vendor ID verification step. It will call the trust verification delegate to continue the process.
+    /**
+     * ContinueAfterLookupOperationalTrustAnchor is a method that continues the JCM trust verification process after the
+     * lookup of the operational trust anchor. It will call the trust verification delegate to continue the process.
      *
-     * @param verified A boolean indicating whether the vendor ID verification was successful (true) or not (false).
+     * @param globallyTrustedRootSpan A ByteSpan representing the globally trusted root public key.
      */
-    void ContinueAfterVendorIDVerification(bool verified);
+    void ContinueAfterLookupOperationalTrustAnchor(const CHIP_ERROR err, const ByteSpan globallyTrustedRootSpan);
 
     /*
      * GetTrustVerificationInfo is a method that returns the JCM trust verification information.
      */
-    TrustVerificationInfo & GetTrustVerificationInfo() { return mInfo; }
+    Credentials::JCM::TrustVerificationInfo & GetTrustVerificationInfo() { return mInfo; }
 
     bool HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData) override;
 
@@ -95,21 +92,33 @@ protected:
     CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params) override;
     // Override CleanupCommissioning to clean up JCM trust verification state
     void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus) override;
+    CHIP_ERROR OnLookupOperationalTrustAnchor(VendorId vendorID, Credentials::CertificateKeyId & subjectKeyId,
+                                              ByteSpan & globallyTrustedRootSpan) override;
+    void OnVendorIdVerificationComplete(const CHIP_ERROR & err) override;
 
 private:
     // Parses the JCM extra commissioning information from the device
-    CHIP_ERROR ParseAdminFabricIndexAndEndpointId(ReadCommissioningInfo & info);
-    CHIP_ERROR ParseOperationalCredentials(ReadCommissioningInfo & info);
-    CHIP_ERROR ParseTrustedRoot(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseAdminFabricIndexAndEndpointId(const ReadCommissioningInfo & info);
+    CHIP_ERROR ParseOperationalCredentials(const ReadCommissioningInfo & info);
+    CHIP_ERROR ParseTrustedRoot(const ReadCommissioningInfo & info);
 
     // JCM commissioning trust verification steps
-    TrustVerificationError VerifyAdministratorInformation();
-    TrustVerificationError PerformVendorIDVerificationProcedure();
-    TrustVerificationError AskUserForConsent();
+    Credentials::JCM::TrustVerificationError VerifyAdministratorInformation();
+    CHIP_ERROR OnSignVIDVerificationSuccessCb(const ByteSpan & signatureSpan, const ByteSpan & clientChallengeSpan);
+    Credentials::JCM::TrustVerificationError PerformVendorIDVerificationProcedure();
+    Credentials::JCM::TrustVerificationError AskUserForConsent();
 
-    TrustVerificationStage GetNextTrustVerificationStage(TrustVerificationStage currentStage);
-    void PerformTrustVerificationStage(TrustVerificationStage nextStage);
-    void TrustVerificationStageFinished(TrustVerificationStage completedStage, TrustVerificationError error);
+    /*
+     * ContinueAfterVendorIDVerification is a method that continues the JCM trust verification process after the
+     * vendor ID verification step.
+     *
+     * @param err The error code indicating the result of the vendor ID verification. CHIP_NO_ERROR if successful.
+     */
+    void ContinueAfterVendorIDVerification(const CHIP_ERROR & err);
+
+    Credentials::JCM::TrustVerificationStage
+    GetNextTrustVerificationStage(const Credentials::JCM::TrustVerificationStage & currentStage) override;
+    void PerformTrustVerificationStage(const Credentials::JCM::TrustVerificationStage & nextStage) override;
 
     /*
      * OnTrustVerificationComplete is a callback method that is called when the JCM trust verification process is complete.
@@ -117,18 +126,10 @@ private:
      *
      * @param result The result of the JCM trust verification process.
      */
-    virtual void OnTrustVerificationComplete(TrustVerificationError error);
+    void OnTrustVerificationComplete(Credentials::JCM::TrustVerificationError error) override;
 
-    // Trust verification delegate for the commissioning client
-    TrustVerificationDelegate * mTrustVerificationDelegate = nullptr;
-
-    // JCM trust verification info
-    // This structure contains the information needed for JCM trust verification
-    // such as the administrator fabric index, endpoint ID, and vendor ID
-    // It is used to store the results of the trust verification process
-    // and is passed to the JCM trust verification delegate
-    // when the trust verification process is complete
-    TrustVerificationInfo mInfo;
+    // Device proxy for the device being commissioned
+    DeviceProxy * mDeviceProxy;
 
     friend class TestCommissioner;
 };

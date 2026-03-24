@@ -75,7 +75,7 @@ async def main():
         default=1,
         type=int,
         help="The Node ID issued to the device",
-        metavar="<nodeid>"
+        metavar="<node-id>"
     )
     optParser.add_option(
         "--discriminator",
@@ -84,7 +84,7 @@ async def main():
         default=TEST_DISCRIMINATOR,
         type=int,
         help="Discriminator of the device",
-        metavar="<nodeid>"
+        metavar="<discriminator>"
     )
     optParser.add_option(
         "-p",
@@ -112,7 +112,7 @@ async def main():
     timeoutTicker.start()
 
     test = BaseTestHelper(
-        nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
+        nodeId=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
     logger.info("Testing discovery")
     FailIfNot(await test.TestDiscovery(discriminator=options.discriminator),
@@ -124,14 +124,14 @@ async def main():
     if options.setupPayload:
         logger.info("Testing commissioning (w/ Setup Payload)")
         FailIfNot(await test.TestCommissioningWithSetupPayload(setupPayload=options.setupPayload,
-                                                               nodeid=options.nodeid,
+                                                               nodeId=options.nodeid,
                                                                discoveryType=options.discoveryType),
                   "Failed to finish commissioning")
     else:
         TestFail("Must provide device setup payload to commissioning the device")
 
     logger.info("Testing on off cluster")
-    FailIfNot(await test.TestOnOffCluster(nodeid=options.nodeid,
+    FailIfNot(await test.TestOnOffCluster(nodeId=options.nodeid,
                                           endpoint=LIGHTING_ENDPOINT_ID), "Failed to test on off cluster")
 
     FailIfNot(test.TestUsedTestCommissioner(),

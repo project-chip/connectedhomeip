@@ -43,7 +43,9 @@ from TC_WEBRTCPTestBase import WEBRTCPTestBase
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
 class TC_WEBRTCP_2_15(MatterBaseTest, WEBRTCPTestBase):
@@ -56,7 +58,8 @@ class TC_WEBRTCP_2_15(MatterBaseTest, WEBRTCPTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success"),
             TestStep(2, "TH sends the ProvideOffer command with null WebRTCSessionID from a specific endpoint ID",
@@ -64,14 +67,21 @@ class TC_WEBRTCP_2_15(MatterBaseTest, WEBRTCPTestBase):
             TestStep(3, "TH reads CurrentSessions attribute from WebRTCTransportProvider on DUT",
                      "Verify the WebRTCSession entry has PeerEndpointID matching the OriginatingEndpointID from step 2"),
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_15(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
+            "WEBRTCP.S.A0000",     # CurrentSessions attribute
+            "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
+            "WEBRTCP.S.C03.Tx",    # ProvideOfferResponse command
             "AVSM.S",
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_WEBRTCP_2_15(self):
@@ -79,7 +89,9 @@ class TC_WEBRTCP_2_15(MatterBaseTest, WEBRTCPTestBase):
         Executes the test steps for validating ProvideOffer OriginatingEndpointID storage.
         """
 
-        endpoint = self.get_endpoint(default=1)
+        self.step("precondition")
+        # Commission DUT - already done
+        endpoint = self.get_endpoint()
         # Use a specific originating endpoint ID for testing (different from default)
         originating_endpoint = 2
 

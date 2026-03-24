@@ -22,6 +22,7 @@ source_set("arl-encoder") {
 
   public_deps = [
     "${chip_root}/src/access:access",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/credentials:credentials",
   ]
 }

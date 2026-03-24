@@ -23,7 +23,7 @@ declare_args() {
   chip_build_example_providers = false
 }
 
-group("nxp_zephyr") {
+group("zephyr") {
   deps = [ "${chip_root}/src/lib" ]
 
   if (chip_build_tests) {
@@ -36,5 +36,5 @@ group("nxp_zephyr") {
 }
 
 group("default") {
-  deps = [ ":nxp_zephyr" ]
+  deps = [ ":zephyr" ]
 }

@@ -36,7 +36,7 @@ except ImportError:
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 
@@ -81,8 +81,11 @@ def main(log_level, idl, path: list[str]):
             datefmt='%Y-%m-%d %H:%M:%S'
         )
 
+    with open(idl) as f:
+        idl_content = f.read()
+
     for p in path:
-        for expanded in expand_path_for_idl(CreateParser().parse(open(idl, "rt").read()), p):
+        for expanded in expand_path_for_idl(CreateParser().parse(idl_content), p):
             # The intent of codegen_paths is to print out the "expanded" paths from the inputs,
             # one per line.
             #

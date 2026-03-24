@@ -34,20 +34,21 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import copy
 import logging
 import time
 
 from mobly import asserts
+from support_modules.idm_support import IDMBaseTest
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters import ClusterObjects as ClusterObjects
-from matter.clusters.Attribute import AttributePath, TypedAttributePath
 from matter.exceptions import ChipStackError
-from matter.interaction_model import Status
+from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 '''
 Category:
@@ -65,12 +66,12 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interacti
 '''
 
 
-class TC_IDM_4_2(MatterBaseTest):
+class TC_IDM_4_2(IDMBaseTest):
 
     def steps_TC_IDM_4_2(self):
         return [TestStep("precondition", "Commissioning already done.", is_commissioning=True),
                 TestStep(1, "CR1 reads the ServerList attribute from the Descriptor cluster on EP0.",
-                         "If the ICD Management cluster ID (70,0x46) is present, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = IdleModeDuration and min_interval_floor_s to 0, otherwise, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = 60 mins and min_interval_floor_s to 3."),
+                         "If the ICD Management cluster ID (70,0x46) is present, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = max(IdleModeDuration, 60min) and min_interval_floor_s to 0, otherwise, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = 60 mins and min_interval_floor_s to 3."),
                 TestStep(2, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than subscription_max_interval_publisher_limit_sec. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.",
                          "Verify on the CR1, a report data message is received. Verify it contains the following data Report data - data of the attribute/event requested earlier. Verify on the CR1 the Subscribe Response has the following fields, SubscriptionId - Verify it is of type uint32. MaxInterval - Verify it is of type uint32. Verify that the MaxInterval is less than or equal to MaxIntervalCeiling."),
                 TestStep(3, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value less than subscription_max_interval_publisher_limit_sec. DUT sends a report data action to the CR1. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.",
@@ -97,81 +98,6 @@ class TC_IDM_4_2(MatterBaseTest):
                 TestStep(14, "CR1 sends a subscription request to the DUT with both AttributeRequests and EventRequests as empty.",
                          "Verify that the Subscription does not succeed and the DUT sends back a Status Response Action with the INVALID_ACTION Status Code")
                 ]
-
-    ROOT_NODE_ENDPOINT_ID = 0
-
-    async def get_descriptor_server_list(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
-        return await self.read_single_attribute_check_success(
-            endpoint=ep,
-            dev_ctrl=ctrl,
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.ServerList
-        )
-
-    async def get_descriptor_parts_list(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
-        return await self.read_single_attribute_check_success(
-            endpoint=ep,
-            dev_ctrl=ctrl,
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.PartsList
-        )
-
-    async def get_idle_mode_duration_sec(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
-        return await self.read_single_attribute_check_success(
-            endpoint=ep,
-            dev_ctrl=ctrl,
-            cluster=Clusters.IcdManagement,
-            attribute=Clusters.IcdManagement.Attributes.IdleModeDuration
-        )
-
-    @staticmethod
-    def verify_attribute_exists(sub, cluster, attribute, ep=ROOT_NODE_ENDPOINT_ID):
-        sub_attrs = sub
-        if isinstance(sub, Clusters.Attribute.SubscriptionTransaction):
-            sub_attrs = sub.GetAttributes()
-
-        asserts.assert_true(ep in sub_attrs, "Must have read endpoint %s data" % ep)
-        asserts.assert_true(cluster in sub_attrs[ep], "Must have read %s cluster data" % cluster.__name__)
-        asserts.assert_true(attribute in sub_attrs[ep][cluster],
-                            "Must have read back attribute %s" % attribute.__name__)
-
-    @staticmethod
-    def get_typed_attribute_path(attribute, ep=ROOT_NODE_ENDPOINT_ID):
-        return TypedAttributePath(
-            Path=AttributePath.from_attribute(
-                EndpointId=ep,
-                Attribute=attribute
-            )
-        )
-
-    async def write_dut_acl(self, ctrl, acl, ep=ROOT_NODE_ENDPOINT_ID):
-        result = await ctrl.WriteAttribute(self.dut_node_id, [(ep, Clusters.AccessControl.Attributes.Acl(acl))])
-        asserts.assert_equal(result[ep].Status, Status.Success, "ACL write failed")
-
-    async def get_dut_acl(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
-        sub = await ctrl.ReadAttribute(
-            nodeid=self.dut_node_id,
-            attributes=[(ep, Clusters.AccessControl.Attributes.Acl)],
-            keepSubscriptions=False,
-            fabricFiltered=True
-        )
-
-        acl_list = sub[ep][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
-
-        return acl_list
-
-    async def add_ace_to_dut_acl(self, ctrl, ace, dut_acl_original):
-        dut_acl = copy.deepcopy(dut_acl_original)
-        dut_acl.append(ace)
-        await self.write_dut_acl(ctrl=ctrl, acl=dut_acl)
-
-    @staticmethod
-    def is_valid_uint32_value(var):
-        return isinstance(var, int) and 0 <= var <= 0xFFFFFFFF
-
-    @staticmethod
-    def is_valid_uint16_value(var):
-        return isinstance(var, int) and 0 <= var <= 0xFFFF
 
     @async_test_body
     async def test_TC_IDM_4_2(self):
@@ -206,7 +132,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # *** Step 1 ***
         # CR1 reads the ServerList attribute from the Descriptor cluster on EP0. If the ICDManagement cluster ID
-        # (70,0x46) is present, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = IdleModeDuration and
+        # (70,0x46) is present, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = max(IdleModeDuration, 60min) and
         # min_interval_floor_s to 0, otherwise, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = 60 mins and
         # min_interval_floor_s to 3.
         self.step(1)
@@ -217,11 +143,11 @@ class TC_IDM_4_2(MatterBaseTest):
         # Check if ep0_servers contains the ICD Management cluster ID (0x0046)
         if Clusters.IcdManagement.id in ep0_servers:
             # Read the IdleModeDuration attribute value from the DUT
-            logging.info(
-                "CR1 reads from the DUT the IdleModeDuration attribute and sets SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = IdleModeDuration")
+            log.info(
+                "CR1 reads from the DUT the IdleModeDuration attribute and sets SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = max(IdleModeDuration, 60min)")
 
             idleModeDuration = await self.get_idle_mode_duration_sec(CR1)
-            subscription_max_interval_publisher_limit_sec = idleModeDuration
+            subscription_max_interval_publisher_limit_sec = max(idleModeDuration, 60 * 60)
             min_interval_floor_sec = 0
         else:
             # Defaulting SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to 60 minutes
@@ -231,7 +157,7 @@ class TC_IDM_4_2(MatterBaseTest):
         asserts.assert_greater_equal(subscription_max_interval_publisher_limit_sec, 1,
                                      "SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC must be at least 1")
 
-        logging.info(
+        log.info(
             f"Set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to {subscription_max_interval_publisher_limit_sec} seconds")
 
         # *** Step 2 ***
@@ -247,7 +173,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to attribute
         sub_cr1_step1 = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=node_label_attr_path,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
@@ -290,7 +216,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to attribute
         sub_cr1_step2 = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=node_label_attr_path,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
@@ -342,7 +268,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         with asserts.assert_raises(ChipStackError) as cm:
             await CR2.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 # Attribute from a cluster controller 2 has no access to
                 attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
                 keepSubscriptions=False,
@@ -375,7 +301,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # "INVALID_ACTION" status response expected
         with asserts.assert_raises(ChipStackError) as cm:
             await CR2.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 # Cluster controller 2 has no access to
                 attributes=[(0, Clusters.BasicInformation)],
                 keepSubscriptions=False,
@@ -416,7 +342,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # "INVALID_ACTION" status response expected
         with asserts.assert_raises(ChipStackError) as cm:
             await CR2.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 # Endpoint controller 2 has no access to
                 attributes=[(0)],
                 keepSubscriptions=False,
@@ -444,7 +370,7 @@ class TC_IDM_4_2(MatterBaseTest):
         with asserts.assert_raises(ChipStackError) as cm:
             await CR2.ReadAttribute(
                 # Node controller 2 has no access to
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=[],
                 keepSubscriptions=False,
                 reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
@@ -464,7 +390,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to attribute with empty dataVersionFilters
         sub_cr1_empty_dvf = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=node_label_attr_path,
             keepSubscriptions=False
         )
@@ -482,7 +408,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to attribute with provided DataVersion
         sub_cr1_step7 = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=node_label_attr_path,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False,
@@ -504,7 +430,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to attribute
         sub_cr1_update_value = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=node_label_attr_path,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
@@ -561,7 +487,7 @@ class TC_IDM_4_2(MatterBaseTest):
         sub_cr1_invalid_intervals = None
         with asserts.assert_raises(ChipStackError, "Expected exception wasn't thrown."):
             sub_cr1_invalid_intervals = await CR1.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=node_label_attr_path,
                 reportInterval=(20, 10),
                 keepSubscriptions=False
@@ -584,7 +510,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to global attribute
         sub_cr1_step11 = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=cluster_rev_attr_path,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
@@ -621,7 +547,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Subscribe to global attribute
         sub_cr1_step12 = await CR1.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=cluster_rev_attr_path,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
@@ -659,7 +585,7 @@ class TC_IDM_4_2(MatterBaseTest):
         sub_cr1_step13 = None
         with asserts.assert_raises(ChipStackError) as cm:
             sub_cr1_step13 = await CR1.Read(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=[],
                 events=[],
                 reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),

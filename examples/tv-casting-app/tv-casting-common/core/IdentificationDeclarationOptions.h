@@ -129,6 +129,11 @@ public:
             id.SetCommissionerPasscodeReady(true);
             id.SetInstanceName(mCommissioneeInstanceName);
         }
+        // mCommissioneeInstanceName cannot be null
+        else if ((mCancelPasscode || mNoPasscode) && strlen(mCommissioneeInstanceName) != 0)
+        {
+            id.SetInstanceName(mCommissioneeInstanceName);
+        }
         else
         {
             ChipLogProgress(AppServer,
@@ -174,7 +179,7 @@ public:
         ChipLogDetail(AppServer, "IdentificationDeclarationOptions::TargetAppInfos list:");
         for (size_t i = 0; i < mTargetAppInfos.size(); i++)
         {
-            const chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info = mTargetAppInfos[i];
+            [[maybe_unused]] const chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info = mTargetAppInfos[i];
             ChipLogDetail(AppServer, "\t\tTargetAppInfo %d, Vendor ID: %u, Product ID: %u", int(i + 1), info.vendorId,
                           info.productId);
         }

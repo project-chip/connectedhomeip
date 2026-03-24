@@ -2,6 +2,7 @@
 
 #include <pw_unit_test/framework.h>
 
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/bdx/BdxTransferDiagnosticLog.h>
 #include <system/RAIIMockClock.h>
 #include <system/SystemClock.h>
@@ -35,7 +36,8 @@ TEST_F(TestTransferDiagnosticLog, InitsDiagnosticLog)
 {
     System::Clock::Internal::RAIIMockClock mockClock;
 
-    mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, kMaxBlockSize, 1000_ms);
+    EXPECT_SUCCESS(
+        mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, kMaxBlockSize, 1000_ms));
 
     TransferInit transferInit{};
 
@@ -84,7 +86,7 @@ TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititator
     BDXTransferProxyDiagnosticLog proxyDiagnosticLog{};
 
     TransferSession initiator;
-    TransferSession::TransferInitData transferInitData{};
+    TransferSession::TransferInitData transferInitData{ TransferControlFlags(0) };
     transferInitData.TransferCtlFlags = TransferControlFlags::kSenderDrive;
     transferInitData.MaxBlockSize     = kMaxBlockSize;
     transferInitData.StartOffset      = 0;
@@ -145,7 +147,7 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer)
     BDXTransferProxyDiagnosticLog proxyDiagnosticLog{};
 
     TransferSession initiator;
-    TransferSession::TransferInitData transferInitData{};
+    TransferSession::TransferInitData transferInitData{ TransferControlFlags(0) };
     transferInitData.TransferCtlFlags = TransferControlFlags::kSenderDrive;
     transferInitData.MaxBlockSize     = kMaxBlockSize;
     transferInitData.StartOffset      = 0;
@@ -218,7 +220,7 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer)
     blockData.IsEof        = false;
     blockData.BlockCounter = 0;
 
-    initiator.PrepareBlock(blockData);
+    EXPECT_SUCCESS(initiator.PrepareBlock(blockData));
 
     initiator.PollOutput(initiatorEvent, System::Clock::kZero);
 
@@ -262,7 +264,7 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer)
     /// initiator prepares next block to send
     blockData.BlockCounter = 10; // while respodner expects 1
 
-    initiator.PrepareBlock(blockData);
+    EXPECT_SUCCESS(initiator.PrepareBlock(blockData));
 
     initiator.PollOutput(initiatorEvent, System::Clock::kZero);
 

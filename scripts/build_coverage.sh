@@ -205,12 +205,12 @@ if [ "$skip_gn" == false ]; then
              --exclude-tags EXTRA_SLOW \
              --exclude-tags SLOW \
              --exclude-tags PURPOSEFUL_FAILURE \
-             --chip-tool \"$OUTPUT_ROOT/chip-tool\" \
              --target TestUserLabelCluster \
              run \
              --iterations 1 \
              --test-timeout-seconds 120 \
-             --all-clusters-app \"$OUTPUT_ROOT/chip-all-clusters-app\" \
+             --tool-path chip-tool:\"$OUTPUT_ROOT/chip-tool\" \
+             --app-path all-clusters:\"$OUTPUT_ROOT/chip-all-clusters-app\" \
             "
     fi
 
@@ -304,6 +304,7 @@ if [ "$GENERATE_XML" == true ]; then
         --exclude=".*testing/.*" \
         --include=src/ \
         --gcov-ignore-parse-errors \
+        --merge-mode-functions=merge-use-line-min \
         --xml="$COVERAGE_ROOT"/coverage.xml
 
     XML_INDEX=$(_abspath "$COVERAGE_ROOT/coverage.xml")

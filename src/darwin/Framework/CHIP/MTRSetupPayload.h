@@ -121,6 +121,25 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  */
 - (nullable instancetype)initWithPayload:(NSString *)payload MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
+/**
+ * Whether this object represents a concatenated QR Code payload consisting
+ * of two or more underlying payloads. If YES, then:
+ *
+ * - The constituent payloads are exposed in the `subPayloads` property.
+ *
+ * - Properties other than `subPayloads` and `qrCodeString` (e.g. `vendorID`, `discriminator`)
+ *   are not relevant to a concatenated payload and should not be used. If accessed, they will
+ *   act as if the payload was not in fact concatenated, and return the relevant value associated
+ *   with the first sub-payload. Mutating such a property will discard the additional sub-payloads.
+ */
+@property (nonatomic, readonly, assign, getter=isConcatenated) BOOL concatenated MTR_AVAILABLE(ios(26.2), macos(26.2), watchos(26.2), tvos(26.2));
+
+/**
+ * The individual constituent payloads, if the receiver represents a concatenated payload.
+ * @see concatenated
+ */
+@property (nonatomic, strong) NSArray<MTRSetupPayload *> * subPayloads MTR_AVAILABLE(ios(26.2), macos(26.2), watchos(26.2), tvos(26.2));
+
 @property (nonatomic, copy) NSNumber * version;
 @property (nonatomic, copy) NSNumber * vendorID;
 @property (nonatomic, copy) NSNumber * productID;
@@ -212,6 +231,9 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * - setupPasscode
  * - discriminator (must be long)
  * - discoveryCapabilities (not MTRDiscoveryCapabilitiesUnknown)
+ *
+ * If this object represents a `concatenated` payload, then this property will
+ * include the QR Code strings of all the underlying `subPayloads.`
  */
 - (NSString * _Nullable)qrCodeString MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 

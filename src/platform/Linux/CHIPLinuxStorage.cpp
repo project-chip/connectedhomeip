@@ -33,7 +33,7 @@
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/CHIPLinuxStorage.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -265,7 +265,7 @@ CHIP_ERROR ChipLinuxStorage::WriteValueBin(const char * key, const uint8_t * dat
     // Store it
     if (retval == CHIP_NO_ERROR)
     {
-        WriteValueStr(key, encodedData.Get());
+        retval = WriteValueStr(key, encodedData.Get());
     }
 
     return retval;

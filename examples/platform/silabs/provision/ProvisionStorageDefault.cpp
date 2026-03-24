@@ -164,7 +164,7 @@ CHIP_ERROR Storage::Initialize(uint32_t flash_addr, uint32_t flash_size)
 #ifndef SLI_SI91X_MCU_INTERFACE
         base_addr = (flash_addr + flash_size - FLASH_PAGE_SIZE);
 #endif // SLI_SI91X_MCU_INTERFACE
-        chip::DeviceLayer::Silabs::GetPlatform().FlashInit();
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::GetPlatform().FlashInit();
 #ifdef SL_PROVISION_GENERATOR
         setNvm3End(base_addr);
 #endif
@@ -760,6 +760,7 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
         {
             // enableKey Hex String doesn't have the correct length
             memset(keySpan.data(), 0, keySpan.size());
+            ChipLogError(DeviceLayer, "Test Event Trigger EnableKey parsing failed");
             return CHIP_ERROR_INTERNAL;
         }
         err = CHIP_NO_ERROR;

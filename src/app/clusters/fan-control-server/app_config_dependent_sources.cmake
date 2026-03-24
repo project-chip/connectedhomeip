@@ -17,6 +17,6 @@ TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
     "${CLUSTER_DIR}/fan-control-delegate.h"
-    "${CLUSTER_DIR}/fan-control-server.cpp"
+    "${CLUSTER_DIR}/FanControlCluster.cpp"
     "${CLUSTER_DIR}/fan-control-server.h"
 )

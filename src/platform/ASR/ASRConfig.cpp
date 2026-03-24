@@ -91,7 +91,7 @@ CHIP_ERROR ASRConfig::ReadConfigValue(Key key, bool & val)
 {
     bool in;
     char key_str[_KVSTORE_MAX_KEY_SIZE] = { 0 };
-    key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
+    TEMPORARY_RETURN_IGNORED key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
     CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key_str, static_cast<void *>(&in), sizeof(bool));
     val            = in;
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -105,7 +105,7 @@ CHIP_ERROR ASRConfig::ReadConfigValue(Key key, uint32_t & val)
 {
     uint32_t in;
     char key_str[_KVSTORE_MAX_KEY_SIZE] = { 0 };
-    key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
+    TEMPORARY_RETURN_IGNORED key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
     CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key_str, static_cast<void *>(&in), 4);
     val            = in;
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -119,7 +119,7 @@ CHIP_ERROR ASRConfig::ReadConfigValue(Key key, uint64_t & val)
 {
     uint64_t in;
     char key_str[_KVSTORE_MAX_KEY_SIZE] = { 0 };
-    key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
+    TEMPORARY_RETURN_IGNORED key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
     CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key_str, static_cast<void *>(&in), 8);
     val            = in;
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -132,7 +132,7 @@ CHIP_ERROR ASRConfig::ReadConfigValue(Key key, uint64_t & val)
 CHIP_ERROR ASRConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     char key_str[_KVSTORE_MAX_KEY_SIZE] = { 0 };
-    key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
+    TEMPORARY_RETURN_IGNORED key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
     CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key_str, buf, bufSize, &outLen);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
@@ -144,7 +144,7 @@ CHIP_ERROR ASRConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, si
 CHIP_ERROR ASRConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
     char key_str[_KVSTORE_MAX_KEY_SIZE] = { 0 };
-    key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
+    TEMPORARY_RETURN_IGNORED key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
     CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Get(key_str, buf, bufSize, &outLen);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
@@ -156,21 +156,21 @@ CHIP_ERROR ASRConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize,
 CHIP_ERROR ASRConfig::WriteConfigValue(Key key, bool val)
 {
     char key_str[_KVSTORE_MAX_KEY_SIZE] = { 0 };
-    key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
+    TEMPORARY_RETURN_IGNORED key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void *>(&val), sizeof(bool));
 }
 
 CHIP_ERROR ASRConfig::WriteConfigValue(Key key, uint32_t val)
 {
     char key_str[_KVSTORE_MAX_KEY_SIZE] = { 0 };
-    key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
+    TEMPORARY_RETURN_IGNORED key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void *>(&val), 4);
 }
 
 CHIP_ERROR ASRConfig::WriteConfigValue(Key key, uint64_t val)
 {
     char key_str[_KVSTORE_MAX_KEY_SIZE] = { 0 };
-    key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
+    TEMPORARY_RETURN_IGNORED key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void *>(&val), 8);
 }
 
@@ -178,28 +178,28 @@ CHIP_ERROR ASRConfig::WriteConfigValueStr(Key key, const char * str)
 {
     size_t size                         = strlen(str) + 1;
     char key_str[_KVSTORE_MAX_KEY_SIZE] = { 0 };
-    key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
+    TEMPORARY_RETURN_IGNORED key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, str, size);
 }
 
 CHIP_ERROR ASRConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
     char key_str[_KVSTORE_MAX_KEY_SIZE] = { 0 };
-    key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
+    TEMPORARY_RETURN_IGNORED key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, str, strLen);
 }
 
 CHIP_ERROR ASRConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
     char key_str[_KVSTORE_MAX_KEY_SIZE] = { 0 };
-    key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
+    TEMPORARY_RETURN_IGNORED key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Put(key_str, static_cast<void *>(&data), dataLen);
 }
 
 CHIP_ERROR ASRConfig::ClearConfigValue(Key key)
 {
     char key_str[_KVSTORE_MAX_KEY_SIZE] = { 0 };
-    key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
+    TEMPORARY_RETURN_IGNORED key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
     return PersistedStorage::KeyValueStoreMgr().Delete(key_str);
 }
 
@@ -208,7 +208,7 @@ bool ASRConfig::ConfigValueExists(Key key)
     char key_str[_KVSTORE_MAX_KEY_SIZE] = { 0 };
     char buf[4];
     size_t outLen;
-    key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
+    TEMPORARY_RETURN_IGNORED key.to_str(key_str, _KVSTORE_MAX_KEY_SIZE);
     if (PersistedStorage::KeyValueStoreMgr().Get(key_str, buf, 4, &outLen) == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         return false;

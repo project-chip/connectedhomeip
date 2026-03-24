@@ -250,7 +250,7 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
         SuccessOrExit(err);
         if (moreChunkedMessages)
         {
-            StatusResponse::Send(Status::Success, apExchangeContext, /*aExpectResponse = */ true);
+            TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::Success, apExchangeContext, /*aExpectResponse = */ true);
             MoveToState(State::AwaitingResponse);
             return CHIP_NO_ERROR;
         }
@@ -276,7 +276,7 @@ exit:
 
     if (sendStatusResponse)
     {
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, /*aExpectResponse = */ false);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, /*aExpectResponse = */ false);
     }
 
     if (mState != State::AwaitingResponse)
@@ -305,7 +305,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
     ReturnErrorOnFailure(invokeResponseMessage.Init(reader));
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    invokeResponseMessage.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED invokeResponseMessage.PrettyPrint();
 #endif
 
     ReturnErrorOnFailure(invokeResponseMessage.GetSuppressResponse(&suppressResponse));
@@ -403,7 +403,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             ReturnErrorOnFailure(commandPath.GetEndpointId(&endpointId));
 
             StatusIB::Parser status;
-            commandStatus.GetErrorStatus(&status);
+            TEMPORARY_RETURN_IGNORED commandStatus.GetErrorStatus(&status);
             ReturnErrorOnFailure(status.DecodeStatusIB(statusIB));
             ReturnErrorOnFailure(GetRef(commandStatus, commandRef, commandRefRequired));
         }
@@ -416,7 +416,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             ReturnErrorOnFailure(commandPath.GetEndpointId(&endpointId));
             ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
             ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
-            commandData.GetFields(&commandDataReader);
+            TEMPORARY_RETURN_IGNORED commandData.GetFields(&commandDataReader);
             ReturnErrorOnFailure(GetRef(commandData, commandRef, commandRefRequired));
             err             = CHIP_NO_ERROR;
             hasDataResponse = true;
@@ -605,7 +605,7 @@ CHIP_ERROR CommandSender::FinishCommandInternal(FinishCommandParameters & aFinis
 
     if (mpPendingResponseTracker && aFinishCommandParams.commandRef.HasValue())
     {
-        mpPendingResponseTracker->Add(aFinishCommandParams.commandRef.Value());
+        TEMPORARY_RETURN_IGNORED mpPendingResponseTracker->Add(aFinishCommandParams.commandRef.Value());
     }
 
     if (aFinishCommandParams.timedInvokeTimeoutMs.HasValue())

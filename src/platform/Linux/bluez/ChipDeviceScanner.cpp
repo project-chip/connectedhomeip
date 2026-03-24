@@ -45,7 +45,7 @@ bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDeviceIden
     GAutoPtr<GVariant> dataValue(g_variant_lookup_value(serviceData, Ble::CHIP_BLE_SERVICE_LONG_UUID_STR, nullptr));
     VerifyOrReturnError(dataValue != nullptr, false);
 
-    size_t dataLen         = 0;
+    gsize dataLen          = 0;
     const void * dataBytes = g_variant_get_fixed_array(dataValue.get(), &dataLen, sizeof(uint8_t));
     VerifyOrReturnError(dataBytes != nullptr && dataLen >= sizeof(aDeviceInfo), false);
 
@@ -74,12 +74,12 @@ void ChipDeviceScanner::Shutdown()
 {
     VerifyOrReturn(mScannerState != ChipDeviceScannerState::UNINITIALIZED);
 
-    StopScan();
+    TEMPORARY_RETURN_IGNORED StopScan();
 
     // Release resources on the glib thread. This is necessary because the D-Bus manager client
     // object handles D-Bus signals. Otherwise, we might face a race when the manager object is
     // released during a D-Bus signal being processed.
-    PlatformMgrImpl().GLibMatterContextInvokeSync(
+    TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](ChipDeviceScanner * self) {
             self->mAdapter.reset();
             return CHIP_NO_ERROR;
@@ -140,7 +140,7 @@ CHIP_ERROR ChipDeviceScanner::StopScanImpl()
     g_cancellable_cancel(mCancellable.get());
     mCancellable.reset();
 
-    mObjectManager.UnsubscribeDeviceNotifications(mAdapter.get(), this);
+    TEMPORARY_RETURN_IGNORED mObjectManager.UnsubscribeDeviceNotifications(mAdapter.get(), this);
 
     GAutoPtr<GError> error;
     if (!bluez_adapter1_call_stop_discovery_sync(mAdapter.get(), nullptr /* not cancellable */, &error.GetReceiver()))

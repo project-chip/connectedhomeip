@@ -94,8 +94,7 @@ CHIP_ERROR EventRefrigeratorAlarmCommandHandler(int argc, char ** argv)
     {
         return AlarmHelpHandler(argc, argv);
     }
-    sShellRefrigeratorEventAlarmDoorSubCommands.ExecCommand(argc, argv);
-    return CHIP_NO_ERROR;
+    return sShellRefrigeratorEventAlarmDoorSubCommands.ExecCommand(argc, argv);
 }
 
 CHIP_ERROR RefrigeratorAlarmSuppressHandler(int argc, char ** argv)
@@ -110,9 +109,7 @@ CHIP_ERROR RefrigeratorAlarmSuppressHandler(int argc, char ** argv)
     data->eventState                  = RefrigeratorAlarm::Events::Notify::Fields::kMask;
     data->doorState                   = static_cast<AlarmBitmap>(0);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
-
-    return CHIP_NO_ERROR;
+    return DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
@@ -142,9 +139,7 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
     data->eventState                  = RefrigeratorAlarm::Events::Notify::Fields::kState;
     data->doorState                   = static_cast<AlarmBitmap>(value);
 
-    DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
-
-    return CHIP_NO_ERROR;
+    return DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 /**

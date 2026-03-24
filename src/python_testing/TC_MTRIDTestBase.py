@@ -14,8 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-
-import logging
 from typing import List
 
 from mobly import asserts
@@ -24,8 +22,6 @@ from matter.clusters import ClusterObjects, Globals, MeterIdentification
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
-
-logger = logging.getLogger(__name__)
 
 cluster = MeterIdentification
 
@@ -119,7 +115,7 @@ class MeterIdentificationTestBaseHelper(MatterBaseTest):
 
         try:
             asserts.assert_not_equal(reports[attribute][0].value, saved_value,
-                                     f"""Reported '{attribute_name}' value should be different from saved value. 
+                                     f"""Reported '{attribute_name}' value should be different from saved value.
                                      Subscriptions should only report when values have changed.""")
         except KeyError as err:
             asserts.fail(f"There are no reports for attribute {attribute_name}:\n{err}")
@@ -127,46 +123,31 @@ class MeterIdentificationTestBaseHelper(MatterBaseTest):
     @staticmethod
     def _meter_type_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.MeterType:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.MeterType
         return AttributeMatcher.from_callable(description="MeterType", matcher=predicate)
 
     @staticmethod
     def _point_of_delivery_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.PointOfDelivery:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.PointOfDelivery
         return AttributeMatcher.from_callable(description="PointOfDelivery", matcher=predicate)
 
     @staticmethod
     def _meter_serial_number_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.MeterSerialNumber:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.MeterSerialNumber
         return AttributeMatcher.from_callable(description="MeterSerialNumber", matcher=predicate)
 
     @staticmethod
     def _protocol_version_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.ProtocolVersion:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.ProtocolVersion
         return AttributeMatcher.from_callable(description="ProtocolVersion", matcher=predicate)
 
     @staticmethod
     def _power_threshold_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.PowerThreshold:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.PowerThreshold
         return AttributeMatcher.from_callable(description="PowerThreshold", matcher=predicate)
 
     def get_mandatory_matchers(self) -> List[AttributeMatcher]:

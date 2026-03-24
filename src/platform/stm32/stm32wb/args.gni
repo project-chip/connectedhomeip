@@ -24,8 +24,7 @@ chip_device_platform = "stm32wb"
 chip_with_lwip = false
 mbedtls_target = "${stm32_sdk_build_root}:mbedtls"
 openthread_external_mbedtls = mbedtls_target
-chip_openthread_target = "${stm32_sdk_build_root}:stm32_sdk"
-openthread_external_platform = "${stm32_sdk_build_root}:stm32_sdk"
+openthread_root = "${chip_root}/third_party/openthread/ot-stm32"
 
 # GLOBAL CONFIG
 chip_monolithic_tests = false
@@ -37,6 +36,9 @@ chip_stack_lock_tracking = "fatal"
 
 # SHELL CONFIG
 chip_build_libshell = false
+
+# OPENTHREAD CONFIG
+chip_enable_thread = true
 
 # NFC ONBOARDING PAYLOAD CONFIG
 chip_enable_nfc_onboarding_payload = false

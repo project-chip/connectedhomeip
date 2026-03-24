@@ -178,15 +178,16 @@ bool ICDMonitoringEntry::IsKeyEquivalent(ByteSpan keyData)
     VerifyOrReturnValue(tempEntry.SetKey(keyData) == CHIP_NO_ERROR, false);
 
     // Challenge
-    uint8_t mic[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES]  = { 0 };
-    uint8_t aead[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES] = { 0 };
+    uint8_t mic[Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES]     = { 0 };
+    uint8_t nonce[Crypto::CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES] = { 0 };
+    VerifyOrReturnValue(Crypto::DRBG_get_bytes(nonce, sizeof(nonce)) == CHIP_NO_ERROR, false);
 
     CHIP_ERROR err;
 
     uint64_t data = Crypto::GetRandU64(), validation, encrypted;
     validation    = data;
 
-    err = Crypto::AES_CCM_encrypt(reinterpret_cast<uint8_t *>(&data), sizeof(data), nullptr, 0, tempEntry.aesKeyHandle, aead,
+    err = Crypto::AES_CCM_encrypt(reinterpret_cast<uint8_t *>(&data), sizeof(data), nullptr, 0, tempEntry.aesKeyHandle, nonce,
                                   Crypto::CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, reinterpret_cast<uint8_t *>(&encrypted), mic,
                                   Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
@@ -194,10 +195,10 @@ bool ICDMonitoringEntry::IsKeyEquivalent(ByteSpan keyData)
     if (err == CHIP_NO_ERROR)
     {
         err = Crypto::AES_CCM_decrypt(reinterpret_cast<uint8_t *>(&encrypted), sizeof(encrypted), nullptr, 0, mic,
-                                      Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, aesKeyHandle, aead,
+                                      Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, aesKeyHandle, nonce,
                                       Crypto::CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, reinterpret_cast<uint8_t *>(&data));
     }
-    tempEntry.DeleteKey();
+    TEMPORARY_RETURN_IGNORED tempEntry.DeleteKey();
 
     if (err != CHIP_NO_ERROR)
     {
@@ -235,9 +236,7 @@ CHIP_ERROR ICDMonitoringTable::Get(uint16_t index, ICDMonitoringEntry & entry) c
 {
     entry.fabricIndex = this->mFabric;
     entry.index       = index;
-    ReturnErrorOnFailure(entry.Load(this->mStorage));
-    entry.fabricIndex = this->mFabric;
-    return CHIP_NO_ERROR;
+    return entry.Load(this->mStorage);
 }
 
 CHIP_ERROR ICDMonitoringTable::Find(NodeId id, ICDMonitoringEntry & entry)
@@ -299,7 +298,7 @@ CHIP_ERROR ICDMonitoringTable::Remove(uint16_t index)
 
     // Retrieve entry and delete the keyHandle first as to not
     // cause any key leaks.
-    this->Get(index, entry);
+    ReturnErrorOnFailure(this->Get(index, entry));
     ReturnErrorOnFailure(entry.DeleteKey());
 
     // Shift remaining entries down one position

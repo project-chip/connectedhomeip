@@ -36,7 +36,43 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace PowerTopology {
-namespace Structs {} // namespace Structs
+namespace Structs {
+namespace CircuitNodeStruct {
+enum class Fields : uint8_t
+{
+    kNode        = 1,
+    kEndpoint    = 2,
+    kLabel       = 3,
+    kFabricIndex = 254,
+};
+
+struct Type
+{
+public:
+    chip::NodeId node = static_cast<chip::NodeId>(0);
+    Optional<chip::EndpointId> endpoint;
+    Optional<chip::CharSpan> label;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+};
+
+using DecodableType = Type;
+
+} // namespace CircuitNodeStruct
+} // namespace Structs
 } // namespace PowerTopology
 } // namespace Clusters
 } // namespace app

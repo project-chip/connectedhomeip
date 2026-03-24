@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,6 +44,10 @@
 #include <OTAUtil.h>
 #endif
 
+#ifdef CONFIG_MCUMGR_TRANSPORT_BT
+#include <DFUOverSMP.h>
+#endif
+
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #endif
@@ -51,6 +55,19 @@
 #include <zephyr/fs/nvs.h>
 #include <zephyr/settings/settings.h>
 #include <zephyr/sys/reboot.h>
+
+extern "C" {
+#if defined(CONFIG_PM) &&                                                                                                          \
+    (defined(CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION) || defined(CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
+#include <zephyr/sys/reboot.h>
+
+extern bool pm_has_deep_sleep_retention_occurred(void);
+#endif
+}
+
+#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
+#include <zephyr/pm/policy.h>
+#endif
 
 using namespace chip::app;
 
@@ -128,41 +145,48 @@ public:
 AppCallbacks sCallbacks;
 } // namespace
 
+static void DoDelayedFactoryReset(struct k_work * work)
+{
+    ChipLogProgress(DeviceLayer, "Erasing settings partition");
+
+    // TC-OPCREDS-3.6 (device doesn't need to reboot automatically after the last fabric is removed) can't use FactoryReset
+    void * storage = nullptr;
+    int status     = settings_storage_get(&storage);
+
+    if (!status)
+    {
+        status = nvs_clear(static_cast<nvs_fs *>(storage));
+    }
+
+    if (!status)
+    {
+        status = nvs_mount(static_cast<nvs_fs *>(storage));
+    }
+
+    if (status)
+    {
+        ChipLogError(DeviceLayer, "Storage clear failed: %d", status);
+    }
+#ifdef CONFIG_TFLM_FEATURE
+    AppTask::MicroSpeechProcessStop();
+#endif
+    // Reboot in case of failed commissioning to allow new pairing via BLE
+    if (sIsCommissioningFailed)
+    {
+        ChipLogProgress(DeviceLayer, "Rebooting board");
+        sys_reboot(SYS_REBOOT_WARM);
+    }
+}
+
+static k_work_delayable sDelayedFactoryResetWork = Z_WORK_DELAYABLE_INITIALIZER(DoDelayedFactoryReset);
+
 class AppFabricTableDelegate : public FabricTable::Delegate
 {
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
     {
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
         {
-            ChipLogProgress(DeviceLayer, "Erasing settings partition");
-
-            // TC-OPCREDS-3.6 (device doesn't need to reboot automatically after the last fabric is removed) can't use FactoryReset
-            void * storage = nullptr;
-            int status     = settings_storage_get(&storage);
-
-            if (!status)
-            {
-                status = nvs_clear(static_cast<nvs_fs *>(storage));
-            }
-
-            if (!status)
-            {
-                status = nvs_mount(static_cast<nvs_fs *>(storage));
-            }
-
-            if (status)
-            {
-                ChipLogError(DeviceLayer, "Storage clear failed: %d", status);
-            }
-#ifdef CONFIG_TFLM_FEATURE
-            AppTask::MicroSpeechProcessStop();
-#endif
-            // Reboot in case of failed commissioning to allow new pairing via BLE
-            if (sIsCommissioningFailed)
-            {
-                ChipLogProgress(DeviceLayer, "Rebooting board");
-                sys_reboot(SYS_REBOOT_WARM);
-            }
+            k_work_schedule(&sDelayedFactoryResetWork, K_SECONDS(2));
         }
     }
 };
@@ -175,7 +199,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
     {
         if (ThreadStackManagerImpl().IsThreadEnabled())
         {
-            ThreadStackManagerImpl().Finalize();
+            otInstanceFinalize(openthread_get_default_instance());
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -243,6 +267,13 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
         DispatchEvent(&event);
     }
 }
+#ifdef CONFIG_MCUMGR_TRANSPORT_BT
+/* Demonstration of the fail handling */
+void HandleDFUFail(VerificationFailReason reason)
+{
+    LOG_INF("DFU image verification failed with reason: %d", reason);
+}
+#endif
 void AppTaskCommon::PrintFirmwareInfo(void)
 {
     LOG_INF("SW Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
@@ -308,15 +339,14 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+#if APP_SET_DEVICE_INFO_PROVIDER
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+#endif
     initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.appDelegate              = &sCallbacks;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
-
-#if APP_SET_DEVICE_INFO_PROVIDER
-    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-#endif
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
@@ -326,6 +356,10 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Set up a valid Network Commissioning cluster on endpoint 0 is done in
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+#endif
+#ifdef CONFIG_MCUMGR_TRANSPORT_BT
+    GetDFUOverSMP().Init();
+    GetDFUOverSMP().SetFailCallback(HandleDFUFail);
 #endif
 
     // We need to disable OpenThread to prevent writing to the NVS storage when factory reset occurs
@@ -340,7 +374,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads.
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
     err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
     if (err != CHIP_NO_ERROR)
@@ -565,6 +599,15 @@ void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
         return;
     }
 
+#if defined(CONFIG_PM) &&                                                                                                          \
+    (defined(CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION) || defined(CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
+    if (pm_has_deep_sleep_retention_occurred())
+    {
+        ChipLogError(DeviceLayer, "BLE state in non-retention RAM corrupted after deep sleep retention. Rebooting...");
+        sys_reboot(SYS_REBOOT_WARM);
+    }
+#endif
+
     if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
     {
         LOG_ERR("OpenBasicCommissioningWindow fail");
@@ -660,14 +703,7 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
     LOG_INF("StartThreadHandler");
     if (!sIsNetworkProvisioned)
     {
-        // Switch context from BLE to Thread
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-        Internal::BLEManagerImpl sInstance;
-        sInstance.SwitchToIeee802154();
-#else
-        ThreadStackMgrImpl().SetRadioBlocked(false);
-        ThreadStackMgrImpl().SetThreadEnabled(true);
-#endif
+        TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(true);
         StartDefaultThreadNetwork();
     }
     else
@@ -751,18 +787,27 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
         UpdateStatusLED();
-#ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
         {
-            if (NFCOnboardingPayloadMgr().IsTagEmulationStarted())
+#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
+            pm_policy_state_lock_get(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+#endif
+
+#ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
+            if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
             {
-                LOG_INF("NFC Tag emulation is already started");
+                if (NFCOnboardingPayloadMgr().IsTagEmulationStarted())
+                {
+                    LOG_INF("NFC Tag emulation is already started");
+                }
+                else
+                {
+                    ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+                }
             }
-            else
-            {
-                ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-            }
+#endif
         }
+#ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
             NFCOnboardingPayloadMgr().StopTagEmulation();
@@ -770,11 +815,30 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 #endif
         break;
     case DeviceEventType::kCHIPoBLEConnectionClosed:
-        if (Internal::BLEMgrImpl().NeedToResetFailSafeTimer())
+        if (ConnectivityMgr().GetBleLayer()->IsInitialized()) // Unexpected BLE disconnect during commissioning
         {
-            LOG_INF("BLE disconnected during commissioning");
-            Internal::BLEMgrImpl().ClearResetFailSafeTimerFlag();
-            Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+            ChipLogDetail(DeviceLayer, "BLE disconnected during commissioning");
+            chip::Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+        }
+        else // Expected BLE disconnect: switching to Thread
+        {
+            bt_disable();
+#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
+            pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+            ChipLogProgress(DeviceLayer, "Switch to Thread");
+            TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(true);
+
+            ChipDeviceEvent opEvent;
+            opEvent.Type     = DeviceEventType::kOperationalNetworkStarted;
+            CHIP_ERROR error = PlatformMgr().PostEvent(&opEvent);
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format());
+            }
+#endif
         }
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD

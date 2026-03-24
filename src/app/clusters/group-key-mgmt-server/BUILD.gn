@@ -16,8 +16,8 @@ import("//build_overrides/chip.gni")
 
 source_set("group-key-mgmt-server") {
   sources = [
-    "group-key-mgmt-cluster.cpp",
-    "group-key-mgmt-cluster.h",
+    "GroupKeyManagementCluster.cpp",
+    "GroupKeyManagementCluster.h",
   ]
 
   public_deps = [

@@ -66,8 +66,14 @@ public:
         return CHIP_NO_ERROR;
     }
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    CHIP_ERROR EndpointUniqueID(EndpointId, MutableCharSpan & id) override
+    {
+        return CopyCharSpanToMutableCharSpan("FAKE"_span, id);
+    }
+#endif
+
     // The following methods are not used in this test, but must be implemented as they are pure virtual in the Provider interface.
-    CHIP_ERROR SemanticTags(EndpointId, ReadOnlyBufferBuilder<SemanticTag> &) override { return CHIP_NO_ERROR; }
     CHIP_ERROR ClientClusters(EndpointId, ReadOnlyBufferBuilder<ClusterId> &) override { return CHIP_NO_ERROR; }
     CHIP_ERROR ServerClusters(EndpointId, ReadOnlyBufferBuilder<ServerClusterEntry> &) override { return CHIP_NO_ERROR; }
     CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<EndpointEntry> &) override { return CHIP_NO_ERROR; }
@@ -88,7 +94,7 @@ public:
     {
         return Protocols::InteractionModel::Status::Success;
     }
-    void ListAttributeWriteNotification(const ConcreteAttributePath &, ListWriteOperation) override {}
+    void ListAttributeWriteNotification(const ConcreteAttributePath &, ListWriteOperation, FabricIndex) override {}
     std::optional<ActionReturnStatus> InvokeCommand(const InvokeRequest &, TLV::TLVReader &, CommandHandler *) override
     {
         return Protocols::InteractionModel::Status::Success;

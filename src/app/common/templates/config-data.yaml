@@ -23,44 +23,23 @@ CommandHandlerInterfaceOnlyClusters:
     # CommandHandlerInterface and hence do not need generated command dispatch.
     # This uses asUpperCamelCase versions of the cluster name.
     # keep-sorted start
-    - Access Control
     - Actions
-    - Activated Carbon Filter Monitoring
-    - Administrator Commissioning
-    - Basic Information
-    - Boolean State
     - Camera AV Settings User Level Management
-    - Camera AV Stream Management
-    - Chime
-    - Closure Control
     - Closure Dimension
     - Commissioner Control
     - Commodity Price
     - Commodity Tariff
-    - Device Energy Management
     - Device Energy Management Mode
-    - Diagnostic Logs
     - Dishwasher Mode
     - Electrical Energy Measurement
-    - Electrical Power Measurement
-    - Energy EVSE
     - Energy EVSE Mode
-    - Ethernet Network Diagnostics
-    - Fixed Label
-    - General Commissioning
-    - General Diagnostics
-    - Group Key Management
-    - HEPA Filter Monitoring
     - Joint Fabric Administrator
     - Laundry Washer Mode
     - Microwave Oven Control
     - Network Commissioning
-    - OTA Software Update Provider
-    - Operational Credentials
     - Operational State
     - Oven Cavity Operational State
     - Oven Mode
-    - Push AV Stream Transport
     - RVC Clean Mode
     - RVC Operational State
     - RVC Run Mode
@@ -68,7 +47,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Sample MEI
     - Scenes Management
     - Service Area
-    - Software Diagnostics
     - Soil Measurement
     - TLS Certificate Management
     - TLS Client Management
@@ -78,8 +56,6 @@ CommandHandlerInterfaceOnlyClusters:
     - Water Heater Mode
     - WebRTC Transport Provider
     - WebRTC Transport Requestor
-    - Wi-Fi Network Diagnostics
-    - Wi-Fi Network Management
     - Zone Management
     # keep-sorted end
 
@@ -88,16 +64,11 @@ CommandHandlerInterfaceOnlyClusters:
 ClustersWithInitFunctions:
     # keep-sorted start
     - Color Control
-    - Groups
-    - Identify
     - Level Control
-    - Localization Configuration
     - Mode Select
-    - Occupancy Sensing
     - On/Off
     - Pump Configuration and Control
     - Sample MEI
-    - Scenes Management
     - Thermostat
     # keep-sorted end
 
@@ -106,7 +77,6 @@ ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
     - Door Lock
     - Fan Control
-    - Identify
     - Pump Configuration and Control
     - Thermostat
     - Window Covering
@@ -120,7 +90,6 @@ ClustersWithShutdownFunctions:
     - Level Control
     - On/Off
     - Sample MEI
-    - Scenes Management
     - Thermostat
     # keep-sorted end
 
@@ -131,7 +100,6 @@ ClustersWithPreAttributeChangeFunctions:
     - Fan Control
     - Laundry Dryer Controls
     - Laundry Washer Controls
-    - Localization Configuration
     - Mode Select
     - Pump Configuration and Control
     - Thermostat
@@ -144,20 +112,50 @@ ClustersWithPreAttributeChangeFunctions:
 CodeDrivenClusters:
     # keep-sorted start
     - Access Control
+    - Activated Carbon Filter Monitoring
     - Administrator Commissioning
     - Basic Information
     - Binding
     - Boolean State
+    - Boolean State Configuration
+    - Camera AV Stream Management
+    - Chime
+    - Closure Control
+    - Descriptor
+    - Device Energy Management
     - Diagnostic Logs
+    - Electrical Power Measurement
+    - Energy EVSE
     - Ethernet Network Diagnostics
     - Fixed Label
     - General Commissioning
     - General Diagnostics
     - Group Key Management
+    - Groupcast
+    - Groups
+    - HEPA Filter Monitoring
+    - ICD Management
+    - Identify
+    - Illuminance Measurement
+    - Localization Configuration
     - OTA Software Update Provider
+    - Occupancy Sensing
     - Operational Credentials
+    - Power Topology
     - Push AV Stream Transport
+    - Scenes Management
     - Software Diagnostics
+    - Switch
+    - TLS Certificate Management
+    - TLS Client Management
+    - Temperature Control
+    - Temperature Measurement
+    - Thread Network Diagnostics
     - Time Format Localization
+    - Time Synchronization
+    - Unit Localization
+    - User Label
+    - Valve Configuration and Control
     - Wi-Fi Network Diagnostics
+    - Wi-Fi Network Management
     # keep-sorted end

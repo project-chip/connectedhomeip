@@ -1,10 +1,11 @@
 # src/python_testing/matter_testing_infrastructure/matter/typings/matter/testing/apps.py
 
 from dataclasses import dataclass
-from typing import Any, List, Optional, Union
+from sys import stderr, stdout
+from typing import Any, BinaryIO, List, Optional, Union
 
-from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.testing.tasks import Subprocess
+
 
 @dataclass
 class OtaImagePath:
@@ -22,6 +23,8 @@ class ImageListPath:
 
 class AppServerSubprocess(Subprocess):
     PREFIX: bytes
+    log_file = ""
+    err_log_file = ""
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, port: int = 5540, extra_args: List[str] = ...) -> None: ...
 
@@ -33,20 +36,15 @@ class IcdAppServerSubprocess(AppServerSubprocess):
     def terminate(self) -> None: ...
 
 
-class JFControllerSubprocess(Subprocess):
-    PREFIX: bytes
-    def __init__(self, app: str, rpc_server_port: int, storage_dir: str,
-                 vendor_id: int, extra_args: List[str] = ...) -> None: ...
-
-
 class OTAProviderSubprocess(AppServerSubprocess):
     DEFAULT_ADMIN_NODE_ID: int
     PREFIX: bytes
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: List[str] = ...,
-                 kvs_path: Optional[str] = ..., persist_kvs: bool = ...) -> None: ...
+                 port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None,
+                 log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer): ...
 
-    def create_acl_entry(self, dev_ctrl: ChipDeviceController, provider_node_id: int,
-                         requestor_node_id: Optional[int] = None) -> Any: ...
+    def kill(self) -> None: ...
+
+    def get_pid(self) -> int: ...

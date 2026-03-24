@@ -33,7 +33,7 @@ def GetUnionUnderlyingType(typeToCheck, matchingType=None):
         If that is 'None' (not to be confused with NoneType), then it will retrieve
         the 'real' type behind the union, i.e not Nullable && not None
     '''
-    if (not (typing.get_origin(typeToCheck) == typing.Union)):
+    if typing.get_origin(typeToCheck) != typing.Union:
         return None
 
     for t in typing.get_args(typeToCheck):
@@ -210,7 +210,7 @@ class ClusterObject:
 
     @ChipUtility.classproperty
     def descriptor(cls):
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 # The below dictionaries will be filled dynamically
@@ -243,11 +243,15 @@ class ClusterCommand(ClusterObject):
 
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def command_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
+
+    @ChipUtility.classproperty
+    def is_client(self) -> bool:
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def must_use_timed_invoke(cls) -> bool:
@@ -281,7 +285,7 @@ class Cluster(ClusterObject):
         '''
         if self._data_version is not None:
             yield "(data version)", self.data_version
-        for k in self.__dataclass_fields__.keys():
+        for k in self.__dataclass_fields__:
             if k in self.__dict__:
                 yield k, self.__dict__[k]
 
@@ -330,15 +334,15 @@ class ClusterAttributeDescriptor:
 
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def attribute_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def must_use_timed_write(cls) -> bool:
@@ -378,8 +382,8 @@ class ClusterEvent(ClusterObject):
 
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @ChipUtility.classproperty
     def event_id(self) -> int:
-        raise NotImplementedError()
+        raise NotImplementedError

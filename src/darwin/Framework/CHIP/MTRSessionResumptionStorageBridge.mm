@@ -132,7 +132,7 @@ CHIP_ERROR MTRSessionResumptionStorageBridge::DeconstructResumptionInfo(MTRCASES
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
-    if (resumptionInfo.sharedSecret.length > sharedSecret.Capacity()) {
+    if (sharedSecret.SetLength(resumptionInfo.sharedSecret.length) != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Unable to return resumption shared secret: Stored size %llu is larger than allowed size %llu",
             static_cast<unsigned long long>(resumptionInfo.sharedSecret.length),
             static_cast<unsigned long long>(sharedSecret.Capacity()));
@@ -141,7 +141,6 @@ CHIP_ERROR MTRSessionResumptionStorageBridge::DeconstructResumptionInfo(MTRCASES
 
     nodeID = resumptionInfo.nodeID.unsignedLongLongValue;
     memcpy(resumptionId.data(), resumptionInfo.resumptionID.bytes, resumptionInfo.resumptionID.length);
-    sharedSecret.SetLength(resumptionInfo.sharedSecret.length);
     memcpy(sharedSecret.Bytes(), resumptionInfo.sharedSecret.bytes, resumptionInfo.sharedSecret.length);
     ReturnErrorOnFailure(SetToCATValues(resumptionInfo.caseAuthenticatedTags, peerCATs));
 

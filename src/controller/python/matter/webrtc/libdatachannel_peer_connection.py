@@ -118,7 +118,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         """Sets the remote ICE candidates for the WebRTC peer connection.
 
         Args:
-            remote_candidates (list[str]): A list of remote ICE candidates to be set.
+            remote_candidates (list[IceCandidate]): A list of remote ICE candidates to be set.
         """
         for candidate in remote_candidates:
             self.add_ice_candidate(candidate.candidate, candidate.sdpMid or "video")
@@ -216,15 +216,15 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         LOGGER.debug("Waiting for remote answer")
         return await self._remote_events[Events.ANSWER].get(timeout_s)
 
-    async def get_remote_ice_candidates(self, timeout_s: Optional[int] = None) -> tuple[int, list[str]]:
-        """Waits for a remote SDP answer to be received through a matter command.
+    async def get_remote_ice_candidates(self, timeout_s: Optional[int] = None) -> tuple[int, list[IceCandidate]]:
+        """Waits for a list of remote ICE Candidates to be received through a matter command.
 
         Args:
-            timeout_s (Optional[int]): The maximum time in seconds to wait for a remote offer.
+            timeout_s (Optional[int]): The maximum time in seconds to wait for a list of remote candidates.
             If None, the function will wait indefinitely.
 
         Returns:
-            tuple[int, list[str]]: A tuple containing the session ID and list of ice candidate strings.
+            tuple[int, list[IceCandidate]]: A tuple containing the session ID and list of ice candidate strings.
 
         Raises:
             asyncio.TimeoutError: If no remote offer is received within the specified timeout period.
@@ -269,7 +269,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
                 PeerConnectionState.INVALID,
             ]:
                 return False
-            elif self._peer_state == PeerConnectionState.CONNECTED:
+            if self._peer_state == PeerConnectionState.CONNECTED:
                 return True
             self._peer_state = await event_queue.get(timeout=30)
 
@@ -331,8 +331,17 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         """Callback function called when a remote SDP answer is received through a matter command."""
         self._remote_events[Events.ANSWER].put((sessionId, answer_sdp))
 
-    def on_remote_ice_candidates(self, sessionId: int, candidates: list[str]) -> None:
-        """Callback function called when a remote ICE candidates are received through a matter command."""
+    def on_remote_ice_candidates(self, sessionId: int, candidates: list[IceCandidate]) -> None:
+        """Callback function called when a remote ICE candidates are received through a matter command.
+
+        Implements trickle ICE by immediately applying received candidates to the peer connection.
+        Also stores them in the event queue for tests that may need to wait for and verify them.
+        """
+        # Immediately apply candidates for trickle ICE support
+        LOGGER.debug(f"Applying {len(candidates)} candidates for trickle ICE support: {candidates}")
+        self.set_remote_ice_candidates(candidates)
+
+        # Also put in event queue for any waiting consumers
         self._remote_events[Events.ICE_CANDIDATE].put((sessionId, candidates))
 
     def on_remote_end(self, sessionId: int, reason: int) -> None:

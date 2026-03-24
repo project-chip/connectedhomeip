@@ -31,9 +31,9 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#ifdef DIC_ENABLE
-#include "dic.h"
-#endif // DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
+#include "MatterAws.h"
+#endif // SL_MATTER_ENABLE_AWS
 
 using namespace ::chip::app::Clusters;
 using namespace ::chip::DeviceLayer::Internal;
@@ -44,16 +44,16 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 {
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
-    ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
+    ChipLogDetail(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
     if (clusterId == DoorLock::Id && attributeId == DoorLock::Attributes::LockState::Id)
     {
         [[maybe_unused]] DoorLock::DlLockState lockState = *(reinterpret_cast<DoorLock::DlLockState *>(value));
         ChipLogProgress(Zcl, "Door lock cluster: " ChipLogFormatMEI " state %d", ChipLogValueMEI(clusterId),
                         to_underlying(lockState));
-#ifdef DIC_ENABLE
-        dic_sendmsg("lock/state", (const char *) (lockState == DoorLock::DlLockState::kLocked ? "lock" : "unlock"));
-#endif // DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
+        MatterAwsSendMsg("lock/state", (const char *) (lockState == DoorLock::DlLockState::kLocked ? "lock" : "unlock"));
+#endif // SL_MATTER_ENABLE_AWS
     }
 }
 

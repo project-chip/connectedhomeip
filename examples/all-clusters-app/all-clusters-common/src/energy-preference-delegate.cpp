@@ -88,7 +88,7 @@ EPrefDelegate::GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex
         aOutStep = gsEnergyBalances[aIndex].step;
         if (gsEnergyBalances[aIndex].label.HasValue())
         {
-            chip::CopyCharSpanToMutableCharSpan(gsEnergyBalances[aIndex].label.Value(), aOutLabel.Value());
+            TEMPORARY_RETURN_IGNORED chip::CopyCharSpanToMutableCharSpan(gsEnergyBalances[aIndex].label.Value(), aOutLabel.Value());
         }
         else
         {
@@ -122,7 +122,7 @@ EPrefDelegate::GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, siz
         aOutStep = gsPowerBalances[aIndex].step;
         if (gsPowerBalances[aIndex].label.HasValue())
         {
-            chip::CopyCharSpanToMutableCharSpan(gsPowerBalances[aIndex].label.Value(), aOutLabel.Value());
+            TEMPORARY_RETURN_IGNORED chip::CopyCharSpanToMutableCharSpan(gsPowerBalances[aIndex].label.Value(), aOutLabel.Value());
         }
         else
         {

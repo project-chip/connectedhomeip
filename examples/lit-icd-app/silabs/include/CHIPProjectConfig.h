@@ -90,6 +90,6 @@
 /**
  * @brief CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
  *
- * Increase default(2) by 1 to account for the AppTask registering
+ * The SDK default is 3; this app adds 1 (AppTask), for a total of 4.
  */
-#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 3
+#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 4

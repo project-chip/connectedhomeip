@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -150,7 +150,7 @@ void TCPEndPoint::Shutdown()
     if (mState == State::kConnected)
     {
         mState = State::kSendShutdown;
-        DriveSending();
+        TEMPORARY_RETURN_IGNORED DriveSending();
     }
 
     // Otherwise, if the peer has already closed their end of the connection,
@@ -198,7 +198,7 @@ void TCPEndPoint::Free()
     // Ensure the end point is Closed or Closing.
     Close();
 
-    GetEndPointManager().DeleteEndPoint(this);
+    Delete();
 }
 
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
@@ -215,8 +215,8 @@ void TCPEndPoint::SetIdleTimeout(uint32_t timeoutMS)
 
     if (!isIdleTimerRunning && mIdleTimeout)
     {
-        GetSystemLayer().StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL), HandleIdleTimer,
-                                    &GetEndPointManager());
+        TEMPORARY_RETURN_IGNORED GetSystemLayer().StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL),
+                                                             HandleIdleTimer, &GetEndPointManager());
     }
 }
 
@@ -226,7 +226,7 @@ void TCPEndPoint::HandleIdleTimer(chip::System::Layer * aSystemLayer, void * aAp
     auto & endPointManager = *reinterpret_cast<EndPointManager<TCPEndPoint> *>(aAppState);
     bool lTimerRequired    = IsIdleTimerRunning(endPointManager);
 
-    endPointManager.ForEachEndPoint([](TCPEndPoint * lEndPoint) -> Loop {
+    endPointManager.ForEachEndPoint([](const TCPEndPointHandle & lEndPoint) -> Loop {
         if (!lEndPoint->IsConnected())
             return Loop::Continue;
         if (lEndPoint->mIdleTimeout == 0)
@@ -246,7 +246,8 @@ void TCPEndPoint::HandleIdleTimer(chip::System::Layer * aSystemLayer, void * aAp
 
     if (lTimerRequired)
     {
-        aSystemLayer->StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL), HandleIdleTimer, &endPointManager);
+        TEMPORARY_RETURN_IGNORED aSystemLayer->StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL),
+                                                          HandleIdleTimer, &endPointManager);
     }
 }
 
@@ -254,7 +255,7 @@ void TCPEndPoint::HandleIdleTimer(chip::System::Layer * aSystemLayer, void * aAp
 bool TCPEndPoint::IsIdleTimerRunning(EndPointManager<TCPEndPoint> & endPointManager)
 {
     // See if there are any TCP connections with the idle timer check in use.
-    return Loop::Break == endPointManager.ForEachEndPoint([](TCPEndPoint * lEndPoint) {
+    return Loop::Break == endPointManager.ForEachEndPoint([](const TCPEndPointHandle & lEndPoint) {
         return (lEndPoint->mIdleTimeout == 0) ? Loop::Continue : Loop::Break;
     });
 }
@@ -284,7 +285,8 @@ void TCPEndPoint::StartConnectTimerIfSet()
 {
     if (mConnectTimeoutMsecs > 0)
     {
-        GetSystemLayer().StartTimer(System::Clock::Milliseconds32(mConnectTimeoutMsecs), TCPConnectTimeoutHandler, this);
+        TEMPORARY_RETURN_IGNORED GetSystemLayer().StartTimer(System::Clock::Milliseconds32(mConnectTimeoutMsecs),
+                                                             TCPConnectTimeoutHandler, this);
     }
 }
 
@@ -322,7 +324,7 @@ CHIP_ERROR TCPEndPoint::DriveSending()
     return err;
 }
 
-void TCPEndPoint::DriveReceiving()
+void TCPEndPoint::DriveReceiving(const TCPEndPointHandle & handle)
 {
     // If there's data in the receive queue and the app is ready to receive it then call the app's callback
     // with the entire receive queue.
@@ -331,13 +333,13 @@ void TCPEndPoint::DriveReceiving()
         // Acknowledgement is done after handling the buffers to allow the
         // application processing to throttle flow.
         size_t ackLength = mRcvQueue->TotalLength();
-        CHIP_ERROR err   = OnDataReceived(this, std::move(mRcvQueue));
+        CHIP_ERROR err   = OnDataReceived(handle, std::move(mRcvQueue));
         if (err != CHIP_NO_ERROR)
         {
             DoClose(err, false);
             return;
         }
-        AckReceive(ackLength);
+        TEMPORARY_RETURN_IGNORED AckReceive(ackLength);
     }
 
     // If the connection is closing, and the receive queue is now empty, call DoClose() to complete
@@ -350,6 +352,7 @@ void TCPEndPoint::DriveReceiving()
 
 void TCPEndPoint::HandleConnectComplete(CHIP_ERROR err)
 {
+    TCPEndPointHandle handle(this);
     // If the connect succeeded enter the Connected state and call the app's callback.
     if (err == CHIP_NO_ERROR)
     {
@@ -365,7 +368,7 @@ void TCPEndPoint::HandleConnectComplete(CHIP_ERROR err)
 
         if (OnConnectComplete != nullptr)
         {
-            OnConnectComplete(this, CHIP_NO_ERROR);
+            OnConnectComplete(handle, CHIP_NO_ERROR);
         }
     }
 
@@ -427,14 +430,16 @@ void TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
             {
                 if (OnConnectComplete != nullptr)
                 {
-                    OnConnectComplete(this, err);
+                    TCPEndPointHandle handle(this);
+                    OnConnectComplete(handle, err);
                 }
             }
             else if ((oldState == State::kConnected || oldState == State::kSendShutdown || oldState == State::kReceiveShutdown ||
                       oldState == State::kClosing) &&
                      OnConnectionClosed != nullptr)
             {
-                OnConnectionClosed(this, err);
+                TCPEndPointHandle handle(this);
+                OnConnectionClosed(handle, err);
             }
         }
     }
@@ -444,7 +449,7 @@ void TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
 
 void TCPEndPoint::ScheduleNextTCPUserTimeoutPoll(uint32_t aTimeOut)
 {
-    GetSystemLayer().StartTimer(System::Clock::Milliseconds32(aTimeOut), TCPUserTimeoutHandler, this);
+    TEMPORARY_RETURN_IGNORED GetSystemLayer().StartTimer(System::Clock::Milliseconds32(aTimeOut), TCPUserTimeoutHandler, this);
 }
 
 void TCPEndPoint::StartTCPUserTimeoutTimer()

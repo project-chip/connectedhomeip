@@ -32,6 +32,7 @@ if (chip_enable_pw_rpc) {
 assert(current_os == "freertos")
 
 silabs_project_dir = "${chip_root}/examples/thermostat/silabs"
+thermostat_common_dir = "${chip_root}/examples/thermostat/thermostat-common"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 if (wifi_soc) {
@@ -57,7 +58,7 @@ if (wifi_soc) {
     ]
 
     include_dirs = [
-      "${chip_root}/src/platform/silabs/SiWx917",
+      "${chip_root}/src/platform/silabs/SiWx",
       "${silabs_project_dir}/include",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
@@ -92,15 +93,6 @@ if (wifi_soc) {
       include_dirs += [ "${examples_plat_dir}/wf200" ]
     }
 
-    if (chip_enable_ble_rs911x) {
-      # TODO efr32_sdk should not need a header from this location
-      include_dirs += [
-        "${chip_root}/src/platform/silabs/efr32/rs911x",
-        "${examples_plat_dir}/rs911x",
-        "${examples_plat_dir}/rs911x/hal",
-      ]
-    }
-
     defines = []
     if (chip_enable_pw_rpc) {
       defines += [
@@ -113,11 +105,15 @@ if (wifi_soc) {
 
 silabs_executable("thermostat_app") {
   output_name = "matter-silabs-thermostat-example.out"
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${thermostat_common_dir}/include",
+  ]
   defines = []
 
   sources = [
     "${examples_common_plat_dir}/main.cpp",
+    "${thermostat_common_dir}/src/thermostat-delegate-impl.cpp",
     "src/AppTask.cpp",
     "src/DataModelCallbacks.cpp",
     "src/SensorManager.cpp",

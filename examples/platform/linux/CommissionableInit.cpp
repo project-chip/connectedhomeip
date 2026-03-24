@@ -191,12 +191,12 @@ CHIP_ERROR InitConfigurationManager(ConfigurationManagerImpl & configManager, co
 {
     if (options.payload.vendorID != 0)
     {
-        configManager.StoreVendorId(options.payload.vendorID);
+        TEMPORARY_RETURN_IGNORED configManager.StoreVendorId(options.payload.vendorID);
     }
 
     if (options.payload.productID != 0)
     {
-        configManager.StoreProductId(options.payload.productID);
+        TEMPORARY_RETURN_IGNORED configManager.StoreProductId(options.payload.productID);
     }
 
     return CHIP_NO_ERROR;

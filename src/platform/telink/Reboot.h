@@ -25,6 +25,7 @@ namespace DeviceLayer {
 enum class SoftwareRebootReason : uint8_t
 {
     kSoftwareUpdate,
+    kUpdateVerificationFailed,
     kOther
 };
 

@@ -36,7 +36,7 @@ public:
     class Connection
     {
         friend class TCPBaseTestAccess;
-        ActiveTCPConnectionHolder mHolder;
+        ActiveTCPConnectionHandle mHolder;
 
     public:
         operator bool() const { return !mHolder.IsNull(); }
@@ -48,9 +48,9 @@ public:
         result.mHolder = tcp.FindInUseConnection(peerAddress);
         return result;
     }
-    static Inet::TCPEndPoint * GetEndpoint(Connection & state) { return state.mHolder->mEndPoint; }
+    static Inet::TCPEndPointHandle & GetEndpoint(Connection & state) { return state.mHolder->mEndPoint; }
 
-    static CHIP_ERROR ProcessReceivedBuffer(TCPImpl & tcp, Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
+    static CHIP_ERROR ProcessReceivedBuffer(TCPImpl & tcp, Inet::TCPEndPointHandle & endPoint, const PeerAddress & peerAddress,
                                             System::PacketBufferHandle && buffer)
     {
         return tcp.ProcessReceivedBuffer(endPoint, peerAddress, std::move(buffer));

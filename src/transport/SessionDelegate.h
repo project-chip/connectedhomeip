@@ -24,7 +24,7 @@
 namespace chip {
 
 namespace Transport {
-class ActiveTCPConnectionHolder;
+class ActiveTCPConnectionHandle;
 struct ActiveTCPConnectionState;
 } // namespace Transport
 
@@ -73,7 +73,7 @@ public:
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     virtual void OnSessionConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR connErr) {}
-    virtual void OnConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR connErr) {}
+    virtual void OnConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR connErr) {}
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 

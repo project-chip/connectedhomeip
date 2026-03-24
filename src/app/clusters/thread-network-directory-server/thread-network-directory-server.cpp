@@ -48,7 +48,7 @@ ThreadNetworkDirectoryServer::ThreadNetworkDirectoryServer(EndpointId endpoint, 
 ThreadNetworkDirectoryServer::~ThreadNetworkDirectoryServer()
 {
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
 }
 
 CHIP_ERROR ThreadNetworkDirectoryServer::Init()
@@ -133,6 +133,7 @@ CHIP_ERROR ThreadNetworkDirectoryServer::ReadThreadNetworks(const ConcreteDataAt
         CHIP_ERROR err = CHIP_NO_ERROR;
         ExtendedPanId exPanId;
         auto * iterator = mStorage.IterateNetworkIds();
+        VerifyOrReturnError(iterator != nullptr, CHIP_ERROR_NO_MEMORY);
         while (iterator->Next(exPanId))
         {
             uint8_t datasetBuffer[kSizeOperationalDataset];
@@ -143,7 +144,7 @@ CHIP_ERROR ThreadNetworkDirectoryServer::ReadThreadNetworks(const ConcreteDataAt
             char networkName[kSizeNetworkName + 1];
             ThreadNetworkStruct::Type network;
 
-            dataset.Init(datasetSpan);
+            TEMPORARY_RETURN_IGNORED dataset.Init(datasetSpan);
             SuccessOrExit(err = dataset.GetExtendedPanIdAsByteSpan(network.extendedPanID));
             SuccessOrExit(err = dataset.GetNetworkName(networkName));
             network.networkName = CharSpan::fromCharString(networkName);

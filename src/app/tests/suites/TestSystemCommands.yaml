@@ -108,7 +108,7 @@ tests:
               - name: "kvs"
                 value: "/tmp/chip_kvs_lock"
               - name: "registerKey"
-                value: "chip-lock-app"
+                value: "lock"
 
     - label: "Commission second accessory from alpha"
       identity: "alpha"
@@ -135,7 +135,7 @@ tests:
       arguments:
           values:
               - name: "registerKey"
-                value: "chip-lock-app"
+                value: "lock"
 
     - label: "Start a second accessory with different KVS"
       command: "Start"
@@ -148,7 +148,7 @@ tests:
               - name: "kvs"
                 value: "/tmp/chip_kvs_lock2"
               - name: "registerKey"
-                value: "chip-lock-app"
+                value: "lock"
 
     # NOTE: Since we have a new KVS, this is basically a factory reset, so we can commission again.
     - label: "Commission second accessory with new KVS from alpha"
@@ -188,7 +188,7 @@ tests:
       arguments:
           values:
               - name: "registerKey"
-                value: "chip-lock-app"
+                value: "lock"
 
     - label: "Factory Reset the default accessory"
       command: "FactoryReset"
@@ -205,7 +205,7 @@ tests:
       arguments:
           values:
               - name: "registerKey"
-                value: "chip-lock-app"
+                value: "lock"
 
     - label: "Commission the now-reset second accessory from alpha"
       identity: "alpha"

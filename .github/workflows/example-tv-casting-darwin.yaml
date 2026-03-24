@@ -31,16 +31,16 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     tv-casting-bridge:
         name: Build TV Casting Bridge example
         if: github.actor != 'restyled-io[bot]'
-        runs-on: macos-14
+        runs-on: macos-26
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:

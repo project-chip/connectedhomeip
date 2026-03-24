@@ -78,6 +78,29 @@ public:
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
+#ifdef DISPLAY_ENABLED
+    /**
+     * @brief Updates the closure UI with current closure state
+     */
+    static void UpdateClosureUI();
+
+    /**
+     * @brief Event handler for UI update events
+     * Called from app task context to safely update UI with chip stack locked
+     *
+     * @param aEvent pointer to the UI update event being processed
+     */
+    static void UpdateClosureUIHandler(AppEvent * aEvent);
+#endif // DISPLAY_ENABLED
+
+    /**
+     * @brief Closure button action event handler
+     * Handles button press events for closure control operations
+     *
+     * @param aEvent pointer to the button event being processed
+     */
+    static void ClosureButtonActionEventHandler(AppEvent * aEvent);
+
 private:
     static AppTask sAppTask;
 

@@ -87,7 +87,7 @@ void BLEApplicationManager::Init(void)
     const char * name      = bt_get_name();
     const uint8_t nameSize = static_cast<uint8_t>(strlen(name));
     Encoding::LittleEndian::Put16(serviceData.uuid, UUID16_CHIPoBLEService.val);
-    chip::DeviceLayer::ConfigurationMgr().GetBLEDeviceIdentificationInfo(serviceData.deviceIdInfo);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ConfigurationMgr().GetBLEDeviceIdentificationInfo(serviceData.deviceIdInfo);
 
     advertisingData[0] = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
     /* Matter adv data for commissining */

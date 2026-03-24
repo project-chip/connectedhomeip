@@ -1,0 +1,882 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0201" name="Thermostat Cluster" revision="5">
+  <revisionHistory>
+    <revision revision="1" summary="mandatory global ClusterRevision attribute added; fixed some defaults; CCB 1823, 1480"/>
+    <revision revision="2" summary="CCB 1981 2186 2249 2250 2251; NFR Thermostat Setback"/>
+    <revision revision="3" summary="CCB 2477 2560 2773 2777 2815 2816 3029"/>
+    <revision revision="4" summary="All Hubs changes"/>
+    <revision revision="5" summary="New data model format and notation, added FeatureMap, collapsed attribute sets, clarified edge cases around limits, default value of xxxSetpointLimit now respects AbsxxxSetpointLimit"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0201" name="Thermostat"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="TSTAT" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="HEAT" name="Heating" summary="Thermostat is capable of managing a heating device">
+      <mandatoryConform>
+        <feature name="AUTO"/>
+      </mandatoryConform>
+    </feature>
+    <feature bit="1" code="COOL" name="Cooling" summary="Thermostat is capable of managing a cooling device">
+      <mandatoryConform>
+        <feature name="AUTO"/>
+      </mandatoryConform>
+    </feature>
+    <feature bit="2" code="OCC" name="Occupancy" summary="Supports Occupied and Unoccupied setpoints">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="SCH" name="Schedule Configuration" summary="Supports remote configuration of a weekly schedule of setpoint transitions">
+      <optionalConform/>
+    </feature>
+    <feature bit="4" code="SB" name="Setback" summary="Supports configurable setback (or span)">
+      <optionalConform/>
+    </feature>
+    <feature bit="5" code="AUTO" name="Auto Mode" summary="Supports a System Mode of Auto">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <number name="SignedTemperatureCX10tempS8Type" type="int8"/>
+    <number name="TemperatureDifferencetempDiffType" type="int16"/>
+    <number name="TemperaturetemperatureType" type="int16"/>
+    <number name="UnsignedTemperatureCX10tempU8Type" type="uint8"/>
+    <struct name="ThermostatScheduleTransition">
+      <field id="0" name="TransitionTime" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="1439"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="HeatSetpoint" type="temperature">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="CoolSetpoint" type="temperature">
+        <mandatoryConform/>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="LocalTemperature" type="temperature" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" reportable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="OutdoorTemperature" type="temperature" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0002" name="Occupancy" type="map8" default="1">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="OCC"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="AbsMinHeatSetpointLimit" type="temperature" default="700">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <feature name="HEAT"/>
+      </optionalConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="AbsMaxHeatSetpointLimit" type="temperature" default="3000">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <feature name="HEAT"/>
+      </optionalConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="AbsMinCoolSetpointLimit" type="temperature" default="1600">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <feature name="COOL"/>
+      </optionalConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="AbsMaxCoolSetpointLimit" type="temperature" default="3200">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <feature name="COOL"/>
+      </optionalConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="PICoolingDemand" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality reportable="true"/>
+      <optionalConform>
+        <feature name="COOL"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="100"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="PIHeatingDemand" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality reportable="true"/>
+      <optionalConform>
+        <feature name="HEAT"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="100"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0009" name="HVACSystemTypeConfiguration" type="map8" default="0">
+      <bitmap>
+        <bitfield name="CoolingStage" from="0x00000000" to="0x00000001" summary="00 – Cool Stage 1 01 – Cool Stage 2 10 – Cool Stage 3 11 – Reserved">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="HeatingStage" from="0x00000002" to="0x00000003" summary="00 – Heat Stage 1 01 – Heat Stage 2 10 – Heat Stage 3 11 – Reserved">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="HeatingType" bit="4" summary="0 – Conventional 1 – Heat Pump">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="HeatingFuel" bit="5" summary="0 – Electric / B 1 – Gas / O">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <deprecateConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0010" name="LocalTemperatureCalibration" type="SignedTemperatureCX10tempS8Type" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0011" name="OccupiedCoolingSetpoint" type="temperature" default="2600">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality scene="true" persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="COOL"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0012" name="OccupiedHeatingSetpoint" type="temperature" default="2000">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality scene="true" persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="HEAT"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0013" name="UnoccupiedCoolingSetpoint" type="temperature" default="2600">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="COOL"/>
+          <feature name="OCC"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0014" name="UnoccupiedHeatingSetpoint" type="temperature" default="2000">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="HEAT"/>
+          <feature name="OCC"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0015" name="MinHeatSetpointLimit" type="temperature">
+      <default>
+        <attribute name="AbsMinHeatSetpointLimit"/>
+      </default>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform>
+        <feature name="HEAT"/>
+      </optionalConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0016" name="MaxHeatSetpointLimit" type="temperature">
+      <default>
+        <attribute name="AbsMaxHeatSetpointLimit"/>
+      </default>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform>
+        <feature name="HEAT"/>
+      </optionalConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0017" name="MinCoolSetpointLimit" type="temperature">
+      <default>
+        <attribute name="AbsMinCoolSetpointLimit"/>
+      </default>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform>
+        <feature name="COOL"/>
+      </optionalConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0018" name="MaxCoolSetpointLimit" type="temperature">
+      <default>
+        <attribute name="AbsMaxCoolSetpointLimit"/>
+      </default>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform>
+        <feature name="COOL"/>
+      </optionalConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0019" name="MinSetpointDeadBand" type="SignedTemperatureCX10tempS8Type" default="0">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="AUTO"/>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="0"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x001A" name="RemoteSensing" type="map8" default="0">
+      <bitmap>
+        <bitfield name="LocalTemperature" bit="0" summary="When set, LocalTemperature is derived from a remote node">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="OutdoorTemperature" bit="1" summary="When set, OutdoorTemperature is derived from a remote node">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="Occupancy" bit="2" summary="When set, Occupancy is derived from a remote node">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <max value="7"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x001B" name="ControlSequenceOfOperation" type="enum8" default="4">
+      <enum>
+        <item value="0" name="HeatAndEmergencyAreNotPossible" summary="Heat and Emergency are not possible">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="HeatAndEmergencyAreNotPossible" summary="Heat and Emergency are not possible">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="CoolAndPrecoolingseeTermsAreNotPossible" summary="Cool and precooling (see Terms) are not possible">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="CoolAndPrecoolingAreNotPossible" summary="Cool and precooling are not possible">
+          <mandatoryConform/>
+        </item>
+        <item value="4" name="AllModesArePossible" summary="All modes are possible">
+          <mandatoryConform/>
+        </item>
+        <item value="5" name="AllModesArePossible" summary="All modes are possible">
+          <mandatoryConform/>
+        </item>
+      </enum>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x001C" name="SystemMode" type="enum8" default="1">
+      <enum>
+        <item value="0" name="TheThermostatDoesNotGenerateDemandForCoolingOrHeating" summary="The Thermostat does not generate demand for Cooling or Heating">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="DemandIsGeneratedForEitherCoolingOrHeatingAsRequired" summary="Demand is generated for either Cooling or Heating, as required">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="DemandIsOnlyGeneratedForCooling" summary="Demand is only generated for Cooling">
+          <mandatoryConform/>
+        </item>
+        <item value="4" name="DemandIsOnlyGeneratedForHeating" summary="Demand is only generated for Heating">
+          <mandatoryConform/>
+        </item>
+        <item value="5" name="2NdStageHeatingIsInUseToAchieveDesiredTemperature" summary="2nd stage heating is in use to achieve desired temperature">
+          <mandatoryConform/>
+        </item>
+        <item value="6" name="seeTerms" summary="(see Terms)">
+          <mandatoryConform/>
+        </item>
+        <item value="7" name="FanOnly" summary="Fan only">
+          <mandatoryConform/>
+        </item>
+        <item value="8" name="Dry" summary="Dry">
+          <mandatoryConform/>
+        </item>
+        <item value="9" name="Sleep" summary="Sleep">
+          <mandatoryConform/>
+        </item>
+      </enum>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality scene="true" persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x001D" name="AlarmMask" type="map8" default="0">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x001E" name="ThermostatRunningMode" type="enum8" default="0">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform>
+        <feature name="AUTO"/>
+      </optionalConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0020" name="StartOfWeek" type="enum8">
+      <enum>
+        <item value="0" name="Sunday" summary="Sunday">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="Monday" summary="Monday">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="Tuesday" summary="Tuesday">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="Wednesday" summary="Wednesday">
+          <mandatoryConform/>
+        </item>
+        <item value="4" name="Thursday" summary="Thursday">
+          <mandatoryConform/>
+        </item>
+        <item value="5" name="Friday" summary="Friday">
+          <mandatoryConform/>
+        </item>
+        <item value="6" name="Saturday" summary="Saturday">
+          <mandatoryConform/>
+        </item>
+      </enum>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="SCH"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0021" name="NumberOfWeeklyTransitions" type="uint8" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="SCH"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0022" name="NumberOfDailyTransitions" type="uint8" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="SCH"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0023" name="TemperatureSetpointHold" type="enum8" default="0">
+      <enum>
+        <item value="0" name="FollowSchedulingProgram" summary="Follow scheduling program">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="MaintainCurrentSetpointRegardlessOfScheduleTransitions" summary="Maintain current setpoint, regardless of schedule transitions">
+          <mandatoryConform/>
+        </item>
+      </enum>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0024" name="TemperatureSetpointHoldDuration" type="uint16" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="1440"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0025" name="ThermostatProgrammingOperationMode" type="map8" default="0">
+      <bitmap>
+        <bitfield name="ScheduleActive" bit="0" summary="Schedule programming mode. This enables any programmed weekly schedule configurations.">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="AutoRecovery" bit="1" summary="Auto/recovery mode">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="Economy" bit="2" summary="Economy/EnergyStar mode">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality reportable="true"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0029" name="ThermostatRunningState" type="map16">
+      <bitmap>
+        <bitfield name="Heat" bit="0" summary="Heat State On">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="Cool" bit="1" summary="Cool State On">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="Fan" bit="2" summary="Fan State On">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="HeatStage2" bit="3" summary="Heat 2nd Stage State On">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="CoolStage2" bit="4" summary="Cool 2nd Stage State On">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="FanStage2" bit="5" summary="Fan 2nd Stage State On">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="FanStage3" bit="6" summary="Fan 3rd Stage Stage On">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0030" name="SetpointChangeSource" type="enum8" default="0">
+      <enum>
+        <item value="0" name="ManualUserInitiatedSetpointChangeViaTheThermostat" summary="Manual, user-initiated setpoint change via the thermostat">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="ScheduleinternalProgrammingInitiatedSetpointChange" summary="Schedule/internal programming-initiated setpoint change">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="ExternallyInitiatedSetpointChangeeGDrlcClusterCommandAttributeWrite" summary="Externally-initiated setpoint change (e.g., DRLC cluster command, attribute write)">
+          <mandatoryConform/>
+        </item>
+      </enum>
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0031" name="SetpointChangeAmount" type="TemperatureDifferencetempDiffType" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0032" name="SetpointChangeSourceTimestamp" type="epoch-s" default="0">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0034" name="OccupiedSetback" type="UnsignedTemperatureCX10tempU8Type" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="SB"/>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="OccupiedSetbackMin"/>
+          </from>
+          <to>
+            <attribute name="OccupiedSetbackMax"/>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0035" name="OccupiedSetbackMin" type="UnsignedTemperatureCX10tempU8Type" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="SB"/>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to>
+            <attribute name="OccupiedSetbackMax"/>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0036" name="OccupiedSetbackMax" type="UnsignedTemperatureCX10tempU8Type" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="SB"/>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="OccupiedSetbackMin"/>
+          </from>
+          <to value="0"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0037" name="UnoccupiedSetback" type="UnsignedTemperatureCX10tempU8Type" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="SB"/>
+          <feature name="OCC"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="UnoccupiedSetbackMin"/>
+          </from>
+          <to>
+            <attribute name="UnoccupiedSetbackMax"/>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0038" name="UnoccupiedSetbackMin" type="UnsignedTemperatureCX10tempU8Type" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="SB"/>
+          <feature name="OCC"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to>
+            <attribute name="UnoccupiedSetbackMax"/>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0039" name="UnoccupiedSetbackMax" type="UnsignedTemperatureCX10tempU8Type" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="SB"/>
+          <feature name="OCC"/>
+        </andTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="UnoccupiedSetbackMin"/>
+          </from>
+          <to value="0"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x003A" name="EmergencyHeatDelta" type="UnsignedTemperatureCX10tempU8Type" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0040" name="ACType" type="enum8" default="0">
+      <enum>
+        <item value="0" name="UnknownAcType" summary="Unknown AC Type">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="CoolingAndFixedSpeed" summary="Cooling and Fixed Speed">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="HeatPumpAndFixedSpeed" summary="Heat Pump and Fixed Speed">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="CoolingAndInverter" summary="Cooling and Inverter">
+          <mandatoryConform/>
+        </item>
+        <item value="4" name="HeatPumpAndInverter" summary="Heat Pump and Inverter">
+          <mandatoryConform/>
+        </item>
+      </enum>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0041" name="ACCapacity" type="uint16" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0042" name="ACRefrigerantType" type="enum8" default="0">
+      <enum>
+        <item value="0" name="UnknownRefrigerantType" summary="Unknown Refrigerant Type">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="R22Refrigerant" summary="R22 Refrigerant">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="R410ARefrigerant" summary="R410a Refrigerant">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="R407CRefrigerant" summary="R407c Refrigerant">
+          <mandatoryConform/>
+        </item>
+      </enum>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0043" name="ACCompressorType" type="enum8" default="0">
+      <enum>
+        <item value="0" name="UnknownCompressorType" summary="Unknown compressor type">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="MaxWorkingAmbient43C" summary="Max working ambient 43 °C">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="MaxWorkingAmbient35C" summary="Max working ambient 35 °C">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="MaxWorkingAmbient52C" summary="Max working ambient 52 °C">
+          <mandatoryConform/>
+        </item>
+      </enum>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0044" name="ACErrorCode" type="map32" default="0">
+      <bitmap>
+        <bitfield name="CompressorFail" bit="0" summary="Compressor Failure or Refrigerant Leakage">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="RoomSensorFail" bit="1" summary="Room Temperature Sensor Failure">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="OutdoorSensorFail" bit="2" summary="Outdoor Temperature Sensor Failure">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="CoilSensorFail" bit="3" summary="Indoor Coil Temperature Sensor Failure">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="FanFail" bit="4" summary="Fan Failure">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0045" name="ACLouverPosition" type="enum8" default="0">
+      <enum>
+        <item value="1" name="FullyClosed" summary="Fully Closed">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="FullyOpen" summary="Fully Open">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="QuarterOpen" summary="Quarter Open">
+          <mandatoryConform/>
+        </item>
+        <item value="4" name="HalfOpen" summary="Half Open">
+          <mandatoryConform/>
+        </item>
+        <item value="5" name="ThreeQuartersOpen" summary="Three Quarters Open">
+          <mandatoryConform/>
+        </item>
+      </enum>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0046" name="ACCoilTemperature" type="temperature" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0047" name="ACCapacityFormat" type="enum8" default="0">
+      <enum>
+        <item value="0" name="BritishThermalUnitPerHour" summary="British Thermal Unit per Hour">
+          <mandatoryConform/>
+        </item>
+      </enum>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="SetpointRaiseLower" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x00" name="GetWeeklyScheduleResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="SCH"/>
+      </mandatoryConform>
+    </command>
+    <command id="0x01" name="SetWeeklySchedule" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="SCH"/>
+      </mandatoryConform>
+    </command>
+    <command id="0x01" name="GetRelayStatusLogResponse" direction="responseFromServer">
+      <optionalConform/>
+    </command>
+    <command id="0x02" name="GetWeeklySchedule" direction="commandToServer" response="GetWeeklyScheduleResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="SCH"/>
+      </mandatoryConform>
+    </command>
+    <command id="0x03" name="ClearWeeklySchedule" direction="commandToServer">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="SCH"/>
+      </mandatoryConform>
+    </command>
+    <command id="0x04" name="GetRelayStatusLog" direction="commandToServer" response="GetRelayStatusLogResponse">
+      <access invokePrivilege="operate"/>
+      <optionalConform/>
+    </command>
+  </commands>
+</cluster>

@@ -50,7 +50,7 @@ COPY --from=realtekzephyr /opt/realtek-zephyr/ /opt/realtek-zephyr/
 
 COPY --from=nxp /opt/nxp /opt/nxp
 
-COPY --from=nxpzephyr /opt/nxp-zephyr/zephyr-sdk-0.17.0/ /opt/nxp-zephyr/zephyr-sdk-0.17.0/
+COPY --from=nxpzephyr /opt/nxp-zephyr/zephyr-sdk-0.17.4/ /opt/nxp-zephyr/zephyr-sdk-0.17.4/
 COPY --from=nxpzephyr /opt/nxp-zephyr/zephyrproject/ /opt/nxp-zephyr/zephyrproject/
 
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
@@ -63,7 +63,6 @@ COPY --from=bouffalolab /opt/bouffalolab_sdk /opt/bouffalolab_sdk
 COPY --from=asr /opt/asr /opt/asr
 
 COPY --from=efr32 /opt/silabs/simplicity_sdk /opt/silabs/simplicity_sdk
-COPY --from=efr32 /opt/silabs/wiseconnect-wifi-bt-sdk /opt/silabs/wiseconnect-wifi-bt-sdk
 COPY --from=efr32 /opt/silabs/wifi_sdk /opt/silabs/wifi_sdk
 
 COPY --from=nuttx /opt/nuttx /opt/nuttx
@@ -106,7 +105,6 @@ ENV SILABS_BOARD=BRD4186C
 ENV GSDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV SISDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV PATH=$PATH:/opt/silabs/slc_cli/
-ENV WISECONNECT_SDK_ROOT=/opt/silabs/wiseconnect-wifi-bt-sdk/
 ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
@@ -125,7 +123,7 @@ ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk/toolchains/latest
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 ENV ZEPHYR_NXP_BASE=/opt/nxp-zephyr/zephyrproject/zephyr
-ENV ZEPHYR_NXP_SDK_INSTALL_DIR=/opt/nxp-zephyr/zephyr-sdk-0.17.0
+ENV ZEPHYR_NXP_SDK_INSTALL_DIR=/opt/nxp-zephyr/zephyr-sdk-0.17.4
 ENV NXP_UPDATE_SDK_SCRIPT_DOCKER=/opt/nxp/nxp_matter_support/scripts/update_nxp_sdk.py
 ENV NXP_SDK_PATH=/opt/nxp
 ENV ZEPHYR_REALTEK_BASE=/opt/realtek-zephyr/zephyr-rtk-project/zephyr

@@ -173,7 +173,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps += [ "${chip_root}/src/app/server" ]
     }
 
-    if (chip_build_tests) {
+    if (chip_build_tests && chip_device_platform != "fake") {
       deps += [
         "//examples:example_tests",
         "//src:tests",
@@ -185,6 +185,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       if (current_os == "android" && current_toolchain == default_toolchain) {
         deps += [ "${chip_root}/build/chip/java/tests:java_build_test" ]
       }
+    }
+
+    if (chip_link_tests && chip_device_platform == "fake") {
+      deps += [ "//:fake_platform_tests" ]
     }
 
     if (chip_with_lwip) {
@@ -258,9 +262,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   }
 
   group("check") {
-    if (chip_link_tests) {
+    if (chip_link_tests && chip_device_platform != "fake") {
       deps = [
-        "//:fake_platform_tests",
         "//examples/chef:chef.tests",
         "//scripts/build:build_examples.tests",
         "//scripts/py_matter_idl:matter-idl.tests",
@@ -275,6 +278,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       if (current_os == "linux" || current_os == "mac") {
         deps += [ "${chip_root}/scripts/tools/zap:tests" ]
       }
+    } else if (chip_link_tests && chip_device_platform == "fake") {
+      deps = [ "//:fake_platform_tests" ]
     }
   }
 } else {
@@ -402,9 +407,25 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_linux_rvc_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
+    # Build the Linux OTA Provider app example.
+    enable_linux_ota_provider_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Air Purifier app example.
+    enable_linux_air_purifier_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
     # TODO: #37983: Add darwin support for libdatachannel and then add host_os == "mac" here.
     # Build the Linux Camera app example.
     enable_linux_camera_app_build = enable_default_builds && host_os == "linux"
+
+    # Build the Linux Closure app example.
+    enable_linux_closure_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux Water Leak Detector app example.
+    enable_linux_water_leak_detector_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
 
     # Build the cc13x2x7_26x2x7 lock app example.
     enable_cc13x2x7_26x2x7_lock_app_build = enable_ti_simplelink_builds
@@ -749,6 +770,43 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     extra_build_deps += [ ":linux_rvc_app" ]
+  }
+
+  if (enable_linux_ota_provider_app_build) {
+    group("linux_ota_provider_app") {
+      deps = [
+        "${chip_root}/examples/ota-provider-app/linux(${standalone_toolchain})",
+      ]
+    }
+
+    extra_build_deps += [ ":linux_ota_provider_app" ]
+  }
+
+  if (enable_linux_air_purifier_app_build) {
+    group("linux_air_purifier_app") {
+      deps = [
+        "${chip_root}/examples/air-purifier-app/linux(${standalone_toolchain})",
+      ]
+    }
+
+    extra_build_deps += [ ":linux_air_purifier_app" ]
+  }
+
+  if (enable_linux_closure_app_build) {
+    group("linux_closure_app") {
+      deps =
+          [ "${chip_root}/examples/closure-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_closure_app" ]
+  }
+
+  if (enable_linux_water_leak_detector_app_build) {
+    group("linux_water_leak_detector_app") {
+      deps = [ "${chip_root}/examples/water-leak-detector-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_water_leak_detector_app" ]
   }
 
   if (enable_linux_camera_app_build) {

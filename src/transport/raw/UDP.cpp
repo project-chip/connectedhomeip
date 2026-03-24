@@ -33,11 +33,6 @@
 namespace chip {
 namespace Transport {
 
-UDP::~UDP()
-{
-    Close();
-}
-
 CHIP_ERROR UDP::Init(UdpListenParameters & params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -47,7 +42,7 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
         Close();
     }
 
-    err = params.GetEndPointManager()->NewEndPoint(&mUDPEndPoint);
+    err = params.GetEndPointManager()->NewEndPoint(mUDPEndPoint);
     SuccessOrExit(err);
 
     mUDPEndPoint->SetNativeParams(params.GetNativeParams());
@@ -70,11 +65,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(Inet, "Failed to initialize Udp transport: %" CHIP_ERROR_FORMAT, err.Format());
-        if (mUDPEndPoint)
-        {
-            mUDPEndPoint->Free();
-            mUDPEndPoint = nullptr;
-        }
+        mUDPEndPoint.Release();
     }
 
     return err;
@@ -82,19 +73,13 @@ exit:
 
 uint16_t UDP::GetBoundPort()
 {
-    VerifyOrDie(mUDPEndPoint != nullptr);
+    VerifyOrDie(mUDPEndPoint);
     return mUDPEndPoint->GetBoundPort();
 }
 
 void UDP::Close()
 {
-    if (mUDPEndPoint)
-    {
-        // Udp endpoint is only non null if udp endpoint is initialized and listening
-        mUDPEndPoint->Close();
-        mUDPEndPoint->Free();
-        mUDPEndPoint = nullptr;
-    }
+    mUDPEndPoint.Release();
     mState = State::kNotReady;
 }
 
@@ -102,7 +87,7 @@ CHIP_ERROR UDP::SendMessage(const Transport::PeerAddress & address, System::Pack
 {
     VerifyOrReturnError(address.GetTransportType() == Type::kUdp, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mUDPEndPoint != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mUDPEndPoint, CHIP_ERROR_INCORRECT_STATE);
 
     Inet::IPPacketInfo addrInfo;
     addrInfo.Clear();

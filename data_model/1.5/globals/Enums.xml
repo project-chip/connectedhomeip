@@ -126,13 +126,13 @@ Davis, CA 95616, USA
     </item>
   </enum>
   <enum name="PowerThresholdSourceEnum">
-    <item value="0x00" name="Contract" summary="The value comes from a signed contract">
+    <item value="0x00" name="Contract" summary="The power threshold comes from a signed contract">
       <mandatoryConform/>
     </item>
-    <item value="0x01" name="Regulator" summary="The value comes from a legal regulator">
+    <item value="0x01" name="Regulator" summary="The power threshold comes from a legal regulator">
       <mandatoryConform/>
     </item>
-    <item value="0x02" name="Equipment" summary="The value comes from a certified limits of the meter">
+    <item value="0x02" name="Equipment" summary="The power threshold comes from a certified limits of the meter">
       <mandatoryConform/>
     </item>
   </enum>
@@ -165,19 +165,19 @@ Davis, CA 95616, USA
     </item>
   </enum>
   <enum name="TariffPriceTypeEnum">
-    <item value="0" name="Standard" summary="Standard tariff price">
+    <item value="0x00" name="Standard" summary="Standard tariff price">
       <mandatoryConform/>
     </item>
-    <item value="1" name="Critical" summary="Price during CPP events">
+    <item value="0x01" name="Critical" summary="Price during CPP events">
       <mandatoryConform/>
     </item>
-    <item value="2" name="Virtual" summary="Price during VPP events">
+    <item value="0x02" name="Virtual" summary="Price during VPP events">
       <mandatoryConform/>
     </item>
-    <item value="3" name="Incentive" summary="Price incentives">
+    <item value="0x03" name="Incentive" summary="Price incentives">
       <mandatoryConform/>
     </item>
-    <item value="4" name="IncentiveSignal" summary="Price incentive signals">
+    <item value="0x04" name="IncentiveSignal" summary="Price incentive signals">
       <mandatoryConform/>
     </item>
   </enum>
