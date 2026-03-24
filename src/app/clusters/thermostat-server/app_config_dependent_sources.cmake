@@ -32,6 +32,8 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/ThermostatClusterAtomic.cpp"
     "${CLUSTER_DIR}/ThermostatClusterEvents.cpp"
     "${CLUSTER_DIR}/ThermostatClusterEvents.h"
+    "${CLUSTER_DIR}/ThermostatAttributeShim.cpp"
+    "${CLUSTER_DIR}/ThermostatAttributeShim.h"
     "${CLUSTER_DIR}/ThermostatClusterPresets.cpp"
     "${CLUSTER_DIR}/ThermostatClusterPresets.h"
     "${CLUSTER_DIR}/ThermostatClusterRead.cpp"

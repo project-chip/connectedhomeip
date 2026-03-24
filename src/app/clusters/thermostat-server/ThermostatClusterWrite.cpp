@@ -56,22 +56,7 @@ DataModel::ActionReturnStatus ThermostatCluster::WriteNonAtomicAttribute(const D
         int16_t setpoint;
         ReturnErrorOnFailure(decoder.Decode(setpoint));
 
-        AttributePersistence persistence(mContext->attributeStorage);
-        Setpoints setpoints = mSetpoints;
-        chip::BitFlags<SetpointAttributes> affectedAttributes;
-
-        auto status = HandleSetpointChange(setpoints, request.path.mAttributeId, setpoint, affectedAttributes);
-
-        if (status == Status::Success && affectedAttributes.HasAny())
-        {
-            if (!setpoints.Valid())
-            {
-                return Status::ConstraintError;
-            }
-            mSetpoints = setpoints;
-            return SaveSetpoints(setpoints, persistence, decoder, affectedAttributes);
-        }
-        return status;
+        return ChangeSetpointAttribute(request.path.mAttributeId, setpoint);
     }
     // return persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, mLocalConfigDisabled);
     case MinSetpointDeadBand::Id: {

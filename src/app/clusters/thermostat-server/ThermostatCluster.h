@@ -75,19 +75,34 @@ public:
 
     void OnAtomicWriteTimeout();
 
+    CHIP_ERROR SetSystemMode(SystemModeEnum systemMode);
+    SystemModeEnum GetSystemMode() const { return mSystemMode; }
+
+    CHIP_ERROR SetRunningMode(ThermostatRunningModeEnum runningMode);
+    ThermostatRunningModeEnum GetRunningMode() const { return mRunningMode; }
+
+    CHIP_ERROR SetLocalTemperature(DataModel::Nullable<int16_t> localTemperature);
+    DataModel::Nullable<int16_t> GetLocalTemperature() const { return mLocalTemperature; }
+
+    Protocols::InteractionModel::Status ChangeSetpointAttribute(const AttributeId attributeId, int16_t temperature);
+    Protocols::InteractionModel::Status SetpointRaiseLower(const SetpointRaiseLowerModeEnum mode, const int16_t amount);
+
+    Setpoints mSetpoints;
+
 private:
     const BitFlags<Thermostat::Feature> mFeatures;
 
     Thermostat::Delegate * mDelegate;
 
-    Setpoints mSetpoints;
     AtomicWriteSession mAtomicWriteSession;
 
     BitMask<RemoteSensingBitmap> mRemoteSensing;
     BitMask<OccupancyBitmap> mOccupancy;
 
     SystemModeEnum mSystemMode;
+    ThermostatRunningModeEnum mRunningMode;
     ControlSequenceOfOperationEnum mControlSequenceOfOperation;
+    DataModel::Nullable<int16_t> mLocalTemperature;
 
     DataModel::ActionReturnStatus WriteNonAtomicAttribute(const DataModel::WriteAttributeRequest & request,
                                                           AttributeValueDecoder & decoder);
@@ -97,7 +112,6 @@ private:
                                                              SetpointAttributes & changedAttributes);
     DataModel::ActionReturnStatus SetpointRaiseLower(const Commands::SetpointRaiseLower::DecodableType & commandData);
 
-    Protocols::InteractionModel::Status LoadSetpoints(Setpoints & setpoints, AttributePersistence & persistence);
 
     Protocols::InteractionModel::Status SaveSetpoints(Setpoints setpoints,
                                                       chip::BitFlags<SetpointAttributes> changedAttributes);

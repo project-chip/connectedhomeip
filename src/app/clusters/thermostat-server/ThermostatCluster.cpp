@@ -73,8 +73,7 @@ CHIP_ERROR ThermostatCluster::Startup(ServerClusterContext & context)
 {
     ChipLogProgress(Zcl, "Starting up thermostat server cluster on endpoint %d", mPath.mEndpointId);
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    AttributePersistence persistence(context.attributeStorage);
-    LoadSetpoints(mSetpoints, persistence);
+    LoadSetpoints(mSetpoints);
 
     TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
     return CHIP_NO_ERROR;
