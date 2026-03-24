@@ -142,6 +142,12 @@ public:
             }
             gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeSet, DeviceLayer::SystemLayer(), config);
         }
+        else
+        {
+            // power source is not wired and is not battery, this is invalid, so we should die
+            // using `VerifyOrDieWitMsg` to print a proper log and die with one line
+            VerifyOrDieWithMsg(false, Zcl, "Invalid FeatureMap from ember for the PowerSource cluster");
+        }
 
         PowerSourceCluster & cluster = gServers[clusterInstanceIndex].Cluster();
 
@@ -150,7 +156,7 @@ public:
 #define DieIfInvalidValue(expr, attr_name)                                                                                         \
     {                                                                                                                              \
         CHIP_ERROR error_val = (expr);                                                                                             \
-        VerifyOrDieWithMsg(error_val == CHIP_NO_ERROR || error_val == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, NotSpecified,           \
+        VerifyOrDieWithMsg(error_val == CHIP_NO_ERROR || error_val == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Zcl,                    \
                            "Unexpected error %" CHIP_ERROR_FORMAT " when trying to set attribute `" #attr_name "`.",               \
                            error_val.Format());                                                                                    \
     }
@@ -211,6 +217,13 @@ public:
 
 void MatterPowerSourceClusterInitCallback(EndpointId endpointId)
 {
+    // If the cluster was already registered manually, don't create and register it from ember.
+    auto clusterList = CodegenDataModelProvider::Instance().Registry().ClustersOnEndpoint();
+    if (std::find(clusterList.begin(), clusterList.end(), PowerSource::Id) != clusterList.end())
+    {
+        return;
+    }
+
     IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::RegisterServer(
