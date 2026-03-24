@@ -52,46 +52,28 @@ static_assert(kOtaRequestorFixedClusterCount == 0 || kOtaRequestorFixedClusterCo
 // Since the OTA requestor cluster uses the singleton as its data source, this means the cluster won't have meaningful
 // data to return for attributes, nor can it properly handle commands. When this happens, an empty OTA requestor cluster
 // is registered that returns default values. A real cluster object replaces the empty one when the singleton is set.
-
-class EmptyOtaRequestorCluster : public DefaultServerCluster
+class OTARequestorCommandForwarder : public OTARequestorCommandInterface
 {
 public:
-    EmptyOtaRequestorCluster(EndpointId endpointId) :
-        DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id))
-    {}
-
-    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override
+    void HandleAnnounceOTAProvider(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override
     {
-        switch (request.path.mAttributeId)
+        if (mDestination)
         {
-        case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id:
-            return encoder.EncodeEmptyList();
-        case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
-            return encoder.Encode<bool>(true);
-        case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
-            return encoder.Encode(OtaSoftwareUpdateRequestor::UpdateStateEnum::kUnknown);
-        case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id:
-            return encoder.EncodeNull();
-        case OtaSoftwareUpdateRequestor::Attributes::FeatureMap::Id:
-            return encoder.Encode<uint32_t>(0);
-        case OtaSoftwareUpdateRequestor::Attributes::ClusterRevision::Id:
-            return encoder.Encode(OtaSoftwareUpdateRequestor::kRevision);
-        default:
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
+            mDestination->HandleAnnounceOTAProvider(commandObj, commandPath, commandData);
         }
     }
 
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
-    {
-        AttributeListBuilder listBuilder(builder);
-        return listBuilder.Append(Span(OtaSoftwareUpdateRequestor::Attributes::kMandatoryMetadata), {});
-    }
+    void SetDestination(OTARequestorCommandInterface * destination) { mDestination = destination; }
+
+private:
+    OTARequestorCommandInterface * mDestination = nullptr;
 };
 
 OTARequestorAttributes gAttributes;
+OTARequestorCommandForwarder gCommandForwarder;
 LazyRegisteredServerCluster<OTARequestorCluster> gServer;
-LazyRegisteredServerCluster<EmptyOtaRequestorCluster> gFallbackServer;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -99,44 +81,18 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ServerClusterRegistration * result = nullptr;
-        if (GetRequestorInstance())
-        {
-            gServer.Create(endpointId, *GetRequestorInstance(), gAttributes);
-            result = &gServer.Registration();
-        }
-        else
-        {
-            gFallbackServer.Create(endpointId);
-            result = &gFallbackServer.Registration();
-        }
-        return *result;
+        gServer.Create(endpointId, gCommandForwarder, gAttributes);
+        return gServer.Registration();
     }
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        ServerClusterInterface * result = nullptr;
-        if (gServer.IsConstructed())
-        {
-            result = &gServer.Cluster();
-        }
-        else if (gFallbackServer.IsConstructed())
-        {
-            result = &gFallbackServer.Cluster();
-        }
-        return result;
+        return &gServer.Cluster();
     }
 
     void ReleaseRegistration(unsigned clusterInstanceIndex) override
     {
-        if (gServer.IsConstructed())
-        {
-            gServer.Destroy();
-        }
-        else
-        {
-            gFallbackServer.Destroy();
-        }
+        gServer.Destroy();
     }
 };
 
@@ -172,18 +128,7 @@ void UnregisterCluster(EndpointId endpointId, MatterClusterShutdownType shutdown
 
 void OnSetGlobalOtaRequestorInstance(OTARequestorInterface * instance)
 {
-    if (gServer.IsConstructed())
-    {
-        EndpointId endpoint = gServer.Cluster().GetPaths()[0].mEndpointId;
-        UnregisterCluster(endpoint, MatterClusterShutdownType::kClusterShutdown);
-        RegisterCluster(endpoint);
-    }
-    else if (gFallbackServer.IsConstructed())
-    {
-        EndpointId endpoint = gFallbackServer.Cluster().GetPaths()[0].mEndpointId;
-        UnregisterCluster(endpoint, MatterClusterShutdownType::kClusterShutdown);
-        RegisterCluster(endpoint);
-    }
+    gCommandForwarder.SetDestination(instance);
 }
 
 } // namespace
