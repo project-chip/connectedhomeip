@@ -55,8 +55,6 @@ private:
     Optional<Structs::WaterHeaterBoostInfoStruct::Type> mBoostInfo;
 };
 
-void InitChefWaterHeaterManagementCluster();
-
 } // namespace Chef
 } // namespace WaterHeaterManagement
 } // namespace Clusters
