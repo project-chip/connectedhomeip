@@ -98,6 +98,80 @@ class SmokeCoBaseTest(MatterBaseTest):
                     # Convert bytes to int (big-endian)
                     converted_value = int.from_bytes(value, byteorder='big')
                     setattr(self, attr_name, converted_value)
+    
+    async def assert_steps_event_trigger_report_actions(self, 
+                                    steps:list,
+                                    pixit_event_trigger,
+                                    smoke_report_handler,
+                                    expected_report_data,
+                                    smoke_handler_timeout:int=300,
+                                    ):
+        """Checks for the actions required to check for event report after eventTrigger
+
+        Args:
+            steps (list): _description_
+            pixit_event_trigger (_type_): _description_
+            smoke_report_handler (_type_): _description_
+            expected_report_data (_type_): _description_
+            smoke_handler_timeout (int, optional): _description_. Defaults to 300.
+        """
+        self.step(steps[0])
+        await self.send_test_event_triggers(eventTrigger=pixit_event_trigger)
+
+        self.step(steps[1])
+        report_data = smoke_report_handler.wait_for_attribute_report(timeout_sec=smoke_handler_timeout)
+        if isinstance(expected_report_data,list):
+            asserts.assert_in(report_data.value,expected_report_data)
+        else:
+            asserts.assert_equal(report_data.value,expected_report_data)
+
+    async def assert_steps_event_trigger_report_event_actions(self, 
+                                    steps:list,
+                                    pixit_event_trigger,
+                                    smoke_report_handler,
+                                    smoke_event,
+                                    expected_report_data,
+                                    expected_event_data,
+                                    expected_expressed_state,
+                                    smoke_handler_timeout:int=300,
+                                    skip_report=False):
+        """_summary_
+
+        Args:
+            steps (list): _description_
+            pixit_event_trigger (_type_): _description_
+            smoke_report_handler (_type_): _description_
+            smoke_event (_type_): _description_
+            expected_report_data (_type_): _description_
+            expected_event_data (_type_): _description_
+            expected_expressed_state (_type_): _description_
+            smoke_handler_timeout (int, optional): _description_. Defaults to 300.
+            skip_report (bool, optional): _description_. Defaults to False.
+        """
+        self.step(steps[0])
+        await self.send_test_event_triggers(eventTrigger=pixit_event_trigger)
+
+        self.step(steps[1])
+        report_data = smoke_report_handler.wait_for_attribute_report(timeout_sec=smoke_handler_timeout)
+        if isinstance(expected_report_data,list):
+            asserts.assert_in(report_data.value,expected_report_data)
+        else:
+            asserts.assert_equal(report_data.value,expected_report_data)
+
+        self.step(steps[2])
+        event_data = await self.read_smokeco_event(smoke_event)
+        if expected_event_data == "REPORT_DATA":
+            asserts.assert_equal(event_data.alarmSeverityLevel,report_data.value)
+        elif expected_event_data == "CLEAR_DATA":
+            # On ClearEvent test just check the event was recorded
+            asserts.assert_is_not_none(event_data)
+        else:
+            asserts.assert_equal(event_data.alarmSeverityLevel,expected_event_data)
+
+
+        self.step(steps[3])
+        expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
+        asserts.assert_equal(expressed_state,expected_expressed_state)
         
 
     async def alarm_primary_functionality_base_test(self, state_attribute, alarm_event, expressed_state_enum_value, pixit_warning, pixit_critical, pixit_clear):
