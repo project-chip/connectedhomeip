@@ -56,7 +56,7 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
     {
     case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id: {
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
-            ProviderLocationList::Iterator providerIterator = mOtaRequestor.GetDefaultOTAProviderListIterator();
+            ProviderLocationList::Iterator providerIterator = mAttributes.GetDefaultOtaProviderListIterator();
             while (providerIterator.Next())
             {
                 ReturnErrorOnFailure(listEncoder.Encode(providerIterator.GetValue()));
@@ -67,12 +67,9 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
     case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
         return encoder.Encode(mAttributes.GetUpdatePossible());
     case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
-        return encoder.Encode(mOtaRequestor.GetCurrentUpdateState());
-    case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id: {
-        DataModel::Nullable<uint8_t> progress;
-        ReturnErrorOnFailure(mOtaRequestor.GetUpdateStateProgressAttribute(mPath.mEndpointId, progress));
-        return encoder.Encode(progress);
-    }
+        return encoder.Encode(mAttributes.GetUpdateState());
+    case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id:
+        return encoder.Encode(mAttributes.GetUpdateStateProgress());
     case Globals::Attributes::FeatureMap::Id:
         return encoder.Encode<uint32_t>(0);
     case Globals::Attributes::ClusterRevision::Id:
@@ -88,8 +85,7 @@ DataModel::ActionReturnStatus OTARequestorCluster::WriteAttribute(const DataMode
     switch (request.path.mAttributeId)
     {
     case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id:
-        return NotifyAttributeChangedIfSuccess(OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
-                                               WriteDefaultOtaProviders(request.path, aDecoder));
+        return WriteDefaultOtaProviders(request.path, aDecoder);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -115,12 +111,12 @@ CHIP_ERROR OTARequestorCluster::WriteDefaultOtaProviders(const ConcreteDataAttri
         DataModel::DecodableList<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> list;
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
-        ReturnErrorOnFailure(mOtaRequestor.ClearDefaultOtaProviderList(aDecoder.AccessingFabricIndex()));
+        ReturnErrorOnFailure(mAttributes.RemoveDefaultOtaProvider(aDecoder.AccessingFabricIndex()));
 
         auto iter = list.begin();
         while (iter.Next())
         {
-            ReturnErrorOnFailure(mOtaRequestor.AddDefaultOtaProvider(iter.GetValue()));
+            ReturnErrorOnFailure(mAttributes.AddDefaultOtaProvider(iter.GetValue()));
         }
 
         return iter.GetStatus();
@@ -135,7 +131,7 @@ CHIP_ERROR OTARequestorCluster::WriteDefaultOtaProviders(const ConcreteDataAttri
     case ConcreteDataAttributePath::ListOperation::AppendItem: {
         OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType item;
         ReturnErrorOnFailure(aDecoder.Decode(item));
-        return mOtaRequestor.AddDefaultOtaProvider(item);
+        return mAttributes.AddDefaultOtaProvider(item);
     }
     default:
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

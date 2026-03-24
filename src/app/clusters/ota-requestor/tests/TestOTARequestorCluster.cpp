@@ -91,10 +91,7 @@ public:
     void SetCurrentProviderLocation(ProviderLocationType providerLocation) override {}
     void SetMetadataForProvider(chip::ByteSpan metadataForProvider) override {}
     void GetProviderLocation(Optional<ProviderLocationType> & providerLocation) override {}
-    CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation) override
-    {
-        return mProviderLocations.Add(providerLocation);
-    }
+    CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation) override { return CHIP_NO_ERROR; }
     ProviderLocationList::Iterator GetDefaultOTAProviderListIterator() override { return mProviderLocations.Begin(); }
 
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType GetLastAnnounceCommandPayload() const
@@ -267,7 +264,7 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
     provider.providerNodeID = 1234u;
     provider.endpoint       = 8;
     provider.fabricIndex    = 2;
-    EXPECT_EQ(otaRequestor.AddDefaultOtaProvider(provider), CHIP_NO_ERROR);
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(provider), CHIP_NO_ERROR);
     DataModel::DecodableList<DecodableProviderLocation> defaultOtaProviders;
     EXPECT_EQ(tester.ReadAttribute(DefaultOTAProviders::Id, defaultOtaProviders), CHIP_NO_ERROR);
     size_t defaultOtaProvidersSize;
@@ -286,6 +283,7 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
     EXPECT_TRUE(updatePossible);
 
     // Read and verify UpdateState.
+    attributes.SetUpdateState(OTARequestorAttributes::OTAUpdateStateEnum::kIdle);
     OtaSoftwareUpdateRequestor::UpdateStateEnum updateState;
     EXPECT_EQ(tester.ReadAttribute(UpdateState::Id, updateState), CHIP_NO_ERROR);
     EXPECT_EQ(updateState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kIdle);
@@ -296,7 +294,7 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
     EXPECT_TRUE(updateStateProgress.IsNull());
 
     // Verify a non-null value as well.
-    otaRequestor.SetUpdateStateProgress(85);
+    EXPECT_EQ(attributes.SetUpdateStateProgress(85), CHIP_NO_ERROR);
     EXPECT_EQ(tester.ReadAttribute(UpdateStateProgress::Id, updateStateProgress), CHIP_NO_ERROR);
     EXPECT_FALSE(updateStateProgress.IsNull());
     EXPECT_EQ(updateStateProgress.Value(), 85);
@@ -340,7 +338,7 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)
     ASSERT_TRUE(result->IsSuccess());
 
     // Verify the data was written correctly.
-    auto iterator = otaRequestor.GetDefaultOTAProviderListIterator();
+    auto iterator = attributes.GetDefaultOtaProviderListIterator();
     ASSERT_TRUE(iterator.Next());
     EXPECT_EQ(iterator.GetValue(), provider);
     EXPECT_FALSE(iterator.Next());
