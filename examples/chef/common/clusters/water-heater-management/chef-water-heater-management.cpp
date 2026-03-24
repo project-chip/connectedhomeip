@@ -39,11 +39,13 @@ namespace Chef {
 namespace {
 static void OnTimerTick(System::Layer * systemLayer, void * data)
 {
-    ChipLogProgress(Zcl,
-                    "Inside examples/chef/common/clusters/water-heater-management/chef-water-heater-management.cpp::OnTimerTick");
+    ChipLogProgress(Zcl, "Inside chef-water-heater-management.cpp::OnTimerTick");
     ChefDelegate * delegate = reinterpret_cast<ChefDelegate *>(data);
     delegate->TimerTick();
 }
+constexpr uint32_t kMinBoostDurationSeconds = 60;
+constexpr int16_t kDefaultTemperature       = 2000;
+constexpr double kWaterHeatCapacity         = 4182.0;
 } // namespace
 
 Protocols::InteractionModel::Status ChefDelegate::HandleBoost(uint32_t duration, Optional<bool> oneShot,
@@ -130,7 +132,7 @@ Energy_mWh ChefDelegate::GetEstimatedHeatRequired()
     if (Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Get(mEndpointId, &occupiedHeatingSetpoint) !=
         Protocols::InteractionModel::Status::Success)
     {
-        occupiedHeatingSetpoint = 2000; // Default 20C
+        occupiedHeatingSetpoint = kDefaultTemperature; // Default 20C
     }
 
     DataModel::Nullable<int16_t> temp;
@@ -138,7 +140,7 @@ Energy_mWh ChefDelegate::GetEstimatedHeatRequired()
             Protocols::InteractionModel::Status::Success ||
         temp.IsNull())
     {
-        localTemperature = 2000; // Default 20C
+        localTemperature = kDefaultTemperature; // Default 20C
     }
     else
     {
@@ -152,11 +154,12 @@ Energy_mWh ChefDelegate::GetEstimatedHeatRequired()
 
     // Formula: Energy (mWh) = (4182 * (OccupiedHeatingSetpoint - LocalTemperature) * Volume) / 3600 * (1 - TankPercentage / 100)
     // Note: Use milliwatt-hours as per the energy_mwh type.
-    double tempDiff = static_cast<double>(occupiedHeatingSetpoint) - static_cast<double>(localTemperature);
-    double energy   = (4182.0 * tempDiff * static_cast<double>(mTankVolume)) / 3600.0;
-    energy          = energy * (1.0 - (static_cast<double>(mTankPercentage) / 100.0));
-
-    return static_cast<Energy_mWh>(energy);
+    double tempDiff            = static_cast<double>(occupiedHeatingSetpoint) - static_cast<double>(localTemperature);
+    double energy              = kWaterHeatCapacity * tempDiff * static_cast<double>(mTankVolume);
+    double coldWaterPercentage = 100.0 - static_cast<double>(mTankPercentage);
+    energy                     = energy * coldWaterPercentage / 100.0;
+    double energyMWh           = energy / 3600.0;
+    return static_cast<Energy_mWh>(energyMWh);
 }
 
 } // namespace Chef

@@ -39,6 +39,12 @@ class TC_WATERHEATER(MatterBaseTest):
     _PW_RPC_SOCKET_ADDR = "0.0.0.0:33000"
     _PW_RPC_BAUD_RATE = 115200
 
+    INITIAL_OCCUPIED_HEATING_SETPOINT = 5500
+    TANK_VOLUME = 150
+    INITIAL_TANK_PERCENTAGE = 50
+    MIN_BOOST_DURATION = 60
+
+
     def desc_TC_WATERHEATER(self) -> str:
         return "[TC_WATERHEATER] chef waterheater functionality test."
 
@@ -87,7 +93,8 @@ class TC_WATERHEATER(MatterBaseTest):
         # 1. Read OccupiedHeatingSetpoint (0x0012) via Client (Initial Value: 5500).
         val = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.OccupiedHeatingSetpoint)
-        asserts.assert_equal(val, 5500, "OccupiedHeatingSetpoint initial value should be 5500")
+        asserts.assert_equal(val, self.INITIAL_OCCUPIED_HEATING_SETPOINT,
+                             f"OccupiedHeatingSetpoint initial value should be {self.INITIAL_OCCUPIED_HEATING_SETPOINT}")
 
         # 2. Send SetpointRaiseLower command with Amount = 70 (Increases by 7.0 C).
         await self.send_single_cmd(
@@ -110,35 +117,38 @@ class TC_WATERHEATER(MatterBaseTest):
         asserts.assert_equal(val, 3000, "LocalTemperature should be 3000")
 
         # Tests ThermostatRunningState
-        # 1. Use Pigweed to set ThermostatRunningState to 1 (Heat).
-        self._write_thermostat_running_state_pwrpc(device, 1)
+        # 1. Use Pigweed to set ThermostatRunningState to Heat.
+        self._write_thermostat_running_state_pwrpc(device, cluster.Bitmaps.RelayStateBitmap.kHeat)
 
-        # 2. Read ThermostatRunningState and check it is 1.
+        # 2. Read ThermostatRunningState and check it is Heat.
         val = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.ThermostatRunningState)
-        asserts.assert_equal(val, 1, "ThermostatRunningState should be 1")
+        asserts.assert_equal(val, cluster.Bitmaps.RelayStateBitmap.kHeat, f"ThermostatRunningState should be {cluster.Bitmaps.RelayStateBitmap.kHeat}")
 
     async def water_heater_management_test(self, device):
         cluster = Clusters.Objects.WaterHeaterManagement
         attributes = cluster.Attributes
 
+        # 0. FeatureMap (read-only attribute) - verify its default value.
+        val = await self.read_single_attribute_check_success(
+            endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.FeatureMap)
+        asserts.assert_equal(val, 0, "FeatureMap initial value should be 0")
+
         # 1. HeaterTypes (read-only attribute) - verify its default value.
-        # mHeaterTypes = kImmersionElement1 | kHeatPump = (1 << 0) | (1 << 2) = 5
+        expected_heater_types = cluster.Bitmaps.HeaterTypesBitmap.kImmersionElement1 | cluster.Bitmaps.HeaterTypesBitmap.kHeatPump
         val = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.HeaterTypes)
-        asserts.assert_equal(val, 5, "HeaterTypes initial value should be 5")
+        asserts.assert_equal(val, expected_heater_types, f"HeaterTypes initial value should be {expected_heater_types}")
 
         # 2. TankVolume (read-only attribute) - verify its default value.
-        # mTankVolume = 150
         val = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.TankVolume)
-        asserts.assert_equal(val, 150, "TankVolume initial value should be 150")
+        asserts.assert_equal(val, self.TANK_VOLUME, "TankVolume initial value should be 150")
 
         # 3. TankPercentage (read-only attribute) - verify its default value.
-        # mTankPercentage = 50
         val = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.TankPercentage)
-        asserts.assert_equal(val, 50, "TankPercentage initial value should be 50")
+        asserts.assert_equal(val, self.INITIAL_TANK_PERCENTAGE, "TankPercentage initial value should be 50")
 
         # 4. BoostState (read-only attribute) - verify it starts as kInactive (0).
         val = await self.read_single_attribute_check_success(
@@ -146,19 +156,20 @@ class TC_WATERHEATER(MatterBaseTest):
         asserts.assert_equal(val, cluster.Enums.BoostStateEnum.kInactive, "BoostState initial value should be kInactive")
 
         # 5. Boost command:
-        # - Call Boost with duration < 60, should fail with ConstraintError.
+        # - Call Boost with duration < MIN_BOOST_DURATION, should fail with ConstraintError.
         try:
             await self.send_single_cmd(
-                cmd=cluster.Commands.Boost(boostInfo=cluster.Structs.WaterHeaterBoostInfoStruct(duration=30)),
+                cmd=cluster.Commands.Boost(boostInfo=cluster.Structs.WaterHeaterBoostInfoStruct(
+                    duration=self.MIN_BOOST_DURATION - 1)),
                 endpoint=self.ENDPOINT
             )
             asserts.fail("Boost with duration < 60 should have failed")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError, "Should be ConstraintError")
 
-        # - Call Boost with duration >= 60, should succeed.
+        # - Call Boost with duration >= MIN_BOOST_DURATION, should succeed.
         await self.send_single_cmd(
-            cmd=cluster.Commands.Boost(boostInfo=cluster.Structs.WaterHeaterBoostInfoStruct(duration=100)),
+            cmd=cluster.Commands.Boost(boostInfo=cluster.Structs.WaterHeaterBoostInfoStruct(duration=self.MIN_BOOST_DURATION)),
             endpoint=self.ENDPOINT
         )
 
@@ -223,34 +234,34 @@ class TC_WATERHEATER(MatterBaseTest):
         current_mode = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.CurrentMode)
 
-        # 3. Change to Mode 1 (Manual)
+        # 3. Change to Mode Manual
         await self.send_single_cmd(
-            cmd=cluster.Commands.ChangeToMode(newMode=1),
+            cmd=cluster.Commands.ChangeToMode(newMode=cluster.Enums.ModeTag.kManual),
             endpoint=self.ENDPOINT
         )
 
-        # 4. Verify CurrentMode is 1
+        # 4. Verify CurrentMode is Manual
         current_mode = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.CurrentMode)
-        asserts.assert_equal(current_mode, 1, "CurrentMode should be 1 (Manual)")
+        asserts.assert_equal(current_mode, cluster.Enums.ModeTag.kManual, "CurrentMode should be 1 (Manual)")
 
         # 5. Change to Mode 0 (Off)
         await self.send_single_cmd(
-            cmd=cluster.Commands.ChangeToMode(newMode=0),
+            cmd=cluster.Commands.ChangeToMode(newMode=cluster.Enums.ModeTag.kOff),
             endpoint=self.ENDPOINT
         )
 
-        # 6. Verify CurrentMode is 0
+        # 6. Verify CurrentMode is Off
         current_mode = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.CurrentMode)
-        asserts.assert_equal(current_mode, 0, "CurrentMode should be 0 (Off)")
+        asserts.assert_equal(current_mode, cluster.Enums.ModeTag.kOff, "CurrentMode should be 0 (Off)")
 
-        # 7. Try an invalid mode (e.g., 2) and verify it returns UnsupportedMode
+        # 7. Try an unsupported mode and verify it returns UnsupportedMode
         response = await self.send_single_cmd(
-            cmd=cluster.Commands.ChangeToMode(newMode=2),
+            cmd=cluster.Commands.ChangeToMode(newMode=cluster.Enums.ModeTag.kTimed),
             endpoint=self.ENDPOINT
         )
-        asserts.assert_equal(response.status, 1, "Status should be UnsupportedMode (1)")  # StatusCode::kUnsupportedMode = 0x01
+        asserts.assert_equal(response.status, Status.UnsupportedMode, "Status should be UnsupportedMode.")
 
     @async_test_body
     async def test_TC_WATERHEATER(self):

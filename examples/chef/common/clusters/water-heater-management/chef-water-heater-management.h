@@ -26,10 +26,16 @@ namespace Clusters {
 namespace WaterHeaterManagement {
 namespace Chef {
 
+const BitMask<WaterHeaterHeatSourceBitmap> kDefaultHeatDemand = 0;
+const uint16_t kDefaultTankVolume                             = 150;
+const Percent kDefaultTankPercentage                          = 50;
+
 class ChefDelegate : public Delegate
 {
 public:
-    ChefDelegate() : Delegate() {}
+    ChefDelegate() :
+        Delegate(), mHeatDemand(kDefaultHeatDemand), mTankVolume(kDefaultTankVolume), mTankPercentage(kDefaultTankPercentage)
+    {}
 
     Protocols::InteractionModel::Status HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
                                                     Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
@@ -47,10 +53,10 @@ public:
 private:
     BitMask<WaterHeaterHeatSourceBitmap> mHeaterTypes =
         to_underlying(WaterHeaterHeatSourceBitmap::kImmersionElement1) | to_underlying(WaterHeaterHeatSourceBitmap::kHeatPump);
-    BitMask<WaterHeaterHeatSourceBitmap> mHeatDemand = 0;
-    uint16_t mTankVolume                             = 150;
-    Percent mTankPercentage                          = 50;
-    BoostStateEnum mBoostState                       = BoostStateEnum::kInactive;
+    BitMask<WaterHeaterHeatSourceBitmap> mHeatDemand;
+    uint16_t mTankVolume;
+    Percent mTankPercentage;
+    BoostStateEnum mBoostState = BoostStateEnum::kInactive;
 
     Optional<Structs::WaterHeaterBoostInfoStruct::Type> mBoostInfo;
 };
