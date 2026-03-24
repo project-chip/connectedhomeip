@@ -138,17 +138,10 @@ private:
     size_t mMaxSize  = CHIP_CONFIG_MAX_FABRICS;
 };
 
-// Interface class to connect the OTA Software Update Requestor cluster command processing
-// with the core OTA Requestor logic
-class OTARequestorInterface
+// Interface class to handle the OTA Software Update Requestor cluster commands.
+class OTARequestorCommandInterface
 {
 public:
-    using OTAUpdateStateEnum   = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
-    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
-
-    // Reset any relevant states
-    virtual void Reset(void) = 0;
-
     /**
      * Called to handle an AnnounceOTAProvider command and is responsible for sending the status. The caller is responsible for
      * validating fields in the command.
@@ -156,6 +149,20 @@ public:
     virtual void HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) = 0;
+
+    virtual ~OTARequestorCommandInterface() = default;
+};
+
+// Interface class to connect the OTA Software Update Requestor cluster command processing
+// with the core OTA Requestor logic
+class OTARequestorInterface : OTARequestorCommandInterface
+{
+public:
+    using OTAUpdateStateEnum   = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using ProviderLocationType = app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type;
+
+    // Reset any relevant states
+    virtual void Reset(void) = 0;
 
     // Destructor
     virtual ~OTARequestorInterface() = default;
