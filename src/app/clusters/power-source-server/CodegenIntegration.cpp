@@ -219,9 +219,12 @@ void MatterPowerSourceClusterInitCallback(EndpointId endpointId)
 {
     // If the cluster was already registered manually, don't create and register it from ember.
     auto clusterList = CodegenDataModelProvider::Instance().Registry().ClustersOnEndpoint(endpointId);
-    if (std::find(clusterList.begin(), clusterList.end(), PowerSource::Id) != clusterList.end())
+    for (ClusterId clusterId : clusterList)
     {
-        return;
+        if (clusterId == PowerSource::Id)
+        {
+            return;
+        }
     }
 
     IntegrationDelegate integrationDelegate;
