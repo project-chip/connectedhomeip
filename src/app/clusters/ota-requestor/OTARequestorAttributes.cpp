@@ -28,7 +28,7 @@
 
 namespace chip {
 
-namespace Attributes = app::Clusters::OtaSoftwareUpdateRequestor::Attributes;
+using namespace app::Clusters::OtaSoftwareUpdateRequestor::Attributes;
 
 constexpr ClusterId kClusterId = app::Clusters::OtaSoftwareUpdateRequestor::Id;
 
@@ -39,7 +39,7 @@ void OTARequestorAttributes::SetUpdateState(OTAUpdateStateEnum updateState)
     mUpdateState = updateState;
     if (mDataModelChangeListener)
     {
-        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, Attributes::UpdateState::Id });
+        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, UpdateState::Id });
     }
 }
 
@@ -49,7 +49,7 @@ CHIP_ERROR OTARequestorAttributes::SetUpdateStateProgress(app::DataModel::Nullab
 
     if (mUpdateStateProgress.Update(updateStateProgress) && mDataModelChangeListener)
     {
-        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, Attributes::UpdateStateProgress::Id });
+        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, UpdateStateProgress::Id });
     }
     return CHIP_NO_ERROR;
 }
@@ -61,7 +61,7 @@ void OTARequestorAttributes::SetUpdatePossible(bool updatePossible)
     mUpdatePossible = updatePossible;
     if (mDataModelChangeListener)
     {
-        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, Attributes::UpdatePossible::Id });
+        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, UpdatePossible::Id });
     }
 }
 
@@ -85,7 +85,7 @@ CHIP_ERROR OTARequestorAttributes::ClearDefaultOtaProviderList(FabricIndex fabri
 
     if (mDataModelChangeListener)
     {
-        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, Attributes::DefaultOTAProviders::Id });
+        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, DefaultOTAProviders::Id });
     }
     return CHIP_NO_ERROR;
 }
@@ -108,7 +108,7 @@ CHIP_ERROR OTARequestorAttributes::AddDefaultOtaProvider(const ProviderLocationT
 
     if (mDataModelChangeListener)
     {
-        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, Attributes::DefaultOTAProviders::Id });
+        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, DefaultOTAProviders::Id });
     }
     return CHIP_NO_ERROR;
 }
