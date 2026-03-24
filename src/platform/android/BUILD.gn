@@ -23,14 +23,15 @@ import("${chip_root}/build/chip/java/rules.gni")
 
 assert(chip_device_platform == "android")
 
-source_set("tracing") {
-  sources = [ "tracing.h" ]
+if (matter_enable_tracing_support) {
+  source_set("tracing") {
+    sources = [
+      "tracing.cpp",
+      "tracing.h",
+    ]
 
-  deps = [ "${chip_root}/src/lib/support" ]
-
-  if (matter_enable_tracing_support) {
-    sources += [ "tracing.cpp" ]
-    deps += [
+    deps = [
+      "${chip_root}/src/lib/support",
       "${chip_root}/src/tracing",
       "${chip_root}/src/tracing/perfetto:event_storage",
       "${chip_root}/src/tracing/perfetto:simple_initialization",
@@ -87,7 +88,6 @@ static_library("android") {
   ]
 
   deps = [
-    ":tracing",
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/app/common:metadata",
@@ -95,6 +95,10 @@ static_library("android") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport/raw:nfc-application-delegate",
   ]
+
+  if (matter_enable_tracing_support) {
+    deps += [ ":tracing" ]
+  }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
