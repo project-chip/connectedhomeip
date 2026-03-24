@@ -266,7 +266,7 @@ TEST_F(TestOTARequestorAttributes, ClearingProvidersRemovesFromList)
     EXPECT_EQ(attributes.AddDefaultOtaProvider(new_location), CHIP_NO_ERROR);
 
     // Remove the locations one at a time and verify they've been removed.
-    EXPECT_EQ(attributes.ClearDefaultOtaProviderList(2), CHIP_NO_ERROR);
+    EXPECT_EQ(attributes.RemoveDefaultOtaProvider(2), CHIP_NO_ERROR);
     ProviderLocationList::Iterator iterator = attributes.GetDefaultOtaProviderListIterator();
     int count                               = 0;
     while (iterator.Next())
@@ -277,7 +277,7 @@ TEST_F(TestOTARequestorAttributes, ClearingProvidersRemovesFromList)
     }
     EXPECT_EQ(count, 2);
 
-    EXPECT_EQ(attributes.ClearDefaultOtaProviderList(3), CHIP_NO_ERROR);
+    EXPECT_EQ(attributes.RemoveDefaultOtaProvider(3), CHIP_NO_ERROR);
     iterator = attributes.GetDefaultOtaProviderListIterator();
     count                                   = 0;
     while (iterator.Next())
@@ -288,7 +288,7 @@ TEST_F(TestOTARequestorAttributes, ClearingProvidersRemovesFromList)
     }
     EXPECT_EQ(count, 1);
 
-    EXPECT_EQ(attributes.ClearDefaultOtaProviderList(1), CHIP_NO_ERROR);
+    EXPECT_EQ(attributes.RemoveDefaultOtaProvider(1), CHIP_NO_ERROR);
     iterator = attributes.GetDefaultOtaProviderListIterator();
     count                                   = 0;
     while (iterator.Next())
@@ -320,7 +320,7 @@ TEST_F(TestOTARequestorAttributes, ChangingProvidersMarksChanged)
     EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, DefaultOTAProviders::Id);
 
     changeListener.DirtyList().clear();
-    EXPECT_EQ(attributes.ClearDefaultOtaProviderList(1), CHIP_NO_ERROR);
+    EXPECT_EQ(attributes.RemoveDefaultOtaProvider(1), CHIP_NO_ERROR);
     ASSERT_EQ(changeListener.DirtyList().size(), 1u);
     EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
     EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
