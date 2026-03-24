@@ -55,8 +55,9 @@ overall provides dynamic lifetime management. An example using it can be seen in
 
 ### Note
 
-The attributes that can be set in the `WiredConfiguration` or `BatteryConfiguration` do not have their
-corresponding `.Set*` methods, because they are marked as `Fixed` and can be set only during construction.
+The attributes that can be set in the `WiredConfiguration` or
+`BatteryConfiguration` do not have their corresponding `.Set*` methods, because
+they are marked as `Fixed` and can be set only during construction.
 
 ## Legacy Usage (Not Recommended)
 
