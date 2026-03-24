@@ -211,19 +211,13 @@ class TC_WATERHEATER(MatterBaseTest):
         supported_modes = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.SupportedModes)
 
-        asserts.assert_equal(len(supported_modes), 2, "SupportedModes should have 2 entries")
-
-        # Verify Mode 0: Off
-        asserts.assert_equal(supported_modes[0].mode, 0, "Mode 0 should be 0")
-        asserts.assert_equal(supported_modes[0].label, "Off", "Label for mode 0 should be 'Off'")
-        asserts.assert_equal(len(supported_modes[0].modeTags), 1, "Mode 0 should have 1 tag")
-        asserts.assert_equal(supported_modes[0].modeTags[0].value, cluster.Enums.ModeTag.kOff, "Tag for mode 0 should be kOff")
-
-        # Verify Mode 1: Manual
-        asserts.assert_equal(supported_modes[1].mode, 1, "Mode 1 should be 1")
-        asserts.assert_equal(supported_modes[1].label, "Manual", "Label for mode 1 should be 'Manual'")
-        asserts.assert_equal(len(supported_modes[1].modeTags), 1, "Mode 1 should have 1 tag")
-        asserts.assert_equal(supported_modes[1].modeTags[0].value, cluster.Enums.ModeTag.kManual, "Tag for mode 1 should be kManual")
+        expected_supported_modes = [
+            cluster.Structs.ModeOptionStruct(
+                label="Off", mode=0, modeTags=[cluster.Structs.ModeTagStruct(value=cluster.Enums.ModeTag.kOff)]),
+            cluster.Structs.ModeOptionStruct(
+                label="Manual", mode=1, modeTags=[cluster.Structs.ModeTagStruct(value=cluster.Enums.ModeTag.kManual)]),
+        ]
+        asserts.assert_equal(supported_modes, expected_supported_modes, "SupportedModes should match expected")
 
         # 2. Read CurrentMode
         current_mode = await self.read_single_attribute_check_success(
