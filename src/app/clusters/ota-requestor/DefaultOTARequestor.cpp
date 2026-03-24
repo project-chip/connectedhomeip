@@ -48,7 +48,7 @@ using Protocols::InteractionModel::Status;
 OTARequestorInterface * globalOTARequestorInstance = nullptr;
 
 // Global callback to call when globalOTARequestorInstance is set.
-void (*internalOnSetRequestorInstance)(OTARequestorInterface * instance) = nullptr;
+void (*gInternalOnSetRequestorInstance)(OTARequestorInterface * instance) = nullptr;
 
 // Abort the QueryImage download request if there's been no progress for 5 minutes
 static constexpr System::Clock::Timeout kDownloadTimeoutSec = chip::System::Clock::Seconds32(5 * 60);
@@ -103,9 +103,9 @@ void SetRequestorInstance(OTARequestorInterface * instance)
         return;
     }
     globalOTARequestorInstance = instance;
-    if (internalOnSetRequestorInstance != nullptr)
+    if (gInternalOnSetRequestorInstance != nullptr)
     {
-        internalOnSetRequestorInstance(globalOTARequestorInstance);
+        gInternalOnSetRequestorInstance(globalOTARequestorInstance);
     }
 }
 

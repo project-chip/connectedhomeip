@@ -236,6 +236,6 @@ OTARequestorInterface * GetRequestorInstance();
 
 // An internal callback to assist with backwards compatibility for codegen. The implementation of SetRequestorInstance must call
 // this (if not null) after setting the requestor instance. THIS MUST ONLY BE SET IN CodegenIntegration.cpp!
-extern void (*internalOnSetRequestorInstance)(OTARequestorInterface * instance);
+extern void (*gInternalOnSetRequestorInstance)(OTARequestorInterface * instance);
 
 } // namespace chip

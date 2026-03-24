@@ -144,7 +144,7 @@ OTARequestorAttributes & GetOTARequestorAttributes()
 
 void MatterOtaSoftwareUpdateRequestorClusterInitCallback(EndpointId endpointId)
 {
-    internalOnSetRequestorInstance = OnSetGlobalOtaRequestorInstance;
+    gInternalOnSetRequestorInstance = OnSetGlobalOtaRequestorInstance;
     RegisterCluster(endpointId);
 }
 
