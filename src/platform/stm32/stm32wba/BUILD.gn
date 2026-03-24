@@ -68,7 +68,6 @@ static_library("stm32wba") {
 
     deps += [
       "${chip_root}/src/app/common:ids",
-      "${chip_root}/src/platform/logging:stdio",
     ]
   public = [
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
