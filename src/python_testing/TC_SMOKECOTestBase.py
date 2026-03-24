@@ -133,8 +133,8 @@ class SmokeCoBaseTest(MatterBaseTest):
                                     expected_report_data,
                                     expected_event_data,
                                     expected_expressed_state,
-                                    smoke_handler_timeout:int=300,
-                                    skip_report=False):
+                                    smoke_handler_timeout:int=300
+                                ):
         """_summary_
 
         Args:

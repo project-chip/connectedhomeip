@@ -57,6 +57,7 @@
 #
 
 import logging
+from asyncio import sleep
 from mobly import asserts
 
 from TC_SMOKECOTestBase import SmokeCoBaseTest
@@ -86,16 +87,16 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
         self.pixit_test_event_interconnect_co_alarm_clear = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTCOALARM.CLEAR", 0x005c0000000000a4)
 
         # Contamination State
-        self.pixit_test_event_contamination_state_low = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CONTAMINATIONSTATE.HIGH", 0x005c000000000096)
         self.pixit_test_event_contamination_state_high = self.user_params.get(
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CONTAMINATIONSTATE.HIGH", 0x005c000000000096)
+        self.pixit_test_event_contamination_state_low = self.user_params.get(
             "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CONTAMINATIONSTATE.LOW", 0x005c000000000097)
         self.pixit_test_event_contamination_state_clear = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CONTAMINATIONSTATE.CLEAR", 0x005c0000000000a6)
         
         # Smoke Sensitivity
-        self.pixit_test_event_smokesensitivity_low = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKESENSITIVITY.HIGH", 0x005c000000000098)
         self.pixit_test_event_smokesensitivity_high = self.user_params.get(
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKESENSITIVITY.HIGH", 0x005c000000000098)
+        self.pixit_test_event_smokesensitivity_low = self.user_params.get(
             "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKESENSITIVITY.LOW", 0x005c000000000099)
         self.pixit_test_event_smokesensitivity_clear = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKESENSITIVITY.CLEAR", 0x005c0000000000a8)
         
@@ -108,7 +109,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
 
         # Smoke CO
         self.pixit_test_event_warning_co_alarm = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.WARNING", 0x005c0000000000a0)
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.WARNING", 0x005c000000000091)
         self.pixit_test_event_critical_co_alarm = self.user_params.get(
             "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.CRITICAL", 0x005c00000000009d)
         self.pixit_test_event_clear_co_alarm = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.CLEAR", 0x005c0000000000a1)
@@ -212,212 +213,194 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
         # Commissioning already done
         self.step(1)
 
-        self.step(2)
-        # Interconnected Smoke Alarm
-        interconnected_smoke_alarm_handler = AttributeSubscriptionHandler(
-            expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm)
-        await interconnected_smoke_alarm_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
-        interconnected_smoke_alarm = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.InterconnectSmokeAlarm)
-        asserts.assert_equal(interconnected_smoke_alarm,0)
+        # InterconnectedSmokeAlarmHandler is optional
+        if self.attribute_guard(endpoint=self.get_endpoint(),attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm):
+            self.step(2)
+            interconnected_smoke_alarm_handler = AttributeSubscriptionHandler(
+                expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm)
+            await interconnected_smoke_alarm_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
+            interconnected_smoke_alarm = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.InterconnectSmokeAlarm)
+            asserts.assert_equal(interconnected_smoke_alarm,self.smokeco_cluster.Enums.AlarmStateEnum.kNormal)
 
-        self.step(3)
-        expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
+            self.step(3)
+            expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
+            asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
 
-        self.step(4)
-        test_event_triggers_enabled = await self.read_general_diagnostics_test_event_triggers_enabled()
-        asserts.assert_equal(test_event_triggers_enabled,1)
+            self.step(4)
+            test_event_triggers_enabled = await self.read_general_diagnostics_test_event_triggers_enabled()
+            asserts.assert_equal(test_event_triggers_enabled,1)
 
-        # self.step(5)
-        # await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_interconnect_smoke_alarm)
-
-        # self.step(6)
-        # interconnected_smoke_alarm_report_data = interconnected_smoke_alarm_handler.wait_for_attribute_report(timeout_sec=300)
-        # asserts.assert_in(interconnected_smoke_alarm_report_data.value,[self.smokeco_cluster.Enums.AlarmStateEnum.kWarning,self.smokeco_cluster.Enums.AlarmStateEnum.kCritical])
-
-        # self.step(7)
-        # interconnected_smoke_alarm_event_data = await self.read_smokeco_event(self.smokeco_cluster.Events.InterconnectSmokeAlarm)
-        # asserts.assert_equal(interconnected_smoke_alarm_event_data.alarmSeverityLevel,interconnected_smoke_alarm_report_data.value)
-
-        # self.step(8)
-        # expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        # asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kInterconnectSmoke)
-
-        await self.assert_steps_event_trigger_actions(
-            steps=[5,6,7,8],
-            pixit_event_trigger=self.pixit_test_event_interconnect_smoke_alarm,
-            smoke_report_handler=interconnected_smoke_alarm_handler,
-            smoke_event=self.smokeco_cluster.Events.InterconnectSmokeAlarm,
-            expected_report_data=[self.smokeco_cluster.Enums.INkWarning,self.smokeco_cluster.Enums.AlarmStateEnum.kCritical],
-            expected_event_data="REPORT_DATA",
-            expected_expressed_state=self.smokeco_cluster.Enums.ExpressedStateEnum.kInterconnectSmoke,
-        )
-
-        self.step(9)
-        # await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_interconnect_smoke_alarm_clear)
-
-        # self.step(10)
-        # interconnected_smoke_alarm_report_data = interconnected_smoke_alarm_handler.wait_for_attribute_report(timeout_sec=300)
-        # asserts.assert_equal(interconnected_smoke_alarm_report_data.value,self.smokeco_cluster.Enums.AlarmStateEnum.kNormal)
-
-        # self.step(11)
-        # expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        # asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
-
-        # self.step(12)
-        # await self.read_smokeco_event(self.smokeco_cluster.Events.AllClear)
-        await self.assert_steps_event_trigger_actions(
-            steps=[15,16,17,18],
-            pixit_event_trigger=self.pixit_test_event_interconnect_smoke_alarm_clear,
-            smoke_report_handler=interconnected_smoke_alarm_handler,
-            smoke_event=self.smokeco_cluster.Events.AllClear,
-            expected_report_data=[self.smokeco_cluster.Enums.AlarmStateEnum.kWarning,self.smokeco_cluster.Enums.AlarmStateEnum.kNormal],
-            expected_event_data="CLEAR_DATA",
-            expected_expressed_state=self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal,
-        )
-
-        interconnected_smoke_alarm_handler.cancel()
-
-        # Interconnected CO Alarm
-        self.step(13)
-        interconnected_co_alarm_handler = AttributeSubscriptionHandler(
-            expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm)
-        await interconnected_co_alarm_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
-        interconnected_co_alarm = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.InterconnectCOAlarm)
-        asserts.assert_equal(interconnected_co_alarm,0)
-
-        self.step(14)
-        expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
-
-        # self.step(15)
-        # await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_interconnect_co_alarm)
-
-        # self.step(16)
-        # interconnected_co_alarm_report_data = interconnected_co_alarm_handler.wait_for_attribute_report(timeout_sec=300)
-        # asserts.assert_in(interconnected_co_alarm_report_data.value,[self.smokeco_cluster.Enums.AlarmStateEnum.kWarning,self.smokeco_cluster.Enums.AlarmStateEnum.kCritical])
-
-        # self.step(17)
-        # interconnected_co_alarm_event_data = await self.read_smokeco_event(self.smokeco_cluster.Events.InterconnectCOAlarm)
-        # asserts.assert_equal(interconnected_co_alarm_event_data.alarmSeverityLevel,interconnected_co_alarm_report_data.value)
-
-        # self.step(18)
-        # expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        # asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kInterconnectCO)
-        
-        await self.assert_steps_event_trigger_actions(
-            steps=[15,16,17,18],
-            pixit_event_trigger=self.pixit_test_event_interconnect_co_alarm,
-            smoke_report_handler=interconnected_co_alarm_handler,
-            smoke_event=self.smokeco_cluster.Events.InterconnectCOAlarm,
-            expected_report_data=[self.smokeco_cluster.Enums.AlarmStateEnum.kWarning,self.smokeco_cluster.Enums.AlarmStateEnum.kCritical],
-            expected_event_data="REPORT_DATA",
-            expected_expressed_state=self.smokeco_cluster.Enums.ExpressedStateEnum.kInterconnectCO,
-        )
-
-        # self.step(19)
-        # await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_interconnect_co_alarm_clear)
-
-        # self.step(20)
-        # interconnected_co_alarm_report_data = interconnected_co_alarm_handler.wait_for_attribute_report(timeout_sec=300)
-        # asserts.assert_equal(interconnected_co_alarm_report_data.value,self.smokeco_cluster.Enums.AlarmStateEnum.kNormal)
-
-        # self.step(21)
-
-        # self.step(22)
-
-        await self.assert_steps_event_trigger_actions(
-            steps=[19,20,21,22],
-            pixit_event_trigger=self.pixit_test_event_interconnect_co_alarm_clear,
-            smoke_report_handler=interconnected_co_alarm_handler,
-            smoke_event=self.smokeco_cluster.Events.AllClear,
-            expected_report_data=self.smokeco_cluster.Enums.AlarmStateEnum.kNormal,
-            expected_event_data="CLEAR_DATA",
-            expected_expressed_state=self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal,
-        )
-        # Cancel Attributesubcription 
-        interconnected_co_alarm_handler.cancel()
-
-        self.step(23)
-        contamination_state_handler = AttributeSubscriptionHandler(
-            expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.ContaminationState)
-        await contamination_state_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
-        contamination_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ContaminationState)
-        asserts.assert_equal(contamination_state,0)
-
-        #self.step(24)
-        #await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_contamination_state_high)
-
-        #self.step(25)
-        #contamination_state_report_data = contamination_state_handler.wait_for_attribute_report(timeout_sec=300)
-        await self.assert_steps_event_trigger_report_actions(
-            steps=[24,25],
-            pixit_event_trigger=self.pixit_test_event_contamination_state_high,
-            smoke_report_handler=contamination_state_handler,
-            expected_report_data=[self.smokeco_cluster.Enums.ContaminationStateEnum.kWarning,self.smokeco_cluster.Enums.ContaminationStateEnum.kCritical]
+            # Sends Event Trigger , Check Alarm State,  Check Expressed State, Send Clear Trigger, Executes 4 steps 
+            await self.assert_steps_event_trigger_report_event_actions(
+                steps=[5,6,7,8],
+                pixit_event_trigger=self.pixit_test_event_interconnect_smoke_alarm,
+                smoke_report_handler=interconnected_smoke_alarm_handler,
+                smoke_event=self.smokeco_cluster.Events.InterconnectSmokeAlarm,
+                expected_report_data=[self.smokeco_cluster.Enums.AlarmStateEnum.kWarning,self.smokeco_cluster.Enums.AlarmStateEnum.kCritical],
+                expected_event_data="REPORT_DATA",
+                expected_expressed_state=self.smokeco_cluster.Enums.ExpressedStateEnum.kInterconnectSmoke,
             )
 
-        # self.step(26)
+            # Sends Event Trigger , Check Alarm State,  Check Expressed State, Send Clear Trigger, Executes 4 steps 
+            await self.assert_steps_event_trigger_report_event_actions(
+                steps=[9,10,11,12],
+                pixit_event_trigger=self.pixit_test_event_interconnect_smoke_alarm_clear,
+                smoke_report_handler=interconnected_smoke_alarm_handler,
+                smoke_event=self.smokeco_cluster.Events.AllClear,
+                expected_report_data=self.smokeco_cluster.Enums.AlarmStateEnum.kNormal,
+                expected_event_data="CLEAR_DATA",
+                expected_expressed_state=self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal,
+            )
+            interconnected_smoke_alarm_handler.cancel()
+            
+        else:
+            self.mark_step_range_skipped(2,12)
+        # End of the checks for InterconnectedSmokeAlarmHandler
 
-        # self.step(27)
-        await self.assert_steps_event_trigger_report_actions(
-            steps=[26,27],
-            pixit_event_trigger=self.pixit_test_event_contamination_state_clear,
-            smoke_report_handler=contamination_state_handler,
-            expected_report_data=self.smokeco_cluster.Enums.ContaminationStateEnum.kNormal
+        # InterconnectedCOAlarmHandler is Optional
+        if self.attribute_guard(endpoint=self.get_endpoint(),attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm):
+            self.step(13)
+            interconnected_co_alarm_handler = AttributeSubscriptionHandler(
+                expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm)
+            await interconnected_co_alarm_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
+            interconnected_co_alarm = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.InterconnectCOAlarm)
+            asserts.assert_equal(interconnected_co_alarm,0)
+
+            self.step(14)
+            expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
+            asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
+            
+            # self.step(15)
+            # await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_interconnect_co_alarm)
+
+            # self.step(16)
+            # interconnected_co_alarm_report_data = interconnected_co_alarm_handler.wait_for_attribute_report(timeout_sec=300)
+            # asserts.assert_in(interconnected_co_alarm_report_data.value,[self.smokeco_cluster.Enums.AlarmStateEnum.kWarning,self.smokeco_cluster.Enums.AlarmStateEnum.kCritical])
+
+            # self.step(17)
+            # interconnected_co_alarm_event_data = await self.read_smokeco_event(self.smokeco_cluster.Events.InterconnectCOAlarm)
+            # asserts.assert_equal(interconnected_co_alarm_event_data.alarmSeverityLevel,interconnected_co_alarm_report_data.value)
+
+            # self.step(18)
+            # expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
+            # asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kInterconnectCO)
+            
+            await self.assert_steps_event_trigger_report_event_actions(
+                steps=[15,16,17,18],
+                pixit_event_trigger=self.pixit_test_event_interconnect_co_alarm,
+                smoke_report_handler=interconnected_co_alarm_handler,
+                smoke_event=self.smokeco_cluster.Events.InterconnectCOAlarm,
+                expected_report_data=[self.smokeco_cluster.Enums.AlarmStateEnum.kWarning,self.smokeco_cluster.Enums.AlarmStateEnum.kCritical],
+                expected_event_data="REPORT_DATA",
+                expected_expressed_state=self.smokeco_cluster.Enums.ExpressedStateEnum.kInterconnectCO,
             )
 
-        await self.assert_steps_event_trigger_report_actions(
-            steps=[28,29],
-            pixit_event_trigger=self.pixit_test_event_contamination_state_low,
-            smoke_report_handler=contamination_state_handler,
-            expected_report_data=self.smokeco_cluster.Enums.ContaminationStateEnum.kLow
-            )
 
-        await self.assert_steps_event_trigger_report_actions(
-            steps=[30,31],
-            pixit_event_trigger=self.pixit_test_event_contamination_state_clear,
-            smoke_report_handler=contamination_state_handler,
-            expected_report_data=self.smokeco_cluster.Enums.ContaminationStateEnum.kNormal
+            await self.assert_steps_event_trigger_report_event_actions(
+                steps=[19,20,21,22],
+                pixit_event_trigger=self.pixit_test_event_interconnect_co_alarm_clear,
+                smoke_report_handler=interconnected_co_alarm_handler,
+                smoke_event=self.smokeco_cluster.Events.AllClear,
+                expected_report_data=self.smokeco_cluster.Enums.AlarmStateEnum.kNormal,
+                expected_event_data="CLEAR_DATA",
+                expected_expressed_state=self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal,
             )
-        contamination_state_handler.cancel()
+            
+            interconnected_co_alarm_handler.cancel()
+        else:
+            self.mark_step_range_skipped(13,22)
+        # End of InterconnectedCOAlarmHandler
 
-        self.step(32)
-        smokesensitivity_handler = AttributeSubscriptionHandler(
-            expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.SmokeSensitivityLevel)
-        await smokesensitivity_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
-        smokesensitivity_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.SmokeSensitivityLevel)
-        asserts.assert_equal(smokesensitivity_state,1)
+        # Contamination State depends on SMOKE
+        if await self.feature_guard(endpoint=self.get_endpoint(),cluster=self.smokeco_cluster,feature_int=self.smokeco_cluster.Bitmaps.Feature.kSmokeAlarm):
 
-        await self.assert_steps_event_trigger_report_actions(
-            steps=[33,34],
-            pixit_event_trigger=self.pixit_test_event_smokesensitivity_high,
-            smoke_report_handler=smokesensitivity_handler,
-            expected_report_data=self.smokeco_cluster.Enums.SensitivityEnum.kHigh
-            )
+            self.step(23)
+            contamination_state_handler = AttributeSubscriptionHandler(
+                expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.ContaminationState)
+            await contamination_state_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
+            contamination_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ContaminationState)
+            asserts.assert_equal(contamination_state,0)
 
-        await self.assert_steps_event_trigger_report_actions(
-            steps=[35,36],
-            pixit_event_trigger=self.pixit_test_event_smokesensitivity_clear,
-            smoke_report_handler=smokesensitivity_handler,
-            expected_report_data=self.smokeco_cluster.Enums.SensitivityEnum.kStandard
-            )
-        
-        await self.assert_steps_event_trigger_report_actions(
-            steps=[37,38],
-            pixit_event_trigger=self.pixit_test_event_smokesensitivity_low,
-            smoke_report_handler=smokesensitivity_handler,
-            expected_report_data=self.smokeco_cluster.Enums.SensitivityEnum.kLow
-            )
+            #self.step(24)
+            #await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_contamination_state_high)
 
-        await self.assert_steps_event_trigger_report_actions(
-            steps=[39,40],
-            pixit_event_trigger=self.pixit_test_event_smokesensitivity_clear,
-            smoke_report_handler=smokesensitivity_handler,
-            expected_report_data=self.smokeco_cluster.Enums.SensitivityEnum.kStandard
-            )
-        smokesensitivity_handler.cancel()
+            #self.step(25)
+            #contamination_state_report_data = contamination_state_handler.wait_for_attribute_report(timeout_sec=300)
+            await self.assert_steps_event_trigger_report_actions(
+                steps=[24,25],
+                pixit_event_trigger=self.pixit_test_event_contamination_state_high,
+                smoke_report_handler=contamination_state_handler,
+                expected_report_data=[self.smokeco_cluster.Enums.ContaminationStateEnum.kWarning,self.smokeco_cluster.Enums.ContaminationStateEnum.kCritical]
+                )
 
+            await self.assert_steps_event_trigger_report_actions(
+                steps=[26,27],
+                pixit_event_trigger=self.pixit_test_event_contamination_state_clear,
+                smoke_report_handler=contamination_state_handler,
+                expected_report_data=self.smokeco_cluster.Enums.ContaminationStateEnum.kNormal
+                )
+
+            await self.assert_steps_event_trigger_report_actions(
+                steps=[28,29],
+                pixit_event_trigger=self.pixit_test_event_contamination_state_low,
+                smoke_report_handler=contamination_state_handler,
+                expected_report_data=self.smokeco_cluster.Enums.ContaminationStateEnum.kLow
+                )
+
+            await self.assert_steps_event_trigger_report_actions(
+                steps=[30,31],
+                pixit_event_trigger=self.pixit_test_event_contamination_state_clear,
+                smoke_report_handler=contamination_state_handler,
+                expected_report_data=self.smokeco_cluster.Enums.ContaminationStateEnum.kNormal
+                )
+            contamination_state_handler.cancel()
+            #  End of ContaminationState
+        else:
+            self.mark_step_range_skipped(23,31)
+
+        # SmokeSensitivity dependes on SMOKE
+        if await self.feature_guard(endpoint=self.get_endpoint(),cluster=self.smokeco_cluster,feature_int=self.smokeco_cluster.Bitmaps.Feature.kSmokeAlarm):
+            self.step(32)
+            smokesensitivity_handler = AttributeSubscriptionHandler(
+                expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.SmokeSensitivityLevel)
+            await smokesensitivity_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
+            smokesensitivity_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.SmokeSensitivityLevel)
+            asserts.assert_equal(smokesensitivity_state,1)
+
+            # This method send the event trigger and check for the report for two steps
+            await self.assert_steps_event_trigger_report_actions(
+                steps=[33,34],
+                pixit_event_trigger=self.pixit_test_event_smokesensitivity_high,
+                smoke_report_handler=smokesensitivity_handler,
+                expected_report_data=self.smokeco_cluster.Enums.SensitivityEnum.kHigh
+                )
+
+            await self.assert_steps_event_trigger_report_actions(
+                steps=[35,36],
+                pixit_event_trigger=self.pixit_test_event_smokesensitivity_clear,
+                smoke_report_handler=smokesensitivity_handler,
+                expected_report_data=self.smokeco_cluster.Enums.SensitivityEnum.kStandard
+                )
+            
+            await self.assert_steps_event_trigger_report_actions(
+                steps=[37,38],
+                pixit_event_trigger=self.pixit_test_event_smokesensitivity_low,
+                smoke_report_handler=smokesensitivity_handler,
+                expected_report_data=self.smokeco_cluster.Enums.SensitivityEnum.kLow
+                )
+
+            await self.assert_steps_event_trigger_report_actions(
+                steps=[39,40],
+                pixit_event_trigger=self.pixit_test_event_smokesensitivity_clear,
+                smoke_report_handler=smokesensitivity_handler,
+                expected_report_data=self.smokeco_cluster.Enums.SensitivityEnum.kStandard
+                )
+            smokesensitivity_handler.cancel()
+        else:
+            self.mark_step_range_skipped(32,40)
+        # End of SmokeSensitivity
+
+        # Device muted on SmokeAlarm and COAlarm
         self.step(41)
         device_muted_handler = AttributeSubscriptionHandler(
             expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.DeviceMuted)
@@ -425,86 +408,129 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
         device_muted_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.DeviceMuted)
         asserts.assert_equal(device_muted_state,0)
         
-        # From step 41 to step 57 is SmokeAlarm
-        if await self.feature_guard(endpoint=self.get_endpoint(),cluster=self.smokeco_cluster,feature_int=self.smokeco_cluster.Bitmaps.Feature.kSmokeAlarm):
-            pass
-        else:
-            pass
-
-
-        self.step(40)
-
-        self.step(41)
-
+        # From step 41 to step 57 is SmokeAlarm and check if feature is enabled.
         self.step(42)
+        if await self.feature_guard(endpoint=self.get_endpoint(),cluster=self.smokeco_cluster,feature_int=self.smokeco_cluster.Bitmaps.Feature.kSmokeAlarm):
+            self.step(43)
+            smoke_state_handler = AttributeSubscriptionHandler(
+            expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.SmokeState)
+            await smoke_state_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
+            
+            self.step(44)
+            await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_warning_smoke_alarm)
 
-        self.step(43)
+            self.step(45)
+            device_muted_report_data = smoke_state_handler.wait_for_attribute_report(timeout_sec=300)
+            asserts.assert_equal(device_muted_report_data.value,self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
 
-        self.step(44)
+            self.step(46)
+            await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_manual_device_mute)
 
-        self.step(45)
+            self.step(47)
+            device_muted_report_data = device_muted_handler.wait_for_attribute_report(timeout_sec=120)
+            asserts.assert_equal(device_muted_report_data.value,self.smokeco_cluster.Enums.MuteStateEnum.kMuted)
 
-        self.step(46)
+            self.step(48)
+            await self.read_smokeco_event(self.smokeco_cluster.Events.AlarmMuted)
 
-        self.step(47)
+            self.step(49)
+            await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_manual_device_mute_clear)
 
-        self.step(48)
+            self.step(50)
+            device_muted_report_data = device_muted_handler.wait_for_attribute_report(timeout_sec=120)
+            asserts.assert_equal(device_muted_report_data.value,self.smokeco_cluster.Enums.MuteStateEnum.kNotMuted)
 
-        self.step(49)
+            self.step(51)
+            await self.read_smokeco_event(self.smokeco_cluster.Events.MuteEnded)
 
-        self.step(50)
+            self.step(52)
+            await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_critical_smoke_alarm)
 
-        self.step(51)
+            self.step(53)
+            smoke_state_report_data = smoke_state_handler.wait_for_attribute_report(timeout_sec=300)
+            asserts.assert_equal(smoke_state_report_data.value,self.smokeco_cluster.Enums.AlarmStateEnum.kCritical)
 
-        self.step(52)
+            self.step(54)
+            await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_manual_device_mute)
 
-        self.step(53)
+            self.step(55)
+            await sleep(5)
+            device_muted = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.DeviceMuted)
+            asserts.assert_equal(device_muted,self.smokeco_cluster.Enums.MuteStateEnum.kNotMuted)
 
-        self.step(54)
+            self.step(56)
+            await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_clear_smoke_alarm)
 
-        self.step(55)
-
-        self.step(56)
-
-        self.step(57)
+            self.step(57)
+            smoke_state_report_data = smoke_state_handler.wait_for_attribute_report(timeout_sec=300)
+            asserts.assert_equal(smoke_state_report_data.value,self.smokeco_cluster.Enums.AlarmStateEnum.kNormal)
+            smoke_state_handler.cancel()
+        else:
+            self.mark_step_range_skipped(43,57)
+        # End check SmokeAlarm DeviceMuted
 
         self.step(58)
-        # From here to step 73 is COAlarm
+        # From step 58 to step 73 is COAlarm and check if Feature is enabled.
         if await self.feature_guard(endpoint=self.get_endpoint(),cluster=self.smokeco_cluster,feature_int=self.smokeco_cluster.Bitmaps.Feature.kCoAlarm):
-            pass
+            self.step(59)
+            co_state_handler = AttributeSubscriptionHandler(
+            expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.COState)
+            await co_state_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
+            
+            self.step(60)
+            await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_warning_co_alarm)
+
+            self.step(61)
+            co_state_report_data = co_state_handler.wait_for_attribute_report(timeout_sec=300)
+            asserts.assert_equal(co_state_report_data.value,self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
+
+            self.step(62)
+            await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_manual_device_mute)
+
+            self.step(63)
+            device_muted_report_data = device_muted_handler.wait_for_attribute_report(timeout_sec=120)
+            asserts.assert_equal(device_muted_report_data.value,self.smokeco_cluster.Enums.MuteStateEnum.kMuted)
+
+            self.step(64)
+            await self.read_smokeco_event(self.smokeco_cluster.Events.AlarmMuted)
+
+            self.step(65)
+            await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_manual_device_mute_clear)
+
+            self.step(66)
+            device_muted_report_data = device_muted_handler.wait_for_attribute_report(timeout_sec=120)
+            asserts.assert_equal(device_muted_report_data.value,self.smokeco_cluster.Enums.MuteStateEnum.kNotMuted)
+
+            self.step(67)
+            await self.read_smokeco_event(self.smokeco_cluster.Events.MuteEnded)
+
+            self.step(68)
+            await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_critical_co_alarm)
+
+            self.step(69)
+            co_state_report_data = co_state_handler.wait_for_attribute_report(timeout_sec=300)
+            asserts.assert_equal(co_state_report_data.value,self.smokeco_cluster.Enums.AlarmStateEnum.kCritical)
+
+            self.step(70)
+            await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_manual_device_mute)
+
+            self.step(71)
+            await sleep(5)
+            device_muted = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.DeviceMuted)
+            asserts.assert_equal(device_muted,self.smokeco_cluster.Enums.MuteStateEnum.kNotMuted)
+
+            self.step(72)
+            await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_clear_co_alarm)
+
+            self.step(73)
+            co_state_report_data = co_state_handler.wait_for_attribute_report(timeout_sec=300)
+            asserts.assert_equal(co_state_report_data.value,self.smokeco_cluster.Enums.AlarmStateEnum.kNormal)
+            co_state_handler.cancel()
         else:
-            pass
+            self.mark_all_remaining_steps_skipped(59)
+        # End check COAlarm DeviceMuted
 
-        self.step(59)
-
-        self.step(60)
-
-        self.step(61)
-
-        self.step(62)
-
-        self.step(63)
-
-        self.step(64)
-
-        self.step(65)
-
-        self.step(66)
-
-        self.step(67)
-
-        self.step(68)
-
-        self.step(69)
-
-        self.step(70)
-
-        self.step(71)
-
-        self.step(72)
-
-        self.step(73)
-
+        device_muted_handler.cancel()
 
 
 if __name__ == "__main__":
