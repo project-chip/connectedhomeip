@@ -250,7 +250,7 @@ class TC_WATERHEATER(MatterBaseTest):
             cmd=cluster.Commands.ChangeToMode(newMode=2),
             endpoint=self.ENDPOINT
         )
-        asserts.assert_equal(response.status, 1, "Status should be UnsupportedMode (1)") # StatusCode::kUnsupportedMode = 0x01
+        asserts.assert_equal(response.status, 1, "Status should be UnsupportedMode (1)")  # StatusCode::kUnsupportedMode = 0x01
 
     @async_test_body
     async def test_TC_WATERHEATER(self):
