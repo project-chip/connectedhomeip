@@ -134,7 +134,7 @@ class TC_JFADMIN_1_2(MatterBaseTest):
         ]
 
     def desc_TC_JFADMIN_1_2(self):
-        return "[TC-JFADMIN-2.2] Validate commands behavior outside Joint Commissioning Method"
+        return "[TC-JFADMIN-1.2] Validate commands behavior outside Joint Commissioning Method"
 
     def pics_TC_JFADMIN_1_2(self):
         return ['JFADMIN.S']

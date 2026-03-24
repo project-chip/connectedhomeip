@@ -75,7 +75,7 @@ class TC_JFADMIN_1_4(MatterBaseTest):
     _TIMEOUT_STEP_2 = 180
 
     def desc_TC_JFADMIN_1_4(self) -> str:
-        return "[TC-JFADMIN-2.4] Validate OpenJointCommissioningWindow Command correct behavior"
+        return "[TC-JFADMIN-1.4] Validate OpenJointCommissioningWindow Command correct behavior"
 
     def pics_TC_JFADMIN_1_4(self) -> list[str]:
         return ["JFADMIN.S"]
