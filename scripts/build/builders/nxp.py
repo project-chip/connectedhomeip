@@ -135,6 +135,10 @@ class NxpApp(Enum):
         raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root, board, os_env, build_system):
+        if os_env == NxpOsUsed.ZEPHYR:
+            if self.ExampleName() == "unit-test":
+                return os.path.join(root, 'src', 'test_driver', 'nxp', 'zephyr')
+            return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName(os_env))
         if ((os_env == NxpOsUsed.FREERTOS) and (build_system == NxpBuildSystem.CMAKE)):
             if (self.ExampleName() == "unit-test"):
                 return os.path.join(root, 'src', 'test_driver', 'nxp')
