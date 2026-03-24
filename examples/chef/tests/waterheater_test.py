@@ -130,7 +130,7 @@ class TC_WATERHEATER(MatterBaseTest):
         attributes = cluster.Attributes
 
         # 1. HeaterTypes (read-only attribute) - verify its default value.
-        expected_heater_types = cluster.Bitmaps.HeaterTypesBitmap.kImmersionElement1 | cluster.Bitmaps.HeaterTypesBitmap.kHeatPump
+        expected_heater_types = cluster.Bitmaps.WaterHeaterHeatSourceBitmap.kImmersionElement1 | cluster.Bitmaps.WaterHeaterHeatSourceBitmap.kHeatPump
         val = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.HeaterTypes)
         asserts.assert_equal(val, expected_heater_types, f"HeaterTypes initial value should be {expected_heater_types}")
