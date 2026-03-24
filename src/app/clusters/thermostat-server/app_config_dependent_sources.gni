@@ -24,6 +24,8 @@ app_config_dependent_sources = [
   "Setpoints.cpp",
   "Setpoints.h",
   "Temperature.h",
+  "ThermostatAttributeShim.cpp",
+  "ThermostatAttributeShim.h",
   "ThermostatCluster.cpp",
   "ThermostatCluster.h",
   "ThermostatClusterAtomic.cpp",
