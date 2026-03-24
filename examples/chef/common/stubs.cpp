@@ -102,6 +102,10 @@ void InitIdentifyCluster()
 #include "clusters/water-heater-management/chef-water-heater-management.h"
 #endif
 
+#if MATTER_DM_WATER_HEATER_MODE_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/water-heater-mode/chef-water-heater-mode.h"
+#endif
+
 #include "clusters/mode-base/chef-mode-base-default.h"
 
 namespace {
