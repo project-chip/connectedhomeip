@@ -102,7 +102,7 @@ public:
         ServerClusterRegistration * result = nullptr;
         if (GetRequestorInstance())
         {
-            gServer.Create(endpointId, *GetRequestorInstance());
+            gServer.Create(endpointId, *GetRequestorInstance(), gAttributes);
             result = &gServer.Registration();
         }
         else

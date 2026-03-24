@@ -696,7 +696,7 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
 
     OTAUpdateStateEnum prevState = mAttributes->GetUpdateState();
     // Update the new state before handling the state transition
-    ReturnOnFailure(mAttributes->SetUpdateState(newState));
+    mAttributes->SetUpdateState(newState);
 
     if (prevState != newState)
     {
@@ -978,7 +978,7 @@ void DefaultOTARequestor::LoadCurrentUpdateInfo()
 
     OTAUpdateStateEnum updateState = OTAUpdateStateEnum::kIdle;
     (void) mStorage->LoadCurrentUpdateState(updateState);
-    (void) mAttributes->SetUpdateState(updateState);
+    mAttributes->SetUpdateState(updateState);
 
     if (mStorage->LoadTargetVersion(mTargetVersion) != CHIP_NO_ERROR)
     {
