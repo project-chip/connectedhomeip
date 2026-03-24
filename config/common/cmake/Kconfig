@@ -759,7 +759,14 @@ config BUILD_FOR_HOST_UNIT_TEST
 	bool "build host unit test"
 	default y if CHIP_BUILD_TESTS
 	help
-		Enable matter host unit test build.
+	  Enable matter host unit test build.
+
+config CHIP_BUILD_NL_FAULT_INJECTION
+	bool "Enable NL fault injection for unit tests"
+	default y
+	depends on CHIP_BUILD_TESTS
+	help
+	  Enables nl fault injection Matter unit tests.
 
 config CHIP_BLE_EXT_ADVERTISING
 	bool "Bluetooth LE extended advertising"
