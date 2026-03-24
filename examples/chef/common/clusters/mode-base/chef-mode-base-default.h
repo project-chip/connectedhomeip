@@ -29,7 +29,7 @@ namespace ModeBase {
 class DefaultChefDelegate : public Delegate
 {
 public:
-    DefaultChefDelegate(const Span<detail::Structs::ModeOptionStruct::Type> aModeOptions) : mModeOptions(aModeOptions) {}
+    DefaultChefDelegate(const Span<const detail::Structs::ModeOptionStruct::Type> aModeOptions) : mModeOptions(aModeOptions) {}
     ~DefaultChefDelegate() override = default;
 
     CHIP_ERROR Init() override;
@@ -39,7 +39,7 @@ public:
     void HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response) override;
 
 private:
-    Span<detail::Structs::ModeOptionStruct::Type> mModeOptions;
+    Span<const detail::Structs::ModeOptionStruct::Type> mModeOptions;
 };
 
 } // namespace ModeBase

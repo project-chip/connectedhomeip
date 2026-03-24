@@ -31,6 +31,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WaterHeaterMode {
+namespace Chef {
 
 const uint8_t ModeOff    = 0;
 const uint8_t ModeManual = 1;
@@ -50,6 +51,7 @@ static const detail::Structs::ModeOptionStruct::Type kModeOptions[] = {
 
 static const Span<const detail::Structs::ModeOptionStruct::Type> kSupportedModes(kModeOptions);
 
+} // namespace Chef
 } // namespace WaterHeaterMode
 } // namespace Clusters
 } // namespace app
