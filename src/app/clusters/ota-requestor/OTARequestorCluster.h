@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 
@@ -26,12 +27,7 @@ namespace chip::app::Clusters {
 class OTARequestorCluster : public DefaultServerCluster
 {
 public:
-    OTARequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor);
-
-    // Only the UpdatePossible attribute can be configured through this class. The source of the other attributes is the
-    // OTARequestorInterface passed into the constructor, so use that object instead to change those attributes.
-    void SetUpdatePossible(bool updatePossible);
-    bool GetUpdatePossible() const { return mUpdatePossible; }
+    OTARequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor, OTARequestorAttributes & attributes);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
@@ -54,7 +50,7 @@ private:
     CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 
     OTARequestorInterface & mOtaRequestor;
-    bool mUpdatePossible = true;
+    OTARequestorAttributes & mAttributes;
 };
 
 } // namespace chip::app::Clusters

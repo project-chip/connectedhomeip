@@ -18,8 +18,8 @@
 
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 
-#include <app/data-model/Nullable.h>
 #include <app/data-model-provider/ProviderChangeListener.h>
+#include <app/data-model/Nullable.h>
 #include <clusters/OtaSoftwareUpdateRequestor/AttributeIds.h>
 #include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
 #include <lib/core/CHIPError.h>
@@ -32,47 +32,46 @@ namespace Attributes = app::Clusters::OtaSoftwareUpdateRequestor::Attributes;
 
 constexpr ClusterId kClusterId = app::Clusters::OtaSoftwareUpdateRequestor::Id;
 
-CHIP_ERROR OTARequestorAttributes::SetUpdateState(OTAUpdateStateEnum updateState)
+void OTARequestorAttributes::SetUpdateState(OTAUpdateStateEnum updateState)
 {
-    VerifyOrReturnError(mDataModelChangeListener != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    VerifyOrReturnError(updateState != mUpdateState, CHIP_NO_ERROR);
+    VerifyOrReturn(updateState != mUpdateState);
 
     mUpdateState = updateState;
-    mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, Attributes::UpdateState::Id });
-    return CHIP_NO_ERROR;
+    if (mDataModelChangeListener)
+    {
+        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, Attributes::UpdateState::Id });
+    }
 }
 
 CHIP_ERROR OTARequestorAttributes::SetUpdateStateProgress(app::DataModel::Nullable<uint8_t> updateStateProgress)
 {
-    VerifyOrReturnError(mDataModelChangeListener != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(updateStateProgress.IsNull() || updateStateProgress.Value() <= 100, CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (mUpdateStateProgress.Update(updateStateProgress))
+    if (mUpdateStateProgress.Update(updateStateProgress) && mDataModelChangeListener)
     {
         mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, Attributes::UpdateStateProgress::Id });
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTARequestorAttributes::SetUpdatePossible(bool updatePossible)
+void OTARequestorAttributes::SetUpdatePossible(bool updatePossible)
 {
-    VerifyOrReturnError(mDataModelChangeListener != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    VerifyOrReturnError(updatePossible != mUpdatePossible, CHIP_NO_ERROR);
+    VerifyOrReturn(updatePossible != mUpdatePossible);
 
     mUpdatePossible = updatePossible;
-    mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, Attributes::UpdatePossible::Id });
-    return CHIP_NO_ERROR;
+    if (mDataModelChangeListener)
+    {
+        mDataModelChangeListener->MarkDirty({ mEndpointId, kClusterId, Attributes::UpdatePossible::Id });
+    }
 }
 
-CHIP_ERROR OTARequestorAttributes::Init(EndpointId endpointId, app::DataModel::ProviderChangeListener & dataModelChangeListener)
+CHIP_ERROR OTARequestorAttributes::SetChangeListener(EndpointId endpointId,
+                                                     app::DataModel::ProviderChangeListener & dataModelChangeListener)
 {
-    VerifyOrReturnError(mDataModelChangeListener == nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidEndpointId(endpointId), CHIP_ERROR_INVALID_ARGUMENT);
 
     mDataModelChangeListener = &dataModelChangeListener;
-    mEndpointId = endpointId;
+    mEndpointId              = endpointId;
     return CHIP_NO_ERROR;
 }
 

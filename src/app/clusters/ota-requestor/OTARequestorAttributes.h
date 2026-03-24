@@ -39,15 +39,16 @@ public:
     using OTAUpdateStateEnum = OTARequestorInterface::OTAUpdateStateEnum;
 
     OTAUpdateStateEnum GetUpdateState() const { return mUpdateState; }
-    CHIP_ERROR SetUpdateState(OTAUpdateStateEnum updateState);
+    void SetUpdateState(OTAUpdateStateEnum updateState);
 
     app::DataModel::Nullable<uint8_t> GetUpdateStateProgress() const { return mUpdateStateProgress; }
+    // Returns an error if the new progress is out of range.
     CHIP_ERROR SetUpdateStateProgress(app::DataModel::Nullable<uint8_t> updateStateProgress);
 
     bool GetUpdatePossible() const { return mUpdatePossible; }
-    CHIP_ERROR SetUpdatePossible(bool updatePossible);
+    void SetUpdatePossible(bool updatePossible);
 
-    CHIP_ERROR Init(EndpointId endpointId, app::DataModel::ProviderChangeListener & dataModelChangeListener);
+    CHIP_ERROR SetChangeListener(EndpointId endpointId, app::DataModel::ProviderChangeListener & dataModelChangeListener);
 
 private:
     OTAUpdateStateEnum mUpdateState = OTAUpdateStateEnum::kUnknown;

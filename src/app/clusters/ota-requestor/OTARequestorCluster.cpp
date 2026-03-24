@@ -37,19 +37,16 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 
 } // namespace
 
-OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor) :
-    DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)), mOtaRequestor(otaRequestor)
+OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor,
+                                         OTARequestorAttributes & attributes) :
+    DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)), mOtaRequestor(otaRequestor),
+    mAttributes(attributes)
 {}
-
-void OTARequestorCluster::SetUpdatePossible(bool updatePossible)
-{
-    mUpdatePossible = updatePossible;
-    NotifyAttributeChanged(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id);
-}
 
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
-    return DefaultServerCluster::Startup(context);
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    return mAttributes.SetChangeListener(mPath.mEndpointId, context.interactionContext.dataModelChangeListener);
 }
 
 DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -68,7 +65,7 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
         });
     }
     case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
-        return encoder.Encode(mUpdatePossible);
+        return encoder.Encode(mAttributes.GetUpdatePossible());
     case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
         return encoder.Encode(mOtaRequestor.GetCurrentUpdateState());
     case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id: {
