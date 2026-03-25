@@ -1100,12 +1100,12 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                   platform: linux
-                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  bootstrap-log-name: bootstrap-logs-linux-${{ env.BUILD_VARIANT }}-${{ matrix.filter }}
 
             - name: Set ASAN symbolizer path
               run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
 
-            - name: Set up a IPV6 known envionment
+            - name: Set up a IPV6 known environment
               uses: ./.github/actions/add-ipv6
 
             - name: Download artifacts for running
@@ -1187,7 +1187,6 @@ jobs:
 
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
-              #TODO: remove --keep-going , ADDED FOR TESTING
               run: |
                   scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file test-summaries/python-tests.json'
             - name: Print python test summary
