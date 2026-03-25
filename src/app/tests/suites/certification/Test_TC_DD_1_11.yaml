@@ -50,8 +50,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1: Scan QR code using concatenation (which supports the
-          commissioning of all the TH devices)"
+          "Step 1: Scan concatenated QR code containing multiple onboarding payloads"
       PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
       verification: |
 
@@ -59,7 +58,7 @@ tests:
 
           Example: ./chip-tool payload parse-setup-payload "MT:-24J061901KA0648G00*-24J0EDH020O0648G00"
 
-          Verify the DUT(chip-tool) is able to scan and parse the payloads from concatenated QR code:
+          Verify the DUT(chip-tool) is successfully parses all embedded onboarding payloads without error:
 
           [1768813041.471] [132802:132802] [DL] ChipLinuxStorage::Init: Using KVS config file: /tmp/chip_tool_kvs
           [1768813041.471] [132802:132802] [SPL] Parsing base38Representation: MT:Y.K90-Q000KA0648G00*Y.K9061901KA0648G00
@@ -82,8 +81,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 2: Commission each TH device one by one using parsed payload
-          data"
+          "Step 2: Commission each TH device one by one using the parsed payload data 
+          in the same order as encoded in the concatenated QR code (left to right)"
       verification: |
 
           Commission the TH devices one by one using parsed payloads in Step-1.
@@ -93,7 +92,7 @@ tests:
           TH device 1:
           ./chip-tool pairing onnetwork 1 20202021
 
-          Verify the DUT (chip-tool) successfully commissions the TH device using the parsed payload data.
+          Verify the DUT(chip-tool) successfully commissions the TH device using the parsed payload data.
 
           [1771308802.157] [9230:9232] [CTL] Commissioning complete for node ID 0x0000000000000001: success
           [1771308802.157] [9230:9232] [TOO] Device commissioning completed with success
@@ -102,7 +101,7 @@ tests:
           TH device 2:
           ./chip-tool pairing onnetwork 2 20202022
 
-          Verify the DUT (chip-tool) successfully commissions the TH device using the parsed payload data.
+          Verify the DUT(chip-tool) successfully commissions the TH device using the parsed payload data.
 
           [1771308802.157] [9230:9232] [CTL] Commissioning complete for node ID 0x0000000000000002: success
           [1771308802.157] [9230:9232] [TOO] Device commissioning completed with success
@@ -110,4 +109,19 @@ tests:
 
           Note: Update the passcode values according to the parsed QR payload data of each TH device.
 
+      disabled: true
+
+    - label:
+          "Step 3: Verify the DUT indicates to the user that TH devices must be commissioned 
+          individually using their separate QR codes or Manual Pairing Codes"
+      PICS: 
+          "!(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) &&
+          MCORE.DD.CTRL_CONCATENATED_QR_CODE_2"
+      verification: |
+          The reference platform (Raspberry Pi running sample applications) does not support user-facing commissioning flows or QR scanning behavior associated with MCORE.DD.CTRL_CONCATENATED_QR_CODE_2.
+          Therefore, this test step is not verifiable on the RPI reference platform.
+
+          This test step can be validated using real Commissioner devices that support user interaction and concatenated QR code handling when
+          !(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) && MCORE.DD.CTRL_CONCATENATED_QR_CODE_2.
+          
       disabled: true
