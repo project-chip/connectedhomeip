@@ -327,7 +327,7 @@ else
     if [ "$USE_DOCKER" != true ] && [ ! -f "$CHIP_ROOT/scripts/setup/silabs/.install-packages-done" ]; then
 
         INSTALL_EVERYTHING=false
-        echo """
+        cat <<'EOF'
         !!!!!!!!! FIRST TIME INSTALL !!!!!!!!!
         Do you agree to install SILICON LABS PACKAGES MANAGER?
 
@@ -335,7 +335,8 @@ else
         SLT (silabs packages manager), zap, arm-gcc,
 
         Most of the files will be located under ~/.silabs,
-        some symbolic link will be created and it will replace simplicity_sdk submodule"""
+        some symbolic link will be created and it will replace simplicity_sdk submodule
+EOF
 
         while true; do
             read -p "Do you want to proceed? (y/n): " yn
