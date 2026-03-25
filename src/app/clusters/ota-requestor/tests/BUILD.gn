@@ -23,7 +23,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestOTARequestorAttributes.cpp",
-    "TestOTARequestorCluster.cpp"
+    "TestOTARequestorCluster.cpp",
   ]
 
   sources = []
