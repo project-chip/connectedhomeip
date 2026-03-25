@@ -319,9 +319,7 @@ CHIP_ERROR ZoneManagementCluster::AcceptedCommands(const ConcreteClusterPath & p
         ReturnErrorOnFailure(builder.AppendElements({ Commands::RemoveZone::kMetadataEntry }));
     }
 
-    return
-        builder.AppendElements({ Commands::CreateOrUpdateTrigger::kMetadataEntry, Commands::RemoveTrigger::kMetadataEntry });
-
+    return builder.AppendElements({ Commands::CreateOrUpdateTrigger::kMetadataEntry, Commands::RemoveTrigger::kMetadataEntry });
 }
 
 CHIP_ERROR ZoneManagementCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
