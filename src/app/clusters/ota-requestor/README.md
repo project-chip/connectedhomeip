@@ -159,8 +159,11 @@ interface. Any custom implementation should reside under
     initialization code above
 -   If the code driven data model provider is in use, the following additional
     steps are needed:
+    -   Create an instance of the `OTARequestorAttribute` class per endpoint and
+        provide it to the instance of `DefaultOTARequestor`
     -   Create an instance of the `OTARequestorCluster` class per endpoint,
-        providing the `OTARequestorInterface` instance
+        providing the `OTARequestorInterface` and corresponding
+        `OTARequestorAttribute` instances
     -   Create an instance of the `ServerClusterRegistration` class per
         `OTARequestorCluster` class
     -   Register the `ServerClusterRegistration` instances through
