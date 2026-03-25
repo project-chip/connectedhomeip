@@ -98,6 +98,12 @@ elseif(CONFIG_CHIP_NVM_COMPONENT_NVMFWK)
     matter_add_gn_arg_string("nxp_nvm_component" "nvm_fwk")
 endif()
 
+# In debug mode build, warnings may appear which could break the build when
+# using a strict option like "treat all warnings as errors"
+if(CONFIG_DEBUG)
+    matter_add_gn_arg_bool("treat_warnings_as_errors" false)
+endif()
+
 if(CONFIG_CHIP_OTA_ENCRYPTION)
     matter_add_gn_arg_bool("chip_with_ota_encryption" CONFIG_CHIP_OTA_ENCRYPTION)
     matter_add_gn_arg_string("chip_with_ota_key" ${CONFIG_CHIP_OTA_ENCRYPTION_KEY})

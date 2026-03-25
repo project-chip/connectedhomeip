@@ -957,6 +957,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
+  attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
   readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1500,7 +1501,6 @@ cluster GeneralDiagnostics = 51 {
 
   bitmap Feature : bitmap32 {
     kDataModelTest = 0x1;
-    kDeviceLoad = 0x2;
   }
 
   struct DeviceLoadStruct {
@@ -1703,9 +1703,9 @@ cluster OperationalCredentials = 62 {
   }
 
   fabric_scoped struct NOCStruct {
-    octet_string<400> noc = 1;
-    nullable octet_string<400> icac = 2;
-    optional octet_string<400> vvsc = 3;
+    long_octet_string<400> noc = 1;
+    nullable long_octet_string<400> icac = 2;
+    optional long_octet_string<400> vvsc = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1726,7 +1726,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct AttestationResponse = 1 {
-    octet_string attestationElements = 0;
+    long_octet_string<900> attestationElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
@@ -1735,7 +1735,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct CertificateChainResponse = 3 {
-    octet_string<600> certificate = 0;
+    long_octet_string<600> certificate = 0;
   }
 
   request struct CSRRequestRequest {
@@ -1744,21 +1744,21 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct CSRResponse = 5 {
-    octet_string NOCSRElements = 0;
+    long_octet_string<900> NOCSRElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
   request struct AddNOCRequest {
-    octet_string<400> NOCValue = 0;
-    optional octet_string<400> ICACValue = 1;
+    long_octet_string<400> NOCValue = 0;
+    optional long_octet_string<400> ICACValue = 1;
     octet_string<16> IPKValue = 2;
     int64u caseAdminSubject = 3;
     vendor_id adminVendorId = 4;
   }
 
   request struct UpdateNOCRequest {
-    octet_string<400> NOCValue = 0;
-    optional octet_string<400> ICACValue = 1;
+    long_octet_string<400> NOCValue = 0;
+    optional long_octet_string<400> ICACValue = 1;
   }
 
   response struct NOCResponse = 8 {
@@ -1776,13 +1776,13 @@ cluster OperationalCredentials = 62 {
   }
 
   request struct AddTrustedRootCertificateRequest {
-    octet_string<400> rootCACertificate = 0;
+    long_octet_string<400> rootCACertificate = 0;
   }
 
   request struct SetVIDVerificationStatementRequest {
     optional vendor_id vendorID = 0;
     optional octet_string<85> VIDVerificationStatement = 1;
-    optional octet_string<400> vvsc = 2;
+    optional long_octet_string<400> vvsc = 2;
   }
 
   request struct SignVIDVerificationRequestRequest {
@@ -1796,25 +1796,25 @@ cluster OperationalCredentials = 62 {
     octet_string signature = 2;
   }
 
-  /** Sender is requesting attestation information from the receiver. */
+  /** This command is used to perform an attestation request. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
-  /** Sender is requesting a device attestation certificate from the receiver. */
+  /** This command is used to request a certificate from the device attestation certificate chain. */
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
-  /** Sender is requesting a certificate signing request (CSR) from the receiver. */
+  /** This command is used to perform a CSR request. */
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
-  /** Sender is requesting to add the new node operational certificates. */
+  /** This command is used to add a new NOC to the device. */
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  /** This command SHALL replace the NOC and optional associated ICAC (if present) scoped under the accessing fabric upon successful validation of all arguments and preconditions. */
+  /** This command is used to update an existing NOC on the device. */
   fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
-  /** This command SHALL be used by an Administrative Node to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute. */
+  /** This command is used to set the user-visible fabric label for a given Fabric. */
   fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
-  /** This command is used by Administrative Nodes to remove a given fabric index and delete all associated fabric-scoped data. */
+  /** This command is used to remove a Fabric from the device. */
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
-  /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
+  /** This command is used to add a trusted root certificate to the device. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
-  /** This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate). */
+  /** This command is used to manage the VendorID and VIDVerificationStatement fields of the Fabrics attribute, and the VVSC field of an entry in the NOCs attribute. */
   fabric command access(invoke: administer) SetVIDVerificationStatement(SetVIDVerificationStatementRequest): DefaultSuccess = 12;
-  /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
+  /** This command is used to authenticate the fabric associated with the FabricIndex. */
   command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 
@@ -2195,48 +2195,48 @@ cluster ColorControl = 768 {
     OptionsBitmap optionsOverride = 6;
   }
 
-  /** Move to specified hue. */
+  /** This command will move the device to the requested hue using a transition. */
   command MoveToHue(MoveToHueRequest): DefaultSuccess = 0;
-  /** Move hue up or down at specified rate. */
+  /** This command will change the hue of the device with a requested rate. */
   command MoveHue(MoveHueRequest): DefaultSuccess = 1;
-  /** Step hue up or down by specified size at specified rate. */
+  /** This command will change the hue of the device using a step and transition. */
   command StepHue(StepHueRequest): DefaultSuccess = 2;
-  /** Move to specified saturation. */
+  /** This command will move the device to the requested saturation using a transition. */
   command MoveToSaturation(MoveToSaturationRequest): DefaultSuccess = 3;
-  /** Move saturation up or down at specified rate. */
+  /** This command will change the saturation of the device with a requested rate. */
   command MoveSaturation(MoveSaturationRequest): DefaultSuccess = 4;
-  /** Step saturation up or down by specified size at specified rate. */
+  /** This command will change the saturation of the device using a step and transition. */
   command StepSaturation(StepSaturationRequest): DefaultSuccess = 5;
-  /** Move to hue and saturation. */
+  /** This command will move the device to the requested hue and saturation using a transition. */
   command MoveToHueAndSaturation(MoveToHueAndSaturationRequest): DefaultSuccess = 6;
-  /** Move to specified color. */
+  /** This command will move the device to the requested color using a transition. */
   command MoveToColor(MoveToColorRequest): DefaultSuccess = 7;
-  /** Moves the color. */
+  /** This command will change the color of the device with a requested rate. */
   command MoveColor(MoveColorRequest): DefaultSuccess = 8;
-  /** Steps the lighting to a specific color. */
+  /** This command will change the color of the device using a step and transition. */
   command StepColor(StepColorRequest): DefaultSuccess = 9;
-  /** Move to a specific color temperature. */
+  /** This command will move the device to the requested color temperate using a transition. */
   command MoveToColorTemperature(MoveToColorTemperatureRequest): DefaultSuccess = 10;
-  /** Command description for EnhancedMoveToHue */
+  /** This command allows the light to be moved in a smooth continuous transition from their current hue to a target hue. */
   command EnhancedMoveToHue(EnhancedMoveToHueRequest): DefaultSuccess = 64;
-  /** Command description for EnhancedMoveHue */
+  /** This command allows the light to start a continuous transition starting from their current hue. */
   command EnhancedMoveHue(EnhancedMoveHueRequest): DefaultSuccess = 65;
-  /** Command description for EnhancedStepHue */
+  /** This command allows the device to be moved in a stepped transition from their current hue. */
   command EnhancedStepHue(EnhancedStepHueRequest): DefaultSuccess = 66;
-  /** Command description for EnhancedMoveToHueAndSaturation */
+  /** This command allows the light to be moved in a smooth continuous transition from their current hue to a target hue and from their current saturation to a target saturation. */
   command EnhancedMoveToHueAndSaturation(EnhancedMoveToHueAndSaturationRequest): DefaultSuccess = 67;
-  /** Command description for ColorLoopSet */
+  /** This command allows a color loop to be activated such that the color light cycles through its range of hues. */
   command ColorLoopSet(ColorLoopSetRequest): DefaultSuccess = 68;
-  /** Command description for StopMoveStep */
+  /** This command is provided to allow MoveTo and Step commands to be stopped. */
   command StopMoveStep(StopMoveStepRequest): DefaultSuccess = 71;
-  /** Command description for MoveColorTemperature */
+  /** This command allows the color temperature of the light to be moved at a specified rate. */
   command MoveColorTemperature(MoveColorTemperatureRequest): DefaultSuccess = 75;
-  /** Command description for StepColorTemperature */
+  /** This command allows the color temperature of the light to be stepped with a specified step size. */
   command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 3;
+  device type ma_rootdevice = 22, version 5;
 
   binding cluster OtaSoftwareUpdateProvider;
 
@@ -2353,6 +2353,7 @@ endpoint 0 {
     callback attribute totalOperationalHours;
     callback attribute bootReason;
     callback attribute testEventTriggersEnabled default = false;
+    callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2410,6 +2411,7 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
+    callback attribute groupcastAdoption;
     callback attribute featureMap;
     callback attribute clusterRevision;
 

@@ -27,7 +27,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     chef_linux_all_devices:
@@ -145,7 +145,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:181
+            image: ghcr.io/project-chip/chip-build-telink:190
             volumes:
                 - "/:/runner-root-volume"
             options: --user root

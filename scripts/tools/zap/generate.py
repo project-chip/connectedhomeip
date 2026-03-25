@@ -77,8 +77,34 @@ def checkDirExists(path):
 
 
 def getFilePath(name, prefix_chip_root_dir=True):
-    if prefix_chip_root_dir:
+    """Resolve a file path and verify that it exists.
+
+    Resolution is attempted in the following order:
+
+    1. If ``name`` is absolute, use it directly.
+    2. If ``prefix_chip_root_dir`` is True and ``name`` is relative, resolve
+       it against the repository root (``CHIP_ROOT_DIR``).  This is the
+       legacy behaviour and is tried first to preserve backward compatibility.
+    3. If (2) does not yield an existing file, resolve ``name`` against the
+       current working directory as a fallback.
+
+    In all cases the resolved path is validated with :func:`checkFileExists`;
+    if the file is not found the program exits with an error message.
+
+    Args:
+        name (str): A file path, either absolute or relative.
+        prefix_chip_root_dir (bool): When True (the default), relative paths
+            are first resolved against ``CHIP_ROOT_DIR``.  When False, ``name``
+            is used as-is (typically because the caller has already produced an
+            absolute path, e.g. via environment-variable expansion).
+
+    Returns:
+        str: The resolved, verified absolute path to the file.
+    """
+    if prefix_chip_root_dir and not os.path.isabs(name):
         fullpath = os.path.join(CHIP_ROOT_DIR, name)
+        if not os.path.isfile(fullpath):
+            fullpath = os.path.join(os.getcwd(), name)
     else:
         fullpath = name
     checkFileExists(fullpath)
@@ -86,7 +112,12 @@ def getFilePath(name, prefix_chip_root_dir=True):
 
 
 def getDirPath(name):
-    fullpath = os.path.join(CHIP_ROOT_DIR, name)
+    if not os.path.isabs(name):
+        fullpath = os.path.join(CHIP_ROOT_DIR, name)
+        if not os.path.isdir(fullpath):
+            fullpath = os.path.join(os.getcwd(), name)
+    else:
+        fullpath = name
     checkDirExists(fullpath)
     return fullpath
 

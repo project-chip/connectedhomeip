@@ -1006,6 +1006,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MaxPathsPerInvoke";
             break;
 
+        case MTRAttributeIDTypeClusterBasicInformationAttributeDeviceLocationID:
+            result = @"DeviceLocation";
+            break;
+
         case MTRAttributeIDTypeClusterBasicInformationAttributeConfigurationVersionID:
             result = @"ConfigurationVersion";
             break;
@@ -2348,6 +2352,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeProductAppearanceID:
             result = @"ProductAppearance";
+            break;
+
+        case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeDeviceLocationID:
+            result = @"DeviceLocation";
             break;
 
         case MTRAttributeIDTypeClusterBridgedDeviceBasicInformationAttributeConfigurationVersionID:

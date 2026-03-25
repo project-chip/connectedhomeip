@@ -18,7 +18,7 @@
 #include <AppMain.h>
 #include <app/clusters/thread-border-router-management-server/thread-border-router-management-server.h>
 #include <app/clusters/thread-network-directory-server/thread-network-directory-server.h>
-#include <app/clusters/wifi-network-management-server/WiFiNetworkManagementCluster.h>
+#include <app/clusters/wifi-network-management-server/wifi-network-management-server.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>

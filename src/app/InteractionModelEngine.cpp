@@ -51,6 +51,7 @@
 #include <lib/support/FibonacciUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <transport/raw/GroupcastTesting.h>
 
 #include <cinttypes>
 
@@ -1097,6 +1098,27 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
         status = Status::InvalidAction;
     }
 
+    // Groupcast Testing
+    if (apExchangeContext->IsGroupExchangeContext())
+    {
+        auto & testing = Groupcast::GetTesting();
+        if (testing.IsEnabled() && testing.IsFabricUnderTest(apExchangeContext->GetSessionHandle()->GetFabricIndex()))
+        {
+            Clusters::Groupcast::Events::GroupcastTesting::Type event;
+            if ((testing.GetTestResultEnum() == Groupcast::Testing::Result::kSuccess) && (status != Status::Success))
+            {
+                testing.SetTestResult(Groupcast::Testing::Result::kGeneralError);
+            }
+            // Convert to event type
+            testing.ToEventType(event);
+            testing.Clear();
+            // Generate event
+            DataModel::EventsGenerator & eventGenerator = EventManagement::GetInstance();
+            eventGenerator.GenerateEvent(event, kRootEndpointId);
+            eventGenerator.ScheduleUrgentEventDeliverySync();
+        }
+    }
+
     if (status != Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
         return StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
@@ -1778,10 +1800,8 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 {
     Access::SubjectDescriptor subjectDescriptor = apCommandObj.GetSubjectDescriptor();
 
-    DataModel::InvokeRequest request;
-    request.path = aCommandPath;
+    DataModel::InvokeRequest request(aCommandPath, subjectDescriptor);
     request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, apCommandObj.IsTimedInvoke());
-    request.subjectDescriptor = &subjectDescriptor;
 
     std::optional<DataModel::ActionReturnStatus> status = GetDataModelProvider()->InvokeCommand(request, apPayload, &apCommandObj);
 
@@ -1819,6 +1839,16 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
     Access::Privilege privilegeToCheck = commandExists ? acceptedCommandEntry.GetInvokePrivilege() : Access::Privilege::kOperate;
 
     Status accessStatus = CheckCommandAccess(request, privilegeToCheck);
+    // Groupcast Testing
+    auto & testing = Groupcast::GetTesting();
+    if (testing.IsEnabled() && testing.IsFabricUnderTest(request.GetAccessingFabricIndex()))
+    {
+        testing.SetAccessAllowed(Status::Success == accessStatus);
+        if (!testing.GetAccessAllowed().ValueOr(false))
+        {
+            testing.SetTestResult(Groupcast::Testing::Result::kFailedAuth);
+        }
+    }
     VerifyOrReturnValue(accessStatus == Status::Success, accessStatus);
 
     if (!commandExists)
@@ -1834,17 +1864,12 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest,
                                                                                const Access::Privilege aRequiredPrivilege)
 {
-    if (aRequest.subjectDescriptor == nullptr)
-    {
-        return Status::UnsupportedAccess; // we require a subject for invoke
-    }
-
     Access::RequestPath requestPath{ .cluster     = aRequest.path.mClusterId,
                                      .endpoint    = aRequest.path.mEndpointId,
                                      .requestType = Access::RequestType::kCommandInvokeRequest,
                                      .entityId    = aRequest.path.mCommandId };
 
-    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, aRequiredPrivilege);
+    CHIP_ERROR err = Access::GetAccessControl().Check(aRequest.subjectDescriptor, requestPath, aRequiredPrivilege);
     if (err != CHIP_NO_ERROR)
     {
         if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))

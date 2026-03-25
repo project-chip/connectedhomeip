@@ -116,7 +116,6 @@ enum class RadioFaultEnum : uint8_t
 enum class Feature : uint32_t
 {
     kDataModelTest = 0x1,
-    kDeviceLoad    = 0x2,
 };
 } // namespace GeneralDiagnostics
 } // namespace Clusters

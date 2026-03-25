@@ -28,10 +28,15 @@ class GroupDataProviderImpl : public GroupDataProvider
 {
 public:
     static constexpr size_t kIteratorsMax         = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
-    static constexpr uint16_t kMaxMembershipCount = 10;
-    static constexpr uint16_t kMaxMcastAddrCount  = 4;
+    static constexpr uint16_t kMaxMembershipCount = CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT;
+    // Per spec, a single fabric cannot use more than half of the total memberships
+    static constexpr uint16_t kMaxMembershipPerFabric = kMaxMembershipCount / 2;
+    static constexpr uint16_t kMaxGroupKeysPerFabric  = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC;
 
-    GroupDataProviderImpl() = default;
+    // TODO Make this configurable. Note: if PGA feature is enabled it SHALL be >= 4. else it SHALL = 1.
+    static constexpr uint16_t kMaxMcastAddrCount = 4;
+
+    GroupDataProviderImpl() : GroupDataProvider(kMaxMembershipPerFabric, kMaxGroupKeysPerFabric) {}
     GroupDataProviderImpl(uint16_t maxGroupsPerFabric, uint16_t maxGroupKeysPerFabric) :
         GroupDataProvider(maxGroupsPerFabric, maxGroupKeysPerFabric)
     {}
@@ -67,6 +72,9 @@ public:
     // Endpoints
     bool HasEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) override;
     CHIP_ERROR AddEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) override;
+    CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id,
+                              GroupCleanupPolicy cleanupPolicy) override;
+    CHIP_ERROR RemoveEndpointAllGroups(FabricIndex fabric_index, EndpointId endpoint_id, GroupCleanupPolicy cleanupPolicy) override;
     CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) override;
     CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, EndpointId endpoint_id) override;
     CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id) override;
@@ -103,9 +111,15 @@ public:
     Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex fabric_index, GroupId group_id) override;
     GroupSessionIterator * IterateGroupSessions(uint16_t session_id) override;
 
-    // Groupcast
+    // Groupcast configurations
     uint16_t getMaxMembershipCount() override { return kMaxMembershipCount; }
     uint16_t getMaxMcastAddrCount() override { return kMaxMcastAddrCount; }
+    bool ConsumeAuxAclNotificationNeeded() override
+    {
+        bool needed               = mAuxAclNotificationNeeded;
+        mAuxAclNotificationNeeded = false;
+        return needed;
+    }
 
 protected:
     class GroupInfoIteratorImpl : public GroupInfoIterator
@@ -262,6 +276,7 @@ protected:
     ObjectPool<KeySetIteratorImpl, kIteratorsMax> mKeySetIterators;
     ObjectPool<GroupSessionIteratorImpl, kIteratorsMax> mGroupSessionsIterator;
     ObjectPool<GroupKeyContext, kIteratorsMax> mGroupKeyContexPool;
+    bool mAuxAclNotificationNeeded = false;
 };
 
 } // namespace Credentials

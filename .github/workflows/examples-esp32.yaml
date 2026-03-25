@@ -27,7 +27,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     esp32:
@@ -105,7 +105,7 @@ jobs:
               run: rm -rf out/esp32-m5stack-all-clusters-minimal examples/all-clusters-minimal-app/esp32/managed_components
 
             - name: Check for changed paths
-              uses: dorny/paths-filter@v3
+              uses: dorny/paths-filter@v4
               id: changed_paths
               with:
                 filters: |
@@ -156,6 +156,11 @@ jobs:
                 scripts/examples/esp_example.sh lighting-app sdkconfig.ext_plat.defaults
                 rm -rf examples/lighting-app/esp32/{build,managed_components}
 
+            - name: Build example All Devices App
+              run: |
+                scripts/examples/esp_example.sh all-devices-app sdkconfig.defaults
+                rm -rf examples/all-devices-app/esp32/{build,managed_components}
+
             - name: Build example Energy Gateway App
               if: steps.changed_paths.outputs.energy_gateway == 'true'
               run: |
@@ -202,9 +207,6 @@ jobs:
 
             - name: Build example Bridge App
               run: scripts/examples/esp_example.sh bridge-app
-
-            - name: Build example All Devices App
-              run: scripts/examples/esp_example.sh all-devices-app sdkconfig.defaults
 
             - name: Build example Persistent Storage App
               run: scripts/examples/esp_example.sh persistent-storage sdkconfig.defaults

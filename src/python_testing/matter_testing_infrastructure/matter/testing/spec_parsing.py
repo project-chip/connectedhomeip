@@ -943,6 +943,7 @@ class PrebuiltDataModelDirectory(Enum):
     k1_4_2 = auto()
     k1_5 = auto()
     k1_5_1 = auto()
+    k1_6 = auto()
 
     @property
     def dirname(self):
@@ -960,6 +961,8 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.5"
         if self == PrebuiltDataModelDirectory.k1_5_1:
             return "1.5.1"
+        if self == PrebuiltDataModelDirectory.k1_6:
+            return "1.6"
         raise KeyError("Invalid enum: %r" % self)
 
 
@@ -1681,6 +1684,7 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
         0x01040200: PrebuiltDataModelDirectory.k1_4_2,
         0x01050000: PrebuiltDataModelDirectory.k1_5,
         0x01050100: PrebuiltDataModelDirectory.k1_5_1,
+        0x01060000: PrebuiltDataModelDirectory.k1_6,
     }
 
     if specification_version not in version_to_dm:

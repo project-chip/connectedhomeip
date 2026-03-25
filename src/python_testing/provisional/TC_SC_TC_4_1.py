@@ -25,8 +25,8 @@
 #       --commissioning-method thread-meshcop
 #       --discriminator 1234
 #       --passcode 20202021
-#       --border-agent-ip-addr 127.0.0.1
-#       --border-agent-port 49152
+#       --thread-ba-host 127.0.0.1
+#       --thread-ba-port 49152
 #       --thread-dataset-hex 0e08000000000001000000030000104a0300001635060004001fffe0020884fa18779329ac770708fd269658e44aa21a030f4f70656e5468726561642d32386335010228c50c0402a0f7f8051000112233445566778899aabbccddeeff041000112233445566778899aabbccddeeff
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto

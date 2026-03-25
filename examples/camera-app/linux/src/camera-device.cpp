@@ -458,6 +458,23 @@ void CameraDevice::Init()
     mPushAVTransportManager.Init();
 }
 
+void CameraDevice::Shutdown()
+{
+    // Close WebRTC connections while the SystemLayer is still alive, so that WebRTC callbacks can safely use ScheduleLambda.
+    mWebRTCProviderManager.CloseConnection();
+
+    // Stop Video and Audio Streams so their threads don't access CameraDevice members (like mAudioStreamPtsOffsetMs) after
+    // destruction.
+    for (auto & stream : mVideoStreams)
+    {
+        StopVideoStream(stream.videoStreamParams.videoStreamID);
+    }
+    for (auto & stream : mAudioStreams)
+    {
+        StopAudioStream(stream.audioStreamParams.audioStreamID);
+    }
+}
+
 CameraError CameraDevice::InitializeCameraDevice()
 {
     static bool gstreamerInitialized = false;
@@ -1636,10 +1653,17 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneId)
     return CameraError::SUCCESS;
 }
 
-void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneId)
+void CameraDevice::HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds)
 {
-    mZoneManager.OnZoneTriggeredEvent(zoneId, ZoneEventTriggeredReasonEnum::kMotion);
-    mPushAVTransportManager.HandleZoneTrigger(zoneId);
+    // Zone events are per-zone - each zone needs its own event notification
+    for (const auto & zoneId : zoneIds)
+    {
+        mZoneManager.OnZoneTriggeredEvent(zoneId, ZoneEventTriggeredReasonEnum::kMotion);
+    }
+    // Transport trigger is per-motion-event - all zones are passed together
+    // This deliberate asymmetry reflects that zone events track individual zone activity
+    // while transport triggers coordinate recording across all zones in a single motion event
+    mPushAVTransportManager.HandleZoneTrigger(zoneIds);
 }
 
 void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneId)

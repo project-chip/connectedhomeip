@@ -83,6 +83,22 @@ namespace Testing {
 //     ASSERT_GT(it.GetValue().label.size(), 0u);
 // }
 //
+
+template <typename>
+inline constexpr bool kIsList = false;
+
+template <typename T>
+inline constexpr bool kIsList<app::DataModel::List<T>> = true;
+
+// All Cluster Servers are expected to support both of the below list writing patterns.
+enum class ListWritingPattern
+{
+    ReplaceAll, // Write the list by encoding the entire list in a single TLV Array, which will replace the entire list on the
+                // cluster side.
+    ClearAllThenAppendItems, // Write the list by first sending a write with an empty list (TLV Array) to clear the entire list on
+                             // the cluster side, then writing list items individually one by one (Appending Items).
+};
+
 class ClusterTester
 {
 public:
@@ -143,9 +159,12 @@ public:
     // Use `app::Clusters::<ClusterName>::Attributes::<AttributeName>::TypeInfo::Type` for the `value` parameter to be spec
     // compliant (see the comment of the class for usage example).
     // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
+    // WARNING: This method should NOT be used for writing list attributes, use the overload below that takes a ListWritingPattern
+    // parameter instead.
+
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
     // @returns `CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute)` if the attribute is not present in AttributeList.
-    template <typename T>
+    template <typename T, std::enable_if_t<!kIsList<T>, int> = 0>
     app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr, const T & value)
     {
         const auto & paths = mCluster.GetPaths();
@@ -183,13 +202,73 @@ public:
             ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, TLV::AnonymousTag(), value));
         }
 
+        ReturnErrorOnFailure(writer.Finalize());
+
         TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
         ReturnErrorOnFailure(reader.Next());
 
-        app::AttributeValueDecoder decoder(reader, *writeOp.GetRequest().subjectDescriptor);
+        app::AttributeValueDecoder decoder(reader, writeOp.GetRequest().subjectDescriptor);
 
         return mCluster.WriteAttribute(writeOp.GetRequest(), decoder);
+    }
+
+    // This WriteAttribute overload is for writing list attributes, and allows specifying the pattern used for mutating/writing the
+    // list on the cluster side (i.e. Replacing the list in its entirety vs Clearing the list in its entirety then appending/writing
+    // list items individually).
+    // Cluster servers usually support both patterns of writing lists, Therefore we should always test list attributes using both
+    // patterns.
+    template <typename T>
+    app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr, const app::DataModel::List<T> & listValue,
+                                                      ListWritingPattern listWritingPattern)
+    {
+        const auto & paths = mCluster.GetPaths();
+
+        VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
+
+        // Verify that the attribute is present in AttributeList before attempting to write it.
+        // This ensures tests match real-world behavior where the Interaction Model checks AttributeList first.
+        VerifyOrReturnError(IsAttributeInAttributeList(attr), Protocols::InteractionModel::Status::UnsupportedAttribute);
+
+        app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
+        chip::Testing::WriteOperation writeOp(path);
+
+        // Create a stable object on the stack
+        const Access::SubjectDescriptor subjectDescriptor = mHandler.GetSubjectDescriptor();
+        writeOp.SetSubjectDescriptor(subjectDescriptor);
+
+        switch (listWritingPattern)
+        {
+        case ListWritingPattern::ReplaceAll: {
+
+            // For ReplaceAll, we need to write the entire list in one go
+            writeOp.SetListOperation(app::ConcreteDataAttributePath::ListOperation::ReplaceAll);
+            auto decoder = writeOp.DecoderFor(listValue);
+            return mCluster.WriteAttribute(writeOp.GetRequest(), decoder);
+        }
+
+        case ListWritingPattern::ClearAllThenAppendItems: {
+
+            // We first write an empty list to clear the existing list using ReplaceAll List Operation
+            writeOp.SetListOperation(app::ConcreteDataAttributePath::ListOperation::ReplaceAll);
+            auto decoder = writeOp.DecoderFor(app::DataModel::List<uint8_t>());
+            auto status  = mCluster.WriteAttribute(writeOp.GetRequest(), decoder);
+            VerifyOrReturnValue(status.IsSuccess(), status);
+
+            // We now write each list item individually with AppendItem list operation.
+            writeOp.SetListOperation(app::ConcreteDataAttributePath::ListOperation::AppendItem);
+            for (const auto & listItem : listValue)
+            {
+                auto decoderAppend = writeOp.DecoderFor(listItem);
+                auto statusAppend  = mCluster.WriteAttribute(writeOp.GetRequest(), decoderAppend);
+                VerifyOrReturnValue(statusAppend.IsSuccess(), statusAppend);
+            }
+            return Protocols::InteractionModel::Status::Success;
+        }
+        default:
+            ChipLogError(Test, "Unhandled ListWritingPattern");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
     }
 
     // Result structure for Invoke operations, containing both status and decoded response.
@@ -206,6 +285,15 @@ public:
                 return status.has_value() && status->IsSuccess();
             else
                 return status.has_value() && status->IsSuccess() && response.has_value();
+        }
+
+        // Returns the ClusterStatusCode if available, otherwise returns std::nullopt.
+        // This allows tests to check the status code with a single EXPECT_EQ()
+        // (i.e. without having to ASSERT_TRUE(status.has_value()) first).
+        std::optional<Protocols::InteractionModel::ClusterStatusCode> GetStatusCode() const
+        {
+            VerifyOrReturnValue(status.has_value(), std::nullopt);
+            return status->GetStatusCode();
         }
     };
 
@@ -234,12 +322,8 @@ public:
         }
 
         const Access::SubjectDescriptor subjectDescriptor = mHandler.GetSubjectDescriptor();
-        const app::DataModel::InvokeRequest invokeRequest = [&]() {
-            app::DataModel::InvokeRequest req;
-            req.path              = { paths[0].mEndpointId, paths[0].mClusterId, commandId };
-            req.subjectDescriptor = &subjectDescriptor;
-            return req;
-        }();
+        const app::DataModel::InvokeRequest invokeRequest({ paths[0].mEndpointId, paths[0].mClusterId, commandId },
+                                                          subjectDescriptor);
 
         TLV::TLVWriter writer;
         writer.Init(mTlvBuffer);
@@ -316,6 +400,18 @@ public:
     }
 
     std::vector<app::AttributePathParams> & GetDirtyList() { return mTestServerClusterContext.ChangeListener().DirtyList(); }
+
+    // Returns true if the given attribute appears in the dirty list.
+    // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
+    // Will VerifyOrDie that `GetPaths()` returns exactly one path.
+    bool IsAttributeDirty(AttributeId attributeId)
+    {
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrDie(paths.size() == 1);
+        app::AttributePathParams target(paths[0].mEndpointId, paths[0].mClusterId, attributeId);
+        const auto & list = GetDirtyList();
+        return std::find(list.begin(), list.end(), target) != list.end();
+    }
 
     void SetFabricIndex(FabricIndex fabricIndex) { mHandler.SetFabricIndex(fabricIndex); }
     void SetSubjectDescriptor(const Access::SubjectDescriptor & subjectDescriptor)

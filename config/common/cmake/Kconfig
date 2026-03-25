@@ -342,6 +342,12 @@ config CHIP_COMMISSIONABLE_DEVICE_TYPE
 	  record. This allows a commissioner to find the node when looking for
 	  a specific device type.
 
+config CHIP_ENABLE_ACL_EXTENSIONS
+	bool "Enable Access Control's Extension attribute into FeatureMap"
+	help
+	  Set Access Control's Extension attribute bit into the FeatureMap
+	  attribute of the same cluster.
+
 config CHIP_EXTENDED_DISCOVERY
 	bool "Extended discovery"
 	help
@@ -379,6 +385,30 @@ choice CHIP_CRYPTO
 		help
 			Enables the implementation of the Matter cryptographic operations that is
 			based on the PSA crypto API.
+
+endchoice
+
+choice CHIP_CRYPTO_SPAKE2P
+	prompt "CHIP Crypto SPAKE2+ Selection"
+	default CHIP_CRYPTO_SPAKE2P_MBEDTLS
+
+	config CHIP_CRYPTO_SPAKE2P_MBEDTLS
+		bool "SPAKE2+ default mbedtls"
+		help
+			Enables the implementation of the SPAKE2+ protocol
+			based on the mbedTLS crypto API.
+
+	config CHIP_CRYPTO_SPAKE2P_PSA
+		bool "SPAKE2+ default PSA"
+		help
+			Enables the implementation of the SPAKE2+ protocol
+			based on the PSA API.
+
+	config CHIP_CRYPTO_SPAKE2P_CUSTOM
+		bool "SPAKE2+ custom"
+		help
+			Enables the implementation of the SPAKE2+ protocol
+			based on custom API.
 
 endchoice
 
@@ -729,7 +759,14 @@ config BUILD_FOR_HOST_UNIT_TEST
 	bool "build host unit test"
 	default y if CHIP_BUILD_TESTS
 	help
-		Enable matter host unit test build.
+	  Enable matter host unit test build.
+
+config CHIP_BUILD_NL_FAULT_INJECTION
+	bool "Enable NL fault injection for unit tests"
+	default y
+	depends on CHIP_BUILD_TESTS
+	help
+	  Enables nl fault injection Matter unit tests.
 
 config CHIP_BLE_EXT_ADVERTISING
 	bool "Bluetooth LE extended advertising"

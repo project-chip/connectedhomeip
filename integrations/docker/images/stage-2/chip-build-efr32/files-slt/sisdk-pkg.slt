@@ -1,0 +1,7 @@
+# Version defaults to "0" if not defined
+version = "0"
+ 
+ 
+[dependency]
+# Get a specific version of the package
+simplicity-sdk = { version = "2025.12.1-alpha@silabs", installer ="conan", prerelease=true }

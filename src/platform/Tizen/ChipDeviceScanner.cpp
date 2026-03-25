@@ -104,8 +104,7 @@ CHIP_ERROR ChipDeviceScanner::StartScanImpl()
             return reinterpret_cast<ChipDeviceScanner *>(self)->LeScanResultCb(result, scanInfo);
         },
         this);
-    VerifyOrReturnValue(ret == BT_ERROR_NONE, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "bt_adapter_le_start_scan() failed: %s", get_error_message(ret)));
+    VerifyOrReturnValue(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret));
     mIsScanning = true;
     return CHIP_NO_ERROR;
 }
@@ -119,45 +118,34 @@ static bool __IsScanFilterSupported()
     return is_supported;
 }
 
-int ChipDeviceScanner::SetupScanFilter(ScanFilterType filterType, const ScanFilterData & filterData)
+CHIP_ERROR ChipDeviceScanner::SetupScanFilter(ScanFilterType filterType, const ScanFilterData & filterData)
 {
-    VerifyOrReturnValue(__IsScanFilterSupported(), BT_ERROR_NONE, ChipLogError(DeviceLayer, "BLE scan filter not supported"));
+    VerifyOrReturnError(__IsScanFilterSupported(), MATTER_PLATFORM_ERROR(BT_ERROR_NOT_SUPPORTED));
 
-    int ret = CreateLEScanFilter(filterType);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "BLE scan filter creation failed: %s. Do Normal Scan", get_error_message(ret)));
+    int ret = bt_adapter_le_scan_filter_create(&mScanFilter);
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret));
 
-    ret = RegisterScanFilter(filterType, filterData);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "BLE scan filter registration failed: %s. Do Normal Scan", get_error_message(ret)));
-
-    return ret;
-
-exit:
-    UnRegisterScanFilter();
-    return ret;
+    ReturnErrorOnFailure(RegisterScanFilter(filterType, filterData), UnRegisterScanFilter());
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDeviceScanner::StartScan(ScanFilterType filterType, const ScanFilterData & filterData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrReturnError(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
-    // Scan Filter Setup if supported: silently bypass error & do filterless scan in case of error
-    SetupScanFilter(filterType, filterData);
+    // Setup scan filter if supported. Otherwise, do filterless scan.
+    CHIP_ERROR err = SetupScanFilter(filterType, filterData);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to set up scan filter: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogProgress(DeviceLayer, "Proceeding with filterless scan");
+    }
 
-    // All set to trigger LE Scan
     err = PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](ChipDeviceScanner * self) { return self->StartScanImpl(); }, this);
-    SuccessOrExit(err);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, TEMPORARY_RETURN_IGNORED StopScan());
 
     return CHIP_NO_ERROR;
-
-exit:
-    ChipLogError(DeviceLayer, "Start CHIP Scan could not succeed fully! Stop Scan...");
-    TEMPORARY_RETURN_IGNORED StopScan();
-    UnRegisterScanFilter();
-    return err;
 }
 
 CHIP_ERROR ChipDeviceScanner::StopScan()
@@ -188,60 +176,49 @@ void ChipDeviceScanner::UnRegisterScanFilter()
     if (mScanFilter)
     {
         bt_adapter_le_scan_filter_unregister(mScanFilter);
+        bt_adapter_le_scan_filter_destroy(mScanFilter);
         mScanFilter = nullptr;
     }
 }
 
-int ChipDeviceScanner::RegisterScanFilter(ScanFilterType filterType, const ScanFilterData & filterData)
+CHIP_ERROR ChipDeviceScanner::RegisterScanFilter(ScanFilterType filterType, const ScanFilterData & filterData)
 {
-    int ret = BT_ERROR_NONE;
+    int ret;
 
     switch (filterType)
     {
-    case ScanFilterType::kAddress: {
+    case ScanFilterType::kAddress:
         ChipLogProgress(DeviceLayer, "Register BLE scan filter: Address");
         ret = bt_adapter_le_scan_filter_set_device_address(mScanFilter, filterData.address);
-        VerifyOrExit(
-            ret == BT_ERROR_NONE,
+        VerifyOrReturnError(
+            ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
             ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_set_device_address() failed: %s", get_error_message(ret)));
         break;
-    }
-    case ScanFilterType::kServiceUUID: {
+    case ScanFilterType::kServiceUUID:
         ChipLogProgress(DeviceLayer, "Register BLE scan filter: Service UUID");
         ret = bt_adapter_le_scan_filter_set_service_uuid(mScanFilter, filterData.service_uuid);
-        VerifyOrExit(ret == BT_ERROR_NONE,
-                     ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_set_service_uuid() failed: %s", get_error_message(ret)));
+        VerifyOrReturnError(
+            ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+            ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_set_service_uuid() failed: %s", get_error_message(ret)));
         break;
-    }
-    case ScanFilterType::kServiceData: {
+    case ScanFilterType::kServiceData:
         ChipLogProgress(DeviceLayer, "Register BLE scan filter: Service Data");
         ret = bt_adapter_le_scan_filter_set_service_data(mScanFilter, filterData.service_uuid, filterData.service_data,
                                                          filterData.service_data_len);
-        VerifyOrExit(ret == BT_ERROR_NONE,
-                     ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_set_service_data() failed: %s", get_error_message(ret)));
+        VerifyOrReturnError(
+            ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+            ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_set_service_data() failed: %s", get_error_message(ret)));
         break;
-    }
     case ScanFilterType::kNoFilter:
     default:
-        goto exit;
+        return CHIP_NO_ERROR;
     }
 
     ret = bt_adapter_le_scan_filter_register(mScanFilter);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_register() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, MATTER_PLATFORM_ERROR(ret),
+                        ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_register() failed: %s", get_error_message(ret)));
 
-exit:
-    return ret;
-}
-
-int ChipDeviceScanner::CreateLEScanFilter(ScanFilterType filterType)
-{
-    int ret = bt_adapter_le_scan_filter_create(&mScanFilter);
-    VerifyOrExit(ret == BT_ERROR_NONE,
-                 ChipLogError(DeviceLayer, "bt_adapter_le_scan_filter_create() failed: %s", get_error_message(ret)));
-    ChipLogProgress(DeviceLayer, "BLE scan filter created successfully");
-exit:
-    return ret;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal

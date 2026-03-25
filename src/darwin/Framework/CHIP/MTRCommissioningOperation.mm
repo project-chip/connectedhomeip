@@ -123,6 +123,8 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     // Just log the first VID/PID we have; that's the best we can do.
     MATTER_LOG_METRIC(kMetricDeviceVendorID, payloads[0].vendorID);
     MATTER_LOG_METRIC(kMetricDeviceProductID, payloads[0].productID);
+    uint32_t capabilities = payloads[0].rendezvousInformation.HasValue() ? payloads[0].rendezvousInformation.Value().Raw() : 0;
+    MATTER_LOG_METRIC(kMetricDeviceDiscoveryCapabilities, capabilities);
 }
 
 - (void)startWithController:(MTRDeviceController *)controller
