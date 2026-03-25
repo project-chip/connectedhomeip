@@ -123,7 +123,8 @@ tests:
     - label:
           "Step 3: Verify the DUT indicates to the user that TH devices must be
           commissioned individually using their separate QR codes or Manual
-          Pairing Codes, when the combined QR code from Step-1 is scanned using the DUT=Commissioner device/app"
+          Pairing Codes, when the combined QR code from Step-1 is scanned using
+          the DUT=Commissioner device/app"
       PICS:
           "!(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) &&
           MCORE.DD.CTRL_CONCATENATED_QR_CODE_2"
