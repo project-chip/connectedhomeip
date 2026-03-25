@@ -24,11 +24,11 @@ namespace chip::app::Clusters::Actions {
  * Legacy wrapper around ActionsCluster for backwards compatibility with existing applications.
  *
  * LIMITATIONS:
- *   - Assumes a single aggregator endpoint. The Matter spec classifies the Actions cluster as
- *     "Scope: Node", so only one instance should exist on the node. Creating more than one
- *     instance will log an error.
- *   - The Delegate interface has no EndpointId parameters; it is designed for this single-instance
- *     use case.
+ *   - Each instance manages a single aggregator endpoint. While the spec permits multiple
+ *     aggregator endpoints on a device (each with its own Actions cluster), this implementation
+ *     supports one instance per aggregator endpoint — create one ActionsServer per aggregator.
+ *   - The Delegate interface has no EndpointId parameters; it is scoped to a single endpoint
+ *     instance.
  *
  * NEW CODE should use ActionsCluster directly (see ActionsCluster.h), which integrates cleanly
  * with the code-driven data model and does not carry the Ember/ZAP compatibility overhead.
@@ -77,8 +77,8 @@ private:
     std::string mSetupURL;
     RegisteredServerCluster<ActionsCluster> mCluster;
 
-    // The Actions cluster has "Scope: Node" per the Matter spec, meaning only one
-    // instance should exist on the node (on a single aggregator endpoint).
+    // Counts active instances for diagnostic logging. Multiple instances are valid when
+    // the device has multiple aggregator endpoints (e.g. separate Zigbee and Z-Wave bridges).
     static uint8_t sInstanceCount;
 };
 

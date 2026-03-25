@@ -69,11 +69,13 @@ ActionsServer::ActionsServer(EndpointId endpointId, Delegate & delegate) :
     mSetupURL(ReadSetupURL(endpointId)),
     mCluster(endpointId, delegate, BuildOptionalAttributes(endpointId), SetupURLSpan(mSetupURL))
 {
-    // The Actions cluster has "Scope: Node" per the Matter spec: it must live on a single
-    // aggregator endpoint. Log an error if an application creates more than one instance.
+    // The Actions cluster has "Scope: Node" per the Matter spec. However, a device can have
+    // multiple aggregator endpoints (e.g. a Zigbee bridge on EP1 and a Z-Wave bridge on EP2),
+    // and each aggregator may host its own Actions cluster instance. Multiple instances are
+    // therefore valid; this counter is retained for diagnostic purposes only.
     if (++sInstanceCount > 1)
     {
-        ChipLogError(Zcl, "ActionsServer: multiple instances created. The Actions cluster must be a node-scoped singleton.");
+        ChipLogDetail(Zcl, "ActionsServer: %u instances active (multiple aggregator endpoints in use).", sInstanceCount);
     }
 }
 
