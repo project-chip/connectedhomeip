@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/zone-management-server/Delegate.h>
 #include <app/clusters/zone-management-server/TwoDCartesianZoneStorage.h>
 #include <app/data-model-provider/MetadataTypes.h>

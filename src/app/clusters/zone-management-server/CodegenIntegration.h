@@ -70,7 +70,39 @@ public:
         return mPendingAppSensitivity.value_or(1);
     }
 
+    const std::vector<ZoneInformationStorage> & GetZones() const
+    {
+        if (mCluster.IsConstructed())
+        {
+            return mCluster.Cluster().GetZones();
+        }
+        static const std::vector<ZoneInformationStorage> empty;
+        return empty;
+    }
+
+    const std::vector<ZoneTriggerControlStruct> & GetTriggers() const
+    {
+        if (mCluster.IsConstructed())
+        {
+            return mCluster.Cluster().GetTriggers();
+        }
+        static const std::vector<ZoneTriggerControlStruct> empty;
+        return empty;
+    }
+
     Optional<ZoneTriggerControlStruct> GetTriggerForZone(uint16_t zoneId) const;
+
+    uint8_t GetMaxUserDefinedZones() const { return mConfig.maxUserDefinedZones; }
+    uint8_t GetMaxZones() const { return mConfig.maxZones; }
+    uint8_t GetSensitivityMax() const { return mConfig.sensitivityMax; }
+    const TwoDCartesianVertexStruct & GetTwoDCartesianMax() const { return mConfig.twoDCartesianMax; }
+
+    CHIP_ERROR AddZone(const ZoneInformationStorage & zone);
+    CHIP_ERROR UpdateZone(uint16_t zoneId, const ZoneInformationStorage & zone);
+    CHIP_ERROR RemoveZone(uint16_t zoneId);
+
+    Protocols::InteractionModel::Status AddOrUpdateTrigger(const ZoneTriggerControlStruct & trigger);
+    Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneId);
 
     Protocols::InteractionModel::Status GenerateZoneTriggeredEvent(uint16_t zoneID, ZoneEventTriggeredReasonEnum triggerReason);
     Protocols::InteractionModel::Status GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEventStoppedReasonEnum stopReason);

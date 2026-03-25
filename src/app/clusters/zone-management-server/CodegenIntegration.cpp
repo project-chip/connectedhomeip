@@ -117,6 +117,41 @@ CHIP_ERROR ZoneMgmtServer::SetSensitivity(uint8_t sensitivity)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ZoneMgmtServer::AddZone(const ZoneInformationStorage & zone)
+{
+    VerifyOrReturnError(mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Zcl, "ZoneManagement[ep=%d]: %s called before cluster init", mEndpointId, __func__));
+    return mCluster.Cluster().AddZone(zone);
+}
+
+CHIP_ERROR ZoneMgmtServer::UpdateZone(uint16_t zoneId, const ZoneInformationStorage & zone)
+{
+    VerifyOrReturnError(mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Zcl, "ZoneManagement[ep=%d]: %s called before cluster init", mEndpointId, __func__));
+    return mCluster.Cluster().UpdateZone(zoneId, zone);
+}
+
+CHIP_ERROR ZoneMgmtServer::RemoveZone(uint16_t zoneId)
+{
+    VerifyOrReturnError(mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(Zcl, "ZoneManagement[ep=%d]: %s called before cluster init", mEndpointId, __func__));
+    return mCluster.Cluster().RemoveZone(zoneId);
+}
+
+Protocols::InteractionModel::Status ZoneMgmtServer::AddOrUpdateTrigger(const ZoneTriggerControlStruct & trigger)
+{
+    VerifyOrReturnValue(mCluster.IsConstructed(), Protocols::InteractionModel::Status::Failure,
+                        ChipLogError(Zcl, "ZoneManagement[ep=%d]: %s called before cluster init", mEndpointId, __func__));
+    return mCluster.Cluster().AddOrUpdateTrigger(trigger);
+}
+
+Protocols::InteractionModel::Status ZoneMgmtServer::RemoveTrigger(uint16_t zoneId)
+{
+    VerifyOrReturnValue(mCluster.IsConstructed(), Protocols::InteractionModel::Status::Failure,
+                        ChipLogError(Zcl, "ZoneManagement[ep=%d]: %s called before cluster init", mEndpointId, __func__));
+    return mCluster.Cluster().RemoveTrigger(zoneId);
+}
+
 } // namespace ZoneManagement
 } // namespace Clusters
 } // namespace app
