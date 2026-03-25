@@ -20,19 +20,19 @@ TV_CASTING_APP optimize_size block:
 import os
 import re
 
-from hypothesis import given, settings, HealthCheck
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Paths
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Paths
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 ANDROID_PY = os.path.join(REPO_ROOT, "scripts", "build", "builders", "android.py")
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Helpers
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Helpers
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 
 def _read_file(path: str) -> str:
@@ -47,7 +47,7 @@ def _extract_optimize_size_block(content: str) -> str:
 
     Returns the indented block text.
     """
-#Find the `if self.optimize_size :` line
+# Find the `if self.optimize_size :` line
     pattern = r"^(\s+)if self\.optimize_size:\s*$"
     m = re.search(pattern, content, re.MULTILINE)
     assert m is not None, (
@@ -56,19 +56,19 @@ def _extract_optimize_size_block(content: str) -> str:
     indent = m.group(1)
     block_indent = indent + "    "  # one level deeper
 
-#Collect all lines that are part of this block(indented deeper or blank)
+# Collect all lines that are part of this block(indented deeper or blank)
     lines = content[m.end():].split("\n")
     block_lines = []
     for line in lines:
-#Blank lines are part of the block
+# Blank lines are part of the block
         if line.strip() == "":
             block_lines.append(line)
             continue
-#Lines indented at block_indent level or deeper are part of the block
+# Lines indented at block_indent level or deeper are part of the block
         if line.startswith(block_indent):
             block_lines.append(line)
             continue
-#A line at the same or lesser indent ends the block
+# A line at the same or lesser indent ends the block
         break
 
     return "\n".join(block_lines)
@@ -109,7 +109,7 @@ def _find_gn_arg_assignment(block: str, arg_name: str) -> str | None:
     Find a `gn_args["<arg_name>"] = <value>` assignment in the block.
     Returns the RHS value as a string, or None if not found.
     """
-#Match multi - line string assignments using parentheses
+# Match multi - line string assignments using parentheses
     pattern = (
         rf'gn_args\[\s*"{re.escape(arg_name)}"\s*\]\s*=\s*'
         r'(\([\s\S]*?\)|"[^"]*"|[^\n]+)'
@@ -119,9 +119,9 @@ def _find_gn_arg_assignment(block: str, arg_name: str) -> str | None:
         return m.group(1).strip()
     return None
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Property - based tests
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Property - based tests
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 
 @given(
@@ -255,9 +255,9 @@ def test_slim_decoder_paths_use_correct_gn_prefix(override_arg):
         f"`tv-casting-app/tv-casting-common/` directory. Got: {value}"
     )
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Allow running directly
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Allow running directly
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 if __name__ == "__main__":
     import sys
 

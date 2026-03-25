@@ -15,7 +15,7 @@ Property 4: Decode logic equivalence for casting clusters
 import os
 import re
 
-from hypothesis import given, settings, HealthCheck
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 #-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -58,10 +58,10 @@ FULL_EVENT_DECODER = os.path.join(
     "CHIPEventTLVValueDecoder.cpp",
 )
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Expected casting cluster set(18 clusters)
-#Note : C++ identifier is `WakeOnLan` (not `WakeOnLAN`).
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Expected casting cluster set(18 clusters)
+# Note : C++ identifier is `WakeOnLan` (not `WakeOnLAN`).
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 CASTING_CLUSTERS = sorted([
     "AccountLogin",
@@ -84,9 +84,9 @@ CASTING_CLUSTERS = sorted([
     "WakeOnLan",
 ])
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Helpers
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Helpers
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 
 def _read_file(path: str) -> str:
@@ -103,29 +103,29 @@ def _extract_case_block(content: str, cluster_name: str) -> str:
 }
 `.Returns the text * between *(and including) the opening and closing braces of the case block.""
                                                                                                "
-#Build the pattern to find the start of the case block
-    pattern = r "case\s+app::Clusters::" + re.escape(cluster_name) + r "::Id\s*:\s*\{" match = re.search(pattern,
+# Build the pattern to find the start of the case block
+   pattern = r "case\s+app::Clusters::" + re.escape(cluster_name) + r "::Id\s*:\s*\{" match = re.search(pattern,
                                                                                                          content) if match is None:
 raise ValueError(f "Could not find case block for cluster '{cluster_name}'")
 
-#Start brace - matching from the opening '{' of the case block
+# Start brace - matching from the opening '{' of the case block
     open_brace_pos = match.end() - 1 #position of the '{' depth = 0 i = open_brace_pos while i < len(content) :
     ch                                                                = content[i] if ch == "{" : depth
     += 1 elif ch == "}" : depth -= 1 if depth ==
     0 :
-#Found the matching closing brace
-#Return everything between(exclusive of outer braces)
+# Found the matching closing brace
+# Return everything between(exclusive of outer braces)
     return content [open_brace_pos + 1:i]
-#Skip string literals to avoid counting braces inside strings
+# Skip string literals to avoid counting braces inside strings
     elif ch
     == '"' : i
     += 1 while i < len(content) and content[i] != '"' : if content[i] == "\\" : i += 1 #skip escaped character i += 1
-#Skip single - line comments
+# Skip single - line comments
         elif ch
         == "/" and
     i + 1 < len(content) and content[i + 1] == "/" : i
     += 2 while i < len(content) and content[i] != "\n" : i += 1
-#Skip multi - line comments
+# Skip multi - line comments
         elif ch
         == "/" and
     i + 1 < len(content) and content[i + 1] == "*" : i
@@ -148,9 +148,9 @@ into a single space and strip leading /
     return re.sub(r "\s+", " ", text)
         .strip()
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Pre - load file contents(read once, reused across hypothesis examples)
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Pre - load file contents(read once, reused across hypothesis examples)
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
             _slim_content = None _full_content = None
 
@@ -171,9 +171,9 @@ into a single space and strip leading /
                                     ->str : global _full_event_content if _full_event_content is None
     : _full_event_content = _read_file(FULL_EVENT_DECODER) return _full_event_content
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Property - based tests
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Property - based tests
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
     @given(cluster = st.sampled_from(CASTING_CLUSTERS))
         @settings(max_examples = 100, suppress_health_check = [HealthCheck.function_scoped_fixture], deadline = None, )
@@ -201,9 +201,9 @@ into a single space and strip leading /
             (f "Decode logic mismatch for cluster '{cluster}'.\n" f "Slim (first 200 chars): {slim_normalized[:200]}...\n" f
                "Full (first 200 chars): {full_normalized[:200]}...")
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Property - based test — Event decoder
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Property - based test — Event decoder
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
                 @given(cluster = st.sampled_from(CASTING_CLUSTERS))
                     @settings(max_examples = 100, suppress_health_check = [HealthCheck.function_scoped_fixture],
@@ -235,9 +235,9 @@ into a single space and strip leading /
         (f "Event decode logic mismatch for cluster '{cluster}'.\n" f "Slim (first 200 chars): {slim_normalized[:200]}...\n" f
            "Full (first 200 chars): {full_normalized[:200]}...")
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Allow running directly
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Allow running directly
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
             if __name__
     == "__main__":
 import sys

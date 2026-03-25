@@ -19,19 +19,19 @@ casting - client - cluster -
     settings,
     HealthCheck from hypothesis import strategies as st
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Paths
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Paths
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
         REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")) SLIM_ATTR_DECODER =
             os.path.join(REPO_ROOT, "examples", "tv-casting-app", "tv-casting-common", "casting-CHIPAttributeTLVValueDecoder.cpp", )
                 SLIM_EVENT_DECODER =
                 os.path.join(REPO_ROOT, "examples", "tv-casting-app", "tv-casting-common", "casting-CHIPEventTLVValueDecoder.cpp", )
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Expected casting cluster set(18 clusters)
-#Note : In the C++ code, the identifier is `WakeOnLan` (not `WakeOnLAN`).
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Expected casting cluster set(18 clusters)
+# Note : In the C++ code, the identifier is `WakeOnLan` (not `WakeOnLAN`).
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
                     EXPECTED_CASTING_CLUSTERS = frozenset({
                     "AccountLogin",
@@ -54,9 +54,9 @@ casting - client - cluster -
                     "WakeOnLan",
                 })
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Helpers
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Helpers
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
                                                     def _read_file(path : str) -> str : with open(path, "r") as f
     : return f
@@ -78,9 +78,9 @@ casting - client - cluster -
     pattern                                       = r
     "case\s+app::Clusters::(\w+)::Id\s*:" matches = re.findall(pattern, content) return set(matches)
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Property - based tests
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Property - based tests
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
                                                         @given(cluster = st.sampled_from(sorted(EXPECTED_CASTING_CLUSTERS)), )
                                                             @settings(max_examples          = 100,
@@ -147,9 +147,9 @@ def test_attribute_decoder_cluster_set_exact_match(dummy):
                                                                                   assert len(found_clusters) == 18,
         (f "Expected exactly 18 clusters, found {len(found_clusters)}: " f "{sorted(found_clusters)}")
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Property - based tests — Event Decoder
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Property - based tests — Event Decoder
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
             @given(cluster = st.sampled_from(sorted(EXPECTED_CASTING_CLUSTERS)), )
                 @settings(max_examples = 100, suppress_health_check = [HealthCheck.function_scoped_fixture], deadline = None, ) def
@@ -213,9 +213,9 @@ def test_event_decoder_cluster_set_exact_match(dummy):
                                                                         assert len(found_clusters) == 18,
         (f "Expected exactly 18 clusters, found {len(found_clusters)}: " f "{sorted(found_clusters)}")
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Allow running directly
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Allow running directly
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
             if __name__
         == "__main__":
 import sys

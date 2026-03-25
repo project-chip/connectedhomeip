@@ -21,16 +21,16 @@ casting - client - cluster - reduction Property 2 : Non -
     settings, HealthCheck,
     assume from hypothesis import strategies as st
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Paths
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Paths
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
         REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")) SLIM_ATTR_DECODER =
             os.path.join(REPO_ROOT, "examples", "tv-casting-app", "tv-casting-common", "casting-CHIPAttributeTLVValueDecoder.cpp", )
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Expected casting cluster set — hex IDs from the Matter spec
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Expected casting cluster set — hex IDs from the Matter spec
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
                 CASTING_CLUSTER_IDS = frozenset(
                 { 0x050E, #AccountLogin 0x050D, #ApplicationBasic 0x050C, #ApplicationLauncher 0x050B, #AudioOutput 0x001E,
@@ -60,9 +60,9 @@ casting - client - cluster - reduction Property 2 : Non -
                     "WakeOnLan",
                 })
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Helpers
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Helpers
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
                                             def _read_file(path : str) -> str : with open(path, "r") as f
     : return f
@@ -85,7 +85,7 @@ casting - client - cluster - reduction Property 2 : Non -
     We parse brace depth to distinguish the top-level switch default from
     inner (per-cluster attribute) switch defaults.
     """
-#Find the start of DecodeAttributeValue function body
+# Find the start of DecodeAttributeValue function body
     func_match = re.search(
         r"jobject\s+DecodeAttributeValue\s*\([^)]*\)\s*\{", content
     )
@@ -93,28 +93,28 @@ casting - client - cluster - reduction Property 2 : Non -
 return False
 
            body_start = func_match.end()
-#Track brace depth : we start at depth 1(inside the function body)
+# Track brace depth : we start at depth 1(inside the function body)
                             depth = 1
-#The top - level switch adds another depth level; its default is at depth 2
-#(depth 1 = function body, depth 2 = inside the switch)
+# The top - level switch adds another depth level; its default is at depth 2
+# (depth 1 = function body, depth 2 = inside the switch)
 
-#Find the `switch (aPath.mClusterId)` opening brace
+# Find the `switch (aPath.mClusterId)` opening brace
        switch_match = re.search(r "switch\s*\(\s*aPath\.mClusterId\s*\)\s*\{", content [body_start:]) if not switch_match
     : return False
 
           switch_body_start = body_start +
            switch_match.end()
-#Now scan through the switch body tracking depth
-#We're looking for `default:` at depth 0 relative to the switch body
+# Now scan through the switch body tracking depth
+# We're looking for `default:` at depth 0 relative to the switch body
                switch_depth = 1 #we 're inside the switch' s opening brace i = switch_body_start while i < len(content) and
            switch_depth > 0 : ch = content[i] if ch == "{" : switch_depth += 1 elif ch == "}" : switch_depth -=
        1 if switch_depth == 0 : break elif ch == "d" and
            switch_depth ==
                1 :
-#Check for `default :` at the top level of the switch
+# Check for `default :` at the top level of the switch
     candidate = content [i:i + 8] if candidate ==
            "default:" :
-#Look ahead for the error assignment
+# Look ahead for the error assignment
     lookahead = content [i:i + 200] if "CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB" in lookahead
     : return True i += 1
 
@@ -126,13 +126,13 @@ return False
           level switch statement closes,
            the function returns `nullptr`.This is the code path taken when the default case breaks out of the switch.""
                                                                                                                      "
-#Find the function body
+# Find the function body
            func_match = re.search(r "jobject\s+DecodeAttributeValue\s*\([^)]*\)\s*\{", content) if not func_match:
 return False
 
            body_start = func_match.end()
 
-#Find the switch statement
+# Find the switch statement
                             switch_match = re.search(r "switch\s*\(\s*aPath\.mClusterId\s*\)\s*\{",
                                                      content [body_start:]) if not switch_match
     : return False
@@ -140,17 +140,17 @@ return False
           switch_body_start = body_start +
            switch_match.end()
 
-#Walk to find the closing brace of the switch
+# Walk to find the closing brace of the switch
                depth = 1 i = switch_body_start while i < len(content) and depth > 0 : if content[i] == "{" : depth +=
        1 elif content[i] == "}" : depth -= 1 i += 1
 
-#i now points just past the closing brace of the switch
-#Look for `return nullptr;` between here and the function's closing brace
+# i now points just past the closing brace of the switch
+# Look for `return nullptr;` between here and the function's closing brace
        remaining = content [i:i + 200] return "return nullptr;" in remaining
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Property - based tests
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Property - based tests
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
            @given(dummy = st.just(True))
                @settings(max_examples = 1, suppress_health_check = [HealthCheck.function_scoped_fixture], deadline = None, )
@@ -208,22 +208,22 @@ def test_random_non_casting_cluster_ids_hit_default(cluster_id):
 
             content = _read_file(SLIM_ATTR_DECODER) found_cluster_names = _extract_top_level_cluster_cases(content)
 
-#Verify the found clusters are exactly the casting set
+# Verify the found clusters are exactly the casting set
                                                                               assert found_cluster_names
         == CASTING_CLUSTER_NAMES,
             (f "Unexpected cluster set in decoder. " f "Expected: {sorted(CASTING_CLUSTER_NAMES)}, " f
                "Found: {sorted(found_cluster_names)}")
 
-#Since the found clusters are exactly the 18 casting clusters,
-#and our cluster_id is NOT in the casting ID set, it cannot match
-#any case label — it will fall through to the default case.
-#This is a logical confirmation : no case label exists for this ID.
+# Since the found clusters are exactly the 18 casting clusters,
+# and our cluster_id is NOT in the casting ID set, it cannot match
+# any case label — it will fall through to the default case.
+# This is a logical confirmation : no case label exists for this ID.
                 assert cluster_id not in CASTING_CLUSTER_IDS,
             (f "Cluster ID 0x{cluster_id:04X} is in the casting set but should not be.")
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Allow running directly
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Allow running directly
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
                 if __name__
         == "__main__":
 import sys
@@ -232,23 +232,23 @@ import sys
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            sys.exit(0 if all_passed else 1)
 
-#== == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == =
-#Event Decoder Tests — Property 2 : Non - casting cluster error handling
+# == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == =
+# Event Decoder Tests — Property 2 : Non - casting cluster error handling
 #
-#** Validates : Requirements 2.2, 5.3 **
+# ** Validates : Requirements 2.2, 5.3 **
 #
-#These tests parse `casting - CHIPEventTLVValueDecoder.cpp` and verify that:
+# These tests parse `casting - CHIPEventTLVValueDecoder.cpp` and verify that:
 # 1. The top - level switch contains a `default :` case that sets
 #    `CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB`.
 # 2. The function returns `nullptr` after the switch (for the default case path).
 # 3. Random cluster IDs not in the casting set would hit the default case.
-#== == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == =
+# == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == =
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         SLIM_EVENT_DECODER = os.path.join(REPO_ROOT, "examples", "tv-casting-app", "tv-casting-common", "casting-CHIPEventTLVValueDecoder.cpp", )
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Event - specific helpers
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Event - specific helpers
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               def _find_event_top_level_default_case(content:str)->bool : ""
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           "
@@ -257,21 +257,21 @@ import sys
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            Strategy:find the function body, then locate the outermost switch's default case by looking for the pattern at the correct brace depth.We parse brace depth to distinguish the top - level switch default from inner(per - cluster event) switch defaults.""
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      "
-#Find the start of DecodeEventValue function body
+# Find the start of DecodeEventValue function body
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 func_match = re.search(r "jobject\s+DecodeEventValue\s*\([^)]*\)\s*\{", content) if not func_match: return False
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        body_start = func_match.end()
 
-#Find the `switch (aPath.mClusterId)` opening brace
+# Find the `switch (aPath.mClusterId)` opening brace
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        switch_match = re.search(r "switch\s*\(\s*aPath\.mClusterId\s*\)\s*\{", content[body_start: ]) if not switch_match: return False
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 switch_body_start = body_start + switch_match.end()
-#Now scan through the switch body tracking depth
-#We're looking for `default:` at depth 0 relative to the switch body
+# Now scan through the switch body tracking depth
+# We're looking for `default:` at depth 0 relative to the switch body
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     switch_depth = 1 #we 're inside the switch' s opening brace i = switch_body_start while i < len(content) and switch_depth > 0 :ch = content[i] if ch == "{" :switch_depth += 1 elif ch == "}" :switch_depth -= 1 if switch_depth == 0 : break elif ch == "d" and switch_depth == 1 :
-#Check for `default :` at the top level of the switch
+# Check for `default :` at the top level of the switch
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 candidate = content[i:i + 8] if candidate == "default:" :
-#Look ahead for the error assignment
+# Look ahead for the error assignment
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 lookahead = content[i:i + 200] if "CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB" in lookahead: return True i += 1
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 return False
@@ -280,26 +280,26 @@ import sys
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       "
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  Verify that after the top - level switch statement closes, the function returns `nullptr`.This is the code path taken when the default case breaks out of the switch.""
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       "
-#Find the function body
+# Find the function body
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             func_match = re.search(r "jobject\s+DecodeEventValue\s*\([^)]*\)\s*\{", content) if not func_match: return False
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    body_start = func_match.end()
 
-#Find the switch statement
+# Find the switch statement
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    switch_match = re.search(r "switch\s*\(\s*aPath\.mClusterId\s*\)\s*\{", content[body_start: ]) if not switch_match: return False
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             switch_body_start = body_start + switch_match.end()
 
-#Walk to find the closing brace of the switch
+# Walk to find the closing brace of the switch
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 depth = 1 i = switch_body_start while i < len(content) and depth > 0 : if content[i] == "{" :depth += 1 elif content[i] == "}" :depth -= 1 i += 1
 
-#i now points just past the closing brace of the switch
-#Look for `return nullptr;` between here and the function's closing brace
+# i now points just past the closing brace of the switch
+# Look for `return nullptr;` between here and the function's closing brace
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             remaining = content[i:i + 200] return "return nullptr;" in remaining
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Event decoder property - based tests
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Event decoder property - based tests
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @given(dummy = st.just(True)) @settings(max_examples = 1, suppress_health_check =[HealthCheck.function_scoped_fixture], deadline = None, ) def test_event_top_level_switch_has_default_case_with_error(dummy) : ""
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             "
@@ -329,10 +329,10 @@ import sys
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             content = _read_file(SLIM_EVENT_DECODER) found_cluster_names = _extract_top_level_cluster_cases(content)
 
-#Verify the found clusters are exactly the casting set
+# Verify the found clusters are exactly the casting set
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 assert found_cluster_names == CASTING_CLUSTER_NAMES, (f "Unexpected cluster set in event decoder. " f "Expected: {sorted(CASTING_CLUSTER_NAMES)}, " f "Found: {sorted(found_cluster_names)}")
 
-#Since the found clusters are exactly the 18 casting clusters,
-#and our cluster_id is NOT in the casting ID set, it cannot match
-#any case label — it will fall through to the default case.
+# Since the found clusters are exactly the 18 casting clusters,
+# and our cluster_id is NOT in the casting ID set, it cannot match
+# any case label — it will fall through to the default case.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           assert cluster_id not in CASTING_CLUSTER_IDS, (f "Cluster ID 0x{cluster_id:04X} is in the casting set but should not be.")

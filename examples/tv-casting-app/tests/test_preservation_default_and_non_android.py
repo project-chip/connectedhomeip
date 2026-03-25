@@ -30,9 +30,9 @@ remain unchanged.It follows observation -
                                    settings,
                                    HealthCheck from hypothesis import strategies as st
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Paths
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Paths
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
     REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
@@ -42,9 +42,9 @@ remain unchanged.It follows observation -
                 os.path
                     .join(REPO_ROOT, "examples", "tv-casting-app", "tv-casting-common", "casting-cluster-objects.cpp", )
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Helpers — lightweight GNI parser
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Helpers — lightweight GNI parser
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
                         def _read_file(path : str)
                     ->str : ""
@@ -71,12 +71,12 @@ else
     """
     stripped = _strip_comments(text)
 
-#Find the if (optimize_apk_size) block first
+# Find the if (optimize_apk_size) block first
     match = re.search(r"if\s*\(\s*optimize_apk_size\s*\)", stripped)
     if not match:
         return ""
 
-#Walk past the if - block's opening brace
+# Walk past the if - block's opening brace
     brace_start = stripped.index("{", match.end())
     depth = 1
     pos = brace_start + 1
@@ -87,8 +87,8 @@ else
             depth -= 1
         pos += 1
 
-#pos is now just past the closing } of the if - block.
-#Look for `else {`
+# pos is now just past the closing } of the if - block.
+# Look for `else {`
     rest = stripped[pos:]
     else_match = re.search(r"else\s*\{", rest)
     if not else_match:
@@ -131,9 +131,9 @@ def _unique_cluster_dirs(text: str) -> set:
     """
     return set(re.findall(r"#include\s+<clusters/([^/]+)/", text))
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Property - based tests
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Property - based tests
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 
 @given(optimize_apk_size=st.just(False))
@@ -156,14 +156,14 @@ def test_android_default_build_preserves_dev_flags(optimize_apk_size: bool):
 
     gni_text = _read_file(ANDROID_ARGS_GNI)
 
-#-- - Check the else(default) block -- -
+# -- - Check the else(default) block -- -
     else_block = _extract_else_block(gni_text)
     assert else_block, (
         "Could not find the `else` block after `if (optimize_apk_size)` "
         "in android/args.gni"
     )
 
-#chip_build_libshell = true
+# chip_build_libshell = true
     libshell_val = _extract_top_level_assignment(else_block, "chip_build_libshell")
     assert libshell_val is not None, (
         "REGRESSION: `chip_build_libshell` is not set in the default (else) block "
@@ -174,7 +174,7 @@ def test_android_default_build_preserves_dev_flags(optimize_apk_size: bool):
         f"in the default build"
     )
 
-#optimize_for_size = false
+# optimize_for_size = false
     opt_size_val = _extract_top_level_assignment(else_block, "optimize_for_size")
     assert opt_size_val is not None, (
         "REGRESSION: `optimize_for_size` is not set in the default (else) block "
@@ -185,7 +185,7 @@ def test_android_default_build_preserves_dev_flags(optimize_apk_size: bool):
         f"in the default build"
     )
 
-#chip_cluster_objects_source_override should NOT be set in the else block
+# chip_cluster_objects_source_override should NOT be set in the else block
     stripped = _strip_comments(gni_text)
     override_in_else = _extract_top_level_assignment(
         else_block, "chip_cluster_objects_source_override"
@@ -196,7 +196,7 @@ def test_android_default_build_preserves_dev_flags(optimize_apk_size: bool):
         f"be set in the optimize_apk_size block (if at all)"
     )
 
-#matter_enable_tlv_decoder_api should NOT be set in the else block
+# matter_enable_tlv_decoder_api should NOT be set in the else block
     tlv_in_else = _extract_top_level_assignment(
         else_block, "matter_enable_tlv_decoder_api"
     )
@@ -258,26 +258,26 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
 
     content = _read_file(SLIM_CLUSTER_FILE)
 
-#Count.ipp includes
+# Count.ipp includes
     ipp_count = _count_ipp_includes(content)
-#The file currently has 157 .ipp includes.Allow a small tolerance
-#(±5) for minor cluster additions / removals, but catch large regressions
-#like accidentally replacing with the full cluster - objects.cpp(~800 +).
+# The file currently has 157 .ipp includes.Allow a small tolerance
+# (±5) for minor cluster additions / removals, but catch large regressions
+# like accidentally replacing with the full cluster - objects.cpp(~800 +).
     assert 100 <= ipp_count <= 200, (
         f"REGRESSION: casting-cluster-objects.cpp has {ipp_count} .ipp includes. "
         f"Expected ~157 (between 100 and 200). If this is much larger, the slim "
         f"file may have been replaced with the full cluster-objects.cpp."
     )
 
-#Verify unique cluster directories
+# Verify unique cluster directories
     cluster_dirs = _unique_cluster_dirs(content)
-#Currently 39 cluster dirs + 'shared' = 40 total
+# Currently 39 cluster dirs + 'shared' = 40 total
     assert 30 <= len(cluster_dirs) <= 50, (
         f"REGRESSION: casting-cluster-objects.cpp references {len(cluster_dirs)} "
         f"unique cluster directories. Expected ~40 (between 30 and 50)."
     )
 
-#Verify key casting - specific clusters are present
+# Verify key casting - specific clusters are present
     expected_casting_clusters = {
         "MediaPlayback",
         "ContentLauncher",
@@ -302,7 +302,7 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
         f"clusters: {missing}"
     )
 
-#Verify key infrastructure clusters are present
+# Verify key infrastructure clusters are present
     expected_infra_clusters = {
         "GeneralCommissioning",
         "OperationalCredentials",
@@ -318,9 +318,9 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
         f"clusters: {missing_infra}"
     )
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Allow running directly
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Allow running directly
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 if __name__ == "__main__":
     import sys
 

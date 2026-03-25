@@ -22,12 +22,12 @@ import re
 import textwrap
 
 import hypothesis
-from hypothesis import given, settings, HealthCheck
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Helpers — lightweight GNI parser
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Helpers — lightweight GNI parser
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 ANDROID_ARGS_GNI = os.path.join(
@@ -93,14 +93,14 @@ def _extract_assignment(block: str, var_name: str) -> str | None:
         return None
     return m.group(1).strip().rstrip(";").strip()
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Property - based test
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Property - based test
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-#We use Hypothesis to parameterise over a(trivially small) strategy so the
-#test is formally a property - based test, but the real assertion is against the
-#concrete file on disk.The strategy generates a boolean flag that is always
-#True — representing `optimize_apk_size = true`.
+# We use Hypothesis to parameterise over a(trivially small) strategy so the
+# test is formally a property - based test, but the real assertion is against the
+# concrete file on disk.The strategy generates a boolean flag that is always
+# True — representing `optimize_apk_size = true`.
 
 @given(optimize_apk_size=st.just(True))
 @settings(
@@ -120,14 +120,14 @@ def test_android_optimized_build_uses_slim_cluster_override(optimize_apk_size: b
     """
     assert optimize_apk_size, "Test only applies when optimize_apk_size is true"
 
-#-- - Parse the android args.gni -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- - Parse the android args.gni -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
     gni_text = _read_gni(ANDROID_ARGS_GNI)
     opt_block = _extract_optimize_block(gni_text)
     assert opt_block, (
         "Could not find `if (optimize_apk_size) { ... }` block in android/args.gni"
     )
 
-#-- - Assert 1 : chip_cluster_objects_source_override is set -- -- -- -- -- -- -- --
+# -- - Assert 1 : chip_cluster_objects_source_override is set -- -- -- -- -- -- -- --
     override_val = _extract_assignment(opt_block, "chip_cluster_objects_source_override")
     assert override_val is not None, (
         "COUNTEREXAMPLE: `chip_cluster_objects_source_override` is NOT set inside "
@@ -136,13 +136,13 @@ def test_android_optimized_build_uses_slim_cluster_override(optimize_apk_size: b
         "even when optimize_apk_size = true."
     )
 
-#The value should reference the slim casting - cluster - objects.cpp
+# The value should reference the slim casting - cluster - objects.cpp
     assert "casting-cluster-objects.cpp" in override_val, (
         f"COUNTEREXAMPLE: `chip_cluster_objects_source_override` is set to "
         f"`{override_val}` which does not reference casting-cluster-objects.cpp"
     )
 
-#-- - Assert 2 : matter_enable_tlv_decoder_api is false -- -- -- -- -- -- -- -- -- -- -
+# -- - Assert 2 : matter_enable_tlv_decoder_api is false -- -- -- -- -- -- -- -- -- -- -
     tlv_val = _extract_assignment(opt_block, "matter_enable_tlv_decoder_api")
     assert tlv_val is not None, (
         "COUNTEREXAMPLE: `matter_enable_tlv_decoder_api` is NOT set inside "
@@ -155,9 +155,9 @@ def test_android_optimized_build_uses_slim_cluster_override(optimize_apk_size: b
         f"instead of `false` — the TLV decoder dependency is not resolved."
     )
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Allow running directly : python test_bug_condition_android_cluster_override.py
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Allow running directly : python test_bug_condition_android_cluster_override.py
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 if __name__ == "__main__":
     print("Running bug condition exploration test...")
 try :

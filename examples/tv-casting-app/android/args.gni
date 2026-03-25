@@ -24,7 +24,8 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/tv-casting-app/tv-casting-common/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
-import("${chip_root}/examples/tv-casting-app/tv-casting-common/tv-casting-common.gni")
+import(
+    "${chip_root}/examples/tv-casting-app/tv-casting-common/tv-casting-common.gni")
 
 chip_enable_additional_data_advertising = true
 
@@ -59,8 +60,8 @@ if (optimize_apk_size) {
   # build path that evaluates args.gni AFTER args.gn (e.g. a manual
   # gn gen with optimize_apk_size=true in args.gn directly).
   chip_build_libshell = false
-  optimize_for_size = true   # -Os (size) instead of -O2 (speed)
-  symbol_level = 0           # -g0: no debug symbols
+  optimize_for_size = true  # -Os (size) instead of -O2 (speed)
+  symbol_level = 0  # -g0: no debug symbols
 
   # Slim TLV decoders covering only the 18 casting clusters.  These
   # replace the full zap-generated decoders (~200+ clusters) at build
@@ -77,7 +78,7 @@ if (optimize_apk_size) {
   # Default development build: full debug features, fast compilation
   chip_build_libshell = true
   optimize_for_size = false  # -O2 (speed) - faster compilation
-  symbol_level = 0           # -g0 (no debug symbols) - fastest compilation
+  symbol_level = 0  # -g0 (no debug symbols) - fastest compilation
 }
 
 # Symbol Level Options:
