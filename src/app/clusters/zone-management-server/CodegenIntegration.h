@@ -61,41 +61,18 @@ public:
     CHIP_ERROR Init();
     void Deinit();
 
-    uint8_t GetSensitivity() const
-    {
-        if (mCluster.IsConstructed())
-        {
-            return mCluster.Cluster().GetSensitivity();
-        }
-        return mPendingAppSensitivity.value_or(1);
-    }
+    uint8_t GetSensitivity() const;
 
-    const std::vector<ZoneInformationStorage> & GetZones() const
-    {
-        if (mCluster.IsConstructed())
-        {
-            return mCluster.Cluster().GetZones();
-        }
-        static const std::vector<ZoneInformationStorage> empty;
-        return empty;
-    }
+    const std::vector<ZoneInformationStorage> & GetZones() const;
 
-    const std::vector<ZoneTriggerControlStruct> & GetTriggers() const
-    {
-        if (mCluster.IsConstructed())
-        {
-            return mCluster.Cluster().GetTriggers();
-        }
-        static const std::vector<ZoneTriggerControlStruct> empty;
-        return empty;
-    }
+    const std::vector<ZoneTriggerControlStruct> & GetTriggers() const;
 
     Optional<ZoneTriggerControlStruct> GetTriggerForZone(uint16_t zoneId) const;
 
-    uint8_t GetMaxUserDefinedZones() const { return mConfig.maxUserDefinedZones; }
-    uint8_t GetMaxZones() const { return mConfig.maxZones; }
-    uint8_t GetSensitivityMax() const { return mConfig.sensitivityMax; }
-    const TwoDCartesianVertexStruct & GetTwoDCartesianMax() const { return mConfig.twoDCartesianMax; }
+    uint8_t GetMaxUserDefinedZones() const;
+    uint8_t GetMaxZones() const;
+    uint8_t GetSensitivityMax() const;
+    const TwoDCartesianVertexStruct & GetTwoDCartesianMax() const;
 
     CHIP_ERROR AddZone(const ZoneInformationStorage & zone);
     CHIP_ERROR UpdateZone(uint16_t zoneId, const ZoneInformationStorage & zone);

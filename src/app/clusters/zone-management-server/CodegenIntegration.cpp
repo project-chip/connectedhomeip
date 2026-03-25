@@ -152,6 +152,55 @@ Protocols::InteractionModel::Status ZoneMgmtServer::RemoveTrigger(uint16_t zoneI
     return mCluster.Cluster().RemoveTrigger(zoneId);
 }
 
+uint8_t ZoneMgmtServer::GetSensitivity() const
+{
+    if (mCluster.IsConstructed())
+    {
+        return mCluster.Cluster().GetSensitivity();
+    }
+    return mPendingAppSensitivity.value_or(1);
+}
+
+const std::vector<ZoneInformationStorage> & ZoneMgmtServer::GetZones() const
+{
+    if (mCluster.IsConstructed())
+    {
+        return mCluster.Cluster().GetZones();
+    }
+    static const std::vector<ZoneInformationStorage> empty;
+    return empty;
+}
+
+const std::vector<ZoneTriggerControlStruct> & ZoneMgmtServer::GetTriggers() const
+{
+    if (mCluster.IsConstructed())
+    {
+        return mCluster.Cluster().GetTriggers();
+    }
+    static const std::vector<ZoneTriggerControlStruct> empty;
+    return empty;
+}
+
+uint8_t ZoneMgmtServer::GetMaxUserDefinedZones() const
+{
+    return mConfig.maxUserDefinedZones;
+}
+
+uint8_t ZoneMgmtServer::GetMaxZones() const
+{
+    return mConfig.maxZones;
+}
+
+uint8_t ZoneMgmtServer::GetSensitivityMax() const
+{
+    return mConfig.sensitivityMax;
+}
+
+const TwoDCartesianVertexStruct & ZoneMgmtServer::GetTwoDCartesianMax() const
+{
+    return mConfig.twoDCartesianMax;
+}
+
 } // namespace ZoneManagement
 } // namespace Clusters
 } // namespace app
