@@ -42,7 +42,6 @@ from TC_GC_common import (generate_membership_entry_matcher, get_auxiliary_acl_e
                           valid_endpoints_list)
 
 import matter.clusters as Clusters
-from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
