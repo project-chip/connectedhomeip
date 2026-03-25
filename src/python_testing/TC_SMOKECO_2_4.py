@@ -47,12 +47,12 @@
 
 import logging
 
-from TC_SMOKECOTestBase import SmokeCoBaseTest
 from mobly import asserts
+from TC_SMOKECOTestBase import SmokeCoBaseTest
 
 import matter.clusters as Clusters
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
