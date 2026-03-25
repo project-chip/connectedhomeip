@@ -61,7 +61,7 @@ tests:
 
           Then create a graphic QR code for this combined code
           (e.g. using https://www.nayuki.io/page/creating-a-qr-code-step-by-step )
-          
+
           ./chip-tool payload parse-setup-payload "MT:<payload1>*<payload2>"
 
           Example: ./chip-tool payload parse-setup-payload "MT:-24J0CEK01KA0648G00*-24J0KQS020O0648G00"
