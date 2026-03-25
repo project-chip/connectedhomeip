@@ -19,13 +19,24 @@ OTA Requestor cluster as well as emitting events.
 `DefaultOTARequestor` class is the default implementation of this interface. Any
 custom implementation should reside under `examples/platform/<platform-name>`.
 
+### OTARequestorAttributes
+
+This is a class to maintain the attributes of the cluster in memory. It is used
+by `DefaultOTARequestor`, and custom implementations of `OTARequestorInterface`
+can also use this.
+
+When using code-generated clusters an instance of this will be automatically
+created and can be accessed through `GetOTARequestorAttributes` in
+`CodegenIntegration.h`. When using code-driven clusters this must be created by
+the app.
+
 ### OTARequestorCluster
 
 This implements the interface the data model provider uses to handle attributes,
 commands, and events. It relies on an instance of OTARequestorInterface as the
-backing for the cluster functionality. Each endpoint with an OTA Software Update
-Requestor cluster requires an instance of this class registered with the data
-model provider.
+backing for commands, and an instance of OTARequestorAttributes as the backing
+for attributes. The endpoint with an OTA Software Update Requestor cluster
+requires an instance of this class registered with the data model provider.
 
 When using code-generated clusters these will be automatically created,
 registered, and maintained by `CodegenIntegration.cpp`. When using code-driven
