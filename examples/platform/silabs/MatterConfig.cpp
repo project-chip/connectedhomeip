@@ -20,6 +20,7 @@
 #include "AppConfig.h"
 #include "BaseApplication.h"
 #include <MatterConfig.h>
+#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 #include <cmsis_os2.h>
 
 #include <mbedtls/platform.h>
@@ -336,6 +337,10 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     // This is needed by localization configuration cluster so we set it before the initialization
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    // Inject group auxiliary access control delegate
+    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate sGroupAuxAccessDelegate(initParams.groupDataProvider);
+    initParams.groupAuxiliaryAccessControlDelegate = &sGroupAuxAccessDelegate;
 
     // Init Matter Server and Start Event Loop
     err = chip::Server::GetInstance().Init(initParams);

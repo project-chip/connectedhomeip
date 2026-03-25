@@ -111,6 +111,19 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
     }
 }
 
+CHIP_ERROR ConnectivityManagerImpl::_DisconnectNetwork(void)
+{
+    return DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+        if (IsWiFiStationConnected())
+        {
+            /* Set the Wi-Fi station mode to application-controlled to prevent automatic reconnection,
+            instead of clearing the Wi-Fi station provisioning */
+            ReturnOnFailure(_SetWiFiStationMode(kWiFiStationMode_ApplicationControlled));
+            esp_wifi_disconnect();
+        }
+    });
+}
+
 #define WIFI_BAND_2_4GHZ 2400
 #define WIFI_BAND_5_0GHZ 5000
 
