@@ -135,8 +135,7 @@ uint16_t AliroDelegate::GetNumberOfAliroEndpointKeysSupported()
 }
 
 CHIP_ERROR AliroDelegate::SetAliroReaderConfig(const ByteSpan & signingKey, const ByteSpan & verificationKey,
-                                               const ByteSpan & groupIdentifier,
-                                               const Optional<ByteSpan> & groupResolvingKey)
+                                               const ByteSpan & groupIdentifier, const Optional<ByteSpan> & groupResolvingKey)
 {
     // We ignore the signing key, since we never do anything with it.
     (void) signingKey;
@@ -217,8 +216,8 @@ bool AliroDelegate::GetCredential(uint16_t index, CredentialTypeEnum type, Ember
     return true;
 }
 
-bool AliroDelegate::SetCredential(uint16_t index, chip::FabricIndex creator, chip::FabricIndex modifier,
-                                  DlCredentialStatus status, CredentialTypeEnum type, const chip::ByteSpan & data)
+bool AliroDelegate::SetCredential(uint16_t index, chip::FabricIndex creator, chip::FabricIndex modifier, DlCredentialStatus status,
+                                  CredentialTypeEnum type, const chip::ByteSpan & data)
 {
     CredentialSlot * slots = SlotArrayForType(type);
     VerifyOrReturnValue(slots != nullptr, false);
@@ -227,10 +226,10 @@ bool AliroDelegate::SetCredential(uint16_t index, chip::FabricIndex creator, chi
 
     if (status == DlCredentialStatus::kAvailable)
     {
-        slot.status          = DlCredentialStatus::kAvailable;
-        slot.dataSize        = 0;
-        slot.createdBy       = creator;
-        slot.lastModifiedBy  = modifier;
+        slot.status         = DlCredentialStatus::kAvailable;
+        slot.dataSize       = 0;
+        slot.createdBy      = creator;
+        slot.lastModifiedBy = modifier;
         return true;
     }
 

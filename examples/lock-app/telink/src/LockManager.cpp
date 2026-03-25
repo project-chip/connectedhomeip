@@ -33,7 +33,6 @@ LockManager LockManager::sLock;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace TelinkDoorLock::LockInitParams;
 
-
 #if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
 __attribute__((section(".data"))) EmberAfPluginDoorLockUserInfo mCurrentLockUsers;
 

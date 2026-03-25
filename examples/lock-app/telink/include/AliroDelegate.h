@@ -69,10 +69,10 @@ private:
 
     struct CredentialSlot
     {
-        DlCredentialStatus status        = DlCredentialStatus::kAvailable;
-        chip::FabricIndex createdBy      = 0;
-        chip::FabricIndex lastModifiedBy = 0;
-        size_t dataSize                  = 0;
+        DlCredentialStatus status             = DlCredentialStatus::kAvailable;
+        chip::FabricIndex createdBy           = 0;
+        chip::FabricIndex lastModifiedBy      = 0;
+        size_t dataSize                       = 0;
         uint8_t data[kAliroCredentialMaxSize] = { 0 };
     };
 
