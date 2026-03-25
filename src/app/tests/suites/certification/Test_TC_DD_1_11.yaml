@@ -55,35 +55,36 @@ tests:
       PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
       verification: |
 
-Collect the QR codes for the devices to be commissioned (either real devices or RPI), and create a concatenated code out of them,
+          Collect the QR codes for the devices to be commissioned (either real devices or RPI), and create a concatenated code out of them,
 
-e.g. "MT:-24J061901KA0648G00" and "MT:-24J0EDH020O0648G00" get combined into "MT:-24J061901KA0648G00*-24J0EDH020O0648G00"
+          e.g. "MT:-24J0CEK01KA0648G00" and "MT:-24J0KQS020O0648G00" get combined into "MT:-24J0CEK01KA0648G00*-24J0KQS020O0648G00"
 
-Then create a graphic QR code for this combined code
-(e.g. using https://www.nayuki.io/page/creating-a-qr-code-step-by-step )
+          Then create a graphic QR code for this combined code
+          (e.g. using https://www.nayuki.io/page/creating-a-qr-code-step-by-step )
+          
           ./chip-tool payload parse-setup-payload "MT:<payload1>*<payload2>"
 
-          Example: ./chip-tool payload parse-setup-payload "MT:-24J061901KA0648G00*-24J0EDH020O0648G00"
+          Example: ./chip-tool payload parse-setup-payload "MT:-24J0CEK01KA0648G00*-24J0KQS020O0648G00"
 
           Verify the DUT(chip-tool) is successfully parses all embedded onboarding payloads without error:
 
-          [1768813041.471] [132802:132802] [DL] ChipLinuxStorage::Init: Using KVS config file: /tmp/chip_tool_kvs
-          [1768813041.471] [132802:132802] [SPL] Parsing base38Representation: MT:Y.K90-Q000KA0648G00*Y.K9061901KA0648G00
-          [1768813041.495] [132802:132802] [SPL] Version:             0
-          [1768813041.495] [132802:132802] [SPL] VendorID:            65521
-          [1768813041.495] [132802:132802] [SPL] ProductID:           32769
-          [1768813041.495] [132802:132802] [SPL] Custom flow:         0    (STANDARD)
-          [1768813041.495] [132802:132802] [SPL] Discovery Bitmask:   0x00 (NONE)
-          [1768813041.495] [132802:132802] [SPL] Long discriminator:  3841   (0xf01)
-          [1768813041.495] [132802:132802] [SPL] Passcode:            20202021
-          [1768813041.495] [132802:132802] [SPL] ----------
-          [1768813041.495] [132802:132802] [SPL] Version:             0
-          [1768813041.495] [132802:132802] [SPL] VendorID:            65522
-          [1768813041.495] [132802:132802] [SPL] ProductID:           32769
-          [1768813041.495] [132802:132802] [SPL] Custom flow:         0    (STANDARD)
-          [1768813041.495] [132802:132802] [SPL] Discovery Bitmask:   0x00 (NONE)
-          [1768813041.495] [132802:132802] [SPL] Long discriminator:  3842   (0xf02)
-          [1768813041.495] [132802:132802] [SPL] Passcode:            20202022
+          [1774458788.299] [30139:30139] [DL] ChipLinuxStorage::Init: Using KVS config file: /tmp/chip_tool_kvs
+          [1774458788.299] [30139:30139] [SPL] Parsing base38Representation: MT:-24J0CEK01KA0648G00*-24J0KQS020O0648G00
+          [1774458788.299] [30139:30139] [SPL] Version:             0
+          [1774458788.299] [30139:30139] [SPL] VendorID:            65521
+          [1774458788.299] [30139:30139] [SPL] ProductID:           32769
+          [1774458788.299] [30139:30139] [SPL] Custom flow:         0    (STANDARD)
+          [1774458788.299] [30139:30139] [SPL] Discovery Bitmask:   0x02 (BLE)
+          [1774458788.299] [30139:30139] [SPL] Long discriminator:  3841   (0xf01)
+          [1774458788.299] [30139:30139] [SPL] Passcode:            20202021
+          [1774458788.299] [30139:30139] [SPL] ----------
+          [1774458788.299] [30139:30139] [SPL] Version:             0
+          [1774458788.299] [30139:30139] [SPL] VendorID:            65521
+          [1774458788.299] [30139:30139] [SPL] ProductID:           32769
+          [1774458788.299] [30139:30139] [SPL] Custom flow:         0    (STANDARD)
+          [1774458788.299] [30139:30139] [SPL] Discovery Bitmask:   0x02 (BLE)
+          [1774458788.299] [30139:30139] [SPL] Long discriminator:  3842   (0xf02)
+          [1774458788.299] [30139:30139] [SPL] Passcode:            20202022
 
       disabled: true
 
