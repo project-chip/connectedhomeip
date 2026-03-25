@@ -59,7 +59,8 @@ constexpr EndpointId kTestEndpointId = 1;
 class MockOtaCommands : public OTARequestorCommandInterface
 {
 public:
-    void HandleAnnounceOTAProvider(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    void
+    HandleAnnounceOTAProvider(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                               const OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override
     {
         mLastAnnounceCommandPayload = commandData;

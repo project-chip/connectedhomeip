@@ -314,7 +314,7 @@ TEST_F(TestOTARequestorAttributes, ClearingProvidersRemovesFromList)
 
     EXPECT_EQ(attributes.RemoveDefaultOtaProvider(3), CHIP_NO_ERROR);
     iterator = attributes.GetDefaultOtaProviderListIterator();
-    count                                   = 0;
+    count    = 0;
     while (iterator.Next())
     {
         auto & location = iterator.GetValue();
@@ -325,7 +325,7 @@ TEST_F(TestOTARequestorAttributes, ClearingProvidersRemovesFromList)
 
     EXPECT_EQ(attributes.RemoveDefaultOtaProvider(1), CHIP_NO_ERROR);
     iterator = attributes.GetDefaultOtaProviderListIterator();
-    count                                   = 0;
+    count    = 0;
     while (iterator.Next())
     {
         auto & location = iterator.GetValue();

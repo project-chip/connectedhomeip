@@ -87,13 +87,11 @@ public:
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
         return &gServer.Cluster();
     }
 
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override
-    {
-        gServer.Destroy();
-    }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 };
 
 void RegisterCluster(EndpointId endpointId)
