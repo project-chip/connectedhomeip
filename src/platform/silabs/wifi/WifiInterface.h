@@ -43,17 +43,7 @@ constexpr size_t kWiFiMacAddressLength = 6;
 /* Defines to update */
 #define MAX_JOIN_RETRIES_COUNT (5)
 
-typedef struct wfx_wifi_scan_result
-{
-    uint8_t ssid[chip::DeviceLayer::Internal::kMaxWiFiSSIDLength]; // excludes null-character
-    size_t ssid_length;
-    chip::BitFlags<chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> security;
-    uint8_t bssid[chip::DeviceLayer::Internal::kWiFiBSSIDLength];
-    uint8_t chan;
-    int16_t rssi; /* I suspect this is in dBm - so signed */
-    chip::app::Clusters::NetworkCommissioning::WiFiBandEnum wiFiBand;
-} wfx_wifi_scan_result_t;
-using ScanCallback = void (*)(wfx_wifi_scan_result_t *);
+using ScanCallback = void (*)(chip::DeviceLayer::NetworkCommissioning::WiFiScanResponse *);
 
 typedef struct wfx_wifi_scan_ext
 {
@@ -244,14 +234,14 @@ public:
 
     /**
      * @brief Gets the connected access point information.
-     *        See @wfx_wifi_scan_result_t for the information that is returned by the function.
+     *        See @NetworkCommissioning::WiFiScanResponse for the information that is returned by the function.
      *
      * @param[out] info AP information
      *
      * @return CHIP_ERROR CHIP_NO_ERROR, device has succesfully pulled all the AP information
      *                    CHIP_ERROR_INTERNAL, otherwise. If the function returns an error, the data in ap cannot be used.
      */
-    virtual CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info) = 0;
+    virtual CHIP_ERROR GetAccessPointInfo(chip::DeviceLayer::NetworkCommissioning::WiFiScanResponse & info) = 0;
 
     /**
      * @brief Gets the connected access point extended information.

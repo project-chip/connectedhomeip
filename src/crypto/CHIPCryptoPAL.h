@@ -584,6 +584,18 @@ public:
     CHIP_ERROR Deserialize(/* const */ P256SerializedKeypair & input) override;
 
     /**
+     * @brief Initializes this object from raw private key material in accordance with FIPS 186-5 appendix A.4.2.
+     * To be valid, the provided key material, when interpreted as a big endian integer x, must be in the range
+     * [0, N-2], where N is the order of the P-256 curve, and the resulting private key is d = x + 1.
+     *
+     * @return CHIP_NO_ERROR on success,
+     *         CHIP_ERROR_INVALID_ARGUMENT if the provided value is out of range,
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the platform does not support this operation,
+     *         or another CHIP_ERROR otherwise.
+     */
+    virtual CHIP_ERROR InitializeFromBitsOrReject(FixedByteSpan<kP256_PrivateKey_Length> privateKeyBits);
+
+    /**
      * @brief Generates a new Certificate Signing Request (CSR).
      * @param csr Newly generated CSR in DER format
      * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated
