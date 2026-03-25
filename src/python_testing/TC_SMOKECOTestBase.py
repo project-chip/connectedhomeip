@@ -66,7 +66,7 @@ class SmokeCoBaseTest(MatterBaseTest):
         assert_valid_bool(value=attr, description=f"Attribute {attribute} is not a bool instance {attr}")
 
     async def read_attribute_check_epoch(self, attribute):
-        """Reads an attribute from the SmokeCluster and validate against a valid timestmap value."""
+        """Reads an attribute from the SmokeCluster and validate against a valid timestamp value."""
         attr = await self.read_smokeco_attribute_expect_success(attribute=attribute)
         assert_valid_uint32(attr, "Attribute is not in uint range")
         assert_is_unixtimestamp(attr, f"Attribute with value: {attr}")
@@ -89,7 +89,7 @@ class SmokeCoBaseTest(MatterBaseTest):
             self.wait_for_user_input(prompt_msg="Start manually DUT self-test", prompt_msg_placeholder="Enter 'y' when done")
 
     def process_pixit_attributes(self):
-        """ Scans instance attributes starting with 'pixit_'. 
+        """ Scans instance attributes starting with 'pixit_'.
         Converts values from bytes to big-endian integers.
         """
         for attr_name in list(vars(self)):
@@ -113,7 +113,7 @@ class SmokeCoBaseTest(MatterBaseTest):
             steps (list): List of steps to execute in this block
             pixit_event_trigger (int): hex code for event trigger
             smoke_report_handler (AttributeSubscriptionHandler): Attribute Report Handler for attribute under test
-            expected_report_data (list,int): Expected report data 
+            expected_report_data (list,int): Expected report data
             smoke_handler_timeout (int, optional): Timeout for attribute report handler. Defaults to 300.
         """
         self.step(steps[0])
@@ -144,9 +144,9 @@ class SmokeCoBaseTest(MatterBaseTest):
             smoke_report_handler (AttributeSubscriptionHandler): Attribute Report Handler for attribute under test
             smoke_event (Event): Event to read after the eventTrigger
             expected_report_data (list,Any): Expected value from the attribute report.
-            expected_event_data (Any): Expected value from the Event. If set to REPORT_DATA match against AttrReport if INORE_DATA ignore check.
-            expected_expressed_state (int): Expecte value for the ExpressedState attribute
-            smoke_handler_timeout (int, optional): _description_. Defaults to 300.
+            expected_event_data (Any): Expected value from the Event. If set to REPORT_DATA match against AttrReport if IGNORE_DATA ignore check.
+            expected_expressed_state (int): Expected value for the ExpressedState attribute
+            smoke_handler_timeout (int, optional): Timeout for wait_for_attribute_report. Defaults to 300.
         """
         self.step(steps[0])
         await self.send_test_event_triggers(eventTrigger=pixit_event_trigger)

@@ -31,7 +31,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
 #       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATTERY.WARNING:005c000000000095
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATERY.CRITICAL:005c00000000009e
+#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATTERY.CRITICAL:005c00000000009e
 #       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATTERY.CLEAR:005c0000000000a5
 #       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.HARDWARE.ALERT:005c000000000093
 #       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.HARDWARE.CLEAR:005c0000000000a3
@@ -186,7 +186,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
             expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.BatteryAlert)
         await battery_alert_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
         battery_alert = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.BatteryAlert)
-        asserts.assert_equal(battery_alert, 0)
+        asserts.assert_equal(battery_alert, self.smokeco_cluster.Enums.AlarmStateEnum.kNormal)
 
         self.step(3)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
@@ -211,7 +211,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(8)
         low_battery_event_data = await self.read_smokeco_event(smokeco_event=self.smokeco_cluster.Events.LowBattery)
-        asserts.assert_equal(low_battery_event_data.alarmSeverityLevel, 1)
+        asserts.assert_equal(low_battery_event_data.alarmSeverityLevel, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
         # End block BatterWarning
 
         # Start block BatteryCritical
@@ -229,7 +229,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(12)
         low_battery_event_data = await self.read_smokeco_event(self.smokeco_cluster.Events.LowBattery)
-        asserts.assert_equal(low_battery_event_data.alarmSeverityLevel, 2)
+        asserts.assert_equal(low_battery_event_data.alarmSeverityLevel, self.smokeco_cluster.Enums.AlarmStateEnum.kCritical)
 
         # End block BatteryCritical
 
@@ -239,7 +239,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(14)
         battery_alert_report = battery_alert_handler.wait_for_attribute_report(timeout_sec=300)
-        log.info(f"Batery Alert Report {battery_alert_report} with value {battery_alert_report.value}")
+        log.info(f"Battery Alert Report {battery_alert_report} with value {battery_alert_report.value}")
         asserts.assert_equal(battery_alert_report.value, self.smokeco_cluster.Enums.AlarmStateEnum.kNormal)
 
         self.step(15)
@@ -260,7 +260,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
             expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.HardwareFaultAlert)
         await hardware_fault_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
         hardware_fault = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.HardwareFaultAlert)
-        asserts.assert_equal(hardware_fault, 0)
+        asserts.assert_equal(hardware_fault, False)
 
         self.step(18)
         await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_hardware_alert)
@@ -268,7 +268,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         self.step(19)
         hardware_fault_report = hardware_fault_handler.wait_for_attribute_report(timeout_sec=300)
         log.info(f"Hardware Fault report {hardware_fault_report} with value {hardware_fault_report.value}")
-        asserts.assert_equal(hardware_fault_report.value, 1)
+        asserts.assert_equal(hardware_fault_report.value, True)
 
         self.step(20)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
@@ -303,14 +303,14 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
             expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.EndOfServiceAlert)
         await end_of_service_alert_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
         end_of_service_attr = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.EndOfServiceAlert)
-        asserts.assert_equal(end_of_service_attr, 0)
+        asserts.assert_equal(end_of_service_attr, self.smokeco_cluster.Enums.EndOfServiceEnum.kNormal)
 
         self.step(27)
         await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_service_alert)
 
         self.step(28)
         end_of_service_report = end_of_service_alert_handler.wait_for_attribute_report(timeout_sec=300)
-        log.info(f"End of service report {hardware_fault_report} with value {end_of_service_report.value}")
+        log.info(f"End of service alert report {end_of_service_report} with value {end_of_service_report.value}")
         asserts.assert_equal(end_of_service_report.value, self.smokeco_cluster.Enums.EndOfServiceEnum.kExpired)
 
         self.step(29)
@@ -357,7 +357,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         self.step(38)
         test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
         log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
-        asserts.assert_equal(test_in_progress_report.value, 1)
+        asserts.assert_equal(test_in_progress_report.value, True)
 
         self.step(39)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
@@ -366,7 +366,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         self.step(40)
         test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
         log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
-        asserts.assert_equal(test_in_progress_report.value, 0)
+        asserts.assert_equal(test_in_progress_report.value, False)
 
         self.step(41)
         await self.read_smokeco_event(self.smokeco_cluster.Events.SelfTestComplete)
@@ -387,7 +387,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         self.step(45)
         test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
         log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
-        asserts.assert_equal(test_in_progress_report.value, 1)
+        asserts.assert_equal(test_in_progress_report.value, True)
 
         self.step(46)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
@@ -396,7 +396,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         self.step(47)
         test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
         log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
-        asserts.assert_equal(test_in_progress_report.value, 0)
+        asserts.assert_equal(test_in_progress_report.value, False)
 
         self.step(48)
         await self.read_smokeco_event(self.smokeco_cluster.Events.SelfTestComplete)

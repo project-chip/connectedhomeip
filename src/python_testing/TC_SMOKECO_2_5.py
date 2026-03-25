@@ -274,7 +274,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
 
             self.step(4)
             test_event_triggers_enabled = await self.read_general_diagnostics_test_event_triggers_enabled()
-            asserts.assert_equal(test_event_triggers_enabled, 1)
+            asserts.assert_equal(test_event_triggers_enabled, True)
 
             # Sends Event Trigger , Check Alarm State,  Check Expressed State, Send Clear Trigger, Executes 4 steps
             await self.assert_steps_event_trigger_report_event_actions(
@@ -348,7 +348,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
                 expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.ContaminationState)
             await contamination_state_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
             contamination_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ContaminationState)
-            asserts.assert_equal(contamination_state, 0)
+            asserts.assert_equal(contamination_state, self.smokeco_cluster.Enums.ContaminationStateEnum.kNormal)
 
             # Runs steps by 2 on each function trigger and evaluate
             await self.assert_steps_event_trigger_attr_report_actions(
@@ -391,7 +391,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
                 expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.SmokeSensitivityLevel)
             await smokesensitivity_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
             smokesensitivity_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.SmokeSensitivityLevel)
-            asserts.assert_equal(smokesensitivity_state, 1)
+            asserts.assert_equal(smokesensitivity_state, self.smokeco_cluster.Enums.SensitivityEnum.kStandard)
 
             # This method send the event trigger and check for the report for two steps
             await self.assert_steps_event_trigger_attr_report_actions(
@@ -432,7 +432,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
             expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.DeviceMuted)
         await device_muted_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
         device_muted_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.DeviceMuted)
-        asserts.assert_equal(device_muted_state, 0)
+        asserts.assert_equal(device_muted_state, self.smokeco_cluster.Enums.MuteStateEnum.kNotMuted)
 
         # From step 41 to step 57 is SmokeAlarm and check if feature is enabled.
         self.step(42)
@@ -446,8 +446,8 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
             await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_warning_smoke_alarm)
 
             self.step(45)
-            device_muted_report_data = smoke_state_handler.wait_for_attribute_report(timeout_sec=300)
-            asserts.assert_equal(device_muted_report_data.value, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
+            smoke_state_report_data = smoke_state_handler.wait_for_attribute_report(timeout_sec=300)
+            asserts.assert_equal(smoke_state_report_data.value, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
 
             self.step(46)
             await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_manual_device_mute)
