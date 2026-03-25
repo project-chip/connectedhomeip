@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/PlatformManager.h>
 
 #include <air-quality-sensor-manager.h>
@@ -156,6 +157,7 @@ void AirQualitySensorAppAttrUpdateDelegate::OnEventCommandReceived(const char * 
         return;
     }
 
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(AirQualitySensorAttrUpdateHandler::HandleCommand,
-                                                                           reinterpret_cast<intptr_t>(handler));
+    SuccessOrLog(chip::DeviceLayer::PlatformMgr().ScheduleWork(AirQualitySensorAttrUpdateHandler::HandleCommand,
+                                                               reinterpret_cast<intptr_t>(handler)),
+                 DeviceLayer, "Cannot schedule work for command handler");
 }
