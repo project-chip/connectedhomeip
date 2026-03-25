@@ -21,6 +21,7 @@
 #include <air-quality-sensor-manager.h>
 
 #include <platform/CHIPDeviceConfig.h>
+#include <lib/support/CodeUtils.h>
 
 #include <string>
 
