@@ -139,7 +139,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.SmokeCoAlarm))
     async def test_TC_SMOKECO_2_4(self):
-        
+
         # Commission device already done
         self.step(1)
 
@@ -150,10 +150,10 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         await battery_alert_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
         battery_alert = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.BatteryAlert)
         asserts.assert_equal(battery_alert,0)
-        
+
         self.step(3)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
+        asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
 
         self.step(4)
         test_event_triggers_enabled = await self.read_general_diagnostics_test_event_triggers_enabled()
@@ -170,7 +170,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(7)
         expressed_state = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kBatteryAlert)
+        asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kBatteryAlert)
 
         self.step(8)
         low_battery_event_data = await self.read_smokeco_event(smokeco_event=self.smokeco_cluster.Events.LowBattery)
@@ -180,7 +180,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         # Start block BatteryCritical
         self.step(9)
         await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_battery_critical)
-        
+
         self.step(10)
         battery_alert_report = battery_alert_handler.wait_for_attribute_report(timeout_sec=300)
         log.info(f"Smoke state report {battery_alert_report} with value {battery_alert_report.value}")
@@ -188,7 +188,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(11)
         expressed_state = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kBatteryAlert)
+        asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kBatteryAlert)
 
         self.step(12)
         low_battery_event_data = await self.read_smokeco_event(self.smokeco_cluster.Events.LowBattery)
@@ -207,7 +207,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(15)
         expressed_state = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
+        asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
 
         self.step(16)
         # Only reads and verify has a new event
@@ -224,7 +224,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         await hardware_fault_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
         hardware_fault = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.HardwareFaultAlert)
         asserts.assert_equal(hardware_fault,0)
-        
+
         self.step(18)
         await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_hardware_alert)
 
@@ -235,11 +235,11 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(20)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kHardwareFault)
+        asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kHardwareFault)
 
         self.step(21)
         await self.read_smokeco_event(self.smokeco_cluster.Events.HardwareFault)
-        # End HardwareFault 
+        # End HardwareFault
 
         # Clear HardwareFault alert
         self.step(22)
@@ -252,7 +252,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(24)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
+        asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
 
         self.step(25)
         await self.read_smokeco_event(self.smokeco_cluster.Events.AllClear)
@@ -278,7 +278,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(29)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kEndOfService)
+        asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kEndOfService)
 
         self.step(30)
         await self.read_smokeco_event(self.smokeco_cluster.Events.EndOfService)
@@ -295,7 +295,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(33)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
+        asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
 
         self.step(34)
         await self.read_smokeco_event(self.smokeco_cluster.Events.AllClear)
@@ -311,7 +311,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(36)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
+        asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
 
         self.step(37)
         # Start manually DUT self-test
@@ -324,7 +324,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(39)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kTesting)
+        asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kTesting)
 
         self.step(40)
         test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
@@ -336,7 +336,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(42)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
+        asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
 
         self.step(43)
         await self.read_smokeco_event(self.smokeco_cluster.Events.AllClear)
@@ -354,7 +354,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(46)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kTesting)
+        asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kTesting)
 
         self.step(47)
         test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
@@ -366,7 +366,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(49)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
-        asserts.assert_equal(expressed_state,self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
+        asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
 
         self.step(50)
         await self.read_smokeco_event(self.smokeco_cluster.Events.AllClear)
