@@ -20,9 +20,9 @@
 
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 
-namespace chip::app {
+namespace chip {
 
 // Returns the OTA requestor attributes that are used by the cluster methods.
 OTARequestorAttributes & GetOTARequestorAttributes();
 
-} // namespace chip::app
+} // namespace chip

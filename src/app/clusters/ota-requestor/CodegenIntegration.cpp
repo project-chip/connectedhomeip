@@ -56,8 +56,8 @@ class OTARequestorCommandForwarder : public OTARequestorCommandInterface
 {
 public:
     void HandleAnnounceOTAProvider(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override
+        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+        const Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override
     {
         if (mDestination)
         {
@@ -131,14 +131,14 @@ void OnSetGlobalOtaRequestorInstance(OTARequestorInterface * instance)
 
 } // namespace
 
-namespace chip::app {
+namespace chip {
 
 OTARequestorAttributes & GetOTARequestorAttributes()
 {
     return gAttributes;
 }
 
-} // namespace chip::app
+} // namespace chip
 
 void MatterOtaSoftwareUpdateRequestorClusterInitCallback(EndpointId endpointId)
 {
