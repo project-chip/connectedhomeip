@@ -34,7 +34,7 @@ tests:
 
     - label: "Precondition"
       verification: |
-          This step is required only for the reference platform(e.g., RPI). Please skip this step when validating with real devices.
+          This step is required when using the reference platforms (e.g., RPIs) as devices to be commissioned. Please skip this step when validating with real devices.
 
           The reference platform advertises only a single QR code per device, which is not sufficient to validate concatenated QR code onboarding payloads. Therefore, QR code payloads must be collected from two separate devices and combined for validation.
 
@@ -55,6 +55,12 @@ tests:
       PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
       verification: |
 
+Collect the QR codes for the devices to be commissioned (either real devices or RPI), and create a concatenated code out of them,
+
+e.g. "MT:-24J061901KA0648G00" and "MT:-24J0EDH020O0648G00" get combined into "MT:-24J061901KA0648G00*-24J0EDH020O0648G00"
+
+Then create a graphic QR code for this combined code
+(e.g. using https://www.nayuki.io/page/creating-a-qr-code-step-by-step )
           ./chip-tool payload parse-setup-payload "MT:<payload1>*<payload2>"
 
           Example: ./chip-tool payload parse-setup-payload "MT:-24J061901KA0648G00*-24J0EDH020O0648G00"
@@ -87,9 +93,9 @@ tests:
           right)"
       verification: |
 
-          Commission the TH devices one by one using parsed payloads in Step-1.
+          Commission the TH devices one by one by scanning the combined QR code from Step-1 with the DUT (commissioner device/app).
 
-          Example commands to commission the TH devices:
+          Example commands to commission the TH devices when using chip-tool as commissioner:
 
           TH device 1:
           ./chip-tool pairing onnetwork 1 20202021
@@ -116,7 +122,7 @@ tests:
     - label:
           "Step 3: Verify the DUT indicates to the user that TH devices must be
           commissioned individually using their separate QR codes or Manual
-          Pairing Codes"
+          Pairing Codes, when the combined QR code from Step-1 is scanned using the DUT=Commissioner device/app"
       PICS:
           "!(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) &&
           MCORE.DD.CTRL_CONCATENATED_QR_CODE_2"
