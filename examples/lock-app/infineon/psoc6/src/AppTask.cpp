@@ -154,6 +154,14 @@ static Identify gIdentify1 = {
 
 static void InitServer(intptr_t context)
 {
+    // Initialize device attestation config before server init so Operational
+    // Credentials sees the configured provider during cluster construction.
+#if ENABLE_DEVICE_ATTESTATION
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleTrustMDACProvider());
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+
     // Init ZCL Data Model
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
@@ -162,13 +170,6 @@ static void InitServer(intptr_t context)
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-
-    // Initialize device attestation config
-#if ENABLE_DEVICE_ATTESTATION
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleTrustMDACProvider());
-#else
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     GetAppTask().InitOTARequestor();

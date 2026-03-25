@@ -180,7 +180,7 @@
             "AdminFabricIndex",
             "AdminVendorId"
         ],
-        "Ambient Context Sensing": ["HoldTimeLimits"],
+        "Ambient Context Sensing": ["HoldTimeLimits", "ObjectCountConfig"],
         "Basic Information": [
             "FeatureMap",
             "ClusterRevision",
@@ -207,16 +207,23 @@
             "ProductAppearance",
             "SpecificationVersion",
             "MaxPathsPerInvoke",
+            "DeviceLocation",
             "ConfigurationVersion"
         ],
         "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
-        "Bridged Device Basic Information": ["ProductAppearance"],
+        "Bridged Device Basic Information": [
+            "DeviceLocation",
+            "ProductAppearance"
+        ],
         "Binding": ["FeatureMap", "ClusterRevision"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": [
             "CountdownTime",
+            "MainState",
+            "CurrentErrorList",
             "OverallCurrentState",
             "OverallTargetState",
+            "LatchControlModes",
             "FeatureMap",
             "ClusterRevision"
         ],
@@ -359,6 +366,11 @@
             "IdentifyTime",
             "IdentifyType"
         ],
+        "Illuminance Measurement": [
+            "ClusterRevision",
+            "FeatureMap",
+            "MeasuredValue"
+        ],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
             "MeterType",
@@ -414,6 +426,7 @@
             "FeatureMap",
             "ThreadMetrics"
         ],
+        "Switch": ["ClusterRevision", "CurrentPosition"],
         "Unit Testing": [
             "struct_attr",
             "nullable_struct",
@@ -423,6 +436,11 @@
             "nullable_global_struct"
         ],
         "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
+        "Temperature Measurement": [
+            "ClusterRevision",
+            "FeatureMap",
+            "MeasuredValue"
+        ],
         "Thread Border Router Management": [
             "BorderRouterName",
             "BorderAgentID",
@@ -532,7 +550,10 @@
             "DSTOffsetListMaxSize",
             "ClusterRevision"
         ],
-        "Temperature Control": ["SupportedTemperatureLevels"],
+        "Temperature Control": [
+            "SupportedTemperatureLevels",
+            "ClusterRevision"
+        ],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [

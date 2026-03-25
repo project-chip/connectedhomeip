@@ -24,9 +24,7 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server/Server.h>
 #include <clusters/TlsClientManagement/Attributes.h>
 #include <clusters/TlsClientManagement/Commands.h>
 #include <clusters/TlsClientManagement/Metadata.h>
@@ -52,10 +50,11 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Commands::RemoveEndpoint::kMetadataEntry,
 };
 
-TLSClientManagementCluster::TLSClientManagementCluster(EndpointId endpointId, TLSClientManagementDelegate & delegate,
-                                                       CertificateTable & certificateTable, uint8_t maxProvisioned) :
+TLSClientManagementCluster::TLSClientManagementCluster(const Context & context, EndpointId endpointId,
+                                                       TLSClientManagementDelegate & delegate, CertificateTable & certificateTable,
+                                                       uint8_t maxProvisioned) :
     DefaultServerCluster({ endpointId, TlsClientManagement::Id }),
-    mDelegate(delegate), mCertificateTable(certificateTable), mMaxProvisioned(maxProvisioned)
+    mContext(context), mDelegate(delegate), mCertificateTable(certificateTable), mMaxProvisioned(maxProvisioned)
 {
     VerifyOrDieWithMsg(mMaxProvisioned >= 5, NotSpecified, "Spec requires MaxProvisioned be >= 5");
     VerifyOrDieWithMsg(mMaxProvisioned <= 254, NotSpecified, "Spec requires MaxProvisioned be <= 254");
@@ -76,7 +75,7 @@ CHIP_ERROR TLSClientManagementCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(mCertificateTable.Init(context.storage));
     ReturnErrorOnFailure(mDelegate.Init(context.storage));
 
-    return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    return mContext.fabricTable.AddFabricDelegate(this);
 }
 
 void TLSClientManagementCluster::Shutdown(ClusterShutdownType)
@@ -84,7 +83,7 @@ void TLSClientManagementCluster::Shutdown(ClusterShutdownType)
     ChipLogProgress(DataManagement, "TLSClientManagementCluster: shutdown");
 
     mCertificateTable.Finish();
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    mContext.fabricTable.RemoveFabricDelegate(this);
 
     DefaultServerCluster::Shutdown(ClusterShutdownType::kClusterShutdown);
 }

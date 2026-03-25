@@ -147,6 +147,14 @@
         {
             "name": "struct_old_name_variants",
             "path": "partials/struct_old_name_variants.zapt"
+        },
+        {
+            "name": "commandDeclarations",
+            "path": "partials/commandDeclarations.zapt"
+        },
+        {
+            "name": "attributeDeclarations",
+            "path": "partials/attributeDeclarations.zapt"
         }
     ],
     "templates": [

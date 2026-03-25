@@ -7,6 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#zcl_clusters}}
 {{#zcl_commands}}
+{{#unless (and manufacturerCode (isInConfigList (asUpperCamelCase parent.name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions"))}}
 {{#*inline "completeDecl"}}
 {{#if (isSupported cluster command=command isForCommandPayload=true)}}
 
@@ -52,6 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
                  base="NSObject <NSCopying>"
                  includeInitWithResponseValue=true}}
 {{/if}}
+{{/unless}}
 {{/zcl_commands}}
 {{/zcl_clusters}}
 

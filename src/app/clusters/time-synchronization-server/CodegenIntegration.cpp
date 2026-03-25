@@ -42,6 +42,7 @@ static_assert((kTimeSynchronizationFixedClusterCount == 0) ||
 
 LazyRegisteredServerCluster<TimeSynchronizationCluster> gServer;
 
+static std::optional<TimeSourceEnum> gForcedTimeSource;
 TimeSynchronization::Delegate * gDelegate = nullptr;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
@@ -66,7 +67,11 @@ public:
 
         TimeSynchronizationCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         TimeSourceEnum timeSource = TimeSourceEnum::kNone;
-        if (optionalAttributeSet.IsSet(TimeSource::Id))
+        if (gForcedTimeSource.has_value())
+        {
+            timeSource = *gForcedTimeSource;
+        }
+        else if (optionalAttributeSet.IsSet(TimeSource::Id))
         {
             VerifyOrDie(TimeSource::Get(endpointId, &timeSource) == Status::Success);
         }
@@ -165,6 +170,12 @@ Delegate * GetDefaultDelegate()
         gDelegate = &delegate;
     }
     return gDelegate;
+}
+
+void ForceTimeSource(std::optional<TimeSourceEnum> value)
+{
+    VerifyOrDie(GetClusterInstance() == nullptr);
+    gForcedTimeSource = value;
 }
 
 } // namespace chip::app::Clusters::TimeSynchronization

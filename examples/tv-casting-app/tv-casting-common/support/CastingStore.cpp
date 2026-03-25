@@ -654,6 +654,7 @@ void CastingStore::OnFabricRemoved(const chip::FabricTable & fabricTable, chip::
     CHIP_ERROR err = chip::Server::GetInstance().GetSessionResumptionStorage()->DeleteAll(fabricIndex);
     ChipLogProgress(AppServer, "CastingStore::OnFabricRemoved() SessionResumptionStorage.DeleteAll(%d) status %" CHIP_ERROR_FORMAT,
                     fabricIndex, err.Format());
+    IgnoreUnusedVariable(err); // May be unused when logging is disabled
 }
 
 }; // namespace support

@@ -41,11 +41,11 @@ class GeneratorStorage:
         """Gets the existing data at the given path.
         If such data does not exist, will return None.
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def write_new_data(self, relative_path: str, content: str):
         """Write new data to the given path."""
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 class FileSystemGeneratorStorage(GeneratorStorage):

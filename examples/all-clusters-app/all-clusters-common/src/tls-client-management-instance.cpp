@@ -400,7 +400,11 @@ void TlsClientManagementCommandDelegate::RemoveFabric(FabricIndex fabric)
     UniquePtr<GlobalEndpointData> globalData(New<GlobalEndpointData>(EndpointId(1)));
     VerifyOrReturn(globalData);
     ReturnOnFailure(globalData->Load(mStorage));
-    ReturnAndLogOnFailure(globalData->RemoveAll(*mStorage, fabric), Zcl, "Failure clearing TLS endpoint data for fabric");
+
+    // Not having endpoint data for a fabric is not an error; the fabric may never
+    // have had TLS endpoints provisioned.
+    ReturnAndLogOnFailure(globalData->RemoveAll(*mStorage, fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND), Zcl,
+                          "Failure clearing TLS endpoint data for fabric");
 }
 
 CHIP_ERROR TlsClientManagementCommandDelegate::MutateEndpointReferenceCount(EndpointId matterEndpoint, FabricIndex fabric,

@@ -99,18 +99,18 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
                 rawPts = 0;
             }
         }
-        auto firstPtsIt = self->mVideoStreamFirstPts.find(videoStreamID);
-        if (firstPtsIt == self->mVideoStreamFirstPts.end())
+        auto firstPtsIt = self->mVideoStreamPtsOffsetMs.find(videoStreamID);
+        if (firstPtsIt == self->mVideoStreamPtsOffsetMs.end())
         {
-            self->mVideoStreamFirstPts[videoStreamID] = rawPts;
+            auto now                                     = std::chrono::steady_clock::now().time_since_epoch();
+            int64_t nowMs                                = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+            int64_t rawMs                                = static_cast<int64_t>(rawPts / 1000000);
+            self->mVideoStreamPtsOffsetMs[videoStreamID] = nowMs - rawMs;
         }
-        GstClockTime offsetNs = 0;
-        int64_t startEpoch    = self->mVideoStreamStartEpochs[videoStreamID];
-        int64_t ts            = 0;
-        if (rawPts >= self->mVideoStreamFirstPts[videoStreamID])
+        int64_t ts = self->mVideoStreamPtsOffsetMs[videoStreamID] + (rawPts / 1000000);
+        if (ts >= self->mVideoStreamPtsOffsetMs[videoStreamID])
         {
-            offsetNs = rawPts - self->mVideoStreamFirstPts[videoStreamID];
-            ts       = startEpoch + (offsetNs / 1000000); // Convert ns to ms
+
             // Forward raw H.264 encoded frames to media controller with timestamp
             // The PreRollBuffer will distribute to ALL transports registered for this videoStreamID
             // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
@@ -120,7 +120,7 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
         {
             ChipLogError(Camera,
                          "Dropping video frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
-                         rawPts, self->mVideoStreamFirstPts[videoStreamID], videoStreamID);
+                         rawPts, self->mVideoStreamPtsOffsetMs[videoStreamID], videoStreamID);
         }
         gst_buffer_unmap(buffer, &map);
     }
@@ -171,18 +171,17 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
                 rawPts = 0;
             }
         }
-        auto firstPtsIt = self->mAudioStreamFirstPts.find(audioStreamID);
-        if (firstPtsIt == self->mAudioStreamFirstPts.end())
+        auto firstPtsIt = self->mAudioStreamPtsOffsetMs.find(audioStreamID);
+        if (firstPtsIt == self->mAudioStreamPtsOffsetMs.end())
         {
-            self->mAudioStreamFirstPts[audioStreamID] = rawPts;
+            auto now                                     = std::chrono::steady_clock::now().time_since_epoch();
+            int64_t nowMs                                = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
+            int64_t rawMs                                = static_cast<int64_t>(rawPts / 1000000);
+            self->mAudioStreamPtsOffsetMs[audioStreamID] = nowMs - rawMs;
         }
-        GstClockTime offsetNs = 0;
-        int64_t startEpoch    = self->mAudioStreamStartEpochs[audioStreamID];
-        int64_t ts            = 0;
-        if (rawPts >= self->mAudioStreamFirstPts[audioStreamID])
+        int64_t ts = self->mAudioStreamPtsOffsetMs[audioStreamID] + (rawPts / 1000000);
+        if (ts >= self->mAudioStreamPtsOffsetMs[audioStreamID])
         {
-            offsetNs = rawPts - self->mAudioStreamFirstPts[audioStreamID];
-            ts       = startEpoch + (offsetNs / 1000000); // Convert ns to ms
             // Forward raw Opus encoded frames to media controller with timestamp
             // The PreRollBuffer will distribute to ALL transports registered for this audioStreamID
             // Each transport will handle its own SFrame encryption (if configured) during RTP packetization
@@ -192,7 +191,7 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
         {
             ChipLogError(Camera,
                          "Dropping audio frame with PTS %" G_GUINT64_FORMAT " <= first PTS %" G_GUINT64_FORMAT " for stream %u",
-                         rawPts, self->mAudioStreamFirstPts[audioStreamID], audioStreamID);
+                         rawPts, self->mAudioStreamPtsOffsetMs[audioStreamID], audioStreamID);
         }
         gst_buffer_unmap(buffer, &map);
     }
@@ -459,6 +458,23 @@ void CameraDevice::Init()
     mPushAVTransportManager.Init();
 }
 
+void CameraDevice::Shutdown()
+{
+    // Close WebRTC connections while the SystemLayer is still alive, so that WebRTC callbacks can safely use ScheduleLambda.
+    mWebRTCProviderManager.CloseConnection();
+
+    // Stop Video and Audio Streams so their threads don't access CameraDevice members (like mAudioStreamPtsOffsetMs) after
+    // destruction.
+    for (auto & stream : mVideoStreams)
+    {
+        StopVideoStream(stream.videoStreamParams.videoStreamID);
+    }
+    for (auto & stream : mAudioStreams)
+    {
+        StopAudioStream(stream.audioStreamParams.audioStreamID);
+    }
+}
+
 CameraError CameraDevice::InitializeCameraDevice()
 {
     static bool gstreamerInitialized = false;
@@ -552,6 +568,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     {
         source = gst_element_factory_make("v4l2src", "source");
         g_object_set(source, "device", device.c_str(), nullptr);
+        ChipLogProgress(Camera, "Video pipeline: using V4L2 source");
     }
 
     // Check for any nullptr among the created elements
@@ -963,10 +980,6 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
-    mVideoStreamFirstPts.erase(streamID);
-    auto now                          = std::chrono::steady_clock::now().time_since_epoch();
-    mVideoStreamStartEpochs[streamID] = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
-
     // Store in stream context
     it->videoContext = videoPipeline;
 
@@ -1000,6 +1013,7 @@ CameraError CameraDevice::StopVideoStream(uint16_t streamID)
             return CameraError::ERROR_VIDEO_STREAM_STOP_FAILED;
         }
     }
+    mVideoStreamPtsOffsetMs.erase(streamID);
 
     return CameraError::SUCCESS;
 }
@@ -1066,10 +1080,6 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
         return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
     }
 
-    mAudioStreamFirstPts.erase(streamID);
-    auto now                          = std::chrono::steady_clock::now().time_since_epoch();
-    mAudioStreamStartEpochs[streamID] = std::chrono::duration_cast<std::chrono::milliseconds>(now).count();
-
     // Store in stream context
     it->audioContext = audioPipeline;
 
@@ -1120,6 +1130,8 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
                          static_cast<int>(playbackError));
         }
     }
+
+    mAudioStreamPtsOffsetMs.erase(streamID);
 
     return CameraError::SUCCESS;
 }
@@ -1641,10 +1653,17 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneId)
     return CameraError::SUCCESS;
 }
 
-void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneId)
+void CameraDevice::HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds)
 {
-    mZoneManager.OnZoneTriggeredEvent(zoneId, ZoneEventTriggeredReasonEnum::kMotion);
-    mPushAVTransportManager.HandleZoneTrigger(zoneId);
+    // Zone events are per-zone - each zone needs its own event notification
+    for (const auto & zoneId : zoneIds)
+    {
+        mZoneManager.OnZoneTriggeredEvent(zoneId, ZoneEventTriggeredReasonEnum::kMotion);
+    }
+    // Transport trigger is per-motion-event - all zones are passed together
+    // This deliberate asymmetry reflects that zone events track individual zone activity
+    // while transport triggers coordinate recording across all zones in a single motion event
+    mPushAVTransportManager.HandleZoneTrigger(zoneIds);
 }
 
 void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneId)

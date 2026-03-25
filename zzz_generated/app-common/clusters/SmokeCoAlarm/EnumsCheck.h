@@ -78,6 +78,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::Expressed
     case EnumType::kEndOfService:
     case EnumType::kInterconnectSmoke:
     case EnumType::kInterconnectCO:
+    case EnumType::kInoperative:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

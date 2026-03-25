@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "EnergyEvseCluster.cpp",
-  "EnergyEvseCluster.h",
-  "EnergyEvseDelegate.h",
-  "EnergyEvseTestEventTriggerHandler.h",
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
   "energy-evse-server.h",
 ]

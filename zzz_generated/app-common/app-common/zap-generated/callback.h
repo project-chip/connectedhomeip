@@ -6992,42 +6992,6 @@ void emberAfSampleMeiClusterServerTickCallback(chip::EndpointId endpoint);
 // Cluster Commands Callback
 
 /**
- * @brief Groups Cluster AddGroup Command callback (from client)
- */
-bool emberAfGroupsClusterAddGroupCallback(chip::app::CommandHandler * commandObj,
-                                          const chip::app::ConcreteCommandPath & commandPath,
-                                          const chip::app::Clusters::Groups::Commands::AddGroup::DecodableType & commandData);
-/**
- * @brief Groups Cluster ViewGroup Command callback (from client)
- */
-bool emberAfGroupsClusterViewGroupCallback(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath,
-                                           const chip::app::Clusters::Groups::Commands::ViewGroup::DecodableType & commandData);
-/**
- * @brief Groups Cluster GetGroupMembership Command callback (from client)
- */
-bool emberAfGroupsClusterGetGroupMembershipCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Groups::Commands::GetGroupMembership::DecodableType & commandData);
-/**
- * @brief Groups Cluster RemoveGroup Command callback (from client)
- */
-bool emberAfGroupsClusterRemoveGroupCallback(chip::app::CommandHandler * commandObj,
-                                             const chip::app::ConcreteCommandPath & commandPath,
-                                             const chip::app::Clusters::Groups::Commands::RemoveGroup::DecodableType & commandData);
-/**
- * @brief Groups Cluster RemoveAllGroups Command callback (from client)
- */
-bool emberAfGroupsClusterRemoveAllGroupsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Groups::Commands::RemoveAllGroups::DecodableType & commandData);
-/**
- * @brief Groups Cluster AddGroupIfIdentifying Command callback (from client)
- */
-bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::DecodableType & commandData);
-/**
  * @brief On/Off Cluster Off Command callback (from client)
  */
 bool emberAfOnOffClusterOffCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -7148,12 +7112,6 @@ bool emberAfTimerClusterReduceTimeCallback(chip::app::CommandHandler * commandOb
 bool emberAfModeSelectClusterChangeToModeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ModeSelect::Commands::ChangeToMode::DecodableType & commandData);
-/**
- * @brief Temperature Control Cluster SetTemperature Command callback (from client)
- */
-bool emberAfTemperatureControlClusterSetTemperatureCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TemperatureControl::Commands::SetTemperature::DecodableType & commandData);
 /**
  * @brief Smoke CO Alarm Cluster SelfTestRequest Command callback (from client)
  */

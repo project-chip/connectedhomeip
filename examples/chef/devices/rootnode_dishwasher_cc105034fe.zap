@@ -54,7 +54,7 @@
         }
       ],
       "deviceVersions": [
-        3
+        5
       ],
       "deviceIdentifiers": [
         22
@@ -1078,10 +1078,10 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -1726,6 +1726,22 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "false",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "DeviceLoadStatus",
+              "code": 10,
+              "mfgCode": null,
+              "side": "server",
+              "type": "DeviceLoadStruct",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2721,6 +2737,22 @@
               "reportableChange": 0
             },
             {
+              "name": "GroupcastAdoption",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "FeatureMap",
               "code": 65532,
               "mfgCode": null,
@@ -3239,7 +3271,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "5000",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3364,10 +3396,10 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

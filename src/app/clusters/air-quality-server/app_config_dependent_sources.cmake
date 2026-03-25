@@ -16,6 +16,6 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/air-quality-server.cpp"
+    "${CLUSTER_DIR}/AirQualityCluster.cpp"
     "${CLUSTER_DIR}/air-quality-server.h"
 )

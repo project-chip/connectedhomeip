@@ -84,7 +84,7 @@ static_library("realtek_zephyr") {
     sources += [ "../../Zephyr/SysHeapMalloc.cpp" ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
       "../../Zephyr/ThreadStackManagerImpl.cpp",

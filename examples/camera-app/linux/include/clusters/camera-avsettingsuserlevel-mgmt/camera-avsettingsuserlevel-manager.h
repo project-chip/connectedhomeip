@@ -40,8 +40,6 @@ public:
 
     bool CanChangeMPTZ() override;
 
-    CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) override;
-    CHIP_ERROR LoadDPTZStreams(std::vector<Structs::DPTZStruct::Type> & dptzStreams) override;
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
     /**

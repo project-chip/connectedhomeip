@@ -20,7 +20,7 @@
 #
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
-#   run1: # Runs through all tests
+#   run1: # Runs through all tests with debug mode enabled (dumps attribute data on failure)
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -29,6 +29,7 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --debug
 #     factory-reset: true
 #     quiet: true
 #   run2: # tests PASE connection using manual code (12.1 only)
@@ -183,18 +184,6 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run18: # Runs through all tests with debug mode enabled (dumps attribute data on failure)
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --manual-code 10054912339
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --debug
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -1175,7 +1164,7 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 if len(taglist) not in range(TAG_LIST_EP_RANGE_MIN, TAG_LIST_EP_RANGE_MAX):
                     self.fail_current_test("Number of tagList is not in the range of 1 to 6")
 
-            no_duplicate_tag = []
+            no_duplicate_tag_keys = set()
             for tag_struct in taglist:
                 self.print_step(5.1, "verifying atleast 1 NamespaceID and tag property in the taglist struct for endpoint: {endpoint_id}".format(
                     endpoint_id=endpoint_id))
@@ -1186,12 +1175,13 @@ class TC_DeviceBasicComposition(BasicCompositionTests):
                 if not isinstance(tag_struct.tag, int):
                     self.fail_current_test("Atleast 1 Tag is not present")
 
-                if tag_struct.tag in no_duplicate_tag:
+                mfg_code_key = None if isinstance(tag_struct.mfgCode, Nullable) else int(tag_struct.mfgCode)
+                tag_key = (mfg_code_key, int(tag_struct.namespaceID), int(tag_struct.tag))
+                if tag_key in no_duplicate_tag_keys:
                     self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=endpoint_id),
-                                      problem="duplicate Tags found in taglist struct", spec_location="TagList")
-                    self.fail_current_test("Duplicate tag found")
-                no_duplicate_tag.append(tag_struct.tag)
-
+                                      problem=f"duplicate Tag found in taglist struct: {tag_key}", spec_location="TagList")
+                    self.fail_current_test(f"Duplicate tag found: {tag_key}")
+                no_duplicate_tag_keys.add(tag_key)
                 self.print_step(5.2, "verifying namespaceID value falls under defined namespaces for endpoint: {endpoint_id}".format(
                     endpoint_id=endpoint_id))
 

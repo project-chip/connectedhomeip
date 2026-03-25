@@ -22,7 +22,7 @@
 #include "glib.h"
 #include "lcd.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
+#include <app/clusters/closure-control-server/ClosureControlClusterObjects.h>
 #include <app/data-model/Nullable.h>
 
 /**

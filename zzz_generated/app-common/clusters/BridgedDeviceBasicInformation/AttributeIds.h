@@ -14,7 +14,7 @@ namespace BridgedDeviceBasicInformation {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 23;
+inline constexpr uint32_t kAttributesCount = 24;
 
 namespace VendorName {
 inline constexpr AttributeId Id = 0x00000001;
@@ -83,6 +83,10 @@ inline constexpr AttributeId Id = 0x00000012;
 namespace ProductAppearance {
 inline constexpr AttributeId Id = 0x00000014;
 } // namespace ProductAppearance
+
+namespace DeviceLocation {
+inline constexpr AttributeId Id = 0x00000017;
+} // namespace DeviceLocation
 
 namespace ConfigurationVersion {
 inline constexpr AttributeId Id = 0x00000018;

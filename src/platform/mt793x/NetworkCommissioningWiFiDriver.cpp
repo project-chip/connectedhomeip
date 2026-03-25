@@ -288,9 +288,10 @@ void GenioWiFiDriver::OnScanWiFiNetworkDone(wifi_scan_list_item_t * aScanResult)
             security = GetInstance().ConvertSecuritytype(aScanResult->auth_mode);
 
             scanResponse.security.Set(security);
-            scanResponse.channel = aScanResult->channel;
-            scanResponse.rssi    = aScanResult->rssi;
-            scanResponse.ssidLen = strnlen((char *) aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
+            scanResponse.channel         = aScanResult->channel;
+            scanResponse.signal.type     = NetworkCommissioning::WirelessSignalType::kdBm;
+            scanResponse.signal.strength = aScanResult->rssi;
+            scanResponse.ssidLen         = strnlen((char *) aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
             memcpy(scanResponse.ssid, aScanResult->ssid, scanResponse.ssidLen);
             memcpy(scanResponse.bssid, aScanResult->bssid, sizeof(scanResponse.bssid));
 

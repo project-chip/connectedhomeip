@@ -22,8 +22,14 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
+#include <app/SafeAttributePersistenceProvider.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
+#include <app/data-model/WrappedStructEncoder.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/reporting/reporting.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/util/util.h>
 #include <assert.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -90,6 +96,8 @@ PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic() {}
 
 CHIP_ERROR PushAvStreamTransportServerLogic::Init()
 {
+    VerifyOrDie(mCluster != nullptr);
+
     LoadPersistentAttributes();
     return CHIP_NO_ERROR;
 }
@@ -128,39 +136,58 @@ PushAvStreamTransportServerLogic::UpsertStreamTransportConnection(const Transpor
 
     if (it != mCurrentConnections.end())
     {
-        *it    = transportConfiguration;
-        result = UpsertResultEnum::kUpdated;
+        TransportConfigurationStorage oldValue = *it;
+        *it                                    = transportConfiguration;
+        result                                 = UpsertResultEnum::kUpdated;
+        CHIP_ERROR err                         = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store updated connection, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            *it = oldValue; // Revert
+            return UpsertResultEnum::kFailed;
+        }
     }
     else
     {
         mCurrentConnections.push_back(transportConfiguration);
-        result = UpsertResultEnum::kInserted;
+        result         = UpsertResultEnum::kInserted;
+        CHIP_ERROR err = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store new connection, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            mCurrentConnections.pop_back(); // Revert
+            return UpsertResultEnum::kFailed;
+        }
     }
 
-    MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                           PushAvStreamTransport::Attributes::CurrentConnections::Id);
+    mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
 
     return result;
 }
 
-void PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uint16_t transportConnectionId)
+CHIP_ERROR PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uint16_t transportConnectionId)
 {
-    size_t originalSize = mCurrentConnections.size();
+    auto it = std::find_if(
+        mCurrentConnections.begin(), mCurrentConnections.end(),
+        [transportConnectionId](const TransportConfigurationStorage & s) { return s.connectionID == transportConnectionId; });
 
-    // Erase-Remove idiom
-    mCurrentConnections.erase(std::remove_if(mCurrentConnections.begin(), mCurrentConnections.end(),
-                                             [transportConnectionId](const TransportConfigurationStorage & s) {
-                                                 return s.connectionID == transportConnectionId;
-                                             }),
-                              mCurrentConnections.end());
-
-    // If a connection was removed, the size will be smaller.
-    if (mCurrentConnections.size() < originalSize)
+    if (it != mCurrentConnections.end())
     {
+        TransportConfigurationStorage removedValue = *it;
+        mCurrentConnections.erase(it);
+
+        CHIP_ERROR err = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store after removal, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            mCurrentConnections.push_back(removedValue); // Revert
+            return err;
+        }
+
         // Notify the stack that the CurrentConnections attribute has changed.
-        MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                               PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
     }
+    return CHIP_NO_ERROR;
 }
 
 void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connectionID)
@@ -183,8 +210,7 @@ void PushAvStreamTransportServerLogic::RemoveTimerAppState(const uint16_t connec
 void PushAvStreamTransportServerLogic::LoadPersistentAttributes()
 {
     // Load currentConnections
-    ChipLogFailure(mDelegate->LoadCurrentConnections(mCurrentConnections), Zcl,
-                   "PushAVStreamTransport: Unable to load allocated connections from the KVS.");
+    LogErrorOnFailure(LoadCurrentConnections());
 
     // Signal delegate that all persistent configuration attributes have been loaded.
     TEMPORARY_RETURN_IGNORED mDelegate->PersistentAttributesLoadedCallback();
@@ -251,7 +277,11 @@ void PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(S
         ChipLogProgress(Zcl, "Push AV Stream Transport Deallocate timer expired. %s", "Deallocating");
 
         // Remove connection from CurrentConnections
-        transportDeallocateContext->instance->RemoveStreamTransportConnection(connectionID);
+        CHIP_ERROR err = transportDeallocateContext->instance->RemoveStreamTransportConnection(connectionID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to remove transport connection: %" CHIP_ERROR_FORMAT, err.Format());
+        }
         transportDeallocateContext->instance->RemoveTimerAppState(connectionID);
     }
     else
@@ -859,6 +889,24 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         return std::nullopt;
     }
 
+    // Enforce CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS as a per-fabric limit.
+    size_t numConnectionsForFabric = 0;
+    for (const auto & entry : mCurrentConnections)
+    {
+        // Each entry is keyed by connection ID; the value stores the fabric index.
+        if (entry.GetFabricIndex() == handler.GetAccessingFabricIndex())
+        {
+            ++numConnectionsForFabric;
+        }
+    }
+
+    if (numConnectionsForFabric >= CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS)
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: Maximum number of connections reached for fabric", mEndpointId);
+        handler.AddStatus(commandPath, Status::ResourceExhausted);
+        return std::nullopt;
+    }
+
     Commands::AllocatePushTransportResponse::Type response;
     auto & transportOptions = commandData.transportOptions;
 
@@ -1148,7 +1196,11 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
         outTransportConfiguration.SetFabricIndex(accessingFabricIndex);
 
-        UpsertStreamTransportConnection(outTransportConfiguration);
+        if (UpsertStreamTransportConnection(outTransportConfiguration) == UpsertResultEnum::kFailed)
+        {
+            handler.AddStatus(commandPath, Status::Failure);
+            return std::nullopt;
+        }
 
         response.transportConfiguration = outTransportConfiguration;
 
@@ -1201,7 +1253,12 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServerLogic::H
     if (delegateStatus.IsSuccess())
     {
         // Remove connection from CurrentConnections
-        RemoveStreamTransportConnection(connectionID);
+        CHIP_ERROR err = RemoveStreamTransportConnection(connectionID);
+        if (err != CHIP_NO_ERROR)
+        {
+            handler.AddStatus(commandPath, Status::Failure);
+            return std::nullopt;
+        }
         RemoveTimerAppState(connectionID);
     }
 
@@ -1273,10 +1330,20 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
 
     if (status == Status::Success)
     {
+        auto oldTransportOptionsPtr = transportConfiguration->GetTransportOptionsPtr();
         transportConfiguration->SetTransportOptionsPtr(transportOptionsPtr);
 
-        MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                               PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        CHIP_ERROR err = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store modified connection, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            transportConfiguration->SetTransportOptionsPtr(oldTransportOptionsPtr); // Revert
+            status = Status::Failure;                                               // Reflect storage failure
+        }
+        else
+        {
+            mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        }
     }
 
     handler.AddStatus(commandPath, status);
@@ -1334,6 +1401,8 @@ PushAvStreamTransportServerLogic::HandleSetTransportStatus(CommandHandler & hand
     status = mDelegate->SetTransportStatus(connectionIDList, transportStatus);
     if (status == Status::Success)
     {
+        auto originalConnections = mCurrentConnections; // Keep a copy for potential revert
+
         for (auto & connID : connectionIDList)
         {
             for (auto & transportConnection : mCurrentConnections)
@@ -1345,8 +1414,17 @@ PushAvStreamTransportServerLogic::HandleSetTransportStatus(CommandHandler & hand
             }
         }
 
-        MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
-                                               PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        CHIP_ERROR err = StoreCurrentConnections();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Failed to store status update, reverting: %" CHIP_ERROR_FORMAT, err.Format());
+            mCurrentConnections = originalConnections; // Revert
+            status              = Status::Failure;     // Reflect storage failure
+        }
+        else
+        {
+            mCluster->ReportAttributeChange(PushAvStreamTransport::Attributes::CurrentConnections::Id);
+        }
     }
     handler.AddStatus(commandPath, status);
 
@@ -1728,6 +1806,104 @@ Status PushAvStreamTransportServerLogic::NotifyTransportStopped(uint16_t connect
 
     // Generate the PushTransportEnd event
     return GeneratePushTransportEndEvent(connectionID);
+}
+
+CHIP_ERROR PushAvStreamTransportServerLogic::StoreCurrentConnections()
+{
+    Platform::ScopedMemoryBuffer<uint8_t> currentConns;
+    MutableByteSpan bufferSpan;
+    size_t maxBufferSize = static_cast<size_t>(kMaxCurrentConnectionsSerializedSize);
+
+    if (!currentConns.Alloc(maxBufferSize))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    bufferSpan = MutableByteSpan{ currentConns.Get(), maxBufferSize };
+    TLV::TLVWriter writer;
+    writer.Init(bufferSpan);
+
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
+
+    for (const auto & connection : mCurrentConnections)
+    {
+        // Use the EncodeForRead() API to also TLV-encode the fabric index for storage.
+        ReturnErrorOnFailure(connection.EncodeForRead(writer, TLV::AnonymousTag(), connection.GetFabricIndex()));
+    }
+
+    ReturnErrorOnFailure(writer.EndContainer(arrayType));
+
+    bufferSpan.reduce_size(writer.GetLengthWritten());
+
+    auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
+    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeWriteValue(path, bufferSpan));
+
+    ChipLogProgress(Zcl, "Saved %u CurrentConnections", static_cast<unsigned int>(mCurrentConnections.size()));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PushAvStreamTransportServerLogic::LoadCurrentConnections()
+{
+    Platform::ScopedMemoryBuffer<uint8_t> currentConns;
+    MutableByteSpan bufferSpan;
+    size_t maxBufferSize = static_cast<size_t>(kMaxCurrentConnectionsSerializedSize);
+
+    if (!currentConns.Alloc(maxBufferSize))
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    bufferSpan = MutableByteSpan{ currentConns.Get(), maxBufferSize };
+
+    // Clear the list before attempting to load
+    mCurrentConnections.clear();
+
+    auto path = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, CurrentConnections::Id);
+
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        ChipLogProgress(Zcl, "No persisted CurrentConnections found.");
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    TLV::TLVReader reader;
+    reader.Init(bufferSpan);
+
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(reader.EnterContainer(arrayType));
+
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        // Decode into a temporary DecodableType first.
+        Structs::TransportConfigurationStruct::DecodableType decodedTransportConfig;
+        ReturnErrorOnFailure(decodedTransportConfig.Decode(reader));
+
+        // Now, create the storage version which will perform a deep copy of the data.
+        std::shared_ptr<TransportOptionsStorage> transportOptionsStorage;
+        if (decodedTransportConfig.transportOptions.HasValue())
+        {
+            transportOptionsStorage = std::make_shared<TransportOptionsStorage>(decodedTransportConfig.transportOptions.Value());
+            if (!transportOptionsStorage)
+            {
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+
+        TransportConfigurationStorage connection(decodedTransportConfig.connectionID, transportOptionsStorage);
+        connection.transportStatus = decodedTransportConfig.transportStatus;
+        connection.fabricIndex     = decodedTransportConfig.fabricIndex;
+        mCurrentConnections.push_back(connection);
+    }
+
+    VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
+
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+
+    ChipLogProgress(Zcl, "Loaded %u CurrentConnections", static_cast<unsigned int>(mCurrentConnections.size()));
+
+    return reader.VerifyEndOfContainer();
 }
 
 } // namespace Clusters
