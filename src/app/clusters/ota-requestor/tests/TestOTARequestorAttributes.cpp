@@ -18,6 +18,7 @@
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 #include <pw_unit_test/framework.h>
 
+#include <app/clusters/ota-requestor/OTARequestorStorage.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/OtaSoftwareUpdateRequestor/AttributeIds.h>
@@ -34,6 +35,40 @@ using chip::app::DataModel::Nullable;
 namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
+
+struct MockOTARequestorStorage : public OTARequestorStorage
+{
+    ~MockOTARequestorStorage() override = default;
+
+    CHIP_ERROR StoreDefaultProviders(const ProviderLocationList & providers) override
+    {
+        storeDefaultProvidersCalled = true;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR LoadDefaultProviders(ProviderLocationList & providers) override
+    {
+        loadDefaultProvidersCalled = true;
+        return CHIP_NO_ERROR;
+    }
+
+    // Unrelated methods.
+    CHIP_ERROR StoreCurrentProviderLocation(const ProviderLocationType & provider) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ClearCurrentProviderLocation() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR LoadCurrentProviderLocation(ProviderLocationType & provider) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StoreUpdateToken(ByteSpan updateToken) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR LoadUpdateToken(MutableByteSpan & updateToken) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ClearUpdateToken() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StoreCurrentUpdateState(OTAUpdateStateEnum currentUpdateState) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR LoadCurrentUpdateState(OTAUpdateStateEnum & currentUpdateState) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ClearCurrentUpdateState() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR StoreTargetVersion(uint32_t targetVersion) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR LoadTargetVersion(uint32_t & targetVersion) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ClearTargetVersion() override { return CHIP_NO_ERROR; }
+
+    bool storeDefaultProvidersCalled = false;
+    bool loadDefaultProvidersCalled  = false;
+};
 
 struct TestOTARequestorAttributes : public ::testing::Test
 {
@@ -348,6 +383,47 @@ TEST_F(TestOTARequestorAttributes, CannotAddProviderForFabricWithProvider)
     location.fabricIndex    = 1;
     EXPECT_NE(attributes.AddDefaultOtaProvider(location), CHIP_NO_ERROR);
     ASSERT_EQ(changeListener.DirtyList().size(), 0u);
+}
+
+TEST_F(TestOTARequestorAttributes, DefaultProvidersAreLoadedWhenSettingStorage)
+{
+    MockOTARequestorStorage storage;
+    OTARequestorAttributes attributes;
+
+    storage.loadDefaultProvidersCalled = false;
+    EXPECT_EQ(attributes.SetStorageAndLoadDefaultOtaProviders(storage), CHIP_NO_ERROR);
+    EXPECT_TRUE(storage.loadDefaultProvidersCalled);
+}
+
+TEST_F(TestOTARequestorAttributes, AddingProviderUpdatesDefaultProviders)
+{
+    MockOTARequestorStorage storage;
+    OTARequestorAttributes attributes;
+    OTARequestorAttributes::ProviderLocationType location;
+    location.providerNodeID = 0x1234;
+    location.endpoint       = 10;
+    location.fabricIndex    = 1;
+    ASSERT_EQ(attributes.SetStorageAndLoadDefaultOtaProviders(storage), CHIP_NO_ERROR);
+
+    storage.storeDefaultProvidersCalled = false;
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(location), CHIP_NO_ERROR);
+    EXPECT_TRUE(storage.storeDefaultProvidersCalled);
+}
+
+TEST_F(TestOTARequestorAttributes, RemovingProviderUpdatesDefaultProviders)
+{
+    MockOTARequestorStorage storage;
+    OTARequestorAttributes attributes;
+    OTARequestorAttributes::ProviderLocationType location;
+    location.providerNodeID = 0x1234;
+    location.endpoint       = 10;
+    location.fabricIndex    = 1;
+    ASSERT_EQ(attributes.SetStorageAndLoadDefaultOtaProviders(storage), CHIP_NO_ERROR);
+    EXPECT_EQ(attributes.AddDefaultOtaProvider(location), CHIP_NO_ERROR);
+
+    storage.storeDefaultProvidersCalled = false;
+    EXPECT_EQ(attributes.RemoveDefaultOtaProvider(1), CHIP_NO_ERROR);
+    EXPECT_TRUE(storage.storeDefaultProvidersCalled);
 }
 
 } // namespace
