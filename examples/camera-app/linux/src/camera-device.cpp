@@ -444,17 +444,6 @@ CameraDevice::CameraDevice()
 
 CameraDevice::~CameraDevice()
 {
-    // Stop Video and Audio Streams so their threads don't access CameraDevice members (like mAudioStreamPtsOffsetMs) after
-    // destruction.
-    for (auto & stream : mVideoStreams)
-    {
-        StopVideoStream(stream.videoStreamParams.videoStreamID);
-    }
-    for (auto & stream : mAudioStreams)
-    {
-        StopAudioStream(stream.audioStreamParams.audioStreamID);
-    }
-
     if (videoDeviceFd != -1)
     {
         close(videoDeviceFd);
@@ -473,6 +462,17 @@ void CameraDevice::Shutdown()
 {
     // Close WebRTC connections while the SystemLayer is still alive, so that WebRTC callbacks can safely use ScheduleLambda.
     mWebRTCProviderManager.CloseConnection();
+
+    // Stop Video and Audio Streams so their threads don't access CameraDevice members (like mAudioStreamPtsOffsetMs) after
+    // destruction.
+    for (auto & stream : mVideoStreams)
+    {
+        StopVideoStream(stream.videoStreamParams.videoStreamID);
+    }
+    for (auto & stream : mAudioStreams)
+    {
+        StopAudioStream(stream.audioStreamParams.audioStreamID);
+    }
 }
 
 CameraError CameraDevice::InitializeCameraDevice()
