@@ -41,7 +41,7 @@ public:
 
 private:
     AirQuality::AirQualityEnum mAirQuality = AirQuality::AirQualityEnum::kUnknown;
-    BitFlags<AirQuality::Feature> mFeature;
+    const BitFlags<AirQuality::Feature> mFeature;
 };
 
 } // namespace Clusters
