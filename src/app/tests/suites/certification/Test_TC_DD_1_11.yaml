@@ -50,7 +50,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 1: Scan concatenated QR code containing multiple onboarding payloads"
+          "Step 1: Scan concatenated QR code containing multiple onboarding
+          payloads"
       PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
       verification: |
 
@@ -81,8 +82,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 2: Commission each TH device one by one using the parsed payload data
-          in the same order as encoded in the concatenated QR code (left to right)"
+          "Step 2: Commission each TH device one by one using the parsed payload
+          data in the same order as encoded in the concatenated QR code (left to
+          right)"
       verification: |
 
           Commission the TH devices one by one using parsed payloads in Step-1.
@@ -112,8 +114,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 3: Verify the DUT indicates to the user that TH devices must be commissioned
-          individually using their separate QR codes or Manual Pairing Codes"
+          "Step 3: Verify the DUT indicates to the user that TH devices must be
+          commissioned individually using their separate QR codes or Manual
+          Pairing Codes"
       PICS:
           "!(MCORE.DD.CTRL_CONCATENATED_QR_CODE_1) &&
           MCORE.DD.CTRL_CONCATENATED_QR_CODE_2"
