@@ -3726,6 +3726,9 @@ PICS:
     - label: "Indicates that node is configured for test event triggers."
       id: DGGEN.S.A0008
 
+    - label: "Indicates the device load status."
+      id: DGGEN.S.A000a
+
     #
     # server / commandsReceived
     #
@@ -3836,6 +3839,9 @@ PICS:
           feature?"
       id: GRPKEY.S.F00
 
+    - label: "Does the device support groups using the Groupcast cluster?"
+      id: GRPKEY.S.F01
+
     #
     #server attributes
     #
@@ -3850,6 +3856,9 @@ PICS:
 
     - label: "Does the device implement the MaxGroupKeysPerFabric attribute?"
       id: GRPKEY.S.A0003
+
+    - label: "Does the device implement the GroupcastAdoption attribute?"
+      id: GRPKEY.S.A0004
 
     #
     # server commandsGenerated

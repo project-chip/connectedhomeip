@@ -191,9 +191,19 @@ TEST_F(TestChipCert, TestChipCert_ChipToX509)
     }
 
     // Error Case:
-    MutableByteSpan outCert(outCertBuf);
-    err = ConvertChipCertToX509Cert(sTestCert_Node01_01_Err01_Chip, outCert);
-    EXPECT_EQ(err, CHIP_ERROR_INVALID_TLV_TAG);
+    {
+        MutableByteSpan outCert(outCertBuf);
+        err = ConvertChipCertToX509Cert(sTestCert_Node01_01_Err01_Chip, outCert);
+        EXPECT_EQ(err, CHIP_ERROR_INVALID_TLV_TAG);
+    }
+
+    // For a PDC Identity, converting from the compact form must work too
+    {
+        MutableByteSpan outCert(outCertBuf);
+        err = ConvertChipCertToX509Cert(sTestCert_PDCID01_ChipCompact, outCert);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_TRUE(sTestCert_PDCID01_DER.data_equal(outCert));
+    }
 }
 
 TEST_F(TestChipCert, TestChipCert_ChipToX509_ErrorCases)
