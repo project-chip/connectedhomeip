@@ -1695,6 +1695,21 @@ void ConnectivityManagerImpl::PostNetworkConnect()
     // (e.g. at scan-done) risks sending PAFTP frames while the radio is still
     // occupied, causing them to be silently dropped.
     mPafChannelAvailable = true;
+
+    // Schedule NAN publisher cancellation to fire once the PAFTP send queue
+    // drains and the peer has acked all outstanding fragments.  Active NAN
+    // prevents IPv6 DAD from completing, delaying mDNS advertising by 30-40 s.
+    // Deferring until tx-idle ensures the ConnectNetworkResponse (enqueued in
+    // the same event-loop iteration as this call) is fully delivered first.
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().ScheduleCancelPublishersOnTxIdle(
+        [](uint32_t id, WiFiPAF::WiFiPafRole role) {
+            CHIP_ERROR err = ConnectivityMgrImpl()._WiFiPAFShutdown(id, role);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "CancelAllPublisherSessions: shutdown failed: %" CHIP_ERROR_FORMAT,
+                             err.Format());
+            }
+        });
 #endif
 
     // Iterate on the network interface to see if we already have beed assigned addresses.

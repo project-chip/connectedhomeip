@@ -273,6 +273,20 @@ bool WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::Pac
     VerifyOrReturnError(err == CHIP_NO_ERROR, false,
                         ChipLogError(WiFiPAF, "Receive failed, err = %" CHIP_ERROR_FORMAT, err.Format()));
 
+    // If PostNetworkConnect has requested a NAN publisher cancel, fire it now
+    // once the send queue is empty and all outstanding PAFTP fragment acks have
+    // been received.  This is the earliest safe point: all data the device sent
+    // via PAF (including the ConnectNetworkResponse) has been confirmed by the
+    // peer, so tearing down NAN cannot cause packet loss.
+    if (mCancelPublishersOnTxIdle && endPoint->mSendQueue.IsNull() && !endPoint->mPafTP.ExpectingAck())
+    {
+        ChipLogProgress(WiFiPAF, "PAFTP tx idle after WiFi connect: cancelling NAN publishers");
+        mCancelPublishersOnTxIdle = false;
+        OnCancelDeviceHandle cb   = mCancelPublishersCallback;
+        mCancelPublishersCallback = nullptr;
+        CancelAllPublisherSessions(cb);
+    }
+
     return true;
 }
 
@@ -406,6 +420,25 @@ void WiFiPAFLayer::CleanPafInfo(WiFiPAFSession & SessionInfo)
     SessionInfo.nodeId        = kUndefinedNodeId;
     SessionInfo.discriminator = UINT16_MAX;
     return;
+}
+
+void WiFiPAFLayer::ScheduleCancelPublishersOnTxIdle(OnCancelDeviceHandle cb)
+{
+    mCancelPublishersOnTxIdle  = true;
+    mCancelPublishersCallback  = cb;
+}
+
+void WiFiPAFLayer::CancelAllPublisherSessions(OnCancelDeviceHandle OnCancelDevice)
+{
+    for (uint8_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+    {
+        WiFiPAFSession * pPafSession = &mPafInfoVect[i];
+        if (pPafSession->role == kWiFiPafRole_Publisher && pPafSession->id != kUndefinedWiFiPafSessionId)
+        {
+            ChipLogProgress(WiFiPAF, "CancelAllPublisherSessions: cancelling publish id=%u", pPafSession->id);
+            OnCancelDevice(pPafSession->id, pPafSession->role);
+        }
+    }
 }
 
 CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo)

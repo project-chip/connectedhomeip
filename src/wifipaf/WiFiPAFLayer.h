@@ -173,6 +173,16 @@ public:
 
     typedef void (*OnCancelDeviceHandle)(uint32_t id, WiFiPAF::WiFiPafRole role);
     void Shutdown(OnCancelDeviceHandle OnCancelDevice);
+    /** Cancel all active NAN publisher sessions, leaving subscriber sessions
+     *  intact.  Call after WiFi connects to release the radio for IPv6 DAD
+     *  and mDNS advertising. */
+    void CancelAllPublisherSessions(OnCancelDeviceHandle OnCancelDevice);
+
+    /** Arrange for CancelAllPublisherSessions(cb) to fire automatically once
+     *  the PAFTP send queue is drained and all outstanding fragment acks have
+     *  been received from the peer.  This is the earliest safe point to tear
+     *  down NAN after WiFi connects without risking loss of in-flight data. */
+    void ScheduleCancelPublishersOnTxIdle(OnCancelDeviceHandle cb);
     bool OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
     CHIP_ERROR OnWiFiPAFMsgRxComplete(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
     State GetWiFiPAFState() { return mAppState; };
@@ -207,6 +217,8 @@ private:
     void CleanPafInfo(WiFiPAFSession & SessionInfo);
     WiFiPAFSession mPafInfoVect[WIFIPAF_LAYER_NUM_PAF_ENDPOINTS];
     chip::System::Layer * mSystemLayer;
+    bool mCancelPublishersOnTxIdle          = false;
+    OnCancelDeviceHandle mCancelPublishersCallback = nullptr;
 };
 
 } /* namespace WiFiPAF */
