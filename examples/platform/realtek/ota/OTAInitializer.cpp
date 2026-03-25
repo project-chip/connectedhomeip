@@ -18,6 +18,7 @@
 #include "OTAInitializer.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <platform/realtek/freertos/OTAImageProcessorImpl.h>
@@ -40,7 +41,7 @@ void OTAInitializer::InitOTARequestor(void)
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     // Set server instance used for session establishment
-    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader, GetOTARequestorAttributes());
     gImageProcessor.SetOTADownloader(&gDownloader);
     // Connect the Downloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);

@@ -18,6 +18,7 @@
 #include "OTAHelper.h"
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
@@ -146,7 +147,8 @@ void OTAHelpers::InitOTARequestor()
     {
         SetRequestorInstance(&gRequestorCore);
         gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-        TEMPORARY_RETURN_IGNORED gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+        TEMPORARY_RETURN_IGNORED gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
+                                                     GetOTARequestorAttributes());
         gImageProcessor.SetOTADownloader(&gDownloader);
 #if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
         gImageProcessor.SetOtaRcpDelegate(&gOtaRcpDelegate);

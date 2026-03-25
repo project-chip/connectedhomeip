@@ -18,6 +18,7 @@
 #include "OTAHelper.h"
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
@@ -154,7 +155,7 @@ static void InitOTARequestorHandler(System::Layer * systemLayer, void * appState
     gRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
 
     // Set server instance used for session establishment
-    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    gRequestorCore.Init(Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader, GetOTARequestorAttributes());
 
     gImageProcessor.SetOTADownloader(&gDownloader);
 

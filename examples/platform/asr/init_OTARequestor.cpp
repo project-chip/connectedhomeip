@@ -19,6 +19,7 @@
 #include "init_OTARequestor.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
@@ -59,7 +60,8 @@ void OTAInitializer::InitOTARequestor(void)
     TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     // Set server instance used for session establishment
-    TEMPORARY_RETURN_IGNORED gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    TEMPORARY_RETURN_IGNORED gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
+                                                 GetOTARequestorAttributes());
     gImageProcessor.SetOTADownloader(&gDownloader);
     // Connect the Downloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);

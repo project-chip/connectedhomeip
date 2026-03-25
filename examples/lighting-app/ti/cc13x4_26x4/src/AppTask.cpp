@@ -39,6 +39,7 @@ extern "C" {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
@@ -146,7 +147,8 @@ void InitializeOTARequestor(void)
     SetRequestorInstance(&sRequestorCore);
 
     sRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    TEMPORARY_RETURN_IGNORED sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
+    TEMPORARY_RETURN_IGNORED sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader,
+                                                 GetOTARequestorAttributes());
     sImageProcessor.SetOTADownloader(&sDownloader);
     sDownloader.SetImageProcessorDelegate(&sImageProcessor);
     sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
