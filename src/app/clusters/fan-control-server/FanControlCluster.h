@@ -186,8 +186,8 @@ private:
     BitMask<FanControl::WindBitmap> mWindSetting;
     FanControl::AirflowDirectionEnum mAirflowDirection = FanControl::AirflowDirectionEnum::kForward;
 
-    bool mSupportsStep  = false;
-    bool mIsOnOffOn     = false;
+    bool mSupportsStep = false;
+    bool mIsOnOffOn    = false;
     uint8_t mSpeedMax;
     BitMask<FanControl::RockBitmap> mRockSupport;
     BitMask<FanControl::WindBitmap> mWindSupport;
