@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Daily Run For Software Update Tests
+name: Daily Run for slow tests
 on:
     # schedule:
     #   - cron: '0 0 * * *'
@@ -164,11 +164,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
         timeout-minutes: 45
         strategy:
-            # These tests take a lot of time so we just run the batch related to TC_SU.
+            # These tests take a lot of time so we just run them on batches.
             fail-fast: false
             matrix:
                 # Regex filter by TC SU we think 45 minutes is more than engough for this task
                 # Each on one run to avoid all the jobs fail if one fails
+                # Add slow tests here as needed using the filter, individually or by group.
                 filter: ["", "TC_SU_2_2", "TC_SU_2_5", "TC_SU_2_7"]
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi
