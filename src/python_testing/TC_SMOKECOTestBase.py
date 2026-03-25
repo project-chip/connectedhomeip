@@ -99,8 +99,8 @@ class SmokeCoBaseTest(MatterBaseTest):
                     # Convert bytes to int (big-endian)
                     converted_value = int.from_bytes(value, byteorder='big')
                     setattr(self, attr_name, converted_value)
-    
-    async def assert_steps_event_trigger_attr_report_actions(self, 
+
+    async def assert_steps_event_trigger_attr_report_actions(self,
                                     steps:list,
                                     pixit_event_trigger,
                                     smoke_report_handler,
@@ -126,7 +126,7 @@ class SmokeCoBaseTest(MatterBaseTest):
         else:
             asserts.assert_equal(report_data.value,expected_report_data)
 
-    async def assert_steps_event_trigger_report_event_actions(self, 
+    async def assert_steps_event_trigger_report_event_actions(self,
                                     steps:list,
                                     pixit_event_trigger,
                                     smoke_report_handler,
@@ -172,7 +172,7 @@ class SmokeCoBaseTest(MatterBaseTest):
         self.step(steps[3])
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
         asserts.assert_equal(expressed_state,expected_expressed_state)
-        
+
 
     async def alarm_primary_functionality_base_test(self, state_attribute, alarm_event, expressed_state_enum_value, pixit_warning, pixit_critical, pixit_clear):
         """Define what attributes,events,enum values and pixit to use depending if is smoke alarm or co alarm for tests SMOKECO 2.2 and SMOKECO 2.3."""
