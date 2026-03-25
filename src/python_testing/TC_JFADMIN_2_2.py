@@ -41,7 +41,7 @@ from configparser import ConfigParser
 
 from mdns_discovery import mdns_discovery
 from mobly import asserts
-from support_modules.JFADMIN_support import JFADMINBaseTest
+from support_modules.cadmin_support import CADMINBaseTest
 
 import matter.clusters as Clusters
 import matter.tlv
@@ -54,7 +54,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-class TC_JFADMIN_2_2(JFADMINBaseTest):
+class TC_JFADMIN_2_2(CADMINBaseTest):
 
     @async_test_body
     async def setup_class(self):
