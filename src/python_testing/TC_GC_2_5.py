@@ -91,7 +91,8 @@ class TC_GC_2_5(MatterBaseTest):
             return
 
         endpoints_list = await valid_endpoints_list(self, ln_enabled)
-        endpoint1 = endpoints_list[0]
+        if len(endpoints_list) > 1:
+            endpoints_list = [endpoints_list[0]]
 
         # Get the Root Node PartsList to use for wildcard expansion in ACL checks.
         parts_list = await self.read_single_attribute_check_success(
@@ -154,8 +155,8 @@ class TC_GC_2_5(MatterBaseTest):
         self.step("3c")
         aux_acl = await self.read_single_attribute_check_success(Clusters.AccessControl, Clusters.AccessControl.Attributes.AuxiliaryACL, endpoint=0)
         actual_set = get_auxiliary_acl_equivalence_set(aux_acl, parts_list)
-        asserts.assert_true((fabric_index, groupID1, endpoint1) in actual_set,
-                            f"Could not find valid AuxiliaryACL entry for FabricIndex {fabric_index}, Group G1 ({groupID1}) and Endpoint {endpoint1}")
+        asserts.assert_true((fabric_index, groupID1, endpoints_list[0]) in actual_set,
+                            f"Could not find valid AuxiliaryACL entry for FabricIndex {fabric_index}, Group G1 ({groupID1}) and Endpoint {endpoints_list[0]}")
 
         self.step(4)
         await self.send_single_cmd(Clusters.Groupcast.Commands.ConfigureAuxiliaryACL(
@@ -174,8 +175,8 @@ class TC_GC_2_5(MatterBaseTest):
         self.step("5c")
         aux_acl = await self.read_single_attribute_check_success(Clusters.AccessControl, Clusters.AccessControl.Attributes.AuxiliaryACL, endpoint=0)
         actual_set = get_auxiliary_acl_equivalence_set(aux_acl, parts_list)
-        asserts.assert_false((fabric_index, groupID1, endpoint1) in actual_set,
-                             f"Entry for FabricIndex {fabric_index}, Group G1 ({groupID1}) and Endpoint {endpoint1} should have been removed from AuxiliaryACL")
+        asserts.assert_false((fabric_index, groupID1, endpoints_list[0]) in actual_set,
+                             f"Entry for FabricIndex {fabric_index}, Group G1 ({groupID1}) and Endpoint {endpoints_list[0]} should have been removed from AuxiliaryACL")
 
         self.step(6)
         try:
