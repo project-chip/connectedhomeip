@@ -30,6 +30,7 @@ log = logging.getLogger(__name__)
 class SmokeCoBaseTest(MatterBaseTest):
 
     smokeco_cluster = Clusters.SmokeCoAlarm
+    gd_cluster = Clusters.GeneralDiagnostics
 
     async def read_smokeco_attribute_expect_success(self, attribute):
         return await self.read_single_attribute_check_success(cluster=self.smokeco_cluster, endpoint=self.get_endpoint(), attribute=attribute)
@@ -99,21 +100,21 @@ class SmokeCoBaseTest(MatterBaseTest):
                     converted_value = int.from_bytes(value, byteorder='big')
                     setattr(self, attr_name, converted_value)
     
-    async def assert_steps_event_trigger_report_actions(self, 
+    async def assert_steps_event_trigger_attr_report_actions(self, 
                                     steps:list,
                                     pixit_event_trigger,
                                     smoke_report_handler,
                                     expected_report_data,
                                     smoke_handler_timeout:int=300,
                                     ):
-        """Checks for the actions required to check for event report after eventTrigger
+        """Verify attribute report data after eventTrigger and execute 2 steps
 
         Args:
-            steps (list): _description_
-            pixit_event_trigger (_type_): _description_
-            smoke_report_handler (_type_): _description_
-            expected_report_data (_type_): _description_
-            smoke_handler_timeout (int, optional): _description_. Defaults to 300.
+            steps (list): List of steps to execute in this block
+            pixit_event_trigger (int): hex code for event trigger
+            smoke_report_handler (AttributeSubscriptionHandler): Attribute Report Handler for attribute under test
+            expected_report_data (list,int): Expected report data 
+            smoke_handler_timeout (int, optional): Timeout for attribute report handler. Defaults to 300.
         """
         self.step(steps[0])
         await self.send_test_event_triggers(eventTrigger=pixit_event_trigger)
@@ -135,18 +136,17 @@ class SmokeCoBaseTest(MatterBaseTest):
                                     expected_expressed_state,
                                     smoke_handler_timeout:int=300
                                 ):
-        """_summary_
+        """Verify AttributeReport and EventReport after event trigger. This execute 4 steps.
 
         Args:
-            steps (list): _description_
-            pixit_event_trigger (_type_): _description_
-            smoke_report_handler (_type_): _description_
-            smoke_event (_type_): _description_
-            expected_report_data (_type_): _description_
-            expected_event_data (_type_): _description_
-            expected_expressed_state (_type_): _description_
+            steps (list): List of the 4 steps to execute
+            pixit_event_trigger (int): Hex code of the event trigger
+            smoke_report_handler (AttributeSubscriptionHandler): Attribute Report Handler for attribute under test
+            smoke_event (Event): Event to read after the eventTrigger
+            expected_report_data (list,Any): Expected value from the attribute report.
+            expected_event_data (Any): Expected value from the Event. If set to REPORT_DATA match against AttrReport if INORE_DATA ignore check.
+            expected_expressed_state (int): Expecte value for the ExpressedState attribute
             smoke_handler_timeout (int, optional): _description_. Defaults to 300.
-            skip_report (bool, optional): _description_. Defaults to False.
         """
         self.step(steps[0])
         await self.send_test_event_triggers(eventTrigger=pixit_event_trigger)
@@ -162,7 +162,7 @@ class SmokeCoBaseTest(MatterBaseTest):
         event_data = await self.read_smokeco_event(smoke_event)
         if expected_event_data == "REPORT_DATA":
             asserts.assert_equal(event_data.alarmSeverityLevel,report_data.value)
-        elif expected_event_data == "CLEAR_DATA":
+        elif expected_event_data == "IGNORE_DATA":
             # On ClearEvent test just check the event was recorded
             asserts.assert_is_not_none(event_data)
         else:
