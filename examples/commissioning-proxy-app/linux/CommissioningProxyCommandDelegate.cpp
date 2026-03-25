@@ -620,6 +620,12 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
                       sessionId, rmErr.Format());
     }
 
+    // Explicitly close the PAFTP endpoint so its ack-received timer does not
+    // fire 30 s later.  RmPafSession only removes the session from the lookup
+    // table; CloseEndPoint calls DoClose() on the endpoint itself, cancelling
+    // all pending timers and triggering the NAN subscription cancel.
+    chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().CloseEndPoint(pafSession);
+
     sProxySessions.erase(it);
     ChipLogProgress(AppServer, "ProxyDisconnectRequest: session %u cleaned up", sessionId);
     return chip::Protocols::InteractionModel::Status::Success;

@@ -910,6 +910,13 @@ void PairingCommand::OnResponse(chip::app::CommandSender * client,
 
 void PairingCommand::OnError(const chip::app::CommandSender * client, CHIP_ERROR error)
 {
+    if (client == mProxyDisconnectCmdSender.get())
+    {
+        // The disconnect is best-effort; log but use the original exit status.
+        ChipLogDetail(chipTool, "PairViaProxy: ProxyDisconnectRequest error (ignored): %" CHIP_ERROR_FORMAT, error.Format());
+        SetCommandExitStatus(mProxyDisconnectExitErr);
+        return;
+    }
     ChipLogError(chipTool, "PairViaProxy CommandSender error: %" CHIP_ERROR_FORMAT, error.Format());
     if (mPairingMode == PairingMode::Proxy && mProxySessionId == 0)
     {
@@ -927,12 +934,13 @@ void PairingCommand::OnDone(chip::app::CommandSender * client)
     else if (mProxyDisconnectCmdSender.get() == client)
     {
         mProxyDisconnectCmdSender.reset();
+        SetCommandExitStatus(mProxyDisconnectExitErr);
     }
 }
 
 // Send ProxyDisconnectRequest to clean up the proxy session, then exit.
-// Fire-and-forget: SetCommandExitStatus is called immediately whether or not
-// the send succeeds, so teardown is best-effort.
+// SetCommandExitStatus is deferred until the response (or a timeout) is received so
+// that chip-tool keeps the TCP session alive long enough for the proxy to reply.
 void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr)
 {
     // Guard: only send if we have an active proxy session to disconnect.
@@ -963,19 +971,19 @@ void PairingCommand::SendProxyDisconnect(CHIP_ERROR exitErr)
 
     // Zero out the session ID now so a duplicate call is a no-op.
     mProxySessionId = 0;
+    mProxyDisconnectExitErr = exitErr;
 
     if (cmdSender->AddRequestData(pathParams, request) != CHIP_NO_ERROR ||
         cmdSender->SendCommandRequest(mProxySession.Get().Value()) != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "PairViaProxy: failed to send ProxyDisconnectRequest");
-    }
-    else
-    {
-        ChipLogProgress(chipTool, "PairViaProxy: sent ProxyDisconnectRequest");
-        mProxyDisconnectCmdSender = std::move(cmdSender);
+        SetCommandExitStatus(exitErr);
+        return;
     }
 
-    SetCommandExitStatus(exitErr);
+    ChipLogProgress(chipTool, "PairViaProxy: sent ProxyDisconnectRequest, waiting for response");
+    mProxyDisconnectCmdSender = std::move(cmdSender);
+    // SetCommandExitStatus is deferred until OnDone/OnError fires for mProxyDisconnectCmdSender.
 }
 
 // ProxyTransportDelegate — called by ProxyTransport when it needs to forward

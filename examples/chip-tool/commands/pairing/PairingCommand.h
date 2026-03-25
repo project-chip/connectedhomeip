@@ -391,8 +391,10 @@ private:
     // Outstanding ProxyMessageRequest CommandSender (null when idle).
     chip::Platform::UniquePtr<chip::app::CommandSender> mProxyCmdSender;
 
-    // CommandSender for the teardown ProxyDisconnectRequest (fire-and-forget).
+    // CommandSender for the teardown ProxyDisconnectRequest.
     chip::Platform::UniquePtr<chip::app::CommandSender> mProxyDisconnectCmdSender;
+    // Exit status to deliver once the ProxyDisconnectResponse is received (or times out).
+    CHIP_ERROR mProxyDisconnectExitErr = CHIP_NO_ERROR;
 
     /** Send ProxyDisconnectRequest to the proxy then call SetCommandExitStatus(exitErr). */
     void SendProxyDisconnect(CHIP_ERROR exitErr);

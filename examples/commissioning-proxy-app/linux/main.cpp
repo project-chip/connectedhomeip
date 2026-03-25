@@ -25,6 +25,11 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include "NamedPipeCommands.h"
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#include <platform/Linux/ConnectivityManagerImpl.h>
+#include <platform/PlatformManager.h>
+#endif
+
 #include <string>
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
@@ -42,6 +47,34 @@ using namespace chip::app::Clusters;
 namespace {
 NamedPipeCommands sChipNamedPipeCommands;
 } // namespace
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+static void CancelWiFiPAFPublish()
+{
+    uint32_t publishId = LinuxDeviceOptions::GetInstance().mPublishId;
+    if (publishId == 0)
+        return;
+
+    // Stop advertising the proxy as a NAN publisher — it is reached by chip-tool
+    // over TCP/IP, not NAN.  Cancel the publish and disconnect the nanreceive
+    // signal handler so that a subsequent _WiFiPAFSubscribe (triggered by
+    // ProxyConnectRequest) registers exactly one handler and packets are not
+    // delivered twice.
+    TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFCancelPublish(publishId);
+    DeviceLayer::ConnectivityMgrImpl().WiFiPAFDisconnectPublishReceiveHandler();
+    LinuxDeviceOptions::GetInstance().mPublishId = 0;
+    ChipLogProgress(AppServer, "CommissioningProxy: cancelled WiFi-PAF publish and disconnected nanreceive handler");
+}
+
+static void OnChipDeviceEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+        ChipLogProgress(AppServer, "CommissioningProxy: commissioning complete, cancelling WiFi-PAF publish");
+        CancelWiFiPAFPublish();
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 #if 0
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
@@ -205,6 +238,21 @@ void ApplicationInit()
 
     // Register the Commissioning Proxy Code Driven mechanism
     VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gCPCluster.Registration()) == CHIP_NO_ERROR);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+    // If the proxy is already on a fabric (i.e. it was previously commissioned
+    // via PAF and restarted), cancel the WiFi-PAF publish immediately.
+    // If it still needs to be commissioned, register an event handler to cancel
+    // the publish once commissioning completes.
+    if (chip::Server::GetInstance().GetFabricTable().FabricCount() > 0)
+    {
+        CancelWiFiPAFPublish();
+    }
+    else
+    {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().AddEventHandler(OnChipDeviceEvent, 0);
+    }
+#endif
 
     ChipLogProgress(AppServer, "===SHM %s()", __func__);
     ChipLogProgress(AppServer, "%s(): Main function is Proxy Commissioner on endpoint %u",

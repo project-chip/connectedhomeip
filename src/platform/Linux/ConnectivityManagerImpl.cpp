@@ -1689,6 +1689,14 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiP
 
 void ConnectivityManagerImpl::PostNetworkConnect()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // Restore NAN channel availability now that WiFi is connected and the radio
+    // is no longer busy with scanning/association/DHCP.  Restoring it earlier
+    // (e.g. at scan-done) risks sending PAFTP frames while the radio is still
+    // occupied, causing them to be silently dropped.
+    mPafChannelAvailable = true;
+#endif
+
     // Iterate on the network interface to see if we already have beed assigned addresses.
     // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
     // This should be removed or find a better place once we deprecate the rendezvous session.
@@ -1965,6 +1973,22 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiDriver::Sca
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+void ConnectivityManagerImpl::WiFiPAFDisconnectPublishReceiveHandler()
+{
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    if (!mWpaSupplicant.iface)
+        return;
+
+    // Disconnect all "nanreceive" handlers on the interface that were registered
+    // with this ConnectivityManagerImpl as user-data.  This removes the handler
+    // added by _WiFiPAFPublish so that a subsequent _WiFiPAFSubscribe call
+    // registers exactly one handler and packets are not delivered twice.
+    guint sig = g_signal_lookup("nanreceive", G_OBJECT_TYPE(mWpaSupplicant.iface.get()));
+    g_signal_handlers_disconnect_matched(mWpaSupplicant.iface.get(),
+                                         static_cast<GSignalMatchType>(G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_DATA),
+                                         sig, 0, nullptr, nullptr, this);
+}
+
 // Scan for Matter PAF devices, but don't connect
 void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
 {
@@ -2519,10 +2543,6 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(WpaSupplicant1Interface * 
 
         delete networkScanned;
     });
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    mPafChannelAvailable = true;
-#endif
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_StartWiFiManagement()

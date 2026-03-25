@@ -506,6 +506,23 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
     return CHIP_ERROR_NOT_FOUND;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+void WiFiPAFLayer::CloseEndPoint(WiFiPAFSession & SessionInfo)
+{
+    WiFiPAFEndPoint * endPoint =
+        sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(&SessionInfo));
+    if (endPoint != nullptr)
+    {
+        ChipLogProgress(WiFiPAF, "CloseEndPoint: closing PAFTP endpoint for session id=%u", SessionInfo.id);
+        endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
+    }
+    else
+    {
+        ChipLogDetail(WiFiPAF, "CloseEndPoint: no endpoint found for session id=%u", SessionInfo.id);
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+
 WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
 {
     uint8_t i;
