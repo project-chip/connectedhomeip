@@ -166,6 +166,7 @@ class TC_GC_2_5(MatterBaseTest):
         )
 
         self.step("5a")
+        membership_sub.reset()
         membership_matcher = generate_membership_entry_matcher(groupID1, has_auxiliary_acl=False)
         membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
