@@ -143,7 +143,8 @@ class TC_GC_2_2(MatterBaseTest):
         membership_sub = AttributeSubscriptionHandler(groupcast_cluster, membership_attribute)
         await membership_sub.start(self.default_controller, self.dut_node_id, self.get_endpoint(), min_interval_sec=0, max_interval_sec=30)
 
-        event_sub = EventSubscriptionHandler(expected_cluster=Clusters.AccessControl, expected_event_id=Clusters.AccessControl.Events.AuxiliaryAccessUpdated.event_id)
+        event_sub = EventSubscriptionHandler(expected_cluster=Clusters.AccessControl,
+                                             expected_event_id=Clusters.AccessControl.Events.AuxiliaryAccessUpdated.event_id)
         await event_sub.start(self.default_controller, self.dut_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=30)
 
         # TH reads OperationalCredentials cluster's CurrentFabricIndex attribute on Endpoint 0
@@ -258,7 +259,8 @@ class TC_GC_2_2(MatterBaseTest):
             # TH awaits subscription report of AuxiliaryAccessUpdated event from AccessControl cluster
             self.step("6c")
             event_data = event_sub.wait_for_event_report(Clusters.AccessControl.Events.AuxiliaryAccessUpdated, timeout_sec=60)
-            asserts.assert_equal(event_data.adminNodeID, self.default_controller.nodeId, "Event adminNodeID should match TH Node ID")
+            asserts.assert_equal(event_data.adminNodeID, self.default_controller.nodeId,
+                                 "Event adminNodeID should match TH Node ID")
 
             # TH reads Endpoint 0 AccessControl cluster AuxiliaryACL attribute
             self.step("6d")

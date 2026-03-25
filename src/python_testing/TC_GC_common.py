@@ -26,9 +26,11 @@ from matter.testing.matter_testing import AttributeMatcher
 
 logger = logging.getLogger(__name__)
 
+
 def group_id_from_node_id(node_id: int) -> int:
     """Extracts the 16-bit Group ID from a Group-scoped Node ID."""
     return node_id & 0xFFFF
+
 
 def get_auxiliary_acl_equivalence_set(aux_acl, parts_list) -> set[tuple[int, int, int]]:
     """Expands AuxiliaryACL entries into a set of (fabric_index, group_id, endpoint_id) tuples.
@@ -78,6 +80,7 @@ def get_auxiliary_acl_equivalence_set(aux_acl, parts_list) -> set[tuple[int, int
                     else:
                         equivalence_set.add((entry.fabricIndex, group_id, endpoint_id))
     return equivalence_set
+
 
 def is_groupcast_supporting_cluster(cluster_id: int) -> bool:
     """

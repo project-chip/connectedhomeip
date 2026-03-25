@@ -126,7 +126,8 @@ class TC_GC_2_4(MatterBaseTest):
         membership_sub = AttributeSubscriptionHandler(groupcast_cluster, membership_attribute)
         await membership_sub.start(self.default_controller, self.dut_node_id, self.get_endpoint(), min_interval_sec=0, max_interval_sec=30)
 
-        event_sub = EventSubscriptionHandler(expected_cluster=Clusters.AccessControl, expected_event_id=Clusters.AccessControl.Events.AuxiliaryAccessUpdated.event_id)
+        event_sub = EventSubscriptionHandler(expected_cluster=Clusters.AccessControl,
+                                             expected_event_id=Clusters.AccessControl.Events.AuxiliaryAccessUpdated.event_id)
         await event_sub.start(self.default_controller, self.dut_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=30)
 
         self.step("1d")

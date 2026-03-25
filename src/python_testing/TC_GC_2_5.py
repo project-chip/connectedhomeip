@@ -61,7 +61,8 @@ class TC_GC_2_5(MatterBaseTest):
             TestStep("1b", "TH removes any existing group and KeySetID on the DUT."),
             TestStep("1c", "TH subscribes to Membership attribute of the Groupcast cluster on Endpoint 0 and to the AuxiliaryAccessUpdated event of the AccessControl cluster with a min interval of 0s and max interval of 30s. Accumulate all reports seen."),
             TestStep("1d", "TH reads OperationalCredentials cluster's CurrentFabricIndex attribute on Endpoint 0"),
-            TestStep("1e", "Join group G1 generating a new KeySetID K1 with Key InputKey1: TH sends command JoinGroup (GroupID=G1, Endpoints=[EP1], KeySetID=K1, Key=InputKey1)."),
+            TestStep(
+                "1e", "Join group G1 generating a new KeySetID K1 with Key InputKey1: TH sends command JoinGroup (GroupID=G1, Endpoints=[EP1], KeySetID=K1, Key=InputKey1)."),
             TestStep(2, "Enable Auxiliary ACL on group G1: TH sends command ConfigureAuxiliaryACL (GroupID=G1, UseAuxiliaryACL=true)."),
             TestStep("3a", "TH awaits subscription report of new Membership within max interval. (G1 entry with HasAuxiliaryACL=true)"),
             TestStep("3b", "TH awaits subscription report of AuxiliaryAccessUpdated event from AccessControl cluster"),
@@ -120,7 +121,8 @@ class TC_GC_2_5(MatterBaseTest):
         membership_sub = AttributeSubscriptionHandler(groupcast_cluster, membership_attribute)
         await membership_sub.start(self.default_controller, self.dut_node_id, self.get_endpoint(), min_interval_sec=0, max_interval_sec=30)
 
-        event_sub = EventSubscriptionHandler(expected_cluster=Clusters.AccessControl, expected_event_id=Clusters.AccessControl.Events.AuxiliaryAccessUpdated.event_id)
+        event_sub = EventSubscriptionHandler(expected_cluster=Clusters.AccessControl,
+                                             expected_event_id=Clusters.AccessControl.Events.AuxiliaryAccessUpdated.event_id)
         await event_sub.start(self.default_controller, self.dut_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=30)
 
         self.step("1d")
