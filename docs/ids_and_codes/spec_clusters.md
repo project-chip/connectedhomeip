@@ -150,7 +150,7 @@ The following markers are used in this document (matches the ID master list):
 |1872          |0x0750    |Ecosystem Information                                     |ECOINFO        |   |   |   |   |C  |C    |C          |C  |C              |C  |
 |1873          |0x0751    |Commissioner Control                                      |CCTRL          |   |   |   |   |C  |C    |C          |C  |C              |C  |
 |1874          |0x0752    |Joint Fabric Datastore                                    |JFDS           |   |   |   |   |P  |P    |P          |P  |P              |P  |
-|1875          |0x0753    |Joint Fabric Administrator                                |JFPKI          |   |   |   |   |P  |P    |P          |P  |P              |P  |
+|1875          |0x0753    |Joint Fabric Administrator                                |JFADMIN        |   |   |   |   |P  |P    |P          |P  |P              |P  |
 |2049          |0x0801    |TLS Certificate Management                                |TLSCERT        |   |   |   |   |   |     |           |C  |C              |C  |
 |2050          |0x0802    |TLS Client Management                                     |TLSCLIENT      |   |   |   |   |   |     |           |C  |C              |C  |
 |2822          |0x0B06    |Meter Identification                                      |MTRID          |   |   |   |   |   |     |           |C  |C              |C  |
