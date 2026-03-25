@@ -403,8 +403,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/data_model python_testing
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
 RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
 
-# Copy PushAV Server to apps and install dependencies
-COPY --from=chip-build-cert-bins /root/connectedhomeip/src/tools/push_av_server apps/push_av_server
+# Install PushAV dependencies
 RUN pip install --break-system-packages -r apps/push_av_server/requirements.txt \
     && patch -d $(pip show hypercorn | grep "Location: " | sed "s/Location: //") -p0 < apps/push_av_server/hypercorn.patch
 
