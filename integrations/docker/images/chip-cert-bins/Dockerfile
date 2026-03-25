@@ -405,7 +405,7 @@ RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requ
 
 # Install PushAV dependencies
 RUN pip install --break-system-packages -r apps/push_av_server/requirements.txt \
-    && patch -d $(pip show hypercorn | grep "Location: " | sed "s/Location: //") -p0 < apps/push_av_server/hypercorn.patch
+    && patch -d $(python3 -c "from importlib.metadata import distribution; print(distribution('hypercorn').locate_file(''))") -p0 < apps/push_av_server/hypercorn.patch
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.nfc.txt /tmp/requirements.nfc.txt
 RUN pip install --break-system-packages -r /tmp/requirements.nfc.txt && rm /tmp/requirements.nfc.txt
