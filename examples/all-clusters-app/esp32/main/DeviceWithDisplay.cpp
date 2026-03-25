@@ -406,7 +406,7 @@ public:
                 auto * powerSource = app::Clusters::PowerSource::FindClusterOnEndpoint(1);
                 if (powerSource != nullptr)
                 {
-                    CHIP_ERROR err = powerSource->SetBatPercentRemaining(static_cast<uint8_t>(n * 2));
+                    CHIP_ERROR err = powerSource->SetBatPercentRemaining(MakeOptional(static_cast<uint8_t>(n * 2)));
                     if (err == CHIP_NO_ERROR)
                     {
                         ESP_LOGI(TAG, "Battery percent remaining changed to : %d", n);

@@ -38,6 +38,8 @@ struct TestPowerSourceCluster : public ::testing::Test
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        // try to shutdown, because maybe some other test left it initialized,
+        DeviceLayer::SystemLayer().Shutdown();
         ASSERT_EQ(DeviceLayer::SystemLayer().Init(), CHIP_NO_ERROR);
     }
 
