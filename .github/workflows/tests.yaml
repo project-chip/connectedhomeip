@@ -949,7 +949,8 @@ jobs:
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-fabric-sync-${BUILD_VARIANT}-asan-clang"
 
-            # TODO: camera app needs clang support
+            # TODO: camera app works for asan-gcc, while asan-clang reports some false positives related to libdatachannel,
+            # consider switching camera and camera-controller to asan-clang once those are resolved: Issue #43340
             - name: Build linux-x64-camera
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
