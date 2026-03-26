@@ -27,6 +27,10 @@ config("icd-shell-config") {
   include_dirs = [ "./icd/" ]
 }
 
+config("im-shell-config") {
+  include_dirs = [ "./im/" ]
+}
+
 source_set("icd") {
   sources = [
     "./icd/ICDShellCommands.cpp",
@@ -37,6 +41,19 @@ source_set("icd") {
 
   deps = [
     "${chip_root}/src/app/icd/server:notifier",
+    "${shell_dependency_path}:matter-shell",
+  ]
+}
+
+source_set("im") {
+  sources = [
+    "./im/IMShellCommands.cpp",
+    "./im/IMShellCommands.h",
+  ]
+
+  public_configs = [ ":im-shell-config" ]
+
+  deps = [
     "${shell_dependency_path}:matter-shell",
   ]
 }

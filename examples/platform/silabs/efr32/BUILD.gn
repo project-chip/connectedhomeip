@@ -20,6 +20,7 @@ import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 import("${silabs_sdk_build_root}/silabs_board.gni")
+import("${chip_root}/src/app/common_flags.gni")
 
 import("${matter_support_root}/provision/args.gni")  # Seperate import since the
                                                      # matter_support_root is
@@ -77,12 +78,10 @@ source_set("matter-shell") {
 
   sources = [ 
     "${silabs_common_plat_dir}/MatterShell.cpp",
-    "${silabs_common_plat_dir}/shell/im/IMShellCommands.cpp",
   ]
   include_dirs = [
     ".",
     "${silabs_common_plat_dir}",
-    "${silabs_common_plat_dir}/shell/im",
   ]
 
   public_deps = [
@@ -195,6 +194,9 @@ source_set("efr32-common") {
 
     if (chip_enable_icd_server) {
       deps += [ "${silabs_common_plat_dir}/shell:icd" ]
+    }
+    if (chip_enable_read_client) {
+      deps += [ "${silabs_common_plat_dir}/shell:im" ]
     }
   }
 
