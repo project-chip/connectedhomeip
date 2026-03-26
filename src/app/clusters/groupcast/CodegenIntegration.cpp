@@ -85,7 +85,9 @@ void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
                       "Can only have groupcast cluster on endpoint 0");
     }
 
-    static_assert(CHIP_CONFIG_ENABLE_GROUPCAST, "CHIP_CONFIG_ENABLE_GROUPCAST must be enabled if groupcast cluster is used, along with the appropriate delegates. See example apps using groupcast");
+    static_assert(CHIP_CONFIG_ENABLE_GROUPCAST,
+                  "CHIP_CONFIG_ENABLE_GROUPCAST must be enabled if groupcast cluster is used, along with the appropriate "
+                  "delegates. See example apps using groupcast");
 
     IntegrationDelegate integrationDelegate;
 
@@ -111,7 +113,9 @@ void MatterGroupcastClusterShutdownCallback(chip::EndpointId endpointId, MatterC
                       "Can only have groupcast cluster on endpoint 0");
     }
 
-    static_assert(CHIP_CONFIG_ENABLE_GROUPCAST, "CHIP_CONFIG_ENABLE_GROUPCAST must be enabled if groupcast cluster is used, along with the appropriate delegates. See example apps using groupcast");
+    static_assert(CHIP_CONFIG_ENABLE_GROUPCAST,
+                  "CHIP_CONFIG_ENABLE_GROUPCAST must be enabled if groupcast cluster is used, along with the appropriate "
+                  "delegates. See example apps using groupcast");
 
     IntegrationDelegate integrationDelegate;
 
