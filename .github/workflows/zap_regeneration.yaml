@@ -48,7 +48,7 @@ jobs:
 
             - name: Generate all
               run: ./scripts/run_in_build_env.sh scripts/tools/zap_regen_all.py
-            - uses: EndBug/add-and-commit@v9
+            - uses: EndBug/add-and-commit@v10
               with:
                 default_author: github_actions
                 message: Regenerating ZAP
