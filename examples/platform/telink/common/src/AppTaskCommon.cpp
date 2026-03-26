@@ -815,13 +815,19 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 #endif
         break;
     case DeviceEventType::kCHIPoBLEConnectionClosed:
-        if (ConnectivityMgr().GetBleLayer()->IsInitialized()) // Unexpected BLE disconnect during commissioning
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        if (chip::Server::GetInstance().GetFailSafeContext().IsFailSafeArmed())
+#else
+        if (ConnectivityMgr().GetBleLayer()->IsInitialized())
+#endif
         {
+            // Unexpected BLE disconnect during commissioning
             ChipLogDetail(DeviceLayer, "BLE disconnected during commissioning");
             chip::Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
         }
-        else // Expected BLE disconnect: switching to Thread
+        else
         {
+            // Expected BLE disconnect, e.g. after commissioning is complete
             bt_disable();
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
             pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
@@ -880,6 +886,14 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         sIsNetworkProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
         sIsNetworkAttached    = ConnectivityMgr().IsWiFiStationConnected();
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        if (sIsNetworkProvisioned && (ConnectivityMgr().NumBLEConnections() == 0))
+        {
+            /* Disable BLE to ability to enter deep sleep mode once Wi-Fi is provisioned
+            and there are no active BLE connections (BLE is only needed for commissioning) */
+            bt_disable();
+        }
+#endif
 #if CONFIG_CHIP_OTA_REQUESTOR
         if (event->WiFiConnectivityChange.Result == kConnectivity_Established)
         {

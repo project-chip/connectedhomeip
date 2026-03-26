@@ -15,7 +15,8 @@
  *    limitations under the License.
  */
 
-#include "actions-server.h"
+#include "CodegenIntegration.h"
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
