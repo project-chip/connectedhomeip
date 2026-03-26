@@ -36,8 +36,8 @@ template("gdbus_library") {
   }
 
   config("${library_name}_compile_config") {
-    # dbus code generation may generate some code detected as unreacheable
-    # by recent enough clang
+    # D-Bus code generation may generate some code detected as unreachable
+    # by recent enough clang.
     cflags = [ "-Wno-unreachable-code" ]
   }
 
@@ -105,6 +105,12 @@ template("gdbus_library") {
       ":${library_name}_config",
       glib_config,
     ]
+
+    # Code generated with new gdbus-codegen adds checks for `GLIB_VERSION_2_84`
+    # which might not yet be defined when compiling with older glib versions
+    # (e.g. cross-compilation). This manually provided definition solves the
+    # problem with undefined identifiers.
+    defines=["GLIB_VERSION_2_84=G_ENCODE_VERSION(2,84)"]
 
     visibility = []
     if (defined(invoker.visibility)) {
