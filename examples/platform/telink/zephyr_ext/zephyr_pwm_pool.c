@@ -97,8 +97,7 @@ static void pwm_pool_aux_update(const struct pwm_pool_data * pwm_pool)
             {
                 pwm_pool_aux[i].t_event       = t_now;
                 pwm_pool_aux[i].current_state = !pwm_pool_aux[i].current_state;
-                pwm_set_dt(&pwm_pool->out[i], pwm_pool->out[i].period,
-                                  pwm_pool_aux[i].current_state ? pwm_pool->out[i].period : 0);
+                pwm_set_dt(&pwm_pool->out[i], pwm_pool->out[i].period, pwm_pool_aux[i].current_state ? pwm_pool->out[i].period : 0);
             }
         }
         else if (pwm_pool_aux[i].state == PWM_BREATH)
