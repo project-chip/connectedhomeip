@@ -542,9 +542,9 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
     auto & credentialsInStorage = credentialsUsers;
     auto & userNamesInStorage   = userNames;
 #else
-    auto & userInStorage        = mLockUsers[userIndex];
-    auto & credentialsInStorage = mCredentials[userIndex];
-    auto & userNamesInStorage   = mUserNames[userIndex];
+    auto & userInStorage              = mLockUsers[userIndex];
+    auto & credentialsInStorage       = mCredentials[userIndex];
+    auto & userNamesInStorage         = mUserNames[userIndex];
 #endif
 
     if (userName.size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
@@ -689,7 +689,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     memcpy(mCurrentCredentialData, lockCredentialsData, credentialInStorage.credentialData.size());
     credentialInStorage.credentialData = chip::ByteSpan{ mCurrentCredentialData, credentialInStorage.credentialData.size() };
 #else
-    const auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
+    const auto & credentialInStorage  = mLockCredentials[to_underlying(credentialType)][credentialIndex];
 #endif
 
     credential.status = credentialInStorage.status;
@@ -802,8 +802,8 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     auto & credentialInStorage     = lockCredentials;
     auto & credentialDataInStorage = lockCredentialsData;
 #else
-    auto & credentialInStorage     = mLockCredentials[to_underlying(credentialType)][credentialIndex];
-    auto & credentialDataInStorage = mCredentialData[to_underlying(credentialType)][credentialIndex];
+    auto & credentialInStorage        = mLockCredentials[to_underlying(credentialType)][credentialIndex];
+    auto & credentialDataInStorage    = mCredentialData[to_underlying(credentialType)][credentialIndex];
 #endif
 
     credentialInStorage.status         = credentialStatus;
@@ -916,7 +916,7 @@ DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
 
     const auto & scheduleInStorage = mWeekdaySchedule;
 #else
-    const auto & scheduleInStorage = mWeekdaySchedule[userIndex][weekdayIndex];
+    const auto & scheduleInStorage    = mWeekdaySchedule[userIndex][weekdayIndex];
 #endif
 
     if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
@@ -951,7 +951,7 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
 
     auto & scheduleInStorage = mWeekdaySchedule;
 #else
-    auto & scheduleInStorage = mWeekdaySchedule[userIndex][weekdayIndex];
+    auto & scheduleInStorage          = mWeekdaySchedule[userIndex][weekdayIndex];
 #endif
 
     scheduleInStorage.schedule.daysMask    = daysMask;
@@ -1001,7 +1001,7 @@ DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 
     const auto & scheduleInStorage = mYeardaySchedule;
 #else
-    const auto & scheduleInStorage = mYeardaySchedule[userIndex][yearDayIndex];
+    const auto & scheduleInStorage    = mYeardaySchedule[userIndex][yearDayIndex];
 #endif
 
     if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
@@ -1035,7 +1035,7 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 
     auto & scheduleInStorage = mYeardaySchedule;
 #else
-    auto & scheduleInStorage = mYeardaySchedule[userIndex][yearDayIndex];
+    auto & scheduleInStorage          = mYeardaySchedule[userIndex][yearDayIndex];
 #endif
 
     scheduleInStorage.schedule.localStartTime = localStartTime;
@@ -1078,7 +1078,7 @@ DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
 
     const auto & scheduleInStorage = mHolidaySchedule;
 #else
-    const auto & scheduleInStorage = mHolidaySchedule[holidayIndex];
+    const auto & scheduleInStorage    = mHolidaySchedule[holidayIndex];
 #endif
 
     if (DlScheduleStatus::kAvailable == scheduleInStorage.status)
@@ -1109,7 +1109,7 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
 
     auto & scheduleInStorage = mHolidaySchedule;
 #else
-    auto & scheduleInStorage = mHolidaySchedule[holidayIndex];
+    auto & scheduleInStorage          = mHolidaySchedule[holidayIndex];
 #endif
 
     scheduleInStorage.schedule.localStartTime = localStartTime;
