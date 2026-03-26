@@ -342,7 +342,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistableData<kPersist
             ReturnErrorOnFailure(reader.Get(value));
             flags = value;
         }
-        
+
         return reader.ExitContainer(container);
     }
 

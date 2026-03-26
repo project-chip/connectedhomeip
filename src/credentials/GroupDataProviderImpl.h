@@ -121,7 +121,7 @@ public:
             bool needed               = mAuxAclNotificationNeeded;
             mAuxAclNotificationNeeded = false;
             return needed;
-        } 
+        }
         return false;
     }
 
