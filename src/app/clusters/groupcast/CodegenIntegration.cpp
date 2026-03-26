@@ -85,7 +85,8 @@ void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
                       "Can only have groupcast cluster on endpoint 0");
     }
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
+    static_assert(CHIP_CONFIG_ENABLE_GROUPCAST, "CHIP_CONFIG_ENABLE_GROUPCAST must be enabled if groupcast cluster is used, along with the appropriate delegates. See example apps using groupcast");
+
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
@@ -99,14 +100,19 @@ void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
-#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 }
 
 void MatterGroupcastClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
-    VerifyOrDie(endpointId == chip::kRootEndpointId);
+    if constexpr (Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() > 0)
+    {
+        static_assert((Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
+                       Groupcast::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == 0),
+                      "Can only have groupcast cluster on endpoint 0");
+    }
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
+    static_assert(CHIP_CONFIG_ENABLE_GROUPCAST, "CHIP_CONFIG_ENABLE_GROUPCAST must be enabled if groupcast cluster is used, along with the appropriate delegates. See example apps using groupcast");
+
     IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::UnregisterServer(
@@ -117,7 +123,6 @@ void MatterGroupcastClusterShutdownCallback(chip::EndpointId endpointId, MatterC
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
         integrationDelegate, shutdownType);
-#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 }
 
 void MatterGroupcastPluginServerInitCallback() {}
