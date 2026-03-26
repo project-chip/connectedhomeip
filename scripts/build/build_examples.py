@@ -19,11 +19,12 @@ import logging
 import os
 import sys
 
-import build
 import click
 import coloredlogs
 from builders.builder import BuilderOptions
 from runner import PrintOnlyRunner, ShellRunner
+
+import build
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
@@ -36,10 +37,6 @@ __LOG_LEVELS__ = {
     'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
-
-
-def CommaSeparate(items) -> str:
-    return ', '.join([x for x in items])
 
 
 def ValidateRepoPath(context, parameter, value):
@@ -170,7 +167,7 @@ before running this script.
         ninja_jobs=ninja_jobs, runner=runner
     )
 
-    requested_targets = set([t.lower() for t in target])
+    requested_targets = {t.lower() for t in target}
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
         enable_link_map_file=enable_link_map_file,
         enable_flashbundle=enable_flashbundle,

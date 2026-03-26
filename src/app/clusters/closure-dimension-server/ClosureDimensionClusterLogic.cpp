@@ -18,7 +18,7 @@
  * @file Cross-platform API to handle cluster-specific logic for the closure dimension cluster on a single endpoint.
  */
 
-#include "closure-dimension-cluster-logic.h"
+#include "ClosureDimensionClusterLogic.h"
 #include <clusters/ClosureDimension/Metadata.h>
 #include <platform/LockTracker.h>
 
