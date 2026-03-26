@@ -383,7 +383,7 @@ exit:
 
     if (pvt_key != nullptr)
     {
-        BN_free(pvt_key);
+        BN_clear_free(pvt_key); // wipe!
         pvt_key = nullptr;
     }
 
@@ -392,6 +392,79 @@ exit:
         EC_POINT_free(key_point);
         key_point = nullptr;
     }
+    SSLErrorLog();
+    return error;
+}
+
+CHIP_ERROR P256Keypair::InitializeFromBitsOrReject(FixedByteSpan<kP256_PrivateKey_Length> privateKeyBits)
+{
+    ERR_clear_error();
+    Clear();
+
+    const EC_GROUP * group;
+    const BIGNUM * order;
+    BIGNUM * pvt_key     = nullptr;
+    EC_POINT * pub_point = nullptr;
+    EC_KEY * ec_key      = nullptr;
+
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    int nid = GetNidForCurve(MapECName(mPublicKey.Type()));
+    VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INTERNAL);
+
+    ec_key = EC_KEY_new_by_curve_name(nid);
+    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    group = EC_KEY_get0_group(ec_key);
+    order = EC_GROUP_get0_order(group);
+
+    // Convert private key bits to BIGNUM x, then compute d = x + 1.
+    // Checking that d < order ensures that x was in [0, order - 2].
+    pvt_key = BN_bin2bn(privateKeyBits.data(), privateKeyBits.size(), nullptr);
+    VerifyOrExit(pvt_key != nullptr, error = CHIP_ERROR_INTERNAL);
+    result = BN_add(pvt_key, pvt_key, BN_value_one());
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(BN_cmp(pvt_key, order) < 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Compute public key: Q = d * G
+    pub_point = EC_POINT_new(group);
+    VerifyOrExit(pub_point != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_POINT_mul(group, pub_point, pvt_key, nullptr, nullptr, nullptr);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_KEY_set_private_key(ec_key, pvt_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_KEY_set_public_key(ec_key, pub_point);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    SuccessOrExit(error = P256PublicKeyFromECKey(ec_key, mPublicKey));
+
+    from_EC_KEY(ec_key, &mKeypair);
+    mInitialized = true;
+    ec_key       = nullptr;
+
+exit:
+    if (ec_key != nullptr)
+    {
+        EC_KEY_free(ec_key);
+        ec_key = nullptr;
+    }
+
+    if (pub_point != nullptr)
+    {
+        EC_POINT_free(pub_point);
+        pub_point = nullptr;
+    }
+
+    if (pvt_key != nullptr)
+    {
+        BN_clear_free(pvt_key); // wipe!
+        pvt_key = nullptr;
+    }
+
     SSLErrorLog();
     return error;
 }

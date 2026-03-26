@@ -750,7 +750,7 @@
             "LevelValue",
             "FeatureMap"
         ],
-        "Air Quality": ["AirQuality", "FeatureMap"],
+        "Air Quality": ["AirQuality", "ClusterRevision", "FeatureMap"],
         "Electrical Energy Measurement": [
             "Accuracy",
             "CumulativeEnergyImported",
