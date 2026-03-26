@@ -312,6 +312,12 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
         expressed_state = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
         asserts.assert_equal(expressed_state, self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal)
 
+        # Cancel handlers
+        co_state_handler.cancel()
+        smoke_state_handler.cancel()
+        battery_alert_handler.cancel()
+        interconnected_co_alarm_handler.cancel()
+        interconnected_smoke_alarm_handler.cancel()
 
 if __name__ == "__main__":
     default_matter_test_main()
