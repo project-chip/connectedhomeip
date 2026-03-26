@@ -548,7 +548,7 @@ private:
         void OnGroupAdded(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group) override
         {
             Credentials::GroupDataProvider * provider = mServer->GetGroupDataProvider();
-            const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
+            const FabricInfo * fabric                 = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
             if (fabric == nullptr)
             {
                 ChipLogError(AppServer, "Group added to nonexistent fabric?");
@@ -584,7 +584,7 @@ private:
             else
             {
                 // Check if the address is still in use
-                bool in_use                               = false;
+                bool in_use = false;
                 if (nullptr != provider)
                 {
                     // Check all groups from all fabrics

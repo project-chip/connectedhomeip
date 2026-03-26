@@ -117,7 +117,8 @@ public:
 
     bool ConsumeAuxAclNotificationNeeded() override
     {
-        if (IsGroupcastEnabled()) {
+        if (IsGroupcastEnabled())
+        {
             bool needed               = mAuxAclNotificationNeeded;
             mAuxAclNotificationNeeded = false;
             return needed;

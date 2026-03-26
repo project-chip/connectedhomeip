@@ -78,8 +78,11 @@ public:
 
 void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
 {
-    if constexpr (Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() > 0) {
-        static_assert((Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() == 1 && Groupcast::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == 0), "Can only have groupcast cluster on endpoint 0");
+    if constexpr (Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() > 0)
+    {
+        static_assert((Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
+                       Groupcast::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == 0),
+                      "Can only have groupcast cluster on endpoint 0");
     }
 
 #if CHIP_CONFIG_ENABLE_GROUPCAST

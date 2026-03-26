@@ -393,13 +393,9 @@ public:
         }
     }
 
-    void SetGroupcastEnabled(bool groupcastVal) {
-        mGroupcastEnabled = groupcastVal;
-    }
+    void SetGroupcastEnabled(bool groupcastVal) { mGroupcastEnabled = groupcastVal; }
 
-    bool IsGroupcastEnabled() {
-        return mGroupcastEnabled;
-    }
+    bool IsGroupcastEnabled() { return mGroupcastEnabled; }
 
     // Groupcast
     virtual uint16_t getMaxMembershipCount() = 0;
@@ -449,7 +445,7 @@ protected:
     const uint16_t mMaxGroupsPerFabric;
     const uint16_t mMaxGroupKeysPerFabric;
     GroupListener * mListeners[kMaxListeners] = { nullptr };
-    bool mGroupcastEnabled = false;
+    bool mGroupcastEnabled                    = false;
 };
 
 /**

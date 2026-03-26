@@ -793,7 +793,7 @@ void Server::OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, 
 void Server::RejoinExistingMulticastGroups()
 {
     ChipLogProgress(AppServer, "Joining Multicast groups");
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     bool groupcast_joined = false;
 
     for (const FabricInfo & fabric : mFabrics)
