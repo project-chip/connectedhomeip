@@ -2570,7 +2570,7 @@ CHIP_ERROR DeviceCommissioner::ParseGeneralCommissioningInfo(ReadCommissioningIn
     err = mAttributeCache->Get<IsCommissioningWithoutPower::TypeInfo>(kRootEndpointId, info.general.isCommissioningWithoutPower);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Ignoring failure to read IsCommissioningWithoutPower: %" CHIP_ERROR_FORMAT, err.Format());
+        // Optional attribute 'IsCommissioningWithoutPower' not present
         info.general.isCommissioningWithoutPower = false; // default to false, not a fatal error
     }
 

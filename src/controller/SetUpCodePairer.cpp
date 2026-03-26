@@ -336,8 +336,8 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverNFC()
     Nfc::NFCReaderTransport * readerTransport = DeviceLayer::Internal::NFCCommissioningMgr().GetNFCReaderTransport();
     if (!readerTransport)
     {
-        ChipLogError(Controller, "Commissionable node discovery over NFC since there is no valid NFC reader transport");
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        // No valid NFC reader transport. This is allowed so it is not an error.
+        return CHIP_NO_ERROR;
     }
 
     readerTransport->SetDelegate(this);
@@ -364,9 +364,8 @@ CHIP_ERROR SetUpCodePairer::StopDiscoveryOverNFC()
     Nfc::NFCReaderTransport * readerTransport = DeviceLayer::Internal::NFCCommissioningMgr().GetNFCReaderTransport();
     if (!readerTransport)
     {
-        ChipLogError(Controller,
-                     "Failed to stop commissionable node discovery over NFC since there is no valid NFC reader transport");
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        // No valid NFC reader transport. This is allowed so it is not an error.
+        return CHIP_NO_ERROR;
     }
 
     ChipLogProgress(Controller, "Stopping commissionable node discovery over NFC by removing delegate");
