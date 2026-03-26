@@ -53,7 +53,7 @@ from matter.tlv import TLVReader, TLVWriter
 log = logging.getLogger(__name__)
 
 
-class TC_JFPKI_2_2(MatterBaseTest):
+class TC_JFADMIN_1_2(MatterBaseTest):
     _JOINT_FABRIC_ADMINISTRATOR_ENDPOINT = 1
     _OPERATIONAL_CREDENTIALS_ENDPOINT = 0
     _GENERAL_COMMISSIONING_ENDPOINT = 0
@@ -98,7 +98,7 @@ class TC_JFPKI_2_2(MatterBaseTest):
             self.storage_directory_ecosystem_a.cleanup()
         super().teardown_class()
 
-    def steps_TC_JFPKI_2_2(self) -> list[TestStep]:
+    def steps_TC_JFADMIN_1_2(self) -> list[TestStep]:
         return [
             TestStep("1", "Commission DUT to TH."),
             TestStep("2", "TH sends ICACCSRRequest command to DUT.",
@@ -133,14 +133,14 @@ class TC_JFPKI_2_2(MatterBaseTest):
                      "DUT responds with status code 0x06 (InvalidAdministratorFabricIndex)."),
         ]
 
-    def desc_TC_JFPKI_2_2(self):
-        return "[TC-JFPKI-2.2] Validate commands behavior outside Joint Commissioning Method"
+    def desc_TC_JFADMIN_1_2(self):
+        return "[TC-JFADMIN-1.2] Validate commands behavior outside Joint Commissioning Method"
 
-    def pics_TC_JFPKI_2_2(self):
-        return ['JFPKI.S']
+    def pics_TC_JFADMIN_1_2(self):
+        return ['JFADMIN.S']
 
     @async_test_body
-    async def test_TC_JFPKI_2_2(self):
+    async def test_TC_JFADMIN_1_2(self):
         self.step("1")
 
         await self.default_controller.CommissionOnNetwork(
