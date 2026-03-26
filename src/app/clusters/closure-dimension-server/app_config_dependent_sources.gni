@@ -13,9 +13,7 @@
 # limitations under the License.
 app_config_dependent_sources = [
   "ClosureDimensionCluster.cpp",
-  "ClosureDimensionClusterLogic.cpp",
   "ClosureDimensionClusterMatterContext.cpp",
-  "closure-dimension-cluster-logic.h",
   "closure-dimension-cluster-objects.h",
   "closure-dimension-delegate.h",
   "closure-dimension-matter-context.h",

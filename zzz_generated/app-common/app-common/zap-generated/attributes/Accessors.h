@@ -1372,15 +1372,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace DishwasherMode
 
 namespace AirQuality {
-namespace Attributes {
-
-namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace ClusterRevision
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 } // namespace AirQuality
 
 namespace SmokeCoAlarm {
