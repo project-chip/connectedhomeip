@@ -69,9 +69,9 @@ by our `CodegenIntegration` layer to automatically instantiate and configure the
 cluster based on your ZAP configuration.
 
 Note that it will be enforced that it is possible to create a valid cluster from
-the configuration with the ZAP tool. This means that you will need to specity
-the type of the power source (wired or battery) with the ZAP tool, otherwise
-the initial startup will fail.
+the configuration with the ZAP tool. This means that you will need to specify
+the type of the power source (wired or battery) with the ZAP tool, otherwise the
+initial startup will fail.
 
 To use the cluster in this mode, your application can get a pointer to the
 cluster instance and call its methods directly using
