@@ -305,7 +305,8 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)
     // This is the fabric index used in ClusterTester::WriteAttribute.
     provider.fabricIndex = chip::Testing::kTestFabricIndex;
     DataModel::List<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type> payload(&provider, 1u);
-    std::optional<DataModel::ActionReturnStatus> result = tester.WriteAttribute(DefaultOTAProviders::Id, payload);
+    std::optional<DataModel::ActionReturnStatus> result =
+        tester.WriteAttribute(DefaultOTAProviders::Id, payload, chip::Testing::ListWritingPattern::ClearAllThenAppendItems);
     ASSERT_TRUE(result.has_value());
     ASSERT_TRUE(result->IsSuccess());
 
