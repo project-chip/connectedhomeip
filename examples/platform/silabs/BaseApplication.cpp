@@ -37,6 +37,10 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
+#ifdef ENABLE_CHIP_SHELL
+#include <shell/im/IMShellCommands.h>
+#endif // ENABLE_CHIP_SHELL
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #ifdef ENABLE_CHIP_SHELL
@@ -341,6 +345,7 @@ CHIP_ERROR BaseApplication::BaseInit()
 #endif // ENABLE_WSTK_LEDS
 
 #ifdef ENABLE_CHIP_SHELL
+    IMShellCommands::RegisterCommands();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     ICDCommands::RegisterCommands();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
