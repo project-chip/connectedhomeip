@@ -157,8 +157,8 @@ class TC_DD_1_5(MatterBaseTest):
             else:
                 # Check that an alternate commissioning channel is supported
                 payload = SetupPayload().ParseQrCode(nfc_tag_content)
-                asserts.assert_true(payload.supports_ble_commissioning or payload.supports_wifi_commissioning or payload.supports_thread_commissioning, "No alternate commissioning channel found!")
-
+                asserts.assert_true(payload.supports_ble_commissioning or payload.supports_wifi_commissioning or payload.supports_thread_commissioning,
+                                    "No alternate commissioning channel found!")
 
     async def wait_for_user_input_async(self, *args, **kwargs):
         loop = asyncio.get_running_loop()
