@@ -97,7 +97,9 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
+#if !defined(SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL) || SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL == 0
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#endif
 /**********************************************************
  * Defines
  *********************************************************/
@@ -109,9 +111,11 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials;
 using namespace chip::DeviceLayer::Silabs;
 
+#if !defined(SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL) || SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL == 0
 #ifdef SL_WIFI
 Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::SlWiFiDriver> sWifiNetworkDriver(kRootEndpointId);
 #endif /* SL_WIFI */
+#endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
@@ -126,9 +130,11 @@ Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::SlWiFiDr
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
 
+#if !defined(SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL) || SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL == 0
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 
 Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(kRootEndpointId);
+#endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
 // ================================================================================
 // Matter Networking Callbacks
 // ================================================================================
@@ -163,7 +169,9 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
 
+#if !defined(SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL) || SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL == 0
     TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
+#endif
 
     return ThreadStackMgrImpl().StartThreadTask();
 }
@@ -330,8 +338,24 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults
     ReturnErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
+
+#if defined(SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL) && SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+    // App is using code-driven data model - initialize it
+    CHIP_ERROR dmErr = AppTask::InitCodeDrivenDataModel(*initParams.persistentStorageDelegate, initParams.groupDataProvider);
+    if (dmErr == CHIP_NO_ERROR)
+    {
+        initParams.dataModelProvider = AppTask::GetDataModelProvider();
+        SILABS_LOG("Using code-driven data model");
+    }
+    else
+    {
+        SILABS_LOG("Code-driven data model init failed: %" CHIP_ERROR_FORMAT, dmErr.Format());
+        return dmErr;
+    }
+#else
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    initParams.appDelegate       = &BaseApplication::sAppDelegate;
+#endif
+    initParams.appDelegate = &BaseApplication::sAppDelegate;
 
     // This is needed by localization configuration cluster so we set it before the initialization
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
