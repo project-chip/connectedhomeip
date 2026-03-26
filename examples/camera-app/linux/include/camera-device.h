@@ -104,6 +104,7 @@ public:
     CameraDeviceInterface::CameraHALInterface & GetCameraHALInterface() override { return *this; }
 
     void Init();
+    void Shutdown();
 
     // HAL interface impl
     CameraError InitializeCameraDevice() override;
