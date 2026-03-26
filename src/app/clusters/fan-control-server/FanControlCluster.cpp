@@ -64,7 +64,6 @@ Protocols::InteractionModel::Status FanControlCluster::SetFanModeToOff()
         ApplyFanModeOffSideEffects();
         NotifyAttributeChanged(FanMode::Id);
     }
-    UpdateOnOffCluster(false);
     return Status::Success;
 }
 
@@ -232,7 +231,6 @@ void FanControlCluster::ApplyPercentSettingChanged()
         return;
 
     mPercentCurrent = mPercentSetting.Value();
-    UpdateOnOffCluster(true);
 }
 
 void FanControlCluster::ApplySpeedSettingChanged()
@@ -270,7 +268,6 @@ void FanControlCluster::ApplySpeedSettingChanged()
     mPercentCurrent = percent;
     mSpeedCurrent   = speedSetting;
     NotifyAttributeChanged(PercentCurrent::Id);
-    UpdateOnOffCluster(true);
 }
 
 DataModel::ActionReturnStatus FanControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -492,10 +489,6 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
         ApplyFanModeAutoSideEffects();
     }
 
-    if (newMode == FanModeEnum::kOff || mIsOnOffOn)
-    {
-        UpdateOnOffCluster(newMode != FanModeEnum::kOff);
-    }
     return NotifyAttributeChangedIfSuccess(FanMode::Id, Status::Success);
 }
 
@@ -616,13 +609,6 @@ void FanControlCluster::SetOnOffState(bool isOn)
             }
             NotifyAttributeChanged(FanMode::Id);
         }
-    }
-}
-void FanControlCluster::UpdateOnOffCluster(bool isOn)
-{
-    if (mDelegate != nullptr)
-    {
-        mDelegate->OnFanStateChanged(isOn);
     }
 }
 
