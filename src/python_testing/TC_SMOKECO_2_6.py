@@ -75,17 +75,25 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
         self.pixit_test_event_battery_clear = self.user_params.get(
             "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATTERY.CLEAR", 0x005c0000000000a5)
 
-        self.pixit_test_event_interconnected_smoke_alarm = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTSMOKEALARM", 0x005c000000000092)
-        self.pixit_test_event_interconnected_smoke_alarm_clear = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTSMOKEALARM.CLEAR", 0x005c0000000000a2)
+        self.pixit_test_event_interconnected_smoke_alarm = self.user_params.get(
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTSMOKEALARM", 0x005c000000000092)
+        self.pixit_test_event_interconnected_smoke_alarm_clear = self.user_params.get(
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTSMOKEALARM.CLEAR", 0x005c0000000000a2)
 
-        self.pixit_test_event_interconnect_co_alarm = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTCOALARM", 0x005c000000000094)
-        self.pixit_test_event_interconnect_co_alarm_clear = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTCOALARM.CLEAR", 0x005c0000000000a4)
+        self.pixit_test_event_interconnect_co_alarm = self.user_params.get(
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTCOALARM", 0x005c000000000094)
+        self.pixit_test_event_interconnect_co_alarm_clear = self.user_params.get(
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTCOALARM.CLEAR", 0x005c0000000000a4)
 
-        self.pixit_test_event_smoke_alarm_warning = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKEALARM.WARNING", 0x005c000000000090)
-        self.pixit_test_event_smoke_alarm_clear = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKEALARM.CLEAR", 0x005c0000000000a0)
+        self.pixit_test_event_smoke_alarm_warning = self.user_params.get(
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKEALARM.WARNING", 0x005c000000000090)
+        self.pixit_test_event_smoke_alarm_clear = self.user_params.get(
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKEALARM.CLEAR", 0x005c0000000000a0)
 
-        self.pixit_test_event_co_alarm_warning = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.WARNING", 0x005c000000000091)
-        self.pixit_test_event_co_alarm_clear = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.CLEAR", 0x005c0000000000a1)
+        self.pixit_test_event_co_alarm_warning = self.user_params.get(
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.WARNING", 0x005c000000000091)
+        self.pixit_test_event_co_alarm_clear = self.user_params.get(
+            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.CLEAR", 0x005c0000000000a1)
 
         # ALARM PRIORITY
         self.pixit_hiest_pri_alarm_1 = self.user_params.get("PIXIT.SMOKECO.HIEST_PRI_ALARM_1", 1)
@@ -102,46 +110,67 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
     def steps_TC_SMOKECO_2_6(self) -> list[TestStep]:
         return [
             TestStep(1, "Commission DUT to TH"),
-            TestStep(2, "TH reads ExpressedState attribute from DUT", "Verify that ExpressedState attribute has a value of 0 (Normal)"),
-            TestStep(3, "TH subscribes to BatteryAlert attribute from DUT", "Verify that BatteryAlert attribute has a value of 0 (Normal)"),
-            TestStep(4, "TH subscribes to InterconnectSmokeAlarm attribute from DUT", "Verify that InterconnectSmokeAlarm attribute has a value of 0 (Normal)"),
-            TestStep(5, "TH subscribes to InterconnectCOAlarm attribute from DUT", "Verify that InterconnectCOAlarm attribute has a value of 0 (Normal)"),
+            TestStep(2, "TH reads ExpressedState attribute from DUT",
+                     "Verify that ExpressedState attribute has a value of 0 (Normal)"),
+            TestStep(3, "TH subscribes to BatteryAlert attribute from DUT",
+                     "Verify that BatteryAlert attribute has a value of 0 (Normal)"),
+            TestStep(4, "TH subscribes to InterconnectSmokeAlarm attribute from DUT",
+                     "Verify that InterconnectSmokeAlarm attribute has a value of 0 (Normal)"),
+            TestStep(5, "TH subscribes to InterconnectCOAlarm attribute from DUT",
+                     "Verify that InterconnectCOAlarm attribute has a value of 0 (Normal)"),
             TestStep(6, "TH subscribes to COState attribute from DUT", "Verify that COState attribute has a value of 0 (Normal)"),
-            TestStep(7, "TH subscribes to SmokeState attribute from DUT", "Verify that SmokeState attribute has a value of 0 (Normal)"),
-            TestStep(8, "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster", "Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
+            TestStep(7, "TH subscribes to SmokeState attribute from DUT",
+                     "Verify that SmokeState attribute has a value of 0 (Normal)"),
+            TestStep(8, "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
+                     "Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
             TestStep(9, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning Battery Alert Test Event"),
-            TestStep(10, "TH waits for a report of BatteryAlert attribute from DUT with a timeout of 300 seconds", "Verify that BatteryAlert attribute has a value of 1 (Warning)"),
+            TestStep(10, "TH waits for a report of BatteryAlert attribute from DUT with a timeout of 300 seconds",
+                     "Verify that BatteryAlert attribute has a value of 1 (Warning)"),
             TestStep(11, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test Event"),
-            TestStep(12, "TH waits for a report of InterconnectSmokeAlarm attribute from DUT with a timeout of 300 seconds", "Verify that InterconnectSmokeAlarm attribute has a value of 2 (Critical) or 1 (Warning)"),
+            TestStep(12, "TH waits for a report of InterconnectSmokeAlarm attribute from DUT with a timeout of 300 seconds",
+                     "Verify that InterconnectSmokeAlarm attribute has a value of 2 (Critical) or 1 (Warning)"),
             TestStep(13, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event"),
-            TestStep(14, "TH waits for a report of InterconnectCOAlarm attribute from DUT with a timeout of 300 seconds", "Verify that InterconnectCOAlarm attribute has a value of 2 (Critical) or 1 (Warning)"),
+            TestStep(14, "TH waits for a report of InterconnectCOAlarm attribute from DUT with a timeout of 300 seconds",
+                     "Verify that InterconnectCOAlarm attribute has a value of 2 (Critical) or 1 (Warning)"),
             TestStep(15, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning CO Alarm Test Event"),
-            TestStep(16, "TH waits for a report of COState attribute from DUT with a timeout of 300 seconds", "Verify that COState attribute has a value of 1 (Warning)"),
+            TestStep(16, "TH waits for a report of COState attribute from DUT with a timeout of 300 seconds",
+                     "Verify that COState attribute has a value of 1 (Warning)"),
             TestStep(17, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning Smoke Alarm Test Event"),
-            TestStep(18, "TH waits for a report of SmokeState attribute from DUT with a timeout of 300 seconds", "Verify that SmokeState attribute has a value of 1 (Warning)"),
-            TestStep(19, "TH reads ExpressedState attribute from DUT", "Verify that ExpressedState attribute has a value that indicates PIXIT.SMOKECO.HIEST_PRI_ALARM"),
+            TestStep(18, "TH waits for a report of SmokeState attribute from DUT with a timeout of 300 seconds",
+                     "Verify that SmokeState attribute has a value of 1 (Warning)"),
+            TestStep(19, "TH reads ExpressedState attribute from DUT",
+                     "Verify that ExpressedState attribute has a value that indicates PIXIT.SMOKECO.HIEST_PRI_ALARM"),
             TestStep(20, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Smoke Alarm Test Event Clear"),
-            TestStep(21, "TH waits for a report of SmokeState attribute from DUT with a timeout of 300 seconds", "Verify that SmokeState attribute has a value of 0 (Normal)"),
-            TestStep(22, "TH reads ExpressedState attribute from DUT", "Verify that ExpressedState attribute has a value that indicates PIXIT.SMOKECO.HIEST_PRI_ALARM"),
+            TestStep(21, "TH waits for a report of SmokeState attribute from DUT with a timeout of 300 seconds",
+                     "Verify that SmokeState attribute has a value of 0 (Normal)"),
+            TestStep(22, "TH reads ExpressedState attribute from DUT",
+                     "Verify that ExpressedState attribute has a value that indicates PIXIT.SMOKECO.HIEST_PRI_ALARM"),
             TestStep(23, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER for CO Alarm Test Event clear"),
-            TestStep(24, "TH waits for a report of COState attribute from DUT with a timeout of 300 seconds", "Verify that COState attribute has a value of 0 (Normal)"),
-            TestStep(25, "TH reads ExpressedState attribute from DUT", "Verify that ExpressedState attribute has a value that indicates PIXIT.SMOKECO.HIEST_PRI_ALARM"),
+            TestStep(24, "TH waits for a report of COState attribute from DUT with a timeout of 300 seconds",
+                     "Verify that COState attribute has a value of 0 (Normal)"),
+            TestStep(25, "TH reads ExpressedState attribute from DUT",
+                     "Verify that ExpressedState attribute has a value that indicates PIXIT.SMOKECO.HIEST_PRI_ALARM"),
             TestStep(26, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect CO Alarm Test Event Clear"),
-            TestStep(27, "TH waits for a report of InterconnectCOAlarm attribute from DUT with a timeout of 300 seconds", "Verify that InterconnectCOAlarm attribute has a value of 0 (Normal)"),
-            TestStep(28, "TH reads ExpressedState attribute from DUT", "Verify that ExpressedState attribute has a value that indicates PIXIT.SMOKECO.HIEST_PRI_ALARM"),
+            TestStep(27, "TH waits for a report of InterconnectCOAlarm attribute from DUT with a timeout of 300 seconds",
+                     "Verify that InterconnectCOAlarm attribute has a value of 0 (Normal)"),
+            TestStep(28, "TH reads ExpressedState attribute from DUT",
+                     "Verify that ExpressedState attribute has a value that indicates PIXIT.SMOKECO.HIEST_PRI_ALARM"),
             TestStep(29, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Interconnect Smoke Alarm Test Event Clear"),
-            TestStep(30, "TH waits for a report of InterconnectSmokeAlarm attribute from DUT with a timeout of 300 seconds", "Verify that InterconnectSmokeAlarm attribute has a value of 0 (Normal)"),
-            TestStep(31, "TH reads ExpressedState attribute from DUT", "Verify that ExpressedState attribute has a value that indicates PIXIT.SMOKECO.HIEST_PRI_ALARM"),
+            TestStep(30, "TH waits for a report of InterconnectSmokeAlarm attribute from DUT with a timeout of 300 seconds",
+                     "Verify that InterconnectSmokeAlarm attribute has a value of 0 (Normal)"),
+            TestStep(31, "TH reads ExpressedState attribute from DUT",
+                     "Verify that ExpressedState attribute has a value that indicates PIXIT.SMOKECO.HIEST_PRI_ALARM"),
             TestStep(32, "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Battery Alert Test Event Clear"),
-            TestStep(33, "TH waits for a report of BatteryAlert attribute from DUT with a timeout of 300 seconds", "Verify that BatteryAlert attribute has a value of 0 (Normal)"),
-            TestStep(34, "TH reads ExpressedState attribute from DUT", "Verify that ExpressedState attribute has a value of 0 (Normal)")
+            TestStep(33, "TH waits for a report of BatteryAlert attribute from DUT with a timeout of 300 seconds",
+                     "Verify that BatteryAlert attribute has a value of 0 (Normal)"),
+            TestStep(34, "TH reads ExpressedState attribute from DUT",
+                     "Verify that ExpressedState attribute has a value of 0 (Normal)")
         ]
 
     def pics_TC_SMOKECO_2_6(self) -> list[str]:
         return [
             "SMOKECO.S",
         ]
-
 
     @run_if_endpoint_matches(has_feature(cluster=Clusters.SmokeCoAlarm, feature=Clusters.SmokeCoAlarm.Bitmaps.Feature.kCoAlarm))
     async def test_TC_SMOKECO_2_6(self):
@@ -173,7 +202,8 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
         await co_state_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
 
         self.step(7)
-        smoke_state_handler = AttributeSubscriptionHandler(expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.SmokeState)
+        smoke_state_handler = AttributeSubscriptionHandler(
+            expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.SmokeState)
         await smoke_state_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
 
         self.step(8)
@@ -197,14 +227,16 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
 
         self.step(12)
         interconnected_smoke_alarm_report_data = interconnected_smoke_alarm_handler.wait_for_attribute_report(timeout_sec=300)
-        asserts.assert_in(interconnected_smoke_alarm_report_data.value, [self.smokeco_cluster.Enums.AlarmStateEnum.kWarning, self.smokeco_cluster.Enums.AlarmStateEnum.kCritical])
+        asserts.assert_in(interconnected_smoke_alarm_report_data.value, [
+                          self.smokeco_cluster.Enums.AlarmStateEnum.kWarning, self.smokeco_cluster.Enums.AlarmStateEnum.kCritical])
 
         self.step(13)
         await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_interconnect_co_alarm)
 
         self.step(14)
         interconnected_co_alarm_report_data = interconnected_co_alarm_handler.wait_for_attribute_report(timeout_sec=300)
-        asserts.assert_in(interconnected_co_alarm_report_data.value, [self.smokeco_cluster.Enums.AlarmStateEnum.kWarning, self.smokeco_cluster.Enums.AlarmStateEnum.kCritical])
+        asserts.assert_in(interconnected_co_alarm_report_data.value, [
+                          self.smokeco_cluster.Enums.AlarmStateEnum.kWarning, self.smokeco_cluster.Enums.AlarmStateEnum.kCritical])
 
         self.step(15)
         await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_co_alarm_warning)
@@ -212,7 +244,6 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
         self.step(16)
         co_state_report_data = co_state_handler.wait_for_attribute_report(timeout_sec=300)
         asserts.assert_equal(co_state_report_data.value, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
-
 
         self.step(17)
         await self.send_test_event_triggers(eventTrigger=self.pixit_test_event_smoke_alarm_warning)
