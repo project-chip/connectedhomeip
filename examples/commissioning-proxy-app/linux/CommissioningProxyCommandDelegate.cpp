@@ -31,6 +31,7 @@
 #include <wifipaf/WiFiPAFLayerDelegate.h>
 #include <wifipaf/WiFiPAFRole.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/Linux/ConnectivityManagerImpl.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -40,6 +41,8 @@ namespace {
 
 using ScanResultT = chip::app::Clusters::CommissioningProxy::Structs::ScanResultStruct::Type;
 
+// Default ProxyConnectRequest timeout when the commissioner sends 0 (spec §10.5.7.1).
+constexpr uint16_t kProxyConnectDefaultTimeoutSecs = 30;
 // ------------------------------------------------------------------
 // Proxy session tracking
 //
@@ -96,6 +99,7 @@ struct ProxyConnectCtx
     chip::app::CommandHandler::Handle handle;
     chip::app::ConcreteCommandPath path;
     uint16_t discriminator;
+    uint32_t subscribeId; // NAN subscribe_id from wpa_supplicant, stored after WiFiPAFSubscribe
     // Back-pointer so OnPafConnectSuccess can transition the cluster state.
     chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster * cluster = nullptr;
 };
@@ -210,6 +214,63 @@ private:
 
 static ProxyWiFiPAFDelegate sProxyWiFiPAFDelegate;
 
+// Called when the ProxyConnectRequest Timeout field expires before the PAF
+// handshake completes.  Per spec the connection attempt is terminated
+// and Status::Timeout is returned.
+static void OnProxyConnectTimeout(chip::System::Layer * layer, void * appState)
+{
+    auto * ctx = sPendingConnectCtx;
+    if (ctx == nullptr)
+    {
+        // Success or error callback already fired first; nothing to do.
+        return;
+    }
+    sPendingConnectCtx = nullptr;
+
+    chip::app::CommandHandler * cmd = ctx->handle.Get();
+    ChipLogError(AppServer, "ProxyConnectRequest: timeout waiting for WiFiPAF connect (disc %u)", ctx->discriminator);
+
+    // Use the subscribe_id stored at subscribe time
+    uint32_t subscribeId = ctx->subscribeId;
+
+    // Null out the platform callbacks FIRST so the kCHIPoWiFiPAFCancelConnect
+    // event posted by OnNanSubscribeTerminated does not call OnPafConnectError.
+    CHIP_ERROR cancelIncompleteErr = chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
+    if (cancelIncompleteErr != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(AppServer, "OnProxyConnectTimeout: WiFiPAFCancelIncompleteSubscribe: %" CHIP_ERROR_FORMAT,
+                      cancelIncompleteErr.Format());
+    }
+
+    // Cancel the actual NAN subscribe in wpa_supplicant so the hardware stops
+    // scanning and nandiscovery-result signals stop arriving.
+    if (subscribeId != 0)
+    {
+        CHIP_ERROR cancelErr = chip::DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(subscribeId);
+        if (cancelErr != CHIP_NO_ERROR)
+        {
+            ChipLogDetail(AppServer, "OnProxyConnectTimeout: WiFiPAFCancelSubscribe(%u): %" CHIP_ERROR_FORMAT,
+                          subscribeId, cancelErr.Format());
+        }
+    }
+
+    // Remove the PAF session registration that was added in ProxyConnectRequest.
+    chip::WiFiPAF::WiFiPAFLayer & pafLayer = chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+    chip::WiFiPAF::WiFiPAFSession keyNodeInfo{};
+    keyNodeInfo.nodeId        = static_cast<chip::NodeId>(ctx->discriminator);
+    keyNodeInfo.discriminator = ctx->discriminator;
+    CHIP_ERROR rmErr = pafLayer.RmPafSession(chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, keyNodeInfo);
+    if (rmErr != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(AppServer, "OnProxyConnectTimeout: RmPafSession: %" CHIP_ERROR_FORMAT, rmErr.Format());
+    }
+
+    // Return Status::Timeout per spec.
+    if (cmd != nullptr)
+        cmd->AddStatus(ctx->path, chip::Protocols::InteractionModel::Status::Timeout);
+    delete ctx;
+}
+
 // Called when WiFiPAF connect (subscribe + PAF handshake) succeeds.
 static void OnPafConnectSuccess(void * context)
 {
@@ -223,6 +284,8 @@ static void OnPafConnectSuccess(void * context)
         return;
     }
     sPendingConnectCtx = nullptr;
+    // Cancel the ProxyConnectRequest timeout — connect succeeded before it fired.
+    chip::DeviceLayer::SystemLayer().CancelTimer(OnProxyConnectTimeout, ctx);
 
     chip::app::CommandHandler * cmd = ctx->handle.Get();
 
@@ -282,6 +345,8 @@ static void OnPafConnectError(void * context, CHIP_ERROR err)
         return;
     }
     sPendingConnectCtx = nullptr;
+    // Cancel the ProxyConnectRequest timeout — error callback is handling this instead.
+    chip::DeviceLayer::SystemLayer().CancelTimer(OnProxyConnectTimeout, ctx);
 
     chip::app::CommandHandler * cmd = ctx->handle.Get();
     ChipLogError(AppServer, "ProxyConnectRequest: WiFiPAF connect failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -410,13 +475,15 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
 
     // Keep the IM invoke alive until the PAF connect succeeds or fails.
     // Pass mServer so OnPafConnectSuccess can update the cluster state.
-    auto * ctx = new ProxyConnectCtx{ chip::app::CommandHandler::Handle(commandObj), request.path, discriminator, mServer };
+    uint16_t effectiveTimeout = timeout > 0 ? timeout : kProxyConnectDefaultTimeoutSecs;
+    auto * ctx = new ProxyConnectCtx{ chip::app::CommandHandler::Handle(commandObj), request.path, discriminator, 0, mServer };
     sPendingConnectCtx = ctx;
 
-    // Extend response timeout to cover PAF discovery + handshake.
     if (auto * exchange = commandObj->GetExchangeContext())
     {
-        exchange->SetResponseTimeout(chip::System::Clock::Seconds16(timeout > 0 ? timeout + 5 : 35));
+        // Extend response timeout to cover PAF discovery + handshake (buffer of +5 s
+        // so the exchange stays open until our application-level timer fires first).
+        exchange->SetResponseTimeout(chip::System::Clock::Seconds16(effectiveTimeout + 5));
     }
 
     // Initiate WiFiPAF NAN subscribe → discovery → PAF handshake.
@@ -428,7 +495,6 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "ProxyConnectRequest: WiFiPAFSubscribe failed: %" CHIP_ERROR_FORMAT, err.Format());
-        // Clean up the PAF session registration since the subscribe failed.
         CHIP_ERROR rmErr = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().RmPafSession(
             chip::WiFiPAF::PafInfoAccess::kAccNodeInfo, pafSessionInfo);
         if (rmErr != CHIP_NO_ERROR)
@@ -440,7 +506,18 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
         return chip::Protocols::InteractionModel::Status::Failure;
     }
 
-    ChipLogProgress(AppServer, "ProxyConnectRequest: WiFiPAFSubscribe started for discriminator %u", discriminator);
+    // Store the subscribe_id assigned by wpa_supplicant so OnProxyConnectTimeout
+    // can cancel the correct NAN session (GetPAFInfo cannot be used here: it
+    // short-circuits on publisher entries before reaching the subscriber).
+    ctx->subscribeId = chip::DeviceLayer::ConnectivityMgrImpl().GetPendingConnectSubscribeId();
+
+    // Start the timeout timer now that subscribeId is populated — so if it fires
+    // immediately it has a valid id to cancel.
+    chip::DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Seconds16(effectiveTimeout), OnProxyConnectTimeout, ctx);
+
+    ChipLogProgress(AppServer, "ProxyConnectRequest: WiFiPAFSubscribe started for discriminator %u (subscribe_id %u)",
+                    discriminator, ctx->subscribeId);
 
     // Response sent asynchronously via OnPafConnectSuccess / OnPafConnectError.
     return chip::Protocols::InteractionModel::Status::Success;

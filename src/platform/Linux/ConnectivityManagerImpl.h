@@ -181,6 +181,7 @@ public:
                                  OnConnectionErrorFunct onError);
     CHIP_ERROR _WiFiPAFCancelSubscribe(uint32_t SubscribeId);
     CHIP_ERROR _WiFiPAFCancelIncompleteSubscribe();
+    uint32_t GetPendingConnectSubscribeId() const { return mPendingConnectSubscribeId; }
     void OnDiscoveryResult(GVariant * obj);
     void OnReplied(GVariant * obj);
     void OnNanReceive(GVariant * obj);
@@ -300,6 +301,7 @@ private:
     WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;
     void * mAppState;
     uint16_t mApFreq;
+    uint32_t mPendingConnectSubscribeId = 0; // set by _WiFiPAFSubscribe, read by app layer on timeout
     CHIP_ERROR _WiFiPAFPublish(WiFiPAFAdvertiseParam & args);
     CHIP_ERROR _WiFiPAFCancelPublish(uint32_t PublishId);
     bool _WiFiPAFResourceAvailable() { return mPafChannelAvailable; };

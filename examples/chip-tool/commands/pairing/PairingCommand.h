@@ -146,6 +146,8 @@ public:
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             AddArgument("proxy-node-id", 0, UINT64_MAX, &mProxyNodeId,
                         "Node ID of the commissioning-proxy-app to tunnel packets through");
+            AddArgument("proxy-connect-timeout", 0, UINT16_MAX, &mProxyConnectTimeout,
+                        "Timeout in seconds for the ProxyConnectRequest");
             break;
         case PairingMode::OnNetwork:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
@@ -381,8 +383,9 @@ private:
     void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override;
     void OnDone(chip::app::CommandSender * client) override;
 
-    NodeId  mProxyNodeId      = chip::kUndefinedNodeId;
-    uint16_t mProxySessionId  = 0;
+    NodeId   mProxyNodeId         = chip::kUndefinedNodeId;
+    uint16_t mProxySessionId      = 0;
+    uint16_t mProxyConnectTimeout = 0;
 
     // Exchange context to the proxy, kept alive for ProxyMessageRequest invokes.
     chip::Messaging::ExchangeManager * mProxyExchangeMgr = nullptr;

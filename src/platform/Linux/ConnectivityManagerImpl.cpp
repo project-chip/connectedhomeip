@@ -1559,6 +1559,7 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
     ChipLogProgress(DeviceLayer, "WiFi-PAF: subscribe_id: [%u], freq: %u", subscribe_id, freq);
     mOnPafSubscribeComplete = onSuccess;
     mOnPafSubscribeError    = onError;
+    mPendingConnectSubscribeId = static_cast<uint32_t>(subscribe_id);
 
     WiFiPAFSession sessionInfo  = { .discriminator = PafPublish_ssi.DevInfo };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
