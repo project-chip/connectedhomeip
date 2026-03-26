@@ -793,9 +793,9 @@ void Server::OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, 
 void Server::RejoinExistingMulticastGroups()
 {
     ChipLogProgress(AppServer, "Joining Multicast groups");
-    CHIP_ERROR err        = CHIP_NO_ERROR;
-    bool groupcast_joined = false;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
+    bool groupcast_joined = false;
     for (const FabricInfo & fabric : mFabrics)
     {
         Credentials::GroupDataProvider::GroupInfo groupInfo;
@@ -813,7 +813,7 @@ void Server::RejoinExistingMulticastGroups()
                     continue;
                 }
 
-                const Transport::PeerAddress & address = (!mGroupsProvider->IsGroupcastEnabled() || use_iana_addr)
+                const Transport::PeerAddress & address = use_iana_addr
                     ? Transport::PeerAddress::Groupcast()
                     : Transport::PeerAddress::Multicast(fabric.GetFabricId(), groupInfo.group_id);
 
@@ -828,7 +828,7 @@ void Server::RejoinExistingMulticastGroups()
                     iterator->Release();
                     return;
                 }
-                if (!mGroupsProvider->IsGroupcastEnabled() && use_iana_addr)
+                if (use_iana_addr)
                     groupcast_joined = true;
             }
 

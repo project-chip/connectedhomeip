@@ -547,15 +547,14 @@ private:
 
         void OnGroupAdded(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group) override
         {
-            Credentials::GroupDataProvider * provider = mServer->GetGroupDataProvider();
-            const FabricInfo * fabric                 = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
+            const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
             if (fabric == nullptr)
             {
                 ChipLogError(AppServer, "Group added to nonexistent fabric?");
                 return;
             }
 
-            const Transport::PeerAddress & address = (!provider->IsGroupcastEnabled() || new_group.UsePerGroupAddress())
+            const Transport::PeerAddress & address = new_group.UsePerGroupAddress()
                 ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), new_group.group_id)
                 : Transport::PeerAddress::Groupcast();
 
@@ -567,8 +566,7 @@ private:
 
         void OnGroupRemoved(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override
         {
-            Credentials::GroupDataProvider * provider = mServer->GetGroupDataProvider();
-            if (!provider->IsGroupcastEnabled() || old_group.UsePerGroupAddress())
+            if (old_group.UsePerGroupAddress())
             {
                 // Per group address no longer in use, unsubscribe
                 const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
@@ -584,7 +582,8 @@ private:
             else
             {
                 // Check if the address is still in use
-                bool in_use = false;
+                Credentials::GroupDataProvider * provider = mServer->GetGroupDataProvider();
+                bool in_use                               = false;
                 if (nullptr != provider)
                 {
                     // Check all groups from all fabrics
