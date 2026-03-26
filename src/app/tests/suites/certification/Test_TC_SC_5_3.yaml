@@ -216,8 +216,10 @@ tests:
       disabled: true
 
     - label:
-          "Step 3: DUT binds GroupId with GroupKeySetID in the GroupKeyMap
-          attribute list on GroupKeyManagement cluster"
+          "Step 3: If Groupcast cluster is enabled on the RootNode endpoint of
+          the DUT, skip to step 7. Otherwise, DUT binds GroupId with
+          GroupKeySetID in the GroupKeyMap attribute list on GroupKeyManagement
+          cluster"
       PICS: GRPKEY.C.A0000
       verification: |
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 259, "groupKeySetID": 419, "fabricIndex": 1},{"groupId": 257, "groupKeySetID": 419, "fabricIndex": 1}]' 1 0
@@ -328,20 +330,15 @@ tests:
       disabled: true
 
     - label:
-          "Step 5: DUT generates fabric-unique GroupID, GroupName. Save the
-          GroupID as GroupID_2, GroupName as GroupName_2"
+          "Step 5: DUT sends an AddGroup command to the Groups cluster with the
+          GroupID field set to GroupID_2 and the GroupName set to GroupName_2.
+          The command is sent as a group command using GroupID_1"
+      PICS: G.C.C00.Tx
       verification: |
           refer to log in step 3
           GroupID_2 = 257
           GroupName_2 = "grp2"
-      disabled: true
 
-    - label:
-          "Step 6: DUT sends a AddGroup Command to the Groups cluster with the
-          GroupID field set to GroupID_2 and the GroupName set to an
-          GroupName_2. The command is sent as a group command using GroupID_1"
-      PICS: G.C.C00.Tx
-      verification: |
           ./chip-tool groups add-group 257 'grp2' 0xffffffffffff0103 0
 
           Verify that  AddGroup command with GroupID as 257 and group name as "grp2" is generated as groupcast message from GroupID 259 is present on TH(Reference app)log:
@@ -404,4 +401,25 @@ tests:
           [1700720496.175523][40754:40754] CHIP:DMG:     {
           [1700720496.175525][40754:40754] CHIP:DMG:         Initiator = true
           [1700720496.175529][40754:40754] CHIP:DMG:     }
+      disabled: true
+
+    - label:
+          "Step 6: If Groupcast cluster is NOT enabled on the RootNode endpoint,
+          or its Sender feature is disabled, skip remaining steps. Otherwise,
+          DUT sends the Groupcast JoinGroup command on the TH on EP0 with
+          GroupID=1, Endpoints=[any endpoint from PartsList], KeySetID=1."
+      verification: |
+          Verify the TH receives the Groupcast JoinGroup command as specified
+          in the step label.
+      disabled: true
+
+    - label:
+          "Step 7: DUT sends a command from a cluster enabled on the Endpoint
+          provided in step 6 to TH. The command is sent as a group command using
+          GroupID 1."
+      verification: |
+          Validate the group message received from DUT via message layer
+          inspection at the receiver: Verify that the IPv6 Destination
+          Multicast address matches the Matter IANA address FF05::FA, Verify
+          the UDP port is 5540, Verify the DSIZ flag is set to group
       disabled: true
