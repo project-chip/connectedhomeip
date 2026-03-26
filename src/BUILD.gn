@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/clusters/access-control-server/tests",
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
+      "${chip_root}/src/app/clusters/air-quality-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
       "${chip_root}/src/app/clusters/bindings/tests",
       "${chip_root}/src/app/clusters/boolean-state-configuration-server/tests",
