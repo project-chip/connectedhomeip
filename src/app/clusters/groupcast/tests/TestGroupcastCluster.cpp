@@ -44,7 +44,6 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <set>
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
 namespace {
 
 using namespace chip;
@@ -112,6 +111,7 @@ struct TestGroupcastCluster : public ::testing::Test
     {
         mProvider.SetStorageDelegate(&mTestContext.StorageDelegate());
         mProvider.SetSessionKeystore(&mKeystore);
+        mProvider.SetGroupcastEnabled(true);
         ASSERT_EQ(mProvider.Init(), CHIP_NO_ERROR);
 
         // Replace the DataModel Provider in the ServerClusterContext provided to the cluster implementation
@@ -1629,4 +1629,3 @@ TEST_F(TestGroupcastCluster, TestAuxiliaryAccessUpdatedEvent)
 }
 
 } // namespace
-#endif // CHIP_CONFIG_ENABLE_GROUPCAST

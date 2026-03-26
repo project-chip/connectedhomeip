@@ -46,9 +46,7 @@ chip::TestPersistentStorageDelegate gTestStorage;
 chip::Crypto::DefaultSessionKeystore gSessionKeystore;
 chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
 chip::Access::Examples::GroupAuxiliaryAccessControlDelegate gGroupAuxiliaryAccessControlDelegate(&gGroupsProvider);
-#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
 } // namespace
 
@@ -802,8 +800,6 @@ CHIP_ERROR LoadAccessControl(AccessControl & ac, const EntryData * entryData, si
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
-
 struct GroupCheckData
 {
     SubjectDescriptor subjectDescriptor;
@@ -881,8 +877,6 @@ const GroupCheckData groupCheckData[] = {
       .requestPath       = { .endpoint = 30, .requestType = Access::RequestType::kCommandInvokeRequest },
       .privilege         = Privilege::kOperate },
 };
-
-#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
 /**
  * The format of Auxiliary entries is up to the implementation of the appropriate
@@ -1314,13 +1308,12 @@ public: // protected
         gTestStorage.ClearStorage();
         gGroupsProvider.SetStorageDelegate(&gTestStorage);
         gGroupsProvider.SetSessionKeystore(&gSessionKeystore);
+        gGroupsProvider.SetGroupcastEnabled(true);
         ASSERT_EQ(gGroupsProvider.Init(), CHIP_NO_ERROR);
         chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
         // Register group auxilary access control delegate
         SuccessOrDie(GetAccessControl().RegisterGroupAuxiliaryDelegate(&gGroupAuxiliaryAccessControlDelegate));
-#endif
     }
     static void TearDownTestSuite()
     {
@@ -2113,8 +2106,6 @@ TEST_F(TestAccessControl, TestFabricFilteredReadEntry)
     }
 }
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
-
 TEST_F(TestAccessControl, TestGroupAuxiliaryDelegateRegistration)
 {
     // The delegate is already registered in SetUpTestSuite.
@@ -2128,7 +2119,7 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryDelegateRegistration)
 
     // Verify AuxiliaryEntries returns CHIP_ERROR_INCORRECT_STATE when no delegate is registered.
     EntryIterator iterator;
-    EXPECT_EQ(accessControl.AuxiliaryEntries(1, iterator), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(accessControl.AuxiliaryEntries(1, iterator), CHIP_ERROR_NOT_IMPLEMENTED);
 
     // Verify registration again after unregistration.
     EXPECT_EQ(accessControl.RegisterGroupAuxiliaryDelegate(delegate), CHIP_NO_ERROR);
@@ -2356,8 +2347,6 @@ TEST_F(TestAccessControl, TestGroupAuxiliaryCheck)
     EXPECT_EQ(provider->RemoveFabric(1), CHIP_NO_ERROR);
     EXPECT_EQ(provider->RemoveFabric(2), CHIP_NO_ERROR);
 }
-
-#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
 TEST_F(TestAccessControl, TestIterator)
 {
