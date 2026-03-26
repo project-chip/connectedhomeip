@@ -19,7 +19,7 @@
 #include <stdlib.h>
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
+LOG_MODULE_REGISTER(key_pool, CONFIG_CHIP_APP_LOG_LEVEL);
 
 /* Key pool denouncing settle time */
 #define KEY_POOL_DEBOUNCING_GUARD_MS 10

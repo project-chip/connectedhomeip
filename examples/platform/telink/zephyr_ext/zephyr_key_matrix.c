@@ -18,7 +18,7 @@
 #include "zephyr_key_matrix.h"
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
+LOG_MODULE_REGISTER(key_matrix, CONFIG_CHIP_APP_LOG_LEVEL);
 
 /* Key matrix scanning period */
 #define KEY_MATRIX_SCAN_PERIOD_MS 100

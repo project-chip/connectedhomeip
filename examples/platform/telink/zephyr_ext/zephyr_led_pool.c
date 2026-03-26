@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
+LOG_MODULE_REGISTER(led_pool, CONFIG_CHIP_APP_LOG_LEVEL);
 
 /* Auxiliary data to support blink */
 struct led_pool_aux_data
