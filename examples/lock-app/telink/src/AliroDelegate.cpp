@@ -30,8 +30,14 @@ AliroDelegate AliroDelegate::sInstance;
 
 AliroDelegate::AliroDelegate()
 {
-    // The group sub-identifier is non-nullable; initialize once with random bytes.
-    TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mAliroReaderGroupSubIdentifier, sizeof(mAliroReaderGroupSubIdentifier));
+    CHIP_ERROR err = Crypto::DRBG_get_bytes(
+        mAliroReaderGroupSubIdentifier,
+        sizeof(mAliroReaderGroupSubIdentifier));
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to init Aliro sub-identifier: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 // ---------------------------------------------------------------------------
