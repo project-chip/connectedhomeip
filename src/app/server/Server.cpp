@@ -311,12 +311,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
-#if CHIP_CONFIG_ENABLE_GROUPCAST
     if (initParams.groupAuxiliaryAccessControlDelegate != nullptr)
     {
         SuccessOrExit(mAccessControl.RegisterGroupAuxiliaryDelegate(initParams.groupAuxiliaryAccessControlDelegate));
     }
-#endif // CHIP_CONFIG_ENABLE_GROUPCAST
     Access::SetAccessControl(mAccessControl);
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS

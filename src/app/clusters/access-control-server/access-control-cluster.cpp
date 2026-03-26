@@ -497,14 +497,12 @@ DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataMode
     case AccessControl::Attributes::FeatureMap::Id: {
         value = 0;
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
         // The kAuxiliary feature can only be set if the group auxiliary access control delegate
         // is defined. Without it, none of the functionality protected by this feature will function.
         if (mClusterContext.accessControl.IsGroupAuxiliaryDelegateRegistered())
         {
             value |= to_underlying(Clusters::AccessControl::Feature::kAuxiliary);
         }
-#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
         value |= to_underlying(Clusters::AccessControl::Feature::kManagedDevice);
@@ -542,14 +540,11 @@ CHIP_ERROR AccessControlCluster::Attributes(const ConcreteClusterPath & path,
 {
     AttributeListBuilder listBuilder(builder);
 
-#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS || CHIP_CONFIG_USE_ACCESS_RESTRICTIONS || CHIP_CONFIG_ENABLE_GROUPCAST
     AttributeListBuilder::OptionalAttributeEntry kOptionalAttributes[] = {
     // The AuxiliaryACL attribute can only be set if the group auxiliary access control delegate
     // is defined. Without it, none of the reporting functionality of auxiliary ACLs will function.
-#if CHIP_CONFIG_ENABLE_GROUPCAST
         { .enabled  = mClusterContext.accessControl.IsGroupAuxiliaryDelegateRegistered(),
           .metadata = Attributes::AuxiliaryACL::kMetadataEntry },
-#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
         { .enabled = true, .metadata = Attributes::Extension::kMetadataEntry },
 #endif
@@ -560,9 +555,6 @@ CHIP_ERROR AccessControlCluster::Attributes(const ConcreteClusterPath & path,
     };
 
     return listBuilder.Append(Span(AccessControl::Attributes::kMandatoryMetadata), Span(kOptionalAttributes));
-#else
-    return listBuilder.Append(Span(AccessControl::Attributes::kMandatoryMetadata), {});
-#endif
 }
 
 CHIP_ERROR AccessControlCluster::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo)
