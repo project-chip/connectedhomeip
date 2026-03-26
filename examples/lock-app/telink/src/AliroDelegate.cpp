@@ -30,9 +30,7 @@ AliroDelegate AliroDelegate::sInstance;
 
 AliroDelegate::AliroDelegate()
 {
-    CHIP_ERROR err = Crypto::DRBG_get_bytes(
-        mAliroReaderGroupSubIdentifier,
-        sizeof(mAliroReaderGroupSubIdentifier));
+    CHIP_ERROR err = Crypto::DRBG_get_bytes(mAliroReaderGroupSubIdentifier, sizeof(mAliroReaderGroupSubIdentifier));
 
     if (err != CHIP_NO_ERROR)
     {
