@@ -99,15 +99,18 @@ void PlatformManagerImpl::HardwareInit(void)
     /* Used for HW initializations */
     otSysInit(0, NULL);
 
+status_t crypto_init_status = kStatus_Success;
 #if CHIP_CRYPTO_PSA
 #if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
     config_mbedtls_threading_alt();
 #endif /* (MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
-    psa_crypto_init();
+    crypto_init_status = psa_crypto_init();
 #else
-    CRYPTO_InitHardware();
+    crypto_init_status = CRYPTO_InitHardware();
 #endif /* CHIP_CRYPTO_PSA */
 
+    VerifyOrDieWithMsg(crypto_init_status == kStatus_Success, DeviceLayer,
+        "A2 Board Detected: secure subsystem is not supported for A2 boards. Aborting...");
     BOARD_InitAppConsole();
 }
 
