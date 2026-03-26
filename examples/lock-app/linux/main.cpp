@@ -55,8 +55,8 @@ void InitOTARequestor()
     SetRequestorInstance(&gRequestorCore);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    SuccessOrDie(gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader),
-                 GetOTARequestorAttributes());
+    SuccessOrDie(gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader,
+                                     GetOTARequestorAttributes()));
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     gImageProcessor.SetOTAImageFile(gOtaDownloadPath);
