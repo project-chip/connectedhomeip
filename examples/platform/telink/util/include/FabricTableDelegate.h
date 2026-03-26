@@ -33,7 +33,7 @@ public:
     {
 #ifndef CONFIG_CHIP_LAST_FABRIC_REMOVED_NONE
         static AppFabricTableDelegate sAppFabricDelegate;
-        TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAppFabricDelegate);
+        LogErrorOnFailure(chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAppFabricDelegate));
         k_timer_init(&sFabricRemovedTimer, &OnFabricRemovedTimerCallback, nullptr);
 #endif // CONFIG_CHIP_LAST_FABRIC_REMOVED_NONE
     }
@@ -61,7 +61,7 @@ private:
 #ifndef CONFIG_CHIP_LAST_FABRIC_REMOVED_NONE
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
         {
-            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
+            LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
 #ifdef CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
 #ifdef CONFIG_CHIP_WIFI
                 chip::Server::GetInstance().ScheduleFactoryReset();
@@ -110,8 +110,8 @@ private:
 #endif
 #ifdef CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-                TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(false);
-                TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(StartThreadPrescan, 0);
+                LogErrorOnFailure(chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
+                LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(StartThreadPrescan, 0));
 #else
                 // Start the New BLE advertising
                 if (!chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled())
@@ -125,7 +125,7 @@ private:
 #endif
 #endif // CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
 #endif // CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
-            });
+            }));
         }
 #endif // CONFIG_CHIP_LAST_FABRIC_REMOVED_NONE
     }
@@ -140,14 +140,14 @@ private:
         void OnFinished(NetworkCommissioning::Status err, CharSpan debugText,
                         NetworkCommissioning::ThreadScanResponseIterator * networks) override
         {
-            TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+            LogErrorOnFailure(chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow());
         }
     };
 
     static void StartThreadPrescan(intptr_t)
     {
         static PairingScanCallback sPairingScanCallback;
-        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ThreadStackMgrImpl().StartThreadScan(&sPairingScanCallback);
+        LogErrorOnFailure(chip::DeviceLayer::ThreadStackMgrImpl().StartThreadScan(&sPairingScanCallback));
     }
 #endif
 };
