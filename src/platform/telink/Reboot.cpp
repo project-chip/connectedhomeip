@@ -17,8 +17,8 @@
 
 #include "Reboot.h"
 
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/KeyValueStoreManager.h>
-
 #include <zephyr/settings/settings.h>
 #include <zephyr/sys/reboot.h>
 
