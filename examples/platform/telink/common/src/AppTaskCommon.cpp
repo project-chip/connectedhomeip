@@ -267,6 +267,7 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
         DispatchEvent(&event);
     }
 }
+
 #ifdef CONFIG_MCUMGR_TRANSPORT_BT
 /* Demonstration of the fail handling */
 void HandleDFUFail(VerificationFailReason reason)
@@ -274,6 +275,7 @@ void HandleDFUFail(VerificationFailReason reason)
     LOG_INF("DFU image verification failed with reason: %d", reason);
 }
 #endif
+
 void AppTaskCommon::PrintFirmwareInfo(void)
 {
     LOG_INF("SW Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
@@ -291,6 +293,7 @@ void AppTaskCommon::PrintFirmwareInfo(void)
     LOG_DBG("\t HAL commit: %.8s%s %s", TELINK_HAL_COMMIT_HASH, TELINK_HAL_LOCAL_STATUS, TELINK_HAL_COMMIT_DATE);
 #endif
 }
+
 CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 {
     CHIP_ERROR err;
@@ -338,7 +341,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
 #endif
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    LogErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
 #if APP_SET_DEVICE_INFO_PROVIDER
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);

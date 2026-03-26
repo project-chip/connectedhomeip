@@ -78,7 +78,7 @@ static k_timer FactoryResetUsualBootTimer;
 static void FactoryResetUsualBoot(struct k_timer * dummy)
 {
     (void) dummy;
-    (void) chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFactoryResetOnBootStoreKey);
+    LogErrorOnFailure(chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFactoryResetOnBootStoreKey));
     LOG_INF("Schedule factory counter deleted");
 }
 

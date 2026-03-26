@@ -85,7 +85,11 @@ static void key_pool_on_pin_isr(const struct device * dev, struct gpio_callback 
 {
     struct key_pool_aux_data * key_pool_aux = CONTAINER_OF(cb, struct key_pool_aux_data, callback);
 
-    (void) k_work_reschedule(&key_pool_aux->key_pool->work, K_MSEC(KEY_POOL_DEBOUNCING_GUARD_MS));
+    int err = k_work_reschedule(&key_pool_aux->key_pool->work, K_MSEC(KEY_POOL_DEBOUNCING_GUARD_MS));
+    if (err < 0)
+    {
+        LOG_ERR("k_work_schedule err: %d", err);
+    }
 }
 
 /* Public APIs */

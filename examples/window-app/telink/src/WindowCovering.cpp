@@ -115,9 +115,13 @@ void WindowCovering::StartTimer(WindowCoveringType aMoveType, uint32_t aTimeoutM
     WindowCoveringType * moveType = chip::Platform::New<WindowCoveringType>();
     VerifyOrReturn(moveType != nullptr);
 
-    *moveType = aMoveType;
-    (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(aTimeoutMs), MoveTimerTimeoutCallback,
-                                                       reinterpret_cast<void *>(moveType));
+    *moveType      = aMoveType;
+    CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(aTimeoutMs),
+                                                                 MoveTimerTimeoutCallback, reinterpret_cast<void *>(moveType));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "WC timer err: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void WindowCovering::MoveTimerTimeoutCallback(chip::System::Layer * systemLayer, void * appState)
