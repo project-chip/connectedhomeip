@@ -46,7 +46,6 @@ public:
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
-    void OnFanStateChanged(bool isOn) override;
 
 private:
     CHIP_ERROR ReadPercentCurrent(AttributeValueEncoder & aEncoder);
@@ -150,25 +149,6 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
     }
 
     return FanControl::SetSpeedSetting(mEndpoint, DataModel::Nullable<uint8_t>(newSpeedSetting));
-}
-
-void FanControlManager::OnFanStateChanged(bool isOn)
-{
-    bool currentOnOff = false;
-    Status status     = OnOff::Attributes::OnOff::Get(mEndpoint, &currentOnOff);
-
-    if (status == Status::Success)
-    {
-        if (currentOnOff != isOn)
-        {
-            ChipLogProgress(NotSpecified, "FanControlManager: Synchronizing OnOff cluster to %d", isOn);
-            OnOff::Attributes::OnOff::Set(mEndpoint, isOn);
-        }
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "FanControlManager: Failed to get OnOff attribute: %d", to_underlying(status));
-    }
 }
 
 CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
