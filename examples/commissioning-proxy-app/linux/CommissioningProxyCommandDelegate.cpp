@@ -428,6 +428,122 @@ static void OnPafScanDone(void * context,
     delete ctx;
 }
 
+// ------------------------------------------------------------------
+// Background scan state
+//
+// Maintains the cache of NAN-discovered devices for
+// ProxyBackgroundScanStartRequest.  Each entry has a per-result TTL timer;
+// the discriminator is used as the timer appState (cast to void*) so the
+// right entry can be removed when the timer fires.
+// ------------------------------------------------------------------
+
+struct BgScanEntry
+{
+    // Store NanPeerInfo (which owns mac[6] and the extendedData storage vector)
+    // rather than ScanResultT (which only holds non-owning ByteSpans).
+    // NanPeerToScanResult is called at encode time while this entry is alive.
+    chip::DeviceLayer::NanPeerInfo peer;
+};
+
+// discriminator → cached scan result
+static std::map<uint16_t, BgScanEntry> sBgScanCache;
+
+// Identity of the commissioner that started the background scan (for stop matching).
+static chip::FabricIndex sBgScanFabricIndex = chip::kUndefinedFabricIndex;
+static chip::NodeId      sBgScanNodeId      = chip::kUndefinedNodeId;
+
+static bool sBgScanActive = false;
+
+// Back-pointer so background scan callbacks can notify attribute change.
+static chip::app::Clusters::CommissioningProxy::CommissioningProxyCluster * sBgScanCluster = nullptr;
+
+// Called when a per-result TTL timer fires: remove the stale entry and
+// notify the cluster that CachedResults has changed.
+static void OnBgScanTTLExpiry(chip::System::Layer * /*layer*/, void * appState)
+{
+    uint16_t discriminator = static_cast<uint16_t>(reinterpret_cast<uintptr_t>(appState));
+    if (sBgScanCache.erase(discriminator) > 0)
+    {
+        ChipLogProgress(AppServer, "BgScan: TTL expired for discriminator %u; cache size=%zu",
+                        discriminator, sBgScanCache.size());
+        if (sBgScanCluster != nullptr)
+            sBgScanCluster->MarkCachedResultsDirty();
+    }
+}
+
+// Convert a NanPeerInfo into the ScanResultStruct used by CachedResults.
+static ScanResultT NanPeerToScanResult(const chip::DeviceLayer::NanPeerInfo & p)
+{
+    ScanResultT r{};
+    r.address.SetNonNull(chip::ByteSpan(p.mac, sizeof(p.mac)));
+    r.transport = chip::BitMask<chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap>(
+        chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap::kWiFiPAF);
+    r.discriminator = p.discriminator;
+    r.vendorId      = static_cast<chip::VendorId>(p.vid);
+    r.productId     = p.pid;
+    if (p.hasExtendedData && !p.storage.empty())
+        r.extendedData.SetNonNull(chip::ByteSpan(p.storage.data(), p.storage.size()));
+    else
+        r.extendedData.SetNull();
+    r.wiFiBand.ClearValue();
+    return r;
+}
+
+// Per-peer callback fired by WiFiPAFStartBackgroundScan on every discovery
+// result, including re-discoveries (so TTL can be reset).
+static void OnBgScanDiscovery(void * /*ctx*/, const chip::DeviceLayer::NanPeerInfo & peer)
+{
+    uint16_t disc = peer.discriminator;
+
+    // Cancel any existing TTL timer for this discriminator (reset on rediscovery).
+    chip::DeviceLayer::SystemLayer().CancelTimer(OnBgScanTTLExpiry, reinterpret_cast<void *>(static_cast<uintptr_t>(disc)));
+
+    auto it    = sBgScanCache.find(disc);
+    bool isNew = (it == sBgScanCache.end());
+
+    if (isNew)
+    {
+        // New entry: check capacity and drop silently when at MaxCachedResults.
+        uint8_t maxResults = (sBgScanCluster != nullptr)
+            ? sBgScanCluster->GetDelegate().GetMaxCachedResults()
+            : 10;
+        if (sBgScanCache.size() >= static_cast<size_t>(maxResults))
+        {
+            ChipLogDetail(AppServer, "BgScan: cache full (%u entries), dropping discriminator %u",
+                          maxResults, disc);
+            return;
+        }
+    }
+
+    // Retrieve CacheTimeout from the delegate.
+    uint16_t cacheTimeout = (sBgScanCluster != nullptr)
+        ? static_cast<uint16_t>(sBgScanCluster->GetDelegate().GetCacheTimeout())
+        : 30;
+
+    // Insert or update the cache entry (stores a copy of NanPeerInfo).
+    // Note: on rediscovery (isNew == false) the entry data is refreshed in case
+    // any fields changed (e.g. extended data), but subscribers are NOT notified
+    // because the discriminator — the unique device identity — is unchanged.
+    // If a device were to change its MAC while keeping its discriminator, the
+    // update would be silent.  This is acceptable for current hardware.
+    sBgScanCache[disc] = BgScanEntry{ peer };
+
+    ChipLogProgress(AppServer, "BgScan: %s discriminator %u (cache size=%zu, TTL=%us)",
+                    isNew ? "cached" : "refreshed TTL for", disc, sBgScanCache.size(), cacheTimeout);
+
+    // (Re)start per-result TTL timer.
+    chip::DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Seconds16(cacheTimeout),
+        OnBgScanTTLExpiry,
+        reinterpret_cast<void *>(static_cast<uintptr_t>(disc)));
+
+    // Only notify subscribers when the cache content actually changes (new entry).
+    // Rediscovery of an existing device only refreshes the TTL; the visible data
+    // is unchanged so no subscription notification should be sent.
+    if (isNew && sBgScanCluster != nullptr)
+        sBgScanCluster->MarkCachedResultsDirty();
+}
+
 } // namespace
 
 Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::ProxyConnectRequest(
@@ -706,4 +822,155 @@ Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::
     sProxySessions.erase(it);
     ChipLogProgress(AppServer, "ProxyDisconnectRequest: session %u cleaned up", sessionId);
     return chip::Protocols::InteractionModel::Status::Success;
+}
+
+// Helper: cancel all per-result TTL timers and clear the background scan cache.
+static void ClearBgScanCache()
+{
+    for (auto & [disc, entry] : sBgScanCache)
+    {
+        chip::DeviceLayer::SystemLayer().CancelTimer(
+            OnBgScanTTLExpiry,
+            reinterpret_cast<void *>(static_cast<uintptr_t>(disc)));
+    }
+    sBgScanCache.clear();
+}
+
+// Called when the scan lifetime timer (Timeout field > 0) expires.
+static void OnBgScanLifetimeExpiry(chip::System::Layer * /*layer*/, void * /*appState*/)
+{
+    if (!sBgScanActive)
+        return;
+    ChipLogProgress(AppServer, "BgScan: scan lifetime expired");
+    chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
+    ClearBgScanCache();
+    sBgScanActive     = false;
+    sBgScanFabricIndex = chip::kUndefinedFabricIndex;
+    sBgScanNodeId     = chip::kUndefinedNodeId;
+    if (sBgScanCluster != nullptr)
+    {
+        sBgScanCluster->MarkCachedResultsDirty();
+        sBgScanCluster = nullptr;
+    }
+}
+
+Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::ProxyBackgroundScanStartRequest(
+    CapabilitiesBitmap transport,
+    uint16_t timeout,
+    WiFiBandBitmap wiFiBands,
+    chip::FabricIndex fabricIndex,
+    chip::NodeId nodeId,
+    app::CommandHandler * commandObj,
+    const DataModel::InvokeRequest & request)
+{
+    ChipLogProgress(AppServer, "===SHM %s() transport:%u timeout:%u fabricIndex:%u nodeId:0x" ChipLogFormatX64,
+                    __func__, static_cast<uint8_t>(transport), timeout, fabricIndex, ChipLogValueX64(nodeId));
+
+    if (sBgScanActive)
+    {
+        // Per spec: if the same commissioner re-issues the command, restart the scan.
+        // If a different commissioner's scan is running, return Busy.
+        if (sBgScanFabricIndex != fabricIndex || sBgScanNodeId != nodeId)
+        {
+            ChipLogError(AppServer, "ProxyBackgroundScanStartRequest: scan already running for different commissioner");
+            return chip::Protocols::InteractionModel::Status::Busy;
+        }
+
+        // Same commissioner: stop the current scan and restart below.
+        ChipLogProgress(AppServer, "ProxyBackgroundScanStartRequest: restarting scan for same commissioner");
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnBgScanLifetimeExpiry, nullptr);
+        chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
+        ClearBgScanCache();
+        sBgScanActive = false;
+    }
+
+    sBgScanCluster    = mServer;
+    sBgScanFabricIndex = fabricIndex;
+    sBgScanNodeId     = nodeId;
+
+    CHIP_ERROR err = chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStartBackgroundScan(OnBgScanDiscovery, nullptr);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "ProxyBackgroundScanStartRequest: WiFiPAFStartBackgroundScan failed: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        sBgScanCluster    = nullptr;
+        sBgScanFabricIndex = chip::kUndefinedFabricIndex;
+        sBgScanNodeId     = chip::kUndefinedNodeId;
+        return chip::Protocols::InteractionModel::Status::Failure;
+    }
+
+    sBgScanActive = true;
+    ChipLogProgress(AppServer, "ProxyBackgroundScanStartRequest: background scan started");
+
+    // If timeout > 0, start a scan-lifetime timer.  timeout = 0 means infinite (spec §10.5.7.6).
+    if (timeout > 0)
+    {
+        chip::DeviceLayer::SystemLayer().StartTimer(
+            chip::System::Clock::Seconds16(timeout), OnBgScanLifetimeExpiry, nullptr);
+    }
+
+    // Synchronous response — IM status Success; no response struct.
+    return chip::Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status Clusters::CommissioningProxy::MyCPDelegate::ProxyBackgroundScanStopRequest(
+    CapabilitiesBitmap transport,
+    WiFiBandBitmap wiFiBands,
+    chip::FabricIndex fabricIndex,
+    chip::NodeId nodeId)
+{
+    ChipLogProgress(AppServer, "===SHM %s() transport:%u fabricIndex:%u nodeId:0x" ChipLogFormatX64,
+                    __func__, static_cast<uint8_t>(transport), fabricIndex, ChipLogValueX64(nodeId));
+
+    // Per spec: silently ignore if NodeId+FabricIndex don't match the
+    // original requester, or if no background scan is currently running.
+    if (!sBgScanActive || sBgScanFabricIndex != fabricIndex || sBgScanNodeId != nodeId)
+    {
+        ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: no matching active scan; ignoring");
+        return chip::Protocols::InteractionModel::Status::Success;
+    }
+
+    // Cancel the scan-lifetime timer if one was started.
+    chip::DeviceLayer::SystemLayer().CancelTimer(OnBgScanLifetimeExpiry, nullptr);
+
+    chip::DeviceLayer::ConnectivityMgrImpl().WiFiPAFStopBackgroundScan();
+    ClearBgScanCache();
+
+    sBgScanActive     = false;
+    sBgScanFabricIndex = chip::kUndefinedFabricIndex;
+    sBgScanNodeId     = chip::kUndefinedNodeId;
+
+    if (sBgScanCluster != nullptr)
+    {
+        sBgScanCluster->MarkCachedResultsDirty();
+        sBgScanCluster = nullptr;
+    }
+
+    ChipLogProgress(AppServer, "ProxyBackgroundScanStopRequest: background scan stopped");
+    return chip::Protocols::InteractionModel::Status::Success;
+}
+
+uint8_t Clusters::CommissioningProxy::MyCPDelegate::GetNumCachedResults()
+{
+    return static_cast<uint8_t>(sBgScanCache.size());
+}
+
+CHIP_ERROR Clusters::CommissioningProxy::MyCPDelegate::EncodeCachedResults(app::AttributeValueEncoder & encoder)
+{
+    if (!sBgScanActive || sBgScanCache.empty())
+    {
+        // Encode the attribute as null (no results / scan not active).
+        chip::app::DataModel::Nullable<chip::app::DataModel::List<const ScanResultT>> nullValue;
+        return encoder.Encode(nullValue);
+    }
+
+    return encoder.EncodeList([](const auto & listEncoder) -> CHIP_ERROR {
+        for (const auto & [disc, entry] : sBgScanCache)
+        {
+            // NanPeerToScanResult creates ByteSpans into entry.peer which is
+            // alive for the duration of this EncodeList call.
+            ReturnErrorOnFailure(listEncoder.Encode(NanPeerToScanResult(entry.peer)));
+        }
+        return CHIP_NO_ERROR;
+    });
 }

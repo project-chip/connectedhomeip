@@ -22,6 +22,7 @@
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <app/CommandHandler.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/data-model-provider/OperationTypes.h>
 
 // Forward-declare to avoid include cycles
@@ -124,13 +125,68 @@ public:
     virtual Protocols::InteractionModel::Status
     ProxyDisconnectRequest(uint16_t sessionId) { return Protocols::InteractionModel::Status::UnsupportedCommand; }
 
+    /**
+     * @brief Start a continuous background scan for commissionable devices.
+     *
+     * Discovery results are cached in the CachedResults attribute; each result
+     * has a per-entry TTL (CacheTimeout seconds) that resets on rediscovery and
+     * removes the entry on expiry.
+     *
+     * @param transport     Transport(s) to scan on.
+     * @param timeout       Scan lifetime in seconds; 0 = infinite (spec §10.5.7.6).
+     * @param wiFiBands     Wi-Fi bands to scan (WI feature only).
+     * @param fabricIndex   Fabric index of the requesting commissioner.
+     * @param nodeId        Node ID of the requesting commissioner.
+     * @param commandObj    Command handler (synchronous response — IM status only).
+     * @param request       Invoke path.
+     * @return Success, Busy (another caller's scan is running), or InvalidCommand.
+     */
+    virtual Protocols::InteractionModel::Status
+    ProxyBackgroundScanStartRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
+                                    uint16_t timeout,
+                                    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
+                                    chip::FabricIndex fabricIndex,
+                                    chip::NodeId nodeId,
+                                    app::CommandHandler * commandObj,
+                                    const DataModel::InvokeRequest & request) = 0;
+
+    /**
+     * @brief Stop the background scan started by ProxyBackgroundScanStartRequest.
+     *
+     * Per spec §10.5.7.7: silently ignore if the requesting NodeId+FabricIndex
+     * do not match the original requester — return Success in that case.
+     *
+     * @param transport     Transport(s) to stop.
+     * @param wiFiBands     Wi-Fi bands (WI feature only).
+     * @param fabricIndex   Fabric index of the requesting commissioner.
+     * @param nodeId        Node ID of the requesting commissioner.
+     * @return Success always (mismatch is silently ignored per spec).
+     */
+    virtual Protocols::InteractionModel::Status
+    ProxyBackgroundScanStopRequest(chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
+                                   chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
+                                   chip::FabricIndex fabricIndex,
+                                   chip::NodeId nodeId) = 0;
+
     // ------------------------------------------------------------------
     // Get attribute methods
-    virtual uint8_t GetScanMaxTime()         = 0;
+    virtual uint8_t GetScanMaxTime()        = 0;
+    virtual uint8_t GetMaxCachedResults()   = 0;
+    virtual uint8_t GetNumCachedResults()   = 0;
+    virtual uint16_t GetCacheTimeout()      = 0;
 
     // ------------------------------------------------------------------
     // Set attribute methods
-    virtual void SetScanMaxTime(uint8_t seconds) = 0;
+    virtual void SetScanMaxTime(uint8_t seconds)    = 0;
+    virtual void SetCacheTimeout(uint16_t seconds)  = 0;
+
+    /**
+     * @brief Encode the CachedResults attribute.
+     *
+     * Encodes DataModel::NullNullable when there are no cached results or no
+     * active background scan; otherwise encodes the list of ScanResultStruct.
+     */
+    virtual CHIP_ERROR EncodeCachedResults(app::AttributeValueEncoder & encoder) = 0;
 
 protected:
     EndpointId mEndpointId = 0;

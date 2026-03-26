@@ -217,11 +217,44 @@ public:
      *  a subsequent _WiFiPAFSubscribe registers exactly one handler. */
     void WiFiPAFDisconnectPublishReceiveHandler();
 
+    /** Per-peer callback fired each time a new NAN discovery result arrives
+     *  during a background scan (including re-discoveries, to allow TTL reset). */
+    using BgScanDiscoveryCallback = void (*)(void * ctx, const NanPeerInfo & peer);
+
+    /**
+     * Start a continuous background NAN discovery scan.
+     * @param cb      Called on every discovery result (including duplicates).
+     * @param cbCtx   Passed unchanged to cb.
+     * @return CHIP_ERROR_BUSY if a one-shot scan is already running.
+     */
+    CHIP_ERROR WiFiPAFStartBackgroundScan(BgScanDiscoveryCallback cb, void * cbCtx);
+
+    /**
+     * Stop the background scan started by WiFiPAFStartBackgroundScan.
+     * No-op if no background scan is active.
+     */
+    void WiFiPAFStopBackgroundScan();
+
     private:
     std::set<NanPeerInfo> mNanScanPeers;
-    PafScanResultsCallback mScanCb = nullptr;
-    void * mScanCbContext = nullptr;
+    PafScanResultsCallback mScanCb        = nullptr;
+    void * mScanCbContext                 = nullptr;
+    uint32_t mActiveScanSubscribeId       = 0; // subscribe_id of the current one-shot scan
     void FinishWiFiPAFScan(ScanTimerCtx * ctx);
+
+    BgScanDiscoveryCallback mBgScanCb = nullptr;
+    void * mBgScanCbCtx               = nullptr;
+    uint32_t mBgScanSubscribeId        = 0;
+
+    // Handler IDs for the three scan GLib signals (nandiscovery-result, nanreceive,
+    // nansubscribe-terminated).  Stored so DisconnectScanSignals() can remove exactly
+    // the scan handlers without disturbing PAF connect-path handlers on the same signals.
+    gulong mScanSignalIds[3] = {};
+
+    /** Disconnect the scan GLib signal handlers registered by WiFiPAFScan or
+     *  WiFiPAFStartBackgroundScan.  Uses stored handler IDs so it does not
+     *  accidentally remove connect-path handlers on the same signals. */
+    void DisconnectScanSignals();
 #endif
 
 private:

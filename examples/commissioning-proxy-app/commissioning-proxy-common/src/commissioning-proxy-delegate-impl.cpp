@@ -28,12 +28,15 @@ namespace CommissioningProxy {
 
 namespace {
 
-constexpr uint8_t kDefaultScanMaxTimeSeconds = 5;
+constexpr uint8_t kDefaultScanMaxTimeSeconds   = 5;
+constexpr uint16_t kDefaultCacheTimeoutSeconds = 30;
+constexpr uint8_t kMaxCachedResults            = 10;
 
 // Store per-instance state without requiring member fields in the header.
 struct DelegateState
 {
-    uint8_t scanMaxTime         = kDefaultScanMaxTimeSeconds;
+    uint8_t  scanMaxTime    = kDefaultScanMaxTimeSeconds;
+    uint16_t cacheTimeout   = kDefaultCacheTimeoutSeconds;
 };
 
 static std::unordered_map<const void *, DelegateState> gState;
@@ -54,10 +57,25 @@ uint8_t MyCPDelegate::GetScanMaxTime()
 
 void MyCPDelegate::SetScanMaxTime(uint8_t seconds)
 {
-    auto & st             = GetState(this);
+    auto & st      = GetState(this);
     st.scanMaxTime = seconds;
-    ChipLogProgress(AppServer, "===SHM %s() delegate scanMaxTimeSeconds=%u",
-        __func__, static_cast<unsigned>(seconds));
+    ChipLogProgress(AppServer, "===SHM %s() scanMaxTime=%u", __func__, static_cast<unsigned>(seconds));
+}
+
+uint8_t MyCPDelegate::GetMaxCachedResults()
+{
+    return kMaxCachedResults;
+}
+
+uint16_t MyCPDelegate::GetCacheTimeout()
+{
+    return GetState(this).cacheTimeout;
+}
+
+void MyCPDelegate::SetCacheTimeout(uint16_t seconds)
+{
+    GetState(this).cacheTimeout = seconds;
+    ChipLogProgress(AppServer, "===SHM %s() cacheTimeout=%u", __func__, static_cast<unsigned>(seconds));
 }
 
 } // namespace CommissioningProxy

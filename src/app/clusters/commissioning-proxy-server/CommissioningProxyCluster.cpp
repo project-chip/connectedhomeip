@@ -46,9 +46,6 @@ constexpr bool HasExactlyOneBitSet(T v)
 
 CHIP_ERROR CommissioningProxyCluster::Startup(ServerClusterContext & context)
 {
-    ChipLogProgress(Zcl, "===SHM %s() EndpointId - delegate has %d, cluster has %d", 
-        __func__, mDelegate.GetEndpointId(), mPath.mEndpointId);
-
     if (mDelegate.GetEndpointId() != mPath.mEndpointId)
     {
         ChipLogError(Zcl, "Commissioning Proxy: EndpointId mismatch - delegate has %d, cluster has %d", mDelegate.GetEndpointId(),
@@ -62,26 +59,30 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::WriteAttribute(const Da
                                                                         AttributeValueDecoder & decoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLogProgress(Zcl, "===SHM %s()", __func__);
     switch (request.path.mAttributeId)
     {
-    case ScanMaxTime::Id:
+    case ScanMaxTime::Id: {
         uint8_t time;
         ReturnErrorOnFailure(decoder.Decode(time));
         mDelegate.SetScanMaxTime(time);
         break;
+    }
+    case CacheTimeout::Id: {
+        uint16_t cacheTimeout;
+        ReturnErrorOnFailure(decoder.Decode(cacheTimeout));
+        mDelegate.SetCacheTimeout(cacheTimeout);
+        break;
+    }
     default:
-        return Protocols::InteractionModel::Status::UnsupportedWrite;    
+        return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
 
-    //return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
     return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, err);
 }
 
 DataModel::ActionReturnStatus CommissioningProxyCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                            AttributeValueEncoder & encoder)
 {
-    ChipLogProgress(Zcl, "===SHM %s()", __func__);
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
@@ -102,6 +103,18 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::ReadAttribute(const Dat
     case ScanMaxTime::Id:
         return encoder.Encode(mDelegate.GetScanMaxTime());
 
+    case MaxCachedResults::Id:
+        return encoder.Encode(mDelegate.GetMaxCachedResults());
+
+    case NumCachedResults::Id:
+        return encoder.Encode(mDelegate.GetNumCachedResults());
+
+    case CacheTimeout::Id:
+        return encoder.Encode(mDelegate.GetCacheTimeout());
+
+    case CachedResults::Id:
+        return mDelegate.EncodeCachedResults(encoder);
+
     default:
         return Status::UnsupportedAttribute;
     }
@@ -112,7 +125,6 @@ std::optional<DataModel::ActionReturnStatus> CommissioningProxyCluster::InvokeCo
                                                                                           CommandHandler * handler)
 {
     using namespace Commands;
-    ChipLogProgress(Zcl, "===SHM %s()", __func__);
 
     switch (request.path.mCommandId)
     {
@@ -161,8 +173,6 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
                                                                                    TLV::TLVReader & input_arguments,
                                                                                    CommandHandler * handler)
 {
-    ChipLogProgress(Zcl, "===SHM %s()", __func__);
-
     Commands::ProxyConnectRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
@@ -187,9 +197,6 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyConnectReque
             commandData.wiFiBand.Value().Raw());
     }
 
-    ChipLogProgress(NotSpecified, "=== %s() Transport:%u WiFiBand:%u Timeout:%u",
-                    __func__, commandData.transport.Raw(), (uint8_t)wiFiBand, commandData.timeout);
-
     // Delegate SHALL establish the transport connection and call commandObj->AddResponse()
     // with a ProxyConnectResponse containing the sessionId per spec.
     // State transition to kState_CPConnected happens in the delegate's async
@@ -207,8 +214,6 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyDisconnectRe
                                                                                       TLV::TLVReader & input_arguments,
                                                                                      CommandHandler * handler)
 {
-    ChipLogProgress(Zcl, "===SHM %s()", __func__);
-
     Commands::ProxyDisconnectRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
@@ -229,8 +234,6 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyScanRequest(
                                                                                 TLV::TLVReader & input_arguments,
                                                                                  CommandHandler * handler)
 {
-    ChipLogProgress(Zcl, "===SHM %s()", __func__);
-
     Commands::ProxyScanRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
@@ -261,22 +264,79 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyBackGroundSc
                                                                                                TLV::TLVReader & input_arguments,
                                                                                                CommandHandler * handler)
 {
-    return Status::UnsupportedCommand;
+    Commands::ProxyBackGroundScanStartRequest::DecodableType commandData;
+    ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
+
+    if (commandData.transport.Has(CapabilitiesBitmap::kWiFiPAF) &&
+        !mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
+    {
+        ChipLogError(Zcl, "CommissioningProxy: kWiFiPAF selected but kWiFiNetworkInterface feature disabled");
+        return Status::InvalidTransportType;
+    }
+
+    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands =
+        static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(0);
+    if (commandData.wiFiBands.HasValue())
+    {
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), Status::InvalidCommand);
+        wiFiBands = static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(
+            commandData.wiFiBands.Value().Raw());
+    }
+
+    chip::FabricIndex fabricIndex = request.subjectDescriptor != nullptr
+        ? request.subjectDescriptor->fabricIndex
+        : chip::kUndefinedFabricIndex;
+    chip::NodeId nodeId = request.subjectDescriptor != nullptr
+        ? request.subjectDescriptor->subject
+        : chip::kUndefinedNodeId;
+
+    auto delegateStatus = mDelegate.ProxyBackgroundScanStartRequest(
+        commandData.transport, commandData.timeout, wiFiBands, fabricIndex, nodeId, handler, request);
+    ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
+
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyBackGroundScanStopRequest(const DataModel::InvokeRequest & request,
                                                                                                TLV::TLVReader & input_arguments,
                                                                                                CommandHandler * handler)
 {
-    return Status::UnsupportedCommand;
+    Commands::ProxyBackGroundScanStopRequest::DecodableType commandData;
+    ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
+
+    if (commandData.transport.Has(CapabilitiesBitmap::kWiFiPAF) &&
+        !mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
+    {
+        ChipLogError(Zcl, "CommissioningProxy: kWiFiPAF selected but kWiFiNetworkInterface feature disabled");
+        return Status::InvalidTransportType;
+    }
+
+    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands =
+        static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(0);
+    if (commandData.wiFiBands.HasValue())
+    {
+        wiFiBands = static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(
+            commandData.wiFiBands.Value().Raw());
+    }
+
+    chip::FabricIndex fabricIndex = request.subjectDescriptor != nullptr
+        ? request.subjectDescriptor->fabricIndex
+        : chip::kUndefinedFabricIndex;
+    chip::NodeId nodeId = request.subjectDescriptor != nullptr
+        ? request.subjectDescriptor->subject
+        : chip::kUndefinedNodeId;
+
+    auto delegateStatus = mDelegate.ProxyBackgroundScanStopRequest(
+        commandData.transport, wiFiBands, fabricIndex, nodeId);
+    ReturnErrorOnFailure(DataModel::ActionReturnStatus(delegateStatus).GetUnderlyingError());
+
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyMessageRequest(const DataModel::InvokeRequest & request,
                                                                                                TLV::TLVReader & input_arguments,
                                                                                                CommandHandler * handler)
 {
-    ChipLogProgress(Zcl, "===SHM %s()", __func__);
-
     Commands::ProxyMessageRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
@@ -304,7 +364,6 @@ CHIP_ERROR CommissioningProxyCluster::Attributes(const ConcreteClusterPath & pat
         WiFiBand::kMetadataEntry,
     };
 
-    ChipLogProgress(Zcl, "===SHM %s()", __func__);
     AttributeListBuilder listBuilder(builder);
 
     return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), mEnabledOptionalAttributes);
@@ -313,7 +372,6 @@ CHIP_ERROR CommissioningProxyCluster::Attributes(const ConcreteClusterPath & pat
 CHIP_ERROR CommissioningProxyCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                            ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    ChipLogProgress(Zcl, "===SHM %s()", __func__);
     ReturnErrorOnFailure(builder.AppendElements({
         Commands::ProxyConnectRequest::kMetadataEntry,
         Commands::ProxyDisconnectRequest::kMetadataEntry,
@@ -323,34 +381,24 @@ CHIP_ERROR CommissioningProxyCluster::AcceptedCommands(const ConcreteClusterPath
 
     if (mFeatureFlags.Has(Feature::kBackgroundScan))
     {
-        ChipLogProgress(Zcl, "===SHM %s() Feature::KBackgroundScan", __func__);
         ReturnErrorOnFailure(builder.AppendElements({
             Commands::ProxyBackGroundScanStartRequest::kMetadataEntry,
             Commands::ProxyBackGroundScanStopRequest::kMetadataEntry,
         }));
     }
-    ChipLogProgress(Zcl, "===SHM %s() CHIP_NO_ERROR", __func__);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommissioningProxyCluster::SetCPState(CommissioningProxyCluster::State_t state)
 {
-    ChipLogProgress(AppServer, "===SHM %s(), state=%d", __func__, uint8_t(state));
     mMainCommissioningProxyState = state;
     return CHIP_NO_ERROR;
 }
 
 CommissioningProxyCluster::State_t CommissioningProxyCluster::GetCPState(void)
 {
-    ChipLogProgress(AppServer, "===SHM %s(), state=%d", __func__, uint8_t(mMainCommissioningProxyState));
     return mMainCommissioningProxyState;
 }
-
-//bool CommissioningProxyManager::IsCPConnected()
-//{
-//   ChipLogProgress(AppServer, "===SHM %s()", __func__);
-//    return mMainCommissioningProxyState == kState_CPConnected;
-//}
 
 
 } // namespace CommissioningProxy

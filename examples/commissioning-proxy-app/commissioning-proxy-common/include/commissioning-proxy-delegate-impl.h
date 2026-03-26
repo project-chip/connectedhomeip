@@ -75,8 +75,28 @@ protected:
 
     Protocols::InteractionModel::Status ProxyDisconnectRequest(uint16_t sessionId) override;
 
-    uint8_t GetScanMaxTime() override;
-    void SetScanMaxTime(uint8_t seconds) override;
+    Protocols::InteractionModel::Status ProxyBackgroundScanStartRequest(
+        chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
+        uint16_t timeout,
+        chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
+        chip::FabricIndex fabricIndex,
+        chip::NodeId nodeId,
+        app::CommandHandler * commandObj,
+        const DataModel::InvokeRequest & request) override;
+
+    Protocols::InteractionModel::Status ProxyBackgroundScanStopRequest(
+        chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
+        chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
+        chip::FabricIndex fabricIndex,
+        chip::NodeId nodeId) override;
+
+    uint8_t  GetScanMaxTime()        override;
+    uint8_t  GetMaxCachedResults()   override;
+    uint8_t  GetNumCachedResults()   override;
+    uint16_t GetCacheTimeout()       override;
+    void SetScanMaxTime(uint8_t seconds)    override;
+    void SetCacheTimeout(uint16_t seconds)  override;
+    CHIP_ERROR EncodeCachedResults(app::AttributeValueEncoder & encoder) override;
 
 private:
     CommissioningProxyCluster * mServer = nullptr;

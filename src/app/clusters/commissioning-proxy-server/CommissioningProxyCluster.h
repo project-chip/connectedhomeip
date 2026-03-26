@@ -111,6 +111,17 @@ public:
     CHIP_ERROR SetCPState(State_t state);
     CommissioningProxyCluster::State_t GetCPState(void);
 
+    /**
+     * @brief Notify subscribers that CachedResults and NumCachedResults have changed.
+     *
+     * Called by the delegate whenever the background scan cache is updated.
+     */
+    void MarkCachedResultsDirty()
+    {
+        NotifyAttributeChanged(CommissioningProxy::Attributes::CachedResults::Id);
+        NotifyAttributeChanged(CommissioningProxy::Attributes::NumCachedResults::Id);
+    }
+
 private:
     DataModel::ActionReturnStatus HandleProxyConnectRequest(const DataModel::InvokeRequest & request,
                                                             TLV::TLVReader & input_arguments, CommandHandler * handler);
