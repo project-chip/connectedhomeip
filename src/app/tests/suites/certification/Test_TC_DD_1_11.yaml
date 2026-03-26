@@ -89,7 +89,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 2: Commission each TH device one by one using the parsed payload data"
+          "Step 2: Commission each TH device one by one using the parsed payload
+          data"
       verification: |
 
           Commission the TH devices one by one by scanning the combined QR code from Step-1 with the DUT (commissioner device/app).
