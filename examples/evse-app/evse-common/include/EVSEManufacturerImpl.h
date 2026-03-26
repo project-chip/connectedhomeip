@@ -200,7 +200,6 @@ private:
     EnergyEvseManager * mEvseInstance;
     ElectricalSensorManager * mESManager;
     DeviceEnergyManagementManager * mDEMInstance;
-    LazyRegisteredServerCluster<PowerSourceCluster> mPSInstance;
 
     int64_t mLastChargingEnergyMeter    = 0;
     int64_t mLastDischargingEnergyMeter = 0;

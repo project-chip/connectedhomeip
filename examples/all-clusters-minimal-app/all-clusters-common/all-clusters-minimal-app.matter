@@ -6605,11 +6605,12 @@ endpoint 0 {
     ram      attribute status default = 0;
     ram      attribute order default = 3;
     ram      attribute description default = "B1";
+    ram      attribute wiredCurrentType default = 0;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     callback attribute clusterRevision;
   }
 
@@ -6777,7 +6778,6 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    callback attribute groupcastAdoption;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -6912,11 +6912,12 @@ endpoint 1 {
     ram      attribute status default = 0;
     ram      attribute order default = 2;
     ram      attribute description default = "B2";
+    ram      attribute wiredCurrentType default = 0;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     callback attribute clusterRevision;
   }
 
@@ -7421,11 +7422,12 @@ endpoint 2 {
     ram      attribute status default = 0;
     ram      attribute order default = 1;
     ram      attribute description default = "B3";
+    ram      attribute wiredCurrentType default = 0;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 1;
     callback attribute clusterRevision;
   }
 

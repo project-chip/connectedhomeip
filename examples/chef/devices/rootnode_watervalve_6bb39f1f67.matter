@@ -1918,7 +1918,6 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    callback attribute groupcastAdoption;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -1976,7 +1975,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 6;
     callback attribute clusterRevision;
   }
 

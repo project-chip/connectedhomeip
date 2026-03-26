@@ -49,9 +49,7 @@ powerSourceInstance.Cluster().SetWiredAssessedInputFrequency(MakeOptional(20000)
 ```
 
 Or with the `LazyRegisteredServerCluster` which can defer the creation and
-overall provides dynamic lifetime management. An example using it can be seen in
-`examples/evse-app/evse-common/include/EVSEManufacturerImpl.h` and corresponding
-`EVSEManufacturerImpl.cpp`.
+overall provides dynamic lifetime management.
 
 ### Note
 
@@ -69,6 +67,11 @@ In this model, you configure the Power Source cluster in your `.zap` file. The
 ZAP tool generates `MatterPowerSourceClusterInitCallback`, which is implemented
 by our `CodegenIntegration` layer to automatically instantiate and configure the
 cluster based on your ZAP configuration.
+
+Note that it will be enforced that it is possible to create a valid cluster from
+the configuration with the ZAP tool. This means that you will need to specity
+the type of the power source (wired or battery) with the ZAP tool, otherwise
+the initial startup will fail.
 
 To use the cluster in this mode, your application can get a pointer to the
 cluster instance and call its methods directly using

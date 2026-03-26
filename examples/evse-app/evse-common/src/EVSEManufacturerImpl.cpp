@@ -28,6 +28,7 @@
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
+#include <app/clusters/power-source-server/power-srouce-server.h>
 #include <app/server/Server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -441,32 +442,27 @@ CHIP_ERROR EVSEManufacturer::InitializePowerMeasurementCluster()
 
 /**
  * @brief   Allows a client application to initialise the PowerSource cluster
+ * @note    Initial configuration of the cluster will need to be done using
+ *          the zap tool, and here list attributes can be set, which can't be
+ *          set with the zap tool, and some other attributes. You can see
+ *          which attributes can be set here by looking up public `Set*`
+ *          member functions in the `PowerSourceCluster` class.
+ *          (see power-source-server/PowerSourceCluster.cpp)
  */
 CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpointId)
 {
-    PowerSourceCluster::WiredConfiguration config(CharSpan::fromCharString("Primary Mains Power"),
-                                                  PowerSource::WiredCurrentTypeEnum::kAc);
+    PowerSourceCluster * cluster = PowerSource::FindClusterOnEndpoint(endpointId);
 
-    config.nominalVoltage = 230'000; // 230V in mv
-    config.maximumCurrent = 32'000;  // 32A in mA
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    PowerSourceCluster::OptionalAttributeSet optionalAttributes{};
-    optionalAttributes.Set<WiredNominalVoltage::Id>();
-    optionalAttributes.Set<WiredMaximumCurrent::Id>();
-
-    mPSInstance.Create(endpointId, optionalAttributes, DeviceLayer::SystemLayer(), config);
-
-    ReturnErrorOnFailure(mPSInstance.Cluster().SetStatus(PowerSourceStatusEnum::kActive));
+    ReturnErrorOnFailure(cluster->SetStatus(PowerSourceStatusEnum::kActive));
 
     chip::EndpointId endpointArray[] = { endpointId };
     Span<EndpointId> endpointList    = Span<EndpointId>(endpointArray);
 
     // Note per API - we do not need to maintain the span after the SetEndpointList has been called
     // since it takes a copy (see power-source-server/PowerSourceCluster.cpp)
-    ReturnErrorOnFailure(mPSInstance.Cluster().SetEndpointList(endpointList));
-
-    // Register the cluster so that the `DataModelProvider` can see it.
-    return CodegenDataModelProvider::Instance().Registry().Register(mPSInstance.Registration());
+    return cluster->SetEndpointList(endpointList);
 }
 
 void EVSEManufacturer::UpdateEVFakeReadings(const Amperage_mA maximumChargeCurrent)

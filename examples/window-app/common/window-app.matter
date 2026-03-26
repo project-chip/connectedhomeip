@@ -2546,13 +2546,16 @@ endpoint 0 {
     ram      attribute batPercentRemaining;
     ram      attribute batTimeRemaining;
     ram      attribute batChargeLevel;
+    ram      attribute batReplacementNeeded;
+    ram      attribute batReplaceability;
     callback attribute activeBatFaults;
     ram      attribute batChargeState;
+    ram      attribute batFunctionalWhileCharging;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 6;
     callback attribute clusterRevision;
   }
 
@@ -2777,7 +2780,6 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    callback attribute groupcastAdoption;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
