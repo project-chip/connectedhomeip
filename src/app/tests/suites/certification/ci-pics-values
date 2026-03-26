@@ -3193,10 +3193,10 @@ WEBRTCR.S.C03.Rsp=1  # End
 
 # Joint Fabric Administrator Cluster
 # Server
-JFPKI.S=1
+JFADMIN.S=1
 
 # Client
-JFPKI.C=1
+JFADMIN.C=1
 
 # Attributes
-JFPKI.S.A0000=1 #AdministratorFabricIndex
+JFADMIN.S.A0000=1 #AdministratorFabricIndex

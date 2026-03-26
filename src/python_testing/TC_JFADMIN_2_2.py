@@ -54,7 +54,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-class TC_CADMIN_1_28(CADMINBaseTest):
+class TC_JFADMIN_2_2(CADMINBaseTest):
 
     @async_test_body
     async def setup_class(self):
@@ -114,7 +114,7 @@ class TC_CADMIN_1_28(CADMINBaseTest):
 
         super().teardown_class()
 
-    def steps_TC_CADMIN_1_28(self) -> list[TestStep]:
+    def steps_TC_JFADMIN_2_2(self) -> list[TestStep]:
         # Steps 1 and 2 from Test Plan are done in setup class
         return [
             TestStep("1", "DUT_AJF starts a commissioning process to commission TH_DEV1 on Fabric 1",
@@ -131,11 +131,11 @@ class TC_CADMIN_1_28(CADMINBaseTest):
                      "DUT_AJF NOC from JointFabric should contain Administrator CAT")
         ]
 
-    def pics_TC_CADMIN_1_28(self):
-        return ['CADMIN.S']
+    def pics_TC_JFADMIN_2_2(self):
+        return ['JFADMIN.S']
 
     @async_test_body
-    async def test_TC_CADMIN_1_28(self):
+    async def test_TC_JFADMIN_2_2(self):
         _devCtrlEcoA = None
         _devCtrlEcoB = None
         _fabric_a_persistent_storage = None
