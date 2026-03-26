@@ -124,7 +124,11 @@ void TelinkWiFiDriver::OnNetworkConnStatusChanged(const wifi_conn_status & connS
 
     if (status == Status::kSuccess)
     {
-        TEMPORARY_RETURN_IGNORED ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
+        CHIP_ERROR err = ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "STA mode err: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 
     if (mpNetworkStatusChangeCallback)
@@ -182,7 +186,7 @@ CHIP_ERROR TelinkWiFiDriver::RevertConfiguration()
             return CHIP_NO_ERROR;
         }
 
-        TEMPORARY_RETURN_IGNORED WiFiManager::Instance().Disconnect();
+        ReturnLogErrorOnFailure(WiFiManager::Instance().Disconnect());
     }
 
     if (mStagingNetwork.IsConfigured())
@@ -254,8 +258,13 @@ void TelinkWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * call
                  status = Status::kOtherConnectionFailure);
     VerifyOrExit(networkId.data_equal(mStagingNetwork.GetSsidSpan()), status = Status::kNetworkIDNotFound);
 
-    TEMPORARY_RETURN_IGNORED WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(),
-                                                             handling);
+    CHIP_ERROR err = WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Connect err: %" CHIP_ERROR_FORMAT, err.Format());
+        status = Status::kUnknownError;
+        goto exit;
+    }
 
 exit:
     if (status != Status::kSuccess && mpConnectCallback)
@@ -318,8 +327,16 @@ void TelinkWiFiDriver::StartDefaultWiFiNetwork(void)
     uint8_t outNetworkIndex = 0;
 
     AddOrUpdateNetwork(ssidSpan, passwordSpan, debugText, outNetworkIndex);
-    TEMPORARY_RETURN_IGNORED CommitConfiguration();
-    TEMPORARY_RETURN_IGNORED RevertConfiguration();
+    CHIP_ERROR err = CommitConfiguration();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Commit Config err: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    err = RevertConfiguration();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Revert Config err: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 } // namespace NetworkCommissioning

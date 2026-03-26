@@ -122,16 +122,25 @@ void WindowCovering::StartTimer(WindowCoveringType aMoveType, uint32_t aTimeoutM
 
 void WindowCovering::MoveTimerTimeoutCallback(chip::System::Layer * systemLayer, void * appState)
 {
+    CHIP_ERROR err                = CHIP_NO_ERROR;
     WindowCoveringType * moveType = reinterpret_cast<WindowCoveringType *>(appState);
     VerifyOrReturn(moveType != nullptr);
 
     if (*moveType == WindowCoveringType::Lift)
     {
-        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentLiftPosition);
+        err = chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentLiftPosition);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "WC lift work err: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
     else if (*moveType == WindowCoveringType::Tilt)
     {
-        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentTiltPosition);
+        err = chip::DeviceLayer::PlatformMgr().ScheduleWork(WindowCovering::DriveCurrentTiltPosition);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "WC tilt work err: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 
     chip::Platform::Delete(moveType);
@@ -297,7 +306,11 @@ void WindowCovering::SchedulePostAttributeChange(chip::EndpointId aEndpoint, chi
     data->mEndpoint    = aEndpoint;
     data->mAttributeId = aAttributeId;
 
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(DoPostAttributeChange, reinterpret_cast<intptr_t>(data));
+    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork(DoPostAttributeChange, reinterpret_cast<intptr_t>(data));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Attr work err: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void WindowCovering::DoPostAttributeChange(intptr_t aArg)

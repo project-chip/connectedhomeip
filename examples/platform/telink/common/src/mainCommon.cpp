@@ -187,19 +187,19 @@ int main(void)
         goto exit;
     }
 
-    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
+    LogErrorOnFailure(sThreadNetworkDriver.Init());
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
         static InternalScanCallback sInternalScanCallback;
-        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ThreadStackMgrImpl().StartThreadScan(&sInternalScanCallback);
+        LogErrorOnFailure(chip::DeviceLayer::ThreadStackMgrImpl().StartThreadScan(&sInternalScanCallback));
         k_sem_take(&gThreadPrescanDoneSem, K_SECONDS(15));
     }
 #endif
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    TEMPORARY_RETURN_IGNORED sWiFiCommissioningInstance.Init();
+    LogErrorOnFailure(sWiFiCommissioningInstance.Init());
 #else
     err = CHIP_ERROR_INTERNAL;
     goto exit;

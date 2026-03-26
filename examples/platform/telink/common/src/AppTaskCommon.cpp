@@ -374,7 +374,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads.
-    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    LogErrorOnFailure(PlatformMgr().AddEventHandler(ChipEventHandler, 0));
 
     err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
     if (err != CHIP_NO_ERROR)
@@ -703,7 +703,7 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
     LOG_INF("StartThreadHandler");
     if (!sIsNetworkProvisioned)
     {
-        TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(true);
+        LogErrorOnFailure(ThreadStackMgrImpl().SetThreadEnabled(true));
         StartDefaultThreadNetwork();
     }
     else
@@ -829,7 +829,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
             ChipLogProgress(DeviceLayer, "Switch to Thread");
-            TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(true);
+            LogErrorOnFailure(ThreadStackMgrImpl().SetThreadEnabled(true));
 
             ChipDeviceEvent opEvent;
             opEvent.Type     = DeviceEventType::kOperationalNetworkStarted;
