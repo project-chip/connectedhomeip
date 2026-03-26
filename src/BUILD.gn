@@ -178,6 +178,14 @@ if (chip_build_tests) {
       ]
     }
 
+    if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
+      tests += [
+        # keep-sorted: start
+        "${chip_root}/src/app/clusters/actions-server/tests:tests-backwards-compatibility",
+        # keep-sorted: end
+      ]
+    }
+
     if (current_os != "zephyr") {
       # Avoid these items from "one single binary" test executions. Once tests
       # are split, we can re-visit this (and likely many others).

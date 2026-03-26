@@ -60,8 +60,6 @@ chip_test_suite("tests-backwards-compatibility") {
     sources += [ "../" + file ]
   }
 
-  sources += [ "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp" ]
-
   public_deps = [
     "${chip_root}/src/app/clusters/actions-server",
     "${chip_root}/src/app/common:cluster-objects",
