@@ -319,5 +319,6 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
         interconnected_co_alarm_handler.cancel()
         interconnected_smoke_alarm_handler.cancel()
 
+
 if __name__ == "__main__":
     default_matter_test_main()
