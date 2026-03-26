@@ -225,15 +225,12 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             return CHIP_ERROR_INTERNAL;
         }
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
         Credentials::GroupDataProvider::GroupInfo info;
         ReturnErrorOnFailure(groups->GetGroupInfo(groupSession->GetFabricIndex(), groupSession->GetGroupId(), info));
-        destination_address = (info.UsePerGroupAddress())
+        destination_address = (!groups->IsGroupcastEnabled() || info.UsePerGroupAddress())
             ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId())
             : Transport::PeerAddress::Groupcast();
-#else
-        destination_address = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
-#endif
+
         Crypto::SymmetricKeyContext * keyContext =
             groups->GetKeyContext(groupSession->GetFabricIndex(), groupSession->GetGroupId());
         VerifyOrReturnError(nullptr != keyContext, CHIP_ERROR_INTERNAL);
@@ -429,18 +426,14 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
         const FabricInfo * fabric = mFabricTable->FindFabricWithIndex(groupSession->GetFabricIndex());
         VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
         auto * groups = Credentials::GetGroupDataProvider();
         VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
 
         Credentials::GroupDataProvider::GroupInfo info;
         ReturnErrorOnFailure(groups->GetGroupInfo(groupSession->GetFabricIndex(), groupSession->GetGroupId(), info));
-        multicastAddress = (info.UsePerGroupAddress())
+        multicastAddress = (!groups->IsGroupcastEnabled() || info.UsePerGroupAddress())
             ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId())
             : Transport::PeerAddress::Groupcast();
-#else
-        multicastAddress    = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
-#endif
         destination = &multicastAddress;
     }
     break;

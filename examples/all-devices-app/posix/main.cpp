@@ -200,6 +200,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(&gGroupDataProvider,
                                                                                         &Server::GetInstance().GetFabricTable());
     initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
+    gGroupDataProvider.SetGroupcastEnabled(true);
 #endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
