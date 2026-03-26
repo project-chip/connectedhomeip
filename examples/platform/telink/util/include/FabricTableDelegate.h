@@ -98,14 +98,18 @@ private:
 #endif // CONFIG_CHIP_WIFI
 #elif defined(CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY) || defined(CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-                (void) chip::DeviceLayer::ThreadStackMgr().ClearAllSrpHostAndServices();
+                LogErrorOnFailure(chip::DeviceLayer::ThreadStackMgr().ClearAllSrpHostAndServices());
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
        // Erase Matter data
-                (void) chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
+                CHIP_ERROR err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "Factory reset err: %" CHIP_ERROR_FORMAT, err.Format());
+                }
                 // Erase Network credentials and disconnect
                 chip::DeviceLayer::ConnectivityMgr().ErasePersistentInfo();
 #ifdef CONFIG_CHIP_WIFI
-                (void) chip::DeviceLayer::WiFiManager::Instance().Disconnect();
+                LogErrorOnFailure(chip::DeviceLayer::WiFiManager::Instance().Disconnect());
                 chip::DeviceLayer::ConnectivityMgr().ClearWiFiStationProvision();
 #endif
 #ifdef CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
