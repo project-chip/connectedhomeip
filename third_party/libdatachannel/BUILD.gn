@@ -24,10 +24,10 @@ _output_dir = "${target_out_dir}/$current_cpu-$_compiler_subdir"
 action("build_libdatachannel") {
   script = "scripts/build_libdatachannel.py"
   outputs = [
-    "${_output_dir}/libdatachannel.a",
+    "${_output_dir}/libdatachannel-static.a",
     "${_output_dir}/deps/usrsctp/usrsctplib/libusrsctp.a",
     "${_output_dir}/deps/libsrtp/libsrtp2.a",
-    "${_output_dir}/deps/libjuice/libjuice.a",
+    "${_output_dir}/deps/libjuice/libjuice-static.a",
   ]
 
   args = [
@@ -54,10 +54,10 @@ action("build_libdatachannel") {
 
 config("datachannel_config") {
   libs = [
-    "datachannel",
+    "datachannel-static",
     "usrsctp",
     "srtp2",
-    "juice",
+    "juice-static",
   ]
 
   cflags_cc = [ "-Wno-shadow" ]

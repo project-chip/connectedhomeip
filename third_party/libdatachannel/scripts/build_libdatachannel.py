@@ -32,7 +32,6 @@ def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
         "-DUSE_NICE=0",
         "-DCMAKE_BUILD_TYPE=Release",
         "-DCMAKE_CXX_FLAGS=-Wno-shadow",
-        "-DBUILD_SHARED_LIBS=OFF",
     ]
 
     # Default compilers
@@ -99,7 +98,7 @@ def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
     subprocess.run(cmake_cmd, check=True)
 
     # Build with Make
-    make_cmd = ["cmake", "--build", str(build_dir), f"-j{os.cpu_count()}"]
+    make_cmd = ["cmake", "--build", str(build_dir), "--target", "datachannel-static", f"-j{os.cpu_count()}"]
     print(f"Running: {shlex.join(make_cmd)}")
     subprocess.run(make_cmd, check=True)
 
