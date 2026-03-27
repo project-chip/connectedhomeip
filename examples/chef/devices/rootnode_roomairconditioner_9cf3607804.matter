@@ -2399,16 +2399,16 @@ endpoint 1 {
   }
 
   server cluster FanControl {
-    persist  attribute fanMode default = 0;
-    ram      attribute fanModeSequence default = 2;
-    ram      attribute percentSetting default = 0;
-    ram      attribute percentCurrent default = 0;
-    ram      attribute speedMax default = 100;
-    ram      attribute speedSetting default = 0;
-    ram      attribute speedCurrent;
-    ram      attribute rockSupport default = 0x00;
-    ram      attribute rockSetting default = 0x00;
-    ram      attribute airflowDirection default = 0;
+    callback attribute fanMode;
+    callback attribute fanModeSequence;
+    callback attribute percentSetting;
+    callback attribute percentCurrent;
+    callback attribute speedMax;
+    callback attribute speedSetting;
+    callback attribute speedCurrent;
+    callback attribute rockSupport;
+    callback attribute rockSetting;
+    callback attribute airflowDirection;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

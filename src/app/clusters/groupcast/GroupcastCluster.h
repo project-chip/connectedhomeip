@@ -70,7 +70,6 @@ private:
     Protocols::InteractionModel::Status GroupcastTesting(FabricIndex fabricIndex,
                                                          Groupcast::Commands::GroupcastTesting::DecodableType data);
 
-    inline FabricIndex GetFabricUnderTest() const { return mFabricUnderTest; }
     const BitFlags<Groupcast::Feature> & Features() const { return mFeatures; }
 
     // Methods moved from GroupcastLogic
@@ -129,7 +128,6 @@ private:
     bool mIanaAddressUsed                    = false;
 
     Groupcast::GroupcastTestingEnum mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
-    FabricIndex mFabricUnderTest                  = kUndefinedFabricIndex;
     class MembershipChangedTimer : public TimerContext
     {
     public:

@@ -21,8 +21,10 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/clusters/fan-control-server/CodegenIntegration.h>
 #include <app/clusters/fan-control-server/fan-control-server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/attribute-table.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -44,6 +46,7 @@ public:
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
+    void OnFanStateChanged(bool isOn) override;
 
 private:
     CHIP_ERROR ReadPercentCurrent(AttributeValueEncoder & aEncoder);
@@ -56,7 +59,7 @@ CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncode
 {
     // Return PercentSetting attribute value for now
     DataModel::Nullable<Percent> percentSetting;
-    PercentSetting::Get(mEndpoint, percentSetting);
+    FanControl::GetPercentSetting(mEndpoint, percentSetting);
     Percent ret = 0;
     if (!percentSetting.IsNull())
     {
@@ -70,7 +73,7 @@ CHIP_ERROR FanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
 {
     // Return SpeedCurrent attribute value for now
     DataModel::Nullable<uint8_t> speedSetting;
-    SpeedSetting::Get(mEndpoint, speedSetting);
+    FanControl::GetSpeedSetting(mEndpoint, speedSetting);
     uint8_t ret = 0;
     if (!speedSetting.IsNull())
     {
@@ -87,11 +90,10 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
 
     VerifyOrReturnError(aDirection != StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
-    uint8_t speedMax;
-    SpeedMax::Get(mEndpoint, &speedMax);
-
+    uint8_t speedMax = 0;
     DataModel::Nullable<uint8_t> speedSetting;
-    SpeedSetting::Get(mEndpoint, speedSetting);
+    FanControl::GetSpeedSetting(mEndpoint, speedSetting);
+    FanControl::GetSpeedMax(mEndpoint, speedMax);
 
     uint8_t newSpeedSetting = speedSetting.IsNull() ? 0 : speedSetting.Value();
 
@@ -147,7 +149,26 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
         }
     }
 
-    return SpeedSetting::Set(mEndpoint, newSpeedSetting);
+    return FanControl::SetSpeedSetting(mEndpoint, DataModel::Nullable<uint8_t>(newSpeedSetting));
+}
+
+void FanControlManager::OnFanStateChanged(bool isOn)
+{
+    bool currentOnOff = false;
+    Status status     = OnOff::Attributes::OnOff::Get(mEndpoint, &currentOnOff);
+
+    if (status == Status::Success)
+    {
+        if (currentOnOff != isOn)
+        {
+            ChipLogProgress(NotSpecified, "FanControlManager: Synchronizing OnOff cluster to %d", isOn);
+            OnOff::Attributes::OnOff::Set(mEndpoint, isOn);
+        }
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "FanControlManager: Failed to get OnOff attribute: %d", to_underlying(status));
+    }
 }
 
 CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
