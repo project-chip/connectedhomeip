@@ -105,7 +105,7 @@ class TC_ACE_1_6(MatterBaseTest):
         keySetID3 = 0x01a3
         ##################################################
         # TODO: check this
-        pixit_g_endpoint = self.get_endpoint() 
+        pixit_g_endpoint = self.get_endpoint()
 
         # Keys
         key1 = b"\xa0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf"
