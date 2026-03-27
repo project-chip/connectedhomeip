@@ -138,7 +138,7 @@ CHIP_ERROR SetUpCodePairer::Connect()
                 ChipLogProgress(Controller,
                                 "Skipping commissionable node discovery over NFC since not supported by the controller!");
             }
-            else if (err != CHIP_ERROR_NOT_FOUND)
+            else if (err == CHIP_ERROR_NOT_FOUND)
             {
                 ChipLogProgress(Controller,
                                 "Skipping commissionable node discovery over NFC since no NFC Reader Transport is present");
