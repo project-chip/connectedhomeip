@@ -39,8 +39,7 @@ CommissionerControlServer::~CommissionerControlServer()
 
 CHIP_ERROR CommissionerControlServer::Init()
 {
-    VerifyOrDie(!mCluster.IsConstructed());
-    mCluster.Create(mEndpointId, &mDelegate);
+    mCluster.Create(mEndpointId, mDelegate);
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }
 
