@@ -175,19 +175,19 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
                           static_cast<unsigned>(mParams.totalFileBytes));
             if (downloadedBytesRestored)
             {
-                error = mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
-                if (error != CHIP_NO_ERROR)
+                CHIP_ERROR err = mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
+                if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(SoftwareUpdate, "OTA skip err: %" CHIP_ERROR_FORMAT, error.Format());
+                    ChipLogError(SoftwareUpdate, "OTA skip err: %" CHIP_ERROR_FORMAT, err.Format());
                 }
                 downloadedBytesRestored = 0;
             }
             else
             {
-                error = mDownloader->FetchNextData();
-                if (error != CHIP_NO_ERROR)
+                err = mDownloader->FetchNextData();
+                if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(SoftwareUpdate, "OTA fetch err: %" CHIP_ERROR_FORMAT, error.Format());
+                    ChipLogError(SoftwareUpdate, "OTA fetch err: %" CHIP_ERROR_FORMAT, err.Format());
                 }
             }
         }
