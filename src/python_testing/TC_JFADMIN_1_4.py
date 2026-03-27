@@ -60,7 +60,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-class TC_JFPKI_2_4(MatterBaseTest):
+class TC_JFADMIN_1_4(MatterBaseTest):
     _JOINT_FABRIC_ADMINISTRATOR_ENDPOINT = 1
     _MIN_COMMISSIONING_TIMEOUT = 60
     _DEFAULT_OJCW_TIMEOUT = 60
@@ -74,11 +74,11 @@ class TC_JFPKI_2_4(MatterBaseTest):
     _REQUEST_TIMEOUT_MS = 5000
     _TIMEOUT_STEP_2 = 180
 
-    def desc_TC_JFPKI_2_4(self) -> str:
-        return "[TC-JFPKI-2.4] Validate OpenJointCommissioningWindow Command correct behavior"
+    def desc_TC_JFADMIN_1_4(self) -> str:
+        return "[TC-JFADMIN-1.4] Validate OpenJointCommissioningWindow Command correct behavior"
 
-    def pics_TC_JFPKI_2_4(self) -> list[str]:
-        return ["JFPKI.S"]
+    def pics_TC_JFADMIN_1_4(self) -> list[str]:
+        return ["JFADMIN.S"]
 
     @property
     def default_timeout(self) -> int:
@@ -211,7 +211,7 @@ class TC_JFPKI_2_4(MatterBaseTest):
 
         super().teardown_class()
 
-    def steps_TC_JFPKI_2_4(self) -> list[TestStep]:
+    def steps_TC_JFADMIN_1_4(self) -> list[TestStep]:
         return [
             TestStep("1", "Commission DUT to TH."),
             TestStep("2", "TH sends OJCW command to DUT with valid parameters: CommissioningTimeout=180, PAKEPasscodeVerifier=valid_97_byte_verifier, Discriminator=3840, Iterations=2000, Salt=valid_16_byte_salt.",
@@ -255,7 +255,7 @@ class TC_JFPKI_2_4(MatterBaseTest):
         ]
 
     @async_test_body
-    async def test_TC_JFPKI_2_4(self):
+    async def test_TC_JFADMIN_1_4(self):
         self.step("1")
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork-long {self.dut_node_id} {self.jfadmin_fabric_a_passcode} {self.jfadmin_fabric_a_discriminator} --anchor true",
