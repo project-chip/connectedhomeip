@@ -53,7 +53,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-class TC_JFPKI_2_1(MatterBaseTest):
+class TC_JFADMIN_1_1(MatterBaseTest):
 
     @async_test_body
     async def setup_class(self):
@@ -90,7 +90,7 @@ class TC_JFPKI_2_1(MatterBaseTest):
 
         super().teardown_class()
 
-    def steps_TC_JFPKI_2_1(self) -> list[TestStep]:
+    def steps_TC_JFADMIN_1_1(self) -> list[TestStep]:
         return [
             TestStep("1", "TH starts a commissioning process with DUT.",
                      "DUT is commissioned by TH with success."),
@@ -100,13 +100,13 @@ class TC_JFPKI_2_1(MatterBaseTest):
                      "DUT response contains a FabricDescriptorStruct with FabricID equal to AdministratorFabricIndex from step 2.")
         ]
 
-    def pics_TC_JFPKI_2_1(self):
-        return ['JFPKI.S']
+    def pics_TC_JFADMIN_1_1(self):
+        return ['JFADMIN.S']
 
     @async_test_body
-    async def test_TC_JFPKI_2_1(self):
+    async def test_TC_JFADMIN_1_1(self):
         self.step("1")
-        self.JFPKI_fabric_a_passcode = random.randint(110220011, 110220999)
+        self.JFADMIN_fabric_a_passcode = random.randint(110220011, 110220999)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
 
         # Start Fabric A JF-Administrator App
@@ -115,7 +115,7 @@ class TC_JFPKI_2_1(MatterBaseTest):
             storage_dir=self.storage_fabric_a,
             port=random.randint(5001, 5999),
             discriminator=random.randint(0, 4095),
-            passcode=self.JFPKI_fabric_a_passcode,
+            passcode=self.JFADMIN_fabric_a_passcode,
             extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
         self.fabric_a_admin.start(
             expected_output="Server initialization complete",
@@ -134,7 +134,7 @@ class TC_JFPKI_2_1(MatterBaseTest):
 
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork 1 {self.JFPKI_fabric_a_passcode} --anchor true",
+            message=f"pairing onnetwork 1 {self.JFADMIN_fabric_a_passcode} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
             timeout=20)
 
@@ -174,7 +174,7 @@ class TC_JFPKI_2_1(MatterBaseTest):
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoACATs, 16)])
 
-        if self.pics_guard(self.check_pics("JFPKI.S.A0000")):
+        if self.pics_guard(self.check_pics("JFADMIN.S.A0000")):
             self.step("2")
             response = await devCtrlEcoA.ReadAttribute(
                 nodeId=1, attributes=[(1, Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
