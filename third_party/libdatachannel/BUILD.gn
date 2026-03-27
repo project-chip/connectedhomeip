@@ -19,12 +19,21 @@ _compiler_subdir = "gcc"
 if (is_clang) {
   _compiler_subdir = "clang"
 }
-_output_dir = "build/$current_cpu-$_compiler_subdir"
+_output_dir = "${target_out_dir}/$current_cpu-$_compiler_subdir"
 
 action("build_libdatachannel") {
   script = "scripts/build_libdatachannel.py"
-  outputs = [ "$target_gen_dir/repo/${_output_dir}/libdatachannel.so" ]
-  args = [ "--output-dir=${_output_dir}" ]
+  outputs = [
+    "${_output_dir}/libdatachannel.a",
+    "${_output_dir}/deps/usrsctp/usrsctplib/libusrsctp.a",
+    "${_output_dir}/deps/libsrtp/libsrtp2.a",
+    "${_output_dir}/deps/libjuice/libjuice.a",
+  ]
+
+  args = [
+    "--build-dir",
+    rebase_path(_output_dir),
+  ]
 
   if (is_clang) {
     args += [ "--clang" ]
@@ -66,10 +75,10 @@ config("datachannel_config") {
   }
 
   lib_dirs = [
-    rebase_path("repo/${_output_dir}"),
-    rebase_path("repo/${_output_dir}/deps/usrsctp/usrsctplib"),
-    rebase_path("repo/${_output_dir}/deps/libsrtp"),
-    rebase_path("repo/${_output_dir}/deps/libjuice"),
+    rebase_path("${_output_dir}"),
+    rebase_path("${_output_dir}/deps/usrsctp/usrsctplib"),
+    rebase_path("${_output_dir}/deps/libsrtp"),
+    rebase_path("${_output_dir}/deps/libjuice"),
   ]
 }
 

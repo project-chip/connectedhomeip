@@ -6,21 +6,22 @@ import subprocess
 
 import click
 
+# figure out paths for building
+script_dir = os.path.dirname(os.path.abspath(__file__))
+repo_dir = os.path.join(script_dir, "..", "repo")
 
 @click.command()
 @click.option("--clang", is_flag=True, default=False, help="If specified, use clang instead of gcc")
-@click.option("--output-dir", default="build", help="Output directory for libdatachannel build")
+@click.option("--build-dir", default=os.path.join(repo_dir, "build"), show_default=True,
+              help="Build directory for libdatachannel build")
 @click.option("--cross-compile-cpu-type", default=None, help="CPU type for cross compilation if needed")
 @click.option("--target-cc", default=None, help="C compiler for cross compilation (from args.gn)")
 @click.option("--target-cxx", default=None, help="C++ compiler for cross compilation (from args.gn)")
-def main(clang: bool, output_dir: str, cross_compile_cpu_type: str | None,
+def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
          target_cc: str | None, target_cxx: str | None):
-    # figure out paths for building
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    repo_dir = os.path.join(script_dir, "..", "repo")
-    build_dir = os.path.join(repo_dir, output_dir)
 
-    # Generate build files in ./build
+
+    # Generate build files in build_dir
     cmake_cmd = [
         "cmake",
         "-B",
