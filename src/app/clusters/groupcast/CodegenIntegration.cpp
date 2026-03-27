@@ -100,7 +100,9 @@ void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
         },
         integrationDelegate);
 #else
-    ChipLogDetail(NotSpecified, "CHIP_CONFIG_ENABLE_GROUPCAST shuold be enabled for groupcast cluster along with injection of the appropriate delegate. Groupcast cluster WILL NOT be registered.");
+    ChipLogDetail(NotSpecified,
+                  "CHIP_CONFIG_ENABLE_GROUPCAST shuold be enabled for groupcast cluster along with injection of the appropriate "
+                  "delegate. Groupcast cluster WILL NOT be registered.");
 #endif
 }
 
