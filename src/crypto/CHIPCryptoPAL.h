@@ -506,6 +506,11 @@ public:
      **/
     virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, Sig & out_signature) const = 0;
 
+    /**
+     * @brief A variant of ECDSA_sign_msg() that uses Deterministic ECDSA (RFC 6979).
+     */
+    virtual CHIP_ERROR ECDSA_sign_msg_det(const uint8_t * msg, size_t msg_length, Sig & out_signature) const = 0;
+
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
      * ASN.1 DER encoded as padded big-endian field elements as described in SEC 1: Elliptic Curve Cryptography
@@ -613,6 +618,11 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const override;
+
+    /**
+     * @brief A variant of ECDSA_sign_msg() that uses Deterministic ECDSA (RFC 6979).
+     */
+    CHIP_ERROR ECDSA_sign_msg_det(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const override;
 
     /**
      * @brief Derives a shared secret using ECDH

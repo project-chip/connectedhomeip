@@ -1326,5 +1326,14 @@ __attribute__((weak)) CHIP_ERROR P256Keypair::InitializeFromBitsOrReject(FixedBy
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
+__attribute__((weak)) CHIP_ERROR P256Keypair::ECDSA_sign_msg_det(const uint8_t * msg, size_t msg_length,
+                                                                 P256ECDSASignature & out_signature) const
+{
+    IgnoreUnusedVariable(msg);
+    IgnoreUnusedVariable(msg_length);
+    IgnoreUnusedVariable(out_signature);
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
 } // namespace Crypto
 } // namespace chip
