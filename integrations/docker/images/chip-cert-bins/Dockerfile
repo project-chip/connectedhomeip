@@ -189,6 +189,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-closure-ipv6only \
     --target linux-x64-jf-control-app-ipv6only \
     --target linux-x64-jf-admin-app-ipv6only \
+    --target linux-x64-water-heater-ipv6only \
     build \
     && mv out/linux-x64-chip-tool-ipv6only-platform-mdns-nfc-commission/chip-tool out/chip-tool \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -222,6 +223,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-closure-ipv6only/closure-app out/closure-app \
     && mv out/linux-x64-jf-control-app-ipv6only/jfc-app out/jfc-app \
     && mv out/linux-x64-jf-admin-app-ipv6only/jfa-app out/jfa-app \
+    && mv out/linux-x64-water-heater-ipv6only/matter-water-heater-app out/matter-water-heater-app \
     ;; \
     "linux/arm64")\
     set -x \
@@ -259,6 +261,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-closure-ipv6only \
     --target linux-arm64-jf-control-app-ipv6only \
     --target linux-arm64-jf-admin-app-ipv6only \
+    --target linux-arm64-water-heater-ipv6only \
     build \
     && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns-nfc-commission/chip-tool out/chip-tool \
     && mv out/linux-arm64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -292,6 +295,7 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-closure-ipv6only/closure-app out/closure-app \
     && mv out/linux-arm64-jf-control-app-ipv6only/jfc-app out/jfc-app \
     && mv out/linux-arm64-jf-admin-app-ipv6only/jfa-app out/jfa-app \
+    && mv out/linux-arm64-water-heater-ipv6only/matter-water-heater-app out/matter-water-heater-app \
     ;; \
     *) ;; \
     esac
@@ -382,6 +386,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-camera-controlle
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/closure-app apps/closure-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/jfc-app apps/jfc-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/jfa-app apps/jfa-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/matter-water-heater-app apps/matter-water-heater-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/tools/push_av_server apps/push_av_server
 
 # Create symbolic links for now since this allows users to use existing configurations

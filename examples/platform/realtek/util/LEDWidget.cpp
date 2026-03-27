@@ -27,9 +27,21 @@
 #include "matter_led.h"
 #include <stdlib.h>
 
+#ifdef BOARD_RTL8777G
+constexpr uint8_t kLedPinNum                    = 3;
+static T_LED_PWM_PARAM kLedPwmParam[kLedPinNum] = { { P2_0, TIMER_PWM2, TIM2 },
+                                                    { XO32K, TIMER_PWM3, TIM3 },
+                                                    { XI32K, TIMER_PWM4, TIM4 } };
+#else
+constexpr uint8_t kLedPinNum                    = 4;
+static T_LED_PWM_PARAM kLedPwmParam[kLedPinNum] = {
+    { P0_1, TIMER_PWM2, TIM2 }, { P0_2, TIMER_PWM3, TIM3 }, { P1_3, TIMER_PWM4, TIM4 }, { P1_4, TIMER_PWM5, TIM5 }
+};
+#endif
+
 void LEDWidget::InitGpio()
 {
-    matter_led_init();
+    matter_led_init(kLedPwmParam, kLedPinNum);
 }
 
 void LEDWidget::Init(uint8_t gpioNum)
