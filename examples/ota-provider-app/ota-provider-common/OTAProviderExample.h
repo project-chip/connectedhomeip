@@ -24,6 +24,9 @@
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <lib/core/OTAImageHeader.h>
 #include <ota-provider-common/BdxOtaSender.h>
+
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 /**
@@ -36,24 +39,30 @@ public:
 
     using OTAQueryStatus       = chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus;
     using OTAApplyUpdateAction = chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction;
+    using DownloadProtocolEnum = chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum;
 
-    static constexpr uint16_t SW_VER_STR_MAX_LEN = 64;
-    static constexpr uint16_t OTA_URL_MAX_LEN    = 512;
-    static constexpr size_t kFilepathBufLen      = 256;
-    static constexpr size_t kUriMaxLen           = 256;
+    static constexpr uint16_t kSwVersionStringMaxLen = 64;
+    static constexpr uint16_t kOtaUrlMaxLen          = 512;
+    static constexpr size_t kFilepathBufLen          = 256;
+    static constexpr size_t kUriMaxLen               = 256;
+    static constexpr size_t kMaxLocation             = 3;
+    static constexpr size_t kMaxProtocolsSupported   = 4;
 
-    typedef struct DeviceSoftwareVersionModel
+    size_t kProtocolsSupportedCount = 0;
+
+    struct DeviceSoftwareVersionModel
     {
         chip::VendorId vendorId;
         uint16_t productId;
         uint32_t softwareVersion;
-        char softwareVersionString[SW_VER_STR_MAX_LEN];
+        char softwareVersionString[kSwVersionStringMaxLen];
         uint16_t cDVersionNumber;
         bool softwareVersionValid;
         uint32_t minApplicableSoftwareVersion;
         uint32_t maxApplicableSoftwareVersion;
-        char otaURL[OTA_URL_MAX_LEN];
-    } DeviceSoftwareVersionModel;
+        char otaURL[kOtaUrlMaxLen];
+        std::string otaFileDesignator;
+    };
 
     //////////// OTAProviderDelegate Implementation ///////////////
     void HandleQueryImage(
@@ -91,6 +100,19 @@ public:
 
     void SetMaxBDXBlockSize(uint16_t blockSize) { mMaxBDXBlockSize = blockSize; }
 
+    uint16_t GetVendorId() const { return mVendorId; }
+    uint16_t GetProductId() const { return mProductId; }
+    uint16_t GetHardwareVersion() const { return mHardwareVersion; }
+    uint32_t GetSoftwareVersion() const { return mRequestorSoftwareVersion; }
+    chip::Span<const DownloadProtocolEnum> GetProtocolsSupported() const
+    {
+        return chip::Span<const DownloadProtocolEnum>(mProtocolsSupported);
+    }
+    bool GetRequestorCanConsent() const { return mRequestorCanConsent; }
+    const char * GetLocation() const { return mLocation; }
+
+    const char * GetFilePathForDesignator(const char * designator) const;
+
 private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
                             const uint32_t requestorSoftwareVersion,
@@ -109,11 +131,17 @@ private:
     void
     SendQueryImageResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                            const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
+    void
+    SaveCommandSnapshot(const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
+
+    std::string MapFileToDesignator(const std::string & filePath);
 
     BdxOtaSender mBdxOtaSender;
     std::vector<DeviceSoftwareVersionModel> mCandidates;
-    char mOTAFilePath[kFilepathBufLen]; // null-terminated
+    std::unordered_map<std::string, std::string> mFileDesignatorMap;
+    std::string mSelectedFileDesignator;
     char mImageUri[kUriMaxLen];
+    bool mImageUriIsSupplied = false;
     OTAQueryStatus mQueryImageStatus;
     OTAApplyUpdateAction mUpdateAction;
     uint32_t mIgnoreQueryImageCount;
@@ -123,7 +151,14 @@ private:
     chip::ota::OTAProviderUserConsentDelegate * mUserConsentDelegate;
     bool mUserConsentNeeded;
     uint32_t mSoftwareVersion;
-    char mSoftwareVersionString[SW_VER_STR_MAX_LEN];
+    char mSoftwareVersionString[kSwVersionStringMaxLen];
     uint32_t mPollInterval;
     uint16_t mMaxBDXBlockSize;
+    uint16_t mVendorId;
+    uint16_t mProductId;
+    uint16_t mHardwareVersion;
+    uint32_t mRequestorSoftwareVersion;
+    DownloadProtocolEnum mProtocolsSupported[kMaxProtocolsSupported];
+    bool mRequestorCanConsent;
+    char mLocation[kMaxLocation] = { 0, 0, 0 };
 };

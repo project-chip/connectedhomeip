@@ -33,126 +33,128 @@ void AirQualitySensorManager::Init()
      */
 
     // Air Quality
-    airQualityInstance.Init();
+    TEMPORARY_RETURN_IGNORED airQualityInstance.Init();
     airQualityInstance.UpdateAirQuality(AirQualityEnum::kGood);
 
     // CO2
-    carbonDioxideConcentrationMeasurementInstance.Init();
-    carbonDioxideConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    carbonDioxideConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    carbonDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
-    carbonDioxideConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    carbonDioxideConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
-    carbonDioxideConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    carbonDioxideConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
-    carbonDioxideConcentrationMeasurementInstance.SetUncertainty(0.0f);
-    carbonDioxideConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED carbonDioxideConcentrationMeasurementInstance.Init();
+    TEMPORARY_RETURN_IGNORED carbonDioxideConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED carbonDioxideConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED carbonDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
+    TEMPORARY_RETURN_IGNORED carbonDioxideConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED carbonDioxideConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED carbonDioxideConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED carbonDioxideConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED carbonDioxideConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED carbonDioxideConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 
     // CO
-    carbonMonoxideConcentrationMeasurementInstance.Init();
-    carbonMonoxideConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    carbonMonoxideConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    carbonMonoxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
-    carbonMonoxideConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    carbonMonoxideConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
-    carbonMonoxideConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    carbonMonoxideConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
-    carbonMonoxideConcentrationMeasurementInstance.SetUncertainty(0.0f);
-    carbonMonoxideConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED carbonMonoxideConcentrationMeasurementInstance.Init();
+    TEMPORARY_RETURN_IGNORED carbonMonoxideConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED carbonMonoxideConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED carbonMonoxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
+    TEMPORARY_RETURN_IGNORED carbonMonoxideConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED carbonMonoxideConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED carbonMonoxideConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED carbonMonoxideConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED carbonMonoxideConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED carbonMonoxideConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 
     // NO2
-    nitrogenDioxideConcentrationMeasurementInstance.Init();
-    nitrogenDioxideConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    nitrogenDioxideConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    nitrogenDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
-    nitrogenDioxideConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    nitrogenDioxideConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
-    nitrogenDioxideConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    nitrogenDioxideConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
-    nitrogenDioxideConcentrationMeasurementInstance.SetUncertainty(0.0f);
-    nitrogenDioxideConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED nitrogenDioxideConcentrationMeasurementInstance.Init();
+    TEMPORARY_RETURN_IGNORED nitrogenDioxideConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED nitrogenDioxideConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED nitrogenDioxideConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
+    TEMPORARY_RETURN_IGNORED nitrogenDioxideConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED nitrogenDioxideConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED nitrogenDioxideConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED nitrogenDioxideConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED nitrogenDioxideConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED nitrogenDioxideConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 
     // PM1
-    pm1ConcentrationMeasurementInstance.Init();
-    pm1ConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    pm1ConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    pm1ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
-    pm1ConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    pm1ConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
-    pm1ConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    pm1ConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
-    pm1ConcentrationMeasurementInstance.SetUncertainty(0.0f);
-    pm1ConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED pm1ConcentrationMeasurementInstance.Init();
+    TEMPORARY_RETURN_IGNORED pm1ConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED pm1ConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED pm1ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
+    TEMPORARY_RETURN_IGNORED pm1ConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED pm1ConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED pm1ConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED pm1ConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED pm1ConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED pm1ConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 
     // PM10
-    pm10ConcentrationMeasurementInstance.Init();
-    pm10ConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    pm10ConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    pm10ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
-    pm10ConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    pm10ConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
-    pm10ConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    pm10ConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
-    pm10ConcentrationMeasurementInstance.SetUncertainty(0.0f);
-    pm10ConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED pm10ConcentrationMeasurementInstance.Init();
+    TEMPORARY_RETURN_IGNORED pm10ConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED pm10ConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED pm10ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
+    TEMPORARY_RETURN_IGNORED pm10ConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED pm10ConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED pm10ConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED pm10ConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED pm10ConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED pm10ConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 
     // PM2.5
-    pm25ConcentrationMeasurementInstance.Init();
-    pm25ConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    pm25ConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    pm25ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
-    pm25ConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    pm25ConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
-    pm25ConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    pm25ConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
-    pm25ConcentrationMeasurementInstance.SetUncertainty(0.0f);
-    pm25ConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED pm25ConcentrationMeasurementInstance.Init();
+    TEMPORARY_RETURN_IGNORED pm25ConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED pm25ConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED pm25ConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
+    TEMPORARY_RETURN_IGNORED pm25ConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED pm25ConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED pm25ConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED pm25ConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED pm25ConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED pm25ConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 
     // Radon
-    radonConcentrationMeasurementInstance.Init();
-    radonConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    radonConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    radonConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
-    radonConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    radonConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
-    radonConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    radonConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
-    radonConcentrationMeasurementInstance.SetUncertainty(0.0f);
-    radonConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED radonConcentrationMeasurementInstance.Init();
+    TEMPORARY_RETURN_IGNORED radonConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED radonConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED radonConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
+    TEMPORARY_RETURN_IGNORED radonConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED radonConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED radonConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED radonConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED radonConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED radonConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 
     // TVOC
-    totalVolatileOrganicCompoundsConcentrationMeasurementInstance.Init();
-    totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
-    totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
-    totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
-    totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetUncertainty(0.0f);
-    totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED totalVolatileOrganicCompoundsConcentrationMeasurementInstance.Init();
+    TEMPORARY_RETURN_IGNORED totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetMaxMeasuredValue(
+        MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
+    TEMPORARY_RETURN_IGNORED totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetAverageMeasuredValue(
+        MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED totalVolatileOrganicCompoundsConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 
     // Ozone
-    ozoneConcentrationMeasurementInstance.Init();
-    ozoneConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    ozoneConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    ozoneConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
-    ozoneConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    ozoneConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
-    ozoneConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    ozoneConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
-    ozoneConcentrationMeasurementInstance.SetUncertainty(0.0f);
-    ozoneConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED ozoneConcentrationMeasurementInstance.Init();
+    TEMPORARY_RETURN_IGNORED ozoneConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED ozoneConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED ozoneConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
+    TEMPORARY_RETURN_IGNORED ozoneConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED ozoneConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED ozoneConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED ozoneConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED ozoneConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED ozoneConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 
     // Formaldehyde
-    formaldehydeConcentrationMeasurementInstance.Init();
-    formaldehydeConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    formaldehydeConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    formaldehydeConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
-    formaldehydeConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    formaldehydeConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
-    formaldehydeConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    formaldehydeConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
-    formaldehydeConcentrationMeasurementInstance.SetUncertainty(0.0f);
-    formaldehydeConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED formaldehydeConcentrationMeasurementInstance.Init();
+    TEMPORARY_RETURN_IGNORED formaldehydeConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED formaldehydeConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED formaldehydeConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(2.0f));
+    TEMPORARY_RETURN_IGNORED formaldehydeConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED formaldehydeConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED formaldehydeConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED formaldehydeConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED formaldehydeConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED formaldehydeConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 }

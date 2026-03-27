@@ -13,6 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+
 import dataclasses
 import logging
 from typing import Iterable, Optional, Protocol, TypeVar
@@ -22,7 +23,7 @@ from matter.idl.matter_idl_types import Attribute, AttributeQuality, Bitmap, Clu
 from .context import Context, IdlPostProcessor
 from .parsing import NormalizeName
 
-LOGGER = logging.getLogger('data-model-xml-data-parsing')
+LOGGER = logging.getLogger(__name__)
 
 T = TypeVar("T")
 

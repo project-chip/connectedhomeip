@@ -24,6 +24,7 @@
  *
  */
 
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <credentials/CHIPCert.h>
@@ -110,6 +111,18 @@ FutureExtension ext{ ByteSpan(sOID_Extension_SubjectAltName),
                               strlen(kExtension_SubjectAltName)) };
 Optional<FutureExtension> kSubjectAltNameAsFutureExt(ext);
 
+static bool DeterministicECDSASupported()
+{
+    static bool supported = []() {
+        P256Keypair keypair;
+        P256ECDSASignature sig;
+        const uint8_t probe = 0;
+        SuccessOrDie(keypair.Initialize(ECPKeyTarget::ECDSA));
+        return keypair.ECDSA_sign_msg_det(&probe, 1, sig) != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }();
+    return supported;
+}
+
 static CHIP_ERROR LoadTestCertSet01(ChipCertificateSet & certSet)
 {
     CHIP_ERROR err;
@@ -191,9 +204,19 @@ TEST_F(TestChipCert, TestChipCert_ChipToX509)
     }
 
     // Error Case:
-    MutableByteSpan outCert(outCertBuf);
-    err = ConvertChipCertToX509Cert(sTestCert_Node01_01_Err01_Chip, outCert);
-    EXPECT_EQ(err, CHIP_ERROR_INVALID_TLV_TAG);
+    {
+        MutableByteSpan outCert(outCertBuf);
+        err = ConvertChipCertToX509Cert(sTestCert_Node01_01_Err01_Chip, outCert);
+        EXPECT_EQ(err, CHIP_ERROR_INVALID_TLV_TAG);
+    }
+
+    // For a PDC Identity, converting from the compact form must work too
+    {
+        MutableByteSpan outCert(outCertBuf);
+        err = ConvertChipCertToX509Cert(sTestCert_PDCID01_ChipCompact, outCert);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_TRUE(sTestCert_PDCID01_DER.data_equal(outCert));
+    }
 }
 
 TEST_F(TestChipCert, TestChipCert_ChipToX509_ErrorCases)
@@ -344,13 +367,13 @@ TEST_F(TestChipCert, TestChipCert_ChipDN)
 
     CATValues noc_cats2;
     chip::CATValues::Serialized serializedCATs;
-    EXPECT_EQ(noc_cats.Serialize(serializedCATs), CHIP_NO_ERROR);
-    EXPECT_EQ(noc_cats2.Deserialize(serializedCATs), CHIP_NO_ERROR);
+    noc_cats.Serialize(serializedCATs);
+    noc_cats2.Deserialize(serializedCATs);
     EXPECT_EQ(memcmp(&noc_cats, &noc_cats2, chip::CATValues::kSerializedLength), 0);
 
     CATValues noc_cats3 = { { 0xABCD0001, 0xFFEEAA00, 0x0001F012 } };
-    EXPECT_EQ(noc_cats3.Serialize(serializedCATs), CHIP_NO_ERROR);
-    EXPECT_EQ(noc_cats2.Deserialize(serializedCATs), CHIP_NO_ERROR);
+    noc_cats3.Serialize(serializedCATs);
+    noc_cats2.Deserialize(serializedCATs);
     EXPECT_EQ(memcmp(&noc_cats3, &noc_cats2, chip::CATValues::kSerializedLength), 0);
 }
 
@@ -2258,6 +2281,75 @@ TEST_F(TestChipCert, TestChipCert_PDCIdentityGeneration)
     MutableByteSpan tlvCert(tlvBuffer); // won't be compact after round-tripping
     EXPECT_EQ(ConvertX509CertToChipCert(derCert, tlvCert), CHIP_NO_ERROR);
     EXPECT_EQ(ValidateChipNetworkIdentity(tlvCert), CHIP_NO_ERROR);
+}
+
+TEST_F(TestChipCert, TestChipCert_PDCIdentityDerivation)
+{
+    if (!DeterministicECDSASupported())
+    {
+        GTEST_SKIP() << "Skipping test: P256Keypair::ECDSA_sign_msg_det not supported";
+    }
+
+    // Generate a new keypair
+    P256Keypair keypair;
+    ASSERT_SUCCESS(keypair.Initialize(ECPKeyTarget::ECDSA));
+
+    // Deterministically derive an identity certificate from the keypair
+    uint8_t buffer[kMaxCHIPCompactNetworkIdentityLength];
+    MutableByteSpan cert(buffer);
+    ASSERT_SUCCESS(DeriveChipNetworkIdentity(keypair, cert));
+    EXPECT_SUCCESS(ValidateChipNetworkIdentity(cert));
+
+    // Running the derivation again should result in an identical certificate
+    uint8_t buffer2[kMaxCHIPCompactNetworkIdentityLength];
+    MutableByteSpan cert2(buffer2);
+    EXPECT_SUCCESS(DeriveChipNetworkIdentity(keypair, cert2));
+    EXPECT_TRUE(cert2.data_equal(cert));
+
+    // It should round-trip to X.509 DER and back, and remain valid.
+    uint8_t derBuffer[kMaxDERCertLength];
+    MutableByteSpan derCert(derBuffer);
+    EXPECT_SUCCESS(ConvertChipCertToX509Cert(cert, derCert));
+    uint8_t tlvBuffer[kMaxCHIPCertLength];
+    MutableByteSpan tlvCert(tlvBuffer); // won't be compact after round-tripping
+    EXPECT_SUCCESS(ConvertX509CertToChipCert(derCert, tlvCert));
+    EXPECT_SUCCESS(ValidateChipNetworkIdentity(tlvCert));
+}
+
+TEST_F(TestChipCert, TestChipCert_PDCIdentityDerivationSpecVector)
+{
+    if (!DeterministicECDSASupported())
+    {
+        GTEST_SKIP() << "Skipping test: P256Keypair::ECDSA_sign_msg_det not supported";
+    }
+
+    P256SerializedKeypair serializedKeypair;
+    ASSERT_SUCCESS(GetTestCertKeypair(kPDCID01, serializedKeypair));
+    P256Keypair keypair;
+    ASSERT_SUCCESS(keypair.Deserialize(serializedKeypair));
+
+    // Derive the compact identity certificate
+    uint8_t buffer[kMaxCHIPCompactNetworkIdentityLength];
+    MutableByteSpan cert(buffer);
+    ASSERT_SUCCESS(DeriveChipNetworkIdentity(keypair, cert));
+
+    // Verify it matches the expected compact identity
+    EXPECT_TRUE(cert.data_equal(sTestCert_PDCID01_ChipCompact));
+
+    // Validate the certificate and the key identifier
+    CertificateKeyIdStorage keyIdStorage;
+    MutableCertificateKeyId keyId(keyIdStorage);
+    EXPECT_SUCCESS(ValidateChipNetworkIdentity(cert, keyId));
+    EXPECT_TRUE(keyId.data_equal(sTestCert_PDCID01_KeyId));
+}
+
+TEST_F(TestChipCert, TestChipCert_PDCIdentityEmptyBuffer)
+{
+    P256Keypair keypair;
+    ASSERT_SUCCESS(keypair.Initialize(ECPKeyTarget::ECDSA));
+
+    MutableByteSpan empty;
+    EXPECT_EQ(NewChipNetworkIdentity(keypair, empty), CHIP_ERROR_BUFFER_TOO_SMALL);
 }
 
 TEST_F(TestChipCert, TestChipCert_KeypairConversion)

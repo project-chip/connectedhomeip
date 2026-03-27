@@ -28,6 +28,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <protocols/interaction_model/Constants.h>
@@ -64,7 +65,7 @@ std::vector<EndpointId> ReadEndpointsThroughAttributeReader(EndpointId endpoint)
     tlvWriter.Init(buf);
 
     AttributeReportIBs::Builder builder;
-    builder.Init(&tlvWriter);
+    EXPECT_SUCCESS(builder.Init(&tlvWriter));
 
     ConcreteAttributePath path(endpoint, Clusters::PowerSource::Id, Clusters::PowerSource::Attributes::EndpointList::Id);
     ConcreteReadAttributePath readPath(path);
@@ -88,20 +89,20 @@ std::vector<EndpointId> ReadEndpointsThroughAttributeReader(EndpointId endpoint)
     TLV::TLVReader attrReportReader;
     TLV::TLVReader attrDataReader;
 
-    reader.Next();
-    reader.OpenContainer(attrReportsReader);
+    EXPECT_SUCCESS(reader.Next());
+    EXPECT_SUCCESS(reader.OpenContainer(attrReportsReader));
 
-    attrReportsReader.Next();
-    attrReportsReader.OpenContainer(attrReportReader);
+    EXPECT_SUCCESS(attrReportsReader.Next());
+    EXPECT_SUCCESS(attrReportsReader.OpenContainer(attrReportReader));
 
-    attrReportReader.Next();
-    attrReportReader.OpenContainer(attrDataReader);
+    EXPECT_SUCCESS(attrReportReader.Next());
+    EXPECT_SUCCESS(attrReportReader.OpenContainer(attrDataReader));
 
     // We're now in the attribute data IB, skip to the desired tag, we want TagNum = 2
-    attrDataReader.Next();
+    EXPECT_SUCCESS(attrDataReader.Next());
     for (int i = 0; i < 3 && !(IsContextTag(attrDataReader.GetTag()) && TagNumFromTag(attrDataReader.GetTag()) == 2); ++i)
     {
-        attrDataReader.Next();
+        EXPECT_SUCCESS(attrDataReader.Next());
     }
     EXPECT_TRUE(IsContextTag(attrDataReader.GetTag()));
     EXPECT_EQ(TagNumFromTag(attrDataReader.GetTag()), 2u);
@@ -148,8 +149,8 @@ TEST_F(TestPowerSourceCluster, TestEndpointList)
 
     // we checked earlier that this fit
     // This test just uses endpoints in order, so we want to set endpoints from
-    // 0 to chip::Test::numEndpoints - 1, and use this for overflow checking
-    chip::Test::numEndpoints = static_cast<EndpointId>(powerSourceServer.GetNumSupportedEndpointLists());
+    // 0 to chip::Testing::numEndpoints - 1, and use this for overflow checking
+    chip::Testing::numEndpoints = static_cast<EndpointId>(powerSourceServer.GetNumSupportedEndpointLists());
 
     // Endpoint 0 - list of 5
     err = powerSourceServer.SetEndpointList(0, Span<EndpointId>(list0));
@@ -174,7 +175,7 @@ TEST_F(TestPowerSourceCluster, TestEndpointList)
     }
 
     // Remaining endpoints - list of 1
-    for (EndpointId ep = 2; ep < chip::Test::numEndpoints; ++ep)
+    for (EndpointId ep = 2; ep < chip::Testing::numEndpoints; ++ep)
     {
         err = powerSourceServer.SetEndpointList(ep, Span<EndpointId>(listRest));
         EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -216,7 +217,7 @@ TEST_F(TestPowerSourceCluster, TestEndpointList)
     }
 
     // Remaining endpoints
-    for (EndpointId ep = 2; ep < chip::Test::numEndpoints; ++ep)
+    for (EndpointId ep = 2; ep < chip::Testing::numEndpoints; ++ep)
     {
         readBack = powerSourceServer.GetEndpointList(ep);
         ASSERT_NE(readBack, nullptr);
@@ -241,7 +242,7 @@ TEST_F(TestPowerSourceCluster, TestEndpointList)
     }
 
     // Ensure only the overwritten list was changed, using read interface
-    for (EndpointId ep = 0; ep < chip::Test::numEndpoints + 1; ++ep)
+    for (EndpointId ep = 0; ep < chip::Testing::numEndpoints + 1; ++ep)
     {
         std::vector<EndpointId> vec = ReadEndpointsThroughAttributeReader(ep);
         if (ep == 0)
@@ -252,7 +253,7 @@ TEST_F(TestPowerSourceCluster, TestEndpointList)
                 EXPECT_EQ(vec[j], list0[j]);
             }
         }
-        else if (ep == chip::Test::numEndpoints)
+        else if (ep == chip::Testing::numEndpoints)
         {
             EXPECT_EQ(vec.size(), 0u);
         }
@@ -269,7 +270,7 @@ TEST_F(TestPowerSourceCluster, TestEndpointList)
     // *****************
     // Test removal
     // *****************
-    for (EndpointId ep = 0; ep < chip::Test::numEndpoints; ++ep)
+    for (EndpointId ep = 0; ep < chip::Testing::numEndpoints; ++ep)
     {
         err = powerSourceServer.SetEndpointList(ep, Span<EndpointId>());
         EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -278,7 +279,7 @@ TEST_F(TestPowerSourceCluster, TestEndpointList)
     }
 
     // Check through the read interface
-    for (EndpointId ep = 0; ep < chip::Test::numEndpoints + 1; ++ep)
+    for (EndpointId ep = 0; ep < chip::Testing::numEndpoints + 1; ++ep)
     {
         std::vector<EndpointId> vec = ReadEndpointsThroughAttributeReader(ep);
         EXPECT_EQ(vec.size(), 0u);

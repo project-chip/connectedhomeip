@@ -37,13 +37,16 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
 class TC_AVSM_2_4(MatterBaseTest, AVSMTestBase):
@@ -56,12 +59,10 @@ class TC_AVSM_2_4(MatterBaseTest, AVSMTestBase):
     def steps_TC_AVSM_2_4(self) -> list[TestStep]:
         return [
             TestStep("precondition", "DUT commissioned and preconditions", is_commissioning=True),
-            TestStep(
-                1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER", "Verify SNP is supported."
-            ),
+            TestStep(1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT", "Verify SNP is supported."),
             TestStep(
                 2,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated snapshot streams in the list is 1. Store StreamID as aStreamIDToDelete.",
             ),
             TestStep(
@@ -76,7 +77,7 @@ class TC_AVSM_2_4(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 5,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated snapshot streams in the list is 0.",
             ),
         ]
@@ -85,7 +86,7 @@ class TC_AVSM_2_4(MatterBaseTest, AVSMTestBase):
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
     )
     async def test_TC_AVSM_2_4(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -96,7 +97,7 @@ class TC_AVSM_2_4(MatterBaseTest, AVSMTestBase):
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
         snpSupport = aFeatureMap & cluster.Bitmaps.Feature.kSnapshot
         asserts.assert_equal(snpSupport, cluster.Bitmaps.Feature.kSnapshot, "Snapshot Feature is not supported.")
 
@@ -104,7 +105,7 @@ class TC_AVSM_2_4(MatterBaseTest, AVSMTestBase):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
         aStreamIDToDelete = aAllocatedSnapshotStreams[0].snapshotStreamID
 
@@ -113,9 +114,7 @@ class TC_AVSM_2_4(MatterBaseTest, AVSMTestBase):
             await self.send_single_cmd(
                 endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=(aStreamIDToDelete + 1))
             )
-            asserts.assert_true(
-                False, "Unexpected success when expecting NOT_FOUND due to snapshotStreamID set to aStreamIDToDelete + 1"
-            )
+            asserts.fail("Unexpected success when expecting NOT_FOUND due to snapshotStreamID set to aStreamIDToDelete + 1")
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
@@ -137,7 +136,7 @@ class TC_AVSM_2_4(MatterBaseTest, AVSMTestBase):
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
-        logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        log.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 0, "The number of allocated snapshot streams in the list is not 0.")
 
 

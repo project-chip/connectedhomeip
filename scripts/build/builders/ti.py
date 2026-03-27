@@ -30,30 +30,28 @@ class TIApp(Enum):
     def ExampleName(self):
         if self == TIApp.LOCK:
             return 'lock-app'
-        elif self == TIApp.PUMP:
+        if self == TIApp.PUMP:
             return 'pump-app'
-        elif self == TIApp.PUMP_CONTROLLER:
+        if self == TIApp.PUMP_CONTROLLER:
             return 'pump-controller-app'
-        elif self == TIApp.LIGHTING:
+        if self == TIApp.LIGHTING:
             return 'lighting-app'
-        elif self == TIApp.SHELL:
+        if self == TIApp.SHELL:
             return 'shell'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self, board):
         if self == TIApp.LOCK:
             return f'chip-{board.BoardName()}-lock-example'
-        elif self == TIApp.PUMP:
+        if self == TIApp.PUMP:
             return f'chip-{board.BoardName()}-pump-example'
-        elif self == TIApp.PUMP_CONTROLLER:
+        if self == TIApp.PUMP_CONTROLLER:
             return f'chip-{board.BoardName()}-pump-controller-example'
-        elif self == TIApp.LIGHTING:
+        if self == TIApp.LIGHTING:
             return f'chip-{board.BoardName()}-lighting-example'
-        elif self == TIApp.SHELL:
+        if self == TIApp.SHELL:
             return f'chip-{board.BoardName()}-shell-example'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root, board):
         return os.path.join(root, 'examples', self.ExampleName() + '/ti/', board.FamilyName())
@@ -65,14 +63,12 @@ class TIBoard(Enum):
     def BoardName(self):
         if self == TIBoard.LP_EM_CC1354P10_6:
             return 'LP_EM_CC1354P10_6'
-        else:
-            raise Exception('Unknown board type: %r' % self)
+        raise Exception('Unknown board type: %r' % self)
 
     def FamilyName(self):
         if self == TIBoard.LP_EM_CC1354P10_6:
             return 'cc13x4_26x4'
-        else:
-            raise Exception('Unknown board type: %r' % self)
+        raise Exception('Unknown board type: %r' % self)
 
 
 class TIBuilder(GnBuilder):

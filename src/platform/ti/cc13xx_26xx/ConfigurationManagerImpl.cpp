@@ -68,7 +68,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     err = Internal::GenericConfigurationManagerImpl<CC13XX_26XXConfig>::Init();
     SuccessOrExit(err);
 
-    IncreaseBootCount();
+    TEMPORARY_RETURN_IGNORED IncreaseBootCount();
 exit:
     return err;
 }
@@ -81,7 +81,7 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    PlatformMgr().ScheduleWork(DoFactoryReset);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
@@ -211,7 +211,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = CC13XX_26XXConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD

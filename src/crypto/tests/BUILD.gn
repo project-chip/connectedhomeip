@@ -26,10 +26,11 @@ chip_test_suite("tests") {
     "DacValidationExplicitVectors.h",
     "DerSigConversion_test_vectors.h",
     "ECDH_P256_test_vectors.h",
+    "ECDSA_det_test_vectors.h",
     "HKDF_SHA256_test_vectors.h",
     "HMAC_SHA256_test_vectors.h",
     "Hash_SHA256_test_vectors.h",
-    "PBKDF2_SHA256_test_vectors.h",
+    "P256_test_vectors.h",
     "PBKDF2_SHA256_test_vectors.h",
     "RawIntegerToDer_test_vectors.h",
     "SPAKE2P_FE_MUL_test_vectors.h",
@@ -56,8 +57,7 @@ chip_test_suite("tests") {
   }
 
   if (chip_device_platform == "esp32" || chip_device_platform == "nrfconnect" ||
-      chip_device_platform == "efr32" || chip_device_platform == "nxp" ||
-      chip_device_platform == "openiotsdk") {
+      chip_device_platform == "efr32" || chip_device_platform == "nxp") {
     defines = [ "CURRENT_TIME_NOT_IMPLEMENTED=1" ]
   }
 

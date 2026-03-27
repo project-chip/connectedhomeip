@@ -18,7 +18,7 @@
 
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
-#include <app/clusters/bindings/bindings.h>
+#include <app/clusters/bindings/BindingManager.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include "lib/shell/Engine.h"
@@ -39,7 +39,7 @@ Engine sShellSwitchThermostatReadSubCommands;
 Engine sShellSwitchGroupsThermostatSubCommands;
 #endif // defined(ENABLE_CHIP_SHELL)
 
-void ProcessThermostatUnicastBindingRead(BindingCommandData * data, const EmberBindingTableEntry & binding,
+void ProcessThermostatUnicastBindingRead(BindingCommandData * data, const Clusters::Binding::TableEntry & binding,
                                          OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
@@ -136,7 +136,7 @@ void ProcessThermostatUnicastBindingRead(BindingCommandData * data, const EmberB
     }
 }
 
-void ProcessThermostatUnicastBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding,
+void ProcessThermostatUnicastBindingCommand(BindingCommandData * data, const Clusters::Binding::TableEntry & binding,
                                             OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
@@ -162,7 +162,7 @@ void ProcessThermostatUnicastBindingCommand(BindingCommandData * data, const Emb
     }
 }
 
-void ProcessThermostatGroupBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding)
+void ProcessThermostatGroupBindingCommand(BindingCommandData * data, const Clusters::Binding::TableEntry & binding)
 {
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
 

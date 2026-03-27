@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <lib/support/FixedBuffer.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
@@ -94,28 +95,8 @@ namespace DeviceLayer {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 struct GDBusWpaSupplicant
 {
-    enum class WpaState
-    {
-        INIT,
-        CONNECTING,
-        CONNECTED,
-        NOT_CONNECTED,
-        NO_INTERFACE_PATH,
-        GOT_INTERFACE_PATH,
-        INTERFACE_CONNECTED,
-    };
-
-    enum class WpaScanningState
-    {
-        IDLE,
-        SCANNING,
-    };
-
-    WpaState state             = WpaState::INIT;
-    WpaScanningState scanState = WpaScanningState::IDLE;
     GAutoPtr<WpaSupplicant1> proxy;
     GAutoPtr<WpaSupplicant1Interface> iface;
-    GAutoPtr<WpaSupplicant1BSS> bss;
     GAutoPtr<char> interfacePath;
     GAutoPtr<char> networkPath;
 };
@@ -150,8 +131,12 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
 public:
+    // Singleton
+
+    static ConnectivityManagerImpl & GetDefaultInstance(void);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
@@ -198,11 +183,13 @@ public:
     const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
     void UpdateEthernetNetworkingStatus();
 
-    void
-    SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
-    {
-        mpStatusChangeCallback = statusChangeCallback;
-    }
+    using NetworkStatusChangeCallback = NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback;
+    using OneShotScanCallback         = NetworkCommissioning::WiFiDriver::ScanCallback;
+    using OneShotConnectCallback      = NetworkCommissioning::Internal::WirelessDriver::ConnectCallback;
+
+    void SetOneShotConnectCallback(OneShotConnectCallback * inOneShotConnectCallback) noexcept;
+    void SetOneShotScanCallback(OneShotScanCallback * inOneShotScanCallback) noexcept;
+    void SetNetworkStatusChangeCallback(NetworkStatusChangeCallback * inStatusChangeCallback) noexcept;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     const char * GetWiFiIfName() { return (sWiFiIfName[0] == '\0') ? nullptr : sWiFiIfName; }
@@ -211,20 +198,13 @@ public:
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
 
-    struct WiFiNetworkScanned
-    {
-        // The fields matches WiFiInterfaceScanResult::Type.
-        uint8_t ssid[Internal::kMaxWiFiSSIDLength];
-        uint8_t ssidLen;
-        uint8_t bssid[6];
-        int8_t rssi;
-        uint16_t frequencyBand;
-        uint8_t channel;
-        uint8_t security;
-    };
-
     CHIP_ERROR _Init();
     void _OnPlatformEvent(const ChipDeviceEvent * event);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    bool IsWiFiStationConnecting() const noexcept;
+    bool IsWiFiStationScanning() const noexcept;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     WiFiStationMode _GetWiFiStationMode();
@@ -246,6 +226,7 @@ private:
     void _MaintainOnDemandWiFiAP();
     System::Clock::Timeout _GetWiFiAPIdleTimeout();
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
+    void NotifyWiFiConnectivityChange(ConnectivityChange change);
     void UpdateNetworkStatus();
     CHIP_ERROR StopAutoScan();
 
@@ -256,7 +237,6 @@ private:
     void _OnWpaInterfaceScanDone(WpaSupplicant1Interface * iface, gboolean success);
     void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
-    void _OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res);
     CHIP_ERROR StartWiFiManagementSync();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
@@ -275,15 +255,21 @@ private:
 
     CHIP_ERROR _StartWiFiManagement();
 
-    bool mAssociationStarted = false;
-    BitFlags<ConnectivityFlags> mConnectivityFlag;
+    bool mAssociationStarted             = false;
+    unsigned int mAssociationRetriesLeft = 0;
     GDBusWpaSupplicant mWpaSupplicant CHIP_GUARDED_BY(mWpaSupplicantMutex);
     // Access to mWpaSupplicant has to be protected by a mutex because it is accessed from
     // the CHIP event loop thread and dedicated D-Bus thread started by platform manager.
     std::mutex mWpaSupplicantMutex;
 
 #endif
-    NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
+    // Network Commissioning Action Delegation Methods
+
+    void OnScanFinished(NetworkCommissioning::Status inStatus, CharSpan inDebugText,
+                        NetworkCommissioning::WiFiScanResponseIterator * inNetworks) noexcept;
+    void OnConnectResult(NetworkCommissioning::Status inCommissioningError, CharSpan inDebugText, int32_t inConnectStatus) noexcept;
+    void OnStatusChange(NetworkCommissioning::Status inCommissioningError, Optional<ByteSpan> inNetworkId,
+                        Optional<int32_t> inConnectStatus) noexcept;
 
     // ==================== ConnectivityManager Private Methods ====================
 
@@ -293,13 +279,6 @@ private:
     void ChangeWiFiAPState(WiFiAPState newState);
     static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState);
 #endif
-
-    // ===== Members for internal use by the following friends.
-
-    friend ConnectivityManager & ConnectivityMgr();
-    friend ConnectivityManagerImpl & ConnectivityMgrImpl();
-
-    static ConnectivityManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
 
@@ -319,57 +298,30 @@ private:
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    uint8_t sInterestedSSID[Internal::kMaxWiFiSSIDLength];
-    uint8_t sInterestedSSIDLen;
+    Internal::WiFiSSIDFixedBuffer mInterestedSSID;
 #endif
-    NetworkCommissioning::WiFiDriver::ScanCallback * mpScanCallback;
-    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+    /**
+     *  A callback through which, when non-null, the Wi-Fi driver
+     *  'OnFinished' method is invoked after a Wi-Fi scan is
+     *  complete. The semantics of this callback are one-shot in that
+     *  it is set-scan-invoke-and-clear.
+     *
+     *  A non-null value implies that a Wi-Fi scan is in progress.
+     */
+    OneShotScanCallback * mpOneShotScanCallback;
+
+    /**
+     *  A callback through which, when non-null, the wireless driver
+     *  'OnResult' method is invoked after a Wi-Fi association is
+     *  complete. The semantics of this callback are one-shot in that
+     *  it is set-associate-invoke-and-clear.
+     *
+     *  A non-null value implies that a Wi-Fi association is in
+     *  progress.
+     */
+    OneShotConnectCallback * mpOneShotConnectCallback;
+    NetworkStatusChangeCallback * mpStatusChangeCallback;
 };
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-inline ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
-{
-    return mWiFiAPMode;
-}
-
-inline bool ConnectivityManagerImpl::_IsWiFiAPActive()
-{
-    return mWiFiAPState == kWiFiAPState_Active;
-}
-
-inline bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled()
-{
-    return mWiFiAPMode == kWiFiAPMode_ApplicationControlled;
-}
-
-inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout()
-{
-    return mWiFiAPIdleTimeout;
-}
-
-#endif
-
-/**
- * Returns the public interface of the ConnectivityManager singleton object.
- *
- * chip applications should use this to access features of the ConnectivityManager object
- * that are common to all platforms.
- */
-inline ConnectivityManager & ConnectivityMgr()
-{
-    return ConnectivityManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the ConnectivityManager singleton object.
- *
- * chip applications can use this to gain access to features of the ConnectivityManager
- * that are specific to the ESP32 platform.
- */
-inline ConnectivityManagerImpl & ConnectivityMgrImpl()
-{
-    return ConnectivityManagerImpl::sInstance;
-}
 
 } // namespace DeviceLayer
 } // namespace chip

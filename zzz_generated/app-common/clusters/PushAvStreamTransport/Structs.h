@@ -87,6 +87,52 @@ public:
 using DecodableType = Type;
 
 } // namespace TransportZoneOptionsStruct
+namespace AudioStreamStruct {
+enum class Fields : uint8_t
+{
+    kAudioStreamName = 0,
+    kAudioStreamID   = 1,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan audioStreamName;
+    uint16_t audioStreamID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace AudioStreamStruct
+namespace VideoStreamStruct {
+enum class Fields : uint8_t
+{
+    kVideoStreamName = 0,
+    kVideoStreamID   = 1,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan videoStreamName;
+    uint16_t videoStreamID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace VideoStreamStruct
 namespace TransportTriggerOptionsStruct {
 enum class Fields : uint8_t
 {
@@ -129,19 +175,27 @@ public:
 namespace CMAFContainerOptionsStruct {
 enum class Fields : uint8_t
 {
-    kChunkDuration   = 0,
-    kCENCKey         = 1,
-    kMetadataEnabled = 2,
-    kCENCKeyID       = 3,
+    kCMAFInterface   = 0,
+    kSegmentDuration = 1,
+    kChunkDuration   = 2,
+    kSessionGroup    = 3,
+    kTrackName       = 4,
+    kCENCKey         = 5,
+    kCENCKeyID       = 6,
+    kMetadataEnabled = 7,
 };
 
 struct Type
 {
 public:
-    uint16_t chunkDuration = static_cast<uint16_t>(0);
+    CMAFInterfaceEnum CMAFInterface = static_cast<CMAFInterfaceEnum>(0);
+    uint16_t segmentDuration        = static_cast<uint16_t>(0);
+    uint16_t chunkDuration          = static_cast<uint16_t>(0);
+    uint8_t sessionGroup            = static_cast<uint8_t>(0);
+    chip::CharSpan trackName;
     Optional<chip::ByteSpan> CENCKey;
-    Optional<bool> metadataEnabled;
     Optional<chip::ByteSpan> CENCKeyID;
+    Optional<bool> metadataEnabled;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -182,12 +236,14 @@ enum class Fields : uint8_t
     kStreamUsage      = 0,
     kVideoStreamID    = 1,
     kAudioStreamID    = 2,
-    kEndpointID       = 3,
+    kTLSEndpointID    = 3,
     kUrl              = 4,
     kTriggerOptions   = 5,
     kIngestMethod     = 6,
     kContainerOptions = 7,
     kExpiryTime       = 8,
+    kVideoStreams     = 9,
+    kAudioStreams     = 10,
 };
 
 struct Type
@@ -196,12 +252,14 @@ public:
     Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
-    uint16_t endpointID = static_cast<uint16_t>(0);
+    uint16_t TLSEndpointID = static_cast<uint16_t>(0);
     chip::CharSpan url;
     Structs::TransportTriggerOptionsStruct::Type triggerOptions;
     IngestMethodsEnum ingestMethod = static_cast<IngestMethodsEnum>(0);
     Structs::ContainerOptionsStruct::Type containerOptions;
     Optional<uint32_t> expiryTime;
+    Optional<DataModel::List<const Structs::VideoStreamStruct::Type>> videoStreams;
+    Optional<DataModel::List<const Structs::AudioStreamStruct::Type>> audioStreams;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -214,12 +272,14 @@ public:
     Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
-    uint16_t endpointID = static_cast<uint16_t>(0);
+    uint16_t TLSEndpointID = static_cast<uint16_t>(0);
     chip::CharSpan url;
     Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions;
     IngestMethodsEnum ingestMethod = static_cast<IngestMethodsEnum>(0);
     Structs::ContainerOptionsStruct::DecodableType containerOptions;
     Optional<uint32_t> expiryTime;
+    Optional<DataModel::DecodableList<Structs::VideoStreamStruct::DecodableType>> videoStreams;
+    Optional<DataModel::DecodableList<Structs::AudioStreamStruct::DecodableType>> audioStreams;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

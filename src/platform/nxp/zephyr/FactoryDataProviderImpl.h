@@ -36,8 +36,6 @@ namespace DeviceLayer {
 class FactoryDataProviderImpl : public FactoryDataProvider
 {
 public:
-    static FactoryDataProviderImpl sInstance;
-
     CHIP_ERROR Init(void);
     CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                            uint32_t * contentAddr = NULL);
@@ -54,7 +52,6 @@ private:
     FactoryData mFactoryData;
 
     CHIP_ERROR ReadEncryptedData(uint8_t * dest, uint8_t * source);
-    CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair);
 };
 
 FactoryDataProvider & FactoryDataPrvdImpl();

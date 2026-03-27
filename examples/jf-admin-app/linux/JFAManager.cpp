@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/server/Server.h>
 
 #include <controller/CHIPCluster.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -30,6 +31,15 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::Controller;
+using namespace chip::Crypto;
+using namespace chip::app::Clusters::JointFabricAdministrator;
+
+constexpr uint8_t kJFAvailableShift = 0;
+constexpr uint8_t kJFAdminShift     = 1;
+constexpr uint8_t kJFAnchorShift    = 2;
+constexpr uint8_t kJFDatastoreShift = 3;
+
+constexpr chip::EndpointId kJointFabricAdminEndpointId = 1;
 
 JFAManager JFAManager::sJFA;
 
@@ -41,18 +51,41 @@ CHIP_ERROR JFAManager::Init(Server & server)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId)
+CHIP_ERROR JFAManager::GetJointFabricMode(uint8_t & jointFabricMode)
+{
+    jointFabricMode = ((IsDeviceCommissioned() ? 0 : 1) << kJFAvailableShift) |
+        (IsDeviceCommissioned() ? (IsDeviceJFAdmin() ? (1 << kJFAdminShift) : 0) : 0) |
+        (IsDeviceCommissioned() ? (IsDeviceJFAnchor() ? (1 << kJFAnchorShift) : 0) : 0) |
+        (IsDeviceCommissioned() ? (1 << kJFDatastoreShift) : 0);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256PublicKey & trustedIcacPublicKeyB, uint16_t endpointId)
 {
     if (jfFabricIndex == kUndefinedFabricId)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    ScopedNodeId scopedNodeId = ScopedNodeId(nodeId, jfFabricIndex);
+    ChipLogProgress(JointFabric, "FinalizeCommissioning for NodeID: 0x" ChipLogFormatX64 ", isJCM = %d, peerEndpointId = %d",
+                    ChipLogValueX64(nodeId), isJCM, endpointId);
 
-    ConnectToNode(scopedNodeId, kStandardCommissioningComplete);
+    peerAdminJFAdminClusterEndpointId = endpointId;
+    peerAdminICACPubKey               = trustedIcacPublicKeyB;
+    ScopedNodeId scopedNodeId         = ScopedNodeId(nodeId, jfFabricIndex);
+    ConnectToNode(scopedNodeId, isJCM ? kJCMCommissioning : kStandardCommissioningComplete);
 
     return CHIP_NO_ERROR;
+}
+
+void JFAManager::SetJFARpc(JFARpc & aJFARpc)
+{
+    mJFARpc = &aJFARpc;
+}
+
+JFARpc * JFAManager::GetJFARpc()
+{
+    return mJFARpc;
 }
 
 void JFAManager::HandleCommissioningCompleteEvent()
@@ -67,12 +100,147 @@ void JFAManager::HandleCommissioningCompleteEvent()
             /* When JFA is commissioned, it has to be issued a NOC with Anchor CAT and Administrator CAT */
             if (cats.ContainsIdentifier(kAdminCATIdentifier) && cats.ContainsIdentifier(kAnchorCATIdentifier))
             {
-                (void) app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Set(1, fabricIndex);
+                (void) app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Set(
+                    kJointFabricAdminEndpointId, fabricIndex);
 
                 jfFabricIndex = fabricIndex;
+
+                // Set AnchorRootCA
+                uint8_t mAnchorRootCABuffer[Credentials::kMaxDERCertLength];
+                MutableByteSpan rootCertSpan(mAnchorRootCABuffer);
+                if (mServer->GetFabricTable().FetchRootCert(fabricIndex, rootCertSpan) == CHIP_NO_ERROR)
+                {
+                    if (Server::GetInstance().GetJointFabricDatastore().SetAnchorRootCA(rootCertSpan) == CHIP_NO_ERROR)
+                    {
+                        ChipLogProgress(JointFabric, "Set AnchorRootCA (%u bytes)", static_cast<unsigned>(rootCertSpan.size()));
+                    }
+                    else
+                    {
+                        ChipLogError(JointFabric, "Failed to set AnchorRootCA");
+                    }
+                }
+
+                // obtain nodeid and use it to set anchornodeid
+                NodeId nodeId = fb.GetNodeId();
+                if (nodeId != kUndefinedNodeId)
+                {
+                    if (Server::GetInstance().GetJointFabricDatastore().SetAnchorNodeId(nodeId) == CHIP_NO_ERROR)
+                    {
+                        ChipLogProgress(JointFabric, "Set AnchorNodeId to 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+                    }
+                    else
+                    {
+                        ChipLogError(JointFabric, "Failed to set AnchorNodeId to 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
+                    }
+                }
+
+                VendorId vendorId = fb.GetVendorId();
+                if (vendorId != VendorId::NotSpecified)
+                {
+                    if (Server::GetInstance().GetJointFabricDatastore().SetAnchorVendorId(vendorId) == CHIP_NO_ERROR)
+                    {
+                        ChipLogProgress(JointFabric, "Set AnchorVendorId to %d", vendorId);
+                    }
+                    else
+                    {
+                        ChipLogError(JointFabric, "Failed to set AnchorVendorId to %d", vendorId);
+                    }
+                }
+
+                if (vendorId != VendorId::NotSpecified && nodeId != kUndefinedNodeId)
+                {
+                    char friendlyNameBuffer[32];
+                    int written = snprintf(friendlyNameBuffer, sizeof(friendlyNameBuffer), "jfa-0x%04X-0x" ChipLogFormatX64,
+                                           to_underlying(vendorId), ChipLogValueX64(nodeId));
+                    CharSpan friendlyName = CharSpan(friendlyNameBuffer, static_cast<size_t>(written));
+
+                    if (Server::GetInstance().GetJointFabricDatastore().SetFriendlyName(friendlyName) == CHIP_NO_ERROR)
+                    {
+                        ChipLogProgress(JointFabric, "Set FriendlyName to %.*s", static_cast<int>(friendlyName.size()),
+                                        friendlyName.data());
+                    }
+                    else
+                    {
+                        ChipLogError(JointFabric, "Failed to set FriendlyName to %.*s", static_cast<int>(friendlyName.size()),
+                                     friendlyName.data());
+                    }
+                }
+
+                Server::GetInstance().GetJointFabricDatastore().SetStatus(
+                    Clusters::JointFabricDatastore::DatastoreStateEnum::kPending,
+                    static_cast<uint32_t>(System::SystemClock().GetMonotonicTimestamp().count()), 0);
+
+                Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type defaultGroupKeySetEntry{ 0 };
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().AddGroupKeySetEntry(defaultGroupKeySetEntry));
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().ForceAddNodeKeySetEntry(0, nodeId));
+
+                // Add default group entry for the JFA itself
+                // Uses internal method that bypasses CAT restrictions since JFA setup needs both Admin and Anchor CATs
+                Clusters::JointFabricDatastore::Commands::AddGroup::DecodableType addGroupCommandData;
+                addGroupCommandData.groupID       = 0;
+                addGroupCommandData.friendlyName  = CharSpan::fromCharString("Default JFA Group");
+                addGroupCommandData.groupKeySetID = 0;
+                addGroupCommandData.groupCAT      = kAdminCATIdentifier; // Use Admin CAT for default group
+                addGroupCommandData.groupCATVersion.SetNonNull(1);
+                addGroupCommandData.groupPermission =
+                    Clusters::JointFabricDatastore::DatastoreAccessControlEntryPrivilegeEnum::kAdminister;
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().ForceAddGroup(addGroupCommandData));
+                addGroupCommandData.groupID  = 1;
+                addGroupCommandData.groupCAT = kAnchorCATIdentifier; // Use Anchor CAT for second default group
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().ForceAddGroup(addGroupCommandData));
+
+                Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntryStruct::Type newAdmin;
+                newAdmin.nodeID       = nodeId;
+                newAdmin.friendlyName = CharSpan::fromCharString("Default JFA Admin");
+                newAdmin.vendorID     = vendorId;
+                newAdmin.icac         = ByteSpan(mICACBuffer, mICACBufferLen);
+
+                LogErrorOnFailure(Server::GetInstance().GetJointFabricDatastore().AddAdmin(newAdmin));
+
+                ChipLogProgress(JointFabric, "Joint Fabric Administrator commissioned on fabric index %d", fabricIndex);
             }
         }
     }
+}
+
+bool JFAManager::IsDeviceJFAdmin()
+{
+    if (jfFabricIndex == kUndefinedFabricId)
+    {
+        return false;
+    }
+
+    CATValues cats;
+
+    if (mServer->GetFabricTable().FetchCATs(jfFabricIndex, cats) == CHIP_NO_ERROR)
+    {
+        if (cats.ContainsIdentifier(kAdminCATIdentifier))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool JFAManager::IsDeviceJFAnchor()
+{
+    if (jfFabricIndex == kUndefinedFabricId)
+    {
+        return false;
+    }
+
+    CATValues cats;
+
+    if (mServer->GetFabricTable().FetchCATs(jfFabricIndex, cats) == CHIP_NO_ERROR)
+    {
+        if (cats.ContainsIdentifier(kAnchorCATIdentifier))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void JFAManager::ReleaseSession()
@@ -100,6 +268,7 @@ void JFAManager::ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onCo
     }
 
     // Set the action to take once connection is successfully established
+    mNodeId            = scopedNodeId.GetNodeId();
     mOnConnectedAction = onConnectedAction;
 
     ChipLogDetail(JointFabric, "Establishing session to node ID 0x" ChipLogFormatX64 " on fabric index %d",
@@ -121,7 +290,11 @@ void JFAManager::OnConnected(void * context, Messaging::ExchangeManager & exchan
     switch (jfaManager->mOnConnectedAction)
     {
     case kStandardCommissioningComplete: {
-        jfaManager->SendCommissioningComplete();
+        TEMPORARY_RETURN_IGNORED jfaManager->SendCommissioningComplete();
+        break;
+    }
+    case kJCMCommissioning: {
+        TEMPORARY_RETURN_IGNORED jfaManager->AnnounceJointFabricAdministrator();
         break;
     }
 
@@ -141,6 +314,83 @@ void JFAManager::OnConnectionFailure(void * context, const ScopedNodeId & peerId
     jfaManager->ReleaseSession();
 }
 
+CHIP_ERROR JFAManager::AnnounceJointFabricAdministrator()
+{
+    Commands::AnnounceJointFabricAdministrator::Type request;
+
+    if (!mExchangeMgr)
+    {
+        return CHIP_ERROR_UNINITIALIZED;
+    }
+
+    ChipLogProgress(JointFabric, "AnnounceJointFabricAdministrator: invoke cluster command.");
+    request.endpointID = kJointFabricAdminEndpointId;
+
+    Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), peerAdminJFAdminClusterEndpointId);
+    return cluster.InvokeCommand(request, this, OnAnnounceJointFabricAdministratorResponse,
+                                 OnAnnounceJointFabricAdministratorFailure);
+}
+
+void JFAManager::OnAnnounceJointFabricAdministratorResponse(void * context, const chip::app::DataModel::NullObjectType & data)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+
+    ChipLogProgress(JointFabric, "OnAnnounceJointFabricAdministratorResponse");
+
+    /* TODO: https://github.com/project-chip/connectedhomeip/issues/38202 */
+    TEMPORARY_RETURN_IGNORED jfaManagerCore->SendICACSRRequest();
+}
+
+void JFAManager::OnAnnounceJointFabricAdministratorFailure(void * context, CHIP_ERROR error)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+    jfaManagerCore->ReleaseSession();
+
+    ChipLogError(JointFabric, "OnAnnounceJointFabricAdministratorFailure: %s\n", chip::ErrorStr(error));
+}
+
+CHIP_ERROR JFAManager::SendICACSRRequest()
+{
+    Commands::ICACCSRRequest::Type request;
+
+    if (!mExchangeMgr)
+    {
+        return CHIP_ERROR_UNINITIALIZED;
+    }
+
+    ChipLogProgress(JointFabric, "SendICACSRRequest: invoke cluster command.");
+
+    Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), peerAdminJFAdminClusterEndpointId);
+    return cluster.InvokeCommand(request, this, OnSendICACSRRequestResponse, OnSendICACSRRequestFailure);
+}
+
+void JFAManager::OnSendICACSRRequestResponse(void * context, const Commands::ICACCSRResponse::DecodableType & icaccsr)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+    P256PublicKey pubKey;
+
+    ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse");
+
+    if ((CHIP_NO_ERROR == VerifyCertificateSigningRequest(icaccsr.icaccsr.data(), icaccsr.icaccsr.size(), pubKey)) &&
+        jfaManagerCore->peerAdminICACPubKey.Matches(pubKey))
+    {
+        ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse: validated ICAC CSR");
+        TEMPORARY_RETURN_IGNORED jfaManagerCore->SendCommissioningComplete();
+    }
+}
+
+void JFAManager::OnSendICACSRRequestFailure(void * context, CHIP_ERROR error)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+    jfaManagerCore->ReleaseSession();
+
+    ChipLogError(JointFabric, "OnSendICACSRRequestFailure: %s\n", chip::ErrorStr(error));
+}
+
 CHIP_ERROR JFAManager::SendCommissioningComplete()
 {
     GeneralCommissioning::Commands::CommissioningComplete::Type request;
@@ -158,22 +408,32 @@ CHIP_ERROR JFAManager::SendCommissioningComplete()
 void JFAManager::OnCommissioningCompleteResponse(
     void * context, const GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data)
 {
-    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
-    VerifyOrDie(jfaManagerCore != nullptr);
-    jfaManagerCore->ReleaseSession();
+    JFAManager * jfaManager = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManager != nullptr);
 
     ChipLogProgress(JointFabric, "OnCommissioningCompleteResponse, Code=%u", to_underlying(data.errorCode));
 
     if (data.errorCode != GeneralCommissioning::CommissioningErrorEnum::kOk)
     {
-        // TODO
+        ChipLogProgress(JointFabric, "Commssioning Failed (nodeId=%ld, isJCM = %d), Code=%u", jfaManager->mNodeId,
+                        jfaManager->mOnConnectedAction == kJCMCommissioning, to_underlying(data.errorCode));
     }
     else
     {
-        // TODO
+        switch (jfaManager->mOnConnectedAction)
+        {
+        case kStandardCommissioningComplete: {
+            ChipLogProgress(JointFabric, "Standard Commissioning (nodeId=%ld) success", jfaManager->mNodeId);
+            break;
+        }
+        case kJCMCommissioning: {
+            ChipLogProgress(JointFabric, "Joint Commissioning Method (nodeId=%ld) success", jfaManager->mNodeId);
+            break;
+        }
+        }
     }
 
-    jfaManagerCore->ReleaseSession();
+    jfaManager->ReleaseSession();
 }
 
 void JFAManager::OnCommissioningCompleteFailure(void * context, CHIP_ERROR error)
@@ -183,4 +443,16 @@ void JFAManager::OnCommissioningCompleteFailure(void * context, CHIP_ERROR error
     jfaManagerCore->ReleaseSession();
 
     ChipLogError(JointFabric, "Received failure response %s\n", chip::ErrorStr(error));
+}
+
+CHIP_ERROR JFAManager::GetIcacCsr(MutableByteSpan & icacCsr)
+{
+    JFARpc * jfaRpc = GetJFARpc();
+
+    if (jfaRpc)
+    {
+        return jfaRpc->GetICACCSRForJF(icacCsr);
+    }
+
+    return CHIP_ERROR_UNINITIALIZED;
 }

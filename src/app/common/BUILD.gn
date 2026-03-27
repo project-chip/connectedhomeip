@@ -16,7 +16,10 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
 
 config("includes") {
-  include_dirs = [ "${chip_app_zap_dir}" ]
+  include_dirs = [
+    "${chip_app_zap_dir}",
+    "${chip_root}/zzz_generated/app-common/",
+  ]
 }
 
 source_set("attribute-type") {
@@ -51,6 +54,7 @@ static_library("cluster-objects") {
   sources = [
     "${chip_app_zap_dir}/app-common/zap-generated/cluster-objects.cpp",
     "${chip_app_zap_dir}/app-common/zap-generated/cluster-objects.h",
+    "CompatClusterObjects.h",
   ]
 
   public_deps = [
@@ -80,6 +84,14 @@ source_set("enums") {
   deps = [
     "${chip_root}/zzz_generated/app-common/clusters:all-enums",
     "${chip_root}/zzz_generated/app-common/clusters/shared:enums",
+  ]
+  public_configs = [ ":includes" ]
+}
+
+source_set("metadata") {
+  public_deps = [
+    "${chip_root}/zzz_generated/app-common/clusters:all-metadata",
+    "${chip_root}/zzz_generated/app-common/clusters:metadata-query",
   ]
   public_configs = [ ":includes" ]
 }

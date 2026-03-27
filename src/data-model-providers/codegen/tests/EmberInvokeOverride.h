@@ -19,7 +19,7 @@
 #include <app/ConcreteCommandPath.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 /// what was the last path on which DispatchSingleClusterCommand was called
 app::ConcreteCommandPath GetLastDispatchPath();
@@ -27,5 +27,5 @@ app::ConcreteCommandPath GetLastDispatchPath();
 /// How many times was DispatchSingleClusterCommand called
 uint32_t DispatchCount();
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

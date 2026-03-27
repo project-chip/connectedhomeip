@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,13 +35,20 @@ namespace Thermostat {
 
 static constexpr uint8_t kMaxNumberOfPresetTypes = 6;
 
-// TODO: #34556 Support multiple presets of each type.
-// We will support only one preset of each preset type.
-static constexpr uint8_t kMaxNumberOfPresetsOfEachType = 1;
+static constexpr uint8_t kMaxNumberOfThermostatSuggestions = 5;
+
+static constexpr uint8_t kMaxNumberOfScheduleTypes = 2;
+
+// TODO: #34556 Support multiple presets/schedules of each type.
+// We will support only one preset of each preset/schedule type.
+static constexpr uint8_t kMaxNumberOfPresetsOfEachType   = 1;
+static constexpr uint8_t kMaxNumberOfSchedulesOfEachType = 1;
 
 // For testing the use case where number of presets added exceeds the number of presets supported, we will have the value of
 // kMaxNumberOfPresetsSupported < kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType
 static constexpr uint8_t kMaxNumberOfPresetsSupported = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType - 1;
+
+static constexpr uint8_t kMaxNumberOfSchedulesSupported = kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType - 1;
 
 class ThermostatDelegate : public Delegate
 {
@@ -70,11 +77,33 @@ public:
 
     void ClearPendingPresetList() override;
 
+    uint8_t GetMaxThermostatSuggestions() override;
+
+    uint8_t GetNumberOfThermostatSuggestions() override;
+
+    CHIP_ERROR GetThermostatSuggestionAtIndex(size_t index,
+                                              ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion) override;
+
+    void GetCurrentThermostatSuggestion(
+        DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion) override;
+
+    DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> GetThermostatSuggestionNotFollowingReason() override;
+
+    CHIP_ERROR AppendToThermostatSuggestionsList(const Structs::ThermostatSuggestionStruct::Type & thermostatSuggestion) override;
+
+    CHIP_ERROR RemoveFromThermostatSuggestionsList(size_t indexToRemove) override;
+
+    CHIP_ERROR GetUniqueID(uint8_t & uniqueID) override;
+
+    CHIP_ERROR ReEvaluateCurrentSuggestion() override;
+
+    CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) override;
+
 private:
     static ThermostatDelegate sInstance;
 
     ThermostatDelegate();
-    ~ThermostatDelegate() = default;
+    ~ThermostatDelegate();
 
     ThermostatDelegate(const ThermostatDelegate &)             = delete;
     ThermostatDelegate & operator=(const ThermostatDelegate &) = delete;
@@ -89,6 +118,27 @@ private:
      */
     void InitializePresets();
 
+    /**
+     * @brief return the index of the thermostat suggestion in the ThermostatSuggestions attribute with the earliest EffectiveTime
+     * field. If there are no entries or an error occurs, returns the value in the MaxThermostatSuggestions attribute as an
+     * invalid index.
+     *
+     */
+    size_t GetThermostatSuggestionIndexWithEarliestEffectiveTime(System::Clock::Seconds32 currentMatterEpochTimestamp);
+
+    CHIP_ERROR StartExpirationTimer(System::Clock::Seconds32 timeout);
+
+    static void TimerExpiredCallback(System::Layer * systemLayer, void * appState);
+
+    void CancelExpirationTimer();
+
+    CHIP_ERROR SetThermostatSuggestionNotFollowingReason(
+        const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason);
+
+    void SetCurrentThermostatSuggestion(size_t index);
+
+    bool HaveSuggestionWithID(uint8_t uniqueIDToFind);
+
     uint8_t mNumberOfPresets;
 
     Structs::PresetTypeStruct::Type mPresetTypes[kMaxNumberOfPresetTypes];
@@ -100,6 +150,26 @@ private:
 
     uint8_t mActivePresetHandleData[kPresetHandleSize];
     size_t mActivePresetHandleDataSize;
+
+    uint8_t mMaxThermostatSuggestions;
+    ThermostatSuggestionStructWithOwnedMembers mThermostatSuggestions[kMaxNumberOfThermostatSuggestions];
+    uint8_t mNextFreeIndexInThermostatSuggestionsList;
+    uint8_t mUniqueID;
+
+    // TODO: #39949 - This information should be stored in the cluster instance.
+    size_t mIndexOfCurrentSuggestion;
+    DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mThermostatSuggestionNotFollowingReason;
+
+    bool mIsExpirationTimerRunning = false;
+
+    uint8_t mMaxNumberOfSchedulesAllowedPerScheduleType;
+
+    Structs::ScheduleTypeStruct::Type mScheduleTypes[kMaxNumberOfScheduleTypes];
+
+    /**
+     * @brief Initializes the schedules types array with example schedule types.
+     */
+    void InitializeScheduleTypes();
 };
 
 } // namespace Thermostat

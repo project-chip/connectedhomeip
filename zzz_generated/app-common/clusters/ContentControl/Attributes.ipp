@@ -48,6 +48,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, remainingScreenTime);
     case Attributes::BlockUnrated::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, blockUnrated);
+    case Attributes::BlockChannelList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, blockChannelList);
+    case Attributes::BlockApplicationList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, blockApplicationList);
+    case Attributes::BlockContentTimeWindow::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, blockContentTimeWindow);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

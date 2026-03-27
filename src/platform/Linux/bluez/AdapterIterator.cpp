@@ -76,7 +76,7 @@ bool AdapterIterator::Next()
         VerifyOrReturnError(
             err == CHIP_NO_ERROR, false,
             ChipLogError(DeviceLayer, "Failed to initialize BlueZ object manager: %" CHIP_ERROR_FORMAT, err.Format()));
-        mObjectList.Init(mObjectManager.GetObjectManager());
+        TEMPORARY_RETURN_IGNORED mObjectList.Init(mObjectManager.GetObjectManager());
         mIterator      = mObjectList.begin();
         mIsInitialized = true;
     }

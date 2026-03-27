@@ -192,9 +192,8 @@ CHIP_ERROR CryptoContext::GetAdditionalAuthData(const PacketHeader & header, uin
 }
 
 CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, ConstNonceView nonce,
-                                  PacketHeader & header, MessageAuthenticationCode & mac) const
+                                  const PacketHeader & header, MessageAuthenticationCode & mac) const
 {
-
     const size_t taglen = header.MICTagLength();
 
     VerifyOrDie(taglen <= kMaxTagLen);
@@ -224,7 +223,7 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
             AES_CCM_encrypt(input, input_length, AAD, aadLen, mEncryptionKey, nonce.data(), nonce.size(), output, tag, taglen));
     }
 
-    mac.SetTag(&header, tag, taglen);
+    mac.SetTag(tag, taglen);
 
     return CHIP_NO_ERROR;
 }
@@ -274,7 +273,7 @@ CHIP_ERROR CryptoContext::PrivacyEncrypt(const uint8_t * input, size_t input_len
     ByteSpan plaintext(input, input_length);
     MutableByteSpan privacytext(output, input_length);
     CryptoContext::NonceStorage privacyNonce;
-    CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac);
+    ReturnErrorOnFailure(CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac));
 
     return mKeyContext->PrivacyEncrypt(plaintext, privacyNonce, privacytext);
 }
@@ -292,7 +291,7 @@ CHIP_ERROR CryptoContext::PrivacyDecrypt(const uint8_t * input, size_t input_len
     const ByteSpan privacytext(input, input_length);
     MutableByteSpan plaintext(output, input_length);
     CryptoContext::NonceStorage privacyNonce;
-    CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac);
+    ReturnErrorOnFailure(CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac));
 
     return mKeyContext->PrivacyDecrypt(privacytext, privacyNonce, plaintext);
 }

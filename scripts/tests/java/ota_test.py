@@ -20,6 +20,7 @@
 import argparse
 import logging
 import queue
+import shlex
 import subprocess
 import threading
 import typing
@@ -31,6 +32,8 @@ from java.base import DumpProgramOutputToQueue
 test-firmware generation instruction:
 ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8001 -vn 10 -vs "10.0" -da sha256 scripts/tests/java/test-firmware.bin scripts/tests/java/test-firmware.ota
 """
+
+log = logging.getLogger(__name__)
 
 
 class OTATest:
@@ -86,20 +89,20 @@ class OTATest:
         try:
             with open(filepath, "rb") as f:
                 file_content = f.read()
-            logging.info("debugging")
-            logging.info(file_content)
+            log.info("debugging")
+            log.info(file_content)
             return file_content == expected_content
         except FileNotFoundError:
-            logging.info(f"Error: File not found at {filepath}")
+            log.info("Error: File not found at '%s'", filepath)
             return False
         except Exception as e:
-            logging.info(f"An error occurred during validation: {e}")
+            log.exception("An error occurred during validation: %r", e)
             return False
 
     def TestCmdOnnetworkLongOtaOverBdx(self, nodeid, setuppin, discriminator, timeout, uri, filename):
         java_command = self.command + ['ota', 'onnetwork-long-ota-over-bdx',
                                        nodeid, setuppin, discriminator, timeout, uri, filename]
-        logging.info(f"Execute: {java_command}")
+        log.info("Execute: %s", shlex.join(java_command))
         java_process = subprocess.Popen(
             java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
@@ -107,17 +110,17 @@ class OTATest:
 
     def RunTest(self):
         if self.command_name == 'onnetwork-long-ota-over-bdx':
-            logging.info("Testing pairing onnetwork-long-ota-over-bdx")
+            log.info("Testing pairing onnetwork-long-ota-over-bdx")
             code = self.TestCmdOnnetworkLongOtaOverBdx(
                 self.nodeid, self.setup_pin_code, self.discriminator, self.timeout, self.uri, self.filename)
             if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long-ota-over-bdx failed with error {code}")
+                raise RuntimeError(f"Testing pairing onnetwork-long-ota-over-bdx failed with error {code}")
             # Validate the received OTA firmware
             filepath = "/tmp/test.bin"
             expected_content = b"Test\n"
             is_valid = self.validate_file_content(filepath, expected_content)
             if not is_valid:
-                raise Exception("OTA content is not matching as the original file")
+                raise RuntimeError("OTA content is not matching as the original file")
 
         else:
-            raise Exception(f"Unsupported command {self.command_name}")
+            raise ValueError(f"Unsupported command {self.command_name}")

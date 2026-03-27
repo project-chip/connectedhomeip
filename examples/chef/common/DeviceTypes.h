@@ -23,17 +23,6 @@
 namespace chef {
 namespace DeviceTypes {
 
-// Common location to store all device type IDs
-// Official list is in the spec and a complete copy is in -
-// https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap-templates/zcl/data-model/chip/matter-devices.xml
-// TODO: Device type IDs must be code generated from matter-devices.xml
-constexpr chip::DeviceTypeId kCookSurfaceDeviceId                  = 0x0077;
-constexpr chip::DeviceTypeId kCooktopDeviceId                      = 0x0078;
-constexpr chip::DeviceTypeId kOvenDeviceId                         = 0x007B;
-constexpr chip::DeviceTypeId kPumpDeviceId                         = 0x0303;
-constexpr chip::DeviceTypeId kRefrigeratorDeviceId                 = 0x0070;
-constexpr chip::DeviceTypeId kTemperatureControlledCabinetDeviceId = 0x0071;
-
 // Expected endpoint IDs for different device types
 namespace ExpectedEndpointId {
 // Oven

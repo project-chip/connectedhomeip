@@ -38,7 +38,9 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
@@ -62,7 +64,9 @@ constexpr uint32_t kTestListLength        = 5;
 // We don't really care about the content, we just need a buffer.
 uint8_t sByteSpanData[app::kMaxSecureSduLengthBytes];
 
-class TestWriteChunking : public Test::AppContext
+TestPersistentStorageDelegate gStorageDelegate;
+
+class TestWriteChunking : public chip::Testing::AppContext
 {
 private:
     using PathStatus = std::pair<app::ConcreteAttributePath, bool>;
@@ -104,6 +108,21 @@ protected:
 
     template <class T>
     void EncodeAttributeListIntoTLV(const DataModel::List<T> & aListAttribute, TLV::ScopedBufferTLVReader & outTlvReader);
+
+    void SetUp() override
+    {
+        AppContext::SetUp();
+        mOldProvider =
+            InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(&gStorageDelegate));
+    }
+    void TearDown() override
+    {
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
+        AppContext::TearDown();
+    }
+
+private:
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
 };
 
 // Encodes an attribute of List Data Type into a TLV Reader object for testing WriteClient::PutPreencodedAttribute
@@ -149,7 +168,7 @@ void TestWriteChunking::EncodeAttributeListIntoTLV(const DataModel::List<T> & aL
 
     // Move Encoded TLV Array into TLVReader Object
     outEncodedListTlvReader.Init(std::move(buffer), writer.GetLengthWritten());
-    outEncodedListTlvReader.Next();
+    EXPECT_SUCCESS(outEncodedListTlvReader.Next());
 }
 
 //clang-format off
@@ -339,11 +358,10 @@ TEST_F(TestWriteChunking, TestListChunking)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
@@ -430,11 +448,10 @@ TEST_F(TestWriteChunking, TestListChunking_NonEmptyReplaceAllList)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServerAcl);
@@ -534,11 +551,10 @@ TEST_F(TestWriteChunking, TestBadChunking)
     bool atLeastOneRequestFailed = false;
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
@@ -617,11 +633,10 @@ TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
     bool atLeastOneRequestFailed = false;
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServerAcl);
@@ -702,11 +717,10 @@ TEST_F(TestWriteChunking, TestConflictWrite)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
@@ -777,11 +791,10 @@ TEST_F(TestWriteChunking, TestConflictWrite_NonEmptyReplaceAllList)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServerAcl);
@@ -861,11 +874,10 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
@@ -925,11 +937,10 @@ TEST_F(TestWriteChunking, TestNonConflictWrite_NonEmptyReplaceAllList)
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServerAcl);
@@ -1110,11 +1121,10 @@ void TestWriteChunking::RunTest(Instructions instructions, EncodingMethod encodi
 TEST_F(TestWriteChunking, TestTransactionalList)
 {
     // Initialize the ember side server logic
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
@@ -1366,11 +1376,10 @@ void TestWriteChunking::RunTest_NonEmptyReplaceAll(Instructions instructions,
 TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
 {
     // Initialize the ember side server logic.
-    app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpointAcl, Span<DataVersion>(dataVersionStorageAcl)));
 
     // Register our fake attribute access interface.
     AttributeAccessInterfaceRegistry::Instance().Register(&testServerAcl);

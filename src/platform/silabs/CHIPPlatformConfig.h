@@ -106,6 +106,10 @@
 #define CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC SL_IDLE_MODE_DURATION_S
 #endif // CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
 
+#ifndef CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+#define CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC SL_SHORT_IDLE_MODE_DURATION_S
+#endif // CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+
 #ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS
 #define CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS SL_ACTIVE_MODE_DURATION_MS
 #endif // CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS
@@ -119,6 +123,10 @@
 #endif // CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
 
 #endif // defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER
+
+#ifndef CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
+#define CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST (2500_ms32)
+#endif // CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
 
 /**
  * @brief CHIP_SHELL_MAX_LINE_SIZE
@@ -141,3 +149,12 @@
 #ifndef CHIP_SHELL_MAX_TOKENS
 #define CHIP_SHELL_MAX_TOKENS 40
 #endif // CHIP_SHELL_MAX_TOKENS
+
+// ==================== Platform-Specific Overrides ====================
+// Define chipDie before CodeUtils.h includes it
+// This allows Silabs to provide custom chipDie implementation
+// The #ifndef check in CodeUtils.h will prevent the inline definition if this is declared
+#ifndef chipDie
+extern "C" void chipDie(void) __attribute((noreturn));
+#define chipDie chipDie
+#endif

@@ -26,7 +26,7 @@ get_filename_component(EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR ${CHIP_ROOT}/examples/pla
 # This must be called before find_package(Zephyr)
 include(${CHIP_ROOT}/config/nxp/app/pre-zephyr.cmake)
 
-list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nxp/chip-module)
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/zephyr/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
 # -Wmaybe-uninitialized has too many false positives, including on std::optional
@@ -51,6 +51,7 @@ target_include_directories(app
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/device_callbacks/include
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/include
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_task/include
+    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/include
 )
 
 target_sources(app
@@ -67,6 +68,16 @@ target_sources(app
     ${EXAMPLE_PLATFORM_NXP_ZEPHYR_DIR}/factory_data/source/AppFactoryDataExample.cpp
 )
 
+if(CONFIG_CHIP_CUSTOM_BLE_ADV_DATA)
+    target_sources(app PRIVATE
+                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BleZephyrManagerApp.cpp
+    )
+else()
+    target_sources(app PRIVATE
+                    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_ble/source/BLEApplicationManagerEmpty.cpp
+    )
+endif()
+
 if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE
                     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
@@ -74,6 +85,13 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
     )
     target_include_directories(app PRIVATE
                     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/ota_requestor/include/
+    )
+endif()
+
+if (CONFIG_CHIP_FACTORY_DATA)
+    target_sources(app PRIVATE
+        ${CHIP_ROOT}/src/platform/nxp/zephyr/FactoryDataProviderImpl.cpp
+        ${CHIP_ROOT}/src/platform/nxp/common/factory_data/legacy/FactoryDataProvider.cpp
     )
 endif()
 
@@ -109,3 +127,6 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/source/ICDUtil.cpp
 )
+
+# Post-build steps
+include(${CHIP_ROOT}/config/nxp/app/zephyr-post-build.cmake)

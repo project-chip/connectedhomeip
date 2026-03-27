@@ -28,7 +28,7 @@ namespace app {
 class TermsAndConditionsManager : public TermsAndConditionsProvider
 {
 public:
-    static TermsAndConditionsManager * GetInstance();
+    static TermsAndConditionsManager & GetInstance();
     CHIP_ERROR Init(PersistentStorageDelegate * inPersistentStorageDelegate,
                     const Optional<TermsAndConditions> & inRequiredTermsAndConditions);
     CHIP_ERROR CommitAcceptance();

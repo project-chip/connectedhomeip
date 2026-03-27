@@ -67,6 +67,8 @@ namespace Dnssd {
         std::string mHostname;
 
         static void OnRegisterRecord(DNSServiceRef sdRef, DNSRecordRef recordRef, DNSServiceFlags flags, DNSServiceErrorType err, void * context);
+        static void OnRegisterRecordTimeout(System::Layer * layer, void * appState);
+        static void RunOnRegisterRecordCallback(void * context, DNSServiceErrorType error);
         OnRegisterRecordCallback mOnRegisterRecordCallback = nullptr;
     };
 

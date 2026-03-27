@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster OnOff (cluster code: 6/0x046)
+// Identifier constant values for cluster OnOff (cluster code: 6/0x0006)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

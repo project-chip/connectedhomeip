@@ -11,5 +11,33 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("camera-av-settings-user-level-management-server") {
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("camera-av-settings-user-level-management-server") {
+  sources = [
+    "CameraAvSettingsUserLevelManagementCluster.cpp",
+    "CameraAvSettingsUserLevelManagementCluster.h",
+    "CameraAvSettingsUserLevelManagementLogic.cpp",
+    "CameraAvSettingsUserLevelManagementLogic.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+
+  public_deps = [ ":camera-av-settings-user-level-management-cluster" ]
+}
+
+source_set("camera-av-settings-user-level-management-cluster") {
+  public_deps = [
+    "${chip_root}/src/app:constants",
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/persistence:singleton",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/CameraAvSettingsUserLevelManagement",
+  ]
 }

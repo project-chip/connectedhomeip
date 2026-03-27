@@ -24,15 +24,13 @@ if [[ $# -ne 1 ]]; then
     exit 1
 fi
 
-pydoc-markdown -I "$PYTHONPATH" --py3 -m chip.ChipDeviceCtrl '{
+pydoc-markdown -I "$PYTHONPATH" --py3 -m matter.ChipDeviceCtrl '{
     renderer: {
       type: markdown,
       descriptive_class_title: false,
       render_toc: true,
       render_toc_title: "ChipDeviceCtrl.py API",
-      insert_header_anchors: false,
+      insert_header_anchors: true,
       add_full_prefix: false,
     }
   }' >"$1"/"$FILENAME"
-
-awk '/\(\#chip.ChipDeviceCtrl/ {gsub(/\./, "", $0)} 1' "$1/$FILENAME" >"$1"/tmp && mv "$1"/tmp "$1/$FILENAME"

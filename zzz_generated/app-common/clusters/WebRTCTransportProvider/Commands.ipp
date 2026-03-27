@@ -41,6 +41,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
     encoder.Encode(to_underlying(Fields::kICETransportPolicy), ICETransportPolicy);
     encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
+    encoder.Encode(to_underlying(Fields::kSFrameConfig), SFrameConfig);
+    encoder.Encode(to_underlying(Fields::kVideoStreams), videoStreams);
+    encoder.Encode(to_underlying(Fields::kAudioStreams), audioStreams);
     return encoder.Finalize();
 }
 
@@ -81,6 +84,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         else if (__context_tag == to_underlying(Fields::kMetadataEnabled))
         {
             err = DataModel::Decode(reader, metadataEnabled);
+        }
+        else if (__context_tag == to_underlying(Fields::kSFrameConfig))
+        {
+            err = DataModel::Decode(reader, SFrameConfig);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoStreams))
+        {
+            err = DataModel::Decode(reader, videoStreams);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioStreams))
+        {
+            err = DataModel::Decode(reader, audioStreams);
         }
 
         ReturnErrorOnFailure(err);
@@ -144,6 +159,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
     encoder.Encode(to_underlying(Fields::kICETransportPolicy), ICETransportPolicy);
     encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
+    encoder.Encode(to_underlying(Fields::kSFrameConfig), SFrameConfig);
+    encoder.Encode(to_underlying(Fields::kVideoStreams), videoStreams);
+    encoder.Encode(to_underlying(Fields::kAudioStreams), audioStreams);
     return encoder.Finalize();
 }
 
@@ -192,6 +210,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
         else if (__context_tag == to_underlying(Fields::kMetadataEnabled))
         {
             err = DataModel::Decode(reader, metadataEnabled);
+        }
+        else if (__context_tag == to_underlying(Fields::kSFrameConfig))
+        {
+            err = DataModel::Decode(reader, SFrameConfig);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoStreams))
+        {
+            err = DataModel::Decode(reader, videoStreams);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioStreams))
+        {
+            err = DataModel::Decode(reader, audioStreams);
         }
 
         ReturnErrorOnFailure(err);

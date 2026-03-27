@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 11;
+
 namespace CountdownTime {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace CountdownTime
@@ -24,13 +28,17 @@ namespace CurrentErrorList {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace CurrentErrorList
 
-namespace OverallState {
+namespace OverallCurrentState {
 inline constexpr AttributeId Id = 0x00000003;
-} // namespace OverallState
+} // namespace OverallCurrentState
 
-namespace OverallTarget {
+namespace OverallTargetState {
 inline constexpr AttributeId Id = 0x00000004;
-} // namespace OverallTarget
+} // namespace OverallTargetState
+
+namespace LatchControlModes {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace LatchControlModes
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

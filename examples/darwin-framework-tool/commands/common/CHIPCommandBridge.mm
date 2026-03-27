@@ -51,7 +51,7 @@ constexpr char kTrustStorePathVariable[] = "PAA_TRUST_STORE_PATH";
 namespace {
 NSString * ToNSString(const chip::Optional<chip::app::DataModel::Nullable<char *>> & string)
 {
-    if (!string.HasValue() && string.Value().IsNull()) {
+    if (!string.HasValue() || string.Value().IsNull()) {
         return nil;
     }
 

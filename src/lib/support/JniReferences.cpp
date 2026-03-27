@@ -61,7 +61,7 @@ void JniReferences::SetJavaVm(JavaVM * jvm, const char * clsType)
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Support, "fail to init mArrayListClass"));
     err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "java/util/HashMap", hashMapClass);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Support, "fail to get local class ref for HashMap"));
-    mHashMapClass.Init(static_cast<jobject>(hashMapClass));
+    err = mHashMapClass.Init(static_cast<jobject>(hashMapClass));
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Support, "fail to init mHashMapClass"));
 }
 

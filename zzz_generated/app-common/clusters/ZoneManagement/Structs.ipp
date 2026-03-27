@@ -114,6 +114,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kZoneID), zoneID);
     encoder.Encode(to_underlying(Fields::kZoneType), zoneType);
     encoder.Encode(to_underlying(Fields::kZoneSource), zoneSource);
+    encoder.Encode(to_underlying(Fields::kTwoDCartesianZone), twoDCartesianZone);
     return encoder.Finalize();
 }
 
@@ -138,6 +139,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kZoneSource))
         {
             err = DataModel::Decode(reader, zoneSource);
+        }
+        else if (__context_tag == to_underlying(Fields::kTwoDCartesianZone))
+        {
+            err = DataModel::Decode(reader, twoDCartesianZone);
         }
 
         ReturnErrorOnFailure(err);

@@ -26,6 +26,7 @@
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>
+#include <imgui_ui/windows/connectivity.h>
 #include <imgui_ui/windows/qrcode.h>
 #endif
 
@@ -56,12 +57,13 @@ int main(int argc, char * argv[])
     if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sAirQualitySensorAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
-        sChipNamedPipeCommands.Stop();
+        LogErrorOnFailure(sChipNamedPipeCommands.Stop());
     }
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
     example::Ui::ImguiUi ui;
     ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
+    ui.AddWindow(std::make_unique<example::Ui::Windows::Connectivity>());
     ChipLinuxAppMainLoop(&ui);
 #else
     ChipLinuxAppMainLoop();

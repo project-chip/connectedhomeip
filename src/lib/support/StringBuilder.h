@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <cctype>
 #include <nlassert.h>
 
 #include "BufferWriter.h"
@@ -50,7 +51,24 @@ public:
         return Add(buff);
     }
 
-    /// did all the values fit?
+    /// Append an uint8_t value
+    StringBuilderBase & Add(uint8_t value)
+    {
+        uint8_t actual = std::isprint(value) ? value : '.';
+        mWriter.Put(actual);
+        NullTerminate();
+        return *this;
+    }
+
+    /// Append a memory block
+    StringBuilderBase & Add(const void * data, size_t size)
+    {
+        mWriter.Put(data, size);
+        NullTerminate();
+        return *this;
+    }
+
+    /// Did all the values fit?
     bool Fit() const { return mWriter.Fit(); }
 
     /// Was nothing written yet?
@@ -73,6 +91,13 @@ public:
     /// access the underlying value
     const char * c_str() const { return reinterpret_cast<const char *>(mWriter.Buffer()); }
 
+protected:
+    /// Number of bytes actually needed
+    size_t Needed() const { return mWriter.Needed(); }
+
+    /// Size of the output buffer
+    size_t Size() const { return mWriter.Size(); }
+
 private:
     Encoding::BufferWriter mWriter;
 
@@ -89,15 +114,67 @@ private:
     }
 };
 
-/// a preallocated sized string builder
+/// A preallocated sized string builder
 template <size_t kSize>
 class StringBuilder : public StringBuilderBase
 {
 public:
     StringBuilder() : StringBuilderBase(mBuffer, kSize) {}
 
+    StringBuilder(const char * data, size_t size, bool add_marker_if_overflow = true) : StringBuilder()
+    {
+        Add(data, size);
+
+        if (add_marker_if_overflow)
+        {
+            AddMarkerIfOverflow();
+        }
+
+        size_t length = Fit() ? Needed() : Size();
+        for (size_t i = 0; i < length; ++i)
+        {
+            if (mBuffer[i] == '\0')
+            {
+                mBuffer[i] = '.';
+            }
+        }
+    }
+
+    StringBuilder(const CharSpan & span, bool add_marker_if_overflow = true) :
+        StringBuilder(span.data(), span.size(), add_marker_if_overflow)
+    {}
+
+    StringBuilder(const uint8_t * data, size_t size, bool add_marker_if_overflow = true) : StringBuilder()
+    {
+        Add(data, size);
+
+        if (add_marker_if_overflow)
+        {
+            AddMarkerIfOverflow();
+        }
+
+        size_t length = Fit() ? Needed() : Size();
+        for (size_t i = 0; i < length; ++i)
+        {
+            if (!std::isprint(mBuffer[i]))
+            {
+                mBuffer[i] = '.';
+            }
+        }
+    }
+
+    StringBuilder(const ByteSpan & span, bool add_marker_if_overflow = true) :
+        StringBuilder(span.data(), span.size(), add_marker_if_overflow)
+    {}
+
 private:
     char mBuffer[kSize];
 };
+
+/// Default buffer size is 257 to accommodate values with size up to 256
+/// If the buffer size is not enough the value will be truncated and an overflow marker will be added
+/// TODO Note that this buffer size will be used always by default even for much smaller values
+/// TODO Preferably the buffer size should be the one appropriate for each value
+using NullTerminated = StringBuilder<257>;
 
 } // namespace chip

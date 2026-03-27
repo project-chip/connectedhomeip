@@ -48,12 +48,20 @@ public:
     /**
      * @brief Sends a VideoStreamAllocate command to the device.
      *
-     * @param nodeId      The node ID of the remote camera device.
-     * @param endpointId  The endpoint on which to send VideoStreamAllocate commands.
-     * @param streamUsage The usage of the stream(Recording, LiveView, etc) that this allocation is for.
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or an appropriate error code on failure.
+     * @param nodeId       The node ID of the remote camera device.
+     * @param endpointId   The endpoint on which to send VideoStreamAllocate commands.
+     * @param streamUsage  The usage of the stream(Recording, LiveView, etc) that this allocation is for.
+     * @param minResWidth  Optional minimum width for the video stream. If not specified, uses default value.
+     * @param minResHeight Optional minimum height for the video stream. If not specified, uses default value.
+     * @param minFrameRate Optional minimum frame rate for the video stream. If not specified, uses default value.
+     * @param minBitRate   Optional minimum bit rate for the video stream. If not specified, uses default value.
+     * @return CHIP_ERROR  CHIP_NO_ERROR on success, or an appropriate error code on failure.
      */
-    CHIP_ERROR AllocateVideoStream(chip::NodeId nodeId, chip::EndpointId endpointId, uint8_t streamUsage);
+    CHIP_ERROR AllocateVideoStream(chip::NodeId nodeId, chip::EndpointId endpointId, uint8_t streamUsage,
+                                   chip::Optional<uint16_t> minResWidth  = chip::NullOptional,
+                                   chip::Optional<uint16_t> minResHeight = chip::NullOptional,
+                                   chip::Optional<uint16_t> minFrameRate = chip::NullOptional,
+                                   chip::Optional<uint32_t> minBitRate   = chip::NullOptional);
 
     /**
      * @brief Sends a VideoStreamDeallocate command to the device.

@@ -23,6 +23,7 @@
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 namespace {
@@ -60,7 +61,7 @@ void ParseStatusResponseMessage(chip::TLV::TLVReader & aReader, bool aTestPositi
     err = statusResponse.Init(aReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    statusResponse.PrettyPrint();
+    EXPECT_SUCCESS(statusResponse.PrettyPrint());
 #endif
 
     err = statusResponse.GetStatus(status);

@@ -122,6 +122,15 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         memcpy(mFileDesignator, fd, fdl);
         mFileDesignator[fdl] = 0;
 
+        // Validate that the designator exists in the map
+        const auto entry = mFileDesignatorMap.find(mFileDesignator);
+        if (entry == mFileDesignatorMap.cend())
+        {
+            VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown) == CHIP_NO_ERROR,
+                           ChipLogError(BDX, "AbortTransfer failed"));
+            return;
+        }
+
         break;
     }
     case TransferSession::OutputEventType::kQueryReceived:
@@ -148,22 +157,29 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         if (blockBuf.IsNull())
         {
             // TODO(#13981): AbortTransfer() needs to support GeneralStatusCode failures as well as BDX specific errors.
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(StatusCode::kUnknown);
             return;
         }
 
-        std::ifstream otaFile(mFileDesignator, std::ifstream::in);
+        const auto entry = mFileDesignatorMap.find(mFileDesignator);
+        if (entry == mFileDesignatorMap.cend())
+        {
+            VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown) == CHIP_NO_ERROR,
+                           ChipLogError(BDX, "AbortTransfer failed"));
+            return;
+        }
+        std::ifstream otaFile(entry->second.c_str(), std::ifstream::in | std::ios::binary);
         if (!otaFile.good())
         {
             ChipLogError(BDX, "OTA file open failed");
-            mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown);
+            TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown);
             return;
         }
 
         if (seekOffset > static_cast<uint64_t>(std::numeric_limits<std::streamoff>::max()))
         {
             ChipLogError(BDX, "Seek offset too large");
-            mTransfer.AbortTransfer(StatusCode::kLengthTooLarge);
+            TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(StatusCode::kLengthTooLarge);
             return;
         }
         otaFile.seekg(static_cast<std::streamoff>(seekOffset));
@@ -171,7 +187,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         if (!(otaFile.good() || otaFile.eof()))
         {
             ChipLogError(BDX, "OTA file read failed");
-            mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown);
+            TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown);
             return;
         }
 
@@ -186,7 +202,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(BDX, "PrepareBlock failed: %" CHIP_ERROR_FORMAT, err.Format());
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(StatusCode::kUnknown);
         }
         break;
     }
@@ -235,4 +251,13 @@ void BdxOtaSender::Reset()
     mInitialized  = false;
     mNumBytesSent = 0;
     memset(mFileDesignator, 0, chip::bdx::kMaxFileDesignatorLen);
+}
+
+void BdxOtaSender::AbortTransfer()
+{
+    if (mInitialized)
+    {
+        TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(StatusCode::kUnknown);
+        PollForOutput();
+    }
 }

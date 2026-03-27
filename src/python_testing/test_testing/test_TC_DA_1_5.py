@@ -29,7 +29,7 @@ def run_single_test(flag: str, factory_reset: bool = False) -> int:
     if factory_reset:
         reset = ' --factory-reset'
 
-    app = os.path.join(CHIP_ROOT, 'out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app')
+    app = os.path.join(CHIP_ROOT, 'objdir-clone/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app')
 
     # Certs in the commissioner_dut directory use 0x8000 as the PID
     app_args = '--discriminator 1234 --KVS kvs1 ' + flag

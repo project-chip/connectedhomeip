@@ -65,7 +65,10 @@ public:
     // Implementation of mdns::Minimal::ParserDelegate
 
     void OnHeader(mdns::Minimal::ConstHeaderRef & header) override { mMsgId = header.GetMessageId(); }
-    void OnQuery(const mdns::Minimal::QueryData & data) override { mResponder->Respond(mMsgId, data, mCurSrc, mRespConfig); }
+    void OnQuery(const mdns::Minimal::QueryData & data) override
+    {
+        TEMPORARY_RETURN_IGNORED mResponder->Respond(mMsgId, data, mCurSrc, mRespConfig);
+    }
     void OnResource(mdns::Minimal::ResourceType type, const mdns::Minimal::ResourceData & data) override {}
 
 private:
@@ -105,7 +108,7 @@ static void Timeout(chip::System::Layer * systemLayer, void * context)
     auto * ctx = static_cast<TestDnssd *>(context);
     ChipLogError(DeviceLayer, "mDNS test timeout, is avahi daemon running?");
     ctx->mTimeoutExpired = true;
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
 static void HandleResolve(void * context, DnssdService * result, const chip::Span<chip::Inet::IPAddress> & addresses,
@@ -137,10 +140,10 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
         // are required when the resolve callback (this one) is called. In order
         // to avoid deadlocks, we need to call the StopEventLoopTask from inside
         // the Matter event loop by scheduling a lambda.
-        chip::DeviceLayer::SystemLayer().ScheduleLambda([]() {
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().ScheduleLambda([]() {
             // After last service is resolved, stop the event loop,
             // so the test case can gracefully exit.
-            chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
         });
     }
 }
@@ -207,7 +210,7 @@ TEST_F(TestDnssd, TestDnssdBrowse)
     mdns::Minimal::ResponseSender responseSender(&server);
 
     mdns::Minimal::QueryResponder<16> queryResponder;
-    responseSender.AddQueryResponder(&queryResponder);
+    TEMPORARY_RETURN_IGNORED responseSender.AddQueryResponder(&queryResponder);
 
     // Respond to PTR queries for _mock._udp.local
     mdns::Minimal::QNamePart serviceName[]       = { "_mock", chip::Dnssd::kCommissionProtocol, chip::Dnssd::kLocalDomain };
@@ -250,7 +253,7 @@ TEST_F(TestDnssd, TestDnssdBrowse)
     EXPECT_FALSE(mTimeoutExpired);
 
     // Stop browsing so we can safely shutdown DNS-SD
-    chip::Dnssd::ChipDnssdStopBrowse(mBrowseIdentifier);
+    TEMPORARY_RETURN_IGNORED chip::Dnssd::ChipDnssdStopBrowse(mBrowseIdentifier);
 
     chip::Dnssd::ChipDnssdShutdown();
 }
@@ -312,7 +315,7 @@ TEST_F(TestDnssd, TestDnssdPublishService)
     EXPECT_FALSE(mTimeoutExpired);
 
     // Stop browsing so we can safely shutdown DNS-SD
-    chip::Dnssd::ChipDnssdStopBrowse(mBrowseIdentifier);
+    TEMPORARY_RETURN_IGNORED chip::Dnssd::ChipDnssdStopBrowse(mBrowseIdentifier);
 
     chip::Dnssd::ChipDnssdShutdown();
 }

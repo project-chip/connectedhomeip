@@ -87,7 +87,9 @@ public:
         // there is no mechanism for us to communicate with the client that sent out the KeepActive
         // command that there was a failure, we simply fail silently. After spec issue is
         // addressed, we can implement what spec defines here.
-        auto onDone    = [=](uint32_t promisedActiveDuration) { ActiveChanged(scopedNodeId, promisedActiveDuration); };
+        auto onDone = [=](uint32_t promisedActiveDuration) {
+            TEMPORARY_RETURN_IGNORED ActiveChanged(scopedNodeId, promisedActiveDuration);
+        };
         CHIP_ERROR err = StayActiveSender::SendStayActiveCommand(checkInData.mStayActiveDurationMs, clientInfo.peer_node,
                                                                  app::InteractionModelEngine::GetInstance(), onDone);
         if (err != CHIP_NO_ERROR)
@@ -151,7 +153,8 @@ public:
     pw::Status CommissionNode(const chip_rpc_DeviceCommissioningInfo & request, pw_protobuf_Empty & response) override
     {
         char saltHex[Crypto::kSpake2p_Max_PBKDF_Salt_Length * 2 + 1];
-        Encoding::BytesToHex(request.salt.bytes, request.salt.size, saltHex, sizeof(saltHex), Encoding::HexFlags::kNullTerminate);
+        TEMPORARY_RETURN_IGNORED Encoding::BytesToHex(request.salt.bytes, request.salt.size, saltHex, sizeof(saltHex),
+                                                      Encoding::HexFlags::kNullTerminate);
 
         ChipLogProgress(NotSpecified, "Received CommissionNode request");
 
@@ -203,7 +206,7 @@ public:
         KeepActiveWorkData * data =
             Platform::New<KeepActiveWorkData>(this, scopedNodeId, request.stay_active_duration_ms, request.timeout_ms);
         VerifyOrReturnValue(data, pw::Status::Internal());
-        DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(KeepActiveWork, reinterpret_cast<intptr_t>(data));
         return pw::OkStatus();
     }
 

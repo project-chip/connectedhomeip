@@ -92,6 +92,10 @@ abstract class PairingCommand(
         addArgument("device-remote-ip", remoteAddr, false)
         addArgument("device-remote-port", 0.toShort(), Short.MAX_VALUE, remotePort, null, false)
       }
+      PairingModeType.NFC -> {
+        addArgument("setup-pin-code", 0, 134217727, setupPINCode, null, false)
+        addArgument("discriminator", 0.toShort(), 4096.toShort(), discriminator, null, false)
+      }
       PairingModeType.ALREADY_DISCOVERED -> {
         addArgument("setup-pin-code", 0, 134217727, setupPINCode, null, false)
         addArgument("device-remote-ip", remoteAddr, false)
@@ -157,7 +161,16 @@ abstract class PairingCommand(
   }
 
   override fun onCommissioningStatusUpdate(nodeId: Long, stage: String?, errorCode: Long) {
-    logger.log(Level.INFO, "onCommissioningStatusUpdate")
+    val stageName = stage ?: "unknown"
+    logger.log(
+      Level.INFO,
+      "Commissioning status update: stage $stageName, nodeId=$nodeId, errorCode=$errorCode"
+    )
+  }
+
+  override fun onCommissioningStageStart(nodeId: Long, stage: String?) {
+    val stageName = stage ?: "unknown"
+    logger.log(Level.INFO, "Commissioning stage $stageName started for nodeId=$nodeId")
   }
 
   override fun onNotifyChipConnectionClosed() {

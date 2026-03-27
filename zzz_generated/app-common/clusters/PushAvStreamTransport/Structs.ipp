@@ -107,6 +107,74 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace TransportZoneOptionsStruct
 
+namespace AudioStreamStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kAudioStreamName), audioStreamName);
+    encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kAudioStreamName))
+        {
+            err = DataModel::Decode(reader, audioStreamName);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioStreamID))
+        {
+            err = DataModel::Decode(reader, audioStreamID);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace AudioStreamStruct
+
+namespace VideoStreamStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kVideoStreamName), videoStreamName);
+    encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kVideoStreamName))
+        {
+            err = DataModel::Decode(reader, videoStreamName);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoStreamID))
+        {
+            err = DataModel::Decode(reader, videoStreamID);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace VideoStreamStruct
+
 namespace TransportTriggerOptionsStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -160,10 +228,14 @@ namespace CMAFContainerOptionsStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kCMAFInterface), CMAFInterface);
+    encoder.Encode(to_underlying(Fields::kSegmentDuration), segmentDuration);
     encoder.Encode(to_underlying(Fields::kChunkDuration), chunkDuration);
+    encoder.Encode(to_underlying(Fields::kSessionGroup), sessionGroup);
+    encoder.Encode(to_underlying(Fields::kTrackName), trackName);
     encoder.Encode(to_underlying(Fields::kCENCKey), CENCKey);
-    encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
     encoder.Encode(to_underlying(Fields::kCENCKeyID), CENCKeyID);
+    encoder.Encode(to_underlying(Fields::kMetadataEnabled), metadataEnabled);
     return encoder.Finalize();
 }
 
@@ -177,21 +249,37 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kChunkDuration))
+        if (__context_tag == to_underlying(Fields::kCMAFInterface))
+        {
+            err = DataModel::Decode(reader, CMAFInterface);
+        }
+        else if (__context_tag == to_underlying(Fields::kSegmentDuration))
+        {
+            err = DataModel::Decode(reader, segmentDuration);
+        }
+        else if (__context_tag == to_underlying(Fields::kChunkDuration))
         {
             err = DataModel::Decode(reader, chunkDuration);
+        }
+        else if (__context_tag == to_underlying(Fields::kSessionGroup))
+        {
+            err = DataModel::Decode(reader, sessionGroup);
+        }
+        else if (__context_tag == to_underlying(Fields::kTrackName))
+        {
+            err = DataModel::Decode(reader, trackName);
         }
         else if (__context_tag == to_underlying(Fields::kCENCKey))
         {
             err = DataModel::Decode(reader, CENCKey);
         }
-        else if (__context_tag == to_underlying(Fields::kMetadataEnabled))
-        {
-            err = DataModel::Decode(reader, metadataEnabled);
-        }
         else if (__context_tag == to_underlying(Fields::kCENCKeyID))
         {
             err = DataModel::Decode(reader, CENCKeyID);
+        }
+        else if (__context_tag == to_underlying(Fields::kMetadataEnabled))
+        {
+            err = DataModel::Decode(reader, metadataEnabled);
         }
 
         ReturnErrorOnFailure(err);
@@ -241,12 +329,14 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
-    encoder.Encode(to_underlying(Fields::kEndpointID), endpointID);
+    encoder.Encode(to_underlying(Fields::kTLSEndpointID), TLSEndpointID);
     encoder.Encode(to_underlying(Fields::kUrl), url);
     encoder.Encode(to_underlying(Fields::kTriggerOptions), triggerOptions);
     encoder.Encode(to_underlying(Fields::kIngestMethod), ingestMethod);
     encoder.Encode(to_underlying(Fields::kContainerOptions), containerOptions);
     encoder.Encode(to_underlying(Fields::kExpiryTime), expiryTime);
+    encoder.Encode(to_underlying(Fields::kVideoStreams), videoStreams);
+    encoder.Encode(to_underlying(Fields::kAudioStreams), audioStreams);
     return encoder.Finalize();
 }
 
@@ -272,9 +362,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, audioStreamID);
         }
-        else if (__context_tag == to_underlying(Fields::kEndpointID))
+        else if (__context_tag == to_underlying(Fields::kTLSEndpointID))
         {
-            err = DataModel::Decode(reader, endpointID);
+            err = DataModel::Decode(reader, TLSEndpointID);
         }
         else if (__context_tag == to_underlying(Fields::kUrl))
         {
@@ -295,6 +385,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kExpiryTime))
         {
             err = DataModel::Decode(reader, expiryTime);
+        }
+        else if (__context_tag == to_underlying(Fields::kVideoStreams))
+        {
+            err = DataModel::Decode(reader, videoStreams);
+        }
+        else if (__context_tag == to_underlying(Fields::kAudioStreams))
+        {
+            err = DataModel::Decode(reader, audioStreams);
         }
 
         ReturnErrorOnFailure(err);

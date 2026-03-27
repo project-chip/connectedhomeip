@@ -49,7 +49,10 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <inet/EndPointStateOpenThread.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+
 #include <src/platform/ti/cc13xx_26xx/DefaultTestEventTriggerDelegate.h>
 
 #include <ti/drivers/apps/Button.h>
@@ -92,6 +95,8 @@ static Button_Handle sAppRightHandle;
 
 static DeviceInfoProviderImpl sExampleDeviceInfoProvider;
 
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
+
 AppTask AppTask::sAppTask;
 
 void uiLocking(void);
@@ -120,7 +125,7 @@ void InitializeOTARequestor(void)
     SetRequestorInstance(&sRequestorCore);
 
     sRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
+    TEMPORARY_RETURN_IGNORED sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
     sImageProcessor.SetOTADownloader(&sDownloader);
     sDownloader.SetImageProcessorDelegate(&sImageProcessor);
     sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
@@ -230,7 +235,7 @@ int AppTask::Init()
     cc13xx_26xxLogInit();
 
     // Init Chip memory management before the stack
-    Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED Platform::MemoryInit();
 
     PLAT_LOG("Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     PLAT_LOG("Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
@@ -284,6 +289,7 @@ int AppTask::Init()
             ;
     }
 
+    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
     ret = ThreadStackMgrImpl().StartThreadTask();
     if (ret != CHIP_NO_ERROR)
     {
@@ -314,11 +320,17 @@ int AppTask::Init()
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = [] { ThreadStackMgr().LockThreadStack(); };
+    nativeParams.unlockCb              = [] { ThreadStackMgr().UnlockThreadStack(); };
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+
     // Initialize info provider
     sExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
 
-    Server::GetInstance().Init(initParams);
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().Init(initParams);
 
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
@@ -330,7 +342,7 @@ int AppTask::Init()
 
     uiInit();
 
-    PlatformMgr().AddEventHandler(DeviceEventCallback, reinterpret_cast<intptr_t>(nullptr));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(DeviceEventCallback, reinterpret_cast<intptr_t>(nullptr));
 
     PlatformMgr().LockChipStack();
     {
@@ -595,7 +607,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
             else
             {
                 // Disable BLE advertisements
-                ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+                TEMPORARY_RETURN_IGNORED ConnectivityMgr().SetBLEAdvertisingEnabled(false);
                 PLAT_LOG("Disabled BLE Advertisements");
             }
         }

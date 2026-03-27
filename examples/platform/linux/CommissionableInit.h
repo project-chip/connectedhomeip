@@ -29,13 +29,22 @@ namespace examples {
 
 /**
  * @brief Initialize a LinuxCommissionableDataProvider from Linux common command-line
- *        options. Handles verifier, passcode, discriminator, etc.
+ *        options, falling back to PosixConfig, or hardcoded test parameters (if enabled).
+ *        Handles passcode, verifier, salt, iteration count, and discriminator.
  *
  * @param provider - provider to initialize from command line arguments
  * @param options - LinuxDeviceOptions instance configured via command-line parsing
+ *
+ * @note  The following PosixConfig keys are used if present:
+ *        - kConfigKey_SetupPinCode
+ *        - kConfigKey_Spake2pVerifier
+ *        - kConfigKey_Spake2pIterationCount
+ *        - kConfigKey_Spake2pSalt
+ *        - kConfigKey_SetupDiscriminator
+ *
  * @return CHIP_NO_ERROR on success or another CHIP_ERROR value on internal validation errors (likely fatal)
  */
-CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options);
+CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, const LinuxDeviceOptions & options);
 
 /**
  * @brief Initialize a Linux ConfigurationManagerImpl to reflect some command-line configured
@@ -45,7 +54,8 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
  * @param options - LinuxDeviceOptions instance configured via command-line parsing
  * @return CHIP_NO_ERROR on success or another CHIP_ERROR value on internal validation errors (likely fatal)
  */
-CHIP_ERROR InitConfigurationManager(chip::DeviceLayer::ConfigurationManagerImpl & configManager, LinuxDeviceOptions & options);
+CHIP_ERROR InitConfigurationManager(chip::DeviceLayer::ConfigurationManagerImpl & configManager,
+                                    const LinuxDeviceOptions & options);
 
 } // namespace examples
 } // namespace chip

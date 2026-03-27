@@ -889,9 +889,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             }
             tlvReader.exitContainer()
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_ARG2)) {
+      } else if (tag == ContextSpecificTag(TAG_ARG2)) {
         arg2_decoded =
           buildList<UnitTestingClusterSimpleStruct> {
             tlvReader.enterArray(tag)
@@ -900,9 +898,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             }
             tlvReader.exitContainer()
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_ARG3)) {
+      } else if (tag == ContextSpecificTag(TAG_ARG3)) {
         arg3_decoded =
           buildList<UByte> {
             tlvReader.enterArray(tag)
@@ -911,9 +907,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             }
             tlvReader.exitContainer()
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_ARG4)) {
+      } else if (tag == ContextSpecificTag(TAG_ARG4)) {
         arg4_decoded =
           buildList<Boolean> {
             tlvReader.enterArray(tag)
@@ -922,13 +916,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             }
             tlvReader.exitContainer()
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_ARG5)) {
+      } else if (tag == ContextSpecificTag(TAG_ARG5)) {
         arg5_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_ARG6)) {
+      } else if (tag == ContextSpecificTag(TAG_ARG6)) {
         arg6_decoded = tlvReader.getBoolean(tag)
       } else {
         tlvReader.skipElement()
@@ -1363,9 +1353,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
       if (tag == ContextSpecificTag(TAG_ARG1)) {
         arg1_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_ARG2)) {
+      } else if (tag == ContextSpecificTag(TAG_ARG2)) {
         arg2_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
@@ -1427,9 +1415,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
       if (tag == ContextSpecificTag(TAG_WAS_PRESENT)) {
         wasPresent_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_WAS_NULL)) {
+      } else if (tag == ContextSpecificTag(TAG_WAS_NULL)) {
         wasNull_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1441,9 +1427,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1455,9 +1439,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_ORIGINAL_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_ORIGINAL_VALUE)) {
         originalValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1683,9 +1665,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
       if (tag == ContextSpecificTag(TAG_NULLABLE_INT_WAS_NULL)) {
         nullableIntWasNull_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_INT_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_INT_VALUE)) {
         nullableIntValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1697,13 +1677,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_OPTIONAL_INT_WAS_PRESENT)) {
+      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_INT_WAS_PRESENT)) {
         optionalIntWasPresent_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_OPTIONAL_INT_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_INT_VALUE)) {
         optionalIntValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1715,13 +1691,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_WAS_PRESENT)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_WAS_PRESENT)) {
         nullableOptionalIntWasPresent_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_WAS_NULL)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_WAS_NULL)) {
         nullableOptionalIntWasNull_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1733,9 +1705,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_VALUE)) {
         nullableOptionalIntValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1747,13 +1717,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_STRING_WAS_NULL)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_STRING_WAS_NULL)) {
         nullableStringWasNull_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_STRING_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_STRING_VALUE)) {
         nullableStringValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1765,13 +1731,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_OPTIONAL_STRING_WAS_PRESENT)) {
+      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_STRING_WAS_PRESENT)) {
         optionalStringWasPresent_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_OPTIONAL_STRING_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_STRING_VALUE)) {
         optionalStringValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1783,13 +1745,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_WAS_PRESENT)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_WAS_PRESENT)) {
         nullableOptionalStringWasPresent_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_WAS_NULL)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_WAS_NULL)) {
         nullableOptionalStringWasNull_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1801,9 +1759,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_VALUE)) {
         nullableOptionalStringValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1815,13 +1771,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_STRUCT_WAS_NULL)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_STRUCT_WAS_NULL)) {
         nullableStructWasNull_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_STRUCT_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_STRUCT_VALUE)) {
         nullableStructValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1833,13 +1785,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_OPTIONAL_STRUCT_WAS_PRESENT)) {
+      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_STRUCT_WAS_PRESENT)) {
         optionalStructWasPresent_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_OPTIONAL_STRUCT_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_STRUCT_VALUE)) {
         optionalStructValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1851,13 +1799,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_WAS_PRESENT)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_WAS_PRESENT)) {
         nullableOptionalStructWasPresent_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_WAS_NULL)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_WAS_NULL)) {
         nullableOptionalStructWasNull_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1869,9 +1813,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_VALUE)) {
         nullableOptionalStructValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1883,13 +1825,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_LIST_WAS_NULL)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_LIST_WAS_NULL)) {
         nullableListWasNull_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_LIST_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_LIST_VALUE)) {
         nullableListValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1907,13 +1845,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_OPTIONAL_LIST_WAS_PRESENT)) {
+      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_LIST_WAS_PRESENT)) {
         optionalListWasPresent_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_OPTIONAL_LIST_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_OPTIONAL_LIST_VALUE)) {
         optionalListValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1931,13 +1865,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_WAS_PRESENT)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_WAS_PRESENT)) {
         nullableOptionalListWasPresent_decoded = tlvReader.getBoolean(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_WAS_NULL)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_WAS_NULL)) {
         nullableOptionalListWasNull_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1949,9 +1879,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               null
             }
           }
-      }
-
-      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_VALUE)) {
+      } else if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_VALUE)) {
         nullableOptionalListValue_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -2450,9 +2378,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
       if (tag == ContextSpecificTag(TAG_FIELD1)) {
         field1_decoded = UnitTestingClusterTestGlobalStruct.fromTlv(tag, tlvReader)
-      }
-
-      if (tag == ContextSpecificTag(TAG_FIELD2)) {
+      } else if (tag == ContextSpecificTag(TAG_FIELD2)) {
         field2_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
@@ -2526,9 +2452,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
       if (tag == ContextSpecificTag(TAG_ARG1)) {
         arg1_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_EVENT_NUMBER)) {
+      } else if (tag == ContextSpecificTag(TAG_EVENT_NUMBER)) {
         eventNumber_decoded = tlvReader.getULong(tag)
       } else {
         tlvReader.skipElement()
@@ -8651,6 +8575,144 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(GlobalStructAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readUnsupportedAttributeRequiringAdminPrivilegeAttribute(): Boolean? {
+    val ATTRIBUTE_ID: UInt = 254u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) {
+      "Unsupportedattributerequiringadminprivilege attribute not found in response"
+    }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: Boolean? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getBoolean(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
+  }
+
+  suspend fun writeUnsupportedAttributeRequiringAdminPrivilegeAttribute(
+    value: Boolean,
+    timedWriteTimeout: Duration? = null,
+  ) {
+    val ATTRIBUTE_ID: UInt = 254u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeUnsupportedAttributeRequiringAdminPrivilegeAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<BooleanSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 254u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            BooleanSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Unsupportedattributerequiringadminprivilege attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Boolean? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getBoolean(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(BooleanSubscriptionState.SubscriptionEstablished)
         }
       }
     }

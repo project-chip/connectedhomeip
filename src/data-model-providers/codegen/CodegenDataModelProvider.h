@@ -19,18 +19,20 @@
 #include <app/data-model-provider/Provider.h>
 
 #include <app/CommandHandlerInterface.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/NodeConfigurationListener.h>
+#include <app/server-cluster/SingleEndpointServerClusterRegistry.h>
 #include <app/util/af-types.h>
-#include <data-model-providers/codegen/ServerClusterInterfaceRegistry.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip {
 namespace app {
 
-/// An implementation of `InteractionModel::Model` that relies on code-generation
+/// An implementation of `DataModel::Provider` that relies on code-generation
 /// via zap/ember.
 ///
 /// The Ember framework uses generated files (like endpoint-config.h and various
@@ -40,8 +42,8 @@ namespace app {
 /// as well as application-specific overrides to provide data model functionality.
 ///
 /// Given that this relies on global data at link time, there generally can be
-/// only one CodegenDataModelProvider per application (you can create more instances,
-/// however they would share the exact same underlying data and storage).
+/// only one CodegenDataModelProvider per application. Per-cluster CodegenIntegration
+/// functions access the global singleton instance via `CodegenDataModelProvider::Instance()`.
 class CodegenDataModelProvider : public DataModel::Provider
 {
 public:
@@ -52,10 +54,14 @@ public:
     /// where path caching does not really apply (the same path may result in different outcomes)
     void Reset() { mPreviouslyFoundCluster = std::nullopt; }
 
-    void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
+    void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate)
+    {
+        VerifyOrDie(!mContext.has_value()); // can't change once started
+        mPersistentStorageDelegate = delegate;
+    }
     PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
 
-    ServerClusterInterfaceRegistry & Registry() { return mRegistry; }
+    SingleEndpointServerClusterRegistry & Registry() { return mRegistry; }
 
     /// Generic model implementations
     CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
@@ -66,7 +72,8 @@ public:
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
 
-    void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType) override;
+    void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType,
+                                        FabricIndex accessingFabric) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
@@ -78,7 +85,6 @@ public:
 
     /// attribute tree iteration
     CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & out) override;
-    CHIP_ERROR SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder) override;
     CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & builder) override;
     CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder) override;
     CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> & builder) override;
@@ -103,6 +109,10 @@ protected:
     CHIP_ERROR Internal_BumpNodeDataModelConfigurationVersion() override;
 
 private:
+    // Context is available after startup and cleared in shutdown.
+    // This has a value for as long as we assume the context is valid.
+    std::optional<DataModel::InteractionModelContext> mContext;
+
     // The registered listener for changes to the data model configuration
     DataModel::NodeConfigurationListener * mNodeConfigurationListener;
 
@@ -135,7 +145,7 @@ private:
     // Ember requires a persistence provider, so we make sure we can always have something
     PersistentStorageDelegate * mPersistentStorageDelegate = nullptr;
 
-    ServerClusterInterfaceRegistry mRegistry;
+    SingleEndpointServerClusterRegistry mRegistry;
 
     /// Finds the specified ember cluster
     ///

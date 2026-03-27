@@ -31,19 +31,20 @@ void MatterSampleMeiPluginServerInitCallback()
     ChipLogProgress(Zcl, "Sample MEI Init. Ep %d, Total Ep %u", MATTER_DM_SAMPLE_MEI_CLUSTER_SERVER_ENDPOINT_COUNT,
                     static_cast<uint16_t>(kNumSupportedEndpoints));
     ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&SampleMeiServer::Instance()));
-    VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Register(&SampleMeiServer::Instance()), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Register(&SampleMeiServer::Instance()),
+                   ChipLogError(Zcl, "Failed to init sample MEI %" CHIP_ERROR_FORMAT, CHIP_ERROR_INCORRECT_STATE.Format()));
 }
 
 void MatterSampleMeiPluginServerShutdownCallback()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&SampleMeiServer::Instance());
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&SampleMeiServer::Instance());
     AttributeAccessInterfaceRegistry::Instance().Unregister(&SampleMeiServer::Instance());
 }
 
 void emberAfSampleMeiClusterServerInitCallback(chip::EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "Creating Sample MEI cluster, Ep %d", endpoint);
-    SampleMeiServer::Instance().RegisterEndpoint(endpoint);
+    TEMPORARY_RETURN_IGNORED SampleMeiServer::Instance().RegisterEndpoint(endpoint);
 }
 
 void MatterSampleMeiClusterServerShutdownCallback(chip::EndpointId endpoint)
@@ -51,7 +52,7 @@ void MatterSampleMeiClusterServerShutdownCallback(chip::EndpointId endpoint)
     // There's currently no whole-cluster shutdown callback. That would trigger
     // call to `Shutdown`. Thus ep-based shutdown calls `UnregisterEndpoint`
     ChipLogProgress(Zcl, "Shutting down Sample MEI cluster, Ep %d", endpoint);
-    SampleMeiServer::Instance().UnregisterEndpoint(endpoint);
+    TEMPORARY_RETURN_IGNORED SampleMeiServer::Instance().UnregisterEndpoint(endpoint);
 }
 
 // *****************************************************************************

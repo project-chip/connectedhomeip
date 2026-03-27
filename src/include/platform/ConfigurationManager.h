@@ -189,7 +189,7 @@ protected:
 };
 
 /**
- * Returns a reference to a ConfigurationManager object.
+ * Returns a reference to a ConfigurationManager singleton object.
  *
  * Applications should use this to access features of the ConfigurationManager object
  * that are common to all platforms.
@@ -197,7 +197,7 @@ protected:
 ConfigurationManager & ConfigurationMgr();
 
 /**
- * Returns the platform-specific implementation of the ConfigurationManager object.
+ * Returns the platform-specific implementation of the ConfigurationManager singleton object.
  *
  * Applications can use this to gain access to features of the ConfigurationManager
  * that are specific to the selected platform.

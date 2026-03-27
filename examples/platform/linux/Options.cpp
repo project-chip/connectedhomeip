@@ -31,12 +31,17 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
 #include <app/tests/suites/credentials/TestHarnessDACProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+
+#if CHIP_ATTESTATION_TRUSTY_OS
+#include <platform/Linux/DeviceAttestationCredsTrusty.h>
+#endif
 
 #if ENABLE_TRACING
 #include <TracingCommandLineArgument.h> // nogncheck
@@ -69,6 +74,7 @@ enum
     kDeviceOption_BleDevice = 0x1000,
     kDeviceOption_WiFi,
     kDeviceOption_Thread,
+    kDeviceOption_ThreadNodeId,
     kDeviceOption_Version,
     kDeviceOption_VendorID,
     kDeviceOption_ProductID,
@@ -89,6 +95,7 @@ enum
     kDeviceOption_KVS,
     kDeviceOption_InterfaceId,
     kDeviceOption_AppPipe,
+    kDeviceOption_AppPipeOut,
     kDeviceOption_Spake2pVerifierBase64,
     kDeviceOption_Spake2pSaltBase64,
     kDeviceOption_Spake2pIterations,
@@ -130,6 +137,9 @@ enum
     kDeviceOption_WiFi_PAF,
 #endif
     kDeviceOption_DacProvider,
+#if CHIP_ATTESTATION_TRUSTY_OS
+    kDeviceOption_TrustyDacProvider,
+#endif
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     kDeviceOption_TermsAndConditions_Version,
     kDeviceOption_TermsAndConditions_Required,
@@ -137,14 +147,18 @@ enum
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     kDeviceOption_icdActiveModeDurationMs,
     kDeviceOption_icdIdleModeDuration,
+    kDeviceOption_icdShortIdleModeDuration,
 #endif
 #if ENABLE_CAMERA_SERVER
     kDeviceOption_Camera_DeferredOffer,
+    kDeviceOption_Camera_TestVideosrc,
+    kDeviceOption_Camera_TestAudiosrc,
+    kDeviceOption_Camera_AudioPlayback,
+    kDeviceOption_Camera_VideoDevice,
 #endif
     kDeviceOption_VendorName,
     kDeviceOption_ProductName,
     kDeviceOption_HardwareVersionString,
-    kDeviceOption_SoftwareVersionString,
     kDeviceOption_SerialNumber,
 };
 
@@ -162,7 +176,11 @@ OptionDef sDeviceOptionDefs[] = {
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    { "thread-node-id", kArgumentRequired, kDeviceOption_ThreadNodeId },
+#else
     { "thread", kNoArgument, kDeviceOption_Thread },
+#endif
 #endif // CHIP_ENABLE_OPENTHREAD
     { "version", kArgumentRequired, kDeviceOption_Version },
     { "vendor-id", kArgumentRequired, kDeviceOption_VendorID },
@@ -170,7 +188,6 @@ OptionDef sDeviceOptionDefs[] = {
     { "vendor-name", kArgumentRequired, kDeviceOption_VendorName },
     { "product-name", kArgumentRequired, kDeviceOption_ProductName },
     { "hardware-version-string", kArgumentRequired, kDeviceOption_HardwareVersionString },
-    { "software-version-string", kArgumentRequired, kDeviceOption_SoftwareVersionString },
     { "serial-number", kArgumentRequired, kDeviceOption_SerialNumber },
     { "custom-flow", kArgumentRequired, kDeviceOption_CustomFlow },
     { "capabilities", kArgumentRequired, kDeviceOption_Capabilities },
@@ -192,6 +209,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "KVS", kArgumentRequired, kDeviceOption_KVS },
     { "interface-id", kArgumentRequired, kDeviceOption_InterfaceId },
     { "app-pipe", kArgumentRequired, kDeviceOption_AppPipe },
+    { "app-pipe-out", kArgumentRequired, kDeviceOption_AppPipeOut },
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     { "trace_file", kArgumentRequired, kDeviceOption_TraceFile },
     { "trace_log", kArgumentRequired, kDeviceOption_TraceLog },
@@ -228,6 +246,9 @@ OptionDef sDeviceOptionDefs[] = {
     { "faults", kArgumentRequired, kDeviceOption_FaultInjection },
 #endif
     { "dac_provider", kArgumentRequired, kDeviceOption_DacProvider },
+#if CHIP_ATTESTATION_TRUSTY_OS
+    { "dac_provider_trusty", kNoArgument, kDeviceOption_TrustyDacProvider },
+#endif
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     { "tc-version", kArgumentRequired, kDeviceOption_TermsAndConditions_Version },
     { "tc-required", kArgumentRequired, kDeviceOption_TermsAndConditions_Required },
@@ -235,9 +256,14 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     { "icdActiveModeDurationMs", kArgumentRequired, kDeviceOption_icdActiveModeDurationMs },
     { "icdIdleModeDuration", kArgumentRequired, kDeviceOption_icdIdleModeDuration },
+    { "icdShortIdleModeDuration", kArgumentRequired, kDeviceOption_icdShortIdleModeDuration },
 #endif
 #if ENABLE_CAMERA_SERVER
     { "camera-deferred-offer", kNoArgument, kDeviceOption_Camera_DeferredOffer },
+    { "camera-test-videosrc", kNoArgument, kDeviceOption_Camera_TestVideosrc },
+    { "camera-test-audiosrc", kNoArgument, kDeviceOption_Camera_TestAudiosrc },
+    { "camera-audio-playback", kNoArgument, kDeviceOption_Camera_AudioPlayback },
+    { "camera-video-device", kArgumentRequired, kDeviceOption_Camera_VideoDevice },
 #endif
     {}
 };
@@ -264,9 +290,14 @@ const char * sDeviceOptionHelp =
     "       Give an empty string if not setting freq_list: \"\"\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAFs
 #if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     "\n"
+    "  --thread-node-id <node id>\n"
+    "       Enable Thread Simulation with the specified node id.\n"
+#else
     "  --thread\n"
     "       Enable Thread management via ot-agent.\n"
+#endif
 #endif // CHIP_ENABLE_OPENTHREAD
     "\n"
     "  --version <version>\n"
@@ -286,9 +317,6 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --hardware-version-string <string>\n"
     "       The HardwareVersionString used in the basic information cluster.\n"
-    "\n"
-    "  --software-version-string <string>\n"
-    "       The SoftwareVersionString used in the basic information cluster.\n"
     "\n"
     "  --serial-number <serial_number>\n"
     "       The serial number specified by vendor.\n"
@@ -350,7 +378,10 @@ const char * sDeviceOptionHelp =
     "       A interface id to advertise on.\n"
     "\n"
     "  --app-pipe <filepath>\n"
-    "       Custom path for the current application to send out of band commands.\n"
+    "       Custom path for the current application to receive out of band commands from the test.\n"
+    "\n"
+    "  --app-pipe-out <filepath>\n"
+    "       Custom path for the current application to send out of band commands to the test.\n"
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     "\n"
     "  --trace_file <file>\n"
@@ -430,6 +461,10 @@ const char * sDeviceOptionHelp =
 #endif
     "  --dac_provider <filepath>\n"
     "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
+#if CHIP_ATTESTATION_TRUSTY_OS
+    "  --dac_provider_trusty\n"
+    "       Invoke Trusty OS to get device attestation from secure storage.\n"
+#endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     "  --icdActiveModeDurationMs <icdActiveModeDurationMs>\n"
     "       Sets the ICD active mode duration (in milliseconds). (Default: 300) \n"
@@ -443,6 +478,19 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --camera-deferred-offer\n"
     "       Indicates the delayed processing hint of the WebRTC Provider.\n"
+    "\n"
+    "  --camera-video-device <path>\n"
+    "       Path to a V4L2 video capture device (default: /dev/video0).\n"
+    "\n"
+    "  --camera-test-videosrc\n"
+    "       Use gstreamer test video source for streaming. Overrides --camera-video-device.\n"
+    "\n"
+    "  --camera-test-audiosrc\n"
+    "       Use gstreamer test audio source for streaming. Overrides --camera-video-device.\n"
+    "\n"
+    "  --camera-audio-playback\n"
+    "       Enables audio playback gstreamer pipeline to play the audio received from remote peer.\n"
+    "\n"
 #endif
     "\n";
 
@@ -518,9 +566,21 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().wifiSupports5g = true;
         break;
 
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    case kDeviceOption_ThreadNodeId:
+        if (!ParseInt(aValue, LinuxDeviceOptions::GetInstance().mThreadNodeId))
+        {
+            PrintArgError("%s: invalid value specified for Thread node id: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        break;
+#else
     case kDeviceOption_Thread:
         LinuxDeviceOptions::GetInstance().mThread = true;
         break;
+#endif
+#endif
 
     case kDeviceOption_Version:
         LinuxDeviceOptions::GetInstance().payload.version = static_cast<uint8_t>(strtoul(aValue, nullptr, 0));
@@ -544,10 +604,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_HardwareVersionString:
         LinuxDeviceOptions::GetInstance().hardwareVersionString.SetValue(std::string{ aValue });
-        break;
-
-    case kDeviceOption_SoftwareVersionString:
-        LinuxDeviceOptions::GetInstance().softwareVersionString.SetValue(std::string{ aValue });
         break;
 
     case kDeviceOption_SerialNumber:
@@ -655,18 +711,18 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     case kDeviceOption_SecuredDevicePort:
-        LinuxDeviceOptions::GetInstance().securedDevicePort = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().securedDevicePort = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
 
     case kDeviceOption_UnsecuredCommissionerPort:
-        LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
 
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     case kDeviceOption_SecuredCommissionerPort:
-        LinuxDeviceOptions::GetInstance().securedCommissionerPort = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().securedCommissionerPort = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
     case kCommissionerOption_FabricID:
         LinuxDeviceOptions::GetInstance().commissionerFabricId = static_cast<chip::FabricId>(strtoull(aValue, nullptr, 0));
@@ -689,9 +745,13 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().app_pipe = aValue;
         break;
 
+    case kDeviceOption_AppPipeOut:
+        LinuxDeviceOptions::GetInstance().app_pipe_out = aValue;
+        break;
+
     case kDeviceOption_InterfaceId:
         LinuxDeviceOptions::GetInstance().interfaceId =
-            Inet::InterfaceId(static_cast<chip::Inet::InterfaceId::PlatformType>(atoi(aValue)));
+            Inet::InterfaceId(static_cast<chip::Inet::InterfaceId::PlatformType>(strtoul(aValue, nullptr, 0)));
         break;
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
@@ -699,13 +759,13 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().traceStreamFilename.SetValue(std::string{ aValue });
         break;
     case kDeviceOption_TraceLog:
-        if (atoi(aValue) != 0)
+        if (strtoul(aValue, nullptr, 0) != 0)
         {
             LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled = true;
         }
         break;
     case kDeviceOption_TraceDecode:
-        if (atoi(aValue) != 0)
+        if (strtoul(aValue, nullptr, 0) != 0)
         {
             LinuxDeviceOptions::GetInstance().traceStreamDecodeEnabled = true;
         }
@@ -781,15 +841,16 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
 #if defined(PW_RPC_ENABLED)
     case kOptionRpcServerPort:
-        LinuxDeviceOptions::GetInstance().rpcServerPort = static_cast<uint16_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().rpcServerPort = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
 #endif
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     case kDeviceOption_SubscriptionCapacity:
-        LinuxDeviceOptions::GetInstance().subscriptionCapacity = static_cast<int32_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().subscriptionCapacity = static_cast<int32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kDeviceOption_SubscriptionResumptionRetryIntervalSec:
-        LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec = static_cast<int32_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec =
+            static_cast<int32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kDeviceOption_IdleRetransmitTimeout: {
         auto mrpConfig            = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
@@ -847,14 +908,20 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().dacProvider = &testDacProvider;
         break;
     }
+#if CHIP_ATTESTATION_TRUSTY_OS
+    case kDeviceOption_TrustyDacProvider: {
+        LinuxDeviceOptions::GetInstance().dacProvider = &chip::Credentials::Trusty::TrustyDACProvider::GetTrustyDACProvider();
+        break;
+    }
+#endif
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     case kDeviceOption_TermsAndConditions_Version: {
-        LinuxDeviceOptions::GetInstance().tcVersion.SetValue(static_cast<uint16_t>(atoi(aValue)));
+        LinuxDeviceOptions::GetInstance().tcVersion.SetValue(static_cast<uint16_t>(strtoul(aValue, nullptr, 0)));
         break;
     }
 
     case kDeviceOption_TermsAndConditions_Required: {
-        LinuxDeviceOptions::GetInstance().tcRequired.SetValue(static_cast<uint16_t>(atoi(aValue)));
+        LinuxDeviceOptions::GetInstance().tcRequired.SetValue(static_cast<uint16_t>(strtoul(aValue, nullptr, 0)));
         break;
     }
 #endif
@@ -881,8 +948,32 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         }
         else
         {
-            // Covert from seconds to mini seconds
+            // Covert from seconds to milli seconds
             LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.SetValue(chip::System::Clock::Milliseconds32(value * 1000));
+        }
+        break;
+    }
+    case kDeviceOption_icdShortIdleModeDuration: {
+        uint32_t value = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
+        if ((value < 1) || (value > 86400))
+        {
+            PrintArgError("%s: invalid value specified for icdShortIdleModeDuration: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            if (LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.HasValue() &&
+                (value > std::chrono::duration_cast<System::Clock::Seconds32>(
+                             LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.Value())
+                             .count()))
+            {
+                PrintArgError("%s: icdShortIdleModeDuration value (%s) must be <= icdIdleModeDuration\n", aProgram, aValue);
+                retval = false;
+            }
+            else
+            {
+                LinuxDeviceOptions::GetInstance().shortIdleModeDurationS = chip::System::Clock::Seconds32(value);
+            }
         }
         break;
     }
@@ -890,6 +981,22 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #if ENABLE_CAMERA_SERVER
     case kDeviceOption_Camera_DeferredOffer: {
         LinuxDeviceOptions::GetInstance().cameraDeferredOffer = true;
+        break;
+    }
+    case kDeviceOption_Camera_TestVideosrc: {
+        LinuxDeviceOptions::GetInstance().cameraTestVideosrc = true;
+        break;
+    }
+    case kDeviceOption_Camera_TestAudiosrc: {
+        LinuxDeviceOptions::GetInstance().cameraTestAudiosrc = true;
+        break;
+    }
+    case kDeviceOption_Camera_AudioPlayback: {
+        LinuxDeviceOptions::GetInstance().cameraAudioPlayback = true;
+        break;
+    }
+    case kDeviceOption_Camera_VideoDevice: {
+        LinuxDeviceOptions::GetInstance().cameraVideoDevice.SetValue(aValue);
         break;
     }
 #endif

@@ -37,8 +37,10 @@ public:
     virtual bool GetGPIO(uint32_t port, uint32_t pin) { return false; }
     virtual uint32_t GetRebootCause() = 0;
 
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
     // Scheduler
     virtual void StartScheduler(void) = 0;
+#endif // SL_CATALOG_CUSTOM_MAIN_PRESENT
 
     // Buttons
     typedef void (*SilabsButtonCb)(uint8_t, uint8_t);
@@ -62,6 +64,12 @@ public:
     virtual CHIP_ERROR FlashInit() { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR FlashErasePage(uint32_t addr) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     virtual CHIP_ERROR FlashWritePage(uint32_t addr, const uint8_t * data, size_t size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    // Watchdog
+    virtual void WatchdogInit(){};
+    virtual void WatchdogFeed(){};
+    virtual void WatchdogEnable(){};
+    virtual void WatchdogDisable(){};
 
     /**
      * @brief Function trigger the platform to execute a software reset.

@@ -12,6 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+declare_args() {
+  # enable extra error logging if emberAf lokups or data loading fails
+  # during cluster register/unregister
+  #
+  # In most cases on a final product, these errors never happen and logs would just
+  # take flash, so default is disabled on smaller platforms
+  chip_enable_codegen_integration_lookup_errors =
+      current_os == "linux" || current_os == "android" || current_os == "mac" ||
+      current_os == "ios"
+}
+
+buildconfig_header("processing-buildconfig") {
+  header = "CodegenProcessingBuildConfig.h"
+  header_dir = "codegen"
+
+  defines = [ "CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS=${chip_enable_codegen_integration_lookup_errors}" ]
+
+  visibility = [ ":processing-config" ]
+}
+
+source_set("processing-config") {
+  sources = [ "CodegenProcessingConfig.h" ]
+  deps = [ ":processing-buildconfig" ]
+}
 
 # This source set is TIGHLY coupled with code-generated data models
 # as generally implemented by `src/app/util`
@@ -20,14 +45,14 @@ import("//build_overrides/chip.gni")
 # be available at link time for this model to use
 #
 # Use `model.gni` to get access to:
+#   ClusterIntegration.cpp
+#   ClusterIntegration.h
 #   CodegenDataModelProvider.cpp
 #   CodegenDataModelProvider.h
 #   CodegenDataModelProvider_Read.cpp
 #   CodegenDataModelProvider_Write.cpp
 #   EmberAttributeDataBuffer.cpp
 #   EmberAttributeDataBuffer.h
-#   EmberMetadata.cpp
-#   EmberMetadata.h
 #   Instance.cpp
 #
 # The above list of files exists to satisfy the "dependency linter"
@@ -46,15 +71,17 @@ source_set("instance-header") {
   sources = [ "Instance.h" ]
 }
 
-source_set("registry") {
-  sources = [
-    "ServerClusterInterfaceRegistry.cpp",
-    "ServerClusterInterfaceRegistry.h",
-  ]
+source_set("headers") {
+  sources = [ "CodegenDataModelProvider.h" ]
 
   public_deps = [
+    "${chip_root}/src/app:attribute-access",
+    "${chip_root}/src/app:command-handler-interface",
     "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/server-cluster:registry",
+    "${chip_root}/src/app/util:af-types",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
   ]

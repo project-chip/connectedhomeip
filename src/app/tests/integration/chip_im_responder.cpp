@@ -90,7 +90,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
 
     if (aReader.GetLength() != 0)
     {
-        chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
+        SuccessOrDie(chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter));
     }
 
     chip::app::ConcreteCommandPath path = {
@@ -181,7 +181,7 @@ int main(int argc, char * argv[])
 
     printf("Listening for IM requests...\n");
 
-    MockEventGenerator::GetInstance()->Init(&gExchangeManager, &gLivenessGenerator, 1000, true);
+    SuccessOrExit(err = MockEventGenerator::GetInstance()->Init(&gExchangeManager, &gLivenessGenerator, 1000, true));
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 

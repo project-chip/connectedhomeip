@@ -137,12 +137,12 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="Accuracy" type="MeasurementAccuracyStruct">
+    <attribute id="0x0000" name="Accuracy" type="">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="CumulativeEnergyImported" type="EnergyMeasurementStruct" default="null">
+    <attribute id="0x0001" name="CumulativeEnergyImported" type="EnergyMeasurementStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -152,7 +152,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0002" name="CumulativeEnergyExported" type="EnergyMeasurementStruct" default="null">
+    <attribute id="0x0002" name="CumulativeEnergyExported" type="EnergyMeasurementStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -162,7 +162,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0003" name="PeriodicEnergyImported" type="EnergyMeasurementStruct" default="null">
+    <attribute id="0x0003" name="PeriodicEnergyImported" type="EnergyMeasurementStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
@@ -172,7 +172,7 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0004" name="PeriodicEnergyExported" type="EnergyMeasurementStruct" default="null">
+    <attribute id="0x0004" name="PeriodicEnergyExported" type="EnergyMeasurementStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>

@@ -6,8 +6,8 @@
     If fixing an error, explain the root cause and the chosen solution's rationale, especially if not obvious.
     Include context like links to related documents/issues/test plans and highlight notable information or specific concerns.
 
-    See guidelines: https://project-chip.github.io/connectedhomeip-doc/pull_request_guidelines.html#pr-summary-description
-    See title formatting: https://project-chip.github.io/connectedhomeip-doc/pull_request_guidelines.html#title-formatting
+    See guidelines: https://project-chip.github.io/connectedhomeip-doc/contributing/pull_request_guidelines.html#pr-summary-description
+    See title formatting: https://project-chip.github.io/connectedhomeip-doc/contributing/pull_request_guidelines.html#title-formatting
 
     Please replace this HTML comment with the actual PR summary.
 -->
@@ -35,7 +35,7 @@
     As a general rule, a proposed PR change must not break the existing code and must be well-tested.
     Please include information about testing.
 
-    See testing guidelines: https://project-chip.github.io/connectedhomeip-doc/pull_request_guidelines.html#testing
+    See testing guidelines: https://project-chip.github.io/connectedhomeip-doc/contributing/pull_request_guidelines.html#testing
 
     Examples:
         added unit tests
@@ -52,7 +52,7 @@ The checklist below will help the reviewer finish PR review in time and keep the
 code readable:
 
 -   [ ] PR title is
-        [descriptive](https://project-chip.github.io/connectedhomeip-doc/pull_request_guidelines.html#title-formatting)
+        [descriptive](https://project-chip.github.io/connectedhomeip-doc/contributing/pull_request_guidelines.html#title-formatting)
 -   [ ] Apply the
         [_“When in Rome…”_](https://project-chip.github.io/connectedhomeip-doc/style/CODING_STYLE_GUIDE.html)
         rule (coding style)
@@ -60,4 +60,4 @@ code readable:
 -   [ ] Try to avoid "squashing" and "force-update" in commit history
 -   [ ] CI time didn't increase
 
-See: [Pull Request Guidelines](https://project-chip.github.io/connectedhomeip-doc/pull_request_guidelines.html)
+See: [Pull Request Guidelines](https://project-chip.github.io/connectedhomeip-doc/contributing/pull_request_guidelines.html)

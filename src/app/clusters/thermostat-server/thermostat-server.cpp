@@ -29,6 +29,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
+#include <clusters/Thermostat/Metadata.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
@@ -521,6 +522,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     if (ep < MATTER_ARRAY_SIZE(gDelegateTable))
     {
         gDelegateTable[ep] = delegate;
+        delegate->SetEndpointId(endpoint);
     }
 }
 
@@ -631,13 +633,73 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     break;
     case ScheduleTypes::Id: {
-        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+        auto delegate = GetDelegate(aPath.mEndpointId);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
+            {
+                ScheduleTypeStruct::Type scheduleType;
+                auto err = delegate->GetScheduleTypeAtIndex(i, scheduleType);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(encoder.Encode(scheduleType));
+            }
+        });
     }
     break;
     case Schedules::Id: {
         return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
     }
     break;
+    case MaxThermostatSuggestions::Id: {
+        auto delegate = GetDelegate(aPath.mEndpointId);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        ReturnErrorOnFailure(aEncoder.Encode(delegate->GetMaxThermostatSuggestions()));
+    }
+    break;
+    case ThermostatSuggestions::Id: {
+        auto delegate = GetDelegate(aPath.mEndpointId);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+            for (size_t i = 0; true; i++)
+            {
+                ThermostatSuggestionStructWithOwnedMembers thermostatSuggestion;
+                auto err = delegate->GetThermostatSuggestionAtIndex(i, thermostatSuggestion);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(encoder.Encode(thermostatSuggestion));
+            }
+        });
+    }
+    break;
+    case CurrentThermostatSuggestion::Id: {
+        auto delegate = GetDelegate(aPath.mEndpointId);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentThermostatSuggestion;
+
+        delegate->GetCurrentThermostatSuggestion(currentThermostatSuggestion);
+        ReturnErrorOnFailure(aEncoder.Encode(currentThermostatSuggestion));
+    }
+    break;
+    case ThermostatSuggestionNotFollowingReason::Id: {
+        auto delegate = GetDelegate(aPath.mEndpointId);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        ReturnErrorOnFailure(aEncoder.Encode(delegate->GetThermostatSuggestionNotFollowingReason()));
+    }
+    break;
+    case ClusterRevision::Id:
+        return aEncoder.Encode(Thermostat::kRevision);
     default: // return CHIP_NO_ERROR and just read from the attribute store in default
         break;
     }
@@ -1023,7 +1085,7 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         requested = *value;
         if (!AutoSupported)
             return Status::UnsupportedAttribute;
-        if (requested < 0 || requested > 25)
+        if (requested < 0 || requested > 127)
             return Status::InvalidValue;
         return Status::Success;
     }
@@ -1349,12 +1411,12 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
 
 void MatterThermostatPluginServerInitCallback()
 {
-    Server::GetInstance().GetFabricTable().AddFabricDelegate(&gThermostatAttrAccess);
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().AddFabricDelegate(&gThermostatAttrAccess);
     AttributeAccessInterfaceRegistry::Instance().Register(&gThermostatAttrAccess);
 }
 
 void MatterThermostatPluginServerShutdownCallback()
 {
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gThermostatAttrAccess);
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gThermostatAttrAccess);
     AttributeAccessInterfaceRegistry::Instance().Unregister(&gThermostatAttrAccess);
 }

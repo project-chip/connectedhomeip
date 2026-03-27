@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
@@ -119,6 +119,20 @@ CHIP_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
     CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT();
 
     return CHIP_NO_ERROR;
+}
+
+void UDPEndPoint::Free()
+{
+    Close();
+
+    // CloseImpl() may have called Ref() to keep endpoint alive for pending operations
+    // (when mDelayReleaseCount != 0). Only delete if ref count is still 0.
+    // If ref count > 0, the deferred Unref() scheduled by CloseImpl() will eventually
+    // call Free() again when all pending operations complete.
+    if (GetReferenceCount() == 0)
+    {
+        Delete();
+    }
 }
 
 void UDPEndPoint::Close()

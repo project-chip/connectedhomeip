@@ -142,7 +142,7 @@ void CancelRequest(Request & request)
     // If cancelled request was top-priority, restart the advertising.
     if (isTopPriority)
     {
-        RestartAdvertising();
+        TEMPORARY_RETURN_IGNORED RestartAdvertising();
     }
 }
 
@@ -158,7 +158,7 @@ void CancelRequest(Request & request)
  */
 DLL_EXPORT CHIP_ERROR MapErrorZephyr(int aError)
 {
-    return chip::System::Internal::MapErrorPOSIX(-aError);
+    return chip::System::Internal::MapErrorPOSIX(-aError CHIP_ERROR_SOURCE_LOCATION_NULL);
 }
 
 } // namespace DeviceLayer

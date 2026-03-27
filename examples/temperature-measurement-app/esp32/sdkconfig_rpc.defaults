@@ -96,3 +96,6 @@ CONFIG_ENABLE_PW_RPC=y
 CONFIG_MBEDTLS_HKDF_C=y
 
 CONFIG_DIAG_USE_EXTERNAL_LOG_WRAP=y
+
+# disable debug shell, this is per documentation
+CONFIG_ENABLE_CHIP_SHELL=n
