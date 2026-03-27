@@ -830,6 +830,8 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
         ExitNow(error = CHIP_ERROR_UNKNOWN_KEY_TYPE);
     }
 
+    GetPSAKeyAllocator().UpdateKeyAttributes(attributes);
+
     status = psa_generate_key(&attributes, &context.key_id);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
