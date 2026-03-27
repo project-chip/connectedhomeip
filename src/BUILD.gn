@@ -148,6 +148,23 @@ if (chip_build_tests) {
       # "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
     ]
 
+    # Backwards compatibility uses ember mocks, so they cannot run in a "unified"
+    # test build. Restrict them to specific platforms only
+    if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
+      tests += [
+        # keep-sorted: start
+        "${chip_root}/src/app/clusters/chime-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/device-energy-management-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/energy-evse-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/identify-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/power-topology-server/tests:tests-backwards-compatibility",
+
+        # keep-sorted: end
+      ]
+    }
+
     if (current_os != "zephyr") {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
     }
