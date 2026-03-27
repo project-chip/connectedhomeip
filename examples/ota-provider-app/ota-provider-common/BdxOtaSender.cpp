@@ -122,6 +122,15 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         memcpy(mFileDesignator, fd, fdl);
         mFileDesignator[fdl] = 0;
 
+        // Validate that the designator exists in the map
+        const auto entry = mFileDesignatorMap.find(mFileDesignator);
+        if (entry == mFileDesignatorMap.cend())
+        {
+            VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown) == CHIP_NO_ERROR,
+                           ChipLogError(BDX, "AbortTransfer failed"));
+            return;
+        }
+
         break;
     }
     case TransferSession::OutputEventType::kQueryReceived:
@@ -152,7 +161,14 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             return;
         }
 
-        std::ifstream otaFile(mFileDesignator, std::ifstream::in);
+        const auto entry = mFileDesignatorMap.find(mFileDesignator);
+        if (entry == mFileDesignatorMap.cend())
+        {
+            VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown) == CHIP_NO_ERROR,
+                           ChipLogError(BDX, "AbortTransfer failed"));
+            return;
+        }
+        std::ifstream otaFile(entry->second.c_str(), std::ifstream::in | std::ios::binary);
         if (!otaFile.good())
         {
             ChipLogError(BDX, "OTA file open failed");

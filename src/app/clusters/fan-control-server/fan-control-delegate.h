@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandResponseHelper.h>
+#include <clusters/FanControl/Enums.h>
 
 namespace chip {
 namespace app {
@@ -44,6 +45,8 @@ public:
      *   @return Other Value indicating it failed to execute the command.
      */
     virtual Protocols::InteractionModel::Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) = 0;
+
+    virtual void OnFanStateChanged(bool isOn) {}
 
     Delegate(EndpointId aEndpoint) : mEndpoint(aEndpoint) {}
 

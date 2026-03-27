@@ -208,7 +208,9 @@ CHIP_ERROR WriteGroupKeyMap(GroupDataProvider & provider, const ConcreteDataAttr
         VerifyOrReturnError(value.groupKeySetID != 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         {
-            auto iter     = provider.IterateGroupKeys(fabric_index);
+            auto iter = provider.IterateGroupKeys(fabric_index);
+            VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
+
             current_count = iter->Count();
             iter->Release();
         }
