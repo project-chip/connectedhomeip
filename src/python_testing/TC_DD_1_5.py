@@ -162,7 +162,6 @@ class TC_DD_1_5(MatterBaseTest):
                 "No alternate commissioning channel found!",
             )
 
-
     async def wait_for_user_input_async(self, *args, **kwargs):
         loop = asyncio.get_running_loop()
         # Run the blocking function in a thread pool executor
