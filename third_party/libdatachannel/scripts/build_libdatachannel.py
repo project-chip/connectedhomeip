@@ -10,6 +10,7 @@ import click
 # figure out paths for building
 repo_dir = Path(__file__).resolve().parents[1] / "repo"
 
+
 @click.command()
 @click.option("--clang", is_flag=True, default=False, help="If specified, use clang instead of gcc")
 @click.option("--build-dir", default=repo_dir / "build", show_default=True,
@@ -19,7 +20,6 @@ repo_dir = Path(__file__).resolve().parents[1] / "repo"
 @click.option("--target-cxx", default=None, help="C++ compiler for cross compilation (from args.gn)")
 def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
          target_cc: str | None, target_cxx: str | None):
-
 
     # Generate build files in build_dir
     cmake_cmd = [
