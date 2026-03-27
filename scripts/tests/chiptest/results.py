@@ -15,7 +15,6 @@
 from __future__ import annotations
 
 import base64
-from collections import defaultdict
 import contextlib
 import datetime
 import enum
@@ -23,6 +22,7 @@ import json
 import logging
 import threading
 import time
+from collections import defaultdict
 from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
