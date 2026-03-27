@@ -20,7 +20,7 @@
 #include <app/clusters/commissioner-control-server/CommissionerControlCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
-namespace chip::app::Clusters {
+namespace chip::app::Clusters::CommissionerControl {
 
 class CommissionerControlServer
 {
@@ -41,9 +41,13 @@ public:
     // Unregister the commissioner control cluster instance with the codegen data model provider.
     CHIP_ERROR Deinit();
 
-    void SetSupportedDeviceCategories(const BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories);
-    BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> GetSupportedDeviceCategories() const;
-    void GenerateCommissioningRequestResultEvent(const CommissionerControl::Events::CommissioningRequestResult::Type & result);
+    void SetSupportedDeviceCategories(EndpointId endpointId,
+                                      const BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories);
+
+    BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> GetSupportedDeviceCategories(EndpointId endpointId) const;
+
+    void GenerateCommissioningRequestResultEvent(EndpointId endpointId,
+                                                 const CommissionerControl::Events::CommissioningRequestResult::Type & result);
 
 private:
     CommissionerControl::Delegate * mDelegate{};
@@ -53,4 +57,4 @@ private:
     chip::app::LazyRegisteredServerCluster<CommissionerControlCluster> mCluster;
 };
 
-} // namespace chip::app::Clusters
+} // namespace chip::app::Clusters::CommissionerControl

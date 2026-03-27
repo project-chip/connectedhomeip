@@ -114,7 +114,7 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
         mLabel.ClearValue();
     }
 
-    mCommissionerControlServer.GenerateCommissioningRequestResultEvent(result);
+    mCommissionerControlServer.GenerateCommissioningRequestResultEvent(kAggregatorEndpointId, result);
     mNextStep = Step::kWaitCommissionNodeRequest;
     ChipLogProgress(NotSpecified, "CommissionerControlDelegate: State transitioned to %s", GetStateString(mNextStep));
     return CHIP_NO_ERROR;
@@ -231,7 +231,8 @@ CHIP_ERROR CommissionerControlInit(bridge::FabricAdminDelegate * fabricAdmin)
     BitMask<Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories;
     supportedDeviceCategories.SetField(Clusters::CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization, 1);
 
-    sCommissionerControlDelegate->GetCommissionerControlServer().SetSupportedDeviceCategories(supportedDeviceCategories);
+    sCommissionerControlDelegate->GetCommissionerControlServer().SetSupportedDeviceCategories(
+        Clusters::CommissionerControl::kAggregatorEndpointId, supportedDeviceCategories);
     return CHIP_NO_ERROR;
 }
 

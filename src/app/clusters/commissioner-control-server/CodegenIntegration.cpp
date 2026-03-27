@@ -23,7 +23,7 @@
 using namespace chip;
 using namespace chip::app;
 
-namespace chip::app::Clusters {
+namespace chip::app::Clusters::CommissionerControl {
 
 CommissionerControlServer::CommissionerControlServer(CommissionerControl::Delegate * delegate, EndpointId endpointId) :
     mDelegate(delegate), mEndpointId(endpointId)
@@ -48,26 +48,30 @@ CHIP_ERROR CommissionerControlServer::Deinit()
 }
 
 void CommissionerControlServer::SetSupportedDeviceCategories(
-    const BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories)
+    EndpointId endpointId, const BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories)
 {
     VerifyOrDie(mCluster.IsConstructed());
+    VerifyOrDie(endpointId == mCluster.Cluster().mPath.mEndpointId);
     mCluster.Cluster().SetSupportedDeviceCategories(supportedDeviceCategories);
 }
 
-BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> CommissionerControlServer::GetSupportedDeviceCategories() const
+BitMask<CommissionerControl::SupportedDeviceCategoryBitmap>
+CommissionerControlServer::GetSupportedDeviceCategories(EndpointId endpointId) const
 {
     VerifyOrDie(mCluster.IsConstructed());
+    VerifyOrDie(endpointId == mCluster.Cluster().mPath.mEndpointId);
     return mCluster.Cluster().GetSupportedDeviceCategories();
 }
 
 void CommissionerControlServer::GenerateCommissioningRequestResultEvent(
-    const CommissionerControl::Events::CommissioningRequestResult::Type & result)
+    EndpointId endpointId, const CommissionerControl::Events::CommissioningRequestResult::Type & result)
 {
     VerifyOrDie(mCluster.IsConstructed());
+    VerifyOrDie(endpointId == mCluster.Cluster().mPath.mEndpointId);
     mCluster.Cluster().GenerateCommissioningRequestResultEvent(result);
 }
 
-} // namespace chip::app::Clusters
+} // namespace chip::app::Clusters::CommissionerControl
 
 void MatterCommissionerControlClusterInitCallback(EndpointId) {}
 void MatterCommissionerControlClusterShutdownCallback(EndpointId, MatterClusterShutdownType) {}
