@@ -152,13 +152,16 @@ class TC_DD_1_5(MatterBaseTest):
 
         # This step is only for NTL devices
         if self.check_pics("MCORE.DD.NTL"):
-            if (self.matter_test_config.commissioning_method == "nfc-ethernet"):
-                log.info("The alternate commissioning channel is the Ethernet connection")
-            else:
-                # Check that an alternate commissioning channel is supported
-                payload = SetupPayload().ParseQrCode(nfc_tag_content)
-                asserts.assert_true(payload.supports_ble_commissioning or payload.supports_wifi_commissioning or payload.supports_thread_commissioning,
-                                    "No alternate commissioning channel found!")
+            # Check that an alternate commissioning channel is supported
+            payload = SetupPayload().ParseQrCode(nfc_tag_content)
+            asserts.assert_true(
+                payload.supports_ble_commissioning or
+                payload.supports_wifi_commissioning or
+                payload.supports_on_network_commissioning or
+                payload.supports_thread_commissioning,
+                "No alternate commissioning channel found!",
+            )
+
 
     async def wait_for_user_input_async(self, *args, **kwargs):
         loop = asyncio.get_running_loop()
