@@ -97,6 +97,11 @@ void InitIdentifyCluster()
 #include "application-launch/chef-application-launch-delegate.h"
 #endif // MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
 
+#if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/chime/chef-chime-delegate.h"
+#include <app/clusters/chime-server/CodegenIntegration.h>
+#endif
+
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -672,6 +677,23 @@ void CastingvideoplayerContentappInit()
 #endif
 }
 
+/**
+ * This initializer is for the chime application.
+ */
+void ChimeInit()
+{
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: ChimeInit called more than once");
+    called = true;
+#if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kChimeDeviceTypeId))
+    {
+        auto * delegate = Platform::New<Chime::ChefChimeDelegate>();
+        Platform::New<ChimeServer>(1, *delegate)->Init();
+    }
+#endif // #if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT
+}
+
 void ApplicationInit()
 {
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
@@ -681,6 +703,7 @@ void ApplicationInit()
     GenericSwitchInit();
     LaundryDryerInit();
     CastingvideoplayerContentappInit();
+    ChimeInit();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
