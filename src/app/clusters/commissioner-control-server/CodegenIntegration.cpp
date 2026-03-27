@@ -25,7 +25,7 @@ using namespace chip::app;
 
 namespace chip::app::Clusters {
 
-CommissionerControlServer::CommissionerControlServer(EndpointId endpointId, CommissionerControl::Delegate * delegate) :
+CommissionerControlServer::CommissionerControlServer(EndpointId endpointId, CommissionerControl::Delegate & delegate) :
     mEndpointId(endpointId), mDelegate(delegate)
 {}
 
@@ -39,7 +39,8 @@ CommissionerControlServer::~CommissionerControlServer()
 
 CHIP_ERROR CommissionerControlServer::Init()
 {
-    mCluster.Create(mEndpointId, mDelegate);
+    VerifyOrDie(!mCluster.IsConstructed());
+    mCluster.Create(mEndpointId, &mDelegate);
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
 }
 

@@ -33,6 +33,18 @@ using namespace chip::app::Clusters::CommissionerControl;
 using namespace chip::app::Clusters::CommissionerControl::Attributes;
 using namespace chip::Testing;
 
+class CommissionerControlDelegate : public Delegate
+{
+public:
+    CHIP_ERROR HandleCommissioningApprovalRequest(const CommissioningApprovalRequest & request) override { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId) override { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR GetCommissioningWindowParams(CommissioningWindowParams & outParams) override { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR HandleCommissionNode(const CommissioningWindowParams & params) override { return CHIP_NO_ERROR; }
+};
+
 struct TestCommissionerControlCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -42,13 +54,15 @@ struct TestCommissionerControlCluster : public ::testing::Test
     TestCommissionerControlCluster() {}
 
     TestServerClusterContext testContext;
+
+    CommissionerControlDelegate testDelegate;
 };
 
 } // namespace
 
 TEST_F(TestCommissionerControlCluster, AttributeTest)
 {
-    CommissionerControlCluster cluster(kRootEndpointId);
+    CommissionerControlCluster cluster(kRootEndpointId, testDelegate);
 
     EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                         {
@@ -58,7 +72,7 @@ TEST_F(TestCommissionerControlCluster, AttributeTest)
 
 TEST_F(TestCommissionerControlCluster, ReadAttributeTest)
 {
-    CommissionerControlCluster cluster(kRootEndpointId);
+    CommissionerControlCluster cluster(kRootEndpointId, testDelegate);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
@@ -77,13 +91,13 @@ TEST_F(TestCommissionerControlCluster, ReadAttributeTest)
 
 TEST_F(TestCommissionerControlCluster, SupportedDeviceCategories)
 {
-    CommissionerControlCluster cluster(kRootEndpointId);
+    CommissionerControlCluster cluster(kRootEndpointId, testDelegate);
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories{
         SupportedDeviceCategoryBitmap::kFabricSynchronization
     };
-    EXPECT_EQ(cluster.SetSupportedDeviceCategories(supportedDeviceCategories), CHIP_NO_ERROR);
+    cluster.SetSupportedDeviceCategories(supportedDeviceCategories);
     EXPECT_EQ(cluster.GetSupportedDeviceCategories(), supportedDeviceCategories);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);

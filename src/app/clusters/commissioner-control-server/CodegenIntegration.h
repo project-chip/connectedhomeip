@@ -32,7 +32,7 @@ public:
      * @param delegate A reference to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CommissionerControlServer(EndpointId endpointId, CommissionerControl::Delegate * delegate);
+    CommissionerControlServer(EndpointId endpointId, CommissionerControl::Delegate & delegate);
     ~CommissionerControlServer();
 
     /**
@@ -46,7 +46,7 @@ public:
 
 private:
     EndpointId mEndpointId;
-    CommissionerControl::Delegate * mDelegate;
+    CommissionerControl::Delegate & mDelegate;
 };
 
 } // namespace chip::app::Clusters

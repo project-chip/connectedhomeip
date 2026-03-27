@@ -27,7 +27,7 @@ namespace chip::app::Clusters {
 class CommissionerControlCluster : public DefaultServerCluster
 {
 public:
-    CommissionerControlCluster(EndpointId endpointId, CommissionerControl::Delegate * delegate = nullptr);
+    CommissionerControlCluster(EndpointId endpointId, CommissionerControl::Delegate & delegate);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -42,22 +42,18 @@ public:
 
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
-    CHIP_ERROR
-    SetSupportedDeviceCategories(const BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories);
+    void SetSupportedDeviceCategories(const BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories);
+
     BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> GetSupportedDeviceCategories() const
     {
         return mSupportedDeviceCategories;
     }
 
     // Should be called after the server return SUCCESS to a correctly formatted RequestCommissioningApproval command.
-    CHIP_ERROR
-    GenerateCommissioningRequestResultEvent(const CommissionerControl::Events::CommissioningRequestResult::Type & result);
-
-    CommissionerControl::Delegate * GetDelegate() { return mDelegate; }
-    void SetDelegate(CommissionerControl::Delegate * delegate) { mDelegate = delegate; }
+    void GenerateCommissioningRequestResultEvent(const CommissionerControl::Events::CommissioningRequestResult::Type & result);
 
 protected:
-    CommissionerControl::Delegate * mDelegate{};
+    CommissionerControl::Delegate & mDelegate;
     BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> mSupportedDeviceCategories;
 
 private:

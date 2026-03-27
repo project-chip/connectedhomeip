@@ -53,7 +53,7 @@ void AddReverseOpenCommissioningWindowResponse(CommandHandler & commandHandler, 
 
 } // namespace
 
-CommissionerControlCluster::CommissionerControlCluster(EndpointId endpointId, Delegate * delegate) :
+CommissionerControlCluster::CommissionerControlCluster(EndpointId endpointId, Delegate & delegate) :
     DefaultServerCluster({ endpointId, CommissionerControl::Id }), mDelegate(delegate)
 {}
 
@@ -117,20 +117,17 @@ CHIP_ERROR CommissionerControlCluster::GeneratedCommands(const ConcreteClusterPa
     });
 }
 
-CHIP_ERROR
-CommissionerControlCluster::SetSupportedDeviceCategories(const BitMask<SupportedDeviceCategoryBitmap> supportedDeviceCategories)
+void CommissionerControlCluster::SetSupportedDeviceCategories(
+    const BitMask<SupportedDeviceCategoryBitmap> supportedDeviceCategories)
 {
     SetAttributeValue(mSupportedDeviceCategories, supportedDeviceCategories, SupportedDeviceCategories::Id);
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR
-CommissionerControlCluster::GenerateCommissioningRequestResultEvent(const Events::CommissioningRequestResult::Type & result)
+void CommissionerControlCluster::GenerateCommissioningRequestResultEvent(const Events::CommissioningRequestResult::Type & result)
 {
-    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(mContext != nullptr);
     auto eventNumber = mContext->interactionContext.eventsGenerator.GenerateEvent(result, mPath.mEndpointId);
-    VerifyOrReturnError(eventNumber.has_value(), CHIP_ERROR_INCORRECT_STATE);
-    return CHIP_NO_ERROR;
+    VerifyOrReturn(eventNumber.has_value());
 }
 
 std::optional<DataModel::ActionReturnStatus> CommissionerControlCluster::HandleRequestCommissioningApproval(
@@ -168,16 +165,12 @@ std::optional<DataModel::ActionReturnStatus> CommissionerControlCluster::HandleR
                                                                             .fabricIndex  = fabricIndex,
                                                                             .label        = label };
 
-    VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
     // Handle commissioning approval request
-    err = mDelegate->HandleCommissioningApprovalRequest(request);
-
-exit:
+    err = mDelegate.HandleCommissioningApprovalRequest(request);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleRequestCommissioningApproval error: %" CHIP_ERROR_FORMAT, err.Format());
-        return StatusIB(err).mStatus;
+        return err;
     }
 
     return Status::Success;
@@ -209,35 +202,25 @@ CommissionerControlCluster::HandleCommissionNode(CommandHandler * commandObj, co
     }
 
     auto requestId                 = commandData.requestID;
-    auto delegate                  = mDelegate;
     auto commissioningWindowParams = std::make_unique<Clusters::CommissionerControl::CommissioningWindowParams>();
 
-    VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
     // Validate the commission node command.
-    err = mDelegate->ValidateCommissionNodeCommand(sourceNodeId, requestId);
+    err = mDelegate.ValidateCommissionNodeCommand(sourceNodeId, requestId);
     SuccessOrExit(err);
 
     // Populate the parameters for the commissioning window
-    err = mDelegate->GetCommissioningWindowParams(*commissioningWindowParams);
+    err = mDelegate.GetCommissioningWindowParams(*commissioningWindowParams);
     SuccessOrExit(err);
 
     // Add the response for the commissioning window.
     AddReverseOpenCommissioningWindowResponse(*commandObj, commandPath, *commissioningWindowParams);
 
     // Schedule the deferred reverse commission node task
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([delegate, params = commissioningWindowParams.release()]() {
-        if (delegate != nullptr)
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, params = commissioningWindowParams.release()]() {
+        CHIP_ERROR error = mDelegate.HandleCommissionNode(*params);
+        if (error != CHIP_NO_ERROR)
         {
-            CHIP_ERROR error = delegate->HandleCommissionNode(*params);
-            if (error != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "HandleCommissionNode error: %" CHIP_ERROR_FORMAT, error.Format());
-            }
-        }
-        else
-        {
-            ChipLogError(Zcl, "No delegate available for HandleCommissionNode");
+            ChipLogError(Zcl, "HandleCommissionNode error: %" CHIP_ERROR_FORMAT, error.Format());
         }
 
         delete params;
@@ -247,7 +230,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleCommissionNode error: %" CHIP_ERROR_FORMAT, err.Format());
-        return StatusIB(err).mStatus;
+        return err;
     }
 
     return std::nullopt;
