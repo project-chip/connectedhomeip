@@ -85,10 +85,7 @@ void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
                       "Can only have groupcast cluster on endpoint 0");
     }
 
-    static_assert(CHIP_CONFIG_ENABLE_GROUPCAST,
-                  "CHIP_CONFIG_ENABLE_GROUPCAST must be enabled if groupcast cluster is used, along with the appropriate "
-                  "delegates. See example apps using groupcast");
-
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     IntegrationDelegate integrationDelegate;
 
     // register a singleton server (root endpoint only)
@@ -102,20 +99,14 @@ void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
+#else
+    ChipLogDetail(NotSpecified, "CHIP_CONFIG_ENABLE_GROUPCAST shuold be enabled for groupcast cluster along with injection of the appropriate delegate. Groupcast cluster WILL NOT be registered.");
+#endif
 }
 
 void MatterGroupcastClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
 {
-    if constexpr (Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() > 0)
-    {
-        static_assert((Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
-                       Groupcast::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == 0),
-                      "Can only have groupcast cluster on endpoint 0");
-    }
-
-    static_assert(CHIP_CONFIG_ENABLE_GROUPCAST,
-                  "CHIP_CONFIG_ENABLE_GROUPCAST must be enabled if groupcast cluster is used, along with the appropriate "
-                  "delegates. See example apps using groupcast");
+    VerifyOrDie(endpointId == chip::kRootEndpointId);
 
     IntegrationDelegate integrationDelegate;
 
