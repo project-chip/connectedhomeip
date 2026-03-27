@@ -2571,7 +2571,7 @@ CHIP_ERROR DeviceCommissioner::ParseGeneralCommissioningInfo(ReadCommissioningIn
     if (err != CHIP_NO_ERROR)
     {
         // 'IsCommissioningWithoutPower' is optional. Any failures (likely not present) means default to assuming false.
-info.general.isCommissioningWithoutPower = false;
+        info.general.isCommissioningWithoutPower = false;
     }
 
     return return_err;
