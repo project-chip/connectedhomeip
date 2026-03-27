@@ -191,7 +191,7 @@ class TC_ACE_1_6(MatterBaseTest):
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[th1_nodeid],
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.AccessControl.id)])
-        
+
         if gc_on_root:
             # Cluster on ep1 with modified attributes (using OnOff as example)
             target_cluster = Clusters.OnOff.id
@@ -205,7 +205,7 @@ class TC_ACE_1_6(MatterBaseTest):
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
             subjects=[groupID3],
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=target_endpoint, cluster=target_cluster)])
-        
+
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl([acl_admin, acl_group]))])
 
         # Step 5: AddGroup 0x0104 over CASE - expect UNSUPPORTED_ACCESS (if GC not on root)
