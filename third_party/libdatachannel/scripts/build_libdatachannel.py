@@ -24,8 +24,10 @@ def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
     # Generate build files in build_dir
     cmake_cmd = [
         "cmake",
+        "-S",
+        str(repo_dir),
         "-B",
-        build_dir,
+        str(build_dir),
         "-DUSE_GNUTLS=0",
         "-DUSE_NICE=0",
         "-DCMAKE_BUILD_TYPE=Release",
@@ -94,12 +96,12 @@ def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
     )
 
     print(f"Running: {shlex.join(cmake_cmd)}")
-    subprocess.run(cmake_cmd, cwd=repo_dir, check=True)
+    subprocess.run(cmake_cmd, check=True)
 
     # Build with Make
-    make_cmd = ["make", "-j%d" % os.cpu_count()]
+    make_cmd = ["cmake", "--build", str(build_dir), f"-j{os.cpu_count()}"]
     print(f"Running: {shlex.join(make_cmd)}")
-    subprocess.run(make_cmd, cwd=build_dir, check=True)
+    subprocess.run(make_cmd, check=True)
 
     print("libdatachannel build complete.")
     print(f"Artifacts are located in: {build_dir}")
