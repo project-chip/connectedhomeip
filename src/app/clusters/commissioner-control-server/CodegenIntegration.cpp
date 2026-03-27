@@ -51,7 +51,7 @@ void CommissionerControlServer::SetSupportedDeviceCategories(
     EndpointId endpointId, const BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories)
 {
     VerifyOrDie(mCluster.IsConstructed());
-    VerifyOrDie(endpointId == mCluster.Cluster().mPath.mEndpointId);
+    VerifyOrDie(endpointId == mCluster.Cluster().GetPaths()[0].mEndpointId);
     mCluster.Cluster().SetSupportedDeviceCategories(supportedDeviceCategories);
 }
 
@@ -59,7 +59,7 @@ BitMask<CommissionerControl::SupportedDeviceCategoryBitmap>
 CommissionerControlServer::GetSupportedDeviceCategories(EndpointId endpointId) const
 {
     VerifyOrDie(mCluster.IsConstructed());
-    VerifyOrDie(endpointId == mCluster.Cluster().mPath.mEndpointId);
+    VerifyOrDie(endpointId == mCluster.Cluster().cluster.GetPaths()[0].mEndpointId);
     return mCluster.Cluster().GetSupportedDeviceCategories();
 }
 
@@ -67,7 +67,7 @@ void CommissionerControlServer::GenerateCommissioningRequestResultEvent(
     EndpointId endpointId, const CommissionerControl::Events::CommissioningRequestResult::Type & result)
 {
     VerifyOrDie(mCluster.IsConstructed());
-    VerifyOrDie(endpointId == mCluster.Cluster().mPath.mEndpointId);
+    VerifyOrDie(endpointId == mCluster.Cluster().GetPaths()[0].mEndpointId);
     mCluster.Cluster().GenerateCommissioningRequestResultEvent(result);
 }
 
