@@ -184,7 +184,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
             }
             else
             {
-                err = mDownloader->FetchNextData();
+                CHIP_ERROR err = mDownloader->FetchNextData();
                 if (err != CHIP_NO_ERROR)
                 {
                     ChipLogError(SoftwareUpdate, "OTA fetch err: %" CHIP_ERROR_FORMAT, err.Format());
