@@ -33,7 +33,7 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-constexpr uint32_t kGroupKeyClusterRevisionBeforeGroupcast = 2;
+[[maybe_unused]] constexpr uint32_t kGroupKeyClusterRevisionBeforeGroupcast = 2;
 
 struct GroupTableCodec
 {
