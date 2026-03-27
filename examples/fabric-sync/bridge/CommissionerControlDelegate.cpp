@@ -114,19 +114,10 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
         mLabel.ClearValue();
     }
 
-    CHIP_ERROR err = mCommissionerControlServer.mCluster.Cluster().GenerateCommissioningRequestResultEvent(result);
-
-    if (err == CHIP_NO_ERROR)
-    {
-        mNextStep = Step::kWaitCommissionNodeRequest;
-        ChipLogProgress(NotSpecified, "CommissionerControlDelegate: State transitioned to %s", GetStateString(mNextStep));
-    }
-    else
-    {
-        ResetDelegateState();
-    }
-
-    return err;
+    mCommissionerControlServer.mCluster.Cluster().GenerateCommissioningRequestResultEvent(result);
+    mNextStep = Step::kWaitCommissionNodeRequest;
+    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: State transitioned to %s", GetStateString(mNextStep));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommissionerControlDelegate::ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId)
