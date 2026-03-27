@@ -8,11 +8,11 @@
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <transport/raw/GroupcastTesting.h>
 
 using chip::Protocols::InteractionModel::Status;
 
 using namespace chip::Credentials;
-using GroupDataProvider = GroupDataProvider;
 using GroupInfo         = GroupDataProvider::GroupInfo;
 using GroupEndpoint     = GroupDataProvider::GroupEndpoint;
 using GroupInfoIterator = GroupDataProvider::GroupInfoIterator;
@@ -42,7 +42,15 @@ GroupcastCluster::GroupcastCluster(GroupcastContext && context, BitFlags<Groupca
     mMembershipChangedTimer(*this), mGroupcastTestingTimer(*this)
 {}
 
-GroupcastCluster::~GroupcastCluster() {}
+GroupcastCluster::~GroupcastCluster()
+{
+    // Context will be non null when the cluster is initialized. Calling
+    // Shutdown() to ensure proper cleanup if the cluster was started.
+    if (mContext != nullptr)
+    {
+        Shutdown(ClusterShutdownType::kPermanentRemove);
+    }
+}
 
 CHIP_ERROR GroupcastCluster::Startup(ServerClusterContext & context)
 {
@@ -81,7 +89,7 @@ DataModel::ActionReturnStatus GroupcastCluster::ReadAttribute(const DataModel::R
     case Groupcast::Attributes::UsedMcastAddrCount::Id:
         return ReadUsedMcastAddrCount(request.path.mEndpointId, encoder);
     case Groupcast::Attributes::FabricUnderTest::Id:
-        return encoder.Encode(mFabricUnderTest);
+        return encoder.Encode(chip::Groupcast::GetTesting().GetFabricIndex());
     }
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
@@ -166,7 +174,8 @@ CHIP_ERROR GroupcastCluster::GeneratedCommands(const ConcreteClusterPath & path,
 
 Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Commands::GroupcastTesting::DecodableType data)
 {
-    VerifyOrReturnError(mFabricUnderTest == kUndefinedFabricIndex || mFabricUnderTest == fabricIndex, Status::ConstraintError);
+    FabricIndex fabricUnderTest = chip::Groupcast::GetTesting().GetFabricIndex();
+    VerifyOrReturnError(fabricUnderTest == kUndefinedFabricIndex || fabricUnderTest == fabricIndex, Status::ConstraintError);
 
     if (data.testOperation == Groupcast::GroupcastTestingEnum::kDisableTesting)
     {
@@ -197,7 +206,14 @@ Status GroupcastCluster::GroupcastTesting(FabricIndex fabricIndex, Groupcast::Co
 
 void GroupcastCluster::SetFabricUnderTest(FabricIndex fabricUnderTest)
 {
-    SetAttributeValue(mFabricUnderTest, fabricUnderTest, Groupcast::Attributes::FabricUnderTest::Id);
+    auto & testing = chip::Groupcast::GetTesting();
+    if (fabricUnderTest != testing.GetFabricIndex())
+    {
+        testing.Clear();
+        testing.SetFabricIndex(fabricUnderTest);
+        NotifyAttributeChanged(Groupcast::Attributes::FabricUnderTest::Id);
+    }
+    testing.SetEnabled(fabricUnderTest != kUndefinedFabricIndex);
 }
 
 // MembershipChangedTimer implementation

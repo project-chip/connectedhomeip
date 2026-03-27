@@ -207,6 +207,7 @@
             "ProductAppearance",
             "SpecificationVersion",
             "MaxPathsPerInvoke",
+            "DeviceLocation",
             "ConfigurationVersion"
         ],
         "Boolean State": ["ClusterRevision", "FeatureMap", "StateValue"],
@@ -754,7 +755,7 @@
             "LevelValue",
             "FeatureMap"
         ],
-        "Air Quality": ["AirQuality", "FeatureMap"],
+        "Air Quality": ["AirQuality", "ClusterRevision", "FeatureMap"],
         "Electrical Energy Measurement": [
             "Accuracy",
             "CumulativeEnergyImported",

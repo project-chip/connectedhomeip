@@ -1458,8 +1458,9 @@ TEST_F(TestGroupcastCluster, TestGroupcastTestingCommand)
 TEST_F(TestGroupcastCluster, TestAuxiliaryAccessUpdatedEvent)
 {
     const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
-    const EndpointId kEndpoints[] = { 1 };
+    const EndpointId kEndpoints[] = { 1, 2 };
     const GroupId kGroupId        = 0x1234;
+    const GroupId kGroupIdNoAux   = 0x5678;
     const KeysetId kKeyset        = 0xabcd;
 
     ClusterTester tester(mListener);
@@ -1516,7 +1517,7 @@ TEST_F(TestGroupcastCluster, TestAuxiliaryAccessUpdatedEvent)
         EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Clusters::AccessControl::Events::AuxiliaryAccessUpdated::Id);
     }
 
-    // 4. Test LeaveGroup with endpoints (partial remove) -> Should NOT generate event
+    // 4. Test LeaveGroup with endpoints (partial remove) -> Should NOT generate event (as hasAuxiliaryACL is false)
     {
         Commands::LeaveGroup::Type data;
         data.groupID   = kGroupId;
@@ -1544,7 +1545,7 @@ TEST_F(TestGroupcastCluster, TestAuxiliaryAccessUpdatedEvent)
         ASSERT_TRUE(event.has_value());
     }
 
-    // 5. Test LeaveGroup (whole group) -> Should generate event
+    // 5. Test LeaveGroup (whole group) -> Should generate event (as hasAuxiliaryACL is true)
     {
         Commands::LeaveGroup::Type data;
         data.groupID = kGroupId;
@@ -1555,6 +1556,74 @@ TEST_F(TestGroupcastCluster, TestAuxiliaryAccessUpdatedEvent)
         auto event = logOnlyEvents.GetNextEvent();
         ASSERT_TRUE(event.has_value());
         EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Clusters::AccessControl::Events::AuxiliaryAccessUpdated::Id);
+    }
+
+    // 6. Test JoinGroup for a group WITHOUT auxiliary ACL -> Should NOT generate event
+    {
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupIdNoAux;
+        data.keySetID        = kKeyset;
+        data.useAuxiliaryACL = MakeOptional(false);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // 7. Test Add Endpoint to group WITHOUT auxiliary ACL -> Should NOT generate event
+    {
+        const EndpointId kEndpoints2[] = { 3 };
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupIdNoAux;
+        data.keySetID        = kKeyset;
+        data.useAuxiliaryACL = MakeOptional(false);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints2, MATTER_ARRAY_SIZE(kEndpoints2));
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // 8. Test LeaveGroup (partial) for group WITHOUT auxiliary ACL -> Should NOT generate event
+    {
+        const EndpointId kEndpoints2[] = { 2 };
+        Commands::LeaveGroup::Type data;
+        data.groupID   = kGroupIdNoAux;
+        data.endpoints = MakeOptional(DataModel::List<const EndpointId>(kEndpoints2, MATTER_ARRAY_SIZE(kEndpoints2)));
+
+        auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // 9. Test JoinGroup with different multicast policy (no updates resulting in ACL change) -> Should NOT generate event
+    {
+        // First, ensure group exists with Aux ACL, endpoint and IANA policy
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupId;
+        data.keySetID        = kKeyset;
+        data.useAuxiliaryACL = MakeOptional(true);
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+        auto setupResult = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(setupResult.status, Protocols::InteractionModel::Status::Success);
+        (void) logOnlyEvents.GetNextEvent(); // Clear event from setup
+
+        // Now call JoinGroup again with same data but different multicast policy
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+        auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
     }
 }
 

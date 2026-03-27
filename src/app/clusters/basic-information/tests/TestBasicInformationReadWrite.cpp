@@ -301,20 +301,16 @@ struct TestBasicInformationReadWrite : public ::testing::Test
     // Context
     MockDeviceInstanceInfoProvider mDeviceInfoProvider;
     MockConfigurationManager mMockConfigurationManager;
-    BasicInformationCluster::Context mContext = {
-        .deviceInstanceInfoProvider = mDeviceInfoProvider,
-        .configurationManager       = mMockConfigurationManager,
-        .platformManager            = chip::DeviceLayer::PlatformMgr(),
-        .subscriptionsPerFabric     = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
-    };
 };
 
 DeviceLayer::DeviceInstanceInfoProvider * TestBasicInformationReadWrite::sDeviceInstanceInfoProviderBackup = nullptr;
 
 TEST_F(TestBasicInformationReadWrite, TestNodeLabelLoadAndSave)
 {
-    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster cluster(optionalAttributeSet, mContext);
+    const BasicInformationOptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, mMockConfigurationManager,
+                                    chip::DeviceLayer::PlatformMgr(),
+                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -367,9 +363,11 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 {
     using namespace chip::app::Clusters::BasicInformation;
 
-    BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-    optionalAttributeSet.Set<Attributes::ManufacturingDate::Id>();
-    BasicInformationCluster cluster(optionalAttributeSet, mContext);
+    BasicInformationOptionalAttributesSet optionalAttributeSet;
+    optionalAttributeSet.template Set<Attributes::ManufacturingDate::Id>();
+    BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, mMockConfigurationManager,
+                                    chip::DeviceLayer::PlatformMgr(),
+                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
     chip::Testing::ClusterTester tester(cluster);
 
     // VendorName
@@ -494,8 +492,10 @@ TEST_F(TestBasicInformationReadWrite, TestAllAttributesSpecCompliance)
 
 TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
 {
-    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster cluster(optionalAttributeSet, mContext);
+    const BasicInformationOptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, mMockConfigurationManager,
+                                    chip::DeviceLayer::PlatformMgr(),
+                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -516,8 +516,10 @@ TEST_F(TestBasicInformationReadWrite, TestWriteNodeLabel)
 
 TEST_F(TestBasicInformationReadWrite, TestWriteLocation)
 {
-    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-    BasicInformationCluster cluster(optionalAttributeSet, mContext);
+    const BasicInformationOptionalAttributesSet optionalAttributeSet;
+    BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, mMockConfigurationManager,
+                                    chip::DeviceLayer::PlatformMgr(),
+                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 
@@ -549,9 +551,11 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
 {
     bool readValue{};
 
-    BasicInformationCluster::OptionalAttributesSet optionalAttributeSet;
-    optionalAttributeSet.Set<Attributes::LocalConfigDisabled::Id>();
-    BasicInformationCluster cluster(optionalAttributeSet, mContext);
+    BasicInformationOptionalAttributesSet optionalAttributeSet;
+    optionalAttributeSet.template Set<Attributes::LocalConfigDisabled::Id>();
+    BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, mMockConfigurationManager,
+                                    chip::DeviceLayer::PlatformMgr(),
+                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
     chip::Testing::ClusterTester tester(cluster);
 

@@ -804,6 +804,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
+  attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
   readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
