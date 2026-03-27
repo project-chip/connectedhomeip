@@ -53,7 +53,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-class TC_CADMIN_1_27(MatterBaseTest):
+class TC_JFADMIN_2_1(MatterBaseTest):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
@@ -112,7 +112,7 @@ class TC_CADMIN_1_27(MatterBaseTest):
 
         super().teardown_class()
 
-    def steps_TC_CADMIN_1_27(self) -> list[TestStep]:
+    def steps_TC_JFADMIN_2_1(self) -> list[TestStep]:
         return [
             TestStep("1", "DUT_AAF starts a commissioning process to commission TH_DEV1 on Fabric 1",
                      "TH_DEV1 is commissioned by DUT_AAF on Fabric 1"),
@@ -124,11 +124,11 @@ class TC_CADMIN_1_27(MatterBaseTest):
                      "TH_AJF2 is successfuly commissioned into Fabric 1 by DUT_AAF using Joint Commissioning Method")
         ]
 
-    def pics_TC_CADMIN_1_27(self):
-        return ['CADMIN.S']
+    def pics_TC_JFADMIN_2_1(self):
+        return ['JFADMIN.S']
 
     @async_test_body
-    async def test_TC_CADMIN_1_27(self):
+    async def test_TC_JFADMIN_2_1(self):
         _devCtrlEcoA = None
         _devCtrlEcoB = None
         _fabric_a_persistent_storage = None

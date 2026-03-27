@@ -19,6 +19,7 @@ source_set("clusters") {
     # keep-sorted: start
     "access-control-server",
     "administrator-commissioning-server",
+    "air-quality-server",
     "basic-information",
     "boolean-state-configuration-server",
     "boolean-state-server",
