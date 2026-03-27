@@ -3,16 +3,16 @@
 import os
 import shlex
 import subprocess
+from pathlib import Path
 
 import click
 
 # figure out paths for building
-script_dir = os.path.dirname(os.path.abspath(__file__))
-repo_dir = os.path.join(script_dir, "..", "repo")
+repo_dir = Path(__file__).resolve().parents[1] / "repo"
 
 @click.command()
 @click.option("--clang", is_flag=True, default=False, help="If specified, use clang instead of gcc")
-@click.option("--build-dir", default=os.path.join(repo_dir, "build"), show_default=True,
+@click.option("--build-dir", default=repo_dir / "build", show_default=True,
               help="Build directory for libdatachannel build")
 @click.option("--cross-compile-cpu-type", default=None, help="CPU type for cross compilation if needed")
 @click.option("--target-cc", default=None, help="C compiler for cross compilation (from args.gn)")
