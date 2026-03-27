@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import base64
+from collections import defaultdict
 import contextlib
 import datetime
 import enum
@@ -31,6 +32,8 @@ from chiptest.log_config import LogConfig
 from chiptest.work_queue import CancellableQueue, EndOfQueue
 
 log = logging.getLogger(__name__)
+
+ExceptionInfoT: TypeAlias = BaseException | str | None
 
 
 class TestStatus(enum.StrEnum):
@@ -65,7 +68,7 @@ class TestResult:
     iteration: int
     status: TestStatus
     duration_seconds: float
-    exception: BaseException | str | None = None
+    exception: ExceptionInfoT = None
 
     @property
     def name_decorated(self) -> str:
@@ -127,7 +130,7 @@ class RunStats:
     failed: int = field(default=0, init=False)
     cancelled: int = field(default=0, init=False)
     mean_duration: float = field(default=0.0, init=False)
-    exception_first: BaseException | str | None = field(default=None, init=False)
+    exception_first: ExceptionInfoT = field(default=None, init=False)
 
     @property
     def pass_rate(self) -> float:
@@ -173,7 +176,7 @@ class RunSummary(RunStats):
     run_timestamp: datetime.datetime | str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
     results: list[TestResult] = field(default_factory=list, init=False)
     test_stats: dict[str, RunStats] = field(default_factory=dict, init=False)
-    exceptions: dict[int, dict[str, BaseException | str | None]] = field(default_factory=dict, init=False)
+    exceptions: defaultdict[int, dict[str, ExceptionInfoT]] = field(default_factory=lambda: defaultdict(dict), init=False)
 
     def record(self, result: TestResult) -> None:
         """Record a test result."""
@@ -188,8 +191,6 @@ class RunSummary(RunStats):
         self.test_stats[result.name].record(result)
 
         # Record exception per iteration.
-        if result.iteration not in self.exceptions:
-            self.exceptions[result.iteration] = {}
         self.exceptions[result.iteration][result.name] = result.exception
 
     def write_json(self, path: Path) -> None:
