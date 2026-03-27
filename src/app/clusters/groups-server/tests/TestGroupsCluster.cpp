@@ -48,6 +48,7 @@ constexpr FabricIndex kFabricIndex3  = kTestFabricIndex + 3;
 constexpr FabricIndex kFabricIndex4  = kTestFabricIndex + 4;
 constexpr FabricIndex kFabricIndex5  = kTestFabricIndex + 5;
 constexpr FabricIndex kFabricIndex6  = kTestFabricIndex + 6;
+[[maybe_unused]] constexpr uint32_t kGroupsClusterRevisionBeforeGroupcast = 4;
 
 // Helper to extract the status field embedded in a command response payload,
 // without requiring an explicit has_value() guard.
@@ -190,7 +191,11 @@ TEST_F(TestGroupsCluster, TestReadAttributes)
 
     uint16_t clusterRevision = 0;
     EXPECT_EQ(mClusterTester->ReadAttribute(Groups::Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     EXPECT_EQ(clusterRevision, Groups::kRevision);
+#else
+    EXPECT_EQ(clusterRevision, kGroupsClusterRevisionBeforeGroupcast);
+#endif
 }
 
 // Tests the basic success case of the AddGroup command.
