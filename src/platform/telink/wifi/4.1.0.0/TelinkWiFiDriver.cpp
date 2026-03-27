@@ -245,7 +245,8 @@ Status TelinkWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutab
 
 void TelinkWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
-    Status status = Status::kSuccess;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    Status status  = Status::kSuccess;
     WiFiManager::ConnectionHandling handling{ [](const wifi_conn_status & connStatus) {
                                                  Instance().OnNetworkConnStatusChanged(connStatus);
                                              },
@@ -258,7 +259,7 @@ void TelinkWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * call
                  status = Status::kOtherConnectionFailure);
     VerifyOrExit(networkId.data_equal(mStagingNetwork.GetSsidSpan()), status = Status::kNetworkIDNotFound);
 
-    CHIP_ERROR err = WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling);
+    err = WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Connect err: %" CHIP_ERROR_FORMAT, err.Format());

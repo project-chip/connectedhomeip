@@ -400,10 +400,10 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data, size_t leng
                 auto currentTimeout = Instance().CalculateNextRecoveryTime();
                 ChipLogProgress(DeviceLayer, "Starting connection recover: re-scanning... (next attempt in %d ms)",
                                 currentTimeout.count());
-                CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(currentTimeout, Recover, nullptr);
-                if (err != CHIP_NO_ERROR)
+                CHIP_ERROR error = DeviceLayer::SystemLayer().StartTimer(currentTimeout, Recover, nullptr);
+                if (error != CHIP_NO_ERROR)
                 {
-                    ChipLogError(DeviceLayer, "Failed to start recovery timer: %" CHIP_ERROR_FORMAT, err.Format());
+                    ChipLogError(DeviceLayer, "Failed to start recovery timer: %" CHIP_ERROR_FORMAT, error.Format());
                 }
                 return;
             }
