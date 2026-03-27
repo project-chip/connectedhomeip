@@ -116,7 +116,7 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
         mLabel.ClearValue();
     }
 
-    mCommissionerControlServer.mCluster.Cluster().GenerateCommissioningRequestResultEvent(result);
+    mCommissionerControlServer.GenerateCommissioningRequestResultEvent(result);
     mNextStep = Step::kWaitCommissionNodeRequest;
     ChipLogProgress(NotSpecified, "CommissionerControlDelegate: State transitioned to %s", GetStateString(mNextStep));
     return CHIP_NO_ERROR;
@@ -232,8 +232,7 @@ CHIP_ERROR CommissionerControlInit()
     BitMask<Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories;
     supportedDeviceCategories.SetField(Clusters::CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization, 1);
 
-    sCommissionerControlDelegate->GetCommissionerControlServer().mCluster.Cluster().SetSupportedDeviceCategories(
-        supportedDeviceCategories);
+    sCommissionerControlDelegate->GetCommissionerControlServer().SetSupportedDeviceCategories(supportedDeviceCategories);
     return CHIP_NO_ERROR;
 }
 

@@ -52,11 +52,10 @@ public:
     // Should be called after the server return SUCCESS to a correctly formatted RequestCommissioningApproval command.
     void GenerateCommissioningRequestResultEvent(const CommissionerControl::Events::CommissioningRequestResult::Type & result);
 
-protected:
+private:
     CommissionerControl::Delegate & mDelegate;
     BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> mSupportedDeviceCategories;
 
-private:
     std::optional<DataModel::ActionReturnStatus> HandleRequestCommissioningApproval(
         CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
         const CommissionerControl::Commands::RequestCommissioningApproval::DecodableType & commandData);

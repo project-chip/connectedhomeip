@@ -33,7 +33,7 @@ class CommissionerControlDelegate : public Delegate
 {
 public:
     CommissionerControlDelegate(bridge::FabricAdminDelegate * fabricAdmin) :
-        mFabricAdmin(fabricAdmin), mCommissionerControlServer(kAggregatorEndpointId, *this)
+        mFabricAdmin(fabricAdmin), mCommissionerControlServer(this, kAggregatorEndpointId)
     {}
 
     CHIP_ERROR HandleCommissioningApprovalRequest(const CommissioningApprovalRequest & request) override;

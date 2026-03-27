@@ -25,22 +25,46 @@ using namespace chip::app;
 
 namespace chip::app::Clusters {
 
-CommissionerControlServer::CommissionerControlServer(EndpointId endpointId, CommissionerControl::Delegate & delegate) :
-    mEndpointId(endpointId), mDelegate(delegate)
+CommissionerControlServer::CommissionerControlServer(CommissionerControl::Delegate * delegate, EndpointId endpointId) :
+    mDelegate(delegate), mEndpointId(endpointId)
 {}
 
 CommissionerControlServer::~CommissionerControlServer()
 {
-    if (mCluster.IsConstructed())
-    {
-        RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
-    }
+    RETURN_SAFELY_IGNORED Deinit();
 }
 
 CHIP_ERROR CommissionerControlServer::Init()
 {
-    mCluster.Create(mEndpointId, mDelegate);
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mCluster.Create(mEndpointId, *mDelegate);
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
+}
+
+CHIP_ERROR CommissionerControlServer::Deinit()
+{
+    VerifyOrReturnError(mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
+    return CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+}
+
+void CommissionerControlServer::SetSupportedDeviceCategories(
+    const BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories)
+{
+    VerifyOrDie(mCluster.IsConstructed());
+    mCluster.Cluster().SetSupportedDeviceCategories(supportedDeviceCategories);
+}
+
+BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> CommissionerControlServer::GetSupportedDeviceCategories() const
+{
+    VerifyOrDie(mCluster.IsConstructed());
+    return mCluster.Cluster().GetSupportedDeviceCategories();
+}
+
+void CommissionerControlServer::GenerateCommissioningRequestResultEvent(
+    const CommissionerControl::Events::CommissioningRequestResult::Type & result)
+{
+    VerifyOrDie(mCluster.IsConstructed());
+    mCluster.Cluster().GenerateCommissioningRequestResultEvent(result);
 }
 
 } // namespace chip::app::Clusters

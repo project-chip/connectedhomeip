@@ -28,25 +28,29 @@ public:
     /**
      * Creates a commissioner control server instance. This is just a backwards compatibility wrapper around the
      * CommissionerControlCluster.
+     * @param delegate A pointer to the delegate to be used by this server.
      * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param delegate A reference to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CommissionerControlServer(EndpointId endpointId, CommissionerControl::Delegate & delegate);
+    CommissionerControlServer(CommissionerControl::Delegate * delegate, EndpointId endpointId);
     ~CommissionerControlServer();
 
-    /**
-     * Register the commissioner control cluster instance with the codegen data model provider.
-     * @return Returns an error if registration fails.
-     */
+    // Register the commissioner control cluster instance with the codegen data model provider.
     CHIP_ERROR Init();
+
+    // Unregister the commissioner control cluster instance with the codegen data model provider.
+    CHIP_ERROR Deinit();
+
+    void SetSupportedDeviceCategories(const BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories);
+    BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> GetSupportedDeviceCategories() const;
+    void GenerateCommissioningRequestResultEvent(const CommissionerControl::Events::CommissioningRequestResult::Type & result);
+
+private:
+    CommissionerControl::Delegate * mDelegate{};
+    EndpointId mEndpointId{};
 
     // The Code Driven CommissionerControlCluster instance (lazy-initialized)
     chip::app::LazyRegisteredServerCluster<CommissionerControlCluster> mCluster;
-
-private:
-    EndpointId mEndpointId;
-    CommissionerControl::Delegate & mDelegate;
 };
 
 } // namespace chip::app::Clusters
