@@ -402,14 +402,10 @@ config CHIP_WIFI
 	select WIFI
 	select WIFI_NM_WPA_SUPPLICANT
 	select NETWORKING
-	imply NORDIC_SECURITY_BACKEND
-	imply MBEDTLS_ENTROPY_C
-	imply MBEDTLS_PSA_CRYPTO_C
 	imply NET_STATISTICS
 	imply NET_L2_ETHERNET
 	imply NET_PKT_TXTIME
 	imply NET_PKT_TIMESTAMP
-	imply MBEDTLS_PROMPTLESS
 	imply BUILD_OUTPUT_META
 	imply USE_DT_CODE_PARTITION # might be removed when the OTA is enabled
 	imply NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
@@ -417,6 +413,37 @@ config CHIP_WIFI
 	imply NET_STATISTICS_IPV6
 	imply NET_STATISTICS_USER_API
 	imply NET_CONFIG_NEED_IPV6
+
+choice CHIP_WIFI_CRYPTO_BACKEND
+	prompt "Wi-Fi crypto backend"
+	default CHIP_WIFI_CRYPTO_BACKEND_PSA if CHIP_CRYPTO_PSA
+	default CHIP_WIFI_CRYPTO_BACKEND_MBEDTLS
+	depends on CHIP_WIFI
+
+config CHIP_WIFI_CRYPTO_BACKEND_PSA
+	bool "Matter WiFi PSA crypto backend"
+    select PSA_WANT_ALG_ECDSA
+    select PSA_WANT_ALG_ECDH
+    select PSA_WANT_ECC_SECP_R1_256
+    select PSA_WANT_ALG_HKDF
+    select PSA_INTERNAL_TRUSTED_STORAGE
+    select MBEDTLS_PSA_CRYPTO_STORAGE_C if !BUILD_WITH_TFM
+    select TRUSTED_STORAGE if !BUILD_WITH_TFM
+    select HW_UNIQUE_KEY_WRITE_ON_CRYPTO_INIT if (SOC_NRF5340_CPUAPP || SOC_SERIES_NRF54L)
+    select MBEDTLS_PSA_CRYPTO_C
+    select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_GENERATE
+	select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_IMPORT
+	select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_EXPORT
+	select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_DERIVE
+
+config CHIP_WIFI_CRYPTO_BACKEND_MBEDTLS
+	bool "Matter WiFi mbedTLS crypto backend"
+	select MBEDTLS
+	imply NORDIC_SECURITY_BACKEND
+	imply MBEDTLS_PSA_CRYPTO_C
+	imply MBEDTLS_PROMPTLESS
+
+endchoice
 
 config CHIP_IM_PRETTY_PRINT
 	bool "Enable detailed logging of Matter messages"
