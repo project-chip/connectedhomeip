@@ -1,0 +1,38 @@
+# Matter SDK Fork - Project Configuration
+#
+# This file contains project-level settings for this fork of the
+# Matter (formerly Project CHIP) SDK.
+
+project:
+  name: connectedhomeip
+  description: Matter SDK fork with device configuration support
+  # Version of the Matter specification implemented at the time of the initial fork
+  matter_specification_version: "1.2.0"
+
+# Development environment settings
+environment:
+  python_min_version: "3.11"
+  bootstrap_script: scripts/bootstrap.sh
+  activate_script: scripts/activate.sh
+
+# Build configuration defaults
+build:
+  default_target: linux
+  output_dir: out
+  examples_dir: examples
+
+# Code quality tools
+lint:
+  python:
+    tool: ruff
+    config: pyproject.toml
+  cpp:
+    tool: clang-format
+    config: .clang-format
+  shell:
+    tool: shellcheck
+
+# Test configuration
+test:
+  unit_test_script: scripts/tests/gn_tests.sh
+  python_test_dir: src/python_testing
