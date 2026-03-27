@@ -16,10 +16,6 @@
  *    limitations under the License.
  */
 
-/* This file contains the glue code for passing the incoming OTA Requestor cluster commands
- * to the OTA Requestor object that handles them
- */
-
 #include <app/clusters/ota-requestor/CodegenIntegration.h>
 
 #include <app/clusters/ota-requestor/OTARequestorCluster.h>
