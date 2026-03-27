@@ -364,6 +364,9 @@ config OPENTHREAD_IP6_MAX_EXT_MCAST_ADDRS
     default 2 if PM
     default 8
 
+config CHIP_OPENTHREAD_NETWORK_SWITCH_PATH
+    default y
+
 endif # NET_L2_OPENTHREAD
 
 config NET_TX_STACK_SIZE
