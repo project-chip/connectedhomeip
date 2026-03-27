@@ -262,32 +262,34 @@ class TC_TSTAT_4_3(MatterBaseTest):
         activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
 
         # Verify that the AddThermostatSuggestion command returns an AddThermostatSuggestionResponse with a distinct value in the UniqueID field.
-        if addThermostatSuggestionResponse:
-            addThermostatSuggestionResponse_uniqueID = addThermostatSuggestionResponse.uniqueID
-            log.info(f"UniqueID from AddThermostatSuggestionResponse: {addThermostatSuggestionResponse_uniqueID}")
+        asserts.assert_is_not_none(addThermostatSuggestionResponse,
+                                   "AddThermostatSuggestion command returned None — expected an AddThermostatSuggestionResponse")
+        addThermostatSuggestionResponse_uniqueID = addThermostatSuggestionResponse.uniqueID
+        log.info(f"UniqueID from AddThermostatSuggestionResponse: {addThermostatSuggestionResponse_uniqueID}")
 
-            # Verify that the ThermostatSuggestions has one entry with the UniqueID field matching the UniqueID sent in the AddThermostatSuggestionResponse.
-            thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
-            if len(thermostatSuggestions) > 0:
-                asserts.assert_equal(thermostatSuggestions[0].uniqueID, addThermostatSuggestionResponse_uniqueID,
-                                     "UniqueID in the entry for ThermostatSuggestions does not match the UniqueID entry from AddThermostatSuggestionResponse.")
+        # Verify that the ThermostatSuggestions has one entry with the UniqueID field matching the UniqueID sent in the AddThermostatSuggestionResponse.
+        thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
+        asserts.assert_greater(len(thermostatSuggestions), 0,
+                               "Expected at least one entry in ThermostatSuggestions after AddThermostatSuggestion command.")
+        asserts.assert_equal(thermostatSuggestions[0].uniqueID, addThermostatSuggestionResponse_uniqueID,
+                             "UniqueID in the entry for ThermostatSuggestions does not match the UniqueID entry from AddThermostatSuggestionResponse.")
 
-            # Verify that the CurrentThermostatSuggestion attribute is set to the uniqueID, preset handle, the EffectiveTime, and the EffectiveTime plus ExpirationInMinutes (converted to seconds) passed in the AddThermostatSuggestion command.
-            asserts.assert_equal(currentThermostatSuggestion.uniqueID, addThermostatSuggestionResponse_uniqueID,
-                                 "UniqueID in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
-            asserts.assert_equal(currentThermostatSuggestion.presetHandle, presetHandle,
-                                 "PresetHandle in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
-            asserts.assert_equal(currentThermostatSuggestion.effectiveTime, currentUTC,
-                                 "EffectiveTime in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
-            expirationTime = currentUTC + int(timedelta(minutes=expirationInMinutes).total_seconds())
-            asserts.assert_equal(currentThermostatSuggestion.expirationTime, expirationTime,
-                                 "ExpirationTime in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
+        # Verify that the CurrentThermostatSuggestion attribute is set to the uniqueID, preset handle, the EffectiveTime, and the EffectiveTime plus ExpirationInMinutes (converted to seconds) passed in the AddThermostatSuggestion command.
+        asserts.assert_equal(currentThermostatSuggestion.uniqueID, addThermostatSuggestionResponse_uniqueID,
+                             "UniqueID in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
+        asserts.assert_equal(currentThermostatSuggestion.presetHandle, presetHandle,
+                             "PresetHandle in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
+        asserts.assert_equal(currentThermostatSuggestion.effectiveTime, currentUTC,
+                             "EffectiveTime in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
+        expirationTime = currentUTC + int(timedelta(minutes=expirationInMinutes).total_seconds())
+        asserts.assert_equal(currentThermostatSuggestion.expirationTime, expirationTime,
+                             "ExpirationTime in the CurrentThermostatSuggestion does not match the entry from AddThermostatSuggestion command.")
 
-            # Verify that the ThermostatSuggestionNotFollowingReason is set to null and the ActivePresetHandle attribute is set to the PresetHandle field of the CurrentThermostatSuggestion attribute.
-            asserts.assert_equal(thermostatSuggestionNotFollowingReason, NullValue,
-                                 "ThermostatSuggestionNotFollowingReason should be set to null")
-            asserts.assert_equal(activePresetHandle, currentThermostatSuggestion.presetHandle,
-                                 "ActivePresetHandle attribute should be equal to the PresetHandle in the CurrentThermostatSuggestion attribute")
+        # Verify that the ThermostatSuggestionNotFollowingReason is set to null and the ActivePresetHandle attribute is set to the PresetHandle field of the CurrentThermostatSuggestion attribute.
+        asserts.assert_equal(thermostatSuggestionNotFollowingReason, NullValue,
+                             "ThermostatSuggestionNotFollowingReason should be set to null")
+        asserts.assert_equal(activePresetHandle, currentThermostatSuggestion.presetHandle,
+                             "ActivePresetHandle attribute should be equal to the PresetHandle in the CurrentThermostatSuggestion attribute")
 
         self.step("6b")
         # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID field of the CurrentThermostatSuggestion attribute to clean up the test.
@@ -338,15 +340,17 @@ class TC_TSTAT_4_3(MatterBaseTest):
             asserts.assert_equal(temperatureSetpointHoldDuration, NullValue, "TemperatureSetpointHoldDuration is not equal to null")
 
             # Verify that the AddThermostatSuggestion command returns an AddThermostatSuggestionResponse with a distinct value in the UniqueID field.
-            if addThermostatSuggestionResponse:
-                addThermostatSuggestionResponse_uniqueID = addThermostatSuggestionResponse.uniqueID
-                log.info(f"UniqueID from AddThermostatSuggestionResponse: {addThermostatSuggestionResponse_uniqueID}")
+            asserts.assert_is_not_none(addThermostatSuggestionResponse,
+                                       "AddThermostatSuggestion command returned None — expected an AddThermostatSuggestionResponse")
+            addThermostatSuggestionResponse_uniqueID = addThermostatSuggestionResponse.uniqueID
+            log.info(f"UniqueID from AddThermostatSuggestionResponse: {addThermostatSuggestionResponse_uniqueID}")
 
             # Verify that the ThermostatSuggestions has one entry with the UniqueID field matching the UniqueID sent in the AddThermostatSuggestionResponse.
             thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
-            if len(thermostatSuggestions) > 0:
-                asserts.assert_equal(thermostatSuggestions[0].uniqueID, addThermostatSuggestionResponse_uniqueID,
-                                     "UniqueID in the entry for ThermostatSuggestions does not match the UniqueID entry from AddThermostatSuggestionResponse.")
+            asserts.assert_greater(len(thermostatSuggestions), 0,
+                                   "Expected at least one entry in ThermostatSuggestions after AddThermostatSuggestion command.")
+            asserts.assert_equal(thermostatSuggestions[0].uniqueID, addThermostatSuggestionResponse_uniqueID,
+                                 "UniqueID in the entry for ThermostatSuggestions does not match the UniqueID entry from AddThermostatSuggestionResponse.")
 
             # Verify that the CurrentThermostatSuggestion attribute is set to the uniqueID, preset handle, the EffectiveTime, and the EffectiveTime plus
             #   ExpirationInMinutes (converted to seconds) passed in the AddThermostatSuggestion command,
@@ -430,15 +434,17 @@ class TC_TSTAT_4_3(MatterBaseTest):
         activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
 
         # Verify that the AddThermostatSuggestion command returns an AddThermostatSuggestionResponse with a value in the UniqueID field.
-        if addThermostatSuggestionResponse:
-            addThermostatSuggestionResponse_uniqueID = addThermostatSuggestionResponse.uniqueID
-            log.info(f"UniqueID from AddThermostatSuggestionResponse: {addThermostatSuggestionResponse_uniqueID}")
+        asserts.assert_is_not_none(addThermostatSuggestionResponse,
+                                   "AddThermostatSuggestion command returned None — expected an AddThermostatSuggestionResponse")
+        addThermostatSuggestionResponse_uniqueID = addThermostatSuggestionResponse.uniqueID
+        log.info(f"UniqueID from AddThermostatSuggestionResponse: {addThermostatSuggestionResponse_uniqueID}")
 
         # Verify that the ThermostatSuggestions has one entry with the UniqueID field matching the UniqueID sent in the AddThermostatSuggestionResponse.
         thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
-        if len(thermostatSuggestions) > 0:
-            asserts.assert_equal(thermostatSuggestions[0].uniqueID, addThermostatSuggestionResponse_uniqueID,
-                                 "UniqueID in the entry for ThermostatSuggestions does not match the UniqueID entry from AddThermostatSuggestionResponse.")
+        asserts.assert_greater(len(thermostatSuggestions), 0,
+                               "Expected at least one entry in ThermostatSuggestions after AddThermostatSuggestion command.")
+        asserts.assert_equal(thermostatSuggestions[0].uniqueID, addThermostatSuggestionResponse_uniqueID,
+                             "UniqueID in the entry for ThermostatSuggestions does not match the UniqueID entry from AddThermostatSuggestionResponse.")
 
         # Verify that the CurrentThermostatSuggestion attribute is set to the uniqueID, preset handle, the EffectiveTime, and the EffectiveTime plus ExpirationInMinutes (converted to seconds) passed in the AddThermostatSuggestion command.
         asserts.assert_equal(currentThermostatSuggestion.uniqueID, addThermostatSuggestionResponse_uniqueID,
@@ -509,9 +515,13 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
         # Verify that both the AddThermostatSuggestion command return a AddThermostatSuggestionResponse with distinct values in the UniqueID field.
         # TH saves both the UniqueID values.
+        asserts.assert_is_not_none(firstAddThermostatSuggestionResponse,
+                                   "First AddThermostatSuggestion command returned None — expected an AddThermostatSuggestionResponse")
         firstAddThermostatSuggestionResponse_uniqueID = firstAddThermostatSuggestionResponse.uniqueID
         log.info(f"UniqueID from First AddThermostatSuggestionResponse: {firstAddThermostatSuggestionResponse_uniqueID}")
 
+        asserts.assert_is_not_none(secondAddThermostatSuggestionResponse,
+                                   "Second AddThermostatSuggestion command returned None — expected an AddThermostatSuggestionResponse")
         secondAddThermostatSuggestionResponse_uniqueID = secondAddThermostatSuggestionResponse.uniqueID
         log.info(f"UniqueID from Second AddThermostatSuggestionResponse: {secondAddThermostatSuggestionResponse_uniqueID}")
 
