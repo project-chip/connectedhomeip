@@ -160,7 +160,7 @@ class TC_ACE_1_6(MatterBaseTest):
         parts_list = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Descriptor.Attributes.PartsList)])
         ep1 = parts_list[0].Data[0] if parts_list[0].Data else 1
 
-#TODO check for success?
+# TODO check for success?
 ###################################
         # Step 3a: AddGroup 0x0103 over CASE (if GC not on root)
         self.step("3a")
@@ -317,7 +317,7 @@ class TC_ACE_1_6(MatterBaseTest):
             ))
 
         # Steps 21-25: (If GC not on root)
-#TODO: fix step 21, check access denied?
+# TODO: fix step 21, check access denied?
 #############################################
         self.step(21)
         if gc_on_root:
