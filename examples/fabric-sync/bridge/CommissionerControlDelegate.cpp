@@ -231,16 +231,8 @@ CHIP_ERROR CommissionerControlInit(bridge::FabricAdminDelegate * fabricAdmin)
     BitMask<Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories;
     supportedDeviceCategories.SetField(Clusters::CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization, 1);
 
-    err = sCommissionerControlDelegate->GetCommissionerControlServer().mCluster.Cluster().SetSupportedDeviceCategories(
+    sCommissionerControlDelegate->GetCommissionerControlServer().mCluster.Cluster().SetSupportedDeviceCategories(
         supportedDeviceCategories);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to set SupportedDeviceCategories: %" CHIP_ERROR_FORMAT, err.Format());
-        sCommissionerControlDelegate.reset();
-        return CHIP_ERROR_INTERNAL;
-    }
-
     return CHIP_NO_ERROR;
 }
 
