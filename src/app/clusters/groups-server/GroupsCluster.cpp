@@ -215,11 +215,7 @@ DataModel::ActionReturnStatus GroupsCluster::ReadAttribute(const DataModel::Read
     switch (request.path.mAttributeId)
     {
     case ClusterRevision::Id:
-#if CHIP_CONFIG_ENABLE_GROUPCAST
-        return encoder.Encode(kRevision);
-#else
-        return encoder.Encode(kGroupsClusterRevisionBeforeGroupcast);
-#endif
+return encoder.Encode(mGroupDataProvider.IsGroupCastSupported() ? kRevision : kGroupsClusterRevisionBeforeGroupcast);
     case FeatureMap::Id:
         // Group names is hardcoded (feature is M conformance in the spec)
         return encoder.Encode(Feature::kGroupNames);
