@@ -126,8 +126,7 @@ void CommissionerControlCluster::SetSupportedDeviceCategories(
 void CommissionerControlCluster::GenerateCommissioningRequestResultEvent(const Events::CommissioningRequestResult::Type & result)
 {
     VerifyOrReturn(mContext != nullptr);
-    auto eventNumber = mContext->interactionContext.eventsGenerator.GenerateEvent(result, mPath.mEndpointId);
-    VerifyOrReturn(eventNumber.has_value());
+    mContext->interactionContext.eventsGenerator.GenerateEvent(result, mPath.mEndpointId);
 }
 
 std::optional<DataModel::ActionReturnStatus> CommissionerControlCluster::HandleRequestCommissioningApproval(
