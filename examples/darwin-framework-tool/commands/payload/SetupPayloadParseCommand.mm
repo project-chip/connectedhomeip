@@ -70,7 +70,7 @@ CHIP_ERROR SetupPayloadParseCommand::Run()
 CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
 {
     // If the top-level payload is concatenated, we recurse with the subpayloads
-    //  which will have `isConcatenated` as `false`. 
+    //  which will have `isConcatenated` as `false`.
     if (payload.isConcatenated) {
         bool firstPayload = true;
         for (MTRSetupPayload * subPayload in payload.subPayloads) {
