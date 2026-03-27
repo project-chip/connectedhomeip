@@ -44,7 +44,8 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +103,9 @@ class TC_ACE_1_6(MatterBaseTest):
         groupID5 = 0x0105
         keySetID1 = 0x01a1
         keySetID3 = 0x01a3
-        pixit_g_endpoint = self.get_endpoint(default=1)
+        ##################################################
+        # TODO: check this
+        pixit_g_endpoint = self.get_endpoint() 
 
         # Keys
         key1 = b"\xa0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf"
