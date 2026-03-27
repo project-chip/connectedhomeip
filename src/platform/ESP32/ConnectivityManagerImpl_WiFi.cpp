@@ -680,9 +680,9 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     case WIFI_REASON_AUTH_EXPIRE:
     case WIFI_REASON_AUTH_LEAVE:
     case WIFI_REASON_ASSOC_LEAVE:
-  #if !(ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0))
+#if !(ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0))
     case WIFI_REASON_ASSOC_EXPIRE:
-  #endif
+#endif
         break;
 
     default:
