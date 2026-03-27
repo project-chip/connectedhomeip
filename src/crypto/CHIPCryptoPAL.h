@@ -506,6 +506,11 @@ public:
      **/
     virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, Sig & out_signature) const = 0;
 
+    /**
+     * @brief A variant of ECDSA_sign_msg() that uses Deterministic ECDSA (RFC 6979).
+     */
+    virtual CHIP_ERROR ECDSA_sign_msg_det(const uint8_t * msg, size_t msg_length, Sig & out_signature) const = 0;
+
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
      * ASN.1 DER encoded as padded big-endian field elements as described in SEC 1: Elliptic Curve Cryptography
@@ -584,6 +589,18 @@ public:
     CHIP_ERROR Deserialize(/* const */ P256SerializedKeypair & input) override;
 
     /**
+     * @brief Initializes this object from raw private key material in accordance with FIPS 186-5 appendix A.4.2.
+     * To be valid, the provided key material, when interpreted as a big endian integer x, must be in the range
+     * [0, N-2], where N is the order of the P-256 curve, and the resulting private key is d = x + 1.
+     *
+     * @return CHIP_NO_ERROR on success,
+     *         CHIP_ERROR_INVALID_ARGUMENT if the provided value is out of range,
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the platform does not support this operation,
+     *         or another CHIP_ERROR otherwise.
+     */
+    virtual CHIP_ERROR InitializeFromBitsOrReject(FixedByteSpan<kP256_PrivateKey_Length> privateKeyBits);
+
+    /**
      * @brief Generates a new Certificate Signing Request (CSR).
      * @param csr Newly generated CSR in DER format
      * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated
@@ -601,6 +618,11 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const override;
+
+    /**
+     * @brief A variant of ECDSA_sign_msg() that uses Deterministic ECDSA (RFC 6979).
+     */
+    CHIP_ERROR ECDSA_sign_msg_det(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const override;
 
     /**
      * @brief Derives a shared secret using ECDH

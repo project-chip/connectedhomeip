@@ -21,9 +21,65 @@ from typing import Optional
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import AttributeMatcher
 
 logger = logging.getLogger(__name__)
+
+
+def group_id_from_node_id(node_id: int) -> int:
+    """Extracts the 16-bit Group ID from a Group-scoped Node ID."""
+    return node_id & 0xFFFF
+
+
+def get_auxiliary_acl_equivalence_set(aux_acl, parts_list) -> set[tuple[int, int, int]]:
+    """Expands AuxiliaryACL entries into a set of (fabric_index, group_id, endpoint_id) tuples.
+
+    This implements the equivalence class logic for verifying auxiliary entries, accounting
+    for various encodings and wildcards (empty target lists). It also strictly validates
+    that Groupcast auxiliary entries have the correct privilege and auth mode.
+
+    Args:
+        aux_acl: The list of AuxiliaryACL entries read from the DUT.
+        parts_list: The list of endpoints from the Root Node's Descriptor PartsList attribute.
+
+    Returns:
+        A set of (fabric_index, group_id, endpoint_id) tuples representing the granted access.
+    """
+    equivalence_set = set()
+    for entry in aux_acl:
+        # We only process Groupcast auxiliary entries.
+        if entry.auxiliaryType != Clusters.AccessControl.Enums.AccessControlAuxiliaryTypeEnum.kGroupcast:
+            continue
+
+        # Strictly validate metadata for Groupcast auxiliary entries.
+        asserts.assert_equal(entry.privilege, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+                             f"Groupcast auxiliary entry MUST have Operate privilege, but has {entry.privilege}")
+        asserts.assert_equal(entry.authMode, Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
+                             f"Groupcast auxiliary entry MUST have Group auth mode, but has {entry.authMode}")
+
+        subjects = entry.subjects if (entry.subjects is not None and entry.subjects is not NullValue) else []
+        targets = entry.targets if (entry.targets is not None and entry.targets is not NullValue) else []
+
+        for subject in subjects:
+            group_id = group_id_from_node_id(subject)
+
+            if not targets:
+                # Wildcard: empty target list represents all endpoints in the parts list (excluding root).
+                for endpoint_id in parts_list:
+                    if endpoint_id != 0:
+                        equivalence_set.add((entry.fabricIndex, group_id, endpoint_id))
+            else:
+                for target in targets:
+                    endpoint_id = target.endpoint
+                    if endpoint_id is None or endpoint_id is NullValue:
+                        # Wildcard target: applies to all endpoints in the parts list (excluding root).
+                        for ep in parts_list:
+                            if ep != 0:
+                                equivalence_set.add((entry.fabricIndex, group_id, ep))
+                    else:
+                        equivalence_set.add((entry.fabricIndex, group_id, endpoint_id))
+    return equivalence_set
 
 
 def is_groupcast_supporting_cluster(cluster_id: int) -> bool:

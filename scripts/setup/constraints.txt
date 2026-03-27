@@ -239,3 +239,7 @@ setuptools==68.0.0
 # Higher versions depend on proto-plus, which break
 # nanopb code generation (due to name conflict of the 'proto' module)
 google-api-core==2.17.0
+
+# pydantic-core < 2.20 uses PyO3 0.21.x which does not support Python 3.13+
+# See: https://github.com/pydantic/pydantic/issues/11524
+pydantic-core>=2.20.0,<3.0.0; python_version >= "3.13"
