@@ -38,24 +38,19 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
     // TODO: This needs to be refactored so the optional attributes, commands and features being set for
     //  the cluster are configurable to allow different settings
-    const BasicInformationCluster::OptionalAttributesSet optionalAttributeSet =
-        BasicInformationCluster::OptionalAttributesSet()
-            .Set<BasicInformation::Attributes::ManufacturingDate::Id>()
-            .Set<BasicInformation::Attributes::PartNumber::Id>()
-            .Set<BasicInformation::Attributes::ProductURL::Id>()
-            .Set<BasicInformation::Attributes::ProductLabel::Id>()
-            .Set<BasicInformation::Attributes::SerialNumber::Id>()
-            .Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
-            .Set<BasicInformation::Attributes::Reachable::Id>();
+    const BasicInformationOptionalAttributesSet optionalAttributeSet =
+        BasicInformationOptionalAttributesSet()
+            .template Set<BasicInformation::Attributes::ManufacturingDate::Id>()
+            .template Set<BasicInformation::Attributes::PartNumber::Id>()
+            .template Set<BasicInformation::Attributes::ProductURL::Id>()
+            .template Set<BasicInformation::Attributes::ProductLabel::Id>()
+            .template Set<BasicInformation::Attributes::SerialNumber::Id>()
+            .template Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
+            .template Set<BasicInformation::Attributes::Reachable::Id>();
 
-    mBasicInformationCluster.Create(
-        optionalAttributeSet,
-        BasicInformationCluster::Context{
-            .deviceInstanceInfoProvider = mContext.deviceInstanceInfoProvider,
-            .configurationManager       = mContext.configurationManager,
-            .platformManager            = mContext.platformManager,
-            .subscriptionsPerFabric     = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(),
-        });
+    mBasicInformationCluster.Create(optionalAttributeSet, mContext.deviceInstanceInfoProvider, mContext.configurationManager,
+                                    mContext.platformManager,
+                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
     mGeneralCommissioningCluster.Create(
@@ -103,7 +98,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
             .groupDataProvider = mContext.groupDataProvider,
             .timerDelegate     = mContext.timerDelegate,
         },
-        BitFlags<Groupcast::Feature>{ Groupcast::Feature::kListener });
+        BitFlags<Clusters::Groupcast::Feature>(Clusters::Groupcast::Feature::kListener, Clusters::Groupcast::Feature::kSender));
     ReturnErrorOnFailure(provider.AddCluster(mGroupcastCluster.Registration()));
 
     mSoftwareDiagnosticsServerCluster.Create(SoftwareDiagnosticsServerCluster::OptionalAttributeSet{},
