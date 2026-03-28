@@ -18,6 +18,7 @@
 
 #include <LockManager.h>
 
+#include <AliroDelegate.h>
 #include <AppConfig.h>
 #include <AppTask.h>
 #include <LockSettingsStorage.h>
@@ -414,7 +415,7 @@ bool LockManager::IsValidCredentialIndex(uint16_t credentialIndex, CredentialTyp
 
 bool LockManager::IsValidCredentialType(CredentialTypeEnum type)
 {
-    return (to_underlying(type) < kNumCredentialTypes);
+    return AliroDelegate::IsAliroCredentialType(type) || (to_underlying(type) < kNumCredentialTypes);
 }
 
 bool LockManager::IsValidWeekdayScheduleIndex(uint8_t scheduleIndex)
@@ -628,6 +629,11 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
                     to_underlying(credentialType), credentialIndex);
 
 #if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
+    if (AliroDelegate::IsAliroCredentialType(credentialType))
+    {
+        return AliroDelegate::GetInstance().GetCredential(credentialIndex, credentialType, credential);
+    }
+
     size_t outLen;
     EmberAfPluginDoorLockCredentialInfo lockCredentials;
     uint8_t lockCredentialsData[kMaxCredentialSize] = { 0 };
@@ -743,6 +749,12 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                     to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size(), creator, modifier);
 
 #if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
+    if (AliroDelegate::IsAliroCredentialType(credentialType))
+    {
+        return AliroDelegate::GetInstance().SetCredential(credentialIndex, creator, modifier, credentialStatus, credentialType,
+                                                          credentialData);
+    }
+
     size_t outLen;
     EmberAfPluginDoorLockCredentialInfo lockCredentials;
     uint8_t lockCredentialsData[kMaxCredentialSize] = { 0 };

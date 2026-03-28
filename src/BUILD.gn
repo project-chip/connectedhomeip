@@ -57,6 +57,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
       "${chip_root}/src/app/clusters/air-quality-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
+      "${chip_root}/src/app/clusters/actions-server/tests",
       "${chip_root}/src/app/clusters/bindings/tests",
       "${chip_root}/src/app/clusters/boolean-state-configuration-server/tests",
       "${chip_root}/src/app/clusters/boolean-state-server/tests",
@@ -153,6 +154,7 @@ if (chip_build_tests) {
     if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
       tests += [
         # keep-sorted: start
+        "${chip_root}/src/app/clusters/actions-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/chime-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/device-energy-management-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests:tests-backwards-compatibility",
