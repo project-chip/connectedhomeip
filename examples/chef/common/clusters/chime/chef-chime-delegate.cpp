@@ -61,11 +61,14 @@ Protocols::InteractionModel::Status ChefChimeDelegate::PlayChimeSound(uint8_t ch
     ChipLogProgress(Zcl, "ChefChimeDelegate: Playing chime sound ID %u", chimeID);
 
     // Simulate sound playing for 2 seconds
-    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), [](System::Layer * layer, void * appState) {
-        auto * delegate = static_cast<ChefChimeDelegate *>(appState);
-        delegate->mIsPlaying = false;
-        ChipLogProgress(Zcl, "ChefChimeDelegate: Finished playing chime sound.");
-    }, this);
+    (void) DeviceLayer::SystemLayer().StartTimer(
+        System::Clock::Seconds16(2),
+        [](System::Layer * layer, void * appState) {
+            auto * delegate      = static_cast<ChefChimeDelegate *>(appState);
+            delegate->mIsPlaying = false;
+            ChipLogProgress(Zcl, "ChefChimeDelegate: Finished playing chime sound.");
+        },
+        this);
 
     return Protocols::InteractionModel::Status::Success;
 }
