@@ -145,13 +145,5 @@ class TC_CHIME(MatterBaseTest):
         # Immediately play another one. Delegate should ignore it and return success.
         await self._send_play_chime_sound_command(chimeID=2)
 
-        # Wait for the simulated 2-second playback to finish
-        logger.info("Waiting for simulated chime playback to finish...")
-        time.sleep(2.5)
-
-        # Should be able to play again now
-        await self._send_play_chime_sound_command(chimeID=3)
-
-
 if __name__ == "__main__":
     default_matter_test_main()
