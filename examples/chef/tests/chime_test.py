@@ -22,6 +22,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
 
@@ -71,7 +72,7 @@ class TC_CHIME(MatterBaseTest):
             TestStep(2, "Read InstalledChimeSounds attribute."),
             TestStep(3, "Read and write SelectedChime attribute."),
             TestStep(4, "Read and write Enabled attribute."),
-            TestStep(5, "Test PlayChimeSound command when Enabled is True."),
+            TestStep(5, "Test PlayChimeSound command when Enabled is True and verify event."),
             TestStep(6, "Test PlayChimeSound command when Enabled is False."),
             TestStep(7, "Test PlayChimeSound command already playing (back-to-back).")
         ]
@@ -110,8 +111,22 @@ class TC_CHIME(MatterBaseTest):
         asserts.assert_true(enabled, "Enabled attribute was not updated to True.")
 
         self.step(5)
-        # Play chime sound when enabled
-        await self._send_play_chime_sound_command(chimeID=1)
+        # Play chime sound when enabled and verify ChimeStartedPlaying event
+        events_callback = EventSubscriptionHandler(expected_cluster=Clusters.Objects.Chime)
+        await events_callback.start(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=self._CHIME_ENDPOINT,
+        )
+
+        chime_id_to_play = 1
+        await self._send_play_chime_sound_command(chimeID=chime_id_to_play)
+
+        event_data = events_callback.wait_for_event_report(Clusters.Objects.Chime.Events.ChimeStartedPlaying)
+        asserts.assert_equal(event_data.chimeID, chime_id_to_play, "Unexpected chimeID in ChimeStartedPlaying event.")
+
+        events_callback.reset()
+        events_callback.cancel()
 
         self.step(6)
         # Disable chime and play sound
