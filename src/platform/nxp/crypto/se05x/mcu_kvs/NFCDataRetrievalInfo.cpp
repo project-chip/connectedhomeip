@@ -102,6 +102,10 @@ uint32_t NFCDataRetrievalInfo::GetRemainingFailSafeTimerForSE05x()
     if (mSe05xReadFailSafe == 0)
     {
         ChipLogDetail(Crypto, "SE05x: Fail-safe timer not active (not first read after NFC commissioning)");
+        if (CHIP_NO_ERROR != se05x_close_session())
+        {
+            ChipLogError(Crypto, "SE05x: Error in session close");
+        }
         return 0;
     }
 
@@ -114,12 +118,20 @@ uint32_t NFCDataRetrievalInfo::GetRemainingFailSafeTimerForSE05x()
                      status.Format());
         // Reset the flag since we attempted to read
         mSe05xReadFailSafe = 0;
+        if (CHIP_NO_ERROR != se05x_close_session())
+        {
+            ChipLogError(Crypto, "SE05x: Error in session close");
+        }
         return 0;
     }
 
     // Reset the flag after successful read
     mSe05xReadFailSafe = 0;
 
+    if (CHIP_NO_ERROR != se05x_close_session())
+    {
+        ChipLogError(Crypto, "SE05x: Error in session close");
+    }
     return fail_safe_time;
 }
 
