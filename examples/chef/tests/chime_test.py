@@ -144,5 +144,6 @@ class TC_CHIME(MatterBaseTest):
         # Immediately play another one. Delegate should ignore it and return success.
         await self._send_play_chime_sound_command(chimeID=2)
 
+
 if __name__ == "__main__":
     default_matter_test_main()
