@@ -195,7 +195,7 @@ int main(void)
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
         static InitScanCallback sInitScanCallback;
-        LogErrorOnFailure(chip::DeviceLayer::ThreadStackMgrImpl().StartThreadScan(&sInternalScanCallback));
+        LogErrorOnFailure(chip::DeviceLayer::ThreadStackMgrImpl().StartThreadScan(&sInitScanCallback));
         k_sem_take(&gThreadPrescanDoneSem, K_SECONDS(15));
     }
 #endif
