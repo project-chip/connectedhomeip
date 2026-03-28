@@ -694,7 +694,7 @@ void ChimeInit()
         uint8_t defaultChimeID = 0;
         VerifyOrDieWithMsg(delegate->GetChimeIDByIndex(0, defaultChimeID) == CHIP_NO_ERROR, Zcl,
                            "Initialisation Error: Failed to get chime ID from chef delegate");
-        VerifyOrDieWithMsg(chimeServer->SetSelectedChime(defaultChimeID) == CHIP_NO_ERROR, Zcl,
+        VerifyOrDieWithMsg(chimeServer->SetSelectedChime(defaultChimeID) == Protocols::InteractionModel::Status::Success, Zcl,
                            "Initialisation Error: Failed to set default chime ID to %d", defaultChimeID);
     }
 #endif // #if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT
