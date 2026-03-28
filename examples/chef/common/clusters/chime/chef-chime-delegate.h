@@ -19,16 +19,32 @@
 #pragma once
 
 #include <app/clusters/chime-server/ChimeCluster.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Chime {
 
+struct ChimeSound
+{
+    uint8_t id;
+    const char * name;
+};
+
+static const ChimeSound kDefaultChimeSounds[] = {
+    { 1, "Classic Ding Dong" },
+    { 2, "Merry Melodies" },
+    { 3, "Digital Alert" },
+};
+
+static constexpr size_t kNumDefaultChimeSounds = sizeof(kDefaultChimeSounds) / sizeof(kDefaultChimeSounds[0]);
+
 class ChefChimeDelegate : public ChimeDelegate
 {
 public:
-    ChefChimeDelegate() = default;
+    ChefChimeDelegate() : mChimeSounds(kDefaultChimeSounds) {}
+    ChefChimeDelegate(Span<const ChimeSound> chimeSounds) : mChimeSounds(chimeSounds) {}
     ~ChefChimeDelegate() override = default;
 
     CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name) override;
@@ -36,6 +52,7 @@ public:
     Protocols::InteractionModel::Status PlayChimeSound(uint8_t chimeID) override;
 
 private:
+    Span<const ChimeSound> mChimeSounds;
     bool mIsPlaying = false;
 };
 

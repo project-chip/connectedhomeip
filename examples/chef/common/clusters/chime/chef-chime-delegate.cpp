@@ -24,23 +24,6 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 
-namespace {
-
-struct ChimeSound {
-    uint8_t id;
-    const char* name;
-};
-
-static const ChimeSound kChimeSounds[] = {
-    { 1, "Classic Ding Dong" },
-    { 2, "Merry Melodies" },
-    { 3, "Digital Alert" },
-};
-
-static constexpr size_t kNumChimeSounds = sizeof(kChimeSounds) / sizeof(kChimeSounds[0]);
-
-} // namespace
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -48,21 +31,21 @@ namespace Chime {
 
 CHIP_ERROR ChefChimeDelegate::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name)
 {
-    if (chimeIndex >= kNumChimeSounds)
+    if (chimeIndex >= mChimeSounds.size())
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    chimeID = kChimeSounds[chimeIndex].id;
-    return CopyCharSpanToMutableCharSpan(CharSpan::fromCharString(kChimeSounds[chimeIndex].name), name);
+    chimeID = mChimeSounds[chimeIndex].id;
+    return CopyCharSpanToMutableCharSpan(CharSpan::fromCharString(mChimeSounds[chimeIndex].name), name);
 }
 
 CHIP_ERROR ChefChimeDelegate::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID)
 {
-    if (chimeIndex >= kNumChimeSounds)
+    if (chimeIndex >= mChimeSounds.size())
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    chimeID = kChimeSounds[chimeIndex].id;
+    chimeID = mChimeSounds[chimeIndex].id;
     return CHIP_NO_ERROR;
 }
 
