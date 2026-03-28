@@ -191,11 +191,7 @@ TEST_F(TestGroupsCluster, TestReadAttributes)
 
     uint16_t clusterRevision = 0;
     EXPECT_EQ(mClusterTester->ReadAttribute(Groups::Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
-#if CHIP_CONFIG_ENABLE_GROUPCAST
-    EXPECT_EQ(clusterRevision, Groups::kRevision);
-#else
-    EXPECT_EQ(clusterRevision, kGroupsClusterRevisionBeforeGroupcast);
-#endif
+    EXPECT_EQ(clusterRevision, mGroupDataProvider.IsGroupcastEnabled() ? Groups::kRevision : kGroupsClusterRevisionBeforeGroupcast);
 }
 
 // Tests the basic success case of the AddGroup command.
