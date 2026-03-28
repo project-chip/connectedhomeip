@@ -49,11 +49,9 @@ class TC_CHIME(MatterBaseTest):
         )
 
     async def _write_chime_attribute(self, attribute, value):
-        return await self.write_single_attribute_check_success(
-            endpoint=self._CHIME_ENDPOINT,
-            cluster=Clusters.Objects.Chime,
-            attribute=attribute,
-            value=value
+        return await self.write_single_attribute(
+            attribute_value=attribute(value),
+            endpoint_id=self._CHIME_ENDPOINT
         )
 
     async def _send_play_chime_sound_command(self, chimeID=None):
