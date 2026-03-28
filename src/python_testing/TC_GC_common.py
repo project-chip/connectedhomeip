@@ -140,6 +140,15 @@ async def valid_endpoints_list(test, ln_enabled: bool) -> list:
     return endpoints_list
 
 
+async def is_groupcast_on_root_node(test) -> bool:
+    """Check if Groupcast cluster is present on the RootNode endpoint (EP0)."""
+    server_list = await test.read_single_attribute_check_success(
+        cluster=Clusters.Descriptor,
+        attribute=Clusters.Descriptor.Attributes.ServerList,
+        endpoint=0)
+    return Clusters.Groupcast.id in server_list
+
+
 def generate_membership_entry_matcher(
     group_id: int,
     key_set_id: Optional[int] = None,
