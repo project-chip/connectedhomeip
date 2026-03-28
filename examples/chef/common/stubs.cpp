@@ -688,8 +688,14 @@ void ChimeInit()
 #if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT > 0
     if (DeviceTypes::EndpointHasDeviceType(1, Device::kChimeDeviceTypeId))
     {
-        auto * delegate = Platform::New<Chime::ChefChimeDelegate>();
-        VerifyOrDieWithMsg(Platform::New<ChimeServer>(1, *delegate)->Init() == CHIP_NO_ERROR, Zcl, "Error: ChimeServer::Init failed");
+        auto * delegate  = Platform::New<Chime::ChefChimeDelegate>();
+        auto chimeServer = Platform::New<ChimeServer>(1, *delegate);
+        VerifyOrDieWithMsg(chimeServer->Init() == CHIP_NO_ERROR, Zcl, "Error: ChimeServer::Init failed");
+        uint8_t defaultChimeID = 0;
+        VerifyOrDieWithMsg(delegate->GetChimeIDByIndex(0, defaultChimeID) == CHIP_NO_ERROR, Zcl,
+                           "Initialisation Error: Failed to get chime ID from chef delegate");
+        VerifyOrDieWithMsg(chimeServer->SetSelectedChime(defaultChimeID) == CHIP_NO_ERROR, Zcl,
+                           "Initialisation Error: Failed to set default chime ID to %d", defaultChimeID);
     }
 #endif // #if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT
 }

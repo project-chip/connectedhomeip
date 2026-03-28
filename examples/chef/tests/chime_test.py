@@ -67,7 +67,7 @@ class TC_CHIME(MatterBaseTest):
         return [
             TestStep(1, "Commissioning already done.", is_commissioning=True),
             TestStep(2, "Read InstalledChimeSounds attribute."),
-            TestStep(3, "Read and write SelectedChime attribute."),
+            TestStep(3, "Verify default SelectedChime is valid and test read/write."),
             TestStep(4, "Read and write Enabled attribute."),
             TestStep(5, "Test PlayChimeSound command when Enabled is True and verify event."),
             TestStep(6, "Test PlayChimeSound command when Enabled is False."),
@@ -89,13 +89,18 @@ class TC_CHIME(MatterBaseTest):
             asserts.assert_equal(installed_sounds[i].name, self._EXPECTED_CHIME_SOUNDS[i].name)
 
         self.step(3)
+        # Verify initial default SelectedChime is valid
+        initial_selected_chime = await self._read_chime_attribute(Clusters.Objects.Chime.Attributes.SelectedChime)
+        valid_chime_ids = [sound.chimeID for sound in self._EXPECTED_CHIME_SOUNDS]
+        asserts.assert_in(initial_selected_chime, valid_chime_ids, "Initial SelectedChime ID is not valid.")
+
         # Test writing SelectedChime
         await self._write_chime_attribute(Clusters.Objects.Chime.Attributes.SelectedChime, 2)
         selected_chime = await self._read_chime_attribute(Clusters.Objects.Chime.Attributes.SelectedChime)
         asserts.assert_equal(selected_chime, 2, "SelectedChime was not updated correctly.")
 
         # Revert to default
-        await self._write_chime_attribute(Clusters.Objects.Chime.Attributes.SelectedChime, 1)
+        await self._write_chime_attribute(Clusters.Objects.Chime.Attributes.SelectedChime, initial_selected_chime)
 
         self.step(4)
         # Test writing Enabled
