@@ -1,28 +1,28 @@
-#TV Casting App — Darwin(iOS / macOS) Size Analysis
+# TV Casting App — Darwin(iOS / macOS) Size Analysis
 
-This document analyzes the binary size of the Matter TV Casting framework
-on Darwin (iOS/macOS) and describes how iOS developers can integrate a
-size-reduced version of the casting library into their apps.
+This document analyzes the binary size of the Matter TV Casting framework on
+Darwin (iOS/macOS) and describes how iOS developers can integrate a size-reduced
+version of the casting library into their apps.
 
 ---
 
 ## 1. Measured Size Comparison (arm64, macOS host build)
 
-| Metric | Default build | Optimized build | Reduction |
-| --- | --- | --- | --- |
-| `libTvCastingCommon.a` (archive) | 210 MB | 144 MB | 31 % |
-| `__TEXT` (actual code) | 12.1 MB | 2.8 MB | 77 % |
-| `__DATA` | 0.4 MB | 0.3 MB | 25 % |
+| Metric                              | Default build | Optimized build | Reduction |
+| ----------------------------------- | ------------- | --------------- | --------- |
+| `libTvCastingCommon.a` (archive)    | 210 MB        | 144 MB          | 31 %      |
+| `__TEXT` (actual code)              | 12.1 MB       | 2.8 MB          | 77 %      |
+| `__DATA`                            | 0.4 MB        | 0.3 MB          | 25 %      |
 
-The `.a` archive sizes (210 / 144 MB) include debug info, symbol tables,
-and object-file metadata — they overstate the real app impact. The
-`__TEXT` row is the aggregate machine-code size across all `.o` files in
-the archive, which closely approximates what the linker pulls into the
-final framework binary (before dead-code stripping removes even more).
+The `.a` archive sizes (210 / 144 MB) include debug info, symbol tables, and
+object-file metadata — they overstate the real app impact. The `__TEXT` row is
+the aggregate machine-code size across all `.o` files in the archive, which
+closely approximates what the linker pulls into the final framework binary
+(before dead-code stripping removes even more).
 
-The 77 % code-size reduction (12.1 → 2.8 MB) is consistent with the
-Android results and represents the actual savings an iOS app would see
-in its `MatterTvCastingBridge.framework` binary.
+The 77 % code-size reduction (12.1 → 2.8 MB) is consistent with the Android
+results and represents the actual savings an iOS app would see in its
+`MatterTvCastingBridge.framework` binary.
 
 ### How to measure
 
@@ -40,11 +40,11 @@ size out/darwin-casting-optimized/lib/libTvCastingCommon.a \
 
 ### What drives the reduction
 
-| Optimization | Mechanism |
-| --- | --- |
-| `optimize_apk_size=true` | Excludes ~20 legacy chip-tool source files and their transitive deps (tracing, JSON, jsoncpp, interaction model test suites) |
-| `is_debug=false` | Removes assert checks, bounds checking, extra logging |
-| `matter_enable_tracing_support=false` | Excludes tracing/perfetto dependencies |
+| Optimization                             | Mechanism                                                                                                                    |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `optimize_apk_size=true`                 | Excludes ~20 legacy chip-tool source files and their transitive deps (tracing, JSON, jsoncpp, interaction model test suites) |
+| `is_debug=false`                         | Removes assert checks, bounds checking, extra logging                                                                        |
+| `matter_enable_tracing_support=false`    | Excludes tracing/perfetto dependencies                                                                                       |
 
 ---
 
@@ -60,8 +60,8 @@ The Darwin casting SDK is delivered as an Xcode framework
 4. Xcode links the `.a` into `MatterTvCastingBridge.framework`
 5. The framework is embedded in the host app (TvCasting example or your app)
 
-Unlike Android, there is no separate `libc++_shared.so` — the Apple
-toolchain statically links the C++ standard library by default.
+Unlike Android, there is no separate `libc++_shared.so` — the Apple toolchain
+statically links the C++ standard library by default.
 
 ---
 
@@ -74,61 +74,61 @@ chip_cluster_objects_source_override =
     "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-objects.cpp"
 ```
 
-This compiles only ~36 casting-relevant clusters instead of the full
-~200+ generated `cluster-objects.cpp`. This is the same slim file used
-by the Android size-optimized build.
+This compiles only ~36 casting-relevant clusters instead of the full ~200+
+generated `cluster-objects.cpp`. This is the same slim file used by the Android
+size-optimized build.
 
-Additionally, the darwin casting bridge uses its own zap-generated
-Objective-C cluster objects (`MCClusterObjects.h/.mm`) that are scoped
-to only the casting clusters defined in `config-data.yaml`:
+Additionally, the darwin casting bridge uses its own zap-generated Objective-C
+cluster objects (`MCClusterObjects.h/.mm`) that are scoped to only the casting
+clusters defined in `config-data.yaml`:
 
-- Application Basic
-- Application Launcher
-- Content Launcher
-- Keypad Input
-- Level Control
-- Media Playback
-- On/Off
-- Target Navigator
-- Wake on LAN
+-   Application Basic
+-   Application Launcher
+-   Content Launcher
+-   Keypad Input
+-   Level Control
+-   Media Playback
+-   On/Off
+-   Target Navigator
+-   Wake on LAN
 
-These are the Objective-C API surfaces exposed to Swift/ObjC consumers.
-The C++ layer underneath (via `libTvCastingCommon.a`) also includes
-infrastructure clusters (Descriptor, Binding, OperationalCredentials,
-etc.) needed for commissioning and session management.
+These are the Objective-C API surfaces exposed to Swift/ObjC consumers. The C++
+layer underneath (via `libTvCastingCommon.a`) also includes infrastructure
+clusters (Descriptor, Binding, OperationalCredentials, etc.) needed for
+commissioning and session management.
 
 ---
 
 ## 4. Optimization Parity with Android
 
-The Android size-optimized build applies several optimizations. Most of
-these are now also wired into the darwin build. The remaining gap is
-`-Os` (optimize for size), which requires changes to the GN toolchain
-config and is better handled as a follow-up:
+The Android size-optimized build applies several optimizations. Most of these
+are now also wired into the darwin build. The remaining gap is `-Os` (optimize
+for size), which requires changes to the GN toolchain config and is better
+handled as a follow-up:
 
-| Optimization | Android status | Darwin status | Potential impact |
-| --- | --- | --- | --- |
-| `optimize_apk_size=true` (excludes legacy chip-tool sources) | ✅ Applied | ✅ Applied (in `args.gni`) | Significant — removes ~20 legacy source files and their transitive deps |
-| `is_debug=false` | ✅ Applied | ✅ Applied (Release builds via Xcode connector) | Moderate — removes assert checks and extra logging |
-| `matter_enable_tracing_support=false` | ✅ Applied | ✅ Applied (when `optimize_apk_size=true`) | Moderate — removes tracing/perfetto deps |
-| `-Os` (optimize for size) | ✅ Applied | ❌ Not applied | 10–20% code size reduction |
-| `-g0` (strip debug symbols) | ✅ Applied | Partial (strip script) | `strip_debug_symbols.sh` runs in Release but not Debug |
-| `-flto=thin` (link-time optimization) | ✅ Applied | ✅ Applied (via tv-casting-common config when `optimize_apk_size=true`) | 5–15% further reduction via cross-TU inlining and dead code elimination |
-| `-fvisibility=hidden` | ✅ Applied | ✅ Applied (via tv-casting-common config when `optimize_apk_size=true`) | Reduces exported symbol table, enables more aggressive dead-code stripping |
-| Slim TLV decoders (18 casting clusters) | ✅ Applied | N/A | Not applicable — darwin uses Objective-C zap-generated decoders, not the C++ TLV decoders |
+| Optimization                                                  | Android status | Darwin status                                            | Potential impact                                                              |
+| ------------------------------------------------------------- | -------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `optimize_apk_size=true` (excludes legacy chip-tool sources)  | ✅ Applied     | ✅ Applied (in `args.gni`)                               | Significant — removes ~20 legacy source files and their transitive deps       |
+| `is_debug=false`                                              | ✅ Applied     | ✅ Applied (Release builds via Xcode connector)          | Moderate — removes assert checks and extra logging                            |
+| `matter_enable_tracing_support=false`                         | ✅ Applied     | ✅ Applied (when `optimize_apk_size=true`)               | Moderate — removes tracing/perfetto deps                                      |
+| `-Os` (optimize for size)                                     | ✅ Applied     | ❌ Not applied                                           | 10–20% code size reduction                                                    |
+| `-g0` (strip debug symbols)                                   | ✅ Applied     | Partial (strip script)                                   | `strip_debug_symbols.sh` runs in Release but not Debug                        |
+| `-flto=thin` (link-time optimization)                         | ✅ Applied     | ✅ Applied (via tv-casting-common config when `optimize_apk_size=true`) | 5–15% further reduction via cross-TU inlining and dead code elimination       |
+| `-fvisibility=hidden`                                         | ✅ Applied     | ✅ Applied (via tv-casting-common config when `optimize_apk_size=true`) | Reduces exported symbol table, enables more aggressive dead-code stripping    |
+| Slim TLV decoders (18 casting clusters)                       | ✅ Applied     | N/A                                                      | Not applicable — darwin uses Objective-C zap-generated decoders, not the C++ TLV decoders |
 
 ### Why slim TLV decoders don't apply to Darwin
 
-On Android, the Java controller uses JNI to call C++ TLV decoder
-functions (`DecodeAttributeValue`, `DecodeEventValue`) that switch over
-cluster IDs. The full zap-generated decoders handle all ~200+ clusters,
-pulling in massive link-time dependencies. The slim decoders replace
-these with 18-cluster versions.
+On Android, the Java controller uses JNI to call C++ TLV decoder functions
+(`DecodeAttributeValue`, `DecodeEventValue`) that switch over cluster IDs. The
+full zap-generated decoders handle all ~200+ clusters, pulling in massive
+link-time dependencies. The slim decoders replace these with 18-cluster
+versions.
 
 On Darwin, the Objective-C bridge (`MatterTvCastingBridge`) uses its own
-zap-generated `MCAttributeObjects.mm`, `MCCommandObjects.mm`, etc. that
-are already scoped to the casting clusters via `config-data.yaml`. There
-is no equivalent of the full C++ TLV decoder path to replace.
+zap-generated `MCAttributeObjects.mm`, `MCCommandObjects.mm`, etc. that are
+already scoped to the casting clusters via `config-data.yaml`. There is no
+equivalent of the full C++ TLV decoder path to replace.
 
 ---
 
@@ -141,11 +141,11 @@ declared in `tv-casting-common.gni` and controls behavior in the
 platform-agnostic `tv-casting-common/BUILD.gn`. Setting it in the darwin
 args will:
 
-- Exclude legacy chip-tool command sources (~20 files)
-- Exclude tracing, JSON, and jsoncpp dependencies
-- Enable `-ffunction-sections`, `-fdata-sections`, `-fvisibility=hidden`,
-  `-flto=thin` in the tv-casting-common config
-- Reduce the source set to only the simplified casting API
+-   Exclude legacy chip-tool command sources (~20 files)
+-   Exclude tracing, JSON, and jsoncpp dependencies
+-   Enable `-ffunction-sections`, `-fdata-sections`, `-fvisibility=hidden`,
+    `-flto=thin` in the tv-casting-common config
+-   Reduce the source set to only the simplified casting API
 
 To enable, add to `examples/tv-casting-app/darwin/args.gni`:
 
@@ -155,8 +155,8 @@ optimize_apk_size = true
 
 ### Option B: Pass additional GN args via the Xcode build connector
 
-The `chip_xcode_build_connector.sh` script builds an `args` array that
-gets passed to `gn gen`. You can add size-optimization flags there:
+The `chip_xcode_build_connector.sh` script builds an `args` array that gets
+passed to `gn gen`. You can add size-optimization flags there:
 
 ```bash
 #In chip_xcode_build_connector.sh, add to the args array:
@@ -171,8 +171,8 @@ Or pass them as Xcode build settings that the script picks up.
 
 ### Option C: Manual `gn gen` for measurement
 
-For measuring the impact without modifying the Xcode project, you can
-run the GN build directly:
+For measuring the impact without modifying the Xcode project, you can run the
+GN build directly:
 
 ```bash
 source scripts/activate.sh
@@ -209,25 +209,25 @@ ninja -C out/darwin-casting-ios lib/libTvCastingCommon.a
 
 ### What's in `MatterTvCastingBridge.framework`
 
-| Layer | Description |
-| --- | --- |
-| Objective-C API | `MCCastingApp`, `MCCastingPlayer`, `MCCastingPlayerDiscovery`, `MCEndpoint`, `MCCluster`, `MCCommand`, `MCAttribute` — the public API surface for Swift/ObjC apps |
+| Layer                      | Description                                                                                                                  |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Objective-C API            | `MCCastingApp`, `MCCastingPlayer`, `MCCastingPlayerDiscovery`, `MCEndpoint`, `MCCluster`, `MCCommand`, `MCAttribute` — the public API surface for Swift/ObjC apps |
 | Zap-generated cluster objects | `MCClusterObjects`, `MCCommandObjects`, `MCAttributeObjects`, `MCCommandPayloads` — typed wrappers for the 9 casting clusters |
-| Compat shim (legacy) | `CastingServerBridge`, `ContentApp`, `DiscoveredNodeData`, etc. — deprecated API, can be excluded in new integrations |
-| `libTvCastingCommon.a` | The GN-built static archive containing Matter core, casting common C++ layer, and all transitive deps |
+| Compat shim (legacy)       | `CastingServerBridge`, `ContentApp`, `DiscoveredNodeData`, etc. — deprecated API, can be excluded in new integrations        |
+| `libTvCastingCommon.a`     | The GN-built static archive containing Matter core, casting common C++ layer, and all transitive deps                        |
 
 ### What's in `libTvCastingCommon.a`
 
-The static archive is built with `complete_static_lib = true`, meaning
-it bundles all transitive dependencies into a single `.a` file:
+The static archive is built with `complete_static_lib = true`, meaning it
+bundles all transitive dependencies into a single `.a` file:
 
-- Matter core (transport, crypto, secure channel, interaction model)
-- Casting common C++ layer (CastingApp, CastingPlayer, Endpoint, etc.)
-- Cluster implementations (~36 via slim `casting-cluster-objects.cpp`)
-- App server, data model provider
-- Darwin platform layer (BLE, DNS-SD via Bonjour, KeyValueStore)
-- mbedTLS (crypto backend)
-- Device attestation, credential management
+-   Matter core (transport, crypto, secure channel, interaction model)
+-   Casting common C++ layer (CastingApp, CastingPlayer, Endpoint, etc.)
+-   Cluster implementations (~36 via slim `casting-cluster-objects.cpp`)
+-   App server, data model provider
+-   Darwin platform layer (BLE, DNS-SD via Bonjour, KeyValueStore)
+-   mbedTLS (crypto backend)
+-   Device attestation, credential management
 
 ---
 
@@ -268,15 +268,15 @@ If you're building a new app (not migrating from the old API):
 
 ## 8. Comparison with Android
 
-| Aspect                  | Android                                                     | Darwin (iOS/macOS)                                          |
-| ----------------------- | ----------------------------------------------------------- | ----------------------------------------------------------- |
-| Delivery format         | `.so` shared library + `.jar` files                         | `.framework` (static lib + ObjC headers)                    |
-| C++ stdlib              | Separate `libc++_shared.so` (or static)                     | Always statically linked by Apple toolchain                 |
-| Cluster API surface     | Java `ChipClusters.java` (all ~200+ clusters, shrunk by R8) | ObjC `MCClusterObjects` (9 casting clusters only)           |
-| TLV decoders            | C++ `CHIPAttributeTLVValueDecoder.cpp` (full or slim)       | ObjC zap-generated `MCAttributeObjects.mm` (already scoped) |
-| Slim cluster-objects    | ✅ via `chip_cluster_objects_source_override`               | ✅ via `chip_cluster_objects_source_override`               |
-| Legacy source exclusion | ✅ via `optimize_apk_size=true`                             | ✅ via `optimize_apk_size=true` (Release builds)            |
-| Build system            | GN → ninja → Gradle                                         | GN → ninja → Xcode                                          |
+| Aspect                  | Android                                                      | Darwin (iOS/macOS)                                           |
+| ----------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Delivery format         | `.so` shared library + `.jar` files                          | `.framework` (static lib + ObjC headers)                     |
+| C++ stdlib              | Separate `libc++_shared.so` (or static)                      | Always statically linked by Apple toolchain                  |
+| Cluster API surface     | Java `ChipClusters.java` (all ~200+ clusters, shrunk by R8)  | ObjC `MCClusterObjects` (9 casting clusters only)            |
+| TLV decoders            | C++ `CHIPAttributeTLVValueDecoder.cpp` (full or slim)        | ObjC zap-generated `MCAttributeObjects.mm` (already scoped)  |
+| Slim cluster-objects    | ✅ via `chip_cluster_objects_source_override`                | ✅ via `chip_cluster_objects_source_override`                |
+| Legacy source exclusion | ✅ via `optimize_apk_size=true`                              | ✅ via `optimize_apk_size=true` (Release builds)             |
+| Build system            | GN → ninja → Gradle                                          | GN → ninja → Xcode                                           |
 
 The darwin build is already in a better starting position than the default
 Android build because:
