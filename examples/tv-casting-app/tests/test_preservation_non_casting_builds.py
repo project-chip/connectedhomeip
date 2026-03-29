@@ -116,7 +116,7 @@ else
             depth -= 1
         epos += 1
 
-    return stripped[else_body_start : epos - 1]
+    return stripped[else_body_start: epos - 1]
 
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 # Property - based tests — config.gni declarations
@@ -256,6 +256,7 @@ def test_args_gni_default_block_does_not_disable_tlv_decoder(dummy):
         f"overridden for default development builds"
     )
 
+
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 # Allow running directly
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -275,7 +276,7 @@ if __name__ == "__main__":
     ]
     all_passed = True
     for name, test_fn in tests:
-    try : test_fn() print(f "  PASS: {name}") except AssertionError as e:
+    try: test_fn() print(f "  PASS: {name}") except AssertionError as e:
             print(f"  FAIL: {name}\n    {e}")
             all_passed = False
         except Exception as e:

@@ -104,7 +104,7 @@ else
             depth -= 1
         epos += 1
 
-    return stripped[else_body_start : epos - 1]
+    return stripped[else_body_start: epos - 1]
 
 
 def _extract_top_level_assignment(text: str, var_name: str) -> str | None:
@@ -351,6 +351,7 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
         f"clusters: {missing_infra}"
     )
 
+
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 # Allow running directly
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -370,7 +371,7 @@ if __name__ == "__main__":
     ]
     all_passed = True
     for name, test_fn in tests:
-    try : test_fn() print(f "  PASS: {name}") except AssertionError as e:
+    try: test_fn() print(f "  PASS: {name}") except AssertionError as e:
             print(f"  FAIL: {name}\n    {e}")
             all_passed = False
         except Exception as e:

@@ -181,7 +181,7 @@ def test_tv_casting_app_does_not_disable_tlv_decoder(dummy):
     opt_block = _extract_optimize_size_block(content)
     casting_block = _extract_tv_casting_app_block(opt_block)
 
-#Check that matter_enable_tlv_decoder_cpp is not set to False
+# Check that matter_enable_tlv_decoder_cpp is not set to False
     value = _find_gn_arg_assignment(casting_block, "matter_enable_tlv_decoder_cpp")
     assert value is None, (
         f"`gn_args[\"matter_enable_tlv_decoder_cpp\"]` is set to {value} in the "
