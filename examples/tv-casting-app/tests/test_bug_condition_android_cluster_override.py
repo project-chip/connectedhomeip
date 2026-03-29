@@ -160,9 +160,10 @@ def test_android_optimized_build_uses_slim_cluster_override(optimize_apk_size: b
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 if __name__ == "__main__":
     print("Running bug condition exploration test...")
-try:
-    test_android_optimized_build_uses_slim_cluster_override() print("TEST PASSED — expected behavior is satisfied (bug is fixed).")
-        except AssertionError as e:
+    try:
+        test_android_optimized_build_uses_slim_cluster_override()
+        print("TEST PASSED — expected behavior is satisfied (bug is fixed).")
+    except AssertionError as e:
         print(f"TEST FAILED (expected on unfixed code) — counterexample:\n  {e}")
     except Exception as e:
         print(f"TEST ERROR: {e}")

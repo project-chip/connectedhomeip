@@ -246,8 +246,26 @@ import sys
 
         failures = 0
 
-    print("  Attribute decoder...") try:test_attribute_decode_logic_equivalence() print("    PASS: Property 4 — Decode logic equivalence (attribute)") except AssertionError as e:print(f "    FAIL: Property 4 (attribute)\n      {e}") failures += 1 except Exception as e:print(f "    ERROR: Property 4 (attribute)\n      {e}") failures += 1
+    print("  Attribute decoder...")
+        try:
+            test_attribute_decode_logic_equivalence()
+            print("    PASS: Property 4 — Decode logic equivalence (attribute)")
+        except AssertionError as e:
+            print(f"    FAIL: Property 4 (attribute)\n      {e}")
+            failures += 1
+        except Exception as e:
+            print(f"    ERROR: Property 4 (attribute)\n      {e}")
+            failures += 1
 
-    print("  Event decoder...") try:test_event_decode_logic_equivalence() print("    PASS: Property 4 — Decode logic equivalence (event)") except AssertionError as e:print(f "    FAIL: Property 4 (event)\n      {e}") failures += 1 except Exception as e:print(f "    ERROR: Property 4 (event)\n      {e}") failures += 1
+        print("  Event decoder...")
+        try:
+            test_event_decode_logic_equivalence()
+            print("    PASS: Property 4 — Decode logic equivalence (event)")
+        except AssertionError as e:
+            print(f"    FAIL: Property 4 (event)\n      {e}")
+            failures += 1
+        except Exception as e:
+            print(f"    ERROR: Property 4 (event)\n      {e}")
+            failures += 1
 
-                                                                                                                                                                                                                                                                    sys.exit(1 if failures else 0)
+        sys.exit(1 if failures else 0)
