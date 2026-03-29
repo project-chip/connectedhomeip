@@ -206,9 +206,9 @@ def test_android_default_build_preserves_dev_flags(optimize_apk_size: bool):
     )
 
 
-@given(platform=st.sampled_from(["linux", "darwin"]))
+@given(platform=st.sampled_from(["darwin"]))
 @settings(
-    max_examples=2,
+    max_examples=1,
     suppress_health_check=[HealthCheck.function_scoped_fixture],
     deadline=None,
 )
@@ -216,11 +216,14 @@ def test_non_android_builds_use_slim_cluster_override(platform: str):
     """
     **Validates: Requirements 3.2**
 
-    Property 2b (Preservation): Linux and Darwin builds SHALL continue to
+    Property 2b (Preservation): Darwin builds SHALL continue to
     set `chip_cluster_objects_source_override` pointing to
     `casting-cluster-objects.cpp`.
+
+    Linux builds set the override conditionally via host.py when
+    chip_casting_simplified=true, so it is NOT in linux/args.gni.
     """
-    gni_path = LINUX_ARGS_GNI if platform == "linux" else DARWIN_ARGS_GNI
+    gni_path = DARWIN_ARGS_GNI
     gni_text = _read_file(gni_path)
     stripped = _strip_comments(gni_text)
 
@@ -234,6 +237,36 @@ def test_non_android_builds_use_slim_cluster_override(platform: str):
     assert "casting-cluster-objects.cpp" in override_val, (
         f"REGRESSION: `chip_cluster_objects_source_override` in {platform}/args.gni "
         f"is `{override_val}` — expected it to reference casting-cluster-objects.cpp"
+    )
+
+
+@given(dummy=st.just(True))
+@settings(
+    max_examples=1,
+    suppress_health_check=[HealthCheck.function_scoped_fixture],
+    deadline=None,
+)
+def test_linux_args_gni_does_not_set_unconditional_cluster_override(dummy: bool):
+    """
+    **Validates: CI fix for linux-x64-tv-casting-app**
+
+    Property 2b-linux: Linux args.gni SHALL NOT unconditionally set
+    chip_cluster_objects_source_override, because the legacy build path
+    (chip_casting_simplified=false) needs the full cluster-objects.cpp.
+    The override is set conditionally via host.py when
+    chip_casting_simplified=true.
+    """
+    gni_text = _read_file(LINUX_ARGS_GNI)
+    stripped = _strip_comments(gni_text)
+
+    override_val = _extract_top_level_assignment(
+        stripped, "chip_cluster_objects_source_override"
+    )
+    assert override_val is None, (
+        f"REGRESSION: `chip_cluster_objects_source_override` is set unconditionally "
+        f"in linux/args.gni to `{override_val}` — this breaks the legacy build path "
+        f"(chip_casting_simplified=false) which needs all clusters. The override "
+        f"should be set via host.py only when chip_casting_simplified=true."
     )
 
 
@@ -328,8 +361,10 @@ if __name__ == "__main__":
     tests = [
         ("2a: Android default build preserves dev flags",
          test_android_default_build_preserves_dev_flags),
-        ("2b: Non-Android builds use slim cluster override",
+        ("2b: Darwin builds use slim cluster override",
          test_non_android_builds_use_slim_cluster_override),
+        ("2b-linux: Linux args.gni does not set unconditional cluster override",
+         test_linux_args_gni_does_not_set_unconditional_cluster_override),
         ("2c: casting-cluster-objects.cpp exists with expected includes",
          test_casting_cluster_objects_file_exists_with_expected_includes),
     ]
