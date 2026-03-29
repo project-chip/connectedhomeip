@@ -1,4 +1,4 @@
-"""
+r"""
 Property Test — Property 5: GN conditional source selection
 
 **Validates: Requirements 3.3, 3.4, 3.5, 6.1, 6.2**
