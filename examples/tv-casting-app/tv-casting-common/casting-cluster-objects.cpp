@@ -85,6 +85,11 @@
 #include <clusters/GroupKeyManagement/Events.ipp>
 #include <clusters/GroupKeyManagement/Structs.ipp>
 
+#include <clusters/Groupcast/Attributes.ipp>
+#include <clusters/Groupcast/Commands.ipp>
+#include <clusters/Groupcast/Events.ipp>
+#include <clusters/Groupcast/Structs.ipp>
+
 #include <clusters/Groups/Attributes.ipp>
 #include <clusters/Groups/Commands.ipp>
 #include <clusters/Groups/Events.ipp>
