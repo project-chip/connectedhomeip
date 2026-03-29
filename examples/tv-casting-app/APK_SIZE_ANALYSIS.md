@@ -8,13 +8,13 @@ Casting App on Android (arm64-v8a).
 
 ## 1. Optimized vs. Non-Optimized Comparison (arm64-v8a)
 
-| Metric | Default build | Optimized build | Reduction |
-| --- | --- | --- | --- |
-| | `optimize_apk_size=false` | `optimize_apk_size=true` | |
-| | `use_static_libcxx=false` | `use_static_libcxx=true` | |
-| **`libTvCastingApp.so`** | 19 MB | 2.8 MB | 85 % |
-| **`libc++_shared.so`** | 8.9 MB (shipped separately) | 1.3 MB (statically linked) | 85 % |
-| **Total native libs** | 27.9 MB | 2.8 MB (single `.so`) | 90 % |
+| Metric                   | Default build               | Optimized build            | Reduction |
+| ------------------------ | --------------------------- | -------------------------- | --------- |
+|                          | `optimize_apk_size=false`   | `optimize_apk_size=true`   |           |
+|                          | `use_static_libcxx=false`   | `use_static_libcxx=true`   |           |
+| **`libTvCastingApp.so`** | 19 MB                       | 2.8 MB                     | 85 %      |
+| **`libc++_shared.so`**   | 8.9 MB (shipped separately) | 1.3 MB (statically linked) | 85 %      |
+| **Total native libs**    | 27.9 MB                     | 2.8 MB (single `.so`)      | 90 %      |
 
 ### What drives the reduction
 
@@ -301,4 +301,3 @@ python -m pytest examples/tv-casting-app/tests/ -v
 
 *Updated March 2026 with measured build sizes after slim TLV decoder integration.*
 *Validates: Requirements 2.1, 2.2, 2.3, 2.4*
-

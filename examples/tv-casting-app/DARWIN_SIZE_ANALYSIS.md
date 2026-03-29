@@ -247,48 +247,48 @@ additional cluster reduction is needed on the Objective-C side.
 
 For apps where binary size is critical:
 
-1. Enable `optimize_apk_size=true` in `darwin/args.gni` to exclude
-   legacy chip-tool sources from `libTvCastingCommon.a`
-2. Remove the compat-shim sources from the Xcode project if you're
-   using only the new `MC*` API (not the deprecated `CastingServerBridge`)
+1. Enable `optimize_apk_size=true` in `darwin/args.gni` to exclude legacy
+   chip-tool sources from `libTvCastingCommon.a`
+2. Remove the compat-shim sources from the Xcode project if you're using only
+   the new `MC*` API (not the deprecated `CastingServerBridge`)
 3. Build in Release configuration to trigger `strip_debug_symbols.sh`
-4. Enable Xcode's "Dead Code Stripping" (`DEAD_CODE_STRIPPING = YES`)
-   and "Strip Linked Product" (`STRIP_INSTALLED_PRODUCT = YES`)
+4. Enable Xcode's "Dead Code Stripping" (`DEAD_CODE_STRIPPING = YES`) and "Strip
+   Linked Product" (`STRIP_INSTALLED_PRODUCT = YES`)
 
 ### What you can safely exclude
 
 If you're building a new app (not migrating from the old API):
 
-- The entire `compat-shim/` directory (~26 files) — these are the
-  deprecated `CastingServerBridge` API wrappers
-- `chip_build_libshell` can be set to `false` (already done when
-  `optimize_apk_size=true`)
+-   The entire `compat-shim/` directory (~26 files) — these are the deprecated
+    `CastingServerBridge` API wrappers
+-   `chip_build_libshell` can be set to `false` (already done when
+    `optimize_apk_size=true`)
 
 ---
 
 ## 8. Comparison with Android
 
-| Aspect | Android | Darwin (iOS/macOS) |
-| --- | --- | --- |
-| Delivery format | `.so` shared library + `.jar` files | `.framework` (static lib + ObjC headers) |
-| C++ stdlib | Separate `libc++_shared.so` (or static) | Always statically linked by Apple toolchain |
-| Cluster API surface | Java `ChipClusters.java` (all ~200+ clusters, shrunk by R8) | ObjC `MCClusterObjects` (9 casting clusters only) |
-| TLV decoders | C++ `CHIPAttributeTLVValueDecoder.cpp` (full or slim) | ObjC zap-generated `MCAttributeObjects.mm` (already scoped) |
-| Slim cluster-objects | ✅ via `chip_cluster_objects_source_override` | ✅ via `chip_cluster_objects_source_override` |
-| Legacy source exclusion | ✅ via `optimize_apk_size=true` | ✅ via `optimize_apk_size=true` (Release builds) |
-| Build system | GN → ninja → Gradle | GN → ninja → Xcode |
+| Aspect                  | Android                                                     | Darwin (iOS/macOS)                                          |
+| ----------------------- | ----------------------------------------------------------- | ----------------------------------------------------------- |
+| Delivery format         | `.so` shared library + `.jar` files                         | `.framework` (static lib + ObjC headers)                    |
+| C++ stdlib              | Separate `libc++_shared.so` (or static)                     | Always statically linked by Apple toolchain                 |
+| Cluster API surface     | Java `ChipClusters.java` (all ~200+ clusters, shrunk by R8) | ObjC `MCClusterObjects` (9 casting clusters only)           |
+| TLV decoders            | C++ `CHIPAttributeTLVValueDecoder.cpp` (full or slim)       | ObjC zap-generated `MCAttributeObjects.mm` (already scoped) |
+| Slim cluster-objects    | ✅ via `chip_cluster_objects_source_override`               | ✅ via `chip_cluster_objects_source_override`               |
+| Legacy source exclusion | ✅ via `optimize_apk_size=true`                             | ✅ via `optimize_apk_size=true` (Release builds)            |
+| Build system            | GN → ninja → Gradle                                         | GN → ninja → Xcode                                          |
 
-The darwin build is already in a better starting position than the
-default Android build because:
+The darwin build is already in a better starting position than the default
+Android build because:
 
-1. The Objective-C cluster API is pre-scoped to casting clusters (no
-   equivalent of the 200+ cluster `ChipClusters.java`)
+1. The Objective-C cluster API is pre-scoped to casting clusters (no equivalent
+   of the 200+ cluster `ChipClusters.java`)
 2. The slim `casting-cluster-objects.cpp` is already set in `args.gni`
 3. There's no separate C++ stdlib shared library to worry about
 
-The main remaining opportunity is enabling `optimize_apk_size=true` to
-drop the legacy chip-tool sources and their transitive dependencies.
+The main remaining opportunity is enabling `optimize_apk_size=true` to drop the
+legacy chip-tool sources and their transitive dependencies.
 
 ---
 
-*March 2026 — Initial analysis of Darwin casting framework size.*
+_March 2026 — Initial analysis of Darwin casting framework size._
