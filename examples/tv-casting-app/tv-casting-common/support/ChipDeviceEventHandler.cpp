@@ -107,7 +107,8 @@ void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * e
                                  "ChipDeviceEventHandler::Handle() Target CastingPlayer no longer exists, skipping cleanup"));
 
                 targetCastingPlayer->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-                CHIP_ERROR err                        = support::CastingStore::GetInstance()->Delete(*targetCastingPlayer);
+                targetCastingPlayer->RemoveFabric();
+                CHIP_ERROR err = support::CastingStore::GetInstance()->Delete(*targetCastingPlayer);
                 if (err != CHIP_NO_ERROR)
                 {
                     ChipLogError(AppServer, "CastingStore::Delete() failed. Err: %" CHIP_ERROR_FORMAT, err.Format());
