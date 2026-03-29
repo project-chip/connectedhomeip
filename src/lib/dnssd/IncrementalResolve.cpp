@@ -141,6 +141,14 @@ SerializedQNameIterator StoredServerName::Get() const
 CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const uint64_t ttl,
                                                   const mdns::Minimal::SrvRecord & srv)
 {
+    // Reject non-matter service names before storing anything. Non-matter devices may use instance names larger than
+    // kMaxStoredNameLength, leading to errors such as CHIP_ERROR_NO_MEMORY.
+    mServiceNameType = ComputeServiceNameType(name);
+    if (mServiceNameType == ServiceNameType::kInvalid)
+    {
+        return CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME;
+    }
+
     AutoInactiveResetter inactiveReset(*this);
 
     ReturnErrorOnFailure(mRecordName.Set(name));
@@ -164,8 +172,6 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
         // only save the first part: the MAC or 802.15.4 Extended Address in hex
         Platform::CopyString(mCommonResolutionData.hostName, serverName.Value());
     }
-
-    mServiceNameType = ComputeServiceNameType(name);
 
     switch (mServiceNameType)
     {
