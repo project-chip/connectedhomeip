@@ -68,7 +68,7 @@ def _extract_optimize_block(text: str) -> str:
     if not match:
         return ""
 
-#Find the opening brace
+# Find the opening brace
     start = stripped.index("{", match.end())
     depth = 1
     pos = start + 1

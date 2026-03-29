@@ -81,7 +81,7 @@ else { use zap - generated }
 
     Returns (if_body, else_body) strings for further inspection.
     """
-#Match the if - condition
+# Match the if - condition
     pattern = rf'if\s*\(\s*{re.escape(override_var)}\s*!=\s*""\s*\)'
     m = re.search(pattern, block)
     assert m is not None, (
@@ -89,11 +89,11 @@ else { use zap - generated }
         f"matter_enable_tlv_decoder_cpp block"
     )
 
-#Extract the if - body
+# Extract the if - body
     if_brace = block.index("{", m.end())
     if_body = _extract_brace_block(block, if_brace)
 
-#Find the else clause immediately after the if - block closing brace
+# Find the else clause immediately after the if - block closing brace
     after_if = if_brace + 1 + len(if_body) + 1  # skip past closing '}'
     rest = block[after_if:]
     else_match = re.match(r"\s*else\s*\{", rest)
@@ -110,7 +110,7 @@ else { use zap - generated }
 # Property - based tests
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
-#Override arg names paired with their zap - generated fallback filenames
+# Override arg names paired with their zap - generated fallback filenames
 OVERRIDE_CONFIGS = [
     ("chip_tlv_decoder_attribute_source_override",
      "zap-generated/CHIPAttributeTLVValueDecoder.cpp"),
@@ -151,10 +151,10 @@ def test_gn_conditional_source_selection(override_config, dummy_path):
     content = _read_file(BUILD_GN)
     block = _find_tlv_decoder_block(content)
 
-#Verify the conditional pattern exists and extract bodies
+# Verify the conditional pattern exists and extract bodies
     if_body, else_body = _find_conditional_override(block, override_var, fallback_file)
 
-#The if - body should reference the override variable(the dynamic path)
+# The if - body should reference the override variable(the dynamic path)
     assert override_var in if_body, (
         f"The if-branch for `{override_var} != \"\"` does not reference "
         f"`{override_var}` — expected `sources += [ {override_var} ]`"
@@ -166,7 +166,7 @@ def test_gn_conditional_source_selection(override_config, dummy_path):
         f"`{fallback_file}` — expected `sources += [ \"{fallback_file}\" ]`"
     )
 
-#The if - body should contain a sources += assignment
+# The if - body should contain a sources += assignment
     assert "sources +=" in if_body, (
         f"The if-branch for `{override_var}` does not contain `sources +=`"
     )
