@@ -60,7 +60,7 @@ def _extract_optimize_size_block(content: str) -> str:
     lines = content[m.end():].split("\n")
     block_lines = []
     for line in lines:
-# Blank lines are part of the block
+        # Blank lines are part of the block
         if line.strip() == "":
             block_lines.append(line)
             continue

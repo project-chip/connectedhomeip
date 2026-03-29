@@ -82,29 +82,29 @@ else { use zap - generated }
     Returns (if_body, else_body) strings for further inspection.
     """
 # Match the if - condition
-    pattern = rf'if\s*\(\s*{re.escape(override_var)}\s*!=\s*""\s*\)'
-    m = re.search(pattern, block)
-    assert m is not None, (
-        f"Could not find `if ({override_var} != \"\")` inside the "
-        f"matter_enable_tlv_decoder_cpp block"
-    )
+pattern = rf'if\s*\(\s*{re.escape(override_var)}\s*!=\s*""\s*\)'
+m = re.search(pattern, block)
+assert m is not None, (
+    f"Could not find `if ({override_var} != \"\")` inside the "
+    f"matter_enable_tlv_decoder_cpp block"
+)
 
 # Extract the if - body
-    if_brace = block.index("{", m.end())
-    if_body = _extract_brace_block(block, if_brace)
+if_brace = block.index("{", m.end())
+if_body = _extract_brace_block(block, if_brace)
 
 # Find the else clause immediately after the if - block closing brace
-    after_if = if_brace + 1 + len(if_body) + 1  # skip past closing '}'
-    rest = block[after_if:]
-    else_match = re.match(r"\s*else\s*\{", rest)
-    assert else_match is not None, (
-        f"Could not find `else` clause after `if ({override_var} != \"\")` block"
-    )
+after_if = if_brace + 1 + len(if_body) + 1  # skip past closing '}'
+rest = block[after_if:]
+else_match = re.match(r"\s*else\s*\{", rest)
+assert else_match is not None, (
+    f"Could not find `else` clause after `if ({override_var} != \"\")` block"
+)
 
-    else_brace = after_if + rest.index("{", else_match.start())
-    else_body = _extract_brace_block(block, else_brace)
+else_brace = after_if + rest.index("{", else_match.start())
+else_body = _extract_brace_block(block, else_brace)
 
-    return if_body, else_body
+return if_body, else_body
 
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 # Property - based tests

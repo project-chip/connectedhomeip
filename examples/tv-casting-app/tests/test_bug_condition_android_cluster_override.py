@@ -77,7 +77,7 @@ def _extract_optimize_block(text: str) -> str:
             depth -= 1
         pos += 1
 
-    return stripped[start + 1 : pos - 1]
+    return stripped[start + 1: pos - 1]
 
 
 def _extract_assignment(block: str, var_name: str) -> str | None:
@@ -99,6 +99,7 @@ def _extract_assignment(block: str, var_name: str) -> str | None:
 # test is formally a property - based test, but the real assertion is against the
 # concrete file on disk.The strategy generates a boolean flag that is always
 # True — representing `optimize_apk_size = true`.
+
 
 @given(optimize_apk_size=st.just(True))
 @settings(
@@ -152,6 +153,7 @@ def test_android_optimized_build_uses_slim_cluster_override(optimize_apk_size: b
         f"COUNTEREXAMPLE: `matter_enable_tlv_decoder_api` is set to `{tlv_val}` "
         f"instead of `false` — the TLV decoder dependency is not resolved."
     )
+
 
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 # Allow running directly : python test_bug_condition_android_cluster_override.py

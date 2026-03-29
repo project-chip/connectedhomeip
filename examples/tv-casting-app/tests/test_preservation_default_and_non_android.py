@@ -69,11 +69,11 @@ else
 
     Returns the text between the braces of the else clause.
     """
-    stripped = _strip_comments(text)
+ stripped = _strip_comments(text)
 
 # Find the if (optimize_apk_size) block first
-    match = re.search(r"if\s*\(\s*optimize_apk_size\s*\)", stripped)
-    if not match:
+  match = re.search(r"if\s*\(\s*optimize_apk_size\s*\)", stripped)
+   if not match:
         return ""
 
 # Walk past the if - block's opening brace
