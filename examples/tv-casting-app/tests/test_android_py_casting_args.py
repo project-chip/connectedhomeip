@@ -255,6 +255,7 @@ def test_slim_decoder_paths_use_correct_gn_prefix(override_arg):
         f"`tv-casting-app/tv-casting-common/` directory. Got: {value}"
     )
 
+
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 # Allow running directly
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -274,7 +275,7 @@ if __name__ == "__main__":
     ]
     all_passed = True
     for name, test_fn in tests:
-try : test_fn() print(f "  PASS: {name}") except AssertionError as e:
+try: test_fn() print(f "  PASS: {name}") except AssertionError as e:
             print(f"  FAIL: {name}\n    {e}")
             all_passed = False
         except Exception as e:

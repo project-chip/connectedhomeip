@@ -18,9 +18,9 @@ import re
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-#Paths
-#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# Paths
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 
@@ -109,7 +109,7 @@ def _extract_case_block(content: str, cluster_name: str) -> str:
 raise ValueError(f "Could not find case block for cluster '{cluster_name}'")
 
 # Start brace - matching from the opening '{' of the case block
-    open_brace_pos = match.end() - 1 #position of the '{' depth = 0 i = open_brace_pos while i < len(content) :
+    open_brace_pos = match.end() - 1 # position of the '{' depth = 0 i = open_brace_pos while i < len(content) :
     ch                                                                = content[i] if ch == "{" : depth
     += 1 elif ch == "}" : depth -= 1 if depth ==
     0 :
@@ -119,7 +119,7 @@ raise ValueError(f "Could not find case block for cluster '{cluster_name}'")
 # Skip string literals to avoid counting braces inside strings
     elif ch
     == '"' : i
-    += 1 while i < len(content) and content[i] != '"' : if content[i] == "\\" : i += 1 #skip escaped character i += 1
+    += 1 while i < len(content) and content[i] != '"' : if content[i] == "\\" : i += 1 # skip escaped character i += 1
 # Skip single - line comments
         elif ch
         == "/" and
@@ -132,7 +132,7 @@ raise ValueError(f "Could not find case block for cluster '{cluster_name}'")
     += 2 while i < len(content) and
     not(content[i] == "*" and i + 1 < len(content) and content[i + 1] == "/") :
     i += 1 i
-    += 1 #skip past the '/' i +=
+    += 1 # skip past the '/' i +=
     1
 
     raise ValueError(f "Unbalanced braces for cluster '{cluster_name}' — " f "reached end of file without finding matching '}}'")
@@ -246,8 +246,8 @@ import sys
 
         failures = 0
 
-    print("  Attribute decoder...") try :test_attribute_decode_logic_equivalence() print("    PASS: Property 4 — Decode logic equivalence (attribute)") except AssertionError as e:print(f "    FAIL: Property 4 (attribute)\n      {e}") failures += 1 except Exception as e:print(f "    ERROR: Property 4 (attribute)\n      {e}") failures += 1
+    print("  Attribute decoder...") try:test_attribute_decode_logic_equivalence() print("    PASS: Property 4 — Decode logic equivalence (attribute)") except AssertionError as e:print(f "    FAIL: Property 4 (attribute)\n      {e}") failures += 1 except Exception as e:print(f "    ERROR: Property 4 (attribute)\n      {e}") failures += 1
 
-    print("  Event decoder...") try :test_event_decode_logic_equivalence() print("    PASS: Property 4 — Decode logic equivalence (event)") except AssertionError as e:print(f "    FAIL: Property 4 (event)\n      {e}") failures += 1 except Exception as e:print(f "    ERROR: Property 4 (event)\n      {e}") failures += 1
+    print("  Event decoder...") try:test_event_decode_logic_equivalence() print("    PASS: Property 4 — Decode logic equivalence (event)") except AssertionError as e:print(f "    FAIL: Property 4 (event)\n      {e}") failures += 1 except Exception as e:print(f "    ERROR: Property 4 (event)\n      {e}") failures += 1
 
                                                                                                                                                                                                                                                                     sys.exit(1 if failures else 0)

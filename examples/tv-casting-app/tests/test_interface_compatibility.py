@@ -239,6 +239,7 @@ def test_event_decoder_function_signature_matches(dummy):
         f"  Full: {full_sig}"
     )
 
+
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 # Allow running directly
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -254,7 +255,7 @@ if __name__ == "__main__":
     ]
     all_passed = True
     for name, test_fn in tests:
-try : test_fn() print(f "  PASS: {name}") except AssertionError as e:
+try: test_fn() print(f "  PASS: {name}") except AssertionError as e:
             print(f"  FAIL: {name}\n    {e}")
             all_passed = False
         except Exception as e:

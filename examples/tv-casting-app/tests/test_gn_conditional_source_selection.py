@@ -160,7 +160,7 @@ def test_gn_conditional_source_selection(override_config, dummy_path):
         f"`{override_var}` — expected `sources += [ {override_var} ]`"
     )
 
-#The else - body should reference the zap - generated fallback file
+# The else - body should reference the zap - generated fallback file
     assert fallback_file in else_body, (
         f"The else-branch for `{override_var}` does not reference "
         f"`{fallback_file}` — expected `sources += [ \"{fallback_file}\" ]`"
@@ -171,7 +171,7 @@ def test_gn_conditional_source_selection(override_config, dummy_path):
         f"The if-branch for `{override_var}` does not contain `sources +=`"
     )
 
-#The else - body should contain a sources += assignment
+# The else - body should contain a sources += assignment
     assert "sources +=" in else_body, (
         f"The else-branch for `{override_var}` does not contain `sources +=`"
     )
@@ -229,6 +229,7 @@ def test_both_override_conditionals_present(dummy):
             f"matter_enable_tlv_decoder_cpp block"
         )
 
+
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
 # Allow running directly
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -246,7 +247,7 @@ if __name__ == "__main__":
     ]
     all_passed = True
     for name, test_fn in tests:
-try : test_fn() print(f "  PASS: {name}") except AssertionError as e:
+try: test_fn() print(f "  PASS: {name}") except AssertionError as e:
             print(f"  FAIL: {name}\n    {e}")
             all_passed = False
         except Exception as e:
