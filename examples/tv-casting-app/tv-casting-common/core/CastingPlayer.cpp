@@ -347,7 +347,6 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
     mIdOptions.LogDetail();
 
     // hack to re-populate mUdcClients cache on TV in order to allow cancel to pass through
-    // mIdOptions.resetState();
     mIdOptions.mCommissionerPasscode     = true;
     mIdOptions.mNoPasscode = true;
     mIdOptions.mCancelPasscode     = false;
@@ -358,13 +357,9 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
         ChipLogError(AppServer, "CastingPlayer::StopConnecting() hack failed with %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    // mIdOptions.resetState();
     mIdOptions.mCancelPasscode     = true;
     mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
     mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
-    // mTargetCastingPlayer.reset();
-    // CastingPlayerDiscovery::GetInstance()->ClearCastingPlayersInternal();
-
     if (!shouldSendIdentificationDeclarationMessage)
     {
         ChipLogProgress(AppServer,
