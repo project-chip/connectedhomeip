@@ -69,7 +69,7 @@ statically links the C++ standard library by default.
 
 The darwin `args.gni` already sets the slim cluster-objects override:
 
-```gni
+```python
 chip_cluster_objects_source_override =
     "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-objects.cpp"
 ```
@@ -149,7 +149,7 @@ args will:
 
 To enable, add to `examples/tv-casting-app/darwin/args.gni`:
 
-```gni
+```python
 optimize_apk_size = true
 ```
 

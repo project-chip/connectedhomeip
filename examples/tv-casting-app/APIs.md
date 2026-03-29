@@ -2033,3 +2033,10 @@ The Casting client can Shutdown all running Subscriptions by calling the
 [Linux](tv-casting-common/core/CastingApp.h),
 [Android](android/App/app/src/main/jni/com/matter/casting/core/CastingApp.java)
 and [iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MCCastingApp.h).
+
+## Size Analysis
+
+For details on binary size optimization and build configuration:
+
+-   [APK Size Analysis (Android)](APK_SIZE_ANALYSIS.md)
+-   [Darwin Size Analysis (iOS/macOS)](DARWIN_SIZE_ANALYSIS.md)
