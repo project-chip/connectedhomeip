@@ -342,8 +342,6 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
 {
     ChipLogProgress(AppServer, "CastingPlayer::StopConnecting() called, while ChipDeviceEventHandler.sUdcInProgress: %s",
                     support::ChipDeviceEventHandler::isUdcInProgress() ? "true" : "false");
-    //VerifyOrReturnValue(mConnectionState == CASTING_PLAYER_CONNECTING, CHIP_ERROR_INCORRECT_STATE,
-    //                    ChipLogError(AppServer, "CastingPlayer::StopConnecting() called while not in connecting state"););
     CHIP_ERROR err = CHIP_NO_ERROR;
     mTargetCastingPlayer = weak_from_this();
     mIdOptions.LogDetail();
@@ -751,7 +749,7 @@ void CastingPlayer::OnCommissioningSessionEstablishmentError(CHIP_ERROR err)
 {
     ChipLogProgress(AppServer, "CastingPlayer::OnCommissioningSessionEstablishmentError() err: %" CHIP_ERROR_FORMAT, err.Format());
     mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-    TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
+    LogErrorOnFailure(support::ChipDeviceEventHandler::SetUdcStatus(false));
     if (mOnCompleted != nullptr)
     {
         // err = 0x38 = CHIP_ERROR_INVALID_PASE_PARAMETER upon bad passcode
