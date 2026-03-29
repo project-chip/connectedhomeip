@@ -190,7 +190,7 @@ class TC_ICDB_3_1(ICDBaseTest):
         self.step(2)
         check_in_node_id = self.default_controller.nodeId
         monitored_subject = self.default_controller.nodeId
-        key = bytes.fromhex(os.urandom(16).hex())
+        key = os.urandom(16)
         try:
             cmd = commands.RegisterClient(
                 checkInNodeID=check_in_node_id,
