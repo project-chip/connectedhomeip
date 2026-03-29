@@ -268,15 +268,15 @@ If you're building a new app (not migrating from the old API):
 
 ## 8. Comparison with Android
 
-| Aspect                  | Android                                                      | Darwin (iOS/macOS)                                           |
-| ----------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Delivery format         | `.so` shared library + `.jar` files                          | `.framework` (static lib + ObjC headers)                     |
-| C++ stdlib              | Separate `libc++_shared.so` (or static)                      | Always statically linked by Apple toolchain                  |
-| Cluster API surface     | Java `ChipClusters.java` (all ~200+ clusters, shrunk by R8)  | ObjC `MCClusterObjects` (9 casting clusters only)            |
-| TLV decoders            | C++ `CHIPAttributeTLVValueDecoder.cpp` (full or slim)        | ObjC zap-generated `MCAttributeObjects.mm` (already scoped)  |
-| Slim cluster-objects    | ✅ via `chip_cluster_objects_source_override`                | ✅ via `chip_cluster_objects_source_override`                |
-| Legacy source exclusion | ✅ via `optimize_apk_size=true`                              | ✅ via `optimize_apk_size=true` (Release builds)             |
-| Build system            | GN → ninja → Gradle                                          | GN → ninja → Xcode                                           |
+| Aspect                  | Android                                                     | Darwin (iOS/macOS)                                          |
+| ----------------------- | ----------------------------------------------------------- | ----------------------------------------------------------- |
+| Delivery format         | `.so` shared library + `.jar` files                         | `.framework` (static lib + ObjC headers)                    |
+| C++ stdlib              | Separate `libc++_shared.so` (or static)                     | Always statically linked by Apple toolchain                 |
+| Cluster API surface     | Java `ChipClusters.java` (all ~200+ clusters, shrunk by R8) | ObjC `MCClusterObjects` (9 casting clusters only)           |
+| TLV decoders            | C++ `CHIPAttributeTLVValueDecoder.cpp` (full or slim)       | ObjC zap-generated `MCAttributeObjects.mm` (already scoped) |
+| Slim cluster-objects    | ✅ via `chip_cluster_objects_source_override`               | ✅ via `chip_cluster_objects_source_override`               |
+| Legacy source exclusion | ✅ via `optimize_apk_size=true`                             | ✅ via `optimize_apk_size=true` (Release builds)            |
+| Build system            | GN → ninja → Gradle                                         | GN → ninja → Xcode                                          |
 
 The darwin build is already in a better starting position than the default
 Android build because:
