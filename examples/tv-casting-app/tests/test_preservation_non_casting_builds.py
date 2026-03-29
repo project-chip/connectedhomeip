@@ -49,7 +49,7 @@ def _strip_comments(text: str) -> str:
 
 
 def _extract_declare_args_block(text: str) -> str:
-    """
+    r"""
     Extract the body of the `declare_args()
 {
     ...

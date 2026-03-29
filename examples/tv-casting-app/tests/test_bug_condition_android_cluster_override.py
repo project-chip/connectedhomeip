@@ -19,9 +19,7 @@ NOT set either flag, confirming the bug exists.
 
 import os
 import re
-import textwrap
 
-import hypothesis
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
