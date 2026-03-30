@@ -23,8 +23,8 @@ import logging
 import threading
 import time
 from collections import defaultdict
-from collections.abc import Callable, Iterable
-from dataclasses import asdict, dataclass, field
+from collections.abc import Callable, Iterable, Mapping
+from dataclasses import dataclass, field, fields, is_dataclass
 from pathlib import Path
 from types import TracebackType
 from typing import Any, ClassVar, TypeAlias
@@ -212,10 +212,12 @@ class RunSummary(RunStats):
         def encode(obj: Any) -> Any:
             """JSON encoder for non-serializable objects.
 
-            We cannot use json.dumps(default) for all cases, as it doesn't touch floats.
+            We cannot use json.dumps(default) for all cases, as it doesn't touch floats, and `asdict` doesn't work for defaultdict.
             """
-            if isinstance(obj, dict):
-                return {key: encode(value) for key, value in obj.items()}
+            if is_dataclass(obj):
+                return {f.name: encode(getattr(obj, f.name)) for f in fields(obj)}
+            if isinstance(obj, Mapping):
+                return {encode(key): encode(value) for key, value in obj.items()}
             if isinstance(obj, Iterable) and not isinstance(obj, (str, bytes)):
                 return [encode(item) for item in obj]
             if isinstance(obj, datetime.datetime):
@@ -225,7 +227,7 @@ class RunSummary(RunStats):
             return obj
 
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(encode(asdict(self)), indent=2, default=repr))
+        path.write_text(json.dumps(encode(self), indent=2, default=repr))
         log.info("Test run summary written to %s", path)
 
     @classmethod
