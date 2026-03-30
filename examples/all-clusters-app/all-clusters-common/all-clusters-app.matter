@@ -4670,7 +4670,7 @@ cluster PumpConfigurationAndControl = 512 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 9;
+  revision 11;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -5085,7 +5085,7 @@ cluster Thermostat = 513 {
     optional int16u timeout = 2;
   }
 
-  /** Upon receipt, the attributes for the indicated setpoint(s) SHALL have the amount specified in the Amount field added to them. */
+  /** This command will raise or lower the setpoint based on the provided values. */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
   /** This command is used to update the thermostat weekly setpoint schedule from a management system. */
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
@@ -5093,11 +5093,13 @@ cluster Thermostat = 513 {
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
   /** This command is used to clear the weekly schedule. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
-  /** Upon receipt, if the Schedules attribute contains a ScheduleStruct whose ScheduleHandle field matches the value of the ScheduleHandle field, the server SHALL set the thermostat's ActiveScheduleHandle attribute to the value of the ScheduleHandle field. */
+  /** This command will set the active schedule to the provided schedule handle. */
   command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
-  /** ID */
+  /** This command will set the active preset to the provided preset handle. */
   command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  /** This command will add a new suggestion based on the specified values. */
   command access(invoke: manage) AddThermostatSuggestion(AddThermostatSuggestionRequest): AddThermostatSuggestionResponse = 7;
+  /** This command will remove the specified suggestion. */
   command access(invoke: manage) RemoveThermostatSuggestion(RemoveThermostatSuggestionRequest): DefaultSuccess = 8;
   /** Begins, Commits or Cancels an atomic write */
   command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
@@ -7565,7 +7567,7 @@ endpoint 0 {
     ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 0x2710;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster FaultInjection {
@@ -7624,7 +7626,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;
@@ -7650,7 +7652,7 @@ endpoint 1 {
     ram      attribute defaultMoveRate default = 50;
     persist  attribute startUpCurrentLevel default = 255;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command MoveToLevel;
     handle command Move;
@@ -7770,7 +7772,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
 
     handle command ChangeToMode;
   }
@@ -7809,7 +7811,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command ChangeToMode;
   }
@@ -7821,7 +7823,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command ChangeToMode;
   }
@@ -7835,7 +7837,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
   }
 
   server cluster RvcRunMode {
@@ -7845,7 +7847,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
 
     handle command ChangeToMode;
   }
@@ -7857,7 +7859,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0005;
 
     handle command ChangeToMode;
   }
@@ -7893,7 +7895,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 0x0003;
 
     handle command ChangeToMode;
   }
@@ -7904,7 +7906,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster SmokeCoAlarm {
@@ -7934,7 +7936,7 @@ endpoint 1 {
     ram      attribute expiryDate default = 0;
     ram      attribute unmounted default = 0;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
 
     handle command SelfTestRequest;
   }
@@ -7962,7 +7964,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 0x0002;
   }
 
   server cluster OperationalState {
@@ -8178,7 +8180,7 @@ endpoint 1 {
     ram      attribute operationMode default = 0x00;
     ram      attribute controlMode default = 0x00;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
   }
 
   server cluster Thermostat {
@@ -8241,7 +8243,7 @@ endpoint 1 {
     ram      attribute windSetting default = 0x00;
     ram      attribute airflowDirection default = 0;
     ram      attribute featureMap default = 0x3F;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0006;
 
     handle command Step;
   }
@@ -8308,7 +8310,7 @@ endpoint 1 {
     ram      attribute coupleColorTempToLevelMinMireds default = 0x009A;
     persist  attribute startUpColorTemperatureMireds default = 0x00FA;
     ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 7;
+    ram      attribute clusterRevision default = 0x0009;
 
     handle command MoveToHue;
     handle command MoveHue;
@@ -8377,7 +8379,7 @@ endpoint 1 {
     ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 32767;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster FlowMeasurement {
@@ -8386,7 +8388,7 @@ endpoint 1 {
     ram      attribute maxMeasuredValue default = 100;
     ram      attribute tolerance default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster RelativeHumidityMeasurement {
@@ -8395,7 +8397,7 @@ endpoint 1 {
     ram      attribute maxMeasuredValue default = 0x2710;
     ram      attribute tolerance;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster OccupancySensing {
@@ -8425,7 +8427,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster CarbonDioxideConcentrationMeasurement {
@@ -8444,7 +8446,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster NitrogenDioxideConcentrationMeasurement {
@@ -8463,7 +8465,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster OzoneConcentrationMeasurement {
@@ -8482,7 +8484,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster Pm25ConcentrationMeasurement {
@@ -8501,7 +8503,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster FormaldehydeConcentrationMeasurement {
@@ -8520,7 +8522,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster Pm1ConcentrationMeasurement {
@@ -8539,7 +8541,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster Pm10ConcentrationMeasurement {
@@ -8558,7 +8560,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement {
@@ -8577,7 +8579,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster RadonConcentrationMeasurement {
@@ -8596,7 +8598,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster SoilMeasurement {
@@ -8836,7 +8838,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;

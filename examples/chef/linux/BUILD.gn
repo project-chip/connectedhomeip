@@ -57,6 +57,7 @@ executable("${sample_name}") {
     "${project_dir}/common/clusters/application-launch/chef-application-launch-delegate.cpp",
     "${project_dir}/common/clusters/audio-output/AudioOutputManager.cpp",
     "${project_dir}/common/clusters/channel/ChannelManager.cpp",
+    "${project_dir}/common/clusters/chime/chef-chime-delegate.cpp",
     "${project_dir}/common/clusters/content-launch/chef-content-launch-delegate.cpp",
     "${project_dir}/common/clusters/door-lock/chef-doorlock-stubs.cpp",
     "${project_dir}/common/clusters/door-lock/chef-lock-endpoint.cpp",

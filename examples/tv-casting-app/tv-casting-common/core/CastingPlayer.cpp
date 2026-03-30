@@ -601,10 +601,33 @@ void CastingPlayer::LogDetail() const
 }
 
 CastingPlayer::CastingPlayer(const CastingPlayer & other) :
-    std::enable_shared_from_this<CastingPlayer>(other), mEndpoints(other.mEndpoints), mConnectionState(other.mConnectionState),
-    mAttributes(other.mAttributes), mIdOptions(other.mIdOptions),
-    mCommissioningWindowTimeoutSec(other.mCommissioningWindowTimeoutSec), mOnCompleted(other.mOnCompleted)
-{}
+    std::enable_shared_from_this<CastingPlayer>(other), mConnectionState(other.mConnectionState), mAttributes(other.mAttributes),
+    mIdOptions(other.mIdOptions), mCommissioningWindowTimeoutSec(other.mCommissioningWindowTimeoutSec),
+    mOnCompleted(other.mOnCompleted)
+{
+    ChipLogProgress(AppServer, "CastingPlayer::CastingPlayer(copy) deep-copying %u endpoint(s) from other=%p to this=%p",
+                    static_cast<unsigned int>(other.mEndpoints.size()), static_cast<const void *>(&other),
+                    static_cast<void *>(this));
+
+    // Create new Endpoint objects instead of sharing them, so that each Endpoint's
+    // mCastingPlayer raw pointer points to *this* CastingPlayer (not `other`).
+    // Sharing Endpoint shared_ptrs would leave their mCastingPlayer pointing to `other`,
+    // which becomes a dangling pointer when `other` is destroyed (e.g. when
+    // CastingStore::ReadAll() returns a std::list<CastingPlayer> by value).
+    mEndpoints.reserve(other.mEndpoints.size());
+    for (const auto & endpoint : other.mEndpoints)
+    {
+        EndpointAttributes attrs;
+        attrs.mId             = endpoint->GetId();
+        attrs.mVendorId       = endpoint->GetVendorId();
+        attrs.mProductId      = endpoint->GetProductId();
+        attrs.mDeviceTypeList = endpoint->GetDeviceTypeList();
+
+        auto newEndpoint = std::make_shared<Endpoint>(this, attrs);
+        newEndpoint->RegisterClusters(endpoint->GetServerList());
+        mEndpoints.push_back(newEndpoint);
+    }
+}
 
 CastingPlayer & CastingPlayer::operator=(const CastingPlayer & other)
 {

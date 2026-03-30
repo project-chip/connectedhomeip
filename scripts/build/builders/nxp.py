@@ -15,6 +15,7 @@
 import importlib.util
 import logging
 import os
+import shlex
 from enum import Enum, auto
 
 from .builder import BuilderOutput
@@ -135,6 +136,10 @@ class NxpApp(Enum):
         raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root, board, os_env, build_system):
+        if os_env == NxpOsUsed.ZEPHYR:
+            if self.ExampleName() == "unit-test":
+                return os.path.join(root, 'src', 'test_driver', 'nxp', 'zephyr')
+            return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName(os_env))
         if ((os_env == NxpOsUsed.FREERTOS) and (build_system == NxpBuildSystem.CMAKE)):
             if (self.ExampleName() == "unit-test"):
                 return os.path.join(root, 'src', 'test_driver', 'nxp')
@@ -247,7 +252,7 @@ class NxpBuilder(GnBuilder):
                 raise Exception("Unknown NXP board")
 
     def GnBuildArgs(self):
-        args = []
+        args = super().GnBuildArgs()
 
         if self.low_power:
             args.append('nxp_use_low_power=true')
@@ -437,26 +442,12 @@ class NxpBuilder(GnBuilder):
             # add empty space at the end to avoid concatenation issue when there is no --args
             cmd += 'gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root=%s ' % self.root
 
-            extra_args = []
-
-            if self.options.pw_command_launcher:
-                extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
-
-            if self.options.enable_link_map_file:
-                extra_args.append('chip_generate_link_map_file=true')
-
-            if self.options.pregen_dir:
-                extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
-
-            extra_args.extend(self.GnBuildArgs() or [])
-            if extra_args:
-                cmd += ' --args="%s' % ' '.join(extra_args) + '" '
+            if args := self.GnBuildArgs():
+                cmd += " --args=%s " % shlex.quote(" ".join(args))
 
             cmd += self.output_dir
 
-            title = 'Generating ' + self.identifier
-
-            self._Execute(['bash', '-c', cmd], title=title)
+            self._Execute(['bash', '-c', cmd], title=f"Generating {self.identifier}")
         else:
             cmd += '\nwest build -p --cmake-only -b {board_name} -d {out_folder} {example_folder} {build_flags}'.format(
                 board_name=self.BoardVariantName(self.board, self.os_env, self.board_variant),
