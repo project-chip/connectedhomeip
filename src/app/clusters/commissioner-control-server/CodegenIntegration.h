@@ -26,8 +26,8 @@ class CommissionerControlServer
 {
 public:
     /**
-     * @brief Creates a Commissioner Control server instance. This is just a backwards compatibility wrapper around the
-     * CommissionerControlCluster.
+     * @brief Creates a Commissioner Control server instance. The Init() function needs to be called for this instance
+     * to be registered and called by the interaction model at the appropriate times.
      * @param delegate A pointer to the delegate to be used by this server.
      * @param endpoint The endpoint on which this cluster exists. This must match the zap configuration.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
