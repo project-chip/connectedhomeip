@@ -358,7 +358,7 @@ std::optional<DataModel::ActionReturnStatus> ZoneManagementCluster::InvokeComman
         ReturnErrorOnFailure(commandData.Decode(input_arguments));
         return HandleRemoveTrigger(commandData);
     }
-    default: 
+    default:
         return Status::UnsupportedCommand;
 }
 }
