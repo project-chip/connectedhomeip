@@ -143,11 +143,7 @@ void ZoneManagementCluster::LoadPersistentAttributes()
     {
         mSensitivity = *mClusterContext.initialSensitivity;
         const ByteSpan value(reinterpret_cast<const uint8_t *>(&mSensitivity), sizeof(mSensitivity));
-        err = mContext->attributeStorage.WriteValue(sensitivityPath, value);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to persist configured Sensitivity", mPath.mEndpointId);
-        }
+        LogErrorOnFailure(mContext->attributeStorage.WriteValue(sensitivityPath, value));
     }
     else
     {
@@ -216,18 +212,15 @@ CHIP_ERROR ZoneManagementCluster::SetSensitivity(uint8_t aSensitivity)
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    VerifyOrReturnValue(aSensitivity != mSensitivity, CHIP_NO_ERROR);
-
-    mSensitivity = aSensitivity;
+    VerifyOrReturnValue(SetAttributeValue(mSensitivity, aSensitivity, Sensitivity::Id), CHIP_NO_ERROR);
 
     if (mContext != nullptr)
     {
         const ConcreteAttributePath path(mPath.mEndpointId, mPath.mClusterId, Sensitivity::Id);
         const ByteSpan value(reinterpret_cast<const uint8_t *>(&mSensitivity), sizeof(mSensitivity));
-        ReturnErrorOnFailure(mContext->attributeStorage.WriteValue(path, value));
+        LogErrorOnFailure(mContext->attributeStorage.WriteValue(path, value));
     }
 
-    DefaultServerCluster::NotifyAttributeChanged(Sensitivity::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -256,7 +249,7 @@ DataModel::ActionReturnStatus ZoneManagementCluster::ReadAttribute(const DataMod
         return encoder.Encode(mClusterContext.config.twoDCartesianMax);
     }
 
-    chipDie();
+   return Status::UnsupportedRead;
 }
 
 DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -281,7 +274,7 @@ DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataMo
             return err;
         }
 
-        mSensitivity = sensitivity;
+        SetAttributeValue(mSensitivity, sensitivity,Sensitivity::Id);
         mDelegate.OnAttributeChanged(request.path.mAttributeId);
 
         NotifyAttributeChanged(request.path.mAttributeId);
@@ -289,7 +282,7 @@ DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataMo
     }
     }
 
-    chipDie();
+   return Status::UnsupportedWrite;
 }
 
 CHIP_ERROR ZoneManagementCluster::Attributes(const ConcreteClusterPath & path,
@@ -365,9 +358,9 @@ std::optional<DataModel::ActionReturnStatus> ZoneManagementCluster::InvokeComman
         ReturnErrorOnFailure(commandData.Decode(input_arguments));
         return HandleRemoveTrigger(commandData);
     }
-    }
-
-    chipDie();
+    default: 
+        return Status::UnsupportedCommand;
+}
 }
 
 CHIP_ERROR ZoneManagementCluster::AddZone(const ZoneInformationStorage & zone)

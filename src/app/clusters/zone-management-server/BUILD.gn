@@ -36,10 +36,7 @@ source_set("zone-management-server") {
   ]
 
   public_deps = [
-    "${chip_root}/src/app:constants",
     "${chip_root}/src/app:interaction-model",
-    "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/ZoneManagement",
   ]

@@ -32,6 +32,8 @@ class ZoneMgmtServer
 {
 public:
     /**
+     * @brief Creates a ZoneManagementCluster instance. The Init() function needs to be called for this instance
+     * to be registered and called by the interaction model at the appropriate times.
      *
      * @param aDelegate                         A reference to the delegate to be used by this cluster.
      *                                          Note: the caller must ensure that the delegate lives throughout the instance's
