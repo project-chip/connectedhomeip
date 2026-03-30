@@ -2454,6 +2454,93 @@ class ChipDeviceControllerBase():
                 self.devCtrl)
         ).raise_on_error()
 
+    def SetGroupKeySet(self, keyset_id: int, policy: int, num_keys: int,
+                       epoch_key0: bytes, epoch_start_time0: int,
+                       epoch_key1: typing.Optional[bytes] = None, epoch_start_time1: int = 0,
+                       epoch_key2: typing.Optional[bytes] = None, epoch_start_time2: int = 0):
+        '''
+        Writes a GroupKeySet into the controller's GroupDataProvider for this fabric.
+
+        Args:
+            keyset_id: Key set identifier.
+            policy: Security policy (0 = TrustFirst, 1 = CacheAndSync).
+            num_keys: Number of epoch keys (1-3).
+            epoch_key0: First epoch key (16 bytes).
+            epoch_start_time0: Start time for first epoch key (microseconds since Matter epoch).
+            epoch_key1: Second epoch key (16 bytes), or None if unused.
+            epoch_start_time1: Start time for second epoch key.
+            epoch_key2: Third epoch key (16 bytes), or None if unused.
+            epoch_start_time2: Start time for third epoch key.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_SetKeySet(
+                self.devCtrl, keyset_id, policy, num_keys,
+                epoch_key0, epoch_start_time0,
+                epoch_key1, epoch_start_time1,
+                epoch_key2, epoch_start_time2)
+        ).raise_on_error()
+
+    def SetGroupInfo(self, group_id: int, group_name: str, flags: int = 0x02):
+        '''
+        Adds or updates a group entry in the controller's GroupDataProvider for this fabric.
+
+        Args:
+            group_id: The group identifier.
+            group_name: Human-readable group name.
+            flags: GroupInfo flags bitmask (kHasAuxiliaryACL=0x01, kMcastAddrPolicy=0x02).
+                   Defaults to 0x02 (kFlagsDefault).
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_SetGroupInfo(
+                self.devCtrl, group_id, group_name.encode('utf-8'), flags)
+        ).raise_on_error()
+
+    def AddGroupEndpoint(self, group_id: int, endpoint_id: int):
+        '''
+        Associates an endpoint with a group in the controller's GroupDataProvider for this fabric.
+
+        Args:
+            group_id: The group identifier.
+            endpoint_id: The endpoint to add to the group.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_AddGroupEndpoint(
+                self.devCtrl, group_id, endpoint_id)
+        ).raise_on_error()
+
+    def SetGroupKey(self, group_id: int, keyset_id: int):
+        '''
+        Maps a group to a key set in the controller's GroupDataProvider for this fabric.
+
+        Args:
+            group_id: The group identifier.
+            keyset_id: The key set identifier to associate with the group.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_SetGroupKey(
+                self.devCtrl, group_id, keyset_id)
+        ).raise_on_error()
+
     def CreateManualCode(self, discriminator: int, passcode: int) -> str:
         '''
         Creates a standard flow manual code from the given discriminator and passcode.
@@ -2727,6 +2814,22 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_OpCreds_InitGroupTestingData.argtypes = [
                 c_void_p]
             self._dmLib.pychip_OpCreds_InitGroupTestingData.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_SetKeySet.argtypes = [
+                c_void_p, c_uint16, c_uint8, c_uint8,
+                c_char_p, c_uint64,
+                c_char_p, c_uint64,
+                c_char_p, c_uint64]
+            self._dmLib.pychip_OpCreds_SetKeySet.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_SetGroupInfo.argtypes = [c_void_p, c_uint16, c_char_p, c_uint8]
+            self._dmLib.pychip_OpCreds_SetGroupInfo.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_AddGroupEndpoint.argtypes = [c_void_p, c_uint16, c_uint16]
+            self._dmLib.pychip_OpCreds_AddGroupEndpoint.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_SetGroupKey.argtypes = [c_void_p, c_uint16, c_uint16]
+            self._dmLib.pychip_OpCreds_SetGroupKey.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.argtypes = [
                 _IssueNOCChainCallbackPythonCallbackFunct]

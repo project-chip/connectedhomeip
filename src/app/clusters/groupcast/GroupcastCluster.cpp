@@ -424,9 +424,24 @@ Status GroupcastCluster::JoinGroup(FabricIndex fabric_index, const Groupcast::Co
     bool is_new_group = (CHIP_ERROR_NOT_FOUND == err);
     VerifyOrReturnError(is_new_group || (CHIP_NO_ERROR == err), Status::Failure);
     // If the group is new, the fabric entries will increase
-    uint16_t new_count              = (is_new_group) ? info.count + 1 : info.count;
-    uint16_t max_fabric_memberships = static_cast<uint16_t>(groups.getMaxMembershipCount() / 2);
-    VerifyOrReturnError(new_count <= max_fabric_memberships, Status::ResourceExhausted);
+    uint16_t new_count = (is_new_group) ? info.count + 1 : info.count;
+    VerifyOrReturnError(new_count <= groups.GetMaxGroupsPerFabric(), Status::ResourceExhausted);
+
+    // Check membership limit across all fabrics
+    if (is_new_group)
+    {
+        uint16_t total_count = 0;
+        for (const FabricInfo & fabric : Fabrics())
+        {
+            auto * iter = groups.IterateGroupInfo(fabric.GetFabricIndex());
+            if (iter != nullptr)
+            {
+                total_count += static_cast<uint16_t>(iter->Count());
+                iter->Release();
+            }
+        }
+        VerifyOrReturnError(total_count < groups.getMaxMembershipCount(), Status::ResourceExhausted);
+    }
 
     // Gather group info
     info.group_id = data.groupID;
