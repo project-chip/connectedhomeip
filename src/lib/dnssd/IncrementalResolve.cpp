@@ -141,6 +141,8 @@ SerializedQNameIterator StoredServerName::Get() const
 CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const uint64_t ttl,
                                                   const mdns::Minimal::SrvRecord & srv)
 {
+    AutoInactiveResetter inactiveReset(*this);
+
     // Reject non-matter service names before storing anything. Non-matter devices may use instance names larger than
     // kMaxStoredNameLength, leading to errors such as CHIP_ERROR_NO_MEMORY.
     mServiceNameType = ComputeServiceNameType(name);
@@ -148,8 +150,6 @@ CHIP_ERROR IncrementalResolver::InitializeParsing(mdns::Minimal::SerializedQName
     {
         return CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME;
     }
-
-    AutoInactiveResetter inactiveReset(*this);
 
     ReturnErrorOnFailure(mRecordName.Set(name));
     ReturnErrorOnFailure(mTargetHostName.Set(srv.GetName()));
