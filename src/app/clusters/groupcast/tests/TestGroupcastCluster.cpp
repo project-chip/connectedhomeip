@@ -111,6 +111,7 @@ struct TestGroupcastCluster : public ::testing::Test
     {
         mProvider.SetStorageDelegate(&mTestContext.StorageDelegate());
         mProvider.SetSessionKeystore(&mKeystore);
+        mProvider.SetGroupcastEnabled(true);
         ASSERT_EQ(mProvider.Init(), CHIP_NO_ERROR);
 
         // Replace the DataModel Provider in the ServerClusterContext provided to the cluster implementation
