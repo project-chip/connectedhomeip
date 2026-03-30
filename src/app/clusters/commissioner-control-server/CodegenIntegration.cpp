@@ -25,8 +25,8 @@ using namespace chip::app;
 
 namespace chip::app::Clusters::CommissionerControl {
 
-CommissionerControlServer::CommissionerControlServer(Delegate * delegate, EndpointId endpoint) :
-    mDelegate(delegate), mEndpoint(endpoint)
+CommissionerControlServer::CommissionerControlServer(Delegate * delegate, EndpointId endpointId) :
+    mDelegate(delegate), mEndpointId(endpointId)
 {}
 
 CommissionerControlServer::~CommissionerControlServer()
