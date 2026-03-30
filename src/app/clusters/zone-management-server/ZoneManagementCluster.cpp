@@ -249,7 +249,7 @@ DataModel::ActionReturnStatus ZoneManagementCluster::ReadAttribute(const DataMod
         return encoder.Encode(mClusterContext.config.twoDCartesianMax);
     }
 
-   return Status::UnsupportedRead;
+    return Status::UnsupportedRead;
 }
 
 DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -274,7 +274,7 @@ DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataMo
             return err;
         }
 
-        SetAttributeValue(mSensitivity, sensitivity,Sensitivity::Id);
+        SetAttributeValue(mSensitivity, sensitivity, Sensitivity::Id);
         mDelegate.OnAttributeChanged(request.path.mAttributeId);
 
         NotifyAttributeChanged(request.path.mAttributeId);
@@ -282,7 +282,7 @@ DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataMo
     }
     }
 
-   return Status::UnsupportedWrite;
+    return Status::UnsupportedWrite;
 }
 
 CHIP_ERROR ZoneManagementCluster::Attributes(const ConcreteClusterPath & path,
@@ -360,7 +360,7 @@ std::optional<DataModel::ActionReturnStatus> ZoneManagementCluster::InvokeComman
     }
     default:
         return Status::UnsupportedCommand;
-}
+    }
 }
 
 CHIP_ERROR ZoneManagementCluster::AddZone(const ZoneInformationStorage & zone)
