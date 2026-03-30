@@ -264,7 +264,7 @@ public:
         response.tlv_data.size = tlvBuffer.size();
         response.has_tlv_data  = true;
 
-        if (CheckTlvDataIsNull(tlvBuffer) == ::pw::Status::OkStatus())
+        if (CheckTlvDataIsNull(tlvBuffer) == pw::OkStatus();)
         {
             response.data.is_null = true;
             response.which_data   = chip_rpc_AttributeData_is_null_tag;
