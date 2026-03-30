@@ -32,7 +32,7 @@ public:
      * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CommissionerControlServer(CommissionerControl::Delegate * delegate, EndpointId endpointId);
+    CommissionerControlServer(Delegate * delegate, EndpointId endpointId);
     ~CommissionerControlServer();
 
     // Register the commissioner control cluster instance with the codegen data model provider.
@@ -41,19 +41,19 @@ public:
     // Unregister the commissioner control cluster instance with the codegen data model provider.
     CHIP_ERROR Deinit();
 
-    Protocols::InteractionModel::Status GetSupportedDeviceCategoriesValue(
-        EndpointId endpointId, BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> * supportedDeviceCategories) const;
+    Protocols::InteractionModel::Status
+    GetSupportedDeviceCategoriesValue(EndpointId endpointId,
+                                      BitMask<SupportedDeviceCategoryBitmap> * supportedDeviceCategories) const;
 
     Protocols::InteractionModel::Status
     SetSupportedDeviceCategoriesValue(EndpointId endpointId,
-                                      const BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories);
+                                      const BitMask<SupportedDeviceCategoryBitmap> supportedDeviceCategories);
 
     CHIP_ERROR
-    GenerateCommissioningRequestResultEvent(EndpointId endpointId,
-                                            const CommissionerControl::Events::CommissioningRequestResult::Type & result);
+    GenerateCommissioningRequestResultEvent(EndpointId endpointId, const Events::CommissioningRequestResult::Type & result);
 
 private:
-    CommissionerControl::Delegate * mDelegate{};
+    Delegate * mDelegate{};
     EndpointId mEndpointId{};
 
     // The Code Driven CommissionerControlCluster instance (lazy-initialized)

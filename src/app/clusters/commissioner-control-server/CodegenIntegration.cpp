@@ -25,7 +25,7 @@ using namespace chip::app;
 
 namespace chip::app::Clusters::CommissionerControl {
 
-CommissionerControlServer::CommissionerControlServer(CommissionerControl::Delegate * delegate, EndpointId endpointId) :
+CommissionerControlServer::CommissionerControlServer(Delegate * delegate, EndpointId endpointId) :
     mDelegate(delegate), mEndpointId(endpointId)
 {}
 
@@ -48,15 +48,16 @@ CHIP_ERROR CommissionerControlServer::Deinit()
 }
 
 Protocols::InteractionModel::Status CommissionerControlServer::GetSupportedDeviceCategoriesValue(
-    EndpointId endpointId, BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> * supportedDeviceCategories) const
+    EndpointId endpointId, BitMask<SupportedDeviceCategoryBitmap> * supportedDeviceCategories) const
 {
     VerifyOrReturnError(mCluster.IsConstructed() && endpointId == mEndpointId, CHIP_IM_GLOBAL_STATUS(CHIP_ERROR_INCORRECT_STATE));
     *supportedDeviceCategories = mCluster.Cluster().GetSupportedDeviceCategories();
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status CommissionerControlServer::SetSupportedDeviceCategoriesValue(
-    EndpointId endpointId, const BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories)
+Protocols::InteractionModel::Status
+CommissionerControlServer::SetSupportedDeviceCategoriesValue(EndpointId endpointId,
+                                                             const BitMask<SupportedDeviceCategoryBitmap> supportedDeviceCategories)
 {
     VerifyOrReturnError(mCluster.IsConstructed() && endpointId == mEndpointId, CHIP_IM_GLOBAL_STATUS(CHIP_ERROR_INCORRECT_STATE));
     mCluster.Cluster().SetSupportedDeviceCategories(supportedDeviceCategories);
@@ -64,8 +65,8 @@ Protocols::InteractionModel::Status CommissionerControlServer::SetSupportedDevic
 }
 
 CHIP_ERROR
-CommissionerControlServer::GenerateCommissioningRequestResultEvent(
-    EndpointId endpointId, const CommissionerControl::Events::CommissioningRequestResult::Type & result)
+CommissionerControlServer::GenerateCommissioningRequestResultEvent(EndpointId endpointId,
+                                                                   const Events::CommissioningRequestResult::Type & result)
 {
     VerifyOrReturnError(mCluster.IsConstructed() && endpointId == mEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mCluster.Cluster().GenerateCommissioningRequestResultEvent(result);
