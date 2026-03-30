@@ -50,18 +50,18 @@ CHIP_ERROR CommissionerControlServer::Deinit()
 Protocols::InteractionModel::Status CommissionerControlServer::GetSupportedDeviceCategoriesValue(
     EndpointId endpoint, BitMask<SupportedDeviceCategoryBitmap> * supportedDeviceCategories) const
 {
-    VerifyOrReturnError(mCluster.IsConstructed() && endpoint == mEndpointId, CHIP_IM_GLOBAL_STATUS(CHIP_ERROR_INCORRECT_STATE));
+    VerifyOrReturnError(mCluster.IsConstructed() && endpoint == mEndpointId, CHIP_ERROR_INCORRECT_STATE);
     *supportedDeviceCategories = mCluster.Cluster().GetSupportedDeviceCategories();
-    return Status::Success;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 Protocols::InteractionModel::Status
 CommissionerControlServer::SetSupportedDeviceCategoriesValue(EndpointId endpoint,
                                                              const BitMask<SupportedDeviceCategoryBitmap> supportedDeviceCategories)
 {
-    VerifyOrReturnError(mCluster.IsConstructed() && endpoint == mEndpointId, CHIP_IM_GLOBAL_STATUS(CHIP_ERROR_INCORRECT_STATE));
+    VerifyOrReturnError(mCluster.IsConstructed() && endpoint == mEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mCluster.Cluster().SetSupportedDeviceCategories(supportedDeviceCategories);
-    return Status::Success;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 CHIP_ERROR
