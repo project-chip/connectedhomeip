@@ -48,21 +48,25 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
             .template Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
             .template Set<BasicInformation::Attributes::Reachable::Id>();
 
+    DataModel::NodeDataModelConfiguration nodeConfig;
+    TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance() -> GetDataModelProvider()->GetNodeDataModelConfiguration(
+        nodeConfig);
+
     mBasicInformationCluster.Create(optionalAttributeSet, mContext.deviceInstanceInfoProvider, mContext.configurationManager,
                                     mContext.platformManager,
-                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
+                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), nodeConfig);
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
     mGeneralCommissioningCluster.Create(
-        GeneralCommissioningCluster::Context {
+        GeneralCommissioningCluster::Context{
             .commissioningWindowManager = mContext.commissioningWindowManager, //
-                .configurationManager   = mContext.configurationManager,       //
-                .deviceControlServer    = mContext.deviceControlServer,        //
-                .fabricTable            = mContext.fabricTable,                //
-                .failSafeContext        = mContext.failSafeContext,            //
-                .platformManager        = mContext.platformManager,            //
+            .configurationManager       = mContext.configurationManager,       //
+            .deviceControlServer        = mContext.deviceControlServer,        //
+            .fabricTable                = mContext.fabricTable,                //
+            .failSafeContext            = mContext.failSafeContext,            //
+            .platformManager            = mContext.platformManager,            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
+            .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
         GeneralCommissioningCluster::OptionalAttributes());

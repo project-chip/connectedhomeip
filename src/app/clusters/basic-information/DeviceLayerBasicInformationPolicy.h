@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/clusters/basic-information/BasicInformationOptionalAttributes.h>
+#include <app/data-model-provider/ProviderMetadataTree.h>
 #include <cstddef>
 #include <cstdint>
 #include <lib/support/Span.h>
@@ -35,10 +36,11 @@ public:
     DeviceLayerBasicInformationPolicy(BasicInformationOptionalAttributesSet optionalAttributes,
                                       DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider,
                                       DeviceLayer::ConfigurationManager & configurationManager,
-                                      DeviceLayer::PlatformManager & platformManager, uint16_t subscriptionsPerFabric) :
+                                      DeviceLayer::PlatformManager & platformManager, uint16_t subscriptionsPerFabric,
+                                      DataModel::NodeDataModelConfiguration nodeConfig) :
         mOptionalAttributes(optionalAttributes), mDeviceInstanceInfoProvider(deviceInstanceInfoProvider),
         mConfigurationManager(configurationManager), mPlatformManager(platformManager),
-        mSubscriptionsPerFabric(subscriptionsPerFabric)
+        mSubscriptionsPerFabric(subscriptionsPerFabric), mNodeConfig(nodeConfig)
     {
         // UniqueID is mandatory as of spec revision 4. We force it on here regardless
         // of what optionalAttributeSet says, to prevent accidental non-certifiable configs.
@@ -137,9 +139,7 @@ public:
 
     CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVersion)
     {
-        DataModel::NodeDataModelConfiguration nodeConfig;
-        InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNodeDataModelConfiguration(nodeConfig);
-        configurationVersion = nodeConfig.configurationVersion;
+        configurationVersion = mNodeConfig.configurationVersion;
         return CHIP_NO_ERROR;
 
         // return mConfigurationManager.GetConfigurationVersion(configurationVersion);
@@ -195,6 +195,7 @@ private:
     DeviceLayer::ConfigurationManager & mConfigurationManager;
     DeviceLayer::PlatformManager & mPlatformManager;
     uint16_t mSubscriptionsPerFabric;
+    DataModel::NodeDataModelConfiguration mNodeConfig;
 };
 
 } // namespace chip::app::Clusters

@@ -25,13 +25,12 @@
 #include <app/clusters/boolean-state-configuration-server/CodegenIntegration.h>
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
-#include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/clusters/switch-server/switch-server.h>
+#include <app/clusters/valve-configuration-and-control-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
@@ -377,13 +376,18 @@ void HandleSimulateSwitchIdle(Json::Value & jsonValue)
 
 void HandleSimulateConfigurationChange(void)
 {
-    EndpointId endpoint = 1;
+    // EndpointId endpoint = 1;
+
+    // auto valveCluster = Clusters::ValveConfigurationAndControl::FindClusterOnEndpoint(endpoint);
 
     // Change a F attribute to simulate a change in configuration of the device
     uint8_t valveLevelStep = 0;
-    Protocols::InteractionModel::Status status =
-        ValveConfigurationAndControl::Attributes::LevelStep::Get(endpoint, &valveLevelStep);
-    VerifyOrDie(status == Protocols::InteractionModel::Status::Success);
+
+    // valveLevelStep = valveCluster->mLevelStep;
+
+    // Protocols::InteractionModel::Status status =
+    //     ValveConfigurationAndControl::Attributes::LevelStep::Get(endpoint, &valveLevelStep);
+    // VerifyOrDie(status == Protocols::InteractionModel::Status::Success);
 
     if (valveLevelStep == 1)
     {
@@ -396,18 +400,18 @@ void HandleSimulateConfigurationChange(void)
         valveLevelStep = 1;
     }
 
-    status = ValveConfigurationAndControl::Attributes::LevelStep::Set(endpoint, valveLevelStep);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "Failed to set LevelStep value");
-    }
-    else
-    {
-        // LevelStep in ValveConfigurationAndControl has been modified,so bump ConfigurationVersion
-        // by calling the getter function to obtain a ScopedConfigurationVersionUpdater
-        DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction =
-            InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNodeDataModelConfigurationVersionUpdater();
-    }
+    // status = ValveConfigurationAndControl::Attributes::LevelStep::Set(endpoint, valveLevelStep);
+    // if (status != Protocols::InteractionModel::Status::Success)
+    // {
+    //     ChipLogError(NotSpecified, "Failed to set LevelStep value");
+    // }
+    // else
+    // {
+    //     // LevelStep in ValveConfigurationAndControl has been modified,so bump ConfigurationVersion
+    //     // by calling the getter function to obtain a ScopedConfigurationVersionUpdater
+    //     DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction =
+    //         InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNodeDataModelConfigurationVersionUpdater();
+    // }
 }
 
 } // namespace
