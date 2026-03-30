@@ -47,28 +47,29 @@ CHIP_ERROR CommissionerControlServer::Deinit()
     return CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
 }
 
-void CommissionerControlServer::SetSupportedDeviceCategories(
+Protocols::InteractionModel::Status CommissionerControlServer::GetSupportedDeviceCategoriesValue(
+    EndpointId endpointId, BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> * supportedDeviceCategories) const
+{
+    VerifyOrReturnError(mCluster.IsConstructed() && endpointId == mEndpointId, CHIP_IM_GLOBAL_STATUS(CHIP_ERROR_INCORRECT_STATE));
+    *supportedDeviceCategories = mCluster.Cluster().GetSupportedDeviceCategories();
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status CommissionerControlServer::SetSupportedDeviceCategoriesValue(
     EndpointId endpointId, const BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories)
 {
-    VerifyOrDie(mCluster.IsConstructed());
-    VerifyOrDie(endpointId == mEndpointId);
+    VerifyOrReturnError(mCluster.IsConstructed() && endpointId == mEndpointId, CHIP_IM_GLOBAL_STATUS(CHIP_ERROR_INCORRECT_STATE));
     mCluster.Cluster().SetSupportedDeviceCategories(supportedDeviceCategories);
+    return Status::Success;
 }
 
-BitMask<CommissionerControl::SupportedDeviceCategoryBitmap>
-CommissionerControlServer::GetSupportedDeviceCategories(EndpointId endpointId) const
-{
-    VerifyOrDie(mCluster.IsConstructed());
-    VerifyOrDie(endpointId == mEndpointId);
-    return mCluster.Cluster().GetSupportedDeviceCategories();
-}
-
-void CommissionerControlServer::GenerateCommissioningRequestResultEvent(
+CHIP_ERROR
+CommissionerControlServer::GenerateCommissioningRequestResultEvent(
     EndpointId endpointId, const CommissionerControl::Events::CommissioningRequestResult::Type & result)
 {
-    VerifyOrDie(mCluster.IsConstructed());
-    VerifyOrDie(endpointId == mEndpointId);
+    VerifyOrReturnError(mCluster.IsConstructed() && endpointId == mEndpointId, CHIP_ERROR_INCORRECT_STATE);
     mCluster.Cluster().GenerateCommissioningRequestResultEvent(result);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip::app::Clusters::CommissionerControl

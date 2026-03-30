@@ -41,13 +41,16 @@ public:
     // Unregister the commissioner control cluster instance with the codegen data model provider.
     CHIP_ERROR Deinit();
 
-    void SetSupportedDeviceCategories(EndpointId endpointId,
+    Protocols::InteractionModel::Status GetSupportedDeviceCategoriesValue(
+        EndpointId endpointId, BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> * supportedDeviceCategories) const;
+
+    Protocols::InteractionModel::Status
+    SetSupportedDeviceCategoriesValue(EndpointId endpointId,
                                       const BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories);
 
-    BitMask<CommissionerControl::SupportedDeviceCategoryBitmap> GetSupportedDeviceCategories(EndpointId endpointId) const;
-
-    void GenerateCommissioningRequestResultEvent(EndpointId endpointId,
-                                                 const CommissionerControl::Events::CommissioningRequestResult::Type & result);
+    CHIP_ERROR
+    GenerateCommissioningRequestResultEvent(EndpointId endpointId,
+                                            const CommissionerControl::Events::CommissioningRequestResult::Type & result);
 
 private:
     CommissionerControl::Delegate * mDelegate{};

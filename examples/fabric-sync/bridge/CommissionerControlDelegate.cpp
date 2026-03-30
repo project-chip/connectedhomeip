@@ -114,10 +114,19 @@ CHIP_ERROR CommissionerControlDelegate::HandleCommissioningApprovalRequest(const
         mLabel.ClearValue();
     }
 
-    mCommissionerControlServer.GenerateCommissioningRequestResultEvent(kAggregatorEndpointId, result);
-    mNextStep = Step::kWaitCommissionNodeRequest;
-    ChipLogProgress(NotSpecified, "CommissionerControlDelegate: State transitioned to %s", GetStateString(mNextStep));
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err = mCommissionerControlServer.GenerateCommissioningRequestResultEvent(kAggregatorEndpointId, result);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        mNextStep = Step::kWaitCommissionNodeRequest;
+        ChipLogProgress(NotSpecified, "CommissionerControlDelegate: State transitioned to %s", GetStateString(mNextStep));
+    }
+    else
+    {
+        ResetDelegateState();
+    }
+
+    return err;
 }
 
 CHIP_ERROR CommissionerControlDelegate::ValidateCommissionNodeCommand(NodeId clientNodeId, uint64_t requestId)
@@ -231,8 +240,17 @@ CHIP_ERROR CommissionerControlInit(bridge::FabricAdminDelegate * fabricAdmin)
     BitMask<Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> supportedDeviceCategories;
     supportedDeviceCategories.SetField(Clusters::CommissionerControl::SupportedDeviceCategoryBitmap::kFabricSynchronization, 1);
 
-    sCommissionerControlDelegate->GetCommissionerControlServer().SetSupportedDeviceCategories(
-        Clusters::CommissionerControl::kAggregatorEndpointId, supportedDeviceCategories);
+    Protocols::InteractionModel::Status status =
+        sCommissionerControlDelegate->GetCommissionerControlServer().SetSupportedDeviceCategoriesValue(
+            Clusters::CommissionerControl::kAggregatorEndpointId, supportedDeviceCategories);
+
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogError(NotSpecified, "Failed to set SupportedDeviceCategories: %d", static_cast<int>(status));
+        sCommissionerControlDelegate.reset();
+        return CHIP_ERROR_INTERNAL;
+    }
+
     return CHIP_NO_ERROR;
 }
 
