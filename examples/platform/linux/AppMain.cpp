@@ -985,10 +985,12 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
         initParams.advertiseCommissionableIfNoFabrics = false;
     }
 
-    // TODO: THIS MUST BE PROTECTED BEHIND MACRO, SEE PR #43677
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+    initParams.groupDataProvider->SetGroupcastEnabled(true);
     static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(initParams.groupDataProvider,
                                                                                         &Server::GetInstance().GetFabricTable());
     initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
+#endif
 
     // Set DAC provider before server init because Operational Credentials may snapshot
     // the provider during cluster construction.

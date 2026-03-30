@@ -32,6 +32,9 @@ using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
+
+[[maybe_unused]] constexpr uint32_t kGroupKeyClusterRevisionBeforeGroupcast = 2;
+
 struct GroupTableCodec
 {
     static constexpr TLV::Tag TagFabric()
@@ -636,7 +639,8 @@ DataModel::ActionReturnStatus GroupKeyManagementCluster::ReadAttribute(const Dat
     switch (request.path.mAttributeId)
     {
     case GroupKeyManagement::Attributes::ClusterRevision::Id:
-        return encoder.Encode(GroupKeyManagement::kRevision);
+        return encoder.Encode(Credentials::GetGroupDataProvider()->IsGroupcastEnabled() ? kRevision
+                                                                                        : kGroupKeyClusterRevisionBeforeGroupcast);
     case Attributes::FeatureMap::Id: {
         BitFlags<GroupKeyManagement::Feature> features;
         features.Set(Clusters::GroupKeyManagement::Feature::kGroupcast);
