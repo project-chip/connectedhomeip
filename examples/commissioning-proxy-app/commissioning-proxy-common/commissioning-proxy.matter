@@ -1663,9 +1663,9 @@ provisional cluster CommissioningProxy = 1109 {
     nullable octet_string<100> address = 0;
     CapabilitiesBitmap transport = 1;
     int16u discriminator = 2;
-    vendor_id vendorId = 3;
-    int16u productId = 4;
-    nullable octet_string extendedData = 5;
+    vendor_id vendorID = 3;
+    int16u productID = 4;
+    nullable octet_string<128> extendedData = 5;
     optional WiFiBandBitmap wiFiBand = 6;
   }
 
@@ -1687,8 +1687,8 @@ provisional cluster CommissioningProxy = 1109 {
     nullable octet_string<100> address = 0;
     CapabilitiesBitmap transport = 1;
     int16u discriminator = 2;
-    vendor_id vendorId = 3;
-    int16u productId = 4;
+    vendor_id vendorID = 3;
+    int16u productID = 4;
     int16u timeout = 5;
     optional WiFiBandBitmap wiFiBand = 6;
   }
@@ -1977,7 +1977,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_commissioning_proxy = 146, version 1;
+  device type ma_commissioning_by_proxy = 146, version 1;
 
 
   server cluster Descriptor {
@@ -2004,12 +2004,14 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
 
     handle command ProxyConnectRequest;
     handle command ProxyDisconnectRequest;
     handle command ProxyScanRequest;
+    handle command ProxyBackGroundScanStartRequest;
+    handle command ProxyBackGroundScanStopRequest;
     handle command ProxyMessageRequest;
   }
 }

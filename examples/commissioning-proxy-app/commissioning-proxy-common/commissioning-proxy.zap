@@ -2912,16 +2912,16 @@
       "deviceTypeRef": {
         "code": 146,
         "profileId": 259,
-        "label": "MA-commissioning-proxy",
-        "name": "MA-commissioning-proxy",
+        "label": "MA-commissioning-by-proxy",
+        "name": "MA-commissioning-by-proxy",
         "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 146,
           "profileId": 259,
-          "label": "MA-commissioning-proxy",
-          "name": "MA-commissioning-proxy",
+          "label": "MA-commissioning-by-proxy",
+          "name": "MA-commissioning-by-proxy",
           "deviceTypeOrder": 0
         }
       ],
@@ -2931,7 +2931,7 @@
       "deviceIdentifiers": [
         146
       ],
-      "deviceTypeName": "MA-commissioning-proxy",
+      "deviceTypeName": "MA-commissioning-by-proxy",
       "deviceTypeCode": 146,
       "deviceTypeProfileId": 259,
       "clusters": [
@@ -3139,6 +3139,22 @@
               "isEnabled": 1
             },
             {
+              "name": "ProxyBackGroundScanStartRequest",
+              "code": 5,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "ProxyBackGroundScanStopRequest",
+              "code": 6,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
               "name": "ProxyMessageRequest",
               "code": 7,
               "mfgCode": null,
@@ -3342,7 +3358,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "3",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
