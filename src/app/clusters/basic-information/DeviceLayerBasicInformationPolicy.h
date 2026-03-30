@@ -36,9 +36,9 @@ public:
                                       DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider,
                                       DeviceLayer::ConfigurationManager & configurationManager,
                                       DeviceLayer::PlatformManager & platformManager, uint16_t subscriptionsPerFabric) :
-        mOptionalAttributes(optionalAttributes),
-        mDeviceInstanceInfoProvider(deviceInstanceInfoProvider), mConfigurationManager(configurationManager),
-        mPlatformManager(platformManager), mSubscriptionsPerFabric(subscriptionsPerFabric)
+        mOptionalAttributes(optionalAttributes), mDeviceInstanceInfoProvider(deviceInstanceInfoProvider),
+        mConfigurationManager(configurationManager), mPlatformManager(platformManager),
+        mSubscriptionsPerFabric(subscriptionsPerFabric)
     {
         // UniqueID is mandatory as of spec revision 4. We force it on here regardless
         // of what optionalAttributeSet says, to prevent accidental non-certifiable configs.
@@ -137,13 +137,18 @@ public:
 
     CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVersion)
     {
-        return mConfigurationManager.GetConfigurationVersion(configurationVersion);
+        DataModel::NodeDataModelConfiguration nodeConfig;
+        InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNodeDataModelConfiguration(nodeConfig);
+        configurationVersion = nodeConfig.configurationVersion;
+        return CHIP_NO_ERROR;
+
+        // return mConfigurationManager.GetConfigurationVersion(configurationVersion);
     }
 
-    CHIP_ERROR StoreConfigurationVersion(uint32_t configurationVersion)
-    {
-        return mConfigurationManager.StoreConfigurationVersion(configurationVersion);
-    }
+    // CHIP_ERROR StoreConfigurationVersion(uint32_t configurationVersion)
+    // {
+    //     return mConfigurationManager.StoreConfigurationVersion(configurationVersion);
+    // }
 
     CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)
     {

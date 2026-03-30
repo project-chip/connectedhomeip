@@ -61,7 +61,7 @@ public:
         {
             if (mParentTree)
             {
-                mParentTree->Internal_BumpNodeDataModelConfigurationVersion();
+                TEMPORARY_RETURN_IGNORED mParentTree->Internal_BumpNodeDataModelConfigurationVersion();
             }
         };
 

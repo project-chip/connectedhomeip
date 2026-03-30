@@ -872,7 +872,8 @@ void Server::ScheduleFactoryReset()
 
     TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t) {
         // Reset the ConfigurationVersion to 1
-        app::InteractionModelEngine::GetInstance()->GetDataModelProvider()->ResetNodeDataModelConfigurationVersion();
+        TEMPORARY_RETURN_IGNORED app::InteractionModelEngine::GetInstance() -> GetDataModelProvider()
+            ->ResetNodeDataModelConfigurationVersion();
 
         // Delete all fabrics and emit Leave event.
         GetInstance().GetFabricTable().DeleteAllFabrics();

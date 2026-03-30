@@ -205,16 +205,6 @@ void PolicyBased<Policy>::OnShutDown()
 }
 
 template <typename Policy>
-CHIP_ERROR PolicyBased<Policy>::IncreaseConfigurationVersion()
-{
-    uint32_t globalConfig = 0;
-    ReturnErrorOnFailure(mPolicy.GetConfigurationVersion(globalConfig));
-    ReturnErrorOnFailure(mPolicy.StoreConfigurationVersion(globalConfig + 1));
-    NotifyAttributeChanged(Attributes::ConfigurationVersion::Id);
-    return CHIP_NO_ERROR;
-}
-
-template <typename Policy>
 template <typename EncodeFunction>
 CHIP_ERROR PolicyBased<Policy>::ReadConfigurationString(EncodeFunction && getter, AttributeValueEncoder & encoder)
 {
