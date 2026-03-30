@@ -163,6 +163,7 @@ if (chip_build_tests) {
         "${chip_root}/src/app/clusters/energy-evse-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/identify-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/power-topology-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/zone-management-server/tests:tests-backwards-compatibility",
 
         # keep-sorted: end
       ]
@@ -198,7 +199,6 @@ if (chip_build_tests) {
       # with ember
       # Disabled on EFR32 since "include <random>" fails with `::fabs` not defined
       tests += [
-        "${chip_root}/src/app/clusters/zone-management-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/data-model-providers/codedriven/tests",
         "${chip_root}/src/data-model-providers/codegen/tests",
         "${chip_root}/examples/common/server-cluster-shim/tests",
