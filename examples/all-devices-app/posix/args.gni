@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 
-# The location of the build configuration file.
-buildconfig = "${build_root}/config/BUILDCONFIG.gn"
+import("${chip_root}/config/standalone/args.gni")
 
-# CHIP uses angle bracket includes.
-check_system_includes = true
+chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_project_config_include = "<CHIPProjectAppConfig.h>"
+chip_system_project_config_include = "<SystemProjectConfig.h>"
 
-default_args = {
-  import("//args.gni")
-}
+chip_project_config_include_dirs =
+    [ "${chip_root}/examples/all-devices-app/posix/include" ]
+chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]

@@ -127,12 +127,12 @@ void AppTask::ContactActionEventHandler(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState(void)
 {
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(UpdateClusterStateInternal, 0);
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(UpdateClusterStateInternal, 0));
 }
 
 void AppTask::UpdateDeviceState(void)
 {
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(UpdateDeviceStateInternal, 0);
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(UpdateDeviceStateInternal, 0));
 }
 
 void AppTask::UpdateDeviceStateInternal(intptr_t arg)
