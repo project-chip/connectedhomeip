@@ -223,7 +223,13 @@ dedicated guide
 
 Connect OM-SE051ARD board on the arduino connector of MCXW72 board.
 
-### Build options
+### Provision SE05x with required keys (One time step)
+
+Refer [SE051H Provision Example](https://github.com/NXP/plug-and-trust/blob/int/CHIPSE_Release/demos/se051h_nfc_comm_prov/readme.md) to provision SE05x with required keys for powered and unpowered commissioning.
+
+**NOTE** For ease of use, the provision example can also be used from Linux machine. Refer [SE051H Provision Example on Linux](https://github.com/NXP/plug-and-trust/blob/int/CHIPSE_Release/demos/se051h_nfc_comm_prov/vcom_prov_readme.md)
+
+### Build options for example
 
 -   Build the example with below options to offload crypto operations to SE05x
     using CMAKE configuration :
@@ -238,9 +244,16 @@ Example :
 west build -d bin/lighting-app/ftd -b frdmmcxw72 examples/lighting-app/nxp -Dcore_id=cm33_core0 -DCONF_FILE_NAME=prj_thread_ftd.conf -DCONFIG_MCUX_COMPONENT_middleware.freertos-kernel.config=n -DCONFIG_CHIP_SE05X=y
 ```
 
-**NOTE** To control secure element using enable pin, ensure to connect jumper
-J14 on OM-SE051ARD board to 3-4 pins. Also build the example with
--DCONFIG_SE05X_HOST_GPIO=y option to allow rt1060 gpio to control the enable pin
-as required.
+> [!NOTE]
+>
+> 1.   To control secure element using enable pin, ensure to connect
+> jumper J14 on OM-SE051ARD board to 3-4 pins. Also build the example with
+> -DCONFIG_SE05X_HOST_GPIO=y option to allow MCXW72 GPIO to control the
+> enable pin as required.
+>
+> 2.  If the SE05x has crypto objects that are enabled with secure
+> messaging, the example needs to be built with secure session support enabled.
+> For example to build with AES applet session support, build with -DCONFIG_SE05X_AES_KEY=y.
+
 
 Refer [SE05x](nxp_se05x_guide.md) for more details on configurations of SE05x.
