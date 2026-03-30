@@ -522,6 +522,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
     thread_ba_port = None
     to_terminate: list[Terminable] = []
     task_queue: TaskQueueT = CancellableQueue()
+    errors: list[BaseException] = []
 
     try:
         # Initialize result thread first so that it's closed last.
@@ -620,26 +621,28 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                 break
 
             time.sleep(0.5)
-    except KeyboardInterrupt:
+    except KeyboardInterrupt as e:
         log.info("Interrupting execution on user request")
-        raise
+        errors.append(e)
     except ResultError as e:
         # We just print the message without stack trace, as the actual failure with stack trace has already been logged.
         log.error("%s", e)
-        sys.exit(2)
+        errors.append(SystemExit(2))
     except Exception as e:
-        log.error("Caught exception during test execution: %s", e, exc_info=True)
-        raise
+        log.error("Caught exception during test execution: %r", e)
+        errors.append(e)
     finally:
-        cleanup_errors: list[Exception] = []
         for item in reversed(to_terminate):
             try:
                 log.info("Cleaning up %s", item.__class__.__name__)
                 item.terminate()
             except Exception as e:
-                cleanup_errors.append(e)
-        if cleanup_errors:
-            raise ExceptionGroup("Encountered exceptions during cleanup", cleanup_errors)
+                errors.append(e)
+
+    if len(errors) == 1:
+        raise errors[0]
+    if errors:
+        raise BaseExceptionGroup("Encountered exceptions during test execution or cleanup", errors)
 
 
 @main.command(
