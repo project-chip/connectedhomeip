@@ -629,7 +629,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
         log.error("%s", e)
         errors.append(SystemExit(2))
     except Exception as e:
-        log.error("Caught exception during test execution: %r", e)
+        log.error("Caught exception during test execution: %r", e, exc_info=True)
         errors.append(e)
     finally:
         for item in reversed(to_terminate):
@@ -637,6 +637,7 @@ def cmd_run(context: click.Context, dry_run: bool, iterations: int, app_path: li
                 log.info("Cleaning up %s", item.__class__.__name__)
                 item.terminate()
             except Exception as e:
+                log.warning("Encountered exception during cleanup: %r", e, exc_info=True)
                 errors.append(e)
 
     if len(errors) == 1:
