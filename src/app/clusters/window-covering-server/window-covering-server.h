@@ -20,10 +20,15 @@
 #include "window-covering-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/util/af-types.h>
-#include <protocols/interaction_model/StatusCode.h>
-
 #include <app/data-model/Nullable.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <app/util/af-types.h>
+#include <clusters/WindowCovering/Attributes.h>
+#include <clusters/WindowCovering/Commands.h>
+#include <clusters/WindowCovering/Enums.h>
+#include <lib/support/BitFlags.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 static constexpr chip::Percent100ths WC_PERCENT100THS_MIN_OPEN   = 0;
 static constexpr chip::Percent100ths WC_PERCENT100THS_MAX_CLOSED = 10000;
@@ -41,14 +46,15 @@ typedef DataModel::Nullable<uint16_t> NAbsolute;
 typedef Optional<Percent> OPercent;
 typedef Optional<Percent100ths> OPercent100ths;
 
-// Match directly with OperationalStatus 2 bits Fields
-enum class OperationalState : uint8_t
-{
-    Stall             = 0x00, // currently not moving
-    MovingUpOrOpen    = 0x01, // is currently opening
-    MovingDownOrClose = 0x02, // is currently closing
-    Reserved          = 0x03, // dont use
-};
+using OptionalAttributeSet = app::OptionalAttributeSet<Attributes::SafetyStatus::Id>
+
+    // Match directly with OperationalStatus 2 bits Fields
+    enum class OperationalState : uint8_t {
+        Stall             = 0x00, // currently not moving
+        MovingUpOrOpen    = 0x01, // is currently opening
+        MovingDownOrClose = 0x02, // is currently closing
+        Reserved          = 0x03, // dont use
+    };
 static_assert(sizeof(OperationalState) == sizeof(uint8_t), "OperationalState Size is not correct");
 
 // Declare Position Limit Status
@@ -69,16 +75,96 @@ struct AbsoluteLimits
     uint16_t closed;
 };
 
-/**
- * @brief  Window Covering Attribute Access Interface.
- */
-class WindowCoverAttrAccess : public AttributeAccessInterface
+class WindowCoveringCluster : public DefaultServerCluster
 {
 public:
-    // Register for the Window Covering cluster on all endpoints.
-    WindowCoverAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), WindowCovering::Id) {}
+    //     Config(Delegate nDelegate, BitFlags<Feature> features);
+    // };
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    WindowCoveringCluster(EndpointId endpointId, BitFlags<WindowCovering::Feature> features,
+                          OptionalAttributeSet & optionalAttributeSet, Delegate * delegate) : mDelegate(delegate)
+    {}
+
+    // Server cluster implementation
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown(ClusterShutdownType) override;
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
+
+    // setters and getters
+    Type GetType() const { return mType; }
+
+    void SetNumberOfActuationsLift(uint16_t numOfLifts);
+    uint16_t GetNumberOfActuationsLift() const { return mNumberOfActuationsLift; }
+
+    void SetNumberOfActuationsTilt(uint16_t numOfLifts);
+    uint16_t GetNumberOfActuationsTilt() const { return mNumberOfActuationsTilt; }
+
+    void SetConfigStatus(chip::BitMask<ConfigStatus> status);
+    chip::BitMask<ConfigStatus> GetConfigStatus() const { return mConfigStatus; }
+
+    void SetCurrentPositionLiftPercentage(OPercent curLiftPercentage);
+    OPercent GetCurrentPositionLiftPercentage() const { return mCurrentPositionLiftPercentage; };
+
+    void SetCurrentPositionTiltPercentage(OPercent curTiltPercentage);
+    OPercent GetCurrentPositionTiltPercentage() const { return mCurrentPositionTiltPercentage; };
+
+    void SetOperationalStatus(chip::BitMask<OperationalStatus> newStatus);
+    chip::BitMask<OperationalStatus> GetOperationalStatus() const { return mOperationalStatus; }
+
+    void SetTargetPositionLiftPercentage100ths(NPercent100ths newTargetLift);
+    NPercent100ths GetTargetPositionLiftPercentage100ths() const { return mTargetPositionTiltPercentage100ths; }
+
+    void SetTargetPositionTiltPercentage100ths(NPercent100ths newTargetLift);
+    NPercent100ths GetTargetPositionTiltPercentage100ths() const { return mTargetPositionTiltPercentage100ths; }
+
+    EndProductType GetEndProductType() const { return mEndProductType; }
+
+    void SetCurrentPositionLiftPercentage100ths(NPercent100ths curLiftPercentage100ths);
+    NPercent100ths GetCurrentPositionLiftPercentage100ths() const { return mCurrentPositionLiftPercentage100ths; }
+
+    void SetCurrentPositionTiltPercentage(NPercent100ths curTiltPercentage100ths);
+    NPercent100ths GetCurrentPositionTiltPercentage100ths() const { return mCurrentPositionTiltPercentage100ths; }
+
+    void SetMode(chip::BitMask<Mode> mode);
+    chip::BitMask<Mode> GetMode() const { return mMode; }
+
+    void SetSafetyStatus(chip::BitMask<SafetyStatus> status);
+    chip::BitMask<SafetyStatus> GetSafetyStatus() const { return mSafetyStatus; }
+
+private:
+    Delegate * mDelegate;
+    BitFlags<WindowCovering::Feature> mFeatureMap;
+
+    // Setters for Fixed attributes
+    void SetType(Type type) { mType = type; }
+    void SetEndProductType(EndProductType type);
+
+    // Attributes
+    Type mType;
+    uint16_t mNumberOfActuationsLift = 0;
+    uint16_t mNumberOfActuationsTilt = 0;
+    chip::BitMask<ConfigStatus> mConfigStatus;
+    NPercent mCurrentPositionLiftPercentage;
+    NPercent mCurrentPositionTiltPercentage;
+    NPercent100ths mTargetPositionLiftPercentage100ths;
+    NPercent100ths mTargetPositionTiltPercentage100ths;
+    chip::BitMask<OperationalStatus> mOperationalStatus;
+    EndProductType mEndProductType;
+    NPercent100ths mCurrentPositionLiftPercentage100ths;
+    NPercent100ths mCurrentPositionTiltPercentage100ths;
+    chip::BitMask<Mode> mMode;
+    chip::BitMask<SafetyStatus> mSafetyStatus;
 };
 
 bool HasFeature(chip::EndpointId endpoint, Feature feature);
