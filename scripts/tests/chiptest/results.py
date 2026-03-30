@@ -26,6 +26,7 @@ from collections import defaultdict
 from collections.abc import Callable, Iterable
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from types import TracebackType
 from typing import Any, ClassVar, TypeAlias
 
 from chiptest.log_config import LogConfig
@@ -171,12 +172,25 @@ class RunStats:
 
 @dataclass
 class RunSummary(RunStats):
-    """Summary of a test run, including results of all iterations and aggregated statistics (both global and per-test)."""
+    """
+    Summary of a test run, including results of all iterations and aggregated statistics (both global and per-test).
+
+    If operated in multithreaded environment, it should be used as a context manager to ensure thread safety when recording results.
+    """
     iterations: int
     run_timestamp: datetime.datetime | str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
     results: list[TestResult] = field(default_factory=list, init=False)
     test_stats: dict[str, RunStats] = field(default_factory=dict, init=False)
     exceptions: defaultdict[int, dict[str, ExceptionInfoT]] = field(default_factory=lambda: defaultdict(dict), init=False)
+
+    def __post_init__(self):
+        self._lock = threading.Lock()
+
+    def __enter__(self):
+        return self._lock.__enter__()
+
+    def __exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> None:
+        return self._lock.__exit__(exc_type, exc_val, exc_tb)
 
     def record(self, result: TestResult) -> None:
         """Record a test result."""
@@ -382,7 +396,6 @@ class ResultProcessingThread(threading.Thread):
     def __post_init__(self) -> None:
         super().__init__(name="Results")
 
-        self._summary_lock = threading.Lock()
         self._summary = RunSummary(self.iterations)
 
         self.result_queue: ResultQueueT = CancellableQueue()
@@ -402,7 +415,7 @@ class ResultProcessingThread(threading.Thread):
 
     def _process_result(self, result: TestResult) -> None:
         iteration = result.iteration
-        with self._summary_lock:
+        with self._summary:
             self._summary.record(result)
 
             # Check for keep going on failure.
@@ -441,6 +454,7 @@ class ResultProcessingThread(threading.Thread):
                     raise RuntimeError(
                         "Failed to terminate result processing thread. Result summary may be incomplete or corrupted") from e
         finally:
-            self._summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
-            if self.summary_file is not None:
-                self._summary.write_json(self.summary_file)
+            with self._summary:
+                self._summary.print_summary(show_failed=True, show_flaky=False, top_slowest=0, show_all=True)
+                if self.summary_file is not None:
+                    self._summary.write_json(self.summary_file)
