@@ -23,6 +23,8 @@
 using namespace chip;
 using namespace chip::app;
 
+using Status = Protocols::InteractionModel::Status;
+
 namespace chip::app::Clusters::CommissionerControl {
 
 CommissionerControlServer::CommissionerControlServer(Delegate * delegate, EndpointId endpointId) :
@@ -47,21 +49,21 @@ CHIP_ERROR CommissionerControlServer::Deinit()
     return CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
 }
 
-Protocols::InteractionModel::Status CommissionerControlServer::GetSupportedDeviceCategoriesValue(
+Status CommissionerControlServer::GetSupportedDeviceCategoriesValue(
     EndpointId endpoint, BitMask<SupportedDeviceCategoryBitmap> * supportedDeviceCategories) const
 {
-    VerifyOrReturnError(mCluster.IsConstructed() && endpoint == mEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mCluster.IsConstructed() && endpoint == mEndpointId, Status::InvalidInState);
     *supportedDeviceCategories = mCluster.Cluster().GetSupportedDeviceCategories();
-    return Protocols::InteractionModel::Status::Success;
+    return Status::Success;
 }
 
-Protocols::InteractionModel::Status
+Status
 CommissionerControlServer::SetSupportedDeviceCategoriesValue(EndpointId endpoint,
                                                              const BitMask<SupportedDeviceCategoryBitmap> supportedDeviceCategories)
 {
-    VerifyOrReturnError(mCluster.IsConstructed() && endpoint == mEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mCluster.IsConstructed() && endpoint == mEndpointId, Status::InvalidInState);
     mCluster.Cluster().SetSupportedDeviceCategories(supportedDeviceCategories);
-    return Protocols::InteractionModel::Status::Success;
+    return Status::Success;
 }
 
 CHIP_ERROR
