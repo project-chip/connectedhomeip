@@ -284,7 +284,15 @@ The complete Border Router guide is located [here](./nxp_otbr_guide.md).
     | GND            | J3_14          | J8_7            |
     | ENA (optional) | J1_12          | J1_6            |
 
-### Build options
+
+### Provision SE05x with required keys (One time step)
+
+Refer [SE051H Provision Example](https://github.com/NXP/plug-and-trust/blob/int/CHIPSE_Release/demos/se051h_nfc_comm_prov/readme.md) to provision SE05x with required keys for powered and unpowered commissioning.
+
+**NOTE** For ease of use, the provision example can also be used from Linux machine. Refer [SE051H Provision Example on Linux](https://github.com/NXP/plug-and-trust/blob/int/CHIPSE_Release/demos/se051h_nfc_comm_prov/vcom_prov_readme.md)
+
+
+### Build options for example
 
 -   Build the example with below options to offload crypto operations to SE05x
     using CMAKE configuration :
@@ -299,9 +307,15 @@ Example :
 ubuntu@ubuntu-Latitude-5420:~/matter/connectedhomeip$ west build -d <out_dir> -b frdmrw612 examples/thermostat/nxp/ -DCONF_FILE_NAME=prj_wifi.conf -DCONFIG_CHIP_SE05X=y
 ```
 
-**NOTE** To control secure element using enable pin, ensure to connect jumper
-J14 on OM-SE051ARD board to 3-4 pins. Also build the example with
--DCONFIG_SE05X_HOST_GPIO=y option to allow frdm-rw61x gpio to control the enable
-pin as required.
+> [!NOTE]
+>
+> 1.   To control secure element using enable pin, ensure to connect
+> jumper J14 on OM-SE051ARD board to 3-4 pins. Also build the example with
+> -DCONFIG_SE05X_HOST_GPIO=y option to allow RW61x GPIO to control the
+> enable pin as required.
+>
+> 2.  If the SE05x has crypto objects that are enabled with secure
+> messaging, the example needs to be built with secure session support enabled.
+> For example to build with AES applet session support, build with -DCONFIG_SE05X_AES_KEY=y.
 
 Refer [SE05x](nxp_se05x_guide.md) for more details on configurations of SE05x.
