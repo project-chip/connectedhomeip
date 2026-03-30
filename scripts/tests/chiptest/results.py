@@ -420,7 +420,7 @@ class ResultProcessingThread(threading.Thread):
 
             # Check for keep going on failure.
             if result.exception is not None and not isinstance(result.exception, KeyboardInterrupt) and not self.keep_going:
-                raise ResultError("Task failed and --keep-going flag is not set.")
+                raise ResultError("Test failed and --keep-going flag is not set.")
 
             # Check if all results for the iteration are in.
             if len(self._summary.exceptions[iteration]) < self.tests_per_iteration:
