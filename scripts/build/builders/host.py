@@ -544,6 +544,13 @@ class HostBuilder(GnBuilder):
             # include things added by the test_runner efr32 build
             self.extra_gn_options.append('silabs_board="BRD4187C"')
 
+            if "GSDK_ROOT" in os.environ:
+                # EFR32 SDK is very large. If the SDK path is already known (the
+                # case for pre-installed images), use it directly.
+                sdk_path = shlex.quote(os.environ['GSDK_ROOT'])
+                self.extra_gn_options.append(f"efr32_sdk_root=\"{sdk_path}\"")
+                self.extra_gn_options.append(f"openthread_root=\"{sdk_path}/openthread_stack/util/third_party/openthread\"")
+
         # Crypto library has per-platform defaults (like openssl for linux/mac
         # and mbedtls for android/freertos/zephyr/mbed/...)
         if crypto_library:
