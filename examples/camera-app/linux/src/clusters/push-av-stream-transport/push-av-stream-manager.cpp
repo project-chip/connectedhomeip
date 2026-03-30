@@ -534,7 +534,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateZoneId
         ChipLogError(Camera, "CameraDeviceInterface not initialized");
         return Status::Failure;
     }
-    auto & zones = mCameraDevice->GetZoneManagementDelegate().GetZoneManagementCluster()->GetZones();
+    auto & zones = mCameraDevice->GetZoneManagementDelegate().GetZoneMgmtServer()->GetZones();
 
     for (const auto & zone : zones)
     {
@@ -553,7 +553,7 @@ bool PushAvStreamTransportManager::ValidateMotionZoneListSize(size_t zoneListSiz
         ChipLogError(Camera, "CameraDeviceInterface not initialized");
         return false;
     }
-    auto maxZones = mCameraDevice->GetZoneManagementDelegate().GetZoneManagementCluster()->GetMaxZones();
+    auto maxZones = mCameraDevice->GetZoneManagementDelegate().GetZoneMgmtServer()->GetMaxZones();
     if (zoneListSize >= maxZones)
     {
         return false;
