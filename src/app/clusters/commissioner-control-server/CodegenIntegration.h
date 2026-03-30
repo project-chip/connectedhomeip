@@ -26,31 +26,41 @@ class CommissionerControlServer
 {
 public:
     /**
-     * Creates a commissioner control server instance. This is just a backwards compatibility wrapper around the
+     * @brief Creates a Commissioner Control server instance. This is just a backwards compatibility wrapper around the
      * CommissionerControlCluster.
      * @param delegate A pointer to the delegate to be used by this server.
-     * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param endpoint The endpoint on which this cluster exists. This must match the zap configuration.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CommissionerControlServer(Delegate * delegate, EndpointId endpointId);
+    CommissionerControlServer(Delegate * delegate, EndpointId endpoint);
     ~CommissionerControlServer();
 
-    // Register the commissioner control cluster instance with the codegen data model provider.
+    /**
+     * @brief Initialise the Commissioner Control server instance.
+     * This function must be called after defining an CommissionerControlServer class object.
+     * @return Returns an error if the CommandHandler registration fails, else returns CHIP_NO_ERROR.
+     */
     CHIP_ERROR Init();
 
-    // Unregister the commissioner control cluster instance with the codegen data model provider.
+    /**
+     * @brief Uninitialise the Commissioner Control server instance.
+     * @return Returns an error if the CommandHandler unregistration fails, else returns CHIP_NO_ERROR.
+     */
     CHIP_ERROR Deinit();
 
     Protocols::InteractionModel::Status
-    GetSupportedDeviceCategoriesValue(EndpointId endpointId,
+    GetSupportedDeviceCategoriesValue(EndpointId endpoint,
                                       BitMask<SupportedDeviceCategoryBitmap> * supportedDeviceCategories) const;
 
     Protocols::InteractionModel::Status
-    SetSupportedDeviceCategoriesValue(EndpointId endpointId,
-                                      const BitMask<SupportedDeviceCategoryBitmap> supportedDeviceCategories);
+    SetSupportedDeviceCategoriesValue(EndpointId endpoint, const BitMask<SupportedDeviceCategoryBitmap> supportedDeviceCategories);
 
+    /**
+     * @brief
+     *   Called after the server return SUCCESS to a correctly formatted RequestCommissioningApproval command.
+     */
     CHIP_ERROR
-    GenerateCommissioningRequestResultEvent(EndpointId endpointId, const Events::CommissioningRequestResult::Type & result);
+    GenerateCommissioningRequestResultEvent(EndpointId endpoint, const Events::CommissioningRequestResult::Type & result);
 
 private:
     Delegate * mDelegate{};
