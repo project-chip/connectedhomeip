@@ -97,6 +97,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/application-launch/chef-application-launch-delegate.cpp
     ${CHEF}/common/clusters/audio-output/AudioOutputManager.cpp
     ${CHEF}/common/clusters/channel/ChannelManager.cpp
+    ${CHEF}/common/clusters/chime/chef-chime-delegate.cpp
     ${CHEF}/common/clusters/content-launch/chef-content-launch-delegate.cpp
     ${CHEF}/common/clusters/door-lock/chef-doorlock-stubs.cpp
     ${CHEF}/common/clusters/door-lock/chef-lock-endpoint.cpp

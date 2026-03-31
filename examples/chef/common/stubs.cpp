@@ -98,6 +98,7 @@ void InitIdentifyCluster()
 #include "application-launch/chef-application-launch-delegate.h"
 #endif // MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
 
+<<<<<<< water-heater
 #if MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #include "clusters/water-heater-management/chef-water-heater-management.h"
 #endif
@@ -108,6 +109,13 @@ void InitIdentifyCluster()
 
 #include "clusters/mode-base/chef-mode-base-default.h"
 
+=======
+#if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/chime/chef-chime-delegate.h"
+#include <app/clusters/chime-server/CodegenIntegration.h>
+#endif
+
+>>>>>>> master
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -696,6 +704,7 @@ void CastingvideoplayerContentappInit()
 #endif
 }
 
+<<<<<<< water-heater
 /*
  * This initializer is for the water heater application rootnode_waterheater_21bd13d651. To not have this initialiser
  * affect new water heater applications, use different endpoints.
@@ -727,6 +736,29 @@ void WaterHeaterInit()
     static ModeBase::Instance WaterHeaterModeInstance(&WaterHeaterModeDelegate, 1, WaterHeaterMode::Id, WaterHeaterModefeatureMap);
     VerifyOrDieWithMsg(WaterHeaterModeInstance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterMode instance.");
 #endif
+=======
+/**
+ * This initializer is for the chime application.
+ */
+void ChimeInit()
+{
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: ChimeInit called more than once");
+    called = true;
+#if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kChimeDeviceTypeId))
+    {
+        static auto * delegate  = Platform::New<Chime::ChefChimeDelegate>();
+        static auto chimeServer = Platform::New<ChimeServer>(1, *delegate);
+        VerifyOrDieWithMsg(chimeServer->Init() == CHIP_NO_ERROR, Zcl, "Error: ChimeServer::Init failed");
+        uint8_t defaultChimeID = 0;
+        VerifyOrDieWithMsg(delegate->GetChimeIDByIndex(0, defaultChimeID) == CHIP_NO_ERROR, Zcl,
+                           "Initialisation Error: Failed to get chime ID from chef delegate");
+        VerifyOrDieWithMsg(chimeServer->SetSelectedChime(defaultChimeID) == Protocols::InteractionModel::Status::Success, Zcl,
+                           "Initialisation Error: Failed to set default chime ID to %d", defaultChimeID);
+    }
+#endif // #if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT
+>>>>>>> master
 }
 
 void ApplicationInit()
@@ -738,7 +770,11 @@ void ApplicationInit()
     GenericSwitchInit();
     LaundryDryerInit();
     CastingvideoplayerContentappInit();
+<<<<<<< water-heater
     WaterHeaterInit();
+=======
+    ChimeInit();
+>>>>>>> master
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER

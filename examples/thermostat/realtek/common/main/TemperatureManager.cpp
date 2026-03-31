@@ -19,7 +19,6 @@
 
 #include "TemperatureManager.h"
 #include "AppConfig.h"
-#include "AppEvent.h"
 #include "AppTask.h"
 #include <app-common/zap-generated/cluster-objects.h>
 

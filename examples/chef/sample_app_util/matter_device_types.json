@@ -62,5 +62,9 @@
     "Mounted On/Off Control": 271,
     "Mounted Dimmable Load Control": 272,
     "Extractor Hood": 122,
+<<<<<<< water-heater
     "Water Heater": 1295
+=======
+    "Chime": 326
+>>>>>>> master
 }
