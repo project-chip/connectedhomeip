@@ -619,9 +619,8 @@ void FanControlCluster::SetOnOffState(bool isOn)
 
         if (mFanMode == FanModeEnum::kOff)
         {
-            const FanModeEnum newMode =
-                mPercentSetting.IsNull() ? (SupportsAuto() ? FanModeEnum::kAuto : FanModeEnum::kHigh)
-                                         : ComputeFanModeFromPercent(mPercentCurrent, mFanModeSequence);
+            const FanModeEnum newMode = mPercentSetting.IsNull() ? (SupportsAuto() ? FanModeEnum::kAuto : FanModeEnum::kHigh)
+                                                                 : ComputeFanModeFromPercent(mPercentCurrent, mFanModeSequence);
             SetAttributeValue(mFanMode, newMode, FanMode::Id);
         }
     }
