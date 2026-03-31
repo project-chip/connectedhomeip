@@ -153,7 +153,7 @@ int main(int argc, char * argv[])
                         ChipLogError(AppServer, "Initialization of CastingApp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     // Initialize Linux KeyValueStoreMgr
-    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+    // TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 
     // Start the CastingApp
     err = CastingApp::GetInstance()->Start();

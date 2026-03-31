@@ -493,21 +493,21 @@ CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
     {
         storage = &gChipLinuxFactoryStorage;
         std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetFactoryDataLocation());
-        path /= "/chip_factory.ini";
+        path /= "chip_factory.ini";
         err = storage->Init(path.c_str());
     }
     else if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
     {
         storage = &gChipLinuxConfigStorage;
         std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetConfigDataLocation());
-        path /= "/chip_config.ini";
+        path /= "chip_config.ini";
         err = storage->Init(path.c_str());
     }
     else if (strcmp(ns, kConfigNamespace_ChipCounters) == 0)
     {
         storage = &gChipLinuxCountersStorage;
         std::filesystem::path path(chip::DeviceLayer::GetFilesystemStorageLocationProvider().GetCountersDataLocation());
-        path /= "/chip_counters.ini";
+        path /= "chip_counters.ini";
         err = storage->Init(path.c_str());
     }
 

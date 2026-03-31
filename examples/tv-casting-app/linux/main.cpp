@@ -163,7 +163,7 @@ int main(int argc, char * argv[])
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
+    // TEMPORARY_RETURN_IGNORED DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(CHIP_CONFIG_KVS_PATH);
 
     // Init the commissionable data provider based on command line options
     // to handle custom verifiers, discriminators, etc.

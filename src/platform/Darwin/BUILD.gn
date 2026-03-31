@@ -70,10 +70,6 @@ static_library("Darwin") {
     "ConnectivityManagerImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
-    "FilesystemStorageLocationProvider.cpp",
-    "FilesystemStorageLocationProvider.h",
-    "FilesystemStorageLocationProviderImpl.cpp",
-    "FilesystemStorageLocationProviderImpl.h",
     "InetPlatformConfig.h",
     "NetworkCommissioningDriver.h",
     "PlatformManagerImpl.h",
@@ -117,6 +113,10 @@ static_library("Darwin") {
       "DeviceInstanceInfoProviderImpl.h",
       "KeyValueStoreManagerImpl.h",
       "KeyValueStoreManagerImpl.mm",
+      "FilesystemStorageLocationProvider.cpp",
+      "FilesystemStorageLocationProvider.h",
+      "FilesystemStorageLocationProviderImpl.cpp",
+      "FilesystemStorageLocationProviderImpl.h",
     ]
   }
 

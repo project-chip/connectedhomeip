@@ -630,6 +630,9 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     ChipLogProgress(NotSpecified, "Storage location provider returned %s",
                     GetFilesystemStorageLocationProvider().GetConfigDataLocation().c_str());
 
+    ChipLogProgress(NotSpecified, "kvs = %s", GetFilesystemStorageLocationProvider().GetKVSDataLocation().c_str());
+    ChipLogProgress(NotSpecified, "factory = %s", GetFilesystemStorageLocationProvider().GetFactoryDataLocation().c_str());
+
 #ifdef CHIP_CONFIG_KVS_PATH
     if (LinuxDeviceOptions::GetInstance().KVS != nullptr)
     {
@@ -1094,9 +1097,9 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     // NOLINTEND(bugprone-signal-handler)
 #endif
 #else
-    struct sigaction sa                        = {};
-    sa.sa_handler                              = StopSignalHandler;
-    sa.sa_flags                                = SA_RESETHAND;
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif
