@@ -94,7 +94,7 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
     VerifyOrReturnError(cluster != nullptr, Status::InvalidCommand);
     VerifyOrReturnError(cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed), Status::InvalidCommand);
 
-    uint8_t speedMax            = cluster->GetSpeedMax();
+    uint8_t speedMax                          = cluster->GetSpeedMax();
     DataModel::Nullable<uint8_t> speedSetting = cluster->GetSpeedSetting();
 
     uint8_t speedCurrent = speedSetting.IsNull() ? 0 : speedSetting.Value();

@@ -227,10 +227,9 @@ void AirPurifierManager::PercentSettingWriteCallback(uint8_t aNewPercentSetting)
     if (mOnOffClusterOn)
     {
         FanControlCluster * c = FanControl::FindClusterOnEndpoint(mEndpointId);
-        Status status         = c == nullptr ? Status::UnsupportedEndpoint
-                                             : c->SetPercentSetting(DataModel::Nullable<Percent>(aNewPercentSetting))
-                                                   .GetStatusCode()
-                                                   .GetStatus();
+        Status status         = c == nullptr
+                    ? Status::UnsupportedEndpoint
+                    : c->SetPercentSetting(DataModel::Nullable<Percent>(aNewPercentSetting)).GetStatusCode().GetStatus();
         if (status != Status::Success)
         {
             ChipLogError(NotSpecified,
@@ -246,10 +245,9 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
     if (mOnOffClusterOn)
     {
         FanControlCluster * c = FanControl::FindClusterOnEndpoint(mEndpointId);
-        Status status         = c == nullptr ? Status::UnsupportedEndpoint
-                                             : c->SetSpeedSetting(DataModel::Nullable<uint8_t>(aNewSpeedSetting))
-                                                   .GetStatusCode()
-                                                   .GetStatus();
+        Status status         = c == nullptr
+                    ? Status::UnsupportedEndpoint
+                    : c->SetSpeedSetting(DataModel::Nullable<uint8_t>(aNewSpeedSetting)).GetStatusCode().GetStatus();
         if (status != Status::Success)
         {
             ChipLogError(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: failed to set SpeedCurrent attribute: %d",
@@ -346,8 +344,7 @@ void AirPurifierManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedS
     }
 
     FanControlCluster * c = FanControl::FindClusterOnEndpoint(mEndpointId);
-    Status status         = c == nullptr ? Status::UnsupportedEndpoint
-                                         : c->SetSpeedSetting(aNewSpeedSetting).GetStatusCode().GetStatus();
+    Status status = c == nullptr ? Status::UnsupportedEndpoint : c->SetSpeedSetting(aNewSpeedSetting).GetStatusCode().GetStatus();
     if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "AirPurifierManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d",
