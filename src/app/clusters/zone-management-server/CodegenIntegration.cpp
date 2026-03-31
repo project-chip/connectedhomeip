@@ -38,7 +38,7 @@ ZoneMgmtServer::~ZoneMgmtServer()
 
 CHIP_ERROR ZoneMgmtServer::Init()
 {
-    VerifyOrReturnValue(!mCluster.IsConstructed(), CHIP_NO_ERROR);
+    VerifyOrReturnError(!mCluster.IsConstructed(), CHIP_ERROR_ALREADY_INITIALIZED);
 
     mCluster.Create(ZoneManagementCluster::Context{
         .delegate   = mDelegate,

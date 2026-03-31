@@ -95,13 +95,13 @@ TEST_F(TestZoneManagementClusterBackwardsCompatibility, LegacySensitivitySetBefo
                 nullptr);
 
     Testing::TestServerClusterContext context;
-    ASSERT_EQ(server.mCluster.Cluster().Startup(context.Get()), CHIP_NO_ERROR);
+    ASSERT_EQ(server.Cluster().Startup(context.Get()), CHIP_NO_ERROR);
     ASSERT_EQ(server.GetSensitivity(), 3);
-    ASSERT_EQ(server.mCluster.Cluster().GetSensitivity(), 3);
+    ASSERT_EQ(server.Cluster().GetSensitivity(), 3);
 
     ASSERT_EQ(server.SetSensitivity(4), CHIP_NO_ERROR);
     ASSERT_EQ(server.GetSensitivity(), 4);
-    ASSERT_EQ(server.mCluster.Cluster().GetSensitivity(), 4);
+    ASSERT_EQ(server.Cluster().GetSensitivity(), 4);
 
     uint8_t persistedSensitivity = 0;
     AttributePersistence persistence(context.Get().attributeStorage);

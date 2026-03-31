@@ -88,14 +88,14 @@ public:
 
     CHIP_ERROR SetSensitivity(uint8_t sensitivity);
 
-    chip::app::LazyRegisteredServerCluster<ZoneManagementCluster> mCluster;
+    ZoneManagementCluster & Cluster() { return mCluster.Cluster(); }
 
 private:
     const EndpointId mEndpointId;
     Delegate & mDelegate;
     const BitFlags<Feature> mFeatures;
     const ZoneManagementCluster::Context::Config mConfig;
-
+    chip::app::LazyRegisteredServerCluster<ZoneManagementCluster> mCluster;
     std::optional<uint8_t> mPendingAppSensitivity;
 };
 
