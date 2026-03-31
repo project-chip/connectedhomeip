@@ -36,6 +36,7 @@ else
     PW_PATH="$PW_ENVIRONMENT_ROOT/cipd/packages/pigweed"
 fi
 
+env
 USE_WIFI=false
 USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
@@ -292,7 +293,7 @@ else
                 shift
                 ;;
             *)
-                if [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
+                if [[ "$1" == *use_SiWx917=true* ]]; then
                     USE_WIFI=true
                     # NCP Mode so base MCU is an EFR32
                     optArgs+="chip_device_platform =\"efr32\" "
