@@ -36,7 +36,6 @@ else
     PW_PATH="$PW_ENVIRONMENT_ROOT/cipd/packages/pigweed"
 fi
 
-env
 USE_WIFI=false
 USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
