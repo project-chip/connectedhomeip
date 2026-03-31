@@ -155,6 +155,8 @@
 #include <openthread/instance.h>
 #endif
 
+#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
+
 using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
@@ -982,6 +984,13 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     {
         initParams.advertiseCommissionableIfNoFabrics = false;
     }
+
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+    initParams.groupDataProvider->SetGroupcastEnabled(true);
+    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(initParams.groupDataProvider,
+                                                                                        &Server::GetInstance().GetFabricTable());
+    initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
+#endif
 
     // Set DAC provider before server init because Operational Credentials may snapshot
     // the provider during cluster construction.

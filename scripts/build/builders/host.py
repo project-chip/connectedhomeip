@@ -544,6 +544,13 @@ class HostBuilder(GnBuilder):
             # include things added by the test_runner efr32 build
             self.extra_gn_options.append('silabs_board="BRD4187C"')
 
+            if "GSDK_ROOT" in os.environ:
+                # EFR32 SDK is very large. If the SDK path is already known (the
+                # case for pre-installed images), use it directly.
+                sdk_path = shlex.quote(os.environ['GSDK_ROOT'])
+                self.extra_gn_options.append(f"efr32_sdk_root=\"{sdk_path}\"")
+                self.extra_gn_options.append(f"openthread_root=\"{sdk_path}/openthread_stack/util/third_party/openthread\"")
+
         # Crypto library has per-platform defaults (like openssl for linux/mac
         # and mbedtls for android/freertos/zephyr/mbed/...)
         if crypto_library:
@@ -625,28 +632,24 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('chip_build_tests_googletest=true')
 
     def GnBuildArgs(self):
-        if self.board == HostBoard.NATIVE:
-            return self.extra_gn_options
-        if self.board == HostBoard.ARM64:
-            self.extra_gn_options.extend(
-                [
+        args = super().GnBuildArgs()
+        args.extend(self.extra_gn_options)
+        match self.board:
+            case HostBoard.NATIVE:
+                pass
+            case HostBoard.ARM64:
+                args.extend([
                     'target_cpu="arm64"',
                     'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
-                ]
-            )
-
-            return self.extra_gn_options
-        if self.board == HostBoard.FAKE:
-            self.extra_gn_options.extend(
-                [
+                ])
+            case HostBoard.FAKE:
+                args.extend([
                     'custom_toolchain="//build/toolchain/fake:fake_x64_gcc"',
                     'chip_link_tests=true',
                     'chip_device_platform="fake"',
                     'chip_fake_platform=true',
-                ]
-            )
-            return self.extra_gn_options
-        raise Exception('Unknown host board type: %r' % self)
+                ])
+        return args
 
     def createJavaExecutable(self, java_program):
         self._Execute(
