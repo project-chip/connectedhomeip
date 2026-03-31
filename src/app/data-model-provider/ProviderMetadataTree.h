@@ -59,11 +59,8 @@ public:
 
         ~ScopedConfigurationVersionUpdater()
         {
-            ChipLogProgress(NotSpecified, "ScopedConfigurationVersionUpdater is being destructed, bumping configuration version");
-
             if (mParentTree)
             {
-                ChipLogProgress(NotSpecified, "Internal_BumpNodeDataModelConfigurationVersion");
                 TEMPORARY_RETURN_IGNORED mParentTree->Internal_BumpNodeDataModelConfigurationVersion();
             }
         };
@@ -172,8 +169,6 @@ public:
     /// the stored configuration version.
     ScopedConfigurationVersionUpdater GetNodeDataModelConfigurationVersionUpdater()
     {
-        ChipLogProgress(NotSpecified, "GetNodeDataModelConfigurationVersionUpdater");
-
         return ScopedConfigurationVersionUpdater(this);
     }
 

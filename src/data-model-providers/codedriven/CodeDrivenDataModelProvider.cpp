@@ -172,13 +172,9 @@ CHIP_ERROR CodeDrivenDataModelProvider::Internal_BumpNodeDataModelConfigurationV
     uint16_t size                     = sizeof(tempConfigurationVersion);
     StorageKeyName kStorageKey        = DefaultStorageKeyAllocator::ConfigurationVersion();
 
-    ChipLogProgress(NotSpecified, "Codedriven - Internal_BumpNodeDataModelConfigurationVersion 2");
-
     // Bump the configuration version and write to persistent storage
     tempConfigurationVersion++;
     ReturnErrorOnFailure(mPersistentStorageDelegate.SyncSetKeyValue(kStorageKey.KeyName(), &tempConfigurationVersion, size));
-
-    ChipLogProgress(NotSpecified, "Codedriven - Internal_BumpNodeDataModelConfigurationVersion 3");
 
     // If successful, update local cache
     mConfigurationVersion = tempConfigurationVersion;
