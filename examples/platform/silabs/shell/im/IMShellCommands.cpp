@@ -17,10 +17,10 @@
 
 #include "IMShellCommands.h"
 
-#include <app/InteractionModelEngine.h> // nogncheck
-#include <app/ReadClient.h> // nogncheck
-#include <app/ReadPrepareParams.h> // nogncheck
-#include <app/server/Server.h> // nogncheck
+#include <app/InteractionModelEngine.h> 
+#include <app/ReadClient.h>             
+#include <app/ReadPrepareParams.h>      
+#include <app/server/Server.h>          
 #include <clusters/OccupancySensing/AttributeIds.h>
 #include <clusters/OccupancySensing/ClusterId.h>
 #include <clusters/OnOff/AttributeIds.h>
@@ -33,8 +33,6 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-
-#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -88,6 +86,10 @@ public:
                 {
                     streamer_printf(streamer_get(), "Attribute Report for Cluster OnOff attribute OnOff Value %s\r\n",
                                     value ? "ON" : "OFF");
+                } 
+                else
+                {
+                    streamer_printf(streamer_get(), "Attribute Report for Cluster OnOff attribute OnOff Value <invalid>\r\n");
                 }
             }
             else
@@ -106,6 +108,11 @@ public:
                     streamer_printf(streamer_get(), "Attribute Report for Cluster OccupancySensing attribute Occupancy Value %u\r\n",
                                     value);
                 }
+                else
+                {
+                    streamer_printf(streamer_get(),
+                                    "Attribute Report for Cluster OccupancySensing attribute Occupancy Value <invalid>\r\n");
+                }
             }
             else
             {
@@ -119,8 +126,6 @@ public:
                             aPath.mClusterId, aPath.mAttributeId);
             break;
         }
-
-        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::GetPlatform().ToggleLed(1);
     }
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
