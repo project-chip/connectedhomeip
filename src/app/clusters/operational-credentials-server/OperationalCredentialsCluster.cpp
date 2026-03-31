@@ -45,7 +45,8 @@ constexpr auto kDACCertificate                = CertificateChainTypeEnum::kDACCe
 constexpr auto kPAICertificate                = CertificateChainTypeEnum::kPAICertificate;
 constexpr auto kNocResponseMaxDebugTextLength = 128;
 
-ByteSpan gVendorReserved[3];
+constexpr size_t kMaxVendorReservedFields = 3;
+ByteSpan gVendorReserved[kMaxVendorReservedFields];
 
 // Get the attestation challenge for the current session in progress. Only valid when called
 // synchronously from inside a CommandHandler. If not called in CASE/PASE session context,
@@ -1052,7 +1053,7 @@ namespace OperationalCredentials {
 CHIP_ERROR SetCSRVendorReserved(CSRVendorReservedField field, ByteSpan data)
 {
     uint8_t index = static_cast<uint8_t>(field);
-    if (index >= 3)
+    if (index >= kMaxVendorReservedFields)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
