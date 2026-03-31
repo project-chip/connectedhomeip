@@ -40,12 +40,12 @@ pw_python_package("matter-testing-module") {
   inputs = [ "env_test.yaml" ]
 
   sources = [
+    "matter/testing/CommissioningPreTest.py",
     "matter/testing/__init__.py",
     "matter/testing/apps.py",
     "matter/testing/basic_composition.py",
     "matter/testing/choice_conformance.py",
     "matter/testing/commissioning.py",
-    "matter/testing/commissioning_test.py",
     "matter/testing/conformance.py",
     "matter/testing/conversions.py",
     "matter/testing/credentials.py",

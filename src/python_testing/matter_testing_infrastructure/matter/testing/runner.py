@@ -389,7 +389,7 @@ def run_tests_no_exit(
         bool: True if all tests passed, False otherwise
     """
 
-    from matter.testing.commissioning_test import CommissionDeviceTest
+    from matter.testing.CommissioningPreTest import CommissionDeviceTest
     from matter.testing.matter_stack_state import MatterStackState
 
     # Mobly deep-copies user_params, so the asyncio event loop cannot be passed
