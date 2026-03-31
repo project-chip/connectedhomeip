@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,7 +55,9 @@ if (chip_build_tests) {
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/clusters/access-control-server/tests",
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
+      "${chip_root}/src/app/clusters/air-quality-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
+      "${chip_root}/src/app/clusters/actions-server/tests",
       "${chip_root}/src/app/clusters/bindings/tests",
       "${chip_root}/src/app/clusters/boolean-state-configuration-server/tests",
       "${chip_root}/src/app/clusters/boolean-state-server/tests",
@@ -146,6 +148,24 @@ if (chip_build_tests) {
       # TODO(#40932): Fix and re-enable the Commodity Tariff unit tests.
       # "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
     ]
+
+    # Backwards compatibility uses ember mocks, so they cannot run in a "unified"
+    # test build. Restrict them to specific platforms only
+    if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
+      tests += [
+        # keep-sorted: start
+        "${chip_root}/src/app/clusters/actions-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/chime-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/device-energy-management-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/energy-evse-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/identify-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/power-topology-server/tests:tests-backwards-compatibility",
+
+        # keep-sorted: end
+      ]
+    }
 
     if (current_os != "zephyr") {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]

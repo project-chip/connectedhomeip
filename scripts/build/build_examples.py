@@ -22,7 +22,7 @@ import sys
 import build
 import click
 import coloredlogs
-from builders.builder import BuilderOptions
+from builders.builder import BuilderOptions, BuildProfile
 from runner import PrintOnlyRunner, ShellRunner
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
@@ -36,10 +36,6 @@ __LOG_LEVELS__ = {
     'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
-
-
-def CommaSeparate(items) -> str:
-    return ', '.join([x for x in items])
 
 
 def ValidateRepoPath(context, parameter, value):
@@ -88,6 +84,11 @@ def ValidateTargetNames(context, parameter, values):
     multiple=True,
     callback=ValidateTargetNames,
     help='Build target(s)')
+@click.option(
+    "--build-profile",
+    default=BuildProfile.DEFAULT,
+    type=click.Choice(BuildProfile, case_sensitive=False),
+    help="The build profile to use.")
 @click.option(
     '--enable-link-map-file',
     default=False,
@@ -141,11 +142,12 @@ def ValidateTargetNames(context, parameter, values):
     help='Show timestamps in log output')
 @click.option(
     '--pw-command-launcher',
+    default=None,
     help=(
         'Set pigweed command launcher. E.g.: "--pw-command-launcher=ccache" '
         'for using ccache when building examples.'))
 @click.pass_context
-def main(context, log_level, verbose, target, enable_link_map_file, repo,
+def main(context, log_level, verbose, target, build_profile, enable_link_map_file, repo,
          out_prefix, ninja_jobs, pregen_dir, clean, dry_run, dry_run_output,
          enable_flashbundle, log_timestamps, pw_command_launcher):
     # Ensures somewhat pretty logging of what is going on
@@ -170,8 +172,9 @@ before running this script.
         ninja_jobs=ninja_jobs, runner=runner
     )
 
-    requested_targets = set([t.lower() for t in target])
+    requested_targets = {t.lower() for t in target}
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
+        build_profile=build_profile,
         enable_link_map_file=enable_link_map_file,
         enable_flashbundle=enable_flashbundle,
         pw_command_launcher=pw_command_launcher,

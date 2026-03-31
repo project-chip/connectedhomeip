@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "commissioner-control-server.cpp",
+  "CodegenIntegration.h",
+  "CommissionerControlCluster.cpp",
+  "Delegate.h",
   "commissioner-control-server.h",
 ]

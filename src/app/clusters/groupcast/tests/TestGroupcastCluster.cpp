@@ -111,6 +111,7 @@ struct TestGroupcastCluster : public ::testing::Test
     {
         mProvider.SetStorageDelegate(&mTestContext.StorageDelegate());
         mProvider.SetSessionKeystore(&mKeystore);
+        mProvider.SetGroupcastEnabled(true);
         ASSERT_EQ(mProvider.Init(), CHIP_NO_ERROR);
 
         // Replace the DataModel Provider in the ServerClusterContext provided to the cluster implementation
@@ -1453,6 +1454,275 @@ TEST_F(TestGroupcastCluster, TestGroupcastTestingCommand)
     }
 
     // Enable Sender Testing with duration
+}
+
+TEST_F(TestGroupcastCluster, TestAuxiliaryAccessUpdatedEvent)
+{
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints[] = { 1, 2 };
+    const GroupId kGroupId        = 0x1234;
+    const GroupId kGroupIdNoAux   = 0x5678;
+    const KeysetId kKeyset        = 0xabcd;
+
+    ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    auto & logOnlyEvents = mTestContext.EventsGenerator();
+
+    // 1. Test JoinGroup with useAuxiliaryACL = true -> Should generate event
+    {
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupId;
+        data.keySetID        = kKeyset;
+        data.key             = MakeOptional(ByteSpan(key));
+        data.useAuxiliaryACL = MakeOptional(true);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(event.value().eventOptions.mPath.mClusterId, Clusters::AccessControl::Id);
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Clusters::AccessControl::Events::AuxiliaryAccessUpdated::Id);
+
+        Clusters::AccessControl::Events::AuxiliaryAccessUpdated::DecodableType decodedEvent;
+        ASSERT_EQ(event.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
+        EXPECT_EQ(decodedEvent.fabricIndex, kTestFabricIndex);
+    }
+
+    // 2. Test ConfigureAuxiliaryACL with no change -> Should NOT generate event
+    {
+        Commands::ConfigureAuxiliaryACL::Type data;
+        data.groupID         = kGroupId;
+        data.useAuxiliaryACL = true;
+
+        auto result = tester.Invoke(Commands::ConfigureAuxiliaryACL::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // 3. Test ConfigureAuxiliaryACL with change (true to false) -> Should generate event
+    {
+        Commands::ConfigureAuxiliaryACL::Type data;
+        data.groupID         = kGroupId;
+        data.useAuxiliaryACL = false;
+
+        auto result = tester.Invoke(Commands::ConfigureAuxiliaryACL::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Clusters::AccessControl::Events::AuxiliaryAccessUpdated::Id);
+    }
+
+    // 4. Test LeaveGroup with endpoints (partial remove) -> Should NOT generate event (as hasAuxiliaryACL is false)
+    {
+        Commands::LeaveGroup::Type data;
+        data.groupID   = kGroupId;
+        data.endpoints = MakeOptional(DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints)));
+
+        auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // Re-join with auxiliary ACL for LeaveGroup test
+    {
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupId;
+        data.keySetID        = kKeyset;
+        data.useAuxiliaryACL = MakeOptional(true);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent(); // Clear the event from JoinGroup
+        ASSERT_TRUE(event.has_value());
+    }
+
+    // 5. Test LeaveGroup (whole group) -> Should generate event (as hasAuxiliaryACL is true)
+    {
+        Commands::LeaveGroup::Type data;
+        data.groupID = kGroupId;
+
+        auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(event.value().eventOptions.mPath.mEventId, Clusters::AccessControl::Events::AuxiliaryAccessUpdated::Id);
+    }
+
+    // 6. Test JoinGroup for a group WITHOUT auxiliary ACL -> Should NOT generate event
+    {
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupIdNoAux;
+        data.keySetID        = kKeyset;
+        data.useAuxiliaryACL = MakeOptional(false);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // 7. Test Add Endpoint to group WITHOUT auxiliary ACL -> Should NOT generate event
+    {
+        const EndpointId kEndpoints2[] = { 3 };
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupIdNoAux;
+        data.keySetID        = kKeyset;
+        data.useAuxiliaryACL = MakeOptional(false);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints2, MATTER_ARRAY_SIZE(kEndpoints2));
+
+        auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // 8. Test LeaveGroup (partial) for group WITHOUT auxiliary ACL -> Should NOT generate event
+    {
+        const EndpointId kEndpoints2[] = { 2 };
+        Commands::LeaveGroup::Type data;
+        data.groupID   = kGroupIdNoAux;
+        data.endpoints = MakeOptional(DataModel::List<const EndpointId>(kEndpoints2, MATTER_ARRAY_SIZE(kEndpoints2)));
+
+        auto result = tester.Invoke(Commands::LeaveGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    // 9. Test JoinGroup with different multicast policy (no updates resulting in ACL change) -> Should NOT generate event
+    {
+        // First, ensure group exists with Aux ACL, endpoint and IANA policy
+        Commands::JoinGroup::Type data;
+        data.groupID         = kGroupId;
+        data.keySetID        = kKeyset;
+        data.useAuxiliaryACL = MakeOptional(true);
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kIanaAddr);
+        data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+        auto setupResult = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(setupResult.status, Protocols::InteractionModel::Status::Success);
+        (void) logOnlyEvents.GetNextEvent(); // Clear event from setup
+
+        // Now call JoinGroup again with same data but different multicast policy
+        data.mcastAddrPolicy = MakeOptional(app::Clusters::Groupcast::MulticastAddrPolicyEnum::kPerGroup);
+        auto result          = tester.Invoke(Commands::JoinGroup::Id, data);
+        AssertStatus(result.status, Protocols::InteractionModel::Status::Success);
+
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+}
+
+TEST_F(TestGroupcastCluster, TestMaxMembershipPerFabric)
+{
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints[] = { 1 };
+    const KeysetId kKeyset        = 0xabcd;
+
+    chip::Testing::ClusterTester tester(mListener);
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    Commands::JoinGroup::Type data;
+    data.keySetID        = kKeyset;
+    data.useAuxiliaryACL = MakeOptional(true);
+    data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+    constexpr uint16_t kMaxPerFabric = GroupDataProviderImpl::kMaxMembershipPerFabric;
+
+    for (GroupId i = 1; i <= kMaxPerFabric; i++)
+    {
+        data.groupID = i;
+        data.key     = (i == 1) ? MakeOptional(ByteSpan(key)) : Optional<ByteSpan>();
+        auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success)) << "JoinGroup for group " << i << " should succeed";
+    }
+
+    // Per-fabric overflow
+    data.groupID = kMaxPerFabric + 1;
+    data.key.ClearValue();
+    auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
+}
+
+TEST_F(TestGroupcastCluster, TestTotalMaxMembership)
+{
+    const uint8_t key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    const EndpointId kEndpoints[] = { 1 };
+    const KeysetId kKeyset        = 0xabcd;
+
+    constexpr uint16_t kMaxCount   = GroupDataProviderImpl::kMaxMembershipCount;
+    constexpr uint16_t kMaxPerFab  = GroupDataProviderImpl::kMaxMembershipPerFabric;
+    constexpr uint16_t kFab1Groups = kMaxPerFab - 1;
+    constexpr uint16_t kRemaining  = kMaxCount - kFab1Groups;
+    constexpr uint16_t kFab2Groups = kRemaining / 2;
+    constexpr uint16_t kFab3Groups = kRemaining - kFab2Groups;
+
+    // Set up two additional fabrics
+    FabricIndex fabricIndex2 = 2;
+    FabricIndex fabricIndex3 = 3;
+    ASSERT_EQ(mFabricHelper.AddAdditionalTestFabric(fabricIndex2), CHIP_NO_ERROR);
+    ASSERT_EQ(mFabricHelper.AddAdditionalTestFabric(fabricIndex3), CHIP_NO_ERROR);
+
+    chip::Testing::ClusterTester tester(mListener);
+
+    Commands::JoinGroup::Type data;
+    data.keySetID        = kKeyset;
+    data.useAuxiliaryACL = MakeOptional(true);
+    data.endpoints       = DataModel::List<const EndpointId>(kEndpoints, MATTER_ARRAY_SIZE(kEndpoints));
+
+    // Fabric 1: kFab1Groups (one below per-fabric limit)
+    tester.SetFabricIndex(kTestFabricIndex);
+    for (GroupId i = 1; i <= kFab1Groups; i++)
+    {
+        data.groupID = i;
+        data.key     = (i == 1) ? MakeOptional(ByteSpan(key)) : Optional<ByteSpan>();
+        auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success)) << "Fabric 1 group " << i;
+    }
+
+    // Fabric 2: kFab2Groups
+    tester.SetFabricIndex(fabricIndex2);
+    for (GroupId i = 1; i <= kFab2Groups; i++)
+    {
+        data.groupID = i;
+        data.key     = (i == 1) ? MakeOptional(ByteSpan(key)) : Optional<ByteSpan>();
+        auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success)) << "Fabric 2 group " << i;
+    }
+
+    // Fabric 3: kFab3Groups
+    tester.SetFabricIndex(fabricIndex3);
+    for (GroupId i = 1; i <= kFab3Groups; i++)
+    {
+        data.groupID = i;
+        data.key     = (i == 1) ? MakeOptional(ByteSpan(key)) : Optional<ByteSpan>();
+        auto result  = tester.Invoke(Commands::JoinGroup::Id, data);
+        EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Success)) << "Fabric 3 group " << i;
+    }
+
+    // Node-wide total is now kMaxCount.
+    // Fabric 1 has kFab1Groups (< kMaxPerFab) so the per-fabric check passes,
+    // but the node-wide check should return ResourceExhausted.
+    tester.SetFabricIndex(kTestFabricIndex);
+    data.groupID = kFab1Groups + 1;
+    data.key.ClearValue();
+    auto result = tester.Invoke(Commands::JoinGroup::Id, data);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::ResourceExhausted));
 }
 
 } // namespace

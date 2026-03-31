@@ -21,6 +21,7 @@
 #include <AppRootNode.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
+#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/DeviceLoadStatusProvider.h>
 #include <app/InteractionModelEngine.h>
@@ -194,6 +195,13 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     static chip::CommonCaseDeviceServerInitParams initParams;
 
     SuccessOrDie(initParams.InitializeStaticResourcesBeforeServerInit());
+
+#if CHIP_CONFIG_ENABLE_GROUPCAST
+    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate groupAuxDelegate(&gGroupDataProvider,
+                                                                                        &Server::GetInstance().GetFabricTable());
+    initParams.groupAuxiliaryAccessControlDelegate = &groupAuxDelegate;
+    gGroupDataProvider.SetGroupcastEnabled(true);
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     gGroupDataProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     Credentials::SetGroupDataProvider(&gGroupDataProvider);

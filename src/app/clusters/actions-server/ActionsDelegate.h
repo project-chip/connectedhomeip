@@ -16,12 +16,10 @@
  */
 
 #pragma once
-
-#include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/actions-server/ActionsStructs.h>
+#include <clusters/Actions/Commands.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
-
-#include "ActionsStructs.h"
 
 namespace chip {
 namespace app {

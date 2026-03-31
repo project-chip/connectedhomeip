@@ -18,7 +18,9 @@ source_set("clusters") {
   public_deps = [
     # keep-sorted: start
     "access-control-server",
+    "actions-server",
     "administrator-commissioning-server",
+    "air-quality-server",
     "basic-information",
     "boolean-state-configuration-server",
     "boolean-state-server",
@@ -42,6 +44,7 @@ source_set("clusters") {
     "push-av-stream-transport-server",
     "scenes-server",
     "software-diagnostics-server",
+    "soil-measurement-server",
     "temperature-control-server",
     "temperature-measurement-server",
     "tls-certificate-management-server",

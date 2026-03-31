@@ -393,9 +393,23 @@ public:
         }
     }
 
+    void SetGroupcastEnabled(bool groupcastVal) { mGroupcastEnabled = groupcastVal; }
+
+    bool IsGroupcastEnabled() { return mGroupcastEnabled; }
+
     // Groupcast
     virtual uint16_t getMaxMembershipCount() = 0;
     virtual uint16_t getMaxMcastAddrCount()  = 0;
+
+    /**
+     * @brief Check if a notification is needed for Auxiliary ACL changes and reset the flag.
+     *
+     * This method returns true if the last set of operations (e.g., SetGroupInfo, RemoveGroupInfo)
+     * somehow changed the Auxiliary ACL status of a group. Calling this method resets the internal flag.
+     *
+     * @return true if a notification is needed, false otherwise.
+     */
+    virtual bool ConsumeAuxAclNotificationNeeded() = 0;
 
 protected:
     void GroupAdded(FabricIndex fabric_index, const GroupInfo & new_group)
@@ -431,6 +445,7 @@ protected:
     const uint16_t mMaxGroupsPerFabric;
     const uint16_t mMaxGroupKeysPerFabric;
     GroupListener * mListeners[kMaxListeners] = { nullptr };
+    bool mGroupcastEnabled                    = false;
 };
 
 /**

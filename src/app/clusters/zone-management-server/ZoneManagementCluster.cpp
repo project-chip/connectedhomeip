@@ -33,18 +33,16 @@
 #include <cmath>
 #include <cstring>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::ZoneManagement;
-using namespace chip::app::Clusters::ZoneManagement::Structs;
 using namespace chip::app::Clusters::ZoneManagement::Attributes;
-using namespace Protocols::InteractionModel;
+using namespace chip::Protocols::InteractionModel;
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ZoneManagement {
+
+using ZoneTriggerControlStruct = Structs::ZoneTriggerControlStruct::Type;
+using ZoneInformationStruct    = Structs::ZoneInformationStruct::Type;
 
 ZoneMgmtServer::ZoneMgmtServer(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
                                uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,

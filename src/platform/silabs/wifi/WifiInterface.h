@@ -43,17 +43,7 @@ constexpr size_t kWiFiMacAddressLength = 6;
 /* Defines to update */
 #define MAX_JOIN_RETRIES_COUNT (5)
 
-typedef struct wfx_wifi_scan_result
-{
-    uint8_t ssid[chip::DeviceLayer::Internal::kMaxWiFiSSIDLength]; // excludes null-character
-    size_t ssid_length;
-    chip::BitFlags<chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> security;
-    uint8_t bssid[chip::DeviceLayer::Internal::kWiFiBSSIDLength];
-    uint8_t chan;
-    int16_t rssi; /* I suspect this is in dBm - so signed */
-    chip::app::Clusters::NetworkCommissioning::WiFiBandEnum wiFiBand;
-} wfx_wifi_scan_result_t;
-using ScanCallback = void (*)(wfx_wifi_scan_result_t *);
+using ScanCallback = void (*)(chip::DeviceLayer::NetworkCommissioning::WiFiScanResponse *);
 
 typedef struct wfx_wifi_scan_ext
 {
@@ -238,22 +228,20 @@ public:
      *
      * @note The disconnection is not immediate. It can take a certain amount of time for the device to be in a disconnected state
      * once the function is called. When the function returns, the device might not have yet disconnected from the Wi-Fi network.
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR, disconnection request was succesfully triggered
-     *         otherwise, CHIP_ERROR_INTERNAL
+     * The implementation may only enqueue a disconnect (e.g. post an event); there is no synchronous success/failure to report.
      */
-    virtual CHIP_ERROR TriggerDisconnection() = 0;
+    virtual void TriggerDisconnection() = 0;
 
     /**
      * @brief Gets the connected access point information.
-     *        See @wfx_wifi_scan_result_t for the information that is returned by the function.
+     *        See @NetworkCommissioning::WiFiScanResponse for the information that is returned by the function.
      *
      * @param[out] info AP information
      *
      * @return CHIP_ERROR CHIP_NO_ERROR, device has succesfully pulled all the AP information
      *                    CHIP_ERROR_INTERNAL, otherwise. If the function returns an error, the data in ap cannot be used.
      */
-    virtual CHIP_ERROR GetAccessPointInfo(wfx_wifi_scan_result_t & info) = 0;
+    virtual CHIP_ERROR GetAccessPointInfo(chip::DeviceLayer::NetworkCommissioning::WiFiScanResponse & info) = 0;
 
     /**
      * @brief Gets the connected access point extended information.
@@ -288,8 +276,9 @@ public:
      *       The function will overwrite any existing Wi-Fi credentials.
      *
      * @param[in] credentials
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if ssidLength is 0 or exceeds max SSID length
      */
-    virtual void SetWifiCredentials(const WiFiCredentials & credentials) = 0;
+    virtual CHIP_ERROR SetWifiCredentials(const WiFiCredentials & credentials) = 0;
 
     /**
      * @brief Returns the configured Wi-Fi credentials
@@ -307,6 +296,7 @@ public:
      *        connection attempt was successful or not.
      *
      *        The returned error code only indicates if the connection attempt was triggered or not.
+     *        On retry after failure, the implementation may use quick join (no scan) when channel/BSSID are known.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR, the connection attempt was succesfully triggered
      *                    CHIP_ERROR_INCORRECT_STATE, the Wi-Fi station does not have any Wi-Fi credentials

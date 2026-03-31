@@ -26,6 +26,8 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
+from chiptest.log_config import LogConfig
+
 log = logging.getLogger(__name__)
 
 
@@ -72,46 +74,47 @@ class TestResult:
         self.status = TestStatus(self.status)
 
     @classmethod
-    def run_test(cls, name: str, iteration: int, dry_run: bool, test_func: Callable[[], None]) -> TestResult:
+    def run_test(cls, name: str, iteration: int, dry_run: bool, log_config: LogConfig, test_func: Callable[[], None]) -> TestResult:
         """Run a test and generate execution summary.
 
         Mind that it catches any exception and saves it in the result. It's up to the caller to reraise the exception.
         """
-        log.info("Would run test: '%s'" if dry_run else "%s - Starting test", name)
+        with log_config.fmt_context(task=name, level=log_config.level_tests):
+            log.info("%s", "Would run test" if dry_run else "Starting test")
 
-        result = cls(name, iteration, TestStatus.FAILED, duration_seconds=0, exception=None)
-        test_start = test_end = time.monotonic()
-        try:
-            test_func()
-            test_end = time.monotonic()
-            result.status = TestStatus.DRY_RUN if dry_run else TestStatus.PASSED
-        except BaseException as e:
-            test_end = time.monotonic()
-            result.exception = e
+            result = cls(name, iteration, TestStatus.FAILED, duration_seconds=0, exception=None)
+            test_start = test_end = time.monotonic()
+            try:
+                test_func()
+                test_end = time.monotonic()
+                result.status = TestStatus.DRY_RUN if dry_run else TestStatus.PASSED
+            except BaseException as e:
+                test_end = time.monotonic()
+                result.exception = e
 
-            if isinstance(e, KeyboardInterrupt):
-                result.status = TestStatus.CANCELLED
-            else:
-                result.status = TestStatus.FAILED
-                if (pcap_path := Path("thread.pcap")).exists():
-                    print("base64 -d - >thread.pcap <<EOF")
-                    print(base64.b64encode(pcap_path.read_bytes()).decode("ascii"))
-                    print("EOF")
-        finally:
-            result.duration_seconds = test_end - test_start
+                if isinstance(e, KeyboardInterrupt):
+                    result.status = TestStatus.CANCELLED
+                else:
+                    result.status = TestStatus.FAILED
+                    if (pcap_path := Path("thread.pcap")).exists():
+                        print("base64 -d - >thread.pcap <<EOF")
+                        print(base64.b64encode(pcap_path.read_bytes()).decode("ascii"))
+                        print("EOF")
+            finally:
+                result.duration_seconds = test_end - test_start
 
-            symbol = result.status.symbol
-            match result.status:
-                case TestStatus.PASSED:
-                    log.info("%s %s - Completed in %0.2f seconds", symbol, name, result.duration_seconds)
-                case TestStatus.CANCELLED:
-                    log.warning("%s %s - Cancelled after %0.2f seconds", symbol, name, result.duration_seconds)
-                case TestStatus.FAILED:
-                    assert isinstance(result.exception, BaseException), "Exception should be set for failed test results"
-                    log.error("%s %s - Failed in %0.2f seconds", symbol, name, result.duration_seconds,
-                              exc_info=(type(result.exception), result.exception, result.exception.__traceback__))
+                symbol = result.status.symbol
+                match result.status:
+                    case TestStatus.PASSED:
+                        log.info("%s Completed in %0.2f seconds", symbol, result.duration_seconds)
+                    case TestStatus.CANCELLED:
+                        log.warning("%s Cancelled after %0.2f seconds", symbol, result.duration_seconds)
+                    case TestStatus.FAILED:
+                        assert isinstance(result.exception, BaseException), "Exception should be set for failed test results"
+                        log.error("%s Failed in %0.2f seconds", symbol, result.duration_seconds,
+                                  exc_info=(type(result.exception), result.exception, result.exception.__traceback__))
 
-            return result
+                return result
 
 
 @dataclass
