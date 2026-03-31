@@ -100,9 +100,13 @@ public:
             config.WithWindSupport(BitMask<WindBitmap>(windSupportRaw));
         }
         if (features.Has(FanControl::Feature::kAirflowDirection))
+        {
             config.WithAirflowDirection();
+        }
         if (features.Has(FanControl::Feature::kStep))
+        {
             config.WithStep();
+        }
 
         gClusters[clusterInstanceIndex].server.Create(config);
         return gClusters[clusterInstanceIndex].server.Registration();

@@ -161,7 +161,7 @@ private:
     bool SupportsStep() const { return mSupportsStep; }
     bool SupportsAirflowDirection() const { return mOptionalAttributes.IsSet(FanControl::Attributes::AirflowDirection::Id); }
 
-    Protocols::InteractionModel::Status SetFanModeToOff();
+    void SetFanModeToOff();
     void ApplyFanModeOffSideEffects();
     void ApplyFanModeAutoSideEffects();
 
