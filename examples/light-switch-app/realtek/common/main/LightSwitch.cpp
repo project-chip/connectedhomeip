@@ -17,7 +17,6 @@
  */
 
 #include "LightSwitch.h"
-#include "AppEvent.h"
 #include "BindingHandler.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/switch-server/switch-server.h>

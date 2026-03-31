@@ -36,7 +36,6 @@ else
     PW_PATH="$PW_ENVIRONMENT_ROOT/cipd/packages/pigweed"
 fi
 
-env
 USE_WIFI=false
 USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
@@ -325,9 +324,41 @@ else
     fi
 
     # Run install-packages once (creates .install-packages-done when done); skip when using Docker (SDK is in image)
-    if [ "$USE_DOCKER" != true ]; then
-        pip install -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt"
-        python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
+    if [ "$USE_DOCKER" != true ] && [ ! -f "$CHIP_ROOT/scripts/setup/silabs/.install-packages-done" ]; then
+
+        INSTALL_EVERYTHING=false
+        cat <<'EOF'
+        !!!!!!!!! FIRST TIME INSTALL !!!!!!!!!
+        Do you agree to install SILICON LABS PACKAGES MANAGER?
+
+        This will take around 8GB of spaces which will include but not limited to :
+        SLT (silabs packages manager), zap, arm-gcc,
+
+        Most of the files will be located under ~/.silabs,
+        some symbolic link will be created and it will replace simplicity_sdk submodule
+EOF
+
+        while true; do
+            read -p "Do you want to proceed? (y/n): " yn
+            case $yn in
+                [Yy]*)
+                    INSTALL_EVERYTHING=true
+                    break
+                    ;; # Case for yes/Y
+                [Nn]*)
+                    echo "You won't be asked again"
+                    break
+                    ;;                                                  # Case for no/N
+                *) echo "Invalid response. Please answer yes or no." ;; # Case for invalid input
+            esac
+        done
+
+        if [ "$INSTALL_EVERYTHING" == true ]; then
+            pip install -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt"
+            python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
+        else
+            touch "$CHIP_ROOT/scripts/setup/silabs/.install-packages-done"
+        fi
     fi
 
     # Zap generation requires activation
