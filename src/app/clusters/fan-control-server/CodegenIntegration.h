@@ -18,35 +18,10 @@
 #pragma once
 
 #include <app/clusters/fan-control-server/FanControlCluster.h>
-#include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
-#include <lib/support/BitMask.h>
-#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip::app::Clusters::FanControl {
 
 FanControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
-
-Protocols::InteractionModel::Status GetFanMode(EndpointId endpointId, FanModeEnum & value);
-Protocols::InteractionModel::Status GetFanModeSequence(EndpointId endpointId, FanModeSequenceEnum & value);
-Protocols::InteractionModel::Status GetPercentSetting(EndpointId endpointId, DataModel::Nullable<chip::Percent> & value);
-Protocols::InteractionModel::Status GetPercentCurrent(EndpointId endpointId, chip::Percent & value);
-Protocols::InteractionModel::Status GetSpeedSetting(EndpointId endpointId, DataModel::Nullable<uint8_t> & value);
-Protocols::InteractionModel::Status GetSpeedCurrent(EndpointId endpointId, uint8_t & value);
-Protocols::InteractionModel::Status GetSpeedMax(EndpointId endpointId, uint8_t & value);
-Protocols::InteractionModel::Status GetFeatureMap(EndpointId endpointId, uint32_t & value);
-Protocols::InteractionModel::Status GetRockSupport(EndpointId endpointId, BitMask<RockBitmap> & value);
-Protocols::InteractionModel::Status GetRockSetting(EndpointId endpointId, BitMask<RockBitmap> & value);
-Protocols::InteractionModel::Status GetWindSupport(EndpointId endpointId, BitMask<WindBitmap> & value);
-Protocols::InteractionModel::Status GetWindSetting(EndpointId endpointId, BitMask<WindBitmap> & value);
-Protocols::InteractionModel::Status GetAirflowDirection(EndpointId endpointId, AirflowDirectionEnum & value);
-
-Protocols::InteractionModel::Status SetFanMode(EndpointId endpointId, FanModeEnum value);
-Protocols::InteractionModel::Status SetPercentSetting(EndpointId endpointId, DataModel::Nullable<chip::Percent> value);
-Protocols::InteractionModel::Status SetSpeedSetting(EndpointId endpointId, DataModel::Nullable<uint8_t> value);
-Protocols::InteractionModel::Status SetRockSetting(EndpointId endpointId, BitMask<RockBitmap> value);
-Protocols::InteractionModel::Status SetWindSetting(EndpointId endpointId, BitMask<WindBitmap> value);
-Protocols::InteractionModel::Status SetAirflowDirection(EndpointId endpointId, AirflowDirectionEnum value);
 
 void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate);
 Delegate * GetDelegate(EndpointId aEndpoint);

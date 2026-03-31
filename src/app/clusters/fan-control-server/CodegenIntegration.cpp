@@ -37,14 +37,17 @@ namespace {
 constexpr size_t kFanControlFixedClusterCount = FanControl::StaticApplicationConfig::kFixedClusterConfig.size();
 constexpr size_t kFanControlMaxClusterCount   = kFanControlFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-constexpr size_t kFanControlDelegateTableSize =
-    MATTER_DM_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kFanControlFixedClusterCount == MATTER_DM_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT,
+              "FanControl static cluster config must match ZAP server endpoint count");
+static_assert(kFanControlMaxClusterCount <= kEmberInvalidEndpointIndex, "FanControl cluster table size error");
 
-static_assert(kFanControlDelegateTableSize <= kEmberInvalidEndpointIndex, "FanControl Delegate table size error");
+struct ClusterWithDelegate
+{
+    Delegate * delegate = nullptr;
+    LazyRegisteredServerCluster<FanControlCluster> server;
+};
 
-FanControl::Delegate * gDelegateTable[kFanControlDelegateTableSize] = { nullptr };
-
-LazyRegisteredServerCluster<FanControlCluster> gServers[kFanControlMaxClusterCount];
+ClusterWithDelegate gClusters[kFanControlMaxClusterCount];
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -101,17 +104,17 @@ public:
         if (features.Has(FanControl::Feature::kStep))
             config.WithStep();
 
-        gServers[clusterInstanceIndex].Create(config);
-        return gServers[clusterInstanceIndex].Registration();
+        gClusters[clusterInstanceIndex].server.Create(config);
+        return gClusters[clusterInstanceIndex].server.Registration();
     }
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
-        return &gServers[clusterInstanceIndex].Cluster();
+        VerifyOrReturnValue(gClusters[clusterInstanceIndex].server.IsConstructed(), nullptr);
+        return &gClusters[clusterInstanceIndex].server.Cluster();
     }
 
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gClusters[clusterInstanceIndex].server.Destroy(); }
 };
 
 } // namespace
@@ -164,255 +167,20 @@ FanControlCluster * FindClusterOnEndpoint(EndpointId endpointId)
     return static_cast<FanControlCluster *>(cluster);
 }
 
-Status GetFanMode(EndpointId endpointId, FanModeEnum & value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    value = cluster->GetFanMode();
-    return Status::Success;
-}
-
-Status GetPercentSetting(EndpointId endpointId, DataModel::Nullable<chip::Percent> & value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    value = cluster->GetPercentSetting();
-    return Status::Success;
-}
-
-Status GetSpeedSetting(EndpointId endpointId, DataModel::Nullable<uint8_t> & value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    value = cluster->GetSpeedSetting();
-    return Status::Success;
-}
-
-Status GetSpeedMax(EndpointId endpointId, uint8_t & value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    value = cluster->GetSpeedMax();
-    return Status::Success;
-}
-
-Status GetFanModeSequence(EndpointId endpointId, FanModeSequenceEnum & value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    value = cluster->GetFanModeSequence();
-    return Status::Success;
-}
-
-Status GetPercentCurrent(EndpointId endpointId, chip::Percent & value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    value = cluster->GetPercentCurrent();
-    return Status::Success;
-}
-
-Status GetSpeedCurrent(EndpointId endpointId, uint8_t & value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    value = cluster->GetSpeedCurrent();
-    return Status::Success;
-}
-
-Status GetFeatureMap(EndpointId endpointId, uint32_t & value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    value = cluster->GetFeatureMap().Raw();
-    return Status::Success;
-}
-
-Status GetRockSupport(EndpointId endpointId, BitMask<RockBitmap> & value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kRocking))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    value = cluster->GetRockSupport();
-    return Status::Success;
-}
-
-Status GetRockSetting(EndpointId endpointId, BitMask<RockBitmap> & value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kRocking))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    value = cluster->GetRockSetting();
-    return Status::Success;
-}
-
-Status GetWindSupport(EndpointId endpointId, BitMask<WindBitmap> & value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kWind))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    value = cluster->GetWindSupport();
-    return Status::Success;
-}
-
-Status GetWindSetting(EndpointId endpointId, BitMask<WindBitmap> & value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kWind))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    value = cluster->GetWindSetting();
-    return Status::Success;
-}
-
-Status GetAirflowDirection(EndpointId endpointId, AirflowDirectionEnum & value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    if (!cluster->GetFeatureMap().Has(FanControl::Feature::kAirflowDirection))
-    {
-        return Status::UnsupportedAttribute;
-    }
-    value = cluster->GetAirflowDirection();
-    return Status::Success;
-}
-
-Status SetSpeedSetting(EndpointId endpointId, DataModel::Nullable<uint8_t> value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    return cluster->SetSpeedSetting(value).GetStatusCode().GetStatus();
-}
-
-Status SetFanMode(EndpointId endpointId, FanModeEnum value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    return cluster->SetFanMode(value).GetStatusCode().GetStatus();
-}
-
-Status SetPercentSetting(EndpointId endpointId, DataModel::Nullable<chip::Percent> value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    return cluster->SetPercentSetting(value).GetStatusCode().GetStatus();
-}
-
-Status SetRockSetting(EndpointId endpointId, BitMask<RockBitmap> value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    return cluster->SetRockSetting(value).GetStatusCode().GetStatus();
-}
-
-Status SetWindSetting(EndpointId endpointId, BitMask<WindBitmap> value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    return cluster->SetWindSetting(value).GetStatusCode().GetStatus();
-}
-
-Status SetAirflowDirection(EndpointId endpointId, AirflowDirectionEnum value)
-{
-    FanControlCluster * cluster = FindClusterOnEndpoint(endpointId);
-    if (cluster == nullptr)
-    {
-        return Status::UnsupportedEndpoint;
-    }
-    return cluster->SetAirflowDirection(value).GetStatusCode().GetStatus();
-}
-
 Delegate * GetDelegate(EndpointId aEndpoint)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(aEndpoint, FanControl::Id, MATTER_DM_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kFanControlDelegateTableSize ? nullptr : gDelegateTable[ep]);
+    return (ep >= kFanControlMaxClusterCount ? nullptr : gClusters[ep].delegate);
 }
 
 void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(aEndpoint, FanControl::Id, MATTER_DM_FAN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    if (ep < kFanControlDelegateTableSize)
+    if (ep < kFanControlMaxClusterCount)
     {
-        gDelegateTable[ep] = aDelegate;
+        gClusters[ep].delegate = aDelegate;
     }
 
     // Update the cluster instance if it already exists (e.g. app sets delegate in emberAfFanControlClusterInitCallback)

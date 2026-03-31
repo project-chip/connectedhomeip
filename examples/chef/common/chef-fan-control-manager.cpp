@@ -90,15 +90,12 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
 
     VerifyOrReturnError(aDirection != StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
-    Protocols::InteractionModel::Status status;
+    FanControlCluster * cluster = FanControl::FindClusterOnEndpoint(mEndpoint);
+    VerifyOrReturnError(cluster != nullptr, Status::InvalidCommand);
+    VerifyOrReturnError(cluster->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed), Status::InvalidCommand);
 
-    uint8_t speedMax = 0;
-    status           = FanControl::GetSpeedMax(mEndpoint, speedMax);
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, Status::InvalidCommand);
-
-    DataModel::Nullable<uint8_t> speedSetting;
-    status = FanControl::GetSpeedSetting(mEndpoint, speedSetting);
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, Status::InvalidCommand);
+    uint8_t speedMax            = cluster->GetSpeedMax();
+    DataModel::Nullable<uint8_t> speedSetting = cluster->GetSpeedSetting();
 
     uint8_t speedCurrent = speedSetting.IsNull() ? 0 : speedSetting.Value();
 
@@ -121,7 +118,7 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
         });
     }
 
-    return FanControl::SetSpeedSetting(mEndpoint, DataModel::Nullable<uint8_t>(newSpeedSetting));
+    return cluster->SetSpeedSetting(DataModel::Nullable<uint8_t>(newSpeedSetting)).GetStatusCode().GetStatus();
 }
 
 void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
@@ -169,7 +166,10 @@ void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attribut
         // When not Null, SpeedCurrent tracks SpeedSetting's value.
         SetSpeedCurrent(speedSetting.ValueOr(0));
         // Determine if the speed change should also change the fan mode
-        FanControl::SetFanMode(mEndpoint, SpeedToFanMode(mSpeedCurrent));
+        if (FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint); fc != nullptr)
+        {
+            (void) fc->SetFanMode(SpeedToFanMode(mSpeedCurrent)).GetStatusCode().GetStatus();
+        }
         break;
     }
 
@@ -209,7 +209,15 @@ void ChefFanControlManager::SetPercentCurrent(uint8_t aNewPercentCurrent)
 {
     ChipLogDetail(NotSpecified, "ChefFanControlManager::SetPercentCurrent: %d", aNewPercentCurrent);
     mPercentCurrent = aNewPercentCurrent;
-    Status status   = FanControl::SetPercentSetting(mEndpoint, DataModel::Nullable<Percent>(mPercentCurrent));
+    Status status   = Status::Success;
+    if (FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint); fc != nullptr)
+    {
+        status = fc->SetPercentSetting(DataModel::Nullable<Percent>(mPercentCurrent)).GetStatusCode().GetStatus();
+    }
+    else
+    {
+        status = Status::UnsupportedEndpoint;
+    }
     if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "ChefFanControlManager::SetPercentCurrent: failed to set PercentCurrent attribute: %d",
@@ -220,7 +228,15 @@ void ChefFanControlManager::SetPercentCurrent(uint8_t aNewPercentCurrent)
 void ChefFanControlManager::SetSpeedCurrent(uint8_t aNewSpeedCurrent)
 {
     mSpeedCurrent = aNewSpeedCurrent;
-    Status status = FanControl::SetSpeedSetting(mEndpoint, DataModel::Nullable<uint8_t>(aNewSpeedCurrent));
+    Status status = Status::Success;
+    if (FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint); fc != nullptr)
+    {
+        status = fc->SetSpeedSetting(DataModel::Nullable<uint8_t>(aNewSpeedCurrent)).GetStatusCode().GetStatus();
+    }
+    else
+    {
+        status = Status::UnsupportedEndpoint;
+    }
     if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedCurrent: failed to set SpeedCurrent attribute: %d",
@@ -282,7 +298,13 @@ void ChefFanControlManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpe
         ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedSetting: invalid null value");
         return;
     }
-    Status status = FanControl::SetSpeedSetting(mEndpoint, aNewSpeedSetting);
+    FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint);
+    if (fc == nullptr)
+    {
+        ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedSetting: no cluster on endpoint");
+        return;
+    }
+    Status status = fc->SetSpeedSetting(aNewSpeedSetting).GetStatusCode().GetStatus();
     if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "ChefFanControlManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d",
@@ -299,28 +321,34 @@ void ChefFanControlManager::Init()
 DataModel::Nullable<Percent> ChefFanControlManager::GetPercentSetting()
 {
     DataModel::Nullable<Percent> percentSetting;
-    Status status = FanControl::GetPercentSetting(mEndpoint, percentSetting);
-
-    if (status != Status::Success)
+    FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint);
+    if (fc == nullptr)
     {
         ChipLogError(NotSpecified, "ChefFanControlManager::GetPercentSetting: failed to get PercentSetting attribute: %d",
-                     to_underlying(status));
+                     to_underlying(Status::UnsupportedEndpoint));
+        return percentSetting;
     }
-
+    percentSetting = fc->GetPercentSetting();
     return percentSetting;
 }
 
 DataModel::Nullable<uint8_t> ChefFanControlManager::GetSpeedSetting()
 {
     DataModel::Nullable<uint8_t> speedSetting;
-    Status status = FanControl::GetSpeedSetting(mEndpoint, speedSetting);
-
-    if (status != Status::Success)
+    FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint);
+    if (fc == nullptr)
     {
         ChipLogError(NotSpecified, "ChefFanControlManager::GetSpeedSetting: failed to get SpeedSetting attribute: %d",
-                     to_underlying(status));
+                     to_underlying(Status::UnsupportedEndpoint));
+        return speedSetting;
     }
-
+    if (!fc->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+    {
+        ChipLogError(NotSpecified, "ChefFanControlManager::GetSpeedSetting: failed to get SpeedSetting attribute: %d",
+                     to_underlying(Status::UnsupportedAttribute));
+        return speedSetting;
+    }
+    speedSetting = fc->GetSpeedSetting();
     return speedSetting;
 }
 

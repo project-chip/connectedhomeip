@@ -18,6 +18,7 @@
 
 #include <air-purifier-manager.h>
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
+#include <app/clusters/fan-control-server/FanControlCluster.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -91,11 +92,14 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
 
     VerifyOrReturnError(aDirection != FanControl::StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
-    uint8_t speedMax = 0;
-    FanControl::GetSpeedMax(mEndpointId, speedMax);
-
+    FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpointId);
+    uint8_t speedMax       = 0;
     DataModel::Nullable<uint8_t> speedSetting;
-    FanControl::GetSpeedSetting(mEndpointId, speedSetting);
+    if (fc != nullptr && fc->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+    {
+        speedMax     = fc->GetSpeedMax();
+        speedSetting = fc->GetSpeedSetting();
+    }
 
     uint8_t newSpeedSetting = speedSetting.IsNull() ? 0 : speedSetting.Value();
 
@@ -151,7 +155,11 @@ Status AirPurifierManager::HandleStep(FanControl::StepDirectionEnum aDirection, 
         }
     }
 
-    return FanControl::SetSpeedSetting(mEndpointId, DataModel::Nullable<uint8_t>(newSpeedSetting));
+    if (fc == nullptr)
+    {
+        return Status::UnsupportedEndpoint;
+    }
+    return fc->SetSpeedSetting(DataModel::Nullable<uint8_t>(newSpeedSetting)).GetStatusCode().GetStatus();
 }
 
 void AirPurifierManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
@@ -218,7 +226,11 @@ void AirPurifierManager::PercentSettingWriteCallback(uint8_t aNewPercentSetting)
     ChipLogDetail(NotSpecified, "AirPurifierManager::PercentSettingWriteCallback: %d", static_cast<int>(aNewPercentSetting));
     if (mOnOffClusterOn)
     {
-        Status status = FanControl::SetPercentSetting(mEndpointId, DataModel::Nullable<Percent>(aNewPercentSetting));
+        FanControlCluster * c = FanControl::FindClusterOnEndpoint(mEndpointId);
+        Status status         = c == nullptr ? Status::UnsupportedEndpoint
+                                             : c->SetPercentSetting(DataModel::Nullable<Percent>(aNewPercentSetting))
+                                                   .GetStatusCode()
+                                                   .GetStatus();
         if (status != Status::Success)
         {
             ChipLogError(NotSpecified,
@@ -233,7 +245,11 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
     ChipLogDetail(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: %d", static_cast<int>(aNewSpeedSetting));
     if (mOnOffClusterOn)
     {
-        Status status = FanControl::SetSpeedSetting(mEndpointId, DataModel::Nullable<uint8_t>(aNewSpeedSetting));
+        FanControlCluster * c = FanControl::FindClusterOnEndpoint(mEndpointId);
+        Status status         = c == nullptr ? Status::UnsupportedEndpoint
+                                             : c->SetSpeedSetting(DataModel::Nullable<uint8_t>(aNewSpeedSetting))
+                                                   .GetStatusCode()
+                                                   .GetStatus();
         if (status != Status::Success)
         {
             ChipLogError(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: failed to set SpeedCurrent attribute: %d",
@@ -263,7 +279,10 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
     {
         return;
     }
-    FanControl::SetFanMode(mEndpointId, fanMode);
+    if (FanControlCluster * c = FanControl::FindClusterOnEndpoint(mEndpointId); c != nullptr)
+    {
+        (void) c->SetFanMode(fanMode).GetStatusCode().GetStatus();
+    }
 }
 
 void AirPurifierManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode)
@@ -326,7 +345,9 @@ void AirPurifierManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedS
         return;
     }
 
-    Status status = FanControl::SetSpeedSetting(mEndpointId, aNewSpeedSetting);
+    FanControlCluster * c = FanControl::FindClusterOnEndpoint(mEndpointId);
+    Status status         = c == nullptr ? Status::UnsupportedEndpoint
+                                         : c->SetSpeedSetting(aNewSpeedSetting).GetStatusCode().GetStatus();
     if (status != Status::Success)
     {
         ChipLogError(NotSpecified, "AirPurifierManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d",
@@ -337,21 +358,32 @@ void AirPurifierManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedS
 DataModel::Nullable<uint8_t> AirPurifierManager::GetSpeedSetting()
 {
     DataModel::Nullable<uint8_t> speedSetting;
-    FanControl::GetSpeedSetting(mEndpointId, speedSetting);
+    FanControlCluster * c = FanControl::FindClusterOnEndpoint(mEndpointId);
+    if (c != nullptr && c->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+    {
+        speedSetting = c->GetSpeedSetting();
+    }
     return speedSetting;
 }
 
 DataModel::Nullable<Percent> AirPurifierManager::GetPercentSetting()
 {
     DataModel::Nullable<Percent> percentSetting;
-    FanControl::GetPercentSetting(mEndpointId, percentSetting);
+    if (FanControlCluster * c = FanControl::FindClusterOnEndpoint(mEndpointId); c != nullptr)
+    {
+        percentSetting = c->GetPercentSetting();
+    }
     return percentSetting;
 }
 
 uint8_t AirPurifierManager::GetSpeedMax()
 {
     uint8_t speedMax = 1;
-    FanControl::GetSpeedMax(mEndpointId, speedMax);
+    if (FanControlCluster * c = FanControl::FindClusterOnEndpoint(mEndpointId);
+        c != nullptr && c->GetFeatureMap().Has(FanControl::Feature::kMultiSpeed))
+    {
+        speedMax = c->GetSpeedMax();
+    }
     return speedMax;
 }
 
