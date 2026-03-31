@@ -1066,7 +1066,7 @@ jobs:
                 filter: ["", "TC_[A-C]", "TC_[D-O]", "!TC_[A-O]" ]
 
         env:
-            BUILD_VARIANT: ipv6only-no-ble-no-wifi
+            BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
             CHIP_IP_PACKET_CAPTURE: 1
