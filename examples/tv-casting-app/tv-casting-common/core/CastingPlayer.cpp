@@ -351,11 +351,13 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
     mIdOptions.mNoPasscode = true;
     mIdOptions.mCancelPasscode     = false;
     mIdOptions.mCommissionerPasscodeReady = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     err = SendUserDirectedCommissioningRequest();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "CastingPlayer::StopConnecting() hack failed with %" CHIP_ERROR_FORMAT, err.Format());
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     mIdOptions.mCancelPasscode     = true;
     mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
