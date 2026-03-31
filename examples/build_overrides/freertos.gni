@@ -16,3 +16,5 @@ declare_args() {
   # Root directory for FreeRTOS
   freertos_root = "//third_party/connectedhomeip/third_party/freertos"
 }
+
+chip_config_enable_groupcast = true
