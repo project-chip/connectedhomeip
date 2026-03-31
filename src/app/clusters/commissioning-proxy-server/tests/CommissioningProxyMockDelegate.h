@@ -66,6 +66,27 @@ public:
 
     Protocols::InteractionModel::Status ProxyDisconnectRequest(uint16_t sessionId) override;
 
+    Protocols::InteractionModel::Status ProxyBackgroundScanStartRequest(
+        chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
+        uint16_t timeout,
+        chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
+        chip::FabricIndex fabricIndex,
+        chip::NodeId nodeId,
+        app::CommandHandler * commandObj,
+        const DataModel::InvokeRequest & request) override;
+
+    Protocols::InteractionModel::Status ProxyBackgroundScanStopRequest(
+        chip::app::Clusters::CommissioningProxy::CapabilitiesBitmap transport,
+        chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands,
+        chip::FabricIndex fabricIndex,
+        chip::NodeId nodeId) override;
+
+    uint8_t GetMaxCachedResults() override { return 10; }
+    uint8_t GetNumCachedResults() override { return 0; }
+    uint16_t GetCacheTimeout() override { return 120; }
+    void SetCacheTimeout(uint16_t) override {}
+    CHIP_ERROR EncodeCachedResults(app::AttributeValueEncoder &) override { return CHIP_NO_ERROR; }
+
     void SetServer(CommissioningProxyCluster * server) override { mServer = server; }
     CommissioningProxyCluster * GetServer() const override { return mServer; }
 

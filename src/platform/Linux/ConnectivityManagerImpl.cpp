@@ -1989,6 +1989,33 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiDriver::Sca
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+
+// Convert a NAN operating frequency (MHz) to a WiFiBandBitmap value.
+// WiFiBandBitmap::k2g4 = 0x0001, WiFiBandBitmap::k5g = 0x0004.
+// 5 GHz range matches GetBandAndChannelFromFrequency() in this file
+// (5035–5945 MHz, plus the isolated channels 5960 and 5980 MHz).
+static uint16_t FreqToBand(uint32_t freq)
+{
+    // 2.4 GHz: channels 1–13 (2412–2472 MHz) plus channel 14 (2484 MHz).
+    if ((freq >= 2412 && freq <= 2472) || freq == 2484)
+        return static_cast<uint16_t>(0x0001u); // k2g4
+    // 5 GHz: main range plus the two additional channels above the main range.
+    if ((freq >= 5035 && freq <= 5945) || freq == 5960 || freq == 5980)
+        return static_cast<uint16_t>(0x0004u); // k5g
+    return 0;
+}
+
+// Context for dispatching background-scan discovery results onto the CHIP event loop.
+// Defined in an anonymous namespace so it is not visible outside this TU.
+namespace {
+struct BgScanWorkCtx
+{
+    chip::DeviceLayer::ConnectivityManagerImpl::BgScanDiscoveryCallback cb;
+    void * cbCtx;
+    chip::DeviceLayer::NanPeerInfo peer;
+};
+} // namespace
+
 void ConnectivityManagerImpl::WiFiPAFDisconnectPublishReceiveHandler()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
@@ -2096,27 +2123,22 @@ void ConnectivityManagerImpl::ScanDiscoveryResult(GVariant * discov_info)
         peer.hasExtendedData = true;
     }
 
-    // Fire background-scan callback on every discovery (including duplicates)
-    // so the app layer can reset per-result TTL timers on rediscovery.
-    // This signal fires on a GLib thread; schedule onto the CHIP event loop
-    // because the callback uses SystemLayer (StartTimer) and cluster APIs.
-    // Note: mWpaSupplicantMutex is still held here.  ScheduleWork only enqueues
-    // work onto the CHIP event loop (does not execute it) so there is no risk
-    // of deadlock with any CHIP-thread code that also acquires the mutex.
+    // Set WiFiBand from the frequency used when the scan was started.
+    peer.band = FreqToBand(mScanFreq);
+
+    // The bg-scan callback uses SystemLayer and cluster APIs which require
+    // the CHIP stack lock.  ScanDiscoveryResult runs on a GLib/dbus thread,
+    // so schedule the callback on the CHIP event loop instead of calling directly.
     if (mBgScanCb != nullptr)
     {
-        struct BgScanWorkCtx
-        {
-            BgScanDiscoveryCallback cb;
-            void * cbCtx;
-            NanPeerInfo peer;
-        };
         auto * workCtx      = new BgScanWorkCtx{ mBgScanCb, mBgScanCbCtx, peer };
-        CHIP_ERROR schedErr = DeviceLayer::PlatformMgr().ScheduleWork(
-            [](intptr_t arg) {
-                auto * ctx = reinterpret_cast<BgScanWorkCtx *>(arg);
-                ctx->cb(ctx->cbCtx, ctx->peer);
-                delete ctx;
+        CHIP_ERROR schedErr = chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            // Unary + converts the stateless lambda to a plain function pointer,
+            // which is required by ScheduleWork's C-style callback signature.
+            +[](intptr_t arg) {
+                auto * w = reinterpret_cast<BgScanWorkCtx *>(arg);
+                w->cb(w->cbCtx, w->peer);
+                delete w;
             },
             reinterpret_cast<intptr_t>(workCtx));
         if (schedErr != CHIP_NO_ERROR)
@@ -2202,8 +2224,8 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime,
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
     uint8_t is_active                             = false; // Do not send subscribes
     unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS;
-    unsigned int freq                             = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
-    unsigned int ssi_len                          = sizeof(struct PAFPublishSSI);
+    unsigned int freq    = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
+    unsigned int ssi_len = sizeof(struct PAFPublishSSI);
     struct PAFPublishSSI PafPublish_ssi;
 
     // Populate with values to indicate to wpa_suppliant that discovery is
@@ -2218,6 +2240,9 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime,
     GVariant * ssi_array_variant = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &PafPublish_ssi, ssi_len, sizeof(guint8));
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    // mScanFreq is read by ScanDiscoveryResult on the GLib thread under this
+    // same mutex, so the write must also be protected by it.
+    mScanFreq = static_cast<uint32_t>(freq);
     GVariantBuilder builder;
     GVariant * args = nullptr;
     g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
@@ -2317,6 +2342,7 @@ void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
     mScanCb                = nullptr;
     mScanCbContext         = nullptr;
     mActiveScanSubscribeId = 0;
+    mScanFreq              = 0;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCallback cb, void * cbCtx)
@@ -2327,6 +2353,8 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCa
     VerifyOrReturnError(mScanCb == nullptr, CHIP_ERROR_BUSY);
 
     // Already running — update callback and return success.
+    // mScanFreq is not updated here because the hardware subscription frequency
+    // does not change when a second fabric joins an already-running scan.
     if (mBgScanCb != nullptr)
     {
         mBgScanCb    = cb;
@@ -2344,8 +2372,8 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCa
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
     uint8_t is_active                             = false; // passive subscribe = discovery mode
     unsigned int ttl                              = 0;     // 0 = infinite in wpa_supplicant
-    unsigned int freq                             = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
-    unsigned int ssi_len                          = sizeof(struct PAFPublishSSI);
+    unsigned int freq    = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
+    unsigned int ssi_len = sizeof(struct PAFPublishSSI);
     struct PAFPublishSSI PafPublish_ssi;
 
     PafPublish_ssi.DevOpCode = 0xFF;
@@ -2355,6 +2383,9 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCa
     GVariant * ssi_array_variant = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &PafPublish_ssi, ssi_len, sizeof(guint8));
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    // mScanFreq is read by ScanDiscoveryResult on the GLib thread under this
+    // same mutex, so the write must also be protected by it.
+    mScanFreq = static_cast<uint32_t>(freq);
     GVariantBuilder builder;
     g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
     g_variant_builder_add(&builder, "{sv}", "srv_name", g_variant_new_string(srv_name));
@@ -2412,9 +2443,15 @@ void ConnectivityManagerImpl::WiFiPAFStopBackgroundScan()
 
     ChipLogProgress(DeviceLayer, "WiFiPAFStopBackgroundScan: stopping subscribe_id=%u", mBgScanSubscribeId);
 
-    // Disconnect GLib signal handlers before cancelling the subscribe so no
-    // spurious discovery callbacks fire after the background scan is stopped.
+    // Disconnect GLib signal handlers under the mutex so no in-flight
+    // ScanDiscoveryResult callback can run after this point.  Zero mScanFreq
+    // inside the same critical section so there is no window where a callback
+    // could observe mScanFreq=0 for a still-valid discovery result.
     DisconnectScanSignals();
+    {
+        std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+        mScanFreq = 0;
+    }
 
     CHIP_ERROR cancelErr = _WiFiPAFCancelSubscribe(mBgScanSubscribeId);
     if (cancelErr != CHIP_NO_ERROR)

@@ -118,6 +118,21 @@ Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyDisconn
     return Protocols::InteractionModel::Status::Success;
 }
 
+Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyBackgroundScanStartRequest(
+    CP::CapabilitiesBitmap transport, uint16_t timeout, CP::WiFiBandBitmap wiFiBands,
+    chip::FabricIndex fabricIndex, chip::NodeId nodeId,
+    app::CommandHandler * commandObj, const DataModel::InvokeRequest & request)
+{
+    return Protocols::InteractionModel::Status::Success;
+}
+
+Protocols::InteractionModel::Status CommissioningProxyMockDelegate::ProxyBackgroundScanStopRequest(
+    CP::CapabilitiesBitmap transport, CP::WiFiBandBitmap wiFiBands,
+    chip::FabricIndex fabricIndex, chip::NodeId nodeId)
+{
+    return Protocols::InteractionModel::Status::Success;
+}
+
 uint8_t CommissioningProxyMockDelegate::GetScanMaxTime()
 {
     return mScanMaxTime;

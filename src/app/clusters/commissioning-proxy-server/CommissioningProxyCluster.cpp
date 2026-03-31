@@ -44,6 +44,15 @@ constexpr bool HasExactlyOneBitSet(T v)
     return v != 0 && (v & (v - 1)) == 0;
 }
 
+// Masks of all spec-defined bits for each bitmap type.
+// Any bit outside these masks is a reserved bit and SHALL be rejected with InvalidCommand.
+constexpr uint8_t  kValidTransportBits =
+    static_cast<uint8_t>(CapabilitiesBitmap::kBle) |
+    static_cast<uint8_t>(CapabilitiesBitmap::kWiFiPAF);
+constexpr uint16_t kValidWiFiBandBits =
+    static_cast<uint16_t>(WiFiBandBitmap::k2g4) |
+    static_cast<uint16_t>(WiFiBandBitmap::k5g);
+
 CHIP_ERROR CommissioningProxyCluster::Startup(ServerClusterContext & context)
 {
     if (mDelegate.GetEndpointId() != mPath.mEndpointId)
@@ -267,20 +276,37 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyBackGroundSc
     Commands::ProxyBackGroundScanStartRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
+    // Transport must be non-zero — at least one transport must be selected.
+    VerifyOrReturnError(commandData.transport.Raw() != 0, Status::InvalidCommand);
+
+    // Transport must not contain reserved (undefined) bits.
+    VerifyOrReturnError((commandData.transport.Raw() & ~kValidTransportBits) == 0, Status::InvalidCommand);
+
+    // Each selected transport must be supported by this proxy instance.
+    // kWiFiPAF requires the WI feature; kBle is defined in the spec but not
+    // supported by this implementation.
     if (commandData.transport.Has(CapabilitiesBitmap::kWiFiPAF) &&
         !mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
     {
         ChipLogError(Zcl, "CommissioningProxy: kWiFiPAF selected but kWiFiNetworkInterface feature disabled");
         return Status::InvalidTransportType;
     }
+    if (commandData.transport.Has(CapabilitiesBitmap::kBle))
+    {
+        ChipLogError(Zcl, "CommissioningProxy: kBle transport not supported");
+        return Status::InvalidTransportType;
+    }
 
-    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands =
-        static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(0);
+    WiFiBandBitmap wiFiBands = static_cast<WiFiBandBitmap>(0);
     if (commandData.wiFiBands.HasValue())
     {
+        // WiFiBands field is only valid when the WI feature is enabled.
         VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), Status::InvalidCommand);
-        wiFiBands = static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(
-            commandData.wiFiBands.Value().Raw());
+
+        // WiFiBands must not contain reserved bits.
+        VerifyOrReturnError((commandData.wiFiBands.Value().Raw() & ~kValidWiFiBandBits) == 0, Status::InvalidCommand);
+
+        wiFiBands = static_cast<WiFiBandBitmap>(commandData.wiFiBands.Value().Raw());
     }
 
     chip::FabricIndex fabricIndex = request.subjectDescriptor != nullptr
@@ -304,6 +330,13 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyBackGroundSc
     Commands::ProxyBackGroundScanStopRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
+    // transport=0 and no wiFiBands → nothing to stop
+    VerifyOrReturnError(commandData.transport.Raw() != 0 || commandData.wiFiBands.HasValue(), Status::InvalidCommand);
+
+    // Reserved bits in transport must be clear
+    VerifyOrReturnError((commandData.transport.Raw() & ~kValidTransportBits) == 0, Status::InvalidCommand);
+
+    // kWiFiPAF requires WI feature
     if (commandData.transport.Has(CapabilitiesBitmap::kWiFiPAF) &&
         !mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
     {
@@ -311,12 +344,23 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::HandleProxyBackGroundSc
         return Status::InvalidTransportType;
     }
 
-    chip::app::Clusters::CommissioningProxy::WiFiBandBitmap wiFiBands =
-        static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(0);
+    // kBle not supported
+    if (commandData.transport.Has(CapabilitiesBitmap::kBle))
+    {
+        ChipLogError(Zcl, "CommissioningProxy: kBle transport not supported");
+        return Status::InvalidTransportType;
+    }
+
+    WiFiBandBitmap wiFiBands = static_cast<WiFiBandBitmap>(0);
     if (commandData.wiFiBands.HasValue())
     {
-        wiFiBands = static_cast<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap>(
-            commandData.wiFiBands.Value().Raw());
+        // WiFiBands field is only valid when the WI feature is enabled.
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), Status::InvalidCommand);
+
+        // Reserved bits must be clear.
+        VerifyOrReturnError((commandData.wiFiBands.Value().Raw() & ~kValidWiFiBandBits) == 0, Status::InvalidCommand);
+
+        wiFiBands = static_cast<WiFiBandBitmap>(commandData.wiFiBands.Value().Raw());
     }
 
     chip::FabricIndex fabricIndex = request.subjectDescriptor != nullptr

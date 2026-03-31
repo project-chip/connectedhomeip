@@ -109,6 +109,7 @@ struct NanPeerInfo
 
     std::vector<uint8_t> storage;   // ExtendedData storage
     bool hasExtendedData = false;
+    uint16_t band = 0;              // WiFiBandBitmap value derived from scan frequency; 0 = unknown
 
     // Used in the std::set<NanPeerInfo> to determine uniqueness
     bool operator<(const NanPeerInfo & o) const
@@ -245,6 +246,7 @@ public:
     BgScanDiscoveryCallback mBgScanCb = nullptr;
     void * mBgScanCbCtx               = nullptr;
     uint32_t mBgScanSubscribeId        = 0;
+    uint32_t mScanFreq                 = 0; // freq (MHz) used for the current scan (one-shot or background)
 
     // Handler IDs for the three scan GLib signals (nandiscovery-result, nanreceive,
     // nansubscribe-terminated).  Stored so DisconnectScanSignals() can remove exactly
