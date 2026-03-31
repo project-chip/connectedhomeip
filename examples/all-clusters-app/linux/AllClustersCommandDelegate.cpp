@@ -367,7 +367,7 @@ void HandleSimulateSwitchIdle(Json::Value & jsonValue)
 
 /**
  * Named pipe handler for simulating a configuration change
- * by changing the LevelStep value in the ValveConfigurationAndControl cluster
+ * by changing the MaxSpeed value in the PumpConfigurationAndControl cluster
  * and incrementing the ConfigurationVersion
  *
  * Usage example:
@@ -376,42 +376,42 @@ void HandleSimulateSwitchIdle(Json::Value & jsonValue)
 
 void HandleSimulateConfigurationChange(void)
 {
-    // EndpointId endpoint = 1;
-
-    // auto valveCluster = Clusters::ValveConfigurationAndControl::FindClusterOnEndpoint(endpoint);
+    EndpointId endpoint = 1;
 
     // Change a F attribute to simulate a change in configuration of the device
-    uint8_t valveLevelStep = 0;
+    DataModel::Nullable<uint16_t> pumpMaxSpeed = 0;
 
-    // valveLevelStep = valveCluster->mLevelStep;
+    Protocols::InteractionModel::Status status = PumpConfigurationAndControl::Attributes::MaxSpeed::Get(endpoint, pumpMaxSpeed);
+    VerifyOrDie(status == Protocols::InteractionModel::Status::Success);
 
-    // Protocols::InteractionModel::Status status =
-    //     ValveConfigurationAndControl::Attributes::LevelStep::Get(endpoint, &valveLevelStep);
-    // VerifyOrDie(status == Protocols::InteractionModel::Status::Success);
-
-    if (valveLevelStep == 1)
+    if (pumpMaxSpeed.IsNull())
     {
-        // Change fixed LevelStep value to 10
-        valveLevelStep = 10;
+        // If the attribute value is null, set it to a default value of 10000
+        pumpMaxSpeed.SetNonNull(10000);
+    }
+    else if (pumpMaxSpeed.Value() == 10000)
+    {
+        // Change fixed MaxSpeed value to 15000
+        pumpMaxSpeed.SetNonNull(15000);
     }
     else
     {
-        // Change fixed LevelStep value back to 1
-        valveLevelStep = 1;
+        // Change fixed MaxSpeed value back to 10000
+        pumpMaxSpeed.SetNonNull(10000);
     }
 
-    // status = ValveConfigurationAndControl::Attributes::LevelStep::Set(endpoint, valveLevelStep);
-    // if (status != Protocols::InteractionModel::Status::Success)
-    // {
-    //     ChipLogError(NotSpecified, "Failed to set LevelStep value");
-    // }
-    // else
-    // {
-    //     // LevelStep in ValveConfigurationAndControl has been modified,so bump ConfigurationVersion
-    //     // by calling the getter function to obtain a ScopedConfigurationVersionUpdater
-    //     DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction =
-    //         InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNodeDataModelConfigurationVersionUpdater();
-    // }
+    status = PumpConfigurationAndControl::Attributes::MaxSpeed::Set(endpoint, pumpMaxSpeed);
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogError(NotSpecified, "Failed to set MaxSpeed value");
+    }
+    else
+    {
+        // MaxSpeed in PumpConfigurationAndControl has been modified,so bump ConfigurationVersion
+        // by calling the getter function to obtain a ScopedConfigurationVersionUpdater
+        DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction =
+            InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNodeDataModelConfigurationVersionUpdater();
+    }
 }
 
 } // namespace

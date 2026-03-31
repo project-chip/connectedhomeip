@@ -63,12 +63,8 @@ public:
         DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
         VerifyOrDie(provider != nullptr);
 
-        DataModel::NodeDataModelConfiguration nodeConfig;
-        TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance() -> GetDataModelProvider()->GetNodeDataModelConfiguration(
-            nodeConfig);
-
         gServer.Create(optionalAttributeSet, *provider, DeviceLayer::ConfigurationMgr(), DeviceLayer::PlatformMgr(),
-                       InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), nodeConfig);
+                       InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
 
         // This disabling of the unique id attribute is here only for test purposes. The unique id attribute
         // is mandatory, but was optional in previous versions. It is forced to be enabled in the basic information

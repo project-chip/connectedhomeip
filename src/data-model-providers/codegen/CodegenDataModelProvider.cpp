@@ -254,9 +254,13 @@ CHIP_ERROR CodegenDataModelProvider::Internal_BumpNodeDataModelConfigurationVers
     uint16_t size                     = sizeof(tempConfigurationVersion);
     chip::StorageKeyName kStorageKey  = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
 
+    ChipLogProgress(NotSpecified, "Codegen - Internal_BumpNodeDataModelConfigurationVersion 2");
+
     // Bump the configuration version and write to persistent storage
     tempConfigurationVersion++;
     ReturnErrorOnFailure(mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &tempConfigurationVersion, size));
+
+    ChipLogProgress(NotSpecified, "Codegen - Internal_BumpNodeDataModelConfigurationVersion 3");
 
     // If successful, update local cache
     mConfigurationVersion = tempConfigurationVersion;

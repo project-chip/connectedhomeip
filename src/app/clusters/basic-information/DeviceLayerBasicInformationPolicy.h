@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/basic-information/BasicInformationOptionalAttributes.h>
 #include <app/data-model-provider/ProviderMetadataTree.h>
 #include <cstddef>
@@ -36,11 +37,10 @@ public:
     DeviceLayerBasicInformationPolicy(BasicInformationOptionalAttributesSet optionalAttributes,
                                       DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider,
                                       DeviceLayer::ConfigurationManager & configurationManager,
-                                      DeviceLayer::PlatformManager & platformManager, uint16_t subscriptionsPerFabric,
-                                      DataModel::NodeDataModelConfiguration nodeConfig) :
+                                      DeviceLayer::PlatformManager & platformManager, uint16_t subscriptionsPerFabric) :
         mOptionalAttributes(optionalAttributes), mDeviceInstanceInfoProvider(deviceInstanceInfoProvider),
         mConfigurationManager(configurationManager), mPlatformManager(platformManager),
-        mSubscriptionsPerFabric(subscriptionsPerFabric), mNodeConfig(nodeConfig)
+        mSubscriptionsPerFabric(subscriptionsPerFabric)
     {
         // UniqueID is mandatory as of spec revision 4. We force it on here regardless
         // of what optionalAttributeSet says, to prevent accidental non-certifiable configs.
@@ -139,16 +139,13 @@ public:
 
     CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVersion)
     {
-        configurationVersion = mNodeConfig.configurationVersion;
+        DataModel::NodeDataModelConfiguration nodeConfig;
+        TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance() -> GetDataModelProvider()->GetNodeDataModelConfiguration(
+            nodeConfig);
+
+        configurationVersion = nodeConfig.configurationVersion;
         return CHIP_NO_ERROR;
-
-        // return mConfigurationManager.GetConfigurationVersion(configurationVersion);
     }
-
-    // CHIP_ERROR StoreConfigurationVersion(uint32_t configurationVersion)
-    // {
-    //     return mConfigurationManager.StoreConfigurationVersion(configurationVersion);
-    // }
 
     CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)
     {
@@ -195,7 +192,6 @@ private:
     DeviceLayer::ConfigurationManager & mConfigurationManager;
     DeviceLayer::PlatformManager & mPlatformManager;
     uint16_t mSubscriptionsPerFabric;
-    DataModel::NodeDataModelConfiguration mNodeConfig;
 };
 
 } // namespace chip::app::Clusters

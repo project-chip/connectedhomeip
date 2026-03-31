@@ -48,13 +48,9 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
             .template Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
             .template Set<BasicInformation::Attributes::Reachable::Id>();
 
-    DataModel::NodeDataModelConfiguration nodeConfig;
-    TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance() -> GetDataModelProvider()->GetNodeDataModelConfiguration(
-        nodeConfig);
-
     mBasicInformationCluster.Create(optionalAttributeSet, mContext.deviceInstanceInfoProvider, mContext.configurationManager,
                                     mContext.platformManager,
-                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), nodeConfig);
+                                    InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
     mGeneralCommissioningCluster.Create(
