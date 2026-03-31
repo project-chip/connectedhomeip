@@ -342,14 +342,14 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
 {
     ChipLogProgress(AppServer, "CastingPlayer::StopConnecting() called, while ChipDeviceEventHandler.sUdcInProgress: %s",
                     support::ChipDeviceEventHandler::isUdcInProgress() ? "true" : "false");
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
     mTargetCastingPlayer = weak_from_this();
     mIdOptions.LogDetail();
 
     // hack to re-populate mUdcClients cache on TV in order to allow cancel to pass through
-    mIdOptions.mCommissionerPasscode     = true;
-    mIdOptions.mNoPasscode = true;
-    mIdOptions.mCancelPasscode     = false;
+    mIdOptions.mCommissionerPasscode      = true;
+    mIdOptions.mNoPasscode                = true;
+    mIdOptions.mCancelPasscode            = false;
     mIdOptions.mCommissionerPasscodeReady = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     err = SendUserDirectedCommissioningRequest();
