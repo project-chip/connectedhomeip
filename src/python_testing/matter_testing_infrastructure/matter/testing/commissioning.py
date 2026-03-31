@@ -133,7 +133,7 @@ class CommissioningMethod(ABC):
         self.commissioning_info = commissioning_info
 
     async def start(self):
-        self.dev_ctrl.ResetCommissioningParameters()
+        # self.dev_ctrl.ResetCommissioningParameters()
         self._set_tc_ack_if_needed()
 
         await self._prepare()
@@ -150,8 +150,9 @@ class CommissioningMethod(ABC):
                 self.commissioning_info.tc_user_response_to_simulate,
             )
 
+    @abstractmethod
     async def _find_or_establish_pase_if_needed(self):
-        return
+        pass
 
     @abstractmethod
     async def _prepare(self):
@@ -167,7 +168,6 @@ class CommissioningNetworkOnNetwork(CommissioningMethod):
         pass
 
     async def _find_or_establish_pase_if_needed(self):
-
         setup_code = self.info.setup_code
         if setup_code is None:
             setup_code = self.dev_ctrl.CreateManualCode(
