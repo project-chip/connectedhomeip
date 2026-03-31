@@ -94,7 +94,7 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
     FanControl::GetSpeedSetting(mEndpoint, speedSetting);
     FanControl::GetSpeedMax(mEndpoint, speedMax);
 
-    uint8_t newSpeedSetting = speedSetting.IsNull() ? 0 : speedSetting.Value();
+    uint8_t newSpeedSetting = speedSetting.ValueOr(0);
 
     if (aDirection == StepDirectionEnum::kIncrease)
     {
@@ -148,7 +148,7 @@ Status FanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, b
         }
     }
 
-    return FanControl::SetSpeedSetting(mEndpoint, DataModel::Nullable<uint8_t>(newSpeedSetting));
+    return FanControl::SetSpeedSetting(mEndpoint, DataModel::MakeNullable(newSpeedSetting));
 }
 
 CHIP_ERROR FanControlManager::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)

@@ -184,7 +184,7 @@ Status SetWindSettingUI(EndpointId ep, BitMask<WindBitmap> value)
     return FanControl::SetWindSetting(ep, value);
 }
 } // namespace
-// --- 2. UPDATE THIS FUNCTION ---
+
 void FanControl::UpdateState()
 {
     UpdateStateEnum(mEndpointId, mTargetFanMode, mFanMode, &SetFanModeUI, &GetFanModeAdapter);

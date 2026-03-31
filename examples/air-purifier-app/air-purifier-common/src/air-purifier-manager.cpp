@@ -17,10 +17,7 @@
  */
 
 #include <air-purifier-manager.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
-#include <app/clusters/fan-control-server/FanControlCluster.h>
-#include <app/util/attribute-table.h>
 
 using namespace chip;
 using namespace chip::app;
