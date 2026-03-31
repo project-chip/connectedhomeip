@@ -954,16 +954,16 @@ jobs:
             - name: Build linux-x64-camera
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-camera-asan
+                  --target linux-x64-camera-${BUILD_VARIANT}
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-camera-asan"
+                  && rm -rf out/linux-x64-camera-${BUILD_VARIANT}"
 
             - name: Build linux-x64-camera-controller
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-camera-controller-asan
+                  --target linux-x64-camera-controller-${BUILD_VARIANT}
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-camera-controller-asan"
+                  && rm -rf out/linux-x64-camera-controller-${BUILD_VARIANT}"
 
             - name: Build linux-x64-light-data-model-no-unique-id
               run: >-
@@ -975,16 +975,16 @@ jobs:
             - name: Build linux-x64-terms-and-conditions
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-terms-and-conditions-asan-clang
+                  --target linux-x64-terms-and-conditions-${BUILD_VARIANT}-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-terms-and-conditions-asan-clang"
+                  && rm -rf out/linux-x64-terms-and-conditions-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-python-bindings
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-python-bindings-webrtc-asan-clang
+                  --target linux-x64-python-bindings-webrtc-${BUILD_VARIANT}-clang
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-python-bindings-webrtc-asan-clang"
+                  && rm -rf out/linux-x64-python-bindings-webrtc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-jf-control-app
               run: >-
@@ -1125,8 +1125,8 @@ jobs:
                   echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
                   echo "ALL_DEVICES_APP: objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}-clang-test/all-devices-app" >> /tmp/test_env.yaml
                   echo "BRIDGE_APP: objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-clang-test-unified/chip-bridge-app" >> /tmp/test_env.yaml
-                  echo "CAMERA_APP: objdir-clone/linux-x64-camera-asan/chip-camera-app" >> /tmp/test_env.yaml
-                  echo "CAMERA_CONTROLLER_APP: objdir-clone/linux-x64-camera-controller-asan/chip-camera-controller" >> /tmp/test_env.yaml
+                  echo "CAMERA_APP: objdir-clone/linux-x64-camera-${BUILD_VARIANT}/chip-camera-app" >> /tmp/test_env.yaml
+                  echo "CAMERA_CONTROLLER_APP: objdir-clone/linux-x64-camera-controller-${BUILD_VARIANT}/chip-camera-controller" >> /tmp/test_env.yaml
                   echo "CHIP_LOCK_APP: objdir-clone/linux-x64-lock-${BUILD_VARIANT}-clang-test-unified/chip-lock-app" >> /tmp/test_env.yaml
                   echo "CHIP_MICROWAVE_OVEN_APP: objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-clang-test-unified/chip-microwave-oven-app" >> /tmp/test_env.yaml
                   echo "CHIP_RVC_APP: objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-clang-test-unified/chip-rvc-app" >> /tmp/test_env.yaml
@@ -1145,7 +1145,7 @@ jobs:
                   echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
                   echo "PUSH_AV_SERVER: src/tools/push_av_server/server.py" >> /tmp/test_env.yaml
                   echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
-                  echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions-asan-clang/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
+                  echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions-${BUILD_VARIANT}-clang/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "WATER_HEATER_APP: objdir-clone/linux-x64-water-heater-${BUILD_VARIANT}-clang-test/matter-water-heater-app" >> /tmp/test_env.yaml
                   echo "WATER_LEAK_DETECTOR_APP: objdir-clone/linux-x64-water-leak-detector-${BUILD_VARIANT}-clang-test-unified/water-leak-detector-app" >> /tmp/test_env.yaml
