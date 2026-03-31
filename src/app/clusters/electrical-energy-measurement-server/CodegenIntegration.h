@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2026 Project CHIP Authors
+ *    Copyright (c) 2025-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 #pragma once
-#include "ElectricalEnergyMeasurementCluster.h"
-#include "ElectricalEnergyMeasurementDelegate.h"
+#include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
+#include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementDelegate.h>
 
-#include <lib/core/Optional.h>
+#include <app/data-model/Nullable.h>
 #include <lib/support/TimerDelegate.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -60,17 +60,18 @@ private:
     RegisteredServerCluster<ElectricalEnergyMeasurementCluster> mCluster;
 };
 
-bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Structs::EnergyMeasurementStruct::Type> & energyImported,
-                                    const Optional<Structs::EnergyMeasurementStruct::Type> & energyExported);
+bool NotifyCumulativeEnergyMeasured(EndpointId endpointId,
+                                    const DataModel::Nullable<Structs::EnergyMeasurementStruct::Type> & energyImported,
+                                    const DataModel::Nullable<Structs::EnergyMeasurementStruct::Type> & energyExported);
 
-bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<Structs::EnergyMeasurementStruct::Type> & energyImported,
-                                  const Optional<Structs::EnergyMeasurementStruct::Type> & energyExported);
+bool NotifyPeriodicEnergyMeasured(EndpointId endpointId,
+                                  const DataModel::Nullable<Structs::EnergyMeasurementStruct::Type> & energyImported,
+                                  const DataModel::Nullable<Structs::EnergyMeasurementStruct::Type> & energyExported);
 
 CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const Structs::MeasurementAccuracyStruct::Type & accuracy);
 
-CHIP_ERROR SetCumulativeReset(EndpointId endpointId, const Optional<Structs::CumulativeEnergyResetStruct::Type> & cumulativeReset);
-
-const ElectricalEnergyMeasurement::MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId);
+CHIP_ERROR SetCumulativeReset(EndpointId endpointId,
+                              const DataModel::Nullable<Structs::CumulativeEnergyResetStruct::Type> & cumulativeReset);
 
 ElectricalEnergyMeasurementCluster * FindElectricalEnergyMeasurementClusterOnEndpoint(chip::EndpointId endpoint);
 

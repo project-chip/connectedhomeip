@@ -85,15 +85,16 @@ void ElectricalSensorManager::Shutdown()
         mEEMCluster.reset();
     }
 
-    TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementShutdown(mEPMInstance, mEPMDelegate);
+    RETURN_SAFELY_IGNORED ElectricalPowerMeasurementShutdown(mEPMInstance, mEPMDelegate);
 }
 
 CHIP_ERROR ElectricalSensorManager::SendPowerReading(int64_t aActivePower_mW, int64_t aVoltage_mV, int64_t aActiveCurrent_mA)
 {
     VerifyOrReturnError(mEPMDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    TEMPORARY_RETURN_IGNORED mEPMDelegate->SetActivePower(DataModel::MakeNullable(aActivePower_mW));
-    TEMPORARY_RETURN_IGNORED mEPMDelegate->SetVoltage(DataModel::MakeNullable(aVoltage_mV));
-    TEMPORARY_RETURN_IGNORED mEPMDelegate->SetActiveCurrent(DataModel::MakeNullable(aActiveCurrent_mA));
+    // All three setters below only return CHIP_NO_ERROR so we can safely ignore the return value
+    RETURN_SAFELY_IGNORED mEPMDelegate->SetActivePower(DataModel::MakeNullable(aActivePower_mW));
+    RETURN_SAFELY_IGNORED mEPMDelegate->SetVoltage(DataModel::MakeNullable(aVoltage_mV));
+    RETURN_SAFELY_IGNORED mEPMDelegate->SetActiveCurrent(DataModel::MakeNullable(aActiveCurrent_mA));
     return CHIP_NO_ERROR;
 }
 
@@ -110,7 +111,7 @@ void ElectricalSensorManager::GenerateEEMReport()
 {
     if (mEEMCluster)
     {
-        mEEMCluster->Cluster().GenerateReport();
+        mEEMCluster->Cluster().GenerateSnapshots();
     }
 }
 

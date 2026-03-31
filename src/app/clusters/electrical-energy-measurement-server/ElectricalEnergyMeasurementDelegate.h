@@ -27,7 +27,7 @@ namespace ElectricalEnergyMeasurement {
 
 /// Abstract interface for the EEM cluster to pull energy readings from hardware.
 ///
-/// The cluster calls these methods on its reporting timer (or on a manual GenerateReport() call).
+/// The cluster calls these methods on its reporting timer (or on a manual GenerateSnapshots() call).
 /// Implementations should return Nullable null when the value cannot currently be determined.
 /// The cluster only calls getters matching its enabled features.
 /// All values are in milli-watt-hours (mWh).

@@ -121,14 +121,6 @@ ElectricalEnergyMeasurementAttrAccess::ElectricalEnergyMeasurementAttrAccess(Bit
     mClusterListNode.mValue = &mCluster.Cluster();
 }
 
-const ElectricalEnergyMeasurement::MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId)
-{
-    ElectricalEnergyMeasurementCluster * cluster = FindElectricalEnergyMeasurementClusterOnEndpoint(endpointId);
-    VerifyOrReturnValue(cluster != nullptr, nullptr);
-
-    return cluster->GetMeasurementData();
-}
-
 CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const MeasurementAccuracyStruct::Type & accuracy)
 {
     ElectricalEnergyMeasurementCluster * cluster = FindElectricalEnergyMeasurementClusterOnEndpoint(endpointId);
@@ -136,15 +128,17 @@ CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const MeasurementAccura
     return cluster->SetMeasurementAccuracy(accuracy);
 }
 
-CHIP_ERROR SetCumulativeReset(EndpointId endpointId, const Optional<CumulativeEnergyResetStruct::Type> & cumulativeReset)
+CHIP_ERROR SetCumulativeReset(EndpointId endpointId,
+                              const DataModel::Nullable<Structs::CumulativeEnergyResetStruct::Type> & cumulativeReset)
 {
     ElectricalEnergyMeasurementCluster * cluster = FindElectricalEnergyMeasurementClusterOnEndpoint(endpointId);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
     return cluster->SetCumulativeEnergyReset(cumulativeReset);
 }
 
-bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<EnergyMeasurementStruct::Type> & energyImported,
-                                    const Optional<EnergyMeasurementStruct::Type> & energyExported)
+bool NotifyCumulativeEnergyMeasured(EndpointId endpointId,
+                                    const DataModel::Nullable<EnergyMeasurementStruct::Type> & energyImported,
+                                    const DataModel::Nullable<EnergyMeasurementStruct::Type> & energyExported)
 {
     ElectricalEnergyMeasurementCluster * cluster = FindElectricalEnergyMeasurementClusterOnEndpoint(endpointId);
 
@@ -155,8 +149,8 @@ bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Energy
     return true;
 }
 
-bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<EnergyMeasurementStruct::Type> & energyImported,
-                                  const Optional<EnergyMeasurementStruct::Type> & energyExported)
+bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const DataModel::Nullable<EnergyMeasurementStruct::Type> & energyImported,
+                                  const DataModel::Nullable<EnergyMeasurementStruct::Type> & energyExported)
 {
     ElectricalEnergyMeasurementCluster * cluster = FindElectricalEnergyMeasurementClusterOnEndpoint(endpointId);
 

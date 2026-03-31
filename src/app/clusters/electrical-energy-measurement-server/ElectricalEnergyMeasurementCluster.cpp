@@ -59,27 +59,52 @@ bool ValueChanged(const EnergyMeasurementStruct::Type & previous, const EnergyMe
         (previous.reactiveEnergy != newValue.reactiveEnergy);
 }
 
-bool ValueChanged(const Optional<EnergyMeasurementStruct::Type> & previous,
-                  const Optional<EnergyMeasurementStruct::Type> & newValue)
+bool ValueChanged(const DataModel::Nullable<EnergyMeasurementStruct::Type> & previous,
+                  const DataModel::Nullable<EnergyMeasurementStruct::Type> & newValue)
 {
-    if (previous.HasValue() != newValue.HasValue())
+    if (previous.IsNull() != newValue.IsNull())
         return true;
-    if (!previous.HasValue())
+    if (previous.IsNull())
         return false;
     return ValueChanged(previous.Value(), newValue.Value());
 }
 
-bool ValueChanged(const Optional<CumulativeEnergyResetStruct::Type> & previous,
-                  const Optional<CumulativeEnergyResetStruct::Type> & newValue)
+bool ValueChanged(const DataModel::Nullable<CumulativeEnergyResetStruct::Type> & previous,
+                  const DataModel::Nullable<CumulativeEnergyResetStruct::Type> & newValue)
 {
-    if (previous.HasValue() != newValue.HasValue())
+    if (previous.IsNull() != newValue.IsNull())
         return true;
-    if (!previous.HasValue())
+    if (previous.IsNull())
         return false;
     return (previous.Value().importedResetTimestamp != newValue.Value().importedResetTimestamp) ||
         (previous.Value().exportedResetTimestamp != newValue.Value().exportedResetTimestamp) ||
         (previous.Value().importedResetSystime != newValue.Value().importedResetSystime) ||
         (previous.Value().exportedResetSystime != newValue.Value().exportedResetSystime);
+}
+
+/** Rate-limit subscription reporting per attribute: notify when endSystime advanced by at least kMinReportInterval
+ *  (monotonic ms), or when null / missing timestamps / non-monotonic endSystime. */
+bool ShouldNotifyEnergyMeasurementAttribute(const DataModel::Nullable<EnergyMeasurementStruct::Type> & previous,
+                                            const DataModel::Nullable<EnergyMeasurementStruct::Type> & newValue)
+{
+    if (newValue.IsNull())
+    {
+        return true;
+    }
+    if (previous.IsNull() || !previous.Value().endSystime.HasValue())
+    {
+        return true;
+    }
+    if (!newValue.Value().endSystime.HasValue())
+    {
+        return true;
+    }
+
+    const uint64_t minIntervalMs = static_cast<uint64_t>(
+        std::chrono::duration_cast<System::Clock::Milliseconds64>(ElectricalEnergyMeasurementCluster::kMinReportInterval).count());
+    const uint64_t prevEnd = previous.Value().endSystime.Value();
+    const uint64_t newEnd  = newValue.Value().endSystime.Value();
+    return (newEnd < prevEnd) || (newEnd - prevEnd >= minIntervalMs);
 }
 
 } // anonymous namespace
@@ -112,16 +137,16 @@ ElectricalEnergyMeasurementCluster::ElectricalEnergyMeasurementCluster(const Con
         mReportInterval = kMaxReportInterval;
     }
 
-    mMeasurementData.measurementAccuracy.measurementType  = config.accuracyStruct.measurementType;
-    mMeasurementData.measurementAccuracy.measured         = config.accuracyStruct.measured;
-    mMeasurementData.measurementAccuracy.minMeasuredValue = config.accuracyStruct.minMeasuredValue;
-    mMeasurementData.measurementAccuracy.maxMeasuredValue = config.accuracyStruct.maxMeasuredValue;
+    mMeasurementAccuracy.measurementType  = config.accuracyStruct.measurementType;
+    mMeasurementAccuracy.measured         = config.accuracyStruct.measured;
+    mMeasurementAccuracy.minMeasuredValue = config.accuracyStruct.minMeasuredValue;
+    mMeasurementAccuracy.maxMeasuredValue = config.accuracyStruct.maxMeasuredValue;
 
     using RangeType = MeasurementAccuracyRangeStruct::Type;
     ReadOnlyBufferBuilder<RangeType> rangesBuilder;
     VerifyOrDie(rangesBuilder.ReferenceExisting(config.accuracyStruct.accuracyRanges) == CHIP_NO_ERROR);
-    mAccuracyRangesStorage                              = rangesBuilder.TakeBuffer();
-    mMeasurementData.measurementAccuracy.accuracyRanges = mAccuracyRangesStorage;
+    mAccuracyRangesStorage              = rangesBuilder.TakeBuffer();
+    mMeasurementAccuracy.accuracyRanges = mAccuracyRangesStorage;
 }
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::Startup(ServerClusterContext & context)
@@ -130,7 +155,7 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::Startup(ServerClusterContext & co
 
     if (mFeatureFlags.HasAny(Feature::kCumulativeEnergy, Feature::kPeriodicEnergy))
     {
-        StartReportTimer();
+        StartSnapshotTimer();
     }
 
     return CHIP_NO_ERROR;
@@ -138,150 +163,125 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::Startup(ServerClusterContext & co
 
 void ElectricalEnergyMeasurementCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    CancelReportTimer();
+    CancelSnapshotTimer();
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
-void ElectricalEnergyMeasurementCluster::StartReportTimer()
+void ElectricalEnergyMeasurementCluster::StartSnapshotTimer()
 {
-    CancelReportTimer();
-    ReturnAndLogOnFailure(mTimerDelegate.StartTimer(&mReportTimer, mReportInterval), AppServer,
+    CancelSnapshotTimer();
+    ReturnAndLogOnFailure(mTimerDelegate.StartTimer(&mSnapshotTimer, mReportInterval), AppServer,
                           "EEM: Failed to start report timer");
 }
 
-void ElectricalEnergyMeasurementCluster::CancelReportTimer()
+void ElectricalEnergyMeasurementCluster::CancelSnapshotTimer()
 {
-    if (mTimerDelegate.IsTimerActive(&mReportTimer))
+    if (mTimerDelegate.IsTimerActive(&mSnapshotTimer))
     {
-        mTimerDelegate.CancelTimer(&mReportTimer);
+        mTimerDelegate.CancelTimer(&mSnapshotTimer);
     }
 }
 
-void ElectricalEnergyMeasurementCluster::ReportTimer::TimerFired()
+void ElectricalEnergyMeasurementCluster::SnapshotTimer::TimerFired()
 {
-    mCluster.DoGenerateReport();
-    mCluster.StartReportTimer();
+    mCluster.DoGenerateSnapshots();
+    mCluster.mLastReportTime = mCluster.mTimerDelegate.GetCurrentMonotonicTimestamp();
+    mCluster.StartSnapshotTimer();
 }
 
-Optional<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct>
+DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct>
 ElectricalEnergyMeasurementCluster::BuildMeasurement(DataModel::Nullable<int64_t> energy,
-                                                     const Optional<EnergyMeasurementStruct> & previous)
+                                                     const DataModel::Nullable<EnergyMeasurementStruct> & previous,
+                                                     bool isCumulative)
 {
     if (energy.IsNull())
     {
-        return Optional<EnergyMeasurementStruct>();
+        return DataModel::NullNullable;
     }
 
     EnergyMeasurementStruct measurement;
     measurement.energy = energy.Value();
 
-    // Carry forward previous endTimestamp/endSystime as new start
-    measurement.startTimestamp.ClearValue();
-    measurement.startSystime.ClearValue();
-    if (previous.HasValue())
+    if (!isCumulative)
     {
-        measurement.startTimestamp = previous.Value().endTimestamp;
-        measurement.startSystime   = previous.Value().endSystime;
+        if (!previous.IsNull())
+        {
+            measurement.startTimestamp = previous.Value().endTimestamp;
+            measurement.startSystime   = previous.Value().endSystime;
+        }
     }
 
-    System::Clock::Milliseconds64 sysTimeMs = mTimerDelegate.GetCurrentMonotonicTimestamp();
-    measurement.endSystime.SetValue(static_cast<uint64_t>(sysTimeMs.count()));
+    // Get current timestamp
+    uint32_t currentTimestamp;
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(currentTimestamp);
+    if (err == CHIP_NO_ERROR)
+    {
+        measurement.endTimestamp.SetValue(currentTimestamp);
+    }
+    else
+    {
+        System::Clock::Milliseconds64 sysTimeMs = mTimerDelegate.GetCurrentMonotonicTimestamp();
+        measurement.endSystime.SetValue(static_cast<uint64_t>(sysTimeMs.count()));
+    }
 
-    return MakeOptional(measurement);
+    return DataModel::MakeNullable(measurement);
 }
 
-void ElectricalEnergyMeasurementCluster::GenerateReport()
+void ElectricalEnergyMeasurementCluster::GenerateSnapshots()
 {
-    // Enforce min 1s between reports
+    // Enforce min 1s between events
     System::Clock::Timestamp now = mTimerDelegate.GetCurrentMonotonicTimestamp();
     if (mLastReportTime != System::Clock::kZero && (now - mLastReportTime) < kMinReportInterval)
     {
         return;
     }
 
-    DoGenerateReport();
-    StartReportTimer();
+    DoGenerateSnapshots();
+    StartSnapshotTimer();
 }
 
-void ElectricalEnergyMeasurementCluster::DoGenerateReport()
+void ElectricalEnergyMeasurementCluster::DoGenerateSnapshots()
 {
-    mLastReportTime = mTimerDelegate.GetCurrentMonotonicTimestamp();
-
-    // Generate cumulative energy report if feature is enabled
     if (mFeatureFlags.Has(Feature::kCumulativeEnergy))
     {
-        Events::CumulativeEnergyMeasured::Type event;
-        bool hasData = false;
+        Nullable<EnergyMeasurementStruct> imported = DataModel::NullNullable;
+        Nullable<EnergyMeasurementStruct> exported = DataModel::NullNullable;
 
         if (mFeatureFlags.Has(Feature::kImportedEnergy))
         {
-            auto measurement = BuildMeasurement(mDelegate.GetCumulativeEnergyImported(), mMeasurementData.cumulativeImported);
-            if (measurement.HasValue())
-            {
-                TEMPORARY_RETURN_IGNORED SetCumulativeEnergyImported(measurement);
-                event.energyImported = measurement;
-                hasData              = true;
-            }
+            imported = BuildMeasurement(mDelegate.GetCumulativeEnergyImported(), mCumulativeImported, true);
         }
-
         if (mFeatureFlags.Has(Feature::kExportedEnergy))
         {
-            auto measurement = BuildMeasurement(mDelegate.GetCumulativeEnergyExported(), mMeasurementData.cumulativeExported);
-            if (measurement.HasValue())
-            {
-                TEMPORARY_RETURN_IGNORED SetCumulativeEnergyExported(measurement);
-                event.energyExported = measurement;
-                hasData              = true;
-            }
+            exported = BuildMeasurement(mDelegate.GetCumulativeEnergyExported(), mCumulativeExported, true);
         }
-
-        if (hasData && mContext != nullptr)
-        {
-            mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-        }
+        CumulativeEnergySnapshot(imported, exported);
     }
 
-    // Generate periodic energy report if feature is enabled
     if (mFeatureFlags.Has(Feature::kPeriodicEnergy))
     {
-        Events::PeriodicEnergyMeasured::Type event;
-        bool hasData = false;
+        Nullable<EnergyMeasurementStruct> imported = DataModel::NullNullable;
+        Nullable<EnergyMeasurementStruct> exported = DataModel::NullNullable;
 
         if (mFeatureFlags.Has(Feature::kImportedEnergy))
         {
-            auto measurement = BuildMeasurement(mDelegate.GetPeriodicEnergyImported(), mMeasurementData.periodicImported);
-            if (measurement.HasValue())
-            {
-                TEMPORARY_RETURN_IGNORED SetPeriodicEnergyImported(measurement);
-                event.energyImported = measurement;
-                hasData              = true;
-            }
+            imported = BuildMeasurement(mDelegate.GetPeriodicEnergyImported(), mPeriodicImported, false);
         }
-
         if (mFeatureFlags.Has(Feature::kExportedEnergy))
         {
-            auto measurement = BuildMeasurement(mDelegate.GetPeriodicEnergyExported(), mMeasurementData.periodicExported);
-            if (measurement.HasValue())
-            {
-                TEMPORARY_RETURN_IGNORED SetPeriodicEnergyExported(measurement);
-                event.energyExported = measurement;
-                hasData              = true;
-            }
+            exported = BuildMeasurement(mDelegate.GetPeriodicEnergyExported(), mPeriodicExported, false);
         }
-
-        if (hasData && mContext != nullptr)
-        {
-            mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-        }
+        PeriodicEnergySnapshot(imported, exported);
     }
 }
 
 void ElectricalEnergyMeasurementCluster::GetMeasurementAccuracy(MeasurementAccuracyStruct & outValue) const
 {
-    outValue = mMeasurementData.measurementAccuracy;
+    outValue = mMeasurementAccuracy;
 }
 
-CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyImported(Optional<EnergyMeasurementStruct> & outValue) const
+CHIP_ERROR
+ElectricalEnergyMeasurementCluster::GetCumulativeEnergyImported(DataModel::Nullable<EnergyMeasurementStruct> & outValue) const
 {
     if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy,
                               ElectricalEnergyMeasurement::Feature::kImportedEnergy))
@@ -290,11 +290,12 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyImported(Optio
             Zcl, "Electrical Energy Measurement: CumulativeEnergyImported requires kCumulativeEnergy and kImportedEnergy features");
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
-    outValue = mMeasurementData.cumulativeImported;
+    outValue = mCumulativeImported;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyExported(Optional<EnergyMeasurementStruct> & outValue) const
+CHIP_ERROR
+ElectricalEnergyMeasurementCluster::GetCumulativeEnergyExported(Nullable<EnergyMeasurementStruct> & outValue) const
 {
     if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy,
                               ElectricalEnergyMeasurement::Feature::kExportedEnergy))
@@ -303,11 +304,11 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyExported(Optio
             Zcl, "Electrical Energy Measurement: CumulativeEnergyExported requires kCumulativeEnergy and kExportedEnergy features");
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
-    outValue = mMeasurementData.cumulativeExported;
+    outValue = mCumulativeExported;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ElectricalEnergyMeasurementCluster::GetPeriodicEnergyImported(Optional<EnergyMeasurementStruct> & outValue) const
+CHIP_ERROR ElectricalEnergyMeasurementCluster::GetPeriodicEnergyImported(Nullable<EnergyMeasurementStruct> & outValue) const
 {
     if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kPeriodicEnergy,
                               ElectricalEnergyMeasurement::Feature::kImportedEnergy))
@@ -316,11 +317,11 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::GetPeriodicEnergyImported(Optiona
                      "Electrical Energy Measurement: PeriodicEnergyImported requires kPeriodicEnergy and kImportedEnergy features");
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
-    outValue = mMeasurementData.periodicImported;
+    outValue = mPeriodicImported;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ElectricalEnergyMeasurementCluster::GetPeriodicEnergyExported(Optional<EnergyMeasurementStruct> & outValue) const
+CHIP_ERROR ElectricalEnergyMeasurementCluster::GetPeriodicEnergyExported(Nullable<EnergyMeasurementStruct> & outValue) const
 {
     if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kPeriodicEnergy,
                               ElectricalEnergyMeasurement::Feature::kExportedEnergy))
@@ -329,29 +330,29 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::GetPeriodicEnergyExported(Optiona
                      "Electrical Energy Measurement: PeriodicEnergyExported requires kPeriodicEnergy and kExportedEnergy features");
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
-    outValue = mMeasurementData.periodicExported;
+    outValue = mPeriodicExported;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyReset(Optional<CumulativeEnergyResetStruct> & outValue) const
+CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyReset(Nullable<CumulativeEnergyResetStruct> & outValue) const
 {
     if (!mEnabledOptionalAttributes.IsSet(CumulativeEnergyReset::Id))
     {
         ChipLogError(Zcl, "Electrical Energy Measurement: CumulativeEnergyReset requires kCumulativeEnergy feature");
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
-    outValue = mMeasurementData.cumulativeReset;
+    outValue = mCumulativeReset;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::SetMeasurementAccuracy(const MeasurementAccuracyStruct & value)
 {
-    if (ValueChanged(mMeasurementData.measurementAccuracy, value))
+    if (ValueChanged(mMeasurementAccuracy, value))
     {
-        mMeasurementData.measurementAccuracy.measurementType  = value.measurementType;
-        mMeasurementData.measurementAccuracy.measured         = value.measured;
-        mMeasurementData.measurementAccuracy.minMeasuredValue = value.minMeasuredValue;
-        mMeasurementData.measurementAccuracy.maxMeasuredValue = value.maxMeasuredValue;
+        mMeasurementAccuracy.measurementType  = value.measurementType;
+        mMeasurementAccuracy.measured         = value.measured;
+        mMeasurementAccuracy.minMeasuredValue = value.minMeasuredValue;
+        mMeasurementAccuracy.maxMeasuredValue = value.maxMeasuredValue;
         NotifyAttributeChanged(Accuracy::Id);
     }
 
@@ -360,34 +361,42 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::SetMeasurementAccuracy(const Meas
     {
         ReadOnlyBufferBuilder<MeasurementAccuracyRangeStruct::Type> rangesBuilder;
         ReturnErrorOnFailure(rangesBuilder.AppendElements(value.accuracyRanges));
-        mAccuracyRangesStorage                              = rangesBuilder.TakeBuffer();
-        mMeasurementData.measurementAccuracy.accuracyRanges = mAccuracyRangesStorage;
+        mAccuracyRangesStorage              = rangesBuilder.TakeBuffer();
+        mMeasurementAccuracy.accuracyRanges = mAccuracyRangesStorage;
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ElectricalEnergyMeasurementCluster::SetCumulativeEnergyImported(const Optional<EnergyMeasurementStruct> & value)
+CHIP_ERROR ElectricalEnergyMeasurementCluster::SetCumulativeEnergyImported(const Nullable<EnergyMeasurementStruct> & value)
 {
-    if (ValueChanged(mMeasurementData.cumulativeImported, value))
+    if (ValueChanged(mCumulativeImported, value))
     {
-        mMeasurementData.cumulativeImported = value;
-        NotifyAttributeChanged(CumulativeEnergyImported::Id);
+        const bool notify   = ShouldNotifyEnergyMeasurementAttribute(mCumulativeImported, value);
+        mCumulativeImported = value;
+        if (notify)
+        {
+            NotifyAttributeChanged(CumulativeEnergyImported::Id);
+        }
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ElectricalEnergyMeasurementCluster::SetCumulativeEnergyExported(const Optional<EnergyMeasurementStruct> & value)
+CHIP_ERROR ElectricalEnergyMeasurementCluster::SetCumulativeEnergyExported(const Nullable<EnergyMeasurementStruct> & value)
 {
-    if (ValueChanged(mMeasurementData.cumulativeExported, value))
+    if (ValueChanged(mCumulativeExported, value))
     {
-        mMeasurementData.cumulativeExported = value;
-        NotifyAttributeChanged(CumulativeEnergyExported::Id);
+        const bool notify   = ShouldNotifyEnergyMeasurementAttribute(mCumulativeExported, value);
+        mCumulativeExported = value;
+        if (notify)
+        {
+            NotifyAttributeChanged(CumulativeEnergyExported::Id);
+        }
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ElectricalEnergyMeasurementCluster::SetPeriodicEnergyImported(const Optional<EnergyMeasurementStruct> & value)
+CHIP_ERROR ElectricalEnergyMeasurementCluster::SetPeriodicEnergyImported(const Nullable<EnergyMeasurementStruct> & value)
 {
     if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kPeriodicEnergy,
                               ElectricalEnergyMeasurement::Feature::kImportedEnergy))
@@ -396,15 +405,19 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::SetPeriodicEnergyImported(const O
                      "Electrical Energy Measurement: PeriodicEnergyImported requires kPeriodicEnergy and kImportedEnergy features");
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
-    if (ValueChanged(mMeasurementData.periodicImported, value))
+    if (ValueChanged(mPeriodicImported, value))
     {
-        mMeasurementData.periodicImported = value;
-        NotifyAttributeChanged(PeriodicEnergyImported::Id);
+        const bool notify = ShouldNotifyEnergyMeasurementAttribute(mPeriodicImported, value);
+        mPeriodicImported = value;
+        if (notify)
+        {
+            NotifyAttributeChanged(PeriodicEnergyImported::Id);
+        }
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ElectricalEnergyMeasurementCluster::SetPeriodicEnergyExported(const Optional<EnergyMeasurementStruct> & value)
+CHIP_ERROR ElectricalEnergyMeasurementCluster::SetPeriodicEnergyExported(const Nullable<EnergyMeasurementStruct> & value)
 {
     if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kPeriodicEnergy,
                               ElectricalEnergyMeasurement::Feature::kExportedEnergy))
@@ -414,24 +427,28 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::SetPeriodicEnergyExported(const O
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 
-    if (ValueChanged(mMeasurementData.periodicExported, value))
+    if (ValueChanged(mPeriodicExported, value))
     {
-        mMeasurementData.periodicExported = value;
-        NotifyAttributeChanged(PeriodicEnergyExported::Id);
+        const bool notify = ShouldNotifyEnergyMeasurementAttribute(mPeriodicExported, value);
+        mPeriodicExported = value;
+        if (notify)
+        {
+            NotifyAttributeChanged(PeriodicEnergyExported::Id);
+        }
     }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ElectricalEnergyMeasurementCluster::SetCumulativeEnergyReset(const Optional<CumulativeEnergyResetStruct> & value)
+CHIP_ERROR ElectricalEnergyMeasurementCluster::SetCumulativeEnergyReset(const Nullable<CumulativeEnergyResetStruct> & value)
 {
     if (!mEnabledOptionalAttributes.IsSet(CumulativeEnergyReset::Id))
     {
         ChipLogError(Zcl, "Electrical Energy Measurement: CumulativeEnergyReset requires kCumulativeEnergy feature");
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
-    if (ValueChanged(mMeasurementData.cumulativeReset, value))
+    if (ValueChanged(mCumulativeReset, value))
     {
-        mMeasurementData.cumulativeReset = value;
+        mCumulativeReset = value;
         NotifyAttributeChanged(CumulativeEnergyReset::Id);
     }
     return CHIP_NO_ERROR;
@@ -449,42 +466,42 @@ DataModel::ActionReturnStatus ElectricalEnergyMeasurementCluster::ReadAttribute(
         return encoder.Encode(kRevision);
 
     case Accuracy::Id:
-        return encoder.Encode(mMeasurementData.measurementAccuracy);
+        return encoder.Encode(mMeasurementAccuracy);
 
     case CumulativeEnergyImported::Id:
-        if (!mMeasurementData.cumulativeImported.HasValue())
+        if (mCumulativeImported.IsNull())
         {
             return encoder.EncodeNull();
         }
-        return encoder.Encode(mMeasurementData.cumulativeImported.Value());
+        return encoder.Encode(mCumulativeImported.Value());
 
     case CumulativeEnergyExported::Id:
-        if (!mMeasurementData.cumulativeExported.HasValue())
+        if (mCumulativeExported.IsNull())
         {
             return encoder.EncodeNull();
         }
-        return encoder.Encode(mMeasurementData.cumulativeExported.Value());
+        return encoder.Encode(mCumulativeExported.Value());
 
     case PeriodicEnergyImported::Id:
-        if (!mMeasurementData.periodicImported.HasValue())
+        if (mPeriodicImported.IsNull())
         {
             return encoder.EncodeNull();
         }
-        return encoder.Encode(mMeasurementData.periodicImported.Value());
+        return encoder.Encode(mPeriodicImported.Value());
 
     case PeriodicEnergyExported::Id:
-        if (!mMeasurementData.periodicExported.HasValue())
+        if (mPeriodicExported.IsNull())
         {
             return encoder.EncodeNull();
         }
-        return encoder.Encode(mMeasurementData.periodicExported.Value());
+        return encoder.Encode(mPeriodicExported.Value());
 
     case CumulativeEnergyReset::Id:
-        if (!mMeasurementData.cumulativeReset.HasValue())
+        if (mCumulativeReset.IsNull())
         {
             return encoder.EncodeNull();
         }
-        return encoder.Encode(mMeasurementData.cumulativeReset.Value());
+        return encoder.Encode(mCumulativeReset.Value());
 
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
@@ -507,48 +524,56 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::Attributes(const ConcreteClusterP
     return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), mEnabledOptionalAttributes);
 }
 
-void ElectricalEnergyMeasurementCluster::CumulativeEnergySnapshot(const Optional<EnergyMeasurementStruct> & energyImported,
-                                                                  const Optional<EnergyMeasurementStruct> & energyExported)
+void ElectricalEnergyMeasurementCluster::CumulativeEnergySnapshot(const Nullable<EnergyMeasurementStruct> & energyImported,
+                                                                  const Nullable<EnergyMeasurementStruct> & energyExported)
 {
     VerifyOrReturn(Features().Has(Feature::kCumulativeEnergy));
     Events::CumulativeEnergyMeasured::Type event;
+    bool hasData = false;
 
-    if (Features().Has(Feature::kImportedEnergy))
+    if (Features().Has(Feature::kImportedEnergy) && !energyImported.IsNull())
     {
-        TEMPORARY_RETURN_IGNORED SetCumulativeEnergyImported(energyImported);
-        event.energyImported = energyImported;
+        RETURN_SAFELY_IGNORED SetCumulativeEnergyImported(energyImported);
+        event.energyImported.SetValue(energyImported.Value());
+        hasData = true;
     }
 
-    if (Features().Has(Feature::kExportedEnergy))
+    if (Features().Has(Feature::kExportedEnergy) && !energyExported.IsNull())
     {
-        TEMPORARY_RETURN_IGNORED SetCumulativeEnergyExported(energyExported);
-        event.energyExported = energyExported;
+        RETURN_SAFELY_IGNORED SetCumulativeEnergyExported(energyExported);
+        event.energyExported.SetValue(energyExported.Value());
+        hasData = true;
     }
 
-    VerifyOrReturn(mContext != nullptr);
+    VerifyOrReturn(hasData && mContext != nullptr);
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    mLastReportTime = mTimerDelegate.GetCurrentMonotonicTimestamp();
 }
 
-void ElectricalEnergyMeasurementCluster::PeriodicEnergySnapshot(const Optional<EnergyMeasurementStruct> & energyImported,
-                                                                const Optional<EnergyMeasurementStruct> & energyExported)
+void ElectricalEnergyMeasurementCluster::PeriodicEnergySnapshot(const Nullable<EnergyMeasurementStruct> & energyImported,
+                                                                const Nullable<EnergyMeasurementStruct> & energyExported)
 {
     VerifyOrReturn(Features().Has(Feature::kPeriodicEnergy));
     Events::PeriodicEnergyMeasured::Type event;
+    bool hasData = false;
 
-    if (Features().Has(Feature::kImportedEnergy))
+    if (Features().Has(Feature::kImportedEnergy) && !energyImported.IsNull())
     {
-        TEMPORARY_RETURN_IGNORED SetPeriodicEnergyImported(energyImported);
-        event.energyImported = energyImported;
+        RETURN_SAFELY_IGNORED SetPeriodicEnergyImported(energyImported);
+        event.energyImported.SetValue(energyImported.Value());
+        hasData = true;
     }
 
-    if (Features().Has(Feature::kExportedEnergy))
+    if (Features().Has(Feature::kExportedEnergy) && !energyExported.IsNull())
     {
-        TEMPORARY_RETURN_IGNORED SetPeriodicEnergyExported(energyExported);
-        event.energyExported = energyExported;
+        RETURN_SAFELY_IGNORED SetPeriodicEnergyExported(energyExported);
+        event.energyExported.SetValue(energyExported.Value());
+        hasData = true;
     }
 
-    VerifyOrReturn(mContext != nullptr);
+    VerifyOrReturn(hasData && mContext != nullptr);
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    mLastReportTime = mTimerDelegate.GetCurrentMonotonicTimestamp();
 }
 
 } // namespace ElectricalEnergyMeasurement
