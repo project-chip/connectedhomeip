@@ -351,11 +351,11 @@ std::optional<DataModel::ActionReturnStatus> HandleCSRRequest(CommandHandler * c
         ChipLogProgress(Zcl, "OpCreds: AllocatePendingOperationalKey succeeded");
 
         // Encode the NOCSR elements with the CSR and Nonce
-        nocsrLengthEstimate = TLV::EstimateStructOverhead(csrSpan.size(),           // CSR buffer
-                                                          CSRNonce.size(),           // CSR Nonce
-                                                          vendorReserved1.size(),    // vendor_reserved1
-                                                          vendorReserved2.size(),    // vendor_reserved2
-                                                          vendorReserved3.size()     // vendor_reserved3
+        nocsrLengthEstimate = TLV::EstimateStructOverhead(csrSpan.size(),         // CSR buffer
+                                                          CSRNonce.size(),        // CSR Nonce
+                                                          vendorReserved1.size(), // vendor_reserved1
+                                                          vendorReserved2.size(), // vendor_reserved2
+                                                          vendorReserved3.size()  // vendor_reserved3
         );
 
         if (!nocsrElements.Alloc(nocsrLengthEstimate + attestationChallenge.size()))
