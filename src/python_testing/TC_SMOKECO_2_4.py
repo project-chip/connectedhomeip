@@ -194,7 +194,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
 
         self.step(4)
         test_event_triggers_enabled = await self.read_general_diagnostics_test_event_triggers_enabled()
-        asserts.assert_equal(test_event_triggers_enabled, 1)
+        asserts.assert_true(test_event_triggers_enabled, "Event triggers are not enabled on General Diagnostics Cluster")
 
         # Start block BatteryWarning
         self.step(5)
@@ -344,7 +344,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
             expected_cluster=self.smokeco_cluster, expected_attribute=self.smokeco_cluster.Attributes.TestInProgress)
         await test_in_progress_handler.start(dev_ctrl=self.default_controller, node_id=self.dut_node_id, endpoint=self.get_endpoint(), max_interval_sec=30)
         test_in_progress = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.TestInProgress)
-        asserts.assert_equal(test_in_progress, 0)
+        asserts.assert_false(test_in_progress, "Test in progress and should not be in progress.")
 
         self.step(36)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
@@ -357,7 +357,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         self.step(38)
         test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
         log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
-        asserts.assert_equal(test_in_progress_report.value, True)
+        asserts.assert_true(test_in_progress_report.value, "Test is not in progresss and should be in progress.")
 
         self.step(39)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
@@ -387,7 +387,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         self.step(45)
         test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
         log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
-        asserts.assert_equal(test_in_progress_report.value, True)
+        asserts.assert_true(test_in_progress_report.value, "Test is not in progress and should be in progress.")
 
         self.step(46)
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
@@ -396,7 +396,7 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
         self.step(47)
         test_in_progress_report = test_in_progress_handler.wait_for_attribute_report(timeout_sec=180)
         log.info(f"Test in progress report {test_in_progress_report} with value {test_in_progress_report.value}")
-        asserts.assert_equal(test_in_progress_report.value, False)
+        asserts.assert_false(test_in_progress_report.value, "Test should not be in progress and is on progress.")
 
         self.step(48)
         await self.read_smokeco_event(self.smokeco_cluster.Events.SelfTestComplete)
