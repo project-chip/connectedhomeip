@@ -17,10 +17,10 @@
 
 #include "IMShellCommands.h"
 
-#include <app/InteractionModelEngine.h> 
-#include <app/ReadClient.h>             
-#include <app/ReadPrepareParams.h>      
-#include <app/server/Server.h>          
+#include <app/InteractionModelEngine.h>
+#include <app/ReadClient.h>
+#include <app/ReadPrepareParams.h>
+#include <app/server/Server.h>
 #include <clusters/OccupancySensing/AttributeIds.h>
 #include <clusters/OccupancySensing/ClusterId.h>
 #include <clusters/OnOff/AttributeIds.h>
@@ -55,9 +55,9 @@ constexpr uint8_t kMaxSubscriptions           = 10;
 
 struct SubscriptionInfo
 {
-    ReadClient * client   = nullptr;
-    NodeId nodeId         = 0;
-    ClusterId clusterId   = 0;
+    ReadClient * client     = nullptr;
+    NodeId nodeId           = 0;
+    ClusterId clusterId     = 0;
     AttributeId attributeId = 0;
 };
 
@@ -70,9 +70,9 @@ public:
     {
         if (!aStatus.IsSuccess())
         {
-            streamer_printf(streamer_get(), "IM: Attribute error ep=%u cluster=0x%08" PRIX32 " attr=0x%08" PRIX32 " status=0x%02x\r\n",
-                            aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
-                            to_underlying(aStatus.mStatus));
+            streamer_printf(streamer_get(),
+                            "IM: Attribute error ep=%u cluster=0x%08" PRIX32 " attr=0x%08" PRIX32 " status=0x%02x\r\n",
+                            aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, to_underlying(aStatus.mStatus));
             return;
         }
 
@@ -86,7 +86,7 @@ public:
                 {
                     streamer_printf(streamer_get(), "Attribute Report for Cluster OnOff attribute OnOff Value %s\r\n",
                                     value ? "ON" : "OFF");
-                } 
+                }
                 else
                 {
                     streamer_printf(streamer_get(), "Attribute Report for Cluster OnOff attribute OnOff Value <invalid>\r\n");
@@ -105,8 +105,8 @@ public:
                 uint8_t value = 0;
                 if (apData != nullptr && apData->Get(value) == CHIP_NO_ERROR)
                 {
-                    streamer_printf(streamer_get(), "Attribute Report for Cluster OccupancySensing attribute Occupancy Value %u\r\n",
-                                    value);
+                    streamer_printf(streamer_get(),
+                                    "Attribute Report for Cluster OccupancySensing attribute Occupancy Value %u\r\n", value);
                 }
                 else
                 {
@@ -209,9 +209,9 @@ CHIP_ERROR ShowFabricHandler(int argc, char ** argv)
 CHIP_ERROR SubscribeHandler(int argc, char ** argv)
 {
     // Usage: im subscribe <fabricIndex> <nodeId> <endpointId> <clusterId> <attributeId>
-    VerifyOrReturnError(argc == 5, CHIP_ERROR_INVALID_ARGUMENT,
-                        streamer_printf(streamer_get(),
-                                        "Usage: im subscribe <fabricIndex> <nodeId> <endpointId> <clusterId> <attributeId>\r\n"););
+    VerifyOrReturnError(
+        argc == 5, CHIP_ERROR_INVALID_ARGUMENT,
+        streamer_printf(streamer_get(), "Usage: im subscribe <fabricIndex> <nodeId> <endpointId> <clusterId> <attributeId>\r\n"););
 
     // Find a free slot
     uint8_t freeSlot = kMaxSubscriptions;
@@ -287,7 +287,8 @@ CHIP_ERROR SubscribeHandler(int argc, char ** argv)
     sSubscriptions[freeSlot].attributeId = attributeId;
 
     streamer_printf(streamer_get(),
-                    "Subscribing to node 0x" ChipLogFormatX64 " on fabric %u ep=%u cluster=0x%08" PRIX32 " attr=0x%08" PRIX32 " (slot %u)\r\n",
+                    "Subscribing to node 0x" ChipLogFormatX64 " on fabric %u ep=%u cluster=0x%08" PRIX32 " attr=0x%08" PRIX32
+                    " (slot %u)\r\n",
                     ChipLogValueX64(nodeId), fabricIndex, endpointId, clusterId, attributeId, freeSlot);
 
     return CHIP_NO_ERROR;
@@ -311,8 +312,9 @@ CHIP_ERROR SubscriptionsHandler(int argc, char ** argv)
     {
         if (sSubscriptions[i].client != nullptr)
         {
-            streamer_printf(streamer_get(), "  [%u] NodeId=0x" ChipLogFormatX64 " Cluster=0x%08" PRIX32 " Attribute=0x%08" PRIX32 "\r\n",
-                            i, ChipLogValueX64(sSubscriptions[i].nodeId), sSubscriptions[i].clusterId, sSubscriptions[i].attributeId);
+            streamer_printf(streamer_get(),
+                            "  [%u] NodeId=0x" ChipLogFormatX64 " Cluster=0x%08" PRIX32 " Attribute=0x%08" PRIX32 "\r\n", i,
+                            ChipLogValueX64(sSubscriptions[i].nodeId), sSubscriptions[i].clusterId, sSubscriptions[i].attributeId);
         }
     }
 

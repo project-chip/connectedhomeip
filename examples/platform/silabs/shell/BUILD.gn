@@ -54,6 +54,8 @@ source_set("im") {
   public_configs = [ ":im-shell-config" ]
 
   deps = [
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/server:server",
     "${shell_dependency_path}:matter-shell",
   ]
 }
