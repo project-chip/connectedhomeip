@@ -116,7 +116,7 @@ class SmokeCoBaseTest(MatterBaseTest):
             attribute=self.gd_cluster.Attributes.TestEventTriggersEnabled,
             dev_ctrl=self.default_controller,
             endpoint=0)
-        asserts.assert_equal(test_event_trigger_enabled, True, "TestEventTriggersEnabled is not True")
+        asserts.assert_true(test_event_trigger_enabled)
 
         self.step(5)
         # By default on endpoint 0
@@ -141,7 +141,7 @@ class SmokeCoBaseTest(MatterBaseTest):
 
         self.step(10)
         test_in_progress = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.TestInProgress)
-        asserts.assert_equal(test_in_progress, False)
+        asserts.assert_false(test_in_progress)
 
         # Gather these steps
         self.step(11)
@@ -154,7 +154,7 @@ class SmokeCoBaseTest(MatterBaseTest):
 
         self.step(13)
         test_in_progress = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.TestInProgress)
-        asserts.assert_equal(test_in_progress, False)
+        asserts.assert_false(test_in_progress)
 
         self.step(14)
         await self.send_test_event_triggers(eventTrigger=pixit_critical)
