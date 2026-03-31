@@ -17,7 +17,7 @@ The first commit introducing this work is `70089581bd`.
 -   [Changed Files — Detailed Notes](#changed-files--detailed-notes)
     -   [Cluster Server](#cluster-server)
     -   [Linux Platform Delegate](#linux-platform-delegate)
-    -   [ProxyTransport (new)](#proxytransport-new)
+    -   [ProxyTransport](#proxytransport)
     -   [WiFi-PAF Subsystem](#wifi-paf-subsystem)
     -   [Controller / chip-tool](#controller--chip-tool)
     -   [AutoCommissioner](#autocommissioner)
@@ -119,9 +119,9 @@ chip-tool                 commissioning-proxy-app (CP)       commissionee
 
 | File | Change |
 | ---- | ------ |
-| `CommissioningProxyCluster.cpp` | New: full code-driven cluster implementation (attribute R/W, command dispatch, async nullopt pattern) |
+| `CommissioningProxyCluster.cpp` | New: full code-driven cluster implementation — attribute R/W, command dispatch, async nullopt pattern, `HandleProxyBackGroundScanStartRequest` / `HandleProxyBackGroundScanStopRequest` handlers, `MaxCachedResults` / `NumCachedResults` / `CacheTimeout` / `CachedResults` attribute reads, `MarkCachedResultsDirty()` |
 | `CommissioningProxyCluster.h` | New: `CommissioningProxyCluster` class and `Config` struct |
-| `CommissioningProxyDelegate.h` | New: abstract `Delegate` interface that all platform implementations must satisfy |
+| `CommissioningProxyDelegate.h` | New: abstract `Delegate` interface with `ProxyConnectRequest`, `ProxyDisconnectRequest`, `ProxyMessageRequest`, `ProxyScanRequest`, `ProxyBackgroundScanStartRequest`, `ProxyBackgroundScanStopRequest`, cache attribute accessors, and `EncodeCachedResults()` |
 | `CodegenIntegration.h/.cpp` | New: thin compatibility shim for ZAP-based apps |
 | `CommissioningProxyTestEventTriggerHandler.h` | New: test-event trigger handler stub |
 | `BUILD.gn` / `*.cmake` / `*.gni` | Updated: build rules to include the new cluster source files |
@@ -132,10 +132,10 @@ chip-tool                 commissioning-proxy-app (CP)       commissionee
 
 | File | Change |
 | ---- | ------ |
-| `CommissioningProxyCommandDelegate.cpp` | Replaced: full PAF delegate implementation — session tracking, `ProxyWiFiPAFDelegate`, async connect/message/disconnect flow |
+| `CommissioningProxyCommandDelegate.cpp` | Replaced: full PAF delegate implementation — session tracking, `ProxyWiFiPAFDelegate`, async connect/message/disconnect flow, `OnProxyConnectTimeout` (cancels NAN subscribe, returns `Status::Timeout`), `ProxyBackgroundScanStartRequest` / `ProxyBackgroundScanStopRequest` (multi-fabric `sBgScanFabrics` map, per-fabric lifetime timer, NAN discovery cache, band encoding) |
 | `CommissioningProxyCommandDelegate.h` | Removed: replaced by `commissioning-proxy-delegate-impl.h` |
 | `CPAppCommandDelegate.cpp/.h` | New: named-pipe command handler for the proxy app |
-| `main.cpp` | Updated: registers `CommissioningProxyCluster` via `CodegenDataModelProvider` |
+| `main.cpp` | Updated: registers `CommissioningProxyCluster` via `CodegenDataModelProvider`; cancels the proxy's own NAN publish on commissioning complete via `CancelWiFiPAFPublish()` / `OnChipDeviceEvent()` |
 | `args.gni` | Updated: enables TCP endpoint (`chip_inet_config_enable_tcp_endpoint`) |
 | `BUILD.gn` | Updated: adds `ProxyTransport` and cluster server as build dependencies |
 | `include/CHIPProjectAppConfig.h` | Updated: project-level CHIP config overrides |
@@ -164,7 +164,9 @@ chip-tool                 commissioning-proxy-app (CP)       commissionee
 | File | Change |
 | ---- | ------ |
 | `WiFiPAFConfig.h` | `PAFTP_ACK_TIMEOUT_MS` increased from 15 000 ms to 30 000 ms to prevent premature session closure during WiFi join |
-| `WiFiPAFLayer.cpp` | `RmPafSession` now handles `kAccNodeInfo` lookup in addition to `kAccSessionId` |
+| `WiFiPAFLayer.cpp` | `RmPafSession` handles `kAccNodeInfo` lookup in addition to `kAccSessionId`; `CloseEndPoint()` forcibly closes a PAFTP endpoint by session; `ScheduleCancelPublishersOnTxIdle()` and `CancelAllPublisherSessions()` implement deferred NAN publisher teardown after WiFi connect |
+| `WiFiPAFLayer.h` | Declares `CloseEndPoint()`, `CancelAllPublisherSessions()`, `ScheduleCancelPublishersOnTxIdle()`; private fields `mCancelPublishersOnTxIdle` and `mCancelPublishersCallback` |
+| `WiFiPAFTP.cpp` / `WiFiPAFEndPoint.cpp` | Sequence-number progress logging for PAFTP fragment debugging |
 
 ### Controller / chip-tool (`src/controller/`, `examples/chip-tool/`)
 
@@ -187,8 +189,8 @@ chip-tool                 commissioning-proxy-app (CP)       commissionee
 
 | File | Change |
 | ---- | ------ |
-| `ConnectivityManagerImpl.cpp` | Adds `ScanDiscoveryResult()` and PAF scanning helpers; adds debug logging to `_WiFiPAFShutdown` |
-| `ConnectivityManagerImpl.h` | Declares the new scan helpers |
+| `ConnectivityManagerImpl.cpp` | `ScanDiscoveryResult()` and PAF scanning helpers; debug logging in `_WiFiPAFShutdown`; `WiFiPAFDisconnectPublishReceiveHandler()` tears down the GLib `nanreceive` handler; `WiFiPAFStartBackgroundScan()` / `WiFiPAFStopBackgroundScan()` for background NAN scanning; `GetPendingConnectSubscribeId()` accessor; `PostNetworkConnect()` calls `ScheduleCancelPublishersOnTxIdle()` to defer NAN publisher teardown until PAFTP tx-idle |
+| `ConnectivityManagerImpl.h` | Declares `WiFiPAFDisconnectPublishReceiveHandler()`, `BgScanDiscoveryCallback` typedef, `WiFiPAFStartBackgroundScan()`, `WiFiPAFStopBackgroundScan()`, `GetPendingConnectSubscribeId()`; `mScanFreq` field |
 
 <hr>
 
@@ -203,7 +205,8 @@ The cluster is implemented as a `DefaultServerCluster` subclass.
 -   **`Startup()`** — validates that the delegate's endpoint ID matches the
     registered endpoint and calls the base class.
 -   **`ReadAttribute()`** — serves `FeatureMap`, `Transport`, `MaxSessions`,
-    and `ScanMaxTime` directly from delegate accessors and feature flags.  All
+    `ScanMaxTime`, `MaxCachedResults`, `NumCachedResults`, `CacheTimeout`, and
+    `CachedResults` directly from delegate accessors and feature flags.  All
     other attribute IDs return `Status::UnsupportedAttribute`.
 -   **`WriteAttribute()`** — accepts `ScanMaxTime`; all other writes return
     `Status::UnsupportedWrite`.
@@ -224,6 +227,20 @@ and resets cluster state to `kState_CPDisconnected`.
 **`HandleProxyMessageRequest`** decodes the message payload and session ID,
 calls the delegate, and returns `std::nullopt`.
 
+**`HandleProxyBackGroundScanStartRequest`** decodes `transport`,
+`timeout`, and `wiFiBands` fields, attaches the caller's `fabricIndex` and
+`nodeId` from the `InvokeRequest`, and calls the delegate synchronously.
+Returns `Status::Success` immediately (background scan results are delivered
+via attribute subscription to `CachedResults`).
+
+**`HandleProxyBackGroundScanStopRequest`** decodes the same fields and
+delegates.  Per spec §10.5.7.7 the delegate silently ignores calls from a
+different fabric/node than the original requester.
+
+**`MarkCachedResultsDirty()`** marks the `CachedResults` and
+`NumCachedResults` attributes dirty so that any active subscriptions receive
+an updated report when new NAN discovery results arrive.
+
 #### `CommissioningProxyDelegate.h`
 
 Defines the pure-virtual `Delegate` interface.  Key methods:
@@ -234,7 +251,12 @@ Defines the pure-virtual `Delegate` interface.  Key methods:
 | `ProxyDisconnectRequest()` | Tear down the PAF session identified by `sessionId` |
 | `ProxyMessageRequest()` | Forward `message` over PAF; must call `commandObj->AddResponse()` asynchronously |
 | `ProxyScanRequest()` | Initiate a NAN scan; must call `commandObj->AddResponse()` asynchronously |
+| `ProxyBackgroundScanStartRequest()` | Start a continuous background NAN scan; results cached and served as a cluster attribute |
+| `ProxyBackgroundScanStopRequest()` | Stop the background scan for the requesting fabric/node; silently ignores calls from a non-matching fabric/node |
 | `GetScanMaxTime()` / `SetScanMaxTime()` | Attribute accessors |
+| `GetMaxCachedResults()` / `GetNumCachedResults()` | Read-only cache size/count attribute accessors |
+| `GetCacheTimeout()` / `SetCacheTimeout()` | Cache expiry timeout attribute accessors |
+| `EncodeCachedResults()` | Encodes the `CachedResults` list attribute into a TLV `AttributeValueEncoder` |
 
 ---
 
@@ -286,9 +308,58 @@ timeout is extended to `responseTimeout + 10` seconds so the proxy's IM
 exchange stays alive while the device processes a slow command (e.g.
 `ConnectNetwork` takes ~15 s on Linux).
 
+**`ProxyConnectRequest` timeout**: a per-connect `OnProxyConnectTimeout`
+timer is started at the beginning of `HandleProxyConnectRequest` using the
+`timeout` field from the request (defaulting to 30 s if zero).  On expiry the
+timer:
+
+1.  Calls `WiFiPAFCancelIncompleteSubscribe()` to abort any in-progress NAN
+    subscribe handshake.
+2.  Calls `WiFiPAFCancelSubscribe(subscribeId)` if a subscribe ID was already
+    allocated.
+3.  Calls `RmPafSession(kAccNodeInfo, ...)` to clean up the session entry.
+4.  Returns `Status::Timeout` to the commissioner via `cmd->AddStatus()`.
+
+The subscribe ID is captured into `ProxyConnectCtx::subscribeId` after
+`WiFiPAFSubscribe` returns so the timeout handler can cancel the right session.
+
+**`ProxyBackgroundScanStartRequest`**: maintains a multi-fabric map
+`sBgScanFabrics` keyed by `FabricKey{fabricIndex, nodeId}`.  Each entry holds a
+`FabricScanRecord{transport, wiFiBands, lifetimeCtx}`.  Behaviour:
+
+-   If the hardware scan is not yet running it starts
+    `WiFiPAFStartBackgroundScan(OnBgScanDiscovery)`.  If a scan is already
+    running for a different fabric the new fabric is added to the map and shares
+    the running scan.
+-   If `timeout > 0` a per-fabric lifetime timer (`OnBgScanLifetimeExpired`) is
+    started; on expiry the fabric is removed from the map and the hardware scan
+    is stopped if no other fabrics remain.
+-   When `OnBgScanDiscovery` fires, the `NanPeerInfo` result is appended to
+    `sCachedResults` (deduplicated by `peer_id`).  The WiFi band is derived from
+    the scan frequency (`FreqToBand()`).  `MarkCachedResultsDirty()` is called
+    to push an attribute-report update to subscribed commissioners.
+
+**`ProxyBackgroundScanStopRequest`**: erases the requesting fabric from
+`sBgScanFabrics`; cancels its lifetime timer; stops the hardware scan if the map
+is now empty.  Silently succeeds if the fabric key is not found (per spec).
+
+#### `main.cpp`
+
+**Proxy NAN publish self-cancel**: after `ApplicationInit()`, if the
+proxy already holds a fabric (i.e. it was previously commissioned and restarted)
+`CancelWiFiPAFPublish()` is called immediately to cancel the proxy's own NAN
+publisher and disconnect the `nanreceive` GLib signal handler.  If the proxy is
+not yet on a fabric, an `OnChipDeviceEvent` handler is registered to call
+`CancelWiFiPAFPublish()` on `kCommissioningComplete`.
+
+**Reason**: once the proxy is reachable by chip-tool over TCP/IP, advertising
+itself as a NAN publisher serves no purpose and can confuse a subscribing
+`_WiFiPAFSubscribe` call (which would register a second `nanreceive` handler on
+top of the first, delivering PAF packets twice).
+
 ---
 
-### ProxyTransport (new)
+### ProxyTransport
 
 #### `src/transport/raw/ProxyTransport.h`
 
@@ -339,6 +410,71 @@ ack flow.
 `RmPafSession()` now handles `PafInfoAccess::kAccNodeInfo` in addition to
 `kAccSessionId`, allowing sessions to be looked up and removed by `nodeId`
 (needed during PAF connect error paths where only the node info is available).
+
+**`CloseEndPoint(WiFiPAFSession &)`** (`CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY`):
+finds the `WiFiPAFEndPoint` matching the given session by looking it up in
+`sWiFiPAFEndPointPool` and calls `DoClose(kWiFiPAFCloseFlag_AbortTransmission,
+WIFIPAF_ERROR_APP_CLOSED_CONNECTION)`.  Used during `ProxyDisconnectRequest` to
+cleanly tear down the PAFTP stack before removing the session entry.
+
+**`ScheduleCancelPublishersOnTxIdle(OnCancelDeviceHandle cb)`**: stores
+`cb` and sets `mCancelPublishersOnTxIdle = true`.  The actual cancellation fires
+inside `OnWiFiPAFMessageReceived()` the next time an inbound PAFTP message is
+processed and the send queue is empty and no acks are outstanding (`mSendQueue.IsNull() && !mPafTP.ExpectingAck()`).
+
+**`CancelAllPublisherSessions(OnCancelDeviceHandle cb)`**: iterates
+`mPafInfoVect` and calls `cb(id, role)` for every entry whose role is
+`kWiFiPafRole_Publisher` and whose `id` is not `kUndefinedWiFiPafSessionId`.
+Called from the tx-idle check in `OnWiFiPAFMessageReceived()` and from
+`PostNetworkConnect()` (directly, when WIFIPAF is disabled).
+
+**Rationale for deferred cancel**: active NAN prevents IPv6 Duplicate Address
+Detection (DAD) from completing after WiFi association, delaying mDNS
+advertising by ~35 s.  Cancelling NAN immediately after `ConnectNetwork` would
+risk tearing down the link before the `ConnectNetworkResponse` PAFTP frame is
+acknowledged by the proxy.  The tx-idle trigger ensures all in-flight PAFTP data
+has been confirmed by the peer before NAN is torn down.  With this fix mDNS
+resolves in ~3 s and CASE completes without MRP retransmissions.
+
+---
+
+### Linux Platform
+
+#### `src/platform/Linux/ConnectivityManagerImpl.cpp` / `.h`
+
+**`WiFiPAFDisconnectPublishReceiveHandler()`**: disconnects all GLib
+signal handlers connected to the `nanreceive` signal on `mWpaSupplicant.iface`
+with `G_SIGNAL_MATCH_ID | G_SIGNAL_MATCH_DATA`.  This is called alongside
+`WiFiPAFCancelPublish()` in `CancelWiFiPAFPublish()` (proxy app `main.cpp`) to
+ensure that a subsequent `_WiFiPAFSubscribe` call registers exactly one
+`nanreceive` handler, preventing duplicate PAF packet delivery.
+
+**`WiFiPAFStartBackgroundScan(BgScanDiscoveryCallback cb, void * cbCtx)`**:
+issues a NAN subscribe for the commissioning discriminator range and registers
+`cb` as the discovery callback.  Discovery results are marshalled from the GLib
+thread to the CHIP event loop via `DeviceLayer::SystemLayer().ScheduleWork()`.
+Returns `CHIP_NO_ERROR` if the hardware scan starts successfully.
+
+**`WiFiPAFStopBackgroundScan()`**: cancels the running background NAN
+subscribe and clears the stored callback.
+
+**`GetPendingConnectSubscribeId()`** (inline): returns
+`mPendingConnectSubscribeId` — the NAN subscribe ID allocated by the most
+recent `_WiFiPAFSubscribe` call that has not yet transitioned to an active
+session.  Used by `HandleProxyConnectRequest` to capture the ID for timeout
+cleanup.
+
+**`mScanFreq`** (private field): the frequency (MHz) reported by
+wpa_supplicant for the most recent NAN discovery event.  Set under
+`mWpaSupplicantMutex` on the GLib thread; read in `ScanDiscoveryResult()` to
+derive a `WiFiBandBitmap` value (`2.4 GHz` / `5 GHz`) for the `CachedResults`
+attribute.
+
+**`PostNetworkConnect()` — deferred NAN publisher cancel**: after setting
+`mPafChannelAvailable = true`, calls
+`WiFiPAFLayer::ScheduleCancelPublishersOnTxIdle()` with a lambda that calls
+`_WiFiPAFShutdown(id, role)` for each publisher session, deferring the cancel
+until the PAFTP send queue is drained and all outstanding acks have been received.
 
 ---
 
