@@ -133,7 +133,6 @@ class CommissioningMethod(ABC):
         self.commissioning_info = commissioning_info
 
     async def start(self):
-        # self.dev_ctrl.ResetCommissioningParameters()
         self._set_tc_ack_if_needed()
 
         await self._prepare()
