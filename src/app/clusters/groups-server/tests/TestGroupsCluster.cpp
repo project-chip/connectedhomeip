@@ -40,14 +40,15 @@ using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
-constexpr EndpointId kTestEndpointId = 1;
-constexpr KeysetId kKeysetId         = 123;
-constexpr FabricIndex kFabricIndex1  = kTestFabricIndex + 1;
-constexpr FabricIndex kFabricIndex2  = kTestFabricIndex + 2;
-constexpr FabricIndex kFabricIndex3  = kTestFabricIndex + 3;
-constexpr FabricIndex kFabricIndex4  = kTestFabricIndex + 4;
-constexpr FabricIndex kFabricIndex5  = kTestFabricIndex + 5;
-constexpr FabricIndex kFabricIndex6  = kTestFabricIndex + 6;
+constexpr EndpointId kTestEndpointId                                      = 1;
+constexpr KeysetId kKeysetId                                              = 123;
+constexpr FabricIndex kFabricIndex1                                       = kTestFabricIndex + 1;
+constexpr FabricIndex kFabricIndex2                                       = kTestFabricIndex + 2;
+constexpr FabricIndex kFabricIndex3                                       = kTestFabricIndex + 3;
+constexpr FabricIndex kFabricIndex4                                       = kTestFabricIndex + 4;
+constexpr FabricIndex kFabricIndex5                                       = kTestFabricIndex + 5;
+constexpr FabricIndex kFabricIndex6                                       = kTestFabricIndex + 6;
+[[maybe_unused]] constexpr uint32_t kGroupsClusterRevisionBeforeGroupcast = 4;
 
 // Helper to extract the status field embedded in a command response payload,
 // without requiring an explicit has_value() guard.
@@ -190,7 +191,7 @@ TEST_F(TestGroupsCluster, TestReadAttributes)
 
     uint16_t clusterRevision = 0;
     EXPECT_EQ(mClusterTester->ReadAttribute(Groups::Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
-    EXPECT_EQ(clusterRevision, Groups::kRevision);
+    EXPECT_EQ(clusterRevision, mGroupDataProvider.IsGroupcastEnabled() ? Groups::kRevision : kGroupsClusterRevisionBeforeGroupcast);
 }
 
 // Tests the basic success case of the AddGroup command.

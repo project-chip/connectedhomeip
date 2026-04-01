@@ -78,7 +78,6 @@ The following markers are used in this document (matches the ID master list):
 |326           |0x0146    |Chime                         |   |   |   |   |   |     |           |C  |C              |C  |
 |327           |0x0147    |Camera Controller             |   |   |   |   |   |     |           |C  |C              |C  |
 |328           |0x0148    |Doorbell                      |   |   |   |   |   |     |           |C  |C              |C  |
-|336           |0x0150    |Ambient Context Sensor        |   |   |   |   |   |     |           |   |               |C  |
 |514           |0x0202    |Window Covering               |C  |C  |C  |C  |C  |C    |C          |C  |C              |C  |
 |515           |0x0203    |Window Covering Controller    |C  |C  |C  |C  |C  |C    |C          |C  |C              |C  |
 |560           |0x0230    |Closure                       |   |   |   |   |   |     |           |C  |C              |C  |

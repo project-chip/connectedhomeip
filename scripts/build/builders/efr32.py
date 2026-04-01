@@ -292,7 +292,9 @@ class Efr32Builder(GnBuilder):
             self.extra_gn_options.append(f"wifi_sdk_root=\"{wifi_sdk_path}\"")
 
     def GnBuildArgs(self):
-        return self.extra_gn_options
+        args = super().GnBuildArgs()
+        args.extend(self.extra_gn_options)
+        return args
 
     def _bundle(self):
         # Only unit-test needs to generate the flashbundle here.  All other examples will generate a flashbundle via the silabs_executable template.
@@ -354,7 +356,7 @@ class Efr32Builder(GnBuilder):
                     sourcepath,
                     os.path.join("flashbundle", name))
 
-    def generate(self):
+    def generate(self, dedup=False):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
             '--add-export-compile-commands=*',
@@ -363,33 +365,19 @@ class Efr32Builder(GnBuilder):
         if self.dotfile:
             cmd += ['--dotfile=%s' % self.dotfile]
 
-        extra_args = self.GnBuildArgs()
-
-        if self.options.pw_command_launcher:
-            extra_args.append('pw_command_launcher="%s"' % self.options.pw_command_launcher)
-
-        if self.options.enable_link_map_file:
-            extra_args.append('chip_generate_link_map_file=true')
-
-        if self.options.pregen_dir:
-            extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
-
-        if extra_args:
-            cmd += ['--args=%s' % ' '.join(extra_args)]
+        if args := self.GnBuildArgs():
+            cmd += ['--args=%s' % ' '.join(args)]
 
         cmd += [self.output_dir]
 
-        title = 'Generating ' + self.identifier
-        extra_env = self.GnBuildEnv()
-
-        if extra_env:
+        if env := self.GnBuildEnv():
             # convert the command into a bash command that includes
             # setting environment variables
             cmd = [
                 'bash', '-c', '\n' + ' '.join(
-                    ['%s="%s" \\\n' % (key, value) for key, value in extra_env.items()] +
+                    ['%s="%s" \\\n' % (key, value) for key, value in env.items()] +
                     [shlex.join(cmd)]
                 )
             ]
 
-        self._Execute(cmd, title=title)
+        self._Execute(cmd, title=f"Generating {self.identifier}", dedup=dedup)
