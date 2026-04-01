@@ -98,7 +98,6 @@ void InitIdentifyCluster()
 #include "application-launch/chef-application-launch-delegate.h"
 #endif // MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
 
-<<<<<<< water-heater
 #if MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #include "clusters/water-heater-management/chef-water-heater-management.h"
 #endif
@@ -109,13 +108,11 @@ void InitIdentifyCluster()
 
 #include "clusters/mode-base/chef-mode-base-default.h"
 
-=======
 #if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #include "clusters/chime/chef-chime-delegate.h"
 #include <app/clusters/chime-server/CodegenIntegration.h>
 #endif
 
->>>>>>> master
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -704,7 +701,6 @@ void CastingvideoplayerContentappInit()
 #endif
 }
 
-<<<<<<< water-heater
 /*
  * This initializer is for the water heater application rootnode_waterheater_21bd13d651. To not have this initialiser
  * affect new water heater applications, use different endpoints.
@@ -736,7 +732,8 @@ void WaterHeaterInit()
     static ModeBase::Instance WaterHeaterModeInstance(&WaterHeaterModeDelegate, 1, WaterHeaterMode::Id, WaterHeaterModefeatureMap);
     VerifyOrDieWithMsg(WaterHeaterModeInstance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterMode instance.");
 #endif
-=======
+}
+
 /**
  * This initializer is for the chime application.
  */
@@ -758,7 +755,6 @@ void ChimeInit()
                            "Initialisation Error: Failed to set default chime ID to %d", defaultChimeID);
     }
 #endif // #if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT
->>>>>>> master
 }
 
 void ApplicationInit()
@@ -770,11 +766,8 @@ void ApplicationInit()
     GenericSwitchInit();
     LaundryDryerInit();
     CastingvideoplayerContentappInit();
-<<<<<<< water-heater
     WaterHeaterInit();
-=======
     ChimeInit();
->>>>>>> master
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
