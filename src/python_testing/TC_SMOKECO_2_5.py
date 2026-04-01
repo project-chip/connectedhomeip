@@ -59,7 +59,7 @@ import logging
 from asyncio import sleep
 
 from mobly import asserts
-from TC_SMOKECOTestBase import SmokeCoBaseTest
+from TC_SMOKECOTestBase import EventDataCheck, SmokeCoBaseTest
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
@@ -284,7 +284,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
                 smoke_event=self.smokeco_cluster.Events.InterconnectSmokeAlarm,
                 expected_report_data=[self.smokeco_cluster.Enums.AlarmStateEnum.kWarning,
                                       self.smokeco_cluster.Enums.AlarmStateEnum.kCritical],
-                expected_event_data="REPORT_DATA",
+                expected_event_data=EventDataCheck.MATCH_REPORT_DATA,
                 expected_expressed_state=self.smokeco_cluster.Enums.ExpressedStateEnum.kInterconnectSmoke,
             )
             # Sends Event Trigger , Check Alarm State,  Check Expressed State, Send Clear Trigger, Executes 4 steps
@@ -294,7 +294,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
                 smoke_report_handler=interconnected_smoke_alarm_handler,
                 smoke_event=self.smokeco_cluster.Events.AllClear,
                 expected_report_data=self.smokeco_cluster.Enums.AlarmStateEnum.kNormal,
-                expected_event_data="IGNORE_DATA",
+                expected_event_data=EventDataCheck.IGNORE,
                 expected_expressed_state=self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal,
             )
             interconnected_smoke_alarm_handler.cancel()
@@ -322,7 +322,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
                 smoke_event=self.smokeco_cluster.Events.InterconnectCOAlarm,
                 expected_report_data=[self.smokeco_cluster.Enums.AlarmStateEnum.kWarning,
                                       self.smokeco_cluster.Enums.AlarmStateEnum.kCritical],
-                expected_event_data="REPORT_DATA",
+                expected_event_data=EventDataCheck.MATCH_REPORT_DATA,
                 expected_expressed_state=self.smokeco_cluster.Enums.ExpressedStateEnum.kInterconnectCO,
             )
 
@@ -332,7 +332,7 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
                 smoke_report_handler=interconnected_co_alarm_handler,
                 smoke_event=self.smokeco_cluster.Events.AllClear,
                 expected_report_data=self.smokeco_cluster.Enums.AlarmStateEnum.kNormal,
-                expected_event_data="IGNORE_DATA",
+                expected_event_data=EventDataCheck.IGNORE,
                 expected_expressed_state=self.smokeco_cluster.Enums.ExpressedStateEnum.kNormal,
             )
             interconnected_co_alarm_handler.cancel()

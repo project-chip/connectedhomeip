@@ -15,6 +15,7 @@
 #    limitations under the License.
 
 import logging
+from enum import Enum, auto
 
 from mobly import asserts
 
@@ -25,6 +26,10 @@ from matter.testing.matter_asserts import assert_int_in_range, assert_is_unixtim
 from matter.testing.matter_testing import MatterBaseTest
 
 log = logging.getLogger(__name__)
+
+class EventDataCheck(Enum):
+    MATCH_REPORT_DATA = auto()
+    IGNORE = auto()
 
 
 class SmokeCoBaseTest(MatterBaseTest):
@@ -132,7 +137,7 @@ class SmokeCoBaseTest(MatterBaseTest):
                                                               smoke_report_handler,
                                                               smoke_event,
                                                               expected_report_data,
-                                                              expected_event_data,
+                                                              expected_event_data:EventDataCheck,
                                                               expected_expressed_state,
                                                               smoke_handler_timeout: int = 300
                                                               ):
@@ -160,13 +165,11 @@ class SmokeCoBaseTest(MatterBaseTest):
 
         self.step(steps[2])
         event_data = await self.read_smokeco_event(smoke_event)
-        if expected_event_data == "REPORT_DATA":
+        if expected_event_data == EventDataCheck.MATCH_REPORT_DATA:
             asserts.assert_equal(event_data.alarmSeverityLevel, report_data.value)
-        elif expected_event_data == "IGNORE_DATA":
+        elif expected_event_data == EventDataCheck.IGNORE:
             # On ClearEvent test just check the event was recorded
             asserts.assert_is_not_none(event_data)
-        else:
-            asserts.assert_equal(event_data.alarmSeverityLevel, expected_event_data)
 
         self.step(steps[3])
         expressed_state = await self.read_smokeco_attribute_expect_success(self.smokeco_cluster.Attributes.ExpressedState)
