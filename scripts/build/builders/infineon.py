@@ -98,7 +98,9 @@ class InfineonBuilder(GnBuilder):
             self.extra_gn_options.append('chip_crypto=\"mbedtls\"')
 
     def GnBuildArgs(self):
-        return self.extra_gn_options
+        args = super().GnBuildArgs()
+        args.extend(self.extra_gn_options)
+        return args
 
     def build_outputs(self):
         extensions = ['out']
