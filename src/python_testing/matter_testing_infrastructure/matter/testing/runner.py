@@ -998,12 +998,12 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
                                   choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread",
-                                    "nfc-wifi", "nfc-ethernet", "thread-meshcop"],
+                                           "nfc-wifi", "nfc-ethernet", "thread-meshcop"],
                                   help='Name of commissioning method to use')
     commission_group.add_argument('--in-test-commissioning-method', type=str,
                                   metavar='METHOD_NAME',
                                   choices=["on-network", "ble-wifi", "ble-thread", "nfc-thread",
-                                    "nfc-wifi", "nfc-ethernet", "thread-meshcop"],
+                                           "nfc-wifi", "nfc-ethernet", "thread-meshcop"],
                                   help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
