@@ -200,6 +200,21 @@ class CommissioningBleWiFi(CommissioningMethod):
             self.commissioning_info.wifi_passphrase,
         )
 
+    async def _find_or_establish_pase_if_needed(self):
+        setup_code = self.info.setup_code
+        if setup_code is None:
+            setup_code = self.dev_ctrl.CreateManualCode(
+                self.info.filter_value,
+                self.info.passcode,
+            )
+
+        commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
+            setupCode=setup_code,
+            nodeId=self.node_id,
+        )
+        if commissionee is None:
+            raise RuntimeError("Failed to find or establish PASE session")
+
     async def _commission(self):
         return await self.dev_ctrl.ConnectBLE(
             self.info.filter_value,
@@ -221,6 +236,21 @@ class CommissioningBleThread(CommissioningMethod):
         self.dev_ctrl.SetThreadOperationalDataset(
             self.commissioning_info.thread_operational_dataset,
         )
+
+    async def _find_or_establish_pase_if_needed(self):
+        setup_code = self.info.setup_code
+        if setup_code is None:
+            setup_code = self.dev_ctrl.CreateManualCode(
+                self.info.filter_value,
+                self.info.passcode,
+            )
+
+        commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
+            setupCode=setup_code,
+            nodeId=self.node_id,
+        )
+        if commissionee is None:
+            raise RuntimeError("Failed to find or establish PASE session")
 
     async def _commission(self):
         return await self.dev_ctrl.ConnectBLE(
@@ -244,6 +274,21 @@ class CommissioningNfcThread(CommissioningMethod):
             self.commissioning_info.thread_operational_dataset,
         )
 
+    async def _find_or_establish_pase_if_needed(self):
+        setup_code = self.info.setup_code
+        if setup_code is None:
+            setup_code = self.dev_ctrl.CreateManualCode(
+                self.info.filter_value,
+                self.info.passcode,
+            )
+
+        commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
+            setupCode=setup_code,
+            nodeId=self.node_id,
+        )
+        if commissionee is None:
+            raise RuntimeError("Failed to find or establish PASE session")
+
     async def _commission(self):
         return await self.dev_ctrl.ConnectNFC(self.info.filter_value, self.info.passcode, self.node_id)
 
@@ -263,6 +308,21 @@ class CommissioningNfcWiFi(CommissioningMethod):
             self.commissioning_info.wifi_ssid,
             self.commissioning_info.wifi_passphrase,
         )
+
+    async def _find_or_establish_pase_if_needed(self):
+        setup_code = self.info.setup_code
+        if setup_code is None:
+            setup_code = self.dev_ctrl.CreateManualCode(
+                self.info.filter_value,
+                self.info.passcode,
+            )
+
+        commissionee = await self.dev_ctrl.FindOrEstablishPASESession(
+            setupCode=setup_code,
+            nodeId=self.node_id,
+        )
+        if commissionee is None:
+            raise RuntimeError("Failed to find or establish PASE session")
 
     async def _commission(self):
         return await self.dev_ctrl.ConnectNFC(self.info.filter_value, self.info.passcode, self.node_id)
