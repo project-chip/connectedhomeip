@@ -52,8 +52,8 @@ public:
 
     static constexpr System::Clock::Timeout kMaxReportDelayInterval = System::Clock::Seconds32(60);
     /// Alias for the maximum delay between timer-driven snapshot attempts (same as kMaxReportDelayInterval).
-    static constexpr System::Clock::Timeout kMaxReportInterval      = kMaxReportDelayInterval;
-    static constexpr System::Clock::Timeout kMinReportInterval      = System::Clock::Seconds32(1);
+    static constexpr System::Clock::Timeout kMaxReportInterval = kMaxReportDelayInterval;
+    static constexpr System::Clock::Timeout kMinReportInterval = System::Clock::Seconds32(1);
 
     struct Config
     {
@@ -116,13 +116,13 @@ public:
                                 const Nullable<EnergyMeasurementStruct> & energyExported);
 
 private:
-enum class AttributeIgnoredDirtyState : uint32_t
-{
-    CumulativeEnergyImported = 0x1,
-    CumulativeEnergyExported = 0x2,
-    PeriodicEnergyImported = 0x4,
-    PeriodicEnergyExported = 0x8,
-};
+    enum class AttributeIgnoredDirtyState : uint32_t
+    {
+        CumulativeEnergyImported = 0x1,
+        CumulativeEnergyExported = 0x2,
+        PeriodicEnergyImported   = 0x4,
+        PeriodicEnergyExported   = 0x8,
+    };
 
     CHIP_ERROR SetCumulativeEnergyImported(const Nullable<EnergyMeasurementStruct> & value);
     CHIP_ERROR SetCumulativeEnergyExported(const Nullable<EnergyMeasurementStruct> & value);
