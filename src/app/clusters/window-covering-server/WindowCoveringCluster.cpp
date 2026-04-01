@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/reporting/reporting.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -115,14 +116,72 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
-CHIP_ERROR WindowCoverAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
     switch (aPath.mAttributeId)
     {
-    case Attributes::ClusterRevision::Id:
-        return aEncoder.Encode(WindowCovering::kRevision);
+    case ClusterRevision::Id:
+        return encoder.Encode(WindowCovering::kRevision);
+    case FeatureMap::Id:
+        return encoder.Encode(mFeatureMap);
+    case Type::Id:
+        return encoder.Encode(GetType());
+    case NumberOfActuationsLift::Id:
+        return encoder.Encode(GetNumberOfActuationsLift());
+    case NumberOfActuationsTilt::Id:
+        return encoder.Encode(GetNumberOfActuationsTilt());
+    case ConfigStatus::Id:
+        return encoder.Encode(GetConfigStatus());
+    case CurrentPositionLiftPercentage:
+    Id:
+        return encoder.Encode(GetCurrentPositionLiftPercentage());
+    case CurrentPositionTiltPercentage:
+    Id:
+        return encoder.Encode(GetCurrentPositionTiltPercentage());
+    case OperationalStatus::Id:
+        return encoder.Encode(GetOperationalStatus());
+    case TargetPositionLiftPercent100ths::Id:
+        return encoder.Encode(GetTargetPositionLiftPercentage100ths());
+    case TargetPositionTiltPercent100ths::Id:
+        return encoder.Encode(GetTargetPositionTiltPercentage100ths());
+    case EndProductType::Id:
+        return encoder.Encode(GetEndProductType());
+    case CurrentPositionLiftPercent100ths::Id:
+        return encoder.Encode(CurrentPositionLiftPercent100ths());
+    case CurrentPositionTiltPercent100ths::Id:
+        return encoder.Encode(CurrentPositionTiltPercent100ths());
+    case Mode::Id:
+        return encoder.Encode(GetMode());
+    case SafetyStatus::Id:
+        return encoder.Encode(GetSafetyStatus());
     default:
-        break;
+        return Status::UnsupportedAttribute;
+    }
+}
+
+DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder)
+{
+    switch (request.path.mAttributeId)
+    {
+    case Mode::Id:
+        // Add checks for out of bounds and for unsupported mode as mentioned in spec
+        chip::BitMask<Mode> mode;
+        ReturnErrorOnFailure(decoder.Decode(mode));
+    }
+}
+
+std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                           chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+{
+    switch (request.path.mCommandId)
+    {
+    case Commands::UpOrOpen::Id:
+    case Commands::DownOrClose::Id:
+    case Commands::StopMotion::Id:
+    case Commands::GoToLiftPercentage::Id:
+    case Commands::GoToTiltPercentage::Id:
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
     return CHIP_NO_ERROR;
 }
@@ -628,14 +687,10 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 } // namespace chip
 
 //------------------------------------------------------------------------------
-// Callbacks
+// Commands
 //------------------------------------------------------------------------------
-
-/**
- * @brief  Cluster UpOrOpen Command callback (from client)
- */
-bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                  const Commands::UpOrOpen::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus> HandleUpOrOpen(app::CommandHandler * commandObj,
+                                                            const app::ConcreteCommandPath & commandPath)
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
@@ -646,16 +701,20 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
     {
         ChipLogProgress(Zcl, "Err device locked");
         commandObj->AddStatus(commandPath, status);
-        return true;
+        return Protocols::InteractionModel::Status::Failure;
     }
 
     if (HasFeature(endpoint, Feature::kPositionAwareLift))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
+        SetCurrentPositionLiftPercent100ths(WC_PERCENT100THS_MIN_OPEN);
+        SetCurrentPositionLiftPercentage(WC_PERCENT100THS_MIN_OPEN);
     }
     if (HasFeature(endpoint, Feature::kPositionAwareTilt))
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
+        SetCurrentPositionLiftPercent100ths(WC_PERCENT100THS_MIN_OPEN);
+        SetCurrentPositionLiftPercentage(WC_PERCENT100THS_MIN_OPEN);
     }
 
     Delegate * delegate = GetDelegate(endpoint);
@@ -681,11 +740,9 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
     return true;
 }
 
-/**
- * @brief  Cluster DownOrClose Command callback (from client)
- */
-bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                     const Commands::DownOrClose::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus> HandleDownOrClose(app::CommandHandler * commandObj,
+                                                               const app::ConcreteCommandPath & commandPath,
+                                                               const Commands::DownOrClose::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
@@ -730,11 +787,9 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
     return true;
 }
 
-/**
- * @brief  Cluster StopMotion Command callback (from client)
- */
-bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                    const Commands::StopMotion::DecodableType & fields)
+std::optional<DataModel::ActionReturnStatus> HandleStopMotion(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath,
+                                                              const Commands::StopMotion::DecodableType & fields)
 {
     app::DataModel::Nullable<Percent100ths> current;
     chip::EndpointId endpoint = commandPath.mEndpointId;
@@ -788,12 +843,9 @@ bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * comman
     return true;
 }
 
-/**
- * @brief  Cluster GoToLiftValue Command callback (from client)
- */
-bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::GoToLiftValue::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus> HandleGoToLiftValue(app::CommandHandler * commandObj,
+                                                                 const app::ConcreteCommandPath & commandPath,
+                                                                 const Commands::GoToLiftValue::DecodableType & commandData)
 {
     auto & liftValue = commandData.liftValue;
 
@@ -831,12 +883,9 @@ bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * com
     return true;
 }
 
-/**
- * @brief  Cluster GoToLiftPercentage Command callback (from client)
- */
-bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler * commandObj,
-                                                            const app::ConcreteCommandPath & commandPath,
-                                                            const Commands::GoToLiftPercentage::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus>
+HandleGoToLiftPercentage(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                         const Commands::GoToLiftPercentage::DecodableType & commandData)
 {
     Percent100ths percent100ths = commandData.liftPercent100thsValue;
     EndpointId endpoint         = commandPath.mEndpointId;
@@ -880,12 +929,9 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
     return true;
 }
 
-/**
- * @brief  Cluster GoToTiltValue Command callback (from client)
- */
-bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::GoToTiltValue::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus> HandleGoToTiltValue(app::CommandHandler * commandObj,
+                                                                 const app::ConcreteCommandPath & commandPath,
+                                                                 const Commands::GoToTiltValue::DecodableType & commandData)
 {
     auto & tiltValue = commandData.tiltValue;
 
@@ -923,12 +969,9 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * com
     return true;
 }
 
-/**
- * @brief  Cluster GoToTiltPercentage Command callback (from client)
- */
-bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler * commandObj,
-                                                            const app::ConcreteCommandPath & commandPath,
-                                                            const Commands::GoToTiltPercentage::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus>
+HandleGoToTiltPercentage(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                         const Commands::GoToTiltPercentage::DecodableType & commandData)
 {
     Percent100ths percent100ths = commandData.tiltPercent100thsValue;
     EndpointId endpoint         = commandPath.mEndpointId;

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "window-covering-delegate.h"
+#include "WindowCoveringClusterDelegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/data-model/Nullable.h>
@@ -25,9 +25,9 @@
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/util/af-types.h>
 #include <clusters/WindowCovering/Attributes.h>
-#include <clusters/WindowCovering/Commands.h>
 #include <clusters/WindowCovering/Enums.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 static constexpr chip::Percent100ths WC_PERCENT100THS_MIN_OPEN   = 0;
@@ -155,8 +155,8 @@ private:
     uint16_t mNumberOfActuationsLift = 0;
     uint16_t mNumberOfActuationsTilt = 0;
     chip::BitMask<ConfigStatus> mConfigStatus;
-    NPercent mCurrentPositionLiftPercentage;
-    NPercent mCurrentPositionTiltPercentage;
+    OPercent mCurrentPositionLiftPercentage;
+    OPercent mCurrentPositionTiltPercentage;
     NPercent100ths mTargetPositionLiftPercentage100ths;
     NPercent100ths mTargetPositionTiltPercentage100ths;
     chip::BitMask<OperationalStatus> mOperationalStatus;
