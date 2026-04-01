@@ -149,9 +149,8 @@ class CommissioningMethod(ABC):
                 self.commissioning_info.tc_user_response_to_simulate,
             )
 
-    @abstractmethod
     async def _find_or_establish_pase_if_needed(self):
-        pass
+        return
 
     @abstractmethod
     async def _prepare(self):
