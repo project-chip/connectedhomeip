@@ -182,5 +182,13 @@ class SetupPayload:
         return (self.rendezvous_information & 0b100) != 0
 
     @property
+    def supports_wifi_commissioning(self) -> bool:
+        return (self.rendezvous_information & 0b1000) != 0
+
+    @property
     def supports_nfc_commissioning(self) -> bool:
         return (self.rendezvous_information & 0b10000) != 0
+
+    @property
+    def supports_thread_commissioning(self) -> bool:
+        return (self.rendezvous_information & 0b100000) != 0
