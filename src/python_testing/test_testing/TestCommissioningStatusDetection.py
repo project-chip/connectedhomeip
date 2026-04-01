@@ -366,10 +366,11 @@ async def test_parallel_session_pase_wins():
     mock_controller.FindOrEstablishPASESession = pase_success
     mock_controller.GetConnectedDevice = case_fail_slow
 
-    pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
+    pase_params = commissioning.PaseConnectionParams(
+        setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params.setup_code)
         # Should succeed via PASE
     except Exception as e:
         return f"Should have succeeded via PASE: {e}"
@@ -402,10 +403,11 @@ async def test_parallel_session_case_wins():
     mock_controller.FindOrEstablishPASESession = pase_slow
     mock_controller.GetConnectedDevice = case_success
 
-    pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
+    pase_params = commissioning.PaseConnectionParams(
+        setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params.setup_code)
         # Should succeed via CASE
     except Exception as e:
         return f"Should have succeeded via CASE: {e}"
@@ -436,15 +438,16 @@ async def test_parallel_session_first_fails_second_succeeds():
 
     async def case_fail(*args, **kwargs):
         call_order.append('case')
-        raise Exception("CASE failed immediately")
+        raise RuntimeError("CASE failed immediately")
 
     mock_controller.FindOrEstablishPASESession = pase_success
     mock_controller.GetConnectedDevice = case_fail
 
-    pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
+    pase_params = commissioning.PaseConnectionParams(
+        setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params.setup_code)
         # Should succeed eventually via PASE
     except Exception as e:
         return f"Should have succeeded via PASE fallback: {e}"
@@ -468,19 +471,20 @@ async def test_parallel_session_both_fail():
     # First task fails quickly, second task fails after delay
     # This ensures there's a pending task when first one fails
     async def pase_fail_fast(*args, **kwargs):
-        raise Exception("PASE failed")
+        raise RuntimeError("PASE failed")
 
     async def case_fail_slow(*args, **kwargs):
         await asyncio.sleep(0.1)  # Delay so PASE fails first
-        raise Exception("CASE failed")
+        raise RuntimeError("CASE failed")
 
     mock_controller.FindOrEstablishPASESession = pase_fail_fast
     mock_controller.GetConnectedDevice = case_fail_slow
 
-    pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
+    pase_params = commissioning.PaseConnectionParams(
+        setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
 
     try:
-        await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params)
+        await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params.setup_code)
         return "Should have raised RuntimeError when both fail"
     except RuntimeError as e:
         error_msg = str(e)
@@ -515,7 +519,7 @@ async def test_parallel_session_no_pase_params():
     mock_controller.GetConnectedDevice = case_success
 
     try:
-        await commissioning._establish_pase_or_case_session(mock_controller, TEST_NODE_ID, pase_params=None)
+        await commissioning.establish_pase_or_case_session(mock_controller, TEST_NODE_ID, setup_code=None)
         # Should succeed via CASE only
         if not case_called:
             return "CASE should have been attempted"
@@ -572,11 +576,11 @@ async def test_is_commissioned_scenario1_factory_fresh():
     mock_controller = MockDeviceController()
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel, \
+            patch.object(commissioning, 'establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel, \
             patch('matter.clusters.OperationalCredentials') as MockOpCreds:
 
         mock_dnssd.return_value = False
-        mock_parallel.return_value = None
+        mock_parallel.return_value = "pase"
 
         # Factory fresh: 0 root certificates
         mock_controller.ReadAttribute = AsyncMock(return_value={
@@ -587,7 +591,8 @@ async def test_is_commissioned_scenario1_factory_fresh():
             }
         })
 
-        pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
+        pase_params = commissioning.PaseConnectionParams(
+            setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
         result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID, pase_params=pase_params)
 
         if result:
@@ -615,11 +620,11 @@ async def test_is_commissioned_scenario3_other_fabric():
     mock_controller = MockDeviceController()
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel, \
+            patch.object(commissioning, 'establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel, \
             patch('matter.clusters.OperationalCredentials') as MockOpCreds:
 
         mock_dnssd.return_value = False
-        mock_parallel.return_value = None
+        mock_parallel.return_value = "pase"
 
         # Commissioned to other fabric: 1 root certificate (other fabric's)
         mock_controller.ReadAttribute = AsyncMock(return_value={
@@ -630,11 +635,14 @@ async def test_is_commissioned_scenario3_other_fabric():
             }
         })
 
-        pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
+        pase_params = commissioning.PaseConnectionParams(
+            setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
         result = await commissioning.is_commissioned(mock_controller, TEST_NODE_ID, pase_params=pase_params)
 
         if not result:
-            return "Expected True for device commissioned to other fabric"
+            pass
+        else:
+            return "Expected False for device commissioned to other fabric"
     return None
 
 
@@ -709,11 +717,11 @@ async def test_get_fabric_count_scenario1_factory_fresh():
     mock_controller = MockDeviceController()
 
     with patch.object(commissioning, '_is_device_operational_via_dnssd', new_callable=AsyncMock) as mock_dnssd, \
-            patch.object(commissioning, '_establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel, \
+            patch.object(commissioning, 'establish_pase_or_case_session', new_callable=AsyncMock) as mock_parallel, \
             patch('matter.clusters.OperationalCredentials') as MockOpCreds:
 
         mock_dnssd.return_value = False
-        mock_parallel.return_value = None
+        mock_parallel.return_value = "pase"
 
         # Factory fresh: 0 certificates
         mock_controller.ReadAttribute = AsyncMock(return_value={
@@ -724,7 +732,8 @@ async def test_get_fabric_count_scenario1_factory_fresh():
             }
         })
 
-        pase_params = {'discriminator': TEST_DISCRIMINATOR, 'passcode': TEST_PASSCODE}
+        pase_params = commissioning.PaseConnectionParams(
+            setup_code="MT:YNJV7VSC00KA0648G00", passcode=TEST_PASSCODE, discriminator=TEST_DISCRIMINATOR)
         result = await commissioning.get_commissioned_fabric_count(
             mock_controller, TEST_NODE_ID, pase_params=pase_params
         )

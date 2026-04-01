@@ -52,6 +52,7 @@ from pathlib import Path
 
 from mobly import asserts
 
+import matter.testing.commissioning as commissioning
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.commissioning import _is_device_operational_via_dnssd, is_commissioned
@@ -158,10 +159,8 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
         LOGGER.info("=== Test: Factory Fresh Device - is_commissioned() ===")
         self.start_th_server()
 
-        pase_params = {
-            'discriminator': self.th_server_discriminator,
-            'passcode': self.th_server_passcode
-        }
+        pase_params = commissioning.PaseConnectionParams(setup_code=self.default_controller.CreateManualCode(
+            self.th_server_discriminator, self.th_server_passcode), discriminator=self.th_server_discriminator, passcode=self.th_server_passcode)
 
         LOGGER.info("Checking is_commissioned() on factory-fresh device")
         commissioned = await is_commissioned(

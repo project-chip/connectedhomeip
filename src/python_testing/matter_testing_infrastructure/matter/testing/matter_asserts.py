@@ -6,6 +6,8 @@ from typing import Any, Callable, List, Optional, Type, TypeVar
 
 from mobly import asserts
 
+from matter.testing.commissioning import PaseConnectionParams
+
 T = TypeVar('T')
 
 
@@ -376,7 +378,7 @@ async def assert_is_commissioned_to_any_fabric(
     dev_ctrl,
     node_id: int,
     description: str = "Device",
-    pase_params: Optional[dict] = None
+    pase_params: Optional[PaseConnectionParams] = None
 ) -> None:
     """
     Asserts that the device has at least one commissioned fabric.
@@ -424,7 +426,7 @@ async def assert_factory_fresh(
     dev_ctrl,
     node_id: int,
     description: str = "Device",
-    pase_params: Optional[dict] = None
+    pase_params: Optional[PaseConnectionParams] = None
 ) -> None:
     """
     Asserts that the device has NO commissioned fabrics (factory fresh state).
@@ -474,7 +476,7 @@ async def assert_fabric_count(
     node_id: int,
     expected_count: int,
     description: str = "Device",
-    pase_params: Optional[dict] = None
+    pase_params: Optional[PaseConnectionParams] = None
 ) -> None:
     """
     Asserts that the device has exactly the expected number of commissioned fabrics.
