@@ -27,6 +27,7 @@ from matter.testing.matter_testing import MatterBaseTest
 
 log = logging.getLogger(__name__)
 
+
 class EventDataCheck(Enum):
     MATCH_REPORT_DATA = auto()
     IGNORE = auto()
@@ -137,7 +138,7 @@ class SmokeCoBaseTest(MatterBaseTest):
                                                               smoke_report_handler,
                                                               smoke_event,
                                                               expected_report_data,
-                                                              expected_event_data:EventDataCheck,
+                                                              expected_event_data: EventDataCheck,
                                                               expected_expressed_state,
                                                               smoke_handler_timeout: int = 300
                                                               ):
