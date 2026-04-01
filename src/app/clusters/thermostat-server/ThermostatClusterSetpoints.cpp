@@ -45,8 +45,264 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
+int16_t SetpointLimits::Clamp(int16_t setpoint)
+{
+    if (setpoint < min)
+    {
+        return min;
+    }
+    if (setpoint > max)
+    {
+        return max;
+    }
+    return setpoint;
+}
+
+SetpointRange Setpoints::GetSetpointRange(OccupancyBitmap occupancy)
+{
+    if (occupancy == OccupancyBitmap::kOccupied)
+    {
+        return SetpointRange(true, occupiedHeatingSetpoint, unoccupiedHeatingSetpoint);
+    }
+    return SetpointRange(false, unoccupiedHeatingSetpoint, unoccupiedHeatingSetpoint);
+}
+
+SetpointLimits Setpoints::GetEffectiveLimits(SystemModeEnum mode)
+{
+    int16_t minHeat = minHeatSetpointLimit.HasValue() ? minHeatSetpointLimit.Value() : absMinHeatSetpointLimit;
+    int16_t maxHeat = maxHeatSetpointLimit.HasValue() ? maxHeatSetpointLimit.Value() : absMaxHeatSetpointLimit;
+    int16_t minCool = minCoolSetpointLimit.HasValue() ? minCoolSetpointLimit.Value() : absMinCoolSetpointLimit;
+    int16_t maxCool = maxCoolSetpointLimit.HasValue() ? maxCoolSetpointLimit.Value() : absMaxCoolSetpointLimit;
+
+    if (autoSupported)
+    {
+        maxHeat = maxCool - deadBand;
+        minCool = maxHeat + deadBand;
+    }
+    switch (mode)
+    {
+    case SystemModeEnum::kHeat:
+        return SetpointLimits(minHeat, maxHeat);
+    default:
+        return SetpointLimits(minCool, maxCool);
+    }
+}
+
+bool Setpoints::CheckSetpoints(int16_t occupiedSetpoint, int16_t unoccupiedSetpoint, chip::Optional<int16_t> min,
+                               chip::Optional<int16_t> max, int16_t absMin, int16_t absMax)
+{
+    int16_t minValue = absMin;
+    int16_t maxValue = absMax;
+    if (min.HasValue())
+    {
+        minValue = min.Value();
+        if (absMin > minValue)
+        {
+            return false;
+        }
+    }
+    if (max.HasValue())
+    {
+        maxValue = max.Value();
+        if (absMax < maxValue)
+        {
+            return false;
+        }
+    }
+    if (minValue > maxValue)
+    {
+        // This really shouldn't happen, but not of the following logic makes sense if the min is larger than the max
+        return false;
+    }
+    if (occupiedSetpoint < minValue || occupiedSetpoint > maxValue)
+    {
+        return false;
+    }
+    if (occupancySupported)
+    {
+        if (unoccupiedSetpoint < minValue || unoccupiedSetpoint > maxValue)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Setpoints::Valid()
+{
+    if (heatSupported &&
+        !CheckSetpoints(occupiedHeatingSetpoint, unoccupiedHeatingSetpoint, minHeatSetpointLimit, maxHeatSetpointLimit,
+                        absMinHeatSetpointLimit, absMaxHeatSetpointLimit))
+    {
+        return false;
+    }
+    if (coolSupported &&
+        !CheckSetpoints(occupiedCoolingSetpoint, unoccupiedCoolingSetpoint, minCoolSetpointLimit, maxCoolSetpointLimit,
+                        absMinCoolSetpointLimit, absMaxCoolSetpointLimit))
+    {
+        return false;
+    }
+
+    if (autoSupported)
+    {
+        if (occupiedCoolingSetpoint - occupiedHeatingSetpoint < deadBand)
+        {
+            return false;
+        }
+        if (occupancySupported)
+        {
+            if (unoccupiedCoolingSetpoint - unoccupiedHeatingSetpoint < deadBand)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+Status Setpoints::Change(SetpointRange range, chip::Optional<int16_t> heat, chip::Optional<int16_t> cool)
+{
+    if (!heat.HasValue() && !cool.HasValue())
+    {
+        return Status::InvalidValue;
+    }
+    auto heatLimits = GetEffectiveLimits(SystemModeEnum::kHeat);
+    auto coolLimits = GetEffectiveLimits(SystemModeEnum::kCool);
+    if (heatSupported && heat.HasValue())
+    {
+        range.heatingSetpoint = heatLimits.Clamp(heat.Value());
+    }
+    if (coolSupported && cool.HasValue())
+    {
+        range.coolingSetpoint = coolLimits.Clamp(cool.Value());
+    }
+    if (!autoSupported)
+    {
+        return Status::Success;
+    }
+    // Check if we need to shift setpoints to preserve the deadband
+    int16_t diff = range.coolingSetpoint - range.heatingSetpoint;
+    if (diff >= deadBand)
+    {
+        return Status::Success;
+    }
+    if (heat.HasValue() && !cool.HasValue())
+    {
+        // We're only adjusting the heating setpoint, so try moving the cooling setpoint
+        range.coolingSetpoint = coolLimits.Clamp(range.heatingSetpoint + deadBand);
+
+        diff = range.coolingSetpoint - range.heatingSetpoint;
+        if (diff > deadBand)
+        {
+            return Status::Success;
+        }
+        // We're still invalid, presumably because we were constrained by the max cooling setpoint
+        // We'll shift the heating setpoint down by the amount needed to preserve the deadband
+        range.heatingSetpoint = heatLimits.Clamp(range.heatingSetpoint - diff);
+        return Status::Success;
+    }
+    if (cool.HasValue() && !heat.HasValue())
+    {
+        // We're only adjusting the cooling setpoint, so try moving the heating setpoint
+        range.heatingSetpoint = heatLimits.Clamp(range.coolingSetpoint - deadBand);
+
+        diff = range.coolingSetpoint - range.heatingSetpoint;
+        if (diff > deadBand)
+        {
+            return Status::Success;
+        }
+        // We're still invalid, presumably because we were constrained by the min heating setpoint
+        // We'll shift the cooling setpoint up by the amount needed to preserve the deadband
+        range.coolingSetpoint = coolLimits.Clamp(range.coolingSetpoint + diff);
+        return Status::Success;
+    }
+    // We're adjusting both at the same time, so let's split the difference
+    diff              = deadBand - diff;
+    int16_t shiftUp   = diff / 2;
+    int16_t shiftDown = shiftUp + (diff % 2); // If the diff is odd, so shift down by an extra 0.01C.
+
+    range.heatingSetpoint = heatLimits.Clamp(range.heatingSetpoint - shiftDown);
+    range.coolingSetpoint = coolLimits.Clamp(range.coolingSetpoint + shiftUp);
+
+    diff = range.coolingSetpoint - range.heatingSetpoint;
+    if (diff >= deadBand)
+    {
+        return Status::Success;
+    }
+    // We're still invalid, probably because we hit one of the limits.
+    if (range.heatingSetpoint == heatLimits.min) // We're at the bottom of the heat limit
+    {
+        range.coolingSetpoint = coolLimits.Clamp(range.heatingSetpoint + deadBand);
+        return Status::Success;
+    }
+    if (range.coolingSetpoint == coolLimits.max)
+    {
+        range.heatingSetpoint = heatLimits.Clamp(range.coolingSetpoint - deadBand);
+        return Status::Success;
+    }
+    // At this point, we're invalid because it's not possible to change to the given setpoints and maintain the deadband
+    return Status::InvalidValue;
+}
+
+Status Setpoints::ChangeLimits(SystemModeEnum mode, chip::Optional<int16_t> min, chip::Optional<int16_t> max)
+{
+    switch (mode)
+    {
+    case SystemModeEnum::kHeat: {
+
+        return Status::Success;
+    }
+
+    default: {
+        return Status::Success;
+    }
+    }
+}
+
+/*
+bool SetpointLimits::ShiftSetpoint(SetpointRange & setpointRange, bool isHeat, int16_t amount)
+{
+    bool preservedDeadband   = false;
+    int16_t minSetpointLimit = isHeat ? minHeatSetpointLimit : minCoolSetpointLimit;
+    int16_t maxSetpointLimit = isHeat ? maxHeatSetpointLimit : maxCoolSetpointLimit;
+    if (setpoint < minSetpointLimit)
+    {
+        setpoint = minSetpointLimit;
+    }
+    else if (setpoint > maxSetpointLimit)
+    {
+        setpoint = maxSetpointLimit;
+    }
+    if (isHeat)
+    {
+        setpointRange.heatingSetpoint = setpointRange.heatingSetpoint + amount;
+    }
+    else
+    {
+        setpointRange.coolingSetpoint = setpointRange.coolingSetpoint + amount;
+    }
+    if (autoSupported)
+    {
+        if (setpointRange.coolingSetpoint - setpointRange.heatingSetpoint < deadBand)
+        {
+            if (isHeat)
+            {
+                setpointRange.coolingSetpoint = setpointRange.heatingSetpoint + deadBand;
+            }
+            else
+            {
+                setpointRange.heatingSetpoint = setpointRange.coolingSetpoint - deadBand;
+            }
+            preservedDeadband = true;
+        }
+    }
+    return preservedDeadband;
+}
+    */
+
 int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint)
 {
+    /*
     // Optional Mfg supplied limits
     int16_t AbsMinHeatSetpointLimit = kDefaultAbsMinHeatSetpointLimit;
     int16_t AbsMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
@@ -112,12 +368,13 @@ int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoin
 
     if (HeatingSetpoint > MaxHeatSetpointLimit)
         HeatingSetpoint = MaxHeatSetpointLimit;
-
+*/
     return HeatingSetpoint;
 }
 
 int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoint)
 {
+    /*
     // Optional Mfg supplied limits
     int16_t AbsMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
     int16_t AbsMaxCoolSetpointLimit = kDefaultAbsMaxCoolSetpointLimit;
@@ -183,62 +440,85 @@ int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoin
 
     if (CoolingSetpoint > MaxCoolSetpointLimit)
         CoolingSetpoint = MaxCoolSetpointLimit;
-
+*/
     return CoolingSetpoint;
 }
 
-Status GetSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
+Status GetSetpoints(EndpointId endpoint, Setpoints & setpoints)
 {
     uint32_t flags;
     if (FeatureMap::Get(endpoint, &flags) != Status::Success)
     {
-        ChipLogError(Zcl, "GetSetpointLimits: could not get feature flags");
+        ChipLogError(Zcl, "Getsetpoints: could not get feature flags");
         flags = FEATURE_MAP_DEFAULT;
     }
 
-    auto featureMap                   = BitMask<Feature, uint32_t>(flags);
-    setpointLimits.autoSupported      = featureMap.Has(Feature::kAutoMode);
-    setpointLimits.heatSupported      = featureMap.Has(Feature::kHeating);
-    setpointLimits.coolSupported      = featureMap.Has(Feature::kCooling);
-    setpointLimits.occupancySupported = featureMap.Has(Feature::kOccupancy);
+    auto featureMap              = BitMask<Feature, uint32_t>(flags);
+    setpoints.autoSupported      = featureMap.Has(Feature::kAutoMode);
+    setpoints.heatSupported      = featureMap.Has(Feature::kHeating);
+    setpoints.coolSupported      = featureMap.Has(Feature::kCooling);
+    setpoints.occupancySupported = featureMap.Has(Feature::kOccupancy);
 
-    if (setpointLimits.autoSupported)
+    if (setpoints.autoSupported)
     {
         int8_t deadBand;
-        if (MinSetpointDeadBand::Get(endpoint, &deadBand) != Status::Success)
+        if (MinSetpointDeadBand::Get(endpoint, &deadBand) == Status::Success)
         {
-            deadBand = kDefaultDeadBand;
+            setpoints.deadBand = static_cast<int16_t>(deadBand * 10);
         }
-        setpointLimits.deadBand = static_cast<int16_t>(deadBand * 10);
+        else
+        {
+            setpoints.deadBand = kDefaultDeadBand;
+        }
     }
 
-    if (AbsMinCoolSetpointLimit::Get(endpoint, &setpointLimits.absMinCoolSetpointLimit) != Status::Success)
-        setpointLimits.absMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
-
-    if (AbsMaxCoolSetpointLimit::Get(endpoint, &setpointLimits.absMaxCoolSetpointLimit) != Status::Success)
-        setpointLimits.absMaxCoolSetpointLimit = kDefaultAbsMaxCoolSetpointLimit;
-
-    if (MinCoolSetpointLimit::Get(endpoint, &setpointLimits.minCoolSetpointLimit) != Status::Success)
-        setpointLimits.minCoolSetpointLimit = setpointLimits.absMinCoolSetpointLimit;
-
-    if (MaxCoolSetpointLimit::Get(endpoint, &setpointLimits.maxCoolSetpointLimit) != Status::Success)
-        setpointLimits.maxCoolSetpointLimit = setpointLimits.absMaxCoolSetpointLimit;
-
-    if (AbsMinHeatSetpointLimit::Get(endpoint, &setpointLimits.absMinHeatSetpointLimit) != Status::Success)
-        setpointLimits.absMinHeatSetpointLimit = kDefaultAbsMinHeatSetpointLimit;
-
-    if (AbsMaxHeatSetpointLimit::Get(endpoint, &setpointLimits.absMaxHeatSetpointLimit) != Status::Success)
-        setpointLimits.absMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
-
-    if (MinHeatSetpointLimit::Get(endpoint, &setpointLimits.minHeatSetpointLimit) != Status::Success)
-        setpointLimits.minHeatSetpointLimit = setpointLimits.absMinHeatSetpointLimit;
-
-    if (MaxHeatSetpointLimit::Get(endpoint, &setpointLimits.maxHeatSetpointLimit) != Status::Success)
-        setpointLimits.maxHeatSetpointLimit = setpointLimits.absMaxHeatSetpointLimit;
-
-    if (setpointLimits.coolSupported)
+    if (AbsMinCoolSetpointLimit::Get(endpoint, &setpoints.absMinCoolSetpointLimit) != Status::Success)
     {
-        if (OccupiedCoolingSetpoint::Get(endpoint, &setpointLimits.occupiedCoolingSetpoint) != Status::Success)
+        setpoints.absMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
+    }
+
+    if (AbsMaxCoolSetpointLimit::Get(endpoint, &setpoints.absMaxCoolSetpointLimit) != Status::Success)
+    {
+        setpoints.absMaxCoolSetpointLimit = kDefaultAbsMaxCoolSetpointLimit;
+    }
+
+    int16_t minCoolSetpointLimit;
+    if (MinCoolSetpointLimit::Get(endpoint, &minCoolSetpointLimit) == Status::Success)
+    {
+        setpoints.minCoolSetpointLimit = chip::Optional<int16_t>(minCoolSetpointLimit);
+    }
+
+    int16_t maxCoolSetpointLimit;
+    if (MaxCoolSetpointLimit::Get(endpoint, &maxCoolSetpointLimit) == Status::Success)
+    {
+        setpoints.maxCoolSetpointLimit = chip::Optional<int16_t>(maxCoolSetpointLimit);
+    }
+
+    if (AbsMinHeatSetpointLimit::Get(endpoint, &setpoints.absMinHeatSetpointLimit) != Status::Success)
+    {
+        setpoints.absMinHeatSetpointLimit = kDefaultAbsMinHeatSetpointLimit;
+    }
+
+    if (AbsMaxHeatSetpointLimit::Get(endpoint, &setpoints.absMaxHeatSetpointLimit) != Status::Success)
+    {
+        setpoints.absMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
+    }
+
+    int16_t minHeatSetpointLimit;
+    if (MinHeatSetpointLimit::Get(endpoint, &minHeatSetpointLimit) == Status::Success)
+    {
+        setpoints.minHeatSetpointLimit = chip::Optional<int16_t>(minHeatSetpointLimit);
+    }
+
+    int16_t maxHeatSetpointLimit;
+    if (MaxHeatSetpointLimit::Get(endpoint, &maxHeatSetpointLimit) == Status::Success)
+    {
+        setpoints.maxHeatSetpointLimit = chip::Optional<int16_t>(maxHeatSetpointLimit);
+    }
+
+    if (setpoints.coolSupported)
+    {
+        if (OccupiedCoolingSetpoint::Get(endpoint, &setpoints.occupiedCoolingSetpoint) != Status::Success)
         {
             // We're substituting the failure code here for backwards-compatibility reasons
             ChipLogError(Zcl, "Error: Can not read Occupied Cooling Setpoint");
@@ -246,9 +526,9 @@ Status GetSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
         }
     }
 
-    if (setpointLimits.heatSupported)
+    if (setpoints.heatSupported)
     {
-        if (OccupiedHeatingSetpoint::Get(endpoint, &setpointLimits.occupiedHeatingSetpoint) != Status::Success)
+        if (OccupiedHeatingSetpoint::Get(endpoint, &setpoints.occupiedHeatingSetpoint) != Status::Success)
         {
             // We're substituting the failure code here for backwards-compatibility reasons
             ChipLogError(Zcl, "Error: Can not read Occupied Heating Setpoint");
@@ -256,9 +536,9 @@ Status GetSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
         }
     }
 
-    if (setpointLimits.coolSupported && setpointLimits.occupancySupported)
+    if (setpoints.coolSupported && setpoints.occupancySupported)
     {
-        if (UnoccupiedCoolingSetpoint::Get(endpoint, &setpointLimits.unoccupiedCoolingSetpoint) != Status::Success)
+        if (UnoccupiedCoolingSetpoint::Get(endpoint, &setpoints.unoccupiedCoolingSetpoint) != Status::Success)
         {
             // We're substituting the failure code here for backwards-compatibility reasons
             ChipLogError(Zcl, "Error: Can not read Unoccupied Cooling Setpoint");
@@ -266,9 +546,9 @@ Status GetSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
         }
     }
 
-    if (setpointLimits.heatSupported && setpointLimits.occupancySupported)
+    if (setpoints.heatSupported && setpoints.occupancySupported)
     {
-        if (UnoccupiedHeatingSetpoint::Get(endpoint, &setpointLimits.unoccupiedHeatingSetpoint) != Status::Success)
+        if (UnoccupiedHeatingSetpoint::Get(endpoint, &setpoints.unoccupiedHeatingSetpoint) != Status::Success)
         {
             // We're substituting the failure code here for backwards-compatibility reasons
             ChipLogError(Zcl, "Error: Can not read Unoccupied Heating Setpoint");
@@ -362,36 +642,38 @@ void EnsureHeatingSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSe
 
 void EnsureDeadband(const ConcreteAttributePath & attributePath)
 {
+    /*
     auto endpoint = attributePath.mEndpointId;
-    SetpointLimits setpointLimits;
-    auto status = GetSetpointLimits(endpoint, setpointLimits);
+    SetpointLimits setpoints;
+    auto status = GetSetpoints(endpoint, setpoints);
     if (status != Status::Success)
     {
         return;
     }
-    if (!setpointLimits.autoSupported)
+    if (!setpoints.autoSupported)
     {
         return;
     }
     switch (attributePath.mAttributeId)
     {
     case OccupiedHeatingSetpoint::Id:
-        EnsureCoolingSetpointDeadband(endpoint, setpointLimits.occupiedCoolingSetpoint, setpointLimits.occupiedHeatingSetpoint,
-                                      setpointLimits.maxCoolSetpointLimit, setpointLimits.deadBand, OccupiedCoolingSetpoint::Set);
+        EnsureCoolingSetpointDeadband(endpoint, setpoints.occupiedCoolingSetpoint, setpoints.occupiedHeatingSetpoint,
+                                      setpoints.maxCoolSetpointLimit, setpoints.deadBand, OccupiedCoolingSetpoint::Set);
         break;
     case OccupiedCoolingSetpoint::Id:
-        EnsureHeatingSetpointDeadband(endpoint, setpointLimits.occupiedHeatingSetpoint, setpointLimits.occupiedCoolingSetpoint,
-                                      setpointLimits.minHeatSetpointLimit, setpointLimits.deadBand, OccupiedHeatingSetpoint::Set);
+        EnsureHeatingSetpointDeadband(endpoint, setpoints.occupiedHeatingSetpoint, setpoints.occupiedCoolingSetpoint,
+                                      setpoints.minHeatSetpointLimit, setpoints.deadBand, OccupiedHeatingSetpoint::Set);
         break;
     case UnoccupiedHeatingSetpoint::Id:
-        EnsureCoolingSetpointDeadband(endpoint, setpointLimits.unoccupiedCoolingSetpoint, setpointLimits.unoccupiedHeatingSetpoint,
-                                      setpointLimits.maxCoolSetpointLimit, setpointLimits.deadBand, UnoccupiedCoolingSetpoint::Set);
+        EnsureCoolingSetpointDeadband(endpoint, setpoints.unoccupiedCoolingSetpoint, setpoints.unoccupiedHeatingSetpoint,
+                                      setpoints.maxCoolSetpointLimit, setpoints.deadBand, UnoccupiedCoolingSetpoint::Set);
         break;
     case UnoccupiedCoolingSetpoint::Id:
-        EnsureHeatingSetpointDeadband(endpoint, setpointLimits.unoccupiedHeatingSetpoint, setpointLimits.unoccupiedCoolingSetpoint,
-                                      setpointLimits.minHeatSetpointLimit, setpointLimits.deadBand, UnoccupiedHeatingSetpoint::Set);
+        EnsureHeatingSetpointDeadband(endpoint, setpoints.unoccupiedHeatingSetpoint, setpoints.unoccupiedCoolingSetpoint,
+                                      setpoints.minHeatSetpointLimit, setpoints.deadBand, UnoccupiedHeatingSetpoint::Set);
         break;
     }
+    */
 }
 
 } // namespace Thermostat
@@ -399,238 +681,353 @@ void EnsureDeadband(const ConcreteAttributePath & attributePath)
 } // namespace app
 } // namespace chip
 
+Status setpointRaiseLower(const EndpointId endpointId, const Commands::SetpointRaiseLower::DecodableType & commandData)
+{
+    /* Setpoints setpoints;
+     auto status = Getsetpoints(endpoint, setpoints);
+     if (status != Status::Success)
+     {
+         return status;
+     }
+
+     auto & mode   = commandData.mode;
+     auto & amount = static_cast<int16_t>(commandData.amount * 10);
+
+     setpoints setpoints;
+     status = Getsetpoints(endpoint, setpoints);
+     if (status != Status::Success)
+     {
+         return status;
+     }
+
+     bool adjustHeat, adjustCool;
+     switch (mode)
+     {
+     case SetpointRaiseLowerModeEnum::kBoth:
+         adjustHeat = setpoints.supportsHeat;
+         adjustCool = setpoints.supportsCool;
+         break;
+     case SetpointRaiseLowerModeEnum::kHeat:
+         adjustHeat = setpoints.supportsHeat;
+         break;
+     case SetpointRaiseLowerModeEnum::kCool:
+         adjustCool = setpoints.supportsCool;
+         break;
+     default:
+         return Status::InvalidCommand;
+     }
+
+     bool isOccupied = true;
+     if (setpoints.occupancySupported)
+     {
+         BitMask<OccupancyBitmap, uint8_t> occupancy;
+         status = Occupancy::Get(aEndpointId, &occupancy);
+         if (status != Status::Success)
+         {
+             ChipLogError(Zcl, "Failed to execute SetpointRaiseLower command: could not get occupancy");
+             return status;
+         }
+         isOccupied = occupancy.Has(OccupancyBitmap::kOccupied);
+     }
+
+     auto range = setpoints.GetSetpointRange(isOccupied);
+     if (adjustHeat)
+     {
+         setpoints.ShiftSetpoint(range, true, amount);
+     }*/
+    return Status::Success;
+}
+
 bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * commandObj,
                                                         const app::ConcreteCommandPath & commandPath,
                                                         const Commands::SetpointRaiseLower::DecodableType & commandData)
 {
-    auto & mode   = commandData.mode;
-    auto & amount = commandData.amount;
 
-    EndpointId aEndpointId = commandPath.mEndpointId;
+    /* auto status = setpointRaiseLower(commandPath.mEndpointId, commandData);
+     commandObj->AddStatus(commandPath, status);
+     return true;
 
-    int16_t HeatingSetpoint = kDefaultHeatingSetpoint, CoolingSetpoint = kDefaultCoolingSetpoint; // Set to defaults to be safe
-    Status status                     = Status::Failure;
-    Status WriteCoolingSetpointStatus = Status::Failure;
-    Status WriteHeatingSetpointStatus = Status::Failure;
-    int16_t DeadBandTemp              = 0;
-    int8_t DeadBand                   = 0;
-    uint32_t OurFeatureMap;
-    bool AutoSupported = false;
-    bool HeatSupported = false;
-    bool CoolSupported = false;
+     auto & mode   = commandData.mode;
+     auto & amount = commandData.amount;
 
-    if (FeatureMap::Get(aEndpointId, &OurFeatureMap) != Status::Success)
-        OurFeatureMap = FEATURE_MAP_DEFAULT;
+     EndpointId aEndpointId = commandPath.mEndpointId;
 
-    if (OurFeatureMap & 1 << 5) // Bit 5 is Auto Mode supported
-        AutoSupported = true;
+     auto endpoint = commandPath.mEndpointId;
+     SetpointLimits setpointLimits;
+     auto status = GetSetpointLimits(endpoint, setpointLimits);
+     if (status != Status::Success)
+     {
+         commandObj->AddStatus(commandPath, status);
+         return true;
+     }
 
-    if (OurFeatureMap & 1 << 0)
-        HeatSupported = true;
+     bool adjustHeat, adjustCool;
+     switch (mode)
+     {
+     case SetpointRaiseLowerModeEnum::kBoth:
+         adjustHeat = setpointLimits.supportsHeat;
+         adjustCool = setpointLimits.supportsCool;
+         break;
+     case SetpointRaiseLowerModeEnum::kHeat:
+         adjustHeat = setpointLimits.supportsHeat;
+         break;
+     case SetpointRaiseLowerModeEnum::kCool:
+         adjustCool = setpointLimits.supportsCool;
+         break;
+     default:
+         commandObj->AddStatus(commandPath, Status::InvalidCommand);
+         return true;
+     }
+     if (!adjustHeat && !adjustCool)
+     {
+         commandObj->AddStatus(commandPath, Status::InvalidCommand);
+         return true;
+     }
+     bool isOccupied = true;
+     if (setpointLimits.occupancySupported)
+     {
+         BitMask<OccupancyBitmap, uint8_t> occupancy;
+         status = Occupancy::Get(aEndpointId, &occupancy);
+         if (status != Status::Success)
+         {
+             ChipLogError(Zcl, "Failed to execute SetpointRaiseLower command: could not get occupancy");
+             commandObj->AddStatus(commandPath, status);
+             return true;
+         }
+         isOccupied = occupancy.Has(OccupancyBitmap::kOccupied);
+     }
+     if (adjustHeat)
+     {
+         auto range          = setpointLimits.GetSetpointRange(isOccupied);
+         int16_t newSetpoint = range.heatingSetpoint + amount;
+         setpointLimits.ChangeSetpoint(newSetpoint, true, isOccupied);
+     }
 
-    if (OurFeatureMap & 1 << 1)
-        CoolSupported = true;
+     int16_t HeatingSetpoint = kDefaultHeatingSetpoint, CoolingSetpoint = kDefaultCoolingSetpoint; // Set to defaults to be safe
+     Status status                     = Status::Failure;
+     Status WriteCoolingSetpointStatus = Status::Failure;
+     Status WriteHeatingSetpointStatus = Status::Failure;
+     int16_t DeadBandTemp              = 0;
+     int8_t DeadBand                   = 0;
+     uint32_t OurFeatureMap;
+     bool AutoSupported = false;
+     bool HeatSupported = false;
+     bool CoolSupported = false;
 
-    if (AutoSupported)
-    {
-        if (MinSetpointDeadBand::Get(aEndpointId, &DeadBand) != Status::Success)
-            DeadBand = kDefaultDeadBand;
-        DeadBandTemp = static_cast<int16_t>(DeadBand * 10);
-    }
+     if (FeatureMap::Get(aEndpointId, &OurFeatureMap) != Status::Success)
+         OurFeatureMap = FEATURE_MAP_DEFAULT;
 
-    switch (mode)
-    {
-    case SetpointRaiseLowerModeEnum::kBoth:
-        if (HeatSupported && CoolSupported)
-        {
-            int16_t DesiredCoolingSetpoint, CoolLimit, DesiredHeatingSetpoint, HeatLimit;
-            if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == Status::Success)
-            {
-                DesiredCoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
-                CoolLimit              = static_cast<int16_t>(DesiredCoolingSetpoint -
-                                                 EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
-                {
-                    if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
-                    {
-                        DesiredHeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
-                        HeatLimit              = static_cast<int16_t>(DesiredHeatingSetpoint -
-                                                         EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
-                        {
-                            if (CoolLimit != 0 || HeatLimit != 0)
-                            {
-                                if (abs(CoolLimit) <= abs(HeatLimit))
-                                {
-                                    // We are limited by the Heating Limit
-                                    DesiredHeatingSetpoint = static_cast<int16_t>(DesiredHeatingSetpoint - HeatLimit);
-                                    DesiredCoolingSetpoint = static_cast<int16_t>(DesiredCoolingSetpoint - HeatLimit);
-                                }
-                                else
-                                {
-                                    // We are limited by Cooling Limit
-                                    DesiredHeatingSetpoint = static_cast<int16_t>(DesiredHeatingSetpoint - CoolLimit);
-                                    DesiredCoolingSetpoint = static_cast<int16_t>(DesiredCoolingSetpoint - CoolLimit);
-                                }
-                            }
-                            WriteCoolingSetpointStatus = OccupiedCoolingSetpoint::Set(aEndpointId, DesiredCoolingSetpoint);
-                            if (WriteCoolingSetpointStatus != Status::Success)
-                            {
-                                ChipLogError(Zcl, "Error: SetOccupiedCoolingSetpoint failed!");
-                            }
-                            WriteHeatingSetpointStatus = OccupiedHeatingSetpoint::Set(aEndpointId, DesiredHeatingSetpoint);
-                            if (WriteHeatingSetpointStatus != Status::Success)
-                            {
-                                ChipLogError(Zcl, "Error: SetOccupiedHeatingSetpoint failed!");
-                            }
-                        }
-                    }
-                }
-            }
-        }
+     if (OurFeatureMap & 1 << 5) // Bit 5 is Auto Mode supported
+         AutoSupported = true;
 
-        if (CoolSupported && !HeatSupported)
-        {
-            if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == Status::Success)
-            {
-                CoolingSetpoint            = static_cast<int16_t>(CoolingSetpoint + amount * 10);
-                CoolingSetpoint            = EnforceCoolingSetpointLimits(CoolingSetpoint, aEndpointId);
-                WriteCoolingSetpointStatus = OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint);
-                if (WriteCoolingSetpointStatus != Status::Success)
-                {
-                    ChipLogError(Zcl, "Error: SetOccupiedCoolingSetpoint failed!");
-                }
-            }
-        }
+     if (OurFeatureMap & 1 << 0)
+         HeatSupported = true;
 
-        if (HeatSupported && !CoolSupported)
-        {
-            if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
-            {
-                HeatingSetpoint            = static_cast<int16_t>(HeatingSetpoint + amount * 10);
-                HeatingSetpoint            = EnforceHeatingSetpointLimits(HeatingSetpoint, aEndpointId);
-                WriteHeatingSetpointStatus = OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint);
-                if (WriteHeatingSetpointStatus != Status::Success)
-                {
-                    ChipLogError(Zcl, "Error: SetOccupiedHeatingSetpoint failed!");
-                }
-            }
-        }
+     if (OurFeatureMap & 1 << 1)
+         CoolSupported = true;
 
-        if ((!HeatSupported || WriteHeatingSetpointStatus == Status::Success) &&
-            (!CoolSupported || WriteCoolingSetpointStatus == Status::Success))
-            status = Status::Success;
-        break;
+     if (AutoSupported)
+     {
+         if (MinSetpointDeadBand::Get(aEndpointId, &DeadBand) != Status::Success)
+             DeadBand = kDefaultDeadBand;
+         DeadBandTemp = static_cast<int16_t>(DeadBand * 10);
+     }
 
-    case SetpointRaiseLowerModeEnum::kCool:
-        if (CoolSupported)
-        {
-            if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == Status::Success)
-            {
-                CoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
-                CoolingSetpoint = EnforceCoolingSetpointLimits(CoolingSetpoint, aEndpointId);
-                if (AutoSupported)
-                {
-                    // Need to check if we can move the cooling setpoint while maintaining the dead band
-                    if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
-                    {
-                        if (CoolingSetpoint - HeatingSetpoint < DeadBandTemp)
-                        {
-                            // Dead Band Violation
-                            // Try to adjust it
-                            HeatingSetpoint = static_cast<int16_t>(CoolingSetpoint - DeadBandTemp);
-                            if (HeatingSetpoint == EnforceHeatingSetpointLimits(HeatingSetpoint, aEndpointId))
-                            {
-                                // Desired cooling setpoint is enforcable
-                                // Set the new cooling and heating setpoints
-                                if (OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint) == Status::Success)
-                                {
-                                    if (OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint) == Status::Success)
-                                        status = Status::Success;
-                                }
-                                else
-                                    ChipLogError(Zcl, "Error: SetOccupiedHeatingSetpoint failed!");
-                            }
-                            else
-                            {
-                                ChipLogError(Zcl, "Error: Could Not adjust heating setpoint to maintain dead band!");
-                                status = Status::InvalidCommand;
-                            }
-                        }
-                        else
-                            status = OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint);
-                    }
-                    else
-                        ChipLogError(Zcl, "Error: GetOccupiedHeatingSetpoint failed!");
-                }
-                else
-                {
-                    status = OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint);
-                }
-            }
-            else
-                ChipLogError(Zcl, "Error: GetOccupiedCoolingSetpoint failed!");
-        }
-        else
-            status = Status::InvalidCommand;
-        break;
+     switch (mode)
+     {
+     case SetpointRaiseLowerModeEnum::kBoth:
+         if (HeatSupported && CoolSupported)
+         {
+             int16_t DesiredCoolingSetpoint, CoolLimit, DesiredHeatingSetpoint, HeatLimit;
+             if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == Status::Success)
+             {
+                 DesiredCoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
+                 CoolLimit              = static_cast<int16_t>(DesiredCoolingSetpoint -
+                                                               EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
+                 {
+                     if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
+                     {
+                         DesiredHeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
+                         HeatLimit              = static_cast<int16_t>(DesiredHeatingSetpoint -
+                                                                       EnforceHeatingSetpointLimits(DesiredHeatingSetpoint,
+     aEndpointId));
+                         {
+                             if (CoolLimit != 0 || HeatLimit != 0)
+                             {
+                                 if (abs(CoolLimit) <= abs(HeatLimit))
+                                 {
+                                     // We are limited by the Heating Limit
+                                     DesiredHeatingSetpoint = static_cast<int16_t>(DesiredHeatingSetpoint - HeatLimit);
+                                     DesiredCoolingSetpoint = static_cast<int16_t>(DesiredCoolingSetpoint - HeatLimit);
+                                 }
+                                 else
+                                 {
+                                     // We are limited by Cooling Limit
+                                     DesiredHeatingSetpoint = static_cast<int16_t>(DesiredHeatingSetpoint - CoolLimit);
+                                     DesiredCoolingSetpoint = static_cast<int16_t>(DesiredCoolingSetpoint - CoolLimit);
+                                 }
+                             }
+                             WriteCoolingSetpointStatus = OccupiedCoolingSetpoint::Set(aEndpointId, DesiredCoolingSetpoint);
+                             if (WriteCoolingSetpointStatus != Status::Success)
+                             {
+                                 ChipLogError(Zcl, "Error: SetOccupiedCoolingSetpoint failed!");
+                             }
+                             WriteHeatingSetpointStatus = OccupiedHeatingSetpoint::Set(aEndpointId, DesiredHeatingSetpoint);
+                             if (WriteHeatingSetpointStatus != Status::Success)
+                             {
+                                 ChipLogError(Zcl, "Error: SetOccupiedHeatingSetpoint failed!");
+                             }
+                         }
+                     }
+                 }
+             }
+         }
 
-    case SetpointRaiseLowerModeEnum::kHeat:
-        if (HeatSupported)
-        {
-            if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
-            {
-                HeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
-                HeatingSetpoint = EnforceHeatingSetpointLimits(HeatingSetpoint, aEndpointId);
-                if (AutoSupported)
-                {
-                    // Need to check if we can move the cooling setpoint while maintaining the dead band
-                    if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == Status::Success)
-                    {
-                        if (CoolingSetpoint - HeatingSetpoint < DeadBandTemp)
-                        {
-                            // Dead Band Violation
-                            // Try to adjust it
-                            CoolingSetpoint = static_cast<int16_t>(HeatingSetpoint + DeadBandTemp);
-                            if (CoolingSetpoint == EnforceCoolingSetpointLimits(CoolingSetpoint, aEndpointId))
-                            {
-                                // Desired cooling setpoint is enforcable
-                                // Set the new cooling and heating setpoints
-                                if (OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint) == Status::Success)
-                                {
-                                    if (OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint) == Status::Success)
-                                        status = Status::Success;
-                                }
-                                else
-                                    ChipLogError(Zcl, "Error: SetOccupiedCoolingSetpoint failed!");
-                            }
-                            else
-                            {
-                                ChipLogError(Zcl, "Error: Could Not adjust cooling setpoint to maintain dead band!");
-                                status = Status::InvalidCommand;
-                            }
-                        }
-                        else
-                            status = OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint);
-                    }
-                    else
-                        ChipLogError(Zcl, "Error: GetOccupiedCoolingSetpoint failed!");
-                }
-                else
-                {
-                    status = OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint);
-                }
-            }
-            else
-                ChipLogError(Zcl, "Error: GetOccupiedHeatingSetpoint failed!");
-        }
-        else
-            status = Status::InvalidCommand;
-        break;
+         if (CoolSupported && !HeatSupported)
+         {
+             if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == Status::Success)
+             {
+                 CoolingSetpoint            = static_cast<int16_t>(CoolingSetpoint + amount * 10);
+                 CoolingSetpoint            = EnforceCoolingSetpointLimits(CoolingSetpoint, aEndpointId);
+                 WriteCoolingSetpointStatus = OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint);
+                 if (WriteCoolingSetpointStatus != Status::Success)
+                 {
+                     ChipLogError(Zcl, "Error: SetOccupiedCoolingSetpoint failed!");
+                 }
+             }
+         }
 
-    default:
-        status = Status::InvalidCommand;
-        break;
-    }
+         if (HeatSupported && !CoolSupported)
+         {
+             if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
+             {
+                 HeatingSetpoint            = static_cast<int16_t>(HeatingSetpoint + amount * 10);
+                 HeatingSetpoint            = EnforceHeatingSetpointLimits(HeatingSetpoint, aEndpointId);
+                 WriteHeatingSetpointStatus = OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint);
+                 if (WriteHeatingSetpointStatus != Status::Success)
+                 {
+                     ChipLogError(Zcl, "Error: SetOccupiedHeatingSetpoint failed!");
+                 }
+             }
+         }
 
-    commandObj->AddStatus(commandPath, status);
+         if ((!HeatSupported || WriteHeatingSetpointStatus == Status::Success) &&
+             (!CoolSupported || WriteCoolingSetpointStatus == Status::Success))
+             status = Status::Success;
+         break;
+
+     case SetpointRaiseLowerModeEnum::kCool:
+         if (CoolSupported)
+         {
+             if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == Status::Success)
+             {
+                 CoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
+                 CoolingSetpoint = EnforceCoolingSetpointLimits(CoolingSetpoint, aEndpointId);
+                 if (AutoSupported)
+                 {
+                     // Need to check if we can move the cooling setpoint while maintaining the dead band
+                     if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
+                     {
+                         if (CoolingSetpoint - HeatingSetpoint < DeadBandTemp)
+                         {
+                             // Dead Band Violation
+                             // Try to adjust it
+                             HeatingSetpoint = static_cast<int16_t>(CoolingSetpoint - DeadBandTemp);
+                             if (HeatingSetpoint == EnforceHeatingSetpointLimits(HeatingSetpoint, aEndpointId))
+                             {
+                                 // Desired cooling setpoint is enforcable
+                                 // Set the new cooling and heating setpoints
+                                 if (OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint) == Status::Success)
+                                 {
+                                     if (OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint) == Status::Success)
+                                         status = Status::Success;
+                                 }
+                                 else
+                                     ChipLogError(Zcl, "Error: SetOccupiedHeatingSetpoint failed!");
+                             }
+                             else
+                             {
+                                 ChipLogError(Zcl, "Error: Could Not adjust heating setpoint to maintain dead band!");
+                                 status = Status::InvalidCommand;
+                             }
+                         }
+                         else
+                             status = OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint);
+                     }
+                     else
+                         ChipLogError(Zcl, "Error: GetOccupiedHeatingSetpoint failed!");
+                 }
+                 else
+                 {
+                     status = OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint);
+                 }
+             }
+             else
+                 ChipLogError(Zcl, "Error: GetOccupiedCoolingSetpoint failed!");
+         }
+         else
+             status = Status::InvalidCommand;
+         break;
+
+     case SetpointRaiseLowerModeEnum::kHeat:
+         if (HeatSupported)
+         {
+             if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
+             {
+                 HeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
+                 HeatingSetpoint = EnforceHeatingSetpointLimits(HeatingSetpoint, aEndpointId);
+                 if (AutoSupported)
+                 {
+                     // Need to check if we can move the cooling setpoint while maintaining the dead band
+                     if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == Status::Success)
+                     {
+                         if (CoolingSetpoint - HeatingSetpoint < DeadBandTemp)
+                         {
+                             // Dead Band Violation
+                             // Try to adjust it
+                             CoolingSetpoint = static_cast<int16_t>(HeatingSetpoint + DeadBandTemp);
+                             if (CoolingSetpoint == EnforceCoolingSetpointLimits(CoolingSetpoint, aEndpointId))
+                             {
+                                 // Desired cooling setpoint is enforcable
+                                 // Set the new cooling and heating setpoints
+                                 if (OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint) == Status::Success)
+                                 {
+                                     if (OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint) == Status::Success)
+                                         status = Status::Success;
+                                 }
+                                 else
+                                     ChipLogError(Zcl, "Error: SetOccupiedCoolingSetpoint failed!");
+                             }
+                             else
+                             {
+                                 ChipLogError(Zcl, "Error: Could Not adjust cooling setpoint to maintain dead band!");
+                                 status = Status::InvalidCommand;
+                             }
+                         }
+                         else
+                             status = OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint);
+                     }
+                     else
+                         ChipLogError(Zcl, "Error: GetOccupiedCoolingSetpoint failed!");
+                 }
+                 else
+                 {
+                     status = OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint);
+                 }
+             }
+             else
+                 ChipLogError(Zcl, "Error: GetOccupiedHeatingSetpoint failed!");
+         }
+         else
+             status = Status::InvalidCommand;
+         break;
+
+     default:
+         status = Status::InvalidCommand;
+         break;
+     }
+
+     commandObj->AddStatus(commandPath, status);
+     */
     return true;
 }
