@@ -737,6 +737,21 @@ public:
         return *SafePointerCast<T *>(&mContext);
     }
 
+    static constexpr size_t Size() { return ContextSize; }
+
+    /**
+     * @brief Access the raw opaque context bytes for persistence.
+     *
+     * The bytes may be either raw key material or a platform-specific key reference,
+     * depending on the crypto backend, and must be treated as opaque.
+     *
+     * @note Do NOT use this to pass key material to crypto primitives.
+     *       Backend-specific code should use As() / AsMutable() to access
+     *       the backend-specific concrete representation instead.
+     */
+    FixedByteSpan<ContextSize> OpaqueBytes() const { return FixedSpan(mContext.mOpaque); }
+    MutableFixedByteSpan<ContextSize> OpaqueBytes() { return FixedSpan(mContext.mOpaque); }
+
 protected:
     SymmetricKeyHandle() = default;
     ~SymmetricKeyHandle() { ClearSecretData(mContext.mOpaque); }
@@ -748,14 +763,14 @@ private:
     } mContext;
 };
 
-using Symmetric128BitsKeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-
 /**
  * @brief Platform-specific 128-bit symmetric key handle
  */
 class Symmetric128BitsKeyHandle : public SymmetricKeyHandle<CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>
 {
 };
+
+using Symmetric128BitsKeyByteArray = uint8_t[Symmetric128BitsKeyHandle::Size()];
 
 /**
  * @brief Platform-specific 128-bit AES key handle
