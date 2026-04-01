@@ -4132,7 +4132,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": null,
+              "defaultValue": "0x000b",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

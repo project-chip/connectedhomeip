@@ -179,7 +179,9 @@ RegisteredServerCluster<Clusters::IdentifyCluster>
                           .WithIdentifyType(Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
                           .WithDelegate(&sIdentifyDelegate));
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
 LazyRegisteredServerCluster<Clusters::GroupcastCluster> gGroupcastCluster;
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
 } // namespace
 
@@ -218,6 +220,7 @@ void ApplicationInit()
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster3.Registration()) == CHIP_NO_ERROR);
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster4.Registration()) == CHIP_NO_ERROR);
 
+#if CHIP_CONFIG_ENABLE_GROUPCAST
     gGroupcastCluster.Create(
         Clusters::GroupcastContext{
             .fabricTable       = Server::GetInstance().GetFabricTable(),
@@ -228,6 +231,7 @@ void ApplicationInit()
                                                Clusters::Groupcast::Feature::kPerGroup));
 
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gGroupcastCluster.Registration()) == CHIP_NO_ERROR);
+#endif // CHIP_CONFIG_ENABLE_GROUPCAST
 
     TEMPORARY_RETURN_IGNORED SetTagList(/* endpoint= */ 0,
                                         Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
