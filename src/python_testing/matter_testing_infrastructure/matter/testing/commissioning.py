@@ -286,7 +286,7 @@ class CommissioningThreadMeshcop(CommissioningMethod):
         )
 
     async def _find_or_establish_pase_if_needed(self):
-        return
+        pass
 
     async def _commission(self):
         return await self.dev_ctrl.CommissionThreadMeshcop(
