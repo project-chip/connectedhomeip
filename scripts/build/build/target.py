@@ -45,7 +45,7 @@ import re
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional
 
-from builders.builder import BuilderOptions
+from builders.builder import BuilderOptions, BuildProfile
 
 log = logging.getLogger(__name__)
 
@@ -205,7 +205,7 @@ def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: List[
 class BuildTarget:
 
     def __init__(self, name, builder_class, **kwargs):
-        """ Sets up a new build tareget starting with the given builder class
+        """ Sets up a new build target starting with the given builder class
             and initial arguments
         """
         self.name = name.lower()
@@ -470,6 +470,9 @@ class BuildTarget:
         else:
             # TODO: can we check if builds are compatible?
             builder.output_dir = os.path.join(output_prefix, name)
+        # Append suffix to the output dir to indicate a non-default build profile.
+        if builder_options.build_profile != BuildProfile.DEFAULT:
+            builder.output_dir += '-' + builder_options.build_profile
         builder.verbose = verbose
         builder.ninja_jobs = ninja_jobs
         builder.chip_dir = os.path.abspath(repository_path)

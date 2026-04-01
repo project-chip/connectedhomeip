@@ -17,7 +17,7 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput
+from .builder import Builder, BuilderOutput, BuildProfile
 
 log = logging.getLogger(__name__)
 
@@ -119,30 +119,15 @@ class AndroidApp(Enum):
         return None
 
 
-class AndroidProfile(Enum):
-    RELEASE = auto()
-    DEBUG = auto()
-
-    @property
-    def ProfileName(self):
-        if self == AndroidProfile.RELEASE:
-            return 'release'
-        if self == AndroidProfile.DEBUG:
-            return 'debug'
-        raise Exception('Unknown profile type: %r' % self)
-
-
 class AndroidBuilder(Builder):
     def __init__(self,
                  root,
                  runner,
                  board: AndroidBoard,
-                 app: AndroidApp,
-                 profile: AndroidProfile = AndroidProfile.DEBUG):
+                 app: AndroidApp):
         super(AndroidBuilder, self).__init__(root, runner)
         self.board = board
         self.app = app
-        self.profile = profile
 
     def _get_sdk_manager_paths(self):
         """Get list of possible SDK manager paths for Android SDK compatibility."""
@@ -427,6 +412,17 @@ class AndroidBuilder(Builder):
             if exampleName == "chip-test":
                 gn_args["chip_build_test_static_libraries"] = False
 
+            match self.options.build_profile:
+                # Explicitly treat DEFAULT as DEBUG when building examples.
+                case BuildProfile.DEFAULT | BuildProfile.DEBUG:
+                    gn_args.update({"is_debug": True, "optimize_debug": False})
+                case BuildProfile.DEBUG_OPTIMIZED:
+                    gn_args.update({"is_debug": True, "optimize_debug": True})
+                case BuildProfile.RELEASE:
+                    gn_args.update({"is_debug": False, "optimize_for_size": False})
+                case BuildProfile.RELEASE_SIZE:
+                    gn_args.update({"is_debug": False, "optimize_for_size": True})
+
             if self.options.pw_command_launcher:
                 gn_args["pw_command_launcher"] = self.options.pw_command_launcher
 
@@ -435,8 +431,6 @@ class AndroidBuilder(Builder):
 
             if exampleName == "chip-test":
                 gn_args["chip_build_tests"] = True
-            if self.profile != AndroidProfile.DEBUG:
-                gn_args["is_debug"] = False
             gn_args.update(self.app.AppGnArgs())
 
             args_str = ""
@@ -617,7 +611,7 @@ class AndroidBuilder(Builder):
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
 
-            if (self.profile != AndroidProfile.DEBUG):
+            if self.options.build_profile in [BuildProfile.RELEASE, BuildProfile.RELEASE_SIZE]:
                 self.stripSymbols()
 
     def build_outputs(self):

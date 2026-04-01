@@ -88,13 +88,14 @@ class TIBuilder(GnBuilder):
         self.openthread_ftd = openthread_ftd
 
     def GnBuildArgs(self):
-        args = [
+        args = super().GnBuildArgs()
+        args.extend([
             'ti_sysconfig_root="%s"' % os.environ['TI_SYSCONFIG_ROOT'],
             'ti_simplelink_board="%s"' % self.board.BoardName(),
             # FIXME: It seems that TI SDK expects link map file to be present.
             #        In order to make it optional, SDK fix is needed.
             'chip_generate_link_map_file=true',
-        ]
+        ])
 
         if self.openthread_ftd:
             args.append('chip_openthread_ftd=true')

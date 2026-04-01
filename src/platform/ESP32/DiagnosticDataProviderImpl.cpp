@@ -190,7 +190,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
-    esp_netif_t * netif     = esp_netif_next(NULL);
+    // TODO: safely iterate over netifs
+    esp_netif_t * netif     = esp_netif_next_unsafe(NULL);
     NetworkInterface * head = NULL;
     uint8_t ipv6_addr_count = 0;
     esp_ip6_addr_t ip6_addr[LWIP_IPV6_NUM_ADDRESSES];
@@ -200,7 +201,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     }
     else
     {
-        for (esp_netif_t * ifa = netif; ifa != NULL; ifa = esp_netif_next(ifa))
+        for (esp_netif_t * ifa = netif; ifa != NULL; ifa = esp_netif_next_unsafe(ifa))
         {
             NetworkInterface * ifp = new NetworkInterface();
             uint8_t addressSize    = 0;

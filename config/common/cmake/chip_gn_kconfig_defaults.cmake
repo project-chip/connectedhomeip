@@ -95,3 +95,7 @@ if(CONFIG_CHIP_FACTORY_DATA OR CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
     matter_add_gn_arg_bool("chip_use_transitional_commissionable_data_provider" FALSE)
     matter_add_gn_arg_bool("chip_use_transitional_device_instance_info_provider" FALSE)
 endif()
+
+if (CONFIG_CHIP_BUILD_TESTS)
+    matter_add_gn_arg_bool("chip_with_nlfaultinjection" CONFIG_CHIP_BUILD_NL_FAULT_INJECTION)
+endif()
