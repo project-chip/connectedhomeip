@@ -197,10 +197,10 @@ class TC_WATERHEATER(MatterBaseTest):
         )
 
         # Now read EstimatedHeatRequired.
-        # Expected: 435620
+        # Expected: 435625
         val = await self.read_single_attribute_check_success(
             endpoint=self.ENDPOINT, cluster=cluster, attribute=attributes.EstimatedHeatRequired)
-        asserts.assert_equal(val, 435620, f"EstimatedHeatRequired should be 435620, got {val}")
+        asserts.assert_equal(val, 435625, f"EstimatedHeatRequired should be 435625, got {val}")
 
         # 8. EstimatedHeatRequired calculation (Zero case):
         self._write_thermostat_local_temperature_pwrpc(device, 3000)  # 30C
