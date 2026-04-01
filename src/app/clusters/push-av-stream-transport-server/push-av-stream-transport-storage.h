@@ -267,100 +267,6 @@ private:
 };
 
 /**
- * @brief Storage implementation for video stream structures.
- * Provides deep copy functionality for stream names with internal buffer management.
- * Must be used when video stream configurations need to persist beyond TLV decode buffer scope.
- */
-struct VideoStreamStructStorage : public Structs::VideoStreamStruct::Type
-{
-    VideoStreamStructStorage() {}
-
-    VideoStreamStructStorage(const VideoStreamStructStorage & aVideoStreamStructStorage) { *this = aVideoStreamStructStorage; }
-
-    VideoStreamStructStorage & operator=(const VideoStreamStructStorage & aVideoStreamStructStorage)
-    {
-        if (this == &aVideoStreamStructStorage)
-        {
-            return *this;
-        }
-
-        // Deep copy the stream name buffer
-        MutableCharSpan nameBuffer(mNameBuffer);
-        CopyCharSpanToMutableCharSpanWithTruncation(aVideoStreamStructStorage.videoStreamName, nameBuffer);
-        videoStreamName = nameBuffer;
-
-        videoStreamID = aVideoStreamStructStorage.videoStreamID;
-
-        return *this;
-    }
-
-    VideoStreamStructStorage & operator=(const Structs::VideoStreamStruct::Type & aVideoStream)
-    {
-        // Deep copy the stream name into internal buffer
-        MutableCharSpan nameBuffer(mNameBuffer);
-        // ValidateIncomingTransportOptions() function already checked the stream name length
-        CopyCharSpanToMutableCharSpanWithTruncation(aVideoStream.videoStreamName, nameBuffer);
-        videoStreamName = nameBuffer;
-
-        videoStreamID = aVideoStream.videoStreamID;
-
-        return *this;
-    }
-
-    VideoStreamStructStorage(const Structs::VideoStreamStruct::Type & videoStream) { *this = videoStream; }
-
-private:
-    char mNameBuffer[kMaxStreamNameLength];
-};
-
-/**
- * @brief Storage implementation for audio stream structures.
- * Provides deep copy functionality for stream names with internal buffer management.
- * Must be used when audio stream configurations need to persist beyond TLV decode buffer scope.
- */
-struct AudioStreamStructStorage : public Structs::AudioStreamStruct::Type
-{
-    AudioStreamStructStorage() {}
-
-    AudioStreamStructStorage(const AudioStreamStructStorage & aAudioStreamStructStorage) { *this = aAudioStreamStructStorage; }
-
-    AudioStreamStructStorage & operator=(const AudioStreamStructStorage & aAudioStreamStructStorage)
-    {
-        if (this == &aAudioStreamStructStorage)
-        {
-            return *this;
-        }
-
-        // Deep copy the stream name buffer
-        MutableCharSpan nameBuffer(mNameBuffer);
-        CopyCharSpanToMutableCharSpanWithTruncation(aAudioStreamStructStorage.audioStreamName, nameBuffer);
-        audioStreamName = nameBuffer;
-
-        audioStreamID = aAudioStreamStructStorage.audioStreamID;
-
-        return *this;
-    }
-
-    AudioStreamStructStorage & operator=(const Structs::AudioStreamStruct::Type & aAudioStream)
-    {
-        // Deep copy the stream name into internal buffer
-        MutableCharSpan nameBuffer(mNameBuffer);
-        // ValidateIncomingTransportOptions() function already checked the stream name length
-        CopyCharSpanToMutableCharSpanWithTruncation(aAudioStream.audioStreamName, nameBuffer);
-        audioStreamName = nameBuffer;
-
-        audioStreamID = aAudioStream.audioStreamID;
-
-        return *this;
-    }
-
-    AudioStreamStructStorage(const Structs::AudioStreamStruct::Type & audioStream) { *this = audioStream; }
-
-private:
-    char mNameBuffer[kMaxStreamNameLength];
-};
-
-/**
  * @brief Storage implementation for container format options.
  * Manages different container formats with type-specific storage handling.
  * Currently supports CMAF containers.
@@ -443,8 +349,18 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         expiryTime = aTransportOptionsStorage.expiryTime;
 
-        // Copy video streams storage
+        // Deep copy flat stream name buffers
+        std::memcpy(mVideoStreamNameBuffer.data(), aTransportOptionsStorage.mVideoStreamNameBuffer.data(),
+                    aTransportOptionsStorage.mVideoStreamNameBufferUsed);
+        std::memcpy(mAudioStreamNameBuffer.data(), aTransportOptionsStorage.mAudioStreamNameBuffer.data(),
+                    aTransportOptionsStorage.mAudioStreamNameBufferUsed);
+        mVideoStreamNameBufferUsed = aTransportOptionsStorage.mVideoStreamNameBufferUsed;
+        mAudioStreamNameBufferUsed = aTransportOptionsStorage.mAudioStreamNameBufferUsed;
+
+        // Copy video streams storage (base types only)
         mVideoStreamsStorage = aTransportOptionsStorage.mVideoStreamsStorage;
+
+        // Rebind videoStreams list view to point to our storage
         if (!mVideoStreamsStorage.empty())
         {
             videoStreams.SetValue(
@@ -455,8 +371,10 @@ struct TransportOptionsStorage : public TransportOptionsStruct
             videoStreams.ClearValue();
         }
 
-        // Copy audio streams storage
+        // Copy audio streams storage (base types only)
         mAudioStreamsStorage = aTransportOptionsStorage.mAudioStreamsStorage;
+
+        // Rebind audioStreams list view to point to our storage
         if (!mAudioStreamsStorage.empty())
         {
             audioStreams.SetValue(
@@ -492,15 +410,26 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         expiryTime = transportOptions.expiryTime;
 
-        // Handle videoStreams from decodable type - perform deep copy
+        // Handle videoStreams from decodable type - perform deep copy into flat buffer
         if (transportOptions.videoStreams.HasValue())
         {
             mVideoStreamsStorage.clear();
-            auto iter = transportOptions.videoStreams.Value().begin();
+            mVideoStreamNameBufferUsed = 0;
+            auto iter                  = transportOptions.videoStreams.Value().begin();
             while (iter.Next())
             {
                 auto & videoStream = iter.GetValue();
-                mVideoStreamsStorage.push_back(videoStream); // Deep copy via VideoStreamStructStorage
+                Structs::VideoStreamStruct::Type newStream;
+                newStream.videoStreamID = videoStream.videoStreamID;
+
+                // Deep copy stream name into flat buffer
+                size_t offset = mVideoStreamNameBufferUsed;
+                MutableCharSpan nameBuffer(mVideoStreamNameBuffer.data() + offset, kMaxStreamNameLength);
+                CopyCharSpanToMutableCharSpanWithTruncation(videoStream.videoStreamName, nameBuffer);
+                newStream.videoStreamName = nameBuffer;
+
+                mVideoStreamsStorage.push_back(newStream);
+                mVideoStreamNameBufferUsed += kMaxStreamNameLength;
             }
             videoStreams.SetValue(
                 DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
@@ -508,18 +437,30 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         else
         {
             mVideoStreamsStorage.clear();
+            mVideoStreamNameBufferUsed = 0;
             videoStreams.ClearValue();
         }
 
-        // Handle audioStreams from decodable type - perform deep copy
+        // Handle audioStreams from decodable type - perform deep copy into flat buffer
         if (transportOptions.audioStreams.HasValue())
         {
             mAudioStreamsStorage.clear();
-            auto iter = transportOptions.audioStreams.Value().begin();
+            mAudioStreamNameBufferUsed = 0;
+            auto iter                  = transportOptions.audioStreams.Value().begin();
             while (iter.Next())
             {
                 auto & audioStream = iter.GetValue();
-                mAudioStreamsStorage.push_back(audioStream); // Deep copy via AudioStreamStructStorage
+                Structs::AudioStreamStruct::Type newStream;
+                newStream.audioStreamID = audioStream.audioStreamID;
+
+                // Deep copy stream name into flat buffer
+                size_t offset = mAudioStreamNameBufferUsed;
+                MutableCharSpan nameBuffer(mAudioStreamNameBuffer.data() + offset, kMaxStreamNameLength);
+                CopyCharSpanToMutableCharSpanWithTruncation(audioStream.audioStreamName, nameBuffer);
+                newStream.audioStreamName = nameBuffer;
+
+                mAudioStreamsStorage.push_back(newStream);
+                mAudioStreamNameBufferUsed += kMaxStreamNameLength;
             }
             audioStreams.SetValue(
                 DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
@@ -527,6 +468,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         else
         {
             mAudioStreamsStorage.clear();
+            mAudioStreamNameBufferUsed = 0;
             audioStreams.ClearValue();
         }
 
@@ -539,12 +481,24 @@ struct TransportOptionsStorage : public TransportOptionsStruct
     void ClearVideoStreams()
     {
         mVideoStreamsStorage.clear();
+        mVideoStreamNameBufferUsed = 0;
         videoStreams.ClearValue();
     }
 
     void AddVideoStream(const Structs::VideoStreamStruct::Type & videoStream)
     {
-        mVideoStreamsStorage.push_back(videoStream);
+        // Deep copy stream name into flat buffer
+        size_t offset = mVideoStreamNameBufferUsed;
+        MutableCharSpan nameBuffer(mVideoStreamNameBuffer.data() + offset, kMaxStreamNameLength);
+        CopyCharSpanToMutableCharSpanWithTruncation(videoStream.videoStreamName, nameBuffer);
+
+        Structs::VideoStreamStruct::Type newStream;
+        newStream.videoStreamID   = videoStream.videoStreamID;
+        newStream.videoStreamName = nameBuffer;
+
+        mVideoStreamsStorage.push_back(newStream);
+        mVideoStreamNameBufferUsed += kMaxStreamNameLength;
+
         videoStreams.SetValue(
             DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
     }
@@ -566,12 +520,24 @@ struct TransportOptionsStorage : public TransportOptionsStruct
     void ClearAudioStreams()
     {
         mAudioStreamsStorage.clear();
+        mAudioStreamNameBufferUsed = 0;
         audioStreams.ClearValue();
     }
 
     void AddAudioStream(const Structs::AudioStreamStruct::Type & audioStream)
     {
-        mAudioStreamsStorage.push_back(audioStream);
+        // Deep copy stream name into flat buffer
+        size_t offset = mAudioStreamNameBufferUsed;
+        MutableCharSpan nameBuffer(mAudioStreamNameBuffer.data() + offset, kMaxStreamNameLength);
+        CopyCharSpanToMutableCharSpanWithTruncation(audioStream.audioStreamName, nameBuffer);
+
+        Structs::AudioStreamStruct::Type newStream;
+        newStream.audioStreamID   = audioStream.audioStreamID;
+        newStream.audioStreamName = nameBuffer;
+
+        mAudioStreamsStorage.push_back(newStream);
+        mAudioStreamNameBufferUsed += kMaxStreamNameLength;
+
         audioStreams.SetValue(
             DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
     }
@@ -593,8 +559,17 @@ private:
     char mUrlBuffer[kMaxUrlLength];
     TransportTriggerOptionsStorage mTriggerOptionsStorage;
     ContainerOptionsStorage mContainerOptionsStorage;
-    std::vector<VideoStreamStructStorage> mVideoStreamsStorage;
-    std::vector<AudioStreamStructStorage> mAudioStreamsStorage;
+
+    // Use base types for DataModel::List compatibility (correct memory layout)
+    std::vector<Structs::VideoStreamStruct::Type> mVideoStreamsStorage;
+    std::vector<Structs::AudioStreamStruct::Type> mAudioStreamsStorage;
+
+    // Separate flat storage for stream names (deep copy buffers)
+    std::array<char, 16 * kMaxStreamNameLength> mVideoStreamNameBuffer;
+    std::array<char, 16 * kMaxStreamNameLength> mAudioStreamNameBuffer;
+
+    size_t mVideoStreamNameBufferUsed = 0;
+    size_t mAudioStreamNameBufferUsed = 0;
 };
 
 /**
