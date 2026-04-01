@@ -281,6 +281,7 @@ class CommissioningThreadMeshcop(CommissioningMethod):
         )
 
     async def _find_or_establish_pase_if_needed(self):
+        # Thread MeshCoP commissioning does not require creating a new PASE session here
         pass
 
     async def _commission(self):
