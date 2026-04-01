@@ -59,6 +59,14 @@ static_assert(CHIP_CONFIG_SHA256_CONTEXT_SIZE == sizeof(psa_hash_operation_t),
 #endif
 #endif
 
+#if CONFIG_NXP_USE_LOW_POWER
+// The "fwk_platform_extflash.h" header file does not export its API for C++
+// linkage so we have to force it here until it does
+extern "C" {
+#include "fwk_platform_extflash.h"
+}
+#endif /* CONFIG_NXP_USE_LOW_POWER */
+
 extern "C" status_t CRYPTO_InitHardware(void);
 extern "C" void BOARD_InitAppConsole();
 
@@ -247,6 +255,29 @@ void PlatformManagerImpl::_Shutdown()
     /* Shutdown all layers */
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
+
+#if CONFIG_NXP_USE_LOW_POWER
+CHIP_ERROR PlatformManagerImpl::EnableOTAStorage(void)
+{
+    // The OTA support from the wireless framework is automatically
+    // initializing the external flash when a new OTA image is started. The
+    // only action remaining here would be just to mark the OTA storage as
+    // enabled
+    otaStorageState = OTAStorageEnabled;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::DisableOTAStorage(void)
+{
+    // Unfortunately we cannot disable the external flash completely (no
+    // support yet in the wireless framework) so we will just suspend it for
+    // now
+    PLATFORM_UninitExternalFlash();
+    otaStorageState = OTAStorageSuspended;
+
+    return CHIP_NO_ERROR;
+}
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip
