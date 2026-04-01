@@ -75,7 +75,6 @@ public:
      */
     ElectricalEnergyMeasurementCluster(const Config & config);
 
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType shutdownType) override;
 
     const OptionalAttributesSet & OptionalAttributes() const { return mEnabledOptionalAttributes; }

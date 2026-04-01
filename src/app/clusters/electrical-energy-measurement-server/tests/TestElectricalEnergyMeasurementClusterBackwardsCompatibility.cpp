@@ -346,13 +346,24 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TimerFiresA
 
     auto & logOnlyEvents = mContext.EventsGenerator();
 
+    // First report to establish stored values with endSystime.
+    mDelegate.mCumulativeImported = 1;
+    mDelegate.mPeriodicImported   = 1;
+    mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(100));
+    cluster->GenerateSnapshots();
+    ASSERT_TRUE(logOnlyEvents.GetNextEvent().has_value());
+    ASSERT_TRUE(logOnlyEvents.GetNextEvent().has_value());
+
+    // Rate-limited update within 1 s starts the delay timer.
+    mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(1));
     mDelegate.mCumulativeImported = 77000;
     mDelegate.mPeriodicImported   = 300;
+    cluster->GenerateSnapshots();
+    EXPECT_FALSE(logOnlyEvents.GetNextEvent().has_value());
 
-    // Advance clock by the default report interval (60s) -- should trigger timer-based report
-    mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMaxReportInterval);
+    // Advance past the max-delay timer -- fires and produces a report.
+    mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMaxReportDelayInterval);
 
-    // Verify cumulative event was generated
     {
         auto event = logOnlyEvents.GetNextEvent();
         ASSERT_TRUE(event.has_value());
@@ -362,7 +373,6 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TimerFiresA
         EXPECT_EQ(decoded.energyImported.Value().energy, 77000);
     }
 
-    // Verify periodic event was generated
     {
         auto event = logOnlyEvents.GetNextEvent();
         ASSERT_TRUE(event.has_value());
@@ -468,7 +478,7 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, RateLimited
     attrAccess.Shutdown();
 }
 
-TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TimerDoesNotWipeSnapshotValuesWithNoOpDelegate)
+TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, GenerateSnapshotsDoesNotWipeValuesWithNoOpDelegate)
 {
     BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kExportedEnergy, Feature::kCumulativeEnergy,
                                  Feature::kPeriodicEnergy);
@@ -481,7 +491,7 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TimerDoesNo
     ASSERT_NE(cluster, nullptr);
     EXPECT_EQ(cluster->Startup(mContext.Get()), CHIP_NO_ERROR);
 
-    // Push values through the legacy Snapshot methods (the CodegenIntegration path)
+    // Push values through the legacy Snapshot methods (the CodegenIntegration path).
     {
         Structs::EnergyMeasurementStruct::Type energyData;
         energyData.energy = 42000;
@@ -503,7 +513,7 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TimerDoesNo
         cluster->PeriodicEnergySnapshot(energyImported, energyExported);
     }
 
-    // Verify values are set
+    // Verify values are set.
     {
         DataModel::Nullable<Structs::EnergyMeasurementStruct::Type> readValue;
         EXPECT_EQ(cluster->GetCumulativeEnergyImported(readValue), CHIP_NO_ERROR);
@@ -523,44 +533,44 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TimerDoesNo
         EXPECT_EQ(readValue.Value().energy, 500);
     }
 
-    // Fire the periodic timer -- NoOpDelegate returns NullNullable for all readings.
-    mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMaxReportInterval);
+    // GenerateSnapshots with a NoOpDelegate (returns NullNullable for all readings) must not wipe
+    // values previously set via the legacy Snapshot methods.
+    cluster->GenerateSnapshots();
 
-    // Cumulative values must survive the timer-based report
     {
         DataModel::Nullable<Structs::EnergyMeasurementStruct::Type> readValue;
         EXPECT_EQ(cluster->GetCumulativeEnergyImported(readValue), CHIP_NO_ERROR);
-        ASSERT_FALSE(readValue.IsNull()) << "Timer wiped CumulativeEnergyImported set via CumulativeEnergySnapshot";
+        ASSERT_FALSE(readValue.IsNull()) << "GenerateSnapshots wiped CumulativeEnergyImported set via CumulativeEnergySnapshot";
         EXPECT_EQ(readValue.Value().energy, 42000);
 
         EXPECT_EQ(cluster->GetCumulativeEnergyExported(readValue), CHIP_NO_ERROR);
-        ASSERT_FALSE(readValue.IsNull()) << "Timer wiped CumulativeEnergyExported set via CumulativeEnergySnapshot";
+        ASSERT_FALSE(readValue.IsNull()) << "GenerateSnapshots wiped CumulativeEnergyExported set via CumulativeEnergySnapshot";
         EXPECT_EQ(readValue.Value().energy, 7000);
     }
 
-    // Periodic values must survive the timer-based report
     {
         DataModel::Nullable<Structs::EnergyMeasurementStruct::Type> readValue;
         EXPECT_EQ(cluster->GetPeriodicEnergyImported(readValue), CHIP_NO_ERROR);
-        ASSERT_FALSE(readValue.IsNull()) << "Timer wiped PeriodicEnergyImported set via PeriodicEnergySnapshot";
+        ASSERT_FALSE(readValue.IsNull()) << "GenerateSnapshots wiped PeriodicEnergyImported set via PeriodicEnergySnapshot";
         EXPECT_EQ(readValue.Value().energy, 1500);
 
         EXPECT_EQ(cluster->GetPeriodicEnergyExported(readValue), CHIP_NO_ERROR);
-        ASSERT_FALSE(readValue.IsNull()) << "Timer wiped PeriodicEnergyExported set via PeriodicEnergySnapshot";
+        ASSERT_FALSE(readValue.IsNull()) << "GenerateSnapshots wiped PeriodicEnergyExported set via PeriodicEnergySnapshot";
         EXPECT_EQ(readValue.Value().energy, 500);
     }
 
-    // Fire the timer a second time to verify repeated timer cycles don't degrade values
-    mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMaxReportInterval);
+    // Second call to verify repeated GenerateSnapshots cycles don't degrade values.
+    mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMinReportInterval);
+    cluster->GenerateSnapshots();
 
     {
         DataModel::Nullable<Structs::EnergyMeasurementStruct::Type> readValue;
         EXPECT_EQ(cluster->GetCumulativeEnergyImported(readValue), CHIP_NO_ERROR);
-        ASSERT_FALSE(readValue.IsNull()) << "Second timer cycle wiped CumulativeEnergyImported";
+        ASSERT_FALSE(readValue.IsNull()) << "Second GenerateSnapshots wiped CumulativeEnergyImported";
         EXPECT_EQ(readValue.Value().energy, 42000);
 
         EXPECT_EQ(cluster->GetPeriodicEnergyImported(readValue), CHIP_NO_ERROR);
-        ASSERT_FALSE(readValue.IsNull()) << "Second timer cycle wiped PeriodicEnergyImported";
+        ASSERT_FALSE(readValue.IsNull()) << "Second GenerateSnapshots wiped PeriodicEnergyImported";
         EXPECT_EQ(readValue.Value().energy, 1500);
     }
 

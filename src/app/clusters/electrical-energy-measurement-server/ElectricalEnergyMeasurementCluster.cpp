@@ -139,18 +139,6 @@ ElectricalEnergyMeasurementCluster::ElectricalEnergyMeasurementCluster(const Con
     mMeasurementAccuracy.accuracyRanges = mAccuracyRangesStorage;
 }
 
-CHIP_ERROR ElectricalEnergyMeasurementCluster::Startup(ServerClusterContext & context)
-{
-    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-
-    if (mFeatureFlags.HasAny(Feature::kCumulativeEnergy, Feature::kPeriodicEnergy))
-    {
-        StartReportDelayTimer();
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 void ElectricalEnergyMeasurementCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     CancelReportDelayTimer();
@@ -250,11 +238,6 @@ void ElectricalEnergyMeasurementCluster::GenerateSnapshots()
             exported = BuildMeasurement(mDelegate.GetPeriodicEnergyExported(), mPeriodicExported, false);
         }
         PeriodicEnergySnapshot(imported, exported);
-    }
-
-    if (mFeatureFlags.HasAny(Feature::kCumulativeEnergy, Feature::kPeriodicEnergy))
-    {
-        StartReportDelayTimer();
     }
 }
 

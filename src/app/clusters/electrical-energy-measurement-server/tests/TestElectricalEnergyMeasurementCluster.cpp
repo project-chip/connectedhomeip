@@ -659,15 +659,28 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TimerFiresAndGeneratesReport)
 
     auto & logOnlyEvents = testContext.EventsGenerator();
 
+    // Establish stored values with a first report.
+    mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(1));
+    mDelegate.mCumulativeExported = DataModel::MakeNullable(static_cast<int64_t>(1));
+    mDelegate.mPeriodicImported   = DataModel::MakeNullable(static_cast<int64_t>(1));
+    mDelegate.mPeriodicExported   = DataModel::MakeNullable(static_cast<int64_t>(1));
+    mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(100));
+    cluster.GenerateSnapshots();
+    ASSERT_TRUE(logOnlyEvents.GetNextEvent().has_value());
+    ASSERT_TRUE(logOnlyEvents.GetNextEvent().has_value());
+
+    // Rate-limited update within 1 s -- starts the delay timer.
+    mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(1));
     mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(99999));
     mDelegate.mCumulativeExported = DataModel::MakeNullable(static_cast<int64_t>(88888));
     mDelegate.mPeriodicImported   = DataModel::MakeNullable(static_cast<int64_t>(7777));
     mDelegate.mPeriodicExported   = DataModel::MakeNullable(static_cast<int64_t>(6666));
+    cluster.GenerateSnapshots();
+    EXPECT_FALSE(logOnlyEvents.GetNextEvent().has_value());
 
-    // Advance clock by the report interval (default 60s) -- should trigger TimerFired → GenerateSnapshots
-    mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMaxReportInterval);
+    // Advance past the max-delay timer -- should fire and produce a full report.
+    mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMaxReportDelayInterval);
 
-    // CumulativeEnergyMeasured event with both imported and exported
     {
         auto event = logOnlyEvents.GetNextEvent();
         ASSERT_TRUE(event.has_value());
@@ -679,7 +692,6 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TimerFiresAndGeneratesReport)
         EXPECT_EQ(decoded.energyExported.Value().energy, 88888);
     }
 
-    // PeriodicEnergyMeasured event with both imported and exported
     {
         auto event = logOnlyEvents.GetNextEvent();
         ASSERT_TRUE(event.has_value());
@@ -691,7 +703,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, TimerFiresAndGeneratesReport)
         EXPECT_EQ(decoded.energyExported.Value().energy, 6666);
     }
 
-    // All 4 attributes must be readable with the correct values
+    // All 4 attributes must be readable with the correct values.
     {
         DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> readValue;
         EXPECT_EQ(cluster.GetCumulativeEnergyImported(readValue), CHIP_NO_ERROR);
