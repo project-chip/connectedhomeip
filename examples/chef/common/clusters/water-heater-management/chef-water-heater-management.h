@@ -27,17 +27,17 @@ namespace WaterHeaterManagement {
 namespace Chef {
 
 const BitMask<WaterHeaterHeatSourceBitmap> kDefaultHeatDemand = 0;
-const uint16_t kDefaultTankVolume                             = 150;
+const uint16_t kDefaultTankVolumeLiters                       = 150;
 const Percent kDefaultTankPercentage                          = 50;
 
 class ChefDelegate : public Delegate
 {
 public:
     ChefDelegate() :
-        Delegate(), mHeatDemand(kDefaultHeatDemand), mTankVolume(kDefaultTankVolume), mTankPercentage(kDefaultTankPercentage)
+        Delegate(), mHeatDemand(kDefaultHeatDemand), mTankVolume(kDefaultTankVolumeLiters), mTankPercentage(kDefaultTankPercentage)
     {}
 
-    Protocols::InteractionModel::Status HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
+    Protocols::InteractionModel::Status HandleBoost(uint32_t durationSeconds, Optional<bool> oneShot, Optional<bool> emergencyBoost,
                                                     Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
                                                     Optional<Percent> targetReheat) override;
     Protocols::InteractionModel::Status HandleCancelBoost() override;

@@ -43,18 +43,18 @@ static void OnTimerTick(System::Layer * systemLayer, void * data)
     ChefDelegate * delegate = reinterpret_cast<ChefDelegate *>(data);
     delegate->TimerTick();
 }
-constexpr uint32_t kMinBoostDurationSeconds = 60;
-constexpr int16_t kDefaultTemperature       = 2000;
-constexpr double kWaterHeatCapacity         = 4182.0;
+constexpr uint32_t kMinBoostDurationSeconds             = 60;
+constexpr int16_t kDefaultTemperatureHundredthsCelsius  = 2000;
+constexpr double kWaterHeatCapacityJoulesPerKgPerKelvin = 4182.0;
 } // namespace
 
-Protocols::InteractionModel::Status ChefDelegate::HandleBoost(uint32_t duration, Optional<bool> oneShot,
+Protocols::InteractionModel::Status ChefDelegate::HandleBoost(uint32_t durationSeconds, Optional<bool> oneShot,
                                                               Optional<bool> emergencyBoost, Optional<int16_t> temporarySetpoint,
                                                               Optional<Percent> targetPercentage, Optional<Percent> targetReheat)
 {
     ChipLogProgress(Zcl, "Inside ChefDelegate::HandleBoost");
 
-    if (duration < 60)
+    if (durationSeconds < kMinBoostDurationSeconds)
     {
         return Protocols::InteractionModel::Status::ConstraintError;
     }
@@ -66,7 +66,7 @@ Protocols::InteractionModel::Status ChefDelegate::HandleBoost(uint32_t duration,
     MatterReportingAttributeChangeCallback(mEndpointId, WaterHeaterManagement::Id, Attributes::BoostState::Id);
 
     Structs::WaterHeaterBoostInfoStruct::Type boostInfo;
-    boostInfo.duration          = duration;
+    boostInfo.duration          = durationSeconds;
     boostInfo.oneShot           = oneShot;
     boostInfo.emergencyBoost    = emergencyBoost;
     boostInfo.temporarySetpoint = temporarySetpoint;
@@ -77,7 +77,7 @@ Protocols::InteractionModel::Status ChefDelegate::HandleBoost(uint32_t duration,
     mBoostInfo.Value().duration--;
 
     CHIP_ERROR err =
-        GenerateBoostStartedEvent(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat);
+        GenerateBoostStartedEvent(durationSeconds, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "HandleBoost: Failed to generate BoostStarted event: %" CHIP_ERROR_FORMAT, err.Format());
@@ -132,7 +132,7 @@ Energy_mWh ChefDelegate::GetEstimatedHeatRequired()
     if (Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Get(mEndpointId, &occupiedHeatingSetpoint) !=
         Protocols::InteractionModel::Status::Success)
     {
-        occupiedHeatingSetpoint = kDefaultTemperature; // Default 20C
+        occupiedHeatingSetpoint = kDefaultTemperatureHundredthsCelsius;
     }
 
     DataModel::Nullable<int16_t> temp;
@@ -140,7 +140,7 @@ Energy_mWh ChefDelegate::GetEstimatedHeatRequired()
             Protocols::InteractionModel::Status::Success ||
         temp.IsNull())
     {
-        localTemperature = kDefaultTemperature; // Default 20C
+        localTemperature = kDefaultTemperatureHundredthsCelsius;
     }
     else
     {
@@ -154,12 +154,12 @@ Energy_mWh ChefDelegate::GetEstimatedHeatRequired()
 
     // Formula: Energy (mWh) = (4182 * (OccupiedHeatingSetpoint - LocalTemperature) * Volume) / 3600 * (1 - TankPercentage / 100)
     // Note: Use milliwatt-hours as per the energy_mwh type.
-    double tempDiff            = static_cast<double>(occupiedHeatingSetpoint) - static_cast<double>(localTemperature);
-    double energy              = kWaterHeatCapacity * tempDiff * static_cast<double>(mTankVolume);
+    double tempDiffHundreths   = static_cast<double>(occupiedHeatingSetpoint) - static_cast<double>(localTemperature);
+    double energyHundreths     = kWaterHeatCapacityJoulesPerKgPerKelvin * tempDiffHundreths * static_cast<double>(mTankVolume);
     double coldWaterPercentage = 100.0 - static_cast<double>(mTankPercentage);
-    energy                     = energy * coldWaterPercentage / 100.0;
-    double energyMWh           = energy / 3600.0;
-    return static_cast<Energy_mWh>(energyMWh);
+    energyHundreths            = energyHundreths * coldWaterPercentage / 100.0;
+    double energymWh           = energyHundreths / 360.0;
+    return static_cast<Energy_mWh>(energymWh);
 }
 
 } // namespace Chef
