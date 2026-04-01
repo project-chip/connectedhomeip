@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/Actions/Structs.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {

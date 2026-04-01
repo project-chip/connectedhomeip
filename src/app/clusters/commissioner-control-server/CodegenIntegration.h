@@ -17,16 +17,12 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/CommandHandlerInterface.h>
-#include <app/clusters/commissioner-control-server/Delegate.h>
+#include <app/clusters/commissioner-control-server/CommissionerControlCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace CommissionerControl {
+namespace chip::app::Clusters::CommissionerControl {
 
-class CommissionerControlServer : public CommandHandlerInterface
+class CommissionerControlServer
 {
 public:
     /**
@@ -38,7 +34,11 @@ public:
      */
     CommissionerControlServer(Delegate * delegate, EndpointId endpointId);
 
-    ~CommissionerControlServer() override;
+    /**
+     * @brief Destroys a Commissioner Control cluster instance. The Deinit() function needs to be called for this instance
+     * to be unregistered and stopped from being called by the interaction model.
+     */
+    ~CommissionerControlServer();
 
     /**
      * @brief Initialise the Commissioner Control server instance.
@@ -46,6 +46,12 @@ public:
      * @return Returns an error if the CommandHandler registration fails, else returns CHIP_NO_ERROR.
      */
     CHIP_ERROR Init();
+
+    /**
+     * @brief Uninitialise the Commissioner Control server instance.
+     * @return Returns an error if the CommandHandler unregistration fails, else returns CHIP_NO_ERROR.
+     */
+    CHIP_ERROR Deinit();
 
     Protocols::InteractionModel::Status
     GetSupportedDeviceCategoriesValue(EndpointId endpoint,
@@ -58,41 +64,15 @@ public:
      * @brief
      *   Called after the server return SUCCESS to a correctly formatted RequestCommissioningApproval command.
      */
-    CHIP_ERROR GenerateCommissioningRequestResultEvent(EndpointId endpoint,
-                                                       const Events::CommissioningRequestResult::Type & result);
+    CHIP_ERROR
+    GenerateCommissioningRequestResultEvent(EndpointId endpoint, const Events::CommissioningRequestResult::Type & result);
 
 private:
-    /**
-     * @brief Inherited from CommandHandlerInterface
-     */
-    void InvokeCommand(HandlerContext & ctx) override;
+    Delegate * mDelegate{};
+    EndpointId mEndpointId{};
 
-    /**
-     * @brief Handle Command: RequestCommissioningApproval.
-     * @param ctx The context for the command handling.
-     * @param req The command request.
-     * This command is sent by a client to request approval for a future CommissionNode call.
-     * The server SHALL always return SUCCESS to a correctly formatted RequestCommissioningApproval
-     * command, and then send a CommissioningRequestResult event once the result is ready.
-     */
-    void HandleRequestCommissioningApproval(HandlerContext & ctx,
-                                            const Commands::RequestCommissioningApproval::DecodableType & req);
-
-    /**
-     * @brief Handle Command: CommissionNode.
-     * @param ctx The context for the command handling.
-     * @param req The command request.
-     * This command is used to commission a node specified by a previously approved request.
-     * The server SHALL return FAILURE if this command is not sent from the same
-     * NodeId as the RequestCommissioningApproval or if the provided RequestId
-     * does not match the value provided to RequestCommissioningApproval.
-     */
-    void HandleCommissionNode(HandlerContext & ctx, const Commands::CommissionNode::DecodableType & req);
-
-    Delegate * mDelegate = nullptr;
+    // The Code Driven CommissionerControlCluster instance (lazy-initialized)
+    chip::app::LazyRegisteredServerCluster<CommissionerControlCluster> mCluster;
 };
 
-} // namespace CommissionerControl
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::CommissionerControl

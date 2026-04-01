@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/examples/platform/silabs/args.gni")
+import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/silabs/wifi/args.gni")
@@ -87,6 +88,12 @@ config("siwx917-common-config") {
     defines += [ "HEAP_MONITORING" ]
   }
 
+  if (sl_matter_use_code_driven_dm) {
+    defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=1" ]
+  } else {
+    defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=0" ]
+  }
+
   ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
@@ -154,6 +161,9 @@ source_set("siwx917-common") {
 
     if (chip_enable_icd_server) {
       deps += [ "${silabs_common_plat_dir}/shell:icd" ]
+    }
+    if (chip_enable_read_client) {
+      deps += [ "${silabs_common_plat_dir}/shell:im" ]
     }
   }
 

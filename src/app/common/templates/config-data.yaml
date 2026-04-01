@@ -23,10 +23,8 @@ CommandHandlerInterfaceOnlyClusters:
     # CommandHandlerInterface and hence do not need generated command dispatch.
     # This uses asUpperCamelCase versions of the cluster name.
     # keep-sorted start
-    - Actions
     - Camera AV Settings User Level Management
     - Closure Dimension
-    - Commissioner Control
     - Commodity Price
     - Commodity Tariff
     - Device Energy Management Mode
@@ -112,6 +110,7 @@ ClustersWithPreAttributeChangeFunctions:
 CodeDrivenClusters:
     # keep-sorted start
     - Access Control
+    - Actions
     - Activated Carbon Filter Monitoring
     - Administrator Commissioning
     - Air Quality
@@ -122,6 +121,7 @@ CodeDrivenClusters:
     - Camera AV Stream Management
     - Chime
     - Closure Control
+    - Commissioner Control
     - Descriptor
     - Device Energy Management
     - Diagnostic Logs

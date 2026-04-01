@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,39 +16,19 @@
  *    limitations under the License.
  */
 
-#ifndef APP_EVENT_H
-#define APP_EVENT_H
+/**
+ *    @file
+ *          Example project configuration file for CHIP.
+ *
+ *          This is a place to put application or project-specific overrides
+ *          to the default configuration values for general CHIP features.
+ *
+ */
 
-#include <stdbool.h>
-#include <stdint.h>
+#pragma once
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+// include the CHIPProjectConfig from config/standalone
+#include <CHIPProjectConfig.h>
 
-struct AppEvent
-{
-    enum AppEventTypes
-    {
-        kEventType_Button = 0,
-        kEventType_Timer,
-    };
-
-    uint16_t Type;
-
-    union
-    {
-        struct
-        {
-            uint8_t ButtonIdx;
-            uint8_t Action;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-    };
-
-    EventHandler Handler;
-};
-
-#endif // APP_EVENT_H
+// Enable groupcast
+#define CHIP_CONFIG_ENABLE_GROUPCAST 1

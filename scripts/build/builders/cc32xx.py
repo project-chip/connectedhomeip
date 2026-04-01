@@ -61,9 +61,9 @@ class cc32xxBuilder(GnBuilder):
                 'TI_SYSCONFIG_ROOT_CC32XX environment variable must be set for CC32XX builds. Please point it to the TI SysConfig installation directory.'
             )
 
-        return [
-            'ti_sysconfig_root="%s"' % sysconfig_root,
-        ]
+        args = super().GnBuildArgs()
+        args.append(f'ti_sysconfig_root="{sysconfig_root}"')
+        return args
 
     def build_outputs(self):
         if (self.app == cc32xxApp.LOCK):

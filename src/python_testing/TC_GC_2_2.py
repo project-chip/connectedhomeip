@@ -38,12 +38,12 @@ import logging
 import secrets
 
 from mobly import asserts
-from TC_GC_common import generate_membership_entry_matcher, get_feature_map, valid_endpoints_list
+from TC_GC_common import generate_membership_entry_matcher, get_auxiliary_acl_equivalence_set, get_feature_map, valid_endpoints_list
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
@@ -58,17 +58,24 @@ class TC_GC_2_2(MatterBaseTest):
     def steps_TC_GC_2_2(self):
         return [TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
                 TestStep("1b", "TH removes any existing group and KeySetID on the DUT"),
-                TestStep("1c", "Th subscribes to Membership attribute with min interval 0s and max interval 30s"),
+                TestStep("1c", "TH subscribes to Membership attribute of the Groupcast cluster on Endpoint 0 and to the AuxiliaryAccessUpdated event of the AccessControl cluster with a min interval of 0s and max interval of 30s. Accumulate all reports seen."),
+                TestStep("1d", "TH reads OperationalCredentials cluster's CurrentFabricIndex attribute on Endpoint 0"),
                 TestStep(2, "If GC.S.F00(LN) feature is not supported on the cluster, skip to step 14"),
                 TestStep("3a", "Attempt to join Group G1 with a new Key with KeySetID K1 on Endpoint EP1"),
                 TestStep("3b", "TH awaits subscription report of new membership within max interval"),
+                TestStep("3c", "TH reads Endpoint 0 AccessControl cluster AuxiliaryACL attribute"),
+                TestStep("3d", "TH awaits subscription report of AuxiliaryAccessUpdated event from AccessControl cluster"),
                 TestStep("4a", "If DUT only support one non-root and non-aggregator endpoint, skip to step 6a"),
                 TestStep("4b", "Attempt to add EP2 to Group G1"),
                 TestStep("4c", "TH awaits subscription report of new membership within max interval"),
+                TestStep("4d", "TH reads Endpoint 0 AccessControl cluster AuxiliaryACL attribute"),
+                TestStep("4e", "TH awaits subscription report of AuxiliaryAccessUpdated event from AccessControl cluster"),
                 TestStep("5a", "Attempt to replace endpoints with only EP1 for Group G1 using ReplaceEndpoints"),
                 TestStep("5b", "TH awaits subscription report of new membership within max interval"),
                 TestStep("6a", "Attempt to join Group G2 with existing Key1 and using Auxiliary ACL"),
                 TestStep("6b", "TH awaits subscription report of new membership within max interval"),
+                TestStep("6c", "TH awaits subscription report of AuxiliaryAccessUpdated event from AccessControl cluster"),
+                TestStep("6d", "TH reads Endpoint 0 AccessControl cluster AuxiliaryACL attribute"),
                 TestStep(7, "Attempt to join Group G3 using a new Key but providing existing KeySetID (result: already exists)"),
                 TestStep(8, "Attempt to join Group G3 using a new KeySetID, but without providing InputKey (result: not found)"),
                 TestStep(9, "Attempt to join Group G3 with invalid endpoint (result: unsupported endpoint)"),
@@ -108,6 +115,13 @@ class TC_GC_2_2(MatterBaseTest):
             self.mark_all_remaining_steps_skipped("1b")
             return
 
+        # Get the Root Node PartsList to use for potential wildcard expansion in ACL checks.
+        parts_list = await self.read_single_attribute_check_success(
+            cluster=Clusters.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.PartsList,
+            endpoint=0
+        )
+
         self.step("1b")
         # Check if there are any groups on the DUT.
         membership = await self.read_single_attribute_check_success(groupcast_cluster, membership_attribute)
@@ -123,10 +137,18 @@ class TC_GC_2_2(MatterBaseTest):
             if key_set_id != 0:
                 await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetRemove(key_set_id))
 
-        # Th subscribes to Membership attribute with min interval 0s and max interval 30s
+        # TH subscribes to Membership attribute of the Groupcast cluster on Endpoint 0 and to the AuxiliaryAccessUpdated event of the AccessControl cluster with a min interval of 0s and max interval of 30s. Accumulate all reports seen.
         self.step("1c")
         membership_sub = AttributeSubscriptionHandler(groupcast_cluster, membership_attribute)
         await membership_sub.start(self.default_controller, self.dut_node_id, self.get_endpoint(), min_interval_sec=0, max_interval_sec=30)
+
+        event_sub = EventSubscriptionHandler(expected_cluster=Clusters.AccessControl,
+                                             expected_event_id=Clusters.AccessControl.Events.AuxiliaryAccessUpdated.event_id)
+        await event_sub.start(self.default_controller, self.dut_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=30)
+
+        # TH reads OperationalCredentials cluster's CurrentFabricIndex attribute on Endpoint 0
+        self.step("1d")
+        fabric_index = await self.read_single_attribute_check_success(Clusters.OperationalCredentials, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex, endpoint=0)
 
         # If GC.S.F00(LN) feature is not supported on the cluster, skip to step 12
         self.step(2)
@@ -154,6 +176,19 @@ class TC_GC_2_2(MatterBaseTest):
                 group_id=groupID1, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=False)
             membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
+            # TH reads Endpoint 0 AccessControl cluster AuxiliaryACL attribute
+            self.step("3c")
+            aux_acl = await self.read_single_attribute_check_success(Clusters.AccessControl, Clusters.AccessControl.Attributes.AuxiliaryACL, endpoint=0)
+
+            # Validate that value does not contain any entry that logically represents or grants access on EP1 to Group G1 for FabricIndex F1.
+            actual_set = get_auxiliary_acl_equivalence_set(aux_acl, parts_list)
+            asserts.assert_false((fabric_index, groupID1, endpoint1) in actual_set,
+                                 f"Entry for FabricIndex {fabric_index}, Group G1 ({groupID1}) and Endpoint EP1 ({endpoint1}) should not be in AuxiliaryACL")
+
+            # TH awaits subscription report of AuxiliaryAccessUpdated event from AccessControl cluster
+            self.step("3d")
+            event_sub.wait_for_event_expect_no_report(timeout_sec=5)
+
             # If DUT only support one non-root and non-aggregator endpoint, skip to step 6a
             self.step("4a")
             if len(endpoints_list) < 2:
@@ -173,6 +208,20 @@ class TC_GC_2_2(MatterBaseTest):
                 membership_matcher = generate_membership_entry_matcher(
                     group_id=groupID1, endpoints=endpoints_list[0:2], key_set_id=keySetID1, has_auxiliary_acl=False)
                 membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+
+                # TH reads Endpoint 0 AccessControl cluster AuxiliaryACL attribute
+                self.step("4d")
+                aux_acl = await self.read_single_attribute_check_success(Clusters.AccessControl, Clusters.AccessControl.Attributes.AuxiliaryACL, endpoint=0)
+
+                # Validate that value does not contain any entry that logically represents or grants access on EP1 or EP2 to Group G1 for FabricIndex F1.
+                actual_set = get_auxiliary_acl_equivalence_set(aux_acl, parts_list)
+                for endpoint_to_check in [endpoints_list[0], endpoints_list[1]]:
+                    asserts.assert_false((fabric_index, groupID1, endpoint_to_check) in actual_set,
+                                         f"Entry for FabricIndex {fabric_index}, Group G1 ({groupID1}) and Endpoint {endpoint_to_check} should not be in AuxiliaryACL")
+
+                # TH awaits subscription report of AuxiliaryAccessUpdated event from AccessControl cluster
+                self.step("4e")
+                event_sub.wait_for_event_expect_no_report(timeout_sec=5)
 
                 # Attempt to replace endpoints for Group G1 using ReplaceEndpoints:
                 self.step("5a")
@@ -205,6 +254,21 @@ class TC_GC_2_2(MatterBaseTest):
             membership_matcher = generate_membership_entry_matcher(
                 group_id=groupID2, endpoints=[endpoint1], key_set_id=keySetID1, has_auxiliary_acl=True)
             membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
+
+            # TH awaits subscription report of AuxiliaryAccessUpdated event from AccessControl cluster
+            self.step("6c")
+            event_data = event_sub.wait_for_event_report(Clusters.AccessControl.Events.AuxiliaryAccessUpdated, timeout_sec=60)
+            asserts.assert_equal(event_data.adminNodeID, self.default_controller.nodeId,
+                                 "Event adminNodeID should match TH Node ID")
+
+            # TH reads Endpoint 0 AccessControl cluster AuxiliaryACL attribute
+            self.step("6d")
+            aux_acl = await self.read_single_attribute_check_success(Clusters.AccessControl, Clusters.AccessControl.Attributes.AuxiliaryACL, endpoint=0)
+
+            # Validate value contains entry that logically represents and grants Operate (3) privilege on EP1 for Group G2 on FabricIndex F1.
+            actual_set = get_auxiliary_acl_equivalence_set(aux_acl, parts_list)
+            asserts.assert_true((fabric_index, groupID2, endpoint1) in actual_set,
+                                f"Could not find valid AuxiliaryACL entry for FabricIndex {fabric_index}, Group G2 ({groupID2}) and Endpoint EP1 ({endpoint1})")
 
             # Attempt to join Group G3 using a new Key but providing existing KeySetID (result: already exists)
             self.step(7)
