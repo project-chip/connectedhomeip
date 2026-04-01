@@ -2222,22 +2222,9 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime,
     guint subscribe_id;
     GAutoPtr<GError> err;
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
-    uint8_t is_active                             = false; // Do not send subscribes
-    unsigned int ttl                              = CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS;
-    unsigned int freq    = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
-    unsigned int ssi_len = sizeof(struct PAFPublishSSI);
-    struct PAFPublishSSI PafPublish_ssi;
-
-    // Populate with values to indicate to wpa_suppliant that discovery is
-    // required on the nansubscribe interface rather than a subscribe.
-    // This is done as the current dbus/USD implemntation does not have a
-    // dedicated discover interface. A small modification is required
-    // in wpa_supplicantto look for this  ~/nan_de.c, function nan_de_rx_publish()
-    PafPublish_ssi.DevOpCode = 0xFF;   // 0x00 and 0x01 are the only valid values in Device OpCcode
-    PafPublish_ssi.DevInfo   = 0xFCCC; // 15:12, Advertisement version 0 is only valid, 11:0 Discriminator
-    PafPublish_ssi.ProductId = 0xCCCC; // All values valid, using 0xCCCC
-    PafPublish_ssi.VendorId  = 0x0000; // Matter Standard Vendor ID
-    GVariant * ssi_array_variant = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &PafPublish_ssi, ssi_len, sizeof(guint8));
+    uint8_t is_active = false; // passive subscribe = discovery mode
+    unsigned int ttl  = CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS;
+    unsigned int freq = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     // mScanFreq is read by ScanDiscoveryResult on the GLib thread under this
@@ -2251,13 +2238,14 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFScan(uint8_t scanMaxTime,
     g_variant_builder_add(&builder, "{sv}", "active", g_variant_new_boolean(is_active));
     g_variant_builder_add(&builder, "{sv}", "ttl", g_variant_new_uint16(ttl));
     g_variant_builder_add(&builder, "{sv}", "freq", g_variant_new_uint16(freq));
-    g_variant_builder_add(&builder, "{sv}", "ssi", ssi_array_variant);
+    g_variant_builder_add(&builder, "{sv}", "discovery_only", g_variant_new_boolean(TRUE));
     args = g_variant_builder_end(&builder);
     wpa_supplicant_1_interface_call_nansubscribe_sync(mWpaSupplicant.iface.get(), args, &subscribe_id, nullptr, &err.GetReceiver());
 
     if (err.get() != nullptr)
     {
         ChipLogError(DeviceLayer, "WiFiPAFScan: nansubscribe failed: %s", err->message);
+        ChipLogError(DeviceLayer, "WiFiPAFScan: Check wpa_supplicant supports discovery_only flag");
         mScanCb        = nullptr;
         mScanCbContext = nullptr;
         return CHIP_ERROR_INTERNAL;
@@ -2370,17 +2358,9 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCa
     guint subscribe_id;
     GAutoPtr<GError> err;
     enum nan_service_protocol_type srv_proto_type = nan_service_protocol_type::NAN_SRV_PROTO_CSA_MATTER;
-    uint8_t is_active                             = false; // passive subscribe = discovery mode
-    unsigned int ttl                              = 0;     // 0 = infinite in wpa_supplicant
-    unsigned int freq    = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
-    unsigned int ssi_len = sizeof(struct PAFPublishSSI);
-    struct PAFPublishSSI PafPublish_ssi;
-
-    PafPublish_ssi.DevOpCode = 0xFF;
-    PafPublish_ssi.DevInfo   = 0xFCCC;
-    PafPublish_ssi.ProductId = 0xCCCC;
-    PafPublish_ssi.VendorId  = 0x0000;
-    GVariant * ssi_array_variant = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &PafPublish_ssi, ssi_len, sizeof(guint8));
+    uint8_t is_active = false; // passive subscribe = discovery mode
+    unsigned int ttl  = 0;     // 0 = infinite in wpa_supplicant
+    unsigned int freq = (mApFreq == 0) ? CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL : mApFreq;
 
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     // mScanFreq is read by ScanDiscoveryResult on the GLib thread under this
@@ -2393,7 +2373,7 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCa
     g_variant_builder_add(&builder, "{sv}", "active", g_variant_new_boolean(is_active));
     g_variant_builder_add(&builder, "{sv}", "ttl", g_variant_new_uint16(ttl));
     g_variant_builder_add(&builder, "{sv}", "freq", g_variant_new_uint16(freq));
-    g_variant_builder_add(&builder, "{sv}", "ssi", ssi_array_variant);
+    g_variant_builder_add(&builder, "{sv}", "discovery_only", g_variant_new_boolean(TRUE));
     GVariant * args = g_variant_builder_end(&builder);
     wpa_supplicant_1_interface_call_nansubscribe_sync(mWpaSupplicant.iface.get(), args, &subscribe_id, nullptr,
                                                       &err.GetReceiver());
@@ -2401,6 +2381,7 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCa
     if (err.get() != nullptr)
     {
         ChipLogError(DeviceLayer, "WiFiPAFStartBackgroundScan: nansubscribe failed: %s", err->message);
+        ChipLogError(DeviceLayer, "WiFiPAFScan: Check wpa_supplicant supports discovery_only flag");
         return CHIP_ERROR_INTERNAL;
     }
 
