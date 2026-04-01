@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,18 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("${chip_root}/config/standalone/args.gni")
+import("//build_overrides/pigweed.gni")
 
-silabs_sdk_target = get_label_info(":sdk", "label_no_toolchain")
-chip_enable_thread = false
-import("${chip_root}/src/platform/silabs/wifi/args.gni")
-
-# Not needed for the Lighting-app
-chip_enable_read_client = false
-
-chip_enable_ota_requestor = true
-app_data_model =
-    "${chip_root}/examples/lighting-app/silabs/data_model:silabs-lighting"
-
-chip_config_enable_groupcast = true
+source_set("posix") {
+  public_deps = [
+    "$dir_pw_unit_test",
+    "$dir_pw_unit_test:googletest_style_event_handler",
+    "$dir_pw_unit_test:simple_printing_event_handler",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:arg_parser",
+  ]
+  sources = [ "unit_test_main.cpp" ]
+}
