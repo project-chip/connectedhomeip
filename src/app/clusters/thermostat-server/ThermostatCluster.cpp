@@ -404,20 +404,20 @@ void ThermostatAttrAccess::GenerateEvents(const ConcreteAttributePath & attribut
     }
     case OccupiedHeatingSetpoint::Id:
         GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kHeat, MakeOptional(OccupancyBitmap::kOccupied),
-                              OccupiedHeatingSetpoint::Get);
+                               OccupiedHeatingSetpoint::Get);
         break;
     case OccupiedCoolingSetpoint::Id:
         GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kCool, MakeOptional(OccupancyBitmap::kOccupied),
-                              OccupiedCoolingSetpoint::Get);
+                               OccupiedCoolingSetpoint::Get);
         break;
     case UnoccupiedHeatingSetpoint::Id:
         GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kHeat, MakeOptional(BitMask<OccupancyBitmap>(0)),
-                              UnoccupiedHeatingSetpoint::Get);
+                               UnoccupiedHeatingSetpoint::Get);
 
         break;
     case UnoccupiedCoolingSetpoint::Id:
         GenerateSetpointEvent(attributePath.mEndpointId, SystemModeEnum::kCool, MakeOptional(BitMask<OccupancyBitmap>(0)),
-                              UnoccupiedCoolingSetpoint::Get);
+                               UnoccupiedCoolingSetpoint::Get);
 
         break;
     case LocalTemperature::Id: {
@@ -661,6 +661,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
     commandObj->AddStatus(commandPath, Thermostat::SetpointRaiseLower(commandPath.mEndpointId, commandData));
     return true;
 }
+
 void MatterThermostatPluginServerInitCallback()
 {
     TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().AddFabricDelegate(&gThermostatAttrAccess);
