@@ -125,18 +125,8 @@ ElectricalEnergyMeasurementCluster::ElectricalEnergyMeasurementCluster(const Con
                                                          config.featureFlags.Has(Feature::kCumulativeEnergy));
         return attrs;
     }()),
-    mDelegate(config.delegate), mTimerDelegate(config.timerDelegate), mReportInterval(config.reportInterval)
+    mDelegate(config.delegate), mTimerDelegate(config.timerDelegate)
 {
-    // The report interval must be between kMinReportInterval and kMaxReportInterval, we cap it here.
-    if (mReportInterval < kMinReportInterval)
-    {
-        mReportInterval = kMinReportInterval;
-    }
-    else if (mReportInterval > kMaxReportInterval)
-    {
-        mReportInterval = kMaxReportInterval;
-    }
-
     mMeasurementAccuracy.measurementType  = config.accuracyStruct.measurementType;
     mMeasurementAccuracy.measured         = config.accuracyStruct.measured;
     mMeasurementAccuracy.minMeasuredValue = config.accuracyStruct.minMeasuredValue;
@@ -155,7 +145,7 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::Startup(ServerClusterContext & co
 
     if (mFeatureFlags.HasAny(Feature::kCumulativeEnergy, Feature::kPeriodicEnergy))
     {
-        StartSnapshotTimer();
+        StartReportDelayTimer();
     }
 
     return CHIP_NO_ERROR;
@@ -163,30 +153,33 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::Startup(ServerClusterContext & co
 
 void ElectricalEnergyMeasurementCluster::Shutdown(ClusterShutdownType shutdownType)
 {
-    CancelSnapshotTimer();
+    CancelReportDelayTimer();
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
-void ElectricalEnergyMeasurementCluster::StartSnapshotTimer()
+void ElectricalEnergyMeasurementCluster::StartReportDelayTimer()
 {
-    CancelSnapshotTimer();
-    ReturnAndLogOnFailure(mTimerDelegate.StartTimer(&mSnapshotTimer, mReportInterval), AppServer,
+    // If we already have a timer active, we let it run its course
+    if (mTimerDelegate.IsTimerActive(&mReportDelayTimer))
+    {
+        return;
+    }
+    // If we delay the report, we start a new timer to ensure we eventually report within the max delay interval.
+    ReturnAndLogOnFailure(mTimerDelegate.StartTimer(&mReportDelayTimer, kMaxReportDelayInterval), AppServer,
                           "EEM: Failed to start report timer");
 }
 
-void ElectricalEnergyMeasurementCluster::CancelSnapshotTimer()
+void ElectricalEnergyMeasurementCluster::CancelReportDelayTimer()
 {
-    if (mTimerDelegate.IsTimerActive(&mSnapshotTimer))
+    if (mTimerDelegate.IsTimerActive(&mReportDelayTimer))
     {
-        mTimerDelegate.CancelTimer(&mSnapshotTimer);
+        mTimerDelegate.CancelTimer(&mReportDelayTimer);
     }
 }
 
-void ElectricalEnergyMeasurementCluster::SnapshotTimer::TimerFired()
+void ElectricalEnergyMeasurementCluster::ReportDelayTimer::TimerFired()
 {
-    mCluster.DoGenerateSnapshots();
-    mCluster.mLastReportTime = mCluster.mTimerDelegate.GetCurrentMonotonicTimestamp();
-    mCluster.StartSnapshotTimer();
+    mCluster.GenerateSnapshots();
 }
 
 DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct>
@@ -211,36 +204,21 @@ ElectricalEnergyMeasurementCluster::BuildMeasurement(DataModel::Nullable<int64_t
         }
     }
 
-    // Get current timestamp
-    uint32_t currentTimestamp;
-    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(currentTimestamp);
+    // Matter epoch timestamp when available; monotonic endSystime is always set so ShouldNotifyEnergyMeasurementAttribute can
+    // enforce kMinReportInterval even when real-time clock is available.
+    uint32_t currentTimestamp = 0;
+    CHIP_ERROR err            = System::Clock::GetClock_MatterEpochS(currentTimestamp);
     if (err == CHIP_NO_ERROR)
     {
         measurement.endTimestamp.SetValue(currentTimestamp);
     }
-    else
-    {
-        System::Clock::Milliseconds64 sysTimeMs = mTimerDelegate.GetCurrentMonotonicTimestamp();
-        measurement.endSystime.SetValue(static_cast<uint64_t>(sysTimeMs.count()));
-    }
+    System::Clock::Milliseconds64 sysTimeMs = mTimerDelegate.GetCurrentMonotonicTimestamp();
+    measurement.endSystime.SetValue(static_cast<uint64_t>(sysTimeMs.count()));
 
     return DataModel::MakeNullable(measurement);
 }
 
 void ElectricalEnergyMeasurementCluster::GenerateSnapshots()
-{
-    // Enforce min 1s between events
-    System::Clock::Timestamp now = mTimerDelegate.GetCurrentMonotonicTimestamp();
-    if (mLastReportTime != System::Clock::kZero && (now - mLastReportTime) < kMinReportInterval)
-    {
-        return;
-    }
-
-    DoGenerateSnapshots();
-    StartSnapshotTimer();
-}
-
-void ElectricalEnergyMeasurementCluster::DoGenerateSnapshots()
 {
     if (mFeatureFlags.Has(Feature::kCumulativeEnergy))
     {
@@ -272,6 +250,11 @@ void ElectricalEnergyMeasurementCluster::DoGenerateSnapshots()
             exported = BuildMeasurement(mDelegate.GetPeriodicEnergyExported(), mPeriodicExported, false);
         }
         PeriodicEnergySnapshot(imported, exported);
+    }
+
+    if (mFeatureFlags.HasAny(Feature::kCumulativeEnergy, Feature::kPeriodicEnergy))
+    {
+        StartReportDelayTimer();
     }
 }
 
@@ -377,6 +360,13 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::SetCumulativeEnergyImported(const
         if (notify)
         {
             NotifyAttributeChanged(CumulativeEnergyImported::Id);
+            mAttributeDirtyState.Clear(AttributeIgnoredDirtyState::CumulativeEnergyImported);
+        }
+        else
+        {
+            mAttributeDirtyState.Set(AttributeIgnoredDirtyState::CumulativeEnergyImported);
+            // If we delay the report, we start a new timer to ensure we eventually report within the max delay interval.
+            StartReportDelayTimer();
         }
     }
     return CHIP_NO_ERROR;
@@ -391,6 +381,13 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::SetCumulativeEnergyExported(const
         if (notify)
         {
             NotifyAttributeChanged(CumulativeEnergyExported::Id);
+            mAttributeDirtyState.Clear(AttributeIgnoredDirtyState::CumulativeEnergyExported);
+        }
+        else
+        {
+            mAttributeDirtyState.Set(AttributeIgnoredDirtyState::CumulativeEnergyExported);
+            // If we delay the report, we start a new timer to ensure we eventually report within the max delay interval.
+            StartReportDelayTimer();
         }
     }
     return CHIP_NO_ERROR;
@@ -412,6 +409,13 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::SetPeriodicEnergyImported(const N
         if (notify)
         {
             NotifyAttributeChanged(PeriodicEnergyImported::Id);
+            mAttributeDirtyState.Clear(AttributeIgnoredDirtyState::PeriodicEnergyImported);
+        }
+        else
+        {
+            mAttributeDirtyState.Set(AttributeIgnoredDirtyState::PeriodicEnergyImported);
+            // If we delay the report, we start a new timer to ensure we eventually report within the max delay interval.
+            StartReportDelayTimer();
         }
     }
     return CHIP_NO_ERROR;
@@ -434,6 +438,13 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::SetPeriodicEnergyExported(const N
         if (notify)
         {
             NotifyAttributeChanged(PeriodicEnergyExported::Id);
+            mAttributeDirtyState.Clear(AttributeIgnoredDirtyState::PeriodicEnergyExported);
+        }
+        else
+        {
+            mAttributeDirtyState.Set(AttributeIgnoredDirtyState::PeriodicEnergyExported);
+            // If we delay the report, we start a new timer to ensure we eventually report within the max delay interval.
+            StartReportDelayTimer();
         }
     }
     return CHIP_NO_ERROR;
@@ -534,20 +545,25 @@ void ElectricalEnergyMeasurementCluster::CumulativeEnergySnapshot(const Nullable
     if (Features().Has(Feature::kImportedEnergy) && !energyImported.IsNull())
     {
         RETURN_SAFELY_IGNORED SetCumulativeEnergyImported(energyImported);
-        event.energyImported.SetValue(energyImported.Value());
-        hasData = true;
+        if (!mAttributeDirtyState.Has(AttributeIgnoredDirtyState::CumulativeEnergyImported))
+        {
+            event.energyImported.SetValue(energyImported.Value());
+            hasData = true;
+        }
     }
 
     if (Features().Has(Feature::kExportedEnergy) && !energyExported.IsNull())
     {
         RETURN_SAFELY_IGNORED SetCumulativeEnergyExported(energyExported);
-        event.energyExported.SetValue(energyExported.Value());
-        hasData = true;
+        if (!mAttributeDirtyState.Has(AttributeIgnoredDirtyState::CumulativeEnergyExported))
+        {
+            event.energyExported.SetValue(energyExported.Value());
+            hasData = true;
+        }
     }
 
     VerifyOrReturn(hasData && mContext != nullptr);
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-    mLastReportTime = mTimerDelegate.GetCurrentMonotonicTimestamp();
 }
 
 void ElectricalEnergyMeasurementCluster::PeriodicEnergySnapshot(const Nullable<EnergyMeasurementStruct> & energyImported,
@@ -560,20 +576,25 @@ void ElectricalEnergyMeasurementCluster::PeriodicEnergySnapshot(const Nullable<E
     if (Features().Has(Feature::kImportedEnergy) && !energyImported.IsNull())
     {
         RETURN_SAFELY_IGNORED SetPeriodicEnergyImported(energyImported);
-        event.energyImported.SetValue(energyImported.Value());
-        hasData = true;
+        if (!mAttributeDirtyState.Has(AttributeIgnoredDirtyState::PeriodicEnergyImported))
+        {
+            event.energyImported.SetValue(energyImported.Value());
+            hasData = true;
+        }
     }
 
     if (Features().Has(Feature::kExportedEnergy) && !energyExported.IsNull())
     {
         RETURN_SAFELY_IGNORED SetPeriodicEnergyExported(energyExported);
-        event.energyExported.SetValue(energyExported.Value());
-        hasData = true;
+        if (!mAttributeDirtyState.Has(AttributeIgnoredDirtyState::PeriodicEnergyExported))
+        {
+            event.energyExported.SetValue(energyExported.Value());
+            hasData = true;
+        }
     }
 
     VerifyOrReturn(hasData && mContext != nullptr);
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
-    mLastReportTime = mTimerDelegate.GetCurrentMonotonicTimestamp();
 }
 
 } // namespace ElectricalEnergyMeasurement

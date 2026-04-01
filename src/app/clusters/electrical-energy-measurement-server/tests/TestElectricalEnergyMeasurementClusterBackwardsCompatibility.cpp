@@ -16,7 +16,6 @@
  */
 
 #include "app/data-model/Nullable.h"
-#include "pw_unit_test/framework.h"
 #include <app/EventManagement.h>
 #include <app/clusters/electrical-energy-measurement-server/CodegenIntegration.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -421,6 +420,49 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, GenerateSna
         ASSERT_EQ((*event).GetEventData(decoded), CHIP_NO_ERROR);
         ASSERT_TRUE(decoded.energyImported.HasValue());
         EXPECT_EQ(decoded.energyImported.Value().energy, 200);
+    }
+
+    attrAccess.Shutdown();
+}
+
+TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, RateLimitedUpdateFlushesOnMaxDelayTimer)
+{
+    BitMask<Feature> features(Feature::kImportedEnergy, Feature::kCumulativeEnergy);
+    BitMask<OptionalAttributes> noOptionalAttrs;
+
+    ElectricalEnergyMeasurementAttrAccess attrAccess(features, noOptionalAttrs, kTestEndpointId, mDelegate, mTimerDelegate);
+    EXPECT_EQ(attrAccess.Init(), CHIP_NO_ERROR);
+
+    ElectricalEnergyMeasurementCluster * cluster = FindElectricalEnergyMeasurementClusterOnEndpoint(kTestEndpointId);
+    ASSERT_NE(cluster, nullptr);
+    EXPECT_EQ(cluster->Startup(mContext.Get()), CHIP_NO_ERROR);
+
+    auto & logOnlyEvents = mContext.EventsGenerator();
+
+    mDelegate.mCumulativeImported = 10;
+    mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(100));
+    cluster->GenerateSnapshots();
+    {
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+    }
+
+    mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(1));
+    mDelegate.mCumulativeImported = 20;
+    cluster->GenerateSnapshots();
+    {
+        auto event = logOnlyEvents.GetNextEvent();
+        EXPECT_FALSE(event.has_value());
+    }
+
+    mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMaxReportDelayInterval);
+    {
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+        Events::CumulativeEnergyMeasured::DecodableType decoded;
+        ASSERT_EQ((*event).GetEventData(decoded), CHIP_NO_ERROR);
+        ASSERT_TRUE(decoded.energyImported.HasValue());
+        EXPECT_EQ(decoded.energyImported.Value().energy, 20);
     }
 
     attrAccess.Shutdown();

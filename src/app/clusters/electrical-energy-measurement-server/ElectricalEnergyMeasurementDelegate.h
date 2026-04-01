@@ -28,7 +28,13 @@ namespace ElectricalEnergyMeasurement {
 /// Abstract interface for the EEM cluster to pull energy readings from hardware.
 ///
 /// The cluster calls these methods on its reporting timer (or on a manual GenerateSnapshots() call).
-/// Implementations should return Nullable null when the value cannot currently be determined.
+/// Implementations should return a non-null value when a new reading is available, and Nullable null when
+/// the value cannot currently be determined or when there is no new reading to report.
+///
+/// Current cluster behavior: a null reading is treated as "no update". The cluster preserves the previously
+/// stored attribute value and does not emit an attribute change or event for that reading; null does not
+/// clear the attribute. Delegate implementations should be written with this behavior in mind.
+///
 /// The cluster only calls getters matching its enabled features.
 /// All values are in milli-watt-hours (mWh).
 class Delegate

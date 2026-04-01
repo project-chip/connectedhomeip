@@ -50,8 +50,10 @@ public:
         Attributes::CumulativeEnergyReset::Id           //
         >;
 
-    static constexpr System::Clock::Timeout kMaxReportInterval = System::Clock::Seconds32(60);
-    static constexpr System::Clock::Timeout kMinReportInterval = System::Clock::Seconds32(1);
+    static constexpr System::Clock::Timeout kMaxReportDelayInterval = System::Clock::Seconds32(60);
+    /// Alias for the maximum delay between timer-driven snapshot attempts (same as kMaxReportDelayInterval).
+    static constexpr System::Clock::Timeout kMaxReportInterval      = kMaxReportDelayInterval;
+    static constexpr System::Clock::Timeout kMinReportInterval      = System::Clock::Seconds32(1);
 
     struct Config
     {
@@ -61,7 +63,6 @@ public:
         const Structs::MeasurementAccuracyStruct::Type & accuracyStruct;
         Delegate & delegate;
         TimerDelegate & timerDelegate;
-        System::Clock::Timeout reportInterval = kMaxReportInterval;
     };
 
     /** @brief Constructor for ElectricalEnergyMeasurementCluster.
@@ -105,7 +106,7 @@ public:
      *  pulls readings from the delegate, updates attributes, generates events, and resets the snapshot timer.
      *
      * @note Enforces the min 1s reporting rule, if a report was generated less than 1s ago, this will do nothing and the
-     * snapshot timer will ensure the next snapshot is generated withing 60 seconds of ignoring the attribute changes.
+     * snapshot timer will ensure the next snapshot is generated within 60 seconds of ignoring the attribute changes.
      */
     void GenerateSnapshots();
 
@@ -116,6 +117,14 @@ public:
                                 const Nullable<EnergyMeasurementStruct> & energyExported);
 
 private:
+enum class AttributeIgnoredDirtyState : uint32_t
+{
+    CumulativeEnergyImported = 0x1,
+    CumulativeEnergyExported = 0x2,
+    PeriodicEnergyImported = 0x4,
+    PeriodicEnergyExported = 0x8,
+};
+
     CHIP_ERROR SetCumulativeEnergyImported(const Nullable<EnergyMeasurementStruct> & value);
     CHIP_ERROR SetCumulativeEnergyExported(const Nullable<EnergyMeasurementStruct> & value);
     CHIP_ERROR SetPeriodicEnergyImported(const Nullable<EnergyMeasurementStruct> & value);
@@ -134,16 +143,13 @@ private:
     DataModel::Nullable<EnergyMeasurementStruct>
     BuildMeasurement(Nullable<int64_t> energy, const Nullable<EnergyMeasurementStruct> & previous, bool isCumulative);
 
-    /** @brief Core snapshot logic shared by GenerateSnapshots() and the timer callback */
-    void DoGenerateSnapshots();
+    void StartReportDelayTimer();
+    void CancelReportDelayTimer();
 
-    void StartSnapshotTimer();
-    void CancelSnapshotTimer();
-
-    class SnapshotTimer : public TimerContext
+    class ReportDelayTimer : public TimerContext
     {
     public:
-        SnapshotTimer(ElectricalEnergyMeasurementCluster & cluster) : mCluster(cluster) {}
+        ReportDelayTimer(ElectricalEnergyMeasurementCluster & cluster) : mCluster(cluster) {}
         void TimerFired() override;
 
     private:
@@ -159,9 +165,9 @@ private:
 
     Delegate & mDelegate;
     TimerDelegate & mTimerDelegate;
-    System::Clock::Timeout mReportInterval;
-    System::Clock::Timestamp mLastReportTime{ System::Clock::kZero };
-    SnapshotTimer mSnapshotTimer{ *this };
+
+    BitFlags<AttributeIgnoredDirtyState> mAttributeDirtyState;
+    ReportDelayTimer mReportDelayTimer{ *this };
 };
 
 } // namespace ElectricalEnergyMeasurement

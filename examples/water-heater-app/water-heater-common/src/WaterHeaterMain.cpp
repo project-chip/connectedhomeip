@@ -255,7 +255,7 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
         {
             // We can ignore the error here as the only reason for error is if the feature is not supported
             // and the feature is enabled
-            RETURN_SAFELY_IGNORED eemCluster->SetCumulativeEnergyReset(MakeOptional(resetStruct));
+            RETURN_SAFELY_IGNORED eemCluster->SetCumulativeEnergyReset(MakeNullable(resetStruct));
         }
     }
 
