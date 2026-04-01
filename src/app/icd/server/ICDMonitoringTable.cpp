@@ -78,6 +78,7 @@ CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
             case to_underlying(Fields::kAesKeyHandle): {
                 ByteSpan buf;
                 ReturnErrorOnFailure(reader.Get(buf));
+                VerifyOrReturnError(buf.size() == Crypto::Aes128KeyHandle::Size(), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
                 // Since we are storing either the raw key or a key ID, we must
                 // simply copy the data as is in the keyHandle.
                 // Calling SetKey here would create another keyHandle in storage and will cause
@@ -89,6 +90,10 @@ CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
             case to_underlying(Fields::kHmacKeyHandle): {
                 ByteSpan buf;
                 CHIP_ERROR error = reader.Get(buf);
+                if (error == CHIP_NO_ERROR && buf.size() != Crypto::Hmac128KeyHandle::Size())
+                {
+                    error = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
+                }
 
                 if (error != CHIP_NO_ERROR)
                 {
