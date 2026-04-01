@@ -97,7 +97,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                 return True
         return False
 
-    def check_conformance(self, ignore_in_progress: bool, is_ci: bool, allow_provisional: bool):
+    def check_conformance(self, ignore_in_progress_test_event_only_disallowed_for_certification: bool, is_ci: bool, allow_provisional_test_event_only_disallowed_for_certification: bool):
         problems = []
         success = True
 
@@ -121,7 +121,7 @@ class DeviceConformanceTests(BasicCompositionTests):
             record_problem(location, problem, ProblemSeverity.WARNING)
 
         ignore_attributes: dict[int, list[int]] = {}
-        if ignore_in_progress:
+        if ignore_in_progress_test_event_only_disallowed_for_certification:
             # This is a manually curated list of attributes that are in-progress in the SDK, but have landed in the spec
             in_progress_attributes = {
                 Clusters.ThreadNetworkDiagnostics.id: [0x3F, 0x40],
@@ -137,7 +137,7 @@ class DeviceConformanceTests(BasicCompositionTests):
             ignore_attributes.update(ci_ignore_attributes)
 
         ignore_feature_masks: dict[int, list[int]] = {}
-        if ignore_in_progress:
+        if ignore_in_progress_test_event_only_disallowed_for_certification:
             # This is a manually curated list of features that are in-progress in the SDK, but have landed in the spec
             in_progress_features = {}
             ignore_feature_masks.update(in_progress_features)
@@ -168,7 +168,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                     continue
 
                 is_provisional = cluster_id in provisional_cluster_ids or self.xml_clusters[cluster_id].is_provisional
-                if not allow_provisional and is_provisional:
+                if not allow_provisional_test_event_only_disallowed_for_certification and is_provisional:
                     record_error(location=cluster_location, problem='Provisional cluster found on device')
                     continue
 
@@ -200,7 +200,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                         continue
                     xml_feature = self.xml_clusters[cluster_id].features[f]
                     conformance_decision_with_choice = xml_feature.conformance(cluster_info)
-                    if not conformance_allowed(conformance_decision_with_choice, allow_provisional):
+                    if not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification):
                         record_error(location=location,
                                      problem=f'Disallowed feature with mask 0x{f:02x} (feature bit {f.bit_length() - 1})')
                 for feature_mask, xml_feature in self.xml_clusters[cluster_id].features.items():
@@ -221,7 +221,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                         continue
                     xml_attribute = self.xml_clusters[cluster_id].attributes[attribute_id]
                     conformance_decision_with_choice = xml_attribute.conformance(cluster_info)
-                    if not conformance_allowed(conformance_decision_with_choice, allow_provisional):
+                    if not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification):
                         location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                         record_error(
                             location=location, problem=f'Attribute 0x{attribute_id:02x} is included, but is disallowed by conformance. {conformance_str(xml_attribute.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
@@ -247,7 +247,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                             continue
                         xml_command = xml_commands_dict[command_id]
                         conformance_decision_with_choice = xml_command.conformance(cluster_info)
-                        if not conformance_allowed(conformance_decision_with_choice, allow_provisional):
+                        if not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification):
                             record_error(
                                 location=location, problem=f'Command 0x{command_id:02x} is included, but disallowed by conformance. {conformance_str(xml_command.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
                     for command_id, xml_command in xml_commands_dict.items():
@@ -274,7 +274,7 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         return success, problems
 
-    def check_revisions(self, ignore_in_progress: bool):
+    def check_revisions(self, ignore_in_progress_test_event_only_disallowed_for_certification: bool):
         problems = []
         success = True
 
@@ -290,7 +290,7 @@ class DeviceConformanceTests(BasicCompositionTests):
             record_problem(location, problem, ProblemSeverity.WARNING)
 
         ignore_revisions: list[int] = []
-        if ignore_in_progress:
+        if ignore_in_progress_test_event_only_disallowed_for_certification:
             # This is a manually curated list of cluster revisions that are in-progress in the SDK, but have landed in the spec
             in_progress_revisions = [Clusters.BasicInformation.id, Clusters.PowerSource.id, Clusters.NetworkCommissioning.id]
             ignore_revisions.extend(in_progress_revisions)
@@ -344,7 +344,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                         location, f"Expected Device type revision for device type {device_type_id} {self.xml_device_types[device_type_id].name} on endpoint {endpoint_id} does not match revision on DUT. Expected: {expected_revision} DUT: {actual_revision}")
         return success, problems
 
-    def check_device_type(self, fail_on_extra_clusters: bool = True, allow_provisional: bool = False) -> tuple[bool, list[ProblemNotice]]:
+    def check_device_type(self, fail_on_extra_clusters: bool = True, allow_provisional_test_event_only_disallowed_for_certification: bool = False) -> tuple[bool, list[ProblemNotice]]:
         success = True
         problems = []
 
@@ -407,7 +407,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                                      problem=f"Mandatory cluster {cluster_requirement.name} for device type {xml_device.name} is not present in the server list")
                         continue
 
-                    if cluster_id in server_clusters and not conformance_allowed(conformance_decision_with_choice, allow_provisional):
+                    if cluster_id in server_clusters and not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification):
                         record_error(location=location,
                                      problem=f"Disallowed cluster {cluster_requirement.name} found in server list for device type {xml_device.name}")
                         continue
@@ -422,7 +422,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                             if conformance_decision_with_choice.is_mandatory() and ((feature_map & mask) == 0):
                                 record_error(
                                     location=location, problem=f"Feature bit {mask.bit_length() - 1} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the feature map")
-                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional) and ((feature_map & mask) != 0):
+                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification) and ((feature_map & mask) != 0):
                                 record_error(
                                     location=location, problem=f"Feature bit {mask.bit_length() - 1} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the feature map")
 
@@ -432,7 +432,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                             if conformance_decision_with_choice.is_mandatory() and id not in attribute_list:
                                 record_error(
                                     location=location, problem=f"Attribute {id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the attribute list")
-                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional) and id in attribute_list:
+                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification) and id in attribute_list:
                                 if device_type_id == water_heater_id and cluster_id == Clusters.Thermostat.id and id == Clusters.Thermostat.Attributes.SystemMode.attribute_id:
                                     # This is a specific problem in the water heater device type where it is specifically disallowing a thing that shouldn't be disallowed
                                     # For now, ignore this requirement until the spec is fixed
@@ -446,7 +446,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                             if conformance_decision_with_choice.is_mandatory() and id not in cmd_list:
                                 record_error(
                                     location=location, problem=f"Command {id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the cmd list")
-                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional) and id in cmd_list:
+                            if not conformance_allowed(conformance_decision_with_choice, allow_provisional_test_event_only_disallowed_for_certification) and id in cmd_list:
                                 record_error(
                                     location=location, problem=f"Command {id} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the cmd list")
 

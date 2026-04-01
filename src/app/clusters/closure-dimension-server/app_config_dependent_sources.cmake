@@ -16,8 +16,6 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/ClosureDimensionClusterLogic.cpp"
-    "${CLUSTER_DIR}/closure-dimension-cluster-logic.h"
     "${CLUSTER_DIR}/closure-dimension-cluster-objects.h"
     "${CLUSTER_DIR}/closure-dimension-delegate.h"
     "${CLUSTER_DIR}/ClosureDimensionClusterMatterContext.cpp"

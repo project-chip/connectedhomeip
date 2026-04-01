@@ -204,6 +204,7 @@ source_set("app-main") {
     ":ota-test-event-trigger",
     "${chip_root}/examples/providers:all_clusters_device_info_provider",
     "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
+    "${chip_root}/src/access",
     "${chip_root}/src/app/server",
     "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
