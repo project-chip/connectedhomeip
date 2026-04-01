@@ -152,13 +152,8 @@ class CommissioningMethod(ABC):
     async def _find_or_establish_pase_if_needed(self):
         setup_code = self.info.setup_code
         if setup_code is None:
-            # Manual codes only support 4-bit short discriminators.
-            # If we have a 12-bit long discriminator, we must truncate it to the top 4 bits.
-            discriminator = self.info.filter_value
-            if self.info.filter_type == discovery.FilterType.LONG_DISCRIMINATOR:
-                discriminator >>= 8
             setup_code = self.dev_ctrl.CreateManualCode(
-                discriminator,
+                self.info.filter_value,
                 self.info.passcode,
             )
 
