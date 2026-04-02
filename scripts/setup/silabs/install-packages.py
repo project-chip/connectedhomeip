@@ -224,7 +224,7 @@ def update_slt_cli(slt_cli_path):
     update_cmd = [slt_cli_path, "update", "--self", "--non-interactive"]
     try:
         logger.info("Updating SLT CLI to latest version...")
-        subprocess.run(update_cmd, stdin=subprocess.DEVNULL, check=True)
+        subprocess.run(update_cmd, check=True)
         logger.info("SLT CLI updated successfully")
     except subprocess.CalledProcessError as e:
         logger.warning("Failed to update slt-cli: %s", e)
@@ -255,7 +255,7 @@ def install_sdk_packages(slt_cli_path):
         install_cmd = [slt_cli_path, "install", "-f", pkg_path, "--non-interactive"]
         try:
             logger.info("Installing packages from %s...", os.path.basename(pkg_path))
-            subprocess.run(install_cmd, stdin=subprocess.DEVNULL, check=True)
+            subprocess.run(install_cmd, check=True)
             logger.info("Packages from %s installed successfully", os.path.basename(pkg_path))
         except subprocess.CalledProcessError as e:
             logger.error("Failed to install packages from %s: %s", pkg_path, e)
@@ -267,7 +267,6 @@ def slt_where(slt_cli_path, package):
     try:
         result = subprocess.run(
             [slt_cli_path, "where", "--non-interactive", package],
-            stdin=subprocess.DEVNULL,
             capture_output=True,
             text=True,
             check=False,
