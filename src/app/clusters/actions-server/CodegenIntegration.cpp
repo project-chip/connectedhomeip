@@ -81,6 +81,9 @@ ActionsServer::ActionsServer(EndpointId endpointId, Delegate & delegate) :
 
 ActionsServer::~ActionsServer()
 {
+    // Ensure Shutdown() was explicitly called prior to destruction to
+    // prevent dangling pointers in the data model provider registry.
+    VerifyOrDie(!mRegistered);
     --sInstanceCount;
 }
 
@@ -95,16 +98,15 @@ CHIP_ERROR ActionsServer::Init()
 void ActionsServer::Shutdown()
 {
     VerifyOrReturn(mRegistered);
-    mRegistered                    = false;
-    const ConcreteClusterPath path = mCluster.Cluster().GetPaths()[0];
-    CHIP_ERROR err                 = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
+    mRegistered    = false;
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
     if (err != CHIP_NO_ERROR)
     {
+        const ConcreteClusterPath path = mCluster.Cluster().GetPaths()[0];
         ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT, path.mEndpointId,
                      ChipLogValueMEI(path.mClusterId), err.Format());
     }
 }
-
 void ActionsServer::ActionListModified(EndpointId aEndpoint)
 {
     VerifyOrReturn(aEndpoint == mCluster.Cluster().GetPaths()[0].mEndpointId);
