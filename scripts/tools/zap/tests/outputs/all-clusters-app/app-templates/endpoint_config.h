@@ -606,84 +606,82 @@
         /* Endpoint: 0, Cluster: Unit Localization (server) */                                                                     \
         { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x2 }, /* TemperatureUnit */                                                  \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: On/Off (server) */                                                                            \
-            { (uint16_t) 0xFF, (uint16_t) 0x0, (uint16_t) 0x2 }, /* StartUpOnOff */                                                \
+        /* Endpoint: 1, Cluster: On/Off (server) */                                                                                \
+        { (uint16_t) 0xFF, (uint16_t) 0x0, (uint16_t) 0x2 }, /* StartUpOnOff */                                                    \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Level Control (server) */                                                                     \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 },   /* Options */                                                    \
-            { (uint16_t) 0x32, (uint16_t) 0x1, (uint16_t) 0xFF }, /* DefaultMoveRate */                                            \
+        /* Endpoint: 1, Cluster: Level Control (server) */                                                                         \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 },   /* Options */                                                        \
+        { (uint16_t) 0x32, (uint16_t) 0x1, (uint16_t) 0xFF }, /* DefaultMoveRate */                                                \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Laundry Washer Controls (server) */                                                           \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1F }, /* SpinSpeedCurrent */                                            \
+        /* Endpoint: 1, Cluster: Laundry Washer Controls (server) */                                                               \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1F }, /* SpinSpeedCurrent */                                                \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Smoke CO Alarm (server) */                                                                    \
-            { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x2 }, /* SmokeSensitivityLevel */                                        \
+        /* Endpoint: 1, Cluster: Smoke CO Alarm (server) */                                                                        \
+        { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x2 }, /* SmokeSensitivityLevel */                                            \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Valve Configuration and Control (server) */                                                   \
-            { (uint16_t) 0x64, (uint16_t) 0x1, (uint16_t) 0x64 }, /* DefaultOpenLevel */                                           \
+        /* Endpoint: 1, Cluster: Valve Configuration and Control (server) */                                                       \
+        { (uint16_t) 0x64, (uint16_t) 0x1, (uint16_t) 0x64 }, /* DefaultOpenLevel */                                               \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Energy EVSE (server) */                                                                       \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFFFE }, /* ApproximateEVEfficiency */                                   \
+        /* Endpoint: 1, Cluster: Energy EVSE (server) */                                                                           \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFFFE }, /* ApproximateEVEfficiency */                                       \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Window Covering (server) */                                                                   \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xF }, /* Mode */                                                         \
+        /* Endpoint: 1, Cluster: Window Covering (server) */                                                                       \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xF }, /* Mode */                                                             \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                    \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 }, /* OperationMode */                                                \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x7 }, /* ControlMode */                                                  \
+        /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                        \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 }, /* OperationMode */                                                    \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x7 }, /* ControlMode */                                                      \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Thermostat (server) */                                                                        \
-            { (uint16_t) 0xA28, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* OccupiedCoolingSetpoint */                             \
-            { (uint16_t) 0x7D0, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* OccupiedHeatingSetpoint */                             \
-            { (uint16_t) 0x2BC, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MinHeatSetpointLimit */                                \
-            { (uint16_t) 0xBB8, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MaxHeatSetpointLimit */                                \
-            { (uint16_t) 0x640, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MinCoolSetpointLimit */                                \
-            { (uint16_t) 0xC80, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MaxCoolSetpointLimit */                                \
-            { (uint16_t) 0x19, (uint16_t) 0x0, (uint16_t) 0x7F },        /* MinSetpointDeadBand */                                 \
-            { (uint16_t) 0x4, (uint16_t) 0x0, (uint16_t) 0x5 },          /* ControlSequenceOfOperation */                          \
-            { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x9 },          /* SystemMode */                                          \
+        /* Endpoint: 1, Cluster: Thermostat (server) */                                                                            \
+        { (uint16_t) 0xA28, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* OccupiedCoolingSetpoint */                                 \
+        { (uint16_t) 0x7D0, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* OccupiedHeatingSetpoint */                                 \
+        { (uint16_t) 0x2BC, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MinHeatSetpointLimit */                                    \
+        { (uint16_t) 0xBB8, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MaxHeatSetpointLimit */                                    \
+        { (uint16_t) 0x640, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MinCoolSetpointLimit */                                    \
+        { (uint16_t) 0xC80, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MaxCoolSetpointLimit */                                    \
+        { (uint16_t) 0x19, (uint16_t) 0x0, (uint16_t) 0x7F },        /* MinSetpointDeadBand */                                     \
+        { (uint16_t) 0x4, (uint16_t) 0x0, (uint16_t) 0x5 },          /* ControlSequenceOfOperation */                              \
+        { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x9 },          /* SystemMode */                                              \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Fan Control (server) */                                                                       \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x6 },  /* FanMode */                                                     \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x64 }, /* PercentSetting */                                              \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x64 }, /* SpeedSetting */                                                \
+        /* Endpoint: 1, Cluster: Fan Control (server) */                                                                           \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x6 },  /* FanMode */                                                         \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x64 }, /* PercentSetting */                                                  \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x64 }, /* SpeedSetting */                                                    \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Thermostat User Interface Configuration (server) */                                           \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 }, /* TemperatureDisplayMode */                                       \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x5 }, /* KeypadLockout */                                                \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 }, /* ScheduleProgrammingVisibility */                                \
+        /* Endpoint: 1, Cluster: Thermostat User Interface Configuration (server) */                                               \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 }, /* TemperatureDisplayMode */                                           \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x5 }, /* KeypadLockout */                                                    \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 }, /* ScheduleProgrammingVisibility */                                    \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Color Control (server) */                                                                     \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* WhitePointX */                                              \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* WhitePointY */                                              \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointRX */                                             \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointRY */                                             \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointGX */                                             \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointGY */                                             \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointBX */                                             \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointBY */                                             \
-            { (uint16_t) 0xFA, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* StartUpColorTemperatureMireds */                            \
+        /* Endpoint: 1, Cluster: Color Control (server) */                                                                         \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* WhitePointX */                                                  \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* WhitePointY */                                                  \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointRX */                                                 \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointRY */                                                 \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointGX */                                                 \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointGY */                                                 \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointBX */                                                 \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF },  /* ColorPointBY */                                                 \
+        { (uint16_t) 0xFA, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* StartUpColorTemperatureMireds */                                \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Ballast Configuration (server) */                                                             \
-            { (uint16_t) 0x1, (uint16_t) 0x1, (uint16_t) 0xFE },     /* MinLevel */                                                \
-            { (uint16_t) 0xFE, (uint16_t) 0x1, (uint16_t) 0xFE },    /* MaxLevel */                                                \
-            { (uint16_t) 0xFF, (uint16_t) 0x64, (uint16_t) 0xFFFF }, /* BallastFactorAdjustment */                                 \
-            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 },      /* LampAlarmMode */                                           \
+        /* Endpoint: 1, Cluster: Ballast Configuration (server) */                                                                 \
+        { (uint16_t) 0x1, (uint16_t) 0x1, (uint16_t) 0xFE },     /* MinLevel */                                                    \
+        { (uint16_t) 0xFE, (uint16_t) 0x1, (uint16_t) 0xFE },    /* MaxLevel */                                                    \
+        { (uint16_t) 0xFF, (uint16_t) 0x64, (uint16_t) 0xFFFF }, /* BallastFactorAdjustment */                                     \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 },      /* LampAlarmMode */                                               \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Unit Testing (server) */                                                                      \
-            { (uint16_t) 0x46, (uint16_t) 0x14, (uint16_t) 0x64 },   /* range_restricted_int8u */                                  \
-            { (uint16_t) -0x14, (uint16_t) -0x28, (uint16_t) 0x32 }, /* range_restricted_int8s */                                  \
-            { (uint16_t) 0xC8, (uint16_t) 0x64, (uint16_t) 0x3E8 },  /* range_restricted_int16u */                                 \
-            { (uint16_t) -0x64, (uint16_t) -0x96, (uint16_t) 0xC8 }, /* range_restricted_int16s */                                 \
-            { (uint16_t) 0x46, (uint16_t) 0x14, (uint16_t) 0x64 },   /* nullable_range_restricted_int8u */                         \
-            { (uint16_t) -0x14, (uint16_t) -0x28, (uint16_t) 0x32 }, /* nullable_range_restricted_int8s */                         \
-            { (uint16_t) 0xC8, (uint16_t) 0x64, (uint16_t) 0x3E8 },  /* nullable_range_restricted_int16u */                        \
-            { (uint16_t) -0x64, (uint16_t) -0x96, (uint16_t) 0xC8 }, /* nullable_range_restricted_int16s */                        \
+        /* Endpoint: 1, Cluster: Unit Testing (server) */                                                                          \
+        { (uint16_t) 0x46, (uint16_t) 0x14, (uint16_t) 0x64 },   /* range_restricted_int8u */                                      \
+        { (uint16_t) -0x14, (uint16_t) -0x28, (uint16_t) 0x32 }, /* range_restricted_int8s */                                      \
+        { (uint16_t) 0xC8, (uint16_t) 0x64, (uint16_t) 0x3E8 },  /* range_restricted_int16u */                                     \
+        { (uint16_t) -0x64, (uint16_t) -0x96, (uint16_t) 0xC8 }, /* range_restricted_int16s */                                     \
+        { (uint16_t) 0x46, (uint16_t) 0x14, (uint16_t) 0x64 },   /* nullable_range_restricted_int8u */                             \
+        { (uint16_t) -0x14, (uint16_t) -0x28, (uint16_t) 0x32 }, /* nullable_range_restricted_int8s */                             \
+        { (uint16_t) 0xC8, (uint16_t) 0x64, (uint16_t) 0x3E8 },  /* nullable_range_restricted_int16u */                            \
+        { (uint16_t) -0x64, (uint16_t) -0x96, (uint16_t) 0xC8 }, /* nullable_range_restricted_int16s */                            \
                                                                                                                                    \
         /* Endpoint: 2, Cluster: On/Off (server) */                                                                                \
-        {                                                                                                                          \
-            (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x2                                                                         \
-        } /* StartUpOnOff */                                                                                                       \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x2 } /* StartUpOnOff */                                                      \
     }
 
 // This is an array of EmberAfAttributeMetadata structures.
@@ -4394,12 +4392,8 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 
 // Array of device types
 #define FIXED_DEVICE_TYPES                                                                                                         \
-    {                                                                                                                              \
-        { 0x00000011, 1 }, { 0x00000016, 1 }, { 0x00000100, 1 }, { 0x00000011, 1 }, { 0x00000100, 1 }, { 0x00000011, 1 },          \
-        {                                                                                                                          \
-            0x00000019, 1                                                                                                          \
-        }                                                                                                                          \
-    }
+    { { 0x00000011, 1 }, { 0x00000016, 1 }, { 0x00000100, 1 }, { 0x00000011, 1 },                                                  \
+      { 0x00000100, 1 }, { 0x00000011, 1 }, { 0x00000019, 1 } }
 
 // Array of device type offsets
 #define FIXED_DEVICE_TYPE_OFFSETS { 0, 2, 4, 6 }
