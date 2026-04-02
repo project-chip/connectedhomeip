@@ -101,11 +101,11 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    /** @brief Handle to Force an immediate report:
-     *  pulls readings from the delegate, updates attributes, generates events, and resets the snapshot timer.
+    /** @brief Handle to request an immediate snapshot/report:
+     *  pulls readings from the delegate, updates attributes, and generates events.
      *
-     * @note Enforces the min 1s reporting rule, if a report was generated less than 1s ago, this will do nothing and the
-     * snapshot timer will ensure the next snapshot is generated within 60 seconds of ignoring the attribute changes.
+     * @note Enforces the minimum reporting interval: if a report was generated less than kMinReportInterval ago, this will
+     *       do nothing, and any subsequent reports will be produced according to the existing reporting/timer mechanisms.
      */
     void GenerateSnapshots();
 
