@@ -131,13 +131,13 @@ CHIP_ERROR se05x_close_session(void)
         ex_sss_session_close(&gex_sss_chip_ctx);
         memset(&gex_sss_chip_ctx, 0, sizeof(gex_sss_chip_ctx));
         is_session_open = 0;
-    }
 
-    ChipLogDetail(Crypto, "Turn OFF SE05x secure element after session close");
-    if (se05x_host_gpio_power_set(0) != 0)
-    {
-        ChipLogError(NotSpecified, "SE05x - Error in se05x_host_gpio_power_set(0) function");
-        return CHIP_ERROR_INTERNAL;
+        ChipLogDetail(Crypto, "Turn OFF SE05x secure element after session close");
+        if (se05x_host_gpio_power_set(0) != 0)
+        {
+            ChipLogError(NotSpecified, "SE05x - Error in se05x_host_gpio_power_set(0) function");
+            return CHIP_ERROR_INTERNAL;
+        }
     }
 
     return CHIP_NO_ERROR;
