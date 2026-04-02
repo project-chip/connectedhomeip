@@ -29,7 +29,6 @@
 #include <platform/ESP32/DiagnosticDataProviderImpl.h>
 #include <platform/ESP32/ESP32Utils.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-#include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <platform/KeyValueStoreManager.h>
 #endif
