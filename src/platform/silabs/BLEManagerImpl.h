@@ -49,7 +49,8 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
 public:
     void HandleBootEvent(void);
 
-#if defined(SLI_SI91X_ENABLE_BLE) && SLI_SI91X_ENABLE_BLE
+    CHIP_ERROR PrintBLEInfo();
+#if SLI_SI91X_ENABLE_BLE
     // Used for posting the event in the BLE queue
     void BlePostEvent(SilabsBleWrapper::BleEvent_t * event);
     void HandleConnectEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt);
