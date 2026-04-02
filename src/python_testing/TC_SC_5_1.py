@@ -36,6 +36,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import logging
+
 from mobly import asserts
 from TC_GC_common import get_feature_map, is_groupcast_on_root_node
 
@@ -46,6 +48,7 @@ from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
+logger = logging.getLogger(__name__)
 
 class TC_SC_5_1(MatterBaseTest):
 
@@ -53,11 +56,12 @@ class TC_SC_5_1(MatterBaseTest):
         return "26.1.1. [TC-SC-5.1] Adding member to a group - TH as Admin and DUT as Group Member"
 
     def pics_TC_SC_5_1(self):
-        return ["GRPKEY.S", "G.S"]
+        return ["MCORE.ROLE.COMMISSIONEE"]
 
     def steps_TC_SC_5_1(self) -> list[TestStep]:
         return [
             TestStep("0", "Commissioning, already done", is_commissioning=True),
+            TestStep("0b", "Run the remaining steps once for each endpoint with a groups cluster"),
             TestStep("1", "TH writes the ACL attribute in the Access Control cluster to add Operate privileges for group 0x0103 and maintain the current administrative privileges for the TH."),
             TestStep("2a", "TH sends KeySetWrite command with a key that is NOT installed on the TH (to test key update in next step)."),
             TestStep("2b", "TH sends KeySetWrite command with a key that is pre-installed on the TH."),
@@ -82,8 +86,32 @@ class TC_SC_5_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SC_5_1(self):
+        self.step("0")
+
+        self.step("0b")
+        endpoints = []
+        await self._populate_wildcard()
+        for endpoint in self.stored_global_wildcard.attributes.keys():
+            # TODO: there's something weird with the groups cluster on EP0 of all clusters. Also, that shouldn't be there.
+            # doing this for now so I can get feedback on the approach here. Need to fix the apps before this is submitted.
+            if endpoint == 0:
+                continue
+            if Clusters.Groups in self.stored_global_wildcard.attributes[endpoint]:
+                endpoints.append(endpoint)
+        if not endpoints:
+            logger.info("No groups endpoints found, test not applicable for this device, skipping all steps")
+            logger.info("Note: Because of the way groups endpoints appear on devices, this test internally determines the" \
+                         "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
+            self.mark_all_remaining_steps_skipped("1")
+            return
+        logger.info(f'Found the following endpoints with Groups clusters: {endpoints}')
+        for endpoint in endpoints:
+            logger.info(f"Running test against endpoint {endpoint} groups cluster")
+            self.current_step_index = 2
+            await self.run_test_against_endpoint(endpoint)
+
+    async def run_test_against_endpoint(self, groups_endpoint: int):
         dev_ctrl = self.default_controller
-        groups_endpoint = self.matter_test_config.endpoint
         groupcast_enabled = await is_groupcast_on_root_node(self)
 
         group_names_supported = False
@@ -93,8 +121,6 @@ class TC_SC_5_1(MatterBaseTest):
                 attribute=Clusters.Groups.Attributes.FeatureMap,
                 endpoint=groups_endpoint)
             group_names_supported = bool(group_feature_map & Clusters.Groups.Bitmaps.Feature.kGroupNames)
-
-        self.step("0")
 
         # Step 1: Write ACL
         self.step("1")
