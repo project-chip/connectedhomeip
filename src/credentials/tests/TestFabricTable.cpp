@@ -28,6 +28,7 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <credentials/FabricTable.h>
 
