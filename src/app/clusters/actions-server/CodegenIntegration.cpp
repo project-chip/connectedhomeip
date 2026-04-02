@@ -81,9 +81,13 @@ ActionsServer::ActionsServer(EndpointId endpointId, Delegate & delegate) :
 
 ActionsServer::~ActionsServer()
 {
-    // Ensure Shutdown() was explicitly called prior to destruction to
-    // prevent dangling pointers in the data model provider registry.
-    VerifyOrDie(!mRegistered);
+    if (mRegistered)
+    {
+        // Shutdown() was not called before destruction. Call it now to avoid
+        // leaving a dangling pointer in the data model provider registry.
+        ChipLogError(AppServer, "ActionsServer destroyed without Shutdown() being called; shutting down now.");
+        Shutdown();
+    }
     --sInstanceCount;
 }
 
