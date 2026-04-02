@@ -63,6 +63,7 @@ class TC_SC_5_2(MatterBaseTest):
     def steps_TC_SC_5_2(self) -> list[TestStep]:
         return [
             TestStep("0", "Commissioning, already done", is_commissioning=True),
+            TestStep("0b", "Run the remaining steps once for each endpoint with a groups cluster"),
             TestStep("1", "TH writes the ACL attribute in the Access Control cluster to add Manage privileges for group 0x0103."),
             TestStep("2", "TH sends KeySetWrite command with pre-installed key."),
             TestStep("3", "If Groupcast enabled on RootNode, skip to step 12. Otherwise, TH binds GroupId 0x0103 and 0x0101 with GroupKeySetID 0x01a3 in GroupKeyMap."),
@@ -85,13 +86,36 @@ class TC_SC_5_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SC_5_2(self):
+        self.step("0")
+
+        self.step("0b")
+        endpoints = []
+        await self._populate_wildcard()
+        for endpoint in self.stored_global_wildcard.attributes.keys():
+            # TODO: there's something weird with the groups cluster on EP0 of all clusters. Also, that shouldn't be there.
+            # doing this for now so I can get feedback on the approach here. Need to fix the apps before this is submitted.
+            if endpoint == 0:
+                continue
+            if Clusters.Groups in self.stored_global_wildcard.attributes[endpoint]:
+                endpoints.append(endpoint)
+        if not endpoints:
+            logging.info("No groups endpoints found, test not applicable for this device, skipping all steps")
+            logging.info("Note: Because of the way groups endpoints appear on devices, this test internally determines the" \
+                         "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
+            self.mark_all_remaining_steps_skipped("1")
+            return
+        logging.info(f'Found the following endpoints with Groups clusters: {endpoints}')
+        for endpoint in endpoints:
+            logger.info(f"Running test against endpoint {endpoint} groups cluster")
+            self.current_step_index = 2
+            await self.run_test_against_endpoint(endpoint)
+
+
+    async def run_test_against_endpoint(self, groups_endpoint: int):
         dev_ctrl = self.default_controller
         dev_ctrl.InitGroupTestingData()
-        groups_endpoint = self.matter_test_config.endpoint
         node_id = self.dut_node_id
         groupcast_enabled = await is_groupcast_on_root_node(self)
-
-        self.step("0")
 
         # Step 1: Write ACL
         self.step("1")
