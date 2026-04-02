@@ -46,6 +46,3 @@
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 1
 
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test Bulb"
-
-// Enable groupcast
-#define CHIP_CONFIG_ENABLE_GROUPCAST 1
