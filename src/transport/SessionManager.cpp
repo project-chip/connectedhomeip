@@ -188,7 +188,19 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
     if (sessionHandle->AllowsLargePayload())
     {
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        uint32_t maxPayload = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
+        if (maxPayload > 0)
+        {
+            VerifyOrReturnError(message->TotalLength() <= maxPayload, CHIP_ERROR_MESSAGE_TOO_LONG);
+        }
+        else
+        {
+            VerifyOrReturnError(message->TotalLength() <= kMaxLargeAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
+        }
+#else
         VerifyOrReturnError(message->TotalLength() <= kMaxLargeAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
+#endif
     }
     else
     {
