@@ -343,17 +343,12 @@ CHIP_ERROR NFCDataRetrievalInfo::GetOperationalDataSetFormSE05x(char * opDataSet
     VerifyOrReturnError(opDataSet != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(opDataSetLen != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // If we already have the operational dataset cached, just return it
-    if (op_data_set_len > 0)
-    {
-        VerifyOrReturnError(*opDataSetLen >= op_data_set_len, CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(opDataSet, op_data_set, op_data_set_len);
-        *opDataSetLen = op_data_set_len;
-        return CHIP_NO_ERROR;
-    }
+    ReturnErrorOnFailure(SynchronizeNetworkCredentials());
 
-    // No cached data available
-    *opDataSetLen = 0;
+    VerifyOrReturnError(*opDataSetLen >= op_data_set_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(opDataSet, op_data_set, op_data_set_len);
+    *opDataSetLen = op_data_set_len;
+
     return CHIP_NO_ERROR;
 }
 
