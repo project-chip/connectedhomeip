@@ -1,82 +1,90 @@
 """
-Preservation Property Test — Property 2: Default and Non-Android Builds Unchanged
+Preservation Property Test -- Property 2: Default and Non-Android Builds Unchanged
 
 **Validates: Requirements 3.1, 3.2**
 
 This test verifies that the baseline build configurations for default
 (non-optimized) Android builds and non-Android platforms (Linux, Darwin)
-remain unchanged.It follows observation -
-    first methodology
-    : the assertions encode the * current *
-          state of the files so that any future change that accidentally regresses these configurations will be caught.
+remain unchanged. It follows observation-first methodology: the assertions
+encode the *current* state of the files so that any future change that
+accidentally regresses these configurations will be caught.
 
-      Observations(on UNFIXED code) :
-    -android
-        / args.gni default block : chip_build_libshell = true,
-                                   optimize_for_size   = false, no chip_cluster_objects_source_override set,
-                                   no matter_enable_tlv_decoder_api set.-
-    linux / args.gni : chip_cluster_objects_source_override points to casting - cluster
-    - objects.cpp.- darwin / args.gni : chip_cluster_objects_source_override points to casting - cluster - objects.cpp.- casting
-    - cluster -
-    objects.cpp exists and contains 157 .ipp includes spanning 39 cluster directories plus the shared utilities directory
-        .
+Observations (on UNFIXED code):
+- android/args.gni default block: chip_build_libshell=true,
+  optimize_for_size=false, no chip_cluster_objects_source_override set,
+  no matter_enable_tlv_decoder_api set.
+- linux/args.gni: does NOT set chip_cluster_objects_source_override
+  unconditionally (set via host.py when chip_casting_simplified=true).
+- darwin/args.gni: chip_cluster_objects_source_override points to
+  casting-cluster-objects.cpp.
+- casting-cluster-objects.cpp exists and contains ~157 .ipp includes
+  spanning ~39 cluster directories plus the shared utilities directory.
 
-    EXPECTED on UNFIXED code : ALL TESTS PASS — confirms baseline to preserve.""
-                                                                              "
+EXPECTED on UNFIXED code: ALL TESTS PASS -- confirms baseline to preserve.
+"""
 
-                               import os import re
+import os
+import re
 
-                               from hypothesis import given,
-                                   settings,
-                                   HealthCheck from hypothesis import strategies as st
+from hypothesis import HealthCheck, given, settings
+from hypothesis import strategies as st
 
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# ---------------------------------------------------------------------------
 # Paths
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# ---------------------------------------------------------------------------
 
-    REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+REPO_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "..")
+)
 
-                    ANDROID_ARGS_GNI = os.path.join(REPO_ROOT, "examples", "tv-casting-app", "android", "args.gni") LINUX_ARGS_GNI =
-        os.path.join(REPO_ROOT, "examples", "tv-casting-app", "linux", "args.gni") DARWIN_ARGS_GNI =
-            os.path.join(REPO_ROOT, "examples", "tv-casting-app", "darwin", "args.gni") SLIM_CLUSTER_FILE =
-                os.path
-                    .join(REPO_ROOT, "examples", "tv-casting-app", "tv-casting-common", "casting-cluster-objects.cpp", )
+ANDROID_ARGS_GNI = os.path.join(
+    REPO_ROOT, "examples", "tv-casting-app", "android", "args.gni"
+)
+LINUX_ARGS_GNI = os.path.join(
+    REPO_ROOT, "examples", "tv-casting-app", "linux", "args.gni"
+)
+DARWIN_ARGS_GNI = os.path.join(
+    REPO_ROOT, "examples", "tv-casting-app", "darwin", "args.gni"
+)
+SLIM_CLUSTER_FILE = os.path.join(
+    REPO_ROOT,
+    "examples",
+    "tv-casting-app",
+    "tv-casting-common",
+    "casting-cluster-objects.cpp",
+)
 
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-# Helpers — lightweight GNI parser
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# ---------------------------------------------------------------------------
+# Helpers -- lightweight GNI parser
+# ---------------------------------------------------------------------------
 
-                        def _read_file(path : str)
-                    ->str : ""
-                            "Return the text content of a file."
-                            "" with open(path, "r") as f
-    : return f.read()
 
-          def _strip_comments(text : str)
-                    ->str
-    : ""
-      "Remove single-line # comments."
-      "" return re.sub(r "#[^\n]*", "", text)
+def _read_file(path: str) -> str:
+    """Return the text content of a file."""
+    with open(path, "r") as f:
+        return f.read()
 
-          def _extract_else_block(text : str)
-                    ->str : ""
-                            "
-                            Extract the body of the `
-}
-else
-{` block that follows the
+
+def _strip_comments(text: str) -> str:
+    """Remove single-line # comments."""
+    return re.sub(r"#[^\n]*", "", text)
+
+
+def _extract_else_block(text: str) -> str:
+    """
+    Extract the body of the `} else {` block that follows the
     `if (optimize_apk_size)` conditional in android/args.gni.
 
     Returns the text between the braces of the else clause.
     """
- stripped = _strip_comments(text)
+    stripped = _strip_comments(text)
 
-# Find the if (optimize_apk_size) block first
-  match = re.search(r"if\s*\(\s*optimize_apk_size\s*\)", stripped)
-   if not match:
+    # Find the if (optimize_apk_size) block first
+    match = re.search(r"if\s*\(\s*optimize_apk_size\s*\)", stripped)
+    if not match:
         return ""
 
-# Walk past the if - block's opening brace
+    # Walk past the if-block's opening brace
     brace_start = stripped.index("{", match.end())
     depth = 1
     pos = brace_start + 1
@@ -87,8 +95,8 @@ else
             depth -= 1
         pos += 1
 
-# pos is now just past the closing } of the if - block.
-# Look for `else {`
+    # pos is now just past the closing } of the if-block.
+    # Look for `else {`
     rest = stripped[pos:]
     else_match = re.search(r"else\s*\{", rest)
     if not else_match:
@@ -104,7 +112,7 @@ else
             depth -= 1
         epos += 1
 
-    return stripped[else_body_start: epos - 1]
+    return stripped[else_body_start:epos - 1]
 
 
 def _extract_top_level_assignment(text: str, var_name: str) -> str | None:
@@ -131,9 +139,9 @@ def _unique_cluster_dirs(text: str) -> set:
     """
     return set(re.findall(r"#include\s+<clusters/([^/]+)/", text))
 
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-# Property - based tests
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# ---------------------------------------------------------------------------
+# Property-based tests
+# ---------------------------------------------------------------------------
 
 
 @given(optimize_apk_size=st.just(False))
@@ -156,14 +164,14 @@ def test_android_default_build_preserves_dev_flags(optimize_apk_size: bool):
 
     gni_text = _read_file(ANDROID_ARGS_GNI)
 
-# -- - Check the else(default) block -- -
+    # Check the else (default) block
     else_block = _extract_else_block(gni_text)
     assert else_block, (
         "Could not find the `else` block after `if (optimize_apk_size)` "
         "in android/args.gni"
     )
 
-# chip_build_libshell = true
+    # chip_build_libshell = true
     libshell_val = _extract_top_level_assignment(else_block, "chip_build_libshell")
     assert libshell_val is not None, (
         "REGRESSION: `chip_build_libshell` is not set in the default (else) block "
@@ -174,7 +182,7 @@ def test_android_default_build_preserves_dev_flags(optimize_apk_size: bool):
         f"in the default build"
     )
 
-# optimize_for_size = false
+    # optimize_for_size = false
     opt_size_val = _extract_top_level_assignment(else_block, "optimize_for_size")
     assert opt_size_val is not None, (
         "REGRESSION: `optimize_for_size` is not set in the default (else) block "
@@ -185,24 +193,23 @@ def test_android_default_build_preserves_dev_flags(optimize_apk_size: bool):
         f"in the default build"
     )
 
-# chip_cluster_objects_source_override should NOT be set in the else block
-    stripped = _strip_comments(gni_text)
+    # chip_cluster_objects_source_override should NOT be set in the else block
     override_in_else = _extract_top_level_assignment(
         else_block, "chip_cluster_objects_source_override"
     )
     assert override_in_else is None, (
         f"REGRESSION: `chip_cluster_objects_source_override` is set to "
-        f"`{override_in_else}` in the default (else) block — it should only "
+        f"`{override_in_else}` in the default (else) block -- it should only "
         f"be set in the optimize_apk_size block (if at all)"
     )
 
-# matter_enable_tlv_decoder_api should NOT be set in the else block
+    # matter_enable_tlv_decoder_api should NOT be set in the else block
     tlv_in_else = _extract_top_level_assignment(
         else_block, "matter_enable_tlv_decoder_api"
     )
     assert tlv_in_else is None, (
         f"REGRESSION: `matter_enable_tlv_decoder_api` is set to `{tlv_in_else}` "
-        f"in the default (else) block — it should not be overridden for dev builds"
+        f"in the default (else) block -- it should not be overridden for dev builds"
     )
 
 
@@ -223,8 +230,7 @@ def test_non_android_builds_use_slim_cluster_override(platform: str):
     Linux builds set the override conditionally via host.py when
     chip_casting_simplified=true, so it is NOT in linux/args.gni.
     """
-    gni_path = DARWIN_ARGS_GNI
-    gni_text = _read_file(gni_path)
+    gni_text = _read_file(DARWIN_ARGS_GNI)
     stripped = _strip_comments(gni_text)
 
     override_val = _extract_top_level_assignment(
@@ -232,11 +238,11 @@ def test_non_android_builds_use_slim_cluster_override(platform: str):
     )
     assert override_val is not None, (
         f"REGRESSION: `chip_cluster_objects_source_override` is not set in "
-        f"{platform}/args.gni — the slim cluster override must remain active"
+        f"{platform}/args.gni -- the slim cluster override must remain active"
     )
     assert "casting-cluster-objects.cpp" in override_val, (
         f"REGRESSION: `chip_cluster_objects_source_override` in {platform}/args.gni "
-        f"is `{override_val}` — expected it to reference casting-cluster-objects.cpp"
+        f"is `{override_val}` -- expected it to reference casting-cluster-objects.cpp"
     )
 
 
@@ -264,7 +270,7 @@ def test_linux_args_gni_does_not_set_unconditional_cluster_override(dummy: bool)
     )
     assert override_val is None, (
         f"REGRESSION: `chip_cluster_objects_source_override` is set unconditionally "
-        f"in linux/args.gni to `{override_val}` — this breaks the legacy build path "
+        f"in linux/args.gni to `{override_val}` -- this breaks the legacy build path "
         f"(chip_casting_simplified=false) which needs all clusters. The override "
         f"should be set via host.py only when chip_casting_simplified=true."
     )
@@ -291,26 +297,26 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
 
     content = _read_file(SLIM_CLUSTER_FILE)
 
-# Count.ipp includes
+    # Count .ipp includes
     ipp_count = _count_ipp_includes(content)
-# The file currently has 157 .ipp includes.Allow a small tolerance
-# (±5) for minor cluster additions / removals, but catch large regressions
-# like accidentally replacing with the full cluster - objects.cpp(~800 +).
+    # The file currently has ~157 .ipp includes. Allow a small tolerance
+    # (+-5) for minor cluster additions/removals, but catch large regressions
+    # like accidentally replacing with the full cluster-objects.cpp (~800+).
     assert 100 <= ipp_count <= 200, (
         f"REGRESSION: casting-cluster-objects.cpp has {ipp_count} .ipp includes. "
         f"Expected ~157 (between 100 and 200). If this is much larger, the slim "
         f"file may have been replaced with the full cluster-objects.cpp."
     )
 
-# Verify unique cluster directories
+    # Verify unique cluster directories
     cluster_dirs = _unique_cluster_dirs(content)
-# Currently 39 cluster dirs + 'shared' = 40 total
+    # Currently 39 cluster dirs + 'shared' = 40 total
     assert 30 <= len(cluster_dirs) <= 50, (
         f"REGRESSION: casting-cluster-objects.cpp references {len(cluster_dirs)} "
         f"unique cluster directories. Expected ~40 (between 30 and 50)."
     )
 
-# Verify key casting - specific clusters are present
+    # Verify key casting-specific clusters are present
     expected_casting_clusters = {
         "MediaPlayback",
         "ContentLauncher",
@@ -335,7 +341,7 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
         f"clusters: {missing}"
     )
 
-# Verify key infrastructure clusters are present
+    # Verify key infrastructure clusters are present
     expected_infra_clusters = {
         "GeneralCommissioning",
         "OperationalCredentials",
@@ -352,9 +358,9 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
     )
 
 
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# ---------------------------------------------------------------------------
 # Allow running directly
-# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
+# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     import sys
 
