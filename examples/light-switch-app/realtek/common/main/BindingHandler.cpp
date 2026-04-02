@@ -219,7 +219,7 @@ void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Bind
 
     if (CHIP_NO_ERROR != ret)
     {
-        ChipLogError(NotSpecified, "Invoke Group Command Request ERROR: %s", ErrorStr(ret));
+        ChipLogError(NotSpecified, "Invoke LevelControl Command Request ERROR: %s", ErrorStr(ret));
     }
 }
 
