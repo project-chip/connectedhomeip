@@ -102,7 +102,7 @@ void ActionsServer::Shutdown()
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
     if (err != CHIP_NO_ERROR)
     {
-        const ConcreteClusterPath path = mCluster.Cluster().GetPaths()[0];
+        [[maybe_unused]] const ConcreteClusterPath path = mCluster.Cluster().GetPaths()[0];
         ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT, path.mEndpointId,
                      ChipLogValueMEI(path.mClusterId), err.Format());
     }
