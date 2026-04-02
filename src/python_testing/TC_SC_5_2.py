@@ -99,12 +99,12 @@ class TC_SC_5_2(MatterBaseTest):
             if Clusters.Groups in self.stored_global_wildcard.attributes[endpoint]:
                 endpoints.append(endpoint)
         if not endpoints:
-            logging.info("No groups endpoints found, test not applicable for this device, skipping all steps")
-            logging.info("Note: Because of the way groups endpoints appear on devices, this test internally determines the" \
+            logger.info("No groups endpoints found, test not applicable for this device, skipping all steps")
+            logger.info("Note: Because of the way groups endpoints appear on devices, this test internally determines the" \
                          "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
             self.mark_all_remaining_steps_skipped("1")
             return
-        logging.info(f'Found the following endpoints with Groups clusters: {endpoints}')
+        logger.info(f'Found the following endpoints with Groups clusters: {endpoints}')
         for endpoint in endpoints:
             logger.info(f"Running test against endpoint {endpoint} groups cluster")
             self.current_step_index = 2
@@ -169,11 +169,11 @@ class TC_SC_5_2(MatterBaseTest):
 
             # Step 6: AddGroup 0x0101 as group command via GroupID 0x0103
             self.step("6")
-            await dev_ctrl.SendGroupCommand(0x0103, Clusters.Groups.Commands.AddGroup(0x0101, "Test Group 0101"))
+            dev_ctrl.SendGroupCommand(0x0103, Clusters.Groups.Commands.AddGroup(0x0101, "Test Group 0101"))
             await asyncio.sleep(3)
 
             # Check if GroupNames are supported
-            group_feature_map = await dev_ctrl.read_single_attribute_check_success(
+            group_feature_map = await self.read_single_attribute_check_success(
                 cluster=Clusters.Groups,
                 attribute=Clusters.Groups.Attributes.FeatureMap,
                 endpoint=0)
