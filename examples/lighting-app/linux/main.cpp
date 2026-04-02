@@ -16,16 +16,19 @@
  *    limitations under the License.
  */
 
-#include "AppOptions.h"
 #include "LightingAppCommandDelegate.h"
 #include "LightingManager.h"
-#include "diagnostic-logs-provider-delegate-impl.h"
 #include <AppMain.h>
+
+#if CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS
+#include "AppOptions.h"
+#include "diagnostic-logs-provider-delegate-impl.h"
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
+#endif
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 #include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -42,7 +45,9 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+#if CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS
 using chip::app::Clusters::DiagnosticLogs::DiagnosticLogsServer;
+#endif
 
 namespace {
 
@@ -79,6 +84,7 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     // TODO: implement any additional Cluster Server init actions
 }
 
+#if CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
     auto & logProvider = chip::app::Clusters::DiagnosticLogs::LogProvider::GetInstance();
@@ -89,6 +95,7 @@ void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
+#endif // CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS
 
 void ApplicationInit()
 {
@@ -118,7 +125,11 @@ extern "C" {
 
 int main(int argc, char * argv[])
 {
+#if CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS
     if (ChipLinuxAppInit(argc, argv, AppOptions::GetOptions()) != 0)
+#else
+    if (ChipLinuxAppInit(argc, argv) != 0)
+#endif
     {
         return -1;
     }
