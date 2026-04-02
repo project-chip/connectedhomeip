@@ -233,6 +233,8 @@ TEST_F(TestLocalizationConfigurationCluster, WriteAttributeNotifiesSubscribers)
     EXPECT_TRUE(actualLocale.data_equal(CharSpan::fromCharString("fr-FR")));
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    EXPECT_TRUE(
+        context.ChangeListener().IsDirty(ConcreteAttributePath(kRootEndpointId, LocalizationConfiguration::Id, ActiveLocale::Id)));
     EXPECT_NE(cluster.GetDataVersion({ kRootEndpointId, LocalizationConfiguration::Id }), versionAfterFirstWrite);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -255,6 +257,33 @@ TEST_F(TestLocalizationConfigurationCluster, WriteAttributeFailureDoesNotNotify)
     AttributeValueDecoder decoder        = writeOp.DecoderFor(CharSpan::fromCharString("de-DE"));
     DataModel::ActionReturnStatus status = cluster.WriteAttribute(writeOp.GetRequest(), decoder);
     EXPECT_EQ(status, Status::ConstraintError);
+
+    CharSpan actualLocale = cluster.GetActiveLocale();
+    EXPECT_TRUE(actualLocale.data_equal(CharSpan::fromCharString("en-US")));
+
+    EXPECT_TRUE(context.ChangeListener().DirtyList().empty());
+    EXPECT_EQ(cluster.GetDataVersion({ kRootEndpointId, LocalizationConfiguration::Id }), versionBefore);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestLocalizationConfigurationCluster, WriteSameLocaleIsNoOp)
+{
+    std::vector<CharSpan> supportedLocales = { CharSpan::fromCharString("en-US"), CharSpan::fromCharString("es-ES") };
+    mDeviceInfoProvider->SetSupportedLocales(supportedLocales);
+
+    MockLocalizationConfigurationCluster cluster(*mDeviceInfoProvider, CharSpan::fromCharString("en-US"));
+
+    chip::Testing::TestServerClusterContext context;
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    DataVersion versionBefore = cluster.GetDataVersion({ kRootEndpointId, LocalizationConfiguration::Id });
+
+    chip::Testing::WriteOperation writeOp(kRootEndpointId, LocalizationConfiguration::Id, ActiveLocale::Id);
+    writeOp.SetSubjectDescriptor(chip::Testing::kAdminSubjectDescriptor);
+    AttributeValueDecoder decoder        = writeOp.DecoderFor(CharSpan::fromCharString("en-US"));
+    DataModel::ActionReturnStatus status = cluster.WriteAttribute(writeOp.GetRequest(), decoder);
+    EXPECT_EQ(status, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
     CharSpan actualLocale = cluster.GetActiveLocale();
     EXPECT_TRUE(actualLocale.data_equal(CharSpan::fromCharString("en-US")));

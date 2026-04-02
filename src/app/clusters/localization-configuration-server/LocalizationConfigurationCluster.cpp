@@ -155,6 +155,9 @@ DataModel::ActionReturnStatus LocalizationConfigurationCluster::SetActiveLocale(
         return Status::ConstraintError;
     }
 
+    VerifyOrReturnValue(!mActiveLocale.Content().data_equal(activeLocale),
+                        DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+
     VerifyOrReturnError(mActiveLocale.SetContent(activeLocale), Status::ConstraintError);
     if (mContext != nullptr)
     {
