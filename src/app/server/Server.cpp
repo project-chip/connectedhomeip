@@ -580,12 +580,37 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         .sessionSetupPool      = &mSessionSetupPool,
     };
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    {
+        SessionParameters localSessionParams;
+        uint16_t supportedTransports = 0;
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+        supportedTransports |= 0x02; // TCP Client
+        supportedTransports |= 0x04; // TCP Server
+#endif
+        localSessionParams.SetSupportedTransports(supportedTransports);
+        localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES);
+        caseSessionManagerConfig.sessionInitParams.localSessionParams = localSessionParams;
+    }
+#endif
+
     err = mCASESessionManager.Init(&DeviceLayer::SystemLayer(), caseSessionManagerConfig);
     SuccessOrExit(err);
 
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage,
                                                     &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    {
+        SessionParameters localSessionParams;
+        uint16_t supportedTransports = static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient) |
+            static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer);
+        localSessionParams.SetSupportedTransports(supportedTransports);
+        localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES);
+        mCASEServer.SetLocalSessionParameters(localSessionParams);
+    }
+#endif
 
     err = app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler, &mCASESessionManager,
                                                            mSubscriptionResumptionStorage);

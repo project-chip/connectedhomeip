@@ -335,6 +335,14 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         .minimumLITBackoffInterval = params.minimumLITBackoffInterval,
     };
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    {
+        uint16_t supportedTransports = static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient);
+        sessionInitParams.localSessionParams.SetSupportedTransports(supportedTransports);
+        sessionInitParams.localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES);
+    }
+#endif
+
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = sessionInitParams,
         .clientPool        = stateParams.caseClientPool,
