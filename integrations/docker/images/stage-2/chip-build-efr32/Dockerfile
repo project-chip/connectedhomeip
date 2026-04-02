@@ -19,10 +19,10 @@ RUN set -x \
 RUN set -x \
     && /tmp/slt_install/slt install -f /tmp/wiseconnect-pkg.slt \
     && /tmp/slt_install/slt install slc-cli \
-    && cp -a $(/tmp/slt_install/slt where wiseconnect/4.0.1) /tmp/wifi_sdk \
+    && cp -a $(/tmp/slt_install/slt where wiseconnect) /tmp/wifi_sdk \
     && cp -a $(/tmp/slt_install/slt where slc-cli) /tmp/slc_cli \
     && /tmp/slt_install/slt install -f /tmp/sisdk-pkg.slt \
-    && cp -a $(/tmp/slt_install/slt where simplicity-sdk/2025.12.2) /tmp/simplicity_sdk \
+    && cp -a $(/tmp/slt_install/slt where simplicity-sdk) /tmp/simplicity_sdk \
     && rm -rf /tmp/slt_install /tmp/sisdk-pkg.slt /tmp/wiseconnect-pkg.slt \
     && : # last line
 
