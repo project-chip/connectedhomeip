@@ -149,10 +149,10 @@ class TC_ACE_1_6(MatterBaseTest):
         ))
 
         # Step 2: GroupKeyMap
-        self.step(2)
         if gc_on_root:
             self.skip_step(2)
         else:
+            self.step(2)
             await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([
                 Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID1, groupKeySetID=keySetID1),
                 Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID2, groupKeySetID=keySetID1),
@@ -166,24 +166,24 @@ class TC_ACE_1_6(MatterBaseTest):
 # TODO check for success?
 ###################################
         # Step 3a: AddGroup 0x0103 over CASE (if GC not on root)
-        self.step("3a")
         if gc_on_root:
             self.skip_step("3a")
         else:
+            self.step("3a")
             await self.send_single_cmd(Clusters.Groups.Commands.AddGroup(groupID=groupID3, groupName=""), endpoint=pixit_g_endpoint)
 
         # Step 3b: Groupcast JoinGroup 0x0103 (if GC on root)
-        self.step("3b")
         if not gc_on_root:
             self.skip_step("3b")
         else:
+            self.step("3b")
             await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(groupID=groupID3, endpoints=[ep1], keySetID=keySetID3, key=key3))
 
         # Step 3c: Groupcast JoinGroup 0x0102
-        self.step("3c")
         if not gc_on_root:
             self.skip_step("3c")
         else:
+            self.step("3c")
             await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(groupID=groupID2, endpoints=[ep1], keySetID=keySetID1, key=key1))
 ####################################
 
@@ -212,36 +212,30 @@ class TC_ACE_1_6(MatterBaseTest):
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl([acl_admin, acl_group]))])
 
         # Step 5: AddGroup 0x0104 over CASE - expect UNSUPPORTED_ACCESS (if GC not on root)
-        self.step(5)
         if gc_on_root:
-            self.skip_step(5)
+            self.mark_step_range_skipped(5, 7)
         else:
+            self.step(5)
             try:
                 await self.send_single_cmd(Clusters.Groups.Commands.AddGroup(groupID=groupID4, groupName=""), endpoint=pixit_g_endpoint)
                 asserts.fail("AddGroup should have failed with UNSUPPORTED_ACCESS")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.UnsupportedAccess, "Incorrect error status")
 
-        # Step 6: Add Group 0x0101 via Group 0x0103
-        self.step(6)
-        if not gc_on_root:
+            # Step 6: Add Group 0x0101 via Group 0x0103
+            self.step(6)
             await self.default_controller.SendCommand(self.dut_node_id, endpoint=pixit_g_endpoint, payload=Clusters.Groups.Commands.AddGroup(groupID=groupID1, groupName=""), group_id=groupID3)
-        else:
-            self.skip_step(6)
 
-        # Step 7: Add Group 0x0102 via Group 0x0101
-        self.step(7)
-        if not gc_on_root:
+            # Step 7: Add Group 0x0102 via Group 0x0101
+            self.step(7)
             await self.default_controller.SendCommand(self.dut_node_id, endpoint=pixit_g_endpoint, payload=Clusters.Groups.Commands.AddGroup(groupID=groupID2, groupName=""), group_id=groupID1)
-        else:
-            self.skip_step(7)
 
         # Step 8: Subscribe to Groupcast events
-        self.step(8)
         event_sub = None
         if not gc_on_root:
             self.mark_step_range_skipped(8, 13)
         else:
+            self.step(8)
             event_sub = EventSubscriptionHandler(expected_cluster=Clusters.Groupcast,
                                                  expected_event_id=Clusters.Groupcast.Events.GroupcastTesting.event_id)
             await event_sub.start(self.default_controller, self.dut_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=30)
@@ -285,10 +279,10 @@ class TC_ACE_1_6(MatterBaseTest):
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl([acl_admin_full]))])
 
         # Step 15: Generic group command to Group 0x0103
-        self.step(15)
         if not gc_on_root:
             self.mark_step_range_skipped(15, 20)
         else:
+            self.step(15)
             await self.default_controller.SendCommand(self.dut_node_id, endpoint=ep1, payload=Clusters.OnOff.Commands.Toggle(), group_id=groupID3)
 
             # Step 16: Verify GroupcastTesting event (AccessAllowed: false)
@@ -319,16 +313,19 @@ class TC_ACE_1_6(MatterBaseTest):
                 testOperation=Clusters.Groupcast.Enums.GroupcastTestingEnum.kDisableTesting
             ))
 
-        # Steps 21-25: (If GC not on root)
 # TODO: fix step 21, check access denied?
 #############################################
         self.step(21)
+
+        # Steps 21-26: (If GC not on root)
         if gc_on_root:
             self.mark_step_range_skipped(21, 26)
         else:
+            self.step(21)
             resp = await self.send_single_cmd(Clusters.Groups.Commands.ViewGroup(groupID=groupID1), endpoint=pixit_g_endpoint)
             asserts.assert_equal(resp.status, Status.Success)
 ###############################################
+
             self.step(22)
             resp = await self.send_single_cmd(Clusters.Groups.Commands.ViewGroup(groupID=groupID2), endpoint=pixit_g_endpoint)
             asserts.assert_equal(resp.status, Status.NotFound)
@@ -343,11 +340,11 @@ class TC_ACE_1_6(MatterBaseTest):
             self.step(25)
             await self.send_single_cmd(Clusters.Groups.Commands.RemoveAllGroups(), endpoint=pixit_g_endpoint)
 
-        # Step 26: Read Membership attribute and verify it is empty
-        self.step(26)
-        membership = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Groupcast.Attributes.Membership)])
-        # membership[0].Data is a list of MembershipStruct. It should be empty if RemoveAllGroups worked correctly for the current fabric.
-        asserts.assert_equal(len(membership[0].Data), 0, "Membership list should be empty after RemoveAllGroups")
+            # Step 26: Read Membership attribute and verify it is empty
+            self.step(26)
+            membership = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Groupcast.Attributes.Membership)])
+            # membership[0].Data is a list of MembershipStruct. It should be empty if RemoveAllGroups worked correctly for the current fabric.
+            asserts.assert_equal(len(membership[0].Data), 0, "Membership list should be empty after RemoveAllGroups")
 
         # Cleanup
         self.step(27)
