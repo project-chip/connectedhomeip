@@ -83,8 +83,7 @@ def parse_version_from_slt(file_path):
     if match:
         version_str = match.group(1)
         if "." in version_str:
-            version = version_str.split("@")[0].strip()
-            return version
+            return version_str.split("@")[0].strip()
     return None
 
 
