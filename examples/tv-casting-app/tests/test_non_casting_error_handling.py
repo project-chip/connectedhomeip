@@ -17,7 +17,7 @@ Property 2: Non-casting cluster error handling
 import os
 import re
 
-from hypothesis import given, settings, HealthCheck, assume
+from hypothesis import HealthCheck, assume, given, settings
 from hypothesis import strategies as st
 
 # ---------------------------------------------------------------------------

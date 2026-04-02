@@ -17,7 +17,7 @@ This ensures that non-empty overrides compile the slim file, while empty
 import os
 import re
 
-from hypothesis import given, settings, HealthCheck
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 # ---------------------------------------------------------------------------
