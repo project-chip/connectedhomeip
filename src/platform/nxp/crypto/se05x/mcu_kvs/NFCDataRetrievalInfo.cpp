@@ -307,6 +307,13 @@ CHIP_ERROR NFCDataRetrievalInfo::SynchronizeNetworkCredentials()
     else if (op_data_set_len > 0)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#ifdef __linux__
+        // On Linux, Thread provisioning is handled by LinuxThreadDriver in PostInit()
+        // Just store the operational dataset for later use
+        ChipLogDetail(Crypto, "SE05x: Thread operational data stored (length: %zu bytes), will be provisioned in PostInit",
+                      op_data_set_len);
+#else
+        // On embedded platforms, provision Thread directly
         ChipLogDetail(Crypto, "SE05x: Setting Thread operational data");
         ByteSpan dataset(reinterpret_cast<const uint8_t *>(op_data_set), op_data_set_len);
         ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().SetThreadProvision(dataset));
@@ -318,9 +325,10 @@ CHIP_ERROR NFCDataRetrievalInfo::SynchronizeNetworkCredentials()
         {
             ChipLogDetail(Crypto, "SE05x: Thread not provisioned");
         }
+#endif // __linux__
 #else
         ChipLogDetail(Crypto, "SE05x: SE05x commissioned for Thread, but example is not built with Thread support");
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
     }
     else
     {
@@ -335,12 +343,17 @@ CHIP_ERROR NFCDataRetrievalInfo::GetOperationalDataSetFormSE05x(char * opDataSet
     VerifyOrReturnError(opDataSet != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(opDataSetLen != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ReturnErrorOnFailure(SynchronizeNetworkCredentials());
+    // If we already have the operational dataset cached, just return it
+    if (op_data_set_len > 0)
+    {
+        VerifyOrReturnError(*opDataSetLen >= op_data_set_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(opDataSet, op_data_set, op_data_set_len);
+        *opDataSetLen = op_data_set_len;
+        return CHIP_NO_ERROR;
+    }
 
-    VerifyOrReturnError(*opDataSetLen >= op_data_set_len, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(opDataSet, op_data_set, op_data_set_len);
-    *opDataSetLen = op_data_set_len;
-
+    // No cached data available
+    *opDataSetLen = 0;
     return CHIP_NO_ERROR;
 }
 
