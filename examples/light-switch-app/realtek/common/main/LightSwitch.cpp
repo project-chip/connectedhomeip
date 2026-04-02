@@ -72,7 +72,7 @@ void LightSwitch::InitiateActionSwitch(chip::EndpointId endpointId, uint8_t acti
             Platform::Delete(data);
             return;
         }
-        DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+        (void) DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
     }
 }
 
