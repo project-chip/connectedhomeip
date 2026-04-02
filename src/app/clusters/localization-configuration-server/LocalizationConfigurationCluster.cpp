@@ -124,7 +124,12 @@ DataModel::ActionReturnStatus LocalizationConfigurationCluster::ReadAttribute(co
 DataModel::ActionReturnStatus LocalizationConfigurationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                                AttributeValueDecoder & aDecoder)
 {
-    AttributePersistence persistence(mContext->attributeStorage);
+    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, aDecoder));
+}
+
+DataModel::ActionReturnStatus LocalizationConfigurationCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
+                                                                          AttributeValueDecoder & aDecoder)
+{
     switch (request.path.mAttributeId)
     {
     case ActiveLocale::Id: {
