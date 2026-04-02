@@ -22,6 +22,13 @@ from .command_dedup import CommandDedup
 log = logging.getLogger(__name__)
 
 
+class SubcommandException(Exception):
+    def __init__(self, command, returncode) -> None:
+        self.command = command
+        self.returncode = returncode
+        super().__init__('Command %r failed: %d' % (command, returncode))
+
+
 class LogPipe(threading.Thread):
 
     def __init__(self, level):
@@ -62,13 +69,14 @@ class ShellRunner:
     def StartCommandExecution(self):
         pass
 
-    def Run(self, cmd, title=None, dedup=False):
+    def Run(self, cmd, title=None, dedup=False, quiet=False):
 
-        if title:
+        if title and not quiet:
             log.info(title)
 
         if dedup and self.deduplicator.is_duplicate(cmd):
-            log.info("Skipping duplicate command...")
+            if not quiet:
+                log.info("Skipping duplicate command...")
             return
 
         outpipe = LogPipe(logging.INFO)
@@ -80,5 +88,6 @@ class ShellRunner:
             errpipe.close()
             code = s.wait()
             if code != 0:
-                raise Exception('Command %r failed: %d' % (cmd, code))
-            log.info('Command %r completed', cmd)
+                raise SubcommandException(cmd, code)
+            if not quiet:
+                log.info('Command %r completed', cmd)

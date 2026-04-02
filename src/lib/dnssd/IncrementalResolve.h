@@ -114,6 +114,8 @@ public:
     /// Start parsing a new record. SRV records are the records we are mainly
     /// interested on, after which TXT and A/AAAA are looked for.
     ///
+    /// Returns CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME for non-matter service names.
+    ///
     /// If this function returns with error, the object will be in an inactive state.
     CHIP_ERROR InitializeParsing(mdns::Minimal::SerializedQNameIterator name, const uint64_t ttl,
                                  const mdns::Minimal::SrvRecord & srv);
