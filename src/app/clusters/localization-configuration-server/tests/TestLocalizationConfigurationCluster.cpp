@@ -209,7 +209,7 @@ TEST_F(TestLocalizationConfigurationCluster, WriteAttributeNotifiesSubscribers)
     chip::Testing::WriteOperation writeOp(kRootEndpointId, LocalizationConfiguration::Id, ActiveLocale::Id);
     writeOp.SetSubjectDescriptor(chip::Testing::kAdminSubjectDescriptor);
 
-    AttributeValueDecoder decoder = writeOp.DecoderFor(CharSpan::fromCharString("es-ES"));
+    AttributeValueDecoder decoder        = writeOp.DecoderFor(CharSpan::fromCharString("es-ES"));
     DataModel::ActionReturnStatus status = cluster.WriteAttribute(writeOp.GetRequest(), decoder);
     EXPECT_EQ(status, Status::Success);
 
@@ -217,7 +217,8 @@ TEST_F(TestLocalizationConfigurationCluster, WriteAttributeNotifiesSubscribers)
     EXPECT_TRUE(actualLocale.data_equal(CharSpan::fromCharString("es-ES")));
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
-    EXPECT_TRUE(context.ChangeListener().IsDirty(ConcreteAttributePath(kRootEndpointId, LocalizationConfiguration::Id, ActiveLocale::Id)));
+    EXPECT_TRUE(
+        context.ChangeListener().IsDirty(ConcreteAttributePath(kRootEndpointId, LocalizationConfiguration::Id, ActiveLocale::Id)));
 
     context.ChangeListener().DirtyList().clear();
     DataVersion versionAfterFirstWrite = cluster.GetDataVersion({ kRootEndpointId, LocalizationConfiguration::Id });
@@ -225,7 +226,7 @@ TEST_F(TestLocalizationConfigurationCluster, WriteAttributeNotifiesSubscribers)
     chip::Testing::WriteOperation writeOp2(kRootEndpointId, LocalizationConfiguration::Id, ActiveLocale::Id);
     writeOp2.SetSubjectDescriptor(chip::Testing::kAdminSubjectDescriptor);
     AttributeValueDecoder decoder2 = writeOp2.DecoderFor(CharSpan::fromCharString("fr-FR"));
-    status = cluster.WriteAttribute(writeOp2.GetRequest(), decoder2);
+    status                         = cluster.WriteAttribute(writeOp2.GetRequest(), decoder2);
     EXPECT_EQ(status, Status::Success);
 
     actualLocale = cluster.GetActiveLocale();
@@ -251,7 +252,7 @@ TEST_F(TestLocalizationConfigurationCluster, WriteAttributeFailureDoesNotNotify)
 
     chip::Testing::WriteOperation writeOp(kRootEndpointId, LocalizationConfiguration::Id, ActiveLocale::Id);
     writeOp.SetSubjectDescriptor(chip::Testing::kAdminSubjectDescriptor);
-    AttributeValueDecoder decoder = writeOp.DecoderFor(CharSpan::fromCharString("de-DE"));
+    AttributeValueDecoder decoder        = writeOp.DecoderFor(CharSpan::fromCharString("de-DE"));
     DataModel::ActionReturnStatus status = cluster.WriteAttribute(writeOp.GetRequest(), decoder);
     EXPECT_EQ(status, Status::ConstraintError);
 
