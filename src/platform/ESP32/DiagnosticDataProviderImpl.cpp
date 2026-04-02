@@ -196,17 +196,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
 
     if (err == CHIP_NO_ERROR && bytesRead == sizeof(otaState) && otaState == OTAUpdateStateEnum::kApplying)
     {
-        bytesRead  = 0;
-        uint32_t currentVersion = 0;
-        uint32_t targetVersion  = 0;
+        bytesRead                        = 0;
+        uint32_t currentVersion          = 0;
+        uint32_t targetVersion           = 0;
         auto otaTargetVersionKeyName     = DefaultStorageKeyAllocator::OTATargetVersion();
         const char * otaTargetVersionKey = otaTargetVersionKeyName.KeyName();
 
         CHIP_ERROR currentVersionGetErr = ConfigurationMgr().GetSoftwareVersion(currentVersion);
         CHIP_ERROR targetVersionGetErr  = keyMgr.Get(otaTargetVersionKey, &targetVersion, sizeof(targetVersion), &bytesRead);
 
-        if (currentVersionGetErr == CHIP_NO_ERROR && targetVersionGetErr == CHIP_NO_ERROR
-            && bytesRead == sizeof(targetVersion) && currentVersion == targetVersion)
+        if (currentVersionGetErr == CHIP_NO_ERROR && targetVersionGetErr == CHIP_NO_ERROR && bytesRead == sizeof(targetVersion) &&
+            currentVersion == targetVersion)
         {
             bootReason  = BootReasonType::kSoftwareUpdateCompleted;
             mBootReason = bootReason;
