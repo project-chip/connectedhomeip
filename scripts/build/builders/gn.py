@@ -71,6 +71,9 @@ class GnBuilder(Builder):
             '--root=%s' % self.root,
         ]
 
+        if self.quiet:
+            cmd.append("--ninja-extra-args=--quiet")
+
         if args := self.GnBuildArgs():
             cmd += ['--args=%s' % ' '.join(args)]
 
@@ -94,6 +97,8 @@ class GnBuilder(Builder):
         cmd = ['ninja', '-C', self.output_dir]
         if self.verbose:
             cmd.append('-v')
+        if self.quiet:
+            cmd.append('--quiet')
         if self.ninja_jobs is not None:
             cmd.append('-j' + str(self.ninja_jobs))
         if self.build_command:
