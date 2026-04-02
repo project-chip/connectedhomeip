@@ -145,10 +145,10 @@ def _find_top_level_default_case(content: str) -> bool:
                 break
         elif ch == "d" and switch_depth == 1:
             # Check for `default:` at the top level of the switch
-            candidate = content[i : i + 8]
+            candidate = content[i: i + 8]
             if candidate == "default:":
                 # Look ahead for the error assignment
-                lookahead = content[i : i + 200]
+                lookahead = content[i: i + 200]
                 if "CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB" in lookahead:
                     return True
         i += 1
@@ -192,7 +192,7 @@ def _function_returns_nullptr_after_switch(content: str) -> bool:
 
     # i now points just past the closing brace of the switch
     # Look for `return nullptr;` between here and the function's closing brace
-    remaining = content[i : i + 200]
+    remaining = content[i: i + 200]
     return "return nullptr;" in remaining
 
 
@@ -371,10 +371,10 @@ def _find_event_top_level_default_case(content: str) -> bool:
                 break
         elif ch == "d" and switch_depth == 1:
             # Check for `default:` at the top level of the switch
-            candidate = content[i : i + 8]
+            candidate = content[i: i + 8]
             if candidate == "default:":
                 # Look ahead for the error assignment
-                lookahead = content[i : i + 200]
+                lookahead = content[i: i + 200]
                 if "CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB" in lookahead:
                     return True
         i += 1
@@ -418,7 +418,7 @@ def _event_function_returns_nullptr_after_switch(content: str) -> bool:
 
     # i now points just past the closing brace of the switch
     # Look for `return nullptr;` between here and the function's closing brace
-    remaining = content[i : i + 200]
+    remaining = content[i: i + 200]
     return "return nullptr;" in remaining
 
 

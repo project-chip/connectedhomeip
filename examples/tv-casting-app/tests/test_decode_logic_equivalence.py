@@ -126,7 +126,7 @@ def _extract_case_block(content: str, cluster_name: str) -> str:
             if depth == 0:
                 # Found the matching closing brace
                 # Return everything between (exclusive of outer braces)
-                return content[open_brace_pos + 1 : i]
+                return content[open_brace_pos + 1: i]
         # Skip string literals to avoid counting braces inside strings
         elif ch == '"':
             i += 1

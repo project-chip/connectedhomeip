@@ -51,7 +51,7 @@ def _extract_brace_block(text: str, start: int) -> str:
         elif text[pos] == "}":
             depth -= 1
         pos += 1
-    return text[start + 1 : pos - 1]
+    return text[start + 1: pos - 1]
 
 
 def _find_tlv_decoder_block(content: str) -> str:
