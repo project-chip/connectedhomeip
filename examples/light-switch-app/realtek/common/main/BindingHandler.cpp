@@ -196,22 +196,21 @@ void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Bind
 
     switch (aCommandId)
     {
-    case Clusters::LevelControl::Commands::MoveToLevel::Id:
+    case Clusters::LevelControl::Commands::MoveToLevel::Id: {
+        Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
+        moveToLevelCommand.level = data->Value;
+        if (aDevice)
         {
-            Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
-            moveToLevelCommand.level = data->Value;
-            if (aDevice)
-            {
-                ret = Controller::InvokeCommandRequest(aDevice->GetExchangeManager(), aDevice->GetSecureSession().Value(),
-                                                    aBinding.remote, moveToLevelCommand, onSuccess, onFailure);
-            }
-            else
-            {
-                Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-                ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, moveToLevelCommand);
-            }
+            ret = Controller::InvokeCommandRequest(aDevice->GetExchangeManager(), aDevice->GetSecureSession().Value(),
+                                                   aBinding.remote, moveToLevelCommand, onSuccess, onFailure);
         }
-        break;
+        else
+        {
+            Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
+            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, moveToLevelCommand);
+        }
+    }
+    break;
 
     default:
         ChipLogProgress(NotSpecified, "Invalid binding command data - commandId is not supported");
@@ -225,7 +224,7 @@ void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Bind
 }
 
 void BindingHandler::ColorControlProcessCommand(CommandId aCommandId, const Binding::TableEntry & aBinding,
-                                                 OperationalDeviceProxy * aDevice, void * aContext)
+                                                OperationalDeviceProxy * aDevice, void * aContext)
 {
     BindingData * data = reinterpret_cast<BindingData *>(aContext);
 
@@ -248,42 +247,40 @@ void BindingHandler::ColorControlProcessCommand(CommandId aCommandId, const Bind
 
     switch (aCommandId)
     {
-    case Clusters::ColorControl::Commands::MoveToColor::Id:
+    case Clusters::ColorControl::Commands::MoveToColor::Id: {
+        Clusters::ColorControl::Commands::MoveToColor::Type moveToColorCommand;
+        moveToColorCommand.colorX = data->ColorXY.x;
+        moveToColorCommand.colorY = data->ColorXY.y;
+        if (aDevice)
         {
-            Clusters::ColorControl::Commands::MoveToColor::Type moveToColorCommand;
-            moveToColorCommand.colorX = data->ColorXY.x;
-            moveToColorCommand.colorY = data->ColorXY.y;
-            if (aDevice)
-            {
-                ret = Controller::InvokeCommandRequest(aDevice->GetExchangeManager(), aDevice->GetSecureSession().Value(),
-                                                       aBinding.remote, moveToColorCommand, onSuccess, onFailure);
-            }
-            else
-            {
-                Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-                ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, moveToColorCommand);
-            }
+            ret = Controller::InvokeCommandRequest(aDevice->GetExchangeManager(), aDevice->GetSecureSession().Value(),
+                                                   aBinding.remote, moveToColorCommand, onSuccess, onFailure);
         }
-        break;
+        else
+        {
+            Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
+            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, moveToColorCommand);
+        }
+    }
+    break;
 
-    case Clusters::ColorControl::Commands::MoveToColorTemperature::Id:
+    case Clusters::ColorControl::Commands::MoveToColorTemperature::Id: {
+        Clusters::ColorControl::Commands::MoveToColorTemperature::Type moveToColorTemperatureCommand;
+        moveToColorTemperatureCommand.colorTemperatureMireds = data->ColorTemperatureMireds;
+        moveToColorTemperatureCommand.transitionTime         = 0;
+        if (aDevice)
         {
-            Clusters::ColorControl::Commands::MoveToColorTemperature::Type moveToColorTemperatureCommand;
-            moveToColorTemperatureCommand.colorTemperatureMireds = data->ColorTemperatureMireds;
-            moveToColorTemperatureCommand.transitionTime         = 0;
-            if (aDevice)
-            {
-                ret = Controller::InvokeCommandRequest(aDevice->GetExchangeManager(), aDevice->GetSecureSession().Value(),
-                                                       aBinding.remote, moveToColorTemperatureCommand, onSuccess, onFailure);
-            }
-            else
-            {
-                Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-                ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId,
-                                                           moveToColorTemperatureCommand);
-            }
+            ret = Controller::InvokeCommandRequest(aDevice->GetExchangeManager(), aDevice->GetSecureSession().Value(),
+                                                   aBinding.remote, moveToColorTemperatureCommand, onSuccess, onFailure);
         }
-        break;
+        else
+        {
+            Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
+            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId,
+                                                        moveToColorTemperatureCommand);
+        }
+    }
+    break;
 
     default:
         ChipLogProgress(NotSpecified, "Invalid binding command data - commandId is not supported");
