@@ -58,8 +58,13 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    return DeviceLayer::SystemLayer().ScheduleLambda(
-        [this] { TEMPORARY_RETURN_IGNORED mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        CHIP_ERROR err = mDownloader->OnPreparedForDownload(PrepareDownloadImpl());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SoftwareUpdate, "OTA prep cb err: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    });
 }
 const struct device * flash_dev;
 
@@ -170,12 +175,20 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
                           static_cast<unsigned>(mParams.totalFileBytes));
             if (downloadedBytesRestored)
             {
-                TEMPORARY_RETURN_IGNORED mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
+                CHIP_ERROR err = mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(SoftwareUpdate, "OTA skip err: %" CHIP_ERROR_FORMAT, err.Format());
+                }
                 downloadedBytesRestored = 0;
             }
             else
             {
-                TEMPORARY_RETURN_IGNORED mDownloader->FetchNextData();
+                CHIP_ERROR err = mDownloader->FetchNextData();
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(SoftwareUpdate, "OTA fetch err: %" CHIP_ERROR_FORMAT, err.Format());
+                }
             }
         }
         else
@@ -267,7 +280,11 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)
         mParams.totalFileBytes = header.mPayloadSize;
 
         // Restore interrupted OTA process
-        TEMPORARY_RETURN_IGNORED RestoreBytes(header.mImageDigest);
+        error = RestoreBytes(header.mImageDigest);
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(SoftwareUpdate, "OTA restore err: %" CHIP_ERROR_FORMAT, error.Format());
+        }
 
         mHeaderParser.Clear();
     }

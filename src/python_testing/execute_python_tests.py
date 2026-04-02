@@ -123,12 +123,17 @@ def main():
     help="Regex the tests to pick. Use `!` to negate the expression. Expressions FILTERS out non-matching (i.e. you can use it to restrict more and more, but not to add)",
 )
 @click.option(
+    "--nightly",
+    is_flag=True,
+    help="If set only run tests under the nightly section.",
+)
+@click.option(
     "--summary-file",
     type=click.Path(dir_okay=False, path_type=Path),
     default=None,
     help="If provided, write a JSON test-run summary to this file at the end of the run.",
 )
-def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], summary_file: Path | None):
+def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], nightly: bool, summary_file: Path | None):
     chip_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
     load_env_from_yaml(env_file)
@@ -138,6 +143,7 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
     with open(os.path.join(chip_root, "src/python_testing/test_metadata.yaml")) as f:
         metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
+    nightly_tests = {item["name"] for item in metadata["nightly"]}
 
     all_python_files = g.glob(os.path.join(search_directory, "*.py"))
 
@@ -157,7 +163,19 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
             def match(p): return r.search(p) is not None
         all_python_files = [path for path in all_python_files if match(path)]
 
-    python_files = [file for file in all_python_files if os.path.basename(file) not in excluded_patterns]
+    # If nightly flag is set that mean only super slow tests are going to run, some of these test may be in the not_automated
+    # section as tests are super slow and they should not run on each PR, only on nightly runs.
+    if nightly and nightly_tests is not None:
+        python_files = [file for file in all_python_files if os.path.basename(file) in nightly_tests]
+
+    if not nightly:
+        # Filter out the files matching the excluded patterns
+        python_files = [file for file in all_python_files if os.path.basename(file) not in excluded_patterns]
+
+    if len(python_files) == 0:
+        # No files match
+        log.error("No tests to execute")
+        sys.exit(1)
 
     run_summary = RunSummary(run_timestamp=datetime.datetime.now(datetime.timezone.utc))
 

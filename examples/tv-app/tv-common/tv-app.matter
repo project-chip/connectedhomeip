@@ -4094,7 +4094,7 @@ endpoint 0 {
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 }
 endpoint 1 {
@@ -4104,7 +4104,7 @@ endpoint 1 {
   server cluster OnOff {
     ram      attribute onOff default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;
@@ -4297,7 +4297,7 @@ endpoint 2 {
   server cluster OnOff {
     ram      attribute onOff default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;
@@ -4320,7 +4320,7 @@ endpoint 2 {
     ram      attribute defaultMoveRate;
     persist  attribute startUpCurrentLevel default = 255;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command MoveToLevel;
     handle command Move;

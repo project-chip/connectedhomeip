@@ -45,6 +45,8 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip::app::Clusters {
 namespace {
 
+[[maybe_unused]] constexpr uint32_t kGroupsClusterRevisionBeforeGroupcast = 4;
+
 constexpr AttributePathParams kGroupKeyGroupTableAttributePath{ kRootEndpointId, GroupKeyManagement::Id,
                                                                 GroupKeyManagement::Attributes::GroupTable::Id };
 
@@ -213,7 +215,7 @@ DataModel::ActionReturnStatus GroupsCluster::ReadAttribute(const DataModel::Read
     switch (request.path.mAttributeId)
     {
     case ClusterRevision::Id:
-        return encoder.Encode(kRevision);
+        return encoder.Encode(mGroupDataProvider.IsGroupcastEnabled() ? kRevision : kGroupsClusterRevisionBeforeGroupcast);
     case FeatureMap::Id:
         // Group names is hardcoded (feature is M conformance in the spec)
         return encoder.Encode(Feature::kGroupNames);
