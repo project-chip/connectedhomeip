@@ -108,7 +108,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                      "DUT responds with Status Code InvalidTLSEndpoint."),
             TestStep(12, "TH sends the AllocatePushTransport command with an invalid IngestMethod.",
                      "DUT responds with Status Code ConstraintError."),
-            TestStep(13, "DUT responds with Status Code InvalidURL.",
+            TestStep(13, "TH sends the AllocatePushTransport command with Invalid URL.",
                      "DUT responds with Status Code InvalidURL."),
             TestStep(14, "TH sends the AllocatePushTransport command with an invalid TriggerType in the TransportTriggerOptions struct field.",
                      "DUT responds with Status Code ConstraintError."),
