@@ -81,10 +81,16 @@ private:
 
 LogProvider::~LogProvider()
 {
-    for (auto f : mFiles)
+    for (const auto & f : mFiles)
     {
+        const auto & session = f.second;
+        if (session.fp == nullptr)
+        {
+            continue;
+        }
+
         errno   = 0;
-        auto rv = fclose(f.second);
+        auto rv = fclose(session.fp);
         if (rv != 0)
         {
             int err = (errno == 0) ? EIO : errno;
