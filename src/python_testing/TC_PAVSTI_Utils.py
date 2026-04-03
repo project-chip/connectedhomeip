@@ -210,3 +210,17 @@ class PAVSTIUtils:
             ccdid=csr_result.ccdid,
         )
         return result.endpointID, host_ip
+
+    async def postcondition_remove_tls_endpoint(self, endpointID, tlsEndPoint):
+
+        # Make sure the passed in values are not None.
+        # This could happen in the unlikely event the test script fails prior to setting of any of these values (which would
+        # be prior to the TLS EP being set).
+
+        if endpointID is None or tlsEndPoint is None:
+            return
+
+        tls_utils = TLSUtils(self, endpoint=endpointID)
+        await tls_utils.send_remove_tls_endpoint_command(
+            endpoint_id=tlsEndPoint
+        )
