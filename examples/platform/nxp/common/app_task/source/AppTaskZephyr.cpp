@@ -46,6 +46,13 @@
 #include <platform/Zephyr/DeviceInstanceInfoProviderImpl.h>
 #endif
 
+#if CONFIG_CHIP_CRYPTO_PSA
+#include <crypto/PSAOperationalKeystore.h>
+#if CONFIG_SOC_FAMILY_NXP_RW
+#include <platform/nxp/common/crypto/S50/S50KeyAllocator.h>
+#endif // CONFIG_SOC_FAMILY_NXP_RW
+#endif // CONFIG_CHIP_CRYPTO_PSA
+
 #include "AppFactoryData.h"
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -80,6 +87,16 @@ chip::DeviceLayer::NetworkCommissioning::EthernetDriver * chip::NXP::App::AppTas
         &(NetworkCommissioning::NxpEthDriver::Instance()));
 }
 #endif
+
+void chip::NXP::App::AppTaskZephyr::PreInitMatterServerInstance()
+{
+#if CONFIG_CHIP_CRYPTO_PSA && CONFIG_SOC_FAMILY_NXP_RW
+    // Configure the PSA crypto subsystem to use the S50 secure element
+    // for hardware-backed key storage.
+    static chip::DeviceLayer::S50KeyAllocator s50KeyAllocator;
+    chip::Crypto::SetPSAKeyAllocator(&s50KeyAllocator);
+#endif
+}
 
 CHIP_ERROR chip::NXP::App::AppTaskZephyr::AppMatter_Register()
 {
