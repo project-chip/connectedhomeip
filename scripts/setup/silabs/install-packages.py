@@ -43,7 +43,7 @@ def get_platform_vars():
         logger.error("Platform %s is not supported (Linux and macOS only)", platform)
         sys.exit(1)
 
-    slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.0.1-{platform_name}-x64.zip"
+    slt_cli_url = f"https://www.silabs.com/documents/public/software/slt-cli-1.1.1-{platform_name}-x64.zip"
     return platform_name, slt_cli_url
 
 
@@ -221,10 +221,10 @@ def download_slt_cli():
 
 def update_slt_cli(slt_cli_path):
     """Update SLT CLI to latest version."""
-    update_cmd = [slt_cli_path, "update", "--self"]
+    update_cmd = [slt_cli_path, "update", "--self", "--non-interactive"]
     try:
         logger.info("Updating SLT CLI to latest version...")
-        subprocess.run(update_cmd, stdin=subprocess.DEVNULL, check=True)
+        subprocess.run(update_cmd, check=True)
         logger.info("SLT CLI updated successfully")
     except subprocess.CalledProcessError as e:
         logger.warning("Failed to update slt-cli: %s", e)
@@ -252,10 +252,10 @@ def install_sdk_packages(slt_cli_path):
             sys.exit(1)
 
     for pkg_path in get_pkg_manifest_paths():
-        install_cmd = [slt_cli_path, "install", "-f", pkg_path]
+        install_cmd = [slt_cli_path, "install", "-f", pkg_path, "--non-interactive"]
         try:
             logger.info("Installing packages from %s...", os.path.basename(pkg_path))
-            subprocess.run(install_cmd, stdin=subprocess.DEVNULL, check=True)
+            subprocess.run(install_cmd, check=True)
             logger.info("Packages from %s installed successfully", os.path.basename(pkg_path))
         except subprocess.CalledProcessError as e:
             logger.error("Failed to install packages from %s: %s", pkg_path, e)
@@ -266,8 +266,7 @@ def slt_where(slt_cli_path, package):
     """Run 'slt where <package>' and return the path, or None if not found."""
     try:
         result = subprocess.run(
-            [slt_cli_path, "where", package],
-            stdin=subprocess.DEVNULL,
+            [slt_cli_path, "where", "--non-interactive", package],
             capture_output=True,
             text=True,
             check=False,
