@@ -638,6 +638,16 @@ choice CHIP_CRYPTO
 
 endchoice
 
+if CHIP_CRYPTO_PSA
+
+config MBEDTLS_PSA_CRYPTO_STORAGE_C
+	default y
+
+config SECURE_STORAGE
+	default y
+
+endif # CHIP_CRYPTO_PSA
+
 config WIFI_NM_WPA_SUPPLICANT_CRYPTO_MBEDTLS_PSA
 	default y if WIFI_NM_WPA_SUPPLICANT && CHIP_CRYPTO_PSA
 
