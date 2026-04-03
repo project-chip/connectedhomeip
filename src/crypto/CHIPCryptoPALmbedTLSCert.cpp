@@ -36,7 +36,8 @@
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 #include <psa/crypto.h>
-#endif
+#endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+
 #include <mbedtls/x509_csr.h>
 
 #if defined(MBEDTLS_X509_CRT_PARSE_C)

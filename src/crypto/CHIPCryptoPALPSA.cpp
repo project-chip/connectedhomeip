@@ -28,7 +28,7 @@
 #define MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
 #include <mbedtls/private/bignum.h>
 #include <mbedtls/private/ecp.h>
-#endif
+#endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 
 #include "CHIPCryptoPALPSA.h"
 #include "CHIPCryptoPALmbedTLS.h"
@@ -47,7 +47,7 @@
 #if (MBEDTLS_VERSION_NUMBER < 0x04000000)
 #include <mbedtls/bignum.h>
 #include <mbedtls/ecp.h>
-#endif
+#endif // (MBEDTLS_VERSION_NUMBER < 0x04000000)
 
 #include <mbedtls/error.h>
 #include <mbedtls/x509_csr.h>
