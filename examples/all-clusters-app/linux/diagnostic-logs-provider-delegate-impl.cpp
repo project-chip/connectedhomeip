@@ -93,9 +93,6 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     auto filePath = GetFilePathForIntent(intent);
     VerifyOrReturnValue(filePath.HasValue(), CHIP_ERROR_NOT_FOUND);
 
-    auto filePath = GetFilePathForIntent(intent);
-    VerifyOrReturnValue(filePath.HasValue(), CHIP_ERROR_NOT_FOUND);
-
     auto fp = fopen(filePath.Value().c_str(), "rb");
     if (fp == nullptr)
     {
