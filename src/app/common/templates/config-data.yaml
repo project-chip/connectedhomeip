@@ -77,7 +77,6 @@ ClustersWithAttributeChangedFunctions:
     - Fan Control
     - Pump Configuration and Control
     - Thermostat
-    - Window Covering
     # keep-sorted end
 
 ClustersWithShutdownFunctions:
@@ -159,4 +158,5 @@ CodeDrivenClusters:
     - Valve Configuration and Control
     - Wi-Fi Network Diagnostics
     - Wi-Fi Network Management
+    - Window Covering
     # keep-sorted end

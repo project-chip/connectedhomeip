@@ -50,7 +50,11 @@ constexpr size_t kWindowCoveringDelegateTableSize =
     MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kWindowCoveringDelegateTableSize <= kEmberInvalidEndpointIndex, "WindowCovering Delegate table size error");
 
-WindowCoverAttrAccess gAttrAccess;
+WindowCoveringCluster(EndpointId endpointId, BitFlags<WindowCovering::Feature> features,
+                      OptionalAttributeSet & optionalAttributeSet, StartupConfig & config) :
+    DefaultServerCluster(ConcreteClusterPath(EndpointId, WindowCovering::Id)), mFeatures(features),
+    mOptionalAttributes(optionalAttributeSet)
+{}
 
 Delegate * gDelegateTable[kWindowCoveringDelegateTableSize] = { nullptr };
 
@@ -123,7 +127,7 @@ DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeReques
     case ClusterRevision::Id:
         return encoder.Encode(WindowCovering::kRevision);
     case FeatureMap::Id:
-        return encoder.Encode(mFeatureMap);
+        return encoder.Encode(GetFeatureMap());
     case Type::Id:
         return encoder.Encode(GetType());
     case NumberOfActuationsLift::Id:
@@ -176,7 +180,9 @@ std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::Invo
     switch (request.path.mCommandId)
     {
     case Commands::UpOrOpen::Id:
+        HandleUporOpen(handler, request.path);
     case Commands::DownOrClose::Id:
+        HandleDownOrClose(handler, request.path);
     case Commands::StopMotion::Id:
     case Commands::GoToLiftPercentage::Id:
     case Commands::GoToTiltPercentage::Id:
@@ -186,40 +192,29 @@ std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::Invo
     return CHIP_NO_ERROR;
 }
 
-bool HasFeature(chip::EndpointId endpoint, Feature feature)
+// Helper functions
+// bool HasFeature(chip::EndpointId endpoint, Feature feature)
+// {
+//     bool hasFeature     = false;
+//     uint32_t featureMap = 0;
+
+//     Status status = Attributes::FeatureMap::Get(endpoint, &featureMap);
+//     if (Status::Success == status)
+//     {
+//         hasFeature = (featureMap & chip::to_underlying(feature));
+//     }
+
+//     return hasFeature;
+// }
+
+bool HasFeaturePaLift(Feature feature)
 {
-    bool hasFeature     = false;
-    uint32_t featureMap = 0;
-
-    Status status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-    if (Status::Success == status)
-    {
-        hasFeature = (featureMap & chip::to_underlying(feature));
-    }
-
-    return hasFeature;
+    return (HasFeature(Feature::kLift) && HasFeature(Feature::kPositionAwareLift));
 }
 
-bool HasFeaturePaLift(chip::EndpointId endpoint)
+bool HasFeaturePaTilt(Feature feature)
 {
-    return (HasFeature(endpoint, Feature::kLift) && HasFeature(endpoint, Feature::kPositionAwareLift));
-}
-
-bool HasFeaturePaTilt(chip::EndpointId endpoint)
-{
-    return (HasFeature(endpoint, Feature::kTilt) && HasFeature(endpoint, Feature::kPositionAwareTilt));
-}
-
-void TypeSet(chip::EndpointId endpoint, Type type)
-{
-    Attributes::Type::Set(endpoint, type);
-}
-
-Type TypeGet(chip::EndpointId endpoint)
-{
-    Type value;
-    Attributes::Type::Get(endpoint, &value);
-    return value;
+    return (HasFeature(Feature::kTilt) && HasFeature(Feature::kPositionAwareTilt));
 }
 
 void ConfigStatusPrint(const chip::BitMask<ConfigStatus> & configStatus)
@@ -233,35 +228,6 @@ void ConfigStatusPrint(const chip::BitMask<ConfigStatus> & configStatus)
                     configStatus.Has(ConfigStatus::kTiltEncoderControlled));
 }
 
-void ConfigStatusSet(chip::EndpointId endpoint, const chip::BitMask<ConfigStatus> & configStatus)
-{
-    Attributes::ConfigStatus::Set(endpoint, configStatus);
-}
-
-chip::BitMask<ConfigStatus> ConfigStatusGet(chip::EndpointId endpoint)
-{
-    chip::BitMask<ConfigStatus> configStatus;
-    Attributes::ConfigStatus::Get(endpoint, &configStatus);
-
-    return configStatus;
-}
-
-void ConfigStatusUpdateFeatures(chip::EndpointId endpoint)
-{
-    chip::BitMask<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
-
-    configStatus.Set(ConfigStatus::kLiftPositionAware, HasFeaturePaLift(endpoint));
-    configStatus.Set(ConfigStatus::kTiltPositionAware, HasFeaturePaTilt(endpoint));
-
-    if (!HasFeaturePaLift(endpoint))
-        configStatus.Clear(ConfigStatus::kLiftEncoderControlled);
-
-    if (!HasFeaturePaTilt(endpoint))
-        configStatus.Clear(ConfigStatus::kTiltEncoderControlled);
-
-    ConfigStatusSet(endpoint, configStatus);
-}
-
 void OperationalStatusPrint(const chip::BitMask<OperationalStatus> & opStatus)
 {
     ChipLogProgress(Zcl, "OperationalStatus raw=0x%02X global=%u lift=%u tilt=%u", opStatus.Raw(),
@@ -269,122 +235,11 @@ void OperationalStatusPrint(const chip::BitMask<OperationalStatus> & opStatus)
                     opStatus.GetField(OperationalStatus::kTilt));
 }
 
-chip::BitMask<OperationalStatus> OperationalStatusGet(chip::EndpointId endpoint)
-{
-    chip::BitMask<OperationalStatus> status;
-
-    Attributes::OperationalStatus::Get(endpoint, &status);
-
-    return status;
-}
-
-void OperationalStatusSet(chip::EndpointId endpoint, chip::BitMask<OperationalStatus> newStatus)
-{
-    chip::BitMask<OperationalStatus> prevStatus;
-    Attributes::OperationalStatus::Get(endpoint, &prevStatus);
-
-    // Filter changes
-    if (newStatus != prevStatus)
-    {
-        OperationalStatusPrint(newStatus);
-        Attributes::OperationalStatus::Set(endpoint, newStatus);
-    }
-}
-
-void OperationalStateSet(chip::EndpointId endpoint, const chip::BitMask<OperationalStatus> field, OperationalState state)
-{
-    chip::BitMask<OperationalStatus> status;
-    Attributes::OperationalStatus::Get(endpoint, &status);
-
-    /* Filter only Lift or Tilt action since we cannot allow global reflecting a state alone */
-    if ((OperationalStatus::kLift == field) || (OperationalStatus::kTilt == field))
-    {
-        status.SetField(field, static_cast<uint8_t>(state));
-        status.SetField(OperationalStatus::kGlobal, static_cast<uint8_t>(state));
-
-        /* Global Always follow Lift by priority or therefore fallback to Tilt */
-        chip::BitMask<OperationalStatus> opGlobal =
-            status.HasAny(OperationalStatus::kLift) ? OperationalStatus::kLift : OperationalStatus::kTilt;
-        status.SetField(OperationalStatus::kGlobal, status.GetField(opGlobal));
-
-        OperationalStatusSet(endpoint, status);
-    }
-}
-
-OperationalState OperationalStateGet(chip::EndpointId endpoint, const chip::BitMask<OperationalStatus> field)
-{
-    chip::BitMask<OperationalStatus> status;
-
-    Attributes::OperationalStatus::Get(endpoint, &status);
-
-    return static_cast<OperationalState>(status.GetField(field));
-}
-
-void EndProductTypeSet(chip::EndpointId endpoint, EndProductType type)
-{
-    Attributes::EndProductType::Set(endpoint, type);
-}
-
-EndProductType EndProductTypeGet(chip::EndpointId endpoint)
-{
-    EndProductType value;
-    Attributes::EndProductType::Get(endpoint, &value);
-
-    return value;
-}
-
 void ModePrint(const chip::BitMask<Mode> & mode)
 {
     ChipLogProgress(Zcl, "Mode 0x%02X MotorDirReversed=%u LedFeedback=%u Maintenance=%u Calibration=%u", mode.Raw(),
                     mode.Has(Mode::kMotorDirectionReversed), mode.Has(Mode::kLedFeedback), mode.Has(Mode::kMaintenanceMode),
                     mode.Has(Mode::kCalibrationMode));
-}
-
-void ModeSet(chip::EndpointId endpoint, chip::BitMask<Mode> & newMode)
-{
-    chip::BitMask<ConfigStatus> newStatus;
-
-    chip::BitMask<ConfigStatus> oldStatus = ConfigStatusGet(endpoint);
-    chip::BitMask<Mode> oldMode           = ModeGet(endpoint);
-
-    newStatus = oldStatus;
-
-    // Attribute: ConfigStatus reflects the following current mode flags
-    newStatus.Set(ConfigStatus::kOperational, !newMode.HasAny(Mode::kMaintenanceMode, Mode::kCalibrationMode));
-    newStatus.Set(ConfigStatus::kLiftMovementReversed, newMode.Has(Mode::kMotorDirectionReversed));
-
-    // Verify only one mode supported at once and maintenance lock goes over calibration
-    if (newMode.HasAll(Mode::kMaintenanceMode, Mode::kCalibrationMode))
-    {
-        newMode.Clear(Mode::kCalibrationMode);
-    }
-
-    if (oldMode != newMode)
-        Attributes::Mode::Set(endpoint, newMode);
-
-    if (oldStatus != newStatus)
-        ConfigStatusSet(endpoint, newStatus);
-}
-
-chip::BitMask<Mode> ModeGet(chip::EndpointId endpoint)
-{
-    chip::BitMask<Mode> mode;
-
-    Attributes::Mode::Get(endpoint, &mode);
-    return mode;
-}
-
-void SafetyStatusSet(chip::EndpointId endpoint, chip::BitMask<SafetyStatus> & newSafetyStatus)
-{
-    Attributes::SafetyStatus::Set(endpoint, newSafetyStatus);
-}
-
-chip::BitMask<SafetyStatus> SafetyStatusGet(chip::EndpointId endpoint)
-{
-    chip::BitMask<SafetyStatus> safetyStatus;
-
-    Attributes::SafetyStatus::Get(endpoint, &safetyStatus);
-    return safetyStatus;
 }
 
 LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
@@ -431,6 +286,8 @@ uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
     return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative);
 }
 
+// The accesors stay because InstalledOpenLimitLift and InstalledClosedLimitLift is dependent on Absolute Positioning which is
+// Zigbee only and is only kept for backwards compatibility
 uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift)
 {
     uint16_t openLimit   = 0;
@@ -453,28 +310,8 @@ uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths)
     return Percent100thsToValue(limits, percent100ths);
 }
 
-void LiftPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
-{
-    NPercent percent;
-    NAbsolute rawpos;
-
-    if (percent100ths.IsNull())
-    {
-        percent.SetNull();
-        rawpos.SetNull();
-        ChipLogProgress(Zcl, "Lift[%u] Position Set to Null", endpoint);
-    }
-    else
-    {
-        percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
-        rawpos.SetNonNull(Percent100thsToLift(endpoint, percent100ths.Value()));
-        ChipLogProgress(Zcl, "Lift[%u] Position Set: %u", endpoint, percent100ths.Value());
-    }
-    Attributes::CurrentPositionLift::Set(endpoint, rawpos);
-    Attributes::CurrentPositionLiftPercentage::Set(endpoint, percent);
-    Attributes::CurrentPositionLiftPercent100ths::Set(endpoint, percent100ths);
-}
-
+// The accesors stay because InstalledOpenLimitTilt and InstalledClosedLimitTilt is dependent on Absolute Positioning which is
+// Zigbee only and is only kept for backwards compatibility
 uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt)
 {
     uint16_t openLimit   = 0;
@@ -497,28 +334,6 @@ uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths)
     AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
 
     return Percent100thsToValue(limits, percent100ths);
-}
-
-void TiltPositionSet(chip::EndpointId endpoint, NPercent100ths percent100ths)
-{
-    NPercent percent;
-    NAbsolute rawpos;
-
-    if (percent100ths.IsNull())
-    {
-        percent.SetNull();
-        rawpos.SetNull();
-        ChipLogProgress(Zcl, "Tilt[%u] Position Set to Null", endpoint);
-    }
-    else
-    {
-        percent.SetNonNull(static_cast<uint8_t>(percent100ths.Value() / 100));
-        rawpos.SetNonNull(Percent100thsToTilt(endpoint, percent100ths.Value()));
-        ChipLogProgress(Zcl, "Tilt[%u] Position Set: %u", endpoint, percent100ths.Value());
-    }
-    Attributes::CurrentPositionTilt::Set(endpoint, rawpos);
-    Attributes::CurrentPositionTiltPercentage::Set(endpoint, percent);
-    Attributes::CurrentPositionTiltPercent100ths::Set(endpoint, percent100ths);
 }
 
 OperationalState ComputeOperationalState(uint16_t target, uint16_t current)
@@ -704,28 +519,28 @@ std::optional<DataModel::ActionReturnStatus> HandleUpOrOpen(app::CommandHandler 
         return Protocols::InteractionModel::Status::Failure;
     }
 
-    if (HasFeature(endpoint, Feature::kPositionAwareLift))
+    if (HasFeature(Feature::kPositionAwareLift))
     {
-        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
-        SetCurrentPositionLiftPercent100ths(WC_PERCENT100THS_MIN_OPEN);
-        SetCurrentPositionLiftPercentage(WC_PERCENT100THS_MIN_OPEN);
+        SetTargetPositionLiftPercent100ths(WC_PERCENT100THS_MIN_OPEN);
+        // SetCurrentPositionLiftPercent100ths(WC_PERCENT100THS_MIN_OPEN);
+        // SetCurrentPositionLiftPercentage(WC_PERCENT100THS_MIN_OPEN);
     }
-    if (HasFeature(endpoint, Feature::kPositionAwareTilt))
+    if (HasFeature(Feature::kPositionAwareTilt))
     {
-        Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
-        SetCurrentPositionLiftPercent100ths(WC_PERCENT100THS_MIN_OPEN);
-        SetCurrentPositionLiftPercentage(WC_PERCENT100THS_MIN_OPEN);
+        SetTargetPositionTiltPercent100ths(WC_PERCENT100THS_MIN_OPEN);
+        // SetCurrentPositionTiltPercent100ths(WC_PERCENT100THS_MIN_OPEN);
+        // SetCurrentPositionTiltPercentage(WC_PERCENT100THS_MIN_OPEN);
     }
 
     Delegate * delegate = GetDelegate(endpoint);
     if (delegate)
     {
-        if (HasFeature(endpoint, Feature::kPositionAwareLift))
+        if (HasFeature(Feature::kPositionAwareLift))
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
         }
 
-        if (HasFeature(endpoint, Feature::kPositionAwareTilt))
+        if (HasFeature(Feature::kPositionAwareTilt))
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
         }
@@ -741,8 +556,7 @@ std::optional<DataModel::ActionReturnStatus> HandleUpOrOpen(app::CommandHandler 
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleDownOrClose(app::CommandHandler * commandObj,
-                                                               const app::ConcreteCommandPath & commandPath,
-                                                               const Commands::DownOrClose::DecodableType & commandData)
+                                                               const app::ConcreteCommandPath & commandPath)
 {
     EndpointId endpoint = commandPath.mEndpointId;
 
@@ -753,14 +567,14 @@ std::optional<DataModel::ActionReturnStatus> HandleDownOrClose(app::CommandHandl
     {
         ChipLogProgress(Zcl, "Err device locked");
         commandObj->AddStatus(commandPath, status);
-        return true;
+        return Protocols::InteractionModel::Status::Failure;
     }
 
-    if (HasFeature(endpoint, Feature::kPositionAwareLift))
+    if (HasFeature(Feature::kPositionAwareLift))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX_CLOSED);
     }
-    if (HasFeature(endpoint, Feature::kPositionAwareTilt))
+    if (HasFeature(Feature::kPositionAwareTilt))
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX_CLOSED);
     }
@@ -769,12 +583,12 @@ std::optional<DataModel::ActionReturnStatus> HandleDownOrClose(app::CommandHandl
     Delegate * delegate = GetDelegate(endpoint);
     if (delegate)
     {
-        if (HasFeature(endpoint, Feature::kPositionAwareLift))
+        if (HasFeature(Feature::kPositionAwareLift))
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
         }
 
-        if (HasFeature(endpoint, Feature::kPositionAwareTilt))
+        if (HasFeature(Feature::kPositionAwareTilt))
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
         }
@@ -784,7 +598,7 @@ std::optional<DataModel::ActionReturnStatus> HandleDownOrClose(app::CommandHandl
         ChipLogProgress(Zcl, "WindowCovering has no delegate set for endpoint:%u", endpoint);
     }
 
-    return true;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleStopMotion(app::CommandHandler * commandObj,
@@ -826,16 +640,16 @@ std::optional<DataModel::ActionReturnStatus> HandleStopMotion(app::CommandHandle
 
     if (changeTarget)
     {
-        if (HasFeaturePaLift(endpoint))
+        if (HasFeaturePaLift())
         {
-            (void) Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
-            (void) Attributes::TargetPositionLiftPercent100ths::Set(endpoint, current);
+            (void) GetCurrentPositionLiftPercent100ths(current);
+            (void) SetTargetPositionLiftPercent100ths(current);
         }
 
-        if (HasFeaturePaTilt(endpoint))
+        if (HasFeaturePaTilt())
         {
-            (void) Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
-            (void) Attributes::TargetPositionTiltPercent100ths::Set(endpoint, current);
+            (void) GetCurrentPositionTiltPercent100ths(current);
+            (void) SetTargetPositionTiltPercent100ths(current);
         }
     }
 
@@ -861,9 +675,9 @@ std::optional<DataModel::ActionReturnStatus> HandleGoToLiftValue(app::CommandHan
         return true;
     }
 
-    if (HasFeature(endpoint, Feature::kAbsolutePosition) && HasFeaturePaLift(endpoint))
+    if (HasFeature(Feature::kAbsolutePosition) && HasFeaturePaLift())
     {
-        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, LiftToPercent100ths(endpoint, liftValue));
+        SetTargetPositionLiftPercent100ths::Set(LiftToPercent100ths(endpoint, liftValue));
         Delegate * delegate = GetDelegate(endpoint);
         if (delegate)
         {
@@ -880,7 +694,7 @@ std::optional<DataModel::ActionReturnStatus> HandleGoToLiftValue(app::CommandHan
         ChipLogProgress(Zcl, "Err Device is not PA LF");
         commandObj->AddStatus(commandPath, Status::Failure);
     }
-    return true;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -897,10 +711,10 @@ HandleGoToLiftPercentage(app::CommandHandler * commandObj, const app::ConcreteCo
     {
         ChipLogProgress(Zcl, "Err device locked");
         commandObj->AddStatus(commandPath, status);
-        return true;
+        return Protocols::InteractionModel::Status::Failure;
     }
 
-    if (HasFeaturePaLift(endpoint))
+    if (HasFeaturePaLift())
     {
         if (IsPercent100thsValid(percent100ths))
         {
@@ -926,7 +740,7 @@ HandleGoToLiftPercentage(app::CommandHandler * commandObj, const app::ConcreteCo
         ChipLogProgress(Zcl, "Err Device is not PA LF");
         commandObj->AddStatus(commandPath, Status::Failure);
     }
-    return true;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 std::optional<DataModel::ActionReturnStatus> HandleGoToTiltValue(app::CommandHandler * commandObj,
@@ -944,10 +758,10 @@ std::optional<DataModel::ActionReturnStatus> HandleGoToTiltValue(app::CommandHan
     {
         ChipLogProgress(Zcl, "Err device locked");
         commandObj->AddStatus(commandPath, status);
-        return true;
+        return Protocols::InteractionModel::Status::Failure;
     }
 
-    if (HasFeature(endpoint, Feature::kAbsolutePosition) && HasFeaturePaTilt(endpoint))
+    if (HasFeature(Feature::kAbsolutePosition) && HasFeaturePaTilt())
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, TiltToPercent100ths(endpoint, tiltValue));
         Delegate * delegate = GetDelegate(endpoint);
@@ -966,7 +780,7 @@ std::optional<DataModel::ActionReturnStatus> HandleGoToTiltValue(app::CommandHan
         ChipLogProgress(Zcl, "Err Device is not PA TL");
         commandObj->AddStatus(commandPath, Status::Failure);
     }
-    return true;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 std::optional<DataModel::ActionReturnStatus>
@@ -986,11 +800,11 @@ HandleGoToTiltPercentage(app::CommandHandler * commandObj, const app::ConcreteCo
         return true;
     }
 
-    if (HasFeaturePaTilt(endpoint))
+    if (HasFeaturePaTilt())
     {
         if (IsPercent100thsValid(percent100ths))
         {
-            Attributes::TargetPositionTiltPercent100ths::Set(endpoint, percent100ths);
+            SetTargetPositionTiltPercent100ths(percent100ths);
             Delegate * delegate = GetDelegate(endpoint);
             if (delegate)
             {
@@ -1012,7 +826,7 @@ HandleGoToTiltPercentage(app::CommandHandler * commandObj, const app::ConcreteCo
         ChipLogProgress(Zcl, "Err Device is not PA TL");
         commandObj->AddStatus(commandPath, Status::Failure);
     }
-    return true;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 /**

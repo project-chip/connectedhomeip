@@ -7004,7 +7004,7 @@ endpoint 1 {
   server cluster WindowCovering {
     ram      attribute type default = 0x00;
     persist  attribute configStatus default = 0x03;
-    ram      attribute operationalStatus default = 0x00;
+    callback attribute operationalStatus;
     ram      attribute endProductType default = 0x00;
     persist  attribute mode default = 0x00;
     callback attribute generatedCommandList;

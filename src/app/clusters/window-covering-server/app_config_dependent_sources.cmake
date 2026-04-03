@@ -19,4 +19,6 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/window-covering-delegate.h"
     "${CLUSTER_DIR}/WindowCoveringCluster.cpp"
     "${CLUSTER_DIR}/window-covering-server.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
 )

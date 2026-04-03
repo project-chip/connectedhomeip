@@ -78,12 +78,16 @@ struct AbsoluteLimits
 class WindowCoveringCluster : public DefaultServerCluster
 {
 public:
-    //     Config(Delegate nDelegate, BitFlags<Feature> features);
-    // };
-
+    struct StartupConfig
+    {
+        Type type;
+        chip::BitMask<ConfigStatus> configStatus;
+        chip::BitMask<OperationalStatus> operationalStatus;
+        EndProductType endProductType;
+        chip::BitMask<Mode> mode;
+    };
     WindowCoveringCluster(EndpointId endpointId, BitFlags<WindowCovering::Feature> features,
-                          OptionalAttributeSet & optionalAttributeSet, Delegate * delegate) : mDelegate(delegate)
-    {}
+                          OptionalAttributeSet & optionalAttributeSet, StartupConfig & config);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -100,8 +104,10 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
-
     // setters and getters
+    bool HasFeature(Feature feature) { return mFeatureMap.Has(feature); }
+    BitFlags<Feature> GetFeatureMap() const { return mFeatureMap; }
+
     Type GetType() const { return mType; }
 
     void SetNumberOfActuationsLift(uint16_t numOfLifts);
@@ -143,12 +149,16 @@ public:
     chip::BitMask<SafetyStatus> GetSafetyStatus() const { return mSafetyStatus; }
 
 private:
-    Delegate * mDelegate;
+    Delegate * mDelegate = nullptr;
     BitFlags<WindowCovering::Feature> mFeatureMap;
+    OptionalAttributeSet mOptionalAttributes;
 
     // Setters for Fixed attributes
     void SetType(Type type) { mType = type; }
     void SetEndProductType(EndProductType type);
+
+    bool HasFeaturePaLift();
+    bool HasFeaturePaTilt();
 
     // Attributes
     Type mType;
@@ -166,10 +176,6 @@ private:
     chip::BitMask<Mode> mMode;
     chip::BitMask<SafetyStatus> mSafetyStatus;
 };
-
-bool HasFeature(chip::EndpointId endpoint, Feature feature);
-bool HasFeaturePaLift(chip::EndpointId endpoint);
-bool HasFeaturePaTilt(chip::EndpointId endpoint);
 
 void TypeSet(chip::EndpointId endpoint, Type type);
 Type TypeGet(chip::EndpointId endpoint);
@@ -228,6 +234,7 @@ Protocols::InteractionModel::Status GetMotionLockStatus(chip::EndpointId endpoin
  */
 void PostAttributeChange(chip::EndpointId endpoint, chip::AttributeId attributeId);
 
+// Move to CodegenIntegration.h
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
 } // namespace WindowCovering

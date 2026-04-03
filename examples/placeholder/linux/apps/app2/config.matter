@@ -9182,7 +9182,7 @@ endpoint 0 {
     persist  attribute configStatus default = 0x03;
     persist  attribute currentPositionLiftPercentage default = 50;
     persist  attribute currentPositionTiltPercentage default = 50;
-    ram      attribute operationalStatus default = 0x00;
+    callback attribute operationalStatus;
     ram      attribute targetPositionLiftPercent100ths default = 500;
     ram      attribute targetPositionTiltPercent100ths default = 500;
     ram      attribute endProductType default = 0x00;
@@ -9193,7 +9193,7 @@ endpoint 0 {
     persist  attribute installedOpenLimitTilt default = 0x0000;
     persist  attribute installedClosedLimitTilt default = 0xFFFF;
     persist  attribute mode default = 0x00;
-    ram      attribute safetyStatus default = 0x00;
+    callback attribute safetyStatus;
     ram      attribute featureMap default = 0x17;
     callback attribute clusterRevision;
 
