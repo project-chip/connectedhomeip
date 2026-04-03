@@ -623,7 +623,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         TH3 = TH3_fabric_admin.NewController(nodeId=TH3_nodeid)
 
         resp = await self.open_commissioning_window()
-        await TH3.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeId=TH3_dut_nodeid, timeoutMs=60000)
+        await TH3.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeid=TH3_dut_nodeid, timeoutMs=60000)
 
         self.print_step(73, "TH3 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to failsafe_max| Verify that the DUT sends ArmFailSafeResponse Command to TH3 with field ErrorCode as 'OK'(0)")
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=failsafe_max, breadcrumb=0)

@@ -621,14 +621,15 @@ TEST_F(TestFabricTable, FailAddNocAndUpdateNocIfIcacSubjectDnIsInvalid)
     ByteSpan icacSpan(TestCerts::sTestCert_Root01_Chip);
     ByteSpan nocSpan(TestCerts::sTestCert_Node01_02_Chip);
 
-    EXPECT_SUCCESS(opKeysSerialized.SetLength(TestCerts::sTestCert_Node01_02_PublicKey.size() +
-                                              TestCerts::sTestCert_Node01_02_PrivateKey.size()));
-    EXPECT_SUCCESS(opKey_Node01_02.Deserialize(opKeysSerialized));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              opKeysSerialized.SetLength(TestCerts::sTestCert_Node01_02_PublicKey.size() +
+                                         TestCerts::sTestCert_Node01_02_PrivateKey.size()));
+    EXPECT_EQ(CHIP_NO_ERROR, opKey_Node01_02.Deserialize(opKeysSerialized));
 
     // Test 1: AddNOC must reject a certificate presented as an ICAC whose subject DN encodes matter-rcac-id instead of
     // matter-icac-id.
     {
-        EXPECT_SUCCESS(fabricTable.AddNewPendingTrustedRootCert(rcacSpan));
+        EXPECT_EQ(CHIP_NO_ERROR, fabricTable.AddNewPendingTrustedRootCert(rcacSpan));
 
         EXPECT_EQ(CHIP_ERROR_UNSUPPORTED_CERT_FORMAT,
                   fabricTable.AddNewPendingFabricWithProvidedOpKey(nocSpan, icacSpan, VendorId::TestVendor1, &opKey_Node01_02,
@@ -640,16 +641,16 @@ TEST_F(TestFabricTable, FailAddNocAndUpdateNocIfIcacSubjectDnIsInvalid)
     // Test 2: UpdateNOC must reject a certificate presented as an ICAC whose subject DN encodes matter-rcac-id instead of
     // matter-icac-id.
     {
-        EXPECT_SUCCESS(fabricTable.AddNewPendingTrustedRootCert(rcacSpan));
-        EXPECT_SUCCESS(fabricTable.AddNewPendingFabricWithProvidedOpKey(nocSpan, ByteSpan{}, VendorId::TestVendor1,
-                                                                        &opKey_Node01_02,
-                                                                        /*isExistingOpKeyExternallyOwned =*/true, &fabricIndex));
-        EXPECT_SUCCESS(fabricTable.CommitPendingFabricData());
+        EXPECT_EQ(CHIP_NO_ERROR, fabricTable.AddNewPendingTrustedRootCert(rcacSpan));
+        EXPECT_EQ(CHIP_NO_ERROR,
+                  fabricTable.AddNewPendingFabricWithProvidedOpKey(nocSpan, ByteSpan{}, VendorId::TestVendor1, &opKey_Node01_02,
+                                                                   /*isExistingOpKeyExternallyOwned =*/true, &fabricIndex));
+        EXPECT_EQ(CHIP_NO_ERROR, fabricTable.CommitPendingFabricData());
 
         uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
-        EXPECT_SUCCESS(
-            fabricTable.AllocatePendingOperationalKey(chip::MakeOptional(static_cast<FabricIndex>(fabricIndex)), csrSpan));
+        EXPECT_EQ(CHIP_NO_ERROR,
+                  fabricTable.AllocatePendingOperationalKey(chip::MakeOptional(static_cast<FabricIndex>(fabricIndex)), csrSpan));
 
         EXPECT_EQ(CHIP_ERROR_UNSUPPORTED_CERT_FORMAT,
                   fabricTable.UpdatePendingFabricWithOperationalKeystore(fabricIndex, nocSpan, icacSpan,
