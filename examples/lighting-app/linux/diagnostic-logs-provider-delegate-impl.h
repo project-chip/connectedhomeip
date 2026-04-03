@@ -73,7 +73,7 @@ private:
     Optional<std::string> mCrashLogFilePath;
 
     LogSessionHandle mLogSessionHandle = kInvalidLogSessionHandle;
-    std::map<LogSessionHandle, LogSession> mFiles; // ← CHANGED: Store LogSession struct instead of FILE*
+    std::map<LogSessionHandle, LogSession> mFiles; // Active log sessions and their cached file metadata
 };
 
 } // namespace DiagnosticLogs
