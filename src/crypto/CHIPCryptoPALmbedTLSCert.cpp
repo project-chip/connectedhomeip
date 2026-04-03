@@ -57,8 +57,6 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
     CHIP_ERROR error   = CHIP_NO_ERROR;
     size_t pubkey_size = 0;
 
-    [[maybe_unused]] mbedtls_ecp_keypair * keypair;
-
     P256ECDSASignature signature;
     MutableByteSpan out_raw_sig_span(signature.Bytes(), signature.Capacity());
 
