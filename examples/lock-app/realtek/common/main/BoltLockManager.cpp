@@ -148,6 +148,7 @@ bool BoltLockManager::SetUser(uint16_t userIndex, FabricIndex creator, FabricInd
     if (rtkErr != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "WriteConfigValueBin LockUser failed: %" CHIP_ERROR_FORMAT, rtkErr.Format());
+        return false;
     }
 
     rtkErr = RTKConfig::WriteConfigValueBin(RTKConfig::kConfigKey_LockUserData, reinterpret_cast<const uint8_t *>(mUserData),
@@ -155,6 +156,7 @@ bool BoltLockManager::SetUser(uint16_t userIndex, FabricIndex creator, FabricInd
     if (rtkErr != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "WriteConfigValueBin LockUserData failed: %" CHIP_ERROR_FORMAT, rtkErr.Format());
+        return false;
     }
 
     ChipLogProgress(Zcl, "Successfully set the user [index=%d]", userIndex);
@@ -201,6 +203,7 @@ bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creato
     if (rtkErr != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "WriteConfigValueBin Credential failed: %" CHIP_ERROR_FORMAT, rtkErr.Format());
+        return false;
     }
 
     rtkErr =
@@ -209,6 +212,7 @@ bool BoltLockManager::SetCredential(uint16_t credentialIndex, FabricIndex creato
     if (rtkErr != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "WriteConfigValueBin CredentialData failed: %" CHIP_ERROR_FORMAT, rtkErr.Format());
+        return false;
     }
 
     ChipLogProgress(Zcl, "Setting lock credential %u: %s", static_cast<unsigned>(credentialIndex),

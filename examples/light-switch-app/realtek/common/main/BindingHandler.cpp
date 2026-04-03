@@ -260,6 +260,7 @@ void BindingHandler::InitInternal(intptr_t arg)
     if (bindErr != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Binding::Manager::Init() failed: %" CHIP_ERROR_FORMAT, bindErr.Format());
+        return;
     }
     Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
     Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);

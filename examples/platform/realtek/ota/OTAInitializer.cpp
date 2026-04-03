@@ -44,6 +44,7 @@ void OTAInitializer::InitOTARequestor(void)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Failed to initialize OTA Requestor: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
     }
     gImageProcessor.SetOTADownloader(&gDownloader);
     // Connect the Downloader and Image Processor objects
