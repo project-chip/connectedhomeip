@@ -28,6 +28,13 @@ namespace app {
 namespace Clusters {
 namespace DiagnosticLogs {
 
+// Structure to hold both FILE pointer and cached file size
+struct LogSession
+{
+    FILE * fp;
+    size_t fileSize;
+};
+
 class LogProvider : public DiagnosticLogsProviderDelegate
 {
 public:
@@ -66,7 +73,7 @@ private:
     Optional<std::string> mCrashLogFilePath;
 
     LogSessionHandle mLogSessionHandle = kInvalidLogSessionHandle;
-    std::map<LogSessionHandle, FILE *> mFiles;
+    std::map<LogSessionHandle, LogSession> mFiles;  // ← CHANGED: Store LogSession struct instead of FILE*
 };
 
 } // namespace DiagnosticLogs
