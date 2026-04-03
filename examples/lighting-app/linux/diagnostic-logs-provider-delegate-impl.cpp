@@ -89,12 +89,15 @@ LogProvider::~LogProvider()
             continue;
         }
 
-        errno   = 0;
-        auto rv = fclose(session.fp);
-        if (rv != 0)
+        if (f.second.fp != nullptr)
         {
-            int err = (errno == 0) ? EIO : errno;
-            ChipLogError(NotSpecified, "Error when closing file pointer: %d", err);
+            errno   = 0;
+            auto rv = fclose(f.second.fp);
+            if (rv != 0)
+            {
+                int err = (errno == 0) ? EIO : errno;
+                ChipLogError(NotSpecified, "Error when closing file pointer: %d", err);
+            }
         }
     }
     mFiles.clear();
