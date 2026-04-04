@@ -275,9 +275,17 @@ jobs:
                   keep_reports: 30
 
             - name: Upload Allure Report
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: allure-report-su-repl
                   path: allure-report
                   retention-days: 30
                   if-no-files-found: warn
+
+            - name: Deploy to GitHub Pages
+              uses: peaceiris/actions-gh-pages@v4
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: allure-report
+                  destination_dir: allure-report
+                  keep_files: true
