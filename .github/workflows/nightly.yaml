@@ -237,7 +237,7 @@ jobs:
 
             - name: Upload JUnit XML Results
               if: always() && matrix.filter != ''
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: junit-results-${{ matrix.filter }}
                   path: out/junit-results/results.xml
@@ -264,7 +264,7 @@ jobs:
 
             - name: Upload Allure Report
               if: always() && matrix.filter != ''
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: allure-report-${{ matrix.filter }}
                   path: out/allure-report

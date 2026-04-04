@@ -70,12 +70,15 @@ class RunSummary:
     def write_junit_xml(self, suite_name: str, path: Path) -> None:
         failures = sum(1 for r in self.results if r.status == "failed")
         skipped = sum(1 for r in self.results if r.status == "dry_run")
+        total_time = sum(r.duration_seconds for r in self.results)
 
         suite = Element("testsuite", {
             "name": suite_name,
             "tests": str(len(self.results)),
             "failures": str(failures),
             "skipped": str(skipped),
+            "errors": "0",
+            "time": f"{total_time:.3f}",
         })
 
         for r in self.results:
