@@ -255,7 +255,7 @@ jobs:
 
             - name: Generate Allure Report
               if: always() && matrix.filter != ''
-              uses: simple-elf/allure-report-action@v1.12
+              uses: simple-elf/allure-report-action@v1.13
               with:
                   allure_results: out/junit-results
                   allure_report: out/allure-report
