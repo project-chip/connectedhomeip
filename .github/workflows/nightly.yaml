@@ -249,6 +249,8 @@ jobs:
         needs: su_repl_tests_linux_run
         if: always()
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
 
         steps:
             - name: Download all JUnit XML results
