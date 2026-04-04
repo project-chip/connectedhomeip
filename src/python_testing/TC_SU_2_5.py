@@ -202,6 +202,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.step(0)
 
         self.step(1)
+        if 1:
+            raise RuntimeError("just testing failure RuntimeError")
         update_state_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
