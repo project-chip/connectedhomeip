@@ -17,12 +17,12 @@ on:
     schedule:
       - cron: '0 0 * * *'
 # --- TEST SECTION: Uncomment below to test on PRs ---
-    # push:
-    #     branches:
-    #         - master
-    #         - 'v*-branch'
-    # pull_request:
-    # merge_group:
+    push:
+        branches:
+            - master
+            - 'v*-branch'
+    pull_request:
+    merge_group:
 # --- END TEST SECTION ---
     workflow_dispatch:
         inputs:
@@ -233,4 +233,40 @@ jobs:
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
               run: |
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --env-file /tmp/test_env.yaml --nightly --search-directory src/python_testing --regex "${{matrix.filter}}"'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --keep-going --env-file /tmp/test_env.yaml --nightly --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file out/test-summary/run-summary.json --junit-file out/junit-results/results.xml'
+
+            - name: Upload JUnit XML Results
+              if: always() && matrix.filter != ''
+              uses: actions/upload-artifact@v4
+              with:
+                  name: junit-results-${{ matrix.filter }}
+                  path: out/junit-results/results.xml
+                  retention-days: 30
+                  if-no-files-found: warn
+
+            - name: Load Allure test report history
+              if: always() && matrix.filter != ''
+              uses: actions/cache@v4
+              with:
+                  path: allure-history
+                  key: allure-history-${{ matrix.filter }}-${{ github.ref }}
+                  restore-keys: |
+                      allure-history-${{ matrix.filter }}-
+
+            - name: Generate Allure Report
+              if: always() && matrix.filter != ''
+              uses: simple-elf/allure-report-action@v1.12
+              with:
+                  allure_results: out/junit-results
+                  allure_report: out/allure-report
+                  allure_history: allure-history
+                  keep_reports: 30
+
+            - name: Upload Allure Report
+              if: always() && matrix.filter != ''
+              uses: actions/upload-artifact@v4
+              with:
+                  name: allure-report-${{ matrix.filter }}
+                  path: out/allure-report
+                  retention-days: 30
+                  if-no-files-found: warn

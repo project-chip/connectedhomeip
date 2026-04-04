@@ -28,6 +28,8 @@ import sys
 import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from xml.dom.minidom import parseString
+from xml.etree.ElementTree import Element, SubElement, tostring
 
 import click
 import coloredlogs
@@ -64,6 +66,33 @@ class RunSummary:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(data, indent=2))
         log.info("Test run summary written to %s", path)
+
+    def write_junit_xml(self, suite_name: str, path: Path) -> None:
+        failures = sum(1 for r in self.results if r.status == "failed")
+        skipped = sum(1 for r in self.results if r.status == "dry_run")
+
+        suite = Element("testsuite", {
+            "name": suite_name,
+            "tests": str(len(self.results)),
+            "failures": str(failures),
+            "skipped": str(skipped),
+        })
+
+        for r in self.results:
+            tc = SubElement(suite, "testcase", {
+                "name": r.name,
+                "classname": suite_name,
+                "time": f"{r.duration_seconds:.3f}",
+            })
+            if r.status == "failed":
+                SubElement(tc, "failure", {"message": f"{r.name} failed"})
+            elif r.status == "dry_run":
+                SubElement(tc, "skipped", {"message": "dry run"})
+
+        path.parent.mkdir(parents=True, exist_ok=True)
+        xml_str = parseString(tostring(suite, encoding="unicode")).toprettyxml(indent="  ")
+        path.write_text(xml_str)
+        log.info("JUnit XML written to %s", path)
 
 
 def load_env_from_yaml(file_path):
@@ -133,7 +162,13 @@ def main():
     default=None,
     help="If provided, write a JSON test-run summary to this file at the end of the run.",
 )
-def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], nightly: bool, summary_file: Path | None):
+@click.option(
+    "--junit-file",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="If provided, write test results as JUnit XML to this file at the end of the run.",
+)
+def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], nightly: bool, summary_file: Path | None, junit_file: Path | None):
     chip_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
     load_env_from_yaml(env_file)
@@ -202,6 +237,8 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
         run_summary.total_runs = len(run_summary.results)
         if summary_file is not None:
             run_summary.write_json(summary_file)
+        if junit_file is not None:
+            run_summary.write_junit_xml("execute_python_tests", junit_file)
 
     if failed_scripts:
         log.error("FAILURES detected:")
