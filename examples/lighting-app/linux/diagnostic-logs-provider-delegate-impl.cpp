@@ -133,11 +133,18 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     auto filePath = GetFilePathForIntent(intent);
     VerifyOrReturnValue(filePath.HasValue(), CHIP_ERROR_NOT_FOUND);
 
-    // Guard against infinite loop if all handles are exhausted
-    VerifyOrReturnError(mFiles.size() < std::numeric_limits<LogSessionHandle>::max(), CHIP_ERROR_NO_MEMORY);
+    constexpr size_t kMaxValidLogSessionHandles = static_cast<size_t>(std::numeric_limits<LogSessionHandle>::max()) - 1;
+    VerifyOrReturnError(mFiles.size() < kMaxValidLogSessionHandles, CHIP_ERROR_NO_MEMORY);
     auto fp = fopen(filePath.Value().c_str(), "rb");
-    VerifyOrReturnValue(!(nullptr == fp && errno == ENOENT), CHIP_ERROR_NOT_FOUND);
-    VerifyOrReturnValue(nullptr != fp, CHIP_ERROR_INTERNAL);
+    if (fp == nullptr)
+    {
+        int err = (errno == 0) ? EIO : errno;
+        if (err == ENOENT)
+        {
+            return CHIP_ERROR_NOT_FOUND;
+        }
+        return CHIP_ERROR_POSIX(err);
+    }
 
     // Select the next unused session handle, skipping the invalid handle.
     do

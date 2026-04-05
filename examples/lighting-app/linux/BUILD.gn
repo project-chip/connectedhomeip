@@ -65,8 +65,7 @@ executable("chip-lighting-app") {
     deps += [ "${chip_root}/src/app/clusters/diagnostic-logs-server" ]
 
     defines += [
-      "CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS=1",
-      "CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER=1",
+      "CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS=1"
     ]
   } else {
     defines += [ "CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS=0" ]
