@@ -185,7 +185,9 @@ CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSp
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(mFiles.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto fp                     = mFiles[sessionHandle];
+    auto & session              = mFiles[sessionHandle];
+    auto fp                     = session.fp;                    // ← Extract FILE pointer
+    const size_t fileSize       = session.fileSize;              // ← Use cached file size
     const size_t bytesRequested = outBuffer.size();
 
     clearerr(fp);
@@ -204,10 +206,7 @@ CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSp
 
     outBuffer.reduce_size(bytesRead);
 
-    // Prefer determining end-of-log by comparing the current offset to the total file size,
-    // so that the last non-empty chunk is marked as EOF even when the file size is an exact
-    // multiple of bytesRequested. Fall back to the short-read/feof heuristic if needed.
-    size_t fileSize    = GetFileSize(fp);
+    // Use cached fileSize - no need to call GetFileSize() again
     long currentOffset = ftell(fp);
     if ((fileSize != 0) && (currentOffset != -1) && CanCastTo<size_t>(currentOffset))
     {
