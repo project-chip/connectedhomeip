@@ -167,13 +167,20 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
 CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle)
 {
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnValue(mFiles.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto fp = mFiles[sessionHandle];
-    mFiles.erase(sessionHandle);
+    auto it = mFiles.find(sessionHandle);
+    VerifyOrReturnValue(it != mFiles.end(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto session = it->second;
+    mFiles.erase(it);
+
+    if (session.fp == nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
 
     errno   = 0;
-    auto rv = fclose(fp);
+    auto rv = fclose(session.fp);
     if (rv != 0)
     {
         int savedErrno = errno;
