@@ -155,7 +155,7 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     } while (mFiles.count(mLogSessionHandle) != 0);
 
     outHandle                 = mLogSessionHandle;
-    mFiles[mLogSessionHandle] = fp;
+    mFiles[mLogSessionHandle] = {fp, GetFileSize(fp)};
 
     // This implementation does not provide timestamps; ensure out-params are cleared
     outTimeStamp.ClearValue();
