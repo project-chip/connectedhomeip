@@ -66,7 +66,8 @@ public final class MatterCastingPlayerDiscovery implements CastingPlayerDiscover
   /**
    * Adds a CastingPlayerChangeListener instance to be used during discovery. The
    * CastingPlayerChangeListener defines the handler methods for when Casting Players are
-   * discovered, updated, or lost from the network. Should be called prior to calling
+   * discovered, updated, or lost from the network during the discovery process.
+   * Should be called prior to calling
    * MatterCastingPlayerDiscovery.startDiscovery().
    *
    * @param listener an instance of the CastingPlayerChangeListener to be implemented by the APIs
