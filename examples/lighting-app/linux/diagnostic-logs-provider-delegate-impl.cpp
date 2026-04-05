@@ -155,7 +155,7 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     } while (mFiles.count(mLogSessionHandle) != 0);
 
     outHandle                 = mLogSessionHandle;
-    mFiles[mLogSessionHandle] = {fp, GetFileSize(fp)};
+    mFiles[mLogSessionHandle] = { fp, GetFileSize(fp) };
 
     // This implementation does not provide timestamps; ensure out-params are cleared
     outTimeStamp.ClearValue();
@@ -200,8 +200,8 @@ CHIP_ERROR LogProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSp
     VerifyOrReturnValue(mFiles.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
 
     auto & session              = mFiles[sessionHandle];
-    auto fp                     = session.fp;                    // ← Extract FILE pointer
-    const size_t fileSize       = session.fileSize;              // ← Use cached file size
+    auto fp                     = session.fp;       // ← Extract FILE pointer
+    const size_t fileSize       = session.fileSize; // ← Use cached file size
     const size_t bytesRequested = outBuffer.size();
 
     clearerr(fp);
