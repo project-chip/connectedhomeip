@@ -92,6 +92,7 @@ class RunSummary:
                 failure = SubElement(tc, "failure", {"message": f"{r.name} failed"})
                 if r.error_message:
                     failure.text = r.error_message
+                    SubElement(tc, "system-out").text = r.error_message
             elif r.status == "dry_run":
                 SubElement(tc, "skipped", {"message": "dry run"})
 
