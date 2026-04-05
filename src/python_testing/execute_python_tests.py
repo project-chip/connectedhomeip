@@ -43,6 +43,7 @@ class TestResult:
     name: str
     status: str          # "passed" | "failed" | "dry_run"
     duration_seconds: float
+    error_message: str | None = None
 
 
 @dataclass
@@ -53,8 +54,8 @@ class RunSummary:
     failed: int = 0
     results: list[TestResult] = field(default_factory=list)
 
-    def record(self, name: str, status: str, duration: float) -> None:
-        self.results.append(TestResult(name=name, status=status, duration_seconds=round(duration, 3)))
+    def record(self, name: str, status: str, duration: float, error_message: str | None = None) -> None:
+        self.results.append(TestResult(name=name, status=status, duration_seconds=round(duration, 3), error_message=error_message))
         if status == "passed":
             self.passed += 1
         elif status == "failed":
@@ -88,7 +89,9 @@ class RunSummary:
                 "time": f"{r.duration_seconds:.3f}",
             })
             if r.status == "failed":
-                SubElement(tc, "failure", {"message": f"{r.name} failed"})
+                failure = SubElement(tc, "failure", {"message": f"{r.name} failed"})
+                if r.error_message:
+                    failure.text = r.error_message
             elif r.status == "dry_run":
                 SubElement(tc, "skipped", {"message": "dry run"})
 
@@ -171,7 +174,13 @@ def main():
     default=None,
     help="If provided, write test results as JUnit XML to this file at the end of the run.",
 )
-def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], nightly: bool, summary_file: Path | None, junit_file: Path | None):
+@click.option(
+    "--junit-suite-name",
+    type=str,
+    default="execute_python_tests script",
+    help="Name for the JUnit XML test suite (default: execute_python_tests script).",
+)
+def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str], nightly: bool, summary_file: Path | None, junit_file: Path | None, junit_suite_name: str):
     chip_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
     load_env_from_yaml(env_file)
@@ -230,8 +239,8 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
                     print(f"Running command: {full_command}", flush=True)
                     subprocess.run(full_command, shell=True, check=True)
                     run_summary.record(os.path.basename(script), "passed", time.monotonic() - test_start)
-            except Exception:
-                run_summary.record(os.path.basename(script), "failed", time.monotonic() - test_start)
+            except Exception as e:
+                run_summary.record(os.path.basename(script), "failed", time.monotonic() - test_start, error_message=str(e))
                 if keep_going:
                     failed_scripts.append(script)
                 else:
@@ -241,7 +250,7 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
         if summary_file is not None:
             run_summary.write_json(summary_file)
         if junit_file is not None:
-            run_summary.write_junit_xml("execute_python_tests", junit_file)
+            run_summary.write_junit_xml(junit_suite_name, junit_file)
 
     if failed_scripts:
         log.error("FAILURES detected:")

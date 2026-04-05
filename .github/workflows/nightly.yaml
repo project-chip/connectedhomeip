@@ -233,7 +233,7 @@ jobs:
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
               run: |
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --keep-going --env-file /tmp/test_env.yaml --nightly --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file out/test-summary/run-summary.json --junit-file out/junit-results/${{matrix.filter}}-results.xml'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --keep-going --env-file /tmp/test_env.yaml --nightly --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file out/test-summary/run-summary.json --junit-file out/junit-results/${{matrix.filter}}-results.xml --junit-suite-name "Nightly CI Tests"'
 
             - name: Upload JUnit XML Results
               if: always() && matrix.filter != ''
