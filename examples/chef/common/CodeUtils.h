@@ -36,6 +36,6 @@
         CHIP_ERROR __err = (err);                                                                                                  \
         if (__err != CHIP_NO_ERROR)                                                                                                \
         {                                                                                                                          \
-            ChipLogError(NotSpecified, "CHIP Error: %" CHIP_ERROR_FORMAT " at %s:%d", __err.Format(), __FILE__, __LINE__);             \
+            ChipLogError(NotSpecified, "CHIP Error: %" CHIP_ERROR_FORMAT " at %s:%d", __err.Format(), __FILE__, __LINE__);         \
         }                                                                                                                          \
     } while (false)
