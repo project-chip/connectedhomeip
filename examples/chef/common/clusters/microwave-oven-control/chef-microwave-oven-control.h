@@ -89,7 +89,7 @@ public:
 private:
     chip::app::Clusters::OperationalState::OperationalStateDelegate * mOperationalStateDelegatePtr;
     chip::app::Clusters::OperationalState::Instance * mOperationalStateInstancePtr;
-    bool mOperationalStateObjectsOwned = true;
+    bool mOperationalStateObjectsOwned = false;
 
     chip::app::Clusters::ModeBase::Instance * mMicrowaveOvenModeInstancePtr;
 

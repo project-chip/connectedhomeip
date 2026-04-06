@@ -17,7 +17,9 @@
  */
 
 #include "chef-microwave-oven-control.h"
+#include "../../CodeUtils.h"
 #include <app/util/attribute-storage.h>
+#include <lib/support/CHIPMem.h> // For chip::Platform
 
 using namespace chip;
 using namespace chip::app;
@@ -32,12 +34,12 @@ using Status            = Protocols::InteractionModel::Status;
 
 #if MATTER_DM_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
-ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
-    mOperationalStateDelegatePtr(new OperationalStateDelegate()),
-    mOperationalStateInstancePtr(new OperationalState::Instance(mOperationalStateDelegatePtr, aClustersEndpoint)),
-    mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint))
+ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint)
 {
+    mOperationalStateDelegatePtr  = Platform::New<OperationalStateDelegate>();
+    mOperationalStateInstancePtr  = Platform::New<OperationalState::Instance>(mOperationalStateDelegatePtr, aClustersEndpoint);
     mOperationalStateObjectsOwned = true;
+    mMicrowaveOvenModeInstancePtr = ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint);
     if (mOperationalStateInstancePtr && mMicrowaveOvenModeInstancePtr)
     {
         mMicrowaveOvenControlInstance = std::make_unique<MicrowaveOvenControl::Instance>(
@@ -45,17 +47,16 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
             BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
                                                    MicrowaveOvenControl::Feature::kPowerNumberLimits),
             *mOperationalStateInstancePtr, *mMicrowaveOvenModeInstancePtr);
-
-        TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
-        TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->Init();
+        VerifyOrLogChipError(mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped)));
+        VerifyOrLogChipError(mOperationalStateInstancePtr->Init());
+        VerifyOrLogChipError(mMicrowaveOvenControlInstance->Init());
     }
 }
 
 ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
                                                  OperationalState::Instance * operationalStateInstancePtr,
                                                  OperationalStateDelegate * operationalStateDelegatePtr) :
-    mOperationalStateDelegatePtr(operationalStateDelegatePtr),
-    mOperationalStateInstancePtr(operationalStateInstancePtr),
+    mOperationalStateDelegatePtr(operationalStateDelegatePtr), mOperationalStateInstancePtr(operationalStateInstancePtr),
     mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint))
 {
     mOperationalStateObjectsOwned = false;
@@ -66,6 +67,7 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
             BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
                                                    MicrowaveOvenControl::Feature::kPowerNumberLimits),
             *mOperationalStateInstancePtr, *mMicrowaveOvenModeInstancePtr);
+        VerifyOrLogChipError(mMicrowaveOvenControlInstance->Init());
     }
 }
 
@@ -75,19 +77,6 @@ ChefMicrowaveOvenDevice::~ChefMicrowaveOvenDevice()
     {
         delete mOperationalStateInstancePtr;
         delete mOperationalStateDelegatePtr;
-    }
-}
-
-void ChefMicrowaveOvenDevice::MicrowaveOvenInit()
-{
-    if (mOperationalStateInstancePtr)
-    {
-        TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
-    }
-
-    if (mMicrowaveOvenControlInstance)
-    {
-        TEMPORARY_RETURN_IGNORED mMicrowaveOvenControlInstance->Init();
     }
 }
 
@@ -197,7 +186,6 @@ void InitChefMicrowaveOvenControlCluster()
                 {
                     gMicrowaveOvenDevice[epIndex] = std::make_unique<ChefMicrowaveOvenDevice>(endpoint);
                 }
-                gMicrowaveOvenDevice[epIndex]->MicrowaveOvenInit();
             }
         }
     }
