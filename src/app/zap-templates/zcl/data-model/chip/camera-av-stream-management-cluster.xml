@@ -379,6 +379,25 @@ Alchemy: v1.6.12
       <access op="write" privilege="manage"/>
       <optionalConform/>
     </attribute>
+    <attribute code="0x0029" side="server" name="ImageRotationDiscreteAngles" define="IMAGE_ROTATION_DISCRETE_ANGLES" type="int16u" max="270" default="0" writable="true" optional="true">
+      <access op="read" privilege="manage"/>
+      <access op="write" privilege="manage"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform choice="b" more="true" min="1">
+          <andTerm>
+            <greaterOrEqualTerm>
+              <revision value="current"/>
+              <revision value="2"/>
+            </greaterOrEqualTerm>
+            <feature name="ICTL"/>
+            <notTerm>
+              <attribute name="ImageRotation"/>
+            </notTerm>
+          </andTerm>
+        </optionalConform>
+      </otherwiseConform>
+    </attribute>
     <command code="0x00" source="client" name="AudioStreamAllocate" response="AudioStreamAllocateResponse" optional="true">
       <description>This command SHALL allocate an audio stream on the camera and return an allocated audio stream identifier.</description>
       <access op="invoke" privilege="manage"/>
@@ -601,24 +620,5 @@ Alchemy: v1.6.12
         </optionalConform>
       </feature>
     </features>
-    <attribute code="0x0029" side="server" name="ImageRotationDiscreteAngles" define="IMAGE_ROTATION_DISCRETE_ANGLES" type="int16u" max="270" default="0" writable="true" optional="true">
-      <access op="read" privilege="manage"/>
-      <access op="write" privilege="manage"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform choice="b" more="true" min="1">
-          <andTerm>
-            <greaterOrEqualTerm>
-              <revision value="current"/>
-              <revision value="2"/>
-            </greaterOrEqualTerm>
-            <feature name="ICTL"/>
-            <notTerm>
-              <attribute name="ImageRotation"/>
-            </notTerm>
-          </andTerm>
-        </optionalConform>
-      </otherwiseConform>
-    </attribute>
   </cluster>
 </configurator>
