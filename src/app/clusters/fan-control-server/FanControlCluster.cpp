@@ -52,8 +52,8 @@ CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
 
     AttributePersistence attrPersistence{ context.attributeStorage };
     FanModeEnum restoredFanMode = mFanMode;
-    attrPersistence.LoadNativeEndianValue(
-        ConcreteAttributePath(mPath.mEndpointId, FanControl::Id, FanMode::Id), restoredFanMode, mFanMode);
+    attrPersistence.LoadNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, FanControl::Id, FanMode::Id), restoredFanMode,
+                                          mFanMode);
 
     if (EnsureKnownEnumValue(restoredFanMode) == FanModeEnum::kUnknownEnumValue)
     {
@@ -596,9 +596,8 @@ void FanControlCluster::StoreFanModePersistence()
 {
     VerifyOrReturn(mContext != nullptr);
     const FanModeEnum value = mFanMode;
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, FanControl::Id, FanMode::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
+    LogErrorOnFailure(mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, FanControl::Id, FanMode::Id),
+                                                            ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
 }
 
 void FanControlCluster::SetDelegate(FanControl::Delegate * delegate)

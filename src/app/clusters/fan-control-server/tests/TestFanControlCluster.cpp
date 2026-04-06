@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
+#include <app/ConcreteAttributePath.h>
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/clusters/fan-control-server/fan-control-delegate.h>
-#include <app/ConcreteAttributePath.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <pw_unit_test/framework.h>
 
@@ -176,9 +176,9 @@ TEST_F(TestFanControlPersistence, StartupRestoresFanModeFromStorage)
     TestServerClusterContext ctx;
     FanModeEnum stored = FanModeEnum::kHigh;
     ConcreteAttributePath path(kTestEndpointId, FanControl::Id, FanControl::Attributes::FanMode::Id);
-    ASSERT_EQ(ctx.AttributePersistenceProvider().WriteValue(
-                    path, ByteSpan(reinterpret_cast<const uint8_t *>(&stored), sizeof(stored))),
-                CHIP_NO_ERROR);
+    ASSERT_EQ(
+        ctx.AttributePersistenceProvider().WriteValue(path, ByteSpan(reinterpret_cast<const uint8_t *>(&stored), sizeof(stored))),
+        CHIP_NO_ERROR);
 
     CountingFanControlDelegate delegate(kTestEndpointId);
     FanControlCluster cluster(
@@ -199,9 +199,9 @@ TEST_F(TestFanControlPersistence, StartupInvalidPersistedFanMode_FallsBackToOff)
     TestServerClusterContext ctx;
     FanModeEnum stored = FanModeEnum::kLow;
     ConcreteAttributePath path(kTestEndpointId, FanControl::Id, FanControl::Attributes::FanMode::Id);
-    ASSERT_EQ(ctx.AttributePersistenceProvider().WriteValue(
-                    path, ByteSpan(reinterpret_cast<const uint8_t *>(&stored), sizeof(stored))),
-                CHIP_NO_ERROR);
+    ASSERT_EQ(
+        ctx.AttributePersistenceProvider().WriteValue(path, ByteSpan(reinterpret_cast<const uint8_t *>(&stored), sizeof(stored))),
+        CHIP_NO_ERROR);
 
     CountingFanControlDelegate delegate(kTestEndpointId);
     FanControlCluster cluster(
