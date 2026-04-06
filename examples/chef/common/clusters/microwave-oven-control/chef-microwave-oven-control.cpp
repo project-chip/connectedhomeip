@@ -51,7 +51,7 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
 ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
                                                  OperationalState::Instance * operationalStateInstancePtr,
                                                  OperationalStateDelegate * operationalStateDelegatePtr) :
-    mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint)),
+    mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint))
 {
     mOperationalStateDelegatePtr = std::make_unique<OperationalStateDelegate>(operationalStateDelegatePtr);
     mOperationalStateInstancePtr = std::make_unique<OperationalState::Instance>(operationalStateInstancePtr);
