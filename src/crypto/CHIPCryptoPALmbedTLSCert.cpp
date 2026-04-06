@@ -84,18 +84,15 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
 
         psa_status_t status =
             mbedtls_pk_get_psa_attributes(&csr.CHIP_CRYPTO_PAL_PRIVATE_X509(pk), PSA_KEY_USAGE_VERIFY_MESSAGE, &attributes);
-        result = static_cast<int>(status);
-        VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(status == PSA_SUCCESS, _log_PSA_error(status); error = CHIP_ERROR_INTERNAL);
 
         // PSA import validates key type and curve (P-256) via attributes; non-matching keys are rejected here.
         status = mbedtls_pk_import_into_psa(&csr.CHIP_CRYPTO_PAL_PRIVATE_X509(pk), &attributes, &key_id);
-        result = static_cast<int>(status);
-        VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(status == PSA_SUCCESS, _log_PSA_error(status); error = CHIP_ERROR_INTERNAL);
 
         status = psa_export_public_key(key_id, Uint8::to_uchar(pubkey), pubkey.Length(), &pubkey_size);
-        result = static_cast<int>(status);
         psa_destroy_key(key_id);
-        VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(status == PSA_SUCCESS, _log_PSA_error(status); error = CHIP_ERROR_INTERNAL);
         VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
     }
 #else
@@ -560,18 +557,15 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
 
         status =
             mbedtls_pk_get_psa_attributes(&mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(pk), PSA_KEY_USAGE_VERIFY_MESSAGE, &attributes);
-        result = static_cast<int>(status);
-        VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(status == PSA_SUCCESS, _log_PSA_error(status); error = CHIP_ERROR_INTERNAL);
 
         // PSA import validates key type and curve (P-256) via attributes; non-matching keys are rejected here.
         status = mbedtls_pk_import_into_psa(&mbed_cert.CHIP_CRYPTO_PAL_PRIVATE_X509(pk), &attributes, &key_id);
-        result = static_cast<int>(status);
-        VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(status == PSA_SUCCESS, _log_PSA_error(status); error = CHIP_ERROR_INTERNAL);
 
         status = psa_export_public_key(key_id, Uint8::to_uchar(pubkey.Bytes()), pubkey.Length(), &pubkey_size);
         psa_destroy_key(key_id);
-        result = static_cast<int>(status);
-        VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit(status == PSA_SUCCESS, _log_PSA_error(status); error = CHIP_ERROR_INTERNAL);
         VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
     }
 #else

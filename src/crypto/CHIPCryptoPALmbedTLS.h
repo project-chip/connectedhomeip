@@ -56,6 +56,16 @@ static inline void _log_mbedTLS_error(int errorCode)
     }
 }
 
+#if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+static inline void _log_PSA_error(psa_status_t status)
+{
+    if (status != PSA_SUCCESS)
+    {
+        ChipLogError(Crypto, "PSA error: %d", static_cast<int>(status));
+    }
+}
+#endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+
 static inline mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
 {
     switch (keyType)
