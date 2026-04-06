@@ -33,35 +33,34 @@ using Status            = Protocols::InteractionModel::Status;
 #if MATTER_DM_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
+    mOperationalStateDelegatePtr(std::make_unique<OperationalStateDelegate>()),
+    mOperationalStateInstancePtr(
+        std::make_unique<OperationalState::Instance>(mOperationalStateDelegatePtr.get(), aClustersEndpoint)),
     mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint)),
     mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id,
                                   BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
                                                                          MicrowaveOvenControl::Feature::kPowerNumberLimits),
                                   *mOperationalStateInstancePtr, *mMicrowaveOvenModeInstancePtr)
 {
-    if (aClustersEndpoint == 1)
-    {
-        // In chef-operational-state-delegate-impl.cpp instance and delegate for EP1 are already registered in ember callback.
-        ChipLogProgress(Zcl,
-                        "ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice: Using globally registered instance for endpoint 1.");
-        mOperationalStateDelegatePtr = std::unique_ptr<OperationalStateDelegate>(GetOperationalStateDelegate());
-        VerifyOrDieWithMsg(mOperationalStateDelegatePtr != nullptr, Zcl,
-                           "Did not find global operational state delegate for endpoint 1");
-        mOperationalStateInstancePtr = std::unique_ptr<OperationalState::Instance>(GetOperationalStateInstance());
-        VerifyOrDieWithMsg(mOperationalStateInstancePtr != nullptr, Zcl,
-                           "Did not find global operational state instance for endpoint 1");
-    }
-    else
-    {
-        mOperationalStateDelegatePtr = std::make_unique<OperationalStateDelegate>();
-        mOperationalStateInstancePtr =
-            std::make_unique<OperationalState::Instance>(mOperationalStateDelegatePtr.get(), aClustersEndpoint);
-        VerifyOrDieWithMsg(mOperationalStateInstancePtr->Init() == CHIP_NO_ERROR, Zcl,
-                           "Failed to initialise operational state instance on Endpoind: %d", aClustersEndpoint);
-    }
+    VerifyOrDie(mOperationalStateInstancePtr != nullptr);
     VerifyOrDie(mMicrowaveOvenModeInstancePtr != nullptr);
     TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
     TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->Init();
+}
+
+ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
+                                                 OperationalState::Instance * operationalStateInstancePtr,
+                                                 OperationalStateDelegate * operationalStateDelegatePtr) :
+    mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint)),
+{
+    mOperationalStateDelegatePtr = std::make_unique<OperationalStateDelegate>(operationalStateDelegatePtr);
+    mOperationalStateInstancePtr = std::make_unique<OperationalState::Instance>(operationalStateInstancePtr);
+    mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id,
+                                  BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
+                                                                         MicrowaveOvenControl::Feature::kPowerNumberLimits),
+                                  *mOperationalStateInstancePtr, *mMicrowaveOvenModeInstancePtr);
+    VerifyOrDie(mOperationalStateInstancePtr != nullptr);
+    VerifyOrDie(mMicrowaveOvenModeInstancePtr != nullptr);
 }
 
 void ChefMicrowaveOvenDevice::MicrowaveOvenInit()
@@ -147,7 +146,15 @@ void InitChefMicrowaveOvenControlCluster()
                 {
                     continue;
                 }
-                gMicrowaveOvenDevice[epIndex] = std::make_unique<ChefMicrowaveOvenDevice>(endpoint);
+                if (endpoint == 1) // Operational state cluster objects are already registered for EP1 in ember callback.
+                {
+                    gMicrowaveOvenDevice[epIndex] = std::make_unique<ChefMicrowaveOvenDevice>(
+                        endpoint, GetOperationalStateInstance(), GetOperationalStateDelegate());
+                }
+                else
+                {
+                    gMicrowaveOvenDevice[epIndex] = std::make_unique<ChefMicrowaveOvenDevice>(endpoint);
+                }
                 gMicrowaveOvenDevice[epIndex]->MicrowaveOvenInit();
             }
         }
