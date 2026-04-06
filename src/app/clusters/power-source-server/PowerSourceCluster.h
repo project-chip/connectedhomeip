@@ -381,7 +381,7 @@ public:
     MinimalWiredPowerSourceCluster(EndpointId endpointId, const WiredConfiguration & config);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
-    
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
 
