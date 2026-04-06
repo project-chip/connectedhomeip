@@ -80,9 +80,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 std::string value_nodeInsideOptionalClassName     = "java/lang/Long";
                 std::string value_nodeInsideOptionalCtorSignature = "(J)V";
                 jlong jnivalue_nodeInsideOptional                 = static_cast<jlong>(cppValue.node.Value());
-                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                    value_nodeInsideOptionalClassName.c_str(), value_nodeInsideOptionalCtorSignature.c_str(),
-                    jnivalue_nodeInsideOptional, value_nodeInsideOptional);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_nodeInsideOptionalClassName.c_str(),
+                                                                            value_nodeInsideOptionalCtorSignature.c_str(),
+                                                                            jnivalue_nodeInsideOptional, value_nodeInsideOptional);
                 chip::JniReferences::GetInstance().CreateOptional(value_nodeInsideOptional, value_node);
             }
 
@@ -90,9 +90,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             std::string value_fabricIndexClassName     = "java/lang/Integer";
             std::string value_fabricIndexCtorSignature = "(I)V";
             jint jnivalue_fabricIndex                  = static_cast<jint>(cppValue.fabricIndex);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                value_fabricIndexClassName.c_str(), value_fabricIndexCtorSignature.c_str(), jnivalue_fabricIndex,
-                value_fabricIndex);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_fabricIndexClassName.c_str(),
+                                                                       value_fabricIndexCtorSignature.c_str(), jnivalue_fabricIndex,
+                                                                       value_fabricIndex);
 
             jclass loggedOutStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
@@ -312,9 +312,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             std::string value_currentStateClassName     = "java/lang/Integer";
             std::string value_currentStateCtorSignature = "(I)V";
             jint jnivalue_currentState                  = static_cast<jint>(cppValue.currentState);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                value_currentStateClassName.c_str(), value_currentStateCtorSignature.c_str(), jnivalue_currentState,
-                value_currentState);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_currentStateClassName.c_str(),
+                                                                       value_currentStateCtorSignature.c_str(),
+                                                                       jnivalue_currentState, value_currentState);
 
             jobject value_startTime;
             std::string value_startTimeClassName     = "java/lang/Long";
@@ -382,25 +382,25 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             std::string value_playbackSpeedClassName     = "java/lang/Float";
             std::string value_playbackSpeedCtorSignature = "(F)V";
             jfloat jnivalue_playbackSpeed                = static_cast<jfloat>(cppValue.playbackSpeed);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jfloat>(
-                value_playbackSpeedClassName.c_str(), value_playbackSpeedCtorSignature.c_str(), jnivalue_playbackSpeed,
-                value_playbackSpeed);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jfloat>(value_playbackSpeedClassName.c_str(),
+                                                                         value_playbackSpeedCtorSignature.c_str(),
+                                                                         jnivalue_playbackSpeed, value_playbackSpeed);
 
             jobject value_seekRangeEnd;
             std::string value_seekRangeEndClassName     = "java/lang/Long";
             std::string value_seekRangeEndCtorSignature = "(J)V";
             jlong jnivalue_seekRangeEnd                 = static_cast<jlong>(cppValue.seekRangeEnd);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_seekRangeEndClassName.c_str(), value_seekRangeEndCtorSignature.c_str(), jnivalue_seekRangeEnd,
-                value_seekRangeEnd);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_seekRangeEndClassName.c_str(),
+                                                                        value_seekRangeEndCtorSignature.c_str(),
+                                                                        jnivalue_seekRangeEnd, value_seekRangeEnd);
 
             jobject value_seekRangeStart;
             std::string value_seekRangeStartClassName     = "java/lang/Long";
             std::string value_seekRangeStartCtorSignature = "(J)V";
             jlong jnivalue_seekRangeStart                 = static_cast<jlong>(cppValue.seekRangeStart);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_seekRangeStartClassName.c_str(), value_seekRangeStartCtorSignature.c_str(), jnivalue_seekRangeStart,
-                value_seekRangeStart);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_seekRangeStartClassName.c_str(),
+                                                                        value_seekRangeStartCtorSignature.c_str(),
+                                                                        jnivalue_seekRangeStart, value_seekRangeStart);
 
             jobject value_data;
             if (!cppValue.data.HasValue())
@@ -421,9 +421,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             std::string value_audioAdvanceUnmutedClassName     = "java/lang/Boolean";
             std::string value_audioAdvanceUnmutedCtorSignature = "(Z)V";
             jboolean jnivalue_audioAdvanceUnmuted              = static_cast<jboolean>(cppValue.audioAdvanceUnmuted);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
-                value_audioAdvanceUnmutedClassName.c_str(), value_audioAdvanceUnmutedCtorSignature.c_str(),
-                jnivalue_audioAdvanceUnmuted, value_audioAdvanceUnmuted);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(value_audioAdvanceUnmutedClassName.c_str(),
+                                                                           value_audioAdvanceUnmutedCtorSignature.c_str(),
+                                                                           jnivalue_audioAdvanceUnmuted, value_audioAdvanceUnmuted);
 
             jclass stateChangedStructClass;
             err = chip::JniReferences::GetInstance().GetLocalClassRef(
@@ -671,9 +671,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 std::string newElement_0_identifierClassName     = "java/lang/Integer";
                 std::string newElement_0_identifierCtorSignature = "(I)V";
                 jint jninewElement_0_identifier                  = static_cast<jint>(entry_0.identifier);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    newElement_0_identifierClassName.c_str(), newElement_0_identifierCtorSignature.c_str(),
-                    jninewElement_0_identifier, newElement_0_identifier);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_identifierClassName.c_str(),
+                                                                           newElement_0_identifierCtorSignature.c_str(),
+                                                                           jninewElement_0_identifier, newElement_0_identifier);
                 jobject newElement_0_name;
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.name, newElement_0_name));
 
@@ -708,9 +708,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             std::string value_currentTargetClassName     = "java/lang/Integer";
             std::string value_currentTargetCtorSignature = "(I)V";
             jint jnivalue_currentTarget                  = static_cast<jint>(cppValue.currentTarget);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                value_currentTargetClassName.c_str(), value_currentTargetCtorSignature.c_str(), jnivalue_currentTarget,
-                value_currentTarget);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_currentTargetClassName.c_str(),
+                                                                       value_currentTargetCtorSignature.c_str(),
+                                                                       jnivalue_currentTarget, value_currentTarget);
 
             jobject value_data;
             jbyteArray value_dataByteArray = env->NewByteArray(static_cast<jsize>(cppValue.data.size()));
