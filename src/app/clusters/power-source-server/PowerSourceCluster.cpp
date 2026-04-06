@@ -111,8 +111,8 @@ PowerSourceCluster::PowerSourceCluster(EndpointId endpointId, System::Layer & sy
 }
 
 PowerSourceCluster::PowerSourceCluster(EndpointId endpointId, System::Layer & systemLayer, const BatteryConfiguration & config) :
-    DefaultServerCluster({ endpointId, PowerSource::Id }), mFeatures(BatteryFeatures(config.isReplaceable(), config.isRechargeable())),
-    mSystemLayer(systemLayer)
+    DefaultServerCluster({ endpointId, PowerSource::Id }),
+    mFeatures(BatteryFeatures(config.isReplaceable(), config.isRechargeable())), mSystemLayer(systemLayer)
 {
     mAttributes.battery = BatteryAttributes{};
     CHIP_ERROR err;
@@ -247,27 +247,22 @@ CHIP_ERROR PowerSourceCluster::Attributes(const ConcreteClusterPath & path,
                                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     // Workaround to save flash.
-    constexpr uint32_t wiredAttributeBits = OptionalAttributeSet<
-        WiredAssessedInputVoltage::Id, WiredAssessedInputFrequency::Id,
-        WiredCurrentType::Id, WiredAssessedCurrent::Id,
-        WiredNominalVoltage::Id, WiredMaximumCurrent::Id,
-        WiredPresent::Id, ActiveWiredFaults::Id>::All();
+    constexpr uint32_t wiredAttributeBits =
+        OptionalAttributeSet<WiredAssessedInputVoltage::Id, WiredAssessedInputFrequency::Id, WiredCurrentType::Id,
+                             WiredAssessedCurrent::Id, WiredNominalVoltage::Id, WiredMaximumCurrent::Id, WiredPresent::Id,
+                             ActiveWiredFaults::Id>::All();
 
-    constexpr uint32_t batteryAttributeBits = OptionalAttributeSet<
-        BatVoltage::Id, BatPercentRemaining::Id,
-        BatTimeRemaining::Id, BatChargeLevel::Id,
-        BatReplacementNeeded::Id, BatReplaceability::Id,
-        BatPresent::Id, ActiveBatFaults::Id>::All();
+    constexpr uint32_t batteryAttributeBits =
+        OptionalAttributeSet<BatVoltage::Id, BatPercentRemaining::Id, BatTimeRemaining::Id, BatChargeLevel::Id,
+                             BatReplacementNeeded::Id, BatReplaceability::Id, BatPresent::Id, ActiveBatFaults::Id>::All();
 
-    constexpr uint32_t replaceableBatteryAttributeBits = OptionalAttributeSet<
-        BatReplacementDescription::Id, BatCommonDesignation::Id,
-        BatANSIDesignation::Id, BatIECDesignation::Id,
-        BatApprovedChemistry::Id, BatQuantity::Id>::All();
+    constexpr uint32_t replaceableBatteryAttributeBits =
+        OptionalAttributeSet<BatReplacementDescription::Id, BatCommonDesignation::Id, BatANSIDesignation::Id, BatIECDesignation::Id,
+                             BatApprovedChemistry::Id, BatQuantity::Id>::All();
 
-    constexpr uint32_t rechargeableBatteryAttributeBits = OptionalAttributeSet<
-        BatChargeState::Id,
-        BatTimeToFullCharge::Id, BatFunctionalWhileCharging::Id,
-        BatChargingCurrent::Id, ActiveBatChargeFaults::Id>::All();
+    constexpr uint32_t rechargeableBatteryAttributeBits =
+        OptionalAttributeSet<BatChargeState::Id, BatTimeToFullCharge::Id, BatFunctionalWhileCharging::Id, BatChargingCurrent::Id,
+                             ActiveBatChargeFaults::Id>::All();
 
     constexpr uint32_t capacityAttributeBit = OptionalAttributeSet<BatCapacity::Id>::All();
 
@@ -300,12 +295,11 @@ CHIP_ERROR PowerSourceCluster::Attributes(const ConcreteClusterPath & path,
                                                                   BatChargingCurrent::kMetadataEntry,
                                                                   ActiveBatChargeFaults::kMetadataEntry };
 
-    AttributeSet optAttributeSet(
-        Features().Has(Feature::kWired)                                  * wiredAttributeBits               |
-        Features().Has(Feature::kBattery)                                * batteryAttributeBits             |
-        Features().Has(Feature::kReplaceable)                            * replaceableBatteryAttributeBits  |
-        Features().Has(Feature::kRechargeable)                           * rechargeableBatteryAttributeBits |
-        Features().HasAny(Feature::kReplaceable, Feature::kRechargeable) * capacityAttributeBit);
+    AttributeSet optAttributeSet(Features().Has(Feature::kWired) * wiredAttributeBits |
+                                 Features().Has(Feature::kBattery) * batteryAttributeBits |
+                                 Features().Has(Feature::kReplaceable) * replaceableBatteryAttributeBits |
+                                 Features().Has(Feature::kRechargeable) * rechargeableBatteryAttributeBits |
+                                 Features().HasAny(Feature::kReplaceable, Feature::kRechargeable) * capacityAttributeBit);
 
     AttributeListBuilder attributeListBuilder(builder);
 
@@ -1111,7 +1105,7 @@ CHIP_ERROR MinimalWiredPowerSourceCluster::Startup(ServerClusterContext & contex
 }
 
 DataModel::ActionReturnStatus MinimalWiredPowerSourceCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                AttributeValueEncoder & encoder)
+                                                                            AttributeValueEncoder & encoder)
 {
     using namespace PowerSource::Attributes;
     // `ReadAttribute` is guaranteed to only be called for attributes that are supported by the cluster, so the code below is valid.
@@ -1137,7 +1131,7 @@ DataModel::ActionReturnStatus MinimalWiredPowerSourceCluster::ReadAttribute(cons
 }
 
 CHIP_ERROR MinimalWiredPowerSourceCluster::Attributes(const ConcreteClusterPath & path,
-                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+                                                      ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     constexpr DataModel::AttributeEntry kOptionalAttributes[] = { WiredCurrentType::kMetadataEntry };
 

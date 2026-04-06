@@ -53,12 +53,12 @@ public:
             description.reduce_size(0);
         }
 
-            PowerSourceCluster::WiredCurrentTypeEnum currentType;
-            VerifyOrDie(WiredCurrentType::Get(endpointId, &currentType) == InteractionModel::Status::Success);
+        PowerSourceCluster::WiredCurrentTypeEnum currentType;
+        VerifyOrDie(WiredCurrentType::Get(endpointId, &currentType) == InteractionModel::Status::Success);
 
-            PowerSourceCluster::WiredConfiguration config(description, currentType);
+        PowerSourceCluster::WiredConfiguration config(description, currentType);
 
-            gServers.Create(endpointId, config);
+        gServers.Create(endpointId, config);
 
         MinimalWiredPowerSourceCluster & cluster = gServers.Cluster();
 

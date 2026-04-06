@@ -180,23 +180,14 @@ TEST_F(TestPowerSourceCluster, AttributeTest)
         PowerSourceCluster cluster(kRootEndpointId, DeviceLayer::SystemLayer(), config);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
-        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
-                                            {
-                                                // Mandatory
-                                                Status::kMetadataEntry,
-                                                Order::kMetadataEntry,
-                                                Description::kMetadataEntry,
-                                                EndpointList::kMetadataEntry,
-                                                // Wired specific
-                                                WiredAssessedInputVoltage::kMetadataEntry,
-                                                WiredAssessedInputFrequency::kMetadataEntry,
-                                                WiredCurrentType::kMetadataEntry,
-                                                WiredAssessedCurrent::kMetadataEntry,
-                                                WiredNominalVoltage::kMetadataEntry,
-                                                WiredMaximumCurrent::kMetadataEntry,
-                                                WiredPresent::kMetadataEntry,
-                                                ActiveWiredFaults::kMetadataEntry
-                                            }));
+        EXPECT_TRUE(IsAttributesListEqualTo(
+            cluster,
+            { // Mandatory
+              Status::kMetadataEntry, Order::kMetadataEntry, Description::kMetadataEntry, EndpointList::kMetadataEntry,
+              // Wired specific
+              WiredAssessedInputVoltage::kMetadataEntry, WiredAssessedInputFrequency::kMetadataEntry,
+              WiredCurrentType::kMetadataEntry, WiredAssessedCurrent::kMetadataEntry, WiredNominalVoltage::kMetadataEntry,
+              WiredMaximumCurrent::kMetadataEntry, WiredPresent::kMetadataEntry, ActiveWiredFaults::kMetadataEntry }));
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
@@ -224,14 +215,9 @@ TEST_F(TestPowerSourceCluster, AttributeTest)
                  { // Mandatory
                    Status::kMetadataEntry, Order::kMetadataEntry, Description::kMetadataEntry, EndpointList::kMetadataEntry,
                    // Battery specific
-                   BatVoltage::kMetadataEntry,
-                   BatPercentRemaining::kMetadataEntry,
-                   BatTimeRemaining::kMetadataEntry,
-                   BatChargeLevel::kMetadataEntry,
-                   BatReplacementNeeded::kMetadataEntry,
-                   BatReplaceability::kMetadataEntry,
-                   BatPresent::kMetadataEntry,
-                   ActiveBatFaults::kMetadataEntry })
+                   BatVoltage::kMetadataEntry, BatPercentRemaining::kMetadataEntry, BatTimeRemaining::kMetadataEntry,
+                   BatChargeLevel::kMetadataEntry, BatReplacementNeeded::kMetadataEntry, BatReplaceability::kMetadataEntry,
+                   BatPresent::kMetadataEntry, ActiveBatFaults::kMetadataEntry })
             {
                 ASSERT_EQ(expected.Append(el), CHIP_NO_ERROR);
             }
@@ -239,13 +225,9 @@ TEST_F(TestPowerSourceCluster, AttributeTest)
             if (replaceable)
             {
                 for (const auto & el : { // replaceable battery specific
-                    BatReplacementDescription::kMetadataEntry,
-                    BatCommonDesignation::kMetadataEntry,
-                    BatANSIDesignation::kMetadataEntry,
-                    BatIECDesignation::kMetadataEntry,
-                    BatApprovedChemistry::kMetadataEntry,
-                    BatQuantity::kMetadataEntry
-                 })
+                                         BatReplacementDescription::kMetadataEntry, BatCommonDesignation::kMetadataEntry,
+                                         BatANSIDesignation::kMetadataEntry, BatIECDesignation::kMetadataEntry,
+                                         BatApprovedChemistry::kMetadataEntry, BatQuantity::kMetadataEntry })
                 {
                     ASSERT_EQ(expected.Append(el), CHIP_NO_ERROR);
                 }
@@ -253,12 +235,9 @@ TEST_F(TestPowerSourceCluster, AttributeTest)
             if (rechargeable)
             {
                 for (const auto & el : { // rechargeable battery specific
-                    BatChargeState::kMetadataEntry,
-                    BatTimeToFullCharge::kMetadataEntry,
-                    BatFunctionalWhileCharging::kMetadataEntry,
-                    BatChargingCurrent::kMetadataEntry,
-                    ActiveBatChargeFaults::kMetadataEntry
-                })
+                                         BatChargeState::kMetadataEntry, BatTimeToFullCharge::kMetadataEntry,
+                                         BatFunctionalWhileCharging::kMetadataEntry, BatChargingCurrent::kMetadataEntry,
+                                         ActiveBatChargeFaults::kMetadataEntry })
                 {
                     ASSERT_EQ(expected.Append(el), CHIP_NO_ERROR);
                 }

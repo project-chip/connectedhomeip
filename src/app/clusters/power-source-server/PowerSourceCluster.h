@@ -361,13 +361,11 @@ private:
     }
 };
 
-
 class MinimalWiredPowerSourceCluster : public DefaultServerCluster
 {
 public:
-
-    using PowerSourceStatusEnum    = PowerSource::PowerSourceStatusEnum;
-    using WiredCurrentTypeEnum     = PowerSource::WiredCurrentTypeEnum;
+    using PowerSourceStatusEnum = PowerSource::PowerSourceStatusEnum;
+    using WiredCurrentTypeEnum  = PowerSource::WiredCurrentTypeEnum;
 
     struct WiredConfiguration
     {
