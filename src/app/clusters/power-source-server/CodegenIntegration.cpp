@@ -44,7 +44,6 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        PowerSourceCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         BitFlags<Feature> features(featureMap);
         using namespace chip::Protocols;
 
@@ -61,7 +60,6 @@ public:
         if (features.Has(Feature::kWired))
         {
             PowerSourceCluster::WiredCurrentTypeEnum currentType;
-            VerifyOrDie(optionalAttributeSet.IsSet(WiredCurrentType::Id));
             VerifyOrDie(WiredCurrentType::Get(endpointId, &currentType) == InteractionModel::Status::Success);
 
             PowerSourceCluster::WiredConfiguration config(description, currentType);
@@ -78,13 +76,13 @@ public:
                 config.maximumCurrent = maximumCurrent;
             }
 
-            gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeSet, DeviceLayer::SystemLayer(), config);
+            gServers[clusterInstanceIndex].Create(endpointId, DeviceLayer::SystemLayer(), config);
         }
         else if (features.Has(Feature::kBattery))
         {
             // default value
             PowerSourceCluster::BatReplaceabilityEnum replaceability = PowerSourceCluster::BatReplaceabilityEnum::kUnspecified;
-            VerifyOrDie(optionalAttributeSet.IsSet(BatReplaceability::Id));
+
             // try to read, if fails, default will be used
             BatReplaceability::Get(endpointId, &replaceability);
 
@@ -100,12 +98,10 @@ public:
             {
                 char replacementDescriptionBuffer[BatReplacementDescription::TypeInfo::MaxLength()];
                 MutableCharSpan replacementDescription(replacementDescriptionBuffer);
-                VerifyOrDie(optionalAttributeSet.IsSet(BatReplacementDescription::Id));
                 VerifyOrDie(BatReplacementDescription::Get(endpointId, replacementDescription) ==
                             InteractionModel::Status::Success);
 
                 uint8_t quantity;
-                VerifyOrDie(optionalAttributeSet.IsSet(BatQuantity::Id));
                 VerifyOrDie(BatQuantity::Get(endpointId, &quantity) == InteractionModel::Status::Success);
 
                 config.MakeReplaceable(replacementDescription, quantity);
@@ -140,7 +136,7 @@ public:
             {
                 config.MakeRechargeable();
             }
-            gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeSet, DeviceLayer::SystemLayer(), config);
+            gServers[clusterInstanceIndex].Create(endpointId, DeviceLayer::SystemLayer(), config);
         }
         else
         {
@@ -217,16 +213,6 @@ public:
 
 void MatterPowerSourceClusterInitCallback(EndpointId endpointId)
 {
-    // If the cluster was already registered manually, don't create and register it from ember.
-    auto clusterList = CodegenDataModelProvider::Instance().Registry().ClustersOnEndpoint(endpointId);
-    for (ClusterId clusterId : clusterList)
-    {
-        if (clusterId == PowerSource::Id)
-        {
-            return;
-        }
-    }
-
     IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::RegisterServer(
@@ -236,7 +222,7 @@ void MatterPowerSourceClusterInitCallback(EndpointId endpointId)
             .fixedClusterInstanceCount = kPowerSourceFixedClusterCount,
             .maxClusterInstanceCount   = kPowerSourceMaxClusterCount,
             .fetchFeatureMap           = true,
-            .fetchOptionalAttributes   = true,
+            .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
 }

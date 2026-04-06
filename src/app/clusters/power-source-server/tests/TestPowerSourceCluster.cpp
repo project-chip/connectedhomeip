@@ -51,7 +51,6 @@ struct TestPowerSourceCluster : public ::testing::Test
 
     TestServerClusterContext testContext;
 
-    // Call only when ALL valid optional attributes are enabled
     void TestReadAllAttributes(ClusterTester & tester, bool battery, bool replaceable = false, bool rechargeable = false)
     {
 #define Read(attr_name)                                                                                                            \
@@ -115,7 +114,6 @@ struct TestPowerSourceCluster : public ::testing::Test
 #undef Read
     }
 
-    // Call only when ALL valid optional attributes are enabled
     void RunAllSupportedGetters(const PowerSourceCluster & cluster, bool battery, bool replaceable = false,
                                 bool rechargeable = false)
     {
@@ -178,24 +176,26 @@ TEST_F(TestPowerSourceCluster, AttributeTest)
 {
     // Wired
     {
-        PowerSourceCluster::OptionalAttributeSet optSet{};
-        optSet.Set<WiredMaximumCurrent::Id>(); // should be left at true
-        optSet.Set<BatCapacity::Id>();         // should be set back to false
-
         PowerSourceCluster::WiredConfiguration config(CharSpan{}, WiredCurrentTypeEnum::kAc);
-        PowerSourceCluster cluster(kRootEndpointId, optSet, DeviceLayer::SystemLayer(), config);
+        PowerSourceCluster cluster(kRootEndpointId, DeviceLayer::SystemLayer(), config);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         EXPECT_TRUE(IsAttributesListEqualTo(cluster,
                                             {
                                                 // Mandatory
-                                                Status::kMetadataEntry, Order::kMetadataEntry, Description::kMetadataEntry,
+                                                Status::kMetadataEntry,
+                                                Order::kMetadataEntry,
+                                                Description::kMetadataEntry,
                                                 EndpointList::kMetadataEntry,
-                                                // Mandatory when `kWired` feature enabled
+                                                // Wired specific
+                                                WiredAssessedInputVoltage::kMetadataEntry,
+                                                WiredAssessedInputFrequency::kMetadataEntry,
                                                 WiredCurrentType::kMetadataEntry,
-                                                // Optional, set to be used above
-                                                WiredMaximumCurrent::kMetadataEntry
-                                                // There is no BatCapacity, because `kBattery` feature is not set
+                                                WiredAssessedCurrent::kMetadataEntry,
+                                                WiredNominalVoltage::kMetadataEntry,
+                                                WiredMaximumCurrent::kMetadataEntry,
+                                                WiredPresent::kMetadataEntry,
+                                                ActiveWiredFaults::kMetadataEntry
                                             }));
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -206,13 +206,6 @@ TEST_F(TestPowerSourceCluster, AttributeTest)
     {
         for (bool rechargeable : { false, true })
         {
-            PowerSourceCluster::OptionalAttributeSet optSet{};
-            optSet.Set<WiredMaximumCurrent::Id>();  // should be set to false
-            optSet.Set<BatPresent::Id>();           // should be set to true
-            optSet.Set<BatCommonDesignation::Id>(); // should be set to true if replaceable otherwise should be false
-            optSet.Set<BatTimeToFullCharge::Id>();  // should be set to true if rechargeable otherwise should be false
-            optSet.Set<BatCapacity::Id>(); // should be set to true if replaceable or rechargeable otherwise should be false
-
             PowerSourceCluster::BatteryConfiguration config(CharSpan{}, BatReplaceabilityEnum::kUnspecified);
             if (replaceable)
             {
@@ -222,7 +215,7 @@ TEST_F(TestPowerSourceCluster, AttributeTest)
             {
                 config.MakeRechargeable();
             }
-            PowerSourceCluster cluster(kRootEndpointId, optSet, DeviceLayer::SystemLayer(), config);
+            PowerSourceCluster cluster(kRootEndpointId, DeviceLayer::SystemLayer(), config);
             ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
             ReadOnlyBufferBuilder<const DataModel::AttributeEntry> expected;
@@ -230,37 +223,48 @@ TEST_F(TestPowerSourceCluster, AttributeTest)
             for (const auto & el :
                  { // Mandatory
                    Status::kMetadataEntry, Order::kMetadataEntry, Description::kMetadataEntry, EndpointList::kMetadataEntry,
-                   // Mandatory when battery
-                   BatChargeLevel::kMetadataEntry, BatReplacementNeeded::kMetadataEntry, BatReplaceability::kMetadataEntry,
-                   // Optional when battery, and set to true above
-                   BatPresent::kMetadataEntry })
+                   // Battery specific
+                   BatVoltage::kMetadataEntry,
+                   BatPercentRemaining::kMetadataEntry,
+                   BatTimeRemaining::kMetadataEntry,
+                   BatChargeLevel::kMetadataEntry,
+                   BatReplacementNeeded::kMetadataEntry,
+                   BatReplaceability::kMetadataEntry,
+                   BatPresent::kMetadataEntry,
+                   ActiveBatFaults::kMetadataEntry })
             {
                 ASSERT_EQ(expected.Append(el), CHIP_NO_ERROR);
             }
 
             if (replaceable)
             {
-                for (const auto & el : { // mandatory
-                                         BatReplacementDescription::kMetadataEntry, BatQuantity::kMetadataEntry,
-                                         // optional, set to true
-                                         BatCommonDesignation::kMetadataEntry })
+                for (const auto & el : { // replaceable battery specific
+                    BatReplacementDescription::kMetadataEntry,
+                    BatCommonDesignation::kMetadataEntry,
+                    BatANSIDesignation::kMetadataEntry,
+                    BatIECDesignation::kMetadataEntry,
+                    BatApprovedChemistry::kMetadataEntry,
+                    BatQuantity::kMetadataEntry
+                 })
                 {
                     ASSERT_EQ(expected.Append(el), CHIP_NO_ERROR);
                 }
             }
             if (rechargeable)
             {
-                for (const auto & el : { // mandatory
-                                         BatChargeState::kMetadataEntry, BatFunctionalWhileCharging::kMetadataEntry,
-                                         // optional, set to true
-                                         BatTimeToFullCharge::kMetadataEntry })
+                for (const auto & el : { // rechargeable battery specific
+                    BatChargeState::kMetadataEntry,
+                    BatTimeToFullCharge::kMetadataEntry,
+                    BatFunctionalWhileCharging::kMetadataEntry,
+                    BatChargingCurrent::kMetadataEntry,
+                    ActiveBatChargeFaults::kMetadataEntry
+                })
                 {
                     ASSERT_EQ(expected.Append(el), CHIP_NO_ERROR);
                 }
             }
             if (replaceable || rechargeable)
             {
-                // optional, set to true
                 ASSERT_EQ(expected.Append(BatCapacity::kMetadataEntry), CHIP_NO_ERROR);
             }
             EXPECT_TRUE(IsAttributesListEqualTo(cluster, expected.TakeBuffer()));
@@ -272,13 +276,10 @@ TEST_F(TestPowerSourceCluster, AttributeTest)
 
 TEST_F(TestPowerSourceCluster, ReadAttributeTest)
 {
-    PowerSourceCluster::OptionalAttributeSet allOptAttributes(
-        UINT32_MAX); // all attributes set to true, the cluster will filter out invalid ones
-
     // Wired
     {
         PowerSourceCluster::WiredConfiguration config(CharSpan{}, WiredCurrentTypeEnum::kDc);
-        PowerSourceCluster cluster(kRootEndpointId, allOptAttributes, DeviceLayer::SystemLayer(), config);
+        PowerSourceCluster cluster(kRootEndpointId, DeviceLayer::SystemLayer(), config);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(cluster);
@@ -302,7 +303,7 @@ TEST_F(TestPowerSourceCluster, ReadAttributeTest)
             {
                 config.MakeRechargeable();
             }
-            PowerSourceCluster cluster(kRootEndpointId, allOptAttributes, DeviceLayer::SystemLayer(), config);
+            PowerSourceCluster cluster(kRootEndpointId, DeviceLayer::SystemLayer(), config);
             ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
             ClusterTester tester(cluster);
@@ -320,13 +321,6 @@ TEST_F(TestPowerSourceCluster, TestSetters)
     PowerSourceCluster::BatteryConfiguration config(CharSpan{}, BatReplaceabilityEnum::kUnspecified);
     config.MakeRechargeable();
 
-    PowerSourceCluster::OptionalAttributeSet optSet{};
-    optSet.Set<WiredMaximumCurrent::Id>();  // should be set to false
-    optSet.Set<BatPresent::Id>();           // should be set to true
-    optSet.Set<BatCommonDesignation::Id>(); // should be set to false
-    optSet.Set<BatTimeToFullCharge::Id>();  // should be set to true
-    optSet.Set<BatCapacity::Id>();          // should be set true
-
     PowerSourceCluster cluster(kRootEndpointId, optSet, DeviceLayer::SystemLayer(), config);
 
     // These are mandatory, so always supported
@@ -343,45 +337,33 @@ TEST_F(TestPowerSourceCluster, TestSetters)
     EXPECT_EQ(cluster.AddActiveWiredFault({}), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     EXPECT_EQ(cluster.RemoveActiveWiredFault({}), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    // These are optional when battery feature is set, but in the optional attribute set they are not set, so unsupported
-    EXPECT_EQ(cluster.SetBatVoltage({}), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    EXPECT_EQ(cluster.SetBatPercentRemaining({}), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    EXPECT_EQ(cluster.SetBatTimeRemaining({}), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    EXPECT_EQ(cluster.SetActiveBatFaults({}), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    EXPECT_EQ(cluster.AddActiveBatFault({}), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    EXPECT_EQ(cluster.RemoveActiveBatFault({}), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    // These are mandatory when battery feature is set
+    // These are supported when battery feature is set
     EXPECT_EQ(cluster.SetBatChargeLevel({}), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.SetBatReplacementNeeded({}), CHIP_NO_ERROR);
-
-    // This one is optional when battery feature is set, and it is set as supported in the optional attribute set
+    EXPECT_EQ(cluster.SetBatVoltage({}), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetBatPercentRemaining({}), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetBatTimeRemaining({}), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetActiveBatFaults({}), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.AddActiveBatFault({}), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.RemoveActiveBatFault({}), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.SetBatPresent({}), CHIP_NO_ERROR);
 
-    // These are mandatory when rechargeable feature is set besides battery
+    // These are supported when rechargeable feature is set besides battery
     EXPECT_EQ(cluster.SetBatChargeState({}), CHIP_NO_ERROR);
     EXPECT_EQ(cluster.SetBatFunctionalWhileCharging({}), CHIP_NO_ERROR);
-
-    // This one is optional when rechargeable battery feature is set, and it is set as supported in the optional attribute set
     EXPECT_EQ(cluster.SetBatTimeToFullCharge({}), CHIP_NO_ERROR);
-
-    // These are optional when rechargeable battery feature is set, but in the optional attribute set they are not set, so
-    // unsupported
-    EXPECT_EQ(cluster.SetBatChargingCurrent({}), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    EXPECT_EQ(cluster.SetActiveBatChargeFaults({}), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    EXPECT_EQ(cluster.AddActiveBatChargeFault({}), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    EXPECT_EQ(cluster.RemoveActiveBatChargeFault({}), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    EXPECT_EQ(cluster.SetBatChargingCurrent({}), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetActiveBatChargeFaults({}), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.AddActiveBatChargeFault({}), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.RemoveActiveBatChargeFault({}), CHIP_NO_ERROR);
 }
 
 TEST_F(TestPowerSourceCluster, TestGetters)
 {
-    PowerSourceCluster::OptionalAttributeSet allOptAttributes(
-        UINT32_MAX); // all attributes set to true, the cluster will filter out invalid ones
-
     // Wired
     {
         PowerSourceCluster::WiredConfiguration config(CharSpan{}, WiredCurrentTypeEnum::kDc);
-        PowerSourceCluster cluster(kRootEndpointId, allOptAttributes, DeviceLayer::SystemLayer(), config);
+        PowerSourceCluster cluster(kRootEndpointId, DeviceLayer::SystemLayer(), config);
 
         // if a getter is called when not supported, the test will die.
         RunAllSupportedGetters(cluster, false);
@@ -401,7 +383,7 @@ TEST_F(TestPowerSourceCluster, TestGetters)
             {
                 config.MakeRechargeable();
             }
-            PowerSourceCluster cluster(kRootEndpointId, allOptAttributes, DeviceLayer::SystemLayer(), config);
+            PowerSourceCluster cluster(kRootEndpointId, DeviceLayer::SystemLayer(), config);
 
             // if a getter is called when not supported, the test will die.
             RunAllSupportedGetters(cluster, true, replaceable, rechargeable);
@@ -428,11 +410,8 @@ TEST_F(TestPowerSourceCluster, TestSetterBounds)
     config.ansiDesignation = ansiDesignation;
     config.iecDesignation  = iecDesignation;
 
-    PowerSourceCluster::OptionalAttributeSet allOptAttributes(
-        UINT32_MAX); // all attributes set to true, the cluster will filter out invalid ones
-
     // This should not fail
-    PowerSourceCluster cluster(kRootEndpointId, allOptAttributes, DeviceLayer::SystemLayer(), config);
+    PowerSourceCluster cluster(kRootEndpointId, DeviceLayer::SystemLayer(), config);
 
     // Test BatPercentRemaining, which can be only from 0 to 200, or null.
 
@@ -449,14 +428,12 @@ TEST_F(TestPowerSourceCluster, TestPersistence)
 {
     // Order attribute is marked with `Persistent` marker.
 
-    PowerSourceCluster::OptionalAttributeSet noOptAttributes(0);
-
     uint8_t testOrder = 3;
 
     PowerSourceCluster::WiredConfiguration config(CharSpan(), WiredCurrentTypeEnum::kAc);
 
     {
-        PowerSourceCluster cluster(kRootEndpointId, noOptAttributes, DeviceLayer::SystemLayer(), config);
+        PowerSourceCluster cluster(kRootEndpointId, DeviceLayer::SystemLayer(), config);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         EXPECT_EQ(cluster.SetOrder(testOrder), CHIP_NO_ERROR);
@@ -466,7 +443,7 @@ TEST_F(TestPowerSourceCluster, TestPersistence)
     }
 
     {
-        PowerSourceCluster cluster(kRootEndpointId, noOptAttributes, DeviceLayer::SystemLayer(), config);
+        PowerSourceCluster cluster(kRootEndpointId, DeviceLayer::SystemLayer(), config);
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(cluster);

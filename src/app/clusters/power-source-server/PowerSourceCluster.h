@@ -47,22 +47,6 @@ public:
     using BatChargeStateEnum       = PowerSource::BatChargeStateEnum;
     using BatChargeFaultEnum       = PowerSource::BatChargeFaultEnum;
 
-    using OptionalAttributeSet = chip::app::OptionalAttributeSet<
-        PowerSource::Attributes::WiredAssessedInputVoltage::Id, PowerSource::Attributes::WiredAssessedInputFrequency::Id,
-        PowerSource::Attributes::WiredCurrentType::Id, PowerSource::Attributes::WiredAssessedCurrent::Id,
-        PowerSource::Attributes::WiredNominalVoltage::Id, PowerSource::Attributes::WiredMaximumCurrent::Id,
-        PowerSource::Attributes::WiredPresent::Id, PowerSource::Attributes::ActiveWiredFaults::Id,
-        PowerSource::Attributes::BatVoltage::Id, PowerSource::Attributes::BatPercentRemaining::Id,
-        PowerSource::Attributes::BatTimeRemaining::Id, PowerSource::Attributes::BatChargeLevel::Id,
-        PowerSource::Attributes::BatReplacementNeeded::Id, PowerSource::Attributes::BatReplaceability::Id,
-        PowerSource::Attributes::BatPresent::Id, PowerSource::Attributes::ActiveBatFaults::Id,
-        PowerSource::Attributes::BatReplacementDescription::Id, PowerSource::Attributes::BatCommonDesignation::Id,
-        PowerSource::Attributes::BatANSIDesignation::Id, PowerSource::Attributes::BatIECDesignation::Id,
-        PowerSource::Attributes::BatApprovedChemistry::Id, PowerSource::Attributes::BatCapacity::Id,
-        PowerSource::Attributes::BatQuantity::Id, PowerSource::Attributes::BatChargeState::Id,
-        PowerSource::Attributes::BatTimeToFullCharge::Id, PowerSource::Attributes::BatFunctionalWhileCharging::Id,
-        PowerSource::Attributes::BatChargingCurrent::Id, PowerSource::Attributes::ActiveBatChargeFaults::Id>;
-
     struct WiredConfiguration
     {
         CharSpan description{};
@@ -109,10 +93,8 @@ public:
         bool rechargeable;
     };
 
-    PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet, System::Layer & systemLayer,
-                       const WiredConfiguration & config);
-    PowerSourceCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet, System::Layer & systemLayer,
-                       const BatteryConfiguration & config);
+    PowerSourceCluster(EndpointId endpointId, System::Layer & systemLayer, const WiredConfiguration & config);
+    PowerSourceCluster(EndpointId endpointId, System::Layer & systemLayer, const BatteryConfiguration & config);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
@@ -307,17 +289,6 @@ private:
         return flags.Set(PowerSource::Feature::kReplaceable, replaceable).Set(PowerSource::Feature::kRechargeable, rechargeable);
     }
 
-    void forceOptionalAttributesValidity();
-
-    template <class T>
-    void SetAndNotify(T & current_val, const T & new_val, AttributeId id)
-    {
-        VerifyOrReturn(current_val != new_val); // no-op if equal
-
-        current_val = new_val;
-        NotifyAttributeChanged(id);
-    }
-
     // maxSize without null byte
     CHIP_ERROR SetStringAndNotify(CharSpan val, CharSpan current, char * buffer, size_t maxSize, AttributeId id)
     {
@@ -370,7 +341,6 @@ private:
         mContext->interactionContext.eventsGenerator.GenerateEvent(event_data, mPath.mEndpointId);
     }
 
-    OptionalAttributeSet mOptionalAttributeSet;
     const BitFlags<PowerSource::Feature> mFeatures;
     struct Attributes mAttributes;
 
