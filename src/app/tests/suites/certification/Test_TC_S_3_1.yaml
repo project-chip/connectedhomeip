@@ -41,9 +41,8 @@ tests:
           the TH. GroupKeySet fields are as follows: * GroupKeySetID: 0x01a1 *
           GroupKeySecurityPolicy: TrustFirst (0) * EpochKey0:
           a0a1a2a3a4a5a6a7a8a9aaabacadaeaf * EpochStartTime0: 1110000 *
-          EpochKey1: b0b1b2b3b4b5b6b7b8b9babbbcbdbebf * EpochStartTime1: 1110001 *
-          EpochKey2: null * EpochStartTime2: null *
-          GroupKeyMulticastPolicy: 0"
+          EpochKey1: b0b1b2b3b4b5b6b7b8b9babbbcbdbebf * EpochStartTime1: 1110001
+          * EpochKey2: null * EpochStartTime2: null * GroupKeyMulticastPolicy: 0"
       verification: |
           Please execute the below commands before starting the test case :
 
@@ -173,7 +172,8 @@ tests:
 
     - label:
           "Step 0d: Precondition 4: If the Groupcast cluster is enabled on the
-          RootNode endpoint, the TH reads the Groupcast _membership_ attribute on the DUT."
+          RootNode endpoint, the TH reads the Groupcast _membership_ attribute
+          on the DUT."
       verification: |
           ./chip-tool groupcast read membership 1 0
 

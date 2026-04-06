@@ -78,8 +78,9 @@ tests:
       arguments:
           value: [{ FabricIndex: 1, GroupId: G1, GroupKeySetID: 0x01a1 }]
 
-    - label: "Step 1a: If the Groupcast cluster is enabled on the RootNode endpoint,
-             the TH reads the Groupcast _membership_ attribute on the DUT"
+    - label:
+          "Step 1a: If the Groupcast cluster is enabled on the RootNode
+          endpoint, the TH reads the Groupcast _membership_ attribute on the DUT"
       PICS: "GC.S"
       cluster: "Groupcast"
       endpoint: groupcastendpoint
@@ -90,8 +91,10 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 1b: If the Groupcast cluster is enabled on the RootNode endpoint,
-             TH sends Groupcast LeaveGroup command with GroupID = 0 to DUT"
+    - label:
+          "Step 1b: If the Groupcast cluster is enabled on the RootNode
+          endpoint, TH sends Groupcast LeaveGroup command with GroupID = 0 to
+          DUT"
       PICS: "GC.S"
       runIf: membershipList
       cluster: "Groupcast"
@@ -108,7 +111,9 @@ tests:
       endpoint: endpoint
       command: "RemoveAllGroups"
 
-    - label: "Step 2a: If Groupcast is enabled on RootNode, TH sends JoinGroup with G1, Scene endpoint, and KeySetID 0x01a1"
+    - label:
+          "Step 2a: If Groupcast is enabled on RootNode, TH sends JoinGroup with
+          G1, Scene endpoint, and KeySetID 0x01a1"
       PICS: GC.S
       cluster: "Groupcast"
       endpoint: groupcastendpoint
