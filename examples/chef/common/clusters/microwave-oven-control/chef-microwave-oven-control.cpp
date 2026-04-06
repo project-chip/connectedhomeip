@@ -36,37 +36,48 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
     mOperationalStateDelegatePtr(std::make_unique<OperationalStateDelegate>()),
     mOperationalStateInstancePtr(
         std::make_unique<OperationalState::Instance>(mOperationalStateDelegatePtr.get(), aClustersEndpoint)),
-    mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint)),
-    mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id,
-                                  BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
-                                                                         MicrowaveOvenControl::Feature::kPowerNumberLimits),
-                                  *mOperationalStateInstancePtr, *mMicrowaveOvenModeInstancePtr)
+    mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint))
 {
-    VerifyOrDie(mOperationalStateInstancePtr != nullptr);
-    VerifyOrDie(mMicrowaveOvenModeInstancePtr != nullptr);
-    TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
-    TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->Init();
+    if (mOperationalStateInstancePtr && mMicrowaveOvenModeInstancePtr)
+    {
+        mMicrowaveOvenControlInstance = std::make_unique<MicrowaveOvenControl::Instance>(
+            this, aClustersEndpoint, MicrowaveOvenControl::Id,
+            BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
+                                                   MicrowaveOvenControl::Feature::kPowerNumberLimits),
+            *mOperationalStateInstancePtr, *mMicrowaveOvenModeInstancePtr);
+
+        TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
+        TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->Init();
+    }
 }
 
 ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
                                                  OperationalState::Instance * operationalStateInstancePtr,
                                                  OperationalStateDelegate * operationalStateDelegatePtr) :
-    mOperationalStateDelegatePtr(operationalStateDelegatePtr),
-    mOperationalStateInstancePtr(operationalStateInstancePtr),
-    mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint)),
-    mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id,
-                                  BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
-                                                                         MicrowaveOvenControl::Feature::kPowerNumberLimits),
-                                  *mOperationalStateInstancePtr, *mMicrowaveOvenModeInstancePtr)
+    mOperationalStateDelegatePtr(operationalStateDelegatePtr), mOperationalStateInstancePtr(operationalStateInstancePtr),
+    mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint))
 {
-    VerifyOrDie(mOperationalStateInstancePtr != nullptr);
-    VerifyOrDie(mMicrowaveOvenModeInstancePtr != nullptr);
+    if (mOperationalStateInstancePtr && mMicrowaveOvenModeInstancePtr)
+    {
+        mMicrowaveOvenControlInstance = std::make_unique<MicrowaveOvenControl::Instance>(
+            this, aClustersEndpoint, MicrowaveOvenControl::Id,
+            BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
+                                                   MicrowaveOvenControl::Feature::kPowerNumberLimits),
+            *mOperationalStateInstancePtr, *mMicrowaveOvenModeInstancePtr);
+    }
 }
 
 void ChefMicrowaveOvenDevice::MicrowaveOvenInit()
 {
-    TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
-    TEMPORARY_RETURN_IGNORED mMicrowaveOvenControlInstance.Init();
+    if (mOperationalStateInstancePtr)
+    {
+        TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
+    }
+
+    if (mMicrowaveOvenControlInstance)
+    {
+        TEMPORARY_RETURN_IGNORED mMicrowaveOvenControlInstance->Init();
+    }
 }
 
 /**
@@ -78,9 +89,12 @@ ChefMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, ui
 {
     Status status;
     // Update cook mode.
-    if ((status = mMicrowaveOvenModeInstancePtr->UpdateCurrentMode(cookMode)) != Status::Success)
+    if (mMicrowaveOvenModeInstancePtr)
     {
-        return status;
+        if ((status = mMicrowaveOvenModeInstancePtr->UpdateCurrentMode(cookMode)) != Status::Success)
+        {
+            return status;
+        }
     }
 
     HandleModifyCookTimeSecondsCallback(cookTimeSec);
@@ -93,7 +107,7 @@ ChefMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, ui
         mPowerSettingNum = powerSettingNum.Value();
     }
 
-    if (startAfterSetting)
+    if (startAfterSetting && mOperationalStateDelegatePtr)
     {
         GenericOperationalError noError(static_cast<uint8_t>(ErrorStateEnum::kNoError));
         mOperationalStateDelegatePtr->HandleStartStateCallback(noError);
@@ -104,8 +118,25 @@ ChefMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, ui
 
 Protocols::InteractionModel::Status ChefMicrowaveOvenDevice::HandleModifyCookTimeSecondsCallback(uint32_t finalCookTimeSec)
 {
-    mMicrowaveOvenControlInstance.SetCookTimeSec(finalCookTimeSec);
-    mOperationalStateDelegatePtr->mCountDownTime.SetNonNull(finalCookTimeSec);
+    if (mOperationalStateInstancePtr && mOperationalStateDelegatePtr)
+    {
+        // Can not shorten existing cycle.
+        if (mOperationalStateInstancePtr->GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kStopped) &&
+            finalCookTimeSec < mOperationalStateDelegatePtr->GetCountdownTime().ValueOr(0))
+        {
+            return Status::ConstraintError;
+        }
+    }
+
+    if (mMicrowaveOvenControlInstance)
+    {
+        mMicrowaveOvenControlInstance->SetCookTimeSec(finalCookTimeSec);
+    }
+
+    if (mOperationalStateDelegatePtr)
+    {
+        mOperationalStateDelegatePtr->mCountDownTime.SetNonNull(finalCookTimeSec);
+    }
 
     if (mOperationalStateInstancePtr)
     {

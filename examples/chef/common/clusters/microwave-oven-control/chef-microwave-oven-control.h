@@ -90,7 +90,7 @@ private:
 
     chip::app::Clusters::ModeBase::Instance * mMicrowaveOvenModeInstancePtr;
 
-    MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
+    std::unique_ptr<MicrowaveOvenControl::Instance> mMicrowaveOvenControlInstance;
 
     static constexpr uint8_t kMinPowerNum            = 20u;
     static constexpr uint8_t kMaxPowerNum            = 90u;
