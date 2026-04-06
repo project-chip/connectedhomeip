@@ -444,7 +444,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
         }
     }
 
-    mFanMode = newMode;
+    SetAttributeValue(mFanMode, newMode, FanMode::Id);
 
     if (newMode == FanModeEnum::kOff)
     {
@@ -469,7 +469,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
 
     StoreFanModePersistence();
 
-    return NotifyAttributeChangedIfSuccess(FanMode::Id, Status::Success);
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nullable<chip::Percent> value)
@@ -484,13 +484,13 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
         return Status::ConstraintError;
     }
 
-    mPercentSetting = value;
+    SetAttributeValue(mPercentSetting, value, PercentSetting::Id);
     ApplyPercentSettingChanged();
     if (!mIsOnOffOn)
     {
         NotifyAttributeChanged(PercentCurrent::Id);
     }
-    return NotifyAttributeChangedIfSuccess(PercentSetting::Id, Status::Success);
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Nullable<uint8_t> value)
@@ -505,13 +505,13 @@ DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Null
         return Status::ConstraintError;
     }
 
-    mSpeedSetting = value;
+    SetAttributeValue(mSpeedSetting, value, SpeedSetting::Id);
     ApplySpeedSettingChanged();
     if (!mIsOnOffOn)
     {
         NotifyAttributeChanged(SpeedCurrent::Id);
     }
-    return NotifyAttributeChangedIfSuccess(SpeedSetting::Id, Status::Success);
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus FanControlCluster::SetRockSetting(BitMask<RockBitmap> value)
@@ -523,8 +523,8 @@ DataModel::ActionReturnStatus FanControlCluster::SetRockSetting(BitMask<RockBitm
         return Status::ConstraintError;
     }
 
-    mRockSetting = value;
-    return NotifyAttributeChangedIfSuccess(RockSetting::Id, Status::Success);
+    SetAttributeValue(mRockSetting, value, RockSetting::Id);
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus FanControlCluster::SetWindSetting(BitMask<WindBitmap> value)
@@ -536,8 +536,8 @@ DataModel::ActionReturnStatus FanControlCluster::SetWindSetting(BitMask<WindBitm
         return Status::ConstraintError;
     }
 
-    mWindSetting = value;
-    return NotifyAttributeChangedIfSuccess(WindSetting::Id, Status::Success);
+    SetAttributeValue(mWindSetting, value, WindSetting::Id);
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus FanControlCluster::SetAirflowDirection(AirflowDirectionEnum value)
@@ -547,8 +547,8 @@ DataModel::ActionReturnStatus FanControlCluster::SetAirflowDirection(AirflowDire
         return Status::ConstraintError;
     }
 
-    mAirflowDirection = value;
-    return NotifyAttributeChangedIfSuccess(AirflowDirection::Id, Status::Success);
+    SetAttributeValue(mAirflowDirection, value, AirflowDirection::Id);
+    return Status::Success;
 }
 
 void FanControlCluster::SetOnOffState(bool isOn)
