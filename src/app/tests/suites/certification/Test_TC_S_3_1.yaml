@@ -48,7 +48,7 @@ tests:
           Please execute the below commands before starting the test case :
 
           ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": "0x01a1", "groupKeySecurityPolicy": 0, "epochKey0": "a0a1a2a3a4a5a6a7a8a9aaabacadaeaf", "epochStartTime0": 1110000, "epochKey1": "b0b1b2b3b4b5b6b7b8b9babbbcbdbebf", "epochStartTime1": 1110001, "epochKey2": null, "epochStartTime2": null, "groupKeyMulticastPolicy": 0}' 1 0
-          
+
           Verify the KeySetWrite command  On TH (all-Clusters-app) log and below is the sample log provided for the raspi platform:
 
           [1706722808.568204][5404:5404] CHIP:DMG: InvokeRequestMessage =
@@ -122,14 +122,14 @@ tests:
           [1775470727.508] [8298:8300] [DMG] 				Cluster = 0x3f,
           [1775470727.508] [8298:8300] [DMG] 				Attribute = 0x0000_0000,
           [1775470727.508] [8298:8300] [DMG] 			}
-          [1775470727.508] [8298:8300] [DMG] 				
+          [1775470727.508] [8298:8300] [DMG]
           [1775470727.508] [8298:8300] [DMG] 			StatusIB =
           [1775470727.508] [8298:8300] [DMG] 			{
           [1775470727.508] [8298:8300] [DMG] 				status = 0x00 (SUCCESS),
           [1775470727.508] [8298:8300] [DMG] 			},
-          [1775470727.508] [8298:8300] [DMG] 			
+          [1775470727.508] [8298:8300] [DMG]
           [1775470727.508] [8298:8300] [DMG] 		},
-          [1775470727.508] [8298:8300] [DMG] 		
+          [1775470727.508] [8298:8300] [DMG]
           [1775470727.508] [8298:8300] [DMG] 		AttributeStatusIB =
           [1775470727.508] [8298:8300] [DMG] 		{
           [1775470727.508] [8298:8300] [DMG] 			AttributePathIB =
@@ -139,14 +139,14 @@ tests:
           [1775470727.508] [8298:8300] [DMG] 				Attribute = 0x0000_0000,
           [1775470727.508] [8298:8300] [DMG] 				ListIndex = Null,
           [1775470727.508] [8298:8300] [DMG] 			}
-          [1775470727.508] [8298:8300] [DMG] 				
+          [1775470727.508] [8298:8300] [DMG]
           [1775470727.508] [8298:8300] [DMG] 			StatusIB =
           [1775470727.508] [8298:8300] [DMG] 			{
           [1775470727.508] [8298:8300] [DMG] 				status = 0x00 (SUCCESS),
           [1775470727.508] [8298:8300] [DMG] 			},
-          [1775470727.509] [8298:8300] [DMG] 			
+          [1775470727.509] [8298:8300] [DMG]
           [1775470727.509] [8298:8300] [DMG] 		},
-          [1775470727.509] [8298:8300] [DMG] 		
+          [1775470727.509] [8298:8300] [DMG]
           [1775470727.509] [8298:8300] [DMG] 		AttributeStatusIB =
           [1775470727.509] [8298:8300] [DMG] 		{
           [1775470727.509] [8298:8300] [DMG] 			AttributePathIB =
@@ -156,16 +156,16 @@ tests:
           [1775470727.509] [8298:8300] [DMG] 				Attribute = 0x0000_0000,
           [1775470727.509] [8298:8300] [DMG] 				ListIndex = Null,
           [1775470727.509] [8298:8300] [DMG] 			}
-          [1775470727.509] [8298:8300] [DMG] 				
+          [1775470727.509] [8298:8300] [DMG]
           [1775470727.509] [8298:8300] [DMG] 			StatusIB =
           [1775470727.509] [8298:8300] [DMG] 			{
           [1775470727.509] [8298:8300] [DMG] 				status = 0x00 (SUCCESS),
           [1775470727.509] [8298:8300] [DMG] 			},
-          [1775470727.509] [8298:8300] [DMG] 			
+          [1775470727.509] [8298:8300] [DMG]
           [1775470727.509] [8298:8300] [DMG] 		},
-          [1775470727.509] [8298:8300] [DMG] 		
+          [1775470727.509] [8298:8300] [DMG]
           [1775470727.509] [8298:8300] [DMG] 	],
-          [1775470727.509] [8298:8300] [DMG] 	
+          [1775470727.509] [8298:8300] [DMG]
           [1775470727.509] [8298:8300] [DMG] 	InteractionModelRevision = 12
           [1775470727.509] [8298:8300] [DMG] }
           [1775470727.509] [8298:8300] [DMG] WriteClient moving to [AwaitingDe]
@@ -178,12 +178,12 @@ tests:
           ./chip-tool groupcast read membership 1 0
 
           If the membership attribute is empty, skip to step 5
-          
+
           [1775471571.340] [8350:8352] [TOO] Endpoint: 0 Cluster: 0x0000_0065 Attribute 0x0000_0000 DataVersion: 302855302
           [1775471571.340] [8350:8352] [TOO]   Membership: 0 entries
           [1775471571.340] [8350:8352] [EM] <<< [E:65251i S:5880 M:89967051 (Ack:254148)] (S) Msg TX from 000000000001B669 to 1:0000000000000001 [FEFE] [UDP:[fe80::7c12:46ff:fed7:416f%vethed6e1e0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
 
-      disabled: true      
+      disabled: true
 
     - label:
           "Step 0e: Precondition 5: If the Groupcast cluster is enabled on the

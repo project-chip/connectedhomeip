@@ -102,7 +102,7 @@ tests:
                   { FabricIndex: 1, GroupId: G1, GroupKeySetID: 0x01a1 },
                   { FabricIndex: 1, GroupId: G2, GroupKeySetID: 0x01a1 },
               ]
-              
+
     - label: "Step 0d: If the Groupcast cluster is enabled on the RootNode endpoint,
              the TH reads the Groupcast _membership_ attribute on the DUT"
       PICS: "GC.S"
