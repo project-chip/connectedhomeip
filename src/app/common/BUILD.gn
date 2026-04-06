@@ -48,9 +48,7 @@ source_set("ids") {
 static_library("cluster-objects") {
   output_name = "libClusterObjects"
 
-  sources = [
-    "${chip_app_zap_dir}/app-common/zap-generated/cluster-objects.h",
-  ]
+  sources = [ "${chip_app_zap_dir}/app-common/zap-generated/cluster-objects.h" ]
 
   if (chip_cluster_objects_source_override != "") {
     sources += [ chip_cluster_objects_source_override ]

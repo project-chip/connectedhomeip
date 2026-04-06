@@ -173,9 +173,7 @@ chip_data_model("tv-casting-common") {
     ]
   }
 
-  public_deps = [
-    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
-  ]
+  public_deps = [ "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is" ]
 
   if (chip_enable_transport_trace) {
     public_deps +=
