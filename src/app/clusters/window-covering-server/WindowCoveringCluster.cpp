@@ -174,8 +174,54 @@ DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequ
     }
 }
 
-std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                           chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+
+    const AttributesListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        { HasFeature(Feature::kLift), Attributes::NumberOfActuationsLift::kMetadataEntry },
+        { HasFeature(Feature::kTilt), Attributes::NumberOfActuationsLift::kMetadataEntry },
+        { HasFeaturePaLift(), Attributes::CurrentPositionLiftPercentage::kMetadataEntry },
+        { HasFeaturePaTilt(), Attributes::CurrentPositionTiltPercentage::kMetadataEntry },
+        { mOptionalAttributes.Has(Attributes::SafetyStatus::Id), Attributes::SafetyStatus::kMetadataEntry };
+
+    return listbuilder.Append(Span(Attributes::kMandatoryAttributes), Span(optionalAttributes));
+}
+
+CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    static constexpr DataModel::AcceptedCommandEntry kMandatoryCommands = {
+        Commands::UpOrOpen::kMetadataEntry,
+        Commands::DownOrClose::kMetadataEntry,
+        Commands::StopMotion::kMetadataEntry,
+    };
+
+    static constexpr DataModel::AcceptedCommandEntry kGoToLiftPercentageCommand[] = {
+        Commands::GoToLiftPercentage::kMetadataEntry,
+    };
+
+    static constexpr DataModel::AcceptedCommandEntry GoToTiltPercentage[] = {
+        Commands::GoToTiltPercentage::kMetadataEntry,
+    };
+
+    if (HasFeaturePaLift())
+    {
+        ReturnErrorOnFailure(builder.ReferenceExisting(kGoToLiftPercentage));
+    }
+
+    ReturnErrorOnFailure(builder.ReferenceExisting(kMandatoryCommands));
+
+    if (HasFeaturePaTilt())
+    {
+        ReturnErrorOnFailure(builder.ReferenceExisting(kGoToTiltPercentage));
+    }
+    return CHIP_NO_ERROR;
+}
+
+return listBuilder.Append(Span(Attributes::kMandatoryMetdata), Span(optionalAttributes))
+
+    std::optional<DataModel::ActionReturnStatus>
+    InvokeCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
@@ -855,3 +901,4 @@ void MatterWindowCoveringPluginServerShutdownCallback()
 {
     app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
 }
+} // namespace WindowCovering
