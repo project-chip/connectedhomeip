@@ -265,13 +265,13 @@ jobs:
                   path: allure-results
                   merge-multiple: true
 
-            - name: Publish test results to GitHub (dorny)
-              uses: dorny/test-reporter@v1
-              with:
-                  name: Nightly CI Test Results (dorny)
-                  path: allure-results/**/*.xml
-                  reporter: java-junit
-                  fail-on-error: false
+            # - name: Publish test results to GitHub (dorny)
+            #   uses: dorny/test-reporter@v1
+            #   with:
+            #       name: Nightly CI Test Results (dorny)
+            #       path: allure-results/**/*.xml
+            #       reporter: java-junit
+            #       fail-on-error: false
 
             - name: Publish test results to GitHub (mikepenz)
               uses: mikepenz/action-junit-report@v5
