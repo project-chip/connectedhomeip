@@ -269,9 +269,10 @@ async def test_dnssd_import_error_propagates():
     mock_controller = MockDeviceController()
 
     import builtins
-    
+
     # Simulate ImportError by intercepting the built-in import function
     original_import = builtins.__import__
+
     def mock_import(name, *args, **kwargs):
         if name == 'mdns_discovery' or name == 'mdns_discovery.mdns_discovery':
             raise ModuleNotFoundError(f"No module named '{name}'")
@@ -289,8 +290,10 @@ async def test_dnssd_import_error_propagates():
             except (ImportError, ModuleNotFoundError):
                 pass  # Expected - ImportError should now propagate
     finally:
-        if saved_mod: sys.modules['mdns_discovery'] = saved_mod
-        if saved_submod: sys.modules['mdns_discovery.mdns_discovery'] = saved_submod
+        if saved_mod:
+            sys.modules['mdns_discovery'] = saved_mod
+        if saved_submod:
+            sys.modules['mdns_discovery.mdns_discovery'] = saved_submod
 
     return None
 
@@ -806,10 +809,14 @@ def main():
         ("B5. Parallel: no PASE params (CASE only)", test_parallel_session_no_pase_params),
 
         # Category C: is_commissioned_on_current_fabric() Tests
-        ("C1. is_commissioned_on_current_fabric: SCENARIO 2 - operational shortcircuit", test_is_commissioned_on_current_fabric_scenario2_operational_shortcircuit),
-        ("C2. is_commissioned_on_current_fabric: SCENARIO 1 - factory fresh", test_is_commissioned_on_current_fabric_scenario1_factory_fresh),
-        ("C3. is_commissioned_on_current_fabric: SCENARIO 3 - other fabric", test_is_commissioned_on_current_fabric_scenario3_other_fabric),
-        ("C4. is_commissioned_on_current_fabric: not operational, no PASE params", test_is_commissioned_on_current_fabric_not_operational_no_pase_params),
+        ("C1. is_commissioned_on_current_fabric: SCENARIO 2 - operational shortcircuit",
+         test_is_commissioned_on_current_fabric_scenario2_operational_shortcircuit),
+        ("C2. is_commissioned_on_current_fabric: SCENARIO 1 - factory fresh",
+         test_is_commissioned_on_current_fabric_scenario1_factory_fresh),
+        ("C3. is_commissioned_on_current_fabric: SCENARIO 3 - other fabric",
+         test_is_commissioned_on_current_fabric_scenario3_other_fabric),
+        ("C4. is_commissioned_on_current_fabric: not operational, no PASE params",
+         test_is_commissioned_on_current_fabric_not_operational_no_pase_params),
 
         # Category D: get_commissioned_fabric_count() Tests
         ("D1. get_fabric_count: SCENARIO 2 - operational", test_get_fabric_count_scenario2_operational),

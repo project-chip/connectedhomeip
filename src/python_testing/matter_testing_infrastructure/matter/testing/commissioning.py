@@ -503,7 +503,7 @@ async def establish_pase_or_case_session(
     # Handle the race condition where both tasks might complete exactly at once
     successful_task = None
     task_errors = {}
-    
+
     # Check all completed tasks
     for task in done:
         try:
@@ -518,7 +518,7 @@ async def establish_pase_or_case_session(
         # Log the failures of the first batch
         for name, e in task_errors.items():
             LOGGER.info(f"{name.upper()} failed ({e}), waiting for other connection attempt")
-            
+
         done2, pending2 = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
         for task in done2:
             try:

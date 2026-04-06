@@ -308,8 +308,8 @@ class TestCommissionedFabricCountExtraction(unittest.TestCase):
     """Unit tests for extract_commissioned_fabric_count robustness."""
 
     def test_extract_commissioned_fabric_count_edge_cases(self):
-        from matter.testing.commissioning import extract_commissioned_fabric_count
         import matter.clusters as Clusters
+        from matter.testing.commissioning import extract_commissioned_fabric_count
 
         # 1. Missing data entirely
         self.assertEqual(0, extract_commissioned_fabric_count(None))
