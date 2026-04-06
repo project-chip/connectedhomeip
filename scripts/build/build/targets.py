@@ -422,6 +422,9 @@ def BuildAndroidTarget():
                    app=AndroidApp.VIRTUAL_DEVICE_APP),
     ])
 
+    # Modifiers
+    target.AppendModifier('size-optimized', optimize_size=True)
+
     return target
 
 
