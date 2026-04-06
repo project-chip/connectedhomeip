@@ -21,8 +21,7 @@ public:
 
     void OnHumidityChangeHandler(uint16_t newValue)
     {
-        CHIP_ERROR err =
-            RelativeHumidityMeasurement::SetMeasuredValue(mEndpointId, DataModel::MakeNullable<uint16_t>(newValue));
+        CHIP_ERROR err = RelativeHumidityMeasurement::SetMeasuredValue(mEndpointId, DataModel::MakeNullable<uint16_t>(newValue));
         VerifyOrReturn(CHIP_NO_ERROR == err,
                        ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MeasuredValue: %" CHIP_ERROR_FORMAT,
                                     err.Format()));
