@@ -42,7 +42,20 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
                                                                          MicrowaveOvenControl::Feature::kPowerNumberLimits),
                                   *mOperationalStateInstancePtr, *mMicrowaveOvenModeInstancePtr)
 {
-    VerifyOrDie(mOperationalStateInstancePtr != nullptr);
+    if (aClustersEndpoint == 1)
+    {
+        // In chef-operational-state-delegate-impl.cpp instance and delegate for EP1 are already registered in ember callback.
+        mOperationalStateDelegatePtr = GetOperationalStateDelegate();
+        VerifyOrDieWithMsg(mOperationalStateDelegatePtr != nullptr,
+                           "Did not find global operational state delegate for endpoint 1");
+        mOperationalStateInstancePtr = GetOperationalStateInstance();
+        VerifyOrDieWithMsg(mOperationalStateInstancePtr != nullptr,
+                           "Did not find global operational state instance for endpoint 1");
+    }
+    else
+    {
+        mOperationalStateInstancePtr->Init();
+    }
     VerifyOrDie(mMicrowaveOvenModeInstancePtr != nullptr);
     TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
     TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->Init();
