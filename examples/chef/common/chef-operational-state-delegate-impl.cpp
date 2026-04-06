@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "CodeUtils.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 #include <chef-operational-state-delegate-impl.h>
@@ -143,7 +144,12 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 {
     GenericOperationalStateDelegateImpl * delegate = reinterpret_cast<GenericOperationalStateDelegateImpl *>(data);
 
-    OperationalState::Instance * instance = OperationalState::GetOperationalStateInstance();
+    OperationalState::Instance * instance = delegate->GetInstance();
+    if (!instance)
+    {
+        ChipLogError(DeviceLayer, "Inside chef onOperationalStateTimerTick: delegate->GetInstance() was NULL.");
+        return;
+    }
     OperationalState::OperationalStateEnum state =
         static_cast<OperationalState::OperationalStateEnum>(instance->GetCurrentOperationalState());
 
@@ -174,35 +180,39 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     {
         (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, delegate);
     }
+
+    ChipLogDetail(
+        DeviceLayer,
+        "Inside chef onOperationalStateTimerTick: countdown_time: %d , RunningTime: %d , PausedTime: %d , OperationalState: %d",
+        countdown_time.ValueOr(0), delegate->mRunningTime, delegate->mPausedTime, instance->GetCurrentOperationalState());
 }
 
 // Init Operational State cluster
 
-static OperationalState::Instance * gOperationalStateInstance = nullptr;
-static OperationalStateDelegate * gOperationalStateDelegate   = nullptr;
+constexpr size_t kOperationalStateTableSize = MATTER_DM_OPERATIONAL_STATE_CLUSTER_SERVER_ENDPOINT_COUNT;
+static_assert(kOperationalStateTableSize < kEmberInvalidEndpointIndex, "OperationalState table size error");
 
-OperationalState::Instance * OperationalState::GetOperationalStateInstance()
+std::unique_ptr<OperationalState::Instance> gOperationalStateInstanceTable[kOperationalStateTableSize];
+std::unique_ptr<OperationalStateDelegate> gOperationalStateDelegateTable[kOperationalStateTableSize];
+
+OperationalState::Instance * OperationalState::GetOperationalStateInstance(EndpointId endpoint)
 {
-    return gOperationalStateInstance;
+    uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpoint, OperationalState::Id,
+                                                            MATTER_DM_OPERATIONAL_STATE_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (epIndex >= kOperationalStateTableSize)
+        return nullptr;
+
+    return gOperationalStateInstanceTable[epIndex].get();
 }
 
-OperationalStateDelegate * OperationalState::GetOperationalStateDelegate()
+OperationalStateDelegate * OperationalState::GetOperationalStateDelegate(EndpointId endpoint)
 {
-    return gOperationalStateDelegate;
-}
+    uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpoint, OperationalState::Id,
+                                                            MATTER_DM_OPERATIONAL_STATE_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (epIndex >= kOperationalStateTableSize)
+        return nullptr;
 
-void OperationalState::Shutdown()
-{
-    if (gOperationalStateInstance != nullptr)
-    {
-        delete gOperationalStateInstance;
-        gOperationalStateInstance = nullptr;
-    }
-    if (gOperationalStateDelegate != nullptr)
-    {
-        delete gOperationalStateDelegate;
-        gOperationalStateDelegate = nullptr;
-    }
+    return gOperationalStateDelegateTable[epIndex].get();
 }
 
 chip::Protocols::InteractionModel::Status chefOperationalStateWriteCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
@@ -210,8 +220,10 @@ chip::Protocols::InteractionModel::Status chefOperationalStateWriteCallback(chip
                                                                             uint8_t * buffer)
 {
     chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gOperationalStateInstance != nullptr);
+    gOperationalStateInstance                     = GetOperationalStateInstance(endpointId);
+    VerifyOrReturnError(gOperationalStateInstance != nullptr, chip::Protocols::InteractionModel::Status::NotFound);
+    gOperationalStateDelegate = GetOperationalStateDelegate(endpointId);
+    VerifyOrReturnError(gOperationalStateDelegate != nullptr, chip::Protocols::InteractionModel::Status::NotFound);
     chip::AttributeId attributeId = attributeMetadata->attributeId;
 
     switch (attributeId)
@@ -263,6 +275,8 @@ chip::Protocols::InteractionModel::Status chefOperationalStateReadCallback(chip:
                                                                            const EmberAfAttributeMetadata * attributeMetadata,
                                                                            uint8_t * buffer, uint16_t maxReadLength)
 {
+    gOperationalStateInstance = GetOperationalStateInstance(endpointId);
+    VerifyOrReturnError(gOperationalStateInstance != nullptr, chip::Protocols::InteractionModel::Status::NotFound);
     chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
     chip::AttributeId attributeId                 = attributeMetadata->attributeId;
     switch (attributeId)
@@ -292,18 +306,25 @@ chip::Protocols::InteractionModel::Status chefOperationalStateReadCallback(chip:
 
 void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrReturn(endpointId == 1); // this global initialiser is only for endpoint 1.
-    VerifyOrDie(gOperationalStateInstance == nullptr && gOperationalStateDelegate == nullptr);
+    uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, OperationalState::Id,
+                                                            MATTER_DM_OPERATIONAL_STATE_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (epIndex >= kOperationalStateTableSize)
+    {
+        ChipLogError(DeviceLayer,
+                     "Chef emberAfOperationalStateClusterInitCallback: Found invalid endpoint index %d for endpoint %d", epIndex,
+                     endpointId);
+        return;
+    }
 
-    gOperationalStateDelegate           = new OperationalStateDelegate;
-    EndpointId operationalStateEndpoint = 0x01;
-    gOperationalStateInstance           = new OperationalState::Instance(gOperationalStateDelegate, operationalStateEndpoint);
+    gOperationalStateDelegateTable[epIndex] = std::make_unique<OperationalStateDelegate>();
+    gOperationalStateInstanceTable[epIndex] =
+        std::make_unique<OperationalState::Instance>(gOperationalStateDelegateTable[epIndex].get(), endpointId);
+    VerifyOrLogChipError(gOperationalStateInstanceTable[epIndex]->Init());
 
-    TEMPORARY_RETURN_IGNORED gOperationalStateInstance->SetOperationalState(
-        to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    VerifyOrLogChipError(gOperationalStateInstanceTable[epIndex]->SetOperationalState(
+        to_underlying(OperationalState::OperationalStateEnum::kStopped)));
 
-    TEMPORARY_RETURN_IGNORED gOperationalStateInstance->Init();
-    ChipLogProgress(Zcl, "Registered global delegate and instance for operational state on endpoint 1.");
+    ChipLogProgress(Zcl, "Registered global delegate and instance for operational state on endpoint %d.", endpointId);
 }
 
 #endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER

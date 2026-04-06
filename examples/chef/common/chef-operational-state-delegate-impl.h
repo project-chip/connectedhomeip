@@ -146,10 +146,8 @@ public:
     }
 };
 
-Instance * GetOperationalStateInstance();
-OperationalStateDelegate * GetOperationalStateDelegate();
-
-void Shutdown();
+Instance * GetOperationalStateInstance(EndpointId endpoint);
+OperationalStateDelegate * GetOperationalStateDelegate(EndpointId endpoint);
 
 } // namespace OperationalState
 } // namespace Clusters

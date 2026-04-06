@@ -38,15 +38,9 @@ namespace Clusters {
 class ChefMicrowaveOvenDevice : public MicrowaveOvenControl::Delegate
 {
 public:
-    explicit ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint);
-
     explicit ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
                                      chip::app::Clusters::OperationalState::Instance * operationalStateInstancePtr,
                                      chip::app::Clusters::OperationalState::OperationalStateDelegate * operationalStateDelegatePtr);
-
-    ~ChefMicrowaveOvenDevice() override;
-
-    void MicrowaveOvenInit();
 
     /**
      * handle command for microwave oven control: set cooking parameters
@@ -89,7 +83,6 @@ public:
 private:
     chip::app::Clusters::OperationalState::OperationalStateDelegate * mOperationalStateDelegatePtr;
     chip::app::Clusters::OperationalState::Instance * mOperationalStateInstancePtr;
-    bool mOperationalStateObjectsOwned = false;
 
     chip::app::Clusters::ModeBase::Instance * mMicrowaveOvenModeInstancePtr;
 

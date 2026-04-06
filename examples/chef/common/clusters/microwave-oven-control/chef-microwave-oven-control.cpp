@@ -18,7 +18,9 @@
 
 #include "chef-microwave-oven-control.h"
 #include "../../CodeUtils.h"
+#include "../../DeviceTypes.h"
 #include <app/util/attribute-storage.h>
+#include <devices/Types.h>
 #include <lib/support/CHIPMem.h> // For chip::Platform
 
 using namespace chip;
@@ -34,30 +36,10 @@ using Status            = Protocols::InteractionModel::Status;
 
 #if MATTER_DM_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
-ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint)
-{
-    mOperationalStateDelegatePtr  = Platform::New<OperationalStateDelegate>();
-    mOperationalStateInstancePtr  = Platform::New<OperationalState::Instance>(mOperationalStateDelegatePtr, aClustersEndpoint);
-    mOperationalStateObjectsOwned = true;
-    mMicrowaveOvenModeInstancePtr = ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint);
-    if (mOperationalStateInstancePtr && mMicrowaveOvenModeInstancePtr)
-    {
-        mMicrowaveOvenControlInstance = std::make_unique<MicrowaveOvenControl::Instance>(
-            this, aClustersEndpoint, MicrowaveOvenControl::Id,
-            BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
-                                                   MicrowaveOvenControl::Feature::kPowerNumberLimits),
-            *mOperationalStateInstancePtr, *mMicrowaveOvenModeInstancePtr);
-        VerifyOrLogChipError(mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped)));
-        VerifyOrLogChipError(mOperationalStateInstancePtr->Init());
-        VerifyOrLogChipError(mMicrowaveOvenControlInstance->Init());
-    }
-}
-
 ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
                                                  OperationalState::Instance * operationalStateInstancePtr,
                                                  OperationalStateDelegate * operationalStateDelegatePtr) :
-    mOperationalStateDelegatePtr(operationalStateDelegatePtr),
-    mOperationalStateInstancePtr(operationalStateInstancePtr),
+    mOperationalStateDelegatePtr(operationalStateDelegatePtr), mOperationalStateInstancePtr(operationalStateInstancePtr),
     mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint))
 {
     mOperationalStateObjectsOwned = false;
@@ -69,15 +51,6 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
                                                    MicrowaveOvenControl::Feature::kPowerNumberLimits),
             *mOperationalStateInstancePtr, *mMicrowaveOvenModeInstancePtr);
         VerifyOrLogChipError(mMicrowaveOvenControlInstance->Init());
-    }
-}
-
-ChefMicrowaveOvenDevice::~ChefMicrowaveOvenDevice()
-{
-    if (mOperationalStateObjectsOwned)
-    {
-        delete mOperationalStateInstancePtr;
-        delete mOperationalStateDelegatePtr;
     }
 }
 
@@ -160,6 +133,33 @@ constexpr size_t kMicrowaveOvenDeviceSize = MATTER_DM_MICROWAVE_OVEN_CONTROL_CLU
 static_assert(kMicrowaveOvenDeviceSize <= kEmberInvalidEndpointIndex, "MicrowaveOvenDevice table size error");
 
 std::unique_ptr<ChefMicrowaveOvenDevice> gMicrowaveOvenDevice[kMicrowaveOvenDeviceSize];
+
+/**
+ * Check if endpoint is a valid MicrowaveOven device.
+ * @param endpoint Endpoint
+ * @return True if this endpoint has required bits to be a microwave device. False otherwise.
+ */
+bool checkEndpointIsValidMicrowave(EndpointId endpoint)
+{
+    if (!emberAfContainsServer(endpoint, MicrowaveOvenControl::Id))
+    {
+        return false;
+    }
+
+    if (!emberAfContainsServer(endpoint, MicrowaveOvenMode::Id))
+    {
+        return false;
+    }
+    if (!emberAfContainsServer(endpoint, OperationalState::Id))
+    {
+        return false;
+    }
+    if (!DeviceTypes::EndpointHasDeviceType(endpoint, Device::kMicrowaveOvenDeviceTypeId))
+    {
+        return false;
+    }
+    return true;
+}
 } // namespace
 
 void InitChefMicrowaveOvenControlCluster()
@@ -168,7 +168,7 @@ void InitChefMicrowaveOvenControlCluster()
     for (uint16_t i = 0; i < emberAfEndpointCount(); ++i)
     {
         EndpointId endpoint = emberAfEndpointFromIndex(i);
-        if (emberAfContainsServer(endpoint, MicrowaveOvenControl::Id))
+        if (checkEndpointIsValidMicrowave(endpoint))
         {
             uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpoint, MicrowaveOvenControl::Id, kMicrowaveOvenDeviceSize);
             if (epIndex < kMicrowaveOvenDeviceSize)
@@ -178,15 +178,8 @@ void InitChefMicrowaveOvenControlCluster()
                 {
                     continue;
                 }
-                if (endpoint == 1) // Operational state cluster objects are already registered for EP1 in ember callback.
-                {
-                    gMicrowaveOvenDevice[epIndex] = std::make_unique<ChefMicrowaveOvenDevice>(
-                        endpoint, GetOperationalStateInstance(), GetOperationalStateDelegate());
-                }
-                else
-                {
-                    gMicrowaveOvenDevice[epIndex] = std::make_unique<ChefMicrowaveOvenDevice>(endpoint);
-                }
+                gMicrowaveOvenDevice[epIndex] = std::make_unique<ChefMicrowaveOvenDevice>(
+                    endpoint, GetOperationalStateInstance(endpoint), GetOperationalStateDelegate(endpoint));
             }
         }
     }
