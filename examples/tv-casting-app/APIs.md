@@ -231,10 +231,10 @@ client's lifecycle:
         }
     ```
 
-    On Android, define a `commissioningDataProvider` that can provide the
+    On Android, define a `CommissionableDataProvider` that can provide the
     required values to the `CastingApp`. If using the `CastingPlayer` /
     Commissioner-Generated Passcode UDC feature, the Casting Client needs to
-    update this `commissioningDataProvider` during the
+    update this `CommissionableDataProvider` during the
     [verifyOrEstablishConnection()](#connect-to-a-casting-player) API call
     (described later). In the example below,
     `updateCommissionableDataSetupPasscode` updates the CommissionableData with
@@ -264,11 +264,11 @@ client's lifecycle:
       };
     ```
 
-    On iOS, add a `func commissioningDataProvider` to the
+    On iOS, add a `func commissionableDataProvider` to the
     `MCAppParametersDataSource` class defined above, that can provide the
     required values to the `MCCastingApp`. If using the `CastingPlayer` /
     Commissioner-Generated Passcode UDC feature, the Casting Client needs to
-    update this `commissioningDataProvider` during the
+    update this `commissionableDataProvider` during the
     [VerifyOrEstablishConnection()](#connect-to-a-casting-player) API call
     (described later). In the example below, the `update` function updates the
     CommissionableData with the `CastingPlayer` generated passcode entered by
@@ -459,7 +459,7 @@ int main(int argc, char * argv[]) {
 ```
 
 On Android, create an `AppParameters` object using the
-`rotatingDeviceIdUniqueIdProvider`, `commissioningDataProvider`, `dacProvider`
+`rotatingDeviceIdUniqueIdProvider`, `CommissionableDataProvider`, `dacProvider`
 and `DataProvider<ConfigurationManager>`, and call
 `CastingApp.getInstance().initialize` with it. Then, call `start` on the
 `CastingApp`
@@ -812,7 +812,7 @@ message as follows:
    was canceled.
 3. The Casting Client should then update the passcode to be used for
    commissioning session to the user-entered Passcode. Refer to how to set up
-   the `commissioningDataProvider` in
+   the `CommissionableDataProvider` in
    [Initialize the Casting Client](#initialize-the-casting-client) section
    above.
 4. Finally, the Casting Client should call `ContinueConnecting` to send a second
@@ -1933,7 +1933,7 @@ object.
                     if (cluster == null) {
                         Log.e(
                                 TAG,
-                                "Could not get ApplicationBasicCluster for endpoint with ID: " + endpoint.getId());
+                                "Could not get MediaPlaybackCluster for endpoint with ID: " + endpoint.getId());
                         return;
                     }
 
@@ -2031,3 +2031,10 @@ The Casting client can Shutdown all running Subscriptions by calling the
 [Linux](tv-casting-common/core/CastingApp.h),
 [Android](android/App/app/src/main/jni/com/matter/casting/core/CastingApp.java)
 and [iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MCCastingApp.h).
+
+## Size Analysis
+
+For details on binary size optimization and build configuration:
+
+-   [APK Size Analysis (Android)](APK_SIZE_ANALYSIS.md)
+-   [Darwin Size Analysis (iOS/macOS)](DARWIN_SIZE_ANALYSIS.md)

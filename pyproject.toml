@@ -17,6 +17,7 @@ exclude = [
     "out",
     "third_party",
     "examples/common/QRCode/",
+    "examples/tv-casting-app/tests/",
     # TODO(#37698)
     "docs/development_controllers/chip-repl/*.ipynb",
 ]

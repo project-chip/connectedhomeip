@@ -398,6 +398,7 @@ def BuildAndroidTarget():
 
     # Modifiers
     target.AppendModifier('no-debug', profile=AndroidProfile.RELEASE)
+    target.AppendModifier('size-optimized', optimize_size=True)
 
     return target
 
