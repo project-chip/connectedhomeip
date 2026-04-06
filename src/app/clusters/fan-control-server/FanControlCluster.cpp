@@ -45,17 +45,6 @@ FanControlCluster::FanControlCluster(const Config & config) :
     mDelegate(config.mDelegate)
 {}
 
-CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
-{
-    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    return CHIP_NO_ERROR;
-}
-
-void FanControlCluster::Shutdown(ClusterShutdownType shutdownType)
-{
-    DefaultServerCluster::Shutdown(shutdownType);
-}
-
 void FanControlCluster::SetFanModeToOff()
 {
     if (SetAttributeValue(mFanMode, FanModeEnum::kOff, FanMode::Id))
