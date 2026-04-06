@@ -24,7 +24,7 @@ namespace app {
 namespace Clusters {
 namespace PowerSource {
 
-PowerSourceCluster * FindClusterOnEndpoint(EndpointId id);
+MinimalWiredPowerSourceCluster * FindClusterOnEndpoint(EndpointId id);
 
 } // namespace PowerSource
 } // namespace Clusters

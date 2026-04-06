@@ -361,6 +361,111 @@ private:
     }
 };
 
+
+class MinimalWiredPowerSourceCluster : public DefaultServerCluster
+{
+public:
+
+    using PowerSourceStatusEnum    = PowerSource::PowerSourceStatusEnum;
+    using WiredCurrentTypeEnum     = PowerSource::WiredCurrentTypeEnum;
+
+    struct WiredConfiguration
+    {
+        CharSpan description{};
+        WiredCurrentTypeEnum currentType{};
+
+        // To force the user to specify these mandatory fixed attributes (taking the corresponding feature into account).
+        WiredConfiguration(CharSpan desc, WiredCurrentTypeEnum currType) : description(desc), currentType(currType) {}
+    };
+
+    MinimalWiredPowerSourceCluster(EndpointId endpointId, const WiredConfiguration & config);
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    const BitFlags<PowerSource::Feature> & Features() const { return mFeatures; }
+
+    // Getters
+
+    PowerSourceStatusEnum GetStatus() const;
+    uint8_t GetOrder() const;
+    CharSpan GetDescription() const;
+    WiredCurrentTypeEnum GetWiredCurrentType() const;
+    Span<const EndpointId> GetEndpointList() const;
+
+    // Setters
+
+    /// Some attributes' setters are private because they are marked with the `Fixed` quality,
+    /// It is possible to set them with the constructor. If it is needed to set them after construction,
+    /// a setter function named like `SetConfiguration` can be added, or separate setters can be made public.
+
+    /// `Fixed` attributes are `Description`, `WiredCurrentType`, `WiredNominalVoltage`, `WiredMaximumCurrent`, `BatReplaceability`,
+    /// `BatReplacementDescription`, `BatCommonDesignation`, `BatANSIDesignation`, `BatIECDesignation`, `BatApprovedChemistry`,
+    /// `BatCapacity` and `BatQuantity`
+
+    CHIP_ERROR SetStatus(PowerSourceStatusEnum val);
+    CHIP_ERROR SetOrder(uint8_t val);
+    CHIP_ERROR SetEndpointList(Span<const EndpointId> val);
+
+private:
+    // Setters for `Fixed` attributes
+
+    CHIP_ERROR SetDescription(CharSpan val);
+    CHIP_ERROR SetWiredCurrentType(WiredCurrentTypeEnum val);
+
+    struct WiredAttributes
+    {
+        WiredCurrentTypeEnum currentType{};
+    };
+
+    struct Attributes
+    {
+        PowerSourceStatusEnum status = PowerSourceStatusEnum::kUnspecified;
+        uint8_t order{};
+        CharSpan GetDescription() const { return CharSpan(mDescriptionBuffer, strlen(mDescriptionBuffer)); }
+        Span<const EndpointId> GetPoweredEndpoints() const
+        {
+            return Span<const EndpointId>(mPoweredEndpointsBuffer.Get(), mPoweredEndpointsCount);
+        };
+
+        char mDescriptionBuffer[PowerSource::Attributes::Description::TypeInfo::MaxLength() + 1] = { 0 };
+
+        Platform::ScopedMemoryBufferWithSize<EndpointId> mPoweredEndpointsBuffer;
+        size_t mPoweredEndpointsCount = 0;
+
+        // wired feature
+        WiredCurrentTypeEnum currentType{};
+    };
+
+    static inline BitFlags<PowerSource::Feature> WiredFeatures()
+    {
+        return BitFlags<PowerSource::Feature>(PowerSource::Feature::kWired);
+    }
+
+    // maxSize without null byte
+    CHIP_ERROR SetStringAndNotify(CharSpan val, CharSpan current, char * buffer, size_t maxSize, AttributeId id)
+    {
+        if (current.data_equal(val))
+        {
+            return CHIP_NO_ERROR; // no-op if equal
+        }
+        MutableCharSpan outbuf(buffer, maxSize);
+        auto err = CopyCharSpanToMutableCharSpan(val, outbuf);
+        ReturnErrorOnFailure(err);
+
+        buffer[val.size()] = 0; // null byte
+        NotifyAttributeChanged(id);
+        return CHIP_NO_ERROR;
+    }
+
+    const BitFlags<PowerSource::Feature> mFeatures;
+    struct Attributes mAttributes;
+};
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

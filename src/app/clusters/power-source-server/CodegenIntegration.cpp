@@ -33,10 +33,7 @@ using namespace chip::app::Clusters::PowerSource::Attributes;
 
 namespace {
 
-constexpr size_t kPowerSourceFixedClusterCount = PowerSource::StaticApplicationConfig::kFixedClusterConfig.size();
-constexpr size_t kPowerSourceMaxClusterCount   = kPowerSourceFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
-
-LazyRegisteredServerCluster<PowerSourceCluster> gServers[kPowerSourceMaxClusterCount];
+LazyRegisteredServerCluster<MinimalWiredPowerSourceCluster> gServers;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -44,7 +41,6 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        BitFlags<Feature> features(featureMap);
         using namespace chip::Protocols;
 
         // Enforce a valid configuration from ember
@@ -57,95 +53,14 @@ public:
             description.reduce_size(0);
         }
 
-        if (features.Has(Feature::kWired))
-        {
             PowerSourceCluster::WiredCurrentTypeEnum currentType;
             VerifyOrDie(WiredCurrentType::Get(endpointId, &currentType) == InteractionModel::Status::Success);
 
             PowerSourceCluster::WiredConfiguration config(description, currentType);
 
-            uint32_t nominalVoltage{};
-            if (WiredNominalVoltage::Get(endpointId, &nominalVoltage) == InteractionModel::Status::Success)
-            {
-                config.nominalVoltage = nominalVoltage;
-            }
+            gServers.Create(endpointId, config);
 
-            uint32_t maximumCurrent{};
-            if (WiredMaximumCurrent::Get(endpointId, &maximumCurrent) == InteractionModel::Status::Success)
-            {
-                config.maximumCurrent = maximumCurrent;
-            }
-
-            gServers[clusterInstanceIndex].Create(endpointId, DeviceLayer::SystemLayer(), config);
-        }
-        else if (features.Has(Feature::kBattery))
-        {
-            // default value
-            PowerSourceCluster::BatReplaceabilityEnum replaceability = PowerSourceCluster::BatReplaceabilityEnum::kUnspecified;
-
-            // try to read, if fails, default will be used
-            BatReplaceability::Get(endpointId, &replaceability);
-
-            PowerSourceCluster::BatteryConfiguration config(description, replaceability);
-
-            uint32_t capacity{};
-            if (BatCapacity::Get(endpointId, &capacity) == InteractionModel::Status::Success)
-            {
-                config.capacity = capacity;
-            }
-
-            if (features.Has(Feature::kReplaceable))
-            {
-                char replacementDescriptionBuffer[BatReplacementDescription::TypeInfo::MaxLength()];
-                MutableCharSpan replacementDescription(replacementDescriptionBuffer);
-                VerifyOrDie(BatReplacementDescription::Get(endpointId, replacementDescription) ==
-                            InteractionModel::Status::Success);
-
-                uint8_t quantity;
-                VerifyOrDie(BatQuantity::Get(endpointId, &quantity) == InteractionModel::Status::Success);
-
-                config.MakeReplaceable(replacementDescription, quantity);
-
-                PowerSourceCluster::BatCommonDesignationEnum commonDesignation{};
-                if (BatCommonDesignation::Get(endpointId, &commonDesignation) == InteractionModel::Status::Success)
-                {
-                    config.commonDesignation = commonDesignation;
-                }
-
-                char ansiDesignationBuffer[BatANSIDesignation::TypeInfo::MaxLength()];
-                MutableCharSpan ansiDesignation(ansiDesignationBuffer);
-                if (BatANSIDesignation::Get(endpointId, ansiDesignation) == InteractionModel::Status::Success)
-                {
-                    config.ansiDesignation = ansiDesignation;
-                }
-
-                char iecDesignationBuffer[BatIECDesignation::TypeInfo::MaxLength()];
-                MutableCharSpan iecDesignation(iecDesignationBuffer);
-                if (BatIECDesignation::Get(endpointId, iecDesignation) == InteractionModel::Status::Success)
-                {
-                    config.iecDesignation = iecDesignation;
-                }
-
-                PowerSourceCluster::BatApprovedChemistryEnum approvedChemistry{};
-                if (BatApprovedChemistry::Get(endpointId, &approvedChemistry) == InteractionModel::Status::Success)
-                {
-                    config.approvedChemistry = approvedChemistry;
-                }
-            }
-            if (features.Has(Feature::kRechargeable))
-            {
-                config.MakeRechargeable();
-            }
-            gServers[clusterInstanceIndex].Create(endpointId, DeviceLayer::SystemLayer(), config);
-        }
-        else
-        {
-            // power source is not wired and is not battery, this is invalid, so we should die
-            // using `VerifyOrDieWitMsg` to print a proper log and die with one line
-            VerifyOrDieWithMsg(false, Zcl, "Invalid FeatureMap from ember for the PowerSource cluster");
-        }
-
-        PowerSourceCluster & cluster = gServers[clusterInstanceIndex].Cluster();
+        MinimalWiredPowerSourceCluster & cluster = gServers.Cluster();
 
         // Get all set defaults for attributes from ember.
 
@@ -178,35 +93,21 @@ public:
 
         SetAttributeDefaultFromEmber(PowerSourceCluster::PowerSourceStatusEnum, Status);
         SetAttributeDefaultFromEmber(uint8_t, Order);
-        SetNullableAttributeDefaultFromEmber(uint32_t, WiredAssessedInputVoltage);
-        SetNullableAttributeDefaultFromEmber(uint16_t, WiredAssessedInputFrequency);
-        SetNullableAttributeDefaultFromEmber(uint32_t, WiredAssessedCurrent);
-        SetAttributeDefaultFromEmber(bool, WiredPresent);
-        SetNullableAttributeDefaultFromEmber(uint32_t, BatVoltage);
-        SetNullableAttributeDefaultFromEmber(uint8_t, BatPercentRemaining);
-        SetNullableAttributeDefaultFromEmber(uint32_t, BatTimeRemaining);
-        SetAttributeDefaultFromEmber(PowerSourceCluster::BatChargeLevelEnum, BatChargeLevel);
-        SetAttributeDefaultFromEmber(bool, BatReplacementNeeded);
-        SetAttributeDefaultFromEmber(bool, BatPresent);
-        SetAttributeDefaultFromEmber(PowerSourceCluster::BatChargeStateEnum, BatChargeState);
-        SetNullableAttributeDefaultFromEmber(uint32_t, BatTimeToFullCharge);
-        SetAttributeDefaultFromEmber(bool, BatFunctionalWhileCharging);
-        SetNullableAttributeDefaultFromEmber(uint32_t, BatChargingCurrent);
 
 #undef DieIfInvalidValue
 #undef SetAttributeDefaultFromEmber
 #undef SetNullableAttributeDefaultFromEmber
 
-        return gServers[clusterInstanceIndex].Registration();
+        return gServers.Registration();
     }
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
     {
-        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
-        return &gServers[clusterInstanceIndex].Cluster();
+        VerifyOrReturnValue(gServers.IsConstructed(), nullptr);
+        return &gServers.Cluster();
     }
 
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers.Destroy(); }
 };
 
 } // namespace
@@ -219,9 +120,9 @@ void MatterPowerSourceClusterInitCallback(EndpointId endpointId)
         {
             .endpointId                = endpointId,
             .clusterId                 = PowerSource::Id,
-            .fixedClusterInstanceCount = kPowerSourceFixedClusterCount,
-            .maxClusterInstanceCount   = kPowerSourceMaxClusterCount,
-            .fetchFeatureMap           = true,
+            .fixedClusterInstanceCount = 1,
+            .maxClusterInstanceCount   = 1,
+            .fetchFeatureMap           = false,
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
@@ -235,8 +136,8 @@ void MatterPowerSourceClusterShutdownCallback(EndpointId endpointId, MatterClust
         {
             .endpointId                = endpointId,
             .clusterId                 = PowerSource::Id,
-            .fixedClusterInstanceCount = kPowerSourceFixedClusterCount,
-            .maxClusterInstanceCount   = kPowerSourceMaxClusterCount,
+            .fixedClusterInstanceCount = 1,
+            .maxClusterInstanceCount   = 1,
         },
         integrationDelegate, shutdownType);
 }
@@ -245,7 +146,7 @@ void MatterPowerSourcePluginServerInitCallback() {}
 
 namespace chip::app::Clusters::PowerSource {
 
-PowerSourceCluster * FindClusterOnEndpoint(EndpointId endpointId)
+MinimalWiredPowerSourceCluster * FindClusterOnEndpoint(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -253,12 +154,12 @@ PowerSourceCluster * FindClusterOnEndpoint(EndpointId endpointId)
         {
             .endpointId                = endpointId,
             .clusterId                 = PowerSource::Id,
-            .fixedClusterInstanceCount = kPowerSourceFixedClusterCount,
-            .maxClusterInstanceCount   = kPowerSourceMaxClusterCount,
+            .fixedClusterInstanceCount = 1,
+            .maxClusterInstanceCount   = 1,
         },
         integrationDelegate);
 
-    return static_cast<PowerSourceCluster *>(powerSource);
+    return static_cast<MinimalWiredPowerSourceCluster *>(powerSource);
 }
 
 } // namespace chip::app::Clusters::PowerSource

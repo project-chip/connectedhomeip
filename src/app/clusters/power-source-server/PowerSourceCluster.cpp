@@ -1081,3 +1081,150 @@ CHIP_ERROR PowerSourceCluster::SetBatQuantity(uint8_t val)
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+MinimalWiredPowerSourceCluster::MinimalWiredPowerSourceCluster(EndpointId endpointId, const WiredConfiguration & config) :
+    DefaultServerCluster({ endpointId, PowerSource::Id }), mFeatures(WiredFeatures())
+{
+    CHIP_ERROR err;
+
+    // mandatory attributes marked `Fixed` when `kWired` features is set
+    VerifyOrDieWithMsg((err = SetDescription(config.description)) == CHIP_NO_ERROR, Zcl,
+                       "Can't set the attribute `Description`, error: %" CHIP_ERROR_FORMAT, err.Format());
+    VerifyOrDieWithMsg((err = SetWiredCurrentType(config.currentType)) == CHIP_NO_ERROR, Zcl,
+                       "Can't set the attribute `WiredCurrentType`, error: %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+CHIP_ERROR MinimalWiredPowerSourceCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    // the `Order` attribute is marked as `Persistent`.
+    uint8_t order;
+
+    AttributePersistence attributePersistence(context.attributeStorage);
+    if (attributePersistence.LoadNativeEndianValue<uint8_t>({ mPath.mEndpointId, mPath.mClusterId, Order::Id }, order, 0))
+    {
+        ReturnErrorOnFailure(SetOrder(order));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+DataModel::ActionReturnStatus MinimalWiredPowerSourceCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                AttributeValueEncoder & encoder)
+{
+    using namespace PowerSource::Attributes;
+    // `ReadAttribute` is guaranteed to only be called for attributes that are supported by the cluster, so the code below is valid.
+    switch (request.path.mAttributeId)
+    {
+    case Status::Id:
+        return encoder.Encode(mAttributes.status);
+    case Order::Id:
+        return encoder.Encode(mAttributes.order);
+    case Description::Id:
+        return encoder.Encode(mAttributes.GetDescription());
+    case WiredCurrentType::Id:
+        return encoder.Encode(mAttributes.currentType);
+    case EndpointList::Id:
+        return EncodeListOfValues(encoder, mAttributes.GetPoweredEndpoints());
+    case Globals::Attributes::FeatureMap::Id:
+        return encoder.Encode(Features());
+    case Globals::Attributes::ClusterRevision::Id:
+        return encoder.Encode(kRevision);
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
+}
+
+CHIP_ERROR MinimalWiredPowerSourceCluster::Attributes(const ConcreteClusterPath & path,
+                                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    constexpr DataModel::AttributeEntry kOptionalAttributes[] = { WiredCurrentType::kMetadataEntry };
+
+    AttributeSet optAttributeSet(OptionalAttributeSet<WiredCurrentType::Id>::All());
+
+    AttributeListBuilder attributeListBuilder(builder);
+
+    return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(kOptionalAttributes), optAttributeSet);
+}
+
+MinimalWiredPowerSourceCluster::PowerSourceStatusEnum MinimalWiredPowerSourceCluster::GetStatus() const
+{
+    return mAttributes.status;
+}
+
+uint8_t MinimalWiredPowerSourceCluster::GetOrder() const
+{
+    return mAttributes.order;
+}
+
+CharSpan MinimalWiredPowerSourceCluster::GetDescription() const
+{
+    return mAttributes.GetDescription();
+}
+
+MinimalWiredPowerSourceCluster::WiredCurrentTypeEnum MinimalWiredPowerSourceCluster::GetWiredCurrentType() const
+{
+    return mAttributes.currentType;
+}
+
+Span<const EndpointId> MinimalWiredPowerSourceCluster::GetEndpointList() const
+{
+    return mAttributes.GetPoweredEndpoints();
+}
+
+CHIP_ERROR MinimalWiredPowerSourceCluster::SetStatus(PowerSourceStatusEnum val)
+{
+    SetAttributeValue(mAttributes.status, val, Status::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MinimalWiredPowerSourceCluster::SetOrder(uint8_t val)
+{
+    // This attribute is marked as `Persistent`.
+    if (mContext != nullptr && val != mAttributes.order)
+    {
+        AttributePersistence attributePersistence(mContext->attributeStorage);
+
+        attributePersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, Order::Id }, val);
+    }
+
+    SetAttributeValue(mAttributes.order, val, Order::Id);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MinimalWiredPowerSourceCluster::SetEndpointList(Span<const EndpointId> val)
+{
+    if (mAttributes.GetPoweredEndpoints().data_equal(val))
+    {
+        return CHIP_NO_ERROR; // no-op if equal
+    }
+
+    if (val.size() > mAttributes.mPoweredEndpointsBuffer.AllocatedSize())
+    {
+        mAttributes.mPoweredEndpointsBuffer.Calloc(val.size());
+    }
+
+    mAttributes.mPoweredEndpointsCount = val.size();
+
+    std::copy(val.begin(), val.end(), mAttributes.mPoweredEndpointsBuffer.Get());
+    NotifyAttributeChanged(EndpointList::Id);
+    return CHIP_NO_ERROR;
+}
+
+// Private setter implementations for Fixed attributes
+
+CHIP_ERROR MinimalWiredPowerSourceCluster::SetDescription(CharSpan val)
+{
+    VerifyOrReturnError(val.size() <= Description::TypeInfo::MaxLength(), CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    return SetStringAndNotify(val, mAttributes.GetDescription(), mAttributes.mDescriptionBuffer, Description::TypeInfo::MaxLength(),
+                              Description::Id);
+}
+
+CHIP_ERROR MinimalWiredPowerSourceCluster::SetWiredCurrentType(WiredCurrentTypeEnum val)
+{
+    SetAttributeValue(mAttributes.currentType, val, WiredCurrentType::Id);
+    return CHIP_NO_ERROR;
+}
