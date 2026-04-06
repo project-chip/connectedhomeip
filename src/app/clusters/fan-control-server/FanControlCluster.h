@@ -172,6 +172,8 @@ private:
 
     void StoreFanModePersistence();
 
+    void NotifyDelegateFanDriveState();
+
     // Attributes
     FanControl::FanModeEnum mFanMode = FanControl::FanModeEnum::kOff;
     FanControl::FanModeSequenceEnum mFanModeSequence;

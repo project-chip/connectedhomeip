@@ -19,8 +19,10 @@
 #pragma once
 
 #include <app/CommandResponseHelper.h>
+#include <app/data-model/Nullable.h>
 #include <clusters/FanControl/Enums.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/BitMask.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -47,11 +49,16 @@ public:
      */
     virtual Protocols::InteractionModel::Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) = 0;
 
-    /**
-     * Called after FanMode has been restored from non-volatile storage during cluster startup (or left at defaults if none was
-     * stored). Applications should align physical fan hardware with the cluster state.
-     */
     virtual void OnPersistenceRestored() {}
+
+    virtual void OnFanModeChanged(FanModeEnum newValue) {}
+    virtual void OnPercentSettingChanged(DataModel::Nullable<chip::Percent> newValue) {}
+    virtual void OnPercentCurrentChanged(chip::Percent newValue) {}
+    virtual void OnSpeedSettingChanged(DataModel::Nullable<uint8_t> newValue) {}
+    virtual void OnSpeedCurrentChanged(uint8_t newValue) {}
+    virtual void OnRockSettingChanged(BitMask<RockBitmap> newValue) {}
+    virtual void OnWindSettingChanged(BitMask<WindBitmap> newValue) {}
+    virtual void OnAirflowDirectionChanged(AirflowDirectionEnum newValue) {}
 
     Delegate(EndpointId aEndpoint) : mEndpoint(aEndpoint) {}
 

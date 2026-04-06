@@ -71,6 +71,27 @@ public:
     void OnPersistenceRestored() override { mPersistenceRestoreCount++; }
 };
 
+class NotifyingFanControlDelegate : public FanControl::Delegate
+{
+public:
+    int mPercentSettingNotifyCount = 0;
+    int mRockSettingNotifyCount    = 0;
+
+    NotifyingFanControlDelegate(EndpointId endpoint) : Delegate(endpoint) {}
+
+    Protocols::InteractionModel::Status HandleStep(StepDirectionEnum, bool, bool) override
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
+
+    void OnPercentSettingChanged(DataModel::Nullable<chip::Percent>) override { mPercentSettingNotifyCount++; }
+    void OnRockSettingChanged(BitMask<RockBitmap> newValue) override
+    {
+        (void) newValue;
+        mRockSettingNotifyCount++;
+    }
+};
+
 FanControlCluster::Config MakeTestConfig()
 {
     return FanControlCluster::Config(kTestEndpointId, &gTestDelegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh);
@@ -164,6 +185,12 @@ using TestFanControlClusterWithWind              = TestFanControlClusterFixture<
 using TestFanControlClusterWithAirflowDirection  = TestFanControlClusterFixture<MakeTestConfigWithAirflowDirection>;
 
 struct TestFanControlPersistence : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+struct TestFanControlDelegateCallbacks : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
@@ -636,4 +663,40 @@ TEST_F(TestFanControlClusterWithAirflowDirection, SetAirflowDirection_ReturnsCon
 
     auto status = tester.WriteAttribute(FanControl::Attributes::AirflowDirection::Id, AirflowDirectionEnum::kUnknownEnumValue);
     EXPECT_EQ(status, Protocols::InteractionModel::Status::ConstraintError);
+}
+
+TEST_F(TestFanControlDelegateCallbacks, WritePercentSetting_NotifiesDelegate)
+{
+    TestServerClusterContext testContext;
+    NotifyingFanControlDelegate delegate(kTestEndpointId);
+    FanControlCluster cluster(
+        FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    delegate.mPercentSettingNotifyCount = 0;
+
+    ClusterTester tester(cluster);
+    DataModel::Nullable<chip::Percent> percentSetting;
+    percentSetting.SetNonNull(40);
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::PercentSetting::Id, percentSetting), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.mPercentSettingNotifyCount, 1);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestFanControlDelegateCallbacks, WriteRockSetting_NotifiesDelegate)
+{
+    TestServerClusterContext testContext;
+    NotifyingFanControlDelegate delegate(kTestEndpointId);
+    FanControlCluster cluster(FanControlCluster::Config(kTestEndpointId, &delegate)
+                                  .WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh)
+                                  .WithRockSupport(BitMask<RockBitmap>(RockBitmap::kRockLeftRight)));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    delegate.mRockSettingNotifyCount = 0;
+
+    ClusterTester tester(cluster);
+    BitMask<RockBitmap> rockSetting(RockBitmap::kRockLeftRight);
+    ASSERT_EQ(tester.WriteAttribute(FanControl::Attributes::RockSetting::Id, rockSetting), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.mRockSettingNotifyCount, 1);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

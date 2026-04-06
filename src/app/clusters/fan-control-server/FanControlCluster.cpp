@@ -46,6 +46,22 @@ FanControlCluster::FanControlCluster(const Config & config) :
     mDelegate(config.mDelegate)
 {}
 
+void FanControlCluster::NotifyDelegateFanDriveState()
+{
+    if (mDelegate == nullptr)
+    {
+        return;
+    }
+    mDelegate->OnFanModeChanged(mFanMode);
+    mDelegate->OnPercentSettingChanged(mPercentSetting);
+    mDelegate->OnPercentCurrentChanged(mPercentCurrent);
+    if (SupportsMultiSpeed())
+    {
+        mDelegate->OnSpeedSettingChanged(mSpeedSetting);
+        mDelegate->OnSpeedCurrentChanged(mSpeedCurrent);
+    }
+}
+
 CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
@@ -81,6 +97,7 @@ void FanControlCluster::SetFanModeToOff()
     {
         ApplyFanModeOffSideEffects();
         StoreFanModePersistence();
+        NotifyDelegateFanDriveState();
     }
 }
 
@@ -469,6 +486,8 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
 
     StoreFanModePersistence();
 
+    NotifyDelegateFanDriveState();
+
     return Status::Success;
 }
 
@@ -490,6 +509,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
     {
         NotifyAttributeChanged(PercentCurrent::Id);
     }
+    NotifyDelegateFanDriveState();
     return Status::Success;
 }
 
@@ -511,6 +531,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Null
     {
         NotifyAttributeChanged(SpeedCurrent::Id);
     }
+    NotifyDelegateFanDriveState();
     return Status::Success;
 }
 
@@ -523,7 +544,14 @@ DataModel::ActionReturnStatus FanControlCluster::SetRockSetting(BitMask<RockBitm
         return Status::ConstraintError;
     }
 
-    SetAttributeValue(mRockSetting, value, RockSetting::Id);
+    if (!SetAttributeValue(mRockSetting, value, RockSetting::Id))
+    {
+        return Status::Success;
+    }
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnRockSettingChanged(mRockSetting);
+    }
     return Status::Success;
 }
 
@@ -536,7 +564,14 @@ DataModel::ActionReturnStatus FanControlCluster::SetWindSetting(BitMask<WindBitm
         return Status::ConstraintError;
     }
 
-    SetAttributeValue(mWindSetting, value, WindSetting::Id);
+    if (!SetAttributeValue(mWindSetting, value, WindSetting::Id))
+    {
+        return Status::Success;
+    }
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnWindSettingChanged(mWindSetting);
+    }
     return Status::Success;
 }
 
@@ -547,7 +582,14 @@ DataModel::ActionReturnStatus FanControlCluster::SetAirflowDirection(AirflowDire
         return Status::ConstraintError;
     }
 
-    SetAttributeValue(mAirflowDirection, value, AirflowDirection::Id);
+    if (!SetAttributeValue(mAirflowDirection, value, AirflowDirection::Id))
+    {
+        return Status::Success;
+    }
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnAirflowDirectionChanged(mAirflowDirection);
+    }
     return Status::Success;
 }
 
@@ -590,6 +632,8 @@ void FanControlCluster::SetOnOffState(bool isOn)
             }
         }
     }
+
+    NotifyDelegateFanDriveState();
 }
 
 void FanControlCluster::StoreFanModePersistence()
