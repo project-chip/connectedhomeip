@@ -17,6 +17,7 @@
 
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/clusters/fan-control-server/fan-control-delegate.h>
+#include <app/ConcreteAttributePath.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <pw_unit_test/framework.h>
 
@@ -28,6 +29,8 @@
 #include <clusters/FanControl/Commands.h>
 #include <clusters/FanControl/Enums.h>
 #include <clusters/FanControl/Metadata.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/Span.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -52,6 +55,21 @@ public:
 };
 
 TestFanControlDelegate gTestDelegate(kTestEndpointId);
+
+class CountingFanControlDelegate : public FanControl::Delegate
+{
+public:
+    int mPersistenceRestoreCount = 0;
+
+    CountingFanControlDelegate(EndpointId endpoint) : Delegate(endpoint) {}
+
+    Protocols::InteractionModel::Status HandleStep(StepDirectionEnum, bool, bool) override
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
+
+    void OnPersistenceRestored() override { mPersistenceRestoreCount++; }
+};
 
 FanControlCluster::Config MakeTestConfig()
 {
@@ -123,8 +141,8 @@ FanControlCluster::Config MakeTestConfigWithAirflowDirection()
 template <FanControlCluster::Config (*ConfigFn)()>
 struct TestFanControlClusterFixture : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     void SetUp() override { ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR); }
     void TearDown() override { cluster.Shutdown(ClusterShutdownType::kClusterShutdown); }
@@ -145,7 +163,58 @@ using TestFanControlClusterWithRocking           = TestFanControlClusterFixture<
 using TestFanControlClusterWithWind              = TestFanControlClusterFixture<MakeTestConfigWithWind>;
 using TestFanControlClusterWithAirflowDirection  = TestFanControlClusterFixture<MakeTestConfigWithAirflowDirection>;
 
+struct TestFanControlPersistence : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
 } // namespace
+
+TEST_F(TestFanControlPersistence, StartupRestoresFanModeFromStorage)
+{
+    TestServerClusterContext ctx;
+    FanModeEnum stored = FanModeEnum::kHigh;
+    ConcreteAttributePath path(kTestEndpointId, FanControl::Id, FanControl::Attributes::FanMode::Id);
+    ASSERT_EQ(ctx.AttributePersistenceProvider().WriteValue(
+                    path, ByteSpan(reinterpret_cast<const uint8_t *>(&stored), sizeof(stored))),
+                CHIP_NO_ERROR);
+
+    CountingFanControlDelegate delegate(kTestEndpointId);
+    FanControlCluster cluster(
+        FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffLowHigh));
+    ASSERT_EQ(cluster.Startup(ctx.Get()), CHIP_NO_ERROR);
+    EXPECT_EQ(delegate.mPersistenceRestoreCount, 1);
+
+    ClusterTester tester(cluster);
+    FanModeEnum readMode = FanModeEnum::kOff;
+    ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, readMode), CHIP_NO_ERROR);
+    EXPECT_EQ(readMode, FanModeEnum::kHigh);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestFanControlPersistence, StartupInvalidPersistedFanMode_FallsBackToOff)
+{
+    TestServerClusterContext ctx;
+    FanModeEnum stored = FanModeEnum::kLow;
+    ConcreteAttributePath path(kTestEndpointId, FanControl::Id, FanControl::Attributes::FanMode::Id);
+    ASSERT_EQ(ctx.AttributePersistenceProvider().WriteValue(
+                    path, ByteSpan(reinterpret_cast<const uint8_t *>(&stored), sizeof(stored))),
+                CHIP_NO_ERROR);
+
+    CountingFanControlDelegate delegate(kTestEndpointId);
+    FanControlCluster cluster(
+        FanControlCluster::Config(kTestEndpointId, &delegate).WithFanModeSequence(FanModeSequenceEnum::kOffHigh));
+    ASSERT_EQ(cluster.Startup(ctx.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    FanModeEnum readMode = FanModeEnum::kHigh;
+    ASSERT_EQ(tester.ReadAttribute(FanControl::Attributes::FanMode::Id, readMode), CHIP_NO_ERROR);
+    EXPECT_EQ(readMode, FanModeEnum::kOff);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
 
 TEST_F(TestFanControlCluster, AttributeList)
 {

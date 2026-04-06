@@ -16,6 +16,7 @@
  */
 
 #include <app/clusters/fan-control-server/FanControlCluster.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/FanControl/Attributes.h>
 #include <clusters/FanControl/Commands.h>
@@ -45,11 +46,41 @@ FanControlCluster::FanControlCluster(const Config & config) :
     mDelegate(config.mDelegate)
 {}
 
+CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    AttributePersistence attrPersistence{ context.attributeStorage };
+    FanModeEnum restoredFanMode = mFanMode;
+    attrPersistence.LoadNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, FanControl::Id, FanMode::Id), restoredFanMode, mFanMode);
+
+    if (EnsureKnownEnumValue(restoredFanMode) == FanModeEnum::kUnknownEnumValue)
+    {
+        restoredFanMode = mFanMode;
+    }
+
+    DataModel::ActionReturnStatus status = SetFanMode(restoredFanMode);
+    if (!status.IsSuccess())
+    {
+        status = SetFanMode(FanModeEnum::kOff);
+    }
+    VerifyOrReturnError(status.IsSuccess(), CHIP_ERROR_INTERNAL);
+
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnPersistenceRestored();
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 void FanControlCluster::SetFanModeToOff()
 {
     if (SetAttributeValue(mFanMode, FanModeEnum::kOff, FanMode::Id))
     {
         ApplyFanModeOffSideEffects();
+        StoreFanModePersistence();
     }
 }
 
@@ -180,7 +211,10 @@ void FanControlCluster::ApplyPercentSettingChanged()
     }
 
     FanModeEnum newMode = ComputeFanModeFromPercent(mPercentSetting.Value(), mFanModeSequence);
-    SetAttributeValue(mFanMode, newMode, FanMode::Id);
+    if (SetAttributeValue(mFanMode, newMode, FanMode::Id))
+    {
+        StoreFanModePersistence();
+    }
 
     if (SupportsMultiSpeed())
     {
@@ -223,7 +257,10 @@ void FanControlCluster::ApplySpeedSettingChanged()
     SetAttributeValue(mPercentSetting, DataModel::MakeNullable(percent), PercentSetting::Id);
 
     FanModeEnum newMode = ComputeFanModeFromPercent(percent, mFanModeSequence);
-    SetAttributeValue(mFanMode, newMode, FanMode::Id);
+    if (SetAttributeValue(mFanMode, newMode, FanMode::Id))
+    {
+        StoreFanModePersistence();
+    }
 
     VerifyOrReturn(mIsOnOffOn);
 
@@ -430,6 +467,8 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
         ApplyFanModeAutoSideEffects();
     }
 
+    StoreFanModePersistence();
+
     return NotifyAttributeChangedIfSuccess(FanMode::Id, Status::Success);
 }
 
@@ -545,9 +584,21 @@ void FanControlCluster::SetOnOffState(bool isOn)
         {
             const FanModeEnum newMode = mPercentSetting.IsNull() ? (SupportsAuto() ? FanModeEnum::kAuto : FanModeEnum::kHigh)
                                                                  : ComputeFanModeFromPercent(mPercentCurrent, mFanModeSequence);
-            SetAttributeValue(mFanMode, newMode, FanMode::Id);
+            if (SetAttributeValue(mFanMode, newMode, FanMode::Id))
+            {
+                StoreFanModePersistence();
+            }
         }
     }
+}
+
+void FanControlCluster::StoreFanModePersistence()
+{
+    VerifyOrReturn(mContext != nullptr);
+    const FanModeEnum value = mFanMode;
+    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
+        ConcreteAttributePath(mPath.mEndpointId, FanControl::Id, FanMode::Id),
+        ByteSpan(reinterpret_cast<const uint8_t *>(&value), sizeof(value))));
 }
 
 void FanControlCluster::SetDelegate(FanControl::Delegate * delegate)

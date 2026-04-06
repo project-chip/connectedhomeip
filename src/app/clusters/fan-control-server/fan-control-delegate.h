@@ -47,6 +47,12 @@ public:
      */
     virtual Protocols::InteractionModel::Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) = 0;
 
+    /**
+     * Called after FanMode has been restored from non-volatile storage during cluster startup (or left at defaults if none was
+     * stored). Applications should align physical fan hardware with the cluster state.
+     */
+    virtual void OnPersistenceRestored() {}
+
     Delegate(EndpointId aEndpoint) : mEndpoint(aEndpoint) {}
 
     virtual ~Delegate() = default;
