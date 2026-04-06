@@ -52,8 +52,8 @@ static_assert(kWindowCoveringDelegateTableSize <= kEmberInvalidEndpointIndex, "W
 
 WindowCoveringCluster(EndpointId endpointId, BitFlags<WindowCovering::Feature> features,
                       OptionalAttributeSet & optionalAttributeSet, StartupConfig & config) :
-    DefaultServerCluster(ConcreteClusterPath(EndpointId, WindowCovering::Id)), mFeatures(features),
-    mOptionalAttributes(optionalAttributeSet)
+    DefaultServerCluster(ConcreteClusterPath(EndpointId, WindowCovering::Id)),
+    mFeatures(features), mOptionalAttributes(optionalAttributeSet)
 {}
 
 Delegate * gDelegateTable[kWindowCoveringDelegateTableSize] = { nullptr };
