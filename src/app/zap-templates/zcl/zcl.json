@@ -326,9 +326,7 @@
             "OverrunCount",
             "ClusterRevision"
         ],
-        "Fan Control": [
-            "ClusterRevision"
-        ],
+        "Fan Control": ["ClusterRevision"],
         "General Commissioning": [
             "FeatureMap",
             "ClusterRevision",
