@@ -260,52 +260,20 @@ DataModel::ActionReturnStatus FanControlCluster::ReadAttribute(const DataModel::
     case PercentCurrent::Id:
         return encoder.Encode(mPercentCurrent);
     case SpeedMax::Id:
-        if (!SupportsMultiSpeed())
-        {
-            return Status::UnsupportedAttribute;
-        }
         return encoder.Encode(mSpeedMax);
     case SpeedSetting::Id:
-        if (!SupportsMultiSpeed())
-        {
-            return Status::UnsupportedAttribute;
-        }
         return encoder.Encode(mSpeedSetting);
     case SpeedCurrent::Id:
-        if (!SupportsMultiSpeed())
-        {
-            return Status::UnsupportedAttribute;
-        }
         return encoder.Encode(mSpeedCurrent);
     case RockSupport::Id:
-        if (!SupportsRocking())
-        {
-            return Status::UnsupportedAttribute;
-        }
         return encoder.Encode(mRockSupport);
     case RockSetting::Id:
-        if (!SupportsRocking())
-        {
-            return Status::UnsupportedAttribute;
-        }
         return encoder.Encode(mRockSetting);
     case WindSupport::Id:
-        if (!SupportsWind())
-        {
-            return Status::UnsupportedAttribute;
-        }
         return encoder.Encode(mWindSupport);
     case WindSetting::Id:
-        if (!SupportsWind())
-        {
-            return Status::UnsupportedAttribute;
-        }
         return encoder.Encode(mWindSetting);
     case AirflowDirection::Id:
-        if (!SupportsAirflowDirection())
-        {
-            return Status::UnsupportedAttribute;
-        }
         return encoder.Encode(mAirflowDirection);
     default:
         return Status::UnsupportedAttribute;
@@ -347,15 +315,6 @@ DataModel::ActionReturnStatus FanControlCluster::WriteAttribute(const DataModel:
         ReturnErrorOnFailure(decoder.Decode(value));
         return SetAirflowDirection(value);
     }
-    case Globals::Attributes::ClusterRevision::Id:
-    case Globals::Attributes::FeatureMap::Id:
-    case FanModeSequence::Id:
-    case PercentCurrent::Id:
-    case SpeedMax::Id:
-    case SpeedCurrent::Id:
-    case RockSupport::Id:
-    case WindSupport::Id:
-        return Status::UnsupportedWrite;
     default:
         return Status::UnsupportedAttribute;
     }
@@ -396,11 +355,6 @@ std::optional<DataModel::ActionReturnStatus> FanControlCluster::InvokeCommand(co
     switch (request.path.mCommandId)
     {
     case Commands::Step::Id: {
-        if (!SupportsStep())
-        {
-            return Status::UnsupportedCommand;
-        }
-
         Commands::Step::DecodableType commandData;
         VerifyOrReturnError(DataModel::Decode(input_arguments, commandData) == CHIP_NO_ERROR, Status::InvalidCommand);
 
@@ -513,11 +467,6 @@ DataModel::ActionReturnStatus FanControlCluster::SetPercentSetting(DataModel::Nu
 
 DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Nullable<uint8_t> value)
 {
-    if (!SupportsMultiSpeed())
-    {
-        return Status::UnsupportedAttribute;
-    }
-
     if (value.IsNull())
     {
         return Status::InvalidInState;
@@ -539,11 +488,6 @@ DataModel::ActionReturnStatus FanControlCluster::SetSpeedSetting(DataModel::Null
 
 DataModel::ActionReturnStatus FanControlCluster::SetRockSetting(BitMask<RockBitmap> value)
 {
-    if (!SupportsRocking())
-    {
-        return Status::UnsupportedAttribute;
-    }
-
     uint8_t rawValue   = value.Raw();
     uint8_t rawSupport = mRockSupport.Raw();
     if ((rawValue & rawSupport) != rawValue)
@@ -557,11 +501,6 @@ DataModel::ActionReturnStatus FanControlCluster::SetRockSetting(BitMask<RockBitm
 
 DataModel::ActionReturnStatus FanControlCluster::SetWindSetting(BitMask<WindBitmap> value)
 {
-    if (!SupportsWind())
-    {
-        return Status::UnsupportedAttribute;
-    }
-
     uint8_t rawValue   = value.Raw();
     uint8_t rawSupport = mWindSupport.Raw();
     if ((rawValue & rawSupport) != rawValue)
@@ -575,10 +514,6 @@ DataModel::ActionReturnStatus FanControlCluster::SetWindSetting(BitMask<WindBitm
 
 DataModel::ActionReturnStatus FanControlCluster::SetAirflowDirection(AirflowDirectionEnum value)
 {
-    if (!SupportsAirflowDirection())
-    {
-        return Status::UnsupportedAttribute;
-    }
     if (EnsureKnownEnumValue(value) == AirflowDirectionEnum::kUnknownEnumValue)
     {
         return Status::ConstraintError;
