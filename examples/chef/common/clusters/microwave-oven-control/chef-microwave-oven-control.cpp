@@ -47,16 +47,17 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
         // In chef-operational-state-delegate-impl.cpp instance and delegate for EP1 are already registered in ember callback.
         mOperationalStateDelegatePtr.reset();
         mOperationalStateDelegatePtr = std::unique_ptr<OperationalStateDelegate>(GetOperationalStateDelegate());
-        VerifyOrDieWithMsg(mOperationalStateDelegatePtr != nullptr,
+        VerifyOrDieWithMsg(mOperationalStateDelegatePtr != nullptr, Zcl,
                            "Did not find global operational state delegate for endpoint 1");
         mOperationalStateInstancePtr.reset();
         mOperationalStateInstancePtr = std::unique_ptr<OperationalState::Instance>(GetOperationalStateInstance());
-        VerifyOrDieWithMsg(mOperationalStateInstancePtr != nullptr,
+        VerifyOrDieWithMsg(mOperationalStateInstancePtr != nullptr, Zcl,
                            "Did not find global operational state instance for endpoint 1");
     }
     else
     {
-        mOperationalStateInstancePtr->Init();
+        VerifyOrDieWithMsg(mOperationalStateInstancePtr->Init() == CHIP_NO_ERROR, Zcl,
+                           "Failed to initialise operational state instance on Endpoind: %d", aClustersEndpoint);
     }
     VerifyOrDie(mMicrowaveOvenModeInstancePtr != nullptr);
     TEMPORARY_RETURN_IGNORED mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
