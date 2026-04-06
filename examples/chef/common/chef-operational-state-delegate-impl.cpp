@@ -303,6 +303,7 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
         to_underlying(OperationalState::OperationalStateEnum::kStopped));
 
     TEMPORARY_RETURN_IGNORED gOperationalStateInstance->Init();
+    ChipLogProgress(Zcl, "Registered global delegate and instance for operational state on endpoint 1.");
 }
 
 #endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER

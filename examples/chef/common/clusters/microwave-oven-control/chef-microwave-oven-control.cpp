@@ -45,6 +45,8 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
     if (aClustersEndpoint == 1)
     {
         // In chef-operational-state-delegate-impl.cpp instance and delegate for EP1 are already registered in ember callback.
+        ChipLogProgress(Zcl,
+                        "ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice: Using globally registered instance for endpoint 1.");
         mOperationalStateDelegatePtr.reset();
         mOperationalStateDelegatePtr = std::unique_ptr<OperationalStateDelegate>(GetOperationalStateDelegate());
         VerifyOrDieWithMsg(mOperationalStateDelegatePtr != nullptr, Zcl,
