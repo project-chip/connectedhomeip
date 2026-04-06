@@ -87,8 +87,8 @@ public:
     uint16_t GetWattRating() const override { return mWattRating; };
 
 private:
-    chip::app::Clusters::OperationalState::OperationalStateDelegate mOperationalStateDelegatePtr;
-    chip::app::Clusters::OperationalState::Instance mOperationalStateInstancePtr;
+    chip::app::Clusters::OperationalState::OperationalStateDelegate * mOperationalStateDelegatePtr;
+    chip::app::Clusters::OperationalState::Instance * mOperationalStateInstancePtr;
     bool mOperationalStateObjectsOwned = true;
 
     chip::app::Clusters::ModeBase::Instance * mMicrowaveOvenModeInstancePtr;
