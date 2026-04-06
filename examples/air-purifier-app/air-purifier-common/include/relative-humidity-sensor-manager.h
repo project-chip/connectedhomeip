@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <protocols/interaction_model/StatusCode.h>
+#include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
@@ -32,21 +32,19 @@ public:
 
     void Init()
     {
-        Protocols::InteractionModel::Status status = RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Set(mEndpointId, 0);
-        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                       ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MinMeasuredValue attribute"));
-
-        status = RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Set(mEndpointId, 10000);
-        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                       ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MaxMeasuredValue attribute"));
+        CHIP_ERROR err = RelativeHumidityMeasurement::SetMeasuredValueRange(mEndpointId, DataModel::MakeNullable<uint16_t>(0),
+                                                                            DataModel::MakeNullable<uint16_t>(10000));
+        VerifyOrReturn(CHIP_NO_ERROR == err,
+                       ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement min/max range: %" CHIP_ERROR_FORMAT,
+                                    err.Format()));
     };
 
     void OnHumidityChangeHandler(uint16_t newValue)
     {
-        Protocols::InteractionModel::Status status =
-            RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(mEndpointId, newValue);
-        VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                       ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MeasuredValue attribute"));
+        CHIP_ERROR err = RelativeHumidityMeasurement::SetMeasuredValue(mEndpointId, DataModel::MakeNullable<uint16_t>(newValue));
+        VerifyOrReturn(CHIP_NO_ERROR == err,
+                       ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MeasuredValue: %" CHIP_ERROR_FORMAT,
+                                    err.Format()));
         ChipLogDetail(NotSpecified, "The new RelativeHumidityMeasurement value: %d", newValue);
     }
 

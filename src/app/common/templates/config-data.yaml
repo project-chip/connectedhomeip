@@ -144,6 +144,7 @@ CodeDrivenClusters:
     - Operational Credentials
     - Power Topology
     - Push AV Stream Transport
+    - Relative Humidity Measurement
     - Scenes Management
     - Software Diagnostics
     - Switch
