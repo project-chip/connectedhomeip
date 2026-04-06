@@ -33,9 +33,6 @@ using Status            = Protocols::InteractionModel::Status;
 #if MATTER_DM_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
-    mOperationalStateDelegatePtr(std::make_unique<OperationalStateDelegate>()),
-    mOperationalStateInstancePtr(
-        std::make_unique<OperationalState::Instance>(mOperationalStateDelegatePtr.get(), aClustersEndpoint)),
     mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint)),
     mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id,
                                   BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
@@ -47,17 +44,18 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
         // In chef-operational-state-delegate-impl.cpp instance and delegate for EP1 are already registered in ember callback.
         ChipLogProgress(Zcl,
                         "ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice: Using globally registered instance for endpoint 1.");
-        mOperationalStateDelegatePtr.reset();
         mOperationalStateDelegatePtr = std::unique_ptr<OperationalStateDelegate>(GetOperationalStateDelegate());
         VerifyOrDieWithMsg(mOperationalStateDelegatePtr != nullptr, Zcl,
                            "Did not find global operational state delegate for endpoint 1");
-        mOperationalStateInstancePtr.reset();
         mOperationalStateInstancePtr = std::unique_ptr<OperationalState::Instance>(GetOperationalStateInstance());
         VerifyOrDieWithMsg(mOperationalStateInstancePtr != nullptr, Zcl,
                            "Did not find global operational state instance for endpoint 1");
     }
     else
     {
+        mOperationalStateDelegatePtr = std::make_unique<OperationalStateDelegate>();
+        mOperationalStateInstancePtr =
+            std::make_unique<OperationalState::Instance>(mOperationalStateDelegatePtr.get(), aClustersEndpoint);
         VerifyOrDieWithMsg(mOperationalStateInstancePtr->Init() == CHIP_NO_ERROR, Zcl,
                            "Failed to initialise operational state instance on Endpoind: %d", aClustersEndpoint);
     }
