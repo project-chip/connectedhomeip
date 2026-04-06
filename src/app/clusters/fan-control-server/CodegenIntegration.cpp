@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
 #include <app/clusters/fan-control-server/FanControlCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/FanControl.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/attribute-table.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
@@ -64,9 +64,10 @@ public:
             features.Has(FanControl::Feature::kAuto) ? FanModeSequenceEnum::kOffLowHighAuto : FanModeSequenceEnum::kOffLowHigh;
 
         FanModeSequenceEnum fanModeSequence = defaultFanModeSequence;
-
-        (void) emberAfReadAttribute(endpointId, FanControl::Id, FanModeSequence::Id, reinterpret_cast<uint8_t *>(&fanModeSequence),
-                                    sizeof(fanModeSequence));
+        if (FanModeSequence::Get(endpointId, &fanModeSequence) != Status::Success)
+        {
+            fanModeSequence = defaultFanModeSequence;
+        }
 
         if (EnsureKnownEnumValue(fanModeSequence) == FanModeSequenceEnum::kUnknownEnumValue)
         {
@@ -78,7 +79,7 @@ public:
         if (features.Has(FanControl::Feature::kMultiSpeed))
         {
             uint8_t speedMax = 100;
-            if (emberAfReadAttribute(endpointId, FanControl::Id, SpeedMax::Id, &speedMax, sizeof(speedMax)) != Status::Success)
+            if (SpeedMax::Get(endpointId, &speedMax) != Status::Success)
             {
                 speedMax = 100;
             }
@@ -86,18 +87,25 @@ public:
         }
         if (features.Has(FanControl::Feature::kRocking))
         {
-            uint8_t rockSupportRaw =
-                static_cast<uint8_t>(static_cast<uint8_t>(RockBitmap::kRockLeftRight) |
-                                     static_cast<uint8_t>(RockBitmap::kRockUpDown) | static_cast<uint8_t>(RockBitmap::kRockRound));
-            (void) emberAfReadAttribute(endpointId, FanControl::Id, RockSupport::Id, &rockSupportRaw, sizeof(rockSupportRaw));
-            config.WithRockSupport(BitMask<RockBitmap>(rockSupportRaw));
+            constexpr uint8_t kDefaultRockSupportRaw = static_cast<uint8_t>(RockBitmap::kRockLeftRight) |
+                static_cast<uint8_t>(RockBitmap::kRockUpDown) | static_cast<uint8_t>(RockBitmap::kRockRound);
+            BitMask<RockBitmap> rockSupport;
+            if (RockSupport::Get(endpointId, &rockSupport) != Status::Success)
+            {
+                rockSupport = BitMask<RockBitmap>(kDefaultRockSupportRaw);
+            }
+            config.WithRockSupport(rockSupport);
         }
         if (features.Has(FanControl::Feature::kWind))
         {
-            uint8_t windSupportRaw =
-                static_cast<uint8_t>(static_cast<uint8_t>(WindBitmap::kSleepWind) | static_cast<uint8_t>(WindBitmap::kNaturalWind));
-            (void) emberAfReadAttribute(endpointId, FanControl::Id, WindSupport::Id, &windSupportRaw, sizeof(windSupportRaw));
-            config.WithWindSupport(BitMask<WindBitmap>(windSupportRaw));
+            constexpr uint8_t kDefaultWindSupportRaw =
+                static_cast<uint8_t>(WindBitmap::kSleepWind) | static_cast<uint8_t>(WindBitmap::kNaturalWind);
+            BitMask<WindBitmap> windSupport;
+            if (WindSupport::Get(endpointId, &windSupport) != Status::Success)
+            {
+                windSupport = BitMask<WindBitmap>(kDefaultWindSupportRaw);
+            }
+            config.WithWindSupport(windSupport);
         }
         if (features.Has(FanControl::Feature::kAirflowDirection))
         {
