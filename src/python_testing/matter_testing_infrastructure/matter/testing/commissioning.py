@@ -616,17 +616,14 @@ def extract_commissioned_fabric_count(endpoint_state: dict) -> int:
     Tolerates missing clusters, missing attributes, None values, and empty cert blobs
     which can occur in various factory-fresh edge cases or mocked CI tests.
     """
-    # Import locally to avoid ModuleNotFoundError in CI coverage builds where matter.clusters is not available at module import time
-    import matter.clusters as Clusters
-
     if not endpoint_state:
         return 0
 
-    # In mocked unit tests, the state might just be the cluster dict directly with string keys
     if "TrustedRootCertificates" in endpoint_state:
         certs = endpoint_state.get("TrustedRootCertificates")
     else:
-        # Real ReadAttribute response: result[endpoint][Cluster][Attribute]
+        # Import locally to avoid ModuleNotFoundError in CI coverage builds where matter.clusters is not available
+        import matter.clusters as Clusters
         opcreds_dict = endpoint_state.get(Clusters.OperationalCredentials, {})
         if not opcreds_dict:
             return 0
@@ -635,7 +632,6 @@ def extract_commissioned_fabric_count(endpoint_state: dict) -> int:
     if not certs:
         return 0
 
-    # Count only non-empty cert blobs
     return sum(1 for c in certs if c)
 
 
