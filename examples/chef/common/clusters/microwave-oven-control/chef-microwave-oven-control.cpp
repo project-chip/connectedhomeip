@@ -33,11 +33,11 @@ using Status            = Protocols::InteractionModel::Status;
 #if MATTER_DM_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
-    mOperationalStateDelegatePtr(std::make_unique<OperationalStateDelegate>()),
-    mOperationalStateInstancePtr(
-        std::make_unique<OperationalState::Instance>(mOperationalStateDelegatePtr.get(), aClustersEndpoint)),
+    mOperationalStateDelegatePtr(new OperationalStateDelegate()),
+    mOperationalStateInstancePtr(new OperationalState::Instance(mOperationalStateDelegatePtr, aClustersEndpoint)),
     mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint))
 {
+    mOperationalStateObjectsOwned = true;
     if (mOperationalStateInstancePtr && mMicrowaveOvenModeInstancePtr)
     {
         mMicrowaveOvenControlInstance = std::make_unique<MicrowaveOvenControl::Instance>(
@@ -58,6 +58,7 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
     mOperationalStateInstancePtr(operationalStateInstancePtr),
     mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint))
 {
+    mOperationalStateObjectsOwned = false;
     if (mOperationalStateInstancePtr && mMicrowaveOvenModeInstancePtr)
     {
         mMicrowaveOvenControlInstance = std::make_unique<MicrowaveOvenControl::Instance>(
@@ -65,6 +66,15 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
             BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
                                                    MicrowaveOvenControl::Feature::kPowerNumberLimits),
             *mOperationalStateInstancePtr, *mMicrowaveOvenModeInstancePtr);
+    }
+}
+
+ChefMicrowaveOvenDevice::~ChefMicrowaveOvenDevice()
+{
+    if (mOperationalStateObjectsOwned)
+    {
+        delete mOperationalStateInstancePtr;
+        delete mOperationalStateDelegatePtr;
     }
 }
 
