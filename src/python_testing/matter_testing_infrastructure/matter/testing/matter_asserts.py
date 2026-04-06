@@ -6,9 +6,6 @@ from typing import Any, Callable, List, Optional, Type, TypeVar
 
 from mobly import asserts
 
-from matter.ChipDeviceCtrl import ChipDeviceController
-from matter.testing.commissioning import PaseConnectionParams, get_commissioned_fabric_count
-
 T = TypeVar('T')
 
 
@@ -376,10 +373,10 @@ def assert_valid_map8(value: Any, description: str = "Value") -> None:
 # Commissioning-related assertions
 
 async def assert_is_commissioned_to_any_fabric(
-    dev_ctrl: ChipDeviceController,
+    dev_ctrl,
     node_id: int,
     description: str = "Device",
-    pase_params: Optional[PaseConnectionParams] = None
+    pase_params=None
 ) -> None:
     """
     Asserts that the device has at least one commissioned fabric.
@@ -413,6 +410,8 @@ async def assert_is_commissioned_to_any_fabric(
         pase_params = PaseConnectionParams(discriminator=1234, passcode=20202021, setup_code="")
         await assert_is_commissioned_to_any_fabric(controller, node_id=1234, description="DUT", pase_params=pase_params)
     """
+    # Import locally to avoid ModuleNotFoundError in CI coverage builds
+    from matter.testing.commissioning import get_commissioned_fabric_count
 
     count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
     asserts.assert_greater(
@@ -424,10 +423,10 @@ async def assert_is_commissioned_to_any_fabric(
 
 
 async def assert_factory_fresh(
-    dev_ctrl: ChipDeviceController,
+    dev_ctrl,
     node_id: int,
     description: str = "Device",
-    pase_params: Optional[PaseConnectionParams] = None
+    pase_params=None
 ) -> None:
     """
     Asserts that the device has NO commissioned fabrics (factory fresh state).
@@ -461,6 +460,8 @@ async def assert_factory_fresh(
         pase_params = PaseConnectionParams(discriminator=1234, passcode=20202021, setup_code="")
         await assert_factory_fresh(controller, node_id=1234, "DUT", pase_params=pase_params)
     """
+    # Import locally to avoid ModuleNotFoundError in CI coverage builds
+    from matter.testing.commissioning import get_commissioned_fabric_count
 
     count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
     asserts.assert_equal(
@@ -473,11 +474,11 @@ async def assert_factory_fresh(
 
 
 async def assert_fabric_count(
-    dev_ctrl: ChipDeviceController,
+    dev_ctrl,
     node_id: int,
     expected_count: int,
     description: str = "Device",
-    pase_params: Optional[PaseConnectionParams] = None
+    pase_params=None
 ) -> None:
     """
     Asserts that the device has exactly the expected number of commissioned fabrics.
@@ -513,6 +514,8 @@ async def assert_fabric_count(
         pase_params = PaseConnectionParams(discriminator=1234, passcode=20202021, setup_code="")
         await assert_fabric_count(controller, node_id=1234, expected_count=0, "DUT", pase_params=pase_params)
     """
+    # Import locally to avoid ModuleNotFoundError in CI coverage builds
+    from matter.testing.commissioning import get_commissioned_fabric_count
 
     actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
     asserts.assert_equal(
