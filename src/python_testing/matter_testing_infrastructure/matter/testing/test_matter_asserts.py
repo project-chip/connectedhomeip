@@ -304,5 +304,38 @@ class TestMatterAsserts(unittest.TestCase):
             matter_asserts.assert_standard_command_id(0x0001_0000)
 
 
+class TestCommissionedFabricCountExtraction(unittest.TestCase):
+    """Unit tests for extract_commissioned_fabric_count robustness."""
+
+    def test_extract_commissioned_fabric_count_edge_cases(self):
+        from matter.testing.commissioning import extract_commissioned_fabric_count
+        import matter.clusters as Clusters
+
+        # 1. Missing data entirely
+        self.assertEqual(0, extract_commissioned_fabric_count(None))
+        self.assertEqual(0, extract_commissioned_fabric_count({}))
+
+        # 2. String-based mocking (for simplistic CI mocks)
+        self.assertEqual(0, extract_commissioned_fabric_count({"TrustedRootCertificates": []}))
+        self.assertEqual(0, extract_commissioned_fabric_count({"TrustedRootCertificates": None}))
+        self.assertEqual(1, extract_commissioned_fabric_count({"TrustedRootCertificates": [b"\x01\x02"]}))
+        # Empty byte strings should not be counted as valid root certs
+        self.assertEqual(2, extract_commissioned_fabric_count({"TrustedRootCertificates": [b"a", b"", b"b"]}))
+
+        # 3. Real ReadAttribute structure
+        valid_cluster_state = {
+            Clusters.OperationalCredentials: {
+                Clusters.OperationalCredentials.Attributes.TrustedRootCertificates: [b"\x01", b"\x02"]
+            }
+        }
+        self.assertEqual(2, extract_commissioned_fabric_count(valid_cluster_state))
+
+        # Missing attributes from cluster entirely
+        empty_cluster_state = {
+            Clusters.OperationalCredentials: {}
+        }
+        self.assertEqual(0, extract_commissioned_fabric_count(empty_cluster_state))
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -6,7 +6,8 @@ from typing import Any, Callable, List, Optional, Type, TypeVar
 
 from mobly import asserts
 
-from matter.testing.commissioning import PaseConnectionParams
+from matter.ChipDeviceCtrl import ChipDeviceController
+from matter.testing.commissioning import PaseConnectionParams, get_commissioned_fabric_count
 
 T = TypeVar('T')
 
@@ -375,7 +376,7 @@ def assert_valid_map8(value: Any, description: str = "Value") -> None:
 # Commissioning-related assertions
 
 async def assert_is_commissioned_to_any_fabric(
-    dev_ctrl,
+    dev_ctrl: ChipDeviceController,
     node_id: int,
     description: str = "Device",
     pase_params: Optional[PaseConnectionParams] = None
@@ -409,21 +410,21 @@ async def assert_is_commissioned_to_any_fabric(
         await assert_is_commissioned_to_any_fabric(controller, node_id=1234, description="Newly commissioned device")
 
         # Verify device is commissioned (establishes PASE if needed)
-        pase_params = {'discriminator': 1234, 'passcode': 20202021}
+        pase_params = PaseConnectionParams(discriminator=1234, passcode=20202021, setup_code="")
         await assert_is_commissioned_to_any_fabric(controller, node_id=1234, description="DUT", pase_params=pase_params)
     """
-    from matter.testing.commissioning import is_commissioned
 
-    commissioned = await is_commissioned(dev_ctrl, node_id, pase_params=pase_params)
-    asserts.assert_true(
-        commissioned,
+    count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
+    asserts.assert_greater(
+        count,
+        0,
         f"{description} must have at least one commissioned fabric. "
         "TrustedRootCertificates list is empty (device is factory fresh)."
     )
 
 
 async def assert_factory_fresh(
-    dev_ctrl,
+    dev_ctrl: ChipDeviceController,
     node_id: int,
     description: str = "Device",
     pase_params: Optional[PaseConnectionParams] = None
@@ -457,14 +458,14 @@ async def assert_factory_fresh(
         await assert_factory_fresh(controller, node_id=1234, "DUT")
 
         # Verify factory-fresh device (establishes PASE if needed)
-        pase_params = {'discriminator': 1234, 'passcode': 20202021}
+        pase_params = PaseConnectionParams(discriminator=1234, passcode=20202021, setup_code="")
         await assert_factory_fresh(controller, node_id=1234, "DUT", pase_params=pase_params)
     """
-    from matter.testing.commissioning import is_commissioned
 
-    commissioned = await is_commissioned(dev_ctrl, node_id, pase_params=pase_params)
-    asserts.assert_false(
-        commissioned,
+    count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
+    asserts.assert_equal(
+        count,
+        0,
         f"{description} must be factory fresh (no commissioned fabrics). "
         "TrustedRootCertificates list is not empty. "
         "Please factory reset the device before running this test."
@@ -472,7 +473,7 @@ async def assert_factory_fresh(
 
 
 async def assert_fabric_count(
-    dev_ctrl,
+    dev_ctrl: ChipDeviceController,
     node_id: int,
     expected_count: int,
     description: str = "Device",
@@ -509,10 +510,9 @@ async def assert_fabric_count(
         await assert_fabric_count(controller, node_id=1234, expected_count=1, "DUT")
 
         # Verify factory-fresh device has 0 fabrics (establishes PASE if needed)
-        pase_params = {'discriminator': 1234, 'passcode': 20202021}
+        pase_params = PaseConnectionParams(discriminator=1234, passcode=20202021, setup_code="")
         await assert_fabric_count(controller, node_id=1234, expected_count=0, "DUT", pase_params=pase_params)
     """
-    from matter.testing.commissioning import get_commissioned_fabric_count
 
     actual_count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
     asserts.assert_equal(

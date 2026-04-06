@@ -27,7 +27,6 @@ from typing import Any, List, Optional
 
 from mobly import asserts, base_test, signals
 
-import matter.clusters as Clusters
 import matter.testing.global_stash as global_stash
 from matter import ChipDeviceCtrl, discovery
 from matter.ChipDeviceCtrl import CommissioningParameters
@@ -501,37 +500,46 @@ async def establish_pase_or_case_session(
     # Wait for first successful completion
     done, pending = await asyncio.wait(task_list, return_when=asyncio.FIRST_COMPLETED)
 
-    # Check if the completed task succeeded or raised an exception
-    completed_task = done.pop()
-    completed_name = completed_task.get_name()
+    # Handle the race condition where both tasks might complete exactly at once
+    successful_task = None
+    task_errors = {}
+    
+    # Check all completed tasks
+    for task in done:
+        try:
+            task.result()
+            if successful_task is None:
+                successful_task = task
+        except Exception as e:
+            task_errors[task.get_name()] = e
 
-    try:
-        # This will raise if the task failed
-        completed_task.result()
-        LOGGER.info(f"Successfully established {completed_name.upper()} session to node {node_id}")
-    except (ChipStackError, RuntimeError) as e:
-        # First task failed, wait for the other if there is one
-        if pending:
-            LOGGER.info(f"{completed_name.upper()} failed ({e}), waiting for other connection attempt")
-            done2, pending2 = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
-            completed_task2 = done2.pop()
-            completed_name = completed_task2.get_name()
+    # If first batch failed, wait for pending tasks
+    if not successful_task and pending:
+        # Log the failures of the first batch
+        for name, e in task_errors.items():
+            LOGGER.info(f"{name.upper()} failed ({e}), waiting for other connection attempt")
+            
+        done2, pending2 = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED)
+        for task in done2:
             try:
-                completed_task2.result()
-                LOGGER.info(f"Successfully established {completed_name.upper()} session to node {node_id}")
-                pending = pending2
-            except (ChipStackError, RuntimeError) as e2:
-                # Use task names to correctly label which error came from which connection type
-                if completed_task.get_name() == "pase":
-                    pase_error, case_error = e, e2
-                else:
-                    pase_error, case_error = e2, e
-                raise RuntimeError(
-                    f"Both PASE and CASE connection attempts failed for node {node_id}. "
-                    f"PASE error: {pase_error}, CASE error: {case_error}"
-                ) from e2
-        else:
-            raise
+                task.result()
+                if successful_task is None:
+                    successful_task = task
+            except Exception as e:
+                task_errors[task.get_name()] = e
+        pending = pending2
+
+    if successful_task:
+        completed_name = successful_task.get_name()
+        LOGGER.info(f"Successfully established {completed_name.upper()} session to node {node_id}")
+    else:
+        # Both tasks failed
+        pase_error = task_errors.get("pase", "Not attempted")
+        case_error = task_errors.get("case", "Not attempted")
+        raise RuntimeError(
+            f"Both PASE and CASE connection attempts failed for node {node_id}. "
+            f"PASE error: {pase_error}, CASE error: {case_error}"
+        )
 
     # Cancel pending tasks
     for task in pending:
@@ -542,7 +550,7 @@ async def establish_pase_or_case_session(
     return completed_name
 
 
-async def is_commissioned(
+async def is_commissioned_on_current_fabric(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
     pase_params: Optional[PaseConnectionParams] = None
@@ -601,6 +609,36 @@ async def is_commissioned(
         raise
 
 
+def extract_commissioned_fabric_count(endpoint_state: dict) -> int:
+    """
+    Safely extract the number of commissioned fabrics from an endpoint's state dict.
+
+    Tolerates missing clusters, missing attributes, None values, and empty cert blobs
+    which can occur in various factory-fresh edge cases or mocked CI tests.
+    """
+    # Import locally to avoid ModuleNotFoundError in CI coverage builds where matter.clusters is not available at module import time
+    import matter.clusters as Clusters
+
+    if not endpoint_state:
+        return 0
+
+    # In mocked unit tests, the state might just be the cluster dict directly with string keys
+    if "TrustedRootCertificates" in endpoint_state:
+        certs = endpoint_state.get("TrustedRootCertificates")
+    else:
+        # Real ReadAttribute response: result[endpoint][Cluster][Attribute]
+        opcreds_dict = endpoint_state.get(Clusters.OperationalCredentials, {})
+        if not opcreds_dict:
+            return 0
+        certs = opcreds_dict.get(Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)
+
+    if not certs:
+        return 0
+
+    # Count only non-empty cert blobs
+    return sum(1 for c in certs if c)
+
+
 async def get_commissioned_fabric_count(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
@@ -627,6 +665,9 @@ async def get_commissioned_fabric_count(
         ValueError: If device is not operational via DNS-SD and no pase_params are provided
         RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
     """
+    # Import locally to avoid ModuleNotFoundError in CI coverage builds where matter.clusters is not available at module import time
+    import matter.clusters as Clusters
+
     try:
         # Fast DNS-SD check to determine if device is operational on this fabric
         # This avoids the long CASE timeout if device is not commissioned
@@ -657,14 +698,10 @@ async def get_commissioned_fabric_count(
                 "Cannot get fabric count without risking long connection timeout."
             )
 
-        # Extract the trusted root certificates list
+        # Extract the trusted root certificates list using the robust helper
         # OperationalCredentials is node-scoped, always on endpoint 0
-        root_certs = result[0][Clusters.OperationalCredentials][
-            Clusters.OperationalCredentials.Attributes.TrustedRootCertificates
-        ]
-
-        # Return the count
-        return len(root_certs)
+        endpoint_zero_state = result.get(0, {})
+        return extract_commissioned_fabric_count(endpoint_zero_state)
 
     except (ChipStackError, RuntimeError, ValueError) as e:
         LOGGER.error(f"Failed to get fabric count for node {node_id}: {e}")

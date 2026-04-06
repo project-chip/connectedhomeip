@@ -55,7 +55,7 @@ from mobly import asserts
 import matter.testing.commissioning as commissioning
 from matter import ChipDeviceCtrl
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.commissioning import _is_device_operational_via_dnssd, is_commissioned
+from matter.testing.commissioning import _is_device_operational_via_dnssd, is_commissioned_on_current_fabric
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
@@ -152,27 +152,27 @@ class TestCommissioningStatusDetectionIntegration(MatterBaseTest):
         LOGGER.info("PASS: Factory-fresh device not found operational via DNS-SD")
 
     @async_test_body
-    async def test_TC_COMMISSION_DETECT_1_2_factory_fresh_is_commissioned(self):
+    async def test_TC_COMMISSION_DETECT_1_2_factory_fresh_is_commissioned_on_current_fabric_on_current_fabric(self):
         """
-        Test that is_commissioned() returns False for factory-fresh device.
+        Test that is_commissioned_on_current_fabric() returns False for factory-fresh device.
         """
-        LOGGER.info("=== Test: Factory Fresh Device - is_commissioned() ===")
+        LOGGER.info("=== Test: Factory Fresh Device - is_commissioned_on_current_fabric() ===")
         self.start_th_server()
 
         pase_params = commissioning.PaseConnectionParams(setup_code=self.default_controller.CreateManualCode(
             self.th_server_discriminator, self.th_server_passcode), discriminator=self.th_server_discriminator, passcode=self.th_server_passcode)
 
-        LOGGER.info("Checking is_commissioned() on factory-fresh device")
-        commissioned = await is_commissioned(
+        LOGGER.info("Checking is_commissioned_on_current_fabric() on factory-fresh device")
+        commissioned = await is_commissioned_on_current_fabric(
             self.default_controller,
             self.th_server_local_nodeid,
             pase_params=pase_params
         )
         asserts.assert_false(
             commissioned,
-            "Factory-fresh device should report is_commissioned=False"
+            "Factory-fresh device should report is_commissioned_on_current_fabric=False"
         )
-        LOGGER.info("PASS: Factory-fresh device reports is_commissioned=False")
+        LOGGER.info("PASS: Factory-fresh device reports is_commissioned_on_current_fabric=False")
 
     @async_test_body
     async def test_TC_COMMISSION_DETECT_1_3_commissioned_dnssd(self):
