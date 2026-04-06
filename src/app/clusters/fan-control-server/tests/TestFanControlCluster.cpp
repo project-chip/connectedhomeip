@@ -25,6 +25,7 @@
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/FanControl/Attributes.h>
+#include <clusters/FanControl/Commands.h>
 #include <clusters/FanControl/Enums.h>
 #include <clusters/FanControl/Metadata.h>
 

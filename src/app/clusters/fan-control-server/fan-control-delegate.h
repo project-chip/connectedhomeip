@@ -18,9 +18,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandResponseHelper.h>
 #include <clusters/FanControl/Enums.h>
+#include <lib/core/DataModelTypes.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {

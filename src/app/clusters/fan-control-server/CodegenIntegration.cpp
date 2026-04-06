@@ -19,7 +19,6 @@
 #include <app-common/zap-generated/callback.h>
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
 #include <app/clusters/fan-control-server/FanControlCluster.h>
-#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/FanControl.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>

@@ -18,11 +18,9 @@
 #pragma once
 
 #include "fan-control-delegate.h"
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/FanControl/Attributes.h>
-#include <clusters/FanControl/Enums.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BitMask.h>
 
