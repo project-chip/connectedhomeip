@@ -314,12 +314,20 @@ class TestCommissionedFabricCountExtraction(unittest.TestCase):
         self.assertEqual(0, extract_commissioned_fabric_count(None))
         self.assertEqual(0, extract_commissioned_fabric_count({}))
 
-        # 2. String-based mocking (for simplistic CI mocks)
+        # 2. String-based mocking (for simplistic CI mocks) and malformed shapes
         self.assertEqual(0, extract_commissioned_fabric_count({"TrustedRootCertificates": []}))
         self.assertEqual(0, extract_commissioned_fabric_count({"TrustedRootCertificates": None}))
         self.assertEqual(1, extract_commissioned_fabric_count({"TrustedRootCertificates": [b"\x01\x02"]}))
         # Empty byte strings should not be counted as valid root certs
         self.assertEqual(2, extract_commissioned_fabric_count({"TrustedRootCertificates": [b"a", b"", b"b"]}))
+
+        # 3. Defensive checks against entirely arbitrary or malformed types (as requested)
+        self.assertEqual(0, extract_commissioned_fabric_count("empty string"))
+        self.assertEqual(0, extract_commissioned_fabric_count({"TrustedRootCertificates": "non-numeric string"}))
+        self.assertEqual(0, extract_commissioned_fabric_count({"TrustedRootCertificates": -5}))
+        self.assertEqual(0, extract_commissioned_fabric_count([1, 2, 3]))  # Array instead of dict
+        self.assertEqual(0, extract_commissioned_fabric_count({"nested": {"value": 1}}))  # Missing key
+        self.assertEqual(0, extract_commissioned_fabric_count({"TrustedRootCertificates": {"nested": "dict"}}))
 
         try:
             import matter.clusters as Clusters

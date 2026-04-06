@@ -613,23 +613,27 @@ def extract_commissioned_fabric_count(endpoint_state: dict) -> int:
     """
     Safely extract the number of commissioned fabrics from an endpoint's state dict.
 
-    Tolerates missing clusters, missing attributes, None values, and empty cert blobs
+    Tolerates missing clusters, missing attributes, None values, malformed data, and empty cert blobs
     which can occur in various factory-fresh edge cases or mocked CI tests.
     """
-    if not endpoint_state:
+    if not isinstance(endpoint_state, dict):
         return 0
 
+    certs = None
     if "TrustedRootCertificates" in endpoint_state:
         certs = endpoint_state.get("TrustedRootCertificates")
     else:
-        # Import locally to avoid ModuleNotFoundError in CI coverage builds where matter.clusters is not available
-        import matter.clusters as Clusters
-        opcreds_dict = endpoint_state.get(Clusters.OperationalCredentials, {})
-        if not opcreds_dict:
-            return 0
-        certs = opcreds_dict.get(Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)
+        try:
+            # Import locally to avoid ModuleNotFoundError in CI coverage builds where matter.clusters is not available
+            import matter.clusters as Clusters
+            opcreds_dict = endpoint_state.get(Clusters.OperationalCredentials, {})
+            if isinstance(opcreds_dict, dict):
+                certs = opcreds_dict.get(Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)
+        except ImportError:
+            # If matter.clusters isn't available and we hit this path, we assume no fabrics were found.
+            pass
 
-    if not certs:
+    if not isinstance(certs, list):
         return 0
 
     return sum(1 for c in certs if c)
