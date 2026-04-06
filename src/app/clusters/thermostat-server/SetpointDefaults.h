@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,18 +21,19 @@
 #include <app/util/attribute-storage.h>
 #include <protocols/interaction_model/Constants.h>
 
-#include "Setpoints.h"
-
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-Protocols::InteractionModel::Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId, int16_t temperature,
-                                                         chip::BitFlags<SetpointAttributes> & affectedAttributes);
+constexpr int16_t kDefaultAbsMinHeatSetpointLimit = 700;  // 7C (44.5 F) is the default
+constexpr int16_t kDefaultAbsMaxHeatSetpointLimit = 3000; // 30C (86 F) is the default
+constexpr int16_t kDefaultAbsMinCoolSetpointLimit = 1600; // 16C (61 F) is the default
+constexpr int16_t kDefaultAbsMaxCoolSetpointLimit = 3200; // 32C (90 F) is the default
+constexpr int16_t kDefaultDeadBand        = 200; // 2.0C is the default; this changed from 2.5C in revision 8 of this cluster
+constexpr int16_t kDefaultHeatingSetpoint = 2000;
+constexpr int16_t kDefaultCoolingSetpoint = 2600;
 
-Protocols::InteractionModel::Status SetpointRaiseLower(const EndpointId endpointId,
-                                                       const Commands::SetpointRaiseLower::DecodableType & commandData);
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app

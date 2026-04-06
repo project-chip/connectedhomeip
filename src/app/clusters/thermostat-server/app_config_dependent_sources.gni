@@ -14,6 +14,13 @@
 app_config_dependent_sources = [
   "PresetStructWithOwnedMembers.cpp",
   "PresetStructWithOwnedMembers.h",
+  "SetpointAttributes.h",
+  "SetpointDefaults.h",
+  "SetpointLimits.cpp",
+  "SetpointLimits.h",
+  "SetpointRange.h",
+  "Setpoints.cpp",
+  "Setpoints.h",
   "ThermostatCluster.cpp",
   "ThermostatCluster.h",
   "ThermostatClusterAtomic.cpp",

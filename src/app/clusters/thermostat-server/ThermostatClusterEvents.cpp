@@ -87,6 +87,12 @@ void GenerateSetpointChangeEvent(EndpointId endpoint, SystemModeEnum systemMode,
     event.previousSetpoint = previousSetpoint;
     event.currentSetpoint  = currentSetpoint;
 
+    ChipLogProgress(Zcl,
+                    "Generating SetpointChange event: systemMode=%d, previousSetpoint=%d, currentSetpoint=%d",
+                    to_underlying(systemMode),
+                    previousSetpoint.HasValue() ? previousSetpoint.Value() : std::numeric_limits<int16_t>::min(),
+                    currentSetpoint);
+
     CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
     if (CHIP_NO_ERROR != err)
     {

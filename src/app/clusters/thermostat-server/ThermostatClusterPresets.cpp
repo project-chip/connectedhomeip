@@ -16,8 +16,8 @@
  */
 
 #include "ThermostatClusterPresets.h"
+#include "Setpoints.h"
 #include "ThermostatCluster.h"
-#include "ThermostatClusterSetpoints.h"
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -503,6 +503,16 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
         }
     }
 
+    Setpoints setpoints;
+    auto status = LoadSetpoints(endpoint, setpoints);
+    if (status != Status::Success)
+    {
+        return status;
+    }
+
+    auto heatLimits = EffectiveSetpointLimits(setpoints, SystemModeEnum::kHeat);
+    auto coolLimits = EffectiveSetpointLimits(setpoints, SystemModeEnum::kCool);
+
     // For each preset in the pending presets list, check that the preset does not violate any spec constraints.
     for (uint8_t i = 0; true; i++)
     {
@@ -524,16 +534,16 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
 
         // Enforce the Setpoint Limits for both the cooling and heating setpoints in the pending preset.
         // TODO: This code does not work, because it's modifying our temporary copy.
-        Optional<int16_t> coolingSetpointValue = pendingPreset.GetCoolingSetpoint();
-        if (coolingSetpointValue.HasValue())
+        Optional<int16_t> coolingSetpoint = pendingPreset.GetCoolingSetpoint();
+        if (coolingSetpoint.HasValue())
         {
-            pendingPreset.SetCoolingSetpoint(MakeOptional(EnforceCoolingSetpointLimits(coolingSetpointValue.Value(), endpoint)));
+            pendingPreset.SetCoolingSetpoint(MakeOptional(coolLimits.Clamp(coolingSetpoint.Value())));
         }
 
-        Optional<int16_t> heatingSetpointValue = pendingPreset.GetHeatingSetpoint();
-        if (heatingSetpointValue.HasValue())
+        Optional<int16_t> heatingSetpoint = pendingPreset.GetHeatingSetpoint();
+        if (heatingSetpoint.HasValue())
         {
-            pendingPreset.SetHeatingSetpoint(MakeOptional(EnforceHeatingSetpointLimits(heatingSetpointValue.Value(), endpoint)));
+            pendingPreset.SetHeatingSetpoint(MakeOptional(heatLimits.Clamp(heatingSetpoint.Value())));
         }
     }
 

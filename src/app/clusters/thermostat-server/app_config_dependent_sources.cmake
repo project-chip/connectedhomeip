@@ -18,6 +18,13 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/PresetStructWithOwnedMembers.cpp"
     "${CLUSTER_DIR}/PresetStructWithOwnedMembers.h"
+    "${CLUSTER_DIR}/SetpointAttributes.h"
+    "${CLUSTER_DIR}/SetpointDefaults.h"
+    "${CLUSTER_DIR}/SetpointLimits.cpp"
+    "${CLUSTER_DIR}/SetpointLimits.h"
+    "${CLUSTER_DIR}/SetpointRange.h"
+    "${CLUSTER_DIR}/Setpoints.cpp"
+    "${CLUSTER_DIR}/Setpoints.h"
     "${CLUSTER_DIR}/ThermostatClusterAtomic.cpp"
     "${CLUSTER_DIR}/ThermostatClusterEvents.cpp"
     "${CLUSTER_DIR}/ThermostatClusterEvents.h"

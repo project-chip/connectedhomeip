@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,18 +21,28 @@
 #include <app/util/attribute-storage.h>
 #include <protocols/interaction_model/Constants.h>
 
-#include "Setpoints.h"
+#include "SetpointAttributes.h"
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-Protocols::InteractionModel::Status HandleSetpointChange(Setpoints & setpoints, const AttributeId attributeId, int16_t temperature,
-                                                         chip::BitFlags<SetpointAttributes> & affectedAttributes);
+class Setpoints;
 
-Protocols::InteractionModel::Status SetpointRaiseLower(const EndpointId endpointId,
-                                                       const Commands::SetpointRaiseLower::DecodableType & commandData);
+struct SetpointRange
+{
+    Setpoints & setpoints;
+    int16_t & heatingSetpoint;
+    int16_t & coolingSetpoint;
+    SetpointAttributes heatingAttribute;
+    SetpointAttributes coolingAttribute;
+
+    SetpointRange(Setpoints & sp, int16_t & heat, int16_t & cool, SetpointAttributes ha, SetpointAttributes ca) :
+        setpoints(sp), heatingSetpoint(heat), coolingSetpoint(cool), heatingAttribute(ha), coolingAttribute(ca)
+    {}
+};
+
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
