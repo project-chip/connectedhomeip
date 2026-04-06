@@ -40,8 +40,9 @@ class ChefMicrowaveOvenDevice : public MicrowaveOvenControl::Delegate
 public:
     explicit ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint);
 
-    explicit ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint, OperationalState::Instance * operationalStateInstancePtr,
-                                     OperationalStateDelegate * operationalStateDelegatePtr);
+    explicit ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
+                                     chip::app::Clusters::OperationalState::Instance * operationalStateInstancePtr,
+                                     chip::app::Clusters::OperationalState::OperationalStateDelegate * operationalStateDelegatePtr);
 
     void MicrowaveOvenInit();
 
