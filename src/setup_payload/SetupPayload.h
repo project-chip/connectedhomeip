@@ -26,6 +26,7 @@
 #include <cstdint>
 #include <map>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include <lib/core/CHIPError.h>
@@ -155,34 +156,33 @@ private:
     bool CheckPayloadCommonConstraints() const;
 };
 
-enum optionalQRCodeInfoType
-{
-    optionalQRCodeInfoTypeUnknown,
-    optionalQRCodeInfoTypeString,
-    optionalQRCodeInfoTypeInt32,
-    optionalQRCodeInfoTypeInt64,
-    optionalQRCodeInfoTypeUInt32,
-    optionalQRCodeInfoTypeUInt64
-};
-
 /**
  * A structure to hold optional QR Code info
  */
 struct OptionalQRCodeInfo
 {
-    /*@{*/
-    uint8_t tag;                      /**< the tag number of the optional info */
-    enum optionalQRCodeInfoType type; /**< the type (String or Int) of the optional info */
-    std::string data;                 /**< the string value if type is optionalQRCodeInfoTypeString, otherwise should not be set */
-    int32_t int32 = 0;                /**< the integer value if type is optionalQRCodeInfoTypeInt32, otherwise should not be set */
-    /*@}*/
-};
+    OptionalQRCodeInfo(uint8_t t, std::string && v) : tag(t), value(std::move(v)) {}
+    OptionalQRCodeInfo(uint8_t t, int64_t v) : tag(t), value(v) {}
+    OptionalQRCodeInfo(uint8_t t, uint64_t v) : tag(t), value(v) {}
 
-struct OptionalQRCodeInfoExtension : OptionalQRCodeInfo
-{
-    int64_t int64   = 0; /**< the integer value if type is optionalQRCodeInfoTypeInt64, otherwise should not be set */
-    uint64_t uint32 = 0; /**< the integer value if type is optionalQRCodeInfoTypeUInt32, otherwise should not be set */
-    uint64_t uint64 = 0; /**< the integer value if type is optionalQRCodeInfoTypeUInt64, otherwise should not be set */
+    template <typename StringVisitor, typename SignedIntVisitor, typename UnsignedIntVisitor,
+              typename ReturnValue = decltype(std::declval<StringVisitor>()(std::string()))>
+    ReturnValue visitValue(StringVisitor stringVisitor, SignedIntVisitor signedIntVisitor,
+                           UnsignedIntVisitor unsignedIntVisitor) const
+    {
+        if (std::holds_alternative<std::string>(value))
+        {
+            return stringVisitor(const_cast<const std::string &>(std::get<std::string>(value)));
+        }
+        if (std::holds_alternative<int64_t>(value))
+        {
+            return signedIntVisitor(int64_t(std::get<int64_t>(value)));
+        }
+        return unsignedIntVisitor(uint64_t(std::get<uint64_t>(value)));
+    }
+
+    uint8_t tag;                                        /**< the tag number of the optional info */
+    std::variant<std::string, int64_t, uint64_t> value; /**< the value of the optional info */
 };
 
 class SetupPayload : public PayloadContents
@@ -201,10 +201,23 @@ public:
 
     /** @brief A function to add an optional vendor data
      * @param tag tag number in the [0x80-0xFF] range
-     * @param data Integer representation of data to add
+     * @param data 64-bit signed integer representation of data to add
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR addOptionalVendorData(uint8_t tag, int32_t data);
+    CHIP_ERROR addOptionalVendorData(uint8_t tag, int64_t data);
+
+    /** @brief A function to add an optional vendor data
+     * @param tag tag number in the [0x80-0xFF] range
+     * @param data 64-bit unsigned integer representation of data to add
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR addOptionalVendorData(uint8_t tag, uint64_t data);
+
+    /** @brief A function to add an optional QR Code info vendor object
+     * @param info Optional QR code info object to add
+     * @return Returns a CHIP_ERROR_INVALID_ARGUMENT on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR addOptionalVendorData(const OptionalQRCodeInfo & info);
 
     /** @brief A function to remove an optional vendor data
      * @param tag tag number in the [0x80-0xFF] range
@@ -214,10 +227,9 @@ public:
 
     /** @brief A function to retrieve an optional QR Code info vendor object
      * @param tag tag number in the [0x80-0xFF] range
-     * @param info retrieved OptionalQRCodeInfo object
-     * @return Returns a CHIP_ERROR_KEY_NOT_FOUND on error, CHIP_NO_ERROR otherwise
+     * @return retrieved OptionalQRCodeInfo object, or std::nullopt if no object was found for tag
      **/
-    CHIP_ERROR getOptionalVendorData(uint8_t tag, OptionalQRCodeInfo & info) const;
+    std::optional<OptionalQRCodeInfo> getOptionalVendorData(uint8_t tag) const;
 
     /**
      * @brief A function to retrieve the vector of OptionalQRCodeInfo infos
@@ -290,38 +302,26 @@ public:
 
 private:
     std::map<uint8_t, OptionalQRCodeInfo> optionalVendorData;
-    std::map<uint8_t, OptionalQRCodeInfoExtension> optionalExtensionData;
-
-    /** @brief A function to add an optional QR Code info vendor object
-     * @param info Optional QR code info object to add
-     * @return Returns a CHIP_ERROR_INVALID_ARGUMENT on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR addOptionalVendorData(const OptionalQRCodeInfo & info);
+    std::map<uint8_t, OptionalQRCodeInfo> optionalExtensionData;
 
     /** @brief A function to add an optional QR Code info CHIP object
      * @param info Optional QR code info object to add
      * @return Returns a CHIP_ERROR_INVALID_ARGUMENT on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR addOptionalExtensionData(const OptionalQRCodeInfoExtension & info);
+    CHIP_ERROR addOptionalExtensionData(const OptionalQRCodeInfo & info);
 
     /**
      * @brief A function to retrieve the vector of CHIPQRCodeInfo infos
      * @return Returns a vector of CHIPQRCodeInfos
      **/
-    std::vector<OptionalQRCodeInfoExtension> getAllOptionalExtensionData() const;
+    std::vector<OptionalQRCodeInfo> getAllOptionalExtensionData() const;
 
     /** @brief A function to retrieve an optional QR Code info extended object
-     * @param tag 8 bit [128-255] tag number
-     * @param info retrieved OptionalQRCodeInfoExtension object
-     * @return Returns a CHIP_ERROR_KEY_NOT_FOUND on error, CHIP_NO_ERROR otherwise
+     * @param tag 8 bit [0-127] tag number
+     * @param info retrieved OptionalQRCodeInfo object
+     * @return retrieved OptionalQRCodeInfo object, or std::nullopt if no object was found for tag
      **/
-    CHIP_ERROR getOptionalExtensionData(uint8_t tag, OptionalQRCodeInfoExtension & info) const;
-
-    /** @brief A function to retrieve the associated expected numeric value for a tag
-     * @param tag 8 bit [0-255] tag number
-     * @return Returns an optionalQRCodeInfoType value
-     **/
-    optionalQRCodeInfoType getNumericTypeFor(uint8_t tag) const;
+    std::optional<OptionalQRCodeInfo> getOptionalExtensionData(uint8_t tag) const;
 };
 
 } // namespace chip

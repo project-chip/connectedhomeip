@@ -43,10 +43,13 @@ typedef NS_ENUM(NSUInteger, MTRCommissioningFlow) {
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
-    MTROptionalQRCodeInfoTypeUnknown MTR_DEPRECATED(
-        "The type is never actually unknown", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)),
+    MTROptionalQRCodeInfoTypeUnknown MTR_DEPRECATED("The type is never actually unknown", ios(16.1, 16.4), macos(13.0, 13.3),
+                                                    watchos(9.1, 9.4), tvos(16.1, 16.4)),
     MTROptionalQRCodeInfoTypeString,
-    MTROptionalQRCodeInfoTypeInt32,
+    MTROptionalQRCodeInfoTypeInt32 MTR_DEPRECATED_WITH_REPLACEMENT("MTROptionalQRCodeInfoTypeSignedInt", ios(16.1, 26.0), macos(13.0, 26.0),
+                                                    watchos(9.1, 26.0), tvos(16.1, 26.0)),
+    MTROptionalQRCodeInfoTypeSignedInt,
+    MTROptionalQRCodeInfoTypeUnsignedInt,
 };
 
 /**
@@ -72,7 +75,19 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Initializes the object with a tag and int32 value.
  * The tag must be in the range 0x80 - 0xFF.
  */
-- (instancetype)initWithTag:(NSNumber *)tag int32Value:(int32_t)value MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+- (instancetype)initWithTag:(NSNumber *)tag int32Value:(int32_t)value MTR_DEPRECATED_WITH_REPLACEMENT("initWithTag:int64:", ios(17.6, 26.0), macos(14.6, 26.0), watchos(10.6, 26.0), tvos(17.6, 26.0));
+
+/**
+ * Initializes the object with a tag and int64 value.
+ * The tag must be in the range 0x80 - 0xFF.
+ */
+- (instancetype)initWithTag:(NSNumber *)tag int64Value:(int64_t)value MTR_AVAILABLE(ios(26.0), macos(26.0), watchos(26.0), tvos(26.0));
+
+/**
+ * Initializes the object with a tag and uint64 value.
+ * The tag must be in the range 0x80 - 0xFF.
+ */
+- (instancetype)initWithTag:(NSNumber *)tag uint64Value:(uint64_t)value MTR_AVAILABLE(ios(26.0), macos(26.0), watchos(26.0), tvos(26.0));
 
 @property (nonatomic, readonly, assign) MTROptionalQRCodeInfoType type MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 

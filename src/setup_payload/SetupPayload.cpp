@@ -30,6 +30,7 @@
 #include <lib/core/TLVData.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <utility>
@@ -125,22 +126,17 @@ bool PayloadContents::operator==(const PayloadContents & input) const
 
 CHIP_ERROR SetupPayload::addOptionalVendorData(uint8_t tag, std::string data)
 {
-    OptionalQRCodeInfo info;
-    info.tag  = tag;
-    info.type = optionalQRCodeInfoTypeString;
-    info.data = std::move(data);
-
-    return addOptionalVendorData(info);
+    return addOptionalVendorData(OptionalQRCodeInfo{ tag, std::move(data) });
 }
 
-CHIP_ERROR SetupPayload::addOptionalVendorData(uint8_t tag, int32_t data)
+CHIP_ERROR SetupPayload::addOptionalVendorData(uint8_t tag, int64_t data)
 {
-    OptionalQRCodeInfo info;
-    info.tag   = tag;
-    info.type  = optionalQRCodeInfoTypeInt32;
-    info.int32 = data;
+    return addOptionalVendorData(OptionalQRCodeInfo{ tag, data });
+}
 
-    return addOptionalVendorData(info);
+CHIP_ERROR SetupPayload::addOptionalVendorData(uint8_t tag, uint64_t data)
+{
+    return addOptionalVendorData(OptionalQRCodeInfo{ tag, data });
 }
 
 std::vector<OptionalQRCodeInfo> SetupPayload::getAllOptionalVendorData() const
@@ -163,44 +159,29 @@ CHIP_ERROR SetupPayload::removeOptionalVendorData(uint8_t tag)
 
 CHIP_ERROR SetupPayload::addSerialNumber(std::string serialNumber)
 {
-    OptionalQRCodeInfoExtension info;
-    info.tag  = kSerialNumberTag;
-    info.type = optionalQRCodeInfoTypeString;
-    info.data = std::move(serialNumber);
-
-    return addOptionalExtensionData(info);
+    return addOptionalExtensionData(OptionalQRCodeInfo{ kSerialNumberTag, std::move(serialNumber) });
 }
 
 CHIP_ERROR SetupPayload::addSerialNumber(uint32_t serialNumber)
 {
-    OptionalQRCodeInfoExtension info;
-    info.tag    = kSerialNumberTag;
-    info.type   = optionalQRCodeInfoTypeUInt32;
-    info.uint32 = serialNumber;
-
-    return addOptionalExtensionData(info);
+    return addOptionalExtensionData(OptionalQRCodeInfo{ kSerialNumberTag, uint64_t(serialNumber) });
 }
 
 CHIP_ERROR SetupPayload::getSerialNumber(std::string & outSerialNumber) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    OptionalQRCodeInfoExtension info;
-    ReturnErrorOnFailure(getOptionalExtensionData(kSerialNumberTag, info));
+    std::optional<OptionalQRCodeInfo> info = getOptionalExtensionData(kSerialNumberTag);
+    VerifyOrReturnError(info.has_value(), CHIP_ERROR_KEY_NOT_FOUND);
 
-    switch (info.type)
-    {
-    case (optionalQRCodeInfoTypeString):
-        outSerialNumber = info.data;
-        break;
-    case (optionalQRCodeInfoTypeUInt32):
-        outSerialNumber = std::to_string(info.uint32);
-        break;
-    default:
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-        break;
-    }
-
-    return err;
+    return info->visitValue(
+        [&](const std::string & v) {
+            outSerialNumber = v;
+            return CHIP_NO_ERROR;
+        },
+        [](int64_t) { return CHIP_ERROR_INVALID_ARGUMENT; },
+        [&](uint64_t v) {
+            outSerialNumber = std::to_string(v);
+            return CHIP_NO_ERROR;
+        });
 }
 
 CHIP_ERROR SetupPayload::removeSerialNumber()
@@ -242,55 +223,64 @@ CHIP_ERROR SetupPayload::generateRandomSetupPin(uint32_t & setupPINCode)
 CHIP_ERROR SetupPayload::addOptionalVendorData(const OptionalQRCodeInfo & info)
 {
     VerifyOrReturnError(IsVendorTag(info.tag), CHIP_ERROR_INVALID_ARGUMENT);
-    optionalVendorData[info.tag] = info;
+    optionalVendorData.emplace(info.tag, info);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SetupPayload::addOptionalExtensionData(const OptionalQRCodeInfoExtension & info)
+CHIP_ERROR SetupPayload::addOptionalExtensionData(const OptionalQRCodeInfo & info)
 {
     VerifyOrReturnError(IsCommonTag(info.tag), CHIP_ERROR_INVALID_ARGUMENT);
-    optionalExtensionData[info.tag] = info;
+
+    // We're lenient for tags that are reserved for future use, for forward-compatibility reasons.
+    bool validValue = info.visitValue(
+        [&](const std::string & v) {
+            return !(info.tag == kPBKDFIterationsTag || info.tag == kNumberOFDevicesTag || info.tag == kCommissioningTimeoutTag);
+        },
+        [&](int64_t v) {
+            return !(info.tag == kSerialNumberTag || info.tag == kPBKDFIterationsTag || info.tag == kBPKFSaltTag ||
+                     info.tag == kNumberOFDevicesTag || info.tag == kCommissioningTimeoutTag);
+        },
+        [&](uint64_t v) {
+            if (info.tag == kSerialNumberTag)
+            {
+                return CanCastTo<uint32_t>(v);
+            }
+            if (info.tag == kPBKDFIterationsTag)
+            {
+                return Crypto::kSpake2p_Min_PBKDF_Iterations <= v && v <= Crypto::kSpake2p_Max_PBKDF_Iterations;
+            }
+            if (info.tag == kNumberOFDevicesTag)
+            {
+                return 0 < v && v <= 255;
+            }
+            return info.tag != kBPKFSaltTag;
+        });
+    // It is not clearly specified whether this should return an error, or simply ignore.
+    VerifyOrReturnError(validValue, CHIP_ERROR_INVALID_ARGUMENT);
+
+    optionalExtensionData.emplace(info.tag, info);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SetupPayload::getOptionalVendorData(uint8_t tag, OptionalQRCodeInfo & info) const
+std::optional<OptionalQRCodeInfo> SetupPayload::getOptionalVendorData(uint8_t tag) const
 {
     const auto it = optionalVendorData.find(tag);
-    VerifyOrReturnError(it != optionalVendorData.end(), CHIP_ERROR_KEY_NOT_FOUND);
-    info = it->second;
-
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError(it != optionalVendorData.end(), std::nullopt);
+    return it->second;
 }
 
-CHIP_ERROR SetupPayload::getOptionalExtensionData(uint8_t tag, OptionalQRCodeInfoExtension & info) const
+std::optional<OptionalQRCodeInfo> SetupPayload::getOptionalExtensionData(uint8_t tag) const
 {
     const auto it = optionalExtensionData.find(tag);
-    VerifyOrReturnError(it != optionalExtensionData.end(), CHIP_ERROR_KEY_NOT_FOUND);
-    info = it->second;
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError(it != optionalExtensionData.end(), std::nullopt);
+    return it->second;
 }
 
-optionalQRCodeInfoType SetupPayload::getNumericTypeFor(uint8_t tag) const
+std::vector<OptionalQRCodeInfo> SetupPayload::getAllOptionalExtensionData() const
 {
-    optionalQRCodeInfoType elemType = optionalQRCodeInfoTypeUnknown;
-
-    if (IsVendorTag(tag))
-    {
-        elemType = optionalQRCodeInfoTypeInt32;
-    }
-    else if (tag == kSerialNumberTag)
-    {
-        elemType = optionalQRCodeInfoTypeUInt32;
-    }
-
-    return elemType;
-}
-
-std::vector<OptionalQRCodeInfoExtension> SetupPayload::getAllOptionalExtensionData() const
-{
-    std::vector<OptionalQRCodeInfoExtension> returnedOptionalInfo;
+    std::vector<OptionalQRCodeInfo> returnedOptionalInfo;
     for (auto & entry : optionalExtensionData)
     {
         returnedOptionalInfo.push_back(entry.second);
@@ -301,7 +291,7 @@ std::vector<OptionalQRCodeInfoExtension> SetupPayload::getAllOptionalExtensionDa
 bool SetupPayload::operator==(const SetupPayload & input) const
 {
     std::vector<OptionalQRCodeInfo> inputOptionalVendorData;
-    std::vector<OptionalQRCodeInfoExtension> inputOptionalExtensionData;
+    std::vector<OptionalQRCodeInfo> inputOptionalExtensionData;
 
     VerifyOrReturnError(PayloadContents::operator==(input), false);
 
@@ -310,28 +300,19 @@ bool SetupPayload::operator==(const SetupPayload & input) const
 
     for (const OptionalQRCodeInfo & inputInfo : inputOptionalVendorData)
     {
-        OptionalQRCodeInfo info;
-        CHIP_ERROR err = getOptionalVendorData(inputInfo.tag, info);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, false);
-        VerifyOrReturnError(inputInfo.type == info.type, false);
-        VerifyOrReturnError(inputInfo.data == info.data, false);
-        VerifyOrReturnError(inputInfo.int32 == info.int32, false);
+        std::optional<OptionalQRCodeInfo> info = getOptionalVendorData(inputInfo.tag);
+        VerifyOrReturnError(info.has_value(), false);
+        VerifyOrReturnError(inputInfo.value == info->value, false);
     }
 
     inputOptionalExtensionData = input.getAllOptionalExtensionData();
     VerifyOrReturnError(optionalExtensionData.size() == inputOptionalExtensionData.size(), false);
 
-    for (const OptionalQRCodeInfoExtension & inputInfo : inputOptionalExtensionData)
+    for (const OptionalQRCodeInfo & inputInfo : inputOptionalExtensionData)
     {
-        OptionalQRCodeInfoExtension info;
-        CHIP_ERROR err = getOptionalExtensionData(inputInfo.tag, info);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, false);
-        VerifyOrReturnError(inputInfo.type == info.type, false);
-        VerifyOrReturnError(inputInfo.data == info.data, false);
-        VerifyOrReturnError(inputInfo.int32 == info.int32, false);
-        VerifyOrReturnError(inputInfo.int64 == info.int64, false);
-        VerifyOrReturnError(inputInfo.uint32 == info.uint32, false);
-        VerifyOrReturnError(inputInfo.uint64 == info.uint64, false);
+        std::optional<OptionalQRCodeInfo> info = getOptionalExtensionData(inputInfo.tag);
+        VerifyOrReturnError(info.has_value(), false);
+        VerifyOrReturnError(inputInfo.value == info->value, false);
     }
 
     return true;

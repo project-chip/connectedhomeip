@@ -33,7 +33,7 @@
 
 MTR_DIRECT_MEMBERS
 @implementation MTROptionalQRCodeInfo {
-    chip::OptionalQRCodeInfo _info;
+    std::optional<chip::OptionalQRCodeInfo> _info;
 }
 
 static uint8_t ValidateVendorTag(NSNumber * tag)
@@ -46,20 +46,28 @@ static uint8_t ValidateVendorTag(NSNumber * tag)
 
 - (instancetype)initWithTag:(NSNumber *)tag int32Value:(int32_t)value
 {
+    return [self initWithTag:tag int64Value:value];
+}
+
+- (instancetype)initWithTag:(NSNumber *)tag int64Value:(int64_t)value
+{
     self = [super init];
-    _info.type = chip::optionalQRCodeInfoTypeInt32;
-    _info.tag = ValidateVendorTag(tag);
-    _info.int32 = value;
+    _info.emplace(ValidateVendorTag(tag), value);
+    return self;
+}
+
+- (instancetype)initWithTag:(NSNumber *)tag uint64Value:(uint64_t)value
+{
+    self = [super init];
+    _info.emplace(ValidateVendorTag(tag), value);
     return self;
 }
 
 - (instancetype)initWithTag:(NSNumber *)tag stringValue:(NSString *)value
 {
     self = [super init];
-    _info.type = chip::optionalQRCodeInfoTypeString;
-    _info.tag = ValidateVendorTag(tag);
     MTRVerifyArgumentOrDie(value != nil, @"value");
-    _info.data = value.UTF8String;
+    _info.emplace(ValidateVendorTag(tag), std::string(value.UTF8String));
     return self;
 }
 
@@ -68,62 +76,39 @@ static uint8_t ValidateVendorTag(NSNumber * tag)
     self = [super init];
     _info = info;
     // Don't expose objects with an out-of-range tag or invalid type
-    VerifyOrReturnValue(chip::SetupPayload::IsVendorTag(_info.tag), nil);
-    VerifyOrReturnValue(self.type != MTROptionalQRCodeInfoTypeUnknown, nil);
+    VerifyOrReturnValue(chip::SetupPayload::IsVendorTag(_info->tag), nil);
     return self;
 }
 
 - (CHIP_ERROR)addAsVendorElementTo:(chip::SetupPayload &)payload
 {
-    switch (_info.type) {
-    case chip::optionalQRCodeInfoTypeString:
-        return payload.addOptionalVendorData(_info.tag, _info.data);
-    case chip::optionalQRCodeInfoTypeInt32:
-        return payload.addOptionalVendorData(_info.tag, _info.int32);
-    default:
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    return payload.addOptionalVendorData(_info.value());
 }
 
 - (MTROptionalQRCodeInfoType)type
 {
-    // The way OptionalQRCodeInfo uses what are effectively C type identifiers (uint32 etc)
-    // rather than TLV types is not ideal. If we add support for additional integer types
-    // we should consider replacing MTROptionalQRCodeInfoTypeInt32 with
-    // MTROptionalQRCodeInfoTypeInteger and hiding the low-level C representation.
-    switch (_info.type) {
-    case chip::optionalQRCodeInfoTypeString:
-        return MTROptionalQRCodeInfoTypeString;
-    case chip::optionalQRCodeInfoTypeInt32:
-        return MTROptionalQRCodeInfoTypeInt32;
-    // No 'default:' so we get a warning if new types are added.
-    // Note: isEqual: also switches over these types.
-    // OptionalQRCodeInfo does not support these types
-    case chip::optionalQRCodeInfoTypeInt64:
-    case chip::optionalQRCodeInfoTypeUInt32:
-    case chip::optionalQRCodeInfoTypeUInt64:
-    // We should never see the unknown type
-    case chip::optionalQRCodeInfoTypeUnknown:
-        /* fall through */;
-    }
-    return MTROptionalQRCodeInfoTypeUnknown;
+    return _info->visitValue([](const std::string &) { return MTROptionalQRCodeInfoTypeString; },
+        [](int64_t) { return MTROptionalQRCodeInfoTypeSignedInt; },
+        [](uint64_t) { return MTROptionalQRCodeInfoTypeUnsignedInt; });
 }
 
 - (NSNumber *)tag
 {
-    return @(_info.tag);
+    return @(_info->tag);
 }
 
 - (NSNumber *)integerValue
 {
-    VerifyOrReturnValue(_info.type == chip::optionalQRCodeInfoTypeInt32, nil);
-    return @(_info.int32);
+    return _info->visitValue([](const std::string &) -> NSNumber * { return nil; },
+        [](int64_t v) -> NSNumber * { return @(v); },
+        [](uint64_t v) -> NSNumber * { return @(v); });
 }
 
 - (NSString *)stringValue
 {
-    VerifyOrReturnValue(_info.type == chip::optionalQRCodeInfoTypeString, nil);
-    return [NSString stringWithUTF8String:_info.data.c_str()];
+    return _info->visitValue([](const std::string & v) -> NSString * { return [NSString stringWithUTF8String:v.c_str()]; },
+        [](int64_t) -> NSString * { return nil; },
+        [](uint64_t) -> NSString * { return nil; });
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -133,23 +118,15 @@ static uint8_t ValidateVendorTag(NSNumber * tag)
 
 - (NSUInteger)hash
 {
-    return _info.type << 8 | _info.tag;
+    return _info->value.index() << 8 | _info->tag;
 }
 
 - (BOOL)isEqual:(id)object
 {
     VerifyOrReturnValue([object class] == [self class], NO);
     MTROptionalQRCodeInfo * other = object;
-    VerifyOrReturnValue(_info.tag == other->_info.tag, NO);
-    VerifyOrReturnValue(_info.type == other->_info.type, NO);
-    switch (_info.type) {
-    case chip::optionalQRCodeInfoTypeString:
-        return _info.data == other->_info.data;
-    case chip::optionalQRCodeInfoTypeInt32:
-        return _info.int32 == other->_info.int32;
-    default:
-        return NO; // unreachable, type is checked in init
-    }
+    VerifyOrReturnValue(_info->tag == other->_info->tag, NO);
+    return _info->value == other->_info->value;
 }
 
 - (NSString *)description
@@ -503,9 +480,9 @@ MTR_DIRECT_MEMBERS
 
 - (MTROptionalQRCodeInfo *)vendorElementWithTag:(NSNumber *)tag
 {
-    chip::OptionalQRCodeInfo element;
-    VerifyOrReturnValue(_payload.getOptionalVendorData(ValidateVendorTag(tag), element) == CHIP_NO_ERROR, nil);
-    return [[MTROptionalQRCodeInfo alloc] initWithQRCodeInfo:element];
+    std::optional<chip::OptionalQRCodeInfo> element = _payload.getOptionalVendorData(ValidateVendorTag(tag));
+    VerifyOrReturnValue(element.has_value(), nil);
+    return [[MTROptionalQRCodeInfo alloc] initWithQRCodeInfo:element.value()];
 }
 
 - (void)removeVendorElementWithTag:(NSNumber *)tag
