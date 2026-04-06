@@ -247,10 +247,12 @@ jobs:
     su_repl_tests_report:
         name: Software Update REPL Tests - Test Report
         needs: su_repl_tests_linux_run
-        if: always()
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' }}
+
         runs-on: ubuntu-latest
         permissions:
             contents: write
+            checks: write
 
         steps:
             - name: Download all JUnit XML results
@@ -259,6 +261,21 @@ jobs:
                   pattern: junit-results-*
                   path: allure-results
                   merge-multiple: true
+
+            - name: Publish test results to GitHub (dorny)
+              uses: dorny/test-reporter@v1
+              with:
+                  name: Nightly CI Test Results (dorny)
+                  path: allure-results/**/*.xml
+                  reporter: java-junit
+                  fail-on-error: false
+
+            - name: Publish test results to GitHub (mikepenz)
+              uses: mikepenz/action-junit-report@v5
+              with:
+                  report_paths: allure-results/**/*.xml
+                  detailed_summary: true
+                  require_tests: false
 
             - name: Load Allure test report history
               uses: actions/cache@v4
@@ -285,6 +302,7 @@ jobs:
                   if-no-files-found: warn
 
             - name: Deploy to GitHub Pages
+              if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
               uses: peaceiris/actions-gh-pages@v4
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
