@@ -221,9 +221,9 @@ chip::Protocols::InteractionModel::Status chefOperationalStateWriteCallback(chip
                                                                             uint8_t * buffer)
 {
     chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
-    gOperationalStateInstance                     = GetOperationalStateInstance(endpointId);
+    auto * gOperationalStateInstance              = GetOperationalStateInstance(endpointId);
     VerifyOrReturnError(gOperationalStateInstance != nullptr, chip::Protocols::InteractionModel::Status::NotFound);
-    gOperationalStateDelegate = GetOperationalStateDelegate(endpointId);
+    auto * gOperationalStateDelegate = GetOperationalStateDelegate(endpointId);
     VerifyOrReturnError(gOperationalStateDelegate != nullptr, chip::Protocols::InteractionModel::Status::NotFound);
     chip::AttributeId attributeId = attributeMetadata->attributeId;
 
@@ -276,7 +276,7 @@ chip::Protocols::InteractionModel::Status chefOperationalStateReadCallback(chip:
                                                                            const EmberAfAttributeMetadata * attributeMetadata,
                                                                            uint8_t * buffer, uint16_t maxReadLength)
 {
-    gOperationalStateInstance = GetOperationalStateInstance(endpointId);
+    auto * gOperationalStateInstance = GetOperationalStateInstance(endpointId);
     VerifyOrReturnError(gOperationalStateInstance != nullptr, chip::Protocols::InteractionModel::Status::NotFound);
     chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
     chip::AttributeId attributeId                 = attributeMetadata->attributeId;
