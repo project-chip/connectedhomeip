@@ -138,7 +138,7 @@ class TC_BINFO_2_2(MatterBaseTest):
         # Read StartUp event
         startup_events = await self.TH1.ReadEvent(
             nodeId=self.dut_node_id,
-            events=[(0, events.StartUp, 1)]
+            events=[(0, events.StartUp, 0)]
         )
         log.info(f"StartUp events found: {len(startup_events)}, no reboot necessary.")
 
@@ -150,7 +150,7 @@ class TC_BINFO_2_2(MatterBaseTest):
             # Read StartUp event again after reboot
             startup_events = await self.TH1.ReadEvent(
                 nodeId=self.dut_node_id,
-                events=[(0, events.StartUp, 1)]
+                events=[(0, events.StartUp, 0)]
             )
             log.info(f"StartUp events found after reboot: {len(startup_events)}")
 
