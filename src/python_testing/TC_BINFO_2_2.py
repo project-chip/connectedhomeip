@@ -83,10 +83,6 @@ class TC_BINFO_2_2(MatterBaseTest):
             self.TH2.Shutdown()
             self.TH2 = None
 
-        if hasattr(self, 'TH1') and self.TH1 is not None:
-            self.TH1.Shutdown()
-            self.TH1 = None
-
         super().teardown_class()
 
     def desc_TC_BINFO_2_2(self) -> str:
