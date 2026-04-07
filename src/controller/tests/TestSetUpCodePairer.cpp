@@ -25,22 +25,44 @@
 #include <lib/core/CHIPError.h>
 #include <transport/raw/PeerAddress.h>
 
+#include <memory>
+
 using namespace chip;
 using namespace chip::Controller;
 using PairerAccess = chip::Testing::SetUpCodePairerTestAccess;
 
 namespace {
 
+// DeviceCommissioner is too large to embed in a test fixture (it exceeds
+// the pw_unit_test light backend's static memory pool).  Heap-allocate it
+// along with the SetUpCodePairer and test accessor that depend on it.
 class TestSetUpCodePairer : public ::testing::Test
 {
 public:
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 
+    void SetUp() override
+    {
+        mCommissioner = std::make_unique<DeviceCommissioner>();
+        mPairer       = std::make_unique<SetUpCodePairer>(mCommissioner.get());
+        mAccess       = std::make_unique<PairerAccess>(mPairer.get());
+    }
+
+    void TearDown() override
+    {
+        mAccess.reset();
+        mPairer.reset();
+        mCommissioner.reset();
+    }
+
 protected:
-    DeviceCommissioner commissioner;
-    SetUpCodePairer pairer{ &commissioner };
-    PairerAccess access{ &pairer };
+    PairerAccess & Access() { return *mAccess; }
+
+private:
+    std::unique_ptr<DeviceCommissioner> mCommissioner;
+    std::unique_ptr<SetUpCodePairer> mPairer;
+    std::unique_ptr<PairerAccess> mAccess;
 };
 
 // When the discovery timeout fires while a PASE attempt is in progress,
@@ -48,36 +70,36 @@ protected:
 // (BLE, Wi-Fi PAF, NFC) should be left alone since they self-terminate.
 TEST_F(TestSetUpCodePairer, TimeoutDuringPASE_StopsDNSSD_PreservesOtherTransports)
 {
-    access.SetRemoteId(1);
-    access.SetWaitingForPASE(true);
-    access.SetWaitingForDiscovery(PairerAccess::kIPTransport, true);
-    access.SetWaitingForDiscovery(PairerAccess::kBLETransport, true);
+    Access().SetRemoteId(1);
+    Access().SetWaitingForPASE(true);
+    Access().SetWaitingForDiscovery(PairerAccess::kIPTransport, true);
+    Access().SetWaitingForDiscovery(PairerAccess::kBLETransport, true);
 
-    access.FireTimeoutCallback();
+    Access().FireTimeoutCallback();
 
     // DNS-SD must be stopped to prevent DiscoveryInProgress() from being stuck true.
-    EXPECT_FALSE(access.GetWaitingForDiscovery(PairerAccess::kIPTransport));
+    EXPECT_FALSE(Access().GetWaitingForDiscovery(PairerAccess::kIPTransport));
     // BLE must be preserved — it may still discover a commissionee.
-    EXPECT_TRUE(access.GetWaitingForDiscovery(PairerAccess::kBLETransport));
+    EXPECT_TRUE(Access().GetWaitingForDiscovery(PairerAccess::kBLETransport));
     // PASE state must not be disturbed.
-    EXPECT_TRUE(access.GetWaitingForPASE());
+    EXPECT_TRUE(Access().GetWaitingForPASE());
 }
 
 // When the discovery timeout fires with no PASE in progress,
 // all transports should be stopped and failure reported.
 TEST_F(TestSetUpCodePairer, TimeoutNoPASE_StopsAllTransports)
 {
-    access.SetRemoteId(1);
-    access.SetWaitingForPASE(false);
-    access.SetWaitingForDiscovery(PairerAccess::kIPTransport, true);
-    access.SetWaitingForDiscovery(PairerAccess::kBLETransport, true);
+    Access().SetRemoteId(1);
+    Access().SetWaitingForPASE(false);
+    Access().SetWaitingForDiscovery(PairerAccess::kIPTransport, true);
+    Access().SetWaitingForDiscovery(PairerAccess::kBLETransport, true);
 
-    access.FireTimeoutCallback();
+    Access().FireTimeoutCallback();
 
-    EXPECT_FALSE(access.GetWaitingForDiscovery(PairerAccess::kIPTransport));
-    EXPECT_FALSE(access.GetWaitingForDiscovery(PairerAccess::kBLETransport));
+    EXPECT_FALSE(Access().GetWaitingForDiscovery(PairerAccess::kIPTransport));
+    EXPECT_FALSE(Access().GetWaitingForDiscovery(PairerAccess::kBLETransport));
     // StopPairingIfTransportsExhausted should have reported failure and cleared mRemoteId.
-    EXPECT_EQ(access.GetRemoteId(), kUndefinedNodeId);
+    EXPECT_EQ(Access().GetRemoteId(), kUndefinedNodeId);
 }
 
 // When a PASE attempt fails (OnPairingComplete with error) and DNS-SD
@@ -87,30 +109,30 @@ TEST_F(TestSetUpCodePairer, TimeoutNoPASE_StopsAllTransports)
 // StopPairingIfTransportsExhausted.
 TEST_F(TestSetUpCodePairer, PASEFailure_DNSSDStaysAlive)
 {
-    access.SetRemoteId(1);
-    access.SetWaitingForDiscovery(PairerAccess::kIPTransport, true);
-    access.SetWaitingForDiscovery(PairerAccess::kBLETransport, true);
+    Access().SetRemoteId(1);
+    Access().SetWaitingForDiscovery(PairerAccess::kIPTransport, true);
+    Access().SetWaitingForDiscovery(PairerAccess::kBLETransport, true);
 
     // Simulate a UDP PASE attempt: set mCurrentPASEParameters and enter
     // the PASE-waiting state (as ConnectToDiscoveredDevice would).
     SetUpCodePairerParameters udpParams;
     udpParams.SetPeerAddress(Transport::PeerAddress::UDP(Inet::IPAddress::Any, 5540));
-    access.SetCurrentPASEParameters(udpParams);
-    access.ExpectPASEEstablishment();
+    Access().SetCurrentPASEParameters(udpParams);
+    Access().ExpectPASEEstablishment();
 
     // PASE fails.
-    access.CallOnPairingComplete(CHIP_ERROR_TIMEOUT);
+    Access().CallOnPairingComplete(CHIP_ERROR_TIMEOUT);
 
     // DNS-SD must still be running — the 30s timeout is its natural upper bound.
-    EXPECT_TRUE(access.GetWaitingForDiscovery(PairerAccess::kIPTransport));
+    EXPECT_TRUE(Access().GetWaitingForDiscovery(PairerAccess::kIPTransport));
     // BLE must still be running.
-    EXPECT_TRUE(access.GetWaitingForDiscovery(PairerAccess::kBLETransport));
+    EXPECT_TRUE(Access().GetWaitingForDiscovery(PairerAccess::kBLETransport));
     // The pairer should still be active (not yet reported failure).
-    EXPECT_NE(access.GetRemoteId(), kUndefinedNodeId);
+    EXPECT_NE(Access().GetRemoteId(), kUndefinedNodeId);
     // The error should be saved for later.
-    EXPECT_EQ(access.GetLastPASEError(), CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(Access().GetLastPASEError(), CHIP_ERROR_TIMEOUT);
     // mCurrentPASEParameters should have been cleared.
-    EXPECT_FALSE(access.HasCurrentPASEParameters());
+    EXPECT_FALSE(Access().HasCurrentPASEParameters());
 }
 
 // When a PASE attempt fails synchronously in ConnectToDiscoveredDevice,
@@ -118,26 +140,26 @@ TEST_F(TestSetUpCodePairer, PASEFailure_DNSSDStaysAlive)
 // completion cannot incorrectly use stale parameters for ReconfirmRecord.
 TEST_F(TestSetUpCodePairer, SyncPASEFailure_ClearsCurrentPASEParameters)
 {
-    access.SetRemoteId(1);
-    access.SetWaitingForDiscovery(PairerAccess::kIPTransport, true);
+    Access().SetRemoteId(1);
+    Access().SetWaitingForDiscovery(PairerAccess::kIPTransport, true);
 
     // Set up stale UDP parameters (as if ConnectToDiscoveredDevice had set
     // them before calling PairDevice, which then failed synchronously).
     SetUpCodePairerParameters udpParams;
     udpParams.SetPeerAddress(Transport::PeerAddress::UDP(Inet::IPAddress::Any, 5540));
-    access.SetCurrentPASEParameters(udpParams);
+    Access().SetCurrentPASEParameters(udpParams);
 
     // Now simulate a subsequent non-UDP PASE completion (e.g., BLE PASE
     // succeeds or fails).  ExpectPASEEstablishment + OnPairingComplete
     // with success exercises ResetDiscoveryState which clears everything.
     // Instead, verify directly that after a PASE failure the stale
     // parameters don't persist: simulate a PASE completion with error.
-    access.ExpectPASEEstablishment();
-    access.CallOnPairingComplete(CHIP_ERROR_CONNECTION_ABORTED);
+    Access().ExpectPASEEstablishment();
+    Access().CallOnPairingComplete(CHIP_ERROR_CONNECTION_ABORTED);
 
     // mCurrentPASEParameters must be cleared — stale UDP params must not
     // survive to confuse a later ReconfirmRecord check.
-    EXPECT_FALSE(access.HasCurrentPASEParameters());
+    EXPECT_FALSE(Access().HasCurrentPASEParameters());
 }
 
 } // namespace
