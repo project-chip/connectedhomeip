@@ -361,22 +361,25 @@ private:
     }
 };
 
-class MinimalWiredPowerSourceCluster : public DefaultServerCluster
+class AllClustersMinimalBatteryPowerSourceCluster : public DefaultServerCluster
 {
 public:
     using PowerSourceStatusEnum = PowerSource::PowerSourceStatusEnum;
-    using WiredCurrentTypeEnum  = PowerSource::WiredCurrentTypeEnum;
+    using BatChargeLevelEnum = PowerSource::BatChargeLevelEnum;
+    using BatReplaceabilityEnum = PowerSource::BatReplaceabilityEnum;
 
-    struct WiredConfiguration
+    struct BatteryConfiguration
     {
         CharSpan description{};
-        WiredCurrentTypeEnum currentType{};
+        BatReplaceabilityEnum replaceability{};
 
         // To force the user to specify these mandatory fixed attributes (taking the corresponding feature into account).
-        WiredConfiguration(CharSpan desc, WiredCurrentTypeEnum currType) : description(desc), currentType(currType) {}
+        BatteryConfiguration(CharSpan desc, BatReplaceabilityEnum replability) :
+            description(desc), replaceability(replability)
+        {}
     };
 
-    MinimalWiredPowerSourceCluster(EndpointId endpointId, const WiredConfiguration & config);
+    AllClustersMinimalBatteryPowerSourceCluster(EndpointId endpointId, System::Layer & systemLayer, const BatteryConfiguration & config);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
@@ -392,7 +395,10 @@ public:
     PowerSourceStatusEnum GetStatus() const;
     uint8_t GetOrder() const;
     CharSpan GetDescription() const;
-    WiredCurrentTypeEnum GetWiredCurrentType() const;
+    Optional<uint8_t> GetBatPercentRemaining() const;
+    BatChargeLevelEnum GetBatChargeLevel() const;
+    bool GetBatReplacementNeeded() const;
+    BatReplaceabilityEnum GetBatReplaceability() const;
     Span<const EndpointId> GetEndpointList() const;
 
     // Setters
@@ -407,18 +413,16 @@ public:
 
     CHIP_ERROR SetStatus(PowerSourceStatusEnum val);
     CHIP_ERROR SetOrder(uint8_t val);
+    CHIP_ERROR SetBatPercentRemaining(Optional<uint8_t> val);
+    CHIP_ERROR SetBatChargeLevel(BatChargeLevelEnum val);
+    CHIP_ERROR SetBatReplacementNeeded(bool val);
     CHIP_ERROR SetEndpointList(Span<const EndpointId> val);
 
 private:
     // Setters for `Fixed` attributes
 
     CHIP_ERROR SetDescription(CharSpan val);
-    CHIP_ERROR SetWiredCurrentType(WiredCurrentTypeEnum val);
-
-    struct WiredAttributes
-    {
-        WiredCurrentTypeEnum currentType{};
-    };
+    CHIP_ERROR SetBatReplaceability(BatReplaceabilityEnum val);
 
     struct Attributes
     {
@@ -435,13 +439,16 @@ private:
         Platform::ScopedMemoryBufferWithSize<EndpointId> mPoweredEndpointsBuffer;
         size_t mPoweredEndpointsCount = 0;
 
-        // wired feature
-        WiredCurrentTypeEnum currentType{};
+        // battery feature
+        Optional<uint8_t> percentRemaining{};
+        BatChargeLevelEnum chargeLevel = BatChargeLevelEnum::kOk;
+        bool replacementNeeded = false;
+        BatReplaceabilityEnum replaceability = BatReplaceabilityEnum::kUnspecified;
     };
 
     static inline BitFlags<PowerSource::Feature> WiredFeatures()
     {
-        return BitFlags<PowerSource::Feature>(PowerSource::Feature::kWired);
+        return BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery);
     }
 
     // maxSize without null byte
@@ -462,6 +469,20 @@ private:
 
     const BitFlags<PowerSource::Feature> mFeatures;
     struct Attributes mAttributes;
+
+    // context
+    System::Layer & mSystemLayer;
+
+    // notify timer stuff
+    std::atomic_bool mBatPercentRemainingNotifyTimerExpired{ true };
+
+    static constexpr System::Clock::Timeout notifyTimerDuration = System::Clock::Seconds16(10);
+
+    static void SetTimerExpired(System::Layer *, void * pAtomicBool)
+    {
+        std::atomic_bool * p = reinterpret_cast<std::atomic_bool *>(pAtomicBool);
+        *p                   = true;
+    }
 };
 
 } // namespace Clusters

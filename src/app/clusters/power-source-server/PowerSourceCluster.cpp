@@ -1072,23 +1072,19 @@ CHIP_ERROR PowerSourceCluster::SetBatQuantity(uint8_t val)
 #undef VerifyFeatureOrReturnError
 #undef VerifyStringAttributeSizeOrReturnError
 
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-MinimalWiredPowerSourceCluster::MinimalWiredPowerSourceCluster(EndpointId endpointId, const WiredConfiguration & config) :
-    DefaultServerCluster({ endpointId, PowerSource::Id }), mFeatures(WiredFeatures())
+AllClustersMinimalBatteryPowerSourceCluster::AllClustersMinimalBatteryPowerSourceCluster(EndpointId endpointId, System::Layer & systemLayer, const BatteryConfiguration & config) :
+    DefaultServerCluster({ endpointId, PowerSource::Id }), mSystemLayer(systemLayer)
 {
     CHIP_ERROR err;
 
     // mandatory attributes marked `Fixed` when `kWired` features is set
     VerifyOrDieWithMsg((err = SetDescription(config.description)) == CHIP_NO_ERROR, Zcl,
                        "Can't set the attribute `Description`, error: %" CHIP_ERROR_FORMAT, err.Format());
-    VerifyOrDieWithMsg((err = SetWiredCurrentType(config.currentType)) == CHIP_NO_ERROR, Zcl,
-                       "Can't set the attribute `WiredCurrentType`, error: %" CHIP_ERROR_FORMAT, err.Format());
+    VerifyOrDieWithMsg((err = SetBatReplaceability(config.replaceability)) == CHIP_NO_ERROR, Zcl,
+                       "Can't set the attribute `BatReplaceability`, error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
-CHIP_ERROR MinimalWiredPowerSourceCluster::Startup(ServerClusterContext & context)
+CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
@@ -1104,7 +1100,7 @@ CHIP_ERROR MinimalWiredPowerSourceCluster::Startup(ServerClusterContext & contex
     return CHIP_NO_ERROR;
 }
 
-DataModel::ActionReturnStatus MinimalWiredPowerSourceCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+DataModel::ActionReturnStatus AllClustersMinimalBatteryPowerSourceCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                             AttributeValueEncoder & encoder)
 {
     using namespace PowerSource::Attributes;
@@ -1117,8 +1113,14 @@ DataModel::ActionReturnStatus MinimalWiredPowerSourceCluster::ReadAttribute(cons
         return encoder.Encode(mAttributes.order);
     case Description::Id:
         return encoder.Encode(mAttributes.GetDescription());
-    case WiredCurrentType::Id:
-        return encoder.Encode(mAttributes.currentType);
+    case BatPercentRemaining::Id:
+        return EncodeOptional(encoder, mAttributes.percentRemaining);
+    case BatChargeLevel::Id:
+        return encoder.Encode(mAttributes.chargeLevel);
+    case BatReplacementNeeded::Id:
+        return encoder.Encode(mAttributes.replacementNeeded);
+    case BatReplaceability::Id:
+        return encoder.Encode(mAttributes.replaceability);
     case EndpointList::Id:
         return EncodeListOfValues(encoder, mAttributes.GetPoweredEndpoints());
     case Globals::Attributes::FeatureMap::Id:
@@ -1130,50 +1132,75 @@ DataModel::ActionReturnStatus MinimalWiredPowerSourceCluster::ReadAttribute(cons
     }
 }
 
-CHIP_ERROR MinimalWiredPowerSourceCluster::Attributes(const ConcreteClusterPath & path,
+CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::Attributes(const ConcreteClusterPath & path,
                                                       ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    constexpr DataModel::AttributeEntry kOptionalAttributes[] = { WiredCurrentType::kMetadataEntry };
+    constexpr DataModel::AttributeEntry kOptionalAttributes[] = 
+    { 
+        PowerSource::Attributes::BatPercentRemaining::kMetadataEntry,
+        PowerSource::Attributes::BatChargeLevel::kMetadataEntry,
+        PowerSource::Attributes::BatReplacementNeeded::kMetadataEntry,
+        PowerSource::Attributes::BatReplaceability::kMetadataEntry 
+    };
 
-    AttributeSet optAttributeSet(OptionalAttributeSet<WiredCurrentType::Id>::All());
+    AttributeSet optAttributeSet(OptionalAttributeSet<
+        BatPercentRemaining::Id,
+        BatChargeLevel::Id,
+        BatReplacementNeeded::Id,
+        BatReplaceability::Id>::All());
 
     AttributeListBuilder attributeListBuilder(builder);
 
     return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(kOptionalAttributes), optAttributeSet);
 }
 
-MinimalWiredPowerSourceCluster::PowerSourceStatusEnum MinimalWiredPowerSourceCluster::GetStatus() const
+AllClustersMinimalBatteryPowerSourceCluster::PowerSourceStatusEnum AllClustersMinimalBatteryPowerSourceCluster::GetStatus() const
 {
     return mAttributes.status;
 }
 
-uint8_t MinimalWiredPowerSourceCluster::GetOrder() const
+uint8_t AllClustersMinimalBatteryPowerSourceCluster::GetOrder() const
 {
     return mAttributes.order;
 }
 
-CharSpan MinimalWiredPowerSourceCluster::GetDescription() const
+CharSpan AllClustersMinimalBatteryPowerSourceCluster::GetDescription() const
 {
     return mAttributes.GetDescription();
 }
 
-MinimalWiredPowerSourceCluster::WiredCurrentTypeEnum MinimalWiredPowerSourceCluster::GetWiredCurrentType() const
+Optional<uint8_t> AllClustersMinimalBatteryPowerSourceCluster::GetBatPercentRemaining() const
 {
-    return mAttributes.currentType;
+    return mAttributes.percentRemaining;
 }
 
-Span<const EndpointId> MinimalWiredPowerSourceCluster::GetEndpointList() const
+AllClustersMinimalBatteryPowerSourceCluster::BatChargeLevelEnum AllClustersMinimalBatteryPowerSourceCluster::GetBatChargeLevel() const
+{
+    return mAttributes.chargeLevel;
+}
+
+bool AllClustersMinimalBatteryPowerSourceCluster::GetBatReplacementNeeded() const
+{
+    return mAttributes.replacementNeeded;
+}
+
+AllClustersMinimalBatteryPowerSourceCluster::BatReplaceabilityEnum AllClustersMinimalBatteryPowerSourceCluster::GetBatReplaceability() const
+{
+    return mAttributes.replaceability;
+}
+
+Span<const EndpointId> AllClustersMinimalBatteryPowerSourceCluster::GetEndpointList() const
 {
     return mAttributes.GetPoweredEndpoints();
 }
 
-CHIP_ERROR MinimalWiredPowerSourceCluster::SetStatus(PowerSourceStatusEnum val)
+CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetStatus(PowerSourceStatusEnum val)
 {
     SetAttributeValue(mAttributes.status, val, Status::Id);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MinimalWiredPowerSourceCluster::SetOrder(uint8_t val)
+CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetOrder(uint8_t val)
 {
     // This attribute is marked as `Persistent`.
     if (mContext != nullptr && val != mAttributes.order)
@@ -1188,7 +1215,7 @@ CHIP_ERROR MinimalWiredPowerSourceCluster::SetOrder(uint8_t val)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MinimalWiredPowerSourceCluster::SetEndpointList(Span<const EndpointId> val)
+CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetEndpointList(Span<const EndpointId> val)
 {
     if (mAttributes.GetPoweredEndpoints().data_equal(val))
     {
@@ -1209,7 +1236,7 @@ CHIP_ERROR MinimalWiredPowerSourceCluster::SetEndpointList(Span<const EndpointId
 
 // Private setter implementations for Fixed attributes
 
-CHIP_ERROR MinimalWiredPowerSourceCluster::SetDescription(CharSpan val)
+CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetDescription(CharSpan val)
 {
     VerifyOrReturnError(val.size() <= Description::TypeInfo::MaxLength(), CHIP_ERROR_INVALID_STRING_LENGTH);
 
@@ -1217,8 +1244,57 @@ CHIP_ERROR MinimalWiredPowerSourceCluster::SetDescription(CharSpan val)
                               Description::Id);
 }
 
-CHIP_ERROR MinimalWiredPowerSourceCluster::SetWiredCurrentType(WiredCurrentTypeEnum val)
+CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetBatPercentRemaining(Optional<uint8_t> val)
 {
-    SetAttributeValue(mAttributes.currentType, val, WiredCurrentType::Id);
+    if (val.HasValue())
+    {
+        // Maximum value of 200 representing 100% battery.
+        VerifyOrReturnError(val.Value() <= 200, CHIP_ERROR_INVALID_INTEGER_VALUE);
+    }
+
+    // This attribute is marked with `Quieter Reporting` quality, with a time interval between change reports.
+    // Or this attribute is to be reported if it changes to or from null.
+
+    // If value changes from or to null, change, notify and return.
+    if (mAttributes.percentRemaining == NullOptional || val == NullOptional)
+    {
+        SetAttributeValue(mAttributes.percentRemaining, val, BatPercentRemaining::Id);
+        return CHIP_NO_ERROR;
+    }
+
+    // If the reporting interval has expired, update the value, notify, and restart the timer.
+    if (mBatPercentRemainingNotifyTimerExpired)
+    {
+        SetAttributeValue(mAttributes.percentRemaining, val, BatPercentRemaining::Id);
+        CHIP_ERROR err = mSystemLayer.StartTimer(notifyTimerDuration, SetTimerExpired, &mBatPercentRemainingNotifyTimerExpired);
+        ReturnErrorOnFailure(err);
+        mBatPercentRemainingNotifyTimerExpired = false;
+        return CHIP_NO_ERROR;
+    }
+
+    // Otherwise, the reporting interval is still active, do not notify.
+    mAttributes.percentRemaining = val;
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetBatChargeLevel(BatChargeLevelEnum val)
+{
+    SetAttributeValue(mAttributes.chargeLevel, val, BatChargeLevel::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetBatReplacementNeeded(bool val)
+{
+    SetAttributeValue(mAttributes.replacementNeeded, val, BatReplacementNeeded::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetBatReplaceability(BatReplaceabilityEnum val)
+{
+    SetAttributeValue(mAttributes.replaceability, val, BatReplaceability::Id);
+    return CHIP_NO_ERROR;
+}
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

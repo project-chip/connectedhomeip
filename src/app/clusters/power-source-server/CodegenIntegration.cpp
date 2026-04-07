@@ -33,7 +33,7 @@ using namespace chip::app::Clusters::PowerSource::Attributes;
 
 namespace {
 
-LazyRegisteredServerCluster<MinimalWiredPowerSourceCluster> gServers;
+LazyRegisteredServerCluster<AllClustersMinimalBatteryPowerSourceCluster> gServers;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -53,14 +53,14 @@ public:
             description.reduce_size(0);
         }
 
-        PowerSourceCluster::WiredCurrentTypeEnum currentType;
-        VerifyOrDie(WiredCurrentType::Get(endpointId, &currentType) == InteractionModel::Status::Success);
+        AllClustersMinimalBatteryPowerSourceCluster::BatReplaceabilityEnum replaceability{};
+        VerifyOrDie(BatReplaceability::Get(endpointId, &replaceability) == InteractionModel::Status::Success);
 
-        PowerSourceCluster::WiredConfiguration config(description, currentType);
+        AllClustersMinimalBatteryPowerSourceCluster::BatteryConfiguration config(description, replaceability);
 
-        gServers.Create(endpointId, config);
+        gServers.Create(endpointId, DeviceLayer::SystemLayer(), config);
 
-        MinimalWiredPowerSourceCluster & cluster = gServers.Cluster();
+        AllClustersMinimalBatteryPowerSourceCluster & cluster = gServers.Cluster();
 
         // Get all set defaults for attributes from ember.
 
@@ -93,6 +93,9 @@ public:
 
         SetAttributeDefaultFromEmber(PowerSourceCluster::PowerSourceStatusEnum, Status);
         SetAttributeDefaultFromEmber(uint8_t, Order);
+        SetNullableAttributeDefaultFromEmber(uint8_t, BatPercentRemaining);
+        SetAttributeDefaultFromEmber(PowerSourceCluster::BatChargeLevelEnum, BatChargeLevel);
+        SetAttributeDefaultFromEmber(bool, BatReplacementNeeded);
 
 #undef DieIfInvalidValue
 #undef SetAttributeDefaultFromEmber
@@ -146,7 +149,7 @@ void MatterPowerSourcePluginServerInitCallback() {}
 
 namespace chip::app::Clusters::PowerSource {
 
-MinimalWiredPowerSourceCluster * FindClusterOnEndpoint(EndpointId endpointId)
+AllClustersMinimalBatteryPowerSourceCluster * FindClusterOnEndpoint(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -159,7 +162,7 @@ MinimalWiredPowerSourceCluster * FindClusterOnEndpoint(EndpointId endpointId)
         },
         integrationDelegate);
 
-    return static_cast<MinimalWiredPowerSourceCluster *>(powerSource);
+    return static_cast<AllClustersMinimalBatteryPowerSourceCluster *>(powerSource);
 }
 
 } // namespace chip::app::Clusters::PowerSource
