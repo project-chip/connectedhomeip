@@ -174,25 +174,22 @@ function(chip_zapgen TARGET_NAME)
 
         set(TEMPLATE_PATH "${CHIP_ROOT}/src/app/zap-templates/${ARG_GENERATOR}.json")
         if (NOT EXISTS "${TEMPLATE_PATH}")
-            message(SEND_ERROR "Unsupported zap generator: ${ARG_GENERATOR}")
+            message(FATAL_ERROR "Unsupported zap generator: ${ARG_GENERATOR}")
         endif()
 
-        # Extract extra dependencies from the generator template.
-        file(READ ${TEMPLATE_PATH} TEMPLATE_STRING)
         set(EXTRA_DEPENDENCIES "")
 
-        string(JSON ARRAY_LEN LENGTH "${TEMPLATE_STRING}" "partials")
-        math(EXPR ARRAY_LEN "${ARRAY_LEN} - 1")
-        foreach(i RANGE ${ARRAY_LEN})
-            string(JSON ITEM_PATH GET "${TEMPLATE_STRING}" "partials" "${i}" "path")
-            list(APPEND EXTRA_DEPENDENCIES "${CHIP_ROOT}/src/app/zap-templates/${ITEM_PATH}")
-        endforeach()
-
-        string(JSON ARRAY_LEN LENGTH "${TEMPLATE_STRING}" "templates")
-        math(EXPR ARRAY_LEN "${ARRAY_LEN} - 1")
-        foreach(i RANGE ${ARRAY_LEN})
-            string(JSON ITEM_PATH GET "${TEMPLATE_STRING}" "templates" "${i}" "path")
-            list(APPEND EXTRA_DEPENDENCIES "${CHIP_ROOT}/src/app/zap-templates/${ITEM_PATH}")
+        # Extract extra dependencies from the generator template.
+        file(READ "${TEMPLATE_PATH}" TEMPLATE_STRING)
+        foreach(key IN ITEMS "partials" "templates")
+            string(JSON ARRAY_LEN ERROR_VARIABLE JSON_ERR LENGTH "${TEMPLATE_STRING}" "${key}")
+            if (NOT JSON_ERR)
+                math(EXPR STOP_INDEX "${ARRAY_LEN} - 1")
+                foreach(i RANGE ${STOP_INDEX})
+                    string(JSON ITEM_PATH GET "${TEMPLATE_STRING}" "${key}" "${i}" "path")
+                    list(APPEND EXTRA_DEPENDENCIES "${CHIP_ROOT}/src/app/zap-templates/${ITEM_PATH}")
+                endforeach()
+            endif()
         endforeach()
 
         set(ZAPGEN_ARGS
