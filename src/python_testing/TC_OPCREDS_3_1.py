@@ -86,6 +86,24 @@ class TC_OPCREDS_3_1(MatterBaseTest):
             asserts.assert_true(False, 'Failed to open commissioning window')
         return (longDiscriminator, params)
 
+    async def is_specification_version_less_than_1_6(self):
+        MATTER_1_6_0 = 0x01060000
+        spec_version_attribute = Clusters.BasicInformation.Attributes.SpecificationVersion
+
+        spec_version = await self.read_single_attribute_check_success(
+            endpoint=0,
+            cluster=Clusters.BasicInformation,
+            attribute=spec_version_attribute,
+            assert_on_error=False)
+
+        if spec_version is None:
+            log.info("SpecificationVersion attribute was not found or could not be decoded on endpoint 0. "
+                     "Treating the DUT as older than Matter 1.6.0.")
+            return True
+
+        log.info(f"DUT's SpecificationVersion Attribute = 0x{spec_version:08X}")
+        return spec_version < MATTER_1_6_0
+
     @async_test_body
     async def test_TC_OPCREDS_3_1(self):
         opcreds = Clusters.OperationalCredentials
@@ -616,74 +634,89 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
                              "Failure status returned from arm failsafe")
 
-        self.print_step(
-            72, "Create a new CA and Fabric configured to generate a certificate chain without an ICAC, then establish PASE to this Fabric.")
-        TH3_CA = self.certificate_authority_manager.NewCertificateAuthority()
-        TH3_CA.alwaysOmitIcac = True
+        # Skipping steps 72-79 if DUT is older than Matter 1.6 since these test a bugfix that was released in Matter 1.6, and older DUTs may not have the fix for this bug.
+        is_dut_older_than_matter_1_6 = await self.is_specification_version_less_than_1_6()
 
-        TH3_vid = 0xFFF4
-        TH3_fabricId = 4
-        TH3_nodeid = self.default_controller.nodeId + 10
-        TH3_dut_nodeid = self.dut_node_id + 10
-        TH3_fabric_admin = TH3_CA.NewFabricAdmin(vendorId=TH3_vid, fabricId=TH3_fabricId)
-        TH3 = TH3_fabric_admin.NewController(nodeId=TH3_nodeid)
+        if is_dut_older_than_matter_1_6:
+            self.print_step(72, "Skipping since DUT's Matter Version is less than 1.6")
+            self.print_step(73, "Skipping since DUT's Matter Version is less than 1.6")
+            self.print_step(74, "Skipping since DUT's Matter Version is less than 1.6")
+            self.print_step(75, "Skipping since DUT's Matter Version is less than 1.6")
+            self.print_step(76, "Skipping since DUT's Matter Version is less than 1.6")
+            self.print_step(77, "Skipping since DUT's Matter Version is less than 1.6")
+            self.print_step(78, "Skipping since DUT's Matter Version is less than 1.6")
+            self.print_step(79, "Skipping since DUT's Matter Version is less than 1.6")
+        else:
+            self.print_step(
+                72, "Create a new CA and Fabric configured to generate a certificate chain without an ICAC, then establish PASE to this Fabric.")
+            TH3_CA = self.certificate_authority_manager.NewCertificateAuthority()
+            TH3_CA.alwaysOmitIcac = True
 
-        resp = await self.open_commissioning_window()
-        await TH3.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeId=TH3_dut_nodeid, timeoutMs=60000)
+            TH3_vid = 0xFFF4
+            TH3_fabricId = 4
+            TH3_nodeid = self.default_controller.nodeId + 10
+            TH3_dut_nodeid = self.dut_node_id + 10
+            TH3_fabric_admin = TH3_CA.NewFabricAdmin(vendorId=TH3_vid, fabricId=TH3_fabricId)
+            TH3 = TH3_fabric_admin.NewController(nodeId=TH3_nodeid)
 
-        self.print_step(73, "TH3 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to failsafe_max| Verify that the DUT sends ArmFailSafeResponse Command to TH3 with field ErrorCode as 'OK'(0)")
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=failsafe_max, breadcrumb=0)
-        resp = await self.send_single_cmd(dev_ctrl=TH3, node_id=TH3_dut_nodeid, cmd=cmd)
-        asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-                             "Failure status returned from arm failsafe")
+            resp = await self.open_commissioning_window()
+            await TH3.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeId=TH3_dut_nodeid, timeoutMs=60000)
 
-        self.print_step(74, "TH3 Sends CSRRequest command with a random 32-byte nonce and saves the response as `csrResponseNoIcac`")
-        nonce = random.randbytes(32)
-        csrResponseNoIcac = await self.send_single_cmd(dev_ctrl=TH3, node_id=TH3_dut_nodeid, cmd=opcreds.Commands.CSRRequest(CSRNonce=nonce, isForUpdateNOC=False))
+            self.print_step(73, "TH3 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to failsafe_max| Verify that the DUT sends ArmFailSafeResponse Command to TH3 with field ErrorCode as 'OK'(0)")
+            cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=failsafe_max, breadcrumb=0)
+            resp = await self.send_single_cmd(dev_ctrl=TH3, node_id=TH3_dut_nodeid, cmd=cmd)
+            asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                                 "Failure status returned from arm failsafe")
 
-        self.print_step(75, "TH3 generates a new RCAC and NOC but Omits ICAC in the Certificate Chain")
-        # Save RCAC as `Root_CA_Certificate_TH3`
-        # Save NOC as `Node_Operational_Certificate_TH3`
-        TH3_certs = await TH3.IssueNOCChain(csrResponseNoIcac, TH3_dut_nodeid)
-        asserts.assert_is_none(TH3_certs.icacBytes,
-                               "IssueNOCChain returned an ICAC, but Step 75 requires omitting the ICAC from the certificate chain")
-        if (TH3_certs.rcacBytes is None or TH3_certs.nocBytes is None or TH3_certs.ipkBytes is None):
-            # Expiring the failsafe timer in an attempt to clean up.
-            await TH3.SendCommand(TH3_dut_nodeid, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
-            asserts.fail("Unable to generate NOC chain for DUT - this is a script failure, please report this as a bug")
+            self.print_step(74, "TH3 Sends CSRRequest command with a random 32-byte nonce and saves the response as `csrResponseNoIcac`")
+            nonce = random.randbytes(32)
+            csrResponseNoIcac = await self.send_single_cmd(dev_ctrl=TH3, node_id=TH3_dut_nodeid, cmd=opcreds.Commands.CSRRequest(CSRNonce=nonce, isForUpdateNOC=False))
 
-        self.print_step(76, "TH3 sends the AddTrustedRootCert command using the certs generated in step 75")
-        cmd = opcreds.Commands.AddTrustedRootCertificate(TH3_certs.rcacBytes)
-        await self.send_single_cmd(cmd=cmd, dev_ctrl=TH3, node_id=TH3_dut_nodeid)
+            self.print_step(75, "TH3 generates a new RCAC and NOC but Omits ICAC in the Certificate Chain")
+            # Save RCAC as `Root_CA_Certificate_TH3`
+            # Save NOC as `Node_Operational_Certificate_TH3`
+            TH3_certs = await TH3.IssueNOCChain(csrResponseNoIcac, TH3_dut_nodeid)
+            asserts.assert_is_none(TH3_certs.icacBytes,
+                                   "IssueNOCChain returned an ICAC, but Step 75 requires omitting the ICAC from the certificate chain")
+            if (TH3_certs.rcacBytes is None or TH3_certs.nocBytes is None or TH3_certs.ipkBytes is None):
+                # Expiring the failsafe timer in an attempt to clean up.
+                await TH3.SendCommand(TH3_dut_nodeid, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0))
+                asserts.fail("Unable to generate NOC chain for DUT - this is a script failure, please report this as a bug")
 
-        self.print_step(77, "TH3 sends the AddNOC Command to DUT using the certs generated in step 75. The RCAC is re-used and presented as an ICAC | Verify that DUT responds with status code InvalidNOC")
-        # NOCValue as `Node_Operational_Certificate_TH3`
-        # ICACValue as `Root_CA_Certificate_TH3`
-        # CaseAdminSubject as the NodeID of TH3
-        # AdminVendorId as the Vendor ID of TH3
-        cmd = opcreds.Commands.AddNOC(NOCValue=TH3_certs.nocBytes, ICACValue=TH3_certs.rcacBytes,
-                                      IPKValue=TH3_certs.ipkBytes, caseAdminSubject=TH3_nodeid, adminVendorId=TH3_vid)
-        resp = await self.send_single_cmd(dev_ctrl=TH3, node_id=TH3_dut_nodeid, cmd=cmd)
-        asserts.assert_equal(
-            resp.statusCode, opcreds.Enums.NodeOperationalCertStatusEnum.kInvalidNOC, "Failure when adding NOC")
+            self.print_step(76, "TH3 sends the AddTrustedRootCert command using the certs generated in step 75")
+            cmd = opcreds.Commands.AddTrustedRootCertificate(TH3_certs.rcacBytes)
+            await self.send_single_cmd(cmd=cmd, dev_ctrl=TH3, node_id=TH3_dut_nodeid)
 
-        self.print_step(
-            78, "TH3 sends the AddNOC Command to DUT using the certs generated in step 75. This time, the ICAC is omitted | Verify that DUT responds with status code OK")
-        # NOCValue as `Node_Operational_Certificate_TH3`
-        # ICACValue as `None`
-        # CaseAdminSubject as the NodeID of TH3
-        # AdminVendorId as the Vendor ID of TH3
-        cmd = opcreds.Commands.AddNOC(NOCValue=TH3_certs.nocBytes, ICACValue=None,
-                                      IPKValue=TH3_certs.ipkBytes, caseAdminSubject=TH3_nodeid, adminVendorId=TH3_vid)
-        resp = await self.send_single_cmd(dev_ctrl=TH3, node_id=TH3_dut_nodeid, cmd=cmd)
-        asserts.assert_equal(
-            resp.statusCode, opcreds.Enums.NodeOperationalCertStatusEnum.kOk, "Failure when adding NOC")
+            self.print_step(
+                77, "TH3 sends the AddNOC Command to DUT using the certs generated in step 75. The RCAC is re-used and presented as an ICAC | Verify that DUT responds with status code InvalidNOC")
+            # NOCValue as `Node_Operational_Certificate_TH3`
+            # ICACValue as `Root_CA_Certificate_TH3`
+            # CaseAdminSubject as the NodeID of TH3
+            # AdminVendorId as the Vendor ID of TH3
+            cmd = opcreds.Commands.AddNOC(NOCValue=TH3_certs.nocBytes, ICACValue=TH3_certs.rcacBytes,
+                                          IPKValue=TH3_certs.ipkBytes, caseAdminSubject=TH3_nodeid, adminVendorId=TH3_vid)
+            resp = await self.send_single_cmd(dev_ctrl=TH3, node_id=TH3_dut_nodeid, cmd=cmd)
+            asserts.assert_equal(
+                resp.statusCode, opcreds.Enums.NodeOperationalCertStatusEnum.kInvalidNOC, "Failure when adding NOC")
 
-        self.print_step(79, "TH3 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0| Verify that the DUT sends ArmFailSafeResponse Command to TH3 with field ErrorCode as 'OK'(0)")
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
-        resp = await self.send_single_cmd(dev_ctrl=TH3, node_id=TH3_dut_nodeid, cmd=cmd)
-        asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-                             "Failure status returned from arm failsafe")
+            self.print_step(
+                78, "TH3 sends the AddNOC Command to DUT using the certs generated in step 75. This time, the ICAC is omitted | Verify that DUT responds with status code OK")
+            # NOCValue as `Node_Operational_Certificate_TH3`
+            # ICACValue as `None`
+            # CaseAdminSubject as the NodeID of TH3
+            # AdminVendorId as the Vendor ID of TH3
+            cmd = opcreds.Commands.AddNOC(NOCValue=TH3_certs.nocBytes, ICACValue=None,
+                                          IPKValue=TH3_certs.ipkBytes, caseAdminSubject=TH3_nodeid, adminVendorId=TH3_vid)
+            resp = await self.send_single_cmd(dev_ctrl=TH3, node_id=TH3_dut_nodeid, cmd=cmd)
+            asserts.assert_equal(
+                resp.statusCode, opcreds.Enums.NodeOperationalCertStatusEnum.kOk, "Failure when adding NOC")
+
+            self.print_step(
+                79, "TH3 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0| Verify that the DUT sends ArmFailSafeResponse Command to TH3 with field ErrorCode as 'OK'(0)")
+            cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
+            resp = await self.send_single_cmd(dev_ctrl=TH3, node_id=TH3_dut_nodeid, cmd=cmd)
+            asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
+                                 "Failure status returned from arm failsafe")
 
         self.print_step(80, "TH2 reads its fabric index from the CurrentFabricIndex attribute and saves as FabricIndex_TH2")
         fabric_index_th2 = await self.read_single_attribute_check_success(
