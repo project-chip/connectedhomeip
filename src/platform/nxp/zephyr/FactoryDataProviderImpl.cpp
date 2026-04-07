@@ -22,7 +22,12 @@
 #include <platform/nxp/zephyr/FactoryDataProviderImpl.h>
 
 /* mbedtls */
+#include <mbedtls/version.h>
+#if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+#include "mbedtls/private/aes.h"
+#else
 #include "mbedtls/aes.h"
+#endif // MBEDTLS_VERSION_NUMBER >= 0x04000000
 #include "mbedtls/sha256.h"
 
 /* -------------------------------------------------------------------------- */
@@ -134,7 +139,7 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     CHIP_ERROR res;
     const struct device * flashDevice;
     uint8_t currentBlock[16];
-    off_t factoryDataOffset = FIXED_PARTITION_OFFSET(factory_partition);
+    off_t factoryDataOffset = PARTITION_OFFSET(factory_partition);
 
     flashDevice = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
 
