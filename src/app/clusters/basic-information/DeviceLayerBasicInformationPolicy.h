@@ -16,15 +16,15 @@
  */
 #pragma once
 
+#include <app/AttributeValueEncoder.h>
 #include <app/clusters/basic-information/BasicInformationOptionalAttributes.h>
+#include <app/persistence/AttributePersistence.h>
 #include <cstddef>
 #include <cstdint>
 #include <lib/support/Span.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
-#include <app/persistence/AttributePersistence.h>
-#include <app/AttributeValueEncoder.h>
 
 namespace chip::app::Clusters {
 
@@ -71,9 +71,9 @@ public:
     CHIP_ERROR GetProductId(uint16_t & productId) const { return mDeviceInstanceInfoProvider.GetProductId(productId); }
 
     CHIP_ERROR GetPartNumber(char * buf, size_t bufSize)
-            {
+    {
         return IgnoreUnimplemented(mDeviceInstanceInfoProvider.GetPartNumber(buf, bufSize), buf, bufSize);
-            }
+    }
 
     CHIP_ERROR GetProductURL(char * buf, size_t bufSize)
     {
@@ -83,7 +83,7 @@ public:
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize)
     {
         return IgnoreUnimplemented(mDeviceInstanceInfoProvider.GetProductLabel(buf, bufSize), buf, bufSize);
-            }
+    }
 
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize)
     {
@@ -96,7 +96,7 @@ public:
     }
 
     CHIP_ERROR GetManufacturingDateSuffix(MutableCharSpan & suffixBuffer)
-        {
+    {
         return mDeviceInstanceInfoProvider.GetManufacturingDateSuffix(suffixBuffer);
     }
 
@@ -111,14 +111,14 @@ public:
     }
 
     CHIP_ERROR GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)
-        {
+    {
         return mDeviceInstanceInfoProvider.GetProductFinish(finish);
-        }
+    }
 
     CHIP_ERROR GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor)
-        {
+    {
         return mDeviceInstanceInfoProvider.GetProductPrimaryColor(primaryColor);
-        }
+    }
 
     CHIP_ERROR GetLocalConfigDisabled(bool & localConfigDisabled)
     {
@@ -146,7 +146,7 @@ public:
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize)
     {
         return IgnoreUnimplemented(mConfigurationManager.GetUniqueId(buf, bufSize), buf, bufSize);
-        }
+    }
 
     CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVersion)
     {
@@ -195,23 +195,19 @@ public:
         std::optional<Globals::AreaTypeTag> areaType;
 
         OwnedDeviceLocation() = default;
-        OwnedDeviceLocation(const LocationDescriptorStructType & other)
-        {
-            *this = other;
-        }
+        OwnedDeviceLocation(const LocationDescriptorStructType & other) { *this = other; }
 
         LocationDescriptorStructType ToView() const
         {
             return {
                 .locationName = { locationName.data(), locationName.size() },
                 .floorNumber  = floorNumber.has_value() ? DataModel::MakeNullable(*floorNumber) : DataModel::Nullable<int16_t>(),
-                .areaType     = areaType.has_value() ? DataModel::MakeNullable(*areaType) : DataModel::Nullable<Globals::AreaTypeTag>(),
+                .areaType = areaType.has_value() ? DataModel::MakeNullable(*areaType) : DataModel::Nullable<Globals::AreaTypeTag>(),
             };
         }
 
         // Safe for empty LocationName (CharSpan.data() may be nullptr)
-        OwnedDeviceLocation &
-        operator=(const LocationDescriptorStructType & value)
+        OwnedDeviceLocation & operator=(const LocationDescriptorStructType & value)
         {
             // Special handling since empty char-span will return nullptr for data() and
             // std::string does not like that
@@ -252,35 +248,31 @@ public:
     /// @param persistence The persistence handler.
     /// @return Status code indicating the result of the operation.
 
-    CHIP_ERROR WriteDeviceLocation(
-        const DataModel::Nullable<
-            LocationDescriptorStructType> & value,
-            AttributePersistence & persistence)
+    CHIP_ERROR WriteDeviceLocation(const DataModel::Nullable<LocationDescriptorStructType> & value,
+                                   AttributePersistence & persistence)
     {
         return SetDeviceLocationInternal(value, persistence, PersistenceMode::kPersist).GetUnderlyingError();
     }
 
     CHIP_ERROR LoadDeviceLocation(AttributePersistence & persistence)
     {
-        const ConcreteAttributePath path{
-            kRootEndpointId,
-            BasicInformation::Id,
-            BasicInformation::Attributes::DeviceLocation::Id
-        };
+        const ConcreteAttributePath path{ kRootEndpointId, BasicInformation::Id, BasicInformation::Attributes::DeviceLocation::Id };
 
         uint8_t buffer[kMaxDeviceLocationTLVSize];
         MutableByteSpan tlvBuffer(buffer);
 
         DataModel::Nullable<LocationDescriptorStructType> decoded;
 
-        if (mDeviceLocation.has_value()){
+        if (mDeviceLocation.has_value())
+        {
             CHIP_ERROR err = persistence.LoadTLV(path, decoded, tlvBuffer);
 
             if (err == CHIP_NO_ERROR)
             {
-                // Best effort: SetDeviceLocationInternal is called with kDoNotPersist, so it will not fail due to persistence errors.
-                // Other failures (like constraint errors) are not expected here as the value comes from storage.
-                LogErrorOnFailure(SetDeviceLocationInternal(decoded, persistence, PersistenceMode::kDoNotPersist).GetUnderlyingError());
+                // Best effort: SetDeviceLocationInternal is called with kDoNotPersist, so it will not fail due to persistence
+                // errors. Other failures (like constraint errors) are not expected here as the value comes from storage.
+                LogErrorOnFailure(
+                    SetDeviceLocationInternal(decoded, persistence, PersistenceMode::kDoNotPersist).GetUnderlyingError());
             }
             else if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
@@ -290,7 +282,6 @@ public:
                 //
                 // Failure to store here should not cause the cluster to stop initializing.
                 LogErrorOnFailure(PersistDeviceLocation(persistence));
-
             }
         }
 
@@ -314,7 +305,6 @@ public:
     }
 
 private:
-
     enum class PersistenceMode
     {
         kPersist,
@@ -335,10 +325,8 @@ private:
     /// @param persistence The persistence handler.
     /// @param mode Whether to persist the new value to NVM.
     /// @return Status code indicating the result of the operation.
-    DataModel::ActionReturnStatus
-    SetDeviceLocationInternal(const DataModel::Nullable<LocationDescriptorStructType> & location,
-                            AttributePersistence & persistence,
-                            PersistenceMode mode)
+    DataModel::ActionReturnStatus SetDeviceLocationInternal(const DataModel::Nullable<LocationDescriptorStructType> & location,
+                                                            AttributePersistence & persistence, PersistenceMode mode)
     {
         using chip::Protocols::InteractionModel::Status;
 
@@ -415,15 +403,13 @@ private:
         if (mDeviceLocation->IsNull())
         {
             loc = DataModel::Nullable<LocationDescriptorStructType>(DataModel::NullNullable);
-        } else {
+        }
+        else
+        {
             loc = DataModel::MakeNullable(mDeviceLocation->Value().ToView());
         }
 
-        const ConcreteAttributePath path{
-            kRootEndpointId,
-            BasicInformation::Id,
-            BasicInformation::Attributes::DeviceLocation::Id
-        };
+        const ConcreteAttributePath path{ kRootEndpointId, BasicInformation::Id, BasicInformation::Attributes::DeviceLocation::Id };
 
         return persistence.StoreTLV<kMaxDeviceLocationTLVSize>(path, *loc);
     }
@@ -433,7 +419,7 @@ private:
         if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
         {
             if (bufSize > 0)
-        {
+            {
                 buf[0] = 0;
             }
             return CHIP_NO_ERROR;

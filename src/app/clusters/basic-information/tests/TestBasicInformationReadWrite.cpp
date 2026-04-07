@@ -659,7 +659,8 @@ TEST_F(TestBasicInformationReadWrite, TestDeviceLocationValidation)
     invalidLocation.areaType.SetNull();
 
     // Attempt to write invalid location
-    ASSERT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, invalidLocation), Protocols::InteractionModel::Status::ConstraintError);
+    ASSERT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, invalidLocation),
+              Protocols::InteractionModel::Status::ConstraintError);
 
     // Check that the value is still null
     DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> readLocationNullable;
@@ -672,8 +673,7 @@ TEST_F(TestBasicInformationReadWrite, TestDeviceLocationPersistence)
     // Clear any previous persistence to ensure we start fresh
     {
         CHIP_ERROR err = testContext.StorageDelegate().SyncDeleteKeyValue(
-            DefaultStorageKeyAllocator::AttributeValue(kRootEndpointId, BasicInformation::Id,
-                                                       Attributes::DeviceLocation::Id)
+            DefaultStorageKeyAllocator::AttributeValue(kRootEndpointId, BasicInformation::Id, Attributes::DeviceLocation::Id)
                 .KeyName());
         if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
@@ -733,6 +733,5 @@ TEST_F(TestBasicInformationReadWrite, TestOwnedDeviceLocationAssignmentWithEmpty
 
     EXPECT_TRUE(ownedLocation.locationName.empty());
 }
-
 
 } // namespace

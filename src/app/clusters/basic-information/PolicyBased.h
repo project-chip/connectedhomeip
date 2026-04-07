@@ -72,9 +72,9 @@ public:
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-        AttributeValueEncoder & encoder) override;
+                                                AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-        AttributeValueDecoder & decoder) override;
+                                                 AttributeValueDecoder & decoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     // Policy::DelegateBase implementation (PlatformManagerDelegate for DeviceLayer)
@@ -161,7 +161,7 @@ CHIP_ERROR PolicyBased<Policy>::Startup(ServerClusterContext & context)
 
     bool localConfigDisabled = false;
     (void) persistence.LoadNativeEndianValue<bool>({ kRootEndpointId, Id, Attributes::LocalConfigDisabled::Id },
-        localConfigDisabled, false);
+                                                   localConfigDisabled, false);
 
     ReturnErrorOnFailure(mPolicy.SetLocalConfigDisabled(localConfigDisabled));
 
@@ -227,7 +227,7 @@ CHIP_ERROR PolicyBased<Policy>::ReadConfigurationString(EncodeFunction && getter
 
 template <typename Policy>
 DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-    AttributeValueEncoder & encoder)
+                                                                 AttributeValueEncoder & encoder)
 {
     using namespace Attributes;
 
@@ -407,14 +407,14 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
 
 template <typename Policy>
 DataModel::ActionReturnStatus PolicyBased<Policy>::WriteAttribute(const DataModel::WriteAttributeRequest & request,
-    AttributeValueDecoder & decoder)
+                                                                  AttributeValueDecoder & decoder)
 {
     return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
 }
 
 template <typename Policy>
 DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::WriteAttributeRequest & request,
-    AttributeValueDecoder & decoder)
+                                                             AttributeValueDecoder & decoder)
 {
     using namespace Attributes;
 
@@ -442,10 +442,8 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
         ReturnErrorOnFailure(mPolicy.SetLocalConfigDisabled(localConfigDisabled));
         return decodeStatus;
     }
-    case DeviceLocation::Id:
-    {
-        DataModel::Nullable<
-            Globals::Structs::LocationDescriptorStruct::Type> value;
+    case DeviceLocation::Id: {
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> value;
         ReturnErrorOnFailure(decoder.Decode(value));
         return mPolicy.WriteDeviceLocation(value, persistence);
     }
@@ -456,7 +454,7 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
 
 template <typename Policy>
 CHIP_ERROR PolicyBased<Policy>::Attributes(const ConcreteClusterPath & path,
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+                                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     using namespace Attributes;
 

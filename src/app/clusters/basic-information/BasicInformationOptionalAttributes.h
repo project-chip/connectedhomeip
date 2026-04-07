@@ -36,6 +36,6 @@ using BasicInformationOptionalAttributesSet = OptionalAttributeSet< //
     BasicInformation::Attributes::UniqueID::Id, //
 
     BasicInformation::Attributes::DeviceLocation::Id //
->;
+    >;
 
 } // namespace chip::app::Clusters
