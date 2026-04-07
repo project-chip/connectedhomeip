@@ -140,7 +140,7 @@ class TC_BINFO_2_2(MatterBaseTest):
             nodeId=self.dut_node_id,
             events=[(0, events.StartUp, 0)]
         )
-        log.info(f"StartUp events found: {len(startup_events)}, no reboot necessary.")
+        log.info(f"StartUp events found: {len(startup_events)}")
 
         if not startup_events:
             # Reboot DUT
