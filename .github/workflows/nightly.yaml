@@ -276,7 +276,7 @@ jobs:
               uses: actions/cache@v4
               with:
                   path: allure-history
-                  key: allure-history-su-repl-${{ github.ref }}
+                  key: allure-history-su-repl-${{ github.run_number }}
                   restore-keys: |
                       allure-history-su-repl-
 
