@@ -199,6 +199,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "FanControl";
     case chip::app::Clusters::ThermostatUserInterfaceConfiguration::Id:
         return "ThermostatUserInterfaceConfiguration";
+    case chip::app::Clusters::Humidistat::Id:
+        return "Humidistat";
     case chip::app::Clusters::ColorControl::Id:
         return "ColorControl";
     case chip::app::Clusters::BallastConfiguration::Id:
@@ -3203,6 +3205,45 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::Humidistat::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Humidistat::Attributes::Mode::Id:
+            return "Mode";
+        case chip::app::Clusters::Humidistat::Attributes::SystemState::Id:
+            return "SystemState";
+        case chip::app::Clusters::Humidistat::Attributes::UserSetpoint::Id:
+            return "UserSetpoint";
+        case chip::app::Clusters::Humidistat::Attributes::MinSetpoint::Id:
+            return "MinSetpoint";
+        case chip::app::Clusters::Humidistat::Attributes::MaxSetpoint::Id:
+            return "MaxSetpoint";
+        case chip::app::Clusters::Humidistat::Attributes::Step::Id:
+            return "Step";
+        case chip::app::Clusters::Humidistat::Attributes::TargetSetpoint::Id:
+            return "TargetSetpoint";
+        case chip::app::Clusters::Humidistat::Attributes::MistType::Id:
+            return "MistType";
+        case chip::app::Clusters::Humidistat::Attributes::Continuous::Id:
+            return "Continuous";
+        case chip::app::Clusters::Humidistat::Attributes::Sleep::Id:
+            return "Sleep";
+        case chip::app::Clusters::Humidistat::Attributes::Optimal::Id:
+            return "Optimal";
+        case chip::app::Clusters::Humidistat::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::Humidistat::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::Humidistat::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::Humidistat::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::Humidistat::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::ColorControl::Id: {
         switch (id)
         {
@@ -5972,6 +6013,15 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
         {
         case chip::app::Clusters::FanControl::Commands::Step::Id:
             return "Step";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::Humidistat::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::Humidistat::Commands::SetSettings::Id:
+            return "SetSettings";
         default:
             return "Unknown";
         }
