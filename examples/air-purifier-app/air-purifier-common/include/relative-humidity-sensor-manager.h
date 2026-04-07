@@ -28,23 +28,20 @@ namespace Clusters {
 class RelativeHumiditySensorManager
 {
 public:
-    RelativeHumiditySensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId){};
+    RelativeHumiditySensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId) {};
 
     void Init()
     {
-        CHIP_ERROR err = RelativeHumidityMeasurement::SetMeasuredValueRange(mEndpointId, DataModel::MakeNullable<uint16_t>(0),
-                                                                            DataModel::MakeNullable<uint16_t>(10000));
-        VerifyOrReturn(CHIP_NO_ERROR == err,
-                       ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement min/max range: %" CHIP_ERROR_FORMAT,
-                                    err.Format()));
+        ReturnAndLogOnFailure(RelativeHumidityMeasurement::SetMeasuredValueRange(mEndpointId, DataModel::MakeNullable<uint16_t>(0),
+                                                                                 DataModel::MakeNullable<uint16_t>(10000)),
+                              NotSpecified, "Failed to set RelativeHumidityMeasurement min/max range");
     };
 
     void OnHumidityChangeHandler(uint16_t newValue)
     {
-        CHIP_ERROR err = RelativeHumidityMeasurement::SetMeasuredValue(mEndpointId, DataModel::MakeNullable<uint16_t>(newValue));
-        VerifyOrReturn(CHIP_NO_ERROR == err,
-                       ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement MeasuredValue: %" CHIP_ERROR_FORMAT,
-                                    err.Format()));
+        ReturnAndLogOnFailure(
+            RelativeHumidityMeasurement::SetMeasuredValue(mEndpointId, DataModel::MakeNullable<uint16_t>(newValue)), NotSpecified,
+            "Failed to set RelativeHumidityMeasurement MeasuredValue");
         ChipLogDetail(NotSpecified, "The new RelativeHumidityMeasurement value: %d", newValue);
     }
 

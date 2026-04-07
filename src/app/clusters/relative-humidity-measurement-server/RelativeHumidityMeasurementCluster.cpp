@@ -25,12 +25,11 @@ namespace chip::app::Clusters {
 using namespace RelativeHumidityMeasurement::Attributes;
 
 // Per the Matter spec (Relative Humidity Measurement cluster):
-// MinMeasuredValue max is 9999 (0x270F)
-constexpr uint16_t kMaxMinMeasuredValue = 9999;
-// MaxMeasuredValue range is 1 to 10000 (0x2710)
-constexpr uint16_t kMinMaxMeasuredValue   = 1;
-constexpr uint16_t kMaxMeasuredValueLimit = 10000;
-// Tolerance max is 2048 (0x0800)
+// MinMeasuredValue is constrained to [0, 9999]
+constexpr uint16_t kMinMeasuredValueMax = 9999;
+// Global ceiling for any measured humidity value (applies to MeasuredValue and MaxMeasuredValue)
+constexpr uint16_t kMeasuredValueMax = 10000;
+// Tolerance max is 2048
 constexpr uint16_t kMaxTolerance = 2048;
 
 RelativeHumidityMeasurementCluster::RelativeHumidityMeasurementCluster(EndpointId endpointId,
@@ -41,7 +40,7 @@ RelativeHumidityMeasurementCluster::RelativeHumidityMeasurementCluster(EndpointI
 {
     if (!config.minMeasuredValue.IsNull())
     {
-        VerifyOrDie(config.minMeasuredValue.Value() <= kMaxMinMeasuredValue);
+        VerifyOrDie(config.minMeasuredValue.Value() <= kMinMeasuredValueMax);
 
         if (!config.maxMeasuredValue.IsNull())
         {
@@ -51,8 +50,7 @@ RelativeHumidityMeasurementCluster::RelativeHumidityMeasurementCluster(EndpointI
 
     if (!config.maxMeasuredValue.IsNull())
     {
-        VerifyOrDie(config.maxMeasuredValue.Value() >= kMinMaxMeasuredValue &&
-                    config.maxMeasuredValue.Value() <= kMaxMeasuredValueLimit);
+        VerifyOrDie(config.maxMeasuredValue.Value() >= 1 && config.maxMeasuredValue.Value() <= kMeasuredValueMax);
     }
 
     VerifyOrDie(!mOptionalAttributeSet.IsSet(Tolerance::Id) || config.tolerance <= kMaxTolerance);
@@ -100,7 +98,7 @@ CHIP_ERROR RelativeHumidityMeasurementCluster::SetMeasuredValue(DataModel::Nulla
 {
     if (!measuredValue.IsNull())
     {
-        VerifyOrReturnError(measuredValue.Value() <= kMaxMeasuredValueLimit, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(measuredValue.Value() <= kMeasuredValueMax, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         if (!mMinMeasuredValue.IsNull())
         {
@@ -122,7 +120,7 @@ CHIP_ERROR RelativeHumidityMeasurementCluster::SetMeasuredValueRange(DataModel::
 {
     if (!minMeasuredValue.IsNull())
     {
-        VerifyOrReturnError(minMeasuredValue.Value() <= kMaxMinMeasuredValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(minMeasuredValue.Value() <= kMinMeasuredValueMax, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         if (!maxMeasuredValue.IsNull())
         {
@@ -132,7 +130,8 @@ CHIP_ERROR RelativeHumidityMeasurementCluster::SetMeasuredValueRange(DataModel::
 
     if (!maxMeasuredValue.IsNull())
     {
-        VerifyOrReturnError(maxMeasuredValue.Value() >= kMinMaxMeasuredValue && maxMeasuredValue.Value() <= kMaxMeasuredValueLimit,
+        // MaxMeasuredValue must be >= MinMeasuredValue+1 (min of MinMeasuredValue is 0, so global min is 1)
+        VerifyOrReturnError(maxMeasuredValue.Value() >= 1 && maxMeasuredValue.Value() <= kMeasuredValueMax,
                             CHIP_IM_GLOBAL_STATUS(ConstraintError));
     }
 

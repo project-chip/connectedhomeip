@@ -152,7 +152,7 @@ RelativeHumidityMeasurementCluster * FindClusterOnEndpoint(EndpointId endpointId
 CHIP_ERROR SetMeasuredValue(EndpointId endpointId, DataModel::Nullable<uint16_t> measuredValue)
 {
     auto * cluster = FindClusterOnEndpoint(endpointId);
-    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
     return cluster->SetMeasuredValue(measuredValue);
 }
 
@@ -160,7 +160,7 @@ CHIP_ERROR SetMeasuredValueRange(EndpointId endpointId, DataModel::Nullable<uint
                                  DataModel::Nullable<uint16_t> maxMeasuredValue)
 {
     auto * cluster = FindClusterOnEndpoint(endpointId);
-    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
     return cluster->SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue);
 }
 
