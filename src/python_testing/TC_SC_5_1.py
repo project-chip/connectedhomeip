@@ -60,7 +60,7 @@ class TC_SC_5_1(MatterBaseTest):
 
     def steps_TC_SC_5_1(self) -> list[TestStep]:
         return [
-            TestStep("0", "Commissioning, already done", is_commissioning=True),
+            TestStep("0a", "Commissioning, already done", is_commissioning=True),
             TestStep("0b", "Run the remaining steps once for each endpoint with a groups cluster"),
             TestStep("1", "TH writes the ACL attribute in the Access Control cluster to add Operate privileges for group 0x0103 and maintain the current administrative privileges for the TH."),
             TestStep("2a", "TH sends KeySetWrite command with a key that is NOT installed on the TH (to test key update in next step)."),
@@ -86,12 +86,12 @@ class TC_SC_5_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SC_5_1(self):
-        self.step("0")
+        self.step("0a")
 
         self.step("0b")
         endpoints = []
         await self._populate_wildcard()
-        for endpoint in self.stored_global_wildcard.attributes.keys():
+        for endpoint in self.stored_global_wildcard.attributes:
             # TODO: there's something weird with the groups cluster on EP0 of all clusters. Also, that shouldn't be there.
             # doing this for now so I can get feedback on the approach here. Need to fix the apps before this is submitted.
             if endpoint == 0:
