@@ -276,7 +276,7 @@ chip::Protocols::InteractionModel::Status chefOperationalStateReadCallback(chip:
                                                                            const EmberAfAttributeMetadata * attributeMetadata,
                                                                            uint8_t * buffer, uint16_t maxReadLength)
 {
-    auto * gOperationalStateInstance = GetOperationalStateInstance(endpointId);
+    auto * gOperationalStateInstance = GetOperationalStateInstance(endpoint);
     VerifyOrReturnError(gOperationalStateInstance != nullptr, chip::Protocols::InteractionModel::Status::NotFound);
     chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
     chip::AttributeId attributeId                 = attributeMetadata->attributeId;
