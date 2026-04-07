@@ -521,6 +521,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     @property
     def stored_global_wildcard(self) -> typing.Any:
         """Accesses the stored global wildcard data."""
+        return global_stash.unstash_globally(self.user_params.get("stored_global_wildcard"))
 
     @property
     def runner_hook(self) -> TestRunnerHooks:
