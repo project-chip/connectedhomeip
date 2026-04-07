@@ -96,7 +96,7 @@ public:
      */
     void HandleStopStateCallback(GenericOperationalError & err) override;
 
-    Instance * GetInstance() { return mInstance; }
+    using Delegate::GetInstance;
 
 protected:
     Span<const GenericOperationalState> mOperationalStateList;
