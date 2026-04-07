@@ -158,35 +158,28 @@ def runArgumentsParser() -> CmdLineArgs:
 
     parser = argparse.ArgumentParser(
         description='Generate artifacts from .zapt templates')
-    parser.add_argument('zap', nargs="?", default=None, help='Path to the application .zap file')
-    parser.add_argument('-t', '--templates', default=default_templates,
-                        help='Path to the .zapt templates records to use for generating artifacts (default: "' + default_templates + '")')
-    parser.add_argument('-z', '--zcl',
-                        help='Path to the zcl templates records to use for generating artifacts (default: autodetect read from zap file)')
-    parser.add_argument('-o', '--output-dir', default=None,
-                        help='Output directory for the generated files (default: a temporary directory in out)')
-    parser.add_argument('-m', '--matter-file-name', default=None,
-                        help='Where to copy any generated .matter file')
-    parser.add_argument('--run-bootstrap', default=None, action='store_true',
+    parser.add_argument('zap', help='path to the application .zap file')
+    parser.add_argument('-t', '--templates', metavar='FILE', default=default_templates,
+                        help='path to the .zapt templates records to use for generating artifacts (default: %(default)s)')
+    parser.add_argument('-z', '--zcl', metavar='FILE',
+                        help='path to the zcl templates records to use for generating artifacts (default: read from the .zap)')
+    parser.add_argument('-o', '--output-dir', metavar='DIR',
+                        help='output directory for the generated files (default: a temporary directory in out)')
+    parser.add_argument('-m', '--matter-file-name', metavar='FILE',
+                        help='move generated .matter file to the destination FILE (default: next to the source .zap)')
+    parser.add_argument('--run-bootstrap', action='store_true',
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
-    parser.add_argument('--parallel', action='store_true')
-    parser.add_argument('--no-parallel', action='store_false', dest='parallel')
-    parser.add_argument('--lock-file', help='serialize zap invocations by using the specified lock file.')
-    parser.add_argument('--prettify-output', action='store_true')
-    parser.add_argument('--no-prettify-output',
-                        action='store_false', dest='prettify_output')
-    parser.add_argument('--version-check', action='store_true')
-    parser.add_argument('--no-version-check',
-                        action='store_false', dest='version_check')
-    parser.add_argument('--retries', help='Retry running zap-cli in case of failure', default=1, type=int)
+    parser.add_argument('--parallel', action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument('--lock-file', metavar='FILE',
+                        help='serialize zap invocations by using the specified lock file')
+    parser.add_argument('--prettify-output', action=argparse.BooleanOptionalAction, default=True,
+                        help='run code prettifier (e.g. clang-format) on generated output (default: %(default)s)')
+    parser.add_argument('--version-check', action=argparse.BooleanOptionalAction, default=True,
+                        help='check zap version before running (default: %(default)s)')
+    parser.add_argument('--retries', type=int, metavar='NUM', default=1,
+                         help='retry running zap-cli in case of failure (default: %(default)s)')
     parser.add_argument('--keep-output-dir', action='store_true',
                         help='Keep any created output directory. Useful for temporary directories.')
-    parser.set_defaults(parallel=True)
-    parser.set_defaults(prettify_output=True)
-    parser.set_defaults(version_check=True)
-    parser.set_defaults(lock_file=None)
-    parser.set_defaults(keep_output_dir=False)
-    parser.set_defaults(matter_file_name=None)
     args = parser.parse_args()
 
     delete_output_dir = False
