@@ -77,7 +77,7 @@ class TC_WNCV_2_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_WNCV_2_2(self):
-        self.endpoint = self.get_endpoint() 
+        self.endpoint = self.get_endpoint()
         cluster    = Clusters.WindowCovering
         attributes = cluster.Attributes
         config_status_bits = cluster.Bitmaps.ConfigStatus
@@ -274,4 +274,3 @@ class TC_WNCV_2_2(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
-    
