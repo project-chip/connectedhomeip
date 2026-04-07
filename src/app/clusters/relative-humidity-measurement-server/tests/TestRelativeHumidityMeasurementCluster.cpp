@@ -188,6 +188,12 @@ TEST_F(TestRelativeHumidityMeasurementCluster, MeasuredValueRange)
     EXPECT_EQ(cluster.GetMinMeasuredValue().Value(), 0u);
     EXPECT_EQ(cluster.GetMaxMeasuredValue().Value(), 10000u);
 
+    // Boundary valid: min at spec max (9999), max at spec max (10000)
+    EXPECT_EQ(cluster.SetMeasuredValueRange(DataModel::MakeNullable<uint16_t>(9999), DataModel::MakeNullable<uint16_t>(10000)),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetMinMeasuredValue().Value(), 9999u);
+    EXPECT_EQ(cluster.GetMaxMeasuredValue().Value(), 10000u);
+
     // min > spec max (9999) → ConstraintError
     EXPECT_EQ(cluster.SetMeasuredValueRange(DataModel::MakeNullable<uint16_t>(10000), DataModel::NullNullable),
               CHIP_IM_GLOBAL_STATUS(ConstraintError));
@@ -208,6 +214,66 @@ TEST_F(TestRelativeHumidityMeasurementCluster, MeasuredValueRange)
     EXPECT_EQ(cluster.SetMeasuredValueRange(DataModel::NullNullable, DataModel::NullNullable), CHIP_NO_ERROR);
     EXPECT_TRUE(cluster.GetMinMeasuredValue().IsNull());
     EXPECT_TRUE(cluster.GetMaxMeasuredValue().IsNull());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+// Verify SetMeasuredValue enforces bounds when only one of min/max is set.
+TEST_F(TestRelativeHumidityMeasurementCluster, MeasuredValueWithPartialRange)
+{
+    // Only MinMeasuredValue set (MaxMeasuredValue null)
+    {
+        RelativeHumidityMeasurementCluster cluster(kRootEndpointId, RelativeHumidityMeasurementCluster::OptionalAttributeSet(),
+                                                   RelativeHumidityMeasurementCluster::StartupConfiguration{
+                                                       .minMeasuredValue = DataModel::MakeNullable<uint16_t>(500),
+                                                   });
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        // Below min → ConstraintError
+        EXPECT_EQ(cluster.SetMeasuredValue(DataModel::MakeNullable<uint16_t>(499)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        // At min → success
+        EXPECT_EQ(cluster.SetMeasuredValue(DataModel::MakeNullable<uint16_t>(500)), CHIP_NO_ERROR);
+        // At absolute max (10000) → success (no MaxMeasuredValue constraint)
+        EXPECT_EQ(cluster.SetMeasuredValue(DataModel::MakeNullable<uint16_t>(10000)), CHIP_NO_ERROR);
+        // Above absolute max → ConstraintError
+        EXPECT_EQ(cluster.SetMeasuredValue(DataModel::MakeNullable<uint16_t>(10001)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    // Only MaxMeasuredValue set (MinMeasuredValue null)
+    {
+        RelativeHumidityMeasurementCluster cluster(kRootEndpointId, RelativeHumidityMeasurementCluster::OptionalAttributeSet(),
+                                                   RelativeHumidityMeasurementCluster::StartupConfiguration{
+                                                       .maxMeasuredValue = DataModel::MakeNullable<uint16_t>(3000),
+                                                   });
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        // At max → success
+        EXPECT_EQ(cluster.SetMeasuredValue(DataModel::MakeNullable<uint16_t>(3000)), CHIP_NO_ERROR);
+        // Above max → ConstraintError
+        EXPECT_EQ(cluster.SetMeasuredValue(DataModel::MakeNullable<uint16_t>(3001)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        // At 0 (no min constraint) → success
+        EXPECT_EQ(cluster.SetMeasuredValue(DataModel::MakeNullable<uint16_t>(0)), CHIP_NO_ERROR);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+// Verify tolerance at spec boundary (2048) is accepted.
+TEST_F(TestRelativeHumidityMeasurementCluster, ToleranceBoundary)
+{
+    RelativeHumidityMeasurementCluster::OptionalAttributeSet optionalAttributeSet;
+    optionalAttributeSet.Set<Tolerance::Id>();
+
+    RelativeHumidityMeasurementCluster cluster(kRootEndpointId, optionalAttributeSet,
+                                               RelativeHumidityMeasurementCluster::StartupConfiguration{ .tolerance = 2048 });
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(cluster);
+    uint16_t tolerance{};
+    ASSERT_EQ(tester.ReadAttribute(Tolerance::Id, tolerance), CHIP_NO_ERROR);
+    EXPECT_EQ(tolerance, 2048u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

@@ -24,7 +24,7 @@ namespace chip::app::Clusters {
 
 using namespace RelativeHumidityMeasurement::Attributes;
 
-// Per the Matter spec (Relative Humidity Measurement cluster, revision 3):
+// Per the Matter spec (Relative Humidity Measurement cluster):
 // MinMeasuredValue max is 9999 (0x270F)
 constexpr uint16_t kMaxMinMeasuredValue = 9999;
 // MaxMeasuredValue range is 1 to 10000 (0x2710)
@@ -36,8 +36,7 @@ constexpr uint16_t kMaxTolerance = 2048;
 RelativeHumidityMeasurementCluster::RelativeHumidityMeasurementCluster(EndpointId endpointId,
                                                                        const OptionalAttributeSet & optionalAttributeSet,
                                                                        const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, RelativeHumidityMeasurement::Id }),
-    mOptionalAttributeSet(optionalAttributeSet)
+    DefaultServerCluster({ endpointId, RelativeHumidityMeasurement::Id }), mOptionalAttributeSet(optionalAttributeSet)
 {
     if (!config.minMeasuredValue.IsNull())
     {
