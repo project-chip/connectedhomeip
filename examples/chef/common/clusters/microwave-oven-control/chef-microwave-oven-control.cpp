@@ -39,8 +39,8 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
                                                  OperationalState::Instance * operationalStateInstancePtr,
                                                  OperationalStateDelegate * operationalStateDelegatePtr,
                                                  ModeBase::Instance * microwaveOvenModeInstancePtr) :
-    mOperationalStateDelegatePtr(operationalStateDelegatePtr), mOperationalStateInstancePtr(operationalStateInstancePtr),
-    mMicrowaveOvenModeInstancePtr(microwaveOvenModeInstancePtr)
+    mOperationalStateDelegatePtr(operationalStateDelegatePtr),
+    mOperationalStateInstancePtr(operationalStateInstancePtr), mMicrowaveOvenModeInstancePtr(microwaveOvenModeInstancePtr)
 {
     if (mOperationalStateInstancePtr && mMicrowaveOvenModeInstancePtr && mMicrowaveOvenModeInstancePtr)
     {
