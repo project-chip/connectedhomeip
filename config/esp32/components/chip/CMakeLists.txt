@@ -82,7 +82,7 @@ chip_gn_arg_bool("is_debug"                ${is_debug})
 # esp-idf v6.0 and onwards migrated to mbedTLS 4.x where PSA is the crypto backend primary interface
 if (IDF_VERSION_MAJOR GREATER_EQUAL 6)
     chip_gn_arg_append("chip_crypto"                    "\"psa\"")
-    # keep using mbedTLS for spake2p, driver for PSA_ALG_SPAKE2P_MATTER is not yet available in esp-idf
+    # keep using older mbedTLS APIs for spake2p, PSA driver for PSA_ALG_SPAKE2P_MATTER is not yet available in mbedtls v4.x
     chip_gn_arg_append("chip_crypto_spake2p"            "\"mbedtls\"")
     chip_gn_arg_bool("chip_crypto_psa_aead_single_part" "true")
 endif()
