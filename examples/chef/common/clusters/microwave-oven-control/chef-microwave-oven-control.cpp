@@ -21,7 +21,6 @@
 #include "../../DeviceTypes.h"
 #include <app/util/attribute-storage.h>
 #include <devices/Types.h>
-#include <lib/support/CHIPMem.h> // For chip::Platform
 
 using namespace chip;
 using namespace chip::app;
@@ -42,8 +41,7 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
     mOperationalStateDelegatePtr(operationalStateDelegatePtr), mOperationalStateInstancePtr(operationalStateInstancePtr),
     mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint))
 {
-    mOperationalStateObjectsOwned = false;
-    if (mOperationalStateInstancePtr && mMicrowaveOvenModeInstancePtr)
+    if (mOperationalStateInstancePtr && mMicrowaveOvenModeInstancePtr && mMicrowaveOvenModeInstancePtr)
     {
         mMicrowaveOvenControlInstance = std::make_unique<MicrowaveOvenControl::Instance>(
             this, aClustersEndpoint, MicrowaveOvenControl::Id,
