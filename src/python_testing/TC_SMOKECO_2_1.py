@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS /tmp/kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -37,7 +37,7 @@
 
 import logging
 
-from TC_SMOKECOTestBase import SmokeCoBaseTest
+from support_modules.smokeco_support import SmokeCoBaseTest
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
@@ -97,10 +97,16 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
         await self.read_attribute_check_range(self.smokeco_cluster.Attributes.ExpressedState, 0, 9)
 
         self.step(3)
-        await self.read_attribute_check_range(self.smokeco_cluster.Attributes.SmokeState, 0, 2)
+        if self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
+            await self.read_attribute_check_range(self.smokeco_cluster.Attributes.SmokeState, 0, 2)
+        else:
+            self.skip_step(3)
 
         self.step(4)
-        await self.read_attribute_check_range(self.smokeco_cluster.Attributes.COState, 0, 2)
+        if self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kCoAlarm):
+            await self.read_attribute_check_range(self.smokeco_cluster.Attributes.COState, 0, 2)
+        else:
+            self.skip_step(4)
 
         self.step(5)
         await self.read_attribute_check_range(self.smokeco_cluster.Attributes.BatteryAlert, 0, 2)
@@ -126,11 +132,17 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
         if self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.InterconnectCOAlarm, 0, 2)
 
-        self.step(12)
-        await self.read_attribute_check_range(self.smokeco_cluster.Attributes.ContaminationState, 0, 3)
+        if self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
+            self.step(12)
+            await self.read_attribute_check_range(self.smokeco_cluster.Attributes.ContaminationState, 0, 3)
+        else:
+            self.skip_step(12)
 
         self.step(13)
-        await self.read_attribute_check_range(self.smokeco_cluster.Attributes.SmokeSensitivityLevel, 0, 2)
+        if self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
+            await self.read_attribute_check_range(self.smokeco_cluster.Attributes.SmokeSensitivityLevel, 0, 2)
+        else:
+            self.skip_step(13)
 
         self.step(14)
         if self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.ExpiryDate):

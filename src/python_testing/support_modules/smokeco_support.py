@@ -43,7 +43,7 @@ class SmokeCoBaseTest(MatterBaseTest):
         if len(events_response) == 0:
             asserts.fail("Failed to read events")
         smoke_alarm_event_data = None
-        # Read tand match events
+        # Read and match events
         for event in events_response:
             if event.Header.EventId == smokeco_event.event_id:
                 log.info(f"Event retrieved {event}")
