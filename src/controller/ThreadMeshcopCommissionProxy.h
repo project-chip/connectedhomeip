@@ -62,12 +62,6 @@ public:
     ThreadMeshcopCommissionProxy();
     ~ThreadMeshcopCommissionProxy() override;
 
-    static ThreadMeshcopCommissionProxy & GetInstance()
-    {
-        static ThreadMeshcopCommissionProxy instance;
-        return instance;
-    }
-
     /**
      * Entry point to start the Thread commissioning and discover the device.
      * TODO: this function is synchronous, we need to make it asynchronous

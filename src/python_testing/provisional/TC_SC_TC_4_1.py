@@ -51,7 +51,7 @@ class TC_SC_TC_4_1(MatterBaseTest):
     def steps_TC_SC_TC_4_1(self) -> list[TestStep]:
         return [
             TestStep(1, "DUT is ready to be discovered", is_commissioning=False),
-            TestStep(2, "TH establishs PASE session over Thread Meshcop with DUT", is_commissioning=False),
+            TestStep(2, "TH establishes PASE session over Thread Meshcop with DUT", is_commissioning=False),
         ]
 
     @async_test_body

@@ -35,10 +35,6 @@
 #include <tracing/metric_event.h>
 #include <vector>
 
-#if CHIP_SUPPORT_THREAD_MESHCOP
-#include <controller/ThreadMeshcopCommissionProxy.h>
-#endif
-
 constexpr uint32_t kDeviceDiscoveredTimeout = CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS * chip::kMillisecondsPerSecond;
 
 using namespace chip::Tracing;
@@ -409,6 +405,12 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverThreadMeshcop()
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 
+    if (!mThreadMeshcopCommissionProxy)
+    {
+        ChipLogError(Controller, "The meshcopCommissioningProxy is not set");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     if (!mThreadMeshcopCommissionParams.HasValue() ||
         mThreadMeshcopCommissionParams.Value().mBorderAgentAddress.GetTransportType() != Transport::Type::kThreadMeshcop)
     {
@@ -439,8 +441,8 @@ CHIP_ERROR SetUpCodePairer::StartDiscoveryOverThreadMeshcop()
         mWaitingForDiscovery[kThreadMeshcopTransport] = true;
         Dnssd::DiscoveredNodeData discoveredNodeData;
 
-        CHIP_ERROR err = ThreadMeshcopCommissionProxy::GetInstance().Discover(
-            pskc, mThreadMeshcopCommissionParams.Value().mBorderAgentAddress, code, connDiscriminator, discoveredNodeData, 30);
+        CHIP_ERROR err = mThreadMeshcopCommissionProxy->Discover(pskc, mThreadMeshcopCommissionParams.Value().mBorderAgentAddress,
+                                                                 code, connDiscriminator, discoveredNodeData, 30);
 
         mWaitingForDiscovery[kThreadMeshcopTransport] = false;
         ReturnErrorOnFailure(err);

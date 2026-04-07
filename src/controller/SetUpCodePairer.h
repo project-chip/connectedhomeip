@@ -44,6 +44,10 @@
 #include <nfc/NFC.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
+#if CHIP_SUPPORT_THREAD_MESHCOP
+#include <controller/ThreadMeshcopCommissionProxy.h>
+#endif // CHIP_SUPPORT_THREAD_MESHCOP
+
 #include <controller/DeviceDiscoveryDelegate.h>
 
 #include <deque>
@@ -122,6 +126,10 @@ public:
 #if CONFIG_NETWORK_LAYER_BLE
     void SetBleLayer(Ble::BleLayer * bleLayer) { mBleLayer = bleLayer; };
 #endif // CONFIG_NETWORK_LAYER_BLE
+
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    void SetThreadMeshcopCommissionProxy(ThreadMeshcopCommissionProxy * proxy) { mThreadMeshcopCommissionProxy = proxy; }
+#endif
 
     // Stop ongoing discovery / pairing of the specified node, or of
     // whichever node we're pairing if kUndefinedNodeId is passed.
@@ -271,6 +279,9 @@ private:
     CHIP_ERROR mLastPASEError = CHIP_NO_ERROR;
 
     Optional<ThreadMeshcopCommissionParameters> mThreadMeshcopCommissionParams;
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    ThreadMeshcopCommissionProxy * mThreadMeshcopCommissionProxy;
+#endif
 };
 
 } // namespace Controller

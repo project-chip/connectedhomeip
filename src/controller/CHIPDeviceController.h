@@ -71,6 +71,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
+#if CHIP_SUPPORT_THREAD_MESHCOP
+#include <controller/ThreadMeshcopCommissionProxy.h>
+#endif
+
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
 #endif
@@ -1149,6 +1153,8 @@ private:
 
 #if CHIP_SUPPORT_THREAD_MESHCOP
     CHIP_ERROR PairThreadMeshcop(RendezvousParameters & rendezvousParams, CommissioningParameters & commissioningParams);
+
+    ThreadMeshcopCommissionProxy mThreadMeshcopCommissionProxy;
 #endif
 
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;

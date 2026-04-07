@@ -74,10 +74,6 @@
 #include <platform/internal/NFCCommissioningManager.h>
 #endif
 
-#if CHIP_SUPPORT_THREAD_MESHCOP
-#include <controller/ThreadMeshcopCommissionProxy.h>
-#endif
-
 #include <algorithm>
 #include <array>
 #include <errno.h>
@@ -684,7 +680,12 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, const char * se
                                           Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams)
 {
     MATTER_TRACE_SCOPE("PairDevice", "DeviceCommissioner");
-
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    if (meshcopCommissionParams.HasValue())
+    {
+        mSetUpCodePairer.SetThreadMeshcopCommissionProxy(&mThreadMeshcopCommissionProxy);
+    }
+#endif
     ReturnErrorOnFailure(mDefaultCommissioner->SetCommissioningParameters(params));
 
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kCommission, discoveryType,
@@ -738,8 +739,8 @@ CHIP_ERROR DeviceCommissioner::PairThreadMeshcop(RendezvousParameters & rendezvo
 
     {
         Dnssd::DiscoveredNodeData discoveredNodeData;
-        ReturnErrorOnFailure(ThreadMeshcopCommissionProxy::GetInstance().Discover(pskc, rendezvousParams.GetPeerAddress(), code,
-                                                                                  discriminator, discoveredNodeData, 30));
+        ReturnErrorOnFailure(mThreadMeshcopCommissionProxy.Discover(pskc, rendezvousParams.GetPeerAddress(), code, discriminator,
+                                                                    discoveredNodeData, 30));
 
         ChipLogProgress(Controller, "Joiner discovered");
         OnNodeDiscovered(discoveredNodeData);
@@ -770,6 +771,12 @@ DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, const char * 
                                             Optional<SetUpCodePairer::ThreadMeshcopCommissionParameters> meshcopCommissionParams)
 {
     MATTER_TRACE_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
+#if CHIP_SUPPORT_THREAD_MESHCOP
+    if (meshcopCommissionParams.HasValue())
+    {
+        mSetUpCodePairer.SetThreadMeshcopCommissionProxy(&mThreadMeshcopCommissionProxy);
+    }
+#endif
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly, discoveryType,
                                        resolutionData, meshcopCommissionParams);
 }
