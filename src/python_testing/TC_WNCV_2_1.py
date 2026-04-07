@@ -38,11 +38,11 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.interaction_model import Status as IMStatus
+from matter.testing.decorators import async_test_body
 from matter.testing.matter_asserts import assert_valid_uint8, assert_valid_uint16
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
-from matter.testing.decorators import async_test_body
-from matter.interaction_model import Status as IMStatus
 
 log = logging.getLogger(__name__)
 
