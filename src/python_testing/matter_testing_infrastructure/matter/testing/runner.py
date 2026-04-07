@@ -39,8 +39,8 @@ from mobly import signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
-import matter.testing.global_stash as global_stash
 import matter.clusters as Clusters
+import matter.testing.global_stash as global_stash
 from matter.clusters import Attribute
 # Add imports for argument parsing dependencies
 from matter.testing.defaults import TestingDefaults
