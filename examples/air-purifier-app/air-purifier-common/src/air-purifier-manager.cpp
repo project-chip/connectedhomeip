@@ -19,6 +19,7 @@
 #include <air-purifier-manager.h>
 #include <app/clusters/fan-control-server/CodegenIntegration.h>
 #include <app/clusters/fan-control-server/FanControlCluster.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -279,7 +280,7 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
     }
     if (FanControlCluster * c = FanControl::FindClusterOnEndpoint(mEndpointId); c != nullptr)
     {
-        (void) c->SetFanMode(fanMode).GetStatusCode().GetStatus();
+        LogErrorOnFailure(c->SetFanMode(fanMode).GetUnderlyingError());
     }
 }
 

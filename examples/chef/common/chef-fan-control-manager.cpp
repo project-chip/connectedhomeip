@@ -168,7 +168,7 @@ void ChefFanControlManager::HandleFanControlAttributeChange(AttributeId attribut
         // Determine if the speed change should also change the fan mode
         if (FanControlCluster * fc = FanControl::FindClusterOnEndpoint(mEndpoint); fc != nullptr)
         {
-            (void) fc->SetFanMode(SpeedToFanMode(mSpeedCurrent)).GetStatusCode().GetStatus();
+            LogErrorOnFailure(fc->SetFanMode(SpeedToFanMode(mSpeedCurrent)).GetUnderlyingError());
         }
         break;
     }
