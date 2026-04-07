@@ -1,3 +1,3 @@
 "DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"","1383770","TC_SU_2_5.py","","","passed","","","Nightly CI Tests","Nightly CI Tests",""
-"","1114776","TC_SU_2_7.py","","","passed","","","Nightly CI Tests","Nightly CI Tests",""
+"","1116549","TC_SU_2_7.py","","","passed","","","Nightly CI Tests","Nightly CI Tests",""
+"","1381312","TC_SU_2_5.py","","","passed","","","Nightly CI Tests","Nightly CI Tests",""
