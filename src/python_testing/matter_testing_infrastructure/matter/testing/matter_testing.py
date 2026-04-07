@@ -517,11 +517,10 @@ class MatterBaseTest(base_test.BaseTestClass):
     def default_timeout(self) -> int:
         """The default timeout in seconds for async operations in a test."""
         return 90
+
+    @property
     def stored_global_wildcard(self) -> typing.Any:
         """Accesses the stored global wildcard data."""
-    def stored_global_wildcard(self) -> TestRunnerHooks:
-        """Accesses the Test Runner Hooks for global wildcard."""
-        return global_stash.unstash_globally(self.user_params.get("stored_global_wildcard"))
 
     @property
     def runner_hook(self) -> TestRunnerHooks:
