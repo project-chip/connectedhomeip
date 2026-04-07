@@ -110,6 +110,12 @@ config("efr32-common-config") {
     defines += [ "HEAP_MONITORING" ]
   }
 
+  if (sl_matter_use_code_driven_dm) {
+    defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=1" ]
+  } else {
+    defines += [ "SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL=0" ]
+  }
+
   ldflags = [
     "-Wl,--no-warn-rwx-segment",
     "-fno-lto",

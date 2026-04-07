@@ -23,6 +23,7 @@ import logging
 from mobly import asserts, signals
 
 import matter.testing.nfc
+from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
@@ -60,6 +61,10 @@ class TC_DD_1_5(MatterBaseTest):
             TestStep("4",
                      "Try to write a new NDEF in the tag",
                      "Writing NFC tag fails, the content of the tag is unmodified."
+                     ),
+            TestStep("5",
+                     "Check that an alternate commissioning channel exists",
+                     "An alternate commissioning channel does exist."
                      )
         ]
 
@@ -141,6 +146,21 @@ class TC_DD_1_5(MatterBaseTest):
         # Check that NDEF content is unchanged
         nfc_tag_content_after_write = reader.read_nfc_tag_data()
         asserts.assert_equal(nfc_tag_content, nfc_tag_content_after_write, "Error! NDEF content has been changed!")
+
+        ###########
+        self.step("5")
+
+        # This step is only for NTL devices
+        if self.check_pics("MCORE.DD.NTL"):
+            # Check that an alternate commissioning channel is supported
+            payload = SetupPayload().ParseQrCode(nfc_tag_content)
+            asserts.assert_true(
+                payload.supports_ble_commissioning or
+                payload.supports_wifi_commissioning or
+                payload.supports_on_network_commissioning or
+                payload.supports_thread_commissioning,
+                "No alternate commissioning channel found!",
+            )
 
     async def wait_for_user_input_async(self, *args, **kwargs):
         loop = asyncio.get_running_loop()

@@ -449,7 +449,7 @@ class BuildTarget:
         return _StringIntoParts(value, suffix, self.fixed_targets, self.modifiers)
 
     def Create(self, name: str, runner, repository_path: str, output_prefix: str,
-               verbose: bool, ninja_jobs: int, builder_options: BuilderOptions):
+               verbose: bool, quiet: bool, ninja_jobs: int, builder_options: BuilderOptions):
 
         parts = self.StringIntoTargetParts(name)
 
@@ -460,7 +460,8 @@ class BuildTarget:
         for part in parts:
             kargs.update(part.build_arguments)
 
-        log.info("Preparing builder '%s'" % (name,))
+        if not quiet:
+            log.info("Preparing builder '%s'" % (name,))
 
         builder = self.builder_class(repository_path, runner=runner, **kargs)
         builder.target = self
@@ -474,6 +475,7 @@ class BuildTarget:
         if builder_options.build_profile != BuildProfile.DEFAULT:
             builder.output_dir += '-' + builder_options.build_profile
         builder.verbose = verbose
+        builder.quiet = quiet
         builder.ninja_jobs = ninja_jobs
         builder.chip_dir = os.path.abspath(repository_path)
         builder.options = builder_options

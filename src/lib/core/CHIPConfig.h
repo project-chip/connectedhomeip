@@ -1132,15 +1132,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_MAX_GROUPCAST_MEMBERSHIP_COUNT
 
 /**
- * @def CHIP_CONFIG_ENABLE_GROUPCAST
- *
- * @brief Enable (1) or disable (0) the Groupcast cluster.
- */
-#ifndef CHIP_CONFIG_ENABLE_GROUPCAST
-#define CHIP_CONFIG_ENABLE_GROUPCAST 0
-#endif // CHIP_CONFIG_ENABLE_GROUPCAST
-
-/**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
  *
  * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.

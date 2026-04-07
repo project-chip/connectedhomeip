@@ -104,8 +104,6 @@ if [ "$#" == "0" ]; then
             --icd can be used to configure both arguments
         use_SiWx917
             Build wifi example with extension board SiWx917. (Default false)
-        use_wf200
-            Build wifi example with extension board wf200. (Default false)
         use_pw_rpc
             Use to build the example with pigweed RPC
         ota_periodic_query_timeout_sec
@@ -140,7 +138,7 @@ if [ "$#" == "0" ]; then
         --low-power
             disables all power consuming features for the most power efficient build
             This flag is to be used with --icd
-        --wifi <wf200 | SiWx917>
+        --wifi <SiWx917>
             build wifi example variant for given expansion board
         --additional_data_advertising
             enable Addition data advertissing and rotating device ID
@@ -188,16 +186,14 @@ else
                 ;;
             --wifi)
                 if [ -z "$2" ]; then
-                    echo "--wifi requires SiWx917 or wf200"
+                    echo "--wifi requires SiWx917"
                     exit 1
                 fi
 
                 if [ "$2" = "SiWx917" ]; then
                     optArgs+="use_SiWx917=true "
-                elif [ "$2" = "wf200" ]; then
-                    optArgs+="use_wf200=true "
                 else
-                    echo "Wifi usage: --wifi SiWx917|wf200"
+                    echo "Wifi usage: --wifi SiWx917"
                     exit 1
                 fi
 
@@ -292,7 +288,7 @@ else
                 shift
                 ;;
             *)
-                if [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
+                if [[ "$1" == *use_SiWx917=true* ]]; then
                     USE_WIFI=true
                     # NCP Mode so base MCU is an EFR32
                     optArgs+="chip_device_platform =\"efr32\" "
