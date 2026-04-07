@@ -58,6 +58,7 @@ def _field_value(value: int, mask: int) -> int:
     shift = (mask & -mask).bit_length() - 1
     return (value & mask) >> shift
 
+
 # Mandatory attribute IDs defined by the WindowCovering cluster spec (section 5.3.5).
 # These must always be present in the DUT's AttributeList regardless of feature flags.
 MANDATORY_ATTRIBUTE_IDS = {
