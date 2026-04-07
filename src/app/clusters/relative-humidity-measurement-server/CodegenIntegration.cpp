@@ -23,8 +23,6 @@
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <lib/support/logging/CHIPLogging.h>
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -63,14 +61,9 @@ public:
         }
 
         // If both values are non-null but form an invalid range (e.g. ZAP defaults of 0/0),
-        // treat both as null rather than crashing. The application can call SetMeasuredValueRange
-        // later with valid values.
+        // treat both as null rather than crashing.
         if (!minMeasuredValue.IsNull() && !maxMeasuredValue.IsNull() && maxMeasuredValue.Value() < minMeasuredValue.Value() + 1)
         {
-            ChipLogError(AppServer,
-                         "RelativeHumidityMeasurement endpoint %u: invalid min/max range from Ember (min=%u max=%u); "
-                         "treating both as null",
-                         endpointId, minMeasuredValue.Value(), maxMeasuredValue.Value());
             minMeasuredValue.SetNull();
             maxMeasuredValue.SetNull();
         }

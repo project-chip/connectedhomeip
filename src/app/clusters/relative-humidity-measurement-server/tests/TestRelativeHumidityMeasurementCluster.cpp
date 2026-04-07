@@ -198,10 +198,6 @@ TEST_F(TestRelativeHumidityMeasurementCluster, MeasuredValueRange)
     EXPECT_EQ(cluster.SetMeasuredValueRange(DataModel::MakeNullable<uint16_t>(10000), DataModel::NullNullable),
               CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-    // max < spec min (1) → ConstraintError
-    EXPECT_EQ(cluster.SetMeasuredValueRange(DataModel::NullNullable, DataModel::MakeNullable<uint16_t>(0)),
-              CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
     // max > spec max (10000) → ConstraintError
     EXPECT_EQ(cluster.SetMeasuredValueRange(DataModel::NullNullable, DataModel::MakeNullable<uint16_t>(10001)),
               CHIP_IM_GLOBAL_STATUS(ConstraintError));
