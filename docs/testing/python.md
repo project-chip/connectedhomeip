@@ -919,7 +919,7 @@ Example:
 
 ```python
 self.step(<STEP_NUMBER>)
-if await self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperationalState):
+if self.attribute_guard(endpoint=self.endpoint, attribute=attributes.OperationalState):
     # If attribute exists then test step continues, else test step is skipped.
 ```
 
@@ -945,7 +945,7 @@ Example:
 
 ```python
 self.step(<STEP_NUMBER>)
-if await self.command_guard(endpoint=self.endpoint, command=commands.Resume):
+if self.command_guard(endpoint=self.endpoint, command=commands.Resume):
     # If command available, then do test step here, else test step is skipped
 ```
 

@@ -111,7 +111,7 @@ class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
         await self.check_meter_serial_number_attribute(endpoint)
 
         # Checks if ProtocolVersion attribute is supported
-        if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
+        if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.ProtocolVersion):
 
             self.step("5")
 
@@ -131,7 +131,7 @@ class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
                 self.skip_step("5")
 
         # Checks if PowerThreshold feature is supported
-        if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
+        if self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
 
             self.step("6")
 

@@ -40,9 +40,12 @@ from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
 import matter.testing.global_stash as global_stash
+import matter.clusters as Clusters
 from matter.clusters import Attribute
 # Add imports for argument parsing dependencies
 from matter.testing.defaults import TestingDefaults
+# Add imports for global wildcard
+from matter.testing.global_attribute_ids import GlobalAttributeIds
 # Add imports for argument parsing dependencies
 from matter.testing.pics import read_pics_from_file
 
@@ -462,39 +465,92 @@ def run_tests_no_exit(
         # Set custom exception handler to catch unhandled exceptions.
         event_loop.set_exception_handler(_handler)
 
-        runner = TestRunner(log_dir=test_config.log_path,
-                            testbed_name=test_config.testbed_name)
+        if hooks:
+            # Right now, we only support running a single test class at once,
+            # but it's relatively easy to expand that to make the test process faster
+            # TODO: support a list of tests
+            hooks.start(count=1)
+            # Mobly gives the test run time in seconds, lets be a bit more
+            # precise
+            runner_start_time = datetime.now(timezone.utc)
 
-        with runner.mobly_logger():
-            if matter_test_config.commissioning_method is not None:
+        #
+        # Run commissioning first, if requested.
+        #
+        if matter_test_config.commissioning_method is not None:
+            runner = TestRunner(log_dir=test_config.log_path,
+                                testbed_name=test_config.testbed_name)
+
+            with runner.mobly_logger():
                 runner.add_test_class(test_config, CommissionDeviceTest, None)
 
-            # Add the tests selected unless we have a commission-only request
-            if not matter_test_config.commission_only:
-                runner.add_test_class(test_config, test_class, tests)
-
-            if hooks:
-                # Right now, we only support running a single test class at once,
-                # but it's relatively easy to expand that to make the test process faster
-                # TODO: support a list of tests
-                hooks.start(count=1)
-                # Mobly gives the test run time in seconds, lets be a bit more
-                # precise
-                runner_start_time = datetime.now(timezone.utc)
-
-            try:
-                runner.run()
-                ok = runner.results.is_all_pass and ok
-                if matter_test_config.fail_on_skipped_tests and runner.results.skipped:
+                try:
+                    runner.run()
+                    ok = runner.results.is_all_pass and ok
+                    if matter_test_config.fail_on_skipped_tests and runner.results.skipped:
+                        ok = False
+                except TimeoutError:
                     ok = False
+                except signals.TestAbortAll:
+                    ok = False
+                except Exception:
+                    LOGGER.exception('Exception when executing %s.',
+                                     test_config.testbed_name)
+                    ok = False
+
+        #
+        # Populate the global wildcard only after commissioning has completed,
+        # so the DUT is reachable for operational reads.
+        #
+        if ok and not matter_test_config.commission_only:
+            try:
+                global_wildcard = event_loop.run_until_complete(
+                    asyncio.wait_for(
+                        default_controller.Read(
+                            matter_test_config.dut_node_ids[0],
+                            [
+                                (Clusters.Descriptor),
+                                Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID),
+                                Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
+                                Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID),
+                            ]
+                        ),
+                        timeout=60
+                    )
+                )
+                test_config.user_params["stored_global_wildcard"] = global_stash.stash_globally(
+                    global_wildcard)
             except TimeoutError:
                 ok = False
-            except signals.TestAbortAll:
-                ok = False
             except Exception:
-                LOGGER.exception('Exception when executing %s.',
+                LOGGER.exception('Exception when populating global wildcard for %s.',
                                  test_config.testbed_name)
                 ok = False
+
+        #
+        # Run the actual test class unless we have a commission-only request.
+        #
+        if ok and not matter_test_config.commission_only:
+            runner = TestRunner(log_dir=test_config.log_path,
+                                testbed_name=test_config.testbed_name)
+
+            with runner.mobly_logger():
+                # Add the tests selected unless we have a commission-only request
+                runner.add_test_class(test_config, test_class, tests)
+
+                try:
+                    runner.run()
+                    ok = runner.results.is_all_pass and ok
+                    if matter_test_config.fail_on_skipped_tests and runner.results.skipped:
+                        ok = False
+                except TimeoutError:
+                    ok = False
+                except signals.TestAbortAll:
+                    ok = False
+                except Exception:
+                    LOGGER.exception('Exception when executing %s.',
+                                     test_config.testbed_name)
+                    ok = False
 
     if hooks:
         duration = (datetime.now(timezone.utc) -

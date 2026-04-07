@@ -176,7 +176,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         # if SETRF.S.F05(RNDM) feature is enabled
         # checks RandomizationOffset and RandomizationType fields
-        if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kRandomization):
+        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kRandomization):
             if struct.randomizationType is not None:
                 # checks RandomizationType field must be DayEntryRandomizationTypeEnum type value and in range 0 - 4
                 matter_asserts.assert_valid_enum(
@@ -313,7 +313,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                             'At least one field from price, friendlyCredit, auxiliaryLoad, peakPeriod, powerThreshold must be set')
 
         # if SETRF.S.F00(PRICE) feature is enabled
-        if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPricing):
+        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPricing):
             # checks Price field must be of type TariffPriceStruct
             if struct.price is not None and struct.price is not NullValue:
                 asserts.assert_true(isinstance(
@@ -323,7 +323,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             asserts.assert_is_none(struct.price, "Price must be None")
 
         # if SETRF.S.F01(FCRED) feature is enabled
-        if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kFriendlyCredit):
+        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kFriendlyCredit):
             if struct.friendlyCredit is not None:
                 # checks FriendlyCredit field must be bool
                 matter_asserts.assert_valid_bool(struct.friendlyCredit, 'FriendlyCredit')
@@ -331,7 +331,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             asserts.assert_is_none(struct.friendlyCredit, "FriendlyCredit must be None")
 
         # if SETRF.S.F02(AUXLD) feature is enabled
-        if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kAuxiliaryLoad):
+        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kAuxiliaryLoad):
             if struct.auxiliaryLoad is not None:
                 # checks AuxiliaryLoad field must be of type AuxiliaryLoadSwitchSettingsStruct
                 asserts.assert_true(isinstance(
@@ -341,7 +341,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             asserts.assert_is_none(struct.auxiliaryLoad, "AuxiliaryLoad must be None")
 
         # if SETRF.S.F03(PEAKP) feature is enabled
-        if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPeakPeriod):
+        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPeakPeriod):
             if struct.peakPeriod is not None:
                 # checks PeakPeriod field must be of type PeakPeriodStruct
                 asserts.assert_true(isinstance(
@@ -351,7 +351,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             asserts.assert_is_none(struct.peakPeriod, "PeakPeriod must be None")
 
         # if SETRF.S.F04(PWRTHLD) feature is enabled
-        if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
+        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
             if struct.powerThreshold is not None:
                 # checks PowerThreshold field must be of type PowerThresholdStruct
                 asserts.assert_true(isinstance(
@@ -401,7 +401,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             asserts.assert_less_equal(len(struct.providerName), 128, "ProviderName must have length at most 128!")
 
         # if SETRF.S.F00(PRICE) feature is enabled
-        if await self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPricing):
+        if self.feature_guard(cluster=cluster, endpoint=endpoint, feature_int=cluster.Bitmaps.Feature.kPricing):
             # checks Currency field must be CurrencyStruct
             asserts.assert_true(struct.currency is not None, "Currency must have real value or can be Null")
             if struct.currency is not NullValue:
@@ -954,7 +954,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         self.defaultRandomizationOffset = attribute_value
         if self.defaultRandomizationOffset is None:
-            if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
+            if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset):
                 self.defaultRandomizationOffset = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationOffset)
 
         log.info(f"DefaultRandomizationOffset attribute value is: {self.defaultRandomizationOffset}")
@@ -964,8 +964,8 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                                  "DefaultRandomizationOffset must be Null when TariffInfo is Null")
 
         # check if RNDM feature and DefaultRandomizationOffset attribute are enabled
-        if (await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset) and
-                await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kRandomization)):
+        if (self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationOffset) and
+                self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kRandomization)):
             # if feature is enabled, DefaultRandomizationOffset attribute must not be None
             asserts.assert_is_not_none(
                 self.defaultRandomizationOffset, "DefaultRandomizationOffset attribute must not be None if RNDM feature is enabled.")
@@ -986,7 +986,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
 
         self.defaultRandomizationType = attribute_value
         if self.defaultRandomizationType is None:
-            if await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
+            if self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType):
                 self.defaultRandomizationType = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationType)
 
         log.info(f"DefaultRandomizationType attribute value is: {self.defaultRandomizationType}")
@@ -996,8 +996,8 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
                                  "DefaultRandomizationType must be Null when TariffInfo is Null")
 
         # check if RNDM feature is enabled
-        if (await self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType) and
-                await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kRandomization)):
+        if (self.attribute_guard(endpoint=endpoint, attribute=cluster.Attributes.DefaultRandomizationType) and
+                self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kRandomization)):
             # if feature is enabled, DefaultRandomizationType attribute must not be None
             asserts.assert_is_not_none(
                 self.defaultRandomizationType, "DefaultRandomizationType attribute must not be None if RNDM feature is enabled.")

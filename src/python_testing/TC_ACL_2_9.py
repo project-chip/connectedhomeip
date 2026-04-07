@@ -219,7 +219,7 @@ class TC_ACL_2_9(MatterBaseTest):
 
         self.step(6)
         # TH2 reads DUT Endpoint 0 AccessControl cluster Extension attribute
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attribute):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=extension_attribute):
             await self.read_single_attribute_expect_error(
                 dev_ctrl=self.th2,
                 cluster=Clusters.Objects.AccessControl,
@@ -229,7 +229,7 @@ class TC_ACL_2_9(MatterBaseTest):
             )
 
         self.step(7)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attribute):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=extension_attribute):
             # TH2 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list
             new_extension = []
             result3 = await self.th2.WriteAttribute(
@@ -257,7 +257,7 @@ class TC_ACL_2_9(MatterBaseTest):
         await self.read_event_expect_unsupported_access(Clusters.AccessControl.Events.AccessControlEntryChanged)
 
         self.step(12)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=extension_attribute):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=extension_attribute):
             # TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event
             await self.read_event_expect_unsupported_access(Clusters.AccessControl.Events.AccessControlExtensionChanged)
 

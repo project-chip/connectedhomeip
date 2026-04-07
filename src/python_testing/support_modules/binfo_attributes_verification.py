@@ -87,7 +87,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.step(0)  # commissioning already done
 
         self.step(1)
-        if hasattr(cluster.Attributes, 'DataModelRevision') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DataModelRevision):
+        if hasattr(cluster.Attributes, 'DataModelRevision') and self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DataModelRevision):
             ret1 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DataModelRevision)
             asserts.assert_equal(ret1, 19, "DataModelRevision should be 19")
         elif not hasattr(cluster.Attributes, 'DataModelRevision'):
@@ -95,14 +95,14 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
 
         # Step 2: VendorName
         self.step(2)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.VendorName):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.VendorName):
             vendor_name = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.VendorName)
             asserts.assert_true(isinstance(vendor_name, str), "VendorName should be a string")
             asserts.assert_less_equal(len(vendor_name), 32, "VendorName should be a string with max 32 bytes")
 
         # Step 3: VendorID
         self.step(3)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.VendorID):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.VendorID):
             ret3 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.VendorID)
             asserts.assert_greater_equal(ret3, 0x0001, "VendorID should be greater than or equal to 0x0001")
             # 0xFFF1-0xFFF4 are reserved for test vendors, so we allow up to 0xFFF4
@@ -110,26 +110,26 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
 
         # Step 4: ProductName
         self.step(4)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ProductName):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ProductName):
             ret4 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.ProductName)
             asserts.assert_equal(len(ret4) <= 32, True, "ProductName should be a string with max 32 bytes")
 
         # Step 5: ProductID
         self.step(5)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ProductID):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ProductID):
             ret5 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.ProductID)
             asserts.assert_greater_equal(ret5, 1, "ProductID should be greater than or equal to 1")
             asserts.assert_less_equal(ret5, 65534, "ProductID should be less than or equal to 65534")
 
         # Step 6: NodeLabel
         self.step(6)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.NodeLabel):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.NodeLabel):
             ret6 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.NodeLabel)
             asserts.assert_equal(len(ret6) <= 32, True, "NodeLabel should be a string with max 32 bytes")
 
         # Step 7: Location
         self.step(7)
-        if hasattr(cluster.Attributes, 'Location') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.Location):
+        if hasattr(cluster.Attributes, 'Location') and self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.Location):
             ret7 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.Location)
             asserts.assert_true(isinstance(ret7, str), "Location should be a string")
             asserts.assert_less_equal(len(ret7), 2, "Location should have max 2 characters")
@@ -143,35 +143,35 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
 
         # Step 8: HardwareVersion
         self.step(8)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.HardwareVersion):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.HardwareVersion):
             ret8 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.HardwareVersion)
             asserts.assert_greater_equal(ret8, 0, "HardwareVersion should be greater than or equal to 0")
             asserts.assert_less_equal(ret8, 65534, "HardwareVersion should be less than or equal to 65534")
 
         # Step 9: HardwareVersionString
         self.step(9)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.HardwareVersionString):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.HardwareVersionString):
             ret9 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.HardwareVersionString)
             asserts.assert_true(isinstance(ret9, str), "HardwareVersionString should be a string")
             asserts.assert_equal(len(ret9) <= 64, True, "HardwareVersionString should be a string with max 64 bytes")
 
         # Step 10: SoftwareVersion
         self.step(10)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SoftwareVersion):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SoftwareVersion):
             ret10 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.SoftwareVersion)
             asserts.assert_greater_equal(ret10, 0, "SoftwareVersion should be greater than or equal to 0")
             asserts.assert_less_equal(ret10, 4294967294, "SoftwareVersion should be less than or equal to 4294967294")
 
         # Step 11: SoftwareVersionString
         self.step(11)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SoftwareVersionString):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SoftwareVersionString):
             ret11 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.SoftwareVersionString)
             asserts.assert_true(isinstance(ret11, str), "SoftwareVersionString should be a string")
             asserts.assert_equal(len(ret11) <= 64, True, "SoftwareVersionString should be a string with max 64 bytes")
 
         # Step 12: ManufacturingDate
         self.step(12)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ManufacturingDate):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ManufacturingDate):
             ret12 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.ManufacturingDate)
             asserts.assert_true(isinstance(ret12, str), "Manufacturing Date should be a string")
             asserts.assert_greater_equal(len(ret12), 8, "ManufacturingDate should have at least 8 characters")
@@ -203,14 +203,14 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
 
         # Step 13: PartNumber
         self.step(13)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.PartNumber):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.PartNumber):
             ret13 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.PartNumber)
             asserts.assert_true(isinstance(ret13, str), "PartNumber should be a string")
             asserts.assert_equal(len(ret13) <= 32, True, "PartNumber should be a string with max 32 bytes")
 
         # Step 14: ProductURL
         self.step(14)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ProductURL):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ProductURL):
             ret14 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.ProductURL)
             asserts.assert_true(isinstance(ret14, str), "ProductURL should be a string")
             asserts.assert_less_equal(len(ret14), 256, "ProductURL should be a string with max 256 bytes")
@@ -220,24 +220,24 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
 
         # Step 15: ProductLabel
         self.step(15)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ProductLabel):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ProductLabel):
             ret15 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.ProductLabel)
             asserts.assert_true(isinstance(ret15, str), "ProductLabel should be a string")
             asserts.assert_equal(len(ret15) <= 64, True, "ProductLabel should be a string with max 64 bytes")
-            if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.VendorName):
+            if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.VendorName):
                 asserts.assert_not_in(
                     vendor_name, ret15, "ProductLabel should not include the name of the vendor as defined within the VendorName attribute")
 
         # Step 16: SerialNumber
         self.step(16)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SerialNumber):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SerialNumber):
             serial_number = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.SerialNumber)
             asserts.assert_true(isinstance(serial_number, str), "SerialNumber should be a string")
             asserts.assert_less_equal(len(serial_number), 32, "SerialNumber should be a string with max 32 bytes")
 
         # Step 17: LocalConfigDisabled
         self.step(17)
-        if hasattr(cluster.Attributes, 'LocalConfigDisabled') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.LocalConfigDisabled):
+        if hasattr(cluster.Attributes, 'LocalConfigDisabled') and self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.LocalConfigDisabled):
             ret17 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.LocalConfigDisabled)
             asserts.assert_true(isinstance(ret17, bool), "LocalConfigDisabled should be a boolean")
             asserts.assert_equal(ret17, False, "LocalConfigDisabled should be set to false")
@@ -246,23 +246,23 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
 
         # Step 18: Reachable
         self.step(18)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.Reachable):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.Reachable):
             ret18 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.Reachable)
             asserts.assert_true(isinstance(ret18, bool), "Reachable should be a boolean")
             asserts.assert_equal(ret18, True, "Reachable should be set to true")
 
         # Step 19: UniqueID
         self.step(19)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.UniqueID):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.UniqueID):
             ret19 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.UniqueID)
             asserts.assert_true(isinstance(ret19, str), "UniqueID should be a string")
-            if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SerialNumber):
+            if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SerialNumber):
                 asserts.assert_not_equal(
                     ret19, serial_number, "UniqueID should not be identical to SerialNumber attribute if SerialNumber attribute is supported")
 
         # Step 20: CapabilityMinima
         self.step(20)
-        if hasattr(cluster.Attributes, 'CapabilityMinima') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.CapabilityMinima):
+        if hasattr(cluster.Attributes, 'CapabilityMinima') and self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.CapabilityMinima):
             capability_minima = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.CapabilityMinima)
             cluster_revision = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.ClusterRevision)
 
@@ -315,14 +315,14 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
 
         # Step 21: ProductAppearance
         self.step(21)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ProductAppearance):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ProductAppearance):
             ret21 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.ProductAppearance)
             asserts.assert_true(isinstance(ret21, cluster.Structs.ProductAppearanceStruct),
                                 "ProductAppearance should be a ProductAppearanceStruct")
 
         # Step 22: SpecificationVersion
         self.step(22)
-        if hasattr(cluster.Attributes, 'SpecificationVersion') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SpecificationVersion):
+        if hasattr(cluster.Attributes, 'SpecificationVersion') and self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SpecificationVersion):
             ret22 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.SpecificationVersion)
             try:
                 dm_from_spec_version(ret22)
@@ -333,7 +333,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
 
         # Step 23: MaxPathsPerInvoke
         self.step(23)
-        if hasattr(cluster.Attributes, 'MaxPathsPerInvoke') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.MaxPathsPerInvoke):
+        if hasattr(cluster.Attributes, 'MaxPathsPerInvoke') and self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.MaxPathsPerInvoke):
             ret23 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.MaxPathsPerInvoke)
             asserts.assert_greater_equal(ret23, 1, "MaxPathsPerInvoke should be greater than or equal to 1")
             asserts.assert_less_equal(ret23, 65535, "MaxPathsPerInvoke should be less than or equal to 65535")
@@ -342,7 +342,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
 
         # Step 24: DeviceLocation
         self.step(24)
-        if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
+        if hasattr(cluster.Attributes, 'DeviceLocation') and self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
             ret24 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation)
             asserts.assert_true(isinstance(ret24, cluster.Structs.DeviceLocationStruct),
                                 "DeviceLocation should be a DeviceLocationStruct")
@@ -357,14 +357,14 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
 
         # Step 25: Write empty DeviceLocation
         self.step(25)
-        if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
+        if hasattr(cluster.Attributes, 'DeviceLocation') and self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
             await self.write_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation, value=cluster.Structs.DeviceLocationStruct(locationName="", floorNumber=-1, areaType=None))
         elif not hasattr(cluster.Attributes, 'DeviceLocation'):
             self.mark_current_step_skipped()
 
         # Step 26: Validate write to DeviceLocation from test step 25
         self.step(26)
-        if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
+        if hasattr(cluster.Attributes, 'DeviceLocation') and self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
             ret26 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation)
             asserts.assert_true(isinstance(ret26, cluster.Structs.DeviceLocationStruct),
                                 "DeviceLocation should be a DeviceLocationStruct")
@@ -376,14 +376,14 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
 
         # Step 27: Write DeviceLocation with location name of 128 characters
         self.step(27)
-        if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
+        if hasattr(cluster.Attributes, 'DeviceLocation') and self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
             await self.write_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation, value=cluster.Structs.DeviceLocationStruct(locationName="location" * 16, floorNumber=200, areaType=0x0002))
         elif not hasattr(cluster.Attributes, 'DeviceLocation'):
             self.mark_current_step_skipped()
 
         # Step 28: Validate write to DeviceLocation from test step 27
         self.step(28)
-        if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
+        if hasattr(cluster.Attributes, 'DeviceLocation') and self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
             ret28 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation)
             asserts.assert_true(isinstance(ret28, cluster.Structs.DeviceLocationStruct),
                                 "DeviceLocation should be a DeviceLocationStruct")
@@ -395,7 +395,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
 
         # Step 29: Read ConfigurationVersion
         self.step(29)
-        if hasattr(cluster.Attributes, 'ConfigurationVersion') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ConfigurationVersion):
+        if hasattr(cluster.Attributes, 'ConfigurationVersion') and self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.ConfigurationVersion):
             ret29 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.ConfigurationVersion)
             asserts.assert_greater_equal(ret29, 1, "ConfigurationVersion should be greater than or equal to 1")
             asserts.assert_less_equal(ret29, 4294967295, "ConfigurationVersion should be less than or equal to 4294967295")

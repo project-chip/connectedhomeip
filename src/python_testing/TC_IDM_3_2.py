@@ -214,7 +214,7 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
         """
         self.step(4)
         # Check if NodeLabel attribute exists for step 4 (SuppressResponse tests)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
             '''
             TH sends the WriteRequestMessage to the DUT to modify the value of one attribute and Set SuppressResponse to True.
 
@@ -256,7 +256,7 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
         """
         # Check if NodeLabel attribute exists for steps 5 and 6 (DataVersion test steps)
         self.step(5)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
             '''
             TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
             DUT returns with a report data action with the attribute values and the dataversion of the cluster.
@@ -292,7 +292,7 @@ class TC_IDM_3_2(IDMBaseTest, BasicCompositionTests):
                                  f"Read value {actual_value} should match written value {new_value0}")
 
         self.step(6)
-        if await self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
+        if self.attribute_guard(endpoint=self.endpoint, attribute=Clusters.BasicInformation.Attributes.NodeLabel):
             '''
             TH sends a ReadRequest message to the DUT to read any attribute on any cluster.
             DUT returns with a report data action with the attribute values and the dataversion of the cluster.

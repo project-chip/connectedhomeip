@@ -152,7 +152,7 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
         # Step 4: Set up subscription
         self.step("4")
         attr_cb = None
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
+        if self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
             attr_cb = AttributeSubscriptionHandler(expected_cluster=cluster, expected_attribute=attributes.SensorFault)
             await attr_cb.start(
                 dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint,
@@ -175,7 +175,7 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
 
         # Step 7: Read SensorFault attribute - should be non-zero
         self.step("7")
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
+        if self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
             sensor_fault = await self.read_single_attribute_check_success(
                 dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint,
                 cluster=cluster, attribute=attributes.SensorFault)
@@ -191,7 +191,7 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
 
         # Step 9: Wait for SensorFault attribute report with non-zero value
         self.step("9")
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
+        if self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
             item = attr_cb.wait_for_attribute_report(timeout_sec=30)
             logger.info("Received SensorFault attribute report: 0x%04x", item.value)
             asserts.assert_not_equal(item.value, 0, "SensorFault attribute report should be non-zero")
@@ -207,7 +207,7 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
 
         # Step 11: Read SensorFault attribute - should be 0
         self.step("11")
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
+        if self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
             sensor_fault = await self.read_single_attribute_check_success(
                 dev_ctrl=dev_ctrl, node_id=node_id, endpoint=endpoint,
                 cluster=cluster, attribute=attributes.SensorFault)
@@ -223,7 +223,7 @@ class TC_BOOLCFG_6_1(MatterBaseTest):
 
         # Step 13: Wait for SensorFault attribute report with zero value
         self.step("13")
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
+        if self.attribute_guard(endpoint=endpoint, attribute=attributes.SensorFault):
             item = attr_cb.wait_for_attribute_report(timeout_sec=30)
             logger.info("Received SensorFault attribute report: 0x%04x", item.value)
             asserts.assert_equal(item.value, 0, "SensorFault attribute report should be zero")
