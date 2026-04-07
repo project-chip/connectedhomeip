@@ -77,7 +77,7 @@ public:
 
     uint8_t GetCurrentWattIndex() const override { return mSelectedWattIndex; };
 
-    uint32_t GetMaxCookTimeSec() const override { return 100; }
+    uint32_t GetMaxCookTimeSec() const override { return 3600; }
 
     uint16_t GetWattRating() const override { return mWattRating; };
 
