@@ -46,7 +46,7 @@ from matter.clusters import Attribute
 from matter.testing.defaults import TestingDefaults
 # Add imports for global wildcard
 from matter.testing.global_attribute_ids import GlobalAttributeIds
-# Add imports for argument parsing dependencies
+# Add imports for PICS
 from matter.testing.pics import read_pics_from_file
 
 try:
