@@ -46,7 +46,7 @@ private:
     struct FactoryData
     {
         struct Header header;
-        uint8_t factoryDataBuffer[FIXED_PARTITION_SIZE(factory_partition) - sizeof(struct Header)];
+        uint8_t factoryDataBuffer[PARTITION_SIZE(factory_partition) - sizeof(struct Header)];
     };
 
     FactoryData mFactoryData;
