@@ -169,10 +169,10 @@ class TC_BINFO_2_2(MatterBaseTest):
         # *** STEP 3 ***
         # Check if BINFO.S.E02 (Leave event) is supported
         # If not supported, skip the remaining steps
-        self.step(3)
-        supports_leave_event = self.pics_guard(self.check_pics("BINFO.S.E02"))
+        supports_leave_event = self.check_pics("BINFO.S.E02")
 
         if not supports_leave_event:
+            self.mark_step_range_skipped(4, 5)
             self.mark_step_range_skipped(4, 5)
         else:
             # *** STEP 4 ***
