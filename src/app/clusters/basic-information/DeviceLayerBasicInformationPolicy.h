@@ -51,11 +51,11 @@ public:
         mOptionalAttributes.template Set<BasicInformation::Attributes::UniqueID::Id>();
 
         // Use null for default, but note that if a device location was previously saved
-        // to persistent storage that value will be loaded by the start up code. 
+        // to persistent storage that value will be loaded by the start up code.
         if (mOptionalAttributes.IsSet(BasicInformation::Attributes::DeviceLocation::Id))
         {
             mDeviceLocation.emplace(DataModel::Nullable<OwnedDeviceLocation>(DataModel::NullNullable));
-        }        
+        }
     }
 
     const BasicInformationOptionalAttributesSet & GetOptionalAttributes() const { return mOptionalAttributes; }
@@ -184,10 +184,10 @@ public:
 
     uint16_t GetSubscriptionsPerFabric() const { return mSubscriptionsPerFabric; }
 
-    // The code for supporting the DeviceLocation attribute was borrowed + adapted 
-    // from the BridgedDeviceBasicInformation cluster. Try to keep the two in sync, 
+    // The code for supporting the DeviceLocation attribute was borrowed + adapted
+    // from the BridgedDeviceBasicInformation cluster. Try to keep the two in sync,
     // if any changes are required.
-    // 
+    //
     struct OwnedDeviceLocation
     {
         std::string locationName;
@@ -206,7 +206,7 @@ public:
                 .locationName = { locationName.data(), locationName.size() },
                 .floorNumber  = floorNumber.has_value() ? DataModel::MakeNullable(*floorNumber) : DataModel::Nullable<int16_t>(),
                 .areaType     = areaType.has_value() ? DataModel::MakeNullable(*areaType) : DataModel::Nullable<Globals::AreaTypeTag>(),
-            };       
+            };
         }
 
         // Safe for empty LocationName (CharSpan.data() may be nullptr)
@@ -251,7 +251,7 @@ public:
     /// @param location The new device location to set.
     /// @param persistence The persistence handler.
     /// @return Status code indicating the result of the operation.
- 
+
     CHIP_ERROR WriteDeviceLocation(
         const DataModel::Nullable<
             LocationDescriptorStructType> & value,
@@ -272,7 +272,7 @@ public:
         MutableByteSpan tlvBuffer(buffer);
 
         DataModel::Nullable<LocationDescriptorStructType> decoded;
-        
+
         if (mDeviceLocation.has_value()){
             CHIP_ERROR err = persistence.LoadTLV(path, decoded, tlvBuffer);
 
@@ -290,7 +290,7 @@ public:
                 //
                 // Failure to store here should not cause the cluster to stop initializing.
                 LogErrorOnFailure(PersistDeviceLocation(persistence));
-                
+
             }
         }
 
@@ -302,12 +302,12 @@ public:
         if (!mDeviceLocation.has_value())
         {
             return std::nullopt;
-        } 
-        else if (mDeviceLocation->IsNull()) 
+        }
+        else if (mDeviceLocation->IsNull())
         {
             return DataModel::Nullable<LocationDescriptorStructType>(DataModel::NullNullable);
-        } 
-        else 
+        }
+        else
         {
             return DataModel::MakeNullable(mDeviceLocation->Value().ToView());
         }
@@ -412,13 +412,13 @@ private:
 
         std::optional<DataModel::Nullable<LocationDescriptorStructType>> loc;
 
-        if (mDeviceLocation->IsNull()) 
-        { 
+        if (mDeviceLocation->IsNull())
+        {
             loc = DataModel::Nullable<LocationDescriptorStructType>(DataModel::NullNullable);
         } else {
             loc = DataModel::MakeNullable(mDeviceLocation->Value().ToView());
         }
-    
+
         const ConcreteAttributePath path{
             kRootEndpointId,
             BasicInformation::Id,

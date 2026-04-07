@@ -448,7 +448,7 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
             Globals::Structs::LocationDescriptorStruct::Type> value;
         ReturnErrorOnFailure(decoder.Decode(value));
         return mPolicy.WriteDeviceLocation(value, persistence);
-    }    
+    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
