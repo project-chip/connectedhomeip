@@ -198,6 +198,7 @@ cbd
 CBOR
 Ccache
 ccf
+CCM
 CCMP
 CCS
 CCSTUDIO
@@ -422,6 +423,7 @@ DeviceTemperatureConfiguration
 DevKitC
 DevKitM
 devtype
+DEX
 df
 dfe
 DFILE
@@ -700,6 +702,7 @@ ICA
 ICAC
 ICD
 ICDs
+ICF
 iCloud
 ICMP
 idempotency
@@ -862,6 +865,7 @@ LPC
 LSP
 LTE
 LTS
+LTO
 LwIP
 LwIP's
 LZMA
@@ -1014,6 +1018,7 @@ nrfconnect
 nrfdks
 nrfutil
 nrfxlib
+NSD
 NTAG
 NTP
 nullable
