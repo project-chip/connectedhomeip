@@ -17,12 +17,12 @@ on:
     schedule:
       - cron: '0 0 * * *'
 # --- TEST SECTION: Uncomment below to test on PRs ---
-    push:
-        branches:
-            - master
-            - 'v*-branch'
-    pull_request:
-    merge_group:
+    # push:
+    #     branches:
+    #         - master
+    #         - 'v*-branch'
+    # pull_request:
+    # merge_group:
 # --- END TEST SECTION ---
     workflow_dispatch:
         inputs:
@@ -264,14 +264,6 @@ jobs:
                   pattern: junit-results-*
                   path: allure-results
                   merge-multiple: true
-
-            # - name: Publish test results to GitHub (dorny)
-            #   uses: dorny/test-reporter@v1
-            #   with:
-            #       name: Nightly CI Test Results (dorny)
-            #       path: allure-results/**/*.xml
-            #       reporter: java-junit
-            #       fail-on-error: false
 
             - name: Publish test results to GitHub (mikepenz)
               uses: mikepenz/action-junit-report@v5
