@@ -100,8 +100,8 @@ class TC_SC_5_2(MatterBaseTest):
                 endpoints.append(endpoint)
         if not endpoints:
             logger.info("No groups endpoints found, test not applicable for this device, skipping all steps")
-            logger.info("Note: Because of the way groups endpoints appear on devices, this test internally determines the" \
-                         "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
+            logger.info("Note: Because of the way groups endpoints appear on devices, this test internally determines the"
+                        "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
             self.mark_all_remaining_steps_skipped("1")
             return
         logger.info(f'Found the following endpoints with Groups clusters: {endpoints}')
@@ -109,7 +109,6 @@ class TC_SC_5_2(MatterBaseTest):
             logger.info(f"Running test against endpoint {endpoint} groups cluster")
             self.current_step_index = 2
             await self.run_test_against_endpoint(endpoint)
-
 
     async def run_test_against_endpoint(self, groups_endpoint: int):
         dev_ctrl = self.default_controller

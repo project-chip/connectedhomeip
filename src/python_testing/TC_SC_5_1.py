@@ -50,6 +50,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
+
 class TC_SC_5_1(MatterBaseTest):
 
     def desc_TC_SC_5_1(self) -> str:
@@ -100,8 +101,8 @@ class TC_SC_5_1(MatterBaseTest):
                 endpoints.append(endpoint)
         if not endpoints:
             logger.info("No groups endpoints found, test not applicable for this device, skipping all steps")
-            logger.info("Note: Because of the way groups endpoints appear on devices, this test internally determines the" \
-                         "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
+            logger.info("Note: Because of the way groups endpoints appear on devices, this test internally determines the"
+                        "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
             self.mark_all_remaining_steps_skipped("1")
             return
         logger.info(f'Found the following endpoints with Groups clusters: {endpoints}')
