@@ -85,9 +85,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
     @async_test_body
     async def setup_test(self):
         super().setup_test()
-        if 1:
-            raise Exception("just testing failure")
-
         self.ota_prov = Clusters.OtaSoftwareUpdateProvider
         self.ota_req = Clusters.OtaSoftwareUpdateRequestor
         self.requestor_node_id = self.dut_node_id
