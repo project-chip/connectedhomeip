@@ -76,10 +76,10 @@ CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
         restoredFanMode = mFanMode;
     }
 
-    DataModel::ActionReturnStatus status = SetFanMode(restoredFanMode);
+    DataModel::ActionReturnStatus status = SetFanMode(restoredFanMode, false);
     if (!status.IsSuccess())
     {
-        status = SetFanMode(FanModeEnum::kOff);
+        status = SetFanMode(FanModeEnum::kOff, false);
     }
     VerifyOrReturnError(status.IsSuccess(), CHIP_ERROR_INTERNAL);
 
@@ -424,7 +424,7 @@ std::optional<DataModel::ActionReturnStatus> FanControlCluster::InvokeCommand(co
     }
 }
 
-DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
+DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value, bool syncOnOffDelegate)
 {
     if (EnsureKnownEnumValue(value) == FanModeEnum::kUnknownEnumValue)
     {
@@ -495,7 +495,7 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
     // Sync OnOff cluster: always notify on turn-off; only notify on turn-on when OnOff is
     // already on. If OnOff is off, changing the fan mode should not implicitly turn the
     // device on — the user must explicitly turn it on via the OnOff cluster.
-    if (mDelegate != nullptr && (newMode == FanModeEnum::kOff || mIsOnOffOn))
+    if (syncOnOffDelegate && mDelegate != nullptr && (newMode == FanModeEnum::kOff || mIsOnOffOn))
     {
         mDelegate->OnFanStateChanged(newMode != FanModeEnum::kOff);
     }
