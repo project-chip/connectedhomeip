@@ -152,7 +152,7 @@ bool checkEndpointIsValidMicrowave(EndpointId endpoint)
     {
         return false;
     }
-    if (!DeviceTypes::EndpointHasDeviceType(endpoint, Device::kMicrowaveOvenDeviceTypeId))
+    if (!chef::DeviceTypes::EndpointHasDeviceType(endpoint, Device::kMicrowaveOvenDeviceTypeId))
     {
         return false;
     }
