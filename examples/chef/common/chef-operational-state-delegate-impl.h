@@ -96,6 +96,8 @@ public:
      */
     void HandleStopStateCallback(GenericOperationalError & err) override;
 
+    Instance * GetInstance() override { return mInstance; }
+
 protected:
     Span<const GenericOperationalState> mOperationalStateList;
     Span<const CharSpan> mOperationalPhaseList;
