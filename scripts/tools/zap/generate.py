@@ -128,22 +128,21 @@ def detectZclFile(zapFile):
     prefix_chip_root_dir = True
     path = DEFAULT_DATA_MODEL_DESCRIPTION_FILE
 
-    if zapFile:
-        with open(zapFile) as f:
-            data = json.load(f)
-        for package in data["package"]:
-            if package["type"] != "zcl-properties":
-                continue
+    with open(zapFile) as f:
+        data = json.load(f)
+    for package in data["package"]:
+        if package["type"] != "zcl-properties":
+            continue
 
-            prefix_chip_root_dir = (package["pathRelativity"] != "resolveEnvVars")
-            # found the right path, try to figure out the actual path
-            if package["pathRelativity"] == "relativeToZap":
-                path = os.path.abspath(os.path.join(
-                    os.path.dirname(zapFile), package["path"]))
-            elif package["pathRelativity"] == "resolveEnvVars":
-                path = os.path.expandvars(package["path"])
-            else:
-                path = package["path"]
+        prefix_chip_root_dir = (package["pathRelativity"] != "resolveEnvVars")
+        # found the right path, try to figure out the actual path
+        if package["pathRelativity"] == "relativeToZap":
+            path = os.path.abspath(os.path.join(
+                os.path.dirname(zapFile), package["path"]))
+        elif package["pathRelativity"] == "resolveEnvVars":
+            path = os.path.expandvars(package["path"])
+        else:
+            path = package["path"]
 
     return getFilePath(path, prefix_chip_root_dir)
 
@@ -158,7 +157,7 @@ def runArgumentsParser() -> CmdLineArgs:
 
     parser = argparse.ArgumentParser(
         description='Generate artifacts from .zapt templates')
-    parser.add_argument('zap', help='path to the application .zap file')
+    parser.add_argument('zap', nargs="?", help='path to the application .zap file')
     parser.add_argument('-t', '--templates', metavar='FILE', default=default_templates,
                         help='path to the .zapt templates records to use for generating artifacts (default: %(default)s)')
     parser.add_argument('-z', '--zcl', metavar='FILE',
@@ -198,8 +197,10 @@ def runArgumentsParser() -> CmdLineArgs:
 
     if args.zcl:
         zcl_file = getFilePath(args.zcl)
-    else:
+    elif zap_file:
         zcl_file = detectZclFile(zap_file)
+    else:
+        zcl_file = getFilePath(DEFAULT_DATA_MODEL_DESCRIPTION_FILE)
 
     templates_file = getFilePath(args.templates)
     output_dir = getDirPath(output_dir)
