@@ -37,7 +37,7 @@
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
 
-#if !(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0xFFF1 || CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0xFFF2 ||                           \
+#if !(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0xFFF1 || CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0xFFF2 ||                            \
       CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0xFFF3)
 
 namespace chip {
@@ -47,6 +47,7 @@ ByteSpan kDacCert;
 ByteSpan kDacPrivateKey;
 ByteSpan kDacPublicKey;
 ByteSpan kPaiCert;
+ByteSpan kDeclaration;
 
 } // namespace DevelopmentCerts
 } // namespace chip
