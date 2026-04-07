@@ -36,7 +36,8 @@ constexpr uint16_t kMaxTolerance = 2048;
 RelativeHumidityMeasurementCluster::RelativeHumidityMeasurementCluster(EndpointId endpointId,
                                                                        const OptionalAttributeSet & optionalAttributeSet,
                                                                        const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, RelativeHumidityMeasurement::Id }), mOptionalAttributeSet(optionalAttributeSet)
+    DefaultServerCluster({ endpointId, RelativeHumidityMeasurement::Id }),
+    mOptionalAttributeSet(optionalAttributeSet)
 {
     if (!config.minMeasuredValue.IsNull())
     {
