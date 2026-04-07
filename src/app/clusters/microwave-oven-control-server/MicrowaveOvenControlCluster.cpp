@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -46,9 +46,8 @@ namespace MicrowaveOvenControl {
 Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
                    BitMask<MicrowaveOvenControl::Feature> aFeature, Clusters::OperationalState::Instance & aOpStateInstance,
                    Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance) :
-    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId),
-    AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
-    mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
+    CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId), AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
+    mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId), mFeature(aFeature), mOpStateInstance(aOpStateInstance),
     mMicrowaveOvenModeInstance(aMicrowaveOvenModeInstance)
 {
     mDelegate->SetInstance(this);
@@ -257,7 +256,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsList;
 
-        TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance()->GetDataModelProvider()->AcceptedCommands(
+        TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance() -> GetDataModelProvider()->AcceptedCommands(
             ConcreteClusterPath(mEndpointId, OperationalState::Id), acceptedCommandsList);
         auto acceptedCommands = acceptedCommandsList.TakeBuffer();
 
