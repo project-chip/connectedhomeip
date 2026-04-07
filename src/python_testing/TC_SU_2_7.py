@@ -30,6 +30,8 @@
 #       --autoApplyImage
 #       --requestorCanConsent true
 #       --userConsentState deferred
+#       --app-pipe /tmp/requestor_2_7_fifo
+#       --app-pipe-out /tmp/requestor_2_7_fifo_out
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -44,6 +46,8 @@
 #       --int-arg ota_image_download_timeout:360
 #       --timeout 1800
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --app-pipe /tmp/requestor_2_7_fifo
+#       --app-pipe-out /tmp/requestor_2_7_fifo_out
 #     factory-reset: true
 #     app-ready-pattern: Server initialization complete
 #     quiet: true
@@ -328,8 +332,24 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.restart_requestor()
 
         self.step(4)
-        # This pics_guard should be replaced when we can read this value directly from the DUT.
-        if self.pics_guard('MCORE.OTA.RequestorConsent'):
+
+        # Verify if the requestor CanConsent
+        # We dont know by default
+        requestor_can_consent = False
+        if self.is_pics_sdk_ci_only:
+            # Read directly from the Requestor if can Consent
+            command = {"Name": "QueryRequestorCanConsent", "Cluster": "OtaSoftwareUpdateRequestor", "Endpoint": self.get_endpoint()}
+            self.write_to_app_pipe(command)
+            response_data = self.read_from_app_pipe()
+            requestor_can_consent = response_data['Payload']['RequestorCanConsent']
+        else:
+            # Ask the use if the Requestor Can Consent the software update
+            user_response = self.wait_for_user_input(prompt_msg="Does the requestor device support CanConsent? Enter 'y' or 'n'",
+                                                         prompt_msg_placeholder="y",
+                                                         default_value="y")
+            requestor_can_consent = user_response.lower() == "y" or user_response.lower() == 'yes'
+        logger.info(f"Requestor CanConsent status: {requestor_can_consent}")
+        if requestor_can_consent:
             self.start_provider(
                 provider_app_path=self.provider_app_path,
                 ota_image_path=self.ota_image,
@@ -348,14 +368,17 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             event_report = state_transition_event_handler.wait_for_event_report(
                 self.ota_req.Events.StateTransition, timeout_sec=600)
             self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
-                                               expected_new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying)
+                                                expected_new_state=self.ota_req.Enums.UpdateStateEnum.kQuerying)
             # Wait State Event to change to kDelayedOnUserConsent
             event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60)
             self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kQuerying,
-                                               expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnUserConsent)
+                                                expected_new_state=self.ota_req.Enums.UpdateStateEnum.kDelayedOnUserConsent)
             state_transition_event_handler.cancel()
             self.terminate_provider()
             self.restart_requestor()
+        else:
+            # Skip the test step as the RequestorDevice can't consent
+            self.skip_step()
 
         self.step(5)
         self.start_provider(

@@ -17,6 +17,7 @@
  */
 
 #include "AppMain.h"
+#include "OtaRequestorAppCommandDelegate.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
@@ -83,6 +84,8 @@ constexpr uint16_t kOptionWatchdogTimeout      = 'w';
 constexpr uint16_t kSkipExecImageFile          = 's';
 constexpr size_t kMaxFilePathSize              = 256;
 
+NamedPipeCommands sChipNamedPipeCommands;
+OtaRequestorAppCommandDelegate sOtaRequestorAppCommandDelegate;
 uint32_t gPeriodicQueryTimeoutSec = 0;
 uint32_t gWatchdogTimeoutSec      = 0;
 chip::Optional<bool> gRequestorCanConsent;
@@ -235,6 +238,20 @@ static void InitOTARequestor(void)
     if (gMaxBDXBlockSize)
     {
         gRequestorUser.SetMaxDownloadBlockSize(*gMaxBDXBlockSize);
+    }
+
+    std::string path     = LinuxDeviceOptions::GetInstance().app_pipe;
+    std::string path_out = LinuxDeviceOptions::GetInstance().app_pipe_out;
+
+    if ((!path.empty()) and (!path_out.empty()) and
+        (sChipNamedPipeCommands.Start(path, path_out, &sOtaRequestorAppCommandDelegate) != CHIP_NO_ERROR))
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommand");
+        LogErrorOnFailure(sChipNamedPipeCommands.Stop());
+    }
+    else
+    {
+        sOtaRequestorAppCommandDelegate.SetPipes(&sChipNamedPipeCommands);
     }
 }
 
