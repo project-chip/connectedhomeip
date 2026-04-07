@@ -33,7 +33,9 @@ using BasicInformationOptionalAttributesSet = OptionalAttributeSet< //
     // Old specification versions had UniqueID as optional, so this
     // appears here even though MANDATORY in the latest spec. We
     // default it enabled (to decrease chances of error)
-    BasicInformation::Attributes::UniqueID::Id //
-    >;
+    BasicInformation::Attributes::UniqueID::Id, //
+
+    BasicInformation::Attributes::DeviceLocation::Id //
+>;
 
 } // namespace chip::app::Clusters

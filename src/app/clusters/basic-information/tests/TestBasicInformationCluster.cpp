@@ -210,7 +210,8 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
                                                                                .template Set<LocalConfigDisabled::Id>()
                                                                                .template Set<Reachable::Id>()
                                                                                .template Set<ProductAppearance::Id>()
-                                                                               .template Set<UniqueID::Id>();
+                                                                               .template Set<UniqueID::Id>()
+                                                                               .template Set<DeviceLocation::Id>();
 
         BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(),
                                         chip::DeviceLayer::PlatformMgr(),
@@ -243,6 +244,7 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
                                                          LocalConfigDisabled::kMetadataEntry,   //
                                                          Reachable::kMetadataEntry,             //
                                                          ProductAppearance::kMetadataEntry,     //
+                                                         DeviceLocation::kMetadataEntry,        //
                                                      }));
     }
 }

@@ -46,7 +46,8 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
             .template Set<BasicInformation::Attributes::ProductLabel::Id>()
             .template Set<BasicInformation::Attributes::SerialNumber::Id>()
             .template Set<BasicInformation::Attributes::LocalConfigDisabled::Id>()
-            .template Set<BasicInformation::Attributes::Reachable::Id>();
+            .template Set<BasicInformation::Attributes::Reachable::Id>(),
+            .template Set<BasicInformation::Attributes::DeviceLocation::Id>();;
 
     mBasicInformationCluster.Create(optionalAttributeSet, mContext.deviceInstanceInfoProvider, mContext.configurationManager,
                                     mContext.platformManager,
