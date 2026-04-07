@@ -205,9 +205,11 @@ def runArgumentsParser() -> CmdLineArgs:
     output_dir = getDirPath(output_dir)
 
     if args.matter_file_name:
-        matter_file_name = getFilePath(args.matter_file_name)
+        matter_file_name = args.matter_file_name
     else:
-        matter_file_name = None
+        # If the .matter file is going to be generated, place it next to
+        # the source .zap file (the same name but with .matter extension).
+        matter_file_name = matterPathFromZapPath(zap_file)
 
     return CmdLineArgs(
         zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap,
@@ -236,15 +238,13 @@ def matterPathFromZapPath(zap_config_path):
 
 def extractGeneratedIdl(output_dir, matter_name):
     """Find a file Clusters.matter in the output directory and
-       place it along with the input zap file.
+       move it to matter_name.
 
        Intent is to make the "zap content" more humanly understandable.
     """
     idl_path = os.path.join(output_dir, "Clusters.matter")
-    if not os.path.exists(idl_path):
-        return
-
-    shutil.move(idl_path, matter_name)
+    if os.path.exists(idl_path):
+        shutil.move(idl_path, matter_name)
 
 
 def runGeneration(cmdLineArgs):
@@ -282,12 +282,7 @@ def runGeneration(cmdLineArgs):
             raise
 
     if cmdLineArgs.matter_file_name:
-        matter_name = cmdLineArgs.matter_file_name
-    else:
-        matter_name = matterPathFromZapPath(zap_file)
-
-    if matter_name:
-        extractGeneratedIdl(output_dir, matter_name)
+        extractGeneratedIdl(output_dir, cmdLineArgs.matter_file_name)
 
 
 def expandPlaceholderWildcards(path: str) -> Generator[str, None, None]:
