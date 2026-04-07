@@ -42,12 +42,8 @@
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
-#endif                                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-// TODO: We shouldn't need any platform specific includes in this file
-#if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
-#include <platform/silabs/SiWx/SiWxPlatformInterface.h>
-#endif // (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SL_WIFI
 
 #if defined(PW_RPC_ENABLED) && PW_RPC_ENABLED
@@ -423,10 +419,9 @@ extern "C" void vApplicationIdleHook(void)
 {
 #if ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-    SiWxPlatformInterface::sl_si91x_btn_event_handler();
+    GetPlatform().SleepButtonActionHandler();
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
-    SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler();
-#endif
+#endif // ((defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 #if SL_MATTER_DEBUG_WATCHDOG_ENABLE
     GetPlatform().WatchdogFeed();
 #endif // SL_MATTER_DEBUG_WATCHDOG_ENABLE
