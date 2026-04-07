@@ -46,6 +46,7 @@ from matter.testing.matter_asserts import assert_valid_uint8
 
 log = logging.getLogger(__name__)
 
+
 def _bit_position(mask: int) -> int:
     """Return the bit position for a single-bit mask."""
     return int(mask).bit_length() - 1
@@ -78,7 +79,7 @@ class TC_WNCV_2_2(MatterBaseTest):
     @async_test_body
     async def test_TC_WNCV_2_2(self):
         self.endpoint = self.get_endpoint()
-        cluster    = Clusters.WindowCovering
+        cluster = Clusters.WindowCovering
         attributes = cluster.Attributes
         config_status_bits = cluster.Bitmaps.ConfigStatus
         feature_bits = cluster.Bitmaps.Feature
@@ -101,8 +102,8 @@ class TC_WNCV_2_2(MatterBaseTest):
 
         # Derive the two compound feature flags referenced by the spec:
         # Use generated bitmap masks from WindowCovering.Objects.Bitmaps.Feature.
-        has_lf    = bool(feature_map & int(feature_bits.kLift))
-        has_tl    = bool(feature_map & int(feature_bits.kTilt))
+        has_lf = bool(feature_map & int(feature_bits.kLift))
+        has_tl = bool(feature_map & int(feature_bits.kTilt))
         has_pa_lf = bool(feature_map & int(feature_bits.kPositionAwareLift))
         has_pa_tl = bool(feature_map & int(feature_bits.kPositionAwareTilt))
 
