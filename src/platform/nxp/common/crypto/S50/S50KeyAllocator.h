@@ -25,10 +25,26 @@ class S50KeyAllocator : public chip::Crypto::DefaultPSAKeyAllocator
 public:
     void UpdateKeyAttributes(psa_key_attributes_t & attrs) override
     {
+        using namespace chip::Crypto;
+        psa_key_id_t keyId = psa_get_key_id(&attrs);
+        psa_key_lifetime_t lifetime = psa_get_key_lifetime(&attrs);
+        psa_key_type_t keyType = psa_get_key_type(&attrs);
+
         if (psa_get_key_lifetime(&attrs) == PSA_KEY_LIFETIME_PERSISTENT)
         {
             psa_set_key_lifetime(&attrs, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
                                  PSA_KEY_LIFETIME_PERSISTENT, PSA_CRYPTO_ELS_PKC_LOCATION_S50_RFC3394_STORAGE));
+        }
+
+        /* NON_EL2GO storage for CASE Ephemeral Keys and pending operational keys */
+        if ((lifetime == PSA_KEY_LIFETIME_VOLATILE) &&
+            PSA_KEY_TYPE_IS_ECC_KEY_PAIR(keyType) &&
+            (PSA_ECC_FAMILY_SECP_R1 == PSA_KEY_TYPE_ECC_GET_FAMILY(keyType)) &&
+            (psa_get_key_bits(&attrs) == kP256_PrivateKey_Length * 8))
+        {
+            psa_set_key_lifetime(&attrs, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
+                PSA_KEY_LIFETIME_VOLATILE, PSA_CRYPTO_ELS_PKC_LOCATION_S50_RFC3394_STORAGE));
+            return;
         }
     }
 
