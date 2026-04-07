@@ -40,7 +40,8 @@ class ChefMicrowaveOvenDevice : public MicrowaveOvenControl::Delegate
 public:
     explicit ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
                                      chip::app::Clusters::OperationalState::Instance * operationalStateInstancePtr,
-                                     chip::app::Clusters::OperationalState::OperationalStateDelegate * operationalStateDelegatePtr);
+                                     chip::app::Clusters::OperationalState::OperationalStateDelegate * operationalStateDelegatePtr,
+                                     ModeBase::Instance * microwaveOvenModeInstancePtr);
 
     /**
      * handle command for microwave oven control: set cooking parameters

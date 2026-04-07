@@ -37,10 +37,10 @@ using Status            = Protocols::InteractionModel::Status;
 
 ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint,
                                                  OperationalState::Instance * operationalStateInstancePtr,
-                                                 OperationalStateDelegate * operationalStateDelegatePtr) :
-    mOperationalStateDelegatePtr(operationalStateDelegatePtr),
-    mOperationalStateInstancePtr(operationalStateInstancePtr),
-    mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint))
+                                                 OperationalStateDelegate * operationalStateDelegatePtr,
+                                                 ModeBase::Instance * microwaveOvenModeInstancePtr) :
+    mOperationalStateDelegatePtr(operationalStateDelegatePtr), mOperationalStateInstancePtr(operationalStateInstancePtr),
+    mMicrowaveOvenModeInstancePtr(microwaveOvenModeInstancePtr)
 {
     if (mOperationalStateInstancePtr && mMicrowaveOvenModeInstancePtr && mMicrowaveOvenModeInstancePtr)
     {
@@ -178,7 +178,8 @@ void InitChefMicrowaveOvenControlCluster()
                     continue;
                 }
                 gMicrowaveOvenDevice[epIndex] = std::make_unique<ChefMicrowaveOvenDevice>(
-                    endpoint, GetOperationalStateInstance(endpoint), GetOperationalStateDelegate(endpoint));
+                    endpoint, GetOperationalStateInstance(endpoint), GetOperationalStateDelegate(endpoint),
+                    ChefMicrowaveOvenMode::GetInstance(endpoint));
             }
         }
     }
