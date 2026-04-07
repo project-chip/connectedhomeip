@@ -177,7 +177,7 @@ def runArgumentsParser() -> CmdLineArgs:
     parser.add_argument('--version-check', action=argparse.BooleanOptionalAction, default=True,
                         help='check zap version before running (default: %(default)s)')
     parser.add_argument('--retries', type=int, metavar='NUM', default=1,
-                         help='retry running zap-cli in case of failure (default: %(default)s)')
+                        help='retry running zap-cli in case of failure (default: %(default)s)')
     parser.add_argument('--keep-output-dir', action='store_true',
                         help='Keep any created output directory. Useful for temporary directories.')
     args = parser.parse_args()
