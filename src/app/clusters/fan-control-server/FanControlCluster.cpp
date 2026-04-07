@@ -98,6 +98,10 @@ void FanControlCluster::SetFanModeToOff()
         ApplyFanModeOffSideEffects();
         StoreFanModePersistence();
         NotifyDelegateFanDriveState();
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnFanStateChanged(false);
+        }
     }
 }
 
@@ -487,6 +491,14 @@ DataModel::ActionReturnStatus FanControlCluster::SetFanMode(FanModeEnum value)
     StoreFanModePersistence();
 
     NotifyDelegateFanDriveState();
+
+    // Sync OnOff cluster: always notify on turn-off; only notify on turn-on when OnOff is
+    // already on. If OnOff is off, changing the fan mode should not implicitly turn the
+    // device on — the user must explicitly turn it on via the OnOff cluster.
+    if (mDelegate != nullptr && (newMode == FanModeEnum::kOff || mIsOnOffOn))
+    {
+        mDelegate->OnFanStateChanged(newMode != FanModeEnum::kOff);
+    }
 
     return Status::Success;
 }

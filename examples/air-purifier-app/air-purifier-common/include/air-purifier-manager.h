@@ -92,6 +92,11 @@ public:
     Protocols::InteractionModel::Status HandleStep(FanControl::StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
 
     /**
+     * @brief Sync the OnOff cluster when the fan turns on or off via FanControl.
+     */
+    void OnFanStateChanged(bool isOn) override;
+
+    /**
      * @brief Callback that thermostat manager calls when the heating state changes
      */
     void HeatingCallback();

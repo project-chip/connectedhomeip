@@ -51,6 +51,13 @@ public:
 
     virtual void OnPersistenceRestored() {}
 
+    /**
+     * @brief Called when the fan transitions between on and off states.
+     *        Implementations should update the OnOff cluster attribute accordingly.
+     *        This is separate from OnFanModeChanged to make the OnOff sync responsibility explicit.
+     */
+    virtual void OnFanStateChanged(bool isOn) {}
+
     virtual void OnFanModeChanged(FanModeEnum newValue) {}
     virtual void OnPercentSettingChanged(DataModel::Nullable<chip::Percent> newValue) {}
     virtual void OnPercentCurrentChanged(chip::Percent newValue) {}

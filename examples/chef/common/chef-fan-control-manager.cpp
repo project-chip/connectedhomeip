@@ -48,6 +48,7 @@ public:
     void Init();
     void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
     Status HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff) override;
+    void OnFanStateChanged(bool isOn) override;
     DataModel::Nullable<uint8_t> GetSpeedSetting();
     DataModel::Nullable<Percent> GetPercentSetting();
 
@@ -82,6 +83,12 @@ private:
 };
 
 static std::unique_ptr<ChefFanControlManager> mFanControlManager;
+
+void ChefFanControlManager::OnFanStateChanged(bool isOn)
+{
+    ChipLogProgress(NotSpecified, "ChefFanControlManager::OnFanStateChanged: %d", isOn);
+    OnOff::Attributes::OnOff::Set(mEndpoint, isOn);
+}
 
 Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff)
 {
