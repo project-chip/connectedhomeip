@@ -98,6 +98,8 @@ CHIP_ERROR RelativeHumidityMeasurementCluster::SetMeasuredValue(DataModel::Nulla
 {
     if (!measuredValue.IsNull())
     {
+        VerifyOrReturnError(measuredValue.Value() <= kMeasuredValueMax, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
         if (!mMinMeasuredValue.IsNull())
         {
             VerifyOrReturnError(measuredValue.Value() >= mMinMeasuredValue.Value(), CHIP_IM_GLOBAL_STATUS(ConstraintError));
