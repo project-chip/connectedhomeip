@@ -71,7 +71,7 @@ const int kManualSetupProductIdCharLength  = 5;
 // Spec 5.1.4.2 CHIP-Common Reserved Tags
 inline constexpr uint8_t kSerialNumberTag         = 0x00;
 inline constexpr uint8_t kPBKDFIterationsTag      = 0x01;
-inline constexpr uint8_t kBPKFSaltTag             = 0x02;
+inline constexpr uint8_t kPBKFSaltTag             = 0x02;
 inline constexpr uint8_t kNumberOFDevicesTag      = 0x03;
 inline constexpr uint8_t kCommissioningTimeoutTag = 0x04;
 
@@ -172,13 +172,13 @@ struct OptionalQRCodeInfo
     {
         if (std::holds_alternative<std::string>(value))
         {
-            return stringVisitor(const_cast<const std::string &>(std::get<std::string>(value)));
+            return stringVisitor(std::get<std::string>(value));
         }
         if (std::holds_alternative<int64_t>(value))
         {
-            return signedIntVisitor(int64_t(std::get<int64_t>(value)));
+            return signedIntVisitor(std::get<int64_t>(value));
         }
-        return unsignedIntVisitor(uint64_t(std::get<uint64_t>(value)));
+        return unsignedIntVisitor(std::get<uint64_t>(value));
     }
 
     uint8_t tag;                                        /**< the tag number of the optional info */

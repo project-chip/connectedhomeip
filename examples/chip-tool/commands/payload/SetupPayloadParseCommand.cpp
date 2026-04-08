@@ -166,10 +166,10 @@ CHIP_ERROR SetupPayloadParseCommand::Print(const SetupPayload & payload)
     {
         info.visitValue(
             [&](const std::string & v) {
-                ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,string value=%s", tag, v.c_str());
+                ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,string value=%s", info.tag, v.c_str());
             },
-            [&](int64_t v) { ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,int value=%i", tag, v); },
-            [&](uint64_t v) { ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,int value=%u", tag, v); });
+            [&](int64_t v) { ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,int value=%i", info.tag, v); },
+            [&](uint64_t v) { ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,int value=%u", info.tag, v); });
     }
 
     return CHIP_NO_ERROR;

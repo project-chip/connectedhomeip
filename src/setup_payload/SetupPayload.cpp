@@ -223,7 +223,7 @@ CHIP_ERROR SetupPayload::generateRandomSetupPin(uint32_t & setupPINCode)
 CHIP_ERROR SetupPayload::addOptionalVendorData(const OptionalQRCodeInfo & info)
 {
     VerifyOrReturnError(IsVendorTag(info.tag), CHIP_ERROR_INVALID_ARGUMENT);
-    optionalVendorData.emplace(info.tag, info);
+    optionalVendorData.insert_or_assign(info.tag, info);
 
     return CHIP_NO_ERROR;
 }
@@ -238,7 +238,7 @@ CHIP_ERROR SetupPayload::addOptionalExtensionData(const OptionalQRCodeInfo & inf
             return !(info.tag == kPBKDFIterationsTag || info.tag == kNumberOFDevicesTag || info.tag == kCommissioningTimeoutTag);
         },
         [&](int64_t v) {
-            return !(info.tag == kSerialNumberTag || info.tag == kPBKDFIterationsTag || info.tag == kBPKFSaltTag ||
+            return !(info.tag == kSerialNumberTag || info.tag == kPBKDFIterationsTag || info.tag == kPBKFSaltTag ||
                      info.tag == kNumberOFDevicesTag || info.tag == kCommissioningTimeoutTag);
         },
         [&](uint64_t v) {
@@ -254,12 +254,12 @@ CHIP_ERROR SetupPayload::addOptionalExtensionData(const OptionalQRCodeInfo & inf
             {
                 return 0 < v && v <= 255;
             }
-            return info.tag != kBPKFSaltTag;
+            return info.tag != kPBKFSaltTag;
         });
     // It is not clearly specified whether this should return an error, or simply ignore.
     VerifyOrReturnError(validValue, CHIP_ERROR_INVALID_ARGUMENT);
 
-    optionalExtensionData.emplace(info.tag, info);
+    optionalExtensionData.insert_or_assign(info.tag, info);
 
     return CHIP_NO_ERROR;
 }
