@@ -29,8 +29,6 @@ using namespace RelativeHumidityMeasurement::Attributes;
 constexpr uint16_t kMinMeasuredValueMax = 9999;
 // Global ceiling for any measured humidity value (applies to MeasuredValue and MaxMeasuredValue)
 constexpr uint16_t kMeasuredValueMax = 10000;
-// Tolerance max is 2048
-constexpr uint16_t kMaxTolerance = 2048;
 
 RelativeHumidityMeasurementCluster::RelativeHumidityMeasurementCluster(EndpointId endpointId,
                                                                        const OptionalAttributeSet & optionalAttributeSet,
@@ -38,23 +36,6 @@ RelativeHumidityMeasurementCluster::RelativeHumidityMeasurementCluster(EndpointI
     DefaultServerCluster({ endpointId, RelativeHumidityMeasurement::Id }),
     mOptionalAttributeSet(optionalAttributeSet)
 {
-    if (!config.minMeasuredValue.IsNull())
-    {
-        VerifyOrDie(config.minMeasuredValue.Value() <= kMinMeasuredValueMax);
-
-        if (!config.maxMeasuredValue.IsNull())
-        {
-            VerifyOrDie(config.maxMeasuredValue.Value() >= config.minMeasuredValue.Value() + 1);
-        }
-    }
-
-    if (!config.maxMeasuredValue.IsNull())
-    {
-        VerifyOrDie(config.maxMeasuredValue.Value() <= kMeasuredValueMax);
-    }
-
-    VerifyOrDie(!mOptionalAttributeSet.IsSet(Tolerance::Id) || config.tolerance <= kMaxTolerance);
-
     mMinMeasuredValue = config.minMeasuredValue;
     mMaxMeasuredValue = config.maxMeasuredValue;
     mTolerance        = config.tolerance;
