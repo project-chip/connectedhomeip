@@ -112,7 +112,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             TestStep(13, "TH sends the AllocatePushTransport command with Invalid URL.",
                      "DUT responds with Status Code InvalidURL."),
             TestStep(14, "TH sends the AllocatePushTransport command with an invalid TriggerType in the TransportTriggerOptions struct field.",
-                     "DUT responds with Status Code InvalidTriggerType."),
+                     "DUT responds with Status Code ConstraintError."),
             TestStep(15, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with a Null Zone in MotionZones.",
                      "DUT responds with Success."),
             TestStep(16, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with duplicate numeric Zone IDs within MotionZones.",

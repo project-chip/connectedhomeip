@@ -22,6 +22,7 @@ exclude = [
     "examples/common/QRCode/repo",
     "examples/common/m5stack-tft/repo",
     "third_party",
+    "examples/tv-casting-app/tests/",
     # TODO(#37698)
     "docs/development_controllers/matter-repl/*.ipynb",
 ]

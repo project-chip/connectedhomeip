@@ -45,6 +45,7 @@ chip_test_suite("tests") {
       test_sources += [
         "TestCommissioningWindowOpener.cpp",
         "TestExampleOperationalCredentialsIssuer.cpp",
+        "TestSetUpCodePairer.cpp",
       ]
     }
   }
@@ -63,6 +64,7 @@ chip_test_suite("tests") {
   sources = [
     "AutoCommissionerTestAccess.h",
     "DeviceCommissionerTestAccess.h",
+    "SetUpCodePairerTestAccess.h",
   ]
 
   public_deps = [
