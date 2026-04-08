@@ -46,14 +46,14 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-def _bit_position(mask: int) -> int:
+def _bit_position(mask) -> int:
     """Return the bit position for a single-bit mask."""
-    return int(mask).bit_length() - 1
+    return mask.bit_length() - 1
 
 
-def _bit(value: int, mask: int) -> int:
+def _bit(value, mask) -> int:
     """Return 1 when the given bitmap mask is set, otherwise 0."""
-    return 1 if value & int(mask) else 0
+    return 1 if value & mask else 0
 
 
 class TC_WNCV_2_2(MatterBaseTest):
@@ -77,7 +77,9 @@ class TC_WNCV_2_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_WNCV_2_2(self):
-        self.endpoint = self.get_endpoint()
+        # Use a local variable rather than self.endpoint to avoid introducing
+        # a new instance attribute on the test object (matches repo convention).
+        endpoint = self.get_endpoint(default=self.default_endpoint)
         cluster = Clusters.WindowCovering
         attributes = cluster.Attributes
         config_status_bits = cluster.Bitmaps.ConfigStatus
@@ -93,18 +95,17 @@ class TC_WNCV_2_2(MatterBaseTest):
         # ------------------------------------------------------------------ #
         self.step(2)
         feature_map = await self.read_single_attribute_check_success(
-            endpoint=self.endpoint,
+            endpoint=endpoint,
             cluster=cluster,
             attribute=attributes.FeatureMap
         )
-        feature_map = int(feature_map)
 
-        # Derive the two compound feature flags referenced by the spec:
-        # Use generated bitmap masks from WindowCovering.Objects.Bitmaps.Feature.
-        has_lf = bool(feature_map & int(feature_bits.kLift))
-        has_tl = bool(feature_map & int(feature_bits.kTilt))
-        has_pa_lf = bool(feature_map & int(feature_bits.kPositionAwareLift))
-        has_pa_tl = bool(feature_map & int(feature_bits.kPositionAwareTilt))
+        # feature_map and feature_bits members are already IntFlag subclasses —
+        # no int() cast needed; direct bitwise operations work cleanly.
+        has_lf    = bool(feature_map & feature_bits.kLift)
+        has_tl    = bool(feature_map & feature_bits.kTilt)
+        has_pa_lf = bool(feature_map & feature_bits.kPositionAwareLift)
+        has_pa_tl = bool(feature_map & feature_bits.kPositionAwareTilt)
 
         # Compound conditions used in bit 3/4/5/6 validation
         lf_and_pa_lf = has_lf and has_pa_lf   # WNCV.S.F00 & WNCV.S.F02
@@ -121,27 +122,33 @@ class TC_WNCV_2_2(MatterBaseTest):
         # ------------------------------------------------------------------ #
         self.step(3)
         config_status = await self.read_single_attribute_check_success(
-            endpoint=self.endpoint,
+            endpoint=endpoint,
             cluster=cluster,
             attribute=attributes.ConfigStatus
         )
-        config_status = int(config_status)
-        assert_valid_uint8(config_status, "ConfigStatus must be a valid uint8/bitmap8")
+        # Pass short field name to assert_valid_uint8 — the helper appends its
+        # own 'must be a valid uint8 integer' text, so a full sentence produces
+        # a redundant/awkward failure message.
+        assert_valid_uint8(config_status, "ConfigStatus")
         log.info(f"ConfigStatus raw value: 0x{config_status:02X} (0b{config_status:08b})")
 
+        # Build the known-bits mask from the SDK-generated ConfigStatus bitmap.
         known_config_status_mask = 0
         for bitmask in config_status_bits:
-            known_config_status_mask |= int(bitmask)
+            known_config_status_mask |= bitmask
+
+        reserved_bits_set = config_status & ~known_config_status_mask
 
         # ── Reserved bits: must always be 0 ────────────────────────────────
         asserts.assert_equal(
-            config_status & ~known_config_status_mask, 0,
-            f"ConfigStatus has reserved bits set: 0x{config_status:02X}"
+            reserved_bits_set, 0,
+            f"ConfigStatus has reserved bits set: "
+            f"0x{reserved_bits_set:02X} "
+            f"(ConfigStatus=0x{config_status:02X}, known mask=0x{known_config_status_mask:02X})"
         )
         log.info("Reserved ConfigStatus bits: 0 ✓")
 
         # ── Bit 0: Operational — SHALL always be 1 ────────────────────────
-        # The spec states this bit SHALL always be set to 1b (Operational).
         asserts.assert_equal(
             _bit(config_status, config_status_bits.kOperational), 1,
             f"ConfigStatus bit 0 (Operational) SHALL always be 1, got 0x{config_status:02X}"
@@ -158,7 +165,6 @@ class TC_WNCV_2_2(MatterBaseTest):
         )
 
         # ── Bit 2: LiftMovementReversed — 0=normal, 1=reversed ────────────
-        # No specific value requirement — just log the state.
         lift_reversed = _bit(config_status, config_status_bits.kLiftMovementReversed)
         log.info(
             f"Bit {_bit_position(config_status_bits.kLiftMovementReversed)} (LiftMovementReversed): {lift_reversed} "
@@ -182,7 +188,7 @@ class TC_WNCV_2_2(MatterBaseTest):
         else:
             asserts.assert_equal(
                 lift_pos_aware, 0,
-                f"ConfigStatus bit 3 (LiftPositionAware) MUST be 0 when LF & PA_LF features are not both present, "
+                f"ConfigStatus bit 3 (LiftPositionAware) MUST be 0 when LF & PA_LF are not both present, "
                 f"got 0x{config_status:02X}"
             )
             log.info(
@@ -207,7 +213,7 @@ class TC_WNCV_2_2(MatterBaseTest):
         else:
             asserts.assert_equal(
                 tilt_pos_aware, 0,
-                f"ConfigStatus bit 4 (TiltPositionAware) MUST be 0 when TL & PA_TL features are not both present, "
+                f"ConfigStatus bit 4 (TiltPositionAware) MUST be 0 when TL & PA_TL are not both present, "
                 f"got 0x{config_status:02X}"
             )
             log.info(
@@ -218,7 +224,6 @@ class TC_WNCV_2_2(MatterBaseTest):
         # ── Bit 5: LiftEncoderControlled ───────────────────────────────────
         # Only verified when LF & PA_LF are both present.
         # 0 = Timer controlled, 1 = Encoder controlled — both are valid.
-        # Just log if not applicable.
         lift_encoder = _bit(config_status, config_status_bits.kLiftEncoderControlled)
         if lf_and_pa_lf:
             log.info(
@@ -268,7 +273,7 @@ class TC_WNCV_2_2(MatterBaseTest):
             f"  bit {_bit_position(config_status_bits.kTiltPositionAware)} TiltPositionAware    = {_bit(config_status, config_status_bits.kTiltPositionAware)}\n"
             f"  bit {_bit_position(config_status_bits.kLiftEncoderControlled)} LiftEncoderCtrl      = {_bit(config_status, config_status_bits.kLiftEncoderControlled)}\n"
             f"  bit {_bit_position(config_status_bits.kTiltEncoderControlled)} TiltEncoderCtrl      = {_bit(config_status, config_status_bits.kTiltEncoderControlled)}\n"
-            f"  reserved bits             = 0x{config_status & ~known_config_status_mask:02X} (must be 0)"
+            f"  reserved bits             = 0x{reserved_bits_set:02X} (must be 0)"
         )
 
 
