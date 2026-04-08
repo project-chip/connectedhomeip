@@ -713,6 +713,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadS
 
     mOTInst = otInst;
 
+    // Lock the OpenThread stack to prevent race conditions with OpenThread's internal operations.
+    // On some platforms (e.g., Zephyr), OpenThread may already be running before Matter initialization completes.
+    Impl()->LockThreadStack();
+
     // Arrange for OpenThread to call the OnOpenThreadStateChange method whenever a
     // state change occurs.  Note that we reference the OnOpenThreadStateChange method
     // on the concrete implementation class so that that class can override the default
@@ -748,6 +752,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadS
 
 exit:
 
+    Impl()->UnlockThreadStack();
     ChipLogProgress(DeviceLayer, "OpenThread started: %s", otThreadErrorToString(otErr));
     return err;
 }
