@@ -280,7 +280,7 @@ private:
 
     Optional<ThreadMeshcopCommissionParameters> mThreadMeshcopCommissionParams;
 #if CHIP_SUPPORT_THREAD_MESHCOP
-    ThreadMeshcopCommissionProxy * mThreadMeshcopCommissionProxy;
+    ThreadMeshcopCommissionProxy * mThreadMeshcopCommissionProxy = nullptr;
 #endif
 };
 
