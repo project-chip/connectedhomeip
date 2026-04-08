@@ -102,8 +102,8 @@ class TC_WNCV_2_2(MatterBaseTest):
 
         # feature_map and feature_bits members are already IntFlag subclasses —
         # no int() cast needed; direct bitwise operations work cleanly.
-        has_lf    = bool(feature_map & feature_bits.kLift)
-        has_tl    = bool(feature_map & feature_bits.kTilt)
+        has_lf = bool(feature_map & feature_bits.kLift)
+        has_tl = bool(feature_map & feature_bits.kTilt)
         has_pa_lf = bool(feature_map & feature_bits.kPositionAwareLift)
         has_pa_tl = bool(feature_map & feature_bits.kPositionAwareTilt)
 
