@@ -132,6 +132,7 @@ CodeDrivenClusters:
     - Groupcast
     - Groups
     - HEPA Filter Monitoring
+    - Humidistat
     - ICD Management
     - Identify
     - Illuminance Measurement
