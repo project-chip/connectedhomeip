@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import contextlib
 import datetime
 import ipaddress
 import json
@@ -15,16 +16,17 @@ import string
 import subprocess
 import sys
 import tempfile
+import xml.etree.ElementTree
 from enum import Enum
 from pathlib import Path
-from typing import Awaitable, Callable, Literal, Optional
+from typing import Awaitable, Callable, Literal, Optional, Tuple
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric.types import CertificateIssuerPrivateKeyTypes, CertificatePublicKeyTypes
-from cryptography.x509.oid import NameOID
-from fastapi import APIRouter, FastAPI, HTTPException, Request, Response
+from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
+from fastapi import APIRouter, FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -290,8 +292,8 @@ class CAHierarchy:
             ]
         )
 
-        extended_key_usage = [x509.ExtendedKeyUsageOID.CLIENT_AUTH] if self.kind == "client" else [
-            x509.ExtendedKeyUsageOID.SERVER_AUTH]
+        extended_key_usage = [ExtendedKeyUsageOID.CLIENT_AUTH] if self.kind == "client" else [
+            ExtendedKeyUsageOID.SERVER_AUTH]
 
         builder = (x509.CertificateBuilder()
                    .subject_name(subject)
@@ -335,7 +337,7 @@ class CAHierarchy:
         )
 
         if self.kind == 'server':
-            san_names = [x509.DNSName(dns)]
+            san_names: list[x509.DNSName | x509.IPAddress] = [x509.DNSName(dns)]
             if ip_address:
                 san_names.append(x509.IPAddress(ipaddress.ip_address(ip_address)))
             builder.add_extension(
@@ -373,7 +375,10 @@ class CAHierarchy:
 
         return (key_path, cert_bundle_path, False)
 
-    def gen_keypair(self, dns: str, override=False, duration: datetime.timedelta = datetime.timedelta(hours=1), ip_address: Optional[str] = None) -> tuple[Path, Path, bool]:
+    def gen_keypair(self, dns: str,
+                    override=False,
+                    duration: datetime.timedelta = datetime.timedelta(hours=1),
+                    ip_address: Optional[str] = None) -> tuple[Path, Path, bool]:
         """
         Generate a private key as well as the associated certificate signed by this CA
         hierarchy. Returns the path to the key, cert, and whether it was reused or not.
@@ -385,7 +390,11 @@ class CAHierarchy:
             key_path = self.directory / f"{dns}.key"
 
             if cert_path.exists() and key_path.exists():
-                return (key_path, cert_path, True)
+                cert = x509.load_pem_x509_certificate(cert_path.read_bytes())
+
+                if datetime.datetime.now(datetime.timezone.utc) < cert.not_valid_after:
+                    # We only reuse the certificate/key if the cert is still valid
+                    return (key_path, cert_path, True)
 
         # Generate private key
         key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
@@ -395,6 +404,9 @@ class CAHierarchy:
 
         # Save that information to disk
         (key_path, cert_bundle_path) = self._save_cert(dns, cert, key, bundle_root=True)
+
+        if key_path is None:
+            raise ValueError("Key path should always be set")
 
         log.debug("leaf generated. dns=%s; path=%s", dns, cert_bundle_path)
 
@@ -408,13 +420,93 @@ class SignClientCertificate(BaseModel):
 
 class TrackNameRequest(BaseModel):
     """Request model to update track name for a stream"""
-    trackName: str
+    track_name: str
 
 
 class SupportedIngestInterface(str, Enum):
-    cmaf = "cmaf-ingest"
-    dash = "dash"
-    hls = "hls"
+    cmaf = "cmaf-ingest"  # Interface 1
+    dash = "dash"  # Interface 2, DASH version
+    hls = "hls"  # Interface 2, HLS version
+
+
+class UploadError(BaseModel):
+    session_id: Optional[int]
+    file_path: str
+    reasons: list[str]
+
+
+class ValidUpload(BaseModel):
+    session_id: Optional[int]
+    file_path: str
+
+
+class Session(BaseModel):
+    # The id is the index in the stream's list.
+    # Keeping a duplicated value here to have it included in API responses.
+    id: int
+
+    uploaded_segments: list[Tuple[str, str]] = []
+    uploaded_manifests: list[Tuple[str, str]] = []
+    complete: bool = False
+
+
+class Stream(BaseModel):
+    # Configuration of the PushAv stream
+    id: int
+    strict_mode: bool = True
+    interface: SupportedIngestInterface
+    track_name: Optional[str] = None
+
+    # Keep track of the various sessions encountered
+    sessions: list[Session] = []
+
+    # tracking uploads with unique file paths
+    error_uploads: list[UploadError] = []
+    valid_uploads: list[ValidUpload] = []
+
+    # Utilities
+
+    def save_to_disk(self, wd: WorkingDirectory):
+        p = wd.path("streams", str(self.id), "stream.json")
+        with open(p, 'w', encoding='utf-8') as f:
+            json.dump(self.model_dump(), f, ensure_ascii=False, indent=4)
+
+    def new_session(self) -> Session:
+        session_id = len(self.sessions) + 1
+        session = Session(id=session_id)
+        self.sessions.append(session)
+        return session
+
+    def last_in_progress_session(self) -> Optional[Session]:
+        if len(self.sessions) == 0:
+            return None
+
+        last_session = self.sessions[-1]
+        if not last_session.complete:
+            return last_session
+
+        return None
+
+    def _is_file_in_error_uploads(self, file_path: str) -> bool:
+        """Check if a file path already exists in error_uploads"""
+        return any(error.file_path == file_path for error in self.error_uploads)
+
+    def _is_file_in_valid_uploads(self, file_path: str) -> bool:
+        """Check if a file path already exists in valid_uploads"""
+        return any(valid.file_path == file_path for valid in self.valid_uploads)
+
+    def add_error_upload(self, session_id: Optional[int], file_path: str, reasons: list[str]):
+        """Add a file to error_uploads if it doesn't already exist"""
+        if not self._is_file_in_error_uploads(file_path):
+            # Check if file exists in valid_uploads and remove it
+            if self._is_file_in_valid_uploads(file_path):
+                self.valid_uploads = [valid for valid in self.valid_uploads if valid.file_path != file_path]
+            self.error_uploads.append(UploadError(session_id=session_id, file_path=file_path, reasons=reasons))
+
+    def add_valid_upload(self, session_id: Optional[int], file_path: str):
+        """Add a file to valid_uploads if it doesn't already exist and isn't in error_uploads"""
+        if not self._is_file_in_valid_uploads(file_path) and not self._is_file_in_error_uploads(file_path):
+            self.valid_uploads.append(ValidUpload(session_id=session_id, file_path=file_path))
 
 
 class PushAvServer:
@@ -427,13 +519,14 @@ class PushAvServer:
         self.strict_mode = strict_mode
         self.router = APIRouter()
 
-        # In-memory map to track stream files: {stream_id: {"valid_files": [], "invalid_files": []}}
-        self.stream_files_map = {}
+        # In-memory map to track camera streams
+        self.streams = self._list_streams()
 
         # UI
         self.router.add_api_route("/", self.index, methods=["GET"], response_class=RedirectResponse)
         self.router.add_api_route("/ui/streams", self.ui_streams_list, methods=["GET"], response_class=HTMLResponse)
-        self.router.add_api_route("/ui/streams/{stream_id}/{file_path:path}", self.ui_streams_details, methods=["GET"])
+        self.router.add_api_route("/ui/streams/{stream_id}", self.ui_streams_details, methods=["GET"])
+        self.router.add_api_route("/ui/streams/{stream_id}/{file_path:path}", self.ui_streams_file_details, methods=["GET"])
         self.router.add_api_route("/ui/certificates", self.ui_certificates_list, methods=["GET"], response_class=HTMLResponse)
         self.router.add_api_route("/ui/certificates/{hierarchy}/{name}",
                                   self.ui_certificates_details, methods=["GET"], response_class=HTMLResponse)
@@ -454,16 +547,34 @@ class PushAvServer:
 
     # Utilities
 
-    def _read_stream_details(self, stream_id: int):
-        p = self.wd.path("streams", str(stream_id), "details.json")
+    def _list_streams(self):
+        streams: dict[str, Stream] = {}
 
-        try:
-            with open(p, 'r') as file:
-                return json.load(file)
-        except FileNotFoundError:
-            raise HTTPException(404, detail="Stream doesn't exists")
-        except Exception as e:
-            raise HTTPException(500, f"An unexpected error occurred: {e}")
+        for stream_path in self.wd.path("streams").iterdir():
+            if stream_path.is_dir():
+                stream_file = stream_path / "stream.json"
+                if stream_file.exists():
+                    with open(stream_file, 'r', encoding='utf-8') as f:
+                        stream_data = json.load(f)
+                        streams[stream_path.name] = Stream.model_validate(stream_data)
+        return streams
+
+    @contextlib.contextmanager
+    def _open_stream(self, stream_id: int):
+        """Context manager helper to save a stream after use.
+
+        Note that any exceptions raised within the context will prevent streams from being saved to disk.
+        """
+        stream_id_str = str(stream_id)
+
+        stream = self.streams.get(stream_id_str)
+
+        if stream is None:
+            raise HTTPException(status_code=400, detail="Stream ID doesn't exist")
+
+        yield stream
+
+        self.streams[stream_id_str].save_to_disk(self.wd)
 
     # UI website
 
@@ -476,7 +587,18 @@ class PushAvServer:
             request=request, name="streams_list.jinja2", context={"streams": s["streams"]}
         )
 
-    def ui_streams_details(self, request: Request, stream_id: int, file_path: str):
+    def ui_streams_details(self, request: Request, stream_id: int):
+        context = {}
+
+        stream = self.streams.get(str(stream_id))
+        if stream is None:
+            raise HTTPException(status_code=400, detail="Stream ID doesn't exist")
+
+        context['stream'] = stream
+
+        return self.templates.TemplateResponse(request=request, name="streams_details.jinja2", context=context)
+
+    def ui_streams_file_details(self, request: Request, stream_id: int, file_path: str):
         context = {}
         context['streams'] = self.list_streams()['streams']
         context['stream_id'] = stream_id
@@ -487,15 +609,12 @@ class PushAvServer:
             p = self.wd.path("streams", str(stream_id), file_path)
             with open(p, "r") as f:
                 context['cert'] = json.load(f)
-        elif file_path == 'details.json':
-            context['type'] = 'details'
-            context['details'] = self._read_stream_details(stream_id)
         else:
             context['type'] = 'media'
             context['probe'] = self.ffprobe_check(stream_id, file_path)
             context['pretty_probe'] = json.dumps(context['probe'], sort_keys=True, indent=4)
 
-        return self.templates.TemplateResponse(request=request, name="streams_details.jinja2", context=context)
+        return self.templates.TemplateResponse(request=request, name="streams_file_details.jinja2", context=context)
 
     def ui_certificates_list(self, request: Request):
         return self.templates.TemplateResponse(
@@ -510,132 +629,211 @@ class PushAvServer:
 
     # APIs
 
-    def create_stream(self, interface: Optional[SupportedIngestInterface] = None):
+    def create_stream(self, interface: SupportedIngestInterface = Query(default=SupportedIngestInterface.cmaf)):
         # Find the last registered stream
-        dirs = [d for d in pathlib.Path(self.wd.path("streams")).iterdir() if d.is_dir()]
-        last_stream = int(dirs[-1].name) if len(dirs) > 0 else 0
+        stream_ids = [int(d.name) for d in self.wd.path("streams").iterdir() if d.is_dir() and d.name.isdigit()]
+        last_stream = max(stream_ids) if stream_ids else 0
         stream_id = last_stream + 1
-
-        # TODO Add option to specify Interface-1, Interface-2 DASH, or I2-HLS to improve the strict mode
-        p = self.wd.mkdir("streams", str(stream_id))
-        stream = {"stream_id": stream_id, "strict_mode": self.strict_mode, "interface": interface}
-
-        with open(p / "details.json", 'w', encoding='utf-8') as f:
-            json.dump(stream, f, ensure_ascii=False, indent=4)
+        stream_id_str = str(stream_id)
 
         # Initialize entry in stream files map
-        self.stream_files_map[str(stream_id)] = {"valid_files": [], "invalid_files": []}
+        stream = Stream(
+            id=stream_id,
+            strict_mode=self.strict_mode,
+            interface=interface,
+        )
+        self.streams[stream_id_str] = stream
 
-        return stream
+        self.wd.mkdir("streams", str(stream_id))
+        self.streams[stream_id_str].save_to_disk(self.wd)
+
+        log.info(f"Stream created: id={stream_id}, interface={interface}")
+        return stream  # TODO Update TH to use sessions instead
 
     def list_streams(self):
-        # Return streams directly from the in-memory map
-        streams = []
-
-        for stream_id, stream_data in self.stream_files_map.items():
-            streams.append({
-                "id": int(stream_id),
-                "valid_files": stream_data["valid_files"],
-                "invalid_files": stream_data["invalid_files"]
-            })
-
-        return {"streams": streams}
-
-    async def _handle_upload(self, dst: Path, req: Request):
-        """ Handle an upload, sending content to disk at 'dst'.
-
-        Extract the parsed version of a client certificate via a patched TLS
-        extension. See https://docs.python.org/3/library/ssl.html#ssl.SSLSocket.getpeercert
-        for the exact content.
-        """
-
-        cert_details = req.scope["extensions"]["ssl"]["client_certificate"]
-
-        with open(dst.with_suffix(dst.suffix + ".crt"), "w") as f:
-            f.write(json.dumps(cert_details))
-
-        with open(dst, "wb") as f:
-            async for chunk in req.stream():
-                f.write(chunk)
-
-        return Response(status_code=202)
+        return {"streams": list(self.streams.values())}
 
     async def handle_upload(self, stream_id: int, file_path: str, ext: str, req: Request):
         """
-            Handle any upload if strict-mode isn't enabled.
-            Otherwise, check if the segment path format complies with Matter Specification path.
-        """
-        stream = self._read_stream_details(stream_id)
-        is_valid = True
-        validation_error_reason = ""
+            Handle file upload for a given stream.
 
-        if stream.get('strict_mode', False):
-            if ext not in VALID_EXTENSIONS:
-                is_valid = False
-                validation_error_reason = f"Invalid extension: {ext}, valid extensions are {', '.join(VALID_EXTENSIONS)}"
-            elif ext in ["mpd", "m3u8"]:
-                iface = stream.get('interface', None)
-                if (iface == SupportedIngestInterface.dash and ext != "mpd" or
-                        iface == SupportedIngestInterface.hls and ext != "m3u8"):
-                    is_valid = False
-                    validation_error_reason = "Unsupported manifest object extension"
-            elif ext == "m4s":
-                # Checks if CMAF extended path matches the pattern session_<SessionNumber>/<TrackName>/segment_<SegmentNumber>
-                # https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/PushAVStreamTransport.adoc#12-operation
-                segment_pattern = re.compile(r"^session_\d+/(?P<trackName>[^/]+)/segment_\d+$")
-                match = segment_pattern.match(file_path)
+            Validate the file name based on the extension and path format.
+            Always save the uploaded file to disk for further analysis.
+            If strict mode is enabled, return bad requests with the errors if any.
+
+            TODO Currently doesn't gracefuly handle overwrite uploads (e.g. when the same session number is reused)
+        """
+        log.debug(f"Upload started: stream={stream_id}, file={file_path}.{ext}")
+
+        with self._open_stream(stream_id) as stream:
+            file_path_with_ext = f"{file_path}.{ext}"
+            session = stream.last_in_progress_session()
+            body = await req.body()
+
+            # Validate the incoming file upload (path and extension)
+            errors = []
+
+            if ext == "mpd":
+                # DASH manifest files
+                if (stream.interface != SupportedIngestInterface.dash):
+                    errors.append("Unsupported manifest object extension")
+
+                if session is None:
+                    session = stream.new_session()
+
+                root = xml.etree.ElementTree.fromstring(body)
+                mpd_type = root.attrib.get('type')
+
+                if mpd_type == "dynamic" and len(session.uploaded_segments) > 0:
+                    errors.append("Dynamic MPD cannot be uploaded after segments have been uploaded")
+
+                if mpd_type == "static" and len(session.uploaded_segments) == 0:
+                    errors.append("Static MPD cannot be uploaded before segments have been uploaded")
+
+                if mpd_type == "static":
+                    session.complete = True
+
+                path_regex = re.compile(r"^session_\d+/index$")
+                if not path_regex.match(file_path):
+                    errors.append("DASH manifest must be uploaded as session_X/index.mpd")
+
+                session.uploaded_manifests.append((file_path_with_ext, file_path_with_ext + ".crt"))
+            elif ext == "m3u8":
+                # HLS manifest files
+                if stream.interface != SupportedIngestInterface.hls:
+                    errors.append("Unsupported manifest object extension")
+
+                if session is None:
+                    session = stream.new_session()
+
+                # TODO Lifecycle validation for HLS manifests
+
+                session.uploaded_manifests.append((file_path_with_ext, file_path_with_ext + ".crt"))
+            elif ext == "m4s" or ext == "init":
+                # Segmented video files
+
+                if session is not None:
+                    session.uploaded_segments.append((file_path_with_ext, file_path_with_ext + ".crt"))
+                else:
+                    errors.append("No active session when uploading " + file_path_with_ext + ", segment uploaded before mpd")
+
+                # The Track's init segment is uploaded as `session_name/track_name/track_name.init`.
+                # Note that the extension is not part of the `file_path` variable.
+                #
+                # `/session_1/index.mpd` - Initial upload. Has `MPD@type="dynamic"`.
+                # `/session_1/video1/video1.init`
+                # `/session_1/audio1/audio1.init`
+                # `/session_1/video1/segment_1001.m4s`
+                # `/session_1/audio1/segment_1001.m4s`
+                # `/session_1/video1/segment_1002.m4s`
+                # `/session_1/audio1/segment_1002.m4s`
+                # `/session_1/video1/segment_1003.m4s`
+                # `/session_1/audio1/segment_1003.m4s`
+                # `/session_1/index.mpd` - Final upload. Has `MPD@type="static"`.
+
+                path_regex = r"^session_\d+/(?P<trackName>[^/]+)/segment_\d+$"
+                if ext == "init":
+                    path_regex = r"^session_\d+/(?P<trackName>[^/]+)/[^/]+"
+                path_regex = re.compile(path_regex)
+
+                match = path_regex.match(file_path)
                 if not match:
-                    is_valid = False
-                    validation_error_reason = "Path does not adhere to Matter's extended path format: session_<SessionNumber>/<TrackName>/segment_<SegmentNumber>"
+                    errors.append("Path does not adhere to Matter's path format")
                 else:
                     # Validate if the trackName is same as the one assigned during transport allocation.
                     # https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/PushAVStreamTransport.adoc#685-trackname-field
                     track_name_in_path = match.group("trackName")
-                    track_name = stream.get('trackName', None)
+                    track_name = stream.track_name
+
+                    # TODO The track naming strategy has changed in 1.5.1. It's now a per audio/video stream option.
                     if track_name and track_name != track_name_in_path:
-                        is_valid = False
-                        validation_error_reason = ("Track name mismatch: "
-                                                   f"{track_name_in_path} != {track_name}, "
-                                                   "must match TrackName provided in ContainerOptions")
+                        errors.append("Track name mismatch: "
+                                      f"{track_name_in_path} != {track_name}, "
+                                      "must match TrackName provided in ContainerOptions")
+            else:
+                errors.append(f"Invalid extension: {ext}, valid extensions are {', '.join(VALID_EXTENSIONS)}")
 
-        dst = self.wd.mkdir("streams", str(stream_id), f"{file_path}.{ext}", is_file=True)
-        extended_path = f"{file_path}.{ext}"
+            # Validation complete, now saving data to disk
+            file_local_path = self.wd.mkdir("streams", str(stream_id), file_path_with_ext, is_file=True)
 
-        # Add file to the appropriate list in the stream files map
-        log.debug(f"Upload received: {extended_path}")
-        stream_id_str = str(stream_id)
-        if stream_id_str in self.stream_files_map:
-            if is_valid and extended_path not in self.stream_files_map[stream_id_str]["valid_files"]:
-                self.stream_files_map[stream_id_str]["valid_files"].append(extended_path)
-            if not is_valid:
-                log.error(f"{extended_path}: {validation_error_reason}")
-                if extended_path not in self.stream_files_map[stream_id_str]["invalid_files"]:
-                    self.stream_files_map[stream_id_str]["invalid_files"].append({
-                        "file_path": extended_path,
-                        "validation_error_reason": validation_error_reason
-                    })
+            # If file already exists, create versioned backup.
+            # Especially useful for manifests that have a fixed location.
+            if file_local_path.exists():
+                # TODO Also needs to update the Session value so that we can retrieved the backed up file.
+                #  Which imply we will need to keep both the original upload name (for validation) and the
+                #  actual on-disk file name (for reading).
+                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                backup_path = file_local_path.with_stem(f"{file_local_path.stem}.{timestamp}")
+                file_local_path.rename(backup_path)
+                log.info(f"Backed up existing file to {backup_path}")
 
-        return await self._handle_upload(dst, req)
+            cert_details = req.scope["extensions"]["ssl"].get('client_certificate', None)
+
+            # TODO If file already exists, come up with   a way to version it instead of overwriting it.
+
+            if cert_details:
+                with open(file_local_path.with_suffix(file_local_path.suffix + ".crt"), "w") as f:
+                    f.write(json.dumps(cert_details))
+            else:
+                errors.append("File upload did not happen with SSL context")
+
+            # Save the file to disk
+            with open(file_local_path, "wb") as f:
+                f.write(body)
+
+            session_id = session.id if session else None
+            if len(errors) > 0:
+                # Add to error uploads (only if not already present)
+                stream.add_error_upload(session_id, file_path_with_ext, errors)
+            else:
+                # Add to valid uploads (only if not already in error uploads)
+                stream.add_valid_upload(session_id, file_path_with_ext)
+
+            if stream.strict_mode and len(errors) > 0:
+                log.warning(f"Upload validation failed: {errors}")
+                return JSONResponse(
+                    status_code=400,
+                    content={"errors": errors}
+                )
+            log.info("Upload successful:"
+                     f"stream={stream_id}, file={file_path}.{ext}, errors={errors}, strict={stream.strict_mode}")
+            return Response(status_code=202)
 
     def ffprobe_check(self, stream_id: int, file_path: str):
 
         p = self.wd.path("streams", str(stream_id), file_path)
 
         if not p.exists():
-            return HTTPException(404, detail="Stream doesn't exists")
+            raise HTTPException(404, detail="Media file doesn't exists")
+
+        cmd = [
+            "ffprobe", "-allowed_extensions", "init,m4s",
+            "-show_streams", "-show_format", "-output_format", "json",
+            str(p.absolute())
+        ]
+
+        print(cmd)
+        # ffprobe -show_streams -show_format -output_format json /Users/francoismonniot/.pavstest/streams/1/index.mpd
 
         proc = subprocess.run(
-            ["ffprobe", "-show_streams", "-show_format", "-output_format", "json", str(p.absolute())],
+            cmd,
             capture_output=True
         )
 
         if proc.returncode != 0:
-            # TODO Add more details (maybe stderr) to the response
-            return HTTPException(500)
+            stderr_text = proc.stderr.decode('utf-8', errors='replace')
+            raise HTTPException(
+                500,
+                detail={
+                    "message": "ffprobe failed to analyze the media file",
+                    "stderr": stderr_text,
+                    "command": " ".join(cmd)
+                }
+            )
 
         return json.loads(proc.stdout)
 
-    async def segment_download(self, file_path: str, stream_id: int):
+    async def segment_download(self, stream_id: int, file_path: str):
         return FileResponse(self.wd.path("streams", str(stream_id), file_path))
 
     def list_certs(self):
@@ -682,29 +880,21 @@ class PushAvServer:
     def create_client_keypair(self, name: str, override: bool = True):
         (key, cert, created) = self.device_hierarchy.gen_keypair(name, override)
 
-        return {key, cert, created}
+        return {"key": key, "cert": cert, "created": created}
 
+    # Seems unused in the current TH tests
+    # TODO Verify in spec how a track name updated should be handled mid-stream
     async def update_track_name(self, stream_id: int, track_request: TrackNameRequest):
-        """
-        Updates the trackName for a given stream_id.
-        """
-        stream_details = self._read_stream_details(stream_id)
-
-        stream_details["trackName"] = track_request.trackName
-
-        details_path = self.wd.path("streams", str(stream_id), "details.json")
-        try:
-            with open(details_path, 'w', encoding='utf-8') as f:
-                json.dump(stream_details, f, ensure_ascii=False, indent=4)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to write stream details: {e}")
+        """Updates the track_name for a given stream_id."""
+        with self._open_stream(stream_id) as stream:
+            stream.track_name = track_request.track_name
 
     def sign_client_certificate(
         self, name: str, req: SignClientCertificate, override: bool = True
     ):
         (key, cert, created) = self.device_hierarchy.gen_cert(name, req.csr, override)
 
-        return {key, cert, created}
+        return {"key": key, "cert": cert, "created": created}
 
 
 class PushAvContext:
@@ -720,7 +910,7 @@ class PushAvContext:
         # Create CA hierarchies (for webserver and devices)
         self.device_hierarchy = CAHierarchy(self.directory.mkdir("certs", "device"), "device", "client")
         self.server_hierarchy = CAHierarchy(self.directory.mkdir("certs", "server"), "server", "server")
-        (self.server_key_file, self.server_cert_file, _) = self.server_hierarchy.gen_keypair(self.dns, override=True, ip_address=server_ip)
+        (self.server_key_file, self.server_cert_file, _) = self.server_hierarchy.gen_keypair(self.dns, ip_address=server_ip)
 
         # mDNS configuration. Registration only happen if the dns isn't localhost.
         self.zeroconf = Zeroconf()

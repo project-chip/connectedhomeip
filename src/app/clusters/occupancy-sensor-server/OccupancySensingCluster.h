@@ -48,9 +48,10 @@ public:
     {
         Config(EndpointId endpointId) : mEndpointId(endpointId) {}
 
-        Config & WithFeatures(OccupancySensing::Feature featureMap)
+        Config & WithFeatures(BitFlags<OccupancySensing::Feature> featureMap)
         {
-            mFeatureMap = featureMap;
+            // we always generate occupancy change events.
+            mFeatureMap = featureMap.Set(OccupancySensing::Feature::kOccupancyEvent);
             return *this;
         }
 
@@ -76,8 +77,8 @@ public:
         }
 
         EndpointId mEndpointId;
-        BitMask<OccupancySensing::Feature> mFeatureMap = 0;
-        bool mShowDeprecatedAttributes                 = true;
+        BitFlags<OccupancySensing::Feature> mFeatureMap = OccupancySensing::Feature::kOccupancyEvent;
+        bool mShowDeprecatedAttributes                  = true;
         uint16_t mHoldTime;
         OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits;
         // The presence of mHoldTimeDelegate indicates that hold time limits are enforced and hold time functionality is active.
@@ -109,7 +110,7 @@ public:
 
     uint16_t GetHoldTime() const;
     const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & GetHoldTimeLimits() const;
-    BitMask<OccupancySensing::Feature> GetFeatureMap() const;
+    BitFlags<OccupancySensing::Feature> GetFeatureMap() const;
 
 private:
     void DoSetOccupancy(bool occupied);
@@ -117,7 +118,7 @@ private:
     // The presence of mHoldTimeDelegate indicates that hold time limits are enforced and hold time functionality is active.
     TimerDelegate * mHoldTimeDelegate;
     OccupancySensingDelegate * mDelegate;
-    const BitMask<OccupancySensing::Feature> mFeatureMap;
+    const BitFlags<OccupancySensing::Feature> mFeatureMap;
     const bool mShowDeprecatedAttributes;
     uint16_t mHoldTime;
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits;

@@ -55,7 +55,8 @@ enum class Type : uint8_t
     kTcp,
     kWiFiPAF,
     kNfc,
-    kLast = kNfc, // This is not an actual transport type, it just refers to the last transport type
+    kThreadMeshcop,
+    kLast = kThreadMeshcop, // This is not an actual transport type, it just refers to the last transport type
 };
 
 /**
@@ -183,6 +184,15 @@ public:
         case Type::kNfc:
             snprintf(buf, bufSize, "NFC:%d", mId.mNFCShortId);
             break;
+        case Type::kThreadMeshcop:
+            mIPAddress.ToString(ip_addr);
+#if INET_CONFIG_ENABLE_IPV4
+            if (mIPAddress.IsIPv4())
+                snprintf(buf, bufSize, "ThreadMeshcop:%s:%d", ip_addr, mPort);
+            else
+#endif
+                snprintf(buf, bufSize, "ThreadMeshcop:[%s]:%d", ip_addr, mPort);
+            break;
         default:
             snprintf(buf, bufSize, "ERROR");
             break;
@@ -198,6 +208,11 @@ public:
     // NB: 0xFFFF is not allowed for NFC ShortId.
     static constexpr PeerAddress NFC() { return PeerAddress(kUndefinedNFCShortId()); }
     static constexpr PeerAddress NFC(const uint16_t shortId) { return PeerAddress(shortId); }
+
+    static PeerAddress ThreadMeshcop(const Inet::IPAddress & addr, uint16_t port)
+    {
+        return PeerAddress(Type::kThreadMeshcop).SetIPAddress(addr).SetPort(port);
+    }
 
     static PeerAddress UDP(const Inet::IPAddress & addr) { return PeerAddress(addr, Type::kUdp); }
     static PeerAddress UDP(const Inet::IPAddress & addr, uint16_t port) { return UDP(addr).SetPort(port); }
@@ -242,6 +257,14 @@ public:
         // * The 16-bits Group Identifier in big-endian order
         uint32_t groupId = static_cast<uint32_t>((fabric << 24) & 0xff000000) | group;
         return UDP(Inet::IPAddress::MakeIPv6PrefixMulticast(scope, prefixLength, prefix, groupId));
+    }
+
+    static PeerAddress Groupcast()
+    {
+        constexpr uint8_t scope        = 0x05; // Site-Local
+        constexpr uint8_t prefixLength = 0x40; // 64-bit long network prefix field
+        // IANA assigned address
+        return UDP(Inet::IPAddress::MakeIPv6PrefixMulticast(scope, prefixLength, 0xff05000000000000, 0xfa));
     }
 
 private:

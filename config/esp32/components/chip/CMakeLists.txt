@@ -234,12 +234,12 @@ if (CONFIG_ENABLE_ETHERNET_TELEMETRY)
 endif()
 
 if (CONFIG_ENABLE_MATTER_OVER_THREAD)
-    chip_gn_arg_append("chip_enable_openthread"                 "true")
+    chip_gn_arg_append("chip_enable_thread"                     "true")
     if (CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER)
         chip_gn_arg_append("chip_device_config_thread_network_endpoint_id" ${CONFIG_THREAD_NETWORK_ENDPOINT_ID})
     endif()
 else()
-    chip_gn_arg_append("chip_enable_openthread"                 "false")
+    chip_gn_arg_append("chip_enable_thread"                     "false")
 endif()
 
 if (CONFIG_OPENTHREAD_FTD)
@@ -343,6 +343,10 @@ endif()
 
 if (CONFIG_ICD_MAX_NOTIFICATION_SUBSCRIBERS)
     chip_gn_arg_append("icd_max_notification_subscribers" ${CONFIG_ICD_MAX_NOTIFICATION_SUBSCRIBERS})
+endif()
+
+if (CONFIG_CHIP_ENABLE_GROUPCAST)
+chip_gn_arg_bool("chip_config_enable_groupcast" CONFIG_CHIP_ENABLE_GROUPCAST)
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")

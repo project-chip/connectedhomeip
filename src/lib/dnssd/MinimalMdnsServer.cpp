@@ -17,7 +17,7 @@
 #include "MinimalMdnsServer.h"
 
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
-#include <minmdns/MinMdnsConfig.h>
+#include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
 
 #ifndef CHIP_MINMDNS_DEFAULT_POLICY
 #define CHIP_MINMDNS_DEFAULT_POLICY 0

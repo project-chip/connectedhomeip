@@ -95,8 +95,21 @@ _DevicePairingDelegate_OnCommissioningCompleteFunct = CFUNCTYPE(
     None, c_uint64, PyChipError)
 _DevicePairingDelegate_OnOpenWindowCompleteFunct = CFUNCTYPE(
     None, c_uint64, c_uint32, c_char_p, c_char_p, PyChipError)
+
+DevicePairingDelegate_OnCommissioningStatusUpdateFunct: typing.TypeAlias = typing.Callable[
+    [int, int, PyChipError],
+    None,
+]
 _DevicePairingDelegate_OnCommissioningStatusUpdateFunct = CFUNCTYPE(
     None, c_uint64, c_uint8, PyChipError)
+
+DevicePairingDelegate_OnCommissioningStageStartFunct: typing.TypeAlias = typing.Callable[
+    [int, bytes],
+    None,
+]
+_DevicePairingDelegate_OnCommissioningStageStartFunct = CFUNCTYPE(
+    None, c_uint64, c_char_p)
+
 _DevicePairingDelegate_OnFabricCheckFunct = CFUNCTYPE(
     None, c_uint64)
 # void (*)(Device *, CHIP_ERROR).
@@ -636,6 +649,22 @@ class ChipDeviceControllerBase():
     def isActive(self) -> bool:
         return self._isActive
 
+    def setCommissioningStatusUpdateCallback(
+        self,
+        commissioning_status_callback: DevicePairingDelegate_OnCommissioningStatusUpdateFunct,
+    ) -> None:
+        self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
+            self.pairingDelegate, commissioning_status_callback
+        )
+
+    def setCommissioningStageStartCallback(
+        self,
+        callback: DevicePairingDelegate_OnCommissioningStageStartFunct,
+    ) -> None:
+        self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback(
+            self.pairingDelegate, callback
+        )
+
     def Shutdown(self):
         '''
         Shuts down this controller and reclaims any used resources, including the bound
@@ -757,6 +786,29 @@ class ChipDeviceControllerBase():
                     self.devCtrl, discriminator, setupPinCode, nodeId)
             )
 
+            return await asyncio.futures.wrap_future(ctx.future)
+
+    async def ContinueCommissioningAfterConnectNetworkRequest(self, nodeId: int) -> int:
+        '''
+        This method is used in case of NFC-based Commissioning without power.
+        It instructs the commissioner to proceed to the 2nd commissioning phase on the
+        operational network, after the device has connected to that network.
+
+        Args:
+            nodeId (int): The node ID of the device (commissionee).
+
+        Returns:
+            int: Effective Node ID of the device (as defined by the assigned NOC).
+        '''
+        self.CheckIsActive()
+
+        async with self._commissioning_context as ctx:
+            self._enablePairingCompleteCallback(False)
+
+            await self._ChipStack.CallAsync(
+                lambda: self._dmLib.pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequest(
+                    self.devCtrl, nodeId)
+            )
             return await asyncio.futures.wrap_future(ctx.future)
 
     async def UnpairDevice(self, nodeId: int) -> None:
@@ -1582,7 +1634,7 @@ class ChipDeviceControllerBase():
             sessionActiveThreshold=sessionParametersStruct.SessionActiveThreshold if sessionParametersStruct.SessionActiveThreshold != 0 else None,
             dataModelRevision=sessionParametersStruct.DataModelRevision if sessionParametersStruct.DataModelRevision != 0 else None,
             interactionModelRevision=sessionParametersStruct.InteractionModelRevision if sessionParametersStruct.InteractionModelRevision != 0 else None,
-            specficiationVersion=sessionParametersStruct.SpecificationVersion if sessionParametersStruct.SpecificationVersion != 0 else None,
+            specificationVersion=sessionParametersStruct.SpecificationVersion if sessionParametersStruct.SpecificationVersion != 0 else None,
             maxPathsPerInvoke=sessionParametersStruct.MaxPathsPerInvoke)
 
     async def TestOnlySendBatchCommands(self, nodeId: int, commands: typing.List[ClusterCommand.InvokeRequestInfo],
@@ -2402,6 +2454,93 @@ class ChipDeviceControllerBase():
                 self.devCtrl)
         ).raise_on_error()
 
+    def SetGroupKeySet(self, keyset_id: int, policy: int, num_keys: int,
+                       epoch_key0: bytes, epoch_start_time0: int,
+                       epoch_key1: typing.Optional[bytes] = None, epoch_start_time1: int = 0,
+                       epoch_key2: typing.Optional[bytes] = None, epoch_start_time2: int = 0):
+        '''
+        Writes a GroupKeySet into the controller's GroupDataProvider for this fabric.
+
+        Args:
+            keyset_id: Key set identifier.
+            policy: Security policy (0 = TrustFirst, 1 = CacheAndSync).
+            num_keys: Number of epoch keys (1-3).
+            epoch_key0: First epoch key (16 bytes).
+            epoch_start_time0: Start time for first epoch key (microseconds since Matter epoch).
+            epoch_key1: Second epoch key (16 bytes), or None if unused.
+            epoch_start_time1: Start time for second epoch key.
+            epoch_key2: Third epoch key (16 bytes), or None if unused.
+            epoch_start_time2: Start time for third epoch key.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_SetKeySet(
+                self.devCtrl, keyset_id, policy, num_keys,
+                epoch_key0, epoch_start_time0,
+                epoch_key1, epoch_start_time1,
+                epoch_key2, epoch_start_time2)
+        ).raise_on_error()
+
+    def SetGroupInfo(self, group_id: int, group_name: str, flags: int = 0x02):
+        '''
+        Adds or updates a group entry in the controller's GroupDataProvider for this fabric.
+
+        Args:
+            group_id: The group identifier.
+            group_name: Human-readable group name.
+            flags: GroupInfo flags bitmask (kHasAuxiliaryACL=0x01, kMcastAddrPolicy=0x02).
+                   Defaults to 0x02 (kFlagsDefault).
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_SetGroupInfo(
+                self.devCtrl, group_id, group_name.encode('utf-8'), flags)
+        ).raise_on_error()
+
+    def AddGroupEndpoint(self, group_id: int, endpoint_id: int):
+        '''
+        Associates an endpoint with a group in the controller's GroupDataProvider for this fabric.
+
+        Args:
+            group_id: The group identifier.
+            endpoint_id: The endpoint to add to the group.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_AddGroupEndpoint(
+                self.devCtrl, group_id, endpoint_id)
+        ).raise_on_error()
+
+    def SetGroupKey(self, group_id: int, keyset_id: int):
+        '''
+        Maps a group to a key set in the controller's GroupDataProvider for this fabric.
+
+        Args:
+            group_id: The group identifier.
+            keyset_id: The key set identifier to associate with the group.
+
+        Raises:
+            ChipStackError: On failure.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_SetGroupKey(
+                self.devCtrl, group_id, keyset_id)
+        ).raise_on_error()
+
     def CreateManualCode(self, discriminator: int, passcode: int) -> str:
         '''
         Creates a standard flow manual code from the given discriminator and passcode.
@@ -2443,6 +2582,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_ConnectNFC.argtypes = [
                 c_void_p, c_uint16, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectNFC.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequest.argtypes = [
+                c_void_p, c_uint64]
+            self._dmLib.pychip_DeviceController_ContinueCommissioningAfterConnectNetworkRequest.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
                 c_char_p, c_uint32]
@@ -2486,6 +2629,15 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_OnNetworkCommission.argtypes = [
                 c_void_p, c_void_p, c_uint64, c_uint32, c_uint8, c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_OnNetworkCommission.restype = PyChipError
+
+            if hasattr(self._dmLib, "pychip_DeviceController_ThreadMeshcopCommission"):
+                self._dmLib.pychip_DeviceController_ThreadMeshcopCommission.argtypes = [
+                    c_void_p, c_void_p, c_uint64, c_uint32, c_uint16, c_char_p, c_uint16]
+                self._dmLib.pychip_DeviceController_ThreadMeshcopCommission.restype = PyChipError
+            else:
+                logging.getLogger(__name__).warning(
+                    "pychip_DeviceController_ThreadMeshcopCommission is not available in the loaded CHIP library; "
+                    "Thread Meshcop commissioning is disabled.")
 
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodes.argtypes = [
                 c_void_p, c_uint8, c_char_p]
@@ -2570,6 +2722,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.argtypes = [
                 c_void_p, _DevicePairingDelegate_OnCommissioningStatusUpdateFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback.restype = PyChipError
+
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback.argtypes = [
+                c_void_p, _DevicePairingDelegate_OnCommissioningStageStartFunct]
+            self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningStageStartCallback.restype = PyChipError
 
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.argtypes = [
                 c_void_p, _DevicePairingDelegate_OnFabricCheckFunct]
@@ -2658,6 +2814,22 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_OpCreds_InitGroupTestingData.argtypes = [
                 c_void_p]
             self._dmLib.pychip_OpCreds_InitGroupTestingData.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_SetKeySet.argtypes = [
+                c_void_p, c_uint16, c_uint8, c_uint8,
+                c_char_p, c_uint64,
+                c_char_p, c_uint64,
+                c_char_p, c_uint64]
+            self._dmLib.pychip_OpCreds_SetKeySet.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_SetGroupInfo.argtypes = [c_void_p, c_uint16, c_char_p, c_uint8]
+            self._dmLib.pychip_OpCreds_SetGroupInfo.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_AddGroupEndpoint.argtypes = [c_void_p, c_uint16, c_uint16]
+            self._dmLib.pychip_OpCreds_AddGroupEndpoint.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_SetGroupKey.argtypes = [c_void_p, c_uint16, c_uint16]
+            self._dmLib.pychip_OpCreds_SetGroupKey.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.argtypes = [
                 _IssueNOCChainCallbackPythonCallbackFunct]
@@ -2829,6 +3001,23 @@ class ChipDeviceController(ChipDeviceControllerBase):
             int: Effective Node ID of the device (as defined by the assigned NOC).
         '''
         self.SetThreadOperationalDataset(threadOperationalDataset)
+        return await self.ConnectNFC(discriminator, setupPinCode, nodeId)
+
+    async def CommissionNfcWiFi(self, discriminator, setupPinCode, nodeId: int, ssid: str, credentials: str) -> int:
+        '''
+        Commissions a Wi-Fi device over NFC.
+
+        Args:
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+            setupPinCode (int): The setup pin code of the device.
+            nodeId (int): The node ID of the device.
+            ssid (str): SSID of the WiFi network.
+            credentials (str): WiFi network password.
+
+        Returns:
+            int: Effective Node ID of the device (as defined by the assigned NOC).
+        '''
+        self.SetWiFiCredentials(ssid, credentials)
         return await self.ConnectNFC(discriminator, setupPinCode, nodeId)
 
     async def CommissionBleWiFi(self, discriminator, setupPinCode, nodeId: int, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> int:
@@ -3101,6 +3290,33 @@ class ChipDeviceController(ChipDeviceControllerBase):
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_OnNetworkCommission(
                     self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") if filter is not None else None, discoveryTimeoutMsec)
+            )
+
+            return await asyncio.futures.wrap_future(ctx.future)
+
+    async def CommissionThreadMeshcop(self, nodeId: int, setupPinCode: int,
+                                      discriminator: int, borderAgentIPAddr: str,
+                                      borderAgentPort: int, threadOperationalDataset: bytes) -> int:
+        '''
+        Commission with the given node ID from the setupPinCode and discriminator
+        over Thread MeshCoP transport
+
+        Args:
+            nodeId (int): The node ID of the device.
+            setupPinCode (int): The setup pin code of the device.
+            discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+            borderAgentIPAddr (str): IP address of Border Agent in Thread network
+            borderAgentPort (int): The port of Border Agent in Thread network
+            threadOperationalDataset (bytes): The operational dataset of Thread network
+        '''
+        self.CheckIsActive()
+
+        self.SetThreadOperationalDataset(threadOperationalDataset)
+        async with self._commissioning_context as ctx:
+            self._enablePairingCompleteCallback(True)
+            await self._ChipStack.CallAsync(
+                lambda: self._dmLib.pychip_DeviceController_ThreadMeshcopCommission(
+                    self.devCtrl, self.pairingDelegate, nodeId, setupPinCode, discriminator, borderAgentIPAddr.encode("utf-8"), borderAgentPort)
             )
 
             return await asyncio.futures.wrap_future(ctx.future)

@@ -35,3 +35,12 @@ particular:
   describes how to implement unit testing
 - [docs/testing/integration_tests.md](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/integration_tests.md)
   describes how to implement integration tests.
+
+## Project Health
+
+### Expected Failures in Integration Tests
+
+Tests in `src/python_testing` and `src/app/tests/suites` which verify expected failures
+should clearly indicate (either in the test name/label or in a failure output) why the
+failure is expected.  For example, if there is a specific section in the spec which
+requires the failure, a summary of the section requirements should be included.

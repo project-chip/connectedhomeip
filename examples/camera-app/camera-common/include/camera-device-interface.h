@@ -57,7 +57,7 @@ struct VideoStream
                 videoStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
                 videoStreamParams.maxResolution.height >= inputParams.maxResolution.height &&
                 videoStreamParams.minBitRate <= inputParams.minBitRate && videoStreamParams.maxBitRate >= inputParams.maxBitRate &&
-                videoStreamParams.keyFrameInterval == inputParams.keyFrameInterval);
+                inputParams.keyFrameInterval != 0);
     }
 };
 
@@ -136,8 +136,7 @@ public:
     virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() = 0;
 
     // Getter for CameraAVSettingsUserLevelManagement Delegate
-    virtual chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelManagementDelegate &
-    GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
+    virtual chip::app::Clusters::CameraAvSettingsUserLevelManagementDelegate & GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
 
     // Getter for ZoneManagement Delegate
     virtual chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() = 0;

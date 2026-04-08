@@ -49,13 +49,13 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-
 -   Step 1: Pull docker image
 
     ```bash
-    $ docker pull ghcr.io/project-chip/chip-build-realtek-zephyr:177
+    $ docker pull ghcr.io/project-chip/chip-build-realtek-zephyr:181
     ```
 
 -   Step 2: Run docker container:
 
     ```bash
-    $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-realtek-zephyr:177
+    $ docker run -it -v ${CHIP_DIR}:/root/chip ghcr.io/project-chip/chip-build-realtek-zephyr:181
     ```
 
 -   Step 3: Activate build environment

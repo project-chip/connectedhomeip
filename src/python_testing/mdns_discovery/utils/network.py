@@ -73,3 +73,42 @@ def get_host_ipv6_addresses():
 
     log.info(f"Discovered IPv6 addresses: {results}")
     return results
+
+
+async def is_dut_tcp_supported(instance_qname: str):
+    """
+    Determines whether the DUT supports TCP by inspecting its operational service TXT record.
+
+    This function queries the DUT's operational mDNS service and examines the T key in the
+    TXT record. MRP-only support (TCP unsupported) is indicated when the T key is absent,
+    empty, or has a value of "0". Any other value indicates TCP support.
+
+    Args:
+        instance_qname (str): The fully qualified instance name of the DUT.
+
+    Returns:
+        bool:
+            - True if the DUT supports TCP (T key present and not "0")
+            - False if the DUT supports MRP-only (T key absent, empty, or "0")
+
+    Raises:
+        Exception: If the TXT record cannot be retrieved from the DUT.
+    """
+    # Import here to avoid circular dependency
+    from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
+
+    try:
+        # Get the operational service TXT record
+        txt_record = await MdnsDiscovery().get_txt_record(
+            service_name=instance_qname, service_type=MdnsServiceType.OPERATIONAL.value
+        )
+    except Exception as e:
+        raise Exception(
+            f"Unable to determine TCP support for '{instance_qname}'. "
+            f"Failure during TXT record retrieval: {e}"
+        ) from e
+
+    # Returns True when TCP is supported (T key present and not "0")
+    # Returns False when MRP-only (T key absent, empty, or "0")
+    t_key = txt_record.txt.get('T', None)
+    return not (t_key is None or not str(t_key).strip() or str(t_key).strip() == "0")

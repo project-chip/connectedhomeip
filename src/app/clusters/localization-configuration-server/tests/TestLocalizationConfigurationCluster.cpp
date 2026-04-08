@@ -18,8 +18,11 @@
 
 #include <app/clusters/localization-configuration-server/LocalizationConfigurationCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/tests/TestConstants.h>
+#include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/LocalizationConfiguration/Enums.h>
 #include <clusters/LocalizationConfiguration/Ids.h>
@@ -190,5 +193,104 @@ TEST_F(TestLocalizationConfigurationCluster, TestReadAttributes)
                                             LocalizationConfiguration::Attributes::ActiveLocale::kMetadataEntry,
                                             LocalizationConfiguration::Attributes::SupportedLocales::kMetadataEntry,
                                         }));
+}
+
+TEST_F(TestLocalizationConfigurationCluster, WriteAttributeNotifiesSubscribers)
+{
+    std::vector<CharSpan> supportedLocales = { CharSpan::fromCharString("en-US"), CharSpan::fromCharString("es-ES"),
+                                               CharSpan::fromCharString("fr-FR") };
+    mDeviceInfoProvider->SetSupportedLocales(supportedLocales);
+
+    MockLocalizationConfigurationCluster cluster(*mDeviceInfoProvider, CharSpan::fromCharString("en-US"));
+
+    chip::Testing::TestServerClusterContext context;
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    chip::Testing::WriteOperation writeOp(kRootEndpointId, LocalizationConfiguration::Id, ActiveLocale::Id);
+    writeOp.SetSubjectDescriptor(chip::Testing::kAdminSubjectDescriptor);
+
+    AttributeValueDecoder decoder        = writeOp.DecoderFor(CharSpan::fromCharString("es-ES"));
+    DataModel::ActionReturnStatus status = cluster.WriteAttribute(writeOp.GetRequest(), decoder);
+    EXPECT_EQ(status, Status::Success);
+
+    CharSpan actualLocale = cluster.GetActiveLocale();
+    EXPECT_TRUE(actualLocale.data_equal(CharSpan::fromCharString("es-ES")));
+
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    EXPECT_TRUE(
+        context.ChangeListener().IsDirty(ConcreteAttributePath(kRootEndpointId, LocalizationConfiguration::Id, ActiveLocale::Id)));
+
+    context.ChangeListener().DirtyList().clear();
+    DataVersion versionAfterFirstWrite = cluster.GetDataVersion({ kRootEndpointId, LocalizationConfiguration::Id });
+
+    chip::Testing::WriteOperation writeOp2(kRootEndpointId, LocalizationConfiguration::Id, ActiveLocale::Id);
+    writeOp2.SetSubjectDescriptor(chip::Testing::kAdminSubjectDescriptor);
+    AttributeValueDecoder decoder2 = writeOp2.DecoderFor(CharSpan::fromCharString("fr-FR"));
+    status                         = cluster.WriteAttribute(writeOp2.GetRequest(), decoder2);
+    EXPECT_EQ(status, Status::Success);
+
+    actualLocale = cluster.GetActiveLocale();
+    EXPECT_TRUE(actualLocale.data_equal(CharSpan::fromCharString("fr-FR")));
+
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    EXPECT_TRUE(
+        context.ChangeListener().IsDirty(ConcreteAttributePath(kRootEndpointId, LocalizationConfiguration::Id, ActiveLocale::Id)));
+    EXPECT_NE(cluster.GetDataVersion({ kRootEndpointId, LocalizationConfiguration::Id }), versionAfterFirstWrite);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestLocalizationConfigurationCluster, WriteAttributeFailureDoesNotNotify)
+{
+    std::vector<CharSpan> supportedLocales = { CharSpan::fromCharString("en-US"), CharSpan::fromCharString("es-ES") };
+    mDeviceInfoProvider->SetSupportedLocales(supportedLocales);
+
+    MockLocalizationConfigurationCluster cluster(*mDeviceInfoProvider, CharSpan::fromCharString("en-US"));
+
+    chip::Testing::TestServerClusterContext context;
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    DataVersion versionBefore = cluster.GetDataVersion({ kRootEndpointId, LocalizationConfiguration::Id });
+
+    chip::Testing::WriteOperation writeOp(kRootEndpointId, LocalizationConfiguration::Id, ActiveLocale::Id);
+    writeOp.SetSubjectDescriptor(chip::Testing::kAdminSubjectDescriptor);
+    AttributeValueDecoder decoder        = writeOp.DecoderFor(CharSpan::fromCharString("de-DE"));
+    DataModel::ActionReturnStatus status = cluster.WriteAttribute(writeOp.GetRequest(), decoder);
+    EXPECT_EQ(status, Status::ConstraintError);
+
+    CharSpan actualLocale = cluster.GetActiveLocale();
+    EXPECT_TRUE(actualLocale.data_equal(CharSpan::fromCharString("en-US")));
+
+    EXPECT_TRUE(context.ChangeListener().DirtyList().empty());
+    EXPECT_EQ(cluster.GetDataVersion({ kRootEndpointId, LocalizationConfiguration::Id }), versionBefore);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestLocalizationConfigurationCluster, WriteSameLocaleIsNoOp)
+{
+    std::vector<CharSpan> supportedLocales = { CharSpan::fromCharString("en-US"), CharSpan::fromCharString("es-ES") };
+    mDeviceInfoProvider->SetSupportedLocales(supportedLocales);
+
+    MockLocalizationConfigurationCluster cluster(*mDeviceInfoProvider, CharSpan::fromCharString("en-US"));
+
+    chip::Testing::TestServerClusterContext context;
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    DataVersion versionBefore = cluster.GetDataVersion({ kRootEndpointId, LocalizationConfiguration::Id });
+
+    chip::Testing::WriteOperation writeOp(kRootEndpointId, LocalizationConfiguration::Id, ActiveLocale::Id);
+    writeOp.SetSubjectDescriptor(chip::Testing::kAdminSubjectDescriptor);
+    AttributeValueDecoder decoder        = writeOp.DecoderFor(CharSpan::fromCharString("en-US"));
+    DataModel::ActionReturnStatus status = cluster.WriteAttribute(writeOp.GetRequest(), decoder);
+    EXPECT_EQ(status, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+
+    CharSpan actualLocale = cluster.GetActiveLocale();
+    EXPECT_TRUE(actualLocale.data_equal(CharSpan::fromCharString("en-US")));
+
+    EXPECT_TRUE(context.ChangeListener().DirtyList().empty());
+    EXPECT_EQ(cluster.GetDataVersion({ kRootEndpointId, LocalizationConfiguration::Id }), versionBefore);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 } // namespace

@@ -20,6 +20,7 @@
 #include <app/clusters/scenes-server/ExtensionFieldSets.h>
 #include <app/clusters/scenes-server/ExtensionFieldSetsImpl.h>
 #include <app/clusters/scenes-server/SceneTable.h>
+#include <app/clusters/scenes-server/ScenesIntegrationDelegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/ScenesManagement/AttributeIds.h>
 #include <clusters/ScenesManagement/ClusterId.h>
@@ -44,7 +45,7 @@ public:
     virtual void Release(ScenesManagementSceneTable *) = 0;
 };
 
-class ScenesManagementCluster : public DefaultServerCluster, public FabricTable::Delegate
+class ScenesManagementCluster : public DefaultServerCluster, public FabricTable::Delegate, public scenes::ScenesIntegrationDelegate
 {
 public:
     // NOTE: this is not great as this means the cluster itself uses fixed storage/sizes
@@ -124,13 +125,17 @@ public:
     /// Can only be called while started up (i.e. after Startup() and before Shutdown()).
     CHIP_ERROR ClearPersistentData();
 
+    // ScenesIntegrationDelegate implementation
+    CHIP_ERROR StoreCurrentGlobalScene(FabricIndex fabricIndex) override;
+    CHIP_ERROR RecallGlobalScene(FabricIndex fabricIndex) override;
+    CHIP_ERROR GroupWillBeRemoved(FabricIndex fabricIndex, GroupId groupId) override;
+    CHIP_ERROR MakeSceneInvalidForAllFabrics() override;
+
     // Integration methods for other cluster integrations
-    CHIP_ERROR GroupWillBeRemoved(FabricIndex aFabricIdx, GroupId aGroupId);
     CHIP_ERROR MakeSceneInvalid(FabricIndex aFabricIdx);
     CHIP_ERROR StoreCurrentScene(FabricIndex aFabricIx, GroupId aGroupId, SceneId aSceneId);
     CHIP_ERROR RecallScene(FabricIndex aFabricIx, GroupId aGroupId, SceneId aSceneId);
     CHIP_ERROR RemoveFabric(FabricIndex aFabricIndex);
-    CHIP_ERROR MakeSceneInvalidForAllFabrics();
 
 private:
     const BitMask<ScenesManagement::Feature> mFeatures;

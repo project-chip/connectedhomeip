@@ -176,6 +176,10 @@ private:
 
     void GetPrimaryOrFallbackMACAddress(MutableByteSpan & mac);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    static CHIP_ERROR SendThreadRendezvousAnnouncement(void * context, const Transport::PeerAddress & peerAddr);
+#endif
+
     //
     // Check if we have any valid operational credentials present in the fabric table and return true
     // if we do.
@@ -214,6 +218,11 @@ private:
 
     // Ephemeral discriminator to use instead of the default if set
     Optional<uint16_t> mEphemeralDiscriminator;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    // This holds the rendezvous announcement over Thread MeshCoP
+    chip::System::PacketBufferHandle mThreadRendezvousAnnouncement;
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     Time::TimeSource<Time::Source::kSystem> mTimeSource;

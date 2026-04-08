@@ -826,6 +826,7 @@ WARN_LOGFILE           =
 INPUT                  = README.md \
                          CODE_OF_CONDUCT.md \
                          CONTRIBUTING.md \
+                         docs/GLOSSARY.md \
                          docs/README.md \
                          docs/guides/BUILDING.md \
                          docs/VSCODE_DEVELOPMENT.md \

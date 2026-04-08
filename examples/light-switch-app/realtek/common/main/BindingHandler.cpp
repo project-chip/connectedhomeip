@@ -171,6 +171,128 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const Binding::Ta
     }
 }
 
+void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Binding::TableEntry & aBinding,
+                                                OperationalDeviceProxy * aDevice, void * aContext)
+{
+    BindingData * data = reinterpret_cast<BindingData *>(aContext);
+
+    auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
+        ChipLogProgress(NotSpecified, "Binding command applied successfully!");
+
+        // If session was recovered and communication works, reset flag to the initial state.
+        if (BindingHandler::GetInstance().mCaseSessionRecovered)
+            BindingHandler::GetInstance().mCaseSessionRecovered = false;
+    };
+
+    auto onFailure = [dataRef = *data](CHIP_ERROR aError) mutable { BindingHandler::OnInvokeCommandFailure(dataRef, aError); };
+
+    CHIP_ERROR ret = CHIP_NO_ERROR;
+
+    if (aDevice)
+    {
+        // We are validating connection is ready once here instead of multiple times in each case statement below.
+        VerifyOrDie(aDevice->ConnectionReady());
+    }
+
+    switch (aCommandId)
+    {
+    case Clusters::LevelControl::Commands::MoveToLevel::Id: {
+        Clusters::LevelControl::Commands::MoveToLevel::Type moveToLevelCommand;
+        moveToLevelCommand.level = data->Value;
+        if (aDevice)
+        {
+            ret = Controller::InvokeCommandRequest(aDevice->GetExchangeManager(), aDevice->GetSecureSession().Value(),
+                                                   aBinding.remote, moveToLevelCommand, onSuccess, onFailure);
+        }
+        else
+        {
+            Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
+            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, moveToLevelCommand);
+        }
+    }
+    break;
+
+    default:
+        ChipLogProgress(NotSpecified, "Invalid binding command data - commandId is not supported");
+        break;
+    }
+
+    if (CHIP_NO_ERROR != ret)
+    {
+        ChipLogError(NotSpecified, "Invoke LevelControl Command Request ERROR: %s", ErrorStr(ret));
+    }
+}
+
+void BindingHandler::ColorControlProcessCommand(CommandId aCommandId, const Binding::TableEntry & aBinding,
+                                                OperationalDeviceProxy * aDevice, void * aContext)
+{
+    BindingData * data = reinterpret_cast<BindingData *>(aContext);
+
+    auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
+        ChipLogProgress(NotSpecified, "Binding command applied successfully!");
+
+        // If session was recovered and communication works, reset flag to the initial state.
+        if (BindingHandler::GetInstance().mCaseSessionRecovered)
+            BindingHandler::GetInstance().mCaseSessionRecovered = false;
+    };
+
+    auto onFailure = [dataRef = *data](CHIP_ERROR aError) mutable { BindingHandler::OnInvokeCommandFailure(dataRef, aError); };
+
+    CHIP_ERROR ret = CHIP_NO_ERROR;
+
+    if (aDevice)
+    {
+        VerifyOrDie(aDevice->ConnectionReady());
+    }
+
+    switch (aCommandId)
+    {
+    case Clusters::ColorControl::Commands::MoveToColor::Id: {
+        Clusters::ColorControl::Commands::MoveToColor::Type moveToColorCommand;
+        moveToColorCommand.colorX = data->ColorXY.x;
+        moveToColorCommand.colorY = data->ColorXY.y;
+        if (aDevice)
+        {
+            ret = Controller::InvokeCommandRequest(aDevice->GetExchangeManager(), aDevice->GetSecureSession().Value(),
+                                                   aBinding.remote, moveToColorCommand, onSuccess, onFailure);
+        }
+        else
+        {
+            Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
+            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId, moveToColorCommand);
+        }
+    }
+    break;
+
+    case Clusters::ColorControl::Commands::MoveToColorTemperature::Id: {
+        Clusters::ColorControl::Commands::MoveToColorTemperature::Type moveToColorTemperatureCommand;
+        moveToColorTemperatureCommand.colorTemperatureMireds = data->ColorTemperatureMireds;
+        moveToColorTemperatureCommand.transitionTime         = 0;
+        if (aDevice)
+        {
+            ret = Controller::InvokeCommandRequest(aDevice->GetExchangeManager(), aDevice->GetSecureSession().Value(),
+                                                   aBinding.remote, moveToColorTemperatureCommand, onSuccess, onFailure);
+        }
+        else
+        {
+            Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
+            ret = Controller::InvokeGroupCommandRequest(&exchangeMgr, aBinding.fabricIndex, aBinding.groupId,
+                                                        moveToColorTemperatureCommand);
+        }
+    }
+    break;
+
+    default:
+        ChipLogProgress(NotSpecified, "Invalid binding command data - commandId is not supported");
+        break;
+    }
+
+    if (CHIP_NO_ERROR != ret)
+    {
+        ChipLogError(NotSpecified, "Invoke ColorControl Command Request ERROR: %s", ErrorStr(ret));
+    }
+}
+
 void BindingHandler::LightSwitchChangedHandler(const Binding::TableEntry & aBinding, OperationalDeviceProxy * deviceProxy,
                                                void * context)
 {
@@ -224,6 +346,12 @@ void BindingHandler::LightSwitchChangedHandler(const Binding::TableEntry & aBind
         case Clusters::OnOff::Id:
             OnOffProcessCommand(data->CommandId, aBinding, nullptr, context);
             break;
+        case Clusters::LevelControl::Id:
+            LevelControlProcessCommand(data->CommandId, aBinding, nullptr, context);
+            break;
+        case Clusters::ColorControl::Id:
+            ColorControlProcessCommand(data->CommandId, aBinding, nullptr, context);
+            break;
         default:
             ChipLogError(NotSpecified, "Invalid binding group command data");
             break;
@@ -235,6 +363,12 @@ void BindingHandler::LightSwitchChangedHandler(const Binding::TableEntry & aBind
         {
         case Clusters::OnOff::Id:
             OnOffProcessCommand(data->CommandId, aBinding, deviceProxy, context);
+            break;
+        case Clusters::LevelControl::Id:
+            LevelControlProcessCommand(data->CommandId, aBinding, deviceProxy, context);
+            break;
+        case Clusters::ColorControl::Id:
+            ColorControlProcessCommand(data->CommandId, aBinding, deviceProxy, context);
             break;
         default:
             ChipLogError(NotSpecified, "Invalid binding unicast command data");

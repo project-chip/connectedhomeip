@@ -25,6 +25,7 @@
 
 #include <mutex>
 #include <string>
+#include <vector>
 
 using OnTransportLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type, const int16_t sessionId)>;
 using OnTransportConnectionStateCallback  = std::function<void(bool connected, const int16_t sessionId)>;
@@ -54,8 +55,8 @@ public:
     struct RequestArgs
     {
         uint16_t sessionId;
-        uint16_t videoStreamId;
-        uint16_t audioStreamId;
+        std::vector<uint16_t> videoStreams;
+        std::vector<uint16_t> audioStreams;
         chip::NodeId peerNodeId;
         chip::FabricIndex fabricIndex;
         chip::EndpointId originatingEndpointId;
@@ -99,6 +100,9 @@ public:
 
     // Adds audio track to the peerconnection with opus codec with default payload type as 111
     void AddAudioTrack(const std::string & audioMid = "audio", int payloadType = 111);
+
+    // Set ICE servers to use when creating the underlying PeerConnection. Call this before Start().
+    void SetICEServers(const std::vector<ICEServerInfo> & servers);
 
     std::shared_ptr<WebRTCPeerConnection> GetPeerConnection() { return mPeerConnection; }
 
@@ -144,6 +148,7 @@ private:
     RequestArgs mRequestArgs;
     OnTransportLocalDescriptionCallback mOnLocalDescription = nullptr;
     OnTransportConnectionStateCallback mOnConnectionState   = nullptr;
+    std::vector<ICEServerInfo> mICEServers;
 
     std::mutex mTrackStatusLock;
 };

@@ -24,6 +24,7 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Enums.h>
@@ -53,16 +54,23 @@ public:
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestNetworkCommissioningClusterEthernet : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
+    inline static NoopBreadcrumbTracker tracker;
+    inline static NetworkCommissioningCluster::Context defaultContext{
+        .breadcrumbTracker   = tracker,
+        .failSafeContext     = Server::GetInstance().GetFailSafeContext(),
+        .platformManager     = DeviceLayer::PlatformMgr(),
+        .deviceControlServer = DeviceLayer::DeviceControlServer::DeviceControlSvr(),
+    };
 };
 
 TEST_F(TestNetworkCommissioningClusterEthernet, TestAttributes)
 {
-    NoopBreadcrumbTracker tracker;
     Testing::FakeEthernetDriver fakeEthernetDriver;
     ByteSpan testInterfaceName(Uint8::from_const_char("eth0_test"), 9);
-    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeEthernetDriver, tracker);
+    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeEthernetDriver, defaultContext);
     chip::Testing::ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Init(), CHIP_NO_ERROR);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);

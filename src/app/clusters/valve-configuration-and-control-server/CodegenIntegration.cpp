@@ -1,0 +1,228 @@
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+#include "CodegenIntegration.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
+#include <app/static-cluster-config/ValveConfigurationAndControl.h>
+#include <app/util/attribute-storage.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+#include <app/clusters/time-synchronization-server/CodegenIntegration.h>
+#endif
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ValveConfigurationAndControl;
+using namespace chip::app::Clusters::ValveConfigurationAndControl::Attributes;
+using namespace chip::Protocols::InteractionModel;
+
+namespace {
+
+constexpr size_t kValveConfigurationAndControlFixedClusterCount =
+    ValveConfigurationAndControl::StaticApplicationConfig::kFixedClusterConfig.size();
+constexpr size_t kValveConfigurationAndControlMaxClusterCount =
+    kValveConfigurationAndControlFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+LazyRegisteredServerCluster<ValveConfigurationAndControlCluster> gServers[kValveConfigurationAndControlMaxClusterCount];
+
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+class CodegenTimeSyncTracker : public TimeSyncTracker
+{
+public:
+    bool IsValidUTCTime() override
+    {
+        if (TimeSynchronization::GetClusterInstance() != nullptr)
+        {
+            return TimeSynchronization::GetClusterInstance()->GetGranularity() !=
+                TimeSynchronization::GranularityEnum::kNoTimeGranularity;
+        }
+        return false;
+    }
+};
+
+CodegenTimeSyncTracker sCodegenTracker;
+#endif
+
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+        // Get DefaultOpenDuration
+        DataModel::Nullable<uint32_t> defaultOpenDuration{};
+        if (DefaultOpenDuration::Get(endpointId, defaultOpenDuration) != Status::Success)
+        {
+            defaultOpenDuration = DataModel::NullNullable;
+        }
+
+        // Get the DefaultOpenLevel
+        Percent defaultOpenLevel{};
+        if (DefaultOpenLevel::Get(endpointId, &defaultOpenLevel) != Status::Success)
+        {
+            defaultOpenLevel = ValveConfigurationAndControlCluster::kDefaultOpenLevel;
+        }
+
+        // Get the LevelStep
+        uint8_t levelStep{};
+        if (LevelStep::Get(endpointId, &levelStep) != Status::Success)
+        {
+            levelStep = ValveConfigurationAndControlCluster::kDefaultLevelStep;
+        }
+
+        ValveConfigurationAndControlCluster::StartupConfiguration startupConfig{ .defaultOpenDuration = defaultOpenDuration,
+                                                                                 .defaultOpenLevel    = defaultOpenLevel,
+                                                                                 .levelStep           = levelStep };
+        ValveConfigurationAndControlCluster::ValveContext context = {
+            .features             = BitFlags<ValveConfigurationAndControl::Feature>(featureMap),
+            .optionalAttributeSet = ValveConfigurationAndControlCluster::OptionalAttributeSet(optionalAttributeBits),
+            .config               = startupConfig,
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+            .tsTracker = &sCodegenTracker,
+#else
+            .tsTracker = nullptr,
+#endif
+            .delegate = nullptr,
+        };
+
+        gServers[clusterInstanceIndex].Create(endpointId, context);
+        return gServers[clusterInstanceIndex].Registration();
+    }
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
+        return &gServers[clusterInstanceIndex].Cluster();
+    }
+
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
+};
+
+} // namespace
+
+void MatterValveConfigurationAndControlClusterInitCallback(EndpointId endpointId)
+{
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = ValveConfigurationAndControl::Id,
+            .fixedClusterInstanceCount = kValveConfigurationAndControlFixedClusterCount,
+            .maxClusterInstanceCount   = kValveConfigurationAndControlMaxClusterCount,
+            .fetchFeatureMap           = true,
+            .fetchOptionalAttributes   = true,
+        },
+        integrationDelegate);
+}
+
+void MatterValveConfigurationAndControlClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    IntegrationDelegate integrationDelegate;
+
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = ValveConfigurationAndControl::Id,
+            .fixedClusterInstanceCount = kValveConfigurationAndControlFixedClusterCount,
+            .maxClusterInstanceCount   = kValveConfigurationAndControlMaxClusterCount,
+        },
+        integrationDelegate, shutdownType);
+}
+
+void MatterValveConfigurationAndControlPluginServerInitCallback() {}
+
+void MatterValveConfigurationAndControlPluginServerShutdownCallback() {}
+
+namespace chip::app::Clusters::ValveConfigurationAndControl {
+
+ValveConfigurationAndControlCluster * FindClusterOnEndpoint(EndpointId endpointId)
+{
+    IntegrationDelegate integrationDelegate;
+
+    ServerClusterInterface * valveConfigurationAndControl = CodegenClusterIntegration::FindClusterOnEndpoint(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = ValveConfigurationAndControl::Id,
+            .fixedClusterInstanceCount = kValveConfigurationAndControlFixedClusterCount,
+            .maxClusterInstanceCount   = kValveConfigurationAndControlMaxClusterCount,
+        },
+        integrationDelegate);
+
+    return static_cast<ValveConfigurationAndControlCluster *>(valveConfigurationAndControl);
+}
+
+void SetDefaultDelegate(EndpointId endpointId, Delegate * delegate)
+{
+    ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(interface != nullptr);
+    interface->SetDelegate(delegate);
+}
+
+CHIP_ERROR CloseValve(EndpointId ep)
+{
+    ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
+    return interface->CloseValve();
+}
+
+CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration)
+{
+    ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
+    return interface->OpenValve(level, openDuration);
+}
+
+CHIP_ERROR UpdateCurrentLevel(EndpointId ep, Percent currentLevel)
+{
+    ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
+    interface->UpdateCurrentLevel(currentLevel);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR UpdateCurrentState(EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState)
+{
+    ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
+    interface->UpdateCurrentState(currentState);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EmitValveFault(EndpointId ep, BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
+{
+    ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
+    interface->SetValveFault(fault);
+    return CHIP_NO_ERROR;
+}
+
+void UpdateAutoCloseTime(uint64_t time)
+{
+    for (size_t serverIndex = 0; serverIndex < kValveConfigurationAndControlMaxClusterCount; serverIndex++)
+    {
+        if (gServers[serverIndex].IsConstructed())
+        {
+            gServers[serverIndex].Cluster().UpdateAutoCloseTime(time);
+        }
+    }
+}
+
+} // namespace chip::app::Clusters::ValveConfigurationAndControl

@@ -21,10 +21,3 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/chime-server.h"
 )
 
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/ChimeCluster.cpp"
-    "${CLUSTER_DIR}/ChimeCluster.h"
-)

@@ -12,34 +12,40 @@
         <a href="/ui/certificates">Certificates</a>
     </nav>
     <div class="left-bar">
-        <h2>Streams</h2>
+        <h2>Stream Details</h2>
 
-
+        <h3>Configuration</h3>
+            <ul>
+                <li>Stream ID: {{stream.id}}</li>
+                <li>Strict Mode: {{stream.strict_mode}}</li>
+                <li>Interface: {{stream.interface}}</li>
+                <li>Track name: {{stream.track_name}}</li>
+            </ul>
+        <h3>Sessions</h3>
         <ul>
-            {% for stream in streams %}
-            <li> Stream {{stream['id']}}
+        {% for session in stream.sessions %}
+            <li> Session {{session.id}}
+                {%- set errors = stream.error_uploads | selectattr('session_id', 'eq', session.id) | list -%}
                 <ul>
-                    {% for file in stream['files'] %}
-                    <li><a href="/ui/streams/{{stream['id']}}/{{file}}">{{file}}</a></li>
+                    <li>
+                        {{- errors|length}} errors{% if errors|length > 1 %}:{% endif %}
+
+                        <ul>
+                            {% for error in errors %}
+                                <li>{{error.file_path}} : {{error.reasons}}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    {% for (file, crt) in session.uploaded_segments %}
+                    <li><a href="/ui/streams/{{stream.id}}/{{file}}">{{file}}</a> (<a href="/ui/streams/{{stream.id}}/{{crt}}">{{crt}}</a>)</li>
+                    {% endfor %}
+                    {% for (file, crt) in session.uploaded_manifests %}
+                    <li><a href="/ui/streams/{{stream.id}}/{{file}}">{{file}}</a> (<a href="/ui/streams/{{stream.id}}/{{crt}}">{{crt}}</a>) </li>
                     {% endfor %}
                 </ul>
             </li>
-            {% endfor %}
+        {% endfor %}
         </ul>
-        <div class="center">
-            {% if type == 'cert' %}
-            <pre><code>{{cert}}</code></pre>
-            {% elif type == 'details' %}
-            <pre><code>{{details}}</code></pre>
-            {% else %}
-            <div>
-                <video controls src="/streams/{{stream_id}}/{{file_path}}"></video>
-            </div>
-            <div>
-                <pre><code>{{pretty_probe}}</code></pre>
-            </div>
-            {% endif %}
-        </div>
 </body>
 
 </html>
