@@ -50,7 +50,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace ResetWatermarks.
+} // namespace ResetWatermarks
 } // namespace Commands
 } // namespace SoftwareDiagnostics
 } // namespace Clusters
