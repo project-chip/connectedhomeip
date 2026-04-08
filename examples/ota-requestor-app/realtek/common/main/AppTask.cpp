@@ -429,7 +429,10 @@ CHIP_ERROR AppTask::Init()
         ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK");
     }
 
-    (void) PlatformMgr().ScheduleWork(InitServer);
+    // ScheduleWork is asynchronous, failure means work couldn't be queued.
+    // Since this is init time, if it fails the system won't work anyway,
+    // so the return value can be safely ignored.
+    RETURN_SAFELY_IGNORED(PlatformMgr().ScheduleWork(InitServer));
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::Shell::Engine::Root().Init();

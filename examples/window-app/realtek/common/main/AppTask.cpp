@@ -320,14 +320,20 @@ void AppTask::ButtonHandler(T_IO_MSG * p_msg)
     case APP_CLOSE_BUTTON:
         if (btnPressed)
         {
-            (void) PlatformMgr().ScheduleWork(CloseHandler);
+            // ScheduleWork is asynchronous and returns immediately.
+            // Failure means the work couldn't be queued, but there's nothing
+            // we can do about it here, so the return value can be safely ignored.
+            RETURN_SAFELY_IGNORED(PlatformMgr().ScheduleWork(CloseHandler));
         }
         break;
 
     case APP_OPEN_BUTTON:
         if (btnPressed)
         {
-            (void) PlatformMgr().ScheduleWork(OpenHandler);
+            // ScheduleWork is asynchronous and returns immediately.
+            // Failure means the work couldn't be queued, but there's nothing
+            // we can do about it here, so the return value can be safely ignored.
+            RETURN_SAFELY_IGNORED(PlatformMgr().ScheduleWork(OpenHandler));
         }
         break;
 
@@ -469,7 +475,10 @@ CHIP_ERROR AppTask::Init()
         ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK");
     }
 
-    (void) PlatformMgr().ScheduleWork(InitServer);
+    // ScheduleWork is asynchronous, failure means work couldn't be queued.
+    // Since this is init time, if it fails the system won't work anyway,
+    // so the return value can be safely ignored.
+    RETURN_SAFELY_IGNORED(PlatformMgr().ScheduleWork(InitServer));
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::Shell::Engine::Root().Init();

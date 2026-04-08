@@ -347,7 +347,10 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Init ZCL Data Model and start server
-    (void) PlatformMgr().ScheduleWork(InitServer, 0);
+    // ScheduleWork is asynchronous, failure means work couldn't be queued.
+    // Since this is init time, if it fails the system won't work anyway,
+    // so the return value can be safely ignored.
+    RETURN_SAFELY_IGNORED(PlatformMgr().ScheduleWork(InitServer, 0));
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::Shell::Engine::Root().Init();

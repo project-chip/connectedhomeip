@@ -341,7 +341,10 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Init ZCL Data Model and start server
-    (void) PlatformMgr().ScheduleWork(InitServer, 0);
+    // ScheduleWork is asynchronous, failure means work couldn't be queued.
+    // Since this is init time, if it fails the system won't work anyway,
+    // so the return value can be safely ignored.
+    RETURN_SAFELY_IGNORED(PlatformMgr().ScheduleWork(InitServer, 0));
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::Shell::Engine::Root().Init();
@@ -445,7 +448,10 @@ void AppTask::ButtonHandler(T_IO_MSG * p_msg)
     case APP_BLE_ADV_BUTTON:
         if (btnPressed)
         {
-            (void) PlatformMgr().ScheduleWork(AppTask::BLEStartAdvertising, 0);
+            // ScheduleWork is asynchronous and returns immediately.
+            // Failure means the work couldn't be queued, but there's nothing
+            // we can do about it here, so the return value can be safely ignored.
+            RETURN_SAFELY_IGNORED(PlatformMgr().ScheduleWork(AppTask::BLEStartAdvertising, 0));
         }
         break;
 
@@ -479,7 +485,10 @@ void AppTask::ButtonHandler(T_IO_MSG * p_msg)
                 sAppTask.CancelTimer();
                 sAppTask.mFunction = kFunction_NoneSelected;
 
-                (void) PlatformMgr().ScheduleWork(AppTask::BLEStartAdvertising, 0);
+                // ScheduleWork is asynchronous and returns immediately.
+                // Failure means the work couldn't be queued, but there's nothing
+                // we can do about it here, so the return value can be safely ignored.
+                RETURN_SAFELY_IGNORED(PlatformMgr().ScheduleWork(AppTask::BLEStartAdvertising, 0));
             }
             else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
             {

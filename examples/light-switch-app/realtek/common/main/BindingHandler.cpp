@@ -58,7 +58,10 @@ void BindingHandler::Init()
     // The initialization of binding manager will try establishing connection with unicast peers
     // so it requires the Server instance to be correctly initialized. Post the init function to
     // the event queue so that everything is ready when initialization is conducted.
-    (void) chip::DeviceLayer::PlatformMgr().ScheduleWork(InitInternal);
+    // ScheduleWork is asynchronous, failure means work couldn't be queued.
+    // Since this is init time, if it fails the system won't work anyway,
+    // so the return value can be safely ignored.
+    RETURN_SAFELY_IGNORED(chip::DeviceLayer::PlatformMgr().ScheduleWork(InitInternal));
 #if CONFIG_ENABLE_CHIP_SHELL
     RegisterSwitchCommands();
 #endif
