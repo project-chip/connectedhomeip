@@ -351,7 +351,7 @@ def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadI
     return infos
 
 
-@dataclass @FrancoLionti FrancoLionti force-pushed the pr41604-ci-docker-eval branch from e8916a8 to c73d5bc 1 minute ago 
+@dataclass
 class SetupParameters:
     """
     Specifies configuration parameters for commissioning.
