@@ -118,12 +118,9 @@ tests:
 
           If the membership attribute is empty, skip to step 1b.
 
-          [1775018049.464] [42664:42666] [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_0065 Command=0x0000_0002
-          [1775018049.464] [42664:42666] [TOO] Endpoint: 0 Cluster: 0x0000_0065 Command 0x0000_0002
-          [1775018049.464] [42664:42666] [TOO]   LeaveGroupResponse: {
-          [1775018049.464] [42664:42666] [TOO]     groupID: 0
-          [1775018049.464] [42664:42666] [TOO]     endpoints: 0 entries
-          [1775018049.464] [42664:42666] [TOO]    }
+          [1775471571.340] [8350:8352] [TOO] Endpoint: 0 Cluster: 0x0000_0065 Attribute 0x0000_0000 DataVersion: 302855302
+          [1775471571.340] [8350:8352] [TOO]   Membership: 0 entries
+          [1775471571.340] [8350:8352] [EM] <<< [E:65251i S:5880 M:89967051 (Ack:254148)] (S) Msg TX from 000000000001B669 to 1:0000000000000001 [FEFE] [UDP:[fe80::7c12:46ff:fed7:416f%vethed6e1e0]:5540] --- Type 0000:10 (SecureChannel:StandaloneAck) (B:34)
       disabled: true
 
     - label:
