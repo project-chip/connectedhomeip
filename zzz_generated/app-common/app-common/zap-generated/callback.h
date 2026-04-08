@@ -907,6 +907,16 @@ void emberAfThermostatUserInterfaceConfigurationClusterShutdownCallback(chip::En
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfHumidistatClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfHumidistatClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfColorControlClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -4827,6 +4837,45 @@ chip::Protocols::InteractionModel::Status MatterThermostatUserInterfaceConfigura
 void emberAfThermostatUserInterfaceConfigurationClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Humidistat Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfHumidistatClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterHumidistatClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfHumidistatClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterHumidistatClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterHumidistatClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfHumidistatClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Color Control Cluster
 //
 
@@ -7382,6 +7431,12 @@ bool emberAfThermostatClusterAtomicRequestCallback(
 bool emberAfFanControlClusterStepCallback(chip::app::CommandHandler * commandObj,
                                           const chip::app::ConcreteCommandPath & commandPath,
                                           const chip::app::Clusters::FanControl::Commands::Step::DecodableType & commandData);
+/**
+ * @brief Humidistat Cluster SetSettings Command callback (from client)
+ */
+bool emberAfHumidistatClusterSetSettingsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Humidistat::Commands::SetSettings::DecodableType & commandData);
 /**
  * @brief Color Control Cluster MoveToHue Command callback (from client)
  */

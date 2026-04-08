@@ -13341,6 +13341,69 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedHumidistatClusterGeneratedCommandListAttributeCallback implements ChipClusters.HumidistatCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedHumidistatClusterAcceptedCommandListAttributeCallback implements ChipClusters.HumidistatCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedHumidistatClusterAttributeListAttributeCallback implements ChipClusters.HumidistatCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedColorControlClusterNumberOfPrimariesAttributeCallback implements ChipClusters.ColorControlCluster.NumberOfPrimariesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -23468,6 +23531,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ThermostatUserInterfaceConfigurationCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("thermostatUserInterfaceConfiguration", thermostatUserInterfaceConfigurationClusterInfo);
 
+    ClusterInfo humidistatClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.HumidistatCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("humidistat", humidistatClusterInfo);
+
     ClusterInfo colorControlClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ColorControlCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("colorControl", colorControlClusterInfo);
@@ -23783,6 +23850,7 @@ public class ClusterInfoMapping {
     destination.get("thermostat").combineCommands(source.get("thermostat"));
     destination.get("fanControl").combineCommands(source.get("fanControl"));
     destination.get("thermostatUserInterfaceConfiguration").combineCommands(source.get("thermostatUserInterfaceConfiguration"));
+    destination.get("humidistat").combineCommands(source.get("humidistat"));
     destination.get("colorControl").combineCommands(source.get("colorControl"));
     destination.get("ballastConfiguration").combineCommands(source.get("ballastConfiguration"));
     destination.get("illuminanceMeasurement").combineCommands(source.get("illuminanceMeasurement"));
@@ -28454,6 +28522,52 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> thermostatUserInterfaceConfigurationClusterInteractionInfoMap = new LinkedHashMap<>();
 
     commandMap.put("thermostatUserInterfaceConfiguration", thermostatUserInterfaceConfigurationClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> humidistatClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> humidistatsetSettingsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo humidistatsetSettingsuserSetpointCommandParameterInfo = new CommandParameterInfo("userSetpoint", Optional.class, Integer.class);
+    humidistatsetSettingsCommandParams.put("userSetpoint",humidistatsetSettingsuserSetpointCommandParameterInfo);
+
+    CommandParameterInfo humidistatsetSettingsmodeCommandParameterInfo = new CommandParameterInfo("mode", Optional.class, Integer.class);
+    humidistatsetSettingsCommandParams.put("mode",humidistatsetSettingsmodeCommandParameterInfo);
+
+    CommandParameterInfo humidistatsetSettingsmistTypeCommandParameterInfo = new CommandParameterInfo("mistType", Optional.class, Integer.class);
+    humidistatsetSettingsCommandParams.put("mistType",humidistatsetSettingsmistTypeCommandParameterInfo);
+
+    CommandParameterInfo humidistatsetSettingscontinuousCommandParameterInfo = new CommandParameterInfo("continuous", Optional.class, Boolean.class);
+    humidistatsetSettingsCommandParams.put("continuous",humidistatsetSettingscontinuousCommandParameterInfo);
+
+    CommandParameterInfo humidistatsetSettingssleepCommandParameterInfo = new CommandParameterInfo("sleep", Optional.class, Boolean.class);
+    humidistatsetSettingsCommandParams.put("sleep",humidistatsetSettingssleepCommandParameterInfo);
+
+    CommandParameterInfo humidistatsetSettingsoptimalCommandParameterInfo = new CommandParameterInfo("optimal", Optional.class, Boolean.class);
+    humidistatsetSettingsCommandParams.put("optimal",humidistatsetSettingsoptimalCommandParameterInfo);
+    InteractionInfo humidistatsetSettingsInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.HumidistatCluster) cluster)
+        .setSettings((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("userSetpoint")
+        , (Optional<Integer>)
+        commandArguments.get("mode")
+        , (Optional<Integer>)
+        commandArguments.get("mistType")
+        , (Optional<Boolean>)
+        commandArguments.get("continuous")
+        , (Optional<Boolean>)
+        commandArguments.get("sleep")
+        , (Optional<Boolean>)
+        commandArguments.get("optimal")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        humidistatsetSettingsCommandParams
+    );
+    humidistatClusterInteractionInfoMap.put("setSettings", humidistatsetSettingsInteractionInfo);
+
+    commandMap.put("humidistat", humidistatClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> colorControlClusterInteractionInfoMap = new LinkedHashMap<>();
 
