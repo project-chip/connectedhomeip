@@ -66,7 +66,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetTarget.
+} // namespace SetTarget
 namespace Step {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -104,7 +104,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace Step.
+} // namespace Step
 } // namespace Commands
 } // namespace ClosureDimension
 } // namespace Clusters

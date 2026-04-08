@@ -251,6 +251,8 @@ static_library("support") {
     "AutoRelease.h",
     "Base64.cpp",
     "Base64.h",
+    "Base85.cpp",
+    "Base85.h",
     "BitFlags.h",
     "BitMask.h",
     "BufferReader.cpp",
