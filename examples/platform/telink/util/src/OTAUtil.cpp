@@ -50,7 +50,8 @@ void InitBasicOTARequestor()
     sOTAImageProcessor.SetOTADownloader(&sBDXDownloader);
     sBDXDownloader.SetImageProcessorDelegate(&sOTAImageProcessor);
     sOTARequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
-    LogErrorOnFailure(sOTARequestor.Init(Server::GetInstance(), sOTARequestorStorage, sOTARequestorDriver, sBDXDownloader, GetOTARequestorAttributes()));
+    LogErrorOnFailure(sOTARequestor.Init(Server::GetInstance(), sOTARequestorStorage, sOTARequestorDriver, sBDXDownloader,
+                                         GetOTARequestorAttributes()));
     chip::SetRequestorInstance(&sOTARequestor);
     sOTARequestorDriver.Init(&sOTARequestor, &sOTAImageProcessor);
 }
