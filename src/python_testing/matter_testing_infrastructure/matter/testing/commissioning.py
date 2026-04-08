@@ -28,7 +28,6 @@ from typing import Any, List, Optional
 from mobly import asserts
 
 import matter.clusters as Clusters
-import matter.testing.global_stash as global_stash
 from matter import ChipDeviceCtrl, discovery
 from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
