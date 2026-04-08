@@ -198,7 +198,7 @@ class TC_ACE_1_6(MatterBaseTest):
             attribute=Clusters.Descriptor.Attributes.PartsList,
             endpoint=0
         )
-        ep1 = parts_list[0] if (parts_list != None and parts_list[0] != None) else 1
+        ep1 = parts_list[0] if (parts_list is not None and parts_list[0] is not None) else 1
 
 # TODO check for success?
 ###################################
