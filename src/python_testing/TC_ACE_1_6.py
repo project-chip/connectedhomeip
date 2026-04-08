@@ -387,7 +387,7 @@ class TC_ACE_1_6(MatterBaseTest):
             await self.send_single_cmd(Clusters.Groups.Commands.RemoveAllGroups(), endpoint=pixit_g_endpoint)
 
             # Step 26: Verify group removal using GetGroupMembership command
-            #TODO: verify functionality of GetGroupMembership, also check if we need this, did not exist in yaml test originally
+            # TODO: verify functionality of GetGroupMembership, also check if we need this, did not exist in yaml test originally
             self.step(26)
             resp = await self.send_single_cmd(Clusters.Groups.Commands.GetGroupMembership(groupList=[]), endpoint=pixit_g_endpoint)
             asserts.assert_equal(len(resp.groupList), 0, "Group list should be empty after RemoveAllGroups")
@@ -407,6 +407,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
         self.step(30)
         await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=keySetID1))
+
 
 if __name__ == "__main__":
     default_matter_test_main()
