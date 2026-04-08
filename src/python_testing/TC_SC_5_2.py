@@ -93,7 +93,8 @@ class TC_SC_5_2(MatterBaseTest):
         await self._populate_wildcard()
         # TODO: there's something weird with the groups cluster on EP0 of all clusters. Also, that shouldn't be there.
         # https://github.com/project-chip/matter-test-scripts/issues/770
-        endpoints = [endpoint for endpoint in self.stored_global_wildcard.attributes if endpoint != 0 and Clusters.Groups in self.stored_global_wildcard.attributes[endpoint]]
+        endpoints = [endpoint for endpoint in self.stored_global_wildcard.attributes if endpoint !=
+                     0 and Clusters.Groups in self.stored_global_wildcard.attributes[endpoint]]
         if not endpoints:
             logger.info("No groups endpoints found, test not applicable for this device, skipping all steps")
             logger.info("Note: Because of the way groups endpoints appear on devices, this test internally determines the"
