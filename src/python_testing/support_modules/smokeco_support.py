@@ -17,9 +17,12 @@
 import logging
 
 from mobly import asserts
+from datetime import datetime, timezone
+
 
 import matter.clusters as Clusters
-from matter.testing.matter_asserts import assert_int_in_range, assert_is_unixtimestamp, assert_valid_bool, assert_valid_uint32
+from matter.testing.matter_asserts import assert_int_in_range, assert_valid_bool, assert_valid_uint32
+from matter.testing.timeoperations import utc_datetime_from_matter_epoch_us
 from matter.testing.matter_testing import MatterBaseTest
 
 log = logging.getLogger(__name__)
@@ -63,7 +66,21 @@ class SmokeCoBaseTest(MatterBaseTest):
         assert_valid_bool(value=attr, description=f"Attribute {attribute} is not a bool instance {attr}")
 
     async def read_attribute_check_epoch(self, attribute):
-        """Reads an attribute from the SmokeCluster and validate against a valid timestmap value."""
+        """Reads an attribute from the SmokeCluster and validate is a int value represeting the seconds of matter epoch."""
         attr = await self.read_smokeco_attribute_expect_success(attribute=attribute)
+        log.info(f"Reading attribte with value {attr} and checking the matter epoch ")
+        # Number of seconds representing the matter epoch
         assert_valid_uint32(attr, "Attribute is not in uint range")
-        assert_is_unixtimestamp(attr, f"Attribute with value: {attr}")
+    
+    async def is_valid_expired_date(self) -> bool:
+        """Check if the device alarm  has expired using the ExpiryDate.
+
+        Returns:
+            bool: Status of Expiration
+        """
+        expiry_date = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpiryDate)
+        # Convert the epoch time from the device into UTC to compare it to current date
+        device_utc_datetime = utc_datetime_from_matter_epoch_us(expiry_date * 1000000)
+        current_date = datetime.now(tz=timezone.utc)
+        log.info(f"Current device Expire Date  {device_utc_datetime}")
+        return device_utc_datetime > current_date

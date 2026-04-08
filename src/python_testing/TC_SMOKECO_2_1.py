@@ -95,15 +95,15 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
 
         self.step(2)
         await self.read_attribute_check_range(self.smokeco_cluster.Attributes.ExpressedState, 0, 9)
-
+        Clusters.SmokeCoAlarm.
         self.step(3)
-        if self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
+        if await self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.SmokeState, 0, 2)
         else:
             self.skip_step(3)
 
         self.step(4)
-        if self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kCoAlarm):
+        if await self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kCoAlarm):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.COState, 0, 2)
         else:
             self.skip_step(4)
@@ -112,7 +112,7 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
         await self.read_attribute_check_range(self.smokeco_cluster.Attributes.BatteryAlert, 0, 2)
 
         self.step(6)
-        if self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.DeviceMuted):
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.DeviceMuted):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.DeviceMuted, 0, 1)
 
         self.step(7)
@@ -125,31 +125,31 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
         await self.read_attribute_check_range(self.smokeco_cluster.Attributes.EndOfServiceAlert, 0, 1)
 
         self.step(10)
-        if self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm):
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectSmokeAlarm):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.InterconnectSmokeAlarm, 0, 2)
 
         self.step(11)
-        if self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm):
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.InterconnectCOAlarm, 0, 2)
 
-        if self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
+        if await self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
             self.step(12)
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.ContaminationState, 0, 3)
         else:
             self.skip_step(12)
 
         self.step(13)
-        if self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
+        if await self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.SmokeSensitivityLevel, 0, 2)
         else:
             self.skip_step(13)
 
         self.step(14)
-        if self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.ExpiryDate):
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.ExpiryDate):
             await self.read_attribute_check_epoch(self.smokeco_cluster.Attributes.ExpiryDate)
 
         self.step(15)
-        if self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.Unmounted):
+        if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.Unmounted):
             await self.read_attribute_check_bool(self.smokeco_cluster.Attributes.Unmounted)
 
 
