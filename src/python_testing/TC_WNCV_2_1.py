@@ -38,6 +38,7 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
 from matter.interaction_model import Status as IMStatus
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_asserts import assert_valid_uint8, assert_valid_uint16
@@ -48,6 +49,7 @@ log = logging.getLogger(__name__)
 
 
 def _combined_bitmap_mask(bitmap_enum) -> int:
+    """Return an integer mask of all defined bits in a bitmap enum."""
     mask = 0
     for bitmask in bitmap_enum:
         mask |= int(bitmask)
@@ -55,6 +57,7 @@ def _combined_bitmap_mask(bitmap_enum) -> int:
 
 
 def _field_value(value: int, mask: int) -> int:
+    """Extract and right-shift a multi-bit field from value using mask."""
     shift = (mask & -mask).bit_length() - 1
     return (value & mask) >> shift
 
@@ -178,6 +181,9 @@ class TC_WNCV_2_1(MatterBaseTest):
             attribute=attributes.ConfigStatus
         )
         assert_valid_uint8(int(config_status_dut), "ConfigStatus should be a valid bitmap8 value")
+        # Use _combined_bitmap_mask to derive reserved-bit mask from the SDK-generated
+        # ConfigStatus bitmap enum — avoids hardcoding bit positions that could drift
+        # from the spec if the cluster definition is updated.
         config_status_reserved_bits = int(config_status_dut) & ~_combined_bitmap_mask(bitmaps.ConfigStatus)
         asserts.assert_equal(
             config_status_reserved_bits, 0,
@@ -193,15 +199,18 @@ class TC_WNCV_2_1(MatterBaseTest):
             attribute=attributes.OperationalStatus
         )
         assert_valid_uint8(int(operational_status_dut), "OperationalStatus should be a valid bitmap8 value")
+        # Check reserved bits using the SDK-generated bitmap mask.
         op_status_reserved_bits = int(operational_status_dut) & ~_combined_bitmap_mask(bitmaps.OperationalStatus)
         asserts.assert_equal(
             op_status_reserved_bits, 0,
             f"OperationalStatus has reserved bits set: 0x{int(operational_status_dut):02X}"
         )
+        # Each 2-bit movement field (Global / Lift / Tilt) must not be 0b11 (undefined).
+        # _field_value extracts and right-shifts the field using its SDK-defined mask.
         for field_name, field_mask in [
             ("Global", int(bitmaps.OperationalStatus.kGlobal)),
-            ("Lift", int(bitmaps.OperationalStatus.kLift)),
-            ("Tilt", int(bitmaps.OperationalStatus.kTilt)),
+            ("Lift",   int(bitmaps.OperationalStatus.kLift)),
+            ("Tilt",   int(bitmaps.OperationalStatus.kTilt)),
         ]:
             field_val = _field_value(int(operational_status_dut), field_mask)
             asserts.assert_not_equal(
@@ -237,6 +246,7 @@ class TC_WNCV_2_1(MatterBaseTest):
             attribute=attributes.Mode
         )
         assert_valid_uint8(int(mode_dut), "Mode should be a valid bitmap8 value")
+        # Check reserved bits using the SDK-generated Mode bitmap mask.
         mode_reserved_bits = int(mode_dut) & ~_combined_bitmap_mask(bitmaps.Mode)
         asserts.assert_equal(
             mode_reserved_bits, 0,
@@ -248,20 +258,16 @@ class TC_WNCV_2_1(MatterBaseTest):
         self.step("1f")
 
         # --- Write --------------------------------------------------------
-        # write_single_attribute is the MatterBaseTest helper that wraps
-        # WriteAttribute and normalises the result across SDK versions.
-        # It returns an IM Status — Status.Success (0) means the DUT accepted
-        # the write. Any other value means the write was rejected.
+        # expect_success=False so the framework does NOT assert internally —
+        # we assert manually below to provide a descriptive error message.
         write_status = await self.write_single_attribute(
             attribute_value=attributes.Mode(0),
             endpoint_id=self.endpoint,
-            expect_success=True,
+            expect_success=False,
         )
-        # write_single_attribute returns a matter.interaction_model.Status enum.
-        # Comparing against Status.Success covers all SDK versions cleanly.
         asserts.assert_equal(
             write_status, IMStatus.Success,
-            f"Write to Mode attribute failed with status: {write_status}"
+            f"Write to Mode attribute failed — expected Status.Success, got {write_status}"
         )
         log.info(f"Write to Mode succeeded, status: {write_status}")
 
@@ -285,21 +291,31 @@ class TC_WNCV_2_1(MatterBaseTest):
         # ================================================================== #
 
         # Helper used for Percent100ths nullable uint16 attributes (steps 2a–2d).
-        # A None return means the DUT reported null — this is valid per spec
-        # (position unknown). When a concrete value is present it must be
-        # within [0, 10000] (representing 0.00% – 100.00%).
+        # The SDK represents a null attribute value using the NullValue sentinel
+        # (matter.clusters.Types.NullValue), NOT Python None. Checking against
+        # None would silently pass a null through to assert_valid_uint16, causing
+        # a spurious failure. We check for NullValue explicitly instead.
+        # When a concrete value is present it must be within [0, 10000]
+        # (representing 0.00% – 100.00%).
         def validate_percent100ths(value, attr_name: str):
-            if value is None:
-                log.info(f"{attr_name}: null (position unknown — permitted by spec)")
+            # The SDK represents null attribute values using NullValue sentinel,
+            # not Python None — guard against it explicitly to avoid passing
+            # NullValue through to assert_valid_uint16 and causing a spurious failure.
+            if value is NullValue:
+                log.info(f"{attr_name}: NullValue (position unknown — permitted by spec)")
                 return
+            asserts.assert_is_instance(
+                value, int,
+                f"{attr_name} expected int or NullValue, got {type(value)}"
+            )
             assert_valid_uint16(value, f"{attr_name} should be a valid uint16 value")
             asserts.assert_greater_equal(value, 0,    f"{attr_name} is below minimum (0)")
             asserts.assert_less_equal(value, 10000,   f"{attr_name} is above maximum (10000)")
             log.info(f"{attr_name}: {value} (valid Percent100ths)")
 
         # Step 2a — TargetPositionLiftPercent100ths
-        self.step("2a")
         if attributes.TargetPositionLiftPercent100ths.attribute_id in attribute_list:
+            self.step("2a")
             value = await self.read_single_attribute_check_success(
                 endpoint=self.endpoint, cluster=cluster,
                 attribute=attributes.TargetPositionLiftPercent100ths
@@ -309,8 +325,8 @@ class TC_WNCV_2_1(MatterBaseTest):
             self.skip_step("2a")
 
         # Step 2b — TargetPositionTiltPercent100ths
-        self.step("2b")
         if attributes.TargetPositionTiltPercent100ths.attribute_id in attribute_list:
+            self.step("2b")
             value = await self.read_single_attribute_check_success(
                 endpoint=self.endpoint, cluster=cluster,
                 attribute=attributes.TargetPositionTiltPercent100ths
@@ -320,8 +336,8 @@ class TC_WNCV_2_1(MatterBaseTest):
             self.skip_step("2b")
 
         # Step 2c — CurrentPositionLiftPercent100ths
-        self.step("2c")
         if attributes.CurrentPositionLiftPercent100ths.attribute_id in attribute_list:
+            self.step("2c")
             value = await self.read_single_attribute_check_success(
                 endpoint=self.endpoint, cluster=cluster,
                 attribute=attributes.CurrentPositionLiftPercent100ths
@@ -331,8 +347,8 @@ class TC_WNCV_2_1(MatterBaseTest):
             self.skip_step("2c")
 
         # Step 2d — CurrentPositionTiltPercent100ths
-        self.step("2d")
         if attributes.CurrentPositionTiltPercent100ths.attribute_id in attribute_list:
+            self.step("2d")
             value = await self.read_single_attribute_check_success(
                 endpoint=self.endpoint, cluster=cluster,
                 attribute=attributes.CurrentPositionTiltPercent100ths
@@ -346,20 +362,27 @@ class TC_WNCV_2_1(MatterBaseTest):
         # ================================================================== #
 
         # Helper used for nullable Percent uint8 attributes (steps 3d–3e).
-        # None means position unknown — valid per spec. Concrete values must
-        # be within [0, 100] (representing 0% – 100%).
+        # The SDK represents a null attribute value using the NullValue sentinel
+        # (matter.clusters.Types.NullValue), NOT Python None. Same reasoning as
+        # validate_percent100ths above — we guard against NullValue explicitly.
+        # Concrete values must be within [0, 100] (representing 0% – 100%).
         def validate_percent(value, attr_name: str):
-            if value is None:
-                log.info(f"{attr_name}: null (position unknown — permitted by spec)")
+            # Same NullValue sentinel handling as validate_percent100ths above.
+            if value is NullValue:
+                log.info(f"{attr_name}: NullValue (position unknown — permitted by spec)")
                 return
+            asserts.assert_is_instance(
+                value, int,
+                f"{attr_name} expected int or NullValue, got {type(value)}"
+            )
             assert_valid_uint8(value, f"{attr_name} should be a valid uint8 value")
             asserts.assert_greater_equal(value, 0,   f"{attr_name} is below minimum (0)")
             asserts.assert_less_equal(value, 100,    f"{attr_name} is above maximum (100)")
             log.info(f"{attr_name}: {value} (valid Percent)")
 
         # Step 3a — SafetyStatus (bitmap16)
-        self.step("3a")
         if attributes.SafetyStatus.attribute_id in attribute_list:
+            self.step("3a")
             safety_status_dut = await self.read_single_attribute_check_success(
                 endpoint=self.endpoint, cluster=cluster,
                 attribute=attributes.SafetyStatus
@@ -370,8 +393,8 @@ class TC_WNCV_2_1(MatterBaseTest):
             self.skip_step("3a")
 
         # Step 3b — NumberOfActuationsLift (uint16)
-        self.step("3b")
         if attributes.NumberOfActuationsLift.attribute_id in attribute_list:
+            self.step("3b")
             num_lift_dut = await self.read_single_attribute_check_success(
                 endpoint=self.endpoint, cluster=cluster,
                 attribute=attributes.NumberOfActuationsLift
@@ -382,8 +405,8 @@ class TC_WNCV_2_1(MatterBaseTest):
             self.skip_step("3b")
 
         # Step 3c — NumberOfActuationsTilt (uint16)
-        self.step("3c")
         if attributes.NumberOfActuationsTilt.attribute_id in attribute_list:
+            self.step("3c")
             num_tilt_dut = await self.read_single_attribute_check_success(
                 endpoint=self.endpoint, cluster=cluster,
                 attribute=attributes.NumberOfActuationsTilt
@@ -394,8 +417,8 @@ class TC_WNCV_2_1(MatterBaseTest):
             self.skip_step("3c")
 
         # Step 3d — CurrentPositionLiftPercentage (nullable Percent, uint8, [0..100])
-        self.step("3d")
         if attributes.CurrentPositionLiftPercentage.attribute_id in attribute_list:
+            self.step("3d")
             value = await self.read_single_attribute_check_success(
                 endpoint=self.endpoint, cluster=cluster,
                 attribute=attributes.CurrentPositionLiftPercentage
@@ -405,8 +428,8 @@ class TC_WNCV_2_1(MatterBaseTest):
             self.skip_step("3d")
 
         # Step 3e — CurrentPositionTiltPercentage (nullable Percent, uint8, [0..100])
-        self.step("3e")
         if attributes.CurrentPositionTiltPercentage.attribute_id in attribute_list:
+            self.step("3e")
             value = await self.read_single_attribute_check_success(
                 endpoint=self.endpoint, cluster=cluster,
                 attribute=attributes.CurrentPositionTiltPercentage
@@ -418,3 +441,4 @@ class TC_WNCV_2_1(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
+    
