@@ -15,9 +15,24 @@
 import os
 
 from matter.idl.generators import CodeGenerator
-from matter.idl.generators.type_definitions import GetDataTypeSizeInBits, IsSignedDataType
 from matter.idl.generators.storage import GeneratorStorage
+from matter.idl.generators.type_definitions import GetDataTypeSizeInBits, IsSignedDataType
 from matter.idl.matter_idl_types import Cluster, Command, DataType, Field, Idl
+
+_PRIMITIVE_PROTOBUF_TYPES = {
+    "boolean": "bool",
+    "float": "float",
+    "single": "float",
+    "double": "double",
+    "char_string": "string",
+    "long_char_string": "string",
+    "octet_string": "bytes",
+    "long_octet_string": "bytes",
+    "uint32": "uint32",
+    "uint64": "uint64",
+    "int32": "int32",
+    "int64": "int64",
+}
 
 
 def toUpperSnakeCase(s):
@@ -42,11 +57,6 @@ def toLowerSnakeCase(s):
     return toUpperSnakeCase(s).lower()
 
 
-def toUpperAcronym(s):
-    """ Remove lower case letters and numbers from the given string"""
-    return ''.join([i for i in s if i.isupper() or i.isnumeric()]).upper()
-
-
 def toEnumEntryName(enumEntry, enumName):
     """Create enum entry name with a stable cluster-local unique prefix."""
     prefix = toUpperSnakeCase(enumName)
@@ -57,28 +67,10 @@ def toEnumEntryName(enumEntry, enumName):
 
 def toProtobufType(zapType: str) -> str:
     """ Convert zap type to protobuf type """
-    stringTypes = ["char_string", "long_char_string"]
-    bytesTypes = ["octet_string", "long_octet_string"]
-
     zapTypeLower = zapType.lower()
-    if zapTypeLower == "float" or zapTypeLower == "single":
-        return "float"
-    if zapTypeLower == "double":
-        return "double"
-    if zapTypeLower == "boolean":
-        return "bool"
-    if zapTypeLower in stringTypes:
-        return "string"
-    if zapTypeLower in bytesTypes:
-        return "bytes"
-    if zapTypeLower == "uint32":
-        return "uint32"
-    if zapTypeLower == "uint64":
-        return "uint64"
-    if zapTypeLower == "int32":
-        return "int32"
-    if zapTypeLower == "int64":
-        return "int64"
+    primitiveType = _PRIMITIVE_PROTOBUF_TYPES.get(zapTypeLower)
+    if primitiveType is not None:
+        return primitiveType
 
     # Reuse Matter IDL's canonical type-size table so derived integer aliases
     # (e.g. epoch_s, elapsed_s, int16u, status, temperature) map correctly.
