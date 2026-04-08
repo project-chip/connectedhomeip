@@ -96,7 +96,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace StartRangingRequest.
+} // namespace StartRangingRequest
 namespace StartRangingResponse {
 
 CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
@@ -129,7 +129,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace StartRangingResponse.
+} // namespace StartRangingResponse
 namespace StopRangingRequest {
 
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -157,7 +157,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace StopRangingRequest.
+} // namespace StopRangingRequest
 } // namespace Commands
 } // namespace ProximityRanging
 } // namespace Clusters
