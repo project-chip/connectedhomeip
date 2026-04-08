@@ -22,19 +22,21 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     factory-reset: true
-#     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 1
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 
 from mobly import asserts
@@ -46,6 +48,7 @@ from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
+from matter.clusters.Types import NullValue
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +98,8 @@ class TC_ACE_1_6(MatterBaseTest):
 
     @async_test_body
     async def test_TC_ACE_1_6(self):
+        self.default_controller.InitGroupTestingData()
+
         # Configuration
         groupID1 = 0x0101
         groupID2 = 0x0102
@@ -103,9 +108,7 @@ class TC_ACE_1_6(MatterBaseTest):
         groupID5 = 0x0105
         keySetID1 = 0x01a1
         keySetID3 = 0x01a3
-        ##################################################
-        # TODO: check this
-        pixit_g_endpoint = self.get_endpoint()
+        pixit_g_endpoint = 1
 
         # Keys
         key1 = b"\xa0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf"
@@ -120,7 +123,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
         # Step 1a: KeySetWrite 0x01a3
         self.step("1a")
-        await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetWrite(
+        await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetWrite(
             groupKeySet=Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
                 groupKeySetID=keySetID3,
                 groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
@@ -135,7 +138,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
         # Step 1b: KeySetWrite 0x01a1
         self.step("1b")
-        await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetWrite(
+        await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetWrite(
             groupKeySet=Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
                 groupKeySetID=keySetID1,
                 groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
@@ -147,6 +150,36 @@ class TC_ACE_1_6(MatterBaseTest):
                 epochStartTime2=2220002
             )
         ))
+
+        # # Configure controller with group keys
+        # self.default_controller.SetGroupKeySet(
+        #     keyset_id=keySetID3,
+        #     policy=0,
+        #     num_keys=3,
+        #     epoch_key0=key3,
+        #     epoch_start_time0=2220000,
+        #     epoch_key1=b"\xd1" + key3[1:],
+        #     epoch_start_time1=2220001,
+        #     epoch_key2=b"\xd2" + key3[1:],
+        #     epoch_start_time2=2220002
+        # )
+        self.default_controller.SetGroupKeySet(
+            keyset_id=keySetID1,
+            policy=0,
+            num_keys=3,
+            epoch_key0=key1,
+            epoch_start_time0=2220000,
+            epoch_key1=b"\xb1" + key1[1:],
+            epoch_start_time1=2220001,
+            epoch_key2=b"\xc2" + key1[1:],
+            epoch_start_time2=2220002
+        )
+        self.default_controller.SetGroupKey(groupID1, keySetID1)
+        self.default_controller.SetGroupKey(groupID2, keySetID1)
+        self.default_controller.SetGroupKey(groupID3, keySetID3)
+        self.default_controller.SetGroupInfo(groupID1, "Group 1", 0)
+        self.default_controller.SetGroupInfo(groupID2, "Group 2", 0)
+        self.default_controller.SetGroupInfo(groupID3, "Group 3", 0)
 
         # Step 2: GroupKeyMap
         if gc_on_root:
@@ -160,8 +193,12 @@ class TC_ACE_1_6(MatterBaseTest):
             ]))])
 
         # Find ep1 (non-root node endpoint)
-        parts_list = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Descriptor.Attributes.PartsList)])
-        ep1 = parts_list[0].Data[0] if parts_list[0].Data else 1
+        parts_list = await self.read_single_attribute_check_success(
+            cluster=Clusters.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.PartsList,
+            endpoint=0
+        )
+        ep1 = parts_list[0] if (parts_list != None and parts_list[0] != None) else 1
 
 # TODO check for success?
 ###################################
@@ -177,14 +214,14 @@ class TC_ACE_1_6(MatterBaseTest):
             self.skip_step("3b")
         else:
             self.step("3b")
-            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(groupID=groupID3, endpoints=[ep1], keySetID=keySetID3, key=key3))
+            await self.send_single_cmd(endpoint=0, cmd=Clusters.Groupcast.Commands.JoinGroup(groupID=groupID3, endpoints=[ep1], keySetID=keySetID3))
 
         # Step 3c: Groupcast JoinGroup 0x0102
         if not gc_on_root:
             self.skip_step("3c")
         else:
             self.step("3c")
-            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(groupID=groupID2, endpoints=[ep1], keySetID=keySetID1, key=key1))
+            await self.send_single_cmd(endpoint=0, cmd=Clusters.Groupcast.Commands.JoinGroup(groupID=groupID2, endpoints=[ep1], keySetID=keySetID1))
 ####################################
 
         # Step 4: ACL Manage for group 0x0103
@@ -193,7 +230,7 @@ class TC_ACE_1_6(MatterBaseTest):
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[th1_nodeid],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.AccessControl.id)])
+            targets=NullValue) # Wildcard target to maintain full admin access
 
         if gc_on_root:
             # Cluster on ep1 with modified attributes (using OnOff as example)
@@ -224,11 +261,13 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 6: Add Group 0x0101 via Group 0x0103
             self.step(6)
-            await self.default_controller.SendCommand(self.dut_node_id, endpoint=pixit_g_endpoint, payload=Clusters.Groups.Commands.AddGroup(groupID=groupID1, groupName=""), group_id=groupID3)
+            self.default_controller.SendGroupCommand(groupID3, Clusters.Groups.Commands.AddGroup(groupID=groupID1, groupName=""))
+            await asyncio.sleep(3)
 
             # Step 7: Add Group 0x0102 via Group 0x0101
             self.step(7)
-            await self.default_controller.SendCommand(self.dut_node_id, endpoint=pixit_g_endpoint, payload=Clusters.Groups.Commands.AddGroup(groupID=groupID2, groupName=""), group_id=groupID1)
+            self.default_controller.SendGroupCommand(groupID1, Clusters.Groups.Commands.AddGroup(groupID=groupID2, groupName=""))
+            await asyncio.sleep(3)
 
         # Step 8: Subscribe to Groupcast events
         event_sub = None
@@ -242,14 +281,15 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 9: Enable GroupcastTesting
             self.step(9)
-            await self.send_single_cmd(Clusters.Groupcast.Commands.GroupcastTesting(
+            await self.send_single_cmd(endpoint=0, cmd=Clusters.Groupcast.Commands.GroupcastTesting(
                 testOperation=Clusters.Groupcast.Enums.GroupcastTestingEnum.kEnableListenerTesting,
                 durationSeconds=300
             ))
 
             # Step 10: Group command to Group 0x0103
             self.step(10)
-            await self.default_controller.SendCommand(self.dut_node_id, endpoint=ep1, payload=Clusters.OnOff.Commands.Toggle(), group_id=groupID3)
+            self.default_controller.SendGroupCommand(groupID3, Clusters.OnOff.Commands.Toggle())
+            await asyncio.sleep(3)
 
             # Step 11: Verify GroupcastTesting event (AccessAllowed: true)
             self.step(11)
@@ -260,7 +300,8 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 12: Group command to Group 0x0102
             self.step(12)
-            await self.default_controller.SendCommand(self.dut_node_id, endpoint=ep1, payload=Clusters.OnOff.Commands.Toggle(), group_id=groupID2)
+            self.default_controller.SendGroupCommand(groupID2, Clusters.OnOff.Commands.Toggle())
+            await asyncio.sleep(3)
 
             # Step 13: Verify GroupcastTesting event (AccessAllowed: false)
             self.step(13)
@@ -275,7 +316,7 @@ class TC_ACE_1_6(MatterBaseTest):
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[th1_nodeid],
-            targets=None)
+            targets=NullValue)
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl([acl_admin_full]))])
 
         # Step 15: Generic group command to Group 0x0103
@@ -283,7 +324,8 @@ class TC_ACE_1_6(MatterBaseTest):
             self.mark_step_range_skipped(15, 20)
         else:
             self.step(15)
-            await self.default_controller.SendCommand(self.dut_node_id, endpoint=ep1, payload=Clusters.OnOff.Commands.Toggle(), group_id=groupID3)
+            self.default_controller.SendGroupCommand(groupID3, Clusters.OnOff.Commands.Toggle())
+            await asyncio.sleep(3)
 
             # Step 16: Verify GroupcastTesting event (AccessAllowed: false)
             self.step(16)
@@ -294,11 +336,12 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 17: ConfigureAuxiliaryACL
             self.step(17)
-            await self.send_single_cmd(Clusters.Groupcast.Commands.ConfigureAuxiliaryACL(groupID=groupID3, useAuxiliaryACL=True))
+            await self.send_single_cmd(endpoint=0, cmd=Clusters.Groupcast.Commands.ConfigureAuxiliaryACL(groupID=groupID3, useAuxiliaryACL=True))
 
             # Step 18: Generic group command to Group 0x0103
             self.step(18)
-            await self.default_controller.SendCommand(self.dut_node_id, endpoint=ep1, payload=Clusters.OnOff.Commands.Toggle(), group_id=groupID3)
+            self.default_controller.SendGroupCommand(groupID3, Clusters.OnOff.Commands.Toggle())
+            await asyncio.sleep(3)
 
             # Step 19: Verify GroupcastTesting event (AccessAllowed: true)
             self.step(19)
@@ -309,14 +352,12 @@ class TC_ACE_1_6(MatterBaseTest):
 
             # Step 20: DisableTesting
             self.step(20)
-            await self.send_single_cmd(Clusters.Groupcast.Commands.GroupcastTesting(
+            await self.send_single_cmd(endpoint=0, cmd=Clusters.Groupcast.Commands.GroupcastTesting(
                 testOperation=Clusters.Groupcast.Enums.GroupcastTestingEnum.kDisableTesting
             ))
 
 # TODO: fix step 21, check access denied?
 #############################################
-        self.step(21)
-
         # Steps 21-26: (If GC not on root)
         if gc_on_root:
             self.mark_step_range_skipped(21, 26)
@@ -331,7 +372,8 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_equal(resp.status, Status.NotFound)
 
             self.step(23)
-            await self.default_controller.SendCommand(self.dut_node_id, endpoint=pixit_g_endpoint, payload=Clusters.Groups.Commands.AddGroup(groupID=groupID5, groupName=""), group_id=groupID3)
+            self.default_controller.SendGroupCommand(groupID3, Clusters.Groups.Commands.AddGroup(groupID=groupID5, groupName=""))
+            await asyncio.sleep(3)
 
             self.step(24)
             resp = await self.send_single_cmd(Clusters.Groups.Commands.ViewGroup(groupID=groupID5), endpoint=pixit_g_endpoint)
@@ -348,16 +390,16 @@ class TC_ACE_1_6(MatterBaseTest):
 
         # Cleanup
         self.step(27)
-        await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
+        await self.send_single_cmd(endpoint=0, cmd=Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
 
         self.step(28)
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))])
 
         self.step(29)
-        await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=keySetID3))
+        await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=keySetID3))
 
         self.step(30)
-        await self.send_single_cmd(Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=keySetID1))
+        await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=keySetID1))
 
 
 if __name__ == "__main__":
