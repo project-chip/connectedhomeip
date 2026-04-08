@@ -164,7 +164,7 @@ uint16_t BLEManagerImpl::_NumConnections(void)
     return numCons;
 }
 
-CHIP_ERROR BLEManagerImpl::PrintBLEInfo()
+CHIP_ERROR BLEManagerImpl::PrintBLEInfo() const
 {
     ChipLogProgress(DeviceLayer, "BLE Info:");
     ChipLogProgress(DeviceLayer, "  Service Mode: %d", mServiceMode);

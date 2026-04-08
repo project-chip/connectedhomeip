@@ -246,7 +246,7 @@ void BLEManagerImpl::BlePostEvent(SilabsBleWrapper::BleEvent_t * event)
     }
 }
 
-CHIP_ERROR BLEManagerImpl::PrintBLEInfo()
+CHIP_ERROR BLEManagerImpl::PrintBLEInfo() const
 {
     ChipLogProgress(DeviceLayer, "BLE Info:");
     ChipLogProgress(DeviceLayer, "  Service Mode: %d", mServiceMode);
