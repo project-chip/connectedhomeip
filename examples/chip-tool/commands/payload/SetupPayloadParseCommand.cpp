@@ -22,6 +22,7 @@
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <inttypes.h>
 #include <string>
 
 using namespace ::chip;
@@ -168,8 +169,8 @@ CHIP_ERROR SetupPayloadParseCommand::Print(const SetupPayload & payload)
             [&](const std::string & v) {
                 ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,string value=%s", info.tag, v.c_str());
             },
-            [&](int64_t v) { ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,int value=%i", info.tag, v); },
-            [&](uint64_t v) { ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,int value=%u", info.tag, v); });
+            [&](int64_t v) { ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,int value=%" PRId64, info.tag, v); },
+            [&](uint64_t v) { ChipLogProgress(SetupPayload, "OptionalQRCodeInfo:  tag=%u,int value=%" PRIu64, info.tag, v); });
     }
 
     return CHIP_NO_ERROR;
