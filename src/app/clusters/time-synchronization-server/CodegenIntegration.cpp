@@ -83,6 +83,9 @@ public:
             VerifyOrDie(SupportsDNSResolve::Get(endpointId, &ntpServerAvailable) == Status::Success);
         }
 
+        VerifyOrDie(Server::GetInstance().GetCASESessionManager() != nullptr);
+        VerifyOrDie(InteractionModelEngine::GetInstance() != nullptr);
+
         TimeSynchronizationCluster::StartupConfiguration startupConfiguration = { .supportsDNSResolve = supportsDNSResolve,
                                                                                   .ntpServerAvailable = ntpServerAvailable,
                                                                                   .timeZoneDatabase   = timeZoneDatabase,

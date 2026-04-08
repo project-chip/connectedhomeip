@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <app/CASESessionManager.h>
+#include <app/InteractionModelEngine.h>
 #include <app/data-model-provider/ActionContext.h>
 #include <app/data-model-provider/Context.h>
 #include <app/data-model-provider/Provider.h>
@@ -24,7 +26,10 @@
 #include <app/server-cluster/testing/EmptyProvider.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestProviderChangeListener.h>
+#include <app/server/Server.h>
+#include <credentials/FabricTable.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <platform/PlatformManager.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -41,7 +46,7 @@ public:
 /// entries that can then be used during testing
 ///
 /// NOTE:
-///   At thist time, `interactionContext::actionContext::CurrentExchange` WILL return nullptr
+///   At this time, `interactionContext::actionContext::CurrentExchange` WILL return nullptr
 ///   in the existing implementation as the exchange is too heavy of an object
 ///   to create for testing
 class TestServerClusterContext
@@ -58,7 +63,9 @@ public:
             .storage            = mTestStorage,
             .attributeStorage   = mDefaultAttributePersistenceProvider,
             .interactionContext = mTestContext,
-        }
+        },
+        mFabricTable(Server::GetInstance().GetFabricTable()), mCaseSessionManager(*Server::GetInstance().GetCASESessionManager()),
+        mPlatformManager(DeviceLayer::PlatformMgr()), mInteractionModelEngine(*app::InteractionModelEngine::GetInstance())
     {
         SuccessOrDie(mDefaultAttributePersistenceProvider.Init(&mTestStorage));
     }
@@ -71,6 +78,10 @@ public:
     TestPersistentStorageDelegate & StorageDelegate() { return mTestStorage; }
     app::DefaultAttributePersistenceProvider & AttributePersistenceProvider() { return mDefaultAttributePersistenceProvider; }
     app::DataModel::InteractionModelContext & ImContext() { return mTestContext; }
+    FabricTable & GetFabricTable() { return mFabricTable; }
+    CASESessionManager & GetCASESessionManager() { return mCaseSessionManager; }
+    DeviceLayer::PlatformManager & GetPlatformManager() { return mPlatformManager; }
+    app::InteractionModelEngine & GetInteractionModelEngine() { return mInteractionModelEngine; }
 
 private:
     NullActionContext mNullActionContext;
@@ -79,10 +90,12 @@ private:
     EmptyProvider mTestProvider;
     TestPersistentStorageDelegate mTestStorage;
     app::DefaultAttributePersistenceProvider mDefaultAttributePersistenceProvider;
-
     app::DataModel::InteractionModelContext mTestContext;
-
     app::ServerClusterContext mContext;
+    FabricTable & mFabricTable;
+    CASESessionManager & mCaseSessionManager;
+    DeviceLayer::PlatformManager & mPlatformManager;
+    app::InteractionModelEngine & mInteractionModelEngine;
 };
 
 } // namespace Testing

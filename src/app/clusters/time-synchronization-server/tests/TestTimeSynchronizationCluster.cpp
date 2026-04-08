@@ -47,10 +47,10 @@ struct TestTimeSynchronizationCluster : public ::testing::Test
 
     TestServerClusterContext testContext;
     TimeSynchronization::DefaultTimeSyncDelegate delegate;
-    const TimeSynchronizationCluster::Context context = { .fabricTable            = Server::GetInstance().GetFabricTable(),
-                                                          .caseSessionManager     = *Server::GetInstance().GetCASESessionManager(),
-                                                          .platformManager        = DeviceLayer::PlatformMgr(),
-                                                          .interactionModelEngine = *InteractionModelEngine::GetInstance() };
+    const TimeSynchronizationCluster::Context context = { .fabricTable            = testContext.GetFabricTable(),
+                                                          .caseSessionManager     = testContext.GetCASESessionManager(),
+                                                          .platformManager        = testContext.GetPlatformManager(),
+                                                          .interactionModelEngine = testContext.GetInteractionModelEngine() };
 };
 
 } // namespace
