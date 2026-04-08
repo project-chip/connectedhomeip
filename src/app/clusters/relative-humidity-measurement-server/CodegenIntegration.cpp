@@ -46,8 +46,8 @@ public:
         RelativeHumidityMeasurementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         using namespace chip::Protocols::InteractionModel;
 
-        // Read default values for mandatory attributes from the Ember attribute store.
-        // Not all apps set defaults, so failure is tolerated.
+        // Read default values from the Ember attribute store. Not all apps set
+        // defaults, so failure is tolerated.
         DataModel::Nullable<uint16_t> minMeasuredValue{};
         if (MinMeasuredValue::Get(endpointId, minMeasuredValue) != Status::Success)
         {
