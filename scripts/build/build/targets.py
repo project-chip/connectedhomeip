@@ -174,6 +174,7 @@ def BuildHostTarget():
     target.AppendModifier(
         'no-interactive', interactive_mode=False).OnlyIfRe('-chip-tool')
     target.AppendModifier("ipv6only", enable_ipv4=False)
+    target.AppendModifier("no-groupcast", enable_groupcast=False)
     target.AppendModifier("no-ble", enable_ble=False)
     target.AppendModifier("no-wifipaf", enable_wifipaf=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
