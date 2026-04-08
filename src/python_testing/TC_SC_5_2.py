@@ -125,6 +125,7 @@ class TC_SC_5_2(MatterBaseTest):
         if groupcast_enabled:
             self.mark_step_range_skipped("3", "11")
         else:
+            dev_ctrl.SetGroupInfo(0x0103, "Group #3")
             # Step 3: GroupKeyMap binding
             self.step("3")
             mapping = [
@@ -145,14 +146,14 @@ class TC_SC_5_2(MatterBaseTest):
 
             # Step 6: AddGroup 0x0101 as group command via GroupID 0x0103
             self.step("6")
-            await dev_ctrl.SendGroupCommand(0x0103, Clusters.Groups.Commands.AddGroup(0x0101, "Test Group 0101"))
+            dev_ctrl.SendGroupCommand(0x0103, Clusters.Groups.Commands.AddGroup(0x0101, "Test Group 0101"))
             await asyncio.sleep(3)
 
             # Check if GroupNames are supported
-            group_feature_map = await dev_ctrl.read_single_attribute_check_success(
+            group_feature_map = await self.read_single_attribute_check_success(
                 cluster=Clusters.Groups,
                 attribute=Clusters.Groups.Attributes.FeatureMap,
-                endpoint=0)
+                endpoint=groups_endpoint)
             group_names_supported = bool(group_feature_map & Clusters.Groups.Bitmaps.Feature.kGroupNames)
 
             # Step 7: ViewGroup 0x0101 with GroupNames
