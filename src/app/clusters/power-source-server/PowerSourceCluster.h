@@ -33,6 +33,37 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+template<class T, class = std::enable_if_t<std::is_trivial_v<T>, void>>
+struct TrivialConstexprOptional
+{
+    constexpr TrivialConstexprOptional() = default;
+    constexpr TrivialConstexprOptional(const T& val) : hasValue(true), value(val) {}
+    constexpr TrivialConstexprOptional & operator=(const T & val)
+    {
+        value    = val;
+        hasValue = true;
+        return *this;
+    }
+
+    constexpr void reset()
+    {
+        value    = T{};
+        hasValue = false;
+    }
+
+    operator Optional<T>() const
+    {
+        if (hasValue)
+        {
+            return MakeOptional(value);
+        }
+        return NullOptional;
+    }
+
+    bool hasValue{false};
+    T value{};
+};
+
 class PowerSourceCluster : public DefaultServerCluster
 {
 public:
@@ -49,44 +80,68 @@ public:
 
     struct WiredConfiguration
     {
+        PowerSourceStatusEnum status = PowerSourceStatusEnum::kUnspecified;
+        uint8_t order{};
+
         CharSpan description{};
         WiredCurrentTypeEnum currentType{};
         uint32_t nominalVoltage{};
         uint32_t maximumCurrent{};
 
+        TrivialConstexprOptional<uint32_t> assessedInputVoltage{};
+        TrivialConstexprOptional<uint16_t> assessedInputFrequency{};
+        TrivialConstexprOptional<uint32_t> assessedCurrent{};
+        bool isPresent{};
+
         // To force the user to specify these mandatory fixed attributes (taking the corresponding feature into account).
-        WiredConfiguration(CharSpan desc, WiredCurrentTypeEnum currType) : description(desc), currentType(currType) {}
+        constexpr WiredConfiguration(CharSpan desc, WiredCurrentTypeEnum currType) : description(desc), currentType(currType) {}
     };
 
     struct BatteryConfiguration
     {
+        PowerSourceStatusEnum status = PowerSourceStatusEnum::kUnspecified;
+        uint8_t order{};
         CharSpan description{};
-        BatReplaceabilityEnum replaceability{};
+
+        TrivialConstexprOptional<uint32_t> voltage{};
+        TrivialConstexprOptional<uint8_t> percentRemaining{};
+        TrivialConstexprOptional<uint32_t> timeRemaining{};
+        BatChargeLevelEnum chargeLevel = BatChargeLevelEnum::kOk;
+        bool replacementNeeded{};
+        BatReplaceabilityEnum replaceability = BatReplaceabilityEnum::kUnspecified;
+        bool isPresent{};
+
         CharSpan replacementDescription{};
         BatCommonDesignationEnum commonDesignation{};
         CharSpan ansiDesignation{};
         CharSpan iecDesignation{};
         BatApprovedChemistryEnum approvedChemistry{};
-        uint32_t capacity{};
         uint8_t quantity{};
+
+        BatChargeStateEnum chargeState = BatChargeStateEnum::kUnknown;
+        TrivialConstexprOptional<uint32_t> timeToFullCharge{};
+        bool functionalWhileCharging{};
+        TrivialConstexprOptional<uint32_t> chargingCurrent{};
+
+        uint32_t capacity{};
 
         // To force the user to specify mandatory fixed attributes (taking the corresponding features into account).
 
-        BatteryConfiguration(CharSpan desc, BatReplaceabilityEnum replability) :
+        constexpr BatteryConfiguration(CharSpan desc, BatReplaceabilityEnum replability) :
             description(desc), replaceability(replability), replaceable(false), rechargeable(false)
         {}
 
-        void MakeReplaceable(CharSpan replDescription, uint8_t quan)
+        constexpr void MakeReplaceable(CharSpan replDescription, uint8_t quan)
         {
             replaceable            = true;
             replacementDescription = replDescription;
             quantity               = quan;
         }
 
-        void MakeRechargeable() { rechargeable = true; }
+        constexpr void MakeRechargeable() { rechargeable = true; }
 
-        bool isReplaceable() const { return replaceable; }
-        bool isRechargeable() const { return rechargeable; }
+        constexpr bool isReplaceable() const { return replaceable; }
+        constexpr bool isRechargeable() const { return rechargeable; }
 
     private:
         bool replaceable;
@@ -178,20 +233,6 @@ public:
     CHIP_ERROR SetEndpointList(Span<const EndpointId> val);
 
 private:
-    // Setters for `Fixed` attributes
-
-    CHIP_ERROR SetDescription(CharSpan val);
-    CHIP_ERROR SetWiredCurrentType(WiredCurrentTypeEnum val);
-    CHIP_ERROR SetWiredNominalVoltage(uint32_t val);
-    CHIP_ERROR SetWiredMaximumCurrent(uint32_t val);
-    CHIP_ERROR SetBatReplaceability(BatReplaceabilityEnum val);
-    CHIP_ERROR SetBatReplacementDescription(CharSpan val);
-    CHIP_ERROR SetBatCommonDesignation(BatCommonDesignationEnum val);
-    CHIP_ERROR SetBatANSIDesignation(CharSpan val);
-    CHIP_ERROR SetBatIECDesignation(CharSpan val);
-    CHIP_ERROR SetBatApprovedChemistry(BatApprovedChemistryEnum val);
-    CHIP_ERROR SetBatCapacity(uint32_t val);
-    CHIP_ERROR SetBatQuantity(uint8_t val);
 
     struct WiredAttributes
     {
@@ -305,6 +346,14 @@ private:
         return CHIP_NO_ERROR;
     }
 
+    // maxSize without null byte
+    void SetStringWithoutNotifying(CharSpan val, char * buffer, size_t maxSize)
+    {
+        MutableCharSpan outbuf(buffer, maxSize);
+        CopyCharSpanToMutableCharSpanWithTruncation(val, outbuf);
+        buffer[maxSize] = 0; // null byte
+    }
+
     template <class EnumT, size_t ValCount = to_underlying(EnumT::kUnknownEnumValue)>
     static std::bitset<ValCount> SpanToBitSet(Span<const EnumT> span)
     {
@@ -351,130 +400,6 @@ private:
     std::atomic_bool mBatPercentRemainingNotifyTimerExpired{ true };
     std::atomic_bool mBatTimeRemainingNotifyTimerExpired{ true };
     std::atomic_bool mBatTimeToFullChargeNotifyTimerExpired{ true };
-
-    static constexpr System::Clock::Timeout notifyTimerDuration = System::Clock::Seconds16(10);
-
-    static void SetTimerExpired(System::Layer *, void * pAtomicBool)
-    {
-        std::atomic_bool * p = reinterpret_cast<std::atomic_bool *>(pAtomicBool);
-        *p                   = true;
-    }
-};
-
-class AllClustersMinimalBatteryPowerSourceCluster : public DefaultServerCluster
-{
-public:
-    using PowerSourceStatusEnum = PowerSource::PowerSourceStatusEnum;
-    using BatChargeLevelEnum = PowerSource::BatChargeLevelEnum;
-    using BatReplaceabilityEnum = PowerSource::BatReplaceabilityEnum;
-
-    struct BatteryConfiguration
-    {
-        CharSpan description{};
-        BatReplaceabilityEnum replaceability{};
-
-        // To force the user to specify these mandatory fixed attributes (taking the corresponding feature into account).
-        BatteryConfiguration(CharSpan desc, BatReplaceabilityEnum replability) :
-            description(desc), replaceability(replability)
-        {}
-    };
-
-    AllClustersMinimalBatteryPowerSourceCluster(EndpointId endpointId, System::Layer & systemLayer, const BatteryConfiguration & config);
-
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
-
-    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override;
-
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
-
-    const BitFlags<PowerSource::Feature> & Features() const { return mFeatures; }
-
-    // Getters
-
-    PowerSourceStatusEnum GetStatus() const;
-    uint8_t GetOrder() const;
-    CharSpan GetDescription() const;
-    Optional<uint8_t> GetBatPercentRemaining() const;
-    BatChargeLevelEnum GetBatChargeLevel() const;
-    bool GetBatReplacementNeeded() const;
-    BatReplaceabilityEnum GetBatReplaceability() const;
-    Span<const EndpointId> GetEndpointList() const;
-
-    // Setters
-
-    /// Some attributes' setters are private because they are marked with the `Fixed` quality,
-    /// It is possible to set them with the constructor. If it is needed to set them after construction,
-    /// a setter function named like `SetConfiguration` can be added, or separate setters can be made public.
-
-    /// `Fixed` attributes are `Description`, `WiredCurrentType`, `WiredNominalVoltage`, `WiredMaximumCurrent`, `BatReplaceability`,
-    /// `BatReplacementDescription`, `BatCommonDesignation`, `BatANSIDesignation`, `BatIECDesignation`, `BatApprovedChemistry`,
-    /// `BatCapacity` and `BatQuantity`
-
-    CHIP_ERROR SetStatus(PowerSourceStatusEnum val);
-    CHIP_ERROR SetOrder(uint8_t val);
-    CHIP_ERROR SetBatPercentRemaining(Optional<uint8_t> val);
-    CHIP_ERROR SetBatChargeLevel(BatChargeLevelEnum val);
-    CHIP_ERROR SetBatReplacementNeeded(bool val);
-    CHIP_ERROR SetEndpointList(Span<const EndpointId> val);
-
-private:
-    // Setters for `Fixed` attributes
-
-    CHIP_ERROR SetDescription(CharSpan val);
-    CHIP_ERROR SetBatReplaceability(BatReplaceabilityEnum val);
-
-    struct Attributes
-    {
-        PowerSourceStatusEnum status = PowerSourceStatusEnum::kUnspecified;
-        uint8_t order{};
-        CharSpan GetDescription() const { return CharSpan(mDescriptionBuffer, strlen(mDescriptionBuffer)); }
-        Span<const EndpointId> GetPoweredEndpoints() const
-        {
-            return Span<const EndpointId>(mPoweredEndpointsBuffer.Get(), mPoweredEndpointsCount);
-        };
-
-        char mDescriptionBuffer[PowerSource::Attributes::Description::TypeInfo::MaxLength() + 1] = { 0 };
-
-        Platform::ScopedMemoryBufferWithSize<EndpointId> mPoweredEndpointsBuffer;
-        size_t mPoweredEndpointsCount = 0;
-
-        // battery feature
-        Optional<uint8_t> percentRemaining{};
-        BatChargeLevelEnum chargeLevel = BatChargeLevelEnum::kOk;
-        bool replacementNeeded = false;
-        BatReplaceabilityEnum replaceability = BatReplaceabilityEnum::kUnspecified;
-    };
-
-    static inline BitFlags<PowerSource::Feature> WiredFeatures()
-    {
-        return BitFlags<PowerSource::Feature>(PowerSource::Feature::kBattery);
-    }
-
-    // maxSize without null byte
-    CHIP_ERROR SetStringAndNotify(CharSpan val, CharSpan current, char * buffer, size_t maxSize, AttributeId id)
-    {
-        if (current.data_equal(val))
-        {
-            return CHIP_NO_ERROR; // no-op if equal
-        }
-        MutableCharSpan outbuf(buffer, maxSize);
-        auto err = CopyCharSpanToMutableCharSpan(val, outbuf);
-        ReturnErrorOnFailure(err);
-
-        buffer[val.size()] = 0; // null byte
-        NotifyAttributeChanged(id);
-        return CHIP_NO_ERROR;
-    }
-
-    const BitFlags<PowerSource::Feature> mFeatures;
-    struct Attributes mAttributes;
-
-    // context
-    System::Layer & mSystemLayer;
-
-    // notify timer stuff
-    std::atomic_bool mBatPercentRemainingNotifyTimerExpired{ true };
 
     static constexpr System::Clock::Timeout notifyTimerDuration = System::Clock::Seconds16(10);
 

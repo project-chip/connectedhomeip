@@ -24,7 +24,9 @@ namespace app {
 namespace Clusters {
 namespace PowerSource {
 
-AllClustersMinimalBatteryPowerSourceCluster * FindClusterOnEndpoint(EndpointId id);
+PowerSourceCluster * CreateClusterOnEndpoint(EndpointId id, const PowerSourceCluster::WiredConfiguration & config);
+PowerSourceCluster * CreateClusterOnEndpoint(EndpointId id, const PowerSourceCluster::BatteryConfiguration & config);
+PowerSourceCluster * FindClusterOnEndpoint(EndpointId id);
 
 } // namespace PowerSource
 } // namespace Clusters

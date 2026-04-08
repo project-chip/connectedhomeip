@@ -7,7 +7,7 @@
 #pragma once
 
 #include <app/util/cluster-config.h>
-#include <clusters/{{cluster_name}}/AttributeIds.h>
+#include <clusters/{{cluster_name}}/Attributes.h>
 #include <clusters/{{cluster_name}}/CommandIds.h>
 #include <clusters/{{cluster_name}}/Enums.h>
 
@@ -27,6 +27,37 @@ inline constexpr AttributeId kEndpoint{{endpoint_config.endpoint_number}}Enabled
   {%- endfor %}
 };
 {%- endif %}
+{%- if endpoint_config.instance.attributes | rejectattr('default', 'none') | list %}
+inline constexpr struct {
+  {%- for attr in endpoint_config.instance.attributes | rejectattr('default', 'none') | sort(attribute="name") %}
+  {%- if attr.default is boolean %}
+    Attributes::{{attr.name | upfirst}}::TypeInfo::Type {{attr.name}} { {{ 'true' if attr.default else 'false' }} };
+  {%- elif attr.default is string %}
+    Attributes::{{attr.name | upfirst}}::TypeInfo::Type {{attr.name}} { "{{attr.default}}"_span };
+  {%- else %}
+    Attributes::{{attr.name | upfirst}}::TypeInfo::Type {{attr.name}} { {{attr.default}} };
+  {%- endif %}
+  {%- endfor %}
+
+    inline constexpr bool HasDefaultValue(AttributeId attributeId) const {
+        switch (attributeId) {
+          {%- for attr in endpoint_config.instance.attributes | rejectattr('default', 'none') | sort(attribute="name") %}
+            case Attributes::{{attr.name | upfirst}}::Id:
+              {%- if loop.last %}
+                return true;
+              {%- endif %}
+          {%- endfor %}
+            default:
+                return false;
+        }
+    }
+} kEndpoint{{endpoint_config.endpoint_number}}AttributeDefaultValues{};
+{%- endif %}
+
+// Undefined class to throw compile time errors when the endpoint is invalid,
+// and to provide a meaningfull error message with id in it.
+// Used in `GetAttributeDefaultValuesOnEndpoint` function.
+template<EndpointId id> struct ErrorNoAttributesWithDefaultValuesOnEndpoint;
 
 {%- if endpoint_config.instance.commands %}
 
@@ -70,6 +101,21 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
 {%- endfor %}
 } };
 
+template <EndpointId id>
+inline constexpr auto GetAttributeDefaultValuesOnEndpoint() {
+  if constexpr (false) {}
+  {%- for endpoint_config in config.endpoint_configs %}
+  {%- if endpoint_config.instance.attributes | rejectattr('default', 'none') | list %}
+    else if constexpr (id == {{endpoint_config.endpoint_number}}) {
+        return detail::kEndpoint{{endpoint_config.endpoint_number}}AttributeDefaultValues;
+    }
+  {%- endif %}
+  {%- endfor %}
+  else {
+      return detail::ErrorNoAttributesWithDefaultValuesOnEndpoint<id>{};
+  }
+}
+
 // If a specific attribute is supported at all across all endpoint static instantiations
 inline constexpr bool IsAttributeEnabledOnSomeEndpoint(AttributeId attributeId) {
   switch (attributeId) {
@@ -103,4 +149,3 @@ inline constexpr bool IsCommandEnabledOnSomeEndpoint(CommandId commandId) {
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-

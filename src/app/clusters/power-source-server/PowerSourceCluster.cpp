@@ -86,64 +86,78 @@ using namespace PowerSource;
 using namespace PowerSource::Attributes;
 using namespace PowerSource::Events;
 
-#define DieIfInvalidValue(expr, attr_name)                                                                                         \
-    {                                                                                                                              \
-        CHIP_ERROR error_val = (expr);                                                                                             \
-        VerifyOrDieWithMsg(error_val == CHIP_NO_ERROR || error_val == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, Zcl,                    \
-                           "Unexpected error %" CHIP_ERROR_FORMAT " when trying to set attribute `" #attr_name "`.",               \
-                           error_val.Format());                                                                                    \
-    }
-
 PowerSourceCluster::PowerSourceCluster(EndpointId endpointId, System::Layer & systemLayer, const WiredConfiguration & config) :
     DefaultServerCluster({ endpointId, PowerSource::Id }), mFeatures(WiredFeatures()), mSystemLayer(systemLayer)
 {
     mAttributes.wired = WiredAttributes{};
-    CHIP_ERROR err;
 
-    // mandatory attributes marked `Fixed` when `kWired` features is set
-    VerifyOrDieWithMsg((err = SetDescription(config.description)) == CHIP_NO_ERROR, Zcl,
-                       "Can't set the attribute `Description`, error: %" CHIP_ERROR_FORMAT, err.Format());
-    VerifyOrDieWithMsg((err = SetWiredCurrentType(config.currentType)) == CHIP_NO_ERROR, Zcl,
-                       "Can't set the attribute `WiredCurrentType`, error: %" CHIP_ERROR_FORMAT, err.Format());
+    mAttributes.status = config.status;
+    mAttributes.order  = config.order;
 
-    // optional attributes marked `Fixed`
-    DieIfInvalidValue(SetWiredMaximumCurrent(config.maximumCurrent), WiredMaximumCurrent);
+    SetStringWithoutNotifying(config.description, mAttributes.mDescriptionBuffer, sizeof(mAttributes.mDescriptionBuffer) - 1);
+    mAttributes.wired.currentType   = config.currentType;
+    mAttributes.wired.nominalVoltage = config.nominalVoltage;
+    mAttributes.wired.maximumCurrent = config.maximumCurrent;
+
+    mAttributes.wired.assessedInputVoltage   = config.assessedInputVoltage;
+    mAttributes.wired.assessedInputFrequency = config.assessedInputFrequency;
+    mAttributes.wired.assessedCurrent        = config.assessedCurrent;
+    mAttributes.wired.isPresent              = config.isPresent;
 }
 
 PowerSourceCluster::PowerSourceCluster(EndpointId endpointId, System::Layer & systemLayer, const BatteryConfiguration & config) :
     DefaultServerCluster({ endpointId, PowerSource::Id }),
-    mFeatures(BatteryFeatures(config.isReplaceable(), config.isRechargeable())), mSystemLayer(systemLayer)
+    mFeatures(BatteryFeatures(config.isReplaceable(), config.isRechargeable())),
+    mSystemLayer(systemLayer)
 {
     mAttributes.battery = BatteryAttributes{};
-    CHIP_ERROR err;
 
-    // mandatory attributes marked `Fixed` when `kBattery` features is set
-    VerifyOrDieWithMsg((err = SetDescription(config.description)) == CHIP_NO_ERROR, Zcl,
-                       "Can't set the attribute `Description`, error: %" CHIP_ERROR_FORMAT, err.Format());
-    VerifyOrDieWithMsg((err = SetBatReplaceability(config.replaceability)) == CHIP_NO_ERROR, Zcl,
-                       "Can't set the attribute `BatReplaceability`, error: %" CHIP_ERROR_FORMAT, err.Format());
+    mAttributes.status = config.status;
+    mAttributes.order  = config.order;
+    SetStringWithoutNotifying(config.description, mAttributes.mDescriptionBuffer, sizeof(mAttributes.mDescriptionBuffer) - 1);
 
-    if (config.isReplaceable())
+    mAttributes.battery.voltage            = config.voltage;
+    if (config.percentRemaining.hasValue)
     {
-        // mandatory attributes marked `Fixed` when `kReplaceable` feature is set
-        VerifyOrDieWithMsg((err = SetBatReplacementDescription(config.replacementDescription)) == CHIP_NO_ERROR, Zcl,
-                           "Can't set the attribute `BatReplacementDescription`, error: %" CHIP_ERROR_FORMAT, err.Format());
-        VerifyOrDieWithMsg((err = SetBatQuantity(config.quantity)) == CHIP_NO_ERROR, Zcl,
-                           "Can't set the attribute `BatQuantity`, error: %" CHIP_ERROR_FORMAT, err.Format());
+        // the upper bound of percentRemaining is 200, which corresponds to 100% battery.
+        mAttributes.battery.percentRemaining = MakeOptional<uint8_t>(config.percentRemaining.value < 200 ? config.percentRemaining.value : 200);
+    }
+    else
+    {
+        mAttributes.battery.percentRemaining = NullOptional;
+    }
+    mAttributes.battery.timeRemaining      = config.timeRemaining;
+    mAttributes.battery.chargeLevel        = config.chargeLevel;
+    mAttributes.battery.replacementNeeded = config.replacementNeeded;
+    mAttributes.battery.replaceability = config.replaceability;
+    mAttributes.battery.isPresent          = config.isPresent;
+
+    if (mFeatures.Has(Feature::kReplaceable))
+    {
+        SetStringWithoutNotifying(config.replacementDescription, mAttributes.battery.replaceable.mReplacementDescriptionBuffer,
+                        sizeof(mAttributes.battery.replaceable.mReplacementDescriptionBuffer) - 1);
+        mAttributes.battery.replaceable.commonDesignation = config.commonDesignation;
+        SetStringWithoutNotifying(config.ansiDesignation, mAttributes.battery.replaceable.mANSIDesignationBuffer,
+                        sizeof(mAttributes.battery.replaceable.mANSIDesignationBuffer) - 1);
+        SetStringWithoutNotifying(config.iecDesignation, mAttributes.battery.replaceable.mIECDesignationBuffer,
+                        sizeof(mAttributes.battery.replaceable.mIECDesignationBuffer) - 1);
+        mAttributes.battery.replaceable.approvedChemistry = config.approvedChemistry;
+        mAttributes.battery.replaceable.quantity         = config.quantity;
     }
 
-    // no mandatory attributes marked `Fixed` when `kRechargeable` feature is set
+    if (mFeatures.Has(Feature::kRechargeable))
+    {
+        mAttributes.battery.rechargeable.chargeState          = config.chargeState;
+        mAttributes.battery.rechargeable.timeToFullCharge     = config.timeToFullCharge;
+        mAttributes.battery.rechargeable.functionalWhileCharging = config.functionalWhileCharging;
+        mAttributes.battery.rechargeable.chargingCurrent      = config.chargingCurrent;
+    }
 
-    // optional attributes marked `Fixed` (deliberately ignoring errors because these will check if the optional attribute is
-    // enabled)
-    DieIfInvalidValue(SetBatCommonDesignation(config.commonDesignation), BatCommonDesignation);
-    DieIfInvalidValue(SetBatANSIDesignation(config.ansiDesignation), BatANSIDesignation);
-    DieIfInvalidValue(SetBatIECDesignation(config.iecDesignation), BatIECDesignation);
-    DieIfInvalidValue(SetBatApprovedChemistry(config.approvedChemistry), BatApprovedChemistry);
-    DieIfInvalidValue(SetBatCapacity(config.capacity), BatCapacity);
+    if (mFeatures.HasAny(Feature::kReplaceable, Feature::kRechargeable))
+    {
+        mAttributes.battery.capacity = config.capacity;
+    }
 }
-
-#undef DieIfInvalidValue
 
 CHIP_ERROR PowerSourceCluster::Startup(ServerClusterContext & context)
 {
@@ -957,343 +971,8 @@ CHIP_ERROR PowerSourceCluster::SetEndpointList(Span<const EndpointId> val)
     return CHIP_NO_ERROR;
 }
 
-// Private setter implementations for Fixed attributes
-
-CHIP_ERROR PowerSourceCluster::SetDescription(CharSpan val)
-{
-    VerifyStringAttributeSizeOrReturnError(val, Description::TypeInfo::MaxLength());
-
-    return SetStringAndNotify(val, mAttributes.GetDescription(), mAttributes.mDescriptionBuffer, Description::TypeInfo::MaxLength(),
-                              Description::Id);
-}
-
-CHIP_ERROR PowerSourceCluster::SetWiredCurrentType(WiredCurrentTypeEnum val)
-{
-    VerifyFeatureOrReturnError(kWired);
-
-    SetAttributeValue(mAttributes.wired.currentType, val, WiredCurrentType::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PowerSourceCluster::SetWiredNominalVoltage(uint32_t val)
-{
-    VerifyFeatureOrReturnError(kWired);
-
-    SetAttributeValue(mAttributes.wired.nominalVoltage, val, WiredNominalVoltage::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PowerSourceCluster::SetWiredMaximumCurrent(uint32_t val)
-{
-    VerifyFeatureOrReturnError(kWired);
-
-    SetAttributeValue(mAttributes.wired.maximumCurrent, val, WiredMaximumCurrent::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PowerSourceCluster::SetBatReplaceability(BatReplaceabilityEnum val)
-{
-    VerifyFeatureOrReturnError(kBattery);
-
-    SetAttributeValue(mAttributes.battery.replaceability, val, BatReplaceability::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PowerSourceCluster::SetBatReplacementDescription(CharSpan val)
-{
-    VerifyFeatureOrReturnError(kBattery);
-    VerifyFeatureOrReturnError(kReplaceable);
-    VerifyStringAttributeSizeOrReturnError(val, BatReplacementDescription::TypeInfo::MaxLength());
-
-    return SetStringAndNotify(val, mAttributes.battery.replaceable.GetReplacementDescription(),
-                              mAttributes.battery.replaceable.mReplacementDescriptionBuffer,
-                              BatReplacementDescription::TypeInfo::MaxLength(), BatReplacementDescription::Id);
-}
-
-CHIP_ERROR PowerSourceCluster::SetBatCommonDesignation(BatCommonDesignationEnum val)
-{
-    VerifyFeatureOrReturnError(kBattery);
-    VerifyFeatureOrReturnError(kReplaceable);
-
-    SetAttributeValue(mAttributes.battery.replaceable.commonDesignation, val, BatCommonDesignation::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PowerSourceCluster::SetBatANSIDesignation(CharSpan val)
-{
-    VerifyFeatureOrReturnError(kBattery);
-    VerifyFeatureOrReturnError(kReplaceable);
-    VerifyStringAttributeSizeOrReturnError(val, BatANSIDesignation::TypeInfo::MaxLength());
-
-    return SetStringAndNotify(val, mAttributes.battery.replaceable.GetANSIDesignation(),
-                              mAttributes.battery.replaceable.mANSIDesignationBuffer, BatANSIDesignation::TypeInfo::MaxLength(),
-                              BatANSIDesignation::Id);
-}
-
-CHIP_ERROR PowerSourceCluster::SetBatIECDesignation(CharSpan val)
-{
-    VerifyFeatureOrReturnError(kBattery);
-    VerifyFeatureOrReturnError(kReplaceable);
-    VerifyStringAttributeSizeOrReturnError(val, BatIECDesignation::TypeInfo::MaxLength());
-
-    return SetStringAndNotify(val, mAttributes.battery.replaceable.GetIECDesignation(),
-                              mAttributes.battery.replaceable.mIECDesignationBuffer, BatIECDesignation::TypeInfo::MaxLength(),
-                              BatIECDesignation::Id);
-}
-
-CHIP_ERROR PowerSourceCluster::SetBatApprovedChemistry(BatApprovedChemistryEnum val)
-{
-    VerifyFeatureOrReturnError(kBattery);
-    VerifyFeatureOrReturnError(kReplaceable);
-
-    SetAttributeValue(mAttributes.battery.replaceable.approvedChemistry, val, BatApprovedChemistry::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PowerSourceCluster::SetBatCapacity(uint32_t val)
-{
-    VerifyFeatureOrReturnError(kBattery);
-    VerifyOrReturnError(Features().Has(Feature::kReplaceable) || Features().Has(Feature::kRechargeable),
-                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    SetAttributeValue(mAttributes.battery.capacity, val, BatCapacity::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PowerSourceCluster::SetBatQuantity(uint8_t val)
-{
-    VerifyFeatureOrReturnError(kBattery);
-    VerifyFeatureOrReturnError(kReplaceable);
-
-    SetAttributeValue(mAttributes.battery.replaceable.quantity, val, BatQuantity::Id);
-    return CHIP_NO_ERROR;
-}
-
 #undef VerifyFeatureOrReturnError
 #undef VerifyStringAttributeSizeOrReturnError
-
-AllClustersMinimalBatteryPowerSourceCluster::AllClustersMinimalBatteryPowerSourceCluster(EndpointId endpointId, System::Layer & systemLayer, const BatteryConfiguration & config) :
-    DefaultServerCluster({ endpointId, PowerSource::Id }), mSystemLayer(systemLayer)
-{
-    CHIP_ERROR err;
-
-    // mandatory attributes marked `Fixed` when `kWired` features is set
-    VerifyOrDieWithMsg((err = SetDescription(config.description)) == CHIP_NO_ERROR, Zcl,
-                       "Can't set the attribute `Description`, error: %" CHIP_ERROR_FORMAT, err.Format());
-    VerifyOrDieWithMsg((err = SetBatReplaceability(config.replaceability)) == CHIP_NO_ERROR, Zcl,
-                       "Can't set the attribute `BatReplaceability`, error: %" CHIP_ERROR_FORMAT, err.Format());
-}
-
-CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::Startup(ServerClusterContext & context)
-{
-    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-
-    // the `Order` attribute is marked as `Persistent`.
-    uint8_t order;
-
-    AttributePersistence attributePersistence(context.attributeStorage);
-    if (attributePersistence.LoadNativeEndianValue<uint8_t>({ mPath.mEndpointId, mPath.mClusterId, Order::Id }, order, 0))
-    {
-        ReturnErrorOnFailure(SetOrder(order));
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-DataModel::ActionReturnStatus AllClustersMinimalBatteryPowerSourceCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                            AttributeValueEncoder & encoder)
-{
-    using namespace PowerSource::Attributes;
-    // `ReadAttribute` is guaranteed to only be called for attributes that are supported by the cluster, so the code below is valid.
-    switch (request.path.mAttributeId)
-    {
-    case Status::Id:
-        return encoder.Encode(mAttributes.status);
-    case Order::Id:
-        return encoder.Encode(mAttributes.order);
-    case Description::Id:
-        return encoder.Encode(mAttributes.GetDescription());
-    case BatPercentRemaining::Id:
-        return EncodeOptional(encoder, mAttributes.percentRemaining);
-    case BatChargeLevel::Id:
-        return encoder.Encode(mAttributes.chargeLevel);
-    case BatReplacementNeeded::Id:
-        return encoder.Encode(mAttributes.replacementNeeded);
-    case BatReplaceability::Id:
-        return encoder.Encode(mAttributes.replaceability);
-    case EndpointList::Id:
-        return EncodeListOfValues(encoder, mAttributes.GetPoweredEndpoints());
-    case Globals::Attributes::FeatureMap::Id:
-        return encoder.Encode(Features());
-    case Globals::Attributes::ClusterRevision::Id:
-        return encoder.Encode(kRevision);
-    default:
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
-}
-
-CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::Attributes(const ConcreteClusterPath & path,
-                                                      ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
-{
-    constexpr DataModel::AttributeEntry kOptionalAttributes[] = 
-    { 
-        PowerSource::Attributes::BatPercentRemaining::kMetadataEntry,
-        PowerSource::Attributes::BatChargeLevel::kMetadataEntry,
-        PowerSource::Attributes::BatReplacementNeeded::kMetadataEntry,
-        PowerSource::Attributes::BatReplaceability::kMetadataEntry 
-    };
-
-    AttributeSet optAttributeSet(OptionalAttributeSet<
-        BatPercentRemaining::Id,
-        BatChargeLevel::Id,
-        BatReplacementNeeded::Id,
-        BatReplaceability::Id>::All());
-
-    AttributeListBuilder attributeListBuilder(builder);
-
-    return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(kOptionalAttributes), optAttributeSet);
-}
-
-AllClustersMinimalBatteryPowerSourceCluster::PowerSourceStatusEnum AllClustersMinimalBatteryPowerSourceCluster::GetStatus() const
-{
-    return mAttributes.status;
-}
-
-uint8_t AllClustersMinimalBatteryPowerSourceCluster::GetOrder() const
-{
-    return mAttributes.order;
-}
-
-CharSpan AllClustersMinimalBatteryPowerSourceCluster::GetDescription() const
-{
-    return mAttributes.GetDescription();
-}
-
-Optional<uint8_t> AllClustersMinimalBatteryPowerSourceCluster::GetBatPercentRemaining() const
-{
-    return mAttributes.percentRemaining;
-}
-
-AllClustersMinimalBatteryPowerSourceCluster::BatChargeLevelEnum AllClustersMinimalBatteryPowerSourceCluster::GetBatChargeLevel() const
-{
-    return mAttributes.chargeLevel;
-}
-
-bool AllClustersMinimalBatteryPowerSourceCluster::GetBatReplacementNeeded() const
-{
-    return mAttributes.replacementNeeded;
-}
-
-AllClustersMinimalBatteryPowerSourceCluster::BatReplaceabilityEnum AllClustersMinimalBatteryPowerSourceCluster::GetBatReplaceability() const
-{
-    return mAttributes.replaceability;
-}
-
-Span<const EndpointId> AllClustersMinimalBatteryPowerSourceCluster::GetEndpointList() const
-{
-    return mAttributes.GetPoweredEndpoints();
-}
-
-CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetStatus(PowerSourceStatusEnum val)
-{
-    SetAttributeValue(mAttributes.status, val, Status::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetOrder(uint8_t val)
-{
-    // This attribute is marked as `Persistent`.
-    if (mContext != nullptr && val != mAttributes.order)
-    {
-        AttributePersistence attributePersistence(mContext->attributeStorage);
-
-        attributePersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, Order::Id }, val);
-    }
-
-    SetAttributeValue(mAttributes.order, val, Order::Id);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetEndpointList(Span<const EndpointId> val)
-{
-    if (mAttributes.GetPoweredEndpoints().data_equal(val))
-    {
-        return CHIP_NO_ERROR; // no-op if equal
-    }
-
-    if (val.size() > mAttributes.mPoweredEndpointsBuffer.AllocatedSize())
-    {
-        mAttributes.mPoweredEndpointsBuffer.Calloc(val.size());
-    }
-
-    mAttributes.mPoweredEndpointsCount = val.size();
-
-    std::copy(val.begin(), val.end(), mAttributes.mPoweredEndpointsBuffer.Get());
-    NotifyAttributeChanged(EndpointList::Id);
-    return CHIP_NO_ERROR;
-}
-
-// Private setter implementations for Fixed attributes
-
-CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetDescription(CharSpan val)
-{
-    VerifyOrReturnError(val.size() <= Description::TypeInfo::MaxLength(), CHIP_ERROR_INVALID_STRING_LENGTH);
-
-    return SetStringAndNotify(val, mAttributes.GetDescription(), mAttributes.mDescriptionBuffer, Description::TypeInfo::MaxLength(),
-                              Description::Id);
-}
-
-CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetBatPercentRemaining(Optional<uint8_t> val)
-{
-    if (val.HasValue())
-    {
-        // Maximum value of 200 representing 100% battery.
-        VerifyOrReturnError(val.Value() <= 200, CHIP_ERROR_INVALID_INTEGER_VALUE);
-    }
-
-    // This attribute is marked with `Quieter Reporting` quality, with a time interval between change reports.
-    // Or this attribute is to be reported if it changes to or from null.
-
-    // If value changes from or to null, change, notify and return.
-    if (mAttributes.percentRemaining == NullOptional || val == NullOptional)
-    {
-        SetAttributeValue(mAttributes.percentRemaining, val, BatPercentRemaining::Id);
-        return CHIP_NO_ERROR;
-    }
-
-    // If the reporting interval has expired, update the value, notify, and restart the timer.
-    if (mBatPercentRemainingNotifyTimerExpired)
-    {
-        SetAttributeValue(mAttributes.percentRemaining, val, BatPercentRemaining::Id);
-        CHIP_ERROR err = mSystemLayer.StartTimer(notifyTimerDuration, SetTimerExpired, &mBatPercentRemainingNotifyTimerExpired);
-        ReturnErrorOnFailure(err);
-        mBatPercentRemainingNotifyTimerExpired = false;
-        return CHIP_NO_ERROR;
-    }
-
-    // Otherwise, the reporting interval is still active, do not notify.
-    mAttributes.percentRemaining = val;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetBatChargeLevel(BatChargeLevelEnum val)
-{
-    SetAttributeValue(mAttributes.chargeLevel, val, BatChargeLevel::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetBatReplacementNeeded(bool val)
-{
-    SetAttributeValue(mAttributes.replacementNeeded, val, BatReplacementNeeded::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR AllClustersMinimalBatteryPowerSourceCluster::SetBatReplaceability(BatReplaceabilityEnum val)
-{
-    SetAttributeValue(mAttributes.replaceability, val, BatReplaceability::Id);
-    return CHIP_NO_ERROR;
-}
 
 } // namespace Clusters
 } // namespace app
