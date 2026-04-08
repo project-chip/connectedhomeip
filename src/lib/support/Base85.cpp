@@ -23,9 +23,6 @@
 
 #include "Base85.h"
 
-#include <lib/support/CodeUtils.h>
-
-#include <stdint.h>
 #include <string.h>
 
 namespace chip {
@@ -186,32 +183,48 @@ static void EncodeGroup(uint32_t value, char * out, size_t count)
 
 CHIP_ERROR BytesToBase85(const uint8_t * src, size_t srcSize, char * dest, size_t destSize)
 {
-    VerifyOrReturnError(destSize >= Base85EncodedLength(srcSize), CHIP_ERROR_BUFFER_TOO_SMALL);
-    while (srcSize > 0)
+    VerifyOrReturnError(src != nullptr || srcSize == 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(dest != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    // Base85EncodedLength(srcSize) could overflow / saturate to SIZE_MAX,
+    // checking via Base85DecodedLength(destSize) instead avoids this issue.
+    VerifyOrReturnError(Base85DecodedLength(destSize) >= srcSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    size_t remainder = srcSize % 4;
+    for (auto * end = src + (srcSize - remainder); src < end; src += 4, dest += 5)
     {
-        size_t count   = srcSize >= 4 ? 4 : srcSize;
-        uint32_t value = ReadGroup(src, count);
-        src += count;
-        srcSize -= count;
-        EncodeGroup(value, dest, count + 1);
-        dest += count + 1;
+        EncodeGroup(ReadGroup(src, 4), dest, 5);
+    }
+    if (remainder > 0)
+    {
+        EncodeGroup(ReadGroup(src, remainder), dest, remainder + 1);
     }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Base85ToBytes(const char * src, size_t srcSize, uint8_t * dest, size_t destSize)
 {
+    VerifyOrReturnError(src != nullptr || srcSize == 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(dest != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(destSize >= Base85DecodedLength(srcSize), CHIP_ERROR_BUFFER_TOO_SMALL);
-    while (srcSize > 0)
+
+    uint32_t value;
+    size_t remainder = srcSize % 5;
+    VerifyOrReturnError(remainder != 1, CHIP_ERROR_INVALID_ARGUMENT); // 1 "digit" does not encode a full byte
+    for (auto * end = src + (srcSize - remainder); src < end; src += 5, dest += 4)
     {
-        VerifyOrReturnError(srcSize != 1, CHIP_ERROR_INVALID_ARGUMENT); // 1 character can't encode anything
-        size_t count = srcSize >= 5 ? 5 : srcSize;
-        uint32_t value;
-        VerifyOrReturnError(DecodeGroup(src, count, value), CHIP_ERROR_INVALID_ARGUMENT);
-        src += count;
-        srcSize -= count;
-        WriteGroup(value, dest, count - 1);
-        dest += count - 1;
+        VerifyOrReturnError(DecodeGroup(src, 5, value), CHIP_ERROR_INVALID_ARGUMENT);
+        WriteGroup(value, dest, 4);
+    }
+    if (remainder > 0) // 2..4
+    {
+        VerifyOrReturnError(DecodeGroup(src, remainder, value), CHIP_ERROR_INVALID_ARGUMENT);
+
+        char check[4];
+        uint32_t padding = UINT32_MAX >> (8 * (remainder - 1));
+        EncodeGroup(value & ~padding, check, remainder);
+        VerifyOrReturnError(memcmp(src, check, remainder) == 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+        WriteGroup(value, dest, remainder - 1); // might clobber src
     }
     return CHIP_NO_ERROR;
 }

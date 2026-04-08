@@ -65,7 +65,7 @@ TEST(TestBase85, EncodeTestVectors)
 
         char output[40];
         ASSERT_EQ(BytesToBase85(tv.input.data(), tv.input.size(), output, sizeof(output)), CHIP_NO_ERROR);
-        EXPECT_EQ(strncmp(output, tv.encoded, expectedLen), 0);
+        EXPECT_EQ(memcmp(output, tv.encoded, expectedLen), 0);
     }
 }
 
@@ -99,11 +99,14 @@ TEST(TestBase85, DecodeInvalidCharacters)
     EXPECT_EQ(Base85ToBytes("123\x7F_", 5, decoded, sizeof(decoded)), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
-TEST(TestBase85, DecodeInvalidLength)
+TEST(TestBase85, DecodeNonCanonical)
 {
     uint8_t decoded[8];
+    // A remainder group of 1 "digit" would be pure padding that does not encode a complete byte
     EXPECT_EQ(Base85ToBytes("0", 1, decoded, sizeof(decoded)), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(Base85ToBytes("AAAAA0", 6, decoded, sizeof(decoded)), CHIP_ERROR_INVALID_ARGUMENT);
+    // "0S" naively decodes to "\x01", but the canonical encoding is "0R"
+    EXPECT_EQ(Base85ToBytes("0S", 2, decoded, sizeof(decoded)), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST(TestBase85, DecodeOverflow)
@@ -113,6 +116,21 @@ TEST(TestBase85, DecodeOverflow)
     EXPECT_EQ(Base85ToBytes("~~~~~", 5, decoded, sizeof(decoded)), CHIP_ERROR_INVALID_ARGUMENT);
     // "|NsC1" is one past the maximum valid encoding "|NsC0" (0xFFFFFFFF)
     EXPECT_EQ(Base85ToBytes("|NsC1", 5, decoded, sizeof(decoded)), CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST(TestBase85, NullArguments)
+{
+    char encoded[8];
+    uint8_t decoded[8];
+    // null src with zero size is OK
+    EXPECT_EQ(BytesToBase85(nullptr, 0, encoded, sizeof(encoded)), CHIP_NO_ERROR);
+    EXPECT_EQ(Base85ToBytes(nullptr, 0, decoded, sizeof(decoded)), CHIP_NO_ERROR);
+    // null src with nonzero size is an error
+    EXPECT_EQ(BytesToBase85(nullptr, 1, encoded, sizeof(encoded)), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(Base85ToBytes(nullptr, 5, decoded, sizeof(decoded)), CHIP_ERROR_INVALID_ARGUMENT);
+    // null dest is always an error
+    EXPECT_EQ(BytesToBase85(decoded, 0, nullptr, 0), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(Base85ToBytes(encoded, 0, nullptr, 0), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 } // namespace

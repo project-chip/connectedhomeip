@@ -23,6 +23,8 @@
  *      Compatible with Python's base64.b85encode / b85decode (RFC 1924 alphabet).
  *      Generally, blocks of 4 bytes are encoded into 5 characters, but arbitrary
  *      input lengths are supported via internal padding and truncation of the last block.
+ *
+ *      Note: Unlike Pythons b85decode, this decoder rejects non-canonical encodings.
  */
 
 #pragma once
@@ -36,19 +38,24 @@
 namespace chip {
 
 /**
- * Returns the Base85 encoded length for a given input length.
- */
-constexpr size_t Base85EncodedLength(size_t inputLength)
-{
-    return (inputLength / 4) * 5 + (inputLength % 4 ? inputLength % 4 + 1 : 0);
-}
-
-/**
  * Returns the decoded length for a given Base85 encoded length.
  */
 constexpr size_t Base85DecodedLength(size_t encodedLength)
 {
-    return (encodedLength / 5) * 4 + (encodedLength % 5 ? encodedLength % 5 - 1 : 0);
+    const size_t remainder = encodedLength % 5;
+    return (encodedLength / 5) * 4 + (remainder ? remainder - 1 : 0);
+}
+
+/**
+ * Returns the Base85 encoded length for a given input length, or SIZE_MAX
+ * if inputLength would require an encoded size longer than SIZE_MAX.
+ */
+constexpr size_t Base85EncodedLength(size_t inputLength)
+{
+    constexpr size_t maxInputLength = Base85DecodedLength(SIZE_MAX);
+    VerifyOrReturnValue(inputLength < maxInputLength, SIZE_MAX);
+    const size_t remainder = inputLength % 4;
+    return (inputLength / 4) * 5 + (remainder ? remainder + 1 : 0);
 }
 
 /**
@@ -59,20 +66,26 @@ constexpr size_t Base85DecodedLength(size_t encodedLength)
  * @param dest      Output buffer for the encoded string.
  * @param destSize  Size of the output buffer (must be >= Base85EncodedLength(srcSize)).
  *
+ * Note: src and dest must not overlap
+ *
  * @retval CHIP_ERROR_BUFFER_TOO_SMALL if the output buffer is too small.
  */
 CHIP_ERROR BytesToBase85(const uint8_t * src, size_t srcSize, char * dest, size_t destSize);
 
 /**
- * Decode a Base85 string to bytes. Supports decode in place (dest == src).
+ * Decode a Base85 string to bytes.
  *
  * @param src       Input Base85 string.
  * @param srcSize   Length of the input string.
  * @param dest      Output buffer for decoded bytes.
  * @param destSize  Size of the output buffer (must be >= Base85DecodedLength(srcSize)).
  *
+ * Note: src and dest must not overlap, except for the special case of
+ * in-place decoding (dest == src), which is supported.
+ *
  * @retval CHIP_ERROR_BUFFER_TOO_SMALL if the output buffer is too small.
- * @retval CHIP_ERROR_INVALID_ARGUMENT if the input contains invalid characters or has an invalid length.
+ * @retval CHIP_ERROR_INVALID_ARGUMENT if the input contains invalid characters, has an
+ *                                     invalid length, or invalid (non-canonical) padding.
  */
 CHIP_ERROR Base85ToBytes(const char * src, size_t srcSize, uint8_t * dest, size_t destSize);
 
