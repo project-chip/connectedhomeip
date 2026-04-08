@@ -6802,7 +6802,7 @@ endpoint 0 {
     ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 0x2710;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 }
 endpoint 1 {
@@ -6849,7 +6849,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;
@@ -6866,7 +6866,7 @@ endpoint 1 {
     ram      attribute onLevel default = 0xFF;
     persist  attribute startUpCurrentLevel default = 255;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command MoveToLevel;
     handle command Move;
@@ -7029,7 +7029,7 @@ endpoint 1 {
     ram      attribute capacity;
     ram      attribute operationMode default = 0x00;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
   }
 
   server cluster Thermostat {
@@ -7049,7 +7049,7 @@ endpoint 1 {
     ram      attribute percentSetting default = 0x00;
     ram      attribute percentCurrent default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 0x0006;
   }
 
   server cluster ThermostatUserInterfaceConfiguration {
@@ -7066,7 +7066,7 @@ endpoint 1 {
     ram      attribute enhancedColorMode default = 0x01;
     ram      attribute colorCapabilities default = 0x1F;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 7;
+    ram      attribute clusterRevision default = 0x0009;
   }
 
   server cluster BallastConfiguration {
@@ -7103,7 +7103,7 @@ endpoint 1 {
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster FlowMeasurement {
@@ -7111,7 +7111,7 @@ endpoint 1 {
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster RelativeHumidityMeasurement {
@@ -7119,7 +7119,7 @@ endpoint 1 {
     ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 0x2710;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster OccupancySensing {
@@ -7390,7 +7390,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0000;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;

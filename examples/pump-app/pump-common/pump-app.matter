@@ -2410,7 +2410,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;
@@ -2427,7 +2427,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command MoveToLevel;
     handle command Move;
@@ -2488,7 +2488,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 31;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 0x0005;
   }
 
   server cluster TemperatureMeasurement {
@@ -2517,7 +2517,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 
   server cluster FlowMeasurement {
@@ -2529,7 +2529,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 }
 

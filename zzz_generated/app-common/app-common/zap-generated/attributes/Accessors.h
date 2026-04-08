@@ -285,20 +285,14 @@ namespace Attributes {
 
 namespace SetupURL {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::MutableCharSpan & value); // long_char_string
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::CharSpan value, MarkAttributeDirty markDirty);
 } // namespace SetupURL
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
 } // namespace FeatureMap
 
 namespace ClusterRevision {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
 } // namespace ClusterRevision
 
 } // namespace Attributes
@@ -3327,6 +3321,95 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace Attributes
 } // namespace ThermostatUserInterfaceConfiguration
 
+namespace Humidistat {
+namespace Attributes {
+
+namespace Mode {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum * value); // ModeEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace Mode
+
+namespace SystemState {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::app::Clusters::Humidistat::SystemStateEnum * value); // SystemStateEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Humidistat::SystemStateEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Humidistat::SystemStateEnum value,
+                                        MarkAttributeDirty markDirty);
+} // namespace SystemState
+
+namespace UserSetpoint {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * value); // percent
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty);
+} // namespace UserSetpoint
+
+namespace MinSetpoint {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * value); // percent
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty);
+} // namespace MinSetpoint
+
+namespace MaxSetpoint {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * value); // percent
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty);
+} // namespace MaxSetpoint
+
+namespace Step {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * value); // percent
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty);
+} // namespace Step
+
+namespace TargetSetpoint {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::Percent * value); // percent
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::Percent value, MarkAttributeDirty markDirty);
+} // namespace TargetSetpoint
+
+namespace MistType {
+Protocols::InteractionModel::Status Get(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> * value); // MistTypeBitmap
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Humidistat::MistTypeBitmap> value,
+                                        MarkAttributeDirty markDirty);
+} // namespace MistType
+
+namespace Continuous {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace Continuous
+
+namespace Sleep {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace Sleep
+
+namespace Optimal {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace Optimal
+
+namespace FeatureMap {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace Humidistat
+
 namespace ColorControl {
 namespace Attributes {
 
@@ -5028,32 +5111,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 } // namespace EcosystemInformation
 
 namespace CommissionerControl {
-namespace Attributes {
-
-namespace SupportedDeviceCategories {
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> *
-                                            value); // SupportedDeviceCategoryBitmap
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::CommissionerControl::SupportedDeviceCategoryBitmap> value,
-    MarkAttributeDirty markDirty);
-} // namespace SupportedDeviceCategories
-
-namespace FeatureMap {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace ClusterRevision
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 } // namespace CommissionerControl
 
 namespace JointFabricDatastore {

@@ -1938,7 +1938,7 @@ endpoint 1 {
     ram      attribute offWaitTime default = 0;
     persist  attribute startUpOnOff default = 0xFF;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;

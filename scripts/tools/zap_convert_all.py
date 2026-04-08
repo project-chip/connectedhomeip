@@ -63,14 +63,10 @@ def getTargets():
 def runArgumentsParser():
     parser = argparse.ArgumentParser(
         description='Convert all .zap files to the current zap version')
-    parser.add_argument('--run-bootstrap', default=None, action='store_true',
+    parser.add_argument('--run-bootstrap', action='store_true',
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
-    parser.add_argument('--parallel', action='store_true')
-    parser.add_argument('--no-parallel', action='store_false', dest='parallel')
-    parser.add_argument('--dry-run', action='store_true', dest='dry_run')
-    parser.set_defaults(parallel=True)
-    parser.set_defaults(dry_run=False)
-
+    parser.add_argument('--parallel', action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument('--dry-run', action=argparse.BooleanOptionalAction, default=False)
     return parser.parse_args()
 
 

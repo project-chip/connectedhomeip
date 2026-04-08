@@ -44,6 +44,10 @@ void MatterAccessControlClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterAccessControlClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
 
+void MatterActionsClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterActionsClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);
+
 void MatterBasicInformationClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBasicInformationClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType);

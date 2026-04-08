@@ -90,8 +90,7 @@ tests:
 
     - label:
           "Step 2: Commission each TH device one by one using the parsed payload
-          data in the same order as encoded in the concatenated QR code (left to
-          right)"
+          data"
       verification: |
 
           Commission the TH devices one by one by scanning the combined QR code from Step-1 with the DUT (commissioner device/app).

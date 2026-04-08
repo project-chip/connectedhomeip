@@ -2268,12 +2268,12 @@ endpoint 1 {
 
   server cluster CommissionerControl {
     emits event CommissioningRequestResult;
-    ram      attribute supportedDeviceCategories default = 0;
+    callback attribute supportedDeviceCategories;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command RequestCommissioningApproval;
     handle command CommissionNode;

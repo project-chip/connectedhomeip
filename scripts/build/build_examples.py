@@ -17,17 +17,20 @@
 import json
 import logging
 import os
+import shlex
 import sys
 
 import click
 import coloredlogs
-from builders.builder import BuilderOptions
+from builders.builder import BuilderOptions, BuildProfile
 from runner import PrintOnlyRunner, ShellRunner
+from runner.shell import SubcommandException
 
 import build
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
+log = logging.getLogger(__name__)
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -80,11 +83,21 @@ def ValidateTargetNames(context, parameter, values):
     is_flag=True,
     help='Pass verbose flag to ninja.')
 @click.option(
+    '--quiet',
+    default=False,
+    is_flag=True,
+    help='Pass quiet flag to ninja.')
+@click.option(
     '--target',
     default=[],
     multiple=True,
     callback=ValidateTargetNames,
     help='Build target(s)')
+@click.option(
+    "--build-profile",
+    default=BuildProfile.DEFAULT,
+    type=click.Choice(BuildProfile, case_sensitive=False),
+    help="The build profile to use.")
 @click.option(
     '--enable-link-map-file',
     default=False,
@@ -138,11 +151,12 @@ def ValidateTargetNames(context, parameter, values):
     help='Show timestamps in log output')
 @click.option(
     '--pw-command-launcher',
+    default=None,
     help=(
         'Set pigweed command launcher. E.g.: "--pw-command-launcher=ccache" '
         'for using ccache when building examples.'))
 @click.pass_context
-def main(context, log_level, verbose, target, enable_link_map_file, repo,
+def main(context, log_level, verbose, quiet, target, build_profile, enable_link_map_file, repo,
          out_prefix, ninja_jobs, pregen_dir, clean, dry_run, dry_run_output,
          enable_flashbundle, log_timestamps, pw_command_launcher):
     # Ensures somewhat pretty logging of what is going on
@@ -163,12 +177,13 @@ before running this script.
         runner = ShellRunner(root=repo)
 
     context.obj = build.Context(
-        repository_path=repo, output_prefix=out_prefix, verbose=verbose,
+        repository_path=repo, output_prefix=out_prefix, verbose=verbose, quiet=quiet,
         ninja_jobs=ninja_jobs, runner=runner
     )
 
     requested_targets = {t.lower() for t in target}
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
+        build_profile=build_profile,
         enable_link_map_file=enable_link_map_file,
         enable_flashbundle=enable_flashbundle,
         pw_command_launcher=pw_command_launcher,
@@ -235,7 +250,11 @@ def cmd_targets(context, format, completion_prefix):
     help='Prefix of compressed archives of the generated files.')
 @click.pass_context
 def cmd_build(context, copy_artifacts_to, create_archives):
-    context.obj.Build()
+    try:
+        context.obj.Build()
+    except SubcommandException as e:
+        log.error("Command '%s' failed with error code %d", shlex.join(e.command), e.returncode)
+        sys.exit(1)
 
     if copy_artifacts_to:
         context.obj.CopyArtifactsTo(copy_artifacts_to)

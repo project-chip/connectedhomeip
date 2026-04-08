@@ -9,6 +9,7 @@
 #include <devices/Types.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPMem.h> // For chip::Platform
+#include <lib/support/TypeTraits.h>
 
 using chip::app::DataModel::Nullable;
 
@@ -96,6 +97,21 @@ void InitIdentifyCluster()
 #if MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 #include "application-launch/chef-application-launch-delegate.h"
 #endif // MATTER_DM_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT
+
+#if MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/water-heater-management/chef-water-heater-management.h"
+#endif
+
+#if MATTER_DM_WATER_HEATER_MODE_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/water-heater-mode/chef-water-heater-mode.h"
+#endif
+
+#include "clusters/mode-base/chef-mode-base-default.h"
+
+#if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+#include "clusters/chime/chef-chime-delegate.h"
+#include <app/clusters/chime-server/CodegenIntegration.h>
+#endif
 
 namespace {
 
@@ -393,6 +409,19 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         HandleFanControlAttributeChange(attributeId, type, size, value);
     }
 #endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+#if (MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                       \
+    (MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
+    if (clusterId == Thermostat::Id &&
+        (attributeId == Thermostat::Attributes::OccupiedHeatingSetpoint::Id ||
+         attributeId == Thermostat::Attributes::LocalTemperature::Id ||
+         attributeId == WaterHeaterManagement::Attributes::TankVolume::Id ||
+         attributeId == WaterHeaterManagement::Attributes::TankPercentage::Id) &&
+        DeviceTypes::EndpointHasDeviceType(1, Device::kWaterHeaterDeviceTypeId))
+    {
+        MatterReportingAttributeChangeCallback(attributePath.mEndpointId, WaterHeaterManagement::Id,
+                                               WaterHeaterManagement::Attributes::EstimatedHeatRequired::Id);
+    }
+#endif
 }
 
 /** @brief OnOff Cluster Init
@@ -672,6 +701,62 @@ void CastingvideoplayerContentappInit()
 #endif
 }
 
+/*
+ * This initializer is for the water heater application rootnode_waterheater_21bd13d651. To not have this initialiser
+ * affect new water heater applications, use different endpoints.
+ */
+void WaterHeaterInit()
+{
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: WaterHeaterInit called more than once");
+    called = true;
+
+#if (MATTER_DM_WATER_HEATER_MANAGEMENT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) &&                                                       \
+    (MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT > 0) && (MATTER_DM_WATER_HEATER_MODE_CLUSTER_SERVER_ENDPOINT_COUNT > 0)
+    if (!DeviceTypes::EndpointHasDeviceType(1, Device::kWaterHeaterDeviceTypeId))
+    {
+        return;
+    }
+    // WaterHeaterManagement initialisation
+    static WaterHeaterManagement::Chef::ChefDelegate delegate;
+    delegate.SetEndpointId(1);
+    static WaterHeaterManagement::Instance instance(
+        1, delegate,
+        WaterHeaterManagement::Feature(to_underlying(WaterHeaterManagement::Feature::kTankPercent) |
+                                       to_underlying(WaterHeaterManagement::Feature::kEnergyManagement)));
+    VerifyOrDieWithMsg(instance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterManagement instance.");
+
+    // WaterHeaterMode initialisation
+    uint32_t WaterHeaterModefeatureMap = 0;
+    static ModeBase::DefaultChefDelegate WaterHeaterModeDelegate(WaterHeaterMode::Chef::kSupportedModes);
+    static ModeBase::Instance WaterHeaterModeInstance(&WaterHeaterModeDelegate, 1, WaterHeaterMode::Id, WaterHeaterModefeatureMap);
+    VerifyOrDieWithMsg(WaterHeaterModeInstance.Init() == CHIP_NO_ERROR, Zcl, "Failed to initialise WaterHeaterMode instance.");
+#endif
+}
+
+/**
+ * This initializer is for the chime application.
+ */
+void ChimeInit()
+{
+    static bool called = false;
+    VerifyOrDieWithMsg(!called, Zcl, "Error: ChimeInit called more than once");
+    called = true;
+#if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT > 0
+    if (DeviceTypes::EndpointHasDeviceType(1, Device::kChimeDeviceTypeId))
+    {
+        static auto * delegate  = Platform::New<Chime::ChefChimeDelegate>();
+        static auto chimeServer = Platform::New<ChimeServer>(1, *delegate);
+        VerifyOrDieWithMsg(chimeServer->Init() == CHIP_NO_ERROR, Zcl, "Error: ChimeServer::Init failed");
+        uint8_t defaultChimeID = 0;
+        VerifyOrDieWithMsg(delegate->GetChimeIDByIndex(0, defaultChimeID) == CHIP_NO_ERROR, Zcl,
+                           "Initialisation Error: Failed to get chime ID from chef delegate");
+        VerifyOrDieWithMsg(chimeServer->SetSelectedChime(defaultChimeID) == Protocols::InteractionModel::Status::Success, Zcl,
+                           "Initialisation Error: Failed to set default chime ID to %d", defaultChimeID);
+    }
+#endif // #if MATTER_DM_CHIME_CLUSTER_SERVER_ENDPOINT_COUNT
+}
+
 void ApplicationInit()
 {
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
@@ -681,6 +766,8 @@ void ApplicationInit()
     GenericSwitchInit();
     LaundryDryerInit();
     CastingvideoplayerContentappInit();
+    WaterHeaterInit();
+    ChimeInit();
 
 #ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
