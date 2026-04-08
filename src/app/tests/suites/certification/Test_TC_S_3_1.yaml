@@ -192,7 +192,34 @@ tests:
       verification: |
           If the Groupcast cluster is enabled on the RootNode endpoint, TH sends Groupcast LeaveGroup command with GroupID 0. Otherwise, TH sends RemoveAllGroups:
 
-            ./chip-tool groupcast leave-group 0 1 0
+          ./chip-tool groupcast leave-group 0 1 0
+
+          Verify the LeaveGroup command On TH (all-Clusters-app) log and below is the sample log provided for the raspi platform:
+
+          [1775017039.839] [41820:41820] [DMG] InvokeRequestMessage =
+          [1775017039.839] [41820:41820] [DMG] {
+          [1775017039.839] [41820:41820] [DMG]         suppressResponse = false, 
+          [1775017039.839] [41820:41820] [DMG]         timedRequest = false, 
+          [1775017039.839] [41820:41820] [DMG]         InvokeRequests =
+          [1775017039.839] [41820:41820] [DMG]         [
+          [1775017039.839] [41820:41820] [DMG]                 CommandDataIB =
+          [1775017039.839] [41820:41820] [DMG]                 {
+          [1775017039.839] [41820:41820] [DMG]                         CommandPathIB =
+          [1775017039.839] [41820:41820] [DMG]                         {
+          [1775017039.839] [41820:41820] [DMG]                                 EndpointId = 0x0,
+          [1775017039.839] [41820:41820] [DMG]                                 ClusterId = 0x65,
+          [1775017039.839] [41820:41820] [DMG]                                 CommandId = 0x1,
+          [1775017039.839] [41820:41820] [DMG]                         },
+          [1775017039.839] [41820:41820] [DMG]                         
+          [1775017039.839] [41820:41820] [DMG]                         CommandFields = 
+          [1775017039.839] [41820:41820] [DMG]                         {
+          [1775017039.839] [41820:41820] [DMG]                                 0x0 = 0 (unsigned), 
+          [1775017039.839] [41820:41820] [DMG]                         },
+          [1775017039.839] [41820:41820] [DMG]                 },
+          [1775017039.839] [41820:41820] [DMG]                 
+          [1775017039.839] [41820:41820] [DMG]         ],
+
+            
           or:
             ./chip-tool groups remove-all-groups 1 1
 
@@ -233,7 +260,38 @@ tests:
           If the Groupcast cluster is enabled on the RootNode endpoint, TH sends Groupcast JoinGroup command with GroupID, Endpoints, and KeySetID. Otherwise, TH sends AddGroup:
 
           Please execute the below commands before starting the test case :
-          ./chip-tool groupcast join-group 0x01 [1] 0x01a1
+          ./chip-tool groupcast join-group 0x01 [1] 0x01a1 1 0
+
+          [1775017376.714] [41820:41820] [DMG] InvokeRequestMessage =
+          [1775017376.714] [41820:41820] [DMG] {
+          [1775017376.714] [41820:41820] [DMG]         suppressResponse = false, 
+          [1775017376.714] [41820:41820] [DMG]         timedRequest = false, 
+          [1775017376.714] [41820:41820] [DMG]         InvokeRequests =
+          [1775017376.714] [41820:41820] [DMG]         [
+          [1775017376.714] [41820:41820] [DMG]                 CommandDataIB =
+          [1775017376.714] [41820:41820] [DMG]                 {
+          [1775017376.714] [41820:41820] [DMG]                         CommandPathIB =
+          [1775017376.714] [41820:41820] [DMG]                         {
+          [1775017376.714] [41820:41820] [DMG]                                 EndpointId = 0x0,
+          [1775017376.714] [41820:41820] [DMG]                                 ClusterId = 0x65,
+          [1775017376.714] [41820:41820] [DMG]                                 CommandId = 0x0,
+          [1775017376.714] [41820:41820] [DMG]                         },
+          [1775017376.714] [41820:41820] [DMG]                         
+          [1775017376.714] [41820:41820] [DMG]                         CommandFields = 
+          [1775017376.714] [41820:41820] [DMG]                         {
+          [1775017376.714] [41820:41820] [DMG]                                 0x0 = 1 (unsigned), 
+          [1775017376.714] [41820:41820] [DMG]                                 0x1 = [
+          [1775017376.714] [41820:41820] [DMG]                                                 1 (unsigned), 
+          [1775017376.714] [41820:41820] [DMG]                                 ],
+          [1775017376.714] [41820:41820] [DMG]                                 0x2 = 417 (unsigned), 
+          [1775017376.714] [41820:41820] [DMG]                         },
+          [1775017376.714] [41820:41820] [DMG]                 },
+          [1775017376.714] [41820:41820] [DMG]                 
+          [1775017376.714] [41820:41820] [DMG]         ],
+          [1775017376.714] [41820:41820] [DMG]         
+          [1775017376.714] [41820:41820] [DMG]         InteractionModelRevision = 12
+          [1775017376.714] [41820:41820] [DMG] },
+
           or:
           ./chip-tool groups add-group 0x01 Gp1 1 1
 
