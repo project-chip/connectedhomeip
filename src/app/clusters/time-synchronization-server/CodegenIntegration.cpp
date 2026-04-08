@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/time-synchronization-server/CodegenIntegration.h>
 #include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
@@ -82,12 +83,19 @@ public:
             VerifyOrDie(SupportsDNSResolve::Get(endpointId, &ntpServerAvailable) == Status::Success);
         }
 
-        gServer.Create(endpointId, featureMap, optionalAttributeSet,
-                       TimeSynchronizationCluster::StartupConfiguration{ .supportsDNSResolve = supportsDNSResolve,
-                                                                         .ntpServerAvailable = ntpServerAvailable,
-                                                                         .timeZoneDatabase   = timeZoneDatabase,
-                                                                         .timeSource         = timeSource,
-                                                                         .delegate = TimeSynchronization::GetDefaultDelegate() });
+        TimeSynchronizationCluster::StartupConfiguration startupConfiguration = { .supportsDNSResolve = supportsDNSResolve,
+                                                                                  .ntpServerAvailable = ntpServerAvailable,
+                                                                                  .timeZoneDatabase   = timeZoneDatabase,
+                                                                                  .timeSource         = timeSource,
+                                                                                  .delegate =
+                                                                                      TimeSynchronization::GetDefaultDelegate() };
+
+        TimeSynchronizationCluster::Context context = { .fabricTable            = Server::GetInstance().GetFabricTable(),
+                                                        .caseSessionManager     = *Server::GetInstance().GetCASESessionManager(),
+                                                        .platformManager        = DeviceLayer::PlatformMgr(),
+                                                        .interactionModelEngine = *InteractionModelEngine::GetInstance() };
+
+        gServer.Create(endpointId, featureMap, optionalAttributeSet, startupConfiguration, context);
         return gServer.Registration();
     }
 

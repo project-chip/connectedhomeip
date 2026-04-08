@@ -16,6 +16,7 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -46,6 +47,10 @@ struct TestTimeSynchronizationCluster : public ::testing::Test
 
     TestServerClusterContext testContext;
     TimeSynchronization::DefaultTimeSyncDelegate delegate;
+    const TimeSynchronizationCluster::Context context = { .fabricTable            = Server::GetInstance().GetFabricTable(),
+                                                          .caseSessionManager     = *Server::GetInstance().GetCASESessionManager(),
+                                                          .platformManager        = DeviceLayer::PlatformMgr(),
+                                                          .interactionModelEngine = *InteractionModelEngine::GetInstance() };
 };
 
 } // namespace
@@ -54,9 +59,9 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 {
     {
         const BitFlags<Feature> features{ 0U };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
@@ -73,7 +78,8 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
         optionalAttributeSet.Set<TimeSource::Id>();
         const BitFlags<Feature> features{ 0U };
         TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features, optionalAttributeSet,
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate },
+                                                       context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
@@ -88,9 +94,9 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kTimeSyncClient };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
@@ -105,9 +111,9 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kNTPClient };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
@@ -123,9 +129,9 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kNTPServer };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
@@ -140,9 +146,9 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kTimeZone };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ASSERT_TRUE(IsAttributesListEqualTo(timeSynchronization,
@@ -165,9 +171,9 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
 {
     {
         const BitFlags<Feature> features{ 0U };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -192,7 +198,8 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
         optionalAttributeSet.Set<TimeSource::Id>();
         const BitFlags<Feature> features{ 0U };
         TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features, optionalAttributeSet,
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate },
+                                                       context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -217,9 +224,9 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kTimeSyncClient };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -244,9 +251,9 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kNTPClient };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -274,9 +281,9 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kNTPServer };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -301,9 +308,9 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kTimeZone };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
-                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
-                                                       TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate });
+        TimeSynchronizationCluster timeSynchronization(
+            kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+            TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate }, context);
         ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
