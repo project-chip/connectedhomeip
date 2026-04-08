@@ -44,7 +44,8 @@ uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // We don't need to check for precision loss since the max value of the IdleModeDuration can fit inside a uint16_t
     const auto idleModeDuration =
-        std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetModeBasedIdleModeDuration()).count();
+        std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetModeBasedIdleModeDuration())
+            .count();
     return std::max(idleModeDuration, kSubscriptionMaxIntervalPublisherLimit);
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
