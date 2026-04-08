@@ -175,7 +175,7 @@ class TC_SC_5_2(MatterBaseTest):
             group_feature_map = await self.read_single_attribute_check_success(
                 cluster=Clusters.Groups,
                 attribute=Clusters.Groups.Attributes.FeatureMap,
-                endpoint=0)
+                endpoint=groups_endpoint)
             group_names_supported = bool(group_feature_map & Clusters.Groups.Bitmaps.Feature.kGroupNames)
 
             # Step 7: ViewGroup 0x0101 with GroupNames
