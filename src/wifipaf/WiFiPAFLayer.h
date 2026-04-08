@@ -183,6 +183,12 @@ public:
      *  been received from the peer.  This is the earliest safe point to tear
      *  down NAN after WiFi connects without risking loss of in-flight data. */
     void ScheduleCancelPublishersOnTxIdle(OnCancelDeviceHandle cb);
+
+    /** Drive any pending standalone ACKs on all active PAFTP endpoints.
+     *  Call this before blocking the event loop (e.g. synchronous D-Bus calls
+     *  during WiFi association) so that the remote peer's ack-recv timer does
+     *  not expire while the loop is frozen. */
+    void FlushPendingAcks();
     bool OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
     CHIP_ERROR OnWiFiPAFMsgRxComplete(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
     State GetWiFiPAFState() { return mAppState; };

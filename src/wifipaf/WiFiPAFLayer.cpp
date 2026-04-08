@@ -280,6 +280,13 @@ bool WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::Pac
     // peer, so tearing down NAN cannot cause packet loss.
     if (mCancelPublishersOnTxIdle && endPoint->mSendQueue.IsNull() && !endPoint->mPafTP.ExpectingAck())
     {
+        // Stop the send-ack timer before tearing down the publisher.  The just-
+        // received packet started the send-ack timer to ACK the peer's sequence
+        // number.  If we cancel the publisher without stopping that timer, the
+        // timer fires ~2.5 s later with no active NAN publish slot, causing
+        // "failed to transmit follow-up" and a spurious PAF session shutdown.
+        endPoint->StopSendAckTimer();
+
         ChipLogProgress(WiFiPAF, "PAFTP tx idle after WiFi connect: cancelling NAN publishers");
         mCancelPublishersOnTxIdle = false;
         OnCancelDeviceHandle cb   = mCancelPublishersCallback;
@@ -426,6 +433,28 @@ void WiFiPAFLayer::ScheduleCancelPublishersOnTxIdle(OnCancelDeviceHandle cb)
 {
     mCancelPublishersOnTxIdle  = true;
     mCancelPublishersCallback  = cb;
+}
+
+void WiFiPAFLayer::FlushPendingAcks()
+{
+    // Drive any pending standalone ACKs on all active PAFTP endpoints before
+    // the event loop is about to block on synchronous D-Bus calls (e.g. during
+    // WiFi network association).  This prevents the peer's ack-recv timer from
+    // expiring while the event loop is frozen.
+    for (size_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+    {
+        WiFiPAFEndPoint * ep = sWiFiPAFEndPointPool.Get(i);
+        if (ep != nullptr && ep->IsConnected(ep->mState) &&
+            ep->mTimerStateFlags.Has(WiFiPAFEndPoint::TimerStateFlag::kSendAckTimerRunning))
+        {
+            ChipLogProgress(WiFiPAF, "FlushPendingAcks: driving stand-alone ack on ep %p", ep);
+            CHIP_ERROR err = ep->DriveStandAloneAck();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(WiFiPAF, "FlushPendingAcks: DriveStandAloneAck failed: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+        }
+    }
 }
 
 void WiFiPAFLayer::CancelAllPublisherSessions(OnCancelDeviceHandle OnCancelDevice)

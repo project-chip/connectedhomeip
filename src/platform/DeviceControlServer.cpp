@@ -66,10 +66,30 @@ exit:
 
 CHIP_ERROR DeviceControlServer::PostConnectedToOperationalNetworkEvent(ByteSpan networkID)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // Under WiFiPAF the device must deliver ConnectNetworkResponse via NAN
+    // (PAF) before the mDNS burst that kOperationalNetworkEnabled triggers.
+    // Firing mDNS immediately causes a large Avahi burst that occupies the
+    // shared radio and prevents the NAN Follow-up from being received by the
+    // proxy.  Defer by 5 s to give the PAF exchange time to complete first.
+    return DeviceLayer::SystemLayer().StartTimer(
+        System::Clock::Seconds32(5),
+        [](System::Layer *, void *) {
+            ChipDeviceEvent ev{ .Type               = DeviceEventType::kOperationalNetworkEnabled,
+                                .OperationalNetwork = { .network = 0 } };
+            CHIP_ERROR err = PlatformMgr().PostEvent(&ev);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Deferred kOperationalNetworkEnabled: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+        },
+        nullptr);
+#else
     ChipDeviceEvent event{ .Type = DeviceEventType::kOperationalNetworkEnabled,
                            // TODO(cecille): This should be some way to specify thread or wifi.
                            .OperationalNetwork = { .network = 0 } };
     return PlatformMgr().PostEvent(&event);
+#endif
 }
 
 CHIP_ERROR DeviceControlServer::PostCloseAllBLEConnectionsToOperationalNetworkEvent()

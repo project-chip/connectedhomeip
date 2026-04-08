@@ -331,6 +331,12 @@ private:
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
     CHIP_ERROR StartWiFiManagementSync();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // Handler ID for the nandiscovery-result signal connected by _WiFiPAFSubscribe
+    // (connect path).  Disconnected once a session match is found so that
+    // subsequent discovery callbacks from the same publisher do not flood the
+    // event loop.  The wpa_supplicant subscribe slot itself is left active so
+    // NAN Follow-up frames can still be sent.
+    gulong mConnectDiscoverySignalId = 0;
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
     OnConnectionErrorFunct mOnPafSubscribeError;
     WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;

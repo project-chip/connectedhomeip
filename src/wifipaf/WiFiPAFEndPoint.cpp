@@ -602,7 +602,16 @@ CHIP_ERROR WiFiPAFEndPoint::DriveSending()
         return CHIP_NO_ERROR;
     }
 
-    if (!mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFResourceAvailable() && (!mAckToSend.IsNull() || !mSendQueue.IsNull()))
+    // Standalone ACKs bypass the resource-unavailable gate so that the peer's
+    // ack-recv timer does not expire while WiFi association monopolises the radio
+    // (mPafChannelAvailable = false).  Data sends are still deferred.
+    // _WiFiPAFSend does not propagate NAN send failures as CHIP errors, so an
+    // attempted ACK during the busy window fails silently at worst; if it
+    // succeeds it resets the peer's 30-second ack-recv timer.
+    const bool hasPendingStandaloneAck =
+        !mAckToSend.IsNull() && !mConnStateFlags.Has(ConnectionStateFlag::kStandAloneAckInFlight);
+    if (!mWiFiPafLayer->mWiFiPAFTransport->WiFiPAFResourceAvailable() && !hasPendingStandaloneAck &&
+        (!mAckToSend.IsNull() || !mSendQueue.IsNull()))
     {
         // Resource is currently unavailable, send packets later
         return StartWaitResourceTimer();
