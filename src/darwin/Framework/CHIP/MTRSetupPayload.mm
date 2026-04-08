@@ -97,14 +97,14 @@ static uint8_t ValidateVendorTag(NSNumber * tag)
     return @(_info->tag);
 }
 
-- (NSNumber *)integerValue
+- (nullable NSNumber *)integerValue
 {
     return _info->visitValue([](const std::string &) -> NSNumber * { return nil; },
         [](int64_t v) -> NSNumber * { return @(v); },
         [](uint64_t v) -> NSNumber * { return @(v); });
 }
 
-- (NSString *)stringValue
+- (nullable NSString *)stringValue
 {
     return _info->visitValue([](const std::string & v) -> NSString * { return [NSString stringWithUTF8String:v.c_str()]; },
         [](int64_t) -> NSString * { return nil; },
@@ -478,7 +478,7 @@ MTR_DIRECT_MEMBERS
     return infos;
 }
 
-- (MTROptionalQRCodeInfo *)vendorElementWithTag:(NSNumber *)tag
+- (nullable MTROptionalQRCodeInfo *)vendorElementWithTag:(NSNumber *)tag
 {
     std::optional<chip::OptionalQRCodeInfo> element = _payload.getOptionalVendorData(ValidateVendorTag(tag));
     VerifyOrReturnValue(element.has_value(), nil);

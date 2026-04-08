@@ -228,36 +228,69 @@ CHIP_ERROR SetupPayload::addOptionalVendorData(const OptionalQRCodeInfo & info)
     return CHIP_NO_ERROR;
 }
 
+namespace {
+
+enum class ValueType
+{
+    String,
+    SignedInt,
+    UnsignedInt,
+};
+
+bool contains(const std::vector<ValueType> & vector, ValueType value)
+{
+    return std::find(vector.cbegin(), vector.cend(), value) != vector.cend();
+}
+
+bool isValidValueForCommonTag(const OptionalQRCodeInfo & info)
+{
+    static const std::map<uint8_t, std::vector<ValueType>> knownCommonTags = {
+        { kSerialNumberTag, { ValueType::String, ValueType::UnsignedInt } },
+        { kPBKDFIterationsTag, { ValueType::UnsignedInt } },
+        { kPBKFSaltTag, { ValueType::String } },
+        { kNumberOFDevicesTag, { ValueType::UnsignedInt } },
+        { kCommissioningTimeoutTag, { ValueType::UnsignedInt } }
+    };
+
+    const auto & knownTag = knownCommonTags.find(info.tag);
+
+    // We're lenient for tags that are reserved for future use, for forward-compatibility reasons.
+    if (knownTag == knownCommonTags.cend())
+    {
+        return true;
+    }
+
+    const auto & validTypes = knownTag->second;
+    return info.visitValue([&](const std::string &) { return contains(validTypes, ValueType::String); },
+                           [&](int64_t) { return contains(validTypes, ValueType::SignedInt); },
+                           [&](uint64_t v) {
+                               if (!contains(validTypes, ValueType::UnsignedInt))
+                               {
+                                   return false;
+                               }
+                               if (info.tag == kSerialNumberTag)
+                               {
+                                   return CanCastTo<uint32_t>(v);
+                               }
+                               if (info.tag == kPBKDFIterationsTag)
+                               {
+                                   return Crypto::kSpake2p_Min_PBKDF_Iterations <= v && v <= Crypto::kSpake2p_Max_PBKDF_Iterations;
+                               }
+                               if (info.tag == kNumberOFDevicesTag)
+                               {
+                                   return 0 < v && v <= 255;
+                               }
+                               return true;
+                           });
+}
+
+} // namespace
+
 CHIP_ERROR SetupPayload::addOptionalExtensionData(const OptionalQRCodeInfo & info)
 {
     VerifyOrReturnError(IsCommonTag(info.tag), CHIP_ERROR_INVALID_ARGUMENT);
 
-    // We're lenient for tags that are reserved for future use, for forward-compatibility reasons.
-    bool validValue = info.visitValue(
-        [&](const std::string & v) {
-            return !(info.tag == kPBKDFIterationsTag || info.tag == kNumberOFDevicesTag || info.tag == kCommissioningTimeoutTag);
-        },
-        [&](int64_t v) {
-            return !(info.tag == kSerialNumberTag || info.tag == kPBKDFIterationsTag || info.tag == kPBKFSaltTag ||
-                     info.tag == kNumberOFDevicesTag || info.tag == kCommissioningTimeoutTag);
-        },
-        [&](uint64_t v) {
-            if (info.tag == kSerialNumberTag)
-            {
-                return CanCastTo<uint32_t>(v);
-            }
-            if (info.tag == kPBKDFIterationsTag)
-            {
-                return Crypto::kSpake2p_Min_PBKDF_Iterations <= v && v <= Crypto::kSpake2p_Max_PBKDF_Iterations;
-            }
-            if (info.tag == kNumberOFDevicesTag)
-            {
-                return 0 < v && v <= 255;
-            }
-            return info.tag != kPBKFSaltTag;
-        });
-    // It is not clearly specified whether this should return an error, or simply ignore.
-    VerifyOrReturnError(validValue, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(isValidValueForCommonTag(info), CHIP_ERROR_INVALID_ARGUMENT);
 
     optionalExtensionData.insert_or_assign(info.tag, info);
 
