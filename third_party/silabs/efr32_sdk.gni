@@ -543,9 +543,7 @@ template("efr32_sdk") {
     }
 
     if (defined(invoker.chip_enable_thread) && invoker.chip_enable_thread) {
-      defines += [
-        "SL_OT_ENABLE=1",
-      ]
+      defines += [ "SL_OT_ENABLE=1" ]
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
