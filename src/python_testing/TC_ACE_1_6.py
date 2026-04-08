@@ -225,7 +225,7 @@ class TC_ACE_1_6(MatterBaseTest):
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[th1_nodeid],
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.AccessControl.id)]
-        ) 
+        )
 
         if gc_on_root:
             # Cluster on ep1 with modified attributes (using OnOff as example)
@@ -240,7 +240,7 @@ class TC_ACE_1_6(MatterBaseTest):
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
             subjects=[groupID3],
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=target_endpoint, cluster=target_cluster)])
-        
+
         acl_entries = [acl_admin, acl_group]
         if gc_on_root:
             groupcast_admin = Clusters.AccessControl.Structs.AccessControlEntryStruct(
