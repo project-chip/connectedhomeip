@@ -7677,6 +7677,73 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster specifies an interface to control the humidity of an environment. */
+provisional cluster Humidistat = 517 {
+  revision 1;
+
+  enum ModeEnum : enum8 {
+    kOff = 0;
+    kHumidifier = 1;
+    kDehumidifier = 2;
+    kAuto = 3;
+    kFanOnly = 4;
+  }
+
+  enum SystemStateEnum : enum8 {
+    kOff = 0;
+    kHumidifying = 1;
+    kDehumidifying = 2;
+    kFan = 3;
+    kIdle = 4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kHumidifier = 0x1;
+    kDehumidifier = 0x2;
+    kContinuous = 0x4;
+    kSensor = 0x8;
+    kAuto = 0x10;
+    kFanOnly = 0x20;
+    kOptimal = 0x40;
+    kWarmMist = 0x80;
+    kColdMist = 0x100;
+  }
+
+  bitmap MistTypeBitmap : bitmap8 {
+    kMistCold = 0x1;
+    kMistWarm = 0x2;
+  }
+
+  readonly attribute ModeEnum mode = 0;
+  readonly attribute SystemStateEnum systemState = 1;
+  readonly attribute optional percent userSetpoint = 2;
+  readonly attribute optional percent minSetpoint = 3;
+  readonly attribute optional percent maxSetpoint = 4;
+  readonly attribute optional percent step = 5;
+  readonly attribute optional percent targetSetpoint = 6;
+  readonly attribute optional MistTypeBitmap mistType = 7;
+  readonly attribute optional boolean continuous = 8;
+  readonly attribute optional boolean sleep = 9;
+  readonly attribute optional boolean optimal = 10;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetSettingsRequest {
+    optional percent userSetpoint = 0;
+    optional ModeEnum mode = 1;
+    optional MistTypeBitmap mistType = 2;
+    optional boolean continuous = 3;
+    optional boolean sleep = 4;
+    optional boolean optimal = 5;
+  }
+
+  /** This command will set the specified settings to new values. */
+  command SetSettings(SetSettingsRequest): DefaultSuccess = 0;
+}
+
 /** Attributes and commands for controlling the color properties of a color-capable light. */
 cluster ColorControl = 768 {
   revision 9;
