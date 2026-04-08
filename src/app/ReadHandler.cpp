@@ -44,7 +44,7 @@ uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // We don't need to check for precision loss since the max value of the IdleModeDuration can fit inside a uint16_t
     const auto idleModeDuration =
-        std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
+        std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetModeBasedIdleModeDuration()).count();
     return std::max(idleModeDuration, kSubscriptionMaxIntervalPublisherLimit);
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
@@ -781,7 +781,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
     // Per spec and static checks, GetIdleModeDuration max value fits a uint16_t.
     // The final selected interval must be a uint16_t but we use a uint32 here during calculation to prevent overflows.
-    uint32_t preferredMaxInterval = ICDConfigurationData::GetInstance().GetIdleModeDuration().count();
+    uint32_t preferredMaxInterval = ICDConfigurationData::GetInstance().GetModeBasedIdleModeDuration().count();
     // Determine the max interval ceiling between GetPublisherSelectedIntervalLimit
     // and the subscriber-requested MaxInterval.
     uint16_t maxIntervalCeiling = std::max(GetPublisherSelectedIntervalLimit(), mMaxInterval);
