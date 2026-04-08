@@ -148,7 +148,7 @@ tests:
               - name: "GroupID"
                 value: G1
               - name: "Endpoints"
-                value: [1]
+                value: [endpoint]
               - name: "KeySetID"
                 value: 0x01a1
 
@@ -1531,7 +1531,7 @@ tests:
               - name: "GroupID"
                 value: G2
               - name: "Endpoints"
-                value: [1]
+                value: [endpoint]
               - name: "KeySetID"
                 value: 0x01a1
 
