@@ -1656,6 +1656,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRHumidistatClusterSetSettingsParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRColorControlClusterMoveToHueParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

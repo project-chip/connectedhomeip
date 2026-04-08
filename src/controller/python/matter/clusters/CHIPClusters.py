@@ -9215,6 +9215,122 @@ class ChipClusters:
             },
         },
     }
+    _HUMIDISTAT_CLUSTER_INFO = {
+        "clusterName": "Humidistat",
+        "clusterId": 0x00000205,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "SetSettings",
+                "args": {
+                    "userSetpoint": "int",
+                    "mode": "int",
+                    "mistType": "int",
+                    "continuous": "bool",
+                    "sleep": "bool",
+                    "optimal": "bool",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Mode",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "SystemState",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "UserSetpoint",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "MinSetpoint",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "MaxSetpoint",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "Step",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "TargetSetpoint",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "MistType",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "Continuous",
+                "attributeId": 0x00000008,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000009: {
+                "attributeName": "Sleep",
+                "attributeId": 0x00000009,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x0000000A: {
+                "attributeName": "Optimal",
+                "attributeId": 0x0000000A,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _COLOR_CONTROL_CLUSTER_INFO = {
         "clusterName": "ColorControl",
         "clusterId": 0x00000300,
@@ -16112,6 +16228,7 @@ class ChipClusters:
         0x00000201: _THERMOSTAT_CLUSTER_INFO,
         0x00000202: _FAN_CONTROL_CLUSTER_INFO,
         0x00000204: _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
+        0x00000205: _HUMIDISTAT_CLUSTER_INFO,
         0x00000300: _COLOR_CONTROL_CLUSTER_INFO,
         0x00000301: _BALLAST_CONFIGURATION_CLUSTER_INFO,
         0x00000400: _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO,
@@ -16258,6 +16375,7 @@ class ChipClusters:
         "Thermostat": _THERMOSTAT_CLUSTER_INFO,
         "FanControl": _FAN_CONTROL_CLUSTER_INFO,
         "ThermostatUserInterfaceConfiguration": _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
+        "Humidistat": _HUMIDISTAT_CLUSTER_INFO,
         "ColorControl": _COLOR_CONTROL_CLUSTER_INFO,
         "BallastConfiguration": _BALLAST_CONFIGURATION_CLUSTER_INFO,
         "IlluminanceMeasurement": _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO,

@@ -25082,6 +25082,133 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 }
 @end
 
+@implementation MTRHumidistatClusterSetSettingsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _userSetpoint = nil;
+
+        _mode = nil;
+
+        _mistType = nil;
+
+        _continuous = nil;
+
+        _sleep = nil;
+
+        _optimal = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRHumidistatClusterSetSettingsParams alloc] init];
+
+    other.userSetpoint = self.userSetpoint;
+    other.mode = self.mode;
+    other.mistType = self.mistType;
+    other.continuous = self.continuous;
+    other.sleep = self.sleep;
+    other.optimal = self.optimal;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: userSetpoint:%@; mode:%@; mistType:%@; continuous:%@; sleep:%@; optimal:%@; >", NSStringFromClass([self class]), _userSetpoint, _mode, _mistType, _continuous, _sleep, _optimal];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRHumidistatClusterSetSettingsParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Humidistat::Commands::SetSettings::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        if (self.userSetpoint != nil) {
+            auto & definedValue_0 = encodableStruct.userSetpoint.Emplace();
+            definedValue_0 = self.userSetpoint.unsignedCharValue;
+        }
+    }
+    {
+        if (self.mode != nil) {
+            auto & definedValue_0 = encodableStruct.mode.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.mode.unsignedCharValue);
+        }
+    }
+    {
+        if (self.mistType != nil) {
+            auto & definedValue_0 = encodableStruct.mistType.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.mistType.unsignedCharValue);
+        }
+    }
+    {
+        if (self.continuous != nil) {
+            auto & definedValue_0 = encodableStruct.continuous.Emplace();
+            definedValue_0 = self.continuous.boolValue;
+        }
+    }
+    {
+        if (self.sleep != nil) {
+            auto & definedValue_0 = encodableStruct.sleep.Emplace();
+            definedValue_0 = self.sleep.boolValue;
+        }
+    }
+    {
+        if (self.optimal != nil) {
+            auto & definedValue_0 = encodableStruct.optimal.Emplace();
+            definedValue_0 = self.optimal.boolValue;
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRColorControlClusterMoveToHueParams
 - (instancetype)init
 {
