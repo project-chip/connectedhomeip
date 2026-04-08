@@ -83,7 +83,7 @@ CHIP_ERROR AppTask::AppInit()
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 
 #ifdef DISPLAY_ENABLED
-    TEMPORARY_RETURN_IGNORED GetLCD().Init((uint8_t *) "Closure-App");
+    LogErrorOnFailure(GetLCD().Init((uint8_t *) "Closure-App"));
     GetLCD().SetCustomUI(ClosureUI::DrawUI);
 #endif
 
@@ -161,13 +161,13 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
         // Schedule work on the chip stack thread to ensure all CHIP API calls are safe
-        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
                 // Check if an action is already in progress
                 if (ClosureManager::GetInstance().IsClosureControlMotionInProgress())
                 {
                     // Stop the current action
-                    auto status = ClosureManager::GetInstance().GetClosureControlLogic().HandleStop();
+                    auto status = ClosureManager::GetInstance().GetClosureControlCluster().HandleStop();
                     if (status != Protocols::InteractionModel::Status::Success)
                     {
                         ChipLogError(AppServer, "Failed to stop closure action: %u", to_underlying(status));
@@ -175,14 +175,9 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
                 }
                 else
                 {
-                    DataModel::Nullable<ClosureControl::GenericOverallCurrentState> currentState;
-                    CHIP_ERROR err = ClosureManager::GetInstance().GetClosureControlLogic().GetOverallCurrentState(currentState);
+                    DataModel::Nullable<ClosureControl::GenericOverallCurrentState> currentState =
+                        ClosureManager::GetInstance().GetClosureControlCluster().GetOverallCurrentState();
 
-                    if (err != CHIP_NO_ERROR)
-                    {
-                        ChipLogError(AppServer, "Failed to get current closure state: %s", chip::ErrorStr(err));
-                        return;
-                    }
                     if (currentState.IsNull())
                     {
                         ChipLogError(AppServer, "Failed to get current closure state: currentState is null");
@@ -217,15 +212,15 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
                     }
 
                     // Move to the target position with latch set to false and preserved speed value
-                    auto status = ClosureManager::GetInstance().GetClosureControlLogic().HandleMoveTo(MakeOptional(targetPosition),
-                                                                                                      latch, speed);
+                    auto status = ClosureManager::GetInstance().GetClosureControlCluster().HandleMoveTo(
+                        MakeOptional(targetPosition), latch, speed);
                     if (status != Protocols::InteractionModel::Status::Success)
                     {
                         ChipLogError(AppServer, "Failed to move closure to target position: %u", to_underlying(status));
                     }
                 }
             },
-            0);
+            0));
     }
     else
     {

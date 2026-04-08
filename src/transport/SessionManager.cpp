@@ -48,6 +48,7 @@
 #include <transport/SecureMessageCodec.h>
 #include <transport/TracingStructs.h>
 #include <transport/TransportMgr.h>
+#include <transport/raw/GroupcastTesting.h>
 
 namespace chip {
 
@@ -224,7 +225,11 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             return CHIP_ERROR_INTERNAL;
         }
 
-        destination_address = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
+        Credentials::GroupDataProvider::GroupInfo info;
+        ReturnErrorOnFailure(groups->GetGroupInfo(groupSession->GetFabricIndex(), groupSession->GetGroupId(), info));
+        destination_address = (info.UsePerGroupAddress())
+            ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId())
+            : Transport::PeerAddress::Groupcast();
 
         Crypto::SymmetricKeyContext * keyContext =
             groups->GetKeyContext(groupSession->GetFabricIndex(), groupSession->GetGroupId());
@@ -420,8 +425,14 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         const FabricInfo * fabric = mFabricTable->FindFabricWithIndex(groupSession->GetFabricIndex());
         VerifyOrReturnError(fabric != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        auto * groups = Credentials::GetGroupDataProvider();
+        VerifyOrReturnError(nullptr != groups, CHIP_ERROR_INTERNAL);
 
-        multicastAddress = Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId());
+        Credentials::GroupDataProvider::GroupInfo info;
+        ReturnErrorOnFailure(groups->GetGroupInfo(groupSession->GetFabricIndex(), groupSession->GetGroupId(), info));
+        multicastAddress = (info.UsePerGroupAddress())
+            ? Transport::PeerAddress::Multicast(fabric->GetFabricId(), groupSession->GetGroupId())
+            : Transport::PeerAddress::Groupcast();
         destination      = &multicastAddress;
     }
     break;
@@ -716,6 +727,7 @@ void SessionManager::HandleConnectionClosed(Transport::ActiveTCPConnectionState 
         appTCPConnCbCtxt->connClosedCb(conn, conErr);
     }
     MarkSecureSessionOverTCPForEviction(conn, conErr);
+    mUnauthenticatedSessions.MarkSessionOverTCPForEviction(conn);
 }
 
 CHIP_ERROR SessionManager::TCPConnect(const PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
@@ -1155,7 +1167,16 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 #endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
     }
     iter.Release();
-
+    // Groupcast Testing
+    auto & testing = chip::Groupcast::GetTesting();
+    if (testing.IsEnabled() && testing.IsFabricUnderTest(groupContext.fabric_index))
+    {
+        testing.SetGroupID(packetHeaderCopy.GetDestinationGroupId().Value());
+        if (!decrypted)
+        {
+            testing.SetTestResult(chip::Groupcast::Testing::Result::kNoAvailableKey);
+        }
+    }
     if (!decrypted)
     {
         ChipLogError(Inet, "Failed to decrypt group message. Discarding everything");

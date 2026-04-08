@@ -1071,6 +1071,13 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000017: {
+                "attributeName": "DeviceLocation",
+                "attributeId": 0x00000017,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
             0x00000018: {
                 "attributeName": "ConfigurationVersion",
                 "attributeId": 0x00000018,
@@ -3159,6 +3166,13 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000017: {
+                "attributeName": "DeviceLocation",
+                "attributeId": 0x00000017,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
             0x00000018: {
                 "attributeName": "ConfigurationVersion",
                 "attributeId": 0x00000018,
@@ -3543,6 +3557,13 @@ class ChipClusters:
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "GroupcastAdoption",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -4929,6 +4950,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x0000000D: {
+                "attributeName": "Unmounted",
+                "attributeId": 0x0000000D,
+                "type": "bool",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -5516,10 +5543,11 @@ class ChipClusters:
                 "args": {
                     "groupID": "int",
                     "endpoints": "int",
-                    "keyID": "int",
+                    "keySetID": "int",
                     "key": "bytes",
-                    "gracePeriod": "int",
                     "useAuxiliaryACL": "bool",
+                    "replaceEndpoints": "bool",
+                    "mcastAddrPolicy": "int",
                 },
             },
             0x00000001: {
@@ -5535,24 +5563,24 @@ class ChipClusters:
                 "commandName": "UpdateGroupKey",
                 "args": {
                     "groupID": "int",
-                    "keyID": "int",
+                    "keySetID": "int",
                     "key": "bytes",
-                    "gracePeriod": "int",
                 },
             },
             0x00000004: {
                 "commandId": 0x00000004,
-                "commandName": "ExpireGracePeriod",
-                "args": {
-                    "groupID": "int",
-                },
-            },
-            0x00000005: {
-                "commandId": 0x00000005,
                 "commandName": "ConfigureAuxiliaryACL",
                 "args": {
                     "groupID": "int",
                     "useAuxiliaryACL": "bool",
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "GroupcastTesting",
+                "args": {
+                    "testOperation": "int",
+                    "durationSeconds": "int",
                 },
             },
         },
@@ -5566,6 +5594,24 @@ class ChipClusters:
             0x00000001: {
                 "attributeName": "MaxMembershipCount",
                 "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "MaxMcastAddrCount",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "UsedMcastAddrCount",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "FabricUnderTest",
+                "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
@@ -9169,6 +9215,122 @@ class ChipClusters:
             },
         },
     }
+    _HUMIDISTAT_CLUSTER_INFO = {
+        "clusterName": "Humidistat",
+        "clusterId": 0x00000205,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "SetSettings",
+                "args": {
+                    "userSetpoint": "int",
+                    "mode": "int",
+                    "mistType": "int",
+                    "continuous": "bool",
+                    "sleep": "bool",
+                    "optimal": "bool",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Mode",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "SystemState",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "UserSetpoint",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "MinSetpoint",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "MaxSetpoint",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "Step",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "TargetSetpoint",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "MistType",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "Continuous",
+                "attributeId": 0x00000008,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000009: {
+                "attributeName": "Sleep",
+                "attributeId": 0x00000009,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x0000000A: {
+                "attributeName": "Optimal",
+                "attributeId": 0x0000000A,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _COLOR_CONTROL_CLUSTER_INFO = {
         "clusterName": "ColorControl",
         "clusterId": 0x00000300,
@@ -10238,6 +10400,12 @@ class ChipClusters:
             0x00000004: {
                 "attributeName": "HoldTimeLimits",
                 "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "PredictedOccupancy",
+                "attributeId": 0x00000005,
                 "type": "",
                 "reportable": True,
             },
@@ -11463,30 +11631,30 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000005: {
-                "attributeName": "SimultaneousDetectionLimit",
+                "attributeName": "ObjectCountReached",
                 "attributeId": 0x00000005,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
-            0x00000006: {
-                "attributeName": "CountThresholdReached",
-                "attributeId": 0x00000006,
                 "type": "bool",
                 "reportable": True,
             },
-            0x00000007: {
-                "attributeName": "CountThreshold",
-                "attributeId": 0x00000007,
-                "type": "int",
+            0x00000006: {
+                "attributeName": "ObjectCountConfig",
+                "attributeId": 0x00000006,
+                "type": "",
                 "reportable": True,
                 "writable": True,
             },
-            0x00000008: {
+            0x00000007: {
                 "attributeName": "ObjectCount",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "SimultaneousDetectionLimit",
                 "attributeId": 0x00000008,
                 "type": "int",
                 "reportable": True,
+                "writable": True,
             },
             0x00000009: {
                 "attributeName": "HoldTime",
@@ -11505,12 +11673,6 @@ class ChipClusters:
                 "attributeName": "PredictedActivity",
                 "attributeId": 0x0000000B,
                 "type": "",
-                "reportable": True,
-            },
-            0x0000000C: {
-                "attributeName": "PrivacyModeEnabled",
-                "attributeId": 0x0000000C,
-                "type": "bool",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -13661,6 +13823,8 @@ class ChipClusters:
                     "ICETransportPolicy": "str",
                     "metadataEnabled": "bool",
                     "SFrameConfig": "SFrameStruct",
+                    "videoStreams": "int",
+                    "audioStreams": "int",
                 },
             },
             0x00000002: {
@@ -13677,6 +13841,8 @@ class ChipClusters:
                     "ICETransportPolicy": "str",
                     "metadataEnabled": "bool",
                     "SFrameConfig": "SFrameStruct",
+                    "videoStreams": "int",
+                    "audioStreams": "int",
                 },
             },
             0x00000004: {
@@ -13926,6 +14092,7 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "PlayChimeSound",
                 "args": {
+                    "chimeID": "int",
                 },
             },
         },
@@ -16061,6 +16228,7 @@ class ChipClusters:
         0x00000201: _THERMOSTAT_CLUSTER_INFO,
         0x00000202: _FAN_CONTROL_CLUSTER_INFO,
         0x00000204: _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
+        0x00000205: _HUMIDISTAT_CLUSTER_INFO,
         0x00000300: _COLOR_CONTROL_CLUSTER_INFO,
         0x00000301: _BALLAST_CONFIGURATION_CLUSTER_INFO,
         0x00000400: _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO,
@@ -16207,6 +16375,7 @@ class ChipClusters:
         "Thermostat": _THERMOSTAT_CLUSTER_INFO,
         "FanControl": _FAN_CONTROL_CLUSTER_INFO,
         "ThermostatUserInterfaceConfiguration": _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
+        "Humidistat": _HUMIDISTAT_CLUSTER_INFO,
         "ColorControl": _COLOR_CONTROL_CLUSTER_INFO,
         "BallastConfiguration": _BALLAST_CONFIGURATION_CLUSTER_INFO,
         "IlluminanceMeasurement": _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO,

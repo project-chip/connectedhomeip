@@ -35,16 +35,20 @@ using namespace ::chip::DeviceLayer;
 
 void test_task(void * pvParameters)
 {
-    chip::Platform::MemoryInit();
-    chip::DeviceLayer::PlatformManagerImpl().ServiceInit();
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    int status = chip::test::RunAllTests();
+    err = chip::Platform::MemoryInit();
+    assert(err == CHIP_NO_ERROR);
+
+    err = chip::DeviceLayer::PlatformManagerImpl().ServiceInit();
+    assert(err == CHIP_NO_ERROR);
+
+    chip::test::RunAllTests();
 }
 
 #if FSL_OSA_MAIN_FUNC_ENABLE
 extern "C" void main_task(void const * argument)
 {
-    TaskHandle_t taskHandle;
 #if CONFIG_ENABLE_PW_RPC
     chip::NXP::App::Rpc::Init();
 #endif

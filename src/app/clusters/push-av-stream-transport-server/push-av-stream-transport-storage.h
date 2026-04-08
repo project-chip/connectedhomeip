@@ -20,12 +20,77 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
+#include <lib/core/TLVTags.h>
 #include <vector>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
+
+// Size calculation for CMAFContainerStorage
+// CMAFInterface: 1 byte
+// segmentDuration: 2 bytes
+// chunkDuration: 2 bytes
+// sessionGroup: 1 byte
+// mTrackNameBuffer: 16 bytes
+// mCENCKeyBuffer: 16 bytes
+// mCENCKeyIDBuffer: 16 bytes
+// metadataEnabled: ~2 bytes (EstimateStructOverhead)
+static constexpr size_t kCMAFContainerStorageSize =
+    TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(uint16_t), sizeof(uint16_t), sizeof(uint8_t), kMaxTrackNameLength,
+                                kMaxCENCKeyLength, kMaxCENCKeyIDLength, sizeof(bool));
+
+// Size calculation for ContainerOptionsStorage
+// containerType: 1 byte
+// mCMAFContainerStorage: kCMAFContainerStorageSize
+static constexpr size_t kContainerOptionsStorageSize = TLV::EstimateStructOverhead(sizeof(uint8_t), kCMAFContainerStorageSize);
+
+// Size of MotionTimeControl struct
+static constexpr size_t kMotionTimeControlSize =
+    TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint32_t), sizeof(uint16_t));
+
+// Size calculation for TransportZoneOptions
+// Depends on CHIP_CONFIG_MAX_NUM_ZONES
+static constexpr size_t kTransportZoneOptionsSize =
+    2 /* Array Overhead */ + (CHIP_CONFIG_MAX_NUM_ZONES * TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint8_t)));
+
+// Size calculation for TriggerOptionsStorage
+// triggerType: 1 byte
+// mTransportZoneOptions: kTransportZoneOptionsSize
+// motionSensitivity: 1 byte
+// motionTimeControl: kMotionTimeControlSize
+// maxPreRollLen: 2 bytes
+static constexpr size_t kTriggerOptionsStorageSize = TLV::EstimateStructOverhead(
+    sizeof(uint8_t), kTransportZoneOptionsSize, sizeof(uint8_t), kMotionTimeControlSize, sizeof(uint16_t));
+
+static constexpr size_t kTransportOptionsStorageSize =
+    TLV::EstimateStructOverhead(sizeof(uint8_t),              // streamUsage
+                                sizeof(uint16_t),             // videoStreamID
+                                sizeof(uint16_t),             // audioStreamID
+                                sizeof(uint16_t),             // TLSEndpointID
+                                kMaxUrlLength,                // max url
+                                sizeof(uint8_t),              // ingestMethod
+                                sizeof(uint32_t),             // expiryTime
+                                kTriggerOptionsStorageSize,   // triggerOptions
+                                kContainerOptionsStorageSize, // containerOptions
+                                2u /* Array Overhead */ +
+                                    CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS *
+                                        TLV::EstimateStructOverhead(kMaxStreamNameLength /* stream name */, sizeof(uint16_t)),
+                                2u /* Array Overhead */ +
+                                    CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS *
+                                        TLV::EstimateStructOverhead(kMaxStreamNameLength /* stream name */, sizeof(uint16_t)));
+
+static constexpr size_t kMaxOneCurrentConnectionSerializedSize =
+    TLV::EstimateStructOverhead(sizeof(uint16_t),             // connectionID
+                                sizeof(uint8_t),              // transportStatus
+                                kTransportOptionsStorageSize, // estimated transportOptions
+                                sizeof(FabricIndex)           // fabricIndex
+    );
+
+// Max size for the TLV-encoded array of CurrentConnection structs
+static constexpr size_t kMaxCurrentConnectionsSerializedSize = 2 /* ArrayTlvOverhead */ +
+    (CHIP_CONFIG_MAX_FABRICS * CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS * kMaxOneCurrentConnectionSerializedSize);
 
 /**
  * @brief Storage implementation for transport trigger options.
@@ -284,6 +349,30 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         expiryTime = aTransportOptionsStorage.expiryTime;
 
+        // Copy video streams storage
+        mVideoStreamsStorage = aTransportOptionsStorage.mVideoStreamsStorage;
+        if (!mVideoStreamsStorage.empty())
+        {
+            videoStreams.SetValue(
+                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+        }
+        else
+        {
+            videoStreams.ClearValue();
+        }
+
+        // Copy audio streams storage
+        mAudioStreamsStorage = aTransportOptionsStorage.mAudioStreamsStorage;
+        if (!mAudioStreamsStorage.empty())
+        {
+            audioStreams.SetValue(
+                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+        }
+        else
+        {
+            audioStreams.ClearValue();
+        }
+
         return *this;
     }
 
@@ -309,15 +398,109 @@ struct TransportOptionsStorage : public TransportOptionsStruct
 
         expiryTime = transportOptions.expiryTime;
 
+        // Handle videoStreams from decodable type
+        if (transportOptions.videoStreams.HasValue())
+        {
+            mVideoStreamsStorage.clear();
+            auto iter = transportOptions.videoStreams.Value().begin();
+            while (iter.Next())
+            {
+                auto & videoStream = iter.GetValue();
+                mVideoStreamsStorage.push_back(videoStream);
+            }
+            videoStreams.SetValue(
+                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+        }
+        else
+        {
+            mVideoStreamsStorage.clear();
+            videoStreams.ClearValue();
+        }
+
+        // Handle audioStreams from decodable type
+        if (transportOptions.audioStreams.HasValue())
+        {
+            mAudioStreamsStorage.clear();
+            auto iter = transportOptions.audioStreams.Value().begin();
+            while (iter.Next())
+            {
+                auto & audioStream = iter.GetValue();
+                mAudioStreamsStorage.push_back(audioStream);
+            }
+            audioStreams.SetValue(
+                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+        }
+        else
+        {
+            mAudioStreamsStorage.clear();
+            audioStreams.ClearValue();
+        }
+
         return *this;
     }
 
     TransportOptionsStorage(const Structs::TransportOptionsStruct::DecodableType & transportOptions) { *this = transportOptions; }
 
+    // Public methods to manage video streams without exposing internal storage
+    void ClearVideoStreams()
+    {
+        mVideoStreamsStorage.clear();
+        videoStreams.ClearValue();
+    }
+
+    void AddVideoStream(const Structs::VideoStreamStruct::Type & videoStream)
+    {
+        mVideoStreamsStorage.push_back(videoStream);
+        videoStreams.SetValue(
+            DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+    }
+
+    void UpdateVideoStreamsList()
+    {
+        if (!mVideoStreamsStorage.empty())
+        {
+            videoStreams.SetValue(
+                DataModel::List<const Structs::VideoStreamStruct::Type>(mVideoStreamsStorage.data(), mVideoStreamsStorage.size()));
+        }
+        else
+        {
+            videoStreams.ClearValue();
+        }
+    }
+
+    // Public methods to manage audio streams without exposing internal storage
+    void ClearAudioStreams()
+    {
+        mAudioStreamsStorage.clear();
+        audioStreams.ClearValue();
+    }
+
+    void AddAudioStream(const Structs::AudioStreamStruct::Type & audioStream)
+    {
+        mAudioStreamsStorage.push_back(audioStream);
+        audioStreams.SetValue(
+            DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+    }
+
+    void UpdateAudioStreamsList()
+    {
+        if (!mAudioStreamsStorage.empty())
+        {
+            audioStreams.SetValue(
+                DataModel::List<const Structs::AudioStreamStruct::Type>(mAudioStreamsStorage.data(), mAudioStreamsStorage.size()));
+        }
+        else
+        {
+            audioStreams.ClearValue();
+        }
+    }
+
 private:
     char mUrlBuffer[kMaxUrlLength];
     TransportTriggerOptionsStorage mTriggerOptionsStorage;
     ContainerOptionsStorage mContainerOptionsStorage;
+    std::vector<Structs::VideoStreamStruct::Type> mVideoStreamsStorage;
+    std::vector<Structs::AudioStreamStruct::Type> mAudioStreamsStorage;
 };
 
 /**

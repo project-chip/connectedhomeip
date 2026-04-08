@@ -21,7 +21,7 @@ import("${chip_root}/src/platform/bouffalolab/common/args.gni")
 
 assert(chip_device_platform == "bl702l")
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -42,13 +42,6 @@ static_library("BL702L") {
     "../common/SystemTimeSupport.cpp",
   ]
 
-  if (chip_enable_ota_requestor) {
-    sources += [
-      "../common/OTAImageProcessorImpl.cpp",
-      "../common/OTAImageProcessorImpl.h",
-    ]
-  }
-
   if (chip_enable_ble) {
     sources += [
       "../common/BLEManagerImpl.cpp",
@@ -64,9 +57,9 @@ static_library("BL702L") {
   }
 
   if (bouffalo_sdk_component_easyflash_enabled) {
-    sources += [ "../common/BLConfig.cpp" ]
+    sources += [ "../common/BflbConfig.cpp" ]
   } else {
-    sources += [ "../common/BLConfig_littlefs.cpp" ]
+    sources += [ "../common/BflbConfig_littlefs.cpp" ]
   }
 
   deps = [
@@ -77,7 +70,14 @@ static_library("BL702L") {
     "${chip_root}/src/platform/logging:headers",
   ]
 
-  if (chip_enable_openthread) {
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "../common/OTAImageProcessorImpl.cpp",
+      "../common/OTAImageProcessorImpl.h",
+    ]
+  }
+
+  if (chip_enable_thread) {
     # needed for MTD/FTD
 
     import("//build_overrides/bouffalolab_iot_sdk.gni")
@@ -89,7 +89,7 @@ static_library("BL702L") {
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
-      "ThreadStackManagerImpl.cpp",
+      "../common/ThreadStackManagerImpl.cpp",
     ]
 
     if (chip_mdns == "platform") {

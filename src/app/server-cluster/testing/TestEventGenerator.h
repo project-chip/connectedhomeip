@@ -21,6 +21,7 @@
 #include <app/data-model-provider/EventsGenerator.h>
 #include <app/data-model/Decode.h>
 #include <deque>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace Testing {
@@ -103,6 +104,10 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    System::Clock::Milliseconds64 GetMonotonicStartupTime() const override { return mStartupTimestamp; }
+
+    void SetStartupTimestamp(System::Clock::Milliseconds64 timestamp) { mStartupTimestamp = timestamp; }
+
     // Returns next event in the event queue, removing it from the queue.
     // Returns `std::nullopt` if no event is in the queue (i.e. no event was generated after consuming last generated one).
     [[nodiscard]] std::optional<EventInformation> GetNextEvent()
@@ -118,7 +123,8 @@ public:
 
 private:
     std::deque<EventInformation> mEventQueue;
-    EventNumber mCurrentEventNumber = 0;
+    EventNumber mCurrentEventNumber                 = 0;
+    System::Clock::Milliseconds64 mStartupTimestamp = System::Clock::Milliseconds64(0);
 };
 
 } // namespace Testing

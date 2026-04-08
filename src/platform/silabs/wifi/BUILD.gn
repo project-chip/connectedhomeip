@@ -91,6 +91,7 @@ config("wifi-platform-config") {
     include_dirs += [
       "${chip_root}/src/platform/silabs/SiWx/ble",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+      "${wifi_sdk_root}/components/protocol/wifi/inc",
     ]
   }
 }
@@ -116,22 +117,13 @@ source_set("wifi-platform") {
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform:platform_error",
     "${silabs_platform_dir}/wifi/icd:power-save-interface",
   ]
 
-  if (use_SiWx917) {
+  if (use_SiWx917 && !wifi_soc) {
     public_deps += [ "${silabs_platform_dir}/wifi/SiWx/ncp:siwx-ncp" ]
     sources += [ "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp" ]
-  } else if (use_wf200) {
-    sources += wf200_plat_src
-    sources += [
-      "${silabs_platform_dir}/wifi/lwip-support/dhcp_client.cpp",
-      "${silabs_platform_dir}/wifi/lwip-support/dhcp_client.h",
-      "${silabs_platform_dir}/wifi/lwip-support/ethernetif.cpp",
-      "${silabs_platform_dir}/wifi/lwip-support/ethernetif.h",
-      "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.cpp",
-      "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.h",
-    ]
   }
 
   if (wifi_soc) {

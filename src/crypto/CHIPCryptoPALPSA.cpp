@@ -830,6 +830,8 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
         ExitNow(error = CHIP_ERROR_UNKNOWN_KEY_TYPE);
     }
 
+    GetPSAKeyAllocator().UpdateKeyAttributes(attributes);
+
     status = psa_generate_key(&attributes, &context.key_id);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
@@ -902,6 +904,13 @@ exit:
     return error;
 }
 
+CHIP_ERROR P256Keypair::InitializeFromBitsOrReject(FixedByteSpan<kP256_PrivateKey_Length> privateKeyBits)
+{
+    // Not implemented for the PSA backend; Direct HKDF to EC key derivation should be used instead.
+    IgnoreUnusedVariable(privateKeyBits);
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
 void P256Keypair::Clear()
 {
     if (mInitialized)
@@ -930,9 +939,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     return CHIP_NO_ERROR;
 }
 
-// We should compile this SPAKE2P implementation only if the PSA implementation is not in use.
-#if !CHIP_CRYPTO_PSA_SPAKE2P
-
+#if CHIP_CRYPTO_SPAKE2P_MBEDTLS
 typedef struct Spake2p_Context
 {
     mbedtls_ecp_group curve;
@@ -1238,7 +1245,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
     return CHIP_NO_ERROR;
 }
 
-#endif // !CHIP_CRYPTO_PSA_SPAKE2P
+#endif // !CHIP_CRYPTO_SPAKE2P_MBEDTLS
 
 } // namespace Crypto
 } // namespace chip

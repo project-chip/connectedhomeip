@@ -673,7 +673,8 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
             mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
     }
 
-    mNeedsNetworkSetup = (transportType == Transport::Type::kBle);
+    // mNeedsNetworkSetup may be set by SetNetworkSetupNeeded().
+    mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kBle);
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kNfc);
 #endif
@@ -786,6 +787,11 @@ void AutoCommissioner::CleanupCommissioning()
     mOperationalDeviceProxy  = OperationalDeviceProxy();
     mDeviceCommissioningInfo = ReadCommissioningInfo();
     mNeedsDST                = false;
+    mNeedsNetworkSetup       = false;
+    mNeedIcdRegistration     = false;
+    mStopCommissioning       = false;
+    mAttestationElementsLen  = 0;
+    mAttestationSignatureLen = 0;
 }
 
 CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)

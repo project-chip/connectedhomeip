@@ -15,7 +15,7 @@
  */
 
 #pragma once
-#include "FabricTestFixture.h"
+
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
@@ -25,11 +25,13 @@
 #include <app/ConcreteEventPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/StringBuilderAdapters.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <app/server-cluster/testing/FabricTestFixture.h>
 #include <app/server-cluster/testing/MockCommandHandler.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/shared/Attributes.h>
@@ -39,9 +41,13 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/StringBuilderAdapters.h>
 #include <lib/core/TLVReader.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+#include <algorithm>
 #include <memory>
 #include <optional>
 #include <type_traits>
@@ -49,6 +55,7 @@
 
 namespace chip {
 namespace Testing {
+
 // Helper class for testing clusters.
 //
 // This class ensures that data read by attribute is referencing valid memory for all
@@ -76,6 +83,22 @@ namespace Testing {
 //     ASSERT_GT(it.GetValue().label.size(), 0u);
 // }
 //
+
+template <typename>
+inline constexpr bool kIsList = false;
+
+template <typename T>
+inline constexpr bool kIsList<app::DataModel::List<T>> = true;
+
+// All Cluster Servers are expected to support both of the below list writing patterns.
+enum class ListWritingPattern
+{
+    ReplaceAll, // Write the list by encoding the entire list in a single TLV Array, which will replace the entire list on the
+                // cluster side.
+    ClearAllThenAppendItems, // Write the list by first sending a write with an empty list (TLV Array) to clear the entire list on
+                             // the cluster side, then writing list items individually one by one (Appending Items).
+};
+
 class ClusterTester
 {
 public:
@@ -86,6 +109,7 @@ public:
         mCluster(cluster), mFabricTestFixture(fabricHelper)
     {}
 
+    TestServerClusterContext & GetTestContext() { return mTestServerClusterContext; }
     app::ServerClusterContext & GetServerClusterContext() { return mTestServerClusterContext.Get(); }
 
     // Read attribute into `out` parameter.
@@ -102,8 +126,7 @@ public:
 
         // Verify that the attribute is present in AttributeList before attempting to read it.
         // This ensures tests match real-world behavior where the Interaction Model checks AttributeList first.
-        auto checkStatus = VerifyAttributeInAttributeList(attr_id);
-        VerifyOrReturnError(checkStatus.IsSuccess(), checkStatus);
+        VerifyOrReturnError(IsAttributeInAttributeList(attr_id), Protocols::InteractionModel::Status::UnsupportedAttribute);
 
         auto path = mCluster.GetPaths()[0];
 
@@ -116,7 +139,7 @@ public:
         mReadOperations.push_back(std::move(readOperation));
         chip::Testing::ReadOperation & readOperationRef = *mReadOperations.back().get();
 
-        Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
+        const Access::SubjectDescriptor subjectDescriptor = mHandler.GetSubjectDescriptor();
         readOperationRef.SetSubjectDescriptor(subjectDescriptor);
 
         std::unique_ptr<app::AttributeValueEncoder> encoder = readOperationRef.StartEncoding();
@@ -136,9 +159,12 @@ public:
     // Use `app::Clusters::<ClusterName>::Attributes::<AttributeName>::TypeInfo::Type` for the `value` parameter to be spec
     // compliant (see the comment of the class for usage example).
     // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
+    // WARNING: This method should NOT be used for writing list attributes, use the overload below that takes a ListWritingPattern
+    // parameter instead.
+
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
     // @returns `CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute)` if the attribute is not present in AttributeList.
-    template <typename T>
+    template <typename T, std::enable_if_t<!kIsList<T>, int> = 0>
     app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr, const T & value)
     {
         const auto & paths = mCluster.GetPaths();
@@ -147,14 +173,13 @@ public:
 
         // Verify that the attribute is present in AttributeList before attempting to write it.
         // This ensures tests match real-world behavior where the Interaction Model checks AttributeList first.
-        auto checkStatus = VerifyAttributeInAttributeList(attr);
-        VerifyOrReturnError(checkStatus.IsSuccess(), checkStatus);
+        VerifyOrReturnError(IsAttributeInAttributeList(attr), Protocols::InteractionModel::Status::UnsupportedAttribute);
 
         app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
         chip::Testing::WriteOperation writeOp(path);
 
         // Create a stable object on the stack
-        Access::SubjectDescriptor subjectDescriptor{ .fabricIndex = mHandler.GetAccessingFabricIndex() };
+        const Access::SubjectDescriptor subjectDescriptor = mHandler.GetSubjectDescriptor();
         writeOp.SetSubjectDescriptor(subjectDescriptor);
 
         uint8_t buffer[1024];
@@ -177,13 +202,73 @@ public:
             ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, TLV::AnonymousTag(), value));
         }
 
+        ReturnErrorOnFailure(writer.Finalize());
+
         TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
         ReturnErrorOnFailure(reader.Next());
 
-        app::AttributeValueDecoder decoder(reader, *writeOp.GetRequest().subjectDescriptor);
+        app::AttributeValueDecoder decoder(reader, writeOp.GetRequest().subjectDescriptor);
 
         return mCluster.WriteAttribute(writeOp.GetRequest(), decoder);
+    }
+
+    // This WriteAttribute overload is for writing list attributes, and allows specifying the pattern used for mutating/writing the
+    // list on the cluster side (i.e. Replacing the list in its entirety vs Clearing the list in its entirety then appending/writing
+    // list items individually).
+    // Cluster servers usually support both patterns of writing lists, Therefore we should always test list attributes using both
+    // patterns.
+    template <typename T>
+    app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr, const app::DataModel::List<T> & listValue,
+                                                      ListWritingPattern listWritingPattern)
+    {
+        const auto & paths = mCluster.GetPaths();
+
+        VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
+
+        // Verify that the attribute is present in AttributeList before attempting to write it.
+        // This ensures tests match real-world behavior where the Interaction Model checks AttributeList first.
+        VerifyOrReturnError(IsAttributeInAttributeList(attr), Protocols::InteractionModel::Status::UnsupportedAttribute);
+
+        app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
+        chip::Testing::WriteOperation writeOp(path);
+
+        // Create a stable object on the stack
+        const Access::SubjectDescriptor subjectDescriptor = mHandler.GetSubjectDescriptor();
+        writeOp.SetSubjectDescriptor(subjectDescriptor);
+
+        switch (listWritingPattern)
+        {
+        case ListWritingPattern::ReplaceAll: {
+
+            // For ReplaceAll, we need to write the entire list in one go
+            writeOp.SetListOperation(app::ConcreteDataAttributePath::ListOperation::ReplaceAll);
+            auto decoder = writeOp.DecoderFor(listValue);
+            return mCluster.WriteAttribute(writeOp.GetRequest(), decoder);
+        }
+
+        case ListWritingPattern::ClearAllThenAppendItems: {
+
+            // We first write an empty list to clear the existing list using ReplaceAll List Operation
+            writeOp.SetListOperation(app::ConcreteDataAttributePath::ListOperation::ReplaceAll);
+            auto decoder = writeOp.DecoderFor(app::DataModel::List<uint8_t>());
+            auto status  = mCluster.WriteAttribute(writeOp.GetRequest(), decoder);
+            VerifyOrReturnValue(status.IsSuccess(), status);
+
+            // We now write each list item individually with AppendItem list operation.
+            writeOp.SetListOperation(app::ConcreteDataAttributePath::ListOperation::AppendItem);
+            for (const auto & listItem : listValue)
+            {
+                auto decoderAppend = writeOp.DecoderFor(listItem);
+                auto statusAppend  = mCluster.WriteAttribute(writeOp.GetRequest(), decoderAppend);
+                VerifyOrReturnValue(statusAppend.IsSuccess(), statusAppend);
+            }
+            return Protocols::InteractionModel::Status::Success;
+        }
+        default:
+            ChipLogError(Test, "Unhandled ListWritingPattern");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
     }
 
     // Result structure for Invoke operations, containing both status and decoded response.
@@ -200,6 +285,15 @@ public:
                 return status.has_value() && status->IsSuccess();
             else
                 return status.has_value() && status->IsSuccess() && response.has_value();
+        }
+
+        // Returns the ClusterStatusCode if available, otherwise returns std::nullopt.
+        // This allows tests to check the status code with a single EXPECT_EQ()
+        // (i.e. without having to ASSERT_TRUE(status.has_value()) first).
+        std::optional<Protocols::InteractionModel::ClusterStatusCode> GetStatusCode() const
+        {
+            VerifyOrReturnValue(status.has_value(), std::nullopt);
+            return status->GetStatusCode();
         }
     };
 
@@ -219,7 +313,17 @@ public:
         mHandler.ClearResponses();
         mHandler.ClearStatuses();
 
-        const app::DataModel::InvokeRequest invokeRequest = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+        // Verify that the command is present in AcceptedCommands before attempting to invoke it.
+        // This ensures tests match real-world behavior where the Interaction Model checks AcceptedCommands first.
+        if (!IsCommandAnAcceptedCommand(commandId))
+        {
+            result.status = Protocols::InteractionModel::Status::UnsupportedCommand;
+            return result;
+        }
+
+        const Access::SubjectDescriptor subjectDescriptor = mHandler.GetSubjectDescriptor();
+        const app::DataModel::InvokeRequest invokeRequest({ paths[0].mEndpointId, paths[0].mClusterId, commandId },
+                                                          subjectDescriptor);
 
         TLV::TLVWriter writer;
         writer.Init(mTlvBuffer);
@@ -297,7 +401,23 @@ public:
 
     std::vector<app::AttributePathParams> & GetDirtyList() { return mTestServerClusterContext.ChangeListener().DirtyList(); }
 
+    // Returns true if the given attribute appears in the dirty list.
+    // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
+    // Will VerifyOrDie that `GetPaths()` returns exactly one path.
+    bool IsAttributeDirty(AttributeId attributeId)
+    {
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrDie(paths.size() == 1);
+        app::AttributePathParams target(paths[0].mEndpointId, paths[0].mClusterId, attributeId);
+        const auto & list = GetDirtyList();
+        return std::find(list.begin(), list.end(), target) != list.end();
+    }
+
     void SetFabricIndex(FabricIndex fabricIndex) { mHandler.SetFabricIndex(fabricIndex); }
+    void SetSubjectDescriptor(const Access::SubjectDescriptor & subjectDescriptor)
+    {
+        mHandler.SetSubjectDescriptor(subjectDescriptor);
+    }
 
     FabricTestFixture * GetFabricHelper() { return mFabricTestFixture; }
 
@@ -313,32 +433,38 @@ private:
         return true;
     }
 
-    // Verifies that an attribute is present in the cluster's AttributeList.
-    // @returns CHIP_NO_ERROR if the attribute is found in AttributeList.
-    // @returns CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute) if the attribute is not found in AttributeList.
-    // @returns error status if Attributes cannot be retrieved.
-    app::DataModel::ActionReturnStatus VerifyAttributeInAttributeList(AttributeId attr_id)
+    bool IsAttributeInAttributeList(AttributeId attr_id)
     {
-        auto path = mCluster.GetPaths()[0];
+        // Attributes are listed by path, so this is only correct for single-path clusters.
+        VerifyOrDie(mCluster.GetPaths().size() == 1);
 
-        // Get the list of attributes from the cluster's metadata
         ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> builder;
-        CHIP_ERROR err = mCluster.Attributes(path, builder);
-        ReturnErrorOnFailure(err);
-
-        ReadOnlyBuffer<app::DataModel::AttributeEntry> attributeEntries = builder.TakeBuffer();
-
-        // Check if the requested attribute ID is present in the attribute list
-        for (const auto & entry : attributeEntries)
+        if (CHIP_ERROR err = mCluster.Attributes(mCluster.GetPaths()[0], builder); err != CHIP_NO_ERROR)
         {
-            if (entry.attributeId == attr_id)
-            {
-                return CHIP_NO_ERROR;
-            }
+            ChipLogError(Test, "Failed to get attribute list: %" CHIP_ERROR_FORMAT, err.Format());
+            return false;
         }
 
-        // Attribute not found in AttributeList
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        ReadOnlyBuffer<app::DataModel::AttributeEntry> attributeEntries = builder.TakeBuffer();
+        return std::any_of(attributeEntries.begin(), attributeEntries.end(),
+                           [&](const app::DataModel::AttributeEntry & entry) { return entry.attributeId == attr_id; });
+    }
+
+    bool IsCommandAnAcceptedCommand(CommandId commandId)
+    {
+        // Commands are listed by path, so this is only correct for single-path clusters.
+        VerifyOrDie(mCluster.GetPaths().size() == 1);
+
+        ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> builder;
+        if (CHIP_ERROR err = mCluster.AcceptedCommands(mCluster.GetPaths()[0], builder); err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Test, "Failed to get accepted commands: %" CHIP_ERROR_FORMAT, err.Format());
+            return false;
+        }
+
+        ReadOnlyBuffer<app::DataModel::AcceptedCommandEntry> commandEntries = builder.TakeBuffer();
+        return std::any_of(commandEntries.begin(), commandEntries.end(),
+                           [&](const app::DataModel::AcceptedCommandEntry & entry) { return entry.commandId == commandId; });
     }
 
     TestServerClusterContext mTestServerClusterContext{};
@@ -348,7 +474,8 @@ private:
     // 256 bytes was chosen as a conservative upper bound for typical command payloads in tests.
     // All command payloads used in tests must fit within this buffer; tests with larger payloads will fail.
     // If protocol or test requirements change, this value may need to be increased.
-    static constexpr size_t kTlvBufferSize = 256;
+    // Increased to 1024 to support certificate management commands which include X.509 certificates (~400+ bytes)
+    static constexpr size_t kTlvBufferSize = 1024;
 
     chip::Testing::MockCommandHandler mHandler;
     uint8_t mTlvBuffer[kTlvBufferSize];

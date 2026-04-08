@@ -17,7 +17,9 @@ import os
 import shlex
 from enum import Enum, auto
 
-from .builder import Builder, BuilderOutput
+from .builder import Builder, BuilderOutput, BuildProfile
+
+log = logging.getLogger(__name__)
 
 
 class AndroidBoard(Enum):
@@ -117,30 +119,17 @@ class AndroidApp(Enum):
         return None
 
 
-class AndroidProfile(Enum):
-    RELEASE = auto()
-    DEBUG = auto()
-
-    @property
-    def ProfileName(self):
-        if self == AndroidProfile.RELEASE:
-            return 'release'
-        if self == AndroidProfile.DEBUG:
-            return 'debug'
-        raise Exception('Unknown profile type: %r' % self)
-
-
 class AndroidBuilder(Builder):
     def __init__(self,
                  root,
                  runner,
                  board: AndroidBoard,
                  app: AndroidApp,
-                 profile: AndroidProfile = AndroidProfile.DEBUG):
+                 optimize_size: bool = False):
         super(AndroidBuilder, self).__init__(root, runner)
         self.board = board
         self.app = app
-        self.profile = profile
+        self.optimize_size = optimize_size
 
     def _get_sdk_manager_paths(self):
         """Get list of possible SDK manager paths for Android SDK compatibility."""
@@ -176,17 +165,17 @@ class AndroidBuilder(Builder):
                 # Test environment - assume the path is valid
                 sdk_manager = path
                 checked_details.append(f"{path} (test environment - assumed valid)")
-                logging.info(f"Using SDK manager for {for_purpose} from test environment: {sdk_manager}")
+                log.info(f"Using SDK manager for {for_purpose} from test environment: {sdk_manager}")
                 break
             # Real environment - check actual file existence
             exists = os.path.isfile(path)
             executable = os.access(path, os.X_OK)
             checked_details.append(f"{path} (exists: {exists}, executable: {executable})")
-            logging.debug(f"Checking SDK manager path for {for_purpose}: {path} - exists: {exists}, executable: {executable}")
+            log.debug(f"Checking SDK manager path for {for_purpose}: {path} - exists: {exists}, executable: {executable}")
 
             if exists and executable:
                 sdk_manager = path
-                logging.info(f"Found SDK manager for {for_purpose} at: {sdk_manager}")
+                log.info(f"Found SDK manager for {for_purpose} at: {sdk_manager}")
                 break
 
         return sdk_manager, checked_details
@@ -203,16 +192,16 @@ class AndroidBuilder(Builder):
                 title="Accepting NDK licenses using: %s" % sdk_manager_for_licenses,
             )
         else:
-            logging.warning("No SDK manager found for license acceptance - licenses may need to be accepted manually")
+            log.warning("No SDK manager found for license acceptance - licenses may need to be accepted manually")
 
     def validate_build_environment(self):
         # Log Android environment paths for debugging
         android_ndk_home = os.environ.get("ANDROID_NDK_HOME", "")
         android_home = os.environ.get("ANDROID_HOME", "")
 
-        logging.info("Android environment paths:")
-        logging.info(f"  ANDROID_NDK_HOME: {android_ndk_home}")
-        logging.info(f"  ANDROID_HOME: {android_home}")
+        log.info("Android environment paths:")
+        log.info(f"  ANDROID_NDK_HOME: {android_ndk_home}")
+        log.info(f"  ANDROID_HOME: {android_home}")
 
         for k in ["ANDROID_NDK_HOME", "ANDROID_HOME"]:
             if k not in os.environ:
@@ -225,9 +214,9 @@ class AndroidBuilder(Builder):
         sdk_manager, checked_details = self._find_sdk_manager("validation")
 
         if not sdk_manager:
-            logging.error("SDK manager not found in any expected location")
+            log.error("SDK manager not found in any expected location")
             for detail in checked_details:
-                logging.error(f"  {detail}")
+                log.error(f"  {detail}")
 
             android_home = os.environ["ANDROID_HOME"]
             possible_fixes = [
@@ -314,7 +303,7 @@ class AndroidBuilder(Builder):
             "CHIPClusterID.jar": "src/controller/java/CHIPClusterID.jar",
         }
 
-        for jarName in jars.keys():
+        for jarName in jars:
             self._Execute(
                 [
                     "cp",
@@ -339,7 +328,7 @@ class AndroidBuilder(Builder):
                 ]
             )
 
-        for jarName in jars.keys():
+        for jarName in jars:
             self._Execute(
                 [
                     "cp",
@@ -367,6 +356,8 @@ class AndroidBuilder(Builder):
     def gradlewBuildExampleAndroid(self):
 
         # Example compilation
+        optimize_flag = "-PoptimizeApkSize=true" if self.optimize_size else "-PoptimizeApkSize=false"
+
         if self.app.Modules():
             for module in self.app.Modules():
                 self._Execute(
@@ -379,6 +370,7 @@ class AndroidBuilder(Builder):
                         "-PmatterBuildSrcDir=%s" % self.output_dir,
                         "-PmatterSdkSourceBuild=false",
                         "-PbuildDir=%s/%s" % (self.output_dir, module),
+                        optimize_flag,
                         ":%s:assembleDebug" % module,
                     ],
                     title="Building Example %s, module %s" % (
@@ -395,6 +387,7 @@ class AndroidBuilder(Builder):
                     "-PmatterBuildSrcDir=%s" % self.output_dir,
                     "-PmatterSdkSourceBuild=false",
                     "-PbuildDir=%s" % self.output_dir,
+                    optimize_flag,
                     "assembleDebug",
                 ],
                 title="Building Example " + self.identifier,
@@ -425,6 +418,17 @@ class AndroidBuilder(Builder):
             if exampleName == "chip-test":
                 gn_args["chip_build_test_static_libraries"] = False
 
+            match self.options.build_profile:
+                # Explicitly treat DEFAULT as DEBUG when building examples.
+                case BuildProfile.DEFAULT | BuildProfile.DEBUG:
+                    gn_args.update({"is_debug": True, "optimize_debug": False})
+                case BuildProfile.DEBUG_OPTIMIZED:
+                    gn_args.update({"is_debug": True, "optimize_debug": True})
+                case BuildProfile.RELEASE:
+                    gn_args.update({"is_debug": False, "optimize_for_size": False})
+                case BuildProfile.RELEASE_SIZE:
+                    gn_args.update({"is_debug": False, "optimize_for_size": True})
+
             if self.options.pw_command_launcher:
                 gn_args["pw_command_launcher"] = self.options.pw_command_launcher
 
@@ -433,8 +437,39 @@ class AndroidBuilder(Builder):
 
             if exampleName == "chip-test":
                 gn_args["chip_build_tests"] = True
-            if self.profile != AndroidProfile.DEBUG:
+            if self.optimize_size:
+                gn_args["optimize_apk_size"] = True
                 gn_args["is_debug"] = False
+                gn_args["matter_enable_tracing_support"] = False
+                gn_args["use_static_libcxx"] = True
+
+                # TV Casting App size optimizations: compile only the
+                # ~36 casting-relevant clusters instead of the full
+                # generated cluster-objects.cpp, and use slim TLV
+                # decoder source overrides covering only the 18
+                # casting clusters so that ChipClusters.java
+                # read/subscribe APIs remain functional at runtime.
+                # These must be passed as explicit GN build args
+                # because args.gni is evaluated inside default_args
+                # (before args.gn is applied), so the
+                # if (optimize_apk_size) conditional there cannot see
+                # the args.gn value.
+                if self.app == AndroidApp.TV_CASTING_APP:
+                    gn_args["chip_cluster_objects_source_override"] = (
+                        "//third_party/connectedhomeip/examples/"
+                        "tv-casting-app/tv-casting-common/"
+                        "casting-cluster-objects.cpp"
+                    )
+                    gn_args["chip_tlv_decoder_attribute_source_override"] = (
+                        "//third_party/connectedhomeip/examples/"
+                        "tv-casting-app/tv-casting-common/"
+                        "casting-CHIPAttributeTLVValueDecoder.cpp"
+                    )
+                    gn_args["chip_tlv_decoder_event_source_override"] = (
+                        "//third_party/connectedhomeip/examples/"
+                        "tv-casting-app/tv-casting-common/"
+                        "casting-CHIPEventTLVValueDecoder.cpp"
+                    )
             gn_args.update(self.app.AppGnArgs())
 
             args_str = ""
@@ -536,7 +571,12 @@ class AndroidBuilder(Builder):
                     self.root, "examples/", self.app.ExampleName(), "android/App/app/libs"
                 )
 
-                libs = ["libc++_shared.so", "libTvCastingApp.so"]
+                # When size-optimized with static libc++, libc++_shared.so is
+                # folded into libTvCastingApp.so and doesn't need to be shipped.
+                if self.optimize_size:
+                    libs = ["libTvCastingApp.so"]
+                else:
+                    libs = ["libc++_shared.so", "libTvCastingApp.so"]
 
                 jars = {
                     "AndroidPlatform.jar": "third_party/connectedhomeip/src/platform/android/AndroidPlatform.jar",
@@ -615,7 +655,7 @@ class AndroidBuilder(Builder):
                 self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
                 self.gradlewBuildExampleAndroid()
 
-            if (self.profile != AndroidProfile.DEBUG):
+            if self.options.build_profile in [BuildProfile.RELEASE, BuildProfile.RELEASE_SIZE] or self.optimize_size:
                 self.stripSymbols()
 
     def build_outputs(self):

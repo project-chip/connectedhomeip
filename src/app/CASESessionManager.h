@@ -21,6 +21,7 @@
 #include <app/CASEClientPool.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/OperationalSessionSetupPool.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Pool.h>
@@ -63,7 +64,7 @@ public:
 
     /**
      * Find an existing session for the given node ID, or trigger a new session
-     * request.
+     * request with optional DNS-SD fallback support.
      *
      * The caller can optionally provide `onConnection` and `onFailure` callback
      * objects. If provided, these will be used to inform the caller about
@@ -83,7 +84,8 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                 uint8_t attemptCount = 1, Callback::Callback<OnDeviceConnectionRetry> * onRetry = nullptr,
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-                                TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
+                                TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload,
+                                const Optional<AddressResolve::ResolveResult> & fallbackResolveResult = NullOptional);
 
     /**
      * Find an existing session for the given node ID or trigger a new session request.
@@ -202,7 +204,8 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                       uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry,
 #endif
-                                      TransportPayloadCapability transportPayloadCapability);
+                                      TransportPayloadCapability transportPayloadCapability,
+                                      const Optional<AddressResolve::ResolveResult> & fallbackResolveResult = NullOptional);
 
     CASESessionManagerConfig mConfig;
 };
