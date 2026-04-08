@@ -167,6 +167,13 @@ struct OptionalQRCodeInfo
     OptionalQRCodeInfo(uint8_t t, int64_t v) : tag(t), value(v) {}
     OptionalQRCodeInfo(uint8_t t, uint64_t v) : tag(t), value(v) {}
 
+    // visitValue will call one of the passed in visitor callbacks for the type that the
+    // value has. The value itself will be passed to the callback.
+    //
+    // We should keep this API working as-is, even when support for more types is added.
+    // So if support for a new type is added, add a new visitValue method with another
+    // visitor callback for that type, and make this method forward to the new one with
+    // a noop visitor for the new type.
     template <typename StringVisitor, typename SignedIntVisitor, typename UnsignedIntVisitor,
               typename ReturnValue = decltype(std::declval<StringVisitor>()(std::string()))>
     ReturnValue visitValue(StringVisitor stringVisitor, SignedIntVisitor signedIntVisitor,
@@ -183,7 +190,13 @@ struct OptionalQRCodeInfo
         return unsignedIntVisitor(std::get<uint64_t>(value));
     }
 
-    uint8_t tag;                                        /**< the tag number of the optional info */
+    bool operator==(const OptionalQRCodeInfo & info) const { return info.tag == tag && info.value == value; }
+    std::size_t hash() const { return value.index() << 8 | tag; }
+
+    uint8_t tag; /**< the tag number of the optional info */
+
+private:
+    friend class SetupPayload;
     std::variant<std::string, int64_t, uint64_t> value; /**< the value of the optional info */
 };
 

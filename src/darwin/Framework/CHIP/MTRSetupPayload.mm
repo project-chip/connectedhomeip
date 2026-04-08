@@ -118,15 +118,14 @@ static uint8_t ValidateVendorTag(NSNumber * tag)
 
 - (NSUInteger)hash
 {
-    return _info->value.index() << 8 | _info->tag;
+    return _info->hash();
 }
 
 - (BOOL)isEqual:(id)object
 {
     VerifyOrReturnValue([object class] == [self class], NO);
     MTROptionalQRCodeInfo * other = object;
-    VerifyOrReturnValue(_info->tag == other->_info->tag, NO);
-    return _info->value == other->_info->value;
+    return _info == other->_info;
 }
 
 - (NSString *)description
