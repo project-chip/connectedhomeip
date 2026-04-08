@@ -230,7 +230,7 @@ class TC_ACE_1_6(MatterBaseTest):
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[th1_nodeid],
-            targets=NullValue) # Wildcard target to maintain full admin access
+            targets=NullValue)  # Wildcard target to maintain full admin access
 
         if gc_on_root:
             # Cluster on ep1 with modified attributes (using OnOff as example)
