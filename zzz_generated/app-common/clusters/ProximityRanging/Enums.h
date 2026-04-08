@@ -28,13 +28,26 @@ namespace app {
 namespace Clusters {
 namespace ProximityRanging {
 
+// Enum for BLTCSModeEnum
+enum class BLTCSModeEnum : uint8_t
+{
+    kPBROnly = 0x00,
+    kRTTOnly = 0x01,
+    kBoth    = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
 // Enum for BLTCSSecurityLevelEnum
 enum class BLTCSSecurityLevelEnum : uint8_t
 {
-    kCsSecurityLevelUnknown = 0x00,
-    kCsSecurityLevelOne     = 0x01,
-    kCsSecurityLevelTwo     = 0x02,
-    kCsSecurityLevelThree   = 0x03,
+    kBLTCSSecurityLevelUnknown = 0x00,
+    kBLTCSSecurityLevelOne     = 0x01,
+    kBLTCSSecurityLevelTwo     = 0x02,
+    kBLTCSSecurityLevelThree   = 0x03,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -43,7 +56,7 @@ enum class BLTCSSecurityLevelEnum : uint8_t
 };
 
 // Enum for NADMEnum
-enum class NADMEnum : uint8_t
+enum class NADMEnum : uint16_t
 {
     kAttackExtremelyUnlikely = 0x00,
     kAttackVeryUnlikely      = 0x01,
@@ -106,12 +119,11 @@ enum class RangingSessionStatusEnum : uint8_t
     kSessionEndTimeReached = 0x00,
     kPeerNotFound          = 0x01,
     kHardwareError         = 0x02,
-    kStopRequested         = 0x03,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
+    kUnknownEnumValue = 3,
 };
 
 // Enum for RangingTechEnum

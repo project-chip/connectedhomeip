@@ -16419,17 +16419,17 @@ public class ClusterReadMapping {
           readProximityRangingWiFiDevIKCommandParams
         );
         result.put("readWiFiDevIKAttribute", readProximityRangingWiFiDevIKAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readProximityRangingBLEDeviceIdCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readProximityRangingBLEDeviceIdAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readProximityRangingBLEDeviceIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readProximityRangingBLEDeviceIDAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ProximityRangingCluster) cluster).readBLEDeviceIdAttribute(
+            ((ChipClusters.ProximityRangingCluster) cluster).readBLEDeviceIDAttribute(
               (ChipClusters.LongAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readProximityRangingBLEDeviceIdCommandParams
+          readProximityRangingBLEDeviceIDCommandParams
         );
-        result.put("readBLEDeviceIdAttribute", readProximityRangingBLEDeviceIdAttributeInteractionInfo);
+        result.put("readBLEDeviceIDAttribute", readProximityRangingBLEDeviceIDAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readProximityRangingBLTDevIKCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readProximityRangingBLTDevIKAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -16441,17 +16441,39 @@ public class ClusterReadMapping {
           readProximityRangingBLTDevIKCommandParams
         );
         result.put("readBLTDevIKAttribute", readProximityRangingBLTDevIKAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readProximityRangingSessionIDsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readProximityRangingSessionIDsAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readProximityRangingBLTCSSecurityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readProximityRangingBLTCSSecurityLevelAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ProximityRangingCluster) cluster).readSessionIDsAttribute(
-              (ChipClusters.ProximityRangingCluster.SessionIDsAttributeCallback) callback
+            ((ChipClusters.ProximityRangingCluster) cluster).readBLTCSSecurityLevelAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedProximityRangingClusterSessionIDsAttributeCallback(),
-          readProximityRangingSessionIDsCommandParams
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readProximityRangingBLTCSSecurityLevelCommandParams
         );
-        result.put("readSessionIDsAttribute", readProximityRangingSessionIDsAttributeInteractionInfo);
+        result.put("readBLTCSSecurityLevelAttribute", readProximityRangingBLTCSSecurityLevelAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readProximityRangingBLTCSModeCapabilityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readProximityRangingBLTCSModeCapabilityAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ProximityRangingCluster) cluster).readBLTCSModeCapabilityAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readProximityRangingBLTCSModeCapabilityCommandParams
+        );
+        result.put("readBLTCSModeCapabilityAttribute", readProximityRangingBLTCSModeCapabilityAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readProximityRangingSessionIDListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readProximityRangingSessionIDListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ProximityRangingCluster) cluster).readSessionIDListAttribute(
+              (ChipClusters.ProximityRangingCluster.SessionIDListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedProximityRangingClusterSessionIDListAttributeCallback(),
+          readProximityRangingSessionIDListCommandParams
+        );
+        result.put("readSessionIDListAttribute", readProximityRangingSessionIDListAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readProximityRangingGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readProximityRangingGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

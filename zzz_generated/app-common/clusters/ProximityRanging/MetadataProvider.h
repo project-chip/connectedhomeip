@@ -27,12 +27,16 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ProximityRan
             return RangingCapabilities::kMetadataEntry;
         case WiFiDevIK::Id:
             return WiFiDevIK::kMetadataEntry;
-        case BLEDeviceId::Id:
-            return BLEDeviceId::kMetadataEntry;
+        case BLEDeviceID::Id:
+            return BLEDeviceID::kMetadataEntry;
         case BLTDevIK::Id:
             return BLTDevIK::kMetadataEntry;
-        case SessionIDs::Id:
-            return SessionIDs::kMetadataEntry;
+        case BLTCSSecurityLevel::Id:
+            return BLTCSSecurityLevel::kMetadataEntry;
+        case BLTCSModeCapability::Id:
+            return BLTCSModeCapability::kMetadataEntry;
+        case SessionIDList::Id:
+            return SessionIDList::kMetadataEntry;
         default:
             return std::nullopt;
         }

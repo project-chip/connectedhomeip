@@ -7616,16 +7616,24 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"WiFiDevIK";
             break;
 
-        case MTRAttributeIDTypeClusterProximityRangingAttributeBLEDeviceIdID:
-            result = @"BLEDeviceId";
+        case MTRAttributeIDTypeClusterProximityRangingAttributeBLEDeviceIDID:
+            result = @"BLEDeviceID";
             break;
 
         case MTRAttributeIDTypeClusterProximityRangingAttributeBLTDevIKID:
             result = @"BLTDevIK";
             break;
 
-        case MTRAttributeIDTypeClusterProximityRangingAttributeSessionIDsID:
-            result = @"SessionIDs";
+        case MTRAttributeIDTypeClusterProximityRangingAttributeBLTCSSecurityLevelID:
+            result = @"BLTCSSecurityLevel";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeBLTCSModeCapabilityID:
+            result = @"BLTCSModeCapability";
+            break;
+
+        case MTRAttributeIDTypeClusterProximityRangingAttributeSessionIDListID:
+            result = @"SessionIDList";
             break;
 
         case MTRAttributeIDTypeClusterProximityRangingAttributeGeneratedCommandListID:

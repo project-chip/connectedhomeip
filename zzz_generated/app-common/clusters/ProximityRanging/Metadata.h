@@ -31,22 +31,30 @@ namespace WiFiDevIK {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(WiFiDevIK::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace WiFiDevIK
-namespace BLEDeviceId {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BLEDeviceId::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+namespace BLEDeviceID {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(BLEDeviceID::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace BLEDeviceId
+} // namespace BLEDeviceID
 namespace BLTDevIK {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(BLTDevIK::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace BLTDevIK
-namespace SessionIDs {
+namespace BLTCSSecurityLevel {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(BLTCSSecurityLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace BLTCSSecurityLevel
+namespace BLTCSModeCapability {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(BLTCSModeCapability::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace BLTCSModeCapability
+namespace SessionIDList {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(SessionIDs::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(SessionIDList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
-} // namespace SessionIDs
+} // namespace SessionIDList
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     RangingCapabilities::kMetadataEntry,
-    SessionIDs::kMetadataEntry,
+    SessionIDList::kMetadataEntry,
 
 };
 

@@ -4951,10 +4951,10 @@ static id _Nullable DecodeEventPayloadForProximityRangingCluster(EventId aEventI
             } else {
                 memberValue.wiFiDevIK = nil;
             }
-            if (cppValue.rangingResultData.BLEDeviceId.HasValue()) {
-                memberValue.bleDeviceId = [NSNumber numberWithUnsignedLongLong:cppValue.rangingResultData.BLEDeviceId.Value()];
+            if (cppValue.rangingResultData.BLEDeviceID.HasValue()) {
+                memberValue.bleDeviceID = [NSNumber numberWithUnsignedLongLong:cppValue.rangingResultData.BLEDeviceID.Value()];
             } else {
-                memberValue.bleDeviceId = nil;
+                memberValue.bleDeviceID = nil;
             }
             if (cppValue.rangingResultData.BLTDevIK.HasValue()) {
                 memberValue.bltDevIK = AsData(cppValue.rangingResultData.BLTDevIK.Value());
@@ -4977,7 +4977,7 @@ static id _Nullable DecodeEventPayloadForProximityRangingCluster(EventId aEventI
                 memberValue.distance = [NSNumber numberWithUnsignedShort:cppValue.rangingResultData.distance.Value()];
             }
             if (cppValue.rangingResultData.errorMargin.HasValue()) {
-                memberValue.errorMargin = [NSNumber numberWithShort:cppValue.rangingResultData.errorMargin.Value()];
+                memberValue.errorMargin = [NSNumber numberWithUnsignedShort:cppValue.rangingResultData.errorMargin.Value()];
             } else {
                 memberValue.errorMargin = nil;
             }
@@ -4992,7 +4992,7 @@ static id _Nullable DecodeEventPayloadForProximityRangingCluster(EventId aEventI
                 memberValue.rdr = nil;
             }
             if (cppValue.rangingResultData.detectedAttackLevel.HasValue()) {
-                memberValue.detectedAttackLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.rangingResultData.detectedAttackLevel.Value())];
+                memberValue.detectedAttackLevel = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue.rangingResultData.detectedAttackLevel.Value())];
             } else {
                 memberValue.detectedAttackLevel = nil;
             }

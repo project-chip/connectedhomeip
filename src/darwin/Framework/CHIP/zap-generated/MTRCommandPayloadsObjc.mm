@@ -27241,6 +27241,10 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
             auto & definedValue_0 = encodableStruct.BLTChannelSoundingDeviceRoleConfig.Emplace();
             definedValue_0.role = static_cast<std::remove_reference_t<decltype(definedValue_0.role)>>(self.bltChannelSoundingDeviceRoleConfig.role.unsignedCharValue);
             definedValue_0.peerBLTDevIK = AsByteSpan(self.bltChannelSoundingDeviceRoleConfig.peerBLTDevIK);
+            if (self.bltChannelSoundingDeviceRoleConfig.bltcsMode != nil) {
+                auto & definedValue_2 = definedValue_0.BLTCSMode.Emplace();
+                definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(self.bltChannelSoundingDeviceRoleConfig.bltcsMode.unsignedCharValue);
+            }
             if (self.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel != nil) {
                 auto & definedValue_2 = definedValue_0.BLTCSSecurityLevel.Emplace();
                 definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(self.bltChannelSoundingDeviceRoleConfig.bltcsSecurityLevel.unsignedCharValue);
@@ -27268,10 +27272,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     }
     {
         encodableStruct.trigger.startTime = self.trigger.startTime.unsignedIntValue;
-        if (self.trigger.endTime != nil) {
-            auto & definedValue_1 = encodableStruct.trigger.endTime.Emplace();
-            definedValue_1 = self.trigger.endTime.unsignedIntValue;
-        }
+        encodableStruct.trigger.endTime = self.trigger.endTime.unsignedIntValue;
         if (self.trigger.rangingInstanceInterval != nil) {
             auto & definedValue_1 = encodableStruct.trigger.rangingInstanceInterval.Emplace();
             definedValue_1 = self.trigger.rangingInstanceInterval.unsignedIntValue;

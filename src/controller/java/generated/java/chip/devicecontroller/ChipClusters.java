@@ -53184,7 +53184,9 @@ public class ChipClusters {
     private static final long WI_FI_DEV_IK_ATTRIBUTE_ID = 1L;
     private static final long BLE_DEVICE_ID_ATTRIBUTE_ID = 2L;
     private static final long BLT_DEV_IK_ATTRIBUTE_ID = 3L;
-    private static final long SESSION_I_DS_ATTRIBUTE_ID = 4L;
+    private static final long BLTCS_SECURITY_LEVEL_ATTRIBUTE_ID = 4L;
+    private static final long BLTCS_MODE_CAPABILITY_ATTRIBUTE_ID = 5L;
+    private static final long SESSION_ID_LIST_ATTRIBUTE_ID = 6L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -53298,7 +53300,7 @@ public class ChipClusters {
       void onSuccess(List<ChipStructs.ProximityRangingClusterRangingCapabilitiesStruct> value);
     }
 
-    public interface SessionIDsAttributeCallback extends BaseAttributeCallback {
+    public interface SessionIDListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable List<Integer> value);
     }
 
@@ -53366,7 +53368,7 @@ public class ChipClusters {
         }, WI_FI_DEV_IK_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readBLEDeviceIdAttribute(
+    public void readBLEDeviceIDAttribute(
         LongAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BLE_DEVICE_ID_ATTRIBUTE_ID);
 
@@ -53379,7 +53381,7 @@ public class ChipClusters {
         }, BLE_DEVICE_ID_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeBLEDeviceIdAttribute(
+    public void subscribeBLEDeviceIDAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BLE_DEVICE_ID_ATTRIBUTE_ID);
 
@@ -53418,9 +53420,61 @@ public class ChipClusters {
         }, BLT_DEV_IK_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readSessionIDsAttribute(
-        SessionIDsAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_I_DS_ATTRIBUTE_ID);
+    public void readBLTCSSecurityLevelAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BLTCS_SECURITY_LEVEL_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BLTCS_SECURITY_LEVEL_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeBLTCSSecurityLevelAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BLTCS_SECURITY_LEVEL_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BLTCS_SECURITY_LEVEL_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readBLTCSModeCapabilityAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BLTCS_MODE_CAPABILITY_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BLTCS_MODE_CAPABILITY_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeBLTCSModeCapabilityAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, BLTCS_MODE_CAPABILITY_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, BLTCS_MODE_CAPABILITY_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSessionIDListAttribute(
+        SessionIDListAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_ID_LIST_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -53428,12 +53482,12 @@ public class ChipClusters {
             @Nullable List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, SESSION_I_DS_ATTRIBUTE_ID, true);
+        }, SESSION_ID_LIST_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeSessionIDsAttribute(
-        SessionIDsAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_I_DS_ATTRIBUTE_ID);
+    public void subscribeSessionIDListAttribute(
+        SessionIDListAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_ID_LIST_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -53441,7 +53495,7 @@ public class ChipClusters {
             @Nullable List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, SESSION_I_DS_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SESSION_ID_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

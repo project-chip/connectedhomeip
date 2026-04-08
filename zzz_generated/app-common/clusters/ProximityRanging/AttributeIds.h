@@ -14,7 +14,7 @@ namespace ProximityRanging {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 10;
+inline constexpr uint32_t kAttributesCount = 12;
 
 namespace RangingCapabilities {
 inline constexpr AttributeId Id = 0x00000000;
@@ -24,17 +24,25 @@ namespace WiFiDevIK {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace WiFiDevIK
 
-namespace BLEDeviceId {
+namespace BLEDeviceID {
 inline constexpr AttributeId Id = 0x00000002;
-} // namespace BLEDeviceId
+} // namespace BLEDeviceID
 
 namespace BLTDevIK {
 inline constexpr AttributeId Id = 0x00000003;
 } // namespace BLTDevIK
 
-namespace SessionIDs {
+namespace BLTCSSecurityLevel {
 inline constexpr AttributeId Id = 0x00000004;
-} // namespace SessionIDs
+} // namespace BLTCSSecurityLevel
+
+namespace BLTCSModeCapability {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace BLTCSModeCapability
+
+namespace SessionIDList {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace SessionIDList
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

@@ -8839,7 +8839,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _wiFiDevIK = nil;
 
-        _bleDeviceId = nil;
+        _bleDeviceID = nil;
 
         _bltDevIK = nil;
 
@@ -8867,7 +8867,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRProximityRangingClusterRangingMeasurementDataStruct alloc] init];
 
     other.wiFiDevIK = self.wiFiDevIK;
-    other.bleDeviceId = self.bleDeviceId;
+    other.bleDeviceID = self.bleDeviceID;
     other.bltDevIK = self.bltDevIK;
     other.timeOfMeasurement = self.timeOfMeasurement;
     other.timeOfMeasurementOffset = self.timeOfMeasurementOffset;
@@ -8883,7 +8883,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: wiFiDevIK:%@; bleDeviceId:%@; bltDevIK:%@; timeOfMeasurement:%@; timeOfMeasurementOffset:%@; distance:%@; errorMargin:%@; rdr:%@; detectedAttackLevel:%@; rssi:%@; txPower:%@; >", NSStringFromClass([self class]), [_wiFiDevIK base64EncodedStringWithOptions:0], _bleDeviceId, [_bltDevIK base64EncodedStringWithOptions:0], _timeOfMeasurement, _timeOfMeasurementOffset, _distance, _errorMargin, _rdr, _detectedAttackLevel, _rssi, _txPower];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: wiFiDevIK:%@; bleDeviceID:%@; bltDevIK:%@; timeOfMeasurement:%@; timeOfMeasurementOffset:%@; distance:%@; errorMargin:%@; rdr:%@; detectedAttackLevel:%@; rssi:%@; txPower:%@; >", NSStringFromClass([self class]), [_wiFiDevIK base64EncodedStringWithOptions:0], _bleDeviceID, [_bltDevIK base64EncodedStringWithOptions:0], _timeOfMeasurement, _timeOfMeasurementOffset, _distance, _errorMargin, _rdr, _detectedAttackLevel, _rssi, _txPower];
     return descriptionString;
 }
 
@@ -8928,6 +8928,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _peerBLTDevIK = [NSData data];
 
+        _bltcsMode = nil;
+
         _bltcsSecurityLevel = nil;
 
         _ltk = nil;
@@ -8941,6 +8943,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.role = self.role;
     other.peerBLTDevIK = self.peerBLTDevIK;
+    other.bltcsMode = self.bltcsMode;
     other.bltcsSecurityLevel = self.bltcsSecurityLevel;
     other.ltk = self.ltk;
 
@@ -8949,7 +8952,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: role:%@; peerBLTDevIK:%@; bltcsSecurityLevel:%@; ltk:%@; >", NSStringFromClass([self class]), _role, [_peerBLTDevIK base64EncodedStringWithOptions:0], _bltcsSecurityLevel, [_ltk base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: role:%@; peerBLTDevIK:%@; bltcsMode:%@; bltcsSecurityLevel:%@; ltk:%@; >", NSStringFromClass([self class]), _role, [_peerBLTDevIK base64EncodedStringWithOptions:0], _bltcsMode, _bltcsSecurityLevel, [_ltk base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -8995,7 +8998,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _startTime = @(0);
 
-        _endTime = nil;
+        _endTime = @(0);
 
         _rangingInstanceInterval = nil;
     }

@@ -5640,12 +5640,12 @@ ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("wiFiDevIK");
 
-    if (value.isMember("BLEDeviceId"))
+    if (value.isMember("BLEDeviceID"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "BLEDeviceId");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.BLEDeviceId, value["BLEDeviceId"]));
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "BLEDeviceID");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.BLEDeviceID, value["BLEDeviceID"]));
     }
-    valueCopy.removeMember("BLEDeviceId");
+    valueCopy.removeMember("BLEDeviceID");
 
     if (value.isMember("BLTDevIK"))
     {
@@ -5715,7 +5715,7 @@ ComplexArgumentParser::Setup(const char * label,
 void ComplexArgumentParser::Finalize(chip::app::Clusters::ProximityRanging::Structs::RangingMeasurementDataStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.wiFiDevIK);
-    ComplexArgumentParser::Finalize(request.BLEDeviceId);
+    ComplexArgumentParser::Finalize(request.BLEDeviceID);
     ComplexArgumentParser::Finalize(request.BLTDevIK);
     ComplexArgumentParser::Finalize(request.timeOfMeasurement);
     ComplexArgumentParser::Finalize(request.timeOfMeasurementOffset);
@@ -5784,6 +5784,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.peerBLTDevIK, value["peerBLTDevIK"]));
     valueCopy.removeMember("peerBLTDevIK");
 
+    if (value.isMember("BLTCSMode"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "BLTCSMode");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.BLTCSMode, value["BLTCSMode"]));
+    }
+    valueCopy.removeMember("BLTCSMode");
+
     if (value.isMember("BLTCSSecurityLevel"))
     {
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "BLTCSSecurityLevel");
@@ -5807,6 +5814,7 @@ void ComplexArgumentParser::Finalize(
 {
     ComplexArgumentParser::Finalize(request.role);
     ComplexArgumentParser::Finalize(request.peerBLTDevIK);
+    ComplexArgumentParser::Finalize(request.BLTCSMode);
     ComplexArgumentParser::Finalize(request.BLTCSSecurityLevel);
     ComplexArgumentParser::Finalize(request.ltk);
 }
@@ -5863,17 +5871,16 @@ ComplexArgumentParser::Setup(const char * label,
 
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("RangingTriggerConditionStruct.startTime", "startTime",
                                                                   value.isMember("startTime")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("RangingTriggerConditionStruct.endTime", "endTime", value.isMember("endTime")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "startTime");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.startTime, value["startTime"]));
     valueCopy.removeMember("startTime");
 
-    if (value.isMember("endTime"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endTime");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endTime, value["endTime"]));
-    }
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endTime");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endTime, value["endTime"]));
     valueCopy.removeMember("endTime");
 
     if (value.isMember("rangingInstanceInterval"))

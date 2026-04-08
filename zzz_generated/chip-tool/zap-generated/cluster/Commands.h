@@ -11687,9 +11687,11 @@ private:
 | Attributes:                                                         |        |
 | * RangingCapabilities                                               | 0x0000 |
 | * WiFiDevIK                                                         | 0x0001 |
-| * BLEDeviceId                                                       | 0x0002 |
+| * BLEDeviceID                                                       | 0x0002 |
 | * BLTDevIK                                                          | 0x0003 |
-| * SessionIDs                                                        | 0x0004 |
+| * BLTCSSecurityLevel                                                | 0x0004 |
+| * BLTCSModeCapability                                               | 0x0005 |
+| * SessionIDList                                                     | 0x0006 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -29821,9 +29823,11 @@ void registerClusterProximityRanging(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "ranging-capabilities", Attributes::RangingCapabilities::Id, credsIssuerConfig),    //
         make_unique<ReadAttribute>(Id, "wi-fi-dev-ik", Attributes::WiFiDevIK::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "bledevice-id", Attributes::BLEDeviceId::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "bledevice-id", Attributes::BLEDeviceID::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "bltdev-ik", Attributes::BLTDevIK::Id, credsIssuerConfig),                          //
-        make_unique<ReadAttribute>(Id, "session-ids", Attributes::SessionIDs::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "bltcssecurity-level", Attributes::BLTCSSecurityLevel::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "bltcsmode-capability", Attributes::BLTCSModeCapability::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "session-idlist", Attributes::SessionIDList::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -29835,12 +29839,18 @@ void registerClusterProximityRanging(Commands & commands, CredentialIssuerComman
             Id, "ranging-capabilities", Attributes::RangingCapabilities::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::ByteSpan>>(Id, "wi-fi-dev-ik", Attributes::WiFiDevIK::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
-        make_unique<WriteAttribute<uint64_t>>(Id, "bledevice-id", 0, UINT64_MAX, Attributes::BLEDeviceId::Id,
+        make_unique<WriteAttribute<uint64_t>>(Id, "bledevice-id", 0, UINT64_MAX, Attributes::BLEDeviceID::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::ByteSpan>>(Id, "bltdev-ik", Attributes::BLTDevIK::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum>>(
+            Id, "bltcssecurity-level", 0, UINT8_MAX, Attributes::BLTCSSecurityLevel::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::ProximityRanging::BLTCSModeEnum>>(
+            Id, "bltcsmode-capability", 0, UINT8_MAX, Attributes::BLTCSModeCapability::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint8_t>>>>(
-            Id, "session-ids", Attributes::SessionIDs::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            Id, "session-idlist", Attributes::SessionIDList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -29855,9 +29865,11 @@ void registerClusterProximityRanging(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "ranging-capabilities", Attributes::RangingCapabilities::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "wi-fi-dev-ik", Attributes::WiFiDevIK::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "bledevice-id", Attributes::BLEDeviceId::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "bledevice-id", Attributes::BLEDeviceID::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "bltdev-ik", Attributes::BLTDevIK::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "session-ids", Attributes::SessionIDs::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "bltcssecurity-level", Attributes::BLTCSSecurityLevel::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "bltcsmode-capability", Attributes::BLTCSModeCapability::Id, credsIssuerConfig),    //
+        make_unique<SubscribeAttribute>(Id, "session-idlist", Attributes::SessionIDList::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

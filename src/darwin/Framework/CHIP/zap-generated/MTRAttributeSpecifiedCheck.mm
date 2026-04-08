@@ -5490,13 +5490,19 @@ static BOOL AttributeIsSpecifiedInProximityRangingCluster(AttributeId aAttribute
     case Attributes::WiFiDevIK::Id: {
         return YES;
     }
-    case Attributes::BLEDeviceId::Id: {
+    case Attributes::BLEDeviceID::Id: {
         return YES;
     }
     case Attributes::BLTDevIK::Id: {
         return YES;
     }
-    case Attributes::SessionIDs::Id: {
+    case Attributes::BLTCSSecurityLevel::Id: {
+        return YES;
+    }
+    case Attributes::BLTCSModeCapability::Id: {
+        return YES;
+    }
+    case Attributes::SessionIDList::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

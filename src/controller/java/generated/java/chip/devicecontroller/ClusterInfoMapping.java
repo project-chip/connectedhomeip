@@ -16683,7 +16683,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedProximityRangingClusterSessionIDsAttributeCallback implements ChipClusters.ProximityRangingCluster.SessionIDsAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedProximityRangingClusterSessionIDListAttributeCallback implements ChipClusters.ProximityRangingCluster.SessionIDListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {

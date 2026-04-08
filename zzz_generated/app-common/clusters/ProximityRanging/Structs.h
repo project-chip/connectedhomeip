@@ -70,7 +70,7 @@ namespace RangingMeasurementDataStruct {
 enum class Fields : uint8_t
 {
     kWiFiDevIK               = 0,
-    kBLEDeviceId             = 1,
+    kBLEDeviceID             = 1,
     kBLTDevIK                = 2,
     kTimeOfMeasurement       = 3,
     kTimeOfMeasurementOffset = 4,
@@ -86,12 +86,12 @@ struct Type
 {
 public:
     Optional<chip::ByteSpan> wiFiDevIK;
-    Optional<uint64_t> BLEDeviceId;
+    Optional<uint64_t> BLEDeviceID;
     Optional<chip::ByteSpan> BLTDevIK;
     Optional<uint32_t> timeOfMeasurement;
     Optional<uint32_t> timeOfMeasurementOffset;
     DataModel::Nullable<uint16_t> distance;
-    Optional<int16_t> errorMargin;
+    Optional<uint16_t> errorMargin;
     Optional<Structs::RDRStruct::Type> rdr;
     Optional<NADMEnum> detectedAttackLevel;
     Optional<DataModel::Nullable<int8_t>> rssi;
@@ -135,8 +135,9 @@ enum class Fields : uint8_t
 {
     kRole               = 0,
     kPeerBLTDevIK       = 1,
-    kBLTCSSecurityLevel = 2,
-    kLtk                = 3,
+    kBLTCSMode          = 2,
+    kBLTCSSecurityLevel = 3,
+    kLtk                = 4,
 };
 
 struct Type
@@ -144,6 +145,7 @@ struct Type
 public:
     RangingRoleEnum role = static_cast<RangingRoleEnum>(0);
     chip::ByteSpan peerBLTDevIK;
+    Optional<BLTCSModeEnum> BLTCSMode;
     Optional<BLTCSSecurityLevelEnum> BLTCSSecurityLevel;
     Optional<chip::ByteSpan> ltk;
 
@@ -194,7 +196,7 @@ struct Type
 {
 public:
     uint32_t startTime = static_cast<uint32_t>(0);
-    Optional<uint32_t> endTime;
+    uint32_t endTime   = static_cast<uint32_t>(0);
     Optional<uint32_t> rangingInstanceInterval;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

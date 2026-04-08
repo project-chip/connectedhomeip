@@ -11748,7 +11748,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "BLEDeviceId",
+                "attributeName": "BLEDeviceID",
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
@@ -11760,8 +11760,20 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "SessionIDs",
+                "attributeName": "BLTCSSecurityLevel",
                 "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "BLTCSModeCapability",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "SessionIDList",
+                "attributeId": 0x00000006,
                 "type": "int",
                 "reportable": True,
             },

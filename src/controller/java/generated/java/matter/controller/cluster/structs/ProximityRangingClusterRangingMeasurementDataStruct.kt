@@ -25,21 +25,21 @@ import matter.tlv.TlvWriter
 
 class ProximityRangingClusterRangingMeasurementDataStruct(
   val wiFiDevIK: Optional<ByteArray>,
-  val BLEDeviceId: Optional<ULong>,
+  val BLEDeviceID: Optional<ULong>,
   val BLTDevIK: Optional<ByteArray>,
   val timeOfMeasurement: Optional<UInt>,
   val timeOfMeasurementOffset: Optional<UInt>,
   val distance: UShort?,
-  val errorMargin: Optional<Short>,
+  val errorMargin: Optional<UShort>,
   val rdr: Optional<ProximityRangingClusterRDRStruct>,
-  val detectedAttackLevel: Optional<UByte>,
+  val detectedAttackLevel: Optional<UShort>,
   val rssi: Optional<Byte>?,
   val txPower: Optional<Byte>?,
 ) {
   override fun toString(): String = buildString {
     append("ProximityRangingClusterRangingMeasurementDataStruct {\n")
     append("\twiFiDevIK : $wiFiDevIK\n")
-    append("\tBLEDeviceId : $BLEDeviceId\n")
+    append("\tBLEDeviceID : $BLEDeviceID\n")
     append("\tBLTDevIK : $BLTDevIK\n")
     append("\ttimeOfMeasurement : $timeOfMeasurement\n")
     append("\ttimeOfMeasurementOffset : $timeOfMeasurementOffset\n")
@@ -59,9 +59,9 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
         val optwiFiDevIK = wiFiDevIK.get()
         put(ContextSpecificTag(TAG_WI_FI_DEV_IK), optwiFiDevIK)
       }
-      if (BLEDeviceId.isPresent) {
-        val optBLEDeviceId = BLEDeviceId.get()
-        put(ContextSpecificTag(TAG_BLE_DEVICE_ID), optBLEDeviceId)
+      if (BLEDeviceID.isPresent) {
+        val optBLEDeviceID = BLEDeviceID.get()
+        put(ContextSpecificTag(TAG_BLE_DEVICE_ID), optBLEDeviceID)
       }
       if (BLTDevIK.isPresent) {
         val optBLTDevIK = BLTDevIK.get()
@@ -136,7 +136,7 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
         } else {
           Optional.empty()
         }
-      val BLEDeviceId =
+      val BLEDeviceID =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_BLE_DEVICE_ID))) {
           Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_BLE_DEVICE_ID)))
         } else {
@@ -169,7 +169,7 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
         }
       val errorMargin =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_MARGIN))) {
-          Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_ERROR_MARGIN)))
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_ERROR_MARGIN)))
         } else {
           Optional.empty()
         }
@@ -183,7 +183,7 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
         }
       val detectedAttackLevel =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_DETECTED_ATTACK_LEVEL))) {
-          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_DETECTED_ATTACK_LEVEL)))
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_DETECTED_ATTACK_LEVEL)))
         } else {
           Optional.empty()
         }
@@ -214,7 +214,7 @@ class ProximityRangingClusterRangingMeasurementDataStruct(
 
       return ProximityRangingClusterRangingMeasurementDataStruct(
         wiFiDevIK,
-        BLEDeviceId,
+        BLEDeviceID,
         BLTDevIK,
         timeOfMeasurement,
         timeOfMeasurementOffset,

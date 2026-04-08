@@ -28227,7 +28227,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan valu
 
 } // namespace WiFiDevIK
 
-namespace BLEDeviceId {
+namespace BLEDeviceID {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint64_t * value)
 {
@@ -28272,7 +28272,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint64_t value)
     return emberAfWriteAttribute(endpoint, Clusters::ProximityRanging::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
-} // namespace BLEDeviceId
+} // namespace BLEDeviceID
 
 namespace BLTDevIK {
 
@@ -28320,6 +28320,102 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan valu
 }
 
 } // namespace BLTDevIK
+
+namespace BLTCSSecurityLevel {
+
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum * value)
+{
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::ProximityRanging::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum value,
+                                        MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ProximityRanging::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum value)
+{
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ProximityRanging::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+
+} // namespace BLTCSSecurityLevel
+
+namespace BLTCSModeCapability {
+
+Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSModeEnum * value)
+{
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ProximityRanging::BLTCSModeEnum>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpoint, Clusters::ProximityRanging::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSModeEnum value,
+                                        MarkAttributeDirty markDirty)
+{
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ProximityRanging::BLTCSModeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::ProximityRanging::Id, Id),
+                                 EmberAfWriteDataInput(writable, ZCL_ENUM8_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+}
+
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ProximityRanging::BLTCSModeEnum value)
+{
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ProximityRanging::BLTCSModeEnum>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return Protocols::InteractionModel::Status::ConstraintError;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ProximityRanging::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+
+} // namespace BLTCSModeCapability
 
 namespace FeatureMap {
 

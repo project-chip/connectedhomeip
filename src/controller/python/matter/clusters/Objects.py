@@ -42944,9 +42944,11 @@ class ProximityRanging(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="rangingCapabilities", Tag=0x00000000, Type=typing.List[ProximityRanging.Structs.RangingCapabilitiesStruct]),
                 ClusterObjectFieldDescriptor(Label="wiFiDevIK", Tag=0x00000001, Type=typing.Optional[bytes]),
-                ClusterObjectFieldDescriptor(Label="BLEDeviceId", Tag=0x00000002, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="BLEDeviceID", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="BLTDevIK", Tag=0x00000003, Type=typing.Optional[bytes]),
-                ClusterObjectFieldDescriptor(Label="sessionIDs", Tag=0x00000004, Type=typing.Union[Nullable, typing.List[uint]]),
+                ClusterObjectFieldDescriptor(Label="BLTCSSecurityLevel", Tag=0x00000004, Type=typing.Optional[ProximityRanging.Enums.BLTCSSecurityLevelEnum]),
+                ClusterObjectFieldDescriptor(Label="BLTCSModeCapability", Tag=0x00000005, Type=typing.Optional[ProximityRanging.Enums.BLTCSModeEnum]),
+                ClusterObjectFieldDescriptor(Label="sessionIDList", Tag=0x00000006, Type=typing.Union[Nullable, typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -42956,9 +42958,11 @@ class ProximityRanging(Cluster):
 
     rangingCapabilities: typing.List[ProximityRanging.Structs.RangingCapabilitiesStruct] = field(default_factory=lambda: [])
     wiFiDevIK: typing.Optional[bytes] = None
-    BLEDeviceId: typing.Optional[uint] = None
+    BLEDeviceID: typing.Optional[uint] = None
     BLTDevIK: typing.Optional[bytes] = None
-    sessionIDs: typing.Union[Nullable, typing.List[uint]] = NullValue
+    BLTCSSecurityLevel: typing.Optional[ProximityRanging.Enums.BLTCSSecurityLevelEnum] = None
+    BLTCSModeCapability: typing.Optional[ProximityRanging.Enums.BLTCSModeEnum] = None
+    sessionIDList: typing.Union[Nullable, typing.List[uint]] = NullValue
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -42966,11 +42970,21 @@ class ProximityRanging(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class BLTCSModeEnum(MatterIntEnum):
+            kPBROnly = 0x00
+            kRTTOnly = 0x01
+            kBoth = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
         class BLTCSSecurityLevelEnum(MatterIntEnum):
-            kCsSecurityLevelUnknown = 0x00
-            kCsSecurityLevelOne = 0x01
-            kCsSecurityLevelTwo = 0x02
-            kCsSecurityLevelThree = 0x03
+            kBLTCSSecurityLevelUnknown = 0x00
+            kBLTCSSecurityLevelOne = 0x01
+            kBLTCSSecurityLevelTwo = 0x02
+            kBLTCSSecurityLevelThree = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -43027,12 +43041,11 @@ class ProximityRanging(Cluster):
             kSessionEndTimeReached = 0x00
             kPeerNotFound = 0x01
             kHardwareError = 0x02
-            kStopRequested = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4
+            kUnknownEnumValue = 3
 
         class RangingTechEnum(MatterIntEnum):
             kBluetoothChannelSounding = 0x00
@@ -43112,12 +43125,12 @@ class ProximityRanging(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="wiFiDevIK", Tag=0, Type=typing.Optional[bytes]),
-                        ClusterObjectFieldDescriptor(Label="BLEDeviceId", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="BLEDeviceID", Tag=1, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="BLTDevIK", Tag=2, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="timeOfMeasurement", Tag=3, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="timeOfMeasurementOffset", Tag=4, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="distance", Tag=5, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="errorMargin", Tag=6, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="errorMargin", Tag=6, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="rdr", Tag=7, Type=typing.Optional[ProximityRanging.Structs.RDRStruct]),
                         ClusterObjectFieldDescriptor(Label="detectedAttackLevel", Tag=8, Type=typing.Optional[ProximityRanging.Enums.NADMEnum]),
                         ClusterObjectFieldDescriptor(Label="rssi", Tag=9, Type=typing.Union[None, Nullable, int]),
@@ -43125,12 +43138,12 @@ class ProximityRanging(Cluster):
                     ])
 
             wiFiDevIK: 'typing.Optional[bytes]' = None
-            BLEDeviceId: 'typing.Optional[uint]' = None
+            BLEDeviceID: 'typing.Optional[uint]' = None
             BLTDevIK: 'typing.Optional[bytes]' = None
             timeOfMeasurement: 'typing.Optional[uint]' = None
             timeOfMeasurementOffset: 'typing.Optional[uint]' = None
             distance: 'typing.Union[Nullable, uint]' = NullValue
-            errorMargin: 'typing.Optional[int]' = None
+            errorMargin: 'typing.Optional[uint]' = None
             rdr: 'typing.Optional[ProximityRanging.Structs.RDRStruct]' = None
             detectedAttackLevel: 'typing.Optional[ProximityRanging.Enums.NADMEnum]' = None
             rssi: 'typing.Union[None, Nullable, int]' = None
@@ -43157,12 +43170,14 @@ class ProximityRanging(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="role", Tag=0, Type=ProximityRanging.Enums.RangingRoleEnum),
                         ClusterObjectFieldDescriptor(Label="peerBLTDevIK", Tag=1, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="BLTCSSecurityLevel", Tag=2, Type=typing.Optional[ProximityRanging.Enums.BLTCSSecurityLevelEnum]),
-                        ClusterObjectFieldDescriptor(Label="ltk", Tag=3, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="BLTCSMode", Tag=2, Type=typing.Optional[ProximityRanging.Enums.BLTCSModeEnum]),
+                        ClusterObjectFieldDescriptor(Label="BLTCSSecurityLevel", Tag=3, Type=typing.Optional[ProximityRanging.Enums.BLTCSSecurityLevelEnum]),
+                        ClusterObjectFieldDescriptor(Label="ltk", Tag=4, Type=typing.Optional[bytes]),
                     ])
 
             role: 'ProximityRanging.Enums.RangingRoleEnum' = 0
             peerBLTDevIK: 'bytes' = b""
+            BLTCSMode: 'typing.Optional[ProximityRanging.Enums.BLTCSModeEnum]' = None
             BLTCSSecurityLevel: 'typing.Optional[ProximityRanging.Enums.BLTCSSecurityLevelEnum]' = None
             ltk: 'typing.Optional[bytes]' = None
 
@@ -43188,12 +43203,12 @@ class ProximityRanging(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="startTime", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="endTime", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="endTime", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="rangingInstanceInterval", Tag=2, Type=typing.Optional[uint]),
                     ])
 
             startTime: 'uint' = 0
-            endTime: 'typing.Optional[uint]' = None
+            endTime: 'uint' = 0
             rangingInstanceInterval: 'typing.Optional[uint]' = None
 
         @dataclass
@@ -43327,7 +43342,7 @@ class ProximityRanging(Cluster):
             value: typing.Optional[bytes] = None
 
         @dataclass
-        class BLEDeviceId(ClusterAttributeDescriptor):
+        class BLEDeviceID(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000433
@@ -43359,7 +43374,7 @@ class ProximityRanging(Cluster):
             value: typing.Optional[bytes] = None
 
         @dataclass
-        class SessionIDs(ClusterAttributeDescriptor):
+        class BLTCSSecurityLevel(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000433
@@ -43367,6 +43382,38 @@ class ProximityRanging(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[ProximityRanging.Enums.BLTCSSecurityLevelEnum])
+
+            value: typing.Optional[ProximityRanging.Enums.BLTCSSecurityLevelEnum] = None
+
+        @dataclass
+        class BLTCSModeCapability(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000433
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[ProximityRanging.Enums.BLTCSModeEnum])
+
+            value: typing.Optional[ProximityRanging.Enums.BLTCSModeEnum] = None
+
+        @dataclass
+        class SessionIDList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000433
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:

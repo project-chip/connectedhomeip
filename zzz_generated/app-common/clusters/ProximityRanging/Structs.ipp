@@ -83,7 +83,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kWiFiDevIK), wiFiDevIK);
-    encoder.Encode(to_underlying(Fields::kBLEDeviceId), BLEDeviceId);
+    encoder.Encode(to_underlying(Fields::kBLEDeviceID), BLEDeviceID);
     encoder.Encode(to_underlying(Fields::kBLTDevIK), BLTDevIK);
     encoder.Encode(to_underlying(Fields::kTimeOfMeasurement), timeOfMeasurement);
     encoder.Encode(to_underlying(Fields::kTimeOfMeasurementOffset), timeOfMeasurementOffset);
@@ -110,9 +110,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, wiFiDevIK);
         }
-        else if (__context_tag == to_underlying(Fields::kBLEDeviceId))
+        else if (__context_tag == to_underlying(Fields::kBLEDeviceID))
         {
-            err = DataModel::Decode(reader, BLEDeviceId);
+            err = DataModel::Decode(reader, BLEDeviceID);
         }
         else if (__context_tag == to_underlying(Fields::kBLTDevIK))
         {
@@ -197,6 +197,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kRole), role);
     encoder.Encode(to_underlying(Fields::kPeerBLTDevIK), peerBLTDevIK);
+    encoder.Encode(to_underlying(Fields::kBLTCSMode), BLTCSMode);
     encoder.Encode(to_underlying(Fields::kBLTCSSecurityLevel), BLTCSSecurityLevel);
     encoder.Encode(to_underlying(Fields::kLtk), ltk);
     return encoder.Finalize();
@@ -219,6 +220,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kPeerBLTDevIK))
         {
             err = DataModel::Decode(reader, peerBLTDevIK);
+        }
+        else if (__context_tag == to_underlying(Fields::kBLTCSMode))
+        {
+            err = DataModel::Decode(reader, BLTCSMode);
         }
         else if (__context_tag == to_underlying(Fields::kBLTCSSecurityLevel))
         {

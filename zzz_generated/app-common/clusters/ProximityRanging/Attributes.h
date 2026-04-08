@@ -70,7 +70,7 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 16; }
 };
 } // namespace WiFiDevIK
-namespace BLEDeviceId {
+namespace BLEDeviceID {
 struct TypeInfo
 {
     using Type             = uint64_t;
@@ -78,10 +78,10 @@ struct TypeInfo
     using DecodableArgType = uint64_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BLEDeviceId::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BLEDeviceID::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BLEDeviceId
+} // namespace BLEDeviceID
 namespace BLTDevIK {
 struct TypeInfo
 {
@@ -95,7 +95,31 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 16; }
 };
 } // namespace BLTDevIK
-namespace SessionIDs {
+namespace BLTCSSecurityLevel {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum;
+    using DecodableType    = chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum;
+    using DecodableArgType = chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BLTCSSecurityLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace BLTCSSecurityLevel
+namespace BLTCSModeCapability {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ProximityRanging::BLTCSModeEnum;
+    using DecodableType    = chip::app::Clusters::ProximityRanging::BLTCSModeEnum;
+    using DecodableArgType = chip::app::Clusters::ProximityRanging::BLTCSModeEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BLTCSModeCapability::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace BLTCSModeCapability
+namespace SessionIDList {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint8_t>>;
@@ -103,10 +127,10 @@ struct TypeInfo
     using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint8_t>> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ProximityRanging::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SessionIDs::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SessionIDList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace SessionIDs
+} // namespace SessionIDList
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -148,9 +172,13 @@ struct TypeInfo
 
         Attributes::RangingCapabilities::TypeInfo::DecodableType rangingCapabilities;
         Attributes::WiFiDevIK::TypeInfo::DecodableType wiFiDevIK;
-        Attributes::BLEDeviceId::TypeInfo::DecodableType BLEDeviceId = static_cast<uint64_t>(0);
+        Attributes::BLEDeviceID::TypeInfo::DecodableType BLEDeviceID = static_cast<uint64_t>(0);
         Attributes::BLTDevIK::TypeInfo::DecodableType BLTDevIK;
-        Attributes::SessionIDs::TypeInfo::DecodableType sessionIDs;
+        Attributes::BLTCSSecurityLevel::TypeInfo::DecodableType BLTCSSecurityLevel =
+            static_cast<chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum>(0);
+        Attributes::BLTCSModeCapability::TypeInfo::DecodableType BLTCSModeCapability =
+            static_cast<chip::app::Clusters::ProximityRanging::BLTCSModeEnum>(0);
+        Attributes::SessionIDList::TypeInfo::DecodableType sessionIDList;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

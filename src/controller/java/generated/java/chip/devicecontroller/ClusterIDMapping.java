@@ -15464,9 +15464,11 @@ public class ClusterIDMapping {
         public enum Attribute {
             RangingCapabilities(0L),
             WiFiDevIK(1L),
-            BLEDeviceId(2L),
+            BLEDeviceID(2L),
             BLTDevIK(3L),
-            SessionIDs(4L),
+            BLTCSSecurityLevel(4L),
+            BLTCSModeCapability(5L),
+            SessionIDList(6L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),

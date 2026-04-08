@@ -30,6 +30,7 @@ import matter.controller.ReadData
 import matter.controller.ReadRequest
 import matter.controller.SubscribeRequest
 import matter.controller.SubscriptionState
+import matter.controller.UByteSubscriptionState
 import matter.controller.UIntSubscriptionState
 import matter.controller.ULongSubscriptionState
 import matter.controller.UShortSubscriptionState
@@ -60,14 +61,14 @@ class ProximityRangingCluster(
     object SubscriptionEstablished : RangingCapabilitiesAttributeSubscriptionState()
   }
 
-  class SessionIDsAttribute(val value: List<UByte>?)
+  class SessionIDListAttribute(val value: List<UByte>?)
 
-  sealed class SessionIDsAttributeSubscriptionState {
-    data class Success(val value: List<UByte>?) : SessionIDsAttributeSubscriptionState()
+  sealed class SessionIDListAttributeSubscriptionState {
+    data class Success(val value: List<UByte>?) : SessionIDListAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : SessionIDsAttributeSubscriptionState()
+    data class Error(val exception: Exception) : SessionIDListAttributeSubscriptionState()
 
-    object SubscriptionEstablished : SessionIDsAttributeSubscriptionState()
+    object SubscriptionEstablished : SessionIDListAttributeSubscriptionState()
   }
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -424,7 +425,7 @@ class ProximityRangingCluster(
     }
   }
 
-  suspend fun readBLEDeviceIdAttribute(): ULong? {
+  suspend fun readBLEDeviceIDAttribute(): ULong? {
     val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
@@ -460,7 +461,7 @@ class ProximityRangingCluster(
     return decodedValue
   }
 
-  suspend fun subscribeBLEDeviceIdAttribute(
+  suspend fun subscribeBLEDeviceIDAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<ULongSubscriptionState> {
@@ -606,7 +607,7 @@ class ProximityRangingCluster(
     }
   }
 
-  suspend fun readSessionIDsAttribute(): SessionIDsAttribute {
+  suspend fun readBLTCSSecurityLevelAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 4u
 
     val attributePath =
@@ -628,31 +629,24 @@ class ProximityRangingCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Sessionids attribute not found in response" }
+    requireNotNull(attributeData) { "Bltcssecuritylevel attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UByte>? =
-      if (!tlvReader.isNull()) {
-        buildList<UByte> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return SessionIDsAttribute(decodedValue)
+    return decodedValue
   }
 
-  suspend fun subscribeSessionIDsAttribute(
+  suspend fun subscribeBLTCSSecurityLevelAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<SessionIDsAttributeSubscriptionState> {
+  ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
       listOf(
@@ -671,7 +665,7 @@ class ProximityRangingCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            SessionIDsAttributeSubscriptionState.Error(
+            UByteSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -684,7 +678,200 @@ class ProximityRangingCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Sessionids attribute not found in Node State update" }
+          requireNotNull(attributeData) {
+            "Bltcssecuritylevel attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readBLTCSModeCapabilityAttribute(): UByte? {
+    val ATTRIBUTE_ID: UInt = 5u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Bltcsmodecapability attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
+  }
+
+  suspend fun subscribeBLTCSModeCapabilityAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 5u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Bltcsmodecapability attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readSessionIDListAttribute(): SessionIDListAttribute {
+    val ATTRIBUTE_ID: UInt = 6u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Sessionidlist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UByte>? =
+      if (!tlvReader.isNull()) {
+        buildList<UByte> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUByte(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return SessionIDListAttribute(decodedValue)
+  }
+
+  suspend fun subscribeSessionIDListAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<SessionIDListAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 6u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            SessionIDListAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Sessionidlist attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -702,10 +889,10 @@ class ProximityRangingCluster(
               null
             }
 
-          decodedValue?.let { emit(SessionIDsAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(SessionIDListAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(SessionIDsAttributeSubscriptionState.SubscriptionEstablished)
+          emit(SessionIDListAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

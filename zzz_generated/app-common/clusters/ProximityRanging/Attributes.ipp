@@ -36,12 +36,16 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, rangingCapabilities);
     case Attributes::WiFiDevIK::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, wiFiDevIK);
-    case Attributes::BLEDeviceId::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, BLEDeviceId);
+    case Attributes::BLEDeviceID::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, BLEDeviceID);
     case Attributes::BLTDevIK::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, BLTDevIK);
-    case Attributes::SessionIDs::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, sessionIDs);
+    case Attributes::BLTCSSecurityLevel::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, BLTCSSecurityLevel);
+    case Attributes::BLTCSModeCapability::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, BLTCSModeCapability);
+    case Attributes::SessionIDList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, sessionIDList);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

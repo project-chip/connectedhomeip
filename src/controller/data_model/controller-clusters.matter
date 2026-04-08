@@ -8911,14 +8911,20 @@ provisional cluster AmbientContextSensing = 1073 {
 provisional cluster ProximityRanging = 1075 {
   revision 1;
 
-  enum BLTCSSecurityLevelEnum : enum8 {
-    kCSSECURITYLEVELUNKNOWN = 0 [spec_name = "CS_SECURITY_LEVEL_UNKNOWN"];
-    kCSSECURITYLEVELONE = 1 [spec_name = "CS_SECURITY_LEVEL_ONE"];
-    kCSSECURITYLEVELTWO = 2 [spec_name = "CS_SECURITY_LEVEL_TWO"];
-    kCSSECURITYLEVELTHREE = 3 [spec_name = "CS_SECURITY_LEVEL_THREE"];
+  enum BLTCSModeEnum : enum8 {
+    kPBROnly = 0;
+    kRTTOnly = 1;
+    kBoth = 2;
   }
 
-  enum NADMEnum : enum8 {
+  enum BLTCSSecurityLevelEnum : enum8 {
+    kBLTCSSecurityLevelUnknown = 0;
+    kBLTCSSecurityLevelOne = 1;
+    kBLTCSSecurityLevelTwo = 2;
+    kBLTCSSecurityLevelThree = 3;
+  }
+
+  enum NADMEnum : enum16 {
     kAttackExtremelyUnlikely = 0;
     kAttackVeryUnlikely = 1;
     kAttackUnlikely = 2;
@@ -8952,7 +8958,6 @@ provisional cluster ProximityRanging = 1075 {
     kSessionEndTimeReached = 0;
     kPeerNotFound = 1;
     kHardwareError = 2;
-    kStopRequested = 3;
   }
 
   enum RangingTechEnum : enum8 {
@@ -9010,12 +9015,12 @@ provisional cluster ProximityRanging = 1075 {
 
   struct RangingMeasurementDataStruct {
     optional octet_string<16> wiFiDevIK = 0;
-    optional int64u BLEDeviceId = 1;
+    optional int64u BLEDeviceID = 1;
     optional octet_string BLTDevIK = 2;
     optional epoch_s timeOfMeasurement = 3;
     optional elapsed_s timeOfMeasurementOffset = 4;
     nullable int16u distance = 5;
-    optional int16s errorMargin = 6;
+    optional int16u errorMargin = 6;
     optional RDRStruct rdr = 7;
     optional NADMEnum detectedAttackLevel = 8;
     optional nullable int8s rssi = 9;
@@ -9030,8 +9035,9 @@ provisional cluster ProximityRanging = 1075 {
   struct BLTChannelSoundingDeviceRoleConfigStruct {
     RangingRoleEnum role = 0;
     octet_string<16> peerBLTDevIK = 1;
-    optional BLTCSSecurityLevelEnum BLTCSSecurityLevel = 2;
-    optional octet_string<16> ltk = 3;
+    optional BLTCSModeEnum BLTCSMode = 2;
+    optional BLTCSSecurityLevelEnum BLTCSSecurityLevel = 3;
+    optional octet_string<16> ltk = 4;
   }
 
   struct RangingCapabilitiesStruct {
@@ -9042,7 +9048,7 @@ provisional cluster ProximityRanging = 1075 {
 
   struct RangingTriggerConditionStruct {
     elapsed_s startTime = 0;
-    optional elapsed_s endTime = 1;
+    elapsed_s endTime = 1;
     optional elapsed_s rangingInstanceInterval = 2;
   }
 
@@ -9070,9 +9076,11 @@ provisional cluster ProximityRanging = 1075 {
 
   readonly attribute RangingCapabilitiesStruct rangingCapabilities[] = 0;
   readonly attribute optional octet_string<16> wiFiDevIK = 1;
-  readonly attribute optional int64u BLEDeviceId = 2;
+  readonly attribute optional int64u BLEDeviceID = 2;
   readonly attribute optional octet_string<16> BLTDevIK = 3;
-  readonly attribute nullable int8u sessionIDs[] = 4;
+  readonly attribute optional BLTCSSecurityLevelEnum BLTCSSecurityLevel = 4;
+  readonly attribute optional BLTCSModeEnum BLTCSModeCapability = 5;
+  readonly attribute nullable int8u sessionIDList[] = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -9100,9 +9108,9 @@ provisional cluster ProximityRanging = 1075 {
     int8u sessionID = 0;
   }
 
-  /** This command allows the client to request the start of a ranging session. */
+  /** This command allows the Client to request the start of a ranging session. */
   command StartRangingRequest(StartRangingRequestRequest): StartRangingResponse = 0;
-  /** Upon receipt of a StopRangingRequest command that contains a SessionID that matches an active ranging session, the server SHALL terminate the corresponding ranging session. */
+  /** Upon receipt of a StopRangingRequest command that contains a SessionID that matches an active ranging session, the Server SHALL terminate the corresponding ranging session. */
   command StopRangingRequest(StopRangingRequestRequest): DefaultSuccess = 2;
 }
 

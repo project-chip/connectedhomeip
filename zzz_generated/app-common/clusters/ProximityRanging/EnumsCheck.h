@@ -25,15 +25,28 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::BLTCSModeEnum val)
+{
+    using EnumType = ProximityRanging::BLTCSModeEnum;
+    switch (val)
+    {
+    case EnumType::kPBROnly:
+    case EnumType::kRTTOnly:
+    case EnumType::kBoth:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::BLTCSSecurityLevelEnum val)
 {
     using EnumType = ProximityRanging::BLTCSSecurityLevelEnum;
     switch (val)
     {
-    case EnumType::kCsSecurityLevelUnknown:
-    case EnumType::kCsSecurityLevelOne:
-    case EnumType::kCsSecurityLevelTwo:
-    case EnumType::kCsSecurityLevelThree:
+    case EnumType::kBLTCSSecurityLevelUnknown:
+    case EnumType::kBLTCSSecurityLevelOne:
+    case EnumType::kBLTCSSecurityLevelTwo:
+    case EnumType::kBLTCSSecurityLevelThree:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -105,7 +118,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ProximityRanging::Rangi
     case EnumType::kSessionEndTimeReached:
     case EnumType::kPeerNotFound:
     case EnumType::kHardwareError:
-    case EnumType::kStopRequested:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

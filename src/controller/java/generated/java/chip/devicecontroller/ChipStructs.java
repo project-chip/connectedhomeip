@@ -12236,7 +12236,7 @@ public static class ProximityRangingClusterRDRStruct {
 }
 public static class ProximityRangingClusterRangingMeasurementDataStruct {
   public Optional<byte[]> wiFiDevIK;
-  public Optional<Long> BLEDeviceId;
+  public Optional<Long> BLEDeviceID;
   public Optional<byte[]> BLTDevIK;
   public Optional<Long> timeOfMeasurement;
   public Optional<Long> timeOfMeasurementOffset;
@@ -12260,7 +12260,7 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
 
   public ProximityRangingClusterRangingMeasurementDataStruct(
     Optional<byte[]> wiFiDevIK,
-    Optional<Long> BLEDeviceId,
+    Optional<Long> BLEDeviceID,
     Optional<byte[]> BLTDevIK,
     Optional<Long> timeOfMeasurement,
     Optional<Long> timeOfMeasurementOffset,
@@ -12272,7 +12272,7 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
     @Nullable Optional<Integer> txPower
   ) {
     this.wiFiDevIK = wiFiDevIK;
-    this.BLEDeviceId = BLEDeviceId;
+    this.BLEDeviceID = BLEDeviceID;
     this.BLTDevIK = BLTDevIK;
     this.timeOfMeasurement = timeOfMeasurement;
     this.timeOfMeasurementOffset = timeOfMeasurementOffset;
@@ -12287,12 +12287,12 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(WI_FI_DEV_IK_ID, wiFiDevIK.<BaseTLVType>map((nonOptionalwiFiDevIK) -> new ByteArrayType(nonOptionalwiFiDevIK)).orElse(new EmptyType())));
-    values.add(new StructElement(BLE_DEVICE_ID_ID, BLEDeviceId.<BaseTLVType>map((nonOptionalBLEDeviceId) -> new UIntType(nonOptionalBLEDeviceId)).orElse(new EmptyType())));
+    values.add(new StructElement(BLE_DEVICE_ID_ID, BLEDeviceID.<BaseTLVType>map((nonOptionalBLEDeviceID) -> new UIntType(nonOptionalBLEDeviceID)).orElse(new EmptyType())));
     values.add(new StructElement(BLT_DEV_IK_ID, BLTDevIK.<BaseTLVType>map((nonOptionalBLTDevIK) -> new ByteArrayType(nonOptionalBLTDevIK)).orElse(new EmptyType())));
     values.add(new StructElement(TIME_OF_MEASUREMENT_ID, timeOfMeasurement.<BaseTLVType>map((nonOptionaltimeOfMeasurement) -> new UIntType(nonOptionaltimeOfMeasurement)).orElse(new EmptyType())));
     values.add(new StructElement(TIME_OF_MEASUREMENT_OFFSET_ID, timeOfMeasurementOffset.<BaseTLVType>map((nonOptionaltimeOfMeasurementOffset) -> new UIntType(nonOptionaltimeOfMeasurementOffset)).orElse(new EmptyType())));
     values.add(new StructElement(DISTANCE_ID, distance != null ? new UIntType(distance) : new NullType()));
-    values.add(new StructElement(ERROR_MARGIN_ID, errorMargin.<BaseTLVType>map((nonOptionalerrorMargin) -> new IntType(nonOptionalerrorMargin)).orElse(new EmptyType())));
+    values.add(new StructElement(ERROR_MARGIN_ID, errorMargin.<BaseTLVType>map((nonOptionalerrorMargin) -> new UIntType(nonOptionalerrorMargin)).orElse(new EmptyType())));
     values.add(new StructElement(RDR_ID, rdr.<BaseTLVType>map((nonOptionalrdr) -> nonOptionalrdr.encodeTlv()).orElse(new EmptyType())));
     values.add(new StructElement(DETECTED_ATTACK_LEVEL_ID, detectedAttackLevel.<BaseTLVType>map((nonOptionaldetectedAttackLevel) -> new UIntType(nonOptionaldetectedAttackLevel)).orElse(new EmptyType())));
     values.add(new StructElement(RSSI_ID, rssi != null ? rssi.<BaseTLVType>map((nonOptionalrssi) -> new IntType(nonOptionalrssi)).orElse(new EmptyType()) : new NullType()));
@@ -12306,7 +12306,7 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
       return null;
     }
     Optional<byte[]> wiFiDevIK = Optional.empty();
-    Optional<Long> BLEDeviceId = Optional.empty();
+    Optional<Long> BLEDeviceID = Optional.empty();
     Optional<byte[]> BLTDevIK = Optional.empty();
     Optional<Long> timeOfMeasurement = Optional.empty();
     Optional<Long> timeOfMeasurementOffset = Optional.empty();
@@ -12325,7 +12325,7 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
       } else if (element.contextTagNum() == BLE_DEVICE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          BLEDeviceId = Optional.of(castingValue.value(Long.class));
+          BLEDeviceID = Optional.of(castingValue.value(Long.class));
         }
       } else if (element.contextTagNum() == BLT_DEV_IK_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -12348,8 +12348,8 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
           distance = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == ERROR_MARGIN_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
-          IntType castingValue = element.value(IntType.class);
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
           errorMargin = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == RDR_ID) {
@@ -12376,7 +12376,7 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
     }
     return new ProximityRangingClusterRangingMeasurementDataStruct(
       wiFiDevIK,
-      BLEDeviceId,
+      BLEDeviceID,
       BLTDevIK,
       timeOfMeasurement,
       timeOfMeasurementOffset,
@@ -12396,8 +12396,8 @@ public static class ProximityRangingClusterRangingMeasurementDataStruct {
     output.append("\twiFiDevIK: ");
     output.append(wiFiDevIK.isPresent() ? Arrays.toString(wiFiDevIK.get()) : "");
     output.append("\n");
-    output.append("\tBLEDeviceId: ");
-    output.append(BLEDeviceId);
+    output.append("\tBLEDeviceID: ");
+    output.append(BLEDeviceID);
     output.append("\n");
     output.append("\tBLTDevIK: ");
     output.append(BLTDevIK.isPresent() ? Arrays.toString(BLTDevIK.get()) : "");
@@ -12494,21 +12494,25 @@ public static class ProximityRangingClusterBLERangingDeviceRoleConfigStruct {
 public static class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct {
   public Integer role;
   public byte[] peerBLTDevIK;
+  public Optional<Integer> BLTCSMode;
   public Optional<Integer> BLTCSSecurityLevel;
   public Optional<byte[]> ltk;
   private static final long ROLE_ID = 0L;
   private static final long PEER_BLT_DEV_IK_ID = 1L;
-  private static final long BLTCS_SECURITY_LEVEL_ID = 2L;
-  private static final long LTK_ID = 3L;
+  private static final long BLTCS_MODE_ID = 2L;
+  private static final long BLTCS_SECURITY_LEVEL_ID = 3L;
+  private static final long LTK_ID = 4L;
 
   public ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
     Integer role,
     byte[] peerBLTDevIK,
+    Optional<Integer> BLTCSMode,
     Optional<Integer> BLTCSSecurityLevel,
     Optional<byte[]> ltk
   ) {
     this.role = role;
     this.peerBLTDevIK = peerBLTDevIK;
+    this.BLTCSMode = BLTCSMode;
     this.BLTCSSecurityLevel = BLTCSSecurityLevel;
     this.ltk = ltk;
   }
@@ -12517,6 +12521,7 @@ public static class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStr
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ROLE_ID, new UIntType(role)));
     values.add(new StructElement(PEER_BLT_DEV_IK_ID, new ByteArrayType(peerBLTDevIK)));
+    values.add(new StructElement(BLTCS_MODE_ID, BLTCSMode.<BaseTLVType>map((nonOptionalBLTCSMode) -> new UIntType(nonOptionalBLTCSMode)).orElse(new EmptyType())));
     values.add(new StructElement(BLTCS_SECURITY_LEVEL_ID, BLTCSSecurityLevel.<BaseTLVType>map((nonOptionalBLTCSSecurityLevel) -> new UIntType(nonOptionalBLTCSSecurityLevel)).orElse(new EmptyType())));
     values.add(new StructElement(LTK_ID, ltk.<BaseTLVType>map((nonOptionalltk) -> new ByteArrayType(nonOptionalltk)).orElse(new EmptyType())));
 
@@ -12529,6 +12534,7 @@ public static class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStr
     }
     Integer role = null;
     byte[] peerBLTDevIK = null;
+    Optional<Integer> BLTCSMode = Optional.empty();
     Optional<Integer> BLTCSSecurityLevel = Optional.empty();
     Optional<byte[]> ltk = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
@@ -12541,6 +12547,11 @@ public static class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStr
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           peerBLTDevIK = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == BLTCS_MODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          BLTCSMode = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == BLTCS_SECURITY_LEVEL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -12557,6 +12568,7 @@ public static class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStr
     return new ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
       role,
       peerBLTDevIK,
+      BLTCSMode,
       BLTCSSecurityLevel,
       ltk
     );
@@ -12571,6 +12583,9 @@ public static class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStr
     output.append("\n");
     output.append("\tpeerBLTDevIK: ");
     output.append(Arrays.toString(peerBLTDevIK));
+    output.append("\n");
+    output.append("\tBLTCSMode: ");
+    output.append(BLTCSMode);
     output.append("\n");
     output.append("\tBLTCSSecurityLevel: ");
     output.append(BLTCSSecurityLevel);
@@ -12660,7 +12675,7 @@ public static class ProximityRangingClusterRangingCapabilitiesStruct {
 }
 public static class ProximityRangingClusterRangingTriggerConditionStruct {
   public Long startTime;
-  public Optional<Long> endTime;
+  public Long endTime;
   public Optional<Long> rangingInstanceInterval;
   private static final long START_TIME_ID = 0L;
   private static final long END_TIME_ID = 1L;
@@ -12668,7 +12683,7 @@ public static class ProximityRangingClusterRangingTriggerConditionStruct {
 
   public ProximityRangingClusterRangingTriggerConditionStruct(
     Long startTime,
-    Optional<Long> endTime,
+    Long endTime,
     Optional<Long> rangingInstanceInterval
   ) {
     this.startTime = startTime;
@@ -12679,7 +12694,7 @@ public static class ProximityRangingClusterRangingTriggerConditionStruct {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(START_TIME_ID, new UIntType(startTime)));
-    values.add(new StructElement(END_TIME_ID, endTime.<BaseTLVType>map((nonOptionalendTime) -> new UIntType(nonOptionalendTime)).orElse(new EmptyType())));
+    values.add(new StructElement(END_TIME_ID, new UIntType(endTime)));
     values.add(new StructElement(RANGING_INSTANCE_INTERVAL_ID, rangingInstanceInterval.<BaseTLVType>map((nonOptionalrangingInstanceInterval) -> new UIntType(nonOptionalrangingInstanceInterval)).orElse(new EmptyType())));
 
     return new StructType(values);
@@ -12690,7 +12705,7 @@ public static class ProximityRangingClusterRangingTriggerConditionStruct {
       return null;
     }
     Long startTime = null;
-    Optional<Long> endTime = Optional.empty();
+    Long endTime = null;
     Optional<Long> rangingInstanceInterval = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == START_TIME_ID) {
@@ -12701,7 +12716,7 @@ public static class ProximityRangingClusterRangingTriggerConditionStruct {
       } else if (element.contextTagNum() == END_TIME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          endTime = Optional.of(castingValue.value(Long.class));
+          endTime = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == RANGING_INSTANCE_INTERVAL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {

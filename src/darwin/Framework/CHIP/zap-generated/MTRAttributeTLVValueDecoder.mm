@@ -17012,8 +17012,8 @@ static id _Nullable DecodeAttributeValueForProximityRangingCluster(AttributeId a
         value = AsData(cppValue);
         return value;
     }
-    case Attributes::BLEDeviceId::Id: {
-        using TypeInfo = Attributes::BLEDeviceId::TypeInfo;
+    case Attributes::BLEDeviceID::Id: {
+        using TypeInfo = Attributes::BLEDeviceID::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17034,8 +17034,30 @@ static id _Nullable DecodeAttributeValueForProximityRangingCluster(AttributeId a
         value = AsData(cppValue);
         return value;
     }
-    case Attributes::SessionIDs::Id: {
-        using TypeInfo = Attributes::SessionIDs::TypeInfo;
+    case Attributes::BLTCSSecurityLevel::Id: {
+        using TypeInfo = Attributes::BLTCSSecurityLevel::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::BLTCSModeCapability::Id: {
+        using TypeInfo = Attributes::BLTCSModeCapability::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::SessionIDList::Id: {
+        using TypeInfo = Attributes::SessionIDList::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

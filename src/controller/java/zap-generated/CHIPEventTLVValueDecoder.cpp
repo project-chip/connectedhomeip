@@ -9244,25 +9244,25 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
                     value_rangingResultData_wiFiDevIKInsideOptional, value_rangingResultData_wiFiDevIK);
             }
-            jobject value_rangingResultData_BLEDeviceId;
-            if (!cppValue.rangingResultData.BLEDeviceId.HasValue())
+            jobject value_rangingResultData_BLEDeviceID;
+            if (!cppValue.rangingResultData.BLEDeviceID.HasValue())
             {
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(nullptr,
-                                                                                           value_rangingResultData_BLEDeviceId);
+                                                                                           value_rangingResultData_BLEDeviceID);
             }
             else
             {
-                jobject value_rangingResultData_BLEDeviceIdInsideOptional;
-                std::string value_rangingResultData_BLEDeviceIdInsideOptionalClassName     = "java/lang/Long";
-                std::string value_rangingResultData_BLEDeviceIdInsideOptionalCtorSignature = "(J)V";
-                jlong jnivalue_rangingResultData_BLEDeviceIdInsideOptional =
-                    static_cast<jlong>(cppValue.rangingResultData.BLEDeviceId.Value());
+                jobject value_rangingResultData_BLEDeviceIDInsideOptional;
+                std::string value_rangingResultData_BLEDeviceIDInsideOptionalClassName     = "java/lang/Long";
+                std::string value_rangingResultData_BLEDeviceIDInsideOptionalCtorSignature = "(J)V";
+                jlong jnivalue_rangingResultData_BLEDeviceIDInsideOptional =
+                    static_cast<jlong>(cppValue.rangingResultData.BLEDeviceID.Value());
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                    value_rangingResultData_BLEDeviceIdInsideOptionalClassName.c_str(),
-                    value_rangingResultData_BLEDeviceIdInsideOptionalCtorSignature.c_str(),
-                    jnivalue_rangingResultData_BLEDeviceIdInsideOptional, value_rangingResultData_BLEDeviceIdInsideOptional);
+                    value_rangingResultData_BLEDeviceIDInsideOptionalClassName.c_str(),
+                    value_rangingResultData_BLEDeviceIDInsideOptionalCtorSignature.c_str(),
+                    jnivalue_rangingResultData_BLEDeviceIDInsideOptional, value_rangingResultData_BLEDeviceIDInsideOptional);
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateOptional(
-                    value_rangingResultData_BLEDeviceIdInsideOptional, value_rangingResultData_BLEDeviceId);
+                    value_rangingResultData_BLEDeviceIDInsideOptional, value_rangingResultData_BLEDeviceID);
             }
             jobject value_rangingResultData_BLTDevIK;
             if (!cppValue.rangingResultData.BLTDevIK.HasValue())
@@ -9546,7 +9546,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
                 value_rangingResultData = env->NewObject(
                     rangingMeasurementDataStructStructClass_0, rangingMeasurementDataStructStructCtor_0,
-                    value_rangingResultData_wiFiDevIK, value_rangingResultData_BLEDeviceId, value_rangingResultData_BLTDevIK,
+                    value_rangingResultData_wiFiDevIK, value_rangingResultData_BLEDeviceID, value_rangingResultData_BLTDevIK,
                     value_rangingResultData_timeOfMeasurement, value_rangingResultData_timeOfMeasurementOffset,
                     value_rangingResultData_distance, value_rangingResultData_errorMargin, value_rangingResultData_rdr,
                     value_rangingResultData_detectedAttackLevel, value_rangingResultData_rssi, value_rangingResultData_txPower);

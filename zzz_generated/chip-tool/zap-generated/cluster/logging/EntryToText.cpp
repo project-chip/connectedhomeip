@@ -4055,12 +4055,16 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "RangingCapabilities";
         case chip::app::Clusters::ProximityRanging::Attributes::WiFiDevIK::Id:
             return "WiFiDevIK";
-        case chip::app::Clusters::ProximityRanging::Attributes::BLEDeviceId::Id:
-            return "BLEDeviceId";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLEDeviceID::Id:
+            return "BLEDeviceID";
         case chip::app::Clusters::ProximityRanging::Attributes::BLTDevIK::Id:
             return "BLTDevIK";
-        case chip::app::Clusters::ProximityRanging::Attributes::SessionIDs::Id:
-            return "SessionIDs";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLTCSSecurityLevel::Id:
+            return "BLTCSSecurityLevel";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLTCSModeCapability::Id:
+            return "BLTCSModeCapability";
+        case chip::app::Clusters::ProximityRanging::Attributes::SessionIDList::Id:
+            return "SessionIDList";
         case chip::app::Clusters::ProximityRanging::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ProximityRanging::Attributes::AcceptedCommandList::Id:

@@ -5006,10 +5006,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("BLEDeviceId", indent + 1, value.BLEDeviceId);
+        CHIP_ERROR err = LogValue("BLEDeviceID", indent + 1, value.BLEDeviceID);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'BLEDeviceId'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'BLEDeviceID'");
             return err;
         }
     }
@@ -5134,6 +5134,14 @@ CHIP_ERROR DataModelLogger::LogValue(
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PeerBLTDevIK'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("BLTCSMode", indent + 1, value.BLTCSMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'BLTCSMode'");
             return err;
         }
     }
@@ -21762,20 +21770,30 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WiFiDevIK", 1, value);
         }
-        case ProximityRanging::Attributes::BLEDeviceId::Id: {
+        case ProximityRanging::Attributes::BLEDeviceID::Id: {
             uint64_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BLEDeviceId", 1, value);
+            return DataModelLogger::LogValue("BLEDeviceID", 1, value);
         }
         case ProximityRanging::Attributes::BLTDevIK::Id: {
             chip::ByteSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BLTDevIK", 1, value);
         }
-        case ProximityRanging::Attributes::SessionIDs::Id: {
+        case ProximityRanging::Attributes::BLTCSSecurityLevel::Id: {
+            chip::app::Clusters::ProximityRanging::BLTCSSecurityLevelEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BLTCSSecurityLevel", 1, value);
+        }
+        case ProximityRanging::Attributes::BLTCSModeCapability::Id: {
+            chip::app::Clusters::ProximityRanging::BLTCSModeEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BLTCSModeCapability", 1, value);
+        }
+        case ProximityRanging::Attributes::SessionIDList::Id: {
             chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint8_t>> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SessionIDs", 1, value);
+            return DataModelLogger::LogValue("SessionIDList", 1, value);
         }
         case ProximityRanging::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

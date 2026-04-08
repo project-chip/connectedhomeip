@@ -2058,7 +2058,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRProximityRangingClusterRangingMeasurementDataStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSData * _Nullable wiFiDevIK MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable bleDeviceId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable bleDeviceID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSData * _Nullable bltDevIK MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable timeOfMeasurement MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable timeOfMeasurementOffset MTR_PROVISIONALLY_AVAILABLE;
@@ -2080,6 +2080,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull role MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSData * _Nonnull peerBLTDevIK MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable bltcsMode MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable bltcsSecurityLevel MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSData * _Nullable ltk MTR_PROVISIONALLY_AVAILABLE;
 @end
@@ -2094,7 +2095,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRProximityRangingClusterRangingTriggerConditionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull startTime MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable endTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull endTime MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable rangingInstanceInterval MTR_PROVISIONALLY_AVAILABLE;
 @end
 
