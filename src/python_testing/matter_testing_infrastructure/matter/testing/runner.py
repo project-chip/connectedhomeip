@@ -491,7 +491,7 @@ def run_tests_no_exit(
         # Populate the global wildcard only after commissioning has completed,
         # so the DUT is reachable for operational reads.
         #
-        if ok and not matter_test_config.commission_only:
+        if ok and not matter_test_config.commission_only and matter_test_config.in_test_commissioning_method is None and matter_test_config.commissioning_method is not None:
             try:
                 global_wildcard = event_loop.run_until_complete(
                     asyncio.wait_for(
