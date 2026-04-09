@@ -319,14 +319,15 @@ else
         } &>/dev/null
     fi
 
-    # Treat packages as ready in Docker or after a completed local install (.install-packages-done).
-    INSTALL_EVERYTHING=false
-    if [ "$USE_DOCKER" == true ] || [ -f "$CHIP_ROOT/scripts/setup/silabs/.install-packages-done" ]; then # INSTALL_EVERYTHING
+    # After a completed local install (.install-packages-done), skip the Silabs package install step. Docker never runs it (SDK is in the image).
+    if [ -f "$CHIP_ROOT/scripts/setup/silabs/.install-packages-done" ]; then # INSTALL_EVERYTHING
         INSTALL_EVERYTHING=true
+    else
+        INSTALL_EVERYTHING=false
     fi # INSTALL_EVERYTHING
 
-    # First-time local install: INSTALL_EVERYTHING is false until Docker or .install-packages-done (see above); respect opt-out.
-    if [ "$INSTALL_EVERYTHING" != true ] && [ ! -f "$CHIP_ROOT/scripts/setup/silabs/.do-not-install-packages" ]; then # first-time install prompt
+    # First-time local install: INSTALL_EVERYTHING is false until .install-packages-done (see above); respect opt-out. No prompt in Docker.
+    if [ "$USE_DOCKER" != true ] && [ "$INSTALL_EVERYTHING" != true ] && [ ! -f "$CHIP_ROOT/scripts/setup/silabs/.do-not-install-packages" ]; then # first-time install prompt
         cat <<'EOF'
         !!!!!!!!! FIRST TIME INSTALL !!!!!!!!!
         Do you agree to install SILICON LABS PACKAGES MANAGER?
@@ -356,8 +357,8 @@ EOF
         done
     fi # first-time install prompt
 
-    # Local Silabs package install when agreed (INSTALL_EVERYTHING) and not already done; skip in Docker (SDK in image).
-    if [ "$INSTALL_EVERYTHING" == true ]; then # run install-packages
+    # Local Silabs package install when agreed (INSTALL_EVERYTHING). Never under Docker.
+    if [ "$INSTALL_EVERYTHING" == true ] && [ "$USE_DOCKER" != true ]; then # run install-packages
         pip install -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt"
         python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
     fi # run install-packages
