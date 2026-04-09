@@ -345,6 +345,10 @@ if (CONFIG_ICD_MAX_NOTIFICATION_SUBSCRIBERS)
     chip_gn_arg_append("icd_max_notification_subscribers" ${CONFIG_ICD_MAX_NOTIFICATION_SUBSCRIBERS})
 endif()
 
+if (CONFIG_CHIP_ENABLE_GROUPCAST)
+chip_gn_arg_bool("chip_config_enable_groupcast" CONFIG_CHIP_ENABLE_GROUPCAST)
+endif()
+
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
 
@@ -393,6 +397,10 @@ endif()
 set(GN_ROOT_TARGET ${CHIP_ROOT}/config/esp32)
 
 set(chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a")
+
+if (CONFIG_BUILD_CHIP_TESTS)
+    list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPWTestsWrapper.a")
+endif()
 
 if(CONFIG_ENABLE_PW_RPC)
   list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")

@@ -6800,6 +6800,128 @@ public static class AmbientContextSensingClusterAmbientContextDetectEndedEvent {
     return output.toString();
   }
 }
+public static class ProximityRangingClusterRangingResultEvent {
+  public Integer sessionID;
+  public ChipStructs.ProximityRangingClusterRangingMeasurementDataStruct rangingResultData;
+  private static final long SESSION_ID_ID = 0L;
+  private static final long RANGING_RESULT_DATA_ID = 1L;
+
+  public ProximityRangingClusterRangingResultEvent(
+    Integer sessionID,
+    ChipStructs.ProximityRangingClusterRangingMeasurementDataStruct rangingResultData
+  ) {
+    this.sessionID = sessionID;
+    this.rangingResultData = rangingResultData;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SESSION_ID_ID, new UIntType(sessionID)));
+    values.add(new StructElement(RANGING_RESULT_DATA_ID, rangingResultData.encodeTlv()));
+
+    return new StructType(values);
+  }
+
+  public static ProximityRangingClusterRangingResultEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer sessionID = null;
+    ChipStructs.ProximityRangingClusterRangingMeasurementDataStruct rangingResultData = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SESSION_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sessionID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == RANGING_RESULT_DATA_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          rangingResultData = ChipStructs.ProximityRangingClusterRangingMeasurementDataStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new ProximityRangingClusterRangingResultEvent(
+      sessionID,
+      rangingResultData
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ProximityRangingClusterRangingResultEvent {\n");
+    output.append("\tsessionID: ");
+    output.append(sessionID);
+    output.append("\n");
+    output.append("\trangingResultData: ");
+    output.append(rangingResultData);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ProximityRangingClusterRangingSessionStatusEvent {
+  public Integer sessionID;
+  public Integer status;
+  private static final long SESSION_ID_ID = 0L;
+  private static final long STATUS_ID = 1L;
+
+  public ProximityRangingClusterRangingSessionStatusEvent(
+    Integer sessionID,
+    Integer status
+  ) {
+    this.sessionID = sessionID;
+    this.status = status;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SESSION_ID_ID, new UIntType(sessionID)));
+    values.add(new StructElement(STATUS_ID, new UIntType(status)));
+
+    return new StructType(values);
+  }
+
+  public static ProximityRangingClusterRangingSessionStatusEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer sessionID = null;
+    Integer status = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SESSION_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sessionID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == STATUS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          status = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ProximityRangingClusterRangingSessionStatusEvent(
+      sessionID,
+      status
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ProximityRangingClusterRangingSessionStatusEvent {\n");
+    output.append("\tsessionID: ");
+    output.append(sessionID);
+    output.append("\n");
+    output.append("\tstatus: ");
+    output.append(status);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class TargetNavigatorClusterTargetUpdatedEvent {
   public ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct> targetList;
   public Integer currentTarget;

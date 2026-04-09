@@ -255,6 +255,10 @@
 #include <clusters/HepaFilterMonitoring/Commands.ipp>
 #include <clusters/HepaFilterMonitoring/Events.ipp>
 #include <clusters/HepaFilterMonitoring/Structs.ipp>
+#include <clusters/Humidistat/Attributes.ipp>
+#include <clusters/Humidistat/Commands.ipp>
+#include <clusters/Humidistat/Events.ipp>
+#include <clusters/Humidistat/Structs.ipp>
 #include <clusters/IcdManagement/Attributes.ipp>
 #include <clusters/IcdManagement/Commands.ipp>
 #include <clusters/IcdManagement/Events.ipp>
@@ -403,6 +407,10 @@
 #include <clusters/PressureMeasurement/Commands.ipp>
 #include <clusters/PressureMeasurement/Events.ipp>
 #include <clusters/PressureMeasurement/Structs.ipp>
+#include <clusters/ProximityRanging/Attributes.ipp>
+#include <clusters/ProximityRanging/Commands.ipp>
+#include <clusters/ProximityRanging/Events.ipp>
+#include <clusters/ProximityRanging/Structs.ipp>
 #include <clusters/ProxyConfiguration/Attributes.ipp>
 #include <clusters/ProxyConfiguration/Commands.ipp>
 #include <clusters/ProxyConfiguration/Events.ipp>
@@ -1224,7 +1232,21 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::Humidistat::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
     case Clusters::ColorControl::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::ProximityRanging::Id: {
         switch (aCommand)
         {
         default:
