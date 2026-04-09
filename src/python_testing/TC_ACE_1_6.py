@@ -34,6 +34,20 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_CLUSTERS_NO_GROUPCAST_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -58,6 +72,9 @@ class TC_ACE_1_6(MatterBaseTest):
     def desc_TC_ACE_1_6(self) -> str:
         return "[TC-ACE-1.6] Group auth mode"
 
+    def pics_TC_ACE_1_6(self):
+        return ["MCORE.ROLE.COMMISSIONEE", "G.S"]
+    
     def steps_TC_ACE_1_6(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
