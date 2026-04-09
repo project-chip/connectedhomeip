@@ -23,7 +23,7 @@
 
 namespace chip::app::Clusters::BasicInformation {
 
-constexpr bool kHasDeviceLocation = 
+constexpr bool kHasDeviceLocation =
     BasicInformation::StaticApplicationConfig::IsAttributeEnabledOnSomeEndpoint(BasicInformation::Attributes::DeviceLocation::Id);
 
 

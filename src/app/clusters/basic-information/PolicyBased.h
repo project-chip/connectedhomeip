@@ -396,8 +396,8 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
         ChipLogDetail(Zcl, "Reading DeviceLocation");
 
         auto location = mPolicy.GetDeviceLocation();
-        return encoder.Encode(*location);     
-    }  
+        return encoder.Encode(*location);
+    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }

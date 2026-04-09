@@ -44,7 +44,7 @@ static_assert((kBasicInformationFixedClusterCount == 0) ||
                    BasicInformation::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
               "Basic Information cluster MUST be on endpoint 0");
 
-constexpr bool kHasDeviceLocation = 
+constexpr bool kHasDeviceLocation =
     BasicInformation::StaticApplicationConfig::IsAttributeEnabledOnSomeEndpoint(BasicInformation::Attributes::DeviceLocation::Id);
 
 LazyRegisteredServerCluster<BasicInformationCluster<kHasDeviceLocation>> gServer;
