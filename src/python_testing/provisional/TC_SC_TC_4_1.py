@@ -62,7 +62,7 @@ class TC_SC_TC_4_1(MatterBaseTest):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
         commissioner.SetThreadOperationalDataset(self.matter_test_config.thread_operational_dataset)
         await commissioner.EstablishPASESessionThreadMeshcop(baAddr=self.matter_test_config.thread_ba_host,
-                                                             setupCode=self.matter_test_config.qr_code_content[0],
+                                                             setupCode=self.first_setup_code(),
                                                              nodeId=self.matter_test_config.dut_node_ids[0],
                                                              baPort=self.matter_test_config.thread_ba_port)
 
