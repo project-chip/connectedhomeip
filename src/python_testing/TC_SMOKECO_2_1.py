@@ -97,13 +97,13 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
         await self.read_attribute_check_range(self.smokeco_cluster.Attributes.ExpressedState, enum=self.smokeco_enums.ExpressedStateEnum)
 
         self.step(3)
-        if await self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
+        if await self.feature_guard(endpoint=self.get_endpoint(), cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.SmokeState, enum=self.smokeco_enums.AlarmStateEnum)
         else:
             self.skip_step(3)
 
         self.step(4)
-        if await self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kCoAlarm):
+        if await self.feature_guard(endpoint=self.get_endpoint(), cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kCoAlarm):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.COState, enum=self.smokeco_enums.AlarmStateEnum)
         else:
             self.skip_step(4)
@@ -132,14 +132,14 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
         if await self.attribute_guard(endpoint=self.get_endpoint(), attribute=self.smokeco_cluster.Attributes.InterconnectCOAlarm):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.InterconnectCOAlarm, enum=self.smokeco_enums.AlarmStateEnum)
 
-        if await self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
+        if await self.feature_guard(endpoint=self.get_endpoint(), cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
             self.step(12)
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.ContaminationState, enum=self.smokeco_enums.ContaminationStateEnum)
         else:
             self.skip_step(12)
 
         self.step(13)
-        if await self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
+        if await self.feature_guard(endpoint=self.get_endpoint(), cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.SmokeSensitivityLevel, enum=self.smokeco_enums.AlarmStateEnum)
         else:
             self.skip_step(13)
