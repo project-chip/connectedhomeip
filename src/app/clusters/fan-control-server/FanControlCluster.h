@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "fan-control-delegate.h"
+#include <app/clusters/fan-control-server/fan-control-delegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/FanControl/Attributes.h>
