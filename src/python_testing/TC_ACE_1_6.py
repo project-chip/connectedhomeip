@@ -74,7 +74,7 @@ class TC_ACE_1_6(MatterBaseTest):
 
     def pics_TC_ACE_1_6(self):
         return ["MCORE.ROLE.COMMISSIONEE", "G.S"]
-    
+
     def steps_TC_ACE_1_6(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
