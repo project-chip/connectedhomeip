@@ -56,7 +56,7 @@ public:
     {
         BitFlags<FanControl::Feature> features(featureMap);
 
-        FanControlCluster::Config config(endpointId, GetDelegate(endpointId));
+        FanControlCluster::Config config(endpointId, gClusters[clusterInstanceIndex].delegate);
 
         // Initialize FanModeSequence from attribute storage if available, otherwise use default.
         FanModeSequenceEnum defaultFanModeSequence =

@@ -166,19 +166,17 @@ void FanControlCluster::ApplyFanModeAutoSideEffects()
 {
     if (mIsOnOffOn && !mPercentSetting.IsNull())
     {
-        mPercentCurrent = mPercentSetting.Value();
+        SetAttributeValue(mPercentCurrent, mPercentSetting.Value(), PercentCurrent::Id);
     }
     SetAttributeValue(mPercentSetting, DataModel::Nullable<chip::Percent>{ DataModel::NullNullable }, PercentSetting::Id);
-    NotifyAttributeChanged(PercentCurrent::Id);
 
     if (SupportsMultiSpeed())
     {
         if (mIsOnOffOn && !mSpeedSetting.IsNull())
         {
-            mSpeedCurrent = mSpeedSetting.Value();
+            SetAttributeValue(mSpeedCurrent, mSpeedSetting.Value(), SpeedCurrent::Id);
         }
         SetAttributeValue(mSpeedSetting, DataModel::Nullable<uint8_t>{ DataModel::NullNullable }, SpeedSetting::Id);
-        NotifyAttributeChanged(SpeedCurrent::Id);
     }
 }
 
@@ -237,9 +235,8 @@ void FanControlCluster::ApplyPercentSettingChanged()
 
     if (SupportsMultiSpeed())
     {
-        uint8_t speedMax     = mSpeedMax;
         uint16_t percent     = mPercentSetting.Value();
-        uint8_t speedSetting = static_cast<uint8_t>((speedMax * percent + 99) / 100);
+        uint8_t speedSetting = static_cast<uint8_t>((mSpeedMax * percent + 99) / 100);
         SetAttributeValue(mSpeedSetting, DataModel::MakeNullable(speedSetting), SpeedSetting::Id);
         if (mIsOnOffOn)
         {
@@ -265,14 +262,13 @@ void FanControlCluster::ApplySpeedSettingChanged()
         return;
     }
 
-    uint8_t speedMax = mSpeedMax;
-    if (speedMax == 0)
+    if (mSpeedMax == 0)
     {
         ChipLogError(Zcl, "FanControlCluster: mSpeedMax is 0; cannot compute PercentSetting");
         return;
     }
     uint8_t speedSetting  = mSpeedSetting.Value();
-    chip::Percent percent = static_cast<chip::Percent>((speedSetting * 100) / speedMax);
+    chip::Percent percent = static_cast<chip::Percent>((speedSetting * 100) / mSpeedMax);
     SetAttributeValue(mPercentSetting, DataModel::MakeNullable(percent), PercentSetting::Id);
 
     FanModeEnum newMode = ComputeFanModeFromPercent(percent, mFanModeSequence);
