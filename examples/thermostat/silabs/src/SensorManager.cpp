@@ -64,12 +64,16 @@ CHIP_ERROR SensorManager::Init()
     }
 
 #if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
+    // Skip sensor initialization for WiFi boards with ICD enabled
+    // Sensor is initialized on-demand in GetSensorData() for power efficiency
+#if !(defined(SL_ICD_ENABLED) && SL_ICD_ENABLED && defined(SLI_SI91X_MCU_INTERFACE))
     sl_status_t status = Si70xxSensor::Init();
     if (status != SL_STATUS_OK)
     {
         SILABS_LOG("Failed to Init Sensor with error code: %lx", status);
         return MATTER_PLATFORM_ERROR(status);
     }
+#endif // !(defined(SL_ICD_ENABLED) && SL_ICD_ENABLED && defined(SLI_SI91X_MCU_INTERFACE))
 #endif // defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 
     // Update Temp immediatly at bootup
