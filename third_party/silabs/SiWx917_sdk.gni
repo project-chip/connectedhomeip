@@ -376,6 +376,7 @@ template("siwx917_sdk") {
     }
 
     cflags += [ "-Wno-shadow" ]
+
     # Suppress VLA warnings for wifi-sdk files that use variable-length arrays
     cflags += [ "-Wno-vla" ]
 
@@ -804,9 +805,9 @@ template("siwx917_sdk") {
     if (sl_enable_si70xx_sensor) {
       sources += [
         "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_i2c_init.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/si70xx_sensor/src/sl_si91x_si70xx.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_i2c.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_peripheral_drivers/src/sl_si91x_peripheral_i2c.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/si70xx_sensor/src/sl_si91x_si70xx.c",
       ]
     }
 
