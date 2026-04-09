@@ -30,7 +30,7 @@ namespace chip {
 template <typename T>
 int PopCount(T word)
 {
-    static_assert(std::is_unsigned_v<T>);
+    static_assert(std::is_integral_v<T> && std::is_unsigned_v<T>, "PopCount requires an unsigned integer type");
     int count = 0;
     while (word)
     {

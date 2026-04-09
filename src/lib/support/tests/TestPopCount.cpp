@@ -16,6 +16,9 @@
  *    limitations under the License.
  */
 
+#include <limits>
+#include <stdint.h>
+
 #include <pw_unit_test/framework.h>
 
 #include <lib/support/PopCount.h>
@@ -26,28 +29,27 @@ namespace {
 
 TEST(TestPopCount, TestZero)
 {
-    EXPECT_EQ(PopCount(0u), 0);
-    EXPECT_EQ(PopCount(static_cast<unsigned char>(0)), 0);
-    EXPECT_EQ(PopCount(static_cast<unsigned short>(0)), 0);
-    EXPECT_EQ(PopCount(0ul), 0);
-    EXPECT_EQ(PopCount(0ull), 0);
+    EXPECT_EQ(PopCount<uint8_t>(0), 0);
+    EXPECT_EQ(PopCount<uint16_t>(0), 0);
+    EXPECT_EQ(PopCount<uint32_t>(0), 0);
+    EXPECT_EQ(PopCount<uint64_t>(0), 0);
 }
 
 TEST(TestPopCount, TestAllOnes)
 {
-    EXPECT_EQ(PopCount(static_cast<unsigned char>(0xFF)), 8);
-    EXPECT_EQ(PopCount(static_cast<unsigned short>(0xFFFF)), 16);
-    EXPECT_EQ(PopCount(0xFFFFFFFFu), 32);
-    EXPECT_EQ(PopCount(0xFFFFFFFFFFFFFFFFull), 64);
+    EXPECT_EQ(PopCount<uint8_t>(0xFF), 8);
+    EXPECT_EQ(PopCount<uint16_t>(0xFFFF), 16);
+    EXPECT_EQ(PopCount<uint32_t>(0xFFFFFFFF), 32);
+    EXPECT_EQ(PopCount<uint64_t>(0xFFFFFFFFFFFFFFFF), 64);
 }
 
 TEST(TestPopCount, TestSingleBits)
 {
-    for (int i = 0; i < 32; i++)
+    for (int i = 0; i < std::numeric_limits<unsigned int>::digits; i++)
     {
         EXPECT_EQ(PopCount(1u << i), 1);
     }
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < std::numeric_limits<unsigned long long>::digits; i++)
     {
         EXPECT_EQ(PopCount(1ull << i), 1);
     }
@@ -55,11 +57,12 @@ TEST(TestPopCount, TestSingleBits)
 
 TEST(TestPopCount, TestKnownValues)
 {
-    EXPECT_EQ(PopCount(0xAu), 2);  // 1010
-    EXPECT_EQ(PopCount(0xFu), 4);  // 1111
-    EXPECT_EQ(PopCount(0x55u), 4); // 01010101
-    EXPECT_EQ(PopCount(0xAAu), 4); // 10101010
-    EXPECT_EQ(PopCount(0xDEADBEEFu), 24);
+    EXPECT_EQ(PopCount<uint8_t>(0xA), 2);  // 0000 1010
+    EXPECT_EQ(PopCount<uint8_t>(0xAA), 4); // 1010 1010
+    EXPECT_EQ(PopCount<uint16_t>(0xA), 2); // 0000 0000 0000 1010
+    EXPECT_EQ(PopCount<uint16_t>(0xAAAA), 8);
+    EXPECT_EQ(PopCount<uint32_t>(0xDEADBEEF), 24);
+    EXPECT_EQ(PopCount<uint64_t>(0xDEADBEEFDEADBEEF), 48);
 }
 
 } // namespace
