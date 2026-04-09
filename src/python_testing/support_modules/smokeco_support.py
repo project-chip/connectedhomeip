@@ -21,6 +21,7 @@ from datetime import datetime, timezone
 
 
 import matter.clusters as Clusters
+from matter.clusters.enum import MatterIntEnum
 from matter.testing.matter_asserts import assert_int_in_range, assert_valid_bool, assert_valid_uint32
 from matter.testing.timeoperations import utc_datetime_from_matter_epoch_us
 from matter.testing.matter_testing import MatterBaseTest
@@ -31,6 +32,7 @@ log = logging.getLogger(__name__)
 class SmokeCoBaseTest(MatterBaseTest):
 
     smokeco_cluster = Clusters.SmokeCoAlarm
+    smokeco_enums = Clusters.SmokeCoAlarm.Enums
 
     async def read_smokeco_attribute_expect_success(self, attribute):
         return await self.read_single_attribute_check_success(cluster=self.smokeco_cluster, endpoint=self.get_endpoint(), attribute=attribute)
@@ -55,10 +57,11 @@ class SmokeCoBaseTest(MatterBaseTest):
             asserts.fail(f"Failed to retrieve event for {smokeco_event}")
         return smoke_alarm_event_data
 
-    async def read_attribute_check_range(self, attribute, range_low: int, range_high: int):
+    async def read_attribute_check_range(self, attribute, enum):
         """Reads an attribute from the SmokeCluster and validate against a range."""
         attr = await self.read_smokeco_attribute_expect_success(attribute=attribute)
-        assert_int_in_range(attr, range_low, range_high, f"Attribute {attribute} is out of range {attr}")
+        is_valid = any(attr == item.value and str(item.name).lower() != "unknown" for item in enum)
+        asserts.assert_true(is_valid, f"Value {attr} is not in the range for the Enum {enum}")
 
     async def read_attribute_check_bool(self, attribute):
         """Reads an attribute from the SmokeCluster and validate against a boolean value."""
