@@ -174,6 +174,7 @@ public:
     virtual uint8_t GetMaxCachedResults()   = 0;
     virtual uint8_t GetNumCachedResults()   = 0;
     virtual uint16_t GetCacheTimeout()      = 0;
+    virtual chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> GetSupportedWiFiBands() = 0;
 
     // ------------------------------------------------------------------
     // Set attribute methods

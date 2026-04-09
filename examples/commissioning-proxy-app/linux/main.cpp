@@ -30,6 +30,7 @@
 #include <platform/PlatformManager.h>
 #endif
 
+#include <cstring>
 #include <string>
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
@@ -238,6 +239,37 @@ void ApplicationInit()
 
     // Register the Commissioning Proxy Code Driven mechanism
     VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gCPCluster.Registration()) == CHIP_NO_ERROR);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // Derive the supported WiFi bands from the configured freq_list and report them via the WiFiBand attribute.
+    {
+        using WiFiBandBitmap = chip::app::Clusters::CommissioningProxy::WiFiBandBitmap;
+        chip::BitMask<WiFiBandBitmap> bands;
+        const char * extCmds = LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds;
+        if (extCmds != nullptr)
+        {
+            const char * p = std::strstr(extCmds, "freq_list=");
+            if (p != nullptr)
+            {
+                p += std::strlen("freq_list=");
+                while (*p != '\0' && *p != ' ')
+                {
+                    uint32_t freq = static_cast<uint32_t>(std::strtoul(p, nullptr, 10));
+                    if ((freq >= 2412 && freq <= 2484))
+                        bands.Set(WiFiBandBitmap::k2g4);
+                    else if ((freq >= 5035 && freq <= 5980))
+                        bands.Set(WiFiBandBitmap::k5g);
+                    // Advance past this number and any comma
+                    while (*p != '\0' && *p != ',' && *p != ' ')
+                        ++p;
+                    if (*p == ',')
+                        ++p;
+                }
+            }
+        }
+        gMyCPDelegate.SetSupportedWiFiBands(bands);
+    }
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
     // If the proxy is already on a fabric (i.e. it was previously commissioned

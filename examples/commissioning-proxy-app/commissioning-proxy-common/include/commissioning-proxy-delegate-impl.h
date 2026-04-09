@@ -35,6 +35,7 @@ class MyCPDelegate : public chip::app::Clusters::CommissioningProxy::Delegate
 public:
     void SetServer(CommissioningProxyCluster * server) override { mServer = server; }
     CommissioningProxyCluster * GetServer() const override { return mServer; }
+    void SetSupportedWiFiBands(chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> bands);
 
 protected:
     CommissioningProxyCluster & Server()
@@ -94,12 +95,14 @@ protected:
     uint8_t  GetMaxCachedResults()   override;
     uint8_t  GetNumCachedResults()   override;
     uint16_t GetCacheTimeout()       override;
+    chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> GetSupportedWiFiBands() override;
     void SetScanMaxTime(uint8_t seconds)    override;
     void SetCacheTimeout(uint16_t seconds)  override;
     CHIP_ERROR EncodeCachedResults(app::AttributeValueEncoder & encoder) override;
 
 private:
     CommissioningProxyCluster * mServer = nullptr;
+    chip::BitMask<chip::app::Clusters::CommissioningProxy::WiFiBandBitmap> mSupportedWiFiBands;
 };
 
 } // namespace CommissioningProxy

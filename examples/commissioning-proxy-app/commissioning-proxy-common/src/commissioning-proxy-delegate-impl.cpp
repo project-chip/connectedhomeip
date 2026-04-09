@@ -78,6 +78,17 @@ void MyCPDelegate::SetCacheTimeout(uint16_t seconds)
     ChipLogProgress(AppServer, "===SHM %s() cacheTimeout=%u", __func__, static_cast<unsigned>(seconds));
 }
 
+chip::BitMask<WiFiBandBitmap> MyCPDelegate::GetSupportedWiFiBands()
+{
+    return mSupportedWiFiBands;
+}
+
+void MyCPDelegate::SetSupportedWiFiBands(chip::BitMask<WiFiBandBitmap> bands)
+{
+    mSupportedWiFiBands = bands;
+    ChipLogProgress(AppServer, "===SHM %s() bands=0x%04x", __func__, static_cast<unsigned>(bands.Raw()));
+}
+
 } // namespace CommissioningProxy
 } // namespace Clusters
 } // namespace app

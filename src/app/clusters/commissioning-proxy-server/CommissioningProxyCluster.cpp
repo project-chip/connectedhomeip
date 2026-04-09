@@ -124,6 +124,9 @@ DataModel::ActionReturnStatus CommissioningProxyCluster::ReadAttribute(const Dat
     case CachedResults::Id:
         return mDelegate.EncodeCachedResults(encoder);
 
+    case WiFiBand::Id:
+        return encoder.Encode(mDelegate.GetSupportedWiFiBands());
+
     default:
         return Status::UnsupportedAttribute;
     }
