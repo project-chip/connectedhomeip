@@ -38,7 +38,7 @@
 #endif // DISPLAY_ENABLED
 
 #if defined(CHIP_CONFIG_ENABLE_READ_CLIENT) && CHIP_CONFIG_ENABLE_READ_CLIENT
-#include <shell/im/IMShellCommands.h>
+#include <shell/im/IMShellCommands.h> // nogncheck
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
