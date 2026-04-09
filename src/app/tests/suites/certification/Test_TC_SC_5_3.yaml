@@ -408,8 +408,40 @@ tests:
           DUT sends the Groupcast JoinGroup command on the TH on EP0 with
           GroupID=1, Endpoints=[any endpoint from PartsList], KeySetID=1."
       verification: |
-          Verify the TH receives the Groupcast JoinGroup command as specified
-          in the step label.
+          ./chip-tool groupcast join-group 1 '[1]' 1 1 0
+
+          Verify the TH receives the Groupcast JoinGroup command as specified in the step label.
+        
+          [1775716977.253] [2593892:2593892] [DMG]  
+          [1775716977.253] [2593892:2593892] [DMG] InvokeResponseMessage =
+          [1775716977.253] [2593892:2593892] [DMG] {
+          [1775716977.253] [2593892:2593892] [DMG]         suppressResponse = false, 
+          [1775716977.253] [2593892:2593892] [DMG]         InvokeResponseIBs =
+          [1775716977.253] [2593892:2593892] [DMG]         [
+          [1775716977.253] [2593892:2593892] [DMG]                 InvokeResponseIB =
+          [1775716977.253] [2593892:2593892] [DMG]                 {
+          [1775716977.253] [2593892:2593892] [DMG]                         CommandStatusIB =
+          [1775716977.253] [2593892:2593892] [DMG]                         {
+          [1775716977.253] [2593892:2593892] [DMG]                                 CommandPathIB =
+          [1775716977.253] [2593892:2593892] [DMG]                                 {
+          [1775716977.253] [2593892:2593892] [DMG]                                         EndpointId = 0x0,
+          [1775716977.253] [2593892:2593892] [DMG]                                         ClusterId = 0x65,
+          [1775716977.253] [2593892:2593892] [DMG]                                         CommandId = 0x0,
+          [1775716977.253] [2593892:2593892] [DMG]                                 },
+          [1775716977.253] [2593892:2593892] [DMG]                                 
+          [1775716977.253] [2593892:2593892] [DMG]                                 StatusIB =
+          [1775716977.253] [2593892:2593892] [DMG]                                 {
+          [1775716977.253] [2593892:2593892] [DMG]                                         status = 0x00 (SUCCESS),
+          [1775716977.253] [2593892:2593892] [DMG]                                 },
+          [1775716977.253] [2593892:2593892] [DMG]                                 
+          [1775716977.253] [2593892:2593892] [DMG]                         },
+          [1775716977.253] [2593892:2593892] [DMG]                         
+          [1775716977.253] [2593892:2593892] [DMG]                 },
+          [1775716977.253] [2593892:2593892] [DMG]                 
+          [1775716977.253] [2593892:2593892] [DMG]         ],
+          [1775716977.253] [2593892:2593892] [DMG]         
+          [1775716977.253] [2593892:2593892] [DMG]         InteractionModelRevision = 12
+          [1775716977.253] [2593892:2593892] [DMG] },
       disabled: true
 
     - label:
