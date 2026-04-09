@@ -449,7 +449,7 @@ TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
     const ConcreteClusterPath kTestClusterPath(kTestEndpointId, MockClusterId(2));
     FakeDefaultServerCluster fakeClusterServer(kTestClusterPath);
     chip::Testing::TestServerClusterContext testContext;
-    ASSERT_EQ(fakeClusterServer.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ASSERT_SUCCESS(fakeClusterServer.Startup(testContext.Get()));
     ServerClusterRegistration registration(fakeClusterServer);
 
     CodegenDataModelProvider model;

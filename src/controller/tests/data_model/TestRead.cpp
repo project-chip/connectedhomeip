@@ -1278,20 +1278,20 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             // ReadSingleMockClusterData in attribute-storage.cpp)
             ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(4));
             TLV::TLVReader reader;
-            EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
+            EXPECT_SUCCESS(cache.Get(attributePath, reader));
             EXPECT_EQ(reader.GetType(), TLV::kTLVType_Array);
             TLV::TLVType containerType;
-            EXPECT_EQ(reader.EnterContainer(containerType), CHIP_NO_ERROR);
+            EXPECT_SUCCESS(reader.EnterContainer(containerType));
             int count = 0;
             while (reader.Next() == CHIP_NO_ERROR)
             {
                 ByteSpan entry;
-                EXPECT_EQ(reader.Get(entry), CHIP_NO_ERROR);
+                EXPECT_SUCCESS(reader.Get(entry));
                 EXPECT_EQ(entry.size(), sizeof(mockAttribute4));
                 EXPECT_EQ(memcmp(entry.data(), mockAttribute4, sizeof(mockAttribute4)), 0);
                 count++;
             }
-            EXPECT_EQ(reader.ExitContainer(containerType), CHIP_NO_ERROR);
+            EXPECT_SUCCESS(reader.ExitContainer(containerType));
             ASSERT_GT(count, 0);
         }
         delegate.mNumAttributeResponse = 0;
