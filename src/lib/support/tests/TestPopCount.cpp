@@ -55,10 +55,10 @@ TEST(TestPopCount, TestSingleBits)
 
 TEST(TestPopCount, TestKnownValues)
 {
-    EXPECT_EQ(PopCount(0xAu), 2);   // 1010
-    EXPECT_EQ(PopCount(0xFu), 4);   // 1111
-    EXPECT_EQ(PopCount(0x55u), 4);  // 01010101
-    EXPECT_EQ(PopCount(0xAAu), 4);  // 10101010
+    EXPECT_EQ(PopCount(0xAu), 2);  // 1010
+    EXPECT_EQ(PopCount(0xFu), 4);  // 1111
+    EXPECT_EQ(PopCount(0x55u), 4); // 01010101
+    EXPECT_EQ(PopCount(0xAAu), 4); // 10101010
     EXPECT_EQ(PopCount(0xDEADBEEFu), 24);
 }
 
