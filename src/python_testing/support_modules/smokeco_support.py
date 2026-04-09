@@ -21,7 +21,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_asserts import assert_int_in_range, assert_is_unixtimestamp, assert_valid_bool, assert_valid_uint32
+from matter.testing.matter_asserts import assert_int_in_range, assert_valid_bool, assert_valid_uint32
 from matter.testing.matter_testing import MatterBaseTest
 
 log = logging.getLogger(__name__)
@@ -30,6 +30,16 @@ log = logging.getLogger(__name__)
 class SmokeCoBaseTest(MatterBaseTest):
 
     smokeco_cluster = Clusters.SmokeCoAlarm
+    # DEFAULT PIXIT ARGUMENTS
+    pixit_test_event_warning_smoke_alarm = 0x005c000000000090
+    pixit_test_event_critical_smoke_alarm = 0x005c00000000009c
+    pixit_test_event_clear_smoke_alarm = 0x005c0000000000a0
+
+    pixit_test_event_warning_co_alarm =  0x005c000000000091
+    pixit_test_event_critical_co_alarm = 0x005c00000000009d
+    pixit_test_event_clear_co_alarm = 0x005c0000000000a1
+
+    # END DEFAULT PIXIT ARGUMENTS
 
     async def read_smokeco_attribute_expect_success(self, attribute):
         return await self.read_single_attribute_check_success(cluster=self.smokeco_cluster, endpoint=self.get_endpoint(), attribute=attribute)
@@ -68,7 +78,6 @@ class SmokeCoBaseTest(MatterBaseTest):
         """Reads an attribute from the SmokeCluster and validate against a valid timestmap value."""
         attr = await self.read_smokeco_attribute_expect_success(attribute=attribute)
         assert_valid_uint32(attr, "Attribute is not in uint range")
-        assert_is_unixtimestamp(attr, f"Attribute with value: {attr}")
 
     def start_device_self_test(self):
         """Start the device Self Test. Ask the user to manually start the self test. On CI it uses out of band communication."""
@@ -137,11 +146,15 @@ class SmokeCoBaseTest(MatterBaseTest):
         asserts.assert_equal(smoke_alarm_event_data.alarmSeverityLevel, self.smokeco_cluster.Enums.AlarmStateEnum.kWarning)
 
         self.step(9)
+        # When the Device has one Active Alarm SMOKE/CO or InterconnectedDevice Test should not start as the device is BUSY
+        # Also ExpressedState should stay the same and not change to kTesting
         self.start_device_self_test()
 
         self.step(10)
         test_in_progress = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.TestInProgress)
         asserts.assert_false(test_in_progress, "Test is not in progress")
+        expressed_state = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
+        asserts.assert_equal(expressed_state, expressed_state_enum_value)
 
         # Gather these steps
         self.step(11)
@@ -151,6 +164,8 @@ class SmokeCoBaseTest(MatterBaseTest):
             await self.send_single_cmd(self_test_cmd, dev_ctrl=self.default_controller, endpoint=self.get_endpoint(), timedRequestTimeoutMs=5000)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Busy, "Unexpected error returned")
+            expressed_state = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.ExpressedState)
+            asserts.assert_equal(expressed_state, expressed_state_enum_value)
 
         self.step(13)
         test_in_progress = await self.read_smokeco_attribute_expect_success(attribute=self.smokeco_cluster.Attributes.TestInProgress)

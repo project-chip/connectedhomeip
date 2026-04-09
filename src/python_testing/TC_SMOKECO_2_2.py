@@ -30,9 +30,6 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.WARNING:005c000000000090
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CRITICAL:005c00000000009c
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CLEAR:005c0000000000a0
 #       --endpoint 1
 #       --app-pipe /tmp/smokeco_2_2_fifo
 #       --PICS src/app/tests/suites/certification/ci-pics-values
@@ -42,7 +39,7 @@
 #
 import logging
 
-from TC_SMOKECOTestBase import SmokeCoBaseTest
+from support_modules.smokeco_support import SmokeCoBaseTest
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body, has_feature, run_if_endpoint_matches
@@ -57,12 +54,6 @@ class TC_SMOKECO_2_2(SmokeCoBaseTest):
     async def setup_test(self):
         super().setup_test()
         self.gd_cluster = Clusters.GeneralDiagnostics
-        self.pixit_test_event_warning_smoke_alarm = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.WARNING", 0x005c000000000090)
-        self.pixit_test_event_critical_smoke_alarm = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CRITICAL", 0x005c00000000009c)
-        self.pixit_test_event_clear_smoke_alarm = self.user_params.get("PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CLEAR", 0x005c0000000000a0)
-        self.process_pixit_attributes()
 
     def desc_TC_SMOKECO_2_2(self) -> str:
         return "[TC-SMOKECO-2.2] Primary Functionality - Smoke Alarm with DUT as Server"
