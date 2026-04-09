@@ -10,7 +10,8 @@ import click
 @click.option("--clang", is_flag=True, default=False, help="If specified, use clang instead of gcc")
 @click.option("--output-dir", default="build", help="Output directory for libdatachannel build")
 @click.option("--cross-compile-cpu-type", default=None, help="CPU type for cross compilation if needed")
-def main(clang: bool, output_dir: str, cross_compile_cpu_type: str | None):
+@click.option("--use-mbedtls", is_flag=True, default=False, help="Use Mbed TLS instead of OpenSSL")
+def main(clang: bool, output_dir: str, cross_compile_cpu_type: str | None, use_mbedtls: bool):
     # figure out paths for building
     script_dir = os.path.dirname(os.path.abspath(__file__))
     repo_dir = os.path.join(script_dir, "..", "repo")
@@ -27,6 +28,9 @@ def main(clang: bool, output_dir: str, cross_compile_cpu_type: str | None):
         "-DCMAKE_CXX_FLAGS=-Wno-shadow",
         "-DBUILD_SHARED_LIBS=OFF",
     ]
+
+    if use_mbedtls:
+        cmake_cmd.append("-DUSE_MBEDTLS=ON")
 
     if clang:
         cmake_cmd.extend(

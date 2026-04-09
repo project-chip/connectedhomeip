@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 import("${build_root}/config/compiler/compiler.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 
 _compiler_subdir = "gcc"
 if (is_clang) {
@@ -33,6 +35,10 @@ action("build_libdatachannel") {
       args += [ "--cross-compile-cpu-type=arm64" ]
     }
   }
+
+  if (chip_crypto == "mbedtls" || chip_crypto == "psa") {
+    args += [ "--use-mbedtls" ]
+  }
 }
 
 config("datachannel_config") {
@@ -48,13 +54,25 @@ config("datachannel_config") {
   # suppress known `libdatachannel` int conversion issues
   cflags = [ "-Wno-implicit-int-conversion" ]
 
-  if (is_clang) {
-    # We build static libraries and srtp2 depends on openssl
-    # TODO: can we somehow query this dynamically?
+  if (chip_crypto == "mbedtls" || chip_crypto == "psa") {
+    libs += [
+      "mbedtls",
+      "mbedcrypto",
+      "mbedx509",
+    ]
+  } else if (chip_crypto == "openssl" || chip_crypto == "boringssl") {
     libs += [
       "ssl",
       "crypto",
     ]
+  } else {
+    # chip_crypto not explicitly set - preserve original behavior
+    if (is_clang) {
+      libs += [
+        "ssl",
+        "crypto",
+      ]
+    }
   }
 
   lib_dirs = [
