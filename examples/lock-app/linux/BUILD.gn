@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2026 Project CHIP Authors
+# Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/src/platform/device.gni")
-
 executable("chip-lock-app") {
   sources = [
     "main.cpp",
@@ -30,10 +28,6 @@ executable("chip-lock-app") {
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",
   ]
-
-  if (chip_enable_ota_requestor) {
-    deps += [ "${chip_root}/src/app/clusters/ota-requestor" ]
-  }
 
   include_dirs = [ "include" ]
 

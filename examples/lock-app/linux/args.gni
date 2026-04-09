@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2026 Project CHIP Authors
+# Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ chip_device_project_config_include = "<CHIPProjectAppConfig.h>"
 chip_project_config_include = "<CHIPProjectAppConfig.h>"
 chip_system_project_config_include = "<SystemProjectConfig.h>"
 
-chip_enable_ota_requestor = true
 chip_project_config_include_dirs =
     [ "${chip_root}/examples/lock-app/linux/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
