@@ -49,7 +49,6 @@ constexpr bool kHasDeviceLocation =
 
 LazyRegisteredServerCluster<BasicInformationCluster<kHasDeviceLocation>> gServer;
 
-
 void LegacyOnlyDisableUniqueIdAttr(BasicInformationOptionalAttributesSet & attributeSet)
 {
     attributeSet.template Set<BasicInformation::Attributes::UniqueID::Id>(false);

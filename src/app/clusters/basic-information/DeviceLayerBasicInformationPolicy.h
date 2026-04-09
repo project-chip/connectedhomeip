@@ -39,9 +39,9 @@ public:
     using LifetimeDelegate = DeviceLayer::PlatformManagerDelegate;
 
     DeviceLayerBasicInformationPolicyBase(BasicInformationOptionalAttributesSet optionalAttributes,
-                                      DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider,
-                                      DeviceLayer::ConfigurationManager & configurationManager,
-                                      DeviceLayer::PlatformManager & platformManager, uint16_t subscriptionsPerFabric) :
+                                          DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider,
+                                          DeviceLayer::ConfigurationManager & configurationManager,
+                                          DeviceLayer::PlatformManager & platformManager, uint16_t subscriptionsPerFabric) :
         mOptionalAttributes(optionalAttributes),
         mDeviceInstanceInfoProvider(deviceInstanceInfoProvider), mConfigurationManager(configurationManager),
         mPlatformManager(platformManager), mSubscriptionsPerFabric(subscriptionsPerFabric)
@@ -49,7 +49,6 @@ public:
         // UniqueID is mandatory as of spec revision 4. We force it on here regardless
         // of what optionalAttributeSet says, to prevent accidental non-certifiable configs.
         mOptionalAttributes.template Set<BasicInformation::Attributes::UniqueID::Id>();
-
     }
 
     const BasicInformationOptionalAttributesSet & GetOptionalAttributes() const { return mOptionalAttributes; }
@@ -179,7 +178,6 @@ public:
     uint16_t GetSubscriptionsPerFabric() const { return mSubscriptionsPerFabric; }
 
 private:
-
     CHIP_ERROR IgnoreUnimplemented(CHIP_ERROR status, char * buf, size_t bufSize)
     {
         if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
@@ -192,8 +190,10 @@ private:
         }
         return status;
     }
+
 protected:
     BasicInformationOptionalAttributesSet mOptionalAttributes;
+
 private:
     DeviceLayer::DeviceInstanceInfoProvider & mDeviceInstanceInfoProvider;
     DeviceLayer::ConfigurationManager & mConfigurationManager;
@@ -204,41 +204,33 @@ private:
 // By default, don't instantiate the code related to the DeviceLocation
 // optional attribute.
 template <bool HasDeviceLocation>
-class DeviceLayerBasicInformationPolicy final
-    : public DeviceLayerBasicInformationPolicyBase
+class DeviceLayerBasicInformationPolicy final : public DeviceLayerBasicInformationPolicyBase
 {
 public:
     using DeviceLayerBasicInformationPolicyBase::DeviceLayerBasicInformationPolicyBase;
 
-    CHIP_ERROR WriteDeviceLocation(const DataModel::Nullable<LocationDescriptorStructType> &,
-                                   AttributePersistence &)
+    CHIP_ERROR WriteDeviceLocation(const DataModel::Nullable<LocationDescriptorStructType> &, AttributePersistence &)
     {
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 
     CHIP_ERROR LoadDeviceLocation(AttributePersistence &) { return CHIP_NO_ERROR; }
 
-    std::optional<DataModel::Nullable<LocationDescriptorStructType>> GetDeviceLocation() const
-    {
-        return std::nullopt;
-    }
+    std::optional<DataModel::Nullable<LocationDescriptorStructType>> GetDeviceLocation() const { return std::nullopt; }
 };
 
 template <>
-class DeviceLayerBasicInformationPolicy<true> final
-    : public DeviceLayerBasicInformationPolicyBase
+class DeviceLayerBasicInformationPolicy<true> final : public DeviceLayerBasicInformationPolicyBase
 {
 public:
     using DeviceLayerBasicInformationPolicyBase::DeviceLayerBasicInformationPolicyBase;
 
-    DeviceLayerBasicInformationPolicy(
-        BasicInformationOptionalAttributesSet optionalAttributes,
-        DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider,
-        DeviceLayer::ConfigurationManager & configurationManager,
-        DeviceLayer::PlatformManager & platformManager,
-        uint16_t subscriptionsPerFabric) :
-        DeviceLayerBasicInformationPolicyBase(optionalAttributes, deviceInstanceInfoProvider,
-                                              configurationManager, platformManager, subscriptionsPerFabric)
+    DeviceLayerBasicInformationPolicy(BasicInformationOptionalAttributesSet optionalAttributes,
+                                      DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider,
+                                      DeviceLayer::ConfigurationManager & configurationManager,
+                                      DeviceLayer::PlatformManager & platformManager, uint16_t subscriptionsPerFabric) :
+        DeviceLayerBasicInformationPolicyBase(optionalAttributes, deviceInstanceInfoProvider, configurationManager, platformManager,
+                                              subscriptionsPerFabric)
     {
         if (mOptionalAttributes.IsSet(BasicInformation::Attributes::DeviceLocation::Id))
         {
@@ -474,7 +466,6 @@ private:
 
         return persistence.StoreTLV<kMaxDeviceLocationTLVSize>(path, *loc);
     }
-
 
     std::optional<DataModel::Nullable<OwnedDeviceLocation>> mDeviceLocation;
 };

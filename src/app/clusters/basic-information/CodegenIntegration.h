@@ -20,12 +20,10 @@
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/static-cluster-config/BasicInformation.h>
 
-
 namespace chip::app::Clusters::BasicInformation {
 
 constexpr bool kHasDeviceLocation =
     BasicInformation::StaticApplicationConfig::IsAttributeEnabledOnSomeEndpoint(BasicInformation::Attributes::DeviceLocation::Id);
-
 
 BasicInformationCluster<kHasDeviceLocation> * GetClusterInstance();
 
