@@ -22,3 +22,10 @@
 #else
 #define CHIP_HAVE_RTTI 0
 #endif
+
+// CHIP_MEMORY_SANITIZER_ENABLED: true when building with Clang MemorySanitizer (MSan).
+#if defined(__clang__)
+#define CHIP_MEMORY_SANITIZER_ENABLED __has_feature(memory_sanitizer)
+#else
+#define CHIP_MEMORY_SANITIZER_ENABLED 0
+#endif

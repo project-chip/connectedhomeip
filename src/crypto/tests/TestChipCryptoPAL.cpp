@@ -44,6 +44,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Compiler.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
@@ -652,10 +653,9 @@ TEST_F(TestChipCryptoPAL, TestSensitiveDataBuffer)
 {
     HeapChecker heapChecker;
 
-    constexpr size_t kCapacity         = 32;
-    constexpr size_t kLength           = 16;
-    using Buffer                       = SensitiveDataBuffer<kCapacity>;
-    const uint8_t kAllZeros[kCapacity] = { 0 };
+    constexpr size_t kCapacity = 32;
+    constexpr size_t kLength   = 16;
+    using Buffer               = SensitiveDataBuffer<kCapacity>;
     uint8_t testVector[kCapacity];
 
     // Give us some data.
@@ -677,20 +677,24 @@ TEST_F(TestChipCryptoPAL, TestSensitiveDataBuffer)
     EXPECT_EQ(buffer.Length(), buffer.Span().size());
 
     // Test sanitization of entire buffer (even though length < capacity)
-    const void * bufferStorage = buffer.ConstBytes();
+    // This check reads memory after the SensitiveDataBuffer destructor is called explicitly to verify secure erasure.
+    // MSan (correctly) flags the memcpy after destructor call as use-of-uninitialized-value, so skip under MSan.
+#if !CHIP_MEMORY_SANITIZER_ENABLED
+    const uint8_t kAllZeros[kCapacity] = { 0 };
+    const void * bufferStorage         = buffer.ConstBytes();
     buffer.~Buffer();
     EXPECT_EQ(memcmp(bufferStorage, kAllZeros, kCapacity), 0);
     EXPECT_TRUE(memcmp(bufferStorage, testVector, kCapacity));
+#endif
 }
 
 TEST_F(TestChipCryptoPAL, TestSensitiveDataFixedBuffer)
 {
     HeapChecker heapChecker;
 
-    constexpr size_t kCapacity         = 32;
-    using Buffer                       = SensitiveDataFixedBuffer<kCapacity>;
-    using BufferSpan                   = FixedByteSpan<kCapacity>;
-    const uint8_t kAllZeros[kCapacity] = { 0 };
+    constexpr size_t kCapacity = 32;
+    using Buffer               = SensitiveDataFixedBuffer<kCapacity>;
+    using BufferSpan           = FixedByteSpan<kCapacity>;
     uint8_t testVector[kCapacity];
 
     // Give us some data.
@@ -704,10 +708,15 @@ TEST_F(TestChipCryptoPAL, TestSensitiveDataFixedBuffer)
     EXPECT_EQ(memcmp(buffer.ConstBytes(), testVector, kCapacity), 0);
 
     // Test sanitization
-    const void * bufferStorage = buffer.ConstBytes();
+    // This check reads memory after the SensitiveDataBuffer destructor is called explicitly to verify secure erasure.
+    // MSan (correctly) flags the memcpy after destructor call as use-of-uninitialized-value, so skip under MSan.
+#if !CHIP_MEMORY_SANITIZER_ENABLED
+    const uint8_t kAllZeros[kCapacity] = { 0 };
+    const void * bufferStorage         = buffer.ConstBytes();
     buffer.~Buffer();
     EXPECT_EQ(memcmp(bufferStorage, kAllZeros, kCapacity), 0);
     EXPECT_TRUE(memcmp(bufferStorage, testVector, kCapacity));
+#endif
 
     // Give us different data
     err = DRBG_get_bytes(testVector, sizeof(testVector));
@@ -1475,10 +1484,11 @@ TEST_F(TestChipCryptoPAL, TestECDH_EstablishSecret)
     EXPECT_EQ(keypair2.Initialize(ECPKeyTarget::ECDH), CHIP_NO_ERROR);
 
     P256ECDHDerivedSecret out_secret1;
-    out_secret1.Bytes()[0] = 0;
+    memset(out_secret1.Bytes(), 0, out_secret1.Capacity());
 
     P256ECDHDerivedSecret out_secret2;
-    out_secret2.Bytes()[0] = 1;
+    // Initialise out_secret2 to 1s to ensure that we pass the sanity check below
+    memset(out_secret2.Bytes(), 1, out_secret2.Capacity());
 
     CHIP_ERROR error = CHIP_NO_ERROR;
     EXPECT_NE(memcmp(out_secret1.ConstBytes(), out_secret2.ConstBytes(), out_secret1.Capacity()),
