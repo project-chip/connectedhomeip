@@ -3372,4 +3372,26 @@ limitations under the License.
             <include cluster="Soil Measurement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
+    <deviceType>
+        <name>MA-proximityranger</name>
+        <domain>CHIP</domain>
+        <typeName>Proximity Ranger</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0152</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Proximity Ranging" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>RANGING_CAPABILITIES</requireAttribute>
+                <requireAttribute>SESSION_IDS</requireAttribute>
+                <requireCommand>StartRangingRequest</requireCommand>
+                <requireCommand>StopRangingRequest</requireCommand>
+                <requireEvent>RangingResult</requireEvent>
+                <requireEvent>RangingSessionStatus</requireEvent>
+            </include>
+        </clusters>
+    </deviceType>
 </configurator>
