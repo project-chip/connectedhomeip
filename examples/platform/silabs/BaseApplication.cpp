@@ -37,9 +37,11 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
+#ifdef ENABLE_CHIP_SHELL
 #if defined(CHIP_CONFIG_ENABLE_READ_CLIENT) && CHIP_CONFIG_ENABLE_READ_CLIENT
-#include <shell/im/IMShellCommands.h>
-#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+#include <shell/im/IMShellCommands.h> // nogncheck
+#endif                                // CHIP_CONFIG_ENABLE_READ_CLIENT
+#endif                                // ENABLE_CHIP_SHELL
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
