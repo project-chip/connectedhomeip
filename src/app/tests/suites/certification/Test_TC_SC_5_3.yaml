@@ -153,7 +153,7 @@ tests:
           EpochKey0 and GroupKeySetID. Save the GroupID as GroupID_1, GroupName
           as GroupName_1 and GroupSetID_1"
       verification: |
-          GroupKeySetID = 419
+          GroupKeySetID = 1
           GroupID_1 = 259
           GroupName_1 = "grp1"
           EpochKey0 = d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
@@ -166,53 +166,52 @@ tests:
           to TH on EP0"
       PICS: GRPKEY.C.C00.Tx
       verification: |
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 419,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002, "groupKeyMulticastPolicy": 0 }' 1 0
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
 
           Verify that  KeySetWrite command on TH(Reference app)log:
 
-          [1684162878.418032][28333:28333] CHIP:DMG: {
-          [1684162878.418034][28333:28333] CHIP:DMG:         suppressResponse = false,
-          [1684162878.418038][28333:28333] CHIP:DMG:         timedRequest = false,
-          [1684162878.418040][28333:28333] CHIP:DMG:         InvokeRequests =
-          [1684162878.418044][28333:28333] CHIP:DMG:         [
-          [1684162878.418046][28333:28333] CHIP:DMG:                 CommandDataIB =
-          [1684162878.418048][28333:28333] CHIP:DMG:                 {
-          [1684162878.418050][28333:28333] CHIP:DMG:                         CommandPathIB =
-          [1684162878.418054][28333:28333] CHIP:DMG:                         {
-          [1684162878.418057][28333:28333] CHIP:DMG:                                 EndpointId = 0x0,
-          [1684162878.418059][28333:28333] CHIP:DMG:                                 ClusterId = 0x3f,
-          [1684162878.418062][28333:28333] CHIP:DMG:                                 CommandId = 0x0,
-          [1684162878.418065][28333:28333] CHIP:DMG:                         },
-          [1684162878.418068][28333:28333] CHIP:DMG:
-          [1684162878.418071][28333:28333] CHIP:DMG:                         CommandFields =
-          [1684162878.418074][28333:28333] CHIP:DMG:                         {
-          [1684162878.418077][28333:28333] CHIP:DMG:                                 0x0 =
-          [1684162878.418079][28333:28333] CHIP:DMG:                                 {
-          [1684162878.418083][28333:28333] CHIP:DMG:                                         0x0 = 419,
-          [1684162878.418087][28333:28333] CHIP:DMG:                                         0x1 = 0,
-          [1684162878.418090][28333:28333] CHIP:DMG:                                         0x2 = [
-          [1684162878.418094][28333:28333] CHIP:DMG:                                                         0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
-          [1684162878.418099][28333:28333] CHIP:DMG:                                         ] (16 bytes)
-          [1684162878.418102][28333:28333] CHIP:DMG:                                         0x3 = 2220000,
-          [1684162878.418105][28333:28333] CHIP:DMG:                                         0x4 = [
-          [1684162878.418110][28333:28333] CHIP:DMG:                                                         0xd1, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
-          [1684162878.418115][28333:28333] CHIP:DMG:                                         ] (16 bytes)
-          [1684162878.418135][28333:28333] CHIP:DMG:                                         0x5 = 2220001,
-          [1684162878.418138][28333:28333] CHIP:DMG:                                         0x6 = [
-          [1684162878.418143][28333:28333] CHIP:DMG:                                                         0xd2, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
-          [1684162878.418146][28333:28333] CHIP:DMG:                                         ] (16 bytes)
-          [1684162878.418150][28333:28333] CHIP:DMG:                                         0x7 = 2220002,
-          [1684162878.418153][28333:28333] CHIP:DMG:                                 },
-          [1684162878.418155][28333:28333] CHIP:DMG:                         },
-          [1684162878.418157][28333:28333] CHIP:DMG:                 },
-          [1684162878.418161][28333:28333] CHIP:DMG:
-          [1684162878.418169][28333:28333] CHIP:DMG:         ],
-          [1684162878.418173][28333:28333] CHIP:DMG:
-          [1684162878.418174][28333:28333] CHIP:DMG:         InteractionModelRevision = 1
-          [1684162878.418176][28333:28333] CHIP:DMG: },
-          [1684162878.418190][28333:28333] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003F e=0 p=a
-          [1684162878.418196][28333:28333] CHIP:DMG: AccessControl: allowed
-          [1684162878.418199][28333:28333] CHIP:DMG: Received command for Endpoint=0 Cluster=0x0000_003F Command=0x0000_0000
+          [1708432099.409163][11937:11937] CHIP:DMG: InvokeRequestMessage =
+          [1708432099.409247][11937:11937] CHIP:DMG: {
+          [1708432099.409299][11937:11937] CHIP:DMG:         suppressResponse = false, 
+          [1708432099.409381][11937:11937] CHIP:DMG:         timedRequest = false, 
+          [1708432099.409439][11937:11937] CHIP:DMG:         InvokeRequests =
+          [1708432099.409526][11937:11937] CHIP:DMG:         [
+          [1708432099.409606][11937:11937] CHIP:DMG:                 CommandDataIB =
+          [1708432099.409670][11937:11937] CHIP:DMG:                 {
+          [1708432099.409757][11937:11937] CHIP:DMG:                         CommandPathIB =
+          [1708432099.409829][11937:11937] CHIP:DMG:                         {
+          [1708432099.409926][11937:11937] CHIP:DMG:                                 EndpointId = 0x0,
+          [1708432099.410005][11937:11937] CHIP:DMG:                                 ClusterId = 0x3f,
+          [1708432099.410097][11937:11937] CHIP:DMG:                                 CommandId = 0x0,
+          [1708432099.410169][11937:11937] CHIP:DMG:                         },
+          [1775715922.281] [2593892:2593892] [DMG]                         
+          [1775715922.281] [2593892:2593892] [DMG]                         CommandFields = 
+          [1775715922.281] [2593892:2593892] [DMG]                         {
+          [1775715922.282] [2593892:2593892] [DMG]                                 0x0 = 
+          [1775715922.282] [2593892:2593892] [DMG]                                 {
+          [1775715922.282] [2593892:2593892] [DMG]                                         0x0 = 1 (unsigned), 
+          [1775715922.282] [2593892:2593892] [DMG]                                         0x1 = 0 (unsigned), 
+          [1775715922.282] [2593892:2593892] [DMG]                                         0x2 = [
+          [1775715922.282] [2593892:2593892] [DMG]                                                         0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 
+          [1775715922.282] [2593892:2593892] [DMG]                                         ] (16 bytes)
+          [1775715922.282] [2593892:2593892] [DMG]                                         0x3 = 2220000 (unsigned), 
+          [1775715922.282] [2593892:2593892] [DMG]                                         0x4 = [
+          [1775715922.282] [2593892:2593892] [DMG]                                                         0xd1, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 
+          [1775715922.282] [2593892:2593892] [DMG]                                         ] (16 bytes)
+          [1775715922.282] [2593892:2593892] [DMG]                                         0x5 = 2220001 (unsigned), 
+          [1775715922.282] [2593892:2593892] [DMG]                                         0x6 = [
+          [1775715922.282] [2593892:2593892] [DMG]                                                         0xd2, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 
+          [1775715922.282] [2593892:2593892] [DMG]                                         ] (16 bytes)
+          [1775715922.282] [2593892:2593892] [DMG]                                         0x7 = 2220002 (unsigned), 
+          [1775715922.282] [2593892:2593892] [DMG]                                         0x8 = 0 (unsigned), 
+          [1775715922.282] [2593892:2593892] [DMG]                                 },
+          [1775715922.282] [2593892:2593892] [DMG]                         },
+          [1775715922.282] [2593892:2593892] [DMG]                 },
+          [1775715922.282] [2593892:2593892] [DMG]                 
+          [1775715922.282] [2593892:2593892] [DMG]         ],
+          [1775715922.282] [2593892:2593892] [DMG]         
+          [1775715922.282] [2593892:2593892] [DMG]         InteractionModelRevision = 12
+          [1775715922.282] [2593892:2593892] [DMG] },
       disabled: true
 
     - label:
