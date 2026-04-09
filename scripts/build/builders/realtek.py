@@ -177,7 +177,7 @@ class RealtekBuilder(Builder):
             ot_src_dir=self.ot_src_dir,
             board_name=self.board.BoardName)
         self._Execute(['bash', '-c', cmd])
-        cmd = 'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {build_flags} {example_folder} -B{out_folder}'.format(
+        cmd = 'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {build_flags} -DPython3_EXECUTABLE=$(which python3) {example_folder} -B{out_folder}'.format(
             build_flags=self.CmakeBuildFlags(),
             example_folder=self.rtk_matter_dir,
             out_folder=self.output_dir)
