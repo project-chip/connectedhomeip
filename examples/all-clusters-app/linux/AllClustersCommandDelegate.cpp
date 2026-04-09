@@ -548,7 +548,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "SimulateConfigurationVersionChange")
     {
-        Clusters::BasicInformationCluster * cluster = Clusters::BasicInformation::GetClusterInstance();
+        Clusters::BasicInformationClusterWithDeviceLocation * cluster = Clusters::BasicInformation::GetClusterInstance();
         if (cluster == nullptr)
         {
             ChipLogError(NotSpecified, "No basic information cluster available. Invalid state.");

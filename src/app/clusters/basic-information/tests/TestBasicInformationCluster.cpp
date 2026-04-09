@@ -143,7 +143,7 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
     // check with default optional attributes (unique ID forced on)
     {
         const BasicInformationOptionalAttributesSet optionalAttributeSet;
-        BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(),
+        BasicInformationClusterNoDeviceLocation cluster(optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(),
                                         chip::DeviceLayer::PlatformMgr(),
                                         app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
 
@@ -171,7 +171,7 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
     // Check that disabling unique id works
     {
         BasicInformationOptionalAttributesSet optionalAttributeSet;
-        BasicInformationCluster cluster2(optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(),
+        BasicInformationClusterNoDeviceLocation cluster2(optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(),
                                          chip::DeviceLayer::PlatformMgr(),
                                          app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
 
@@ -213,7 +213,7 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
                                                                                .template Set<UniqueID::Id>()
                                                                                .template Set<DeviceLocation::Id>();
 
-        BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(),
+        BasicInformationClusterWithDeviceLocation cluster(optionalAttributeSet, mDeviceInfoProvider, chip::DeviceLayer::ConfigurationMgr(),
                                         chip::DeviceLayer::PlatformMgr(),
                                         app::InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
 

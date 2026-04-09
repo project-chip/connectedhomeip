@@ -32,13 +32,13 @@ constexpr size_t kMaxDeviceLocationTLVSize = 160;
 
 using LocationDescriptorStructType = chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type;
 
-class DeviceLayerBasicInformationPolicy
+class DeviceLayerBasicInformationPolicyBase
 {
 public:
     // Base class for the cluster to inherit from, to satisfy PlatformManagerDelegate requirements
     using LifetimeDelegate = DeviceLayer::PlatformManagerDelegate;
 
-    DeviceLayerBasicInformationPolicy(BasicInformationOptionalAttributesSet optionalAttributes,
+    DeviceLayerBasicInformationPolicyBase(BasicInformationOptionalAttributesSet optionalAttributes,
                                       DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider,
                                       DeviceLayer::ConfigurationManager & configurationManager,
                                       DeviceLayer::PlatformManager & platformManager, uint16_t subscriptionsPerFabric) :
@@ -50,12 +50,6 @@ public:
         // of what optionalAttributeSet says, to prevent accidental non-certifiable configs.
         mOptionalAttributes.template Set<BasicInformation::Attributes::UniqueID::Id>();
 
-        // Use null for default, but note that if a device location was previously saved
-        // to persistent storage that value will be loaded by the start up code.
-        if (mOptionalAttributes.IsSet(BasicInformation::Attributes::DeviceLocation::Id))
-        {
-            mDeviceLocation.emplace(DataModel::Nullable<OwnedDeviceLocation>(DataModel::NullNullable));
-        }
     }
 
     const BasicInformationOptionalAttributesSet & GetOptionalAttributes() const { return mOptionalAttributes; }
@@ -184,6 +178,73 @@ public:
 
     uint16_t GetSubscriptionsPerFabric() const { return mSubscriptionsPerFabric; }
 
+private:
+
+    CHIP_ERROR IgnoreUnimplemented(CHIP_ERROR status, char * buf, size_t bufSize)
+    {
+        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            if (bufSize > 0)
+            {
+                buf[0] = 0;
+            }
+            return CHIP_NO_ERROR;
+        }
+        return status;
+    }
+protected:
+    BasicInformationOptionalAttributesSet mOptionalAttributes;
+private:
+    DeviceLayer::DeviceInstanceInfoProvider & mDeviceInstanceInfoProvider;
+    DeviceLayer::ConfigurationManager & mConfigurationManager;
+    DeviceLayer::PlatformManager & mPlatformManager;
+    uint16_t mSubscriptionsPerFabric;
+};
+
+// By default, don't instantiate the code related to the DeviceLocation
+// optional attribute.
+template <bool HasDeviceLocation>
+class DeviceLayerBasicInformationPolicy final
+    : public DeviceLayerBasicInformationPolicyBase
+{
+public:
+    using DeviceLayerBasicInformationPolicyBase::DeviceLayerBasicInformationPolicyBase;
+
+    CHIP_ERROR WriteDeviceLocation(const DataModel::Nullable<LocationDescriptorStructType> &,
+                                   AttributePersistence &)
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    CHIP_ERROR LoadDeviceLocation(AttributePersistence &) { return CHIP_NO_ERROR; }
+
+    std::optional<DataModel::Nullable<LocationDescriptorStructType>> GetDeviceLocation() const
+    {
+        return std::nullopt;
+    }
+};
+
+template <>
+class DeviceLayerBasicInformationPolicy<true> final
+    : public DeviceLayerBasicInformationPolicyBase
+{
+public:
+    using DeviceLayerBasicInformationPolicyBase::DeviceLayerBasicInformationPolicyBase;
+
+    DeviceLayerBasicInformationPolicy(
+        BasicInformationOptionalAttributesSet optionalAttributes,
+        DeviceLayer::DeviceInstanceInfoProvider & deviceInstanceInfoProvider,
+        DeviceLayer::ConfigurationManager & configurationManager,
+        DeviceLayer::PlatformManager & platformManager,
+        uint16_t subscriptionsPerFabric) :
+        DeviceLayerBasicInformationPolicyBase(optionalAttributes, deviceInstanceInfoProvider,
+                                              configurationManager, platformManager, subscriptionsPerFabric)
+    {
+        if (mOptionalAttributes.IsSet(BasicInformation::Attributes::DeviceLocation::Id))
+        {
+            mDeviceLocation.emplace(DataModel::Nullable<OwnedDeviceLocation>(DataModel::NullNullable));
+        }
+    }
     // The code for supporting the DeviceLocation attribute was borrowed + adapted
     // from the BridgedDeviceBasicInformation cluster. Try to keep the two in sync,
     // if any changes are required.
@@ -414,26 +475,7 @@ private:
         return persistence.StoreTLV<kMaxDeviceLocationTLVSize>(path, *loc);
     }
 
-    CHIP_ERROR IgnoreUnimplemented(CHIP_ERROR status, char * buf, size_t bufSize)
-    {
-        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            if (bufSize > 0)
-            {
-                buf[0] = 0;
-            }
-            return CHIP_NO_ERROR;
-        }
-        return status;
-    }
 
-    BasicInformationOptionalAttributesSet mOptionalAttributes;
-    DeviceLayer::DeviceInstanceInfoProvider & mDeviceInstanceInfoProvider;
-    DeviceLayer::ConfigurationManager & mConfigurationManager;
-    DeviceLayer::PlatformManager & mPlatformManager;
-    uint16_t mSubscriptionsPerFabric;
-
-    // Nullable backing store
     std::optional<DataModel::Nullable<OwnedDeviceLocation>> mDeviceLocation;
 };
 

@@ -27,6 +27,14 @@ namespace chip::app::Clusters {
 // Integrators that only need a subset of these capabilities, or that want to avoid
 // pulling in the full DeviceLayer dependency, should instantiate BasicInformation::PolicyBased
 // directly with a custom policy instead.
-using BasicInformationCluster = BasicInformation::PolicyBased<DeviceLayerBasicInformationPolicy>;
+//
+// Setting HasDeviceLocation to false results in having no instantiation of the code related to
+// the optional attribute named DeviceLocation. Use this option if facing severe storage constraints.
+template <bool HasDeviceLocation> 
+using BasicInformationCluster = BasicInformation::PolicyBased<DeviceLayerBasicInformationPolicy<HasDeviceLocation>>;
+
+// Convenience aliases
+using BasicInformationClusterNoDeviceLocation   = BasicInformationCluster<false>;
+using BasicInformationClusterWithDeviceLocation = BasicInformationCluster<true>;
 
 } // namespace chip::app::Clusters

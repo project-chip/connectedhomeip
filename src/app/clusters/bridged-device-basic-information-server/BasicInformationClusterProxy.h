@@ -29,12 +29,12 @@ namespace chip::app::Clusters {
 class BasicInformationClusterProxy : public ConfigurationVersionDelegate
 {
 public:
-    BasicInformationClusterProxy(BasicInformationCluster & basicInfo) : mBasicInformation(basicInfo) {}
+    BasicInformationClusterProxy(BasicInformationClusterNoDeviceLocation & basicInfo) : mBasicInformation(basicInfo) {}
 
     CHIP_ERROR IncreaseConfigurationVersion() override { return mBasicInformation.IncreaseConfigurationVersion(); }
 
 private:
-    BasicInformationCluster & mBasicInformation;
+    BasicInformationClusterNoDeviceLocation & mBasicInformation;
 };
 
 } // namespace chip::app::Clusters

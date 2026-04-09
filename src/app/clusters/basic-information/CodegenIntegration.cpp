@@ -44,7 +44,11 @@ static_assert((kBasicInformationFixedClusterCount == 0) ||
                    BasicInformation::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
               "Basic Information cluster MUST be on endpoint 0");
 
-LazyRegisteredServerCluster<BasicInformationCluster> gServer;
+constexpr bool kHasDeviceLocation = 
+    BasicInformation::StaticApplicationConfig::IsAttributeEnabledOnSomeEndpoint(BasicInformation::Attributes::DeviceLocation::Id);
+
+LazyRegisteredServerCluster<BasicInformationCluster<kHasDeviceLocation>> gServer;
+
 
 void LegacyOnlyDisableUniqueIdAttr(BasicInformationOptionalAttributesSet & attributeSet)
 {
@@ -91,7 +95,7 @@ public:
 
 namespace chip::app::Clusters::BasicInformation {
 
-BasicInformationCluster * GetClusterInstance()
+BasicInformationCluster<kHasDeviceLocation> * GetClusterInstance()
 {
     VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
     return &gServer.Cluster();

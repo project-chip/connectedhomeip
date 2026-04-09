@@ -392,14 +392,12 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
     }
     case Reachable::Id:
         return encoder.Encode<bool>(true);
-    case DeviceLocation::Id:
+    case DeviceLocation::Id: {
         ChipLogDetail(Zcl, "Reading DeviceLocation");
 
-        if (auto location = mPolicy.GetDeviceLocation(); location.has_value())
-        {
-            return encoder.Encode(*location);
-        }
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+        auto location = mPolicy.GetDeviceLocation();
+        return encoder.Encode(*location);     
+    }  
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }

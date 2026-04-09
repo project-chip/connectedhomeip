@@ -1061,7 +1061,7 @@ TEST_F(TestBridgedDeviceBasicInformationCluster, TestNodeLabelPersistence)
 
 TEST_F(TestBridgedDeviceBasicInformationCluster, TestBasicInformationClusterProxy)
 {
-    BasicInformationCluster basicInfo(BasicInformationOptionalAttributesSet(), mDeviceInfoProvider, mMockConfigManager,
+    BasicInformationClusterNoDeviceLocation basicInfo(BasicInformationOptionalAttributesSet(), mDeviceInfoProvider, mMockConfigManager,
                                       chip::DeviceLayer::PlatformMgr(), static_cast<uint16_t>(1));
 
     // Initial value in our mock is 10
