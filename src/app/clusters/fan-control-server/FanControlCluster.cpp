@@ -41,9 +41,8 @@ namespace chip::app::Clusters {
 
 FanControlCluster::FanControlCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, FanControl::Id }), mFanModeSequence(config.mFanModeSequence),
-    mSpeedMax(config.mSpeedMax), mRockSupport(config.mRockSupport),
-    mWindSupport(config.mWindSupport), mOptionalAttributes(config.mOptionalAttributes), mFeatureMap(config.mFeatureMap),
-    mDelegate(config.mDelegate)
+    mSpeedMax(config.mSpeedMax), mRockSupport(config.mRockSupport), mWindSupport(config.mWindSupport),
+    mOptionalAttributes(config.mOptionalAttributes), mFeatureMap(config.mFeatureMap), mDelegate(config.mDelegate)
 {}
 
 void FanControlCluster::NotifyDelegateFanDriveState()
