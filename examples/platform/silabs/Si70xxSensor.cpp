@@ -116,21 +116,21 @@ sl_status_t Init()
     // Initialize I2C bus
     status = sl_i2c_driver_init(SI70XX_I2C_INSTANCE, &i2c_config);
     VerifyOrReturnError(status == SL_I2C_SUCCESS, status);
-    
+
     status = sl_i2c_driver_configure_fifo_threshold(SI70XX_I2C_INSTANCE, TX_THRESHOLD, RX_THRESHOLD);
     VerifyOrReturnError(status == SL_I2C_SUCCESS, status);
-    
+
     // reset the sensor
     status = sl_si91x_si70xx_reset(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
-    
+
     // Wait for sensor to recover after reset (Si70xx needs ~15ms to recover)
     delay(15);
-    
+
     // Initializes sensor and reads electronic ID 1st byte
     status = sl_si91x_si70xx_init(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR, SL_EID_FIRST_BYTE);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
-    
+
     // Initializes sensor and reads electronic ID 2nd byte
     status = sl_si91x_si70xx_init(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR, SL_EID_SECOND_BYTE);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
@@ -145,7 +145,7 @@ sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
 #if (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED && defined(SLI_SI91X_MCU_INTERFACE))
     // Add PS requirement to keep the sensor awake
     sl_si91x_power_manager_add_ps_requirement(SL_SI91X_POWER_MANAGER_PS3);
-    
+
     // Initialize I2C instances
     sl_i2c_init_instances();
 
@@ -153,7 +153,7 @@ sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
     status = Init();
     VerifyOrExit(status == SL_STATUS_OK, ChipLogError(AppServer, "Failed to initialize the sensor : %ld", status));
 #endif // (defined(SL_ICD_ENABLED) && SL_ICD_ENABLED && defined(SLI_SI91X_MCU_INTERFACE))
-    
+
     status = sl_si91x_si70xx_measure_rh_and_temp(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR, &tempHumidity, &tempTemperature);
     VerifyOrExit(status == SL_STATUS_OK, ChipLogError(AppServer, "Failed to measure sensor data : %ld", status));
 
