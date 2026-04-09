@@ -15,16 +15,14 @@
 #    limitations under the License.
 
 import logging
-
-from mobly import asserts
 from datetime import datetime, timezone
 
+from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.clusters.enum import MatterIntEnum
-from matter.testing.matter_asserts import assert_int_in_range, assert_valid_bool, assert_valid_uint32
-from matter.testing.timeoperations import utc_datetime_from_matter_epoch_us
+from matter.testing.matter_asserts import assert_valid_bool, assert_valid_uint32
 from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.timeoperations import utc_datetime_from_matter_epoch_us
 
 log = logging.getLogger(__name__)
 
@@ -74,7 +72,7 @@ class SmokeCoBaseTest(MatterBaseTest):
         log.info(f"Reading attribte with value {attr} and checking the matter epoch ")
         # Number of seconds representing the matter epoch
         assert_valid_uint32(attr, "Attribute is not in uint range")
-    
+
     async def is_valid_expired_date(self) -> bool:
         """Check if the device alarm  has expired using the ExpiryDate.
 

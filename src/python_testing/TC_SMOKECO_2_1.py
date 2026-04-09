@@ -95,7 +95,7 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
 
         self.step(2)
         await self.read_attribute_check_range(self.smokeco_cluster.Attributes.ExpressedState, enum=self.smokeco_enums.ExpressedStateEnum)
-        
+
         self.step(3)
         if await self.feature_guard(endpoint=self.get_endpoint(),cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
             await self.read_attribute_check_range(self.smokeco_cluster.Attributes.SmokeState, enum=self.smokeco_enums.AlarmStateEnum)
