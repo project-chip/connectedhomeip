@@ -370,7 +370,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 7: DUT reads the Groupcast 'membership' attribute on the TH on EP0."
+          "Step 7: DUT reads the Groupcast 'membership' attribute on the TH on
+          EP0."
       verification: |
           ./chip-tool groupcast read membership 1 0
 
