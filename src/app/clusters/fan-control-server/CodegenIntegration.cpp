@@ -86,23 +86,19 @@ public:
         }
         if (features.Has(FanControl::Feature::kRocking))
         {
-            constexpr uint8_t kDefaultRockSupportRaw = static_cast<uint8_t>(RockBitmap::kRockLeftRight) |
-                static_cast<uint8_t>(RockBitmap::kRockUpDown) | static_cast<uint8_t>(RockBitmap::kRockRound);
             BitMask<RockBitmap> rockSupport;
             if (RockSupport::Get(endpointId, &rockSupport) != Status::Success)
             {
-                rockSupport = BitMask<RockBitmap>(kDefaultRockSupportRaw);
+                rockSupport = BitMask<RockBitmap>(RockBitmap::kRockLeftRight, RockBitmap::kRockUpDown, RockBitmap::kRockRound);
             }
             config.WithRockSupport(rockSupport);
         }
         if (features.Has(FanControl::Feature::kWind))
         {
-            constexpr uint8_t kDefaultWindSupportRaw =
-                static_cast<uint8_t>(WindBitmap::kSleepWind) | static_cast<uint8_t>(WindBitmap::kNaturalWind);
             BitMask<WindBitmap> windSupport;
             if (WindSupport::Get(endpointId, &windSupport) != Status::Success)
             {
-                windSupport = BitMask<WindBitmap>(kDefaultWindSupportRaw);
+                windSupport = BitMask<WindBitmap>(WindBitmap::kSleepWind, WindBitmap::kNaturalWind);
             }
             config.WithWindSupport(windSupport);
         }
@@ -192,12 +188,12 @@ void SetDefaultDelegate(EndpointId aEndpoint, Delegate * aDelegate)
     if (ep < kFanControlMaxClusterCount)
     {
         gClusters[ep].delegate = aDelegate;
-    }
 
-    // Update the cluster instance if it already exists (e.g. app sets delegate in emberAfFanControlClusterInitCallback)
-    if (FanControlCluster * cluster = FindClusterOnEndpoint(aEndpoint); cluster != nullptr)
-    {
-        cluster->SetDelegate(aDelegate);
+        // Update the cluster instance if it already exists (e.g. app sets delegate in emberAfFanControlClusterInitCallback)
+        if (gClusters[ep].server.IsConstructed())
+        {
+            gClusters[ep].server.Cluster().SetDelegate(aDelegate);
+        }
     }
 }
 

@@ -87,14 +87,12 @@ public:
         }
         Config & WithStep()
         {
-            mSupportsStep = true;
             mFeatureMap.Set(FanControl::Feature::kStep);
             return *this;
         }
 
         EndpointId mEndpointId;
         FanControl::Delegate * mDelegate;
-        bool mSupportsStep                               = false;
         FanControl::FanModeSequenceEnum mFanModeSequence = FanControl::FanModeSequenceEnum::kOffLowHigh;
         uint8_t mSpeedMax                                = 0;
         BitMask<FanControl::RockBitmap> mRockSupport;
@@ -155,7 +153,7 @@ private:
     }
     bool SupportsRocking() const { return mOptionalAttributes.IsSet(FanControl::Attributes::RockSupport::Id); }
     bool SupportsWind() const { return mOptionalAttributes.IsSet(FanControl::Attributes::WindSupport::Id); }
-    bool SupportsStep() const { return mSupportsStep; }
+    bool SupportsStep() const { return mFeatureMap.Has(FanControl::Feature::kStep); }
     bool SupportsAirflowDirection() const { return mOptionalAttributes.IsSet(FanControl::Attributes::AirflowDirection::Id); }
 
     void SetFanModeToOff();
@@ -185,8 +183,7 @@ private:
     BitMask<FanControl::WindBitmap> mWindSetting;
     FanControl::AirflowDirectionEnum mAirflowDirection = FanControl::AirflowDirectionEnum::kForward;
 
-    bool mSupportsStep = false;
-    bool mIsOnOffOn    = false;
+    bool mIsOnOffOn = false;
     uint8_t mSpeedMax;
     BitMask<FanControl::RockBitmap> mRockSupport;
     BitMask<FanControl::WindBitmap> mWindSupport;
