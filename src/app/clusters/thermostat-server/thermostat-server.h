@@ -29,6 +29,22 @@
 #include <app-common/zap-generated/callback.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
+#include <app/util/config.h>
+#include <platform/CHIPDeviceConfig.h>
+
+// Provide a fallback when the generated endpoint count macro is not available
+// (e.g. unit-test or Android builds compiled with
+// CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1).
+#ifndef MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT
+#define MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT 0
+#endif
+
+// Forward declaration to allow the test access helper to be a friend.
+namespace chip {
+namespace Testing {
+class ThermostatAttrAccessTestAccess;
+} // namespace Testing
+} // namespace chip
 
 namespace chip {
 namespace app {
@@ -44,6 +60,11 @@ enum class AtomicWriteState
 static constexpr size_t kThermostatEndpointCount =
     MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
+// Some unit-test builds compile the Thermostat server sources without configuring
+// any Thermostat endpoints. Keep the actual endpoint count unchanged, but ensure
+// fixed-size backing storage remains valid in those configurations.
+static constexpr size_t kThermostatStorageEndpointCount = kThermostatEndpointCount > 0 ? kThermostatEndpointCount : 1;
+
 /**
  * @brief  Thermostat Attribute Access Interface.
  */
@@ -57,6 +78,9 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override;
 
 private:
+    // Allow test access helper to call private methods without #define private public.
+    friend class chip::Testing::ThermostatAttrAccessTestAccess;
+
     /**
      * @brief Set the Active Preset to a given preset handle, or null
      *
@@ -233,7 +257,7 @@ private:
         EndpointId endpointId = kInvalidEndpointId;
     };
 
-    AtomicWriteSession mAtomicWriteSessions[kThermostatEndpointCount];
+    AtomicWriteSession mAtomicWriteSessions[kThermostatStorageEndpointCount];
 };
 
 /**
