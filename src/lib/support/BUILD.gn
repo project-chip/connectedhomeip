@@ -113,6 +113,7 @@ source_set("arg_parser") {
 
 source_set("numeric-primitives") {
   sources = [
+    "PopCount.h",
     "attribute-storage-null-handling.h",
     "odd-sized-integers.h",
   ]
