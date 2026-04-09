@@ -17,8 +17,8 @@ Observations (on UNFIXED code):
   unconditionally (set via host.py when chip_casting_simplified=true).
 - darwin/args.gni: chip_cluster_objects_source_override points to
   casting-cluster-objects.cpp.
-- casting-cluster-objects.cpp exists and contains ~157 .ipp includes
-  spanning ~39 cluster directories plus the shared utilities directory.
+- casting-cluster-objects.cpp exists and contains ~117 .ipp includes
+  spanning ~29 cluster directories plus the shared utilities directory.
 
 EXPECTED on UNFIXED code: ALL TESTS PASS -- confirms baseline to preserve.
 """
@@ -288,8 +288,8 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
 
     Property 2c (Preservation): The slim `casting-cluster-objects.cpp` file
     SHALL exist and include .ipp files for the expected set of casting-relevant
-    and infrastructure clusters (~39 cluster directories plus shared utilities,
-    totalling ~157 .ipp includes).
+    and infrastructure clusters (~29 cluster directories plus shared utilities,
+    totalling ~117 .ipp includes).
     """
     assert os.path.isfile(SLIM_CLUSTER_FILE), (
         f"REGRESSION: casting-cluster-objects.cpp not found at {SLIM_CLUSTER_FILE}"
@@ -299,21 +299,21 @@ def test_casting_cluster_objects_file_exists_with_expected_includes(dummy: bool)
 
     # Count .ipp includes
     ipp_count = _count_ipp_includes(content)
-    # The file currently has ~157 .ipp includes. Allow a small tolerance
+    # The file currently has ~117 .ipp includes. Allow a small tolerance
     # (+-5) for minor cluster additions/removals, but catch large regressions
     # like accidentally replacing with the full cluster-objects.cpp (~800+).
     assert 100 <= ipp_count <= 200, (
         f"REGRESSION: casting-cluster-objects.cpp has {ipp_count} .ipp includes. "
-        f"Expected ~157 (between 100 and 200). If this is much larger, the slim "
+        f"Expected ~117 (between 100 and 200). If this is much larger, the slim "
         f"file may have been replaced with the full cluster-objects.cpp."
     )
 
     # Verify unique cluster directories
     cluster_dirs = _unique_cluster_dirs(content)
-    # Currently 39 cluster dirs + 'shared' = 40 total
+    # Currently 29 cluster dirs + 'shared' = 30 total
     assert 30 <= len(cluster_dirs) <= 50, (
         f"REGRESSION: casting-cluster-objects.cpp references {len(cluster_dirs)} "
-        f"unique cluster directories. Expected ~40 (between 30 and 50)."
+        f"unique cluster directories. Expected ~30 (between 30 and 50)."
     )
 
     # Verify key casting-specific clusters are present

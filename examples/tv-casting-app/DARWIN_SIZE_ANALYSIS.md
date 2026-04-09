@@ -10,8 +10,8 @@ version of the casting library into their apps.
 
 | Metric                           | Default build | Optimized build | Reduction |
 | -------------------------------- | ------------- | --------------- | --------- |
-| `libTvCastingCommon.a` (archive) | 210 MB        | 144 MB          | 31 %      |
-| `__TEXT` (actual code)           | 12.1 MB       | 2.8 MB          | 77 %      |
+| `libTvCastingCommon.a` (archive) | 184 MB        | 135 MB          | 27 %      |
+| `__TEXT` (actual code)           | 11.6 MB       | 2.7 MB          | 77 %      |
 | `__DATA`                         | 0.4 MB        | 0.3 MB          | 25 %      |
 
 The `.a` archive sizes (210 / 144 MB) include debug info, symbol tables, and
@@ -291,3 +291,40 @@ legacy chip-tool sources and their transitive dependencies.
 ---
 
 _March 2026 — Initial analysis of Darwin casting framework size._
+
+
+---
+
+## 9. Phase 2 Optimizations — Darwin Applicability
+
+Phase 2 of the APK size reduction effort introduces five additional
+optimizations for the Android size-optimized build. Some of these also apply to
+Darwin builds; others are Android-specific due to platform differences.
+
+### Optimizations that apply to Darwin
+
+| Optimization | Darwin applicability | Notes |
+|---|---|---|
+| Cluster trimming (11 clusters) | ✅ Applies | The slim `casting-cluster-objects.cpp` is shared between Android and Darwin. Removing 11 non-essential infrastructure clusters reduces code in `libTvCastingCommon.a` identically. |
+| ICD client removal | ✅ Applies | The `tv-casting-common/BUILD.gn` conditional excluding `icd/client:handler` and `icd/client:manager` applies to all platforms when `optimize_apk_size=true`. Darwin casting builds do not use ICD client APIs. |
+
+### Optimizations that are Android-specific
+
+| Optimization | Why it doesn't apply to Darwin |
+|---|---|
+| Disable RTTI (`enable_rtti=false`) | The Darwin Objective-C bridge (`MatterTvCastingBridge`) uses `typeid` in the ObjC-to-C++ interop layer. Disabling RTTI would break the bridge at compile time. RTTI is safe to disable only on Android where the JNI layer does not use `dynamic_cast` or `typeid`. |
+| Disable extra data-model logging (`chip_data_model_extra_logging=false`) | This GN arg is passed by `android.py` specifically for the `TV_CASTING_APP` target. Darwin builds use a separate build flow (Xcode + `chip_xcode_build_connector.sh`) and do not pass this argument. It could be added to `darwin/args.gni` in a future phase if desired. |
+| Disable host unit-test hooks (`CONFIG_BUILD_FOR_HOST_UNIT_TEST=0`) | The define override is applied via the `tv-casting-common/BUILD.gn` config block only when `optimize_apk_size=true`. While technically platform-agnostic, the primary motivation and testing is Android-focused. Darwin Release builds already strip test code via different mechanisms. |
+
+### Summary
+
+Of the five phase 2 optimizations, two (cluster trimming and ICD removal) are
+platform-agnostic and benefit Darwin builds automatically when
+`optimize_apk_size=true` is set. The remaining three (RTTI, extra logging,
+unit-test hooks) are Android-specific — RTTI cannot be disabled on Darwin due to
+`typeid` usage in the ObjC bridge, and the logging/test-hook flags are wired
+through the Android build pipeline.
+
+---
+
+_Updated March 2026 with phase 2 applicability notes for Darwin builds._

@@ -470,6 +470,8 @@ class AndroidBuilder(Builder):
                         "tv-casting-app/tv-casting-common/"
                         "casting-CHIPEventTLVValueDecoder.cpp"
                     )
+                    gn_args["chip_data_model_extra_logging"] = False
+                    gn_args["enable_rtti"] = False
             gn_args.update(self.app.AppGnArgs())
 
             args_str = ""

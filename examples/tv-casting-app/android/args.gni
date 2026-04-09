@@ -62,6 +62,7 @@ if (optimize_apk_size) {
   chip_build_libshell = false
   optimize_for_size = true  # -Os (size) instead of -O2 (speed)
   symbol_level = 0  # -g0: no debug symbols
+  enable_rtti = false  # Disable C++ RTTI to remove type_info and vtable overhead
 
   # Slim TLV decoders covering only the 18 casting clusters.  These
   # replace the full zap-generated decoders (~200+ clusters) at build

@@ -3150,12 +3150,6 @@ endpoint 0 {
     callback attribute clusterRevision;
   }
 
-  server cluster UnitLocalization {
-    callback attribute temperatureUnit;
-    ram      attribute featureMap default = 0x1;
-    callback attribute clusterRevision;
-  }
-
   server cluster GeneralCommissioning {
     callback attribute breadcrumb;
     callback attribute basicCommissioningInfo;
@@ -3204,52 +3198,6 @@ endpoint 0 {
 
     handle command TestEventTrigger;
     handle command TimeSnapshot;
-  }
-
-  server cluster SoftwareDiagnostics {
-    callback attribute threadMetrics;
-    callback attribute currentHeapFree;
-    callback attribute currentHeapUsed;
-    callback attribute currentHeapHighWatermark;
-    callback attribute featureMap;
-    callback attribute clusterRevision;
-  }
-
-  server cluster WiFiNetworkDiagnostics {
-    emits event Disconnection;
-    emits event AssociationFailure;
-    emits event ConnectionStatus;
-    callback attribute bssid;
-    callback attribute securityType;
-    callback attribute wiFiVersion;
-    callback attribute channelNumber;
-    callback attribute rssi;
-    callback attribute beaconLostCount;
-    callback attribute beaconRxCount;
-    callback attribute packetMulticastRxCount;
-    callback attribute packetMulticastTxCount;
-    callback attribute packetUnicastRxCount;
-    callback attribute packetUnicastTxCount;
-    callback attribute currentMaxRate;
-    callback attribute overrunCount;
-    ram      attribute featureMap default = 3;
-    callback attribute clusterRevision default = 1;
-  }
-
-  server cluster EthernetNetworkDiagnostics {
-    callback attribute PHYRate;
-    callback attribute fullDuplex;
-    callback attribute packetRxCount;
-    callback attribute packetTxCount;
-    callback attribute txErrCount;
-    callback attribute collisionCount;
-    callback attribute overrunCount;
-    callback attribute carrierDetect;
-    callback attribute timeSinceReset;
-    ram      attribute featureMap default = 3;
-    callback attribute clusterRevision;
-
-    handle command ResetCounts;
   }
 
   server cluster AdministratorCommissioning {
@@ -3375,5 +3323,3 @@ endpoint 1 {
     handle command ContentAppMessage;
   }
 }
-
-
