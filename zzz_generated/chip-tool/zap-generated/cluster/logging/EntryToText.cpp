@@ -241,6 +241,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "SoilMeasurement";
     case chip::app::Clusters::AmbientContextSensing::Id:
         return "AmbientContextSensing";
+    case chip::app::Clusters::ProximityRanging::Id:
+        return "ProximityRanging";
     case chip::app::Clusters::WiFiNetworkManagement::Id:
         return "WiFiNetworkManagement";
     case chip::app::Clusters::ThreadBorderRouterManagement::Id:
@@ -4046,6 +4048,37 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ProximityRanging::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ProximityRanging::Attributes::RangingCapabilities::Id:
+            return "RangingCapabilities";
+        case chip::app::Clusters::ProximityRanging::Attributes::WiFiDevIK::Id:
+            return "WiFiDevIK";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLEDeviceID::Id:
+            return "BLEDeviceID";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLTDevIK::Id:
+            return "BLTDevIK";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLTCSSecurityLevel::Id:
+            return "BLTCSSecurityLevel";
+        case chip::app::Clusters::ProximityRanging::Attributes::BLTCSModeCapability::Id:
+            return "BLTCSModeCapability";
+        case chip::app::Clusters::ProximityRanging::Attributes::SessionIDList::Id:
+            return "SessionIDList";
+        case chip::app::Clusters::ProximityRanging::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ProximityRanging::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ProximityRanging::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ProximityRanging::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ProximityRanging::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WiFiNetworkManagement::Id: {
         switch (id)
         {
@@ -6071,6 +6104,17 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ProximityRanging::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ProximityRanging::Commands::StartRangingRequest::Id:
+            return "StartRangingRequest";
+        case chip::app::Clusters::ProximityRanging::Commands::StopRangingRequest::Id:
+            return "StopRangingRequest";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WiFiNetworkManagement::Id: {
         switch (id)
         {
@@ -6979,6 +7023,15 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ProximityRanging::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ProximityRanging::Commands::StartRangingResponse::Id:
+            return "StartRangingResponse";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::WiFiNetworkManagement::Id: {
         switch (id)
         {
@@ -7389,6 +7442,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Doorbell";
     case 0x00000150:
         return "Ambient Context Sensor";
+    case 0x00000152:
+        return "Proximity Ranger";
     case 0x00000202:
         return "Window Covering";
     case 0x00000203:

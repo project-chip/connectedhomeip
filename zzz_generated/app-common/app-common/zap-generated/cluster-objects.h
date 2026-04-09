@@ -407,6 +407,10 @@
 #include <clusters/PressureMeasurement/Commands.h>
 #include <clusters/PressureMeasurement/Events.h>
 #include <clusters/PressureMeasurement/Structs.h>
+#include <clusters/ProximityRanging/Attributes.h>
+#include <clusters/ProximityRanging/Commands.h>
+#include <clusters/ProximityRanging/Events.h>
+#include <clusters/ProximityRanging/Structs.h>
 #include <clusters/ProxyConfiguration/Attributes.h>
 #include <clusters/ProxyConfiguration/Commands.h>
 #include <clusters/ProxyConfiguration/Events.h>

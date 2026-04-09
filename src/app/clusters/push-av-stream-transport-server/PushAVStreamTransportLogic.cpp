@@ -601,7 +601,7 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
 
         uint16_t chunkDuration = containerOptions.CMAFContainerOptions.Value().chunkDuration;
 
-        VerifyOrReturnValue(chunkDuration >= 0 && chunkDuration <= segmentDuration / 2, Status::ConstraintError,
+        VerifyOrReturnValue(chunkDuration <= segmentDuration / 2, Status::ConstraintError,
                             ChipLogError(Zcl,
                                          "Transport Options verification from command data[ep=%d]: CMAF Container Options Chunk "
                                          "Duration field not within allowed range",
