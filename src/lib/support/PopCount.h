@@ -28,7 +28,7 @@ namespace chip {
  * specializations below use compiler builtins where available.
  */
 template <typename T>
-int PopCount(T word)
+constexpr int PopCount(T word)
 {
     static_assert(std::is_integral_v<T> && std::is_unsigned_v<T>, "PopCount requires an unsigned integer type");
     int count = 0;
@@ -46,19 +46,19 @@ int PopCount(T word)
 // standard guarantees: unsigned int, unsigned long, unsigned long long.
 #if defined(__GNUC__)
 template <>
-inline int PopCount<unsigned int>(unsigned int word)
+constexpr inline int PopCount<unsigned int>(unsigned int word)
 {
     return __builtin_popcount(word);
 }
 
 template <>
-inline int PopCount<unsigned long>(unsigned long word)
+constexpr inline int PopCount<unsigned long>(unsigned long word)
 {
     return __builtin_popcountl(word);
 }
 
 template <>
-inline int PopCount<unsigned long long>(unsigned long long word)
+constexpr inline int PopCount<unsigned long long>(unsigned long long word)
 {
     return __builtin_popcountll(word);
 }
@@ -69,13 +69,13 @@ inline int PopCount<unsigned long long>(unsigned long long word)
 // lets the compiler use its natural word size. When the builtin specialization
 // above is available they also benefit from it automatically.
 template <>
-inline int PopCount<unsigned char>(unsigned char word)
+constexpr inline int PopCount<unsigned char>(unsigned char word)
 {
     return PopCount(static_cast<unsigned int>(word));
 }
 
 template <>
-inline int PopCount<unsigned short>(unsigned short word)
+constexpr inline int PopCount<unsigned short>(unsigned short word)
 {
     return PopCount(static_cast<unsigned int>(word));
 }

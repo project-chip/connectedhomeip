@@ -65,4 +65,12 @@ TEST(TestPopCount, TestKnownValues)
     EXPECT_EQ(PopCount<uint64_t>(0xDEADBEEFDEADBEEF), 48);
 }
 
+// Test compile-time use
+static_assert(PopCount<uint8_t>(0xA) == 2);
+static_assert(PopCount<uint8_t>(0xAA) == 4);
+static_assert(PopCount<uint16_t>(0xA) == 2);
+static_assert(PopCount<uint16_t>(0xAAAA) == 8);
+static_assert(PopCount<uint32_t>(0xDEADBEEF) == 24);
+static_assert(PopCount<uint64_t>(0xDEADBEEFDEADBEEF) == 48);
+
 } // namespace
