@@ -171,10 +171,20 @@ class TC_ACE_1_6(MatterBaseTest):
         self.default_controller.SetGroupKey(groupID2, keySetID1)
         self.default_controller.SetGroupKey(groupID3, keySetID3)
 
-        # Set group info, mark all groups to use IANA address
-        self.default_controller.SetGroupInfo(groupID1, "Group 1", 0)
-        self.default_controller.SetGroupInfo(groupID2, "Group 2", 0)
-        self.default_controller.SetGroupInfo(groupID3, "Group 3", 0)
+        # Set group info on controller
+        INTERNAL_USE_IANA_ADDR_AND_NO_AUX_ACL = 0
+        INTERNAL_USE_PER_GROUP_ADDR_AND_NO_AUX_ACL = 2
+
+        if gc_on_root:
+            # Test both IANA and per group addressing
+            self.default_controller.SetGroupInfo(groupID1, "Group 1", INTERNAL_USE_IANA_ADDR_AND_NO_AUX_ACL)
+            self.default_controller.SetGroupInfo(groupID2, "Group 2", INTERNAL_USE_PER_GROUP_ADDR_AND_NO_AUX_ACL)
+            self.default_controller.SetGroupInfo(groupID3, "Group 3", INTERNAL_USE_IANA_ADDR_AND_NO_AUX_ACL)
+        else:
+            # Legacy groups cluster does not support IANA addresses, only uses per group addressing
+            self.default_controller.SetGroupInfo(groupID1, "Group 1", INTERNAL_USE_PER_GROUP_ADDR_AND_NO_AUX_ACL)
+            self.default_controller.SetGroupInfo(groupID2, "Group 2", INTERNAL_USE_PER_GROUP_ADDR_AND_NO_AUX_ACL)
+            self.default_controller.SetGroupInfo(groupID3, "Group 3", INTERNAL_USE_PER_GROUP_ADDR_AND_NO_AUX_ACL)
 
         # Step 2: GroupKeyMap
         if gc_on_root:
@@ -216,7 +226,7 @@ class TC_ACE_1_6(MatterBaseTest):
             self.skip_step("3c")
         else:
             self.step("3c")
-            await self.send_single_cmd(endpoint=0, cmd=Clusters.Groupcast.Commands.JoinGroup(groupID=groupID2, endpoints=[ep1], keySetID=keySetID1))
+            await self.send_single_cmd(endpoint=0, cmd=Clusters.Groupcast.Commands.JoinGroup(groupID=groupID2, endpoints=[ep1], keySetID=keySetID1, mcastAddrPolicy=Clusters.Groupcast.Enums.MulticastAddrPolicyEnum.kPerGroup))
 
         # Step 4: ACL Manage for group 0x0103
         self.step(4)
@@ -250,13 +260,21 @@ class TC_ACE_1_6(MatterBaseTest):
                 targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.Groupcast.id)]
             )
             acl_entries.append(groupcast_admin)
+        else:
+            groups_admin = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                subjects=[th1_nodeid],
+                targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.Groups.id)]
+            )
+            acl_entries.append(groups_admin)
 
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl_entries))])
 
-        # Step 5: AddGroup 0x0104 over CASE - expect UNSUPPORTED_ACCESS (if GC not on root)
         if gc_on_root:
             self.mark_step_range_skipped(5, 7)
         else:
+            # Step 5: AddGroup 0x0104 over CASE - expect UNSUPPORTED_ACCESS
             self.step(5)
             try:
                 await self.send_single_cmd(Clusters.Groups.Commands.AddGroup(groupID=groupID4, groupName=""), endpoint=pixit_g_endpoint)
@@ -387,7 +405,6 @@ class TC_ACE_1_6(MatterBaseTest):
             await self.send_single_cmd(Clusters.Groups.Commands.RemoveAllGroups(), endpoint=pixit_g_endpoint)
 
             # Step 26: Verify group removal using GetGroupMembership command
-            # TODO: verify functionality of GetGroupMembership, also check if we need this, did not exist in yaml test originally
             self.step(26)
             resp = await self.send_single_cmd(Clusters.Groups.Commands.GetGroupMembership(groupList=[]), endpoint=pixit_g_endpoint)
             asserts.assert_equal(len(resp.groupList), 0, "Group list should be empty after RemoveAllGroups")
