@@ -76,10 +76,10 @@ CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
         restoredFanMode = mFanMode;
     }
 
-    DataModel::ActionReturnStatus status = SetFanMode(restoredFanMode, false);
+    DataModel::ActionReturnStatus status = SetFanMode(restoredFanMode, /* syncOnOffDelegate = */ false);
     if (!status.IsSuccess())
     {
-        status = SetFanMode(FanModeEnum::kOff, false);
+        status = SetFanMode(FanModeEnum::kOff, /* syncOnOffDelegate = */ false);
     }
     VerifyOrReturnError(status.IsSuccess(), CHIP_ERROR_INTERNAL);
 
@@ -93,15 +93,13 @@ CHIP_ERROR FanControlCluster::Startup(ServerClusterContext & context)
 
 void FanControlCluster::SetFanModeToOff()
 {
-    if (SetAttributeValue(mFanMode, FanModeEnum::kOff, FanMode::Id))
+    VerifyOrReturn(SetAttributeValue(mFanMode, FanModeEnum::kOff, FanMode::Id)); // noop if already off
+    ApplyFanModeOffSideEffects();
+    StoreFanModePersistence();
+    NotifyDelegateFanDriveState();
+    if (mDelegate != nullptr)
     {
-        ApplyFanModeOffSideEffects();
-        StoreFanModePersistence();
-        NotifyDelegateFanDriveState();
-        if (mDelegate != nullptr)
-        {
-            mDelegate->OnFanStateChanged(false);
-        }
+        mDelegate->OnFanStateChanged(false);
     }
 }
 
