@@ -168,7 +168,7 @@ void FanControlCluster::ApplyFanModeAutoSideEffects()
     {
         mPercentCurrent = mPercentSetting.Value();
     }
-    SetAttributeValue(mPercentSetting, DataModel::Nullable<chip::Percent>{}, PercentSetting::Id);
+    SetAttributeValue(mPercentSetting, DataModel::Nullable<chip::Percent>{ DataModel::NullNullable }, PercentSetting::Id);
     NotifyAttributeChanged(PercentCurrent::Id);
 
     if (SupportsMultiSpeed())
@@ -177,7 +177,7 @@ void FanControlCluster::ApplyFanModeAutoSideEffects()
         {
             mSpeedCurrent = mSpeedSetting.Value();
         }
-        SetAttributeValue(mSpeedSetting, DataModel::Nullable<uint8_t>{}, SpeedSetting::Id);
+        SetAttributeValue(mSpeedSetting, DataModel::Nullable<uint8_t>{ DataModel::NullNullable }, SpeedSetting::Id);
         NotifyAttributeChanged(SpeedCurrent::Id);
     }
 }
