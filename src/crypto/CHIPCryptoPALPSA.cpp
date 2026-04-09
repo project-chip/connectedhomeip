@@ -21,14 +21,17 @@
  */
 
 // In mbedTLS v4.0, ECP and bignum function declarations moved to private headers.
-// These must be included before CHIPCryptoPALmbedTLS.h which transitively includes
-// the public mbedtls/ecp.h (they share the same include guard MBEDTLS_ECP_H).
+// These are only needed for the mbedTLS-based SPAKE2+ fallback. Platforms with a
+// PSA SPAKE2+ driver don't need these private headers.
+// TODO(#71479): Remove once a PSA SPAKE2+ driver is available for all platforms.
+#if !defined(CHIP_CRYPTO_SPAKE2P_PSA) || !CHIP_CRYPTO_SPAKE2P_PSA
 #include <mbedtls/version.h>
 #if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 #define MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
 #include <mbedtls/private/bignum.h>
 #include <mbedtls/private/ecp.h>
 #endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+#endif // !CHIP_CRYPTO_SPAKE2P_PSA
 
 #include "CHIPCryptoPALPSA.h"
 #include "CHIPCryptoPALmbedTLS.h"
