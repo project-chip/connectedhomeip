@@ -361,7 +361,7 @@ EOF
         pip install -r "$CHIP_ROOT/integrations/docker/images/stage-2/chip-build-efr32/requirements.txt"
         python3 "$CHIP_ROOT/scripts/setup/silabs/install-packages.py" || exit 1
     fi # run install-packages
-    
+
     # Zap generation requires activation
     source "$CHIP_ROOT/scripts/activate.sh"
 
