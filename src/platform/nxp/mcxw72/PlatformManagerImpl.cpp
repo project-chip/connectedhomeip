@@ -127,6 +127,11 @@ CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
     SecLib_Init();
 
+#if CHIP_CRYPTO_PSA
+    static chip::DeviceLayer::S200KeyAllocator s200KeyAllocator;
+    chip::Crypto::SetPSAKeyAllocator(&s200KeyAllocator);
+#endif
+
 #if !CHIP_CRYPTO_PSA
     err = chip::Crypto::add_entropy_source(plat_entropy_source, NULL, 16);
     SuccessOrExit(err);
@@ -140,10 +145,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
 
-#if CHIP_CRYPTO_PSA
-    static chip::DeviceLayer::S200KeyAllocator s200KeyAllocator;
-#endif
-
     // Initialize the configuration system.
     err = Internal::NXPConfig::Init();
     SuccessOrExit(err);
@@ -155,10 +156,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     /* Initialize platform services */
     err = ServiceInit();
     SuccessOrExit(err);
-#endif
-
-#if CHIP_CRYPTO_PSA
-    chip::Crypto::SetPSAKeyAllocator(&s200KeyAllocator);
 #endif
 
     // Call _InitChipStack() on the generic implementation base class
