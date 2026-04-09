@@ -81,6 +81,11 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             self.server.terminate()
         super().teardown_class()
 
+    @async_test_body
+    async def teardown_test(self):
+        await self.postcondition_remove_tls_endpoint(self.endpoint, self.tlsEndpointId)
+        super().teardown_test()
+
     def steps_TC_PAVSTI_1_2(self) -> list[TestStep]:
         return [
             TestStep(
@@ -166,6 +171,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
     async def test_TC_PAVSTI_1_2(self):
         PICS_PRIVACY = "AVSM.S.F03"
         endpoint = self.get_endpoint()
+        self.endpoint = endpoint
         pushavCluster = Clusters.PushAvStreamTransport
         avsmCluster = Clusters.CameraAvStreamManagement
         pushavAttr = Clusters.PushAvStreamTransport.Attributes
@@ -175,7 +181,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         # Commission DUT - already done
         await self.precondition_one_allocated_video_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
         await self.precondition_one_allocated_audio_stream(streamUsage=Globals.Enums.StreamUsageEnum.kRecording)
-        tlsEndpointId, _ = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=self.host_ip)
+        self.tlsEndpointId, _ = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=self.host_ip)
         uploadStreamId = self.server.create_stream(SupportedIngestInterface.dash.value)
 
         self.step(1)
@@ -252,7 +258,7 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
                     "streamUsage": Globals.Enums.StreamUsageEnum.kRecording,
                     "videoStreamID": videoStreamId,
                     "audioStreamID": audioStreamId,
-                    "TLSEndpointID": tlsEndpointId,
+                    "TLSEndpointID": self.tlsEndpointId,
                     "url": f"https://{self.host_ip}:1234/streams/{uploadStreamId}/",
                     "triggerOptions": {"triggerType": pushavCluster.Enums.TransportTriggerTypeEnum.kContinuous},
                     "ingestMethod": pushavCluster.Enums.IngestMethodsEnum.kCMAFIngest,

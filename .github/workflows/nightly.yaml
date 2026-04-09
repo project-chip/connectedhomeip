@@ -1,0 +1,306 @@
+# Copyright (c) 2020-2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Daily Run for slow tests
+on:
+    schedule:
+      - cron: '0 0 * * *'
+# --- TEST SECTION: Uncomment below to test on PRs ---
+    # push:
+    #     branches:
+    #         - master
+    #         - 'v*-branch'
+    # pull_request:
+    # merge_group:
+# --- END TEST SECTION ---
+    workflow_dispatch:
+        inputs:
+            disable_ccache:
+                description: 'Disable ccache restore and builds (sets CCACHE_DISABLE=1)'
+                required: false
+                default: 'false'
+                type: choice
+                options: ['false', 'true']
+            cache_suffix:
+                description: 'Optional suffix appended to ccache key to rotate (e.g. short hash)'
+                required: false
+                default: ''
+                type: string
+
+concurrency:
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
+jobs:
+    su_repl_tests_linux_build:
+        name: REPL Tests - Linux Software Update (BUILD)
+        if: |
+            github.actor != 'restyled-io[bot]' &&
+            (github.ref == 'refs/heads/master' || github.event_name == 'pull_request')
+        env:
+            BUILD_VARIANT: ipv6only-no-ble-no-wifi
+            DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
+            CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
+
+        # Run on namespace.so instead of `ubuntu-latest`: since compilations are generally CPU
+        # bound, we run these on larger/faster machines.
+        runs-on: namespace-profile-4x16
+
+        container:
+            image: ghcr.io/project-chip/chip-build:184
+            volumes:
+                - /var/run/nsc/:/var/run/nsc/
+            env:
+                NSC_TOKEN_FILE: ${{ env.NSC_TOKEN_FILE }}
+                NAMESPACE_ACTIONS_RESULTS_URL: ${{ env.NAMESPACE_ACTIONS_RESULTS_URL }}
+                NAMESPACE_ACTIONS_RESULTS_SERVICE: ${{ env.NAMESPACE_ACTIONS_RESULTS_SERVICE }}
+                NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD: ${{ env.NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD }}
+            options: >-
+                --privileged
+                --sysctl net.ipv6.conf.all.disable_ipv6=0
+                --sysctl net.ipv4.conf.all.forwarding=0
+                --sysctl net.ipv6.conf.all.forwarding=0
+
+        steps:
+            - name: Set up additional environment
+              run: |
+                echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
+                echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
+            - name: Checkout
+              uses: actions/checkout@v6
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+
+            - name: Setup and Restore Cache
+              id: ccache
+              uses: ./.github/actions/setup-ccache
+              with:
+                build-variant: ${{ matrix.build_variant }}
+                disable: ${{ env.DISABLE_CCACHE }}
+                cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
+
+            - name: Build python env
+              run: scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
+
+            - name: ccache stats
+              run: ccache -s
+
+            - name: Build linux-x64-requestor-app
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-provider-app
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build Software Update ota images with new version.
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2
+                  && mv out/su_ota_images_min-v*/*.ota objdir-clone
+                  && rm -rf out/su_ota_images_min-v*"
+
+            - name: ccache stats
+              run: ccache -s
+
+            # We archive ourselves since upload-artifact seems to lose permission bits
+            # We also remove some debug info to make artifacts smaller (otherwise they are 2GB for binaries)
+            - name: Archive artifacts
+              env:
+                XZ_OPT: -T 0 -1
+              run: |
+                find objdir-clone -executable -type f | xargs -n 1 strip
+                tar cfJ repl-build-data.tar.xz out/venv objdir-clone
+
+            - name: Upload artifacts for running
+              uses: namespace-actions/upload-artifact@v1
+              with:
+                name: repl-build-data
+                path: repl-build-data.tar.xz
+                retention-days: 2
+                if-no-files-found: error
+                overwrite: true
+            - name: Ensure only useful ccache is kept
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              run: ccache --evict-older-than 1d || true
+            - name: Delete existing ccache before save
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: ./.github/actions/delete-cache
+              with:
+                  cache-key: ${{ env.CCACHE_KEY }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+            - name: Save ccache
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: actions/cache/save@v5
+              with:
+                  path: .ccache
+                  key: ${{ env.CCACHE_KEY }}
+
+    su_repl_tests_linux_run:
+        name: Software Update REPL Tests - Linux (RUN)
+        needs: su_repl_tests_linux_build
+        if: github.actor != 'restyled-io[bot]'
+        timeout-minutes: 45
+        strategy:
+            # These tests take a lot of time so we just run them on batches.
+            fail-fast: false
+            matrix:
+                # Regex filter by TC SU we think 45 minutes is more than engough for this task
+                # Each on one run to avoid all the jobs fail if one fails
+                # Add slow tests here as needed using the filter, individually or by group.
+                filter: ["", "TC_SU_2_5", "TC_SU_2_7"]
+        env:
+            BUILD_VARIANT: ipv6only-no-ble-no-wifi
+            DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
+            CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
+
+        # Tests are I/O bound, so run on a smaller machine
+        runs-on: namespace-profile-1x2
+
+        container:
+            image: ghcr.io/project-chip/chip-build:184
+            volumes:
+                - /var/run/nsc/:/var/run/nsc/
+            env:
+                NSC_TOKEN_FILE: ${{ env.NSC_TOKEN_FILE }}
+                NAMESPACE_ACTIONS_RESULTS_URL: ${{ env.NAMESPACE_ACTIONS_RESULTS_URL }}
+                NAMESPACE_ACTIONS_RESULTS_SERVICE: ${{ env.NAMESPACE_ACTIONS_RESULTS_SERVICE }}
+                NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD: ${{ env.NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD }}
+            options: >-
+                --privileged
+                --sysctl net.ipv6.conf.all.disable_ipv6=0
+                --sysctl net.ipv4.conf.all.forwarding=0
+                --sysctl net.ipv6.conf.all.forwarding=0
+
+        steps:
+            - name: Set up additional environment
+              run: |
+                echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
+            - name: Checkout
+              uses: actions/checkout@v6
+            # NOTE: no bootstrap since we only use compile outputs from previous steps (including python venv in out/venv)
+            - name: Set up a IPV6 known envionment
+              uses: ./.github/actions/add-ipv6
+
+            - name: Download artifacts for running
+              uses: namespace-actions/download-artifact@v2
+              with:
+                name: repl-build-data
+
+            - name: Unpack artifacts
+              run: |
+                tar xfJ repl-build-data.tar.xz
+
+            - name: Generate an argument environment file
+              run: |
+                  echo -n "" >/tmp/test_env.yaml
+                  echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test/chip-ota-provider-app" >> /tmp/test_env.yaml
+                  echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
+                  echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+                  # SU OTA Images
+                  echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
+
+                  # Generic trace setups after applications
+                  echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+                  echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+
+            - name: Verify Testing Support for Software Update
+              if: ${{matrix.filter == ''}}
+              run: |
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v2.min.ota -v 2'
+            - name: Run Tests ${{matrix.filter}}
+              if: ${{matrix.filter != ''}}
+              run: |
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --keep-going --env-file /tmp/test_env.yaml --nightly --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file out/test-summary/run-summary.json --junit-file out/junit-results/${{matrix.filter}}-results.xml --junit-suite-name "Nightly CI Tests"'
+
+            - name: Upload JUnit XML Results
+              if: always() && matrix.filter != ''
+              uses: actions/upload-artifact@v7
+              with:
+                  name: junit-results-${{ matrix.filter }}
+                  path: out/junit-results/${{ matrix.filter }}-results.xml
+                  retention-days: 30
+                  if-no-files-found: warn
+
+    su_repl_tests_report:
+        name: Software Update REPL Tests - Test Report
+        needs: su_repl_tests_linux_run
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' }}
+
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            checks: write
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+
+            - name: Download all JUnit XML results
+              uses: actions/download-artifact@v4
+              with:
+                  pattern: junit-results-*
+                  path: junit-results
+                  merge-multiple: true
+
+            - name: Publish test results to GitHub Actions
+              uses: mikepenz/action-junit-report@v5
+              with:
+                  report_paths: junit-results/**/*.xml
+                  detailed_summary: true
+                  require_tests: false
+
+            - name: Load Allure test report history
+              uses: actions/cache@v5
+              with:
+                  path: allure-history
+                  key: allure-history-su-repl-${{ github.run_number }}
+                  restore-keys: |
+                      allure-history-su-repl-
+
+            - name: Generate Allure Report
+              uses: simple-elf/allure-report-action@v1.13
+              with:
+                  allure_results: junit-results
+                  allure_report: allure-report
+                  allure_history: allure-history
+                  keep_reports: 30
+
+            - name: Upload Allure Report
+              uses: actions/upload-artifact@v7
+              with:
+                  name: allure-report-su-repl
+                  path: allure-report
+                  retention-days: 30
+                  if-no-files-found: warn
+
+            - name: Deploy to GitHub Pages
+              if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
+              uses: peaceiris/actions-gh-pages@v4
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: allure-report
+                  destination_dir: allure-report
+                  keep_files: true

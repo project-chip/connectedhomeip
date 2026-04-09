@@ -43,12 +43,6 @@ public:
     static constexpr uint16_t kMaxMembershipEndpoints = 255;
     static constexpr uint16_t kMaxCommandEndpoints    = 20;
 
-    struct EndpointList
-    {
-        EndpointId entries[kMaxMembershipEndpoints];
-        uint16_t count = 0;
-    };
-
     GroupcastCluster(GroupcastContext && context);
     GroupcastCluster(GroupcastContext && context, BitFlags<Groupcast::Feature> features);
     virtual ~GroupcastCluster() override;
@@ -66,10 +60,16 @@ public:
 
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
+private:
+    struct EndpointList
+    {
+        EndpointId entries[kMaxMembershipEndpoints];
+        uint16_t count = 0;
+    };
+
     Protocols::InteractionModel::Status GroupcastTesting(FabricIndex fabricIndex,
                                                          Groupcast::Commands::GroupcastTesting::DecodableType data);
 
-    inline FabricIndex GetFabricUnderTest() const { return mFabricUnderTest; }
     const BitFlags<Groupcast::Feature> & Features() const { return mFeatures; }
 
     // Methods moved from GroupcastLogic
@@ -95,7 +95,6 @@ public:
     void SetDataModelProvider(DataModel::Provider & provider) { mDataModelProvider = &provider; }
     void ResetDataModelProvider() { mDataModelProvider = nullptr; }
 
-private:
     void SetFabricUnderTest(FabricIndex fabricUnderTest);
     static void OnGroupcastTestingDone(System::Layer * aLayer, void * appState);
     TimerDelegate & GetTimerDelegate() const { return mGroupcastContext.timerDelegate; }
@@ -129,7 +128,6 @@ private:
     bool mIanaAddressUsed                    = false;
 
     Groupcast::GroupcastTestingEnum mTestingState = Groupcast::GroupcastTestingEnum::kDisableTesting;
-    FabricIndex mFabricUnderTest                  = kUndefinedFabricIndex;
     class MembershipChangedTimer : public TimerContext
     {
     public:

@@ -76,10 +76,10 @@ class TestBuilder(unittest.TestCase):
         ROOT = '/TEST/BUILD/ROOT'
         OUT = '/OUTPUT/DIR'
 
-        expected = [line for line in build_expected_output(expected_file, ROOT, OUT)]
-        actual = [line for line in build_actual_output(ROOT, OUT, args)]
+        expected = list(build_expected_output(expected_file, ROOT, OUT))
+        actual = list(build_actual_output(ROOT, OUT, args))
 
-        diffs = [line for line in difflib.unified_diff(expected, actual)]
+        diffs = list(difflib.unified_diff(expected, actual))
 
         if diffs:
             reference = os.path.basename(expected_file) + '.actual'

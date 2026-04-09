@@ -391,6 +391,16 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
 
     // Reset the previously set callback since it will never be called in case incorrect dataset was supplied.
     mpConnectCallback = nullptr;
+
+#if defined(CONFIG_CHIP_OPENTHREAD_NETWORK_SWITCH_PATH) && CONFIG_CHIP_OPENTHREAD_NETWORK_SWITCH_PATH
+    if (callback == nullptr && dataset.IsCommissioned() && current_dataset.IsCommissioned() &&
+        !dataset.AsByteSpan().data_equal(current_dataset.AsByteSpan()) && Impl()->IsThreadEnabled())
+    {
+        ReturnErrorOnFailure(Impl()->SetThreadProvision(dataset.AsByteSpan()));
+        return CHIP_NO_ERROR;
+    }
+#endif
+
     ReturnErrorOnFailure(Impl()->SetThreadEnabled(false));
     ReturnErrorOnFailure(Impl()->SetThreadProvision(dataset.AsByteSpan()));
 
@@ -703,6 +713,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadS
 
     mOTInst = otInst;
 
+    // Lock the OpenThread stack to prevent race conditions with OpenThread's internal operations.
+    // On some platforms (e.g., Zephyr), OpenThread may already be running before Matter initialization completes.
+    Impl()->LockThreadStack();
+
     // Arrange for OpenThread to call the OnOpenThreadStateChange method whenever a
     // state change occurs.  Note that we reference the OnOpenThreadStateChange method
     // on the concrete implementation class so that that class can override the default
@@ -738,6 +752,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadS
 
 exit:
 
+    Impl()->UnlockThreadStack();
     ChipLogProgress(DeviceLayer, "OpenThread started: %s", otThreadErrorToString(otErr));
     return err;
 }

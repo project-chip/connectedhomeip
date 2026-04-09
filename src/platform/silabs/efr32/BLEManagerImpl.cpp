@@ -126,8 +126,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
     // SW timer for BLE timeouts and interval change.
     sbleAdvTimeoutTimer = osTimerNew(BleAdvTimeoutHandler, osTimerOnce, NULL, NULL);
 
+    // Preserve kSiLabsBLEStackInitialize so a boot event that set it before _Init() (e.g. from HandleBootEvent) is not lost.
+    bool hadBleStackInit = mFlags.Has(Flags::kSiLabsBLEStackInitialize);
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+    mFlags.Set(Flags::kSiLabsBLEStackInitialize, hadBleStackInit);
 
     // Check that an address was not already configured at boot.
     // This covers the init-shutdown-init case to comply with the BLE address change at boot only requirement
@@ -159,6 +162,17 @@ uint16_t BLEManagerImpl::_NumConnections(void)
     }
 
     return numCons;
+}
+
+CHIP_ERROR BLEManagerImpl::PrintBLEInfo() const
+{
+    ChipLogProgress(DeviceLayer, "BLE Info:");
+    ChipLogProgress(DeviceLayer, "  Service Mode: %d", mServiceMode);
+    ChipLogProgress(DeviceLayer, "  Device Name: %s", mDeviceName);
+    ChipLogProgress(DeviceLayer, "  Random Static Address: %02X:%02X:%02X:%02X:%02X:%02X", randomizedAddr.addr[5],
+                    randomizedAddr.addr[4], randomizedAddr.addr[3], randomizedAddr.addr[2], randomizedAddr.addr[1],
+                    randomizedAddr.addr[0]);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
@@ -481,9 +495,9 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
             err = MapBLEError(ret);
             ChipLogError(DeviceLayer, "sl_bt_advertiser_set_random_address() failed: %" CHIP_ERROR_FORMAT, err.Format());
         });
-        ChipLogDetail(DeviceLayer, "BLE Static Device Address %02X:%02X:%02X:%02X:%02X:%02X", randomizedAddr.addr[5],
-                      randomizedAddr.addr[4], randomizedAddr.addr[3], randomizedAddr.addr[2], randomizedAddr.addr[1],
-                      randomizedAddr.addr[0]);
+        ChipLogProgress(DeviceLayer, "BLE Static Device Address %02X:%02X:%02X:%02X:%02X:%02X", randomizedAddr.addr[5],
+                        randomizedAddr.addr[4], randomizedAddr.addr[3], randomizedAddr.addr[2], randomizedAddr.addr[1],
+                        randomizedAddr.addr[0]);
     }
 
     ret = sl_bt_legacy_advertiser_set_data(advertising_set_handle, sl_bt_advertiser_advertising_data_packet, index,

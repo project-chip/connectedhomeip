@@ -852,6 +852,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
+  attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
   readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2540,7 +2541,7 @@ cluster UserLabel = 65 {
 }
 
 /** This cluster provides an interface for passing messages to be presented by a device. */
-provisional cluster Messages = 151 {
+cluster Messages = 151 {
   revision 3;
 
   enum FutureMessagePreferenceEnum : enum8 {
@@ -2584,7 +2585,7 @@ provisional cluster Messages = 151 {
     MessageControlBitmap messageControl = 2;
     nullable epoch_s startTime = 3;
     nullable int64u duration = 4;
-    char_string<256> messageText = 5;
+    long_char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
   }
 
@@ -2599,7 +2600,7 @@ provisional cluster Messages = 151 {
   info event MessageComplete = 2 {
     octet_string messageID = 0;
     optional nullable int32u responseID = 1;
-    optional nullable char_string reply = 2;
+    optional nullable long_char_string reply = 2;
     nullable FutureMessagePreferenceEnum futureMessagesPreference = 3;
   }
 
@@ -2617,7 +2618,7 @@ provisional cluster Messages = 151 {
     MessageControlBitmap messageControl = 2;
     nullable epoch_s startTime = 3;
     nullable int64u duration = 4;
-    char_string<256> messageText = 5;
+    long_char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
   }
 
@@ -2625,9 +2626,9 @@ provisional cluster Messages = 151 {
     octet_string messageIDs[] = 0;
   }
 
-  /** Command for requesting messages be presented */
+  /** Upon receipt, this SHALL cause the message in the passed fields to be appended to the Messages attribute. */
   fabric command PresentMessagesRequest(PresentMessagesRequestRequest): DefaultSuccess = 0;
-  /** Command for cancelling message present requests */
+  /** This command will cancel the message IDs specified. */
   fabric command CancelMessagesRequest(CancelMessagesRequestRequest): DefaultSuccess = 1;
 }
 
@@ -4093,7 +4094,7 @@ endpoint 0 {
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 0x0004;
   }
 }
 endpoint 1 {
@@ -4103,7 +4104,7 @@ endpoint 1 {
   server cluster OnOff {
     ram      attribute onOff default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;
@@ -4296,7 +4297,7 @@ endpoint 2 {
   server cluster OnOff {
     ram      attribute onOff default = 0x00;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command Off;
     handle command On;
@@ -4319,7 +4320,7 @@ endpoint 2 {
     ram      attribute defaultMoveRate;
     persist  attribute startUpCurrentLevel default = 255;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 6;
+    ram      attribute clusterRevision default = 0x0007;
 
     handle command MoveToLevel;
     handle command Move;

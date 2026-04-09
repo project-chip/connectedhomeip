@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
-from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
+from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
 from builders.asr import ASRApp, ASRBoard, ASRBuilder
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder, BouffalolabThreadType
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
@@ -174,6 +174,7 @@ def BuildHostTarget():
     target.AppendModifier(
         'no-interactive', interactive_mode=False).OnlyIfRe('-chip-tool')
     target.AppendModifier("ipv6only", enable_ipv4=False)
+    target.AppendModifier("no-groupcast", enable_groupcast=False)
     target.AppendModifier("no-ble", enable_ble=False)
     target.AppendModifier("no-wifipaf", enable_wifipaf=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
@@ -423,7 +424,7 @@ def BuildAndroidTarget():
     ])
 
     # Modifiers
-    target.AppendModifier('no-debug', profile=AndroidProfile.RELEASE)
+    target.AppendModifier('size-optimized', optimize_size=True)
 
     return target
 
