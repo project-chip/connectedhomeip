@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,14 +17,12 @@
 
 """Lightweight commissioning-related types (no controller / cluster imports).
 
-Use this module for dataclasses and similar shared types so callers like
-``matter_asserts`` do not need to import ``commissioning.py`` (which pulls in
-``matter.clusters`` and the controller). That keeps Pigweed-isolated tests
+
+This module provides common data structures for commissioning procedures that
+are intentionally decoupled from heavy dependencies such as `matter.clusters`
+or the `ChipDeviceController`. That keeps Pigweed-isolated tests
 (e.g. ``test_matter_asserts``) working when the full ``matter`` package is not
 on ``sys.path``.
-
-Additional types for the commissioning-status / PASE work can live here as
-long as they remain import-light.
 """
 
 from __future__ import annotations

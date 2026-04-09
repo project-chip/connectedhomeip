@@ -29,7 +29,6 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl, discovery
-from .commissioning_types import PaseParams
 from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.setup_payload import SetupPayload
