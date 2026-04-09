@@ -27,11 +27,11 @@ constexpr uint16_t kSensorTemperatureOffset = 475;
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 // WiFi SDK (Si91x) includes
-#include "sl_si91x_si70xx.h"
-#include "sl_si91x_i2c.h"
 #include "sl_i2c_instances.h"
 #include "sl_si91x_driver_gpio.h"
 #include "sl_si91x_gpio.h"
+#include "sl_si91x_i2c.h"
+#include "sl_si91x_si70xx.h"
 #if defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
 #include "sl_si91x_power_manager.h"
 #endif // defined(SL_ICD_ENABLED) && SL_ICD_ENABLED
@@ -39,16 +39,16 @@ constexpr uint16_t kSensorTemperatureOffset = 475;
 /*******************************************************************************
 ***************************  Defines / Macros  ********************************
 ******************************************************************************/
-#define TX_THRESHOLD       0                   // tx threshold value
-#define RX_THRESHOLD       0                   // rx threshold value
-#define OUTPUT_VALUE       1                   // GPIO output value
+#define TX_THRESHOLD 0 // tx threshold value
+#define RX_THRESHOLD 0 // rx threshold value
+#define OUTPUT_VALUE 1 // GPIO output value
 
 /*******************************************************************************
-* Function to provide 1 ms Delay
-*******************************************************************************/
+ * Function to provide 1 ms Delay
+ *******************************************************************************/
 static void delay(uint32_t idelay)
 {
-    for (uint32_t x = 0; x < 4600 * idelay; x++) //1.002ms delay
+    for (uint32_t x = 0; x < 4600 * idelay; x++) // 1.002ms delay
     {
         __NOP();
     }
@@ -66,43 +66,43 @@ sl_status_t Init()
     i2c_config.i2c_callback   = NULL;
 
 #if defined(SENSOR_ENABLE_GPIO_MAPPED_TO_UULP)
-    if (sl_si91x_gpio_driver_get_uulp_npss_pin(SENSOR_ENABLE_GPIO_PIN) != 1) {
+    if (sl_si91x_gpio_driver_get_uulp_npss_pin(SENSOR_ENABLE_GPIO_PIN) != 1)
+    {
         // Enable GPIO ULP_CLK
-        status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)ULPCLK_GPIO);
+        status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t) ULPCLK_GPIO);
         VerifyOrReturnError(status == SL_STATUS_OK, status);
         // Set NPSS GPIO pin MUX
         status = sl_si91x_gpio_driver_set_uulp_npss_pin_mux(SENSOR_ENABLE_GPIO_PIN, NPSS_GPIO_PIN_MUX_MODE0);
         VerifyOrReturnError(status == SL_STATUS_OK, status);
         // Set NPSS GPIO pin direction
-        status =
-            sl_si91x_gpio_driver_set_uulp_npss_direction(SENSOR_ENABLE_GPIO_PIN, (sl_si91x_gpio_direction_t)GPIO_OUTPUT);
+        status = sl_si91x_gpio_driver_set_uulp_npss_direction(SENSOR_ENABLE_GPIO_PIN, (sl_si91x_gpio_direction_t) GPIO_OUTPUT);
         VerifyOrReturnError(status == SL_STATUS_OK, status);
         // Set UULP GPIO pin
         status = sl_si91x_gpio_driver_set_uulp_npss_pin_value(SENSOR_ENABLE_GPIO_PIN, GPIO_PIN_SET);
         VerifyOrReturnError(status == SL_STATUS_OK, status);
     }
 #else
-    sl_gpio_t sensor_enable_port_pin = { (sl_gpio_port_t)SENSOR_ENABLE_GPIO_PORT, SENSOR_ENABLE_GPIO_PIN };
+    sl_gpio_t sensor_enable_port_pin = { (sl_gpio_port_t) SENSOR_ENABLE_GPIO_PORT, SENSOR_ENABLE_GPIO_PIN };
     uint8_t pin_value;
 
     status = sl_gpio_driver_get_pin(&sensor_enable_port_pin, &pin_value);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
-    if (pin_value != 1) {
+    if (pin_value != 1)
+    {
         // Enable GPIO CLK
 #ifdef SENSOR_ENABLE_GPIO_MAPPED_TO_ULP
-        status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)ULPCLK_GPIO);
+        status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t) ULPCLK_GPIO);
 #else
-        status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t)M4CLK_GPIO);
+        status = sl_si91x_gpio_driver_enable_clock((sl_si91x_gpio_select_clock_t) M4CLK_GPIO);
 #endif
         VerifyOrReturnError(status == SL_STATUS_OK, status);
 
         // Set the pin mode for GPIO pins.
-        status = sl_gpio_driver_set_pin_mode(&sensor_enable_port_pin, (sl_gpio_mode_t)0, OUTPUT_VALUE);
+        status = sl_gpio_driver_set_pin_mode(&sensor_enable_port_pin, (sl_gpio_mode_t) 0, OUTPUT_VALUE);
         VerifyOrReturnError(status == SL_STATUS_OK, status);
         // Select the direction of GPIO pin whether Input/ Output
-        status = sl_si91x_gpio_driver_set_pin_direction(SENSOR_ENABLE_GPIO_PORT,
-                                                        SENSOR_ENABLE_GPIO_PIN,
-                                                        (sl_si91x_gpio_direction_t)GPIO_OUTPUT);
+        status = sl_si91x_gpio_driver_set_pin_direction(SENSOR_ENABLE_GPIO_PORT, SENSOR_ENABLE_GPIO_PIN,
+                                                        (sl_si91x_gpio_direction_t) GPIO_OUTPUT);
         VerifyOrReturnError(status == SL_STATUS_OK, status);
         // Set GPIO pin
         status = sl_gpio_driver_set_pin(&sensor_enable_port_pin); // Set ULP GPIO pin
@@ -157,7 +157,8 @@ sl_status_t GetSensorData(uint16_t & relativeHumidity, int16_t & temperature)
     status = sl_si91x_si70xx_measure_rh_and_temp(SI70XX_I2C_INSTANCE, SI70XX_SLAVE_ADDR, &tempHumidity, &tempTemperature);
     VerifyOrExit(status == SL_STATUS_OK, ChipLogError(AppServer, "Failed to measure sensor data : %ld", status));
 
-    // Sensor precision is X. We need to multiply by 100 to change the precision to centiX to fit with the cluster attributes precision.
+    // Sensor precision is X. We need to multiply by 100 to change the precision to centiX to fit with the cluster attributes
+    // precision.
     temperature      = static_cast<int16_t>(tempTemperature * 100) - kSensorTemperatureOffset;
     relativeHumidity = static_cast<uint16_t>(tempHumidity * 100);
 
@@ -192,7 +193,7 @@ bool initialized = false;
 sl_status_t Init()
 {
     sl_status_t status = SL_STATUS_OK;
-    status = sl_board_enable_sensor(SL_BOARD_SENSOR_RHT);
+    status             = sl_board_enable_sensor(SL_BOARD_SENSOR_RHT);
     VerifyOrReturnError(status == SL_STATUS_OK, status);
 
     status = sl_si70xx_init(sl_i2cspm_sensor, SI7021_ADDR);
