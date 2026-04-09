@@ -1014,9 +1014,9 @@ class ChipDeviceControllerBase():
 
         Args:
             baAddr (str): IP address of BorderAgent.
-            baPort (int): IP port of BorderAgent.
             setupCode (str): The setup code of the device.
             nodeId (int): The node ID of the device.
+            baPort (int): IP port of BorderAgent.
 
         Returns:
             None
