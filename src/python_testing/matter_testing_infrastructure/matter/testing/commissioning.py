@@ -29,6 +29,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl, discovery
+from .commissioning_types import PaseParams
 from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.setup_payload import SetupPayload
@@ -436,7 +437,11 @@ async def _is_device_operational_via_dnssd(
         LOGGER.info(f"Device {node_id} not found operational on fabric {compressed_fabric_id:016X} via DNS-SD")
         return False
 
-    except Exception as e:
+    except ImportError:
+        raise
+    except asyncio.CancelledError:
+        raise
+    except (OSError, ValueError, RuntimeError, TypeError, ChipStackError) as e:
         LOGGER.warning(f"DNS-SD check failed, will fall back to connection attempt: {e}")
         return False
 
@@ -444,7 +449,7 @@ async def _is_device_operational_via_dnssd(
 async def _establish_pase_or_case_session(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
-    pase_params: Optional[dict] = None
+    pase_params: Optional[PaseParams] = None
 ) -> None:
     """
     Establish a session to the device by trying PASE and CASE in parallel.
@@ -469,12 +474,7 @@ async def _establish_pase_or_case_session(
 
     # Add PASE task if we have parameters
     if pase_params is not None:
-        setup_code = pase_params.get('setup_code')
-        if not setup_code:
-            passcode = pase_params.get('passcode')
-            discriminator = pase_params.get('discriminator')
-            if passcode is not None and discriminator is not None:
-                setup_code = dev_ctrl.CreateManualCode(discriminator, passcode)
+        setup_code = pase_params.resolve_setup_code(dev_ctrl)
 
         if setup_code:
             LOGGER.info(f"Creating PASE task for node {node_id}")
@@ -499,7 +499,7 @@ async def _establish_pase_or_case_session(
         # This will raise if the task failed
         completed_task.result()
         LOGGER.info(f"Successfully established {completed_name.upper()} session to node {node_id}")
-    except Exception as e:
+    except (ChipStackError, RuntimeError, OSError) as e:
         # First task failed, wait for the other if there is one
         if pending:
             LOGGER.info(f"{completed_name.upper()} failed ({e}), waiting for other connection attempt")
@@ -515,7 +515,7 @@ async def _establish_pase_or_case_session(
                     with contextlib.suppress(asyncio.CancelledError):
                         await task
                 return
-            except Exception as e2:
+            except (ChipStackError, RuntimeError, OSError) as e2:
                 # Use task names to correctly label which error came from which connection type
                 if completed_name == "pase":
                     pase_error, case_error = e, e2
@@ -538,7 +538,7 @@ async def _establish_pase_or_case_session(
 async def is_commissioned(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
-    pase_params: Optional[dict] = None
+    pase_params: Optional[PaseParams] = None
 ) -> bool:
     """
     Check if a device has any commissioned fabrics.
@@ -553,8 +553,7 @@ async def is_commissioned(
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
-        pase_params: Optional parameters for establishing PASE if device is not commissioned.
-                    Format: {'setup_code': str, 'discriminator': int, 'passcode': int}
+        pase_params: Optional :class:`PaseParams` when PASE is needed in addition to CASE (e.g. device not seen on fabric via DNS-SD).
 
     Returns:
         True if device has at least one commissioned fabric, False otherwise.
@@ -615,7 +614,7 @@ async def is_commissioned(
 async def get_commissioned_fabric_count(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
-    pase_params: Optional[dict] = None
+    pase_params: Optional[PaseParams] = None
 ) -> int:
     """
     Get the number of commissioned fabrics on a device.
@@ -627,8 +626,7 @@ async def get_commissioned_fabric_count(
     Args:
         dev_ctrl: The chip device controller instance
         node_id: Node ID of the device to check
-        pase_params: Optional parameters for establishing PASE if device is not commissioned.
-                    Format: {'setup_code': str, 'discriminator': int, 'passcode': int}
+        pase_params: Optional :class:`PaseParams` when PASE is needed in addition to CASE (e.g. device not seen on fabric via DNS-SD).
 
     Returns:
         Number of commissioned fabrics (count of trusted root certificates).

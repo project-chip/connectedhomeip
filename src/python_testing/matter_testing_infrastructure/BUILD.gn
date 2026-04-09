@@ -46,6 +46,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/basic_composition.py",
     "matter/testing/choice_conformance.py",
     "matter/testing/commissioning.py",
+    "matter/testing/commissioning_types.py",
     "matter/testing/conformance.py",
     "matter/testing/conversions.py",
     "matter/testing/credentials.py",
