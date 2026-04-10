@@ -24,30 +24,47 @@
 
 namespace chip::app::Clusters {
 
+class RelativeHumidityMeasurementCluster;
+
+// Fixed configuration for RelativeHumidityMeasurementCluster. MinMeasuredValue,
+// MaxMeasuredValue, and Tolerance reflect hardware characteristics and do not
+// change at runtime. Use WithTolerance() to enable the optional Tolerance
+// attribute — this ensures both the value and the attribute presence flag are
+// always set together.
+class RelativeHumidityMeasurementConfig
+{
+public:
+    DataModel::Nullable<uint16_t> minMeasuredValue{};
+    DataModel::Nullable<uint16_t> maxMeasuredValue{};
+
+    RelativeHumidityMeasurementConfig & WithTolerance(uint16_t value)
+    {
+        mTolerance = value;
+        mOptionalAttributeSet.template Set<RelativeHumidityMeasurement::Attributes::Tolerance::Id>();
+        return *this;
+    }
+
+private:
+    friend class RelativeHumidityMeasurementCluster;
+    app::OptionalAttributeSet<RelativeHumidityMeasurement::Attributes::Tolerance::Id> mOptionalAttributeSet{};
+    uint16_t mTolerance{};
+};
+
 class RelativeHumidityMeasurementCluster : public DefaultServerCluster
 {
 public:
     using OptionalAttributeSet = app::OptionalAttributeSet<RelativeHumidityMeasurement::Attributes::Tolerance::Id>;
+    using Config               = RelativeHumidityMeasurementConfig;
 
-    struct StartupConfiguration
-    {
-        DataModel::Nullable<uint16_t> minMeasuredValue{};
-        DataModel::Nullable<uint16_t> maxMeasuredValue{};
-        uint16_t tolerance{};
-    };
-
-    RelativeHumidityMeasurementCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet,
-                                       const StartupConfiguration & config);
+    RelativeHumidityMeasurementCluster(EndpointId endpointId, const Config & config = {});
 
     // ServerClusterInterface implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    // Setters — intended for application use to push new sensor readings
+    // Setter — intended for application use to push new sensor readings
     CHIP_ERROR SetMeasuredValue(DataModel::Nullable<uint16_t> measuredValue);
-    CHIP_ERROR SetMeasuredValueRange(DataModel::Nullable<uint16_t> minMeasuredValue,
-                                     DataModel::Nullable<uint16_t> maxMeasuredValue);
 
     // Getters
     DataModel::Nullable<uint16_t> GetMeasuredValue() const { return mMeasuredValue; }

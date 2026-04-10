@@ -43,43 +43,40 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        RelativeHumidityMeasurementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         using namespace chip::Protocols::InteractionModel;
 
         // Read default values from the Ember attribute store. Not all apps set
         // defaults, so failure is tolerated.
-        DataModel::Nullable<uint16_t> minMeasuredValue{};
-        if (MinMeasuredValue::Get(endpointId, minMeasuredValue) != Status::Success)
+        RelativeHumidityMeasurementCluster::Config config;
+
+        if (MinMeasuredValue::Get(endpointId, config.minMeasuredValue) != Status::Success)
         {
-            minMeasuredValue.SetNull();
+            config.minMeasuredValue.SetNull();
         }
 
-        DataModel::Nullable<uint16_t> maxMeasuredValue{};
-        if (MaxMeasuredValue::Get(endpointId, maxMeasuredValue) != Status::Success)
+        if (MaxMeasuredValue::Get(endpointId, config.maxMeasuredValue) != Status::Success)
         {
-            maxMeasuredValue.SetNull();
+            config.maxMeasuredValue.SetNull();
         }
 
         // If both values are non-null but form an invalid range (e.g. ZAP defaults of 0/0),
         // treat both as null rather than crashing.
-        if (!minMeasuredValue.IsNull() && !maxMeasuredValue.IsNull() && maxMeasuredValue.Value() < minMeasuredValue.Value() + 1)
+        if (!config.minMeasuredValue.IsNull() && !config.maxMeasuredValue.IsNull() &&
+            config.maxMeasuredValue.Value() < config.minMeasuredValue.Value() + 1)
         {
-            minMeasuredValue.SetNull();
-            maxMeasuredValue.SetNull();
+            config.minMeasuredValue.SetNull();
+            config.maxMeasuredValue.SetNull();
         }
 
-        uint16_t tolerance{};
+        RelativeHumidityMeasurementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
+            uint16_t tolerance{};
             VerifyOrDie(Tolerance::Get(endpointId, &tolerance) == Status::Success);
+            config.WithTolerance(tolerance);
         }
 
-        gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeSet,
-                                              RelativeHumidityMeasurementCluster::StartupConfiguration{
-                                                  .minMeasuredValue = minMeasuredValue,
-                                                  .maxMeasuredValue = maxMeasuredValue,
-                                                  .tolerance        = tolerance,
-                                              });
+        gServers[clusterInstanceIndex].Create(endpointId, config);
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -149,12 +146,5 @@ CHIP_ERROR SetMeasuredValue(EndpointId endpointId, DataModel::Nullable<uint16_t>
     return cluster->SetMeasuredValue(measuredValue);
 }
 
-CHIP_ERROR SetMeasuredValueRange(EndpointId endpointId, DataModel::Nullable<uint16_t> minMeasuredValue,
-                                 DataModel::Nullable<uint16_t> maxMeasuredValue)
-{
-    auto * cluster = FindClusterOnEndpoint(endpointId);
-    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
-    return cluster->SetMeasuredValueRange(minMeasuredValue, maxMeasuredValue);
-}
 
 } // namespace chip::app::Clusters::RelativeHumidityMeasurement

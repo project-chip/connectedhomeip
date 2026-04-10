@@ -10,14 +10,7 @@ namespace Clusters {
 class RelativeHumiditySensorManager
 {
 public:
-    RelativeHumiditySensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId)
-    {
-        CHIP_ERROR err = RelativeHumidityMeasurement::SetMeasuredValueRange(mEndpointId, DataModel::MakeNullable<uint16_t>(0),
-                                                                            DataModel::MakeNullable<uint16_t>(100));
-        VerifyOrReturn(CHIP_NO_ERROR == err,
-                       ChipLogError(NotSpecified, "Failed to set RelativeHumidityMeasurement min/max range: %" CHIP_ERROR_FORMAT,
-                                    err.Format()));
-    };
+    RelativeHumiditySensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId) {};
 
     void OnHumidityChangeHandler(uint16_t newValue)
     {

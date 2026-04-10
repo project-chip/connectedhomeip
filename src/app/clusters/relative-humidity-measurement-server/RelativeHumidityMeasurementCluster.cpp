@@ -24,21 +24,37 @@ namespace chip::app::Clusters {
 
 using namespace RelativeHumidityMeasurement::Attributes;
 
-// Per the Matter spec (Relative Humidity Measurement cluster):
-// MinMeasuredValue is constrained to [0, 9999]
+// Spec-defined upper bound for MinMeasuredValue
 constexpr uint16_t kMinMeasuredValueMax = 9999;
-// Global ceiling for any measured humidity value (applies to MeasuredValue and MaxMeasuredValue)
+// Spec-defined upper bound for MeasuredValue and MaxMeasuredValue
 constexpr uint16_t kMeasuredValueMax = 10000;
+// Spec-defined upper bound for Tolerance
+constexpr uint16_t kMaxTolerance = 2048;
 
-RelativeHumidityMeasurementCluster::RelativeHumidityMeasurementCluster(EndpointId endpointId,
-                                                                       const OptionalAttributeSet & optionalAttributeSet,
-                                                                       const StartupConfiguration & config) :
+RelativeHumidityMeasurementCluster::RelativeHumidityMeasurementCluster(EndpointId endpointId, const Config & config) :
     DefaultServerCluster({ endpointId, RelativeHumidityMeasurement::Id }),
-    mOptionalAttributeSet(optionalAttributeSet)
+    mOptionalAttributeSet(config.mOptionalAttributeSet)
 {
+    if (!config.minMeasuredValue.IsNull())
+    {
+        VerifyOrDie(config.minMeasuredValue.Value() <= kMinMeasuredValueMax);
+
+        if (!config.maxMeasuredValue.IsNull())
+        {
+            VerifyOrDie(config.maxMeasuredValue.Value() >= config.minMeasuredValue.Value() + 1);
+        }
+    }
+
+    if (!config.maxMeasuredValue.IsNull())
+    {
+        VerifyOrDie(config.maxMeasuredValue.Value() <= kMeasuredValueMax);
+    }
+
+    VerifyOrDie(!mOptionalAttributeSet.IsSet(Tolerance::Id) || config.mTolerance <= kMaxTolerance);
+
     mMinMeasuredValue = config.minMeasuredValue;
     mMaxMeasuredValue = config.maxMeasuredValue;
-    mTolerance        = config.tolerance;
+    mTolerance        = config.mTolerance;
 }
 
 DataModel::ActionReturnStatus RelativeHumidityMeasurementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -93,29 +109,6 @@ CHIP_ERROR RelativeHumidityMeasurementCluster::SetMeasuredValue(DataModel::Nulla
     }
 
     SetAttributeValue(mMeasuredValue, measuredValue, MeasuredValue::Id);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::SetMeasuredValueRange(DataModel::Nullable<uint16_t> minMeasuredValue,
-                                                                     DataModel::Nullable<uint16_t> maxMeasuredValue)
-{
-    if (!minMeasuredValue.IsNull())
-    {
-        VerifyOrReturnError(minMeasuredValue.Value() <= kMinMeasuredValueMax, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-        if (!maxMeasuredValue.IsNull())
-        {
-            VerifyOrReturnError(maxMeasuredValue.Value() >= minMeasuredValue.Value() + 1, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        }
-    }
-
-    if (!maxMeasuredValue.IsNull())
-    {
-        VerifyOrReturnError(maxMeasuredValue.Value() <= kMeasuredValueMax, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    }
-
-    SetAttributeValue(mMinMeasuredValue, minMeasuredValue, MinMeasuredValue::Id);
-    SetAttributeValue(mMaxMeasuredValue, maxMeasuredValue, MaxMeasuredValue::Id);
     return CHIP_NO_ERROR;
 }
 

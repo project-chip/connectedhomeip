@@ -28,8 +28,5 @@ RelativeHumidityMeasurementCluster * FindClusterOnEndpoint(EndpointId endpointId
 /// Convenience helper — pushes a new measured value to the cluster on the given endpoint.
 CHIP_ERROR SetMeasuredValue(EndpointId endpointId, DataModel::Nullable<uint16_t> measuredValue);
 
-/// Convenience helper — updates the min/max measured value range on the given endpoint.
-CHIP_ERROR SetMeasuredValueRange(EndpointId endpointId, DataModel::Nullable<uint16_t> minMeasuredValue,
-                                 DataModel::Nullable<uint16_t> maxMeasuredValue);
 
 } // namespace chip::app::Clusters::RelativeHumidityMeasurement

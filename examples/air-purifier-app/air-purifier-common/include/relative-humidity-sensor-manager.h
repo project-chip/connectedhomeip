@@ -30,12 +30,7 @@ class RelativeHumiditySensorManager
 public:
     RelativeHumiditySensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId){};
 
-    void Init()
-    {
-        ReturnAndLogOnFailure(RelativeHumidityMeasurement::SetMeasuredValueRange(mEndpointId, DataModel::MakeNullable(uint16_t(0)),
-                                                                                 DataModel::MakeNullable(uint16_t(10000))),
-                              NotSpecified, "Failed to set RelativeHumidityMeasurement min/max range");
-    };
+    void Init() {};
 
     void OnHumidityChangeHandler(uint16_t newValue)
     {
