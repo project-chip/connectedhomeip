@@ -152,7 +152,6 @@ class TC_CC_2_1(MatterBaseTest):
         # Validate the expected attribute is found.
         for primary in primary_list:
             attribute_str = primary.format(primary=primary_index)
-            await self._populate_wildcard()
             has_attr_func = has_attribute(attribute=getattr(self.attributes, attribute_str))
             has_attr_status = has_attr_func(self.stored_global_wildcard, self.endpoint)
             if attribute_str not in instance_attribute_names or not has_attr_status:
