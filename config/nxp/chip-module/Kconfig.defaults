@@ -265,9 +265,21 @@ config OPENTHREAD_NUM_MESSAGE_BUFFERS
 config OPENTHREAD_IP6_FRAGM
 	default y
 
+if OPENTHREAD_DEBUG
+
 choice OPENTHREAD_LOG_LEVEL_CHOICE
 	default OPENTHREAD_LOG_LEVEL_DEBG
 endchoice
+
+endif # OPENTHREAD_DEBUG
+
+# Zephyr auto-starts OpenThread by default (creates a default network, 
+# and attaches as a Leader). This causes Matter commissioning to start
+# from an already-attached state, triggering a costly re-attach 
+# (~28s delay). Enabling manual start forces OT to begin in a detached
+# state and lets Matter control bring-up, reducing OT join time to ~3s.
+config OPENTHREAD_MANUAL_START
+	default y
 
 choice OPENTHREAD_STACK_VERSION
 	default OPENTHREAD_THREAD_VERSION_1_4
@@ -489,6 +501,7 @@ config ETH_DRIVER
 endif
 
 config SHELL_STACK_SIZE
+	default 2048 if OPENTHREAD_LOG_LEVEL_DEBG
 	default 1536
 
 config LOG_PROCESS_THREAD_STACK_SIZE
