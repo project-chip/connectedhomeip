@@ -22,6 +22,7 @@ import validators
 from mobly import asserts
 
 from matter.clusters.ClusterObjects import Cluster
+from matter.clusters import Globals
 from matter.testing.conformance import ConformanceException
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.spec_parsing import dm_from_spec_version
@@ -344,7 +345,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.step(24)
         if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
             ret24 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation)
-            asserts.assert_true(isinstance(ret24, cluster.Structs.LocationDescriptorStruct),
+            asserts.assert_true(isinstance(ret24, Globals.Structs.LocationDescriptorStruct),
                                 "DeviceLocation should be a LocationDescriptorStruct")
             asserts.assert_is_not_none(ret24.locationName, "LocationName should not be null")
             asserts.assert_less_equal(len(ret24.locationName), 128, "LocationName should have max 128 characters")
@@ -358,7 +359,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         # Step 25: Write empty DeviceLocation
         self.step(25)
         if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
-            await self.write_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation, value=cluster.Structs.LocationDescriptorStruct(locationName="", floorNumber=-1, areaType=None))
+            await self.write_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation, value=Globals.Structs.LocationDescriptorStruct(locationName="", floorNumber=-1, areaType=None))
         elif not hasattr(cluster.Attributes, 'DeviceLocation'):
             self.mark_current_step_skipped()
 
@@ -366,7 +367,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.step(26)
         if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
             ret26 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation)
-            asserts.assert_true(isinstance(ret26, cluster.Structs.LocationDescriptorStruct),
+            asserts.assert_true(isinstance(ret26, Globals.Structs.LocationDescriptorStruct),
                                 "DeviceLocation should be a LocationDescriptorStruct")
             asserts.assert_equal(ret26.locationName, "", "LocationName should be an empty string")
             asserts.assert_equal(ret26.floorNumber, -1, "FloorNumber should be -1")
@@ -377,7 +378,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         # Step 27: Write DeviceLocation with location name of 128 characters
         self.step(27)
         if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
-            await self.write_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation, value=cluster.Structs.LocationDescriptorStruct(locationName="location" * 16, floorNumber=200, areaType=0x0002))
+            await self.write_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation, value=Globals.Structs.LocationDescriptorStruct(locationName="location" * 16, floorNumber=200, areaType=0x0002))
         elif not hasattr(cluster.Attributes, 'DeviceLocation'):
             self.mark_current_step_skipped()
 
@@ -385,7 +386,7 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.step(28)
         if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
             ret28 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation)
-            asserts.assert_true(isinstance(ret28, cluster.Structs.LocationDescriptorStruct),
+            asserts.assert_true(isinstance(ret28, Globals.Structs.LocationDescriptorStruct),
                                 "DeviceLocation should be a LocationDescriptorStruct")
             asserts.assert_equal(ret28.locationName, "location" * 16, "LocationName should be a string of 128 characters")
             asserts.assert_equal(ret28.floorNumber, 200, "FloorNumber should be 200")
