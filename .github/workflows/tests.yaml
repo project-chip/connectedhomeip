@@ -1074,6 +1074,15 @@ jobs:
                 # This list is empirically created to have a reasonable time split. The "" that runs the "other"
                 # tests is reasonably fast, the others take about 20-30 minutes each at the time this was split.
                 filter: ["", "TC_[A-C]", "TC_[D-O]", "!TC_[A-O]" ]
+                include:
+                    - filter: ""
+                      name: Other
+                    - filter: "TC_[A-C]"
+                      name: TC_A-C
+                    - filter: "TC_[D-O]"
+                      name: TC_D-O
+                    - filter: "!TC_[A-O]"
+                      name: TC_Non-A-O
 
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan
@@ -1199,7 +1208,7 @@ jobs:
             - name: Run Tests ${{matrix.filter}}
               if: ${{matrix.filter != ''}}
               run: |
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file test-summaries/python-tests.json --junit-file out/junit-results/${{matrix.filter}}-results.xml --junit-suite-name "REPL Tests Linux - ${{github.ref_name}}"'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py run --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}" --summary-file test-summaries/python-tests.json --junit-file out/junit-results/${{matrix.name}}-results.xml --junit-suite-name "REPL Tests Linux - ${{github.ref_name}}"'
             - name: Print python test summary
               if: ${{ matrix.filter != '' && always() }}
               run: |
@@ -1219,7 +1228,7 @@ jobs:
               uses: actions/upload-artifact@v7
               with:
                   name: junit-results-repl-${{ matrix.filter }}
-                  path: out/junit-results/${{ matrix.filter }}-results.xml
+                  path: out/junit-results/${{ matrix.name }}-results.xml
                   retention-days: 30
                   if-no-files-found: warn
             - name: Execute Jupyter Notebooks
