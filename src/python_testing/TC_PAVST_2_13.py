@@ -34,6 +34,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
 #       --app-pipe /tmp/pavst_2_13_fifo
+#       --timeout 300
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -77,6 +78,11 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         if self.server is not None:
             self.server.terminate()
         super().teardown_class()
+
+    @async_test_body
+    async def teardown_test(self):
+        await self.postcondition_remove_tls_endpoint(self.endpoint, self.tlsEndpointId)
+        super().teardown_test()
 
     def steps_TC_PAVST_2_13(self) -> list[TestStep]:
         return [
@@ -212,7 +218,7 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
-        tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
+        self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(endpoint=endpoint, server=self.server, host_ip=host_ip)
         uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf.value)
 
         self.step(1)
@@ -278,19 +284,21 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             zoneID1 = cmdResponse.zoneID
 
         self.step(6)
+        # Initialze the time control fields
         initDuration = 5
         augDuration = 2
         maxDuration = 15
-        blindDuration = 3
+        # blindDuration time set as 10 sec to ensure it is sufficient enough to receive the motion event at DUT post the clip recording is completed
+        blindDuration = 10
         maxPreRollLen = 4
         try:
             zoneList = [{"zone": zoneID1, "sensitivity": 4}]
             triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                               "maxPreRollLen": 4000,
                               "motionZones": zoneList,
-                              "motionTimeControl": {"initialDuration": 5, "augmentationDuration": 2, "maxDuration": 15, "blindDuration": 3}}
+                              "motionTimeControl": {"initialDuration": initDuration, "augmentationDuration": augDuration, "maxDuration": maxDuration, "blindDuration": blindDuration}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
-                                                              tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
+                                                              tlsEndPoint=self.tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
             asserts.assert_equal(status, Status.Success,
                                  "DUT must responds with Status Code Success.")
         except InteractionModelError as e:
@@ -323,7 +331,8 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                                    self.dut_node_id,
                                    self.get_endpoint())
 
-        timeControl = {"initialDuration": 5, "augmentationDuration": 2, "maxDuration": 15, "blindDuration": 3}
+        timeControl = {"initialDuration": initDuration, "augmentationDuration": augDuration,
+                       "maxDuration": maxDuration, "blindDuration": blindDuration}
         cmd = pvcluster.Commands.ManuallyTriggerTransport(
             connectionID=aConnectionID,
             activationReason=pvcluster.Enums.TriggerActivationReasonEnum.kEmergency,
@@ -444,15 +453,17 @@ class TC_PAVST_2_13(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
 
         self.step(17)
+        # update maxDuration and  augDuration fields to ensure initDuration + augDuration > maxDuration
         maxDuration = 10
+        augDuration = 15
         try:
             zoneList = [{"zone": zoneID1, "sensitivity": 4}]
             triggerOptions = {"triggerType": pvcluster.Enums.TransportTriggerTypeEnum.kMotion,
                               "maxPreRollLen": 4000,
                               "motionZones": zoneList,
-                              "motionTimeControl": {"initialDuration": 5, "augmentationDuration": 15, "maxDuration": 10, "blindDuration": 3}}
+                              "motionTimeControl": {"initialDuration": initDuration, "augmentationDuration": augDuration, "maxDuration": maxDuration, "blindDuration": blindDuration}}
             status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions,
-                                                              tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
+                                                              tlsEndPoint=self.tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
             asserts.assert_equal(status, Status.Success,
                                  "DUT must responds with Status Code Success.")
         except InteractionModelError as e:

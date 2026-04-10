@@ -19,9 +19,9 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
   output_name = "libTestAdministratorCommissioningCluster"
-  if (!chip_fake_platform) {
-    test_sources = [ "TestAdministratorCommissioningCluster.cpp" ]
-  }
+
+  test_sources = [ "TestAdministratorCommissioningCluster.cpp" ]
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [

@@ -28,7 +28,7 @@ import subprocess
 import textwrap
 import time
 import typing
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from enum import IntFlag
 from typing import Any, Callable, List, Optional, Type, Union
@@ -74,6 +74,8 @@ LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
 
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
+
+_SUMMARY_MAX_HEX_CHARS = 128
 
 
 class TestError(Exception):
@@ -237,7 +239,66 @@ class MatterBaseTest(base_test.BaseTestClass):
             for problem in self.problems:
                 LOGGER.info(str(problem))
             LOGGER.info("###########################################################")
+        self._log_execution_parameters_summary()
         super().teardown_class()
+
+    def _format_summary_value(self, key: str, value: Any) -> str:
+        """Format values for end-of-test summary logs."""
+        if isinstance(value, bytes):
+            hex_value = value.hex()
+            if len(hex_value) > _SUMMARY_MAX_HEX_CHARS:
+                return f"0x{hex_value[:_SUMMARY_MAX_HEX_CHARS]}... (truncated, {len(value)} bytes)"
+            return f"0x{hex_value}"
+        if isinstance(value, list) and len(value) > 8:
+            head = ", ".join(repr(v) for v in value[:5])
+            return f"[{head}, ...] (len={len(value)})"
+        if key == "pics" and isinstance(value, dict):
+            return "Please request if needed"
+        return repr(value)
+
+    def _log_execution_parameters_summary(self):
+        """Log execution parameters at test end to aid result triage."""
+        try:
+            meta = asdict(self.matter_test_config)
+        except Exception as ex:
+            LOGGER.warning("Unable to collect execution parameter summary: %s", ex)
+            return
+
+        config_fields: dict[str, Any] = {}
+        for key, value in meta.items():
+            if key == "global_test_params":
+                continue
+            if isinstance(value, os.PathLike):
+                value = os.fspath(value)
+            if value in (None, [], {}, ""):
+                continue
+            config_fields[key] = value
+
+        named_args: dict[str, Any] = {}
+        for key, value in self.matter_test_config.global_test_params.items():
+            if key == "meta_config":
+                continue
+            if value in (None, [], {}, ""):
+                continue
+            named_args[key] = value
+
+        LOGGER.info("===== EXECUTION FLAGS SUMMARY BEGIN =====")
+
+        if config_fields:
+            LOGGER.info("Config values:")
+            for key in sorted(config_fields.keys()):
+                LOGGER.info("  - %s: %s", key, self._format_summary_value(key, config_fields[key]))
+
+        if named_args:
+            LOGGER.info("\n\nNamed args:")
+            for key in sorted(named_args.keys()):
+                LOGGER.info("  - %s: %s", key, self._format_summary_value(key, named_args[key]))
+
+        if self.is_pics_sdk_ci_only:
+            test_name = self.__class__.__name__
+            LOGGER.info(f"===== PICS_SDK_CI_ONLY is enabled (True) for test '{test_name}'.")
+
+        LOGGER.info("===== EXECUTION FLAGS SUMMARY END =====")
 
     def _dump_device_attributes_on_failure(self):
         """
@@ -1511,15 +1572,18 @@ class MatterBaseTest(base_test.BaseTestClass):
         else:
             try:
                 # Create the restart flag file to signal the test runner
+                # Allow for multiple reboots like SW update tests do using the "restart" mode
+                restart_text = "restart"
                 with open(restart_flag_file, "w") as f:
-                    f.write("restart")
+                    f.write(restart_text)
                 LOGGER.info("Created restart flag file to signal app reboot")
 
-                # The test runner will automatically wait for the app-ready-pattern before continuing
-
-                # Expire sessions and re-establish connections
+                # Expire sessions before the monitor picks up the flag
                 self._expire_sessions_on_all_controllers()
-                LOGGER.info("App restart completed successfully")
+
+                await self.wait_for_restart_flag_file_removal(restart_flag_file, restart_text)
+
+                LOGGER.info("App reboot completed successfully")
 
             except Exception as e:
                 LOGGER.error(f"Failed to reboot app: {e}")
@@ -1559,16 +1623,26 @@ class MatterBaseTest(base_test.BaseTestClass):
                     f.write(restart_flag_text)
                     LOGGER.info("Created restart flag file to signal %s request", restart_flag_text)
 
-                # The test runner will automatically wait for the app-ready-pattern before continuing
-
                 # Expire sessions and re-establish connections
                 self._expire_sessions_on_all_controllers()
                 LOGGER.info("%s request sent successfully", restart_flag_text.capitalize())
+
+                await self.wait_for_restart_flag_file_removal(restart_flag_file, restart_flag_text)
 
             except Exception as e:
                 err = f"Failed to {restart_flag_text}: {e}"
                 LOGGER.error(err)
                 asserts.fail(err)
+
+    async def wait_for_restart_flag_file_removal(self, restart_flag_file, restart_flag_text, timeout_sec=30.0):
+        # Wait for the monitor thread to remove the flag file
+        # The monitor deletes the flag file AFTER the restart completes, so this ensures
+        # the app has fully rebooted and is ready before we continue
+        start_time = time.time()
+        while os.path.exists(restart_flag_file):
+            if time.time() - start_time > timeout_sec:
+                asserts.fail(f"App {restart_flag_text} did not complete within timeout (flag file still exists)")
+            await asyncio.sleep(0.1)
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):

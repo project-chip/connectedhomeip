@@ -107,6 +107,8 @@ protected:
     const ConcreteClusterPath mPath;
     ServerClusterContext * mContext = nullptr;
 
+    bool IsStarted() const { return mContext != nullptr; }
+
     void IncreaseDataVersion() { mDataVersion++; }
 
     /// Marks that a specific attribute has changed value

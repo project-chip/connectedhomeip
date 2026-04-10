@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,13 +55,18 @@ if (chip_build_tests) {
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/clusters/access-control-server/tests",
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
+      "${chip_root}/src/app/clusters/air-quality-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
+      "${chip_root}/src/app/clusters/actions-server/tests",
       "${chip_root}/src/app/clusters/bindings/tests",
       "${chip_root}/src/app/clusters/boolean-state-configuration-server/tests",
       "${chip_root}/src/app/clusters/boolean-state-server/tests",
+      "${chip_root}/src/app/clusters/bridged-device-basic-information-server/tests",
       "${chip_root}/src/app/clusters/camera-av-stream-management-server/tests",
       "${chip_root}/src/app/clusters/camera-av-settings-user-level-management-server/tests",
       "${chip_root}/src/app/clusters/chime-server/tests",
+      "${chip_root}/src/app/clusters/closure-control-server/tests",
+      "${chip_root}/src/app/clusters/commissioner-control-server/tests",
       "${chip_root}/src/app/clusters/descriptor/tests",
       "${chip_root}/src/app/clusters/device-energy-management-server/tests",
       "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests",
@@ -92,6 +97,8 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/soil-measurement-server/tests",
       "${chip_root}/src/app/clusters/switch-server/tests",
+      "${chip_root}/src/app/clusters/temperature-control-server/tests",
+      "${chip_root}/src/app/clusters/temperature-measurement-server/tests",
       "${chip_root}/src/app/clusters/thread-network-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/time-format-localization-server/tests",
       "${chip_root}/src/app/clusters/time-synchronization-server/tests",
@@ -103,6 +110,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/webrtc-transport-provider-server/tests",
       "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/tests",
       "${chip_root}/src/app/clusters/wifi-network-diagnostics-server/tests",
+      "${chip_root}/src/app/clusters/wifi-network-management-server/tests",
       "${chip_root}/src/app/clusters/zone-management-server/tests",
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
@@ -142,8 +150,34 @@ if (chip_build_tests) {
       # "${chip_root}/src/app/clusters/commodity-tariff-server/tests",
     ]
 
+    # Backwards compatibility uses ember mocks, so they cannot run in a "unified"
+    # test build. Restrict them to specific platforms only
+    if (chip_device_platform == "darwin" || chip_device_platform == "linux") {
+      tests += [
+        # keep-sorted: start
+        "${chip_root}/src/app/clusters/actions-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/chime-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/device-energy-management-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/electrical-power-measurement-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/energy-evse-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/identify-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/power-topology-server/tests:tests-backwards-compatibility",
+
+        # keep-sorted: end
+      ]
+    }
+
     if (current_os != "zephyr") {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/records/tests" ]
+    }
+
+    if (chip_device_platform == "darwin") {
+      # Darwin does not include the uriparser submodule, which is required by
+      # push-av-stream-transport-server tests.
+      tests -= [
+        "${chip_root}/src/app/clusters/push-av-stream-transport-server/tests",
+      ]
     }
 
     if (current_os != "zephyr") {
@@ -233,8 +267,10 @@ if (chip_build_tests) {
     deps = []
     tests = []
 
+    # NXP: EVSE tests depend on ot-simulation; missing headers
+    # in ot-nxp OpenThread cause build failure, so we exclude them here.
     if (chip_device_platform != "esp32" && chip_device_platform != "efr32" &&
-        current_os != "android") {
+        chip_device_platform != "nxp" && current_os != "android") {
       tests += [ "${chip_root}/examples/evse-app/evse-common/tests" ]
     }
   }

@@ -20,9 +20,11 @@
 #include "AES_CCM_128_test_vectors.h"
 #include "DerSigConversion_test_vectors.h"
 #include "ECDH_P256_test_vectors.h"
+#include "ECDSA_det_test_vectors.h"
 #include "HKDF_SHA256_test_vectors.h"
 #include "HMAC_SHA256_test_vectors.h"
 #include "Hash_SHA256_test_vectors.h"
+#include "P256_test_vectors.h"
 #include "PBKDF2_SHA256_test_vectors.h"
 
 #include "RawIntegerToDer_test_vectors.h"
@@ -42,7 +44,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
+#include <lib/support/Span.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <stdarg.h>
@@ -1368,6 +1371,72 @@ TEST_F(TestChipCryptoPAL, TestECDSA_ValidationHashInvalidParam)
     signing_error = CHIP_NO_ERROR;
 }
 
+TEST_F(TestChipCryptoPAL, TestP256_DeterministicECDSA_Sanity)
+{
+    HeapChecker heapChecker;
+    P256Keypair keypair;
+    ASSERT_SUCCESS(keypair.Initialize(ECPKeyTarget::ECDSA));
+
+    const char * msg         = "Test Message for Deterministic ECDSA";
+    const uint8_t * test_msg = Uint8::from_const_char(msg);
+    size_t msglen            = strlen(msg);
+
+    // Sign the same message twice and verify the signatures are identical (and valid)
+    P256ECDSASignature sig1;
+    CHIP_ERROR err = keypair.ECDSA_sign_msg_det(test_msg, msglen, sig1);
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        GTEST_SKIP() << "Skipping test: P256Keypair::ECDSA_sign_msg_det not supported";
+    }
+    EXPECT_SUCCESS(err);
+    EXPECT_SUCCESS(keypair.Pubkey().ECDSA_validate_msg_signature(test_msg, msglen, sig1));
+
+    P256ECDSASignature sig2;
+    EXPECT_SUCCESS(keypair.ECDSA_sign_msg_det(test_msg, msglen, sig2));
+    EXPECT_TRUE(sig1.Span().data_equal(sig2.Span()));
+}
+
+TEST_F(TestChipCryptoPAL, TestP256_DeterministicECDSA_TestVectors)
+{
+    HeapChecker heapChecker;
+
+    for (const auto & tv : ecdsa_det_test_vectors)
+    {
+        // Construct a serialized keypair from the test vector: [04 || Qx || Qy || d]
+        P256SerializedKeypair serialized;
+        uint8_t * p = serialized.Bytes();
+        *p++        = 0x04;
+        memcpy(p, tv.public_key_x, sizeof(tv.public_key_x));
+        p += sizeof(tv.public_key_x);
+        memcpy(p, tv.public_key_y, sizeof(tv.public_key_y));
+        p += sizeof(tv.public_key_y);
+        memcpy(p, tv.private_key, sizeof(tv.private_key));
+        p += sizeof(tv.private_key);
+        EXPECT_EQ(serialized.Bytes() + serialized.Capacity(), p);
+        EXPECT_SUCCESS(serialized.SetLength(serialized.Capacity()));
+
+        P256Keypair keypair;
+        EXPECT_SUCCESS(keypair.Deserialize(serialized));
+
+        CharSpan message = CharSpan::fromCharString(tv.message);
+        P256ECDSASignature sig;
+        CHIP_ERROR err = keypair.ECDSA_sign_msg_det(Uint8::from_const_char(message.data()), message.size(), sig);
+        if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            GTEST_SKIP() << "Skipping test: P256Keypair::ECDSA_sign_msg_det not supported";
+        }
+        EXPECT_SUCCESS(err);
+
+        // Verify the signature is valid
+        EXPECT_SUCCESS(keypair.Pubkey().ECDSA_validate_msg_signature(Uint8::from_const_char(message.data()), message.size(), sig));
+
+        // Compare r and s against expected values
+        EXPECT_EQ(sig.Length(), kP256_ECDSA_Signature_Length_Raw);
+        EXPECT_EQ(memcmp(sig.ConstBytes(), tv.r, kP256_FE_Length), 0);
+        EXPECT_EQ(memcmp(sig.ConstBytes() + kP256_FE_Length, tv.s, kP256_FE_Length), 0);
+    }
+}
+
 TEST_F(TestChipCryptoPAL, TestECDH_EstablishSecret)
 {
     HeapChecker heapChecker;
@@ -1470,6 +1539,74 @@ TEST_F(TestChipCryptoPAL, TestP256_Keygen)
     P256ECDSASignature test_sig;
     EXPECT_EQ(keypair.ECDSA_sign_msg(test_msg, msglen, test_sig), CHIP_NO_ERROR);
     EXPECT_EQ(keypair.Pubkey().ECDSA_validate_msg_signature(test_msg, msglen, test_sig), CHIP_NO_ERROR);
+}
+
+TEST_F(TestChipCryptoPAL, TestP256_InitializeFromBitsOrReject)
+{
+    HeapChecker heapChecker;
+    P256Keypair keypair;
+    static constexpr uint8_t kZeroes[kP256_PrivateKey_Length] = { 0 };
+
+    CHIP_ERROR err = keypair.InitializeFromBitsOrReject(FixedSpan(kZeroes));
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        GTEST_SKIP() << "Skipping test: P256Keypair::InitializeFromBitsOrReject not supported";
+    }
+    EXPECT_SUCCESS(err);
+
+    uint8_t bits[kP256_PrivateKey_Length];
+    for (auto & tv : p256_test_vectors)
+    {
+        static_assert(sizeof(bits) == sizeof(tv.d));
+        memcpy(bits, tv.d, sizeof(bits));
+
+        // Decrement big integer `bits` by 1. Valid values for d are in [1, N-1],
+        // but FIPS 186-5 A.4.2 requires checking for x in [0, N-2] and then
+        // setting d = x + 1. Note that the subtraction here doesn't handle
+        // underflow, but none of the test vectors have an LSB of 0.
+        ASSERT_TRUE(bits[kP256_PrivateKey_Length - 1]-- != 0);
+
+        keypair.Clear();
+        EXPECT_SUCCESS(keypair.InitializeFromBitsOrReject(FixedSpan(bits)));
+
+        // Construct expected serialized keypair from the test vector
+        P256SerializedKeypair expected;
+        uint8_t * p = expected.Bytes();
+        *p++        = 0x04; // Uncompressed point tag
+        memcpy(p, tv.Qx, sizeof(tv.Qx));
+        p += sizeof(tv.Qx);
+        memcpy(p, tv.Qy, sizeof(tv.Qy));
+        p += sizeof(tv.Qy);
+        memcpy(p, tv.d, sizeof(tv.d));
+        p += sizeof(tv.d);
+        EXPECT_EQ(expected.Bytes() + expected.Capacity(), p);
+        EXPECT_SUCCESS(expected.SetLength(expected.Capacity()));
+
+        P256SerializedKeypair actual;
+        EXPECT_SUCCESS(keypair.Serialize(actual));
+        EXPECT_TRUE(actual.Span().data_equal(expected.Span()));
+    }
+
+    static constexpr uint8_t kP256CurveOrder[] = { 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
+                                                   0xff, 0xff, 0xff, 0xff, 0xff, 0xbc, 0xe6, 0xfa, 0xad, 0xa7, 0x17,
+                                                   0x9e, 0x84, 0xf3, 0xb9, 0xca, 0xc2, 0xfc, 0x63, 0x25, 0x51 };
+    static_assert(sizeof(kP256CurveOrder) == kP256_PrivateKey_Length);
+
+    // Test a few values around the curve order boundary. Values up to and including N-2 are valid.
+    for (int ofs = -4; ofs < 2; ofs++)
+    {
+        memcpy(bits, kP256CurveOrder, sizeof(bits));
+        bits[kP256_PrivateKey_Length - 1] = static_cast<uint8_t>(
+            bits[kP256_PrivateKey_Length - 1] + ofs); // LSB of curve order is 0x51, no over/underflow handling needed
+
+        keypair.Clear();
+        CHIP_ERROR expected = (ofs <= -2) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
+        EXPECT_EQ(keypair.InitializeFromBitsOrReject(FixedSpan(bits)), expected);
+    }
+
+    memset(bits, 0xff, sizeof(bits));
+    keypair.Clear();
+    EXPECT_EQ(keypair.InitializeFromBitsOrReject(FixedSpan(bits)), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST_F(TestChipCryptoPAL, TestCSR_Verify)

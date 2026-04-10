@@ -1,0 +1,255 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.5.1. [TC-SU-2.7] Verifying Events on OTA-R(DUT)
+
+PICS:
+    - MCORE.OTA.Requestor
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: Perform a software update on the DUT."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Please use Interactive mode to Verify the subscription of an event
+
+          ./chip-tool interactive start
+
+          Subscribe to StateTransition event using command
+
+          otasoftwareupdaterequestor subscribe-event state-transition 5 10 321 0
+
+          Verify that the OTA-Subscriber(TH) receives the SateTransition event notification for the state changes like Querying,Downloading,Applying,Idle(Optional).
+
+
+          [1673513950.693526][6070:6073] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Event 0x0000_0000
+          [1673513950.693585][6070:6073] CHIP:TOO:   Event number: 65539
+          [1673513950.693687][6070:6073] CHIP:TOO:   Priority: Info
+          [1673513950.693733][6070:6073] CHIP:TOO:   Timestamp: 92662821
+          [1673513950.693907][6070:6073] CHIP:TOO:   StateTransition: {
+          [1673513950.693982][6070:6073] CHIP:TOO:     PreviousState: 5
+          [1673513950.694036][6070:6073] CHIP:TOO:     NewState: 1
+          [1673513950.694088][6070:6073] CHIP:TOO:     Reason: 1
+          [1673513950.694142][6070:6073] CHIP:TOO:     TargetSoftwareVersion: null
+          [1673513950.694258][6070:6073] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 2: DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P
+          sends a QueryImageResponse back to DUT. QueryStatus is set to 'Busy'."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Please use Interactive mode to Verify the subscription of an event
+          ./chip-tool interactive start
+
+          Subscribe to StateTransition event using command
+          otasoftwareupdaterequestor subscribe-event state-transition 5 10 321 0
+
+          Verify that the OTA-Subscriber receives(TH) a StateTransition event notification for the state change to DelayedOnQuery.
+
+          [1673514130.748245][6097:6099] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Event 0x0000_0000
+          [1673514130.748304][6097:6099] CHIP:TOO:   Event number: 3
+          [1673514130.748349][6097:6099] CHIP:TOO:   Priority: Info
+          [1673514130.748394][6097:6099] CHIP:TOO:   Timestamp: 97644124
+          [1673514130.748640][6097:6099] CHIP:TOO:   StateTransition: {
+          [1673514130.748720][6097:6099] CHIP:TOO:     PreviousState: 1
+          [1673514130.748778][6097:6099] CHIP:TOO:     NewState: 2
+          [1673514130.748832][6097:6099] CHIP:TOO:     Reason: 1
+          [1673514130.748887][6097:6099] CHIP:TOO:     TargetSoftwareVersion: null
+          [1673514130.748940][6097:6099] CHIP:TOO:    }
+          [1673514130.749175][6097:6099] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Event 0x0000_0000
+          [1673514130.749233][6097:6099] CHIP:TOO:   Event number: 4
+          [1673514130.749278][6097:6099] CHIP:TOO:   Priority: Info
+          [1673514130.749324][6097:6099] CHIP:TOO:   Timestamp: 97644362
+          [1673514130.749389][6097:6099] CHIP:TOO:   StateTransition: {
+          [1673514130.749446][6097:6099] CHIP:TOO:     PreviousState: 2
+          [1673514130.749500][6097:6099] CHIP:TOO:     NewState: 3
+          [1673514130.749551][6097:6099] CHIP:TOO:     Reason: 4
+          [1673514130.749603][6097:6099] CHIP:TOO:     TargetSoftwareVersion: null
+          [1673514130.749658][6097:6099] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 3: DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P does
+          not respond back to DUT."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Please use Interactive mode to Verify the subscription of an event
+          ./chip-tool interactive start
+
+          Subscribe to StateTransition event using command
+          otasoftwareupdaterequestor subscribe-event state-transition 5 10 321 0
+
+          Kill OTA Provider App before issuing query using
+
+          Verify that the OTA-Subscriber receives(TH) a StateTransition event notification for the state change to Idle.
+          [1673515600.737159][6193:6195] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Event 0x0000_0000
+          [1673515600.737213][6193:6195] CHIP:TOO:   Event number: 6
+          [1673515600.737258][6193:6195] CHIP:TOO:   Priority: Info
+          [1673515600.737303][6193:6195] CHIP:TOO:   Timestamp: 99077244
+          [1673515600.737367][6193:6195] CHIP:TOO:   StateTransition: {
+          [1673515600.737421][6193:6195] CHIP:TOO:     PreviousState: 4
+          [1673515600.737473][6193:6195] CHIP:TOO:     NewState: 1
+          [1673515600.737523][6193:6195] CHIP:TOO:     Reason: 3
+          [1673515600.737575][6193:6195] CHIP:TOO:     TargetSoftwareVersion: null
+          [1673515600.737626][6193:6195] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 4: DUT sends a QueryImage command to the TH/OTA-P.
+          RequestorCanConsent is set to True by DUT. OTA-P/TH responds with a
+          QueryImageResponse with UserConsentNeeded field set to True."
+      PICS: MCORE.OTA.RequestorConsent
+      verification: |
+          Run the Provider App using
+          ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -c
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Please use Interactive mode to Verify the subscription of an event
+          ./chip-tool interactive start
+
+          Subscribe to StateTransition event using command
+          otasoftwareupdaterequestor subscribe-event state-transition 5 10 321 0
+
+          Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnUserConsent.
+      disabled: true
+
+    - label:
+          "Step 5: Force an error during the download of the OTA image to the
+          DUT. Wait for the Idle timeout which should be no less than 5 minutes."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Please use Interactive mode to Verify the subscription of an event
+          ./chip-tool interactive start
+
+          Force an error during the download of the OTA image to the DUT. Wait for the Idle timeout which should be no less than 5 minutes.
+
+          otasoftwareupdaterequestor subscribe-event download-error 5 10 321 0 --timeout 65535
+
+          Verify that the OTA-Subscribe(TH) receives a DownloadError event notification on BDX Idle timeout which should be no less than 5 minutes
+          Verify following fields:
+           - SoftwareVersion - Set to the value of the SoftwareVersion being downloaded.
+           - BytesDownloaded - Number of bytes that have been downloaded.
+           - ProgressPercent - Nearest Integer percent value reflecting how far within the transfer the failure occurred. IF the total length of the transfer is unknown, the value can be NULL.
+           - PlatformCode - Internal product-specific error code or NULL.
+
+          [1651520178426] [98732:38086919] CHIP: [TOO]   DownloadError: {
+          [1651520178426] [98732:38086919] CHIP: [TOO]     SoftwareVersion: 2
+          [1651520178426] [98732:38086919] CHIP: [TOO]     BytesDownloaded: 2995
+          [1651520178426] [98732:38086919] CHIP: [TOO]     ProgressPercent: 65
+          [1651520178426] [98732:38086919] CHIP: [TOO]     PlatformCode: null
+          [1651520178426] [98732:38086919] CHIP: [TOO]    }
+
+          otasoftwareupdaterequestor subscribe-event-by-id 0 30 60 321 0
+
+          Verify that the OTA-Subscribe(TH) receives a StateTransition event notification for the state change to Idle.
+
+          [1654558704063] [57765:69159905] CHIP: [TOO]   StateTransition: {
+          [1654558704064] [57765:69159905] CHIP: [TOO]     PreviousState: 4
+          [1654558704064] [57765:69159905] CHIP: [TOO]     NewState: 1
+          [1654558704064] [57765:69159905] CHIP: [TOO]     Reason: 3
+          [1654558704064] [57765:69159905] CHIP: [TOO]     TargetSoftwareVersion: null
+          [1654558704064] [57765:69159905] CHIP: [TOO]    }
+      disabled: true
+
+    - label:
+          "Step 6: After the OTA image is transferred, DUT sends
+          ApplyUpdateRequest to the OTA-P. OTA-P/TH sends the
+          ApplyUpdateResponse Command to the DUT. Action field is set to
+          'AwaitNextAction'."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Please use Interactive mode to Verify the subscription of an event
+          ./chip-tool interactive start
+
+          Subscribe to StateTransition event using command
+          otasoftwareupdaterequestor subscribe-event state-transition 5 10 321 0
+
+          Verify that the OTA-Subscriber(TH) receives the SateTransition event notification for the state change to DelayedOnApply
+
+          [1651283503471] [29332:35530821] CHIP: [TOO]   StateTransition: {
+          [1651283503471] [29332:35530821] CHIP: [TOO]     PreviousState: 1
+          [1651283503471] [29332:35530821] CHIP: [TOO]     NewState: 2
+          [1651283503471] [29332:35530821] CHIP: [TOO]     Reason: 1
+          [1651283503471] [29332:35530821] CHIP: [TOO]     TargetSoftwareVersion: null
+          [1651283503471] [29332:35530821] CHIP: [TOO]    }
+
+          [1651283503471] [29332:35530821] CHIP: [TOO]   StateTransition: {
+          [1651283503471] [29332:35530821] CHIP: [TOO]     PreviousState: 2
+          [1651283503471] [29332:35530821] CHIP: [TOO]     NewState: 4
+          [1651283503471] [29332:35530821] CHIP: [TOO]     Reason: 1
+          [1651283503471] [29332:35530821] CHIP: [TOO]     TargetSoftwareVersion: 2
+          [1651283503471] [29332:35530821] CHIP: [TOO]    }
+
+          [1651283513475] [29332:35531053] CHIP: [TOO]   StateTransition: {
+          [1651283513475] [29332:35531053] CHIP: [TOO]     PreviousState: 4
+          [1651283513475] [29332:35531053] CHIP: [TOO]     NewState: 5
+          [1651283513475] [29332:35531053] CHIP: [TOO]     Reason: 1
+          [1651283513475] [29332:35531053] CHIP: [TOO]     TargetSoftwareVersion: 2
+          [1651283513475] [29332:35531053] CHIP: [TOO]    }
+
+          [1651283513475] [29332:35531053] CHIP: [TOO]   StateTransition: {
+          [1651283513475] [29332:35531053] CHIP: [TOO]     PreviousState: 5
+          [1651283513475] [29332:35531053] CHIP: [TOO]     NewState: 6
+          [1651283513475] [29332:35531053] CHIP: [TOO]     Reason: 4
+          [1651283513475] [29332:35531053] CHIP: [TOO]     TargetSoftwareVersion: null
+          [1651283513475] [29332:35531053] CHIP: [TOO]    }
+      disabled: true
+
+    - label:
+          "Step 7: DUT successfully finishes applying a software update, and the
+          new software image version is being executed on the DUT.
+          OTA-Subscriber sends a read request to read the VersionApplied event
+          from the DUT."
+      verification: |
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
+
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
+
+          Read VersionApplied event once the DUT successfully finishes applying a software update .
+
+          ./chip-tool otasoftwareupdaterequestor read-event version-applied 321 0
+
+          Verify TH receives VersionApplied event with following fields:
+          - SoftwareVersion - Same as the one available in the SoftwareVersion attribute of the Basic Information Cluster for the newly executing version.
+          -  ProductID - Same as what is available in the ProductID attribute of the Basic Information Cluster.
+
+          [1645818271254] [21222:21170014] CHIP: [TOO]   VersionApplied: {
+          [1645818271254] [21222:21170014] CHIP: [TOO]     SoftwareVersion: 2
+          [1645818271254] [21222:21170014] CHIP: [TOO]     ProductID: 32769
+          [1645818271254] [21222:21170014] CHIP: [TOO]    }
+      disabled: true

@@ -54,7 +54,7 @@ chip_data_model("chef-common") {
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${examples_common_plat_dir}/FreeRTOSConfig.h",
+    "${examples_common_plat_dir}/freertos_config/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
@@ -63,12 +63,8 @@ efr32_sdk("sdk") {
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
     "${examples_common_plat_dir}",
+    "${examples_common_plat_dir}/freertos_config",
   ]
-
-  if (use_wf200) {
-    # TODO efr32_sdk should not need a header from this location
-    include_dirs += [ "${examples_plat_dir}/wf200" ]
-  }
 
   defines = []
   if (chip_enable_pw_rpc) {

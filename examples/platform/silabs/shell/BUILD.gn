@@ -20,11 +20,15 @@ import("${chip_root}/third_party/silabs/silabs_board.gni")
 # This is necessary since the BUILD.gn for both platforms are still split
 shell_dependency_path = "${chip_root}/examples/platform/silabs/efr32"
 if (wifi_soc) {
-  shell_dependency_path = "${chip_root}/examples/platform/silabs/SiWx"
+  shell_dependency_path = "${chip_root}/examples/platform/silabs/SiWx917"
 }
 
 config("icd-shell-config") {
   include_dirs = [ "./icd/" ]
+}
+
+config("im-shell-config") {
+  include_dirs = [ "./im/" ]
 }
 
 source_set("icd") {
@@ -37,6 +41,21 @@ source_set("icd") {
 
   deps = [
     "${chip_root}/src/app/icd/server:notifier",
+    "${shell_dependency_path}:matter-shell",
+  ]
+}
+
+source_set("im") {
+  sources = [
+    "./im/IMShellCommands.cpp",
+    "./im/IMShellCommands.h",
+  ]
+
+  public_configs = [ ":im-shell-config" ]
+
+  deps = [
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/server:server",
     "${shell_dependency_path}:matter-shell",
   ]
 }

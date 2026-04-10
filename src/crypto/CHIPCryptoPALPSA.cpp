@@ -830,6 +830,8 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
         ExitNow(error = CHIP_ERROR_UNKNOWN_KEY_TYPE);
     }
 
+    GetPSAKeyAllocator().UpdateKeyAttributes(attributes);
+
     status = psa_generate_key(&attributes, &context.key_id);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
@@ -900,6 +902,13 @@ exit:
     LogPsaError(status);
 
     return error;
+}
+
+CHIP_ERROR P256Keypair::InitializeFromBitsOrReject(FixedByteSpan<kP256_PrivateKey_Length> privateKeyBits)
+{
+    // Not implemented for the PSA backend; Direct HKDF to EC key derivation should be used instead.
+    IgnoreUnusedVariable(privateKeyBits);
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 void P256Keypair::Clear()

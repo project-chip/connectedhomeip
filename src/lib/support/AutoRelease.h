@@ -36,7 +36,7 @@ class AutoRelease
 {
 public:
     AutoRelease(Releasable * releasable) : mReleasable(releasable) {}
-    ~AutoRelease() { Release(); }
+    __attribute__((always_inline)) inline ~AutoRelease() { Release(); }
 
     // Not copyable
     AutoRelease(const AutoRelease &)             = delete;
@@ -62,7 +62,7 @@ public:
     inline operator bool() { return mReleasable != nullptr; }
     inline bool IsNull() const { return mReleasable == nullptr; }
 
-    void Release()
+    __attribute__((always_inline)) inline void Release()
     {
         VerifyOrReturn(mReleasable != nullptr);
         mReleasable->Release();

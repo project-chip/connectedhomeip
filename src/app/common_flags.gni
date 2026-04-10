@@ -41,4 +41,8 @@ declare_args() {
 
   # Flag that controls whether the camera server is enabled
   matter_enable_camera_server = false
+
+  # Disable matter groupcast by default, this should be enabled on an
+  # application/platform specific layer
+  chip_config_enable_groupcast = false
 }

@@ -66,7 +66,10 @@ struct TestSource : public LayerImplSelect::EventSource
 
     void ProcessEvents(const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds) override
     {
-        if (FD_ISSET(wakeEvent.GetReadFD(), &readfds))
+        // Create mutable copy because Zephyr's FD_ISSET() API requires a non-const fd_set*.
+        // The original parameters are const, so we must work on local mutable copies.
+        fd_set readfds_copy = readfds;
+        if (FD_ISSET(wakeEvent.GetReadFD(), &readfds_copy))
         {
             wakeEvent.Confirm();
             handlerCalled++;
