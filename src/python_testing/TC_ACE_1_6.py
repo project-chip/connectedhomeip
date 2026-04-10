@@ -64,7 +64,7 @@ from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import TestStep, default_matter_test_main
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class TC_ACE_1_6(MatterBaseTest):
@@ -115,9 +115,8 @@ class TC_ACE_1_6(MatterBaseTest):
 
     @async_test_body
     async def test_TC_ACE_1_6(self):
-        self.default_controller.InitGroupTestingData()
 
-        # Configuration
+        # Declare group ids and key sets
         groupID1 = 0x0101
         groupID2 = 0x0102
         groupID3 = 0x0103
@@ -125,9 +124,8 @@ class TC_ACE_1_6(MatterBaseTest):
         groupID5 = 0x0105
         keySetID1 = 0x01a1
         keySetID3 = 0x01a3
-        pixit_g_endpoint = 1
 
-        # Keys
+        # Declare Keys
         key1 = bytes.fromhex("a0d1d2d3d4d5d6d7d8d9dadbdcdddedf")
         key3 = bytes.fromhex("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf")
 
@@ -137,6 +135,24 @@ class TC_ACE_1_6(MatterBaseTest):
 
         # Check if Groupcast cluster is on RootNode (endpoint 0)
         gc_on_root = await is_groupcast_on_root_node(self)
+
+        # Indicate endpoints to be used for test
+        if not gc_on_root:
+            pixit_g_endpoint = self.get_endpoint()
+            asserts.assert_false(pixit_g_endpoint is None, "--endpoint <endpoint> with Groups cluster must be included on the command line.")
+            asserts.assert_not_equal(pixit_g_endpoint, 0, "Not allowed to have groups clusters on endpoint 0.")
+            log.info(f"Endpoint value for PIXIT.G.ENDPOINT used for test steps with groups cluster: {pixit_g_endpoint}")
+        else:
+            # Find "ep~1~" (not endpoint1) (non-root node endpoint) that will be used later
+            parts_list = await self.read_single_attribute_check_success(
+                cluster=Clusters.Descriptor,
+                attribute=Clusters.Descriptor.Attributes.PartsList,
+                endpoint=0
+            )
+            # TODO: ep~1~ should be fetched using code to find an endpoint with a cluster with attributes that can be modified by a cluster command,
+            # should replace hard-coded uses of OnOff
+            ep1 = parts_list[0] if (parts_list is not None and parts_list[0] is not None) else 1
+            log.info(f"Endpoint value for ep~1~ used for test steps with groupcast cluster: {ep1}")
 
         # Step 1a: KeySetWrite 0x01a3
         self.step("1a")
@@ -168,18 +184,28 @@ class TC_ACE_1_6(MatterBaseTest):
             )
         ))
 
-        # TODO: can this be replaced with the one from InitGroupTestingData() ?
-        # Must manually set the group key set for the controller. This is only needed for key1 and not
-        # key3, as this key is not included as part of the test group data initialized in InitGroupTestingData()
+        # Must manually set the group key sets for the controller. 
         self.default_controller.SetGroupKeySet(
             keyset_id=keySetID1,
-            policy=0,
+            policy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
             num_keys=3,
             epoch_key0=key1,
             epoch_start_time0=2220000,
             epoch_key1=b"\xb1" + key1[1:],
             epoch_start_time1=2220001,
             epoch_key2=b"\xc2" + key1[1:],
+            epoch_start_time2=2220002
+        )
+
+        self.default_controller.SetGroupKeySet(
+            keyset_id=keySetID3,
+            policy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
+            num_keys=3,
+            epoch_key0=key3,
+            epoch_start_time0=2220000,
+            epoch_key1=b"\xd1" + key3[1:],
+            epoch_start_time1=2220001,
+            epoch_key2=b"\xd2" + key3[1:],
             epoch_start_time2=2220002
         )
 
@@ -215,14 +241,6 @@ class TC_ACE_1_6(MatterBaseTest):
             ]))])
             asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap attribute write failed")
 
-        # Find ep1 (non-root node endpoint)
-        parts_list = await self.read_single_attribute_check_success(
-            cluster=Clusters.Descriptor,
-            attribute=Clusters.Descriptor.Attributes.PartsList,
-            endpoint=0
-        )
-        ep1 = parts_list[0] if (parts_list is not None and parts_list[0] is not None) else 1
-
         # Step 3a: AddGroup 0x0103 over CASE (if GC not on root)
         if gc_on_root:
             self.skip_step("3a")
@@ -257,6 +275,7 @@ class TC_ACE_1_6(MatterBaseTest):
         if gc_on_root:
             # Cluster on ep1 with modified attributes (using OnOff as example)
             target_cluster = Clusters.OnOff.id
+            # TODO: fix possubly unbound
             target_endpoint = ep1
         else:
             target_cluster = Clusters.Groups.id
@@ -277,14 +296,6 @@ class TC_ACE_1_6(MatterBaseTest):
                 targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.Groupcast.id)]
             )
             acl_entries.append(groupcast_admin)
-        else:
-            groups_admin = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[th1_nodeid],
-                targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.Groups.id)]
-            )
-            acl_entries.append(groups_admin)
 
         await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl_entries))])
 
@@ -442,6 +453,7 @@ class TC_ACE_1_6(MatterBaseTest):
         self.step(30)
         await self.send_single_cmd(endpoint=0, cmd=Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=keySetID1))
 
+        # TODO(#71506): A step should be added in this test to restore a wildcard ACL entry.
 
 if __name__ == "__main__":
     default_matter_test_main()
