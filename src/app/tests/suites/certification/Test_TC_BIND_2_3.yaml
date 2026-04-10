@@ -38,9 +38,10 @@ tests:
       verification: |
           TH1 enables DUT to handle group communication
           TH2 supports On/Off server on Endpoint 1
-          TH2 supports Groups server on Endpoint 1
+          TH2 supports Groupcast Listener on the RootNode endpoint or Groups server on Endpoint 1.
           TH2 should have an ACL entry with the AuthMode as Group by TH1
           DUT supports On/Off client
+          DUT supports Groupcast Sender on the RootNode endpoint or Groups server on Endpoint 1.
       disabled: true
 
     - label: "Step 1: Factory Reset DUT"
