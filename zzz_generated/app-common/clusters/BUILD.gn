@@ -106,6 +106,7 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/PowerSourceConfiguration" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/PowerTopology" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/PressureMeasurement" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/ProximityRanging" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ProxyConfiguration" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ProxyDiscovery" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/ProxyValid" + invoker.target,

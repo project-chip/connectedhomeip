@@ -80,6 +80,7 @@ class RunSummary:
             "skipped": str(skipped),
             "errors": "0",
             "time": f"{total_time:.3f}",
+            "timestamp": self.run_timestamp.strftime("%Y-%m-%dT%H:%M:%S"),
         })
 
         for r in self.results:

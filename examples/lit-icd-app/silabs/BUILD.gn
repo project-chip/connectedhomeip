@@ -123,10 +123,6 @@ silabs_executable("lit_icd_app") {
     deps += [ "${examples_plat_dir}:efr32-common" ]
   }
 
-  if (chip_build_libshell) {
-    sources += [ "src/ShellCommands.cpp" ]
-  }
-
   if (chip_enable_pw_rpc) {
     defines += [
       "PW_RPC_ENABLED",
