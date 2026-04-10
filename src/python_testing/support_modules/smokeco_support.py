@@ -39,7 +39,7 @@ class SmokeCoBaseTest(MatterBaseTest):
     gd_cluster = Clusters.GeneralDiagnostics
 
     # SmokeAlarm triggers
-    pixit_test_event_warning_smoke_alarm =  0x005c000000000090    
+    pixit_test_event_warning_smoke_alarm =  0x005c000000000090
     pixit_test_event_critical_smoke_alarm =  0x005c00000000009c
     pixit_test_event_clear_smoke_alarm =  0x005c0000000000a0
 
@@ -69,12 +69,12 @@ class SmokeCoBaseTest(MatterBaseTest):
     # Manual Device Mute
     pixit_test_event_manual_device_mute =  0x005c00000000009b
     pixit_test_event_manual_device_mute_clear =  0x005c0000000000ab
-    
+
     # Battery triggers
     pixit_test_event_battery_warning =  0x005c000000000095
     pixit_test_event_battery_critical =  0x005c00000000009e
     pixit_test_event_battery_clear =  0x005c0000000000a5
-    
+
     # Hardware triggers
     pixit_test_event_hardware_alert =  0x005c000000000093
     pixit_test_event_hardware_clear =  0x005c0000000000a3
