@@ -393,7 +393,7 @@ async def assert_is_commissioned_to_any_fabric(
         node_id: Node ID of the device to check
         description: User-defined description for error messages (default: "Device")
         pase_params: Optional parameters for establishing PASE if needed.
-                    See is_commissioned() for format details.
+                    See get_commissioned_fabric_count() for format details.
 
     Raises:
         AssertionError: If device has no commissioned fabrics (is factory fresh)
@@ -412,11 +412,11 @@ async def assert_is_commissioned_to_any_fabric(
         pase_params = PaseParams(discriminator=1234, passcode=20202021)
         await assert_is_commissioned_to_any_fabric(controller, node_id=1234, description="DUT", pase_params=pase_params)
     """
-    from matter.testing.commissioning import is_commissioned
+    from matter.testing.commissioning import get_commissioned_fabric_count
 
-    commissioned = await is_commissioned(dev_ctrl, node_id, pase_params=pase_params)
+    fabric_count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
     asserts.assert_true(
-        commissioned,
+        fabric_count > 0,
         f"{description} must have at least one commissioned fabric. "
         "TrustedRootCertificates list is empty (device is factory fresh)."
     )
@@ -444,7 +444,7 @@ async def assert_factory_fresh(
         node_id: Node ID of the device to check
         description: User-defined description for error messages (default: "Device")
         pase_params: Optional parameters for establishing PASE if needed.
-                    See is_commissioned() for format details.
+                    See get_commissioned_fabric_count() for format details.
 
     Raises:
         AssertionError: If device has any commissioned fabrics
@@ -460,11 +460,12 @@ async def assert_factory_fresh(
         pase_params = PaseParams(discriminator=1234, passcode=20202021)
         await assert_factory_fresh(controller, node_id=1234, "DUT", pase_params=pase_params)
     """
-    from matter.testing.commissioning import is_commissioned
+    from matter.testing.commissioning import get_commissioned_fabric_count
 
-    commissioned = await is_commissioned(dev_ctrl, node_id, pase_params=pase_params)
-    asserts.assert_false(
-        commissioned,
+    fabric_count = await get_commissioned_fabric_count(dev_ctrl, node_id, pase_params=pase_params)
+    asserts.assert_equal(
+        fabric_count,
+        0,
         f"{description} must be factory fresh (no commissioned fabrics). "
         "TrustedRootCertificates list is not empty. "
         "Please factory reset the device before running this test."
@@ -496,7 +497,7 @@ async def assert_fabric_count(
         expected_count: Expected number of commissioned fabrics
         description: User-defined description for error messages (default: "Device")
         pase_params: Optional parameters for establishing PASE if needed.
-                    See is_commissioned() for format details.
+                    Same as for get_commissioned_fabric_count().
 
     Raises:
         AssertionError: If actual fabric count doesn't match expected count

@@ -23,6 +23,7 @@ import asyncio
 import contextlib
 import logging
 from dataclasses import dataclass
+from enum import Enum
 from typing import Any, List, Optional
 
 from mobly import asserts
@@ -393,6 +394,13 @@ class SetupParameters:
 DNSSD_DISCOVERY_TIMEOUT_SEC = 3
 
 
+class EstablishedSessionKind(str, Enum):
+    """Session type that succeeded when establishing PASE and CASE in parallel."""
+
+    PASE = "pase"
+    CASE = "case"
+
+
 async def _is_device_operational_via_dnssd(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
@@ -451,7 +459,7 @@ async def _establish_pase_or_case_session(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
     node_id: int,
     pase_params: Optional[PaseParams] = None
-) -> None:
+) -> EstablishedSessionKind:
     """
     Establish a session to the device by trying PASE and CASE in parallel.
 
@@ -467,6 +475,10 @@ async def _establish_pase_or_case_session(
         node_id: Node ID for the session
         pase_params: Optional parameters for PASE establishment.
                     If not provided, only CASE will be attempted.
+
+    Returns:
+        Whether the active session is PASE or CASE. CASE implies an operational
+        session on this controller's fabric; PASE implies not (for this fabric).
 
     Raises:
         RuntimeError: If both connection attempts fail
@@ -496,6 +508,9 @@ async def _establish_pase_or_case_session(
     completed_task = done.pop()
     completed_name = completed_task.get_name()
 
+    def _session_kind_from_task_name(name: str) -> EstablishedSessionKind:
+        return EstablishedSessionKind.PASE if name == "pase" else EstablishedSessionKind.CASE
+
     try:
         # This will raise if the task failed
         completed_task.result()
@@ -515,7 +530,7 @@ async def _establish_pase_or_case_session(
                     task.cancel()
                     with contextlib.suppress(asyncio.CancelledError):
                         await task
-                return
+                return _session_kind_from_task_name(completed_name2)
             except (ChipStackError, RuntimeError, OSError) as e2:
                 # Use task names to correctly label which error came from which connection type
                 if completed_name == "pase":
@@ -535,6 +550,8 @@ async def _establish_pase_or_case_session(
         with contextlib.suppress(asyncio.CancelledError):
             await task
 
+    return _session_kind_from_task_name(completed_name)
+
 
 async def is_commissioned(
     dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
@@ -542,14 +559,17 @@ async def is_commissioned(
     pase_params: Optional[PaseParams] = None
 ) -> bool:
     """
-    Check if a device has any commissioned fabrics.
+    Check if the device is commissioned on the current fabric (Controller's fabric).
 
-    Uses DNS-SD to check if the device is operational on this fabric, avoiding long timeouts.
-    Then reads the TrustedRootCertificates attribute from endpoint 0 (OperationalCredentials
-    is node-scoped per the Matter spec and always resides on endpoint 0).
+    Uses DNS-SD first: if the device advertises as operational for this fabric and node,
+    returns True without opening a session.
 
-    Note: This function attempts a fast DNS-SD check first. If the device is found
-    operational on the current fabric via DNS-SD, it returns True.
+    If DNS-SD does not see the device on this fabric, tries PASE and CASE in parallel.
+    Whichever session wins determines the answer: **CASE** means operational on this
+    fabric; **PASE** means we only have a commissioning channel, not operational
+    membership on this fabric (even if the device might hold other fabrics).
+
+    For global fabric count (any fabric), use :func:`get_commissioned_fabric_count`.
 
     Args:
         dev_ctrl: The chip device controller instance
@@ -557,10 +577,9 @@ async def is_commissioned(
         pase_params: Optional :class:`PaseParams` when PASE is needed in addition to CASE (e.g. device not seen on fabric via DNS-SD).
 
     Returns:
-        True if device has at least one commissioned fabric, False otherwise.
+        True if the device is operational on this fabric, False otherwise.
 
     Raises:
-        ChipStackError: If unable to read the TrustedRootCertificates attribute
         ValueError: If device is not operational via DNS-SD and no pase_params are provided
         RuntimeError: If both PASE and CASE connection attempts fail when establishing a session
     """
@@ -591,21 +610,8 @@ async def is_commissioned(
 
         # Try both PASE and CASE in parallel - use whichever succeeds first
         LOGGER.info(f"Device {node_id} not found via DNS-SD, trying parallel PASE/CASE connection")
-        await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
-
-        # OperationalCredentials is node-scoped, always on endpoint 0
-        result = await dev_ctrl.ReadAttribute(
-            nodeId=node_id,
-            attributes=[(0, Clusters.OperationalCredentials.Attributes.TrustedRootCertificates)]
-        )
-
-        # Extract the trusted root certificates list
-        root_certs = result[0][Clusters.OperationalCredentials][
-            Clusters.OperationalCredentials.Attributes.TrustedRootCertificates
-        ]
-
-        # Device is commissioned if it has any root certificates
-        return len(root_certs) > 0
+        session_kind = await _establish_pase_or_case_session(dev_ctrl, node_id, pase_params)
+        return session_kind == EstablishedSessionKind.CASE
 
     except Exception as e:
         LOGGER.error(f"Failed to check commissioning status for node {node_id}: {e}")
