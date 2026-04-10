@@ -190,11 +190,13 @@ tests:
 
     - label:
           "Step 3: If Groupcast cluster is enabled on the RootNode endpoint of
-          the DUT, skip to step 7. Otherwise, DUT binds GroupId with
+          the DUT, skip to step 6. Otherwise, DUT binds GroupId with
           GroupKeySetID in the GroupKeyMap attribute list on GroupKeyManagement
           cluster"
       PICS: GRPKEY.C.A0000
       verification: |
+          If Groupcast cluster is enabled on the RootNode endpoint of the TH, skip to step 6. Otherwise, Execute below step
+          
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 259, "groupKeySetID": 1, "fabricIndex": 1},{"groupId": 257, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
 
           Verify that  group-key-map attribute with GroupID_1 as 259, GroupID_2 as 257 and Group Set ID as 1 is present on TH(Reference app)log and below is the sample log provided for the raspi platform:
@@ -381,6 +383,12 @@ tests:
           DUT sends the Groupcast JoinGroup command on the TH on EP0 with
           GroupID=1, Endpoints=[any endpoint from PartsList], KeySetID=1."
       verification: |
+          ./chip-tool groupsettings add-group grp1 1 --addressPolicy 0
+          ./chip-tool groupsettings add-keysets 1 0 0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf        
+          ./chip-tool groupsettings bind-keyset 1 1
+        
+          Before joining the group, configure the above commands. The client (chip-tool) must be properly configured with a group and corresponding keyset that matches the configuration on the end device.
+          
           ./chip-tool groupcast join-group 1 '[1]' 1 1 0
 
           Verify the TH receives the Groupcast JoinGroup command as specified in the step label.
@@ -421,8 +429,17 @@ tests:
           provided in step 6 to TH. The command is sent as a group command using
           GroupID 1."
       verification: |
-          Validate the group message received from DUT via message layer
-          inspection at the receiver: Verify that the IPv6 Destination
-          Multicast address matches the Matter IANA address FF05::FA, Verify
-          the UDP port is 5540, Verify the DSIZ flag is set to group
+          ./chip-tool onoff toggle 0xffffffffffff0001 1
+
+          Verify that the IPv6 Destination Multicast address follows the Matter IANA address "FF05::FA" * and  the UDP port is 5540 * on DUT(chip-tool) log: 
+        
+          [1775758227.997] [2754009:2754011] [IN] UDP::Init bound to port=5551
+          [1775758227.997] [2754009:2754011] [IN] TransportMgr initialized
+          [1775758228.012] [2754009:2754011] [TOO] Sending command to group 0x1
+          [1775758228.012] [2754009:2754011] [TOO] Sending cluster (0x00000006) command (0x00000002) on Group 1
+          [1775758228.012] [2754009:2754011] [DMG] ICR moving to [AddingComm]
+          [1775758228.012] [2754009:2754011] [DMG] ICR moving to [AddedComma]
+          [1775758228.012] [2754009:2754011] [EM] <<< [E:14931i S:1 M:157645958] (G) Msg TX from 000000000001B669 to 1:FFFFFFFFFFFF0001 [CAE0] [UDP:[ff35:40:ff05::fa]:5540] --- Type 0001:08 (IM:InvokeCommandRequest) (B:66)
+          [1775758228.013] [2754009:2754011] [IN] Interface wlan0 has a link local address
+          [1775758228.013] [2754009:2754011] [IN] Successfully send Multicast message on interface wlan0
       disabled: true
