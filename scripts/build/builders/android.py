@@ -470,6 +470,16 @@ class AndroidBuilder(Builder):
                         "tv-casting-app/tv-casting-common/"
                         "casting-CHIPEventTLVValueDecoder.cpp"
                     )
+                    gn_args["chip_cluster_server_source_override"] = (
+                        "//third_party/connectedhomeip/examples/"
+                        "tv-casting-app/tv-casting-common/"
+                        "casting-cluster-servers.gni"
+                    )
+                    gn_args["chip_accessors_source_override"] = (
+                        "//third_party/connectedhomeip/examples/"
+                        "tv-casting-app/tv-casting-common/"
+                        "casting-Accessors.cpp"
+                    )
                     gn_args["chip_data_model_extra_logging"] = False
                     gn_args["enable_rtti"] = False
             gn_args.update(self.app.AppGnArgs())

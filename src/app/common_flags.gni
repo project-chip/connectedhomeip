@@ -53,4 +53,19 @@ declare_args() {
   # The replacement file must provide the same translation-unit contract
   # (i.e. include the necessary .ipp files and the shared/Structs.ipp).
   chip_cluster_objects_source_override = ""
+
+  # Optional path to a .gni file that defines the list of cluster server
+  # directories to compile. When set, the chip_data_model template imports
+  # this file and uses its cluster list instead of calling
+  # zap_cluster_list.py to auto-discover all server clusters from the
+  # .matter file. This allows applications to compile only the cluster
+  # server implementations they actually need.
+  chip_cluster_server_source_override = ""
+
+  # Optional path to a replacement Accessors.cpp source file.
+  # When set, the chip_data_model template compiles this file instead
+  # of the full generated zzz_generated/.../Accessors.cpp, allowing
+  # applications to include only the attribute accessors for the
+  # clusters they actually need.
+  chip_accessors_source_override = ""
 }

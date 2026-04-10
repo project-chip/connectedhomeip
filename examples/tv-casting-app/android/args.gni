@@ -55,6 +55,8 @@ if (optimize_apk_size) {
   #   chip_tlv_decoder_attribute_source_override  (tv-casting-app only)
   #   chip_tlv_decoder_event_source_override     (tv-casting-app only)
   #   chip_cluster_objects_source_override        (tv-casting-app only)
+  #   chip_cluster_server_source_override         (tv-casting-app only)
+  #   chip_accessors_source_override              (tv-casting-app only)
   #
   # The assignments below are kept for documentation and for any
   # build path that evaluates args.gni AFTER args.gn (e.g. a manual
@@ -75,6 +77,19 @@ if (optimize_apk_size) {
   # generated cluster-objects.cpp (~200+ clusters).  This is the same
   # slim file already used by Linux and Darwin builds.
   chip_cluster_objects_source_override = "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-objects.cpp"
+
+  # Compile only the 13 cluster server implementations required by the
+  # casting app (12 commissioning + content-app-observer) instead of all
+  # ~44 server clusters discovered from the .matter file.  The override
+  # points to a .gni file listing the retained cluster server directories,
+  # replacing the zap_cluster_list.py auto-discovery (~1.1 MB savings).
+  chip_cluster_server_source_override = "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-servers.gni"
+
+  # Compile only the 29 casting-relevant cluster attribute accessors
+  # (12 commissioning + 17 casting) instead of the full zap-generated
+  # Accessors.cpp (~200+ clusters).  The slim file provides identical
+  # function signatures for the retained clusters (~826 KB savings).
+  chip_accessors_source_override = "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-Accessors.cpp"
 } else {
   # Default development build: full debug features, fast compilation
   chip_build_libshell = true

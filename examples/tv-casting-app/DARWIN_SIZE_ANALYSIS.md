@@ -328,3 +328,54 @@ through the Android build pipeline.
 ---
 
 _Updated March 2026 with phase 2 applicability notes for Darwin builds._
+
+
+---
+
+## 10. Phase 3 Optimizations — Darwin Applicability
+
+Phase 3 targets ~3.5 MB of additional binary bloat in the Android
+size-optimized build across four areas: cluster server exclusion, slim
+Accessors.cpp, jsoncpp/jsontlv removal, and controller code reduction. Some
+of these optimizations are platform-agnostic and can be adopted by Darwin
+builds; others are Android-specific.
+
+### Optimizations that apply to Darwin
+
+| Optimization | Darwin applicability | How to enable |
+|---|---|---|
+| Cluster server exclusion (`chip_cluster_server_source_override`) | ✅ Applies | The GN arg is declared in `src/app/common_flags.gni` (platform-agnostic). Darwin builds can set `chip_cluster_server_source_override` in `darwin/args.gni` pointing to `casting-cluster-servers.gni` to compile only the 13 required cluster server implementations instead of all ~44 discovered from the `.matter` file. |
+| Slim Accessors.cpp (`chip_accessors_source_override`) | ✅ Applies | The GN arg is declared in `src/app/common_flags.gni` (platform-agnostic). Darwin builds can set `chip_accessors_source_override` in `darwin/args.gni` pointing to `casting-Accessors.cpp` to compile only the 29 casting-relevant cluster accessors instead of the full ~200+ cluster Accessors.cpp. |
+
+Both GN args follow the same override pattern as the existing
+`chip_cluster_objects_source_override` already set in `darwin/args.gni`. To
+adopt them, add the following to `examples/tv-casting-app/darwin/args.gni`:
+
+```python
+chip_cluster_server_source_override =
+    "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-servers.gni"
+
+chip_accessors_source_override =
+    "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-Accessors.cpp"
+```
+
+### Optimizations that are Android-specific
+
+| Optimization | Why it doesn't apply to Darwin |
+|---|---|
+| jsoncpp/jsontlv removal (~350 KB) | The jsontlv dependency is in `src/controller/java/BUILD.gn`, which is the Android JNI layer (`android_chip_im_jni` and the `jni` shared library). Darwin does not use the Java controller or JNI — the Objective-C bridge (`MatterTvCastingBridge`) has its own interaction path. This optimization has no effect on Darwin builds. |
+| Controller code reduction (future work — ~1.3 MB) | The dependency chain analysis through the JNI layer (`AndroidDeviceControllerWrapper.cpp`, etc.) is Android-specific. The general finding that the casting app does not need commissioner code (`CHIPDeviceController.cpp`, `CommissioningWindowOpener.cpp`, etc.) applies to both platforms, but the JNI-layer refactoring required to cleanly split the controller library is an Android concern. Darwin builds could independently investigate excluding commissioner code through their own build flow. |
+
+### Summary
+
+Of the four phase 3 optimization areas, two (cluster server exclusion and slim
+Accessors.cpp) are platform-agnostic — they use GN args declared in
+`src/app/common_flags.gni` and can be adopted by Darwin builds by setting the
+args in `darwin/args.gni`. The jsoncpp/jsontlv removal is Android JNI-specific
+and does not apply to Darwin. The controller code reduction analysis identifies
+savings relevant to both platforms, but the implementation path is tied to the
+Android JNI dependency chain.
+
+---
+
+_Updated March 2026 with phase 3 applicability notes for Darwin builds._

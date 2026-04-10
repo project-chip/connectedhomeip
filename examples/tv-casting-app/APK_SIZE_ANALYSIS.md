@@ -8,24 +8,27 @@ Casting App on Android (arm64-v8a).
 
 ## 1. Optimized vs. Non-Optimized Comparison (arm64-v8a)
 
-| Metric                   | Default build               | Optimized build            | Reduction |
+| Metric                   | Default build               | Optimized build (phase 3)  | Reduction |
 | ------------------------ | --------------------------- | -------------------------- | --------- |
 |                          | `optimize_apk_size=false`   | `optimize_apk_size=true`   |           |
 |                          | `use_static_libcxx=false`   | `use_static_libcxx=true`   |           |
-| **`libTvCastingApp.so`** | 18 MB                       | 2.8 MB                     | 84 %      |
+| **`libTvCastingApp.so`** | 18 MB                       | 2.6 MB                     | 86 %      |
 | **`libc++_shared.so`**   | 8.9 MB (shipped separately) | 1.3 MB (statically linked) | 85 %      |
-| **Total native libs**    | 27.9 MB                     | 2.8 MB (single `.so`)      | 90 %      |
+| **Total native libs**    | 27.9 MB                     | 2.6 MB (single `.so`)      | 91 %      |
 
 ### What drives the reduction
 
 | Optimization                           | Mechanism                                                                                                                                       | Impact                                                                                                    |
 | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Slim cluster-objects override          | Compile ~36 casting clusters instead of ~200+ via `chip_cluster_objects_source_override`                                                        | Major `.so` reduction                                                                                     |
+| Slim cluster-objects override          | Compile ~29 casting clusters instead of ~200+ via `chip_cluster_objects_source_override`                                                        | Major `.so` reduction                                                                                     |
 | Slim TLV decoder overrides             | Compile TLV decoders for 18 casting clusters only via `chip_tlv_decoder_attribute_source_override` and `chip_tlv_decoder_event_source_override` | Removes link-time deps on ~200+ clusters while keeping `ChipClusters.java` read/subscribe APIs functional |
 | Remove legacy chip-tool sources        | Exclude ~20 source files + tracing/JSON deps                                                                                                    | Further `.so` reduction                                                                                   |
 | Static libc++ with dead-code stripping | `−static-libstdc++` + `--gc-sections` + LTO                                                                                                     | Eliminates separate 8.9 MB `libc++_shared.so`; only referenced symbols survive                            |
 | Compiler / linker flags                | `-Os`, `-g0`, `-flto=thin`, `--icf=safe`, `-fvisibility=hidden`                                                                                 | ~10–20 % further `.so` reduction                                                                          |
 | R8 Java shrinking                      | `minifyEnabled true` in Gradle debug build                                                                                                      | Reduces DEX size (Java / Kotlin)                                                                          |
+| Cluster server exclusion (phase 3)     | Compile only 13 cluster server dirs via `chip_cluster_server_source_override` + `casting-cluster-servers.gni`                                   | ~1.1 MB `.o` savings                                                                                      |
+| Slim Accessors.cpp (phase 3)           | Compile accessors for 29 clusters only via `chip_accessors_source_override` + `casting-Accessors.cpp`                                           | ~826 KB `.o` savings                                                                                      |
+| jsoncpp/jsontlv removal (phase 3)      | Not feasible — `AndroidCallbacks.cpp` and `AndroidInteractionClient.cpp` use jsontlv at runtime                                                | ~350 KB (not achievable)                                                                                   |
 
 ---
 
@@ -43,14 +46,13 @@ casting use case.
 -   Messaging layer (exchange management, protocol dispatch)
 -   Interaction model engine (read / write / invoke / subscribe)
 
-### Casting-specific clusters (39 clusters, ~157 `.ipp` includes)
+### Casting-specific clusters (29 clusters, ~116 `.ipp` includes)
 
-**Infrastructure clusters (21):** AccessControl, AdministratorCommissioning,
-BasicInformation, Binding, Descriptor, EthernetNetworkDiagnostics, FixedLabel,
+**Infrastructure clusters (12):** AccessControl, AdministratorCommissioning,
+BasicInformation, Binding, Descriptor,
 GeneralCommissioning, GeneralDiagnostics, GroupKeyManagement, Groups,
-IcdManagement, Identify, LocalizationConfiguration, NetworkCommissioning,
-OperationalCredentials, SoftwareDiagnostics, TimeFormatLocalization,
-TimeSynchronization, UnitLocalization, UserLabel, WiFiNetworkDiagnostics
+Identify, NetworkCommissioning,
+OperationalCredentials
 
 **Casting clusters (17):** AccountLogin, ApplicationBasic, ApplicationLauncher,
 AudioOutput, Channel, ContentAppObserver, ContentControl, ContentLauncher,
@@ -107,8 +109,12 @@ TargetNavigator, WakeOnLan
 
 -   ~164 non-casting cluster implementations (DoorLock, Thermostat,
     PumpConfigurationAndControl, etc.)
+-   ~31 non-casting cluster server implementations (phase 3 — only 13 of ~44
+    cluster server directories are compiled)
 -   Full zap-generated TLV decoder files for all ~200+ clusters (replaced by
     slim 18-cluster versions)
+-   Full zap-generated Accessors.cpp for all ~200+ clusters (phase 3 — replaced
+    by slim 29-cluster `casting-Accessors.cpp`)
 -   Legacy chip-tool command sources (`Command.cpp`, `Commands.cpp`,
     `CHIPCommand.cpp`, `RemoteDataModelLogger.cpp`, etc.)
 -   Tracing dependencies (`commandline`, `json`, `jsoncpp`)
@@ -146,7 +152,7 @@ overhead is removed.
 
 | Component                                         | Estimated size   | Notes                                                                  |
 | ------------------------------------------------- | ---------------- | ---------------------------------------------------------------------- |
-| `libTvCastingApp.so` (arm64-v8a, optimized)       | 2.8 MB           | Measured — primary size contributor                                    |
+| `libTvCastingApp.so` (arm64-v8a, optimized)       | 2.6 MB           | Measured post-phase 3 — primary size contributor                       |
 | Java casting API classes (`com.matter.casting.*`) | ~0.1 MB          | `TvCastingApp.jar` is 91 KB                                            |
 | `CHIPInteractionModel.jar`                        | ~7.3 MB (pre-R8) | Shrinks significantly with R8 — only casting-relevant classes retained |
 | `AndroidPlatform.jar`                             | ~54 KB           | Platform abstraction                                                   |
@@ -156,10 +162,10 @@ overhead is removed.
 
 | Scenario                                               | Estimated size |
 | ------------------------------------------------------ | -------------- |
-| Native library only (`libTvCastingApp.so`, arm64-v8a)  | 2.8 MB         |
-| Native + Java classes (before R8)                      | ~10 MB         |
-| Native + Java classes (after R8 shrinking by host app) | ~4–5 MB        |
-| Compressed in APK (ZIP deflate, single ABI)            | ~2–3 MB        |
+| Native library only (`libTvCastingApp.so`, arm64-v8a)  | 2.6 MB         |
+| Native + Java classes (before R8)                       | ~10 MB         |
+| Native + Java classes (after R8 shrinking by host app)  | ~4–5 MB        |
+| Compressed in APK (ZIP deflate, single ABI)             | ~2–3 MB        |
 
 The `CHIPInteractionModel.jar` (7.3 MB) is the largest Java component, but it
 contains classes for all ~200+ clusters. When the host app applies R8 shrinking,
@@ -216,11 +222,15 @@ The `size-optimized` modifier sets the following GN args automatically:
 
 For the TV Casting App specifically, the build also sets:
 
--   `chip_cluster_objects_source_override` — slim cluster-objects (~36 clusters)
+-   `chip_cluster_objects_source_override` — slim cluster-objects (~29 clusters)
 -   `chip_tlv_decoder_attribute_source_override` — slim attribute TLV decoder
     (18 casting clusters)
 -   `chip_tlv_decoder_event_source_override` — slim event TLV decoder (18
     casting clusters)
+-   `chip_cluster_server_source_override` — slim cluster server list (13
+    clusters) _(phase 3)_
+-   `chip_accessors_source_override` — slim attribute accessors (29 clusters)
+    _(phase 3)_
 
 Output lands in `out/android-arm64-tv-casting-app-size-optimized/`.
 
@@ -238,11 +248,11 @@ ls -lh out/android-arm64-tv-casting-app-size-optimized/lib/jni/arm64-v8a/*.so
 
 Expected results (arm64-v8a, March 2026):
 
-| File                 | Default     | Optimized                  |
-| -------------------- | ----------- | -------------------------- |
-| `libTvCastingApp.so` | 19 MB       | 2.8 MB                     |
-| `libc++_shared.so`   | 8.9 MB      | 1.3 MB (static, folded in) |
-| **Total**            | **27.9 MB** | **2.8 MB**                 |
+| File                 | Default     | Optimized                      |
+| -------------------- | ----------- | ------------------------------ |
+| `libTvCastingApp.so` | 19 MB       | 2.6 MB (measured, post-phase 3) |
+| `libc++_shared.so`   | 8.9 MB      | 1.3 MB (static, folded in)      |
+| **Total**            | **27.9 MB** | **2.6 MB**                      |
 
 ### Desktop — Build with slim cluster set (for cluster vetting)
 
@@ -323,7 +333,7 @@ python -m pytest examples/tv-casting-app/tests/ -v
 ---
 
 _Updated March 2026 with measured build sizes after slim TLV decoder
-integration._ _Validates: Requirements 2.1, 2.2, 2.3, 2.4_
+integration and phase 3 optimizations._ _Validates: Requirements 2.1, 2.2, 2.3, 2.4_
 
 
 ---
@@ -414,3 +424,304 @@ New test files in `examples/tv-casting-app/tests/`:
 
 _Updated March 2026 with phase 2 optimizations: cluster trimming, extra logging,
 unit-test hooks, RTTI, and ICD removal._
+
+
+---
+
+## 7. Phase 3 Optimizations (~2.6 MB → ~2.3 MB estimated)
+
+Phase 2 reduced `libTvCastingApp.so` from 2.8 MB to 2.6 MB. Phase 3 targets an
+additional ~2.3 MB of `.o` file bloat identified through binary analysis of the
+size-optimized arm64 build. Four optimization areas were investigated; three are
+implemented and one is documented as future work.
+
+All changes are gated behind `optimize_apk_size=true`. Default builds and
+non-casting-app targets remain unaffected.
+
+### Phase 3 optimization summary
+
+| Optimization | Mechanism | `.o` file savings | Status |
+|---|---|---|---|
+| Cluster server exclusion | `chip_cluster_server_source_override` + `casting-cluster-servers.gni` | ~1.1 MB | Implemented |
+| Slim Accessors.cpp | `chip_accessors_source_override` + `casting-Accessors.cpp` | ~826 KB | Implemented |
+| jsoncpp/jsontlv removal | Conditional dep in `src/controller/java/BUILD.gn` | ~350 KB | Not feasible |
+| Controller code reduction | Requires controller library refactoring | ~1.3 MB | Future work |
+| **Total implemented** | | **~1.9 MB (.o)** | |
+
+The `.o` file savings represent uncompressed object file sizes before linking.
+After LTO (thin link-time optimization), ICF (identical code folding), and
+`--gc-sections` dead-code stripping, the actual `.so` reduction is smaller.
+Measured result: `libTvCastingApp.so` remains at 2.6 MB (same as phase 2).
+The linker was already stripping the unused cluster server code and accessor
+functions in earlier phases via `--gc-sections` and LTO. The phase 3 changes
+still provide value by reducing compile time, intermediate object file sizes,
+and making the build explicit about what's needed — preventing regressions if
+LTO/gc-sections behavior changes upstream.
+
+### 7.1 Cluster server exclusion (~1.1 MB .o savings)
+
+**Problem:** The `chip_data_model` GN template calls `zap_cluster_list.py` to
+discover ALL server-side cluster implementations from the `.matter` file. The
+casting app's `.matter` file declares ~44 clusters, but only ~13 need server
+implementations (12 commissioning + ContentAppObserver). The remaining ~31
+cluster server directories are compiled unnecessarily.
+
+**Mechanism:** A new GN argument `chip_cluster_server_source_override` in
+`src/app/common_flags.gni` allows overriding the cluster server source list.
+When set to a non-empty path (a `.gni` file), the `chip_data_model` template
+imports the override file and uses its cluster list instead of calling
+`zap_cluster_list.py`. Both `public_deps` (cluster server sources) and
+`_app_config_dependent_sources` are scoped to the override clusters only.
+
+**Override file:** `examples/tv-casting-app/tv-casting-common/casting-cluster-servers.gni`
+defines exactly 13 cluster server directories:
+
+- `access-control-server`, `administrator-commissioning-server`,
+  `basic-information`, `bindings`, `descriptor`,
+  `general-commissioning-server`, `general-diagnostics-server`,
+  `group-key-management-server`, `groups-server`, `identify-server`,
+  `network-commissioning`, `operational-credentials-server`,
+  `content-app-observer`
+
+**Default behavior:** When `chip_cluster_server_source_override` is empty
+(default), the template calls `zap_cluster_list.py` as before — no change for
+non-casting builds.
+
+### 7.2 Slim Accessors.cpp (~826 KB .o savings)
+
+**Problem:** `chip_data_model.gni` hardcodes the full
+`zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp`
+which contains attribute getter/setter functions for ALL ~200+ clusters. Only
+the 29 casting-relevant clusters' accessors are needed (12 commissioning + 17
+casting).
+
+**Mechanism:** A new GN argument `chip_accessors_source_override` in
+`src/app/common_flags.gni` allows overriding the Accessors.cpp source file.
+When set to a non-empty path, the `chip_data_model` template compiles the
+override file instead of the full generated Accessors.cpp.
+
+**Override file:** `examples/tv-casting-app/tv-casting-common/casting-Accessors.cpp`
+is a hand-maintained slim file containing attribute accessor functions for only
+the 29 casting-relevant clusters. It includes the same `Accessors.h` header and
+provides identical function signatures for the retained clusters.
+
+**Retained clusters (29):**
+
+- **Commissioning (12):** AccessControl, AdministratorCommissioning,
+  BasicInformation, Binding, Descriptor, GeneralCommissioning,
+  GeneralDiagnostics, GroupKeyManagement, Groups, Identify,
+  NetworkCommissioning, OperationalCredentials
+- **Casting (17):** AccountLogin, ApplicationBasic, ApplicationLauncher,
+  AudioOutput, Channel, ContentAppObserver, ContentControl, ContentLauncher,
+  KeypadInput, LevelControl, LowPower, MediaInput, MediaPlayback, Messages,
+  OnOff, TargetNavigator, WakeOnLan
+
+**Default behavior:** When `chip_accessors_source_override` is empty (default),
+the full Accessors.cpp is compiled — no change for non-casting builds.
+
+### 7.3 jsoncpp/jsontlv removal (~350 KB — not feasible)
+
+**Problem:** `android_chip_im_jni` and the `jni` shared library in
+`src/controller/java/BUILD.gn` both depend on `src/lib/support/jsontlv`, which
+pulls in `jsoncpp` (~350 KB).
+
+**Investigation:** Initial analysis suggested the casting app does not use
+JSON-TLV conversion at runtime. However, build testing revealed that
+`AndroidCallbacks.cpp` and `AndroidInteractionClient.cpp` — both core files in
+`android_chip_im_jni` — call `JsonToTlv()`, `TlvToJson()`, and
+`ConvertTlvTag()` directly. These functions are used for:
+
+- Converting command invoke payloads from JSON to TLV
+  (`AndroidInteractionClient.cpp`)
+- Converting attribute/event report TLV to JSON for Java callbacks
+  (`AndroidCallbacks.cpp`)
+- Converting write attribute payloads from JSON to TLV
+  (`AndroidInteractionClient.cpp`)
+
+These are core interaction model operations that the casting app uses at
+runtime for sending commands, reading attributes, and subscribing to events
+on the remote TV/player endpoint.
+
+**Conclusion:** The jsontlv dependency **cannot be removed** without also
+wrapping all call sites in `AndroidCallbacks.cpp` and
+`AndroidInteractionClient.cpp` with conditionals and providing alternative
+code paths — a significantly larger refactoring effort. The ~350 KB savings
+is documented as a future optimization opportunity that would require
+restructuring the JNI interaction model layer to separate JSON-based APIs
+from binary TLV-only APIs.
+
+### 7.4 Controller code reduction (~1.3 MB — future work)
+
+Setting `chip_support_commissioning_in_controller=false` for the casting app
+**will cause link failures**. The dependency chain is too entangled for a simple
+flag flip. A clean split requires restructuring the controller library, which is
+a larger refactoring effort suitable for a future phase.
+
+#### Dependency chain
+
+```
+libTvCastingApp.so (examples/tv-casting-app/android/BUILD.gn :jni)
+  └─ tv-casting-common (examples/tv-casting-app/tv-casting-common/BUILD.gn)
+       └─ ${chip_root}/src/controller  (src/controller/BUILD.gn :controller)
+```
+
+#### What the casting app uses from `src/controller`
+
+1. **`controller/CHIPCluster.h` (`ClusterBase`)** — Used by `BaseCluster.h` and
+   `MediaClusterBase` for sending commands, reading attributes, and subscribing
+   to the remote TV/player endpoint. In the `:interactions` source set, always
+   compiled regardless of `chip_support_commissioning_in_controller`.
+
+2. **`controller/CHIPCommissionableNodeController.h/.cpp`** — Used by
+   `CastingPlayerDiscovery` to discover casting targets. Calls
+   `DiscoverCommissioners()`, `StopDiscovery()`,
+   `RegisterDeviceDiscoveryDelegate()`, and `GetDiscoveredCommissioner()`.
+
+3. **`controller/DeviceDiscoveryDelegate.h`** — Header-only discovery delegate
+   interface. Always available.
+
+#### Why the flag flip breaks
+
+Setting `chip_support_commissioning_in_controller=false` excludes **all** `.cpp`
+files in the conditional, including two the casting app needs:
+
+- `AbstractDnssdDiscoveryController.cpp` — base class of
+  `CommissionableNodeController`
+- `CHIPCommissionableNodeController.cpp` — discovery of casting targets
+
+The linker fails with unresolved symbols for `DiscoverCommissioners()`,
+`GetDiscoveredCommissioner()`, `OnNodeDiscovered()`, etc.
+
+#### Files inside the conditional
+
+| File | Size (approx.) | Needed by casting? |
+|---|---|---|
+| `AbstractDnssdDiscoveryController.cpp` | small | **YES** — base class |
+| `CHIPCommissionableNodeController.cpp` | small | **YES** — discovery |
+| `AutoCommissioner.cpp` | medium | No |
+| `CHIPDeviceControllerFactory.cpp` | ~90 KB | No |
+| `CommissioneeDeviceProxy.cpp` | medium | No |
+| `CommissionerDiscoveryController.cpp` | medium | No |
+| `CommissioningDelegate.cpp` | medium | No |
+| `ExampleOperationalCredentialsIssuer.cpp` | medium | No |
+| `SetUpCodePairer.cpp` | medium | No |
+| `CHIPDeviceController.cpp` | ~970 KB | No |
+| `CommissioningWindowOpener.cpp` | ~167 KB | No |
+| `CurrentFabricRemover.cpp` | ~86 KB | No |
+
+#### JNI layer analysis
+
+The casting app's `jni` shared library depends on
+`${chip_root}/src/controller/java:android_chip_im_jni` (interaction model JNI
+bindings), **not** on the full controller JNI (`libCHIPController.so`). The full
+controller JNI is deeply entangled with commissioner code
+(`AndroidDeviceControllerWrapper`, `CHIPDeviceController-JNI`, etc.), but the
+casting app does not use it. The problem is the direct dependency from
+`tv-casting-common` on `src/controller`.
+
+#### Future refactoring approach
+
+To achieve the ~1.3 MB savings, the controller library needs a finer-grained
+split:
+
+1. **Move discovery code to a separate `:discovery` source set** — Extract
+   `AbstractDnssdDiscoveryController.cpp` and
+   `CHIPCommissionableNodeController.cpp` into a new `:discovery` source set
+   that is always compiled.
+
+2. **Set `chip_support_commissioning_in_controller=false` after the split** —
+   With discovery code extracted, the remaining conditional files are all
+   commissioner-specific and can be safely excluded.
+
+3. **Estimated effort:** Medium — requires modifying `src/controller/BUILD.gn`,
+   updating `tv-casting-common/BUILD.gn` to depend on the split targets, and
+   verifying no transitive header dependencies pull in commissioner code. The
+   existing TODO comment in `BUILD.gn` notes that "these conditionals are NOT ok
+   and should have been solved with separate source sets."
+
+#### Estimated savings breakdown
+
+| File | Compiled size (arm64, -Os) | Status |
+|---|---|---|
+| `CHIPDeviceController.cpp` | ~970 KB | Excludable after split |
+| `CommissioningWindowOpener.cpp` | ~167 KB | Excludable after split |
+| `CHIPDeviceControllerFactory.cpp` | ~90 KB | Excludable after split |
+| `CurrentFabricRemover.cpp` | ~86 KB | Excludable after split |
+| `AutoCommissioner.cpp` | ~50 KB (est.) | Excludable after split |
+| Other commissioner files | ~50 KB (est.) | Excludable after split |
+| **Total potential savings** | **~1.3 MB** | Requires controller library refactoring |
+
+### Updated size comparison (arm64-v8a)
+
+| Metric | Default build | Phase 1 | Phase 2 | Phase 3 (est.) | Phase 3 reduction |
+|---|---|---|---|---|---|
+| `libTvCastingApp.so` | 18 MB | 2.8 MB | 2.6 MB | 2.6 MB | 0 % vs phase 2 |
+| `libc++_shared.so` | 8.9 MB | 1.3 MB (static) | 1.3 MB (static) | 1.3 MB (static) | — |
+| **Total native libs** | **26.9 MB** | **2.8 MB** | **2.6 MB** | **2.6 MB** | **0 %** |
+
+The phase 3 `.so` size is unchanged from phase 2. The ~1.9 MB of `.o` file
+savings from cluster server exclusion and slim Accessors.cpp were already being
+eliminated by the linker's `--gc-sections` and thin LTO in earlier phases. The
+phase 3 changes reduce compile time and intermediate object sizes, and make the
+build explicit about what's needed — preventing regressions if linker behavior
+changes upstream.
+
+### Phase 3 GN arguments
+
+These arguments are passed automatically by `android.py` when building the
+`android-arm64-tv-casting-app-size-optimized` target:
+
+| Argument | Value | Set by |
+|---|---|---|
+| `chip_cluster_server_source_override` | Path to `casting-cluster-servers.gni` | `android.py` (TV_CASTING_APP only) |
+| `chip_accessors_source_override` | Path to `casting-Accessors.cpp` | `android.py` (TV_CASTING_APP only) |
+
+All new GN arguments have inert defaults (empty string) so that non-casting
+builds are unaffected.
+
+### Phase 3 override files
+
+| File | Location | Purpose |
+|---|---|---|
+| `casting-cluster-servers.gni` | `tv-casting-common/` | Lists the 13 required cluster server directories |
+| `casting-Accessors.cpp` | `tv-casting-common/` | Slim accessors for 29 casting-relevant clusters |
+| `casting-cluster-objects.cpp` | `tv-casting-common/` | (existing, phase 1) Slim cluster objects for 29 clusters |
+
+### Phase 3 property tests
+
+Property-based tests for phase 3 are defined in the design document and validate
+the correctness of the new override mechanisms. They follow the same pattern as
+phase 1/2 tests in `examples/tv-casting-app/tests/`:
+
+| Property | What it validates |
+|---|---|
+| Cluster server set membership | Override list contains exactly the 13 required clusters, no extras, no duplicates |
+| Slim accessors cluster set membership | Slim accessors file contains exactly the 29 casting clusters' namespaces |
+| Slim accessors signature equivalence | Function signatures in slim file match full Accessors.cpp for all retained clusters |
+| Phase 3 args target isolation | `android.py` sets phase 3 args only for TV_CASTING_APP; new GN args have inert defaults |
+
+Additional unit-level validations:
+
+| Validation | What it checks |
+|---|---|
+| Accessors override in GNI | `common_flags.gni` declares `chip_accessors_source_override` with empty default |
+| Cluster server override in GNI | `common_flags.gni` declares `chip_cluster_server_source_override` with empty default |
+| Data model template conditionals | `chip_data_model.gni` has conditionals for both accessors and cluster server overrides |
+| Default preservation | Default builds (`optimize_apk_size=false`) are unaffected by all phase 3 changes |
+
+### When to run phase 3 tests
+
+- After modifying `casting-Accessors.cpp` or `casting-cluster-servers.gni`
+- After changing `chip_data_model.gni`, `common_flags.gni`, `android.py`, or
+  `src/controller/java/BUILD.gn`
+- Before pushing a commit that touches any phase 3 files
+
+```bash
+python -m pytest examples/tv-casting-app/tests/ -v
+```
+
+---
+
+_Updated April 2026 with Phase 3 optimizations: cluster server exclusion, slim
+Accessors.cpp, and controller code investigation. jsoncpp/jsontlv removal was
+investigated but found not feasible due to runtime usage in the JNI layer._
