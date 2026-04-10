@@ -22,6 +22,7 @@ import validators
 from mobly import asserts
 
 from matter.clusters import Globals
+from matter.clusters.Types import Nullable
 from matter.clusters.ClusterObjects import Cluster
 from matter.testing.conformance import ConformanceException
 from matter.testing.matter_testing import MatterBaseTest, TestStep
@@ -345,9 +346,9 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.step(24)
         if hasattr(cluster.Attributes, 'DeviceLocation') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DeviceLocation):
             ret24 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DeviceLocation)
-            asserts.assert_true(ret24 is None or isinstance(ret24, Globals.Structs.LocationDescriptorStruct),
+            asserts.assert_true(isinstance(ret24, Nullable) or isinstance(ret24, Globals.Structs.LocationDescriptorStruct),
                                 "DeviceLocation should be a null or LocationDescriptorStruct")
-            if ret24 is not None:
+            if not isinstance(ret24, Nullable):
                 asserts.assert_is_not_none(ret24.locationName, "LocationName should not be null")
                 asserts.assert_less_equal(len(ret24.locationName), 128, "LocationName should have max 128 characters")
                 asserts.assert_true(ret24.floorNumber is None or isinstance(ret24.floorNumber, int),
