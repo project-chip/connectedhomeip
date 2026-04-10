@@ -104,6 +104,7 @@ To ensure that a cluster is initialized correctly and that feature flags remain 
 **Reference Example:** The [Level Control Cluster](https://github.com/project-chip/connectedhomeip/blob/master/src/app/clusters/level-control/LevelControlCluster.h) is the primary reference for this implementation pattern.
 
 **Pattern Principles:**
+
 *   **Nested Config Struct:** Define a `struct Config` within the main cluster class to hold all startup state.
 *   **Fluent Builder API:** Provide `With<Feature>(...)` methods that return a reference to the `Config` object to allow for chained configuration calls.
 *   **Atomic Configuration:** Methods must handle both the `FeatureMap` bit setting and the initialization of any associated attributes to prevent invalid states.
