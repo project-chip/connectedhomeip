@@ -21,7 +21,9 @@ from rich.console import Console
 
 import matter.clusters as Clusters
 from matter.testing.basic_composition import BasicCompositionTests
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.runner import default_matter_test_main
 from matter.testing.taglist_and_topology_test import build_tree_for_graph
 
 console = None
@@ -40,7 +42,7 @@ def AddServerOrClientNode(graphSection, endpoint, clusterName, color, nodeRef):
     graphSection.edge(nodeRef, f"ep{endpoint}_{clusterName}", style="invis")
 
 
-def tag_str(tag: Clusters.Descriptor.Structs.SemanticTagStruct):
+def tag_str(tag: Clusters.Objects.Globals.Structs.SemanticTagStruct):
     # TODO: resolve to names once the namespace stuff lands
     return f"({tag.namespaceID}: {tag.tag}{f' {tag.label}' if tag.label is not None else ''})"
 
@@ -203,7 +205,7 @@ def create_graph(wildcardResponse, xml_device_types, outfile_dir: str = '.'):
     deviceGraph.render(filename, format='png')
 
 
-class TC_MatterDeviceGraph(MatterBaseTest, BasicCompositionTests):
+class TC_MatterDeviceGraph(BasicCompositionTests):
     @async_test_body
     async def setup_class(self):
         super().setup_class()
