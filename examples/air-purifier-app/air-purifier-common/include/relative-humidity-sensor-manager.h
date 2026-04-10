@@ -30,7 +30,7 @@ class RelativeHumiditySensorManager
 public:
     RelativeHumiditySensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId){};
 
-    void Init() {};
+    void Init(){};
 
     void OnHumidityChangeHandler(uint16_t newValue)
     {

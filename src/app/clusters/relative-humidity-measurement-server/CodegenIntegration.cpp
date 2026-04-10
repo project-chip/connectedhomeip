@@ -146,5 +146,4 @@ CHIP_ERROR SetMeasuredValue(EndpointId endpointId, DataModel::Nullable<uint16_t>
     return cluster->SetMeasuredValue(measuredValue);
 }
 
-
 } // namespace chip::app::Clusters::RelativeHumidityMeasurement

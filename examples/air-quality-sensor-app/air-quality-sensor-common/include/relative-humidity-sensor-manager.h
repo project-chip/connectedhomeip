@@ -10,7 +10,7 @@ namespace Clusters {
 class RelativeHumiditySensorManager
 {
 public:
-    RelativeHumiditySensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId) {};
+    RelativeHumiditySensorManager(EndpointId aEndpointId) : mEndpointId(aEndpointId){};
 
     void OnHumidityChangeHandler(uint16_t newValue)
     {

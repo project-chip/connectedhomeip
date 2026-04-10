@@ -86,8 +86,7 @@ TEST_F(TestRelativeHumidityMeasurementCluster, AttributeListTest)
         RelativeHumidityMeasurementCluster::OptionalAttributeSet optionalAttributeSet;
         optionalAttributeSet.Set<Tolerance::Id>();
 
-        RelativeHumidityMeasurementCluster cluster(kRootEndpointId,
-                                                   RelativeHumidityMeasurementCluster::Config{}.WithTolerance(0));
+        RelativeHumidityMeasurementCluster cluster(kRootEndpointId, RelativeHumidityMeasurementCluster::Config{}.WithTolerance(0));
         ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -244,8 +243,7 @@ TEST_F(TestRelativeHumidityMeasurementCluster, MeasuredValueWithPartialRange)
 // Verify tolerance at spec boundary is accepted.
 TEST_F(TestRelativeHumidityMeasurementCluster, ToleranceBoundary)
 {
-    RelativeHumidityMeasurementCluster cluster(kRootEndpointId,
-                                               RelativeHumidityMeasurementCluster::Config{}.WithTolerance(2048));
+    RelativeHumidityMeasurementCluster cluster(kRootEndpointId, RelativeHumidityMeasurementCluster::Config{}.WithTolerance(2048));
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
