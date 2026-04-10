@@ -783,24 +783,42 @@ void SetUpCodePairer::OnStatusUpdate(DevicePairingDelegate::Status status)
 {
     if (status == DevicePairingDelegate::Status::SecurePairingFailed)
     {
-        // If we're still waiting on discovery, don't propagate this failure
-        // (which is due to PASE failure with something we discovered, but the
-        // "something" may not have been the right thing) for now.  Wait until
-        // discovery completes.  Then we will either succeed and notify
-        // accordingly or time out and land in OnStatusUpdate again, but at that
-        // point we will not be waiting on discovery anymore.
-        if (!mDiscoveredParameters.empty())
+
+        if (mFailOnPasscodeMismatch)
         {
-            ChipLogProgress(Controller, "Ignoring SecurePairingFailed status for now; we have more discovered devices to try");
-            return;
+            // Stop all discovery and PASE attempts now instead of waiting for the discovery timeout.
+            ChipLogProgress(Controller,
+                            "SecurePairingFailed with mFailOnPasscodeMismatch set; aborting pairing immediately");
+            if (mWaitingForPASE)
+            {
+                PASEEstablishmentComplete();
+            }
+            ResetDiscoveryState();
+            mRemoteId = kUndefinedNodeId;
+            // Fall through so the delegate is notified below.
+        }
+        else
+        {
+            // If we're still waiting on discovery, don't propagate this failure
+            // (which is due to PASE failure with something we discovered, but the
+            // "something" may not have been the right thing) for now.  Wait until
+            // discovery completes.  Then we will either succeed and notify
+            // accordingly or time out and land in OnStatusUpdate again, but at that
+            // point we will not be waiting on discovery anymore.
+            if (!mDiscoveredParameters.empty())
+            {
+                ChipLogProgress(Controller, "Ignoring SecurePairingFailed status for now; we have more discovered devices to try");
+                return;
+            }
+
+            if (DiscoveryInProgress())
+            {
+                ChipLogProgress(Controller,
+                                "Ignoring SecurePairingFailed status for now; we are waiting to see if we discover more devices");
+                return;
+            }
         }
 
-        if (DiscoveryInProgress())
-        {
-            ChipLogProgress(Controller,
-                            "Ignoring SecurePairingFailed status for now; we are waiting to see if we discover more devices");
-            return;
-        }
     }
 
     if (mPairingDelegate)

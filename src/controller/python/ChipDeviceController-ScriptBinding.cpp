@@ -209,6 +209,10 @@ PyChipError pychip_DeviceController_OpenJointCommissioningWindow(chip::Controlle
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
                                                       uint32_t len);
 
+void pychip_DeviceController_SetFailOnPasscodeMismatch(chip::Controller::DeviceCommissioner * devCtrl, bool enable){
+    devCtrl->SetFailOnPasscodeMismatch(enable);
+}
+
 PyChipError pychip_DeviceController_SetTermsAcknowledgements(uint16_t tcVersion, uint16_t tcUserResponse);
 
 PyChipError pychip_DeviceController_SetSkipCommissioningComplete(bool skipCommissioningComplete);

@@ -2566,6 +2566,10 @@ class ChipDeviceControllerBase():
             raise MemoryError("Invalid output size for manual code")
         return buf.value.decode()
 
+    def SetFailOnPasscodeMismatch(self, enable: bool):
+        """immediately abort on passcode mismatch instead of waiting for the discovery/PASE timeout to expire."""
+        self._dmLib.pychip_DeviceController_SetFailOnPasscodeMismatch(self.devCtrl, enable)
+
     # ----- Private Members -----
     def _InitLib(self):
         if self._dmLib is None:
@@ -2590,6 +2594,9 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
                 c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_SetFailOnPasscodeMismatch.argtypes = [c_void_p, c_bool]
+            self._dmLib.pychip_DeviceController_SetFailOnPasscodeMismatch.restype = None
 
             self._dmLib.pychip_DeviceController_SetWiFiCredentials.argtypes = [
                 c_char_p, c_char_p]
