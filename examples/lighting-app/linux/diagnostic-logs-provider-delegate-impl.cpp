@@ -66,7 +66,11 @@ public:
     {
         if (mActive && mHandle != kInvalidLogSessionHandle)
         {
-            (void) mProvider.EndLogCollection(mHandle);
+            CHIP_ERROR err = mProvider.EndLogCollection(mHandle);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(NotSpecified, "EndLogCollection failed: %" CHIP_ERROR_FORMAT, err.Format());
+            }
         }
     }
 
@@ -89,15 +93,12 @@ LogProvider::~LogProvider()
             continue;
         }
 
-        if (f.second.fp != nullptr)
+        errno      = 0;
+        auto rv    = fclose(session.fp);
+        if (rv != 0)
         {
-            errno   = 0;
-            auto rv = fclose(f.second.fp);
-            if (rv != 0)
-            {
-                int err = (errno == 0) ? EIO : errno;
-                ChipLogError(NotSpecified, "Error when closing file pointer: %d", err);
-            }
+            int savedErrno = (errno == 0) ? EIO : errno;
+            ChipLogError(NotSpecified, "Error when closing file pointer: %d", savedErrno);
         }
     }
     mFiles.clear();
@@ -267,9 +268,6 @@ Optional<std::string> LogProvider::GetFilePathForIntent(IntentEnum intent) const
     case IntentEnum::kCrashLogs:
         return mCrashLogFilePath;
     case IntentEnum::kUnknownEnumValue:
-        // It should never happen.
-        chipDie();
-        return NullOptional; // Unreachable.
     default:
         return NullOptional;
     }
