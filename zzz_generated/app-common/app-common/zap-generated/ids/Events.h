@@ -116,6 +116,7 @@
 #include <clusters/PowerSourceConfiguration/EventIds.h>
 #include <clusters/PowerTopology/EventIds.h>
 #include <clusters/PressureMeasurement/EventIds.h>
+#include <clusters/ProximityRanging/EventIds.h>
 #include <clusters/ProxyConfiguration/EventIds.h>
 #include <clusters/ProxyDiscovery/EventIds.h>
 #include <clusters/ProxyValid/EventIds.h>

@@ -398,6 +398,10 @@ set(GN_ROOT_TARGET ${CHIP_ROOT}/config/esp32)
 
 set(chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a")
 
+if (CONFIG_BUILD_CHIP_TESTS)
+    list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPWTestsWrapper.a")
+endif()
+
 if(CONFIG_ENABLE_PW_RPC)
   list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")
 endif()
