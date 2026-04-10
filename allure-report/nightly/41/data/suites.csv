@@ -1,0 +1,3 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","1379982","TC_SU_2_5.py","","Fri Apr 10 05:48:58 UTC 2026","passed","Fri Apr 10 06:11:57 UTC 2026","","Nightly CI Tests","Nightly CI Tests",""
+"","1114809","TC_SU_2_7.py","","Fri Apr 10 05:48:58 UTC 2026","passed","Fri Apr 10 06:07:32 UTC 2026","","Nightly CI Tests","Nightly CI Tests",""
