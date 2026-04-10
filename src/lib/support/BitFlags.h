@@ -167,8 +167,8 @@ public:
      * Check that at least one of the given flags is set.
      *
      * @param args      Flags to test. Arguments can be BitFlags<FlagsEnum>, BitFlags<FlagsEnum>, or FlagsEnum.
-     * @returns         True if all given flags are set.
-     *                  False if any given flag is not set.
+     * @returns         True if any given flag is set.
+     *                  False if all given flags are not set.
      */
     template <typename... Args>
     bool HasAny(Args &&... args) const
