@@ -41,7 +41,7 @@ import logging
 from asyncio import sleep
 
 from mobly import asserts
-from support_modules.smokeco_support import EventDataCheck,SmokeCoBaseTest
+from support_modules.smokeco_support import EventDataCheck, SmokeCoBaseTest
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches

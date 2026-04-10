@@ -39,49 +39,49 @@ class SmokeCoBaseTest(MatterBaseTest):
     gd_cluster = Clusters.GeneralDiagnostics
 
     # SmokeAlarm triggers
-    pixit_test_event_warning_smoke_alarm =  0x005c000000000090
-    pixit_test_event_critical_smoke_alarm =  0x005c00000000009c
-    pixit_test_event_clear_smoke_alarm =  0x005c0000000000a0
+    pixit_test_event_warning_smoke_alarm = 0x005c000000000090
+    pixit_test_event_critical_smoke_alarm = 0x005c00000000009c
+    pixit_test_event_clear_smoke_alarm = 0x005c0000000000a0
 
     # Smoke CO triggers
-    pixit_test_event_warning_co_alarm =  0x005c000000000091
-    pixit_test_event_critical_co_alarm =  0x005c00000000009d
-    pixit_test_event_clear_co_alarm =  0x005c0000000000a1
+    pixit_test_event_warning_co_alarm = 0x005c000000000091
+    pixit_test_event_critical_co_alarm = 0x005c00000000009d
+    pixit_test_event_clear_co_alarm = 0x005c0000000000a1
 
     # Interconnect smoke alarm
-    pixit_test_event_interconnect_smoke_alarm =  0x005c000000000092
+    pixit_test_event_interconnect_smoke_alarm = 0x005c000000000092
     pixit_test_event_interconnect_smoke_alarm_clear = 0x005c0000000000a2
 
     # Interconnect co alarm triggers
-    pixit_test_event_interconnect_co_alarm =  0x005c000000000094
+    pixit_test_event_interconnect_co_alarm = 0x005c000000000094
     pixit_test_event_interconnect_co_alarm_clear = 0x005c0000000000a4
 
     # Contamination State triggers
-    pixit_test_event_contamination_state_high =  0x005c000000000096
-    pixit_test_event_contamination_state_low =  0x005c000000000097
+    pixit_test_event_contamination_state_high = 0x005c000000000096
+    pixit_test_event_contamination_state_low = 0x005c000000000097
     pixit_test_event_contamination_state_clear = 0x005c0000000000a6
 
     # Smoke Sensitivity triggers
-    pixit_test_event_smokesensitivity_high =  0x005c000000000098
-    pixit_test_event_smokesensitivity_low =  0x005c000000000099
-    pixit_test_event_smokesensitivity_clear =  0x005c0000000000a8
+    pixit_test_event_smokesensitivity_high = 0x005c000000000098
+    pixit_test_event_smokesensitivity_low = 0x005c000000000099
+    pixit_test_event_smokesensitivity_clear = 0x005c0000000000a8
 
     # Manual Device Mute
-    pixit_test_event_manual_device_mute =  0x005c00000000009b
-    pixit_test_event_manual_device_mute_clear =  0x005c0000000000ab
+    pixit_test_event_manual_device_mute = 0x005c00000000009b
+    pixit_test_event_manual_device_mute_clear = 0x005c0000000000ab
 
     # Battery triggers
-    pixit_test_event_battery_warning =  0x005c000000000095
-    pixit_test_event_battery_critical =  0x005c00000000009e
-    pixit_test_event_battery_clear =  0x005c0000000000a5
+    pixit_test_event_battery_warning = 0x005c000000000095
+    pixit_test_event_battery_critical = 0x005c00000000009e
+    pixit_test_event_battery_clear = 0x005c0000000000a5
 
     # Hardware triggers
-    pixit_test_event_hardware_alert =  0x005c000000000093
-    pixit_test_event_hardware_clear =  0x005c0000000000a3
+    pixit_test_event_hardware_alert = 0x005c000000000093
+    pixit_test_event_hardware_clear = 0x005c0000000000a3
 
     # Service Triggers
-    pixit_test_event_service_alert =  0x005c00000000009a
-    pixit_test_event_service_clear =  0x005c0000000000aa
+    pixit_test_event_service_alert = 0x005c00000000009a
+    pixit_test_event_service_clear = 0x005c0000000000aa
 
     async def read_smokeco_attribute_expect_success(self, attribute):
         return await self.read_single_attribute_check_success(cluster=self.smokeco_cluster, endpoint=self.get_endpoint(), attribute=attribute)
