@@ -39,13 +39,13 @@ tests:
 
           Execute the below mentioned command to put TH(Reference app) into a commissionable state in RPI platform, Pls use equivalent command on the respective platform
           ./chip-all-clusters-app --trace_decode 1
-        
+
           Once TH reach the  commissionable state pls send below mentioned command on DUT(chip-tool) in RPI platform. Pls use equivalent command on the respective platform
-        
+
           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
-        
+
           Verify the commissioning completed with success on DUT(Chip-tool)
-        
+
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
 
@@ -412,11 +412,11 @@ tests:
           ./chip-tool groupkeymanagement key-set-read 1 1 0
 
           Verify TH recieves KeySetRead command on TH(Reference app)log:
-        
+
           [1775644884.049] [2326190:2326190] [DMG] InvokeRequestMessage =
           [1775644884.049] [2326190:2326190] [DMG] {
-          [1775644884.049] [2326190:2326190] [DMG]         suppressResponse = false, 
-          [1775644884.049] [2326190:2326190] [DMG]         timedRequest = false, 
+          [1775644884.049] [2326190:2326190] [DMG]         suppressResponse = false,
+          [1775644884.049] [2326190:2326190] [DMG]         timedRequest = false,
           [1775644884.049] [2326190:2326190] [DMG]         InvokeRequests =
           [1775644884.049] [2326190:2326190] [DMG]         [
           [1775644884.049] [2326190:2326190] [DMG]                 CommandDataIB =
@@ -427,15 +427,15 @@ tests:
           [1775644884.049] [2326190:2326190] [DMG]                                 ClusterId = 0x3f,
           [1775644884.049] [2326190:2326190] [DMG]                                 CommandId = 0x1,
           [1775644884.049] [2326190:2326190] [DMG]                         },
-          [1775644884.049] [2326190:2326190] [DMG]                         
-          [1775644884.049] [2326190:2326190] [DMG]                         CommandFields = 
+          [1775644884.049] [2326190:2326190] [DMG]
+          [1775644884.049] [2326190:2326190] [DMG]                         CommandFields =
           [1775644884.049] [2326190:2326190] [DMG]                         {
-          [1775644884.049] [2326190:2326190] [DMG]                                 0x0 = 1 (unsigned), 
+          [1775644884.049] [2326190:2326190] [DMG]                                 0x0 = 1 (unsigned),
           [1775644884.050] [2326190:2326190] [DMG]                         },
           [1775644884.050] [2326190:2326190] [DMG]                 },
-          [1775644884.050] [2326190:2326190] [DMG]                 
+          [1775644884.050] [2326190:2326190] [DMG]
           [1775644884.050] [2326190:2326190] [DMG]         ],
-          [1775644884.050] [2326190:2326190] [DMG]         
+          [1775644884.050] [2326190:2326190] [DMG]
           [1775644884.050] [2326190:2326190] [DMG]         InteractionModelRevision = 12
           [1775644884.050] [2326190:2326190] [DMG] },
       disabled: true
