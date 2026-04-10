@@ -78,6 +78,12 @@ chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
 chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
 chip_gn_arg_bool("is_debug"                ${is_debug})
 
+# If ccache was enabled by IDF and the ccache executable was found,
+# use it as the command launcher for GN to speed up subsequent builds.
+if (CCACHE_ENABLE AND CCACHE_FOUND)
+    chip_gn_arg_append("pw_command_launcher" "\"${CCACHE_FOUND}\"")
+endif()
+
 if (CONFIG_CHIP_CONFIG_IM_PRETTY_PRINT)
     chip_gn_arg_bool("enable_im_pretty_print" "true")
 endif()
