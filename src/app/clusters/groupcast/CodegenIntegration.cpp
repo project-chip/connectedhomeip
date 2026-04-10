@@ -16,18 +16,18 @@
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/groupcast/GroupcastCluster.h>
-#include <app/clusters/groupcast/GroupcastContext.h>
 #include <app/static-cluster-config/Groupcast.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <platform/DefaultTimerDelegate.h>
+#include <app/server/Server.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Groupcast::Attributes;
-using namespace chip::app::Clusters::Groupcast::StaticApplicationConfig;
+using namespace app::Clusters::Groupcast::Attributes;
+using namespace app::Clusters::Groupcast::StaticApplicationConfig;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
@@ -38,11 +38,11 @@ DefaultTimerDelegate sTimerDelegate;
 // Groupcast implementation is specifically implemented
 // only for the root endpoint (endpoint 0)
 
-static constexpr size_t kGroupcastFixedClusterCount = Groupcast::StaticApplicationConfig::kFixedClusterConfig.size();
+static constexpr size_t kGroupcastFixedClusterCount = app::Clusters::Groupcast::StaticApplicationConfig::kFixedClusterConfig.size();
 
 static_assert((kGroupcastFixedClusterCount == 0) ||
                   ((kGroupcastFixedClusterCount == 1) &&
-                   Groupcast::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == chip::kRootEndpointId),
+                   app::Clusters::Groupcast::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == chip::kRootEndpointId),
               "Groupcast cluster MUST be on endpoint 0");
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
@@ -60,7 +60,7 @@ public:
                 .groupDataProvider = *groupDataProvider,
                 .timerDelegate     = sTimerDelegate,
             },
-            BitFlags<Groupcast::Feature>(featureMap));
+            BitFlags<app::Clusters::Groupcast::Feature>(featureMap));
         return gServer.Registration();
     }
 
@@ -78,10 +78,10 @@ public:
 
 void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
 {
-    if constexpr (Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() > 0)
+    if constexpr (app::Clusters::Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() > 0)
     {
-        static_assert((Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
-                       Groupcast::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == 0),
+        static_assert((app::Clusters::Groupcast::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
+                       app::Clusters::Groupcast::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == 0),
                       "Can only have groupcast cluster on endpoint 0");
     }
 
@@ -92,8 +92,8 @@ void MatterGroupcastClusterInitCallback(chip::EndpointId endpointId)
     CodegenClusterIntegration::RegisterServer(
         {
             .endpointId                = endpointId,
-            .clusterId                 = Groupcast::Id,
-            .fixedClusterInstanceCount = Groupcast::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .clusterId                 = app::Clusters::Groupcast::Id,
+            .fixedClusterInstanceCount = app::Clusters::Groupcast::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
             .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = false,
@@ -115,8 +115,8 @@ void MatterGroupcastClusterShutdownCallback(chip::EndpointId endpointId, MatterC
     CodegenClusterIntegration::UnregisterServer(
         {
             .endpointId                = endpointId,
-            .clusterId                 = Groupcast::Id,
-            .fixedClusterInstanceCount = Groupcast::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .clusterId                 = app::Clusters::Groupcast::Id,
+            .fixedClusterInstanceCount = app::Clusters::Groupcast::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
         },
         integrationDelegate, shutdownType);

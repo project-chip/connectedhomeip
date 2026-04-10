@@ -73,7 +73,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
 
     // Ignoring the return value from OnMessageReceived, because we might be
     // passing it all sorts of garbage that will cause it to fail.
-    Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(buf));
+    Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, peerAddr, std::move(buf));
 
     // Now process pending events until our sentinel is reached.
     RETURN_SAFELY_IGNORED PlatformMgr().ScheduleWork([](intptr_t) { RETURN_SAFELY_IGNORED PlatformMgr().StopEventLoopTask(); });

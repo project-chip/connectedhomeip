@@ -208,14 +208,5 @@ private:
     chip::FabricIndex mFabricIndex = kUndefinedFabricIndex;
 };
 
-/**
- * @brief Get the singleton Testing instance.
- *
- * Callers must externally synchronize usage of this function.
- *
- * @return Reference to the global GroupcastTesting instance
- */
-Testing & GetTesting();
-
 } // namespace Groupcast
 } // namespace chip

@@ -26,8 +26,6 @@ static_library("raw") {
 
   sources = [
     "Base.h",
-    "GroupcastTesting.cpp",
-    "GroupcastTesting.h",
     "MessageHeader.cpp",
     "MessageHeader.h",
     "PeerAddress.cpp",

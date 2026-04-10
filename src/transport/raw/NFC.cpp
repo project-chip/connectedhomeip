@@ -88,7 +88,7 @@ void NFCBase::OnNfcTagResponse(const Transport::PeerAddress & address, System::P
 {
     ChipLogProgress(Controller, "NFCBase::OnNfcTagResponse");
 
-    HandleMessageReceived(address, std::move(buffer));
+    HandleMessageReceived(address, address, std::move(buffer));
 }
 
 void NFCBase::OnNfcTagError(const Transport::PeerAddress & address)

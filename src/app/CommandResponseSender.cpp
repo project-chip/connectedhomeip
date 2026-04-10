@@ -211,6 +211,8 @@ void CommandResponseSender::OnInvokeCommandRequest(Messaging::ExchangeContext * 
     mExchangeCtx.Grab(ec);
     mExchangeCtx->WillSendMessage();
 
+    mCommandHandler.SetGroupcastTesting(&ec->GetExchangeMgr()->GetSessionManager()->GetGroupcastTesting());
+
     // Grabbing Handle to prevent mCommandHandler from calling OnDone before OnInvokeCommandRequest returns.
     // This allows us to send a StatusResponse error instead of any potentially queued up InvokeResponseMessages.
     CommandHandler::Handle workHandle(&mCommandHandler);
@@ -256,6 +258,7 @@ void CommandResponseSender::TestOnlyInvokeCommandRequestWithFaultsInjected(Messa
     mExchangeCtx.Grab(ec);
     mExchangeCtx->WillSendMessage();
 
+    mCommandHandler.SetGroupcastTesting(&ec->GetExchangeMgr()->GetSessionManager()->GetGroupcastTesting());
     mCommandHandler.TestOnlyInvokeCommandRequestWithFaultsInjected(*this, std::move(payload), isTimedInvoke, faultType);
 }
 #endif // CHIP_WITH_NLFAULTINJECTION

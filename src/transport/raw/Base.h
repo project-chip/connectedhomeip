@@ -48,8 +48,8 @@ class RawTransportDelegate
 {
 public:
     virtual ~RawTransportDelegate() {}
-    virtual void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg,
-                                       MessageTransportContext * ctxt = nullptr) = 0;
+    virtual void HandleMessageReceived(const Transport::PeerAddress & peerAddress, const Transport::PeerAddress & destAddress,
+                                       System::PacketBufferHandle && msg, MessageTransportContext * ctxt = nullptr) = 0;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     virtual void HandleConnectionReceived(ActiveTCPConnectionState & conn){};
@@ -121,10 +121,10 @@ protected:
      * Method used by subclasses to notify that a packet has been received after
      * any associated headers have been decoded.
      */
-    void HandleMessageReceived(const PeerAddress & source, System::PacketBufferHandle && buffer,
+    void HandleMessageReceived(const PeerAddress & source, const PeerAddress & destAddress, System::PacketBufferHandle && buffer,
                                MessageTransportContext * ctxt = nullptr)
     {
-        mDelegate->HandleMessageReceived(source, std::move(buffer), ctxt);
+        mDelegate->HandleMessageReceived(source, destAddress, std::move(buffer), ctxt);
     }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT

@@ -166,7 +166,8 @@ void BLEBase::OnBleConnectionError(CHIP_ERROR err)
 
 void BLEBase::OnEndPointMessageReceived(BLEEndPoint * endPoint, PacketBufferHandle && buffer)
 {
-    HandleMessageReceived(Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
+    Transport::PeerAddress addr(Transport::Type::kBle);
+    HandleMessageReceived(addr, addr, std::move(buffer));
 }
 
 void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err)

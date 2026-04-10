@@ -574,8 +574,8 @@ public:
     }
 
 private:
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
-                           Transport::MessageTransportContext * ctxt = nullptr) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, const Transport::PeerAddress & destAddress,
+                           System::PacketBufferHandle && msgBuf, Transport::MessageTransportContext * ctxt = nullptr) override;
 
     CommissionerDeclarationHandler * mCommissionerDeclarationHandler = nullptr;
 };
@@ -688,8 +688,8 @@ private:
     void HandleNewUDC(const Transport::PeerAddress & source, IdentificationDeclaration & id);
     void HandleUDCCancel(IdentificationDeclaration & id);
     void HandleUDCCommissionerPasscodeReady(IdentificationDeclaration & id);
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
-                           Transport::MessageTransportContext * ctxt = nullptr) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, const Transport::PeerAddress & destAddress,
+                           System::PacketBufferHandle && msgBuf, Transport::MessageTransportContext * ctxt = nullptr) override;
 
     UDCClients<kMaxUDCClients> mUdcClients; // < Active UDC clients
 

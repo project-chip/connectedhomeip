@@ -50,13 +50,14 @@ public:
      * @brief
      *   Handle received secure message.
      *
-     * @param source    the source address of the package
-     * @param msgBuf    the buffer containing a full CHIP message (except for the optional length field).
-     * @param ctxt      the pointer to additional context on the underlying transport. For TCP, it is a pointer
-     *                  to the underlying connection object.
+     * @param source       the source address of the package
+     * @param destAddress  the destination address (local) the packet was received on, when applicable (e.g. UDP)
+     * @param msgBuf       the buffer containing a full CHIP message (except for the optional length field).
+     * @param ctxt         the pointer to additional context on the underlying transport. For TCP, it is a pointer
+     *                     to the underlying connection object.
      */
-    virtual void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
-                                   Transport::MessageTransportContext * ctxt = nullptr) = 0;
+    virtual void OnMessageReceived(const Transport::PeerAddress & source, const Transport::PeerAddress & destAddress,
+                                   System::PacketBufferHandle && msgBuf, Transport::MessageTransportContext * ctxt = nullptr) = 0;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     /**

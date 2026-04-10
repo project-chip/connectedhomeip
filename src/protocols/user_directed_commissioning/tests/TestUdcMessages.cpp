@@ -181,7 +181,7 @@ TEST_F(TestUdcMessages, TestUDCServerInstanceNameResolver)
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(commissioner, port);
 
     // test OnMessageReceived
-    mUdcTransportMgr->HandleMessageReceived(peerAddress, std::move(payloadBuf));
+    mUdcTransportMgr->HandleMessageReceived(peerAddress, peerAddress, std::move(payloadBuf));
 
     // check if the state is set for the instance name sent
     state = udcServer.GetUDCClients().FindUDCClientState(nameBuffer);
@@ -201,7 +201,7 @@ TEST_F(TestUdcMessages, TestUDCServerInstanceNameResolver)
     udcClient.EncodeUDCMessage(payloadBuf);
 
     // test OnMessageReceived again
-    mUdcTransportMgr->HandleMessageReceived(peerAddress, std::move(payloadBuf));
+    mUdcTransportMgr->HandleMessageReceived(peerAddress, peerAddress, std::move(payloadBuf));
 
     // verify it was not called
     EXPECT_FALSE(testCallback.mFindCommissionableNodeCalled);
@@ -215,7 +215,7 @@ TEST_F(TestUdcMessages, TestUDCServerInstanceNameResolver)
     udcClient.EncodeUDCMessage(payloadBuf);
 
     // test OnMessageReceived again
-    mUdcTransportMgr->HandleMessageReceived(peerAddress, std::move(payloadBuf));
+    mUdcTransportMgr->HandleMessageReceived(peerAddress, peerAddress, std::move(payloadBuf));
 
     // verify it was called
     EXPECT_TRUE(testCallback.mFindCommissionableNodeCalled);

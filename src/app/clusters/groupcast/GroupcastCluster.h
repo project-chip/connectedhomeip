@@ -16,7 +16,6 @@
  */
 #pragma once
 
-#include "GroupcastContext.h"
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/Groupcast/AttributeIds.h>
 #include <clusters/Groupcast/ClusterId.h>
@@ -29,10 +28,19 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/TimerDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <transport/GroupcastTesting.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+
+struct GroupcastContext
+{
+    chip::FabricTable & fabricTable;
+    chip::Credentials::GroupDataProvider & groupDataProvider;
+    chip::TimerDelegate & timerDelegate;
+    chip::Groupcast::Testing * groupcastTesting;
+};
 
 /**
  * @brief Provides code-driven implementation for the Groupcast cluster server.
@@ -120,6 +128,7 @@ private:
     void NotifyMembershipChanged();
 
     void EmitAuxiliaryAccessUpdated(const chip::Access::SubjectDescriptor & subjectDescriptor);
+    FabricIndex GetFabricUnderTest() const { return mGroupcastContext.groupcastTesting ? mGroupcastContext.groupcastTesting->GetFabricIndex() : kUndefinedFabricIndex; }
 
     GroupcastContext mGroupcastContext;
     const BitFlags<Groupcast::Feature> mFeatures;

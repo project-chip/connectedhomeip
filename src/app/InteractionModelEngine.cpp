@@ -51,7 +51,7 @@
 #include <lib/support/FibonacciUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <transport/raw/GroupcastTesting.h>
+#include <transport/GroupcastTesting.h>
 
 #include <cinttypes>
 
@@ -1109,7 +1109,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     // Groupcast Testing
     if (apExchangeContext->IsGroupExchangeContext())
     {
-        auto & testing = Groupcast::GetTesting();
+        auto & testing = mpExchangeMgr->GetSessionManager()->GetGroupcastTesting();
         if (testing.IsEnabled() && testing.IsFabricUnderTest(apExchangeContext->GetSessionHandle()->GetFabricIndex()))
         {
             Clusters::Groupcast::Events::GroupcastTesting::Type event;
@@ -1848,7 +1848,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
 
     Status accessStatus = CheckCommandAccess(request, privilegeToCheck);
     // Groupcast Testing
-    auto & testing = Groupcast::GetTesting();
+    auto & testing = mpExchangeMgr->GetSessionManager()->GetGroupcastTesting();
     if (testing.IsEnabled() && testing.IsFabricUnderTest(request.GetAccessingFabricIndex()))
     {
         testing.SetAccessAllowed(Status::Success == accessStatus);

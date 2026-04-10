@@ -52,6 +52,7 @@
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
 #include <transport/raw/Tuple.h>
+#include <transport/GroupcastTesting.h>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/SessionConnectionDelegate.h>
@@ -465,13 +466,14 @@ public:
      * @brief
      *   Handle received secure message. Implements TransportMgrDelegate
      *
-     * @param source    the source address of the package
-     * @param msgBuf    the buffer containing a full CHIP message (except for the optional length field).
-     * @param ctxt      pointer to additional context on the underlying transport. For TCP, it is a pointer
-     *                  to the underlying connection object.
+     * @param source       the source address of the package
+     * @param destAddress  the destination address (local) the packet was received on, when applicable
+     * @param msgBuf       the buffer containing a full CHIP message (except for the optional length field).
+     * @param ctxt         pointer to additional context on the underlying transport. For TCP, it is a pointer
+     *                     to the underlying connection object.
      */
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
-                           Transport::MessageTransportContext * ctxt = nullptr) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, const Transport::PeerAddress & destAddress,
+                           System::PacketBufferHandle && msgBuf, Transport::MessageTransportContext * ctxt = nullptr) override;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR TCPConnect(const Transport::PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
@@ -532,6 +534,8 @@ public:
 
     MessageStats GetMessageStats() const { return mMessageStats; }
 
+    chip::Groupcast::Testing & GetGroupcastTesting() { return mGroupcastTesting; }
+
 private:
     /**
      *    The State of a secure transport object.
@@ -556,6 +560,7 @@ private:
     State mState; // < Initialization state of the object
     chip::Transport::GroupOutgoingCounters mGroupClientCounter;
     MessageStats mMessageStats;
+    chip::Groupcast::Testing mGroupcastTesting;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     OnTCPConnectionReceivedCallback mConnReceivedCb = nullptr;
@@ -589,7 +594,8 @@ private:
      *             to the underlying connection object.
      */
     void SecureUnicastMessageDispatch(const PacketHeader & partialPacketHeader, const Transport::PeerAddress & peerAddress,
-                                      System::PacketBufferHandle && msg, Transport::MessageTransportContext * ctxt = nullptr);
+                                      const Transport::PeerAddress & destAddress, System::PacketBufferHandle && msg,
+                                      Transport::MessageTransportContext * ctxt = nullptr);
 
     /**
      * @brief Parse, decrypt, validate, and dispatch a secure group message.
@@ -599,7 +605,7 @@ private:
      * @param msg The full message buffer, including header fields.
      */
     void SecureGroupMessageDispatch(const PacketHeader & partialPacketHeader, const Transport::PeerAddress & peerAddress,
-                                    System::PacketBufferHandle && msg);
+                                    const Transport::PeerAddress & destAddress, System::PacketBufferHandle && msg);
 
     /**
      * @brief Parse, decrypt, validate, and dispatch an unsecured message.
@@ -611,7 +617,8 @@ private:
      *             to the underlying connection object.
      */
     void UnauthenticatedMessageDispatch(const PacketHeader & partialPacketHeader, const Transport::PeerAddress & peerAddress,
-                                        System::PacketBufferHandle && msg, Transport::MessageTransportContext * ctxt = nullptr);
+                                        const Transport::PeerAddress & destAddress, System::PacketBufferHandle && msg,
+                                        Transport::MessageTransportContext * ctxt = nullptr);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source);
 

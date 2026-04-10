@@ -77,10 +77,11 @@ CHIP_ERROR MessageCounterManager::StartSync(const SessionHandle & session, Trans
 CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(const PacketHeader & packetHeader, const SessionHandle & session,
                                                                    Transport::SecureSession * state,
                                                                    const Transport::PeerAddress & peerAddress,
+                                                                   const Transport::PeerAddress & destAddress,
                                                                    System::PacketBufferHandle && msgBuf)
 {
     // Queue the message to be reprocessed when sync completes.
-    ReturnErrorOnFailure(AddToReceiveTable(packetHeader, peerAddress, std::move(msgBuf)));
+    ReturnErrorOnFailure(AddToReceiveTable(packetHeader, peerAddress, destAddress, std::move(msgBuf)));
     ReturnErrorOnFailure(StartSync(session, state));
 
     // After the message that triggers message counter synchronization is stored, and a message counter
@@ -124,7 +125,7 @@ void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * excha
 }
 
 CHIP_ERROR MessageCounterManager::AddToReceiveTable(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                                    System::PacketBufferHandle && msgBuf)
+                                                    const Transport::PeerAddress & destAddress, System::PacketBufferHandle && msgBuf)
 {
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(msgBuf));
 
@@ -133,6 +134,7 @@ CHIP_ERROR MessageCounterManager::AddToReceiveTable(const PacketHeader & packetH
         if (entry.msgBuf.IsNull())
         {
             entry.peerAddress = peerAddress;
+            entry.destAddress = destAddress;
             entry.msgBuf      = std::move(msgBuf);
 
             return CHIP_NO_ERROR;
@@ -173,7 +175,7 @@ void MessageCounterManager::ProcessPendingMessages(NodeId peerNodeId)
             if (packetHeader.GetSourceNodeId().HasValue() && packetHeader.GetSourceNodeId().Value() == peerNodeId)
             {
                 // Reprocess message.
-                sessionManager->OnMessageReceived(entry.peerAddress, std::move(entry.msgBuf));
+                sessionManager->OnMessageReceived(entry.peerAddress, entry.destAddress, std::move(entry.msgBuf));
 
                 // Explicitly free any buffer owned by this handle.
                 entry.msgBuf = nullptr;

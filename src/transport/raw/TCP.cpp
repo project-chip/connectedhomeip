@@ -451,7 +451,18 @@ CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, Active
 
     MessageTransportContext msgContext;
     msgContext.conn = &state; // Take ownership
-    HandleMessageReceived(peerAddress, std::move(message), &msgContext);
+
+    PeerAddress destAddress = PeerAddress::Uninitialized();
+    // Inet::IPAddress localIp;
+    // uint16_t localPort;
+    // Inet::InterfaceId intfId;
+    // if (state.mEndPoint->GetLocalInfo(&localIp, &localPort) == CHIP_NO_ERROR &&
+    //     state.mEndPoint->GetInterfaceId(&intfId) == CHIP_NO_ERROR)
+    // {
+    //     destAddress = PeerAddress::TCP(localIp, localPort, intfId);
+    // }
+
+    HandleMessageReceived(peerAddress, destAddress, std::move(message), &msgContext);
     return CHIP_NO_ERROR;
 }
 

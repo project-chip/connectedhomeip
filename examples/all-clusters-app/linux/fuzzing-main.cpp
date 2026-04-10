@@ -107,11 +107,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
     if (fuzzedTransportType == Transport::Type::kTcp)
     {
         Transport::MessageTransportContext msgContext;
-        Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(buf), &msgContext);
+        Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, peerAddr, std::move(buf), &msgContext);
     }
     else
     {
-        Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, std::move(buf));
+        Server::GetInstance().GetSecureSessionManager().OnMessageReceived(peerAddr, peerAddr, std::move(buf));
     }
     // Now process pending events until our sentinel is reached.
     RETURN_SAFELY_IGNORED PlatformMgr().ScheduleWork([](intptr_t) { RETURN_SAFELY_IGNORED PlatformMgr().StopEventLoopTask(); });

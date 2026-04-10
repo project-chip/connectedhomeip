@@ -244,9 +244,11 @@ CHIP_ERROR CommissionerDeclaration::ReadPayload(uint8_t * udcPayload, size_t pay
     return CHIP_NO_ERROR;
 }
 
-void UserDirectedCommissioningClient::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msg,
-                                                        Transport::MessageTransportContext * ctxt)
+void UserDirectedCommissioningClient::OnMessageReceived(const Transport::PeerAddress & source,
+                                                        const Transport::PeerAddress & destAddress,
+                                                        System::PacketBufferHandle && msg, Transport::MessageTransportContext * ctxt)
 {
+    (void) destAddress;
     char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
     source.ToString(addrBuffer);
 

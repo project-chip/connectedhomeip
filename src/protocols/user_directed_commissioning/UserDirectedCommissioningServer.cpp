@@ -34,9 +34,11 @@ namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
 
-void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msg,
-                                                        Transport::MessageTransportContext * ctxt)
+void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAddress & source,
+                                                        const Transport::PeerAddress & destAddress,
+                                                        System::PacketBufferHandle && msg, Transport::MessageTransportContext * ctxt)
 {
+    (void) destAddress;
     char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
     source.ToString(addrBuffer);
     ChipLogProgress(AppServer, "UserDirectedCommissioningServer::OnMessageReceived from %s", addrBuffer);

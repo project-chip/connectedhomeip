@@ -127,9 +127,10 @@ public:
         mCallbackData = callback_data;
     }
 
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
-                           Transport::MessageTransportContext * transCtxt = nullptr) override
+    void OnMessageReceived(const Transport::PeerAddress & source, const Transport::PeerAddress & destAddress,
+                           System::PacketBufferHandle && msgBuf, Transport::MessageTransportContext * transCtxt = nullptr) override
     {
+        (void) destAddress;
         PacketHeader packetHeader;
 
         EXPECT_EQ(packetHeader.DecodeAndConsume(msgBuf), CHIP_NO_ERROR);

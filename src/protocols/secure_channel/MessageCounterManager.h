@@ -51,6 +51,7 @@ public:
     CHIP_ERROR StartSync(const SessionHandle & session, Transport::SecureSession * state) override;
     CHIP_ERROR QueueReceivedMessageAndStartSync(const PacketHeader & packetHeader, const SessionHandle & session,
                                                 Transport::SecureSession * state, const Transport::PeerAddress & peerAddress,
+                                                const Transport::PeerAddress & destAddress,
                                                 System::PacketBufferHandle && msgBuf) override;
 
     /**
@@ -77,7 +78,7 @@ public:
      *  @retval  #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR AddToReceiveTable(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                 System::PacketBufferHandle && msgBuf);
+                                 const Transport::PeerAddress & destAddress, System::PacketBufferHandle && msgBuf);
 
 private:
     /**
@@ -92,8 +93,9 @@ private:
      */
     struct ReceiveTableEntry
     {
-        Transport::PeerAddress peerAddress; /**< The peer address for the message*/
-        System::PacketBufferHandle msgBuf;  /**< A handle to the PacketBuffer object holding the message data. */
+        Transport::PeerAddress peerAddress;   /**< The peer address for the message*/
+        Transport::PeerAddress destAddress;    /**< The local destination address the message was received on*/
+        System::PacketBufferHandle msgBuf;    /**< A handle to the PacketBuffer object holding the message data. */
     };
 
     Messaging::ExchangeManager * mExchangeMgr; // [READ ONLY] Associated Exchange Manager object.

@@ -116,7 +116,8 @@ public:
         {
             auto item = std::move(_this->mPendingMessageQueue.front());
             _this->mPendingMessageQueue.pop();
-            _this->HandleMessageReceived(LoopbackPeer(item.mDestinationAddress), std::move(item.mPendingMessage));
+            _this->HandleMessageReceived(LoopbackPeer(item.mDestinationAddress), item.mDestinationAddress,
+                                         std::move(item.mPendingMessage));
         }
     }
 

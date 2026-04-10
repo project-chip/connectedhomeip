@@ -60,8 +60,8 @@ CHIP_ERROR TransportMgrBase::MulticastGroupJoinLeave(const Transport::PeerAddres
     return mTransport->MulticastGroupJoinLeave(address, join);
 }
 
-void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg,
-                                             Transport::MessageTransportContext * ctxt)
+void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peerAddress, const Transport::PeerAddress & destAddress,
+                                             System::PacketBufferHandle && msg, Transport::MessageTransportContext * ctxt)
 {
     // This is the first point all incoming messages funnel through.  Ensure
     // that our message receipts are all synchronized correctly.
@@ -78,7 +78,7 @@ void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peer
 
     if (mSessionManager != nullptr)
     {
-        mSessionManager->OnMessageReceived(peerAddress, std::move(msg), ctxt);
+        mSessionManager->OnMessageReceived(peerAddress, destAddress, std::move(msg), ctxt);
     }
     else
     {

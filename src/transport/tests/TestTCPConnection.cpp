@@ -218,7 +218,7 @@ TEST_F(TestTCPConnection, TestUnauthenticatedSessionReleaseOnConnectionClose)
         Transport::MessageTransportContext ctxt;
         ctxt.conn = connHandle;
 
-        mSessionManager.OnMessageReceived(peerAddr, std::move(msgBuf), &ctxt);
+        mSessionManager.OnMessageReceived(peerAddr, peerAddr, std::move(msgBuf), &ctxt);
     }
 
     // Close TCP connection & release local handle

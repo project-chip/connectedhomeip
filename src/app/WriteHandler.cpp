@@ -40,7 +40,6 @@
 #include <lib/support/logging/TextOnlyLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <transport/raw/GroupcastTesting.h>
 
 #include <optional>
 
@@ -505,7 +504,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 
             dataAttributePath.mEndpointId = mapping.endpoint_id;
             // Groupcast Testing
-            auto & testing = Groupcast::GetTesting();
+            auto & testing = mExchangeCtx->GetExchangeMgr()->GetSessionManager()->GetGroupcastTesting();
             if (testing.IsEnabled() && testing.IsFabricUnderTest(fabric))
             {
                 testing.SetGroupID(groupId);

@@ -59,8 +59,8 @@ public:
 
     CHIP_ERROR MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join);
 
-    void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg,
-                               Transport::MessageTransportContext * ctxt = nullptr) override;
+    void HandleMessageReceived(const Transport::PeerAddress & peerAddress, const Transport::PeerAddress & destAddress,
+                               System::PacketBufferHandle && msg, Transport::MessageTransportContext * ctxt = nullptr) override;
 
 private:
     TransportMgrDelegate * mSessionManager = nullptr;

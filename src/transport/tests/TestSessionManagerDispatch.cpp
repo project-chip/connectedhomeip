@@ -600,7 +600,7 @@ TEST_F(TestSessionManagerDispatch, TestSessionManagerDispatch)
             chip::MessagePacketBuffer::NewWithData(reinterpret_cast<const uint8_t *>(privacy), testEntry.privacyLength);
 
         const PeerAddress peerAddress = AddressFromString(testEntry.peerAddr);
-        sessionManager.OnMessageReceived(peerAddress, std::move(msg));
+        sessionManager.OnMessageReceived(peerAddress, peerAddress, std::move(msg));
         EXPECT_EQ(callback.NumMessagesReceived(), testEntry.expectedMessageCount);
 
         if ((testEntry.expectedMessageCount == 0) && (callback.NumMessagesReceived() == 0))

@@ -40,6 +40,7 @@ public:
     virtual CHIP_ERROR QueueReceivedMessageAndStartSync(const PacketHeader & packetHeader, const SessionHandle & session,
                                                         Transport::SecureSession * state,
                                                         const Transport::PeerAddress & peerAddress,
+                                                        const Transport::PeerAddress & destAddress,
                                                         System::PacketBufferHandle && msgBuf) = 0;
 };
 

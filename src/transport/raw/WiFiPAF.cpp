@@ -97,7 +97,8 @@ CHIP_ERROR WiFiPAFBase::WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, PacketBu
                      RxInfo.peer_addr[5]);
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    HandleMessageReceived(Transport::PeerAddress(Transport::Type::kWiFiPAF, pPafInfo->nodeId), std::move(buffer));
+    Transport::PeerAddress addr(Transport::Type::kWiFiPAF, pPafInfo->nodeId);
+    HandleMessageReceived(addr, addr, std::move(buffer));
     return CHIP_NO_ERROR;
 }
 

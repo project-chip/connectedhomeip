@@ -261,6 +261,12 @@ public:
      */
     bool IsGroupRequest() { return mGroupRequest; }
 
+    /**
+     * Supplies the SessionManager-owned Groupcast testing state for this invoke transaction.
+     * Typically set by CommandResponseSender using SessionManager::GetGroupcastTesting().
+     */
+     void SetGroupcastTesting(Groupcast::Testing * testing) { mpGroupcastTesting = testing; }
+
 protected:
     // Lifetime management for CommandHandler::Handle
 
@@ -482,6 +488,7 @@ private:
     std::optional<uint16_t> mRefForResponse;
 
     CommandHandlerExchangeInterface * mpResponder = nullptr;
+    Groupcast::Testing * mpGroupcastTesting = nullptr;
 
     State mState = State::Idle;
     State mBackupState;
