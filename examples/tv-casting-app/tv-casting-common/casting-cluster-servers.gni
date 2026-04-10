@@ -15,9 +15,10 @@
 # Cluster server override for the casting app's size-optimized build.
 # 12 commissioning-essential + 1 casting-specific (content-app-observer).
 #
-# When chip_cluster_server_source_override points to this file, the
-# chip_data_model template uses this list instead of auto-discovering
-# cluster server directories via zap_cluster_list.py. This excludes
+# When chip_data_model_overrides_dir points to this directory, the
+# chip_data_model template imports this file and uses this list instead
+# of auto-discovering cluster server directories via zap_cluster_list.py.
+# This excludes
 # ~31 unused server implementations, saving ~1.1 MB in the binary.
 
 casting_cluster_server_dirs = [

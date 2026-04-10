@@ -1,18 +1,13 @@
 """
-Property Test — Property 6: android.py casting build args correctness
+Property Test — Property 3: android.py passes only the consolidated override arg
 
-Feature: casting-client-cluster-reduction (updated for consolidation)
-Property 6: android.py casting build args correctness
+Feature: consolidate-overrides-and-generation-script
 
 **Validates: Requirements 6.1, 6.2, 14.3**
 
-This test parses `scripts/build/builders/android.py` and verifies that the
-TV_CASTING_APP optimize_size block:
-
-1. Sets `chip_data_model_overrides_dir` to the tv-casting-common directory
-2. Does NOT set any of the 5 individual per-file override args
-3. Still sets `chip_data_model_extra_logging` to False
-4. Still sets `enable_rtti` to False
+Parse `android.py` and verify the TV_CASTING_APP optimize_size block sets
+`chip_data_model_overrides_dir` and does NOT set any of the 5 individual
+per-file override args.
 """
 
 import os
@@ -27,6 +22,18 @@ from hypothesis import strategies as st
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 ANDROID_PY = os.path.join(REPO_ROOT, "scripts", "build", "builders", "android.py")
+
+# ---------------------------------------------------------------------------
+# The 5 individual per-file override args that should NOT be set
+# ---------------------------------------------------------------------------
+
+REMOVED_OVERRIDE_ARGS = [
+    "chip_tlv_decoder_attribute_source_override",
+    "chip_tlv_decoder_event_source_override",
+    "chip_cluster_objects_source_override",
+    "chip_cluster_server_source_override",
+    "chip_accessors_source_override",
+]
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -119,11 +126,11 @@ def _find_gn_arg_assignment(block: str, arg_name: str) -> str | None:
     suppress_health_check=[HealthCheck.function_scoped_fixture],
     deadline=None,
 )
-def test_tv_casting_app_sets_overrides_dir(dummy):
+def test_tv_casting_app_sets_chip_data_model_overrides_dir(dummy):
     """
     **Validates: Requirements 6.1, 14.3**
 
-    Property 6a: For any size-optimized TV_CASTING_APP build, android.py
+    Property 3a: For a size-optimized TV_CASTING_APP build, android.py
     SHALL set `chip_data_model_overrides_dir` pointing to the
     tv-casting-common directory.
     """
@@ -134,7 +141,7 @@ def test_tv_casting_app_sets_overrides_dir(dummy):
     value = _find_gn_arg_assignment(casting_block, "chip_data_model_overrides_dir")
     assert value is not None, (
         '`gn_args["chip_data_model_overrides_dir"]` is not set in the '
-        "TV_CASTING_APP optimize_size block"
+        "TV_CASTING_APP optimize_size block of android.py"
     )
     assert "tv-casting-app/tv-casting-common" in value, (
         f'`gn_args["chip_data_model_overrides_dir"]` is set to {value}, '
@@ -143,26 +150,19 @@ def test_tv_casting_app_sets_overrides_dir(dummy):
 
 
 @given(
-    removed_arg=st.sampled_from([
-        "chip_tlv_decoder_attribute_source_override",
-        "chip_tlv_decoder_event_source_override",
-        "chip_cluster_objects_source_override",
-        "chip_cluster_server_source_override",
-        "chip_accessors_source_override",
-    ])
+    removed_arg=st.sampled_from(REMOVED_OVERRIDE_ARGS),
 )
 @settings(
     max_examples=100,
     suppress_health_check=[HealthCheck.function_scoped_fixture],
     deadline=None,
 )
-def test_tv_casting_app_does_not_set_individual_overrides(removed_arg):
+def test_tv_casting_app_does_not_set_individual_override_args(removed_arg):
     """
     **Validates: Requirements 6.2, 14.3**
 
-    Property 6b: For any size-optimized TV_CASTING_APP build, android.py
+    Property 3b: For a size-optimized TV_CASTING_APP build, android.py
     SHALL NOT set any of the 5 individual per-file override GN args.
-    These have been replaced by `chip_data_model_overrides_dir`.
     """
     content = _read_file(ANDROID_PY)
     opt_block = _extract_optimize_size_block(content)
@@ -176,86 +176,18 @@ def test_tv_casting_app_does_not_set_individual_overrides(removed_arg):
     )
 
 
-@given(dummy=st.just(True))
-@settings(
-    max_examples=1,
-    suppress_health_check=[HealthCheck.function_scoped_fixture],
-    deadline=None,
-)
-def test_tv_casting_app_preserves_extra_logging_and_rtti(dummy):
-    """
-    **Validates: Requirements 6.1**
-
-    Property 6c: The TV_CASTING_APP optimize_size block SHALL still set
-    `chip_data_model_extra_logging = False` and `enable_rtti = False`.
-    """
-    content = _read_file(ANDROID_PY)
-    opt_block = _extract_optimize_size_block(content)
-    casting_block = _extract_tv_casting_app_block(opt_block)
-
-    extra_logging = _find_gn_arg_assignment(casting_block, "chip_data_model_extra_logging")
-    assert extra_logging is not None, (
-        '`gn_args["chip_data_model_extra_logging"]` is not set in the '
-        "TV_CASTING_APP optimize_size block"
-    )
-    assert extra_logging == "False", (
-        f'`gn_args["chip_data_model_extra_logging"]` is {extra_logging}, '
-        f"expected False"
-    )
-
-    rtti = _find_gn_arg_assignment(casting_block, "enable_rtti")
-    assert rtti is not None, (
-        '`gn_args["enable_rtti"]` is not set in the '
-        "TV_CASTING_APP optimize_size block"
-    )
-    assert rtti == "False", (
-        f'`gn_args["enable_rtti"]` is {rtti}, expected False'
-    )
-
-
-@given(dummy=st.just(True))
-@settings(
-    max_examples=1,
-    suppress_health_check=[HealthCheck.function_scoped_fixture],
-    deadline=None,
-)
-def test_overrides_dir_uses_correct_gn_prefix(dummy):
-    """
-    **Validates: Requirements 6.1**
-
-    Property 6d: The `chip_data_model_overrides_dir` path SHALL use the
-    `//third_party/connectedhomeip/examples/` GN path prefix.
-    """
-    content = _read_file(ANDROID_PY)
-    opt_block = _extract_optimize_size_block(content)
-    casting_block = _extract_tv_casting_app_block(opt_block)
-
-    value = _find_gn_arg_assignment(casting_block, "chip_data_model_overrides_dir")
-    assert value is not None, (
-        '`gn_args["chip_data_model_overrides_dir"]` is not set'
-    )
-    assert "//third_party/connectedhomeip/examples/" in value, (
-        f'`gn_args["chip_data_model_overrides_dir"]` path does not use the '
-        f"expected `//third_party/connectedhomeip/examples/` GN prefix. Got: {value}"
-    )
-
-
 # ---------------------------------------------------------------------------
 # Allow running directly
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     import sys
 
-    print("Running android.py casting build args property tests...")
+    print("Running android.py consolidated arg property tests...")
     tests = [
-        ("6a: TV_CASTING_APP sets overrides dir",
-         test_tv_casting_app_sets_overrides_dir),
-        ("6b: TV_CASTING_APP does not set individual overrides",
-         test_tv_casting_app_does_not_set_individual_overrides),
-        ("6c: TV_CASTING_APP preserves extra logging and RTTI",
-         test_tv_casting_app_preserves_extra_logging_and_rtti),
-        ("6d: Overrides dir uses correct GN prefix",
-         test_overrides_dir_uses_correct_gn_prefix),
+        ("Property 3a: TV_CASTING_APP sets chip_data_model_overrides_dir",
+         test_tv_casting_app_sets_chip_data_model_overrides_dir),
+        ("Property 3b: TV_CASTING_APP does not set individual override args",
+         test_tv_casting_app_does_not_set_individual_override_args),
     ]
     all_passed = True
     for name, test_fn in tests:

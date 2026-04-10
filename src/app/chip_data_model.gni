@@ -199,8 +199,8 @@ template("chip_data_model") {
       "${_app_root}/util/privilege-storage.cpp",
     ]
 
-    if (chip_accessors_source_override != "") {
-      sources += [ chip_accessors_source_override ]
+    if (chip_data_model_overrides_dir != "") {
+      sources += [ "${chip_data_model_overrides_dir}/casting-Accessors.cpp" ]
     } else {
       sources += [ "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp" ]
     }
@@ -218,12 +218,12 @@ template("chip_data_model") {
       ]
     }
 
-    if (chip_cluster_server_source_override != "") {
+    if (chip_data_model_overrides_dir != "") {
       # Use the override .gni file to get the cluster server list instead
       # of auto-discovering from the .zap file via zap_cluster_list.py.
       # This allows applications to compile only the cluster server
       # implementations they actually need.
-      import(chip_cluster_server_source_override)
+      import("${chip_data_model_overrides_dir}/casting-cluster-servers.gni")
       _cluster_sources = casting_cluster_server_dirs
     } else if (defined(invoker.zap_file)) {
       _zap_file = rebase_path(invoker.zap_file, root_build_dir)
