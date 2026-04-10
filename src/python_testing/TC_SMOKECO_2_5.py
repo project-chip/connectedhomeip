@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
+#     app-args: --discriminator 1234 --KVS /kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -30,24 +30,6 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTSMOKEALARM:005c000000000092
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTSMOKEALARM.CLEAR:005c0000000000a2
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTCOALARM:005c000000000094
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTCOALARM.CLEAR:005c0000000000a4
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CONTAMINATIONSTATE.HIGH:005c000000000096
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CONTAMINATIONSTATE.LOW:005c000000000097
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CONTAMINATIONSTATE.CLEAR:005c0000000000a6
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKESENSITIVITY.HIGH:005c000000000098
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKESENSITIVITY.LOW:005c000000000099
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKESENSITIVITY.CLEAR:005c0000000000a8
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKEALARM.WARNING:005c000000000090
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKEALARM.CRITICAL:005c00000000009c
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKEALARM.CLEAR:005c0000000000a0
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.WARNING:005c000000000091
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.CRITICAL:005c00000000009d
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.CLEAR:005c0000000000a1
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.MANUALDEVICEMUTE:005c00000000009b
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.MANUALDEVICEMUTE.CLEAR:005c0000000000ab
 #       --endpoint 1
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
@@ -59,7 +41,7 @@ import logging
 from asyncio import sleep
 
 from mobly import asserts
-from TC_SMOKECOTestBase import EventDataCheck, SmokeCoBaseTest
+from support_modules.smokeco_support import EventDataCheck,SmokeCoBaseTest
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
@@ -75,59 +57,6 @@ class TC_SMOKECO_2_5(SmokeCoBaseTest):
     async def setup_test(self):
         super().setup_test()
         self.gd_cluster = Clusters.GeneralDiagnostics
-
-        # Interconnect smoke alarm
-        self.pixit_test_event_interconnect_smoke_alarm = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTSMOKEALARM", 0x005c000000000092)
-        self.pixit_test_event_interconnect_smoke_alarm_clear = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTSMOKEALARM.CLEAR", 0x005c0000000000a2)
-
-        # Interconnect co alarm
-        self.pixit_test_event_interconnect_co_alarm = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTCOALARM", 0x005c000000000094)
-        self.pixit_test_event_interconnect_co_alarm_clear = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.INTERCONNECTCOALARM.CLEAR", 0x005c0000000000a4)
-
-        # Contamination State
-        self.pixit_test_event_contamination_state_high = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CONTAMINATIONSTATE.HIGH", 0x005c000000000096)
-        self.pixit_test_event_contamination_state_low = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CONTAMINATIONSTATE.LOW", 0x005c000000000097)
-        self.pixit_test_event_contamination_state_clear = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.CONTAMINATIONSTATE.CLEAR", 0x005c0000000000a6)
-
-        # Smoke Sensitivity
-        self.pixit_test_event_smokesensitivity_high = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKESENSITIVITY.HIGH", 0x005c000000000098)
-        self.pixit_test_event_smokesensitivity_low = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKESENSITIVITY.LOW", 0x005c000000000099)
-        self.pixit_test_event_smokesensitivity_clear = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKESENSITIVITY.CLEAR", 0x005c0000000000a8)
-
-        # SmokeAlarm
-        self.pixit_test_event_warning_smoke_alarm = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKEALARM.WARNING", 0x005c000000000090)
-        self.pixit_test_event_critical_smoke_alarm = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKEALARM.CRITICAL", 0x005c00000000009c)
-        self.pixit_test_event_clear_smoke_alarm = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SMOKEALARM.CLEAR", 0x005c0000000000a0)
-
-        # Smoke CO
-        self.pixit_test_event_warning_co_alarm = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.WARNING", 0x005c000000000091)
-        self.pixit_test_event_critical_co_alarm = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.CRITICAL", 0x005c00000000009d)
-        self.pixit_test_event_clear_co_alarm = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.COALARM.CLEAR", 0x005c0000000000a1)
-
-        # Manual Device Mute
-        self.pixit_test_event_manual_device_mute = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.MANUALDEVICEMUTE", 0x005c00000000009b)
-        self.pixit_test_event_manual_device_mute_clear = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.MANUALDEVICEMUTE.CLEAR", 0x005c0000000000ab)
-
-        # Process pixit arguments and convert from bytes if needed
-        self.process_pixit_attributes()
 
     def desc_TC_SMOKECO_2_5(self) -> str:
         return "[TC-SMOKECO-2.5] Secondary Functionality - Optional with DUT as Server"

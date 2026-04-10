@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f --app-pipe /tmp/smokeco_2_4_fifo
+#     app-args: --discriminator 1234 --KVS /kvs1 --trace-to json:${TRACE_APP}.json --enable-key 000102030405060708090a0b0c0d0e0f --app-pipe /tmp/smokeco_2_4_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -30,13 +30,6 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATTERY.WARNING:005c000000000095
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATTERY.CRITICAL:005c00000000009e
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATTERY.CLEAR:005c0000000000a5
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.HARDWARE.ALERT:005c000000000093
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.HARDWARE.CLEAR:005c0000000000a3
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SERVICE.ALERT:005c00000000009a
-#       --hex-arg PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SERVICE.CLEAR:005c0000000000aa
 #       --endpoint 1
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --app-pipe /tmp/smokeco_2_4_fifo
@@ -48,7 +41,7 @@
 import logging
 
 from mobly import asserts
-from TC_SMOKECOTestBase import SmokeCoBaseTest
+from support_modules.smokeco_support import SmokeCoBaseTest
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
@@ -64,22 +57,6 @@ class TC_SMOKECO_2_4(SmokeCoBaseTest):
     async def setup_test(self):
         super().setup_test()
         self.gd_cluster = Clusters.GeneralDiagnostics
-        self.pixit_test_event_battery_warning = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATTERY.WARNING", 0x005c000000000095)
-        self.pixit_test_event_battery_critical = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATTERY.CRITICAL", 0x005c00000000009e)
-        self.pixit_test_event_battery_clear = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.BATTERY.CLEAR", 0x005c0000000000a5)
-        self.pixit_test_event_hardware_alert = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.HARDWARE.ALERT", 0x005c000000000093)
-        self.pixit_test_event_hardware_clear = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.HARDWARE.CLEAR", 0x005c0000000000a3)
-        self.pixit_test_event_service_alert = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SERVICE.ALERT", 0x005c00000000009a)
-        self.pixit_test_event_service_clear = self.user_params.get(
-            "PIXIT.SMOKECO.TEST_EVENT_TRIGGER.SERVICE.CLEAR", 0x005c0000000000aa)
-
-        self.process_pixit_attributes()
 
     def desc_TC_SMOKECO_2_4(self) -> str:
         return "[TC-SMOKECO-2.4] Secondary Functionality - Mandatory with DUT as Server"
