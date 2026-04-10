@@ -163,6 +163,7 @@ if (chip_build_tests) {
         "${chip_root}/src/app/clusters/energy-evse-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/identify-server/tests:tests-backwards-compatibility",
         "${chip_root}/src/app/clusters/power-topology-server/tests:tests-backwards-compatibility",
+        "${chip_root}/src/app/clusters/zone-management-server/tests:tests-backwards-compatibility",
 
         # keep-sorted: end
       ]

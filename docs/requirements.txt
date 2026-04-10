@@ -4,5 +4,5 @@ sphinx-book-theme
 sphinxcontrib-mermaid
 myst-parser>=2.0.0
 breathe>=4.34
-pydata-sphinx-theme==0.16.1
+pydata-sphinx-theme==0.17.0
 pydoc-markdown>=4.8.2
