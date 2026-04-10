@@ -33,7 +33,7 @@ The default values are read from the ZAP-configured Ember attribute store at
 init time. If your app needs specific values, configure them in the ZAP file
 (`.zap`) for the endpoint.
 
-If you need to set them programmatically (e.g. in tests or for dynamic
+If you need to set them via code (e.g. in tests or for dynamic
 endpoints), pass a `Config` at construction time:
 
 ```cpp
