@@ -51,14 +51,14 @@ tests:
 
     - label: "Step 2: Commission DUT to TH1s fabric"
       verification: |
-           Advertise the [ light-switch-app ] on [ nrf54L15-DK ]Thread device  and  pair the TH using below cmmd.
+          Advertise the [ light-switch-app ] on [ nrf54L15-DK ]Thread device  and  pair the TH using below cmmd.
 
           ./chip-tool pairing ble-thread 74 hex:0e080000000000010000000300000f35060004001fffe0020810101191022022920708fd6587bfe9821353051000112237945966880899aabbccddeeff030f7070656e5468726561644465696f6c010212340410f23d85dd55d9748cc6a1fd5fccbb1da20c0402a0fff8 20202021 3840
       disabled: true
 
     - label: "Step 3: TH1 enables DUT as Controller"
       verification: |
-
+          TH1 enables DUT as Controller
       disabled: true
 
     - label: "Step 4: Commission TH2 to TH1s fabric (Node ID = 2)"
