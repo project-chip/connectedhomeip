@@ -22,8 +22,8 @@ import validators
 from mobly import asserts
 
 from matter.clusters import Globals
-from matter.clusters.Types import Nullable
 from matter.clusters.ClusterObjects import Cluster
+from matter.clusters.Types import Nullable
 from matter.testing.conformance import ConformanceException
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.spec_parsing import dm_from_spec_version
