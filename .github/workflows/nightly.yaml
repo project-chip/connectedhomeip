@@ -248,6 +248,9 @@ jobs:
         if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' }}
 
         runs-on: ubuntu-latest
+        concurrency:
+          group: gh-pages-deploy
+          cancel-in-progress: false
         permissions:
             contents: write
             checks: write
